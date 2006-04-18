@@ -1,1 +1,1 @@
-<%@ Application Inherits="AddUser.Global" Language="VB" %>
+<%@ Application Inherits="AddUser.Global" Language="c#" %>
