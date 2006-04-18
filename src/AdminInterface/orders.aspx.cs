@@ -1,89 +1,76 @@
-'mports ByteFX.Data.MySqlClient
-Imports MySql.Data.MySqlClient
+using System;
+using System.Drawing;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using MySql.Data.MySqlClient;
 
+namespace AddUser
+{
+	partial class orders : Page
+	{
+		MySqlConnection соединение = new MySqlConnection(Literals.GetConnectionString());
+		MySqlCommand Комманда = new MySqlCommand();
+		MySqlDataReader Reader;
+		Int64 ClientCode;
+		TableRow row = new TableRow();
+		TableCell cell = new TableCell();
 
-Namespace AddUser
+		protected void Button1_Click(object sender, EventArgs e)
+		{
+			соединение.Open();
+			ClientCode = Convert.ToInt32(Request["cc"]);
+			Комманда.Connection = соединение;
+			Комманда.CommandText =
+				" SELECT ordershead.rowid, WriteTime, PriceDate, client.shortname, firm.shortname, PriceName, RowCount, Processed" +
+				" FROM orders.ordershead, usersettings.pricesdata, usersettings.clientsdata as firm, usersettings.clientsdata as client, usersettings.clientsdata as sel where " +
+				" clientcode=client.firmcode" + " and client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)" +
+				" and firm.firmcode=if(sel.firmtype=0, sel.firmcode, firm.firmcode)" +
+				" and writetime between ?FromDate and ?ToDate and pricesdata.pricecode=ordershead.pricecode" +
+				" and firm.firmcode=pricesdata.firmcode and sel.firmcode=?clientCode order by writetime desc";
+			Комманда.Parameters.Add(new MySqlParameter("FromDate", MySqlDbType.Datetime));
+			Комманда.Parameters["FromDate"].Value = CalendarFrom.SelectedDate;
+			Комманда.Parameters.Add(new MySqlParameter("ToDate", MySqlDbType.Datetime));
+			Комманда.Parameters["ToDate"].Value = CalendarTo.SelectedDate;
+			Комманда.Parameters.Add("?clientCode", ClientCode);
+			Reader = Комманда.ExecuteReader();
+			while (Reader.Read())
+			{
+				row = new TableRow();
+				if (Convert.ToInt32(Reader[6]) == 0)
+				{
+					row.BackColor = Color.Red;
+				}
+				for (int i = 0; i <= Table3.Rows[0].Cells.Count - 1; i++)
+				{
+					cell = new TableCell();
+					if (i == 1 | i == 2)
+					{
+						cell.Text = Convert.ToDateTime(Reader[i]).ToString();
+						cell.HorizontalAlign = HorizontalAlign.Center;
+					}
+					else
+					{
+						cell.Text = Reader[i].ToString();
+					}
+					row.Cells.Add(cell);
+				}
+				Table3.Rows.Add(row);
+			}
+			Reader.Close();
+			соединение.Close();
+		}
 
-
-Partial Class orders
-    Inherits System.Web.UI.Page
-    Dim соединение As New MySqlConnection("Data Source=testsql.analit.net;Database=usersettings;User ID=system;Password=123;Connect Timeout=300;")
-    Dim Комманда As New MySqlCommand()
-    Dim Reader As MySqlDataReader
-    Dim ClientCode As Int64
-    Dim row As New TableRow()
-    Dim cell As New TableCell()
-    Dim i As Int16
-
-#Region " Web Form Designer Generated Code "
-
-    'This call is required by the Web Form Designer.
-    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-
-    End Sub
-
-    Private Sub Page_Init(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Init
-        'CODEGEN: This method call is required by the Web Form Designer
-        'Do not modify it using the code editor.
-        InitializeComponent()
-    End Sub
-
-#End Region
-
-        'Private Sub Page_Load(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
-
-        'End Sub
-
-    Private Sub Button1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles Button1.Click
-        соединение.Open()
-        ClientCode = Request("cc")
-
-        With Комманда
-            .Connection = соединение
-            'ToDo Этот запрос устарел - нго необходимо переписать
-            .CommandText = " SELECT ordershead.rowid, WriteTime, PriceDate, client.shortname, firm.shortname, PriceName, RowCount, Processed" & _
-            " FROM orders.ordershead, usersettings.pricesdata, usersettings.clientsdata as firm, usersettings.clientsdata as client, usersettings.clientsdata as sel where " & _
-            " clientcode=client.firmcode" & _
-            " and client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)" & _
-            " and firm.firmcode=if(sel.firmtype=0, sel.firmcode, firm.firmcode)" & _
-            " and writetime between ?FromDate and ?ToDate" & _
-            " and pricesdata.pricecode=ordershead.pricecode" & _
-            " and firm.firmcode=pricesdata.firmcode" & _
-            " and sel.firmcode=" & ClientCode & " order by writetime desc"
-
-            .Parameters.Add(New MySqlParameter("FromDate", MySqlDbType.Datetime))
-            .Parameters("FromDate").Value = CalendarFrom.SelectedDate
-
-            .Parameters.Add(New MySqlParameter("ToDate", MySqlDbType.Datetime))
-            .Parameters("ToDate").Value = CalendarTo.SelectedDate
-        End With
-        Reader = Комманда.ExecuteReader
-        While Reader.Read
-            row = New TableRow
-            If CInt(Reader(6).ToString) = 0 Then row.BackColor = Color.Red
-            For i = 0 To Table3.Rows(0).Cells.Count - 1
-                cell = New TableCell
-                If i = 1 Or i = 2 Then
-                    cell.Text = FormatDateTime(Reader.Item(i))
-                    cell.HorizontalAlign = HorizontalAlign.Center
-                Else
-                    cell.Text = Reader.Item(i).ToString
-                End If
-                row.Cells.Add(cell)
-            Next
-            Table3.Rows.Add(row)
-        End While
-        Reader.Close()
-        соединение.Close()
-    End Sub
-
-        Protected Sub Page_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
-            If Session.Item("AccessGrant") <> 1 Then Response.Redirect("default.aspx")
-            If Not Page.IsPostBack Then
-                CalendarFrom.SelectedDate = Now().AddDays(-7)
-                CalendarTo.SelectedDate = Now().AddDays(1)
-            End If
-        End Sub
-    End Class
-
-End Namespace
+		protected void Page_Load(object sender, EventArgs e)
+		{
+			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
+			{
+				Response.Redirect("default.aspx");
+			}
+			if (!(Page.IsPostBack))
+			{
+				CalendarFrom.SelectedDate = DateTime.Now.AddDays(-7);
+				CalendarTo.SelectedDate = DateTime.Now.AddDays(1);
+			}
+		}
+	}
+}
