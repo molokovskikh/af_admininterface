@@ -1,77 +1,65 @@
-Imports System.Web
-Imports System.Web.SessionState
+//#define DEBUG
+using System;
+using System.Web;
+using System.Web.SessionState;
 
+namespace AddUser
+{
+	public class Global : System.Web.HttpApplication
+	{
+		private System.ComponentModel.IContainer components;
+		
+		public Global()
+		{
+			InitializeComponent();
+		}
+		
+		[System.Diagnostics.DebuggerStepThrough()]
+		private void InitializeComponent()
+		{
+			components = new System.ComponentModel.Container();
+		}
 
-Namespace AddUser
+		void Application_Start(object sender, EventArgs e)
+		{
+		}
 
+		void Session_Start(object sender, EventArgs e)
+		{
+			Session["strStatus"] = "No";
+			Session["strError"] = "";
+			string UserName;
+			UserName = HttpContext.Current.User.Identity.Name;
+			if (UserName.Substring(0, 7) == "ANALIT\\")
+			#if DEBUG
+				UserName = "morozov";
+			#else
+				UserName = UserName.Substring(7);
+			#endif
+			Session["UserName"] = UserName;
+			Session["SessionID"] = this.Session.SessionID;
+		}
 
-Public Class [Global]
-    Inherits System.Web.HttpApplication
+		void Application_BeginRequest(object sender, EventArgs e)
+		{
+		}
 
-#Region " Component Designer Generated Code "
+		void Application_AuthenticateRequest(object sender, EventArgs e)
+		{
+		}
 
-    Public Sub New()
-        MyBase.New()
+		void Application_Error(object sender, EventArgs e)
+		{
+		}
 
-        'This call is required by the Component Designer.
-        InitializeComponent()
+		void Session_End(object sender, EventArgs e)
+		{
+			Response.Cookies["Inforoom.Admins.ShowStatsC"].Value = Session["MaxID"].ToString();
+			Response.Cookies["Inforoom.Admins.ShowStatsC"].Expires = DateTime.Now.AddYears(2);
+		}
 
-        'Add any initialization after the InitializeComponent() call
-
-    End Sub
-
-    'Required by the Component Designer
-    Private components As System.ComponentModel.IContainer
-
-    'NOTE: The following procedure is required by the Component Designer
-    'It can be modified using the Component Designer.
-    'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> Private Sub InitializeComponent()
-        components = New System.ComponentModel.Container()
-    End Sub
-
-#End Region
-
-    Sub Application_Start(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the application is started    
-    End Sub
-
-    Sub Session_Start(ByVal sender As Object, ByVal e As EventArgs)
-        Session("strStatus") = "No"
-        Session("strError") = ""
-        Dim UserName As String
-        UserName = HttpContext.Current.User.Identity.Name
-        If Left(UserName, 7) = "ANALIT\" Then
-            UserName = Mid(UserName, 8)
-        End If
-        Session("UserName") = UserName
-        ' Fires when the session is started
-        Dim i As Int16
-        i = 10
-        Session("SessionID") = Me.Session.SessionID
-    End Sub
-
-    Sub Application_BeginRequest(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires at the beginning of each request        
-    End Sub
-
-    Sub Application_AuthenticateRequest(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires upon attempting to authenticate the use
-    End Sub
-
-    Sub Application_Error(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when an error occurs
-    End Sub
-
-    Sub Session_End(ByVal sender As Object, ByVal e As EventArgs)
-        Response.Cookies("Inforoom.Admins.ShowStatsC").Value = Session("MaxID")
-        Response.Cookies("Inforoom.Admins.ShowStatsC").Expires = Now().AddYears(2)
-    End Sub
-
-    Sub Application_End(ByVal sender As Object, ByVal e As EventArgs)
-        ' Fires when the application ends
-    End Sub
-
-End Class
-
-End Namespace
+		void Application_End(object sender, EventArgs e)
+		{
+		}
+	}
+}
