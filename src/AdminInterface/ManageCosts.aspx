@@ -1,85 +1,100 @@
-<%@ Page Language="VB" AutoEventWireup="false" CodeFile="ManageCosts.aspx.vb" Inherits="ManageCosts" %>
+<%@ Page Language="c#" AutoEventWireup="true" CodeFile="ManageCosts.aspx.cs" Inherits="AddUser.ManageCosts" %>
 
-<HTML>
-	<HEAD>
-		<title>Система управления "Оптовик" - Аналитическая Компания "Инфорум"</title>
-		<meta content="http://schemas.microsoft.com/intellisense/ie5" name="vs_targetSchema">
-		<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-	</HEAD>
-	<body vLink="#ab51cc" aLink="#0093e1" link="#0093e1" bgColor="#ffffff">
-		<form id="Form1" method="post" runat="server">
-			<TABLE id="Table1" cellSpacing="0" cellPadding="0" width="98%" border="0">
-				<TR>
-					<TD style="HEIGHT: 19px" align="center"><FONT face="Verdana" size="2"><STRONG>Настройка цен 
-								для прайс - листа</STRONG> </FONT>
-						<asp:label id="PriceNameLB" runat="server" Font-Bold="True" Font-Names="Verdana" Font-Size="9pt"></asp:label></TD>
-				</TR>
-				<TR>
-					<TD align="center"><asp:datagrid id=CostsDG runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA" DataSource="<%# Costs %>" HorizontalAlign="Center" AutoGenerateColumns="False">
-							<FooterStyle HorizontalAlign="Center"></FooterStyle>
-							<AlternatingItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#EEF8FF"></AlternatingItemStyle>
-							<ItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#F6F6F6"></ItemStyle>
-							<HeaderStyle Font-Bold="True" HorizontalAlign="Center" BackColor="#EBEBEB"></HeaderStyle>
-							<Columns>
-								<asp:TemplateColumn SortExpression="CostName" HeaderText="Наименование">
-									<HeaderStyle Width="160px"></HeaderStyle>
-									<ItemTemplate>
-										<asp:TextBox id="CostName" Font-Size="8pt" Font-Names="Verdana" runat="server" Width="150px" text='<%#DataBinder.eval(Container, "DataItem.CostName") %>' >
- >
-												</asp:TextBox>
-										<asp:RequiredFieldValidator id="rfv1" ControlToValidate="CostName" runat="server" text="*" ErrorMessage="Необходимо указать наименование цены в полях, указанных знаком *."
-											Visible="true"></asp:RequiredFieldValidator>
-									</ItemTemplate>
-								</asp:TemplateColumn>
-								<asp:TemplateColumn HeaderText="Включить">
-									<HeaderStyle Width="100px"></HeaderStyle>
-									<ItemTemplate>
-										<asp:CheckBox id="Ena" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.Enabled")%>'></asp:CheckBox>
-									</ItemTemplate>
-								</asp:TemplateColumn>
-								<asp:TemplateColumn HeaderText="Публиковать">
-									<HeaderStyle Width="100px"></HeaderStyle>
-									<ItemTemplate>
-										<asp:CheckBox id="Pub" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.AgencyEnabled")%>'></asp:CheckBox>
-									</ItemTemplate>
-								</asp:TemplateColumn>
-								
-								<asp:TemplateColumn SortExpression="BaseCost" HeaderText="Базовая&lt;br&gt;цена">
-									<HeaderStyle Width="80px"></HeaderStyle>
-									<ItemTemplate>
-										<input value='<%# DataBinder.Eval(Container, "DataItem.CostCode")%>' type="radio" name="uid" <%# ischecked(DataBinder.Eval(Container, "DataItem.BaseCost")) %> >
-									</ItemTemplate>
-								</asp:TemplateColumn>
-								<asp:BoundColumn DataField="CostID" SortExpression="CostID" HeaderText="Идентификатор">
-									<HeaderStyle Width="150px"></HeaderStyle>
-								</asp:BoundColumn>
-								<asp:BoundColumn Visible="False" DataField="CostCode" HeaderText="CostCode"></asp:BoundColumn>
-							</Columns>
-						</asp:datagrid>
-                        <asp:LinkButton ID="CreateCost" runat="server" Font-Names="Verdana" Font-Size="8pt">Новая ценовая колонка</asp:LinkButton></TD>
-				</TR>
-				<TR>
-					<TD height="10"></TD>
-				</TR>
-				<TR>
-					<TD align="center"><asp:label id="UpdateLB" runat="server" Font-Bold="True" Font-Names="Verdana" Font-Size="8pt"
-							Font-Italic="True" ForeColor="Green"></asp:label></TD>
-				</TR>
-				<TR>
-					<TD height="10"></TD>
-				</TR>
-				<TR>
-					<TD align="center"><asp:button id="PostB" runat="server" Font-Names="Verdana" Font-Size="8pt" Text="Применить"></asp:button></TD>
-				</TR>
-				<TR>
-					<TD align="center" style="HEIGHT: 14px"><asp:label id="ErrLB" runat="server" Font-Names="Verdana" Font-Size="9pt" ForeColor="#C00000"></asp:label></TD>
-				</TR>
-				<TR>
-					<TD align="center"><FONT face="Arial, Helvetica, sans-serif"><FONT face="veranda" color="#000000" size="1">© 
-								АК "</FONT> <A href="http://www.analit.net/"><FONT face="veranda" size="1">Инфорум</FONT></A><FONT face="veranda" color="#000000" size="1">" 
-								2005</FONT></FONT></TD>
-				</TR>
-			</TABLE>
-		</form>
-	</body>
-</HTML>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Система управления "Оптовик" - Аналитическая Компания "Инфорум"</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+</head>
+<body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
+    <form id="Form1" method="post" runat="server">
+        <table id="Table1" cellspacing="0" cellpadding="0" width="98%" border="0">
+            <tr>
+                <td style="height: 19px" align="center">
+                    <font face="Verdana" size="2"><strong>Настройка цен для прайс - листа</strong> </font>
+                    <asp:Label ID="PriceNameLB" runat="server" Font-Bold="True" Font-Names="Verdana"
+                        Font-Size="9pt"></asp:Label></td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <asp:DataGrid ID="CostsDG" runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA"
+                        DataSource="<%# Costs %>" HorizontalAlign="Center" AutoGenerateColumns="False">
+                        <FooterStyle HorizontalAlign="Center"></FooterStyle>
+                        <AlternatingItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#EEF8FF">
+                        </AlternatingItemStyle>
+                        <ItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#F6F6F6"></ItemStyle>
+                        <HeaderStyle Font-Bold="True" HorizontalAlign="Center" BackColor="#EBEBEB"></HeaderStyle>
+                        <Columns>
+                            <asp:TemplateColumn SortExpression="CostName" HeaderText="Наименование">
+                                <HeaderStyle Width="160px"></HeaderStyle>
+                                <ItemTemplate>
+                                    <asp:TextBox ID="CostName" Font-Size="8pt" Font-Names="Verdana" runat="server" Width="150px"
+                                        Text='<%#DataBinder.Eval(Container, "DataItem.CostName") %>'>
+                                    </asp:TextBox>
+                                    <asp:RequiredFieldValidator ID="rfv1" ControlToValidate="CostName" runat="server"
+                                        Text="*" ErrorMessage="Необходимо указать наименование цены в полях, указанных знаком *."
+                                        Visible="true"></asp:RequiredFieldValidator>
+                                </ItemTemplate>
+                            </asp:TemplateColumn>
+                            <asp:TemplateColumn HeaderText="Включить">
+                                <HeaderStyle Width="100px"></HeaderStyle>
+                                <ItemTemplate>
+                                    <asp:CheckBox ID="Ena" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.Enabled")%>'>
+                                    </asp:CheckBox>
+                                </ItemTemplate>
+                            </asp:TemplateColumn>
+                            <asp:TemplateColumn HeaderText="Публиковать">
+                                <HeaderStyle Width="100px"></HeaderStyle>
+                                <ItemTemplate>
+                                    <asp:CheckBox ID="Pub" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.AgencyEnabled")%>'>
+                                    </asp:CheckBox>
+                                </ItemTemplate>
+                            </asp:TemplateColumn>
+                            <asp:TemplateColumn SortExpression="BaseCost" HeaderText="Базовая&lt;br&gt;цена">
+                                <HeaderStyle Width="80px"></HeaderStyle>
+                                <ItemTemplate>
+                                    <input value='<%# DataBinder.Eval(Container, "DataItem.CostCode")%>' type="radio"
+                                        name="uid" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %>>
+                                </ItemTemplate>
+                            </asp:TemplateColumn>
+                            <asp:BoundColumn DataField="CostID" SortExpression="CostID" HeaderText="Идентификатор">
+                                <HeaderStyle Width="150px"></HeaderStyle>
+                            </asp:BoundColumn>
+                            <asp:BoundColumn Visible="False" DataField="CostCode" HeaderText="CostCode"></asp:BoundColumn>
+                        </Columns>
+                    </asp:DataGrid>
+                    <asp:LinkButton ID="CreateCost" runat="server" OnClick="CreateCost_Click" Font-Names="Verdana" Font-Size="8pt">Новая ценовая колонка</asp:LinkButton></td>
+            </tr>
+            <tr>
+                <td height="10">
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <asp:Label ID="UpdateLB" runat="server" Font-Bold="True" Font-Names="Verdana" Font-Size="8pt"
+                        Font-Italic="True" ForeColor="Green"></asp:Label></td>
+            </tr>
+            <tr>
+                <td height="10">
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <asp:Button ID="PostB" runat="server" OnClick="PostB_Click" Font-Names="Verdana" Font-Size="8pt" Text="Применить">
+                    </asp:Button></td>
+            </tr>
+            <tr>
+                <td align="center" style="height: 14px">
+                    <asp:Label ID="ErrLB" runat="server" Font-Names="Verdana" Font-Size="9pt" ForeColor="#C00000"></asp:Label></td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <font face="Arial, Helvetica, sans-serif"><font face="veranda" color="#000000" size="1">
+                        © АК "</font> <a href="http://www.analit.net/"><font face="veranda" size="1">Инфорум</font></a><font
+                            face="veranda" color="#000000" size="1">" 2005</font></font></td>
+            </tr>
+        </table>
+    </form>
+</body>
+</html>
