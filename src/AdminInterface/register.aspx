@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
 </head>
 <body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
-    <form method="post" runat="server">
+    <form method="post" runat="server" defaultbutton="Registe">
         <table id="Table1" cellspacing="0" cellpadding="0" width="100%" align="center" bgcolor="#ebebeb"
             border="0">
             <tr>
