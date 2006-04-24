@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
 </head>
 <body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
-    <form id="Form1" method="post" runat="server">
+    <form id="Form1" method="post" runat="server" defaultbutton="GoFind">
         <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
             <tr>
                 <td colspan="2" height="20">
@@ -28,22 +28,25 @@
                             </td>
                         </tr>
                         <tr>
-                            <td style="width: 181px">
+                            <td style="width: 181px; height: 117px;">
                                 <p align="center">
                                     &nbsp;&nbsp;
                                     <asp:TextBox ID="FindTB" runat="server" BorderStyle="None" Font-Names="Verdana" Font-Size="8pt"></asp:TextBox>
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="FindTB"
                                         ErrorMessage="*"></asp:RequiredFieldValidator></p>
                             </td>
-                            <td align="center">
+                            <td align="center" style="height: 117px">
+                                <div align="left">
                                 <asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Font-Names="Verdana"
                                     Font-Size="8pt" Width="81px">
                                     <asp:ListItem Value="0" Selected="True">Имя</asp:ListItem>
                                     <asp:ListItem Value="1">ID</asp:ListItem>
                                     <asp:ListItem Value="3">Billing ID</asp:ListItem>
                                     <asp:ListItem Value="2">Логин</asp:ListItem>
-                                </asp:RadioButtonList></td>
-                            <td>
+                                </asp:RadioButtonList>
+                                </div>
+                                </td>
+                            <td style="height: 117px">
                                 <p align="center">
                                     <asp:Button ID="GoFind" runat="server" BorderStyle="None" Font-Names="Verdana" Font-Size="8pt"
                                         Text="Найти" OnClick="GoFind_Click" CausesValidation="true"></asp:Button></p>
