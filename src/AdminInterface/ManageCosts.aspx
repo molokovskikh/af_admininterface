@@ -40,14 +40,14 @@
                             <asp:TemplateColumn HeaderText="Включить">
                                 <HeaderStyle Width="100px"></HeaderStyle>
                                 <ItemTemplate>
-                                    <asp:CheckBox ID="Ena" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.Enabled")%>'>
+                                    <asp:CheckBox ID="Ena" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled"))%>'>
                                     </asp:CheckBox>
                                 </ItemTemplate>
                             </asp:TemplateColumn>
                             <asp:TemplateColumn HeaderText="Публиковать">
                                 <HeaderStyle Width="100px"></HeaderStyle>
                                 <ItemTemplate>
-                                    <asp:CheckBox ID="Pub" runat="server" Checked='<%# DataBinder.Eval(Container, "DataItem.AgencyEnabled")%>'>
+                                    <asp:CheckBox ID="Pub" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled"))%>'>
                                     </asp:CheckBox>
                                 </ItemTemplate>
                             </asp:TemplateColumn>
@@ -55,7 +55,7 @@
                                 <HeaderStyle Width="80px"></HeaderStyle>
                                 <ItemTemplate>
                                     <input value='<%# DataBinder.Eval(Container, "DataItem.CostCode")%>' type="radio"
-                                        name="uid" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %>>
+                                       name="uid" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %> />
                                 </ItemTemplate>
                             </asp:TemplateColumn>
                             <asp:BoundColumn DataField="CostID" SortExpression="CostID" HeaderText="Идентификатор">

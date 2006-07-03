@@ -20,7 +20,7 @@ namespace AddUser
 		protected DataColumn DataColumn8;
 		protected DataColumn DataColumn3;
 
-		MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
+		MySqlConnection myMySqlConnection = new MySqlConnection();
 
 		MySqlCommand myMySqlCommand = new MySqlCommand();
 		MySqlTransaction myTrans;
@@ -116,6 +116,7 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
+			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
 			ClientCode = Convert.ToInt32(Request["cc"]);
 			if (!(IsPostBack))
 			{

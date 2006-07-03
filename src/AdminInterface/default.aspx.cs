@@ -8,17 +8,18 @@ namespace AddUser
 {
 	partial class _default : Page
 	{
-		private MySqlConnection соединение = new MySqlConnection(Literals.GetConnectionString());
+		private MySqlConnection _connection = new MySqlConnection();
 //		private MySqlDataReader Reader;
 		private IADsUser ADUser;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			соединение.Open();
+			_connection.ConnectionString = Literals.GetConnectionString();
+			_connection.Open();
 			try
 			{
-				ADUser = Marshal.BindToMoniker(@"WinNT://adc.analit.net/" + Session["UserName"].ToString()) as IADsUser;
-				if ((ADUser.PasswordExpirationDate >= DateTime.Now) || (Session["UserName"] == "michail"))
+				ADUser = Marshal.BindToMoniker(@"WinNT://adc.analit.net/" + Convert.ToString(Session["UserName"])) as IADsUser;
+				if ((ADUser.PasswordExpirationDate >= DateTime.Now) || (Convert.ToString(Session["UserName"]) == "michail"))
 				{
 					PassLB.Text = "Срок действия Вашего пароля истекает " + ADUser.PasswordExpirationDate.ToShortDateString() + " в " +
 					              ADUser.PasswordExpirationDate.ToShortTimeString() + ". <br>Пожалуйста не забывайте изменять пароль.";
@@ -41,7 +42,7 @@ namespace AddUser
 				Session["AccessGrant"] = 1;
 				
 				MySqlCommand command = new MySqlCommand();
-				command.Connection = соединение;
+				command.Connection = _connection;
 				command.CommandText = " SELECT AlowChangePassword, AlowManage, (alowCreateRetail=1 or AlowCreateVendor=1) as AlowRegister, AlowClone," +
 				                      " (ShowRet=1 or ShowOpt=1) as ShowInfo FROM (accessright.showright as a, accessright.regionaladmins as b)" +
 				                      " where a.username=b.username and a.username=?userName";
@@ -265,7 +266,7 @@ namespace AddUser
 			}
 			finally
 			{
-				соединение.Close();
+				_connection.Close();
 			}
 		}
 	}

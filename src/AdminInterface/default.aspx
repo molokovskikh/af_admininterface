@@ -2,7 +2,6 @@
 	CodeFile="default.aspx.cs" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>Интерфейс управления клиентами</title>
@@ -37,6 +36,10 @@
 					<p>
 						<asp:HyperLink ID="FTPHL" runat="server" NavigateUrl="docs.aspx">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Общие документы</font></asp:HyperLink></p>
+					<p>
+						<asp:HyperLink ID="ViewAdministrators" Font-Names="Verdana, Arial, Helvetica, sans-serif" Font-Size="small"
+							runat="server" NavigateUrl="ViewAdministrators.aspx">Региональные администраторы</asp:HyperLink>
+					</p>
 				</td>
 				<td align="center">
 					<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" width="95%"

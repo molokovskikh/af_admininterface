@@ -8,7 +8,7 @@ namespace AddUser
 {
 	partial class orders : Page
 	{
-		MySqlConnection соединение = new MySqlConnection(Literals.GetConnectionString());
+		MySqlConnection соединение = new MySqlConnection();
 		MySqlCommand Комманда = new MySqlCommand();
 		MySqlDataReader Reader;
 		Int64 ClientCode;
@@ -66,6 +66,7 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
+			соединение.ConnectionString = Literals.GetConnectionString();
 			if (!(Page.IsPostBack))
 			{
 				CalendarFrom.SelectedDate = DateTime.Now.AddDays(-7);

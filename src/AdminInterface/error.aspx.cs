@@ -11,7 +11,7 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
-			Label1.Text = Application["strError"].ToString();
+			Label1.Text = Convert.ToString(Application["strError"]);
 		}
 	}
 }

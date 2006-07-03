@@ -11,7 +11,7 @@ namespace AddUser
 
 		protected void Page_Load(object sender, EventArgs e) 
 		{
-			if (Session["AccessGrant"] != "1")
+			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 			{
 				Response.Redirect("default.aspx");
 			}

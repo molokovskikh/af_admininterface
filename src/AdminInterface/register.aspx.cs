@@ -70,8 +70,6 @@ namespace AddUser
 			DataColumn8 = new DataColumn();
 			Clientsdata = new DataTable();
 			DataColumn9 = new DataColumn();
-			DataColumn10 = new DataColumn();
-			DataColumn11 = new DataColumn();
 			DataColumn12 = new DataColumn();
 			DataColumn13 = new DataColumn();
 			DataColumn14 = new DataColumn();
@@ -128,8 +126,6 @@ namespace AddUser
 					});
 			Clientsdata.TableName = "Clientsdata";
 			DataColumn9.ColumnName = "adress";
-			DataColumn10.ColumnName = "bussinfo";
-			DataColumn11.ColumnName = "bussstop";
 			DataColumn12.ColumnName = "fax";
 			DataColumn13.ColumnName = "firmsegment";
 			DataColumn13.DataType = typeof (Int16);
@@ -173,11 +169,12 @@ namespace AddUser
 			InitializeComponent();
 		}
 			
-		private MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-		private MySqlDataReader myMySqlDataReader;
+		private MySqlConnection _connection = new MySqlConnection();
+		private MySqlDataReader _reader;
 		private IADsUser ADUser;
 		private IADs Domain;
-		private MySqlCommand ms_Command = new MySqlCommand();
+		private MySqlCommand _command = new MySqlCommand();
+		private MySqlDataAdapter _adapter = new MySqlDataAdapter();
 		private MySqlTransaction mytrans;
 
 		//******** InsertOldData *************
@@ -190,28 +187,47 @@ namespace AddUser
 		//при выборе региона клиента обновляет 'Регионы работы' и 'Показываемые регионы'
 		//выделяя те регионы, которые установлены как регионы по умолчанию в таблице regions
 
-		public void SetWorkRegions(string RegCode)
+		private void SetWorkRegions(string RegCode, bool AllRegions)
 		{
-			Func.SelectTODS(
-				"select a.RegionCode, a.Region, (b.defaultshowregionmask & " + RegCode.ToString() + ")>0 as ShowMask," +
-				"a.regioncode=" + RegCode.ToString() + " as RegMask from (farm.regions as a, farm.regions as b) where b.regioncode=" +
-				RegCode.ToString() + " and a.regioncode & b.defaultshowregionmask>0 order by region", "WorkReg", DS1);
+			//здесь применяется хитрожопый способ что бы модифицировать запрос для выбора всех регионов
+			//если мы хотим выбрать все регионы тогда коментируем ту часть которая отвечает за выбор текущего региона
+			//т.е. -> "{1} b.regioncode={0} and" форматируем так что {1} заменяется на коментарий -> "--"
+			//если выбираем конкретный регион то форматируем  так что {1} заменяется на пустую строке -> ""
+			string commandText = 
+@"select a.RegionCode, a.Region,
+	(b.defaultshowregionmask & {0})>0 as ShowMask,
+	a.regioncode={0} as RegMask
+from farm.regions as a, farm.regions as b, accessright.regionaladmins
+where {1} b.regioncode={0} and
+	a.regioncode & b.defaultshowregionmask>0 and
+	regionaladmins.username='michail' and
+	a.regioncode & regionaladmins.RegionMask > 0
+group by regioncode
+order by region";
+			Func.SelectTODS(String.Format(commandText, RegCode, AllRegions ? "-- " : ""), "WorkReg", DS1);
+
 			WRList.DataBind();
 			WRList2.DataBind();
 			OrderList.DataBind();
 			ShowList.DataBind();
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
-				WRList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["regmask"]);
-				OrderList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["regmask"]);
-				WRList2.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["regmask"]);
-				ShowList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["showmask"]);
+				ShowList.Items[i].Selected = true;
+				if (WRList.Items[i].Value == RegCode.ToString())
+				{
+					WRList.Items[i].Selected = true;
+				}
+				if (WRList2.Items[i].Value == RegCode.ToString())
+				{
+					WRList2.Items[i].Selected = true;
+				}
+				OrderList.Items[i].Selected = WRList.Items[i].Selected;
 			}
 		}
 
 		protected void RegionDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			SetWorkRegions(RegionDD.SelectedItem.Value);
+			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
 		private object CheckLogin()
@@ -219,21 +235,21 @@ namespace AddUser
 			float rc;
 			float rc1;
 			Label2.Text = "";
-			myMySqlConnection.Open();
-			myMySqlDataReader =
+			_connection.Open();
+			_reader =
 				new MySqlCommand("select Max(osusername='" + LoginTB.Text + "') as Present from (osuseraccessright)",
-				                 myMySqlConnection).ExecuteReader();
-			myMySqlDataReader.Read();
-			if (myMySqlDataReader.Read())
+				                 _connection).ExecuteReader();
+			_reader.Read();
+			if (_reader.Read())
 			{
-				rc = Convert.ToInt32(myMySqlDataReader[0]);
+				rc = Convert.ToInt32(_reader[0]);
 			}
 			else
 			{
 				rc = 0;
 			}
-			myMySqlDataReader.Close();
-			myMySqlConnection.Close();
+			_reader.Close();
+			_connection.Close();
 			try
 			{
 				ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + LoginTB.Text) as IADsUser;
@@ -261,8 +277,8 @@ namespace AddUser
 				Label3.Text = "Ошибка в Учетном имени!";
 				return;
 			}
-			myMySqlConnection.Open();
-			mytrans = myMySqlConnection.BeginTransaction();
+			_connection.Open();
+			mytrans = _connection.BeginTransaction();
 			Int64 MaskRegion = 0;
 			Int64 ShowRegionMask = 0;
 			Int64 WorkMask = 0;
@@ -286,94 +302,92 @@ namespace AddUser
 					OrderMask += Convert.ToInt64(OrderList.Items[i].Value);
 				}
 			}
-			ms_Command.Transaction = mytrans;
-			ms_Command.Parameters.Add(new MySqlParameter("MaskRegion", MySqlDbType.Int64));
-			ms_Command.Parameters["MaskRegion"].Value = MaskRegion;
-			ms_Command.Parameters.Add(new MySqlParameter("OrderMask", MySqlDbType.Int64));
-			ms_Command.Parameters["OrderMask"].Value = OrderMask;
-			ms_Command.Parameters.Add(new MySqlParameter("ShowRegionMask", MySqlDbType.Int64));
-			ms_Command.Parameters["ShowRegionMask"].Value = ShowRegionMask;
-			ms_Command.Parameters.Add(new MySqlParameter("WorkMask", MySqlDbType.Int64));
-			ms_Command.Parameters["WorkMask"].Value = WorkMask;
-			ms_Command.Parameters.Add(new MySqlParameter("fullname", MySqlDbType.String));
-			ms_Command.Parameters["fullname"].Value = FullNameTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("shortname", MySqlDbType.String));
-			ms_Command.Parameters["shortname"].Value = ShortNameTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("BeforeNamePrefix", MySqlDbType.String));
-			ms_Command.Parameters["BeforeNamePrefix"].Value = "";
+			_command.Transaction = mytrans;
+			_command.Parameters.Add(new MySqlParameter("MaskRegion", MySqlDbType.Int64));
+			_command.Parameters["MaskRegion"].Value = MaskRegion;
+			_command.Parameters.Add(new MySqlParameter("OrderMask", MySqlDbType.Int64));
+			_command.Parameters["OrderMask"].Value = OrderMask;
+			_command.Parameters.Add(new MySqlParameter("ShowRegionMask", MySqlDbType.Int64));
+			_command.Parameters["ShowRegionMask"].Value = ShowRegionMask;
+			_command.Parameters.Add(new MySqlParameter("WorkMask", MySqlDbType.Int64));
+			_command.Parameters["WorkMask"].Value = WorkMask;
+			_command.Parameters.Add(new MySqlParameter("fullname", MySqlDbType.String));
+			_command.Parameters["fullname"].Value = FullNameTB.Text;
+			_command.Parameters.Add(new MySqlParameter("shortname", MySqlDbType.String));
+			_command.Parameters["shortname"].Value = ShortNameTB.Text;
+			_command.Parameters.Add(new MySqlParameter("BeforeNamePrefix", MySqlDbType.String));
+			_command.Parameters["BeforeNamePrefix"].Value = "";
 			if (TypeDD.SelectedItem.Value == "1")
 			{
-				ms_Command.Parameters["BeforeNamePrefix"].Value = "Аптека";
+				_command.Parameters["BeforeNamePrefix"].Value = "Аптека";
 			}
-			ms_Command.Parameters.Add(new MySqlParameter("phone", MySqlDbType.String));
-			ms_Command.Parameters["phone"].Value = PhoneTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("fax", MySqlDbType.String));
-			ms_Command.Parameters["fax"].Value = FaxTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("url", MySqlDbType.String));
-			ms_Command.Parameters["url"].Value = URLTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("firmsegment", MySqlDbType.Int24));
-			ms_Command.Parameters["firmsegment"].Value = SegmentDD.SelectedItem.Value;
-			ms_Command.Parameters.Add(new MySqlParameter("RegionCode", MySqlDbType.Int24));
-			ms_Command.Parameters["RegionCode"].Value = RegionDD.SelectedItem.Value;
-			ms_Command.Parameters.Add(new MySqlParameter("adress", MySqlDbType.String));
-			ms_Command.Parameters["adress"].Value = AddressTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("bussinfo", MySqlDbType.String));
-			ms_Command.Parameters["bussinfo"].Value = BusInfoTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("bussstop", MySqlDbType.String));
-			ms_Command.Parameters["bussstop"].Value = BussStopTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("firmtype", MySqlDbType.Int24));
-			ms_Command.Parameters["firmtype"].Value = TypeDD.SelectedItem.Value;
-			ms_Command.Parameters.Add(new MySqlParameter("registrant", MySqlDbType.String));
-			ms_Command.Parameters["registrant"].Value = Session["UserName"];
-			ms_Command.Parameters.Add(new MySqlParameter("mail", MySqlDbType.String));
-			ms_Command.Parameters["mail"].Value = EmailTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("InvisibleOnFirm", MySqlDbType.Byte));
-			ms_Command.Parameters["InvisibleOnFirm"].Value = 0;
-			ms_Command.Parameters.Add(new MySqlParameter("OrderManagerName", MySqlDbType.String));
-			ms_Command.Parameters["OrderManagerName"].Value = TBOrderManagerName.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("OrderManagerPhone", MySqlDbType.String));
-			ms_Command.Parameters["OrderManagerPhone"].Value = TBOrderManagerPhone.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("OrderManagerMail", MySqlDbType.String));
-			ms_Command.Parameters["OrderManagerMail"].Value = TBOrderManagerMail.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("ClientManagerName", MySqlDbType.String));
-			ms_Command.Parameters["ClientManagerName"].Value = TBClientManagerName.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("ClientManagerPhone", MySqlDbType.String));
-			ms_Command.Parameters["ClientManagerPhone"].Value = TBClientManagerPhone.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("ClientManagerMail", MySqlDbType.String));
-			ms_Command.Parameters["ClientManagerMail"].Value = TBClientManagerMail.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("AccountantName", MySqlDbType.String));
-			ms_Command.Parameters["AccountantName"].Value = TBAccountantName.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("AccountantPhone", MySqlDbType.String));
-			ms_Command.Parameters["AccountantPhone"].Value = TBAccountantPhone.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("AccountantMail", MySqlDbType.String));
-			ms_Command.Parameters["AccountantMail"].Value = TBAccountantMail.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int24));
-			ms_Command.Parameters.Add(new MySqlParameter("AllowGetData", MySqlDbType.Int24));
-			ms_Command.Parameters["AllowGetData"].Value = TypeDD.SelectedItem.Value;
-			ms_Command.Parameters.Add(new MySqlParameter("OSUserName", MySqlDbType.String));
-			ms_Command.Parameters["OSUserName"].Value = LoginTB.Text;
-			ms_Command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.String));
-			ms_Command.Parameters["OSUserPass"].Value = PassTB.Text;
-			ms_Command.Connection = myMySqlConnection;
+			_command.Parameters.Add(new MySqlParameter("phone", MySqlDbType.String));
+			_command.Parameters["phone"].Value = PhoneTB.Text;
+			_command.Parameters.Add(new MySqlParameter("fax", MySqlDbType.String));
+			_command.Parameters["fax"].Value = FaxTB.Text;
+			_command.Parameters.Add(new MySqlParameter("url", MySqlDbType.String));
+			_command.Parameters["url"].Value = URLTB.Text;
+			_command.Parameters.Add(new MySqlParameter("firmsegment", MySqlDbType.Int24));
+			_command.Parameters["firmsegment"].Value = SegmentDD.SelectedItem.Value;
+			_command.Parameters.Add(new MySqlParameter("RegionCode", MySqlDbType.Int24));
+			_command.Parameters["RegionCode"].Value = RegionDD.SelectedItem.Value;
+			_command.Parameters.Add(new MySqlParameter("adress", MySqlDbType.String));
+			_command.Parameters["adress"].Value = AddressTB.Text;
+			_command.Parameters.Add(new MySqlParameter("firmtype", MySqlDbType.Int24));
+			_command.Parameters["firmtype"].Value = TypeDD.SelectedItem.Value;
+			_command.Parameters.Add(new MySqlParameter("registrant", MySqlDbType.String));
+			_command.Parameters["registrant"].Value = Session["UserName"];
+			_command.Parameters.Add(new MySqlParameter("mail", MySqlDbType.String));
+			_command.Parameters["mail"].Value = EmailTB.Text;
+			_command.Parameters.Add(new MySqlParameter("InvisibleOnFirm", MySqlDbType.Byte));
+			_command.Parameters["InvisibleOnFirm"].Value = 0;
+			_command.Parameters.Add(new MySqlParameter("OrderManagerName", MySqlDbType.String));
+			_command.Parameters["OrderManagerName"].Value = TBOrderManagerName.Text;
+			_command.Parameters.Add(new MySqlParameter("OrderManagerPhone", MySqlDbType.String));
+			_command.Parameters["OrderManagerPhone"].Value = TBOrderManagerPhone.Text;
+			_command.Parameters.Add(new MySqlParameter("OrderManagerMail", MySqlDbType.String));
+			_command.Parameters["OrderManagerMail"].Value = TBOrderManagerMail.Text;
+			_command.Parameters.Add(new MySqlParameter("ClientManagerName", MySqlDbType.String));
+			_command.Parameters["ClientManagerName"].Value = TBClientManagerName.Text;
+			_command.Parameters.Add(new MySqlParameter("ClientManagerPhone", MySqlDbType.String));
+			_command.Parameters["ClientManagerPhone"].Value = TBClientManagerPhone.Text;
+			_command.Parameters.Add(new MySqlParameter("ClientManagerMail", MySqlDbType.String));
+			_command.Parameters["ClientManagerMail"].Value = TBClientManagerMail.Text;
+			_command.Parameters.Add(new MySqlParameter("AccountantName", MySqlDbType.String));
+			_command.Parameters["AccountantName"].Value = TBAccountantName.Text;
+			_command.Parameters.Add(new MySqlParameter("AccountantPhone", MySqlDbType.String));
+			_command.Parameters["AccountantPhone"].Value = TBAccountantPhone.Text;
+			_command.Parameters.Add(new MySqlParameter("AccountantMail", MySqlDbType.String));
+			_command.Parameters["AccountantMail"].Value = TBAccountantMail.Text;
+			_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int24));
+			_command.Parameters.Add(new MySqlParameter("AllowGetData", MySqlDbType.Int24));
+			_command.Parameters["AllowGetData"].Value = TypeDD.SelectedItem.Value;
+			_command.Parameters.Add(new MySqlParameter("OSUserName", MySqlDbType.String));
+			_command.Parameters["OSUserName"].Value = LoginTB.Text;
+			_command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.String));
+			_command.Parameters["OSUserPass"].Value = PassTB.Text;
+			
+			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
+			_command.Connection = _connection;
 			if (InvCB.Checked)
 			{
-				ms_Command.Parameters["invisibleonfirm"].Value = 1;
+				_command.Parameters["invisibleonfirm"].Value = 1;
 			}
 			try
 			{
 				Label3.Text = "";
 				if (IncludeCB.Checked)
 				{
-					myMySqlDataReader =
+					_reader =
 						new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue,
-						                 myMySqlConnection).ExecuteReader();
-					if (myMySqlDataReader.Read())
+						                 _connection).ExecuteReader();
+					if (_reader.Read())
 					{
-						Session["DogN"] = Convert.ToInt32(myMySqlDataReader[0].ToString());
+						Session["DogN"] = Convert.ToInt32(_reader[0].ToString());
 					}
-					if (!(myMySqlDataReader.IsClosed))
+					if (!(_reader.IsClosed))
 					{
-						myMySqlDataReader.Close();
+						_reader.Close();
 					}
 				}
 				else
@@ -387,8 +401,8 @@ namespace AddUser
 						Session["DogN"] = PayerDDL.SelectedItem.Value;
 					}
 				}
-				ms_Command.Parameters["ClientCode"].Value = CreateClientOnClientsData();
-				Session["Code"] = ms_Command.Parameters["ClientCode"].Value;
+				_command.Parameters["ClientCode"].Value = CreateClientOnClientsData();
+				Session["Code"] = _command.Parameters["ClientCode"].Value;
 				if (IncludeCB.Checked)
 				{
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
@@ -397,7 +411,7 @@ namespace AddUser
 				{
 					CreateClientOnOSUserAccessRight();
 				}
-				LogRegister();
+
 				if (TypeDD.SelectedItem.Value == "1")
 				{
 					CreateClientOnRCS_and_I(InvCB.Checked);
@@ -409,21 +423,21 @@ namespace AddUser
 				if (!(IncludeCB.Checked))
 				{
 					Domain = Marshal.BindToMoniker("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net") as IADs;
-					ADUser = (Domain as IADsContainer).Create("user", "cn=" + ms_Command.Parameters["OSUserName"].Value) as IADsUser;
-					ADUser.Put("samAccountName", ms_Command.Parameters["OSUserName"].Value);
+					ADUser = (Domain as IADsContainer).Create("user", "cn=" + _command.Parameters["OSUserName"].Value) as IADsUser;
+					ADUser.Put("samAccountName", _command.Parameters["OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + ms_Command.Parameters["OSUserName"].Value) as IADsUser;
-					ADUser.SetPassword(ms_Command.Parameters["OSUserPass"].Value.ToString());
+					ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value) as IADsUser;
+					ADUser.SetPassword(_command.Parameters["OSUserPass"].Value.ToString());
 					ADUser.SetInfo();
 					Int32 fl = 66049;
 					ADUser.Put("userFlags", fl);
-					ADUser.Description = ms_Command.Parameters["ClientCode"].Value.ToString();
+					ADUser.Description = _command.Parameters["ClientCode"].Value.ToString();
 					ADUser.AccountDisabled = false;
 					ADUser.LoginWorkstations = "ISRV";
 					IADsGroup grp;
 					grp = Marshal.BindToMoniker("WinNT://adc.analit.net/Базовая группа клиентов - получателей данных") as IADsGroup;
-					grp.Add("WinNT://adc.analit.net/" + ms_Command.Parameters["OSUserName"].Value);
+					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
 				}
@@ -551,9 +565,9 @@ namespace AddUser
 			{
 				if (!((excL) is ThreadAbortException))
 				{
-					if (!(myMySqlDataReader.IsClosed))
+					if (!(_reader.IsClosed))
 					{
-						myMySqlDataReader.Close();
+						_reader.Close();
 					}
 					Label3.Text = "Ошибка при регистрации клиента: " + excL.Message;
 					mytrans.Rollback();
@@ -561,16 +575,16 @@ namespace AddUser
 			}
 			finally
 			{
-				if (!(myMySqlDataReader.IsClosed))
+				if (!(_reader.IsClosed))
 				{
-					myMySqlDataReader.Close();
+					_reader.Close();
 				}
-				if (myMySqlConnection.State == ConnectionState.Open)
+				if (_connection.State == ConnectionState.Open)
 				{
-					myMySqlConnection.Close();
+					_connection.Close();
 				}
-				ms_Command.Dispose();
-				myMySqlConnection.Dispose();
+				_command.Dispose();
+				_connection.Dispose();
 			}
 		}
 
@@ -594,7 +608,7 @@ namespace AddUser
 
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
-			Func.SelectTODS(" SELECT distinct PayerID, concat(PayerID, '. ', p.ShortName) PayerName"
+			Func.SelectTODS(" SELECT distinct PayerID, convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName"
 			                + " FROM clientsdata as cd, accessright.showright, billing.payers p "
 			                + " where p.payerid=cd.billingcode and cd.regioncode & showright.regionmask > 0 "
 			                + " and showright.UserName='" + Session["UserName"]
@@ -653,13 +667,14 @@ namespace AddUser
 				IncludeSTB.Visible = false;
 				IncludeSB.Visible = false;
 				IncludeSDD.Visible = false;
+				IncludeType.Visible = false;
 				IncludeCountLB.Visible = false;
 			}
 		}
 
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
-			Func.SelectTODS(" SELECT distinct cd.FirmCode, concat(cd.FirmCode, '. ', cd.ShortName) ShortName, cd.RegionCode" +
+			Func.SelectTODS(" SELECT distinct cd.FirmCode, convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, cd.RegionCode" +
 			                " FROM (accessright.showright, clientsdata as cd)"
 			                + " left join includeregulation ir on ir.includeclientcode=cd.firmcode"
 			                + " where cd.regioncode & showright.regionmask > 0"
@@ -672,10 +687,14 @@ namespace AddUser
 			IncludeSDD.DataBind();
 			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
 			IncludeCountLB.Visible = true;
-			RegionDD.SelectedValue = DS1.Tables["Includes"].Rows[0]["RegionCode"].ToString();
-			SetWorkRegions(RegionDD.SelectedItem.Value);
+			if (DS1.Tables["Includes"].Rows.Count > 0)
+			{
+				RegionDD.SelectedValue = DS1.Tables["Includes"].Rows[0]["RegionCode"].ToString();
+				SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
+			}
 			if (IncludeSDD.Items.Count > 0)
 			{
+				IncludeType.Visible = true;
 				IncludeSDD.Visible = true;
 				IncludeSTB.Visible = false;
 				IncludeSB.Visible = false;
@@ -684,53 +703,45 @@ namespace AddUser
 
 		private int CreateClientOnBilling()
 		{
-			ms_Command.CommandText =
+			_command.CommandText =
 				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, BeforeNamePrefix) values(0, now(), 'Дата регистрации: " +
 				DateTime.Now + "', null, ?ShortName, ?BeforeNamePrefix); ";
-			ms_Command.CommandText += "SELECT LAST_INSERT_ID()";
-			return Convert.ToInt32(ms_Command.ExecuteScalar());
+			_command.CommandText += "SELECT LAST_INSERT_ID()";
+			return Convert.ToInt32(_command.ExecuteScalar());
 		}
 
 		private int CreateClientOnClientsData()
 		{
-			ms_Command.CommandText =
-				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Phone, Fax, URL, FirmSegment, RegionCode, Adress, BussInfo, BussStop, FirmType, Mail, OrderManagerName, OrderManagerPhone, OrderManagerMail, ClientManagerName, ClientManagerPhone, ClientManagerMail, AccountantName, AccountantPhone, AccountantMail, FirmStatus, registrant, BillingCode, BillingStatus) ";
+			_command.CommandText =
+				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Phone, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, Mail, OrderManagerName, OrderManagerPhone, OrderManagerMail, ClientManagerName, ClientManagerPhone, ClientManagerMail, AccountantName, AccountantPhone, AccountantMail, FirmStatus, registrant, BillingCode, BillingStatus) ";
 			if (!(IncludeCB.Checked))
 			{
-				ms_Command.CommandText +=
-					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?BussInfo, ?BussStop, ?FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, " +
+				_command.CommandText +=
+					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, " +
 					Session["DogN"] + ", 1); ";
 			}
 			else
 			{
-				ms_Command.CommandText +=
-					" select 0, maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, ?BussInfo, ?BussStop, FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, BillingCode, BillingStatus" +
+				_command.CommandText +=
+					" select 0, maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, BillingCode, BillingStatus" +
 					" from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
-			ms_Command.CommandText += "SELECT LAST_INSERT_ID()";
-			return Convert.ToInt32(ms_Command.ExecuteScalar());
+			_command.CommandText += "SELECT LAST_INSERT_ID()";
+			return Convert.ToInt32(_command.ExecuteScalar());
 		}
 
 		private void CreateClientOnOSUserAccessRight()
 		{
-			ms_Command.CommandText =
+			_command.CommandText =
 				"INSERT INTO usersettings.osuseraccessright (ClientCode, AllowGetData, OSUserName) Values(?ClientCode, ?AllowGetData, ?OSUserName)";
-			ms_Command.ExecuteNonQuery();
-		}
-
-		private void LogRegister()
-		{
-			ms_Command.CommandText = " insert into logs.register select null, now(), ?registrant, '" +
-			                         HttpContext.Current.Request.UserHostAddress +
-			                         "', ?ClientCode, ?FullName, ?FirmSegment, ?FirmType";
-			ms_Command.ExecuteNonQuery();
+			_command.ExecuteNonQuery();
 		}
 
 		private void CreateClientOnRCS_and_I(bool Invisible)
 		{
-			ms_Command.CommandText =
+			_command.CommandText =
 				"INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask); ";
-			ms_Command.CommandText += " INSERT " + " INTO intersection" + " (" + " ClientCode, " + " regioncode, " +
+			_command.CommandText += " INSERT " + " INTO intersection" + " (" + " ClientCode, " + " regioncode, " +
 			                          " pricecode, " + " InvisibleonFirm, " + " costcode" + " ) " + " SELECT DISTINCT " +
 			                          " clientsdata2.firmcode, " + " regions.regioncode, " + " pc.showpricecode, " +
 			                          " a.invisibleonfirm, " + " (" + " SELECT " + " costcode " + " FROM pricescosts pcc " +
@@ -749,34 +760,34 @@ namespace AddUser
 			                          " clientsdata2.maskregion & regions.regioncode " + " ) " + " >0;";
 			if (!(Invisible))
 			{
-				ms_Command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
+				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
 			}
-			ms_Command.ExecuteNonQuery();
+			_command.ExecuteNonQuery();
 		}
 
 		private void CreatePriceRecords()
 		{
-			ms_Command.CommandText = "INSERT INTO pricesdata(Firmcode, PriceCode) values(?ClientCode, null); " +
+			_command.CommandText = "INSERT INTO pricesdata(Firmcode, PriceCode) values(?ClientCode, null); " +
 			                         " set @NewPriceCode:=Last_Insert_ID(); insert into farm.formrules(firmcode) values(@NewPriceCode); " +
 			                         " insert into farm.sources(FirmCode) values(@NewPriceCode);";
-			ms_Command.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
+			_command.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
 			                          " Select @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;" +
 			                          " Insert into farm.costformrules(PC_CostCode) Select @NewPriceCode;";
-			ms_Command.CommandText += " insert into regionaldata(regioncode, firmcode)" +
+			_command.CommandText += " insert into regionaldata(regioncode, firmcode)" +
 			                          " SELECT distinct regions.regioncode, clientsdata.firmcode" +
 			                          " FROM (clientsdata, farm.regions, pricesdata)" +
 			                          " left join regionaldata on regionaldata.firmcode=clientsdata.firmcode and regionaldata.regioncode= regions.regioncode" +
 			                          " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
 			                          " and (clientsdata.maskregion & regions.regioncode)>0" +
 			                          " and regionaldata.firmcode is null;";
-			ms_Command.CommandText += " insert into pricesregionaldata(regioncode, pricecode)" +
+			_command.CommandText += " insert into pricesregionaldata(regioncode, pricecode)" +
 			                          " SELECT distinct regions.regioncode, pricesdata.pricecode" +
 			                          " FROM (clientsdata, farm.regions, pricesdata, clientsdata as a)" +
 			                          " left join pricesregionaldata on pricesregionaldata.pricecode=pricesdata.pricecode and pricesregionaldata.regioncode= regions.regioncode" +
 			                          " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
 			                          " and (clientsdata.maskregion & regions.regioncode)>0" +
 			                          " and pricesregionaldata.pricecode is null;";
-			ms_Command.CommandText +=
+			_command.CommandText +=
 				" insert into intersection(clientcode, regioncode, pricecode, invisibleonclient, InvisibleonFirm, CostCode) " +
 				" SELECT distinct clientsdata2.firmcode, regions.regioncode, pricesdata.pricecode," +
 				" 0 as invisibleonclient, a.invisibleonfirm, pricesdata.pricecode" +
@@ -788,44 +799,45 @@ namespace AddUser
 				" and pricesdata.firmcode=clientsdata.firmcode" + " and pricesregionaldata.pricecode=pricesdata.pricecode" +
 				" and pricesregionaldata.regioncode=regions.regioncode" + " and (clientsdata.maskregion & regions.regioncode)>0" +
 				" and (clientsdata2.maskregion & regions.regioncode)>0;";
-			ms_Command.ExecuteNonQuery();
+			_command.ExecuteNonQuery();
 		}
 
 		private void CreateClientOnShowInclude(int PrimaryClientCode)
 		{
-			ms_Command.CommandText = "INSERT INTO showregulation" + "(PrimaryClientCode, ShowClientCode, Addition)" + " VALUES (" +
+			_command.CommandText = "INSERT INTO showregulation" + "(PrimaryClientCode, ShowClientCode, Addition)" + " VALUES (" +
 			                         PrimaryClientCode + ", ?ClientCode, ?ShortName);" + "INSERT INTO includeregulation" +
-			                         "(ID, PrimaryClientCode, IncludeClientCode, Addition)" + "VALUES(NULL," + PrimaryClientCode +
-			                         ", ?ClientCode, ?ShortName)";
-			ms_Command.ExecuteNonQuery();
+			                         "(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)" + "VALUES(NULL," + PrimaryClientCode +
+			                         ", ?ClientCode, ?ShortName, ?IncludeType)";
+			_command.ExecuteNonQuery();
 		}
 
 		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			myMySqlConnection.Open();
-			myMySqlDataReader =
-				new MySqlCommand("select RegionCode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, myMySqlConnection)
+			_connection.Open();
+			_reader =
+				new MySqlCommand("select RegionCode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, _connection)
 					.ExecuteReader();
-			if (myMySqlDataReader.Read())
+			if (_reader.Read())
 			{
-				RegionDD.SelectedValue = myMySqlDataReader[0].ToString();
+				RegionDD.SelectedValue = _reader[0].ToString();
 			}
-			if (!(myMySqlDataReader.IsClosed))
+			if (!(_reader.IsClosed))
 			{
-				myMySqlDataReader.Close();
+				_reader.Close();
 			}
-			myMySqlConnection.Close();
-			SetWorkRegions(RegionDD.SelectedItem.Value);
+			_connection.Close();
+			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			InitializeComponent();
-
+#if !DEBUG
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 			{
 				Response.Redirect("default.aspx");
 			}
+#endif
+			_connection.ConnectionString = Literals.GetConnectionString();
 			Func.SelectTODS(
 				"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
 				Session["UserName"] + "' order by region", "admin", DS1);
@@ -843,16 +855,14 @@ namespace AddUser
 				RegionDD.DataBind();
 				for (int i = 0; i <= RegionDD.Items.Count - 1; i++)
 				{
-					if (RegionDD.Items[i].Text == DS1.Tables["admin"].Rows[0][2])
+					if (RegionDD.Items[i].Text == DS1.Tables["admin"].Rows[0][2].ToString())
 					{
 						RegionDD.SelectedIndex = i;
-						goto exitForStatement0;
+						break;
 					}
 				}
-				exitForStatement0:
-				;
 				string iInt = DS1.Tables["admin"].Rows[0][1].ToString();
-				SetWorkRegions(iInt);
+				SetWorkRegions(iInt, CheckBox1.Checked);
 				if (DS1.Tables["admin"].Rows[0][3].ToString() == "1")
 				{
 					TypeDD.Items.Add("Аптека");
@@ -891,6 +901,11 @@ namespace AddUser
 				}
 			}
 			Session["strStatus"] = "Yes";
+		}
+		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
+		{
+			CheckBox checkBox = sender as CheckBox;
+			SetWorkRegions(RegionDD.SelectedItem.Value, checkBox.Checked);
 		}
 	}
 }

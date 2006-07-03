@@ -16,7 +16,7 @@ namespace AddUser
 		protected DataTable Regions;
 		protected DataColumn DataColumn1;
 		protected DataColumn DataColumn2;
-		MySqlConnection соединение = new MySqlConnection(Literals.GetConnectionString());
+		MySqlConnection соединение = new MySqlConnection();
 		MySqlDataAdapter DA = new MySqlDataAdapter();
 		protected DataTable From;
 		protected DataColumn DataColumn3;
@@ -120,7 +120,7 @@ namespace AddUser
 		{
 			DA.SelectCommand =
 				new MySqlCommand(
-					"select shortname name, firmcode as clientcode from clientsdata, accessright.regionaladmins" +
+					"select convert(concat(FirmCode, '. ', ShortName) using cp1251) name from clientsdata, accessright.regionaladmins" +
 					" where regioncode =" + RegionDD.SelectedItem.Value + " and firmtype=1 and firmstatus=1" +
 					" and shortname like ?NameStr" + " and UserName='" + Session["UserName"] + "'" +
 					" and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)" +
@@ -191,6 +191,7 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
+			соединение.ConnectionString = Literals.GetConnectionString();
 			UserName = Session["UserName"].ToString();
 			DA.SelectCommand =
 				new MySqlCommand(

@@ -1,7 +1,8 @@
-#undef DEBUG
 using System;
 using System.Web;
 using System.Web.SessionState;
+using System.Runtime.InteropServices;
+using ActiveDs;
 
 namespace AddUser
 {
@@ -32,7 +33,7 @@ namespace AddUser
 			UserName = HttpContext.Current.User.Identity.Name;
 			if (UserName.Substring(0, 7) == "ANALIT\\")
 			#if DEBUG
-				UserName = "morozov";
+				UserName = "michail";
 			#else
 				UserName = UserName.Substring(7);
 			#endif
@@ -50,6 +51,7 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
+
 		}
 
 		void Session_End(object sender, EventArgs e)

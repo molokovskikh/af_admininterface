@@ -6,6 +6,7 @@ using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using MySql.Data.MySqlClient;
+using DAL;
 
 namespace AddUser
 {
@@ -37,7 +38,7 @@ namespace AddUser
 		protected DataColumn DataColumn3;
 		protected DataColumn DataColumn4;
 		protected DataTable RetClientsSet;
-		MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
+		MySqlConnection myMySqlConnection = new MySqlConnection();
 		MySqlCommand myMySqlCommand = new MySqlCommand();
 		MySqlDataReader myMySqlDataReader;
 		MySqlTransaction myTrans;
@@ -166,8 +167,6 @@ namespace AddUser
 			myMySqlCommand.Parameters["AlowRegister"].Value = RegisterCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("AlowRejection", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["AlowRejection"].Value = RejectsCB.Checked;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("AlowDocuments", MySqlDbType.Int16));
-			myMySqlCommand.Parameters["AlowDocuments"].Value = DocumentsCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("MultiUserLevel", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["MultiUserLevel"].Value = MultiUserLevelTB.Text;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("AdvertisingLevel", MySqlDbType.Int16));
@@ -178,14 +177,31 @@ namespace AddUser
 			myMySqlCommand.Parameters["AlowChangeSegment"].Value = ChangeSegmentCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("EnableUpdate", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["EnableUpdate"].Value = EnableUpdateCB.Checked;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("CheckCopyID", MySqlDbType.Int16));
-			myMySqlCommand.Parameters["CheckCopyID"].Value = CheckCopyIDCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("AlowCumulativeUpdate", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["AlowCumulativeUpdate"].Value = AlowCumulativeCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("ResetIDCause", MySqlDbType.String));
 			myMySqlCommand.Parameters["ResetIDCause"].Value = CopyIDWTB.Text;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("CumulativeUpdateCause", MySqlDbType.String));
 			myMySqlCommand.Parameters["CumulativeUpdateCause"].Value = CUWTB.Text;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("EncryptSynonym", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["EncryptSynonym"].Value = EncryptSynonymCB.Checked;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("CalculateLeader", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["CalculateLeader"].Value = CalculateLeaderCB.Checked;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("AllowSubmitOrders", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["AllowSubmitOrders"].Value = AllowSubmitOrdersCB.Checked;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("SubmitOrders", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["SubmitOrders"].Value = SubmitOrdersCB.Checked;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("ServiceClient", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["ServiceClient"].Value = ServiceClientCB.Checked;
+
+			myMySqlCommand.Parameters.Add(new MySqlParameter("OrdersVisualizationMode", MySqlDbType.Int16));
+			myMySqlCommand.Parameters["OrdersVisualizationMode"].Value = OrdersVisualizationModeCB.Checked;
+
 			HomeRegionCode = RegionDD.SelectedItem.Value;
 			for (int i = 0; i <= ShowList.Items.Count - 1; i++)
 			{
@@ -214,8 +230,6 @@ namespace AddUser
 				myMySqlCommand.Parameters.Add("?userHostAddress", HttpContext.Current.Request.UserHostAddress);
 				myMySqlCommand.Parameters.Add("?orderMask", OrderMask);
 				
-				if (myMySqlCommand.ExecuteScalar() == "0")
-					InsertCommand += "insert into logs.clientsdataupdates select null, now(), ?userName, ?userHostAddress, ?clientCode, null, null, null, if(RegionCode=?homeRegionCode, null, ?homeRegionCode), if(MaskRegion=?workMask, null, ?workMask), if(ShowRegionMask=?showMask, null, ?showMask), null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null from clientsdata where firmcode=?clientCode; ";
 
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
 				if (myMySqlCommand.ExecuteScalar() == "0")
@@ -238,40 +252,6 @@ namespace AddUser
 									" and (clientsdata.maskregion & regions.regioncode)>0" + " and (?workMask" +
 					                " & regions.regioncode)>0;";
 				}
-				myMySqlCommand.CommandText = "select OrderRegionMask=?orderMask" +
-				                             " and InvisibleOnFirm=?InvisibleOnFirm and AlowRegister=?AlowRegister and AlowRejection=?AlowRejection and AlowDocuments=?AlowDocuments and MultiUserLevel=?MultiUserLevel and (WorkRegionMask=if(WorkRegionMask & " +
-											 "?workMask > 0, WorkRegionMask, ?homeRegionCode))" +
-				                             "and AdvertisingLevel=?AdvertisingLevel and AlowWayBill=?AlowWayBill and AlowChangeSegment=?AlowChangeSegment and EnableUpdate=?EnableUpdate and CheckCopyID=?CheckCopyID " +
-											 " from retclientsset where clientcode=?clientCode";
-				if ((myMySqlCommand.ExecuteScalar() == "0")
-				    || (((AlowCumulativeCB.Enabled) && (AlowCumulativeCB.Checked))
-				        || ((ResetCopyIDCB.Enabled) && (ResetCopyIDCB.Checked))))
-				{
-					InsertCommand = InsertCommand + 
-									"insert into logs.retclientssetupdate select null, now(), ?userName , ?userHostAddress, ?clientCode " +
-									", if(InvisibleOnFirm=?InvisibleOnFirm, null, ?InvisibleOnFirm), null, null, null, null, if(AlowRegister=?AlowRegister, null, ?AlowRegister), if(AlowRejection=?AlowRejection, null, ?AlowRejection), " +
-					                "if(AlowDocuments=?AlowDocuments, null, ?AlowDocuments), if(MultiUserLevel=?MultiUserLevel, null, ?MultiUserLevel), if(AdvertisingLevel=?AdvertisingLevel, null, ?AdvertisingLevel), " +
-					                "if(AlowWayBill=?AlowWayBill, null, ?AlowWayBill), if(AlowChangeSegment=?AlowChangeSegment, null, ?AlowChangeSegment), null, if(WorkRegionMask=if(WorkRegionMask & " +
-									"?workMask > 0, WorkRegionMask, ?homeRegionCode), null, ?homeRegionCode), if(OrderRegionMask=?orderMask, null, ?orderMask" +
-					                "), null, null, if(EnableUpdate=?EnableUpdate, null, ?EnableUpdate), if(CheckCopyID=?CheckCopyID, null, ?CheckCopyID), ";
-					if (AlowCumulativeCB.Enabled & AlowCumulativeCB.Checked)
-					{
-						InsertCommand += "?CumulativeUpdateCause, ";
-					}
-					else
-					{
-						InsertCommand += "null, ";
-					}
-					if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
-					{
-						InsertCommand += "?ResetIDCause ";
-					}
-					else
-					{
-						InsertCommand += "null ";
-					}
-					InsertCommand += ",null, null, null from retclientsset where clientcode=?clientCode; ";
-				}
 				if (InvisibleCB.Enabled)
 				{
 					myMySqlCommand.CommandText = "select InvisibleOnFirm=?InvisibleOnFirm from retclientsset where clientcode=?clientCode";
@@ -285,11 +265,13 @@ namespace AddUser
 						InsertCommand += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
 					}
 				}
-				InsertCommand += "update retclientsset, clientsdata set OrderRegionMask=?orderMask, MaskRegion=?workMask" +
+				InsertCommand += "update UserSettings.retclientsset, UserSettings.clientsdata set OrderRegionMask=?orderMask, MaskRegion=?workMask" +
 								 ", ShowRegionMask=?showMask, RegionCode=?homeRegionCode" +
 								 ", WorkRegionMask=if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), " +
-				                 " AlowRegister=?AlowRegister, AlowRejection=?AlowRejection, AlowDocuments=?AlowDocuments, MultiUserLevel=?MultiUserLevel, " +
-				                 "AdvertisingLevel=?AdvertisingLevel, AlowWayBill=?AlowWayBill, AlowChangeSegment=?AlowChangeSegment, EnableUpdate=?EnableUpdate, CheckCopyID=?CheckCopyID, AlowCumulativeUpdate=?AlowCumulativeUpdate";
+								 " AlowRegister=?AlowRegister, AlowRejection=?AlowRejection, MultiUserLevel=?MultiUserLevel, " +
+								 "AdvertisingLevel=?AdvertisingLevel, AlowWayBill=?AlowWayBill, AlowChangeSegment=?AlowChangeSegment, EnableUpdate=?EnableUpdate, AlowCumulativeUpdate=?AlowCumulativeUpdate, " +
+								 " CryptSynonym = ?EncryptSynonym, CalculateLeader = ?CalculateLeader, AllowSubmitOrders = ?AllowSubmitOrders, " +
+								" SubmitOrders = ?SubmitOrders, ServiceClient = ?ServiceClient, OrdersVisualizationMode = ?OrdersVisualizationMode ";
 				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
 				{
 					InsertCommand += ", UniqueCopyID=''";
@@ -321,14 +303,11 @@ namespace AddUser
 			myMySqlCommand.Transaction = myTrans;
 			try
 			{
-				myMySqlCommand.CommandText = "insert into logs.retclientssetupdate (RowID, LogTime, OperatorName, OperatorHost, ClientCode, ShowMessageCount, Message) select null, now(), '"
-				                             + Session["UserName"] + "', '" + HttpContext.Current.Request.UserHostAddress + "', "
-				                             + ClientCode + ", " + SendMessageCountDD.SelectedItem.Value + ", ?Message; "
-				                             + "update retclientsset set ShowMessageCount="
+				myMySqlCommand.CommandText = "update retclientsset set ShowMessageCount="
 				                             + SendMessageCountDD.SelectedItem.Value + ", Message=?Message where clientcode="
 				                             + ClientCode;
 				myMySqlCommand.Parameters.Add("Message", MySqlDbType.String);
-				myMySqlCommand.Parameters[0].Value = MessageTB.Text;
+				myMySqlCommand.Parameters["Message"].Value = MessageTB.Text;
 				myMySqlCommand.ExecuteNonQuery();
 				myTrans.Commit();
 				MessageTB.Text = "";
@@ -415,28 +394,28 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
+			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
 			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
 			myMySqlCommand.Connection = myMySqlConnection;
-			myMySqlConnection.Open();
-			myTrans = myMySqlConnection.BeginTransaction();
-			myMySqlCommand.Transaction = myTrans;
-			myMySqlCommand.CommandText = " SELECT RegionCode, MaskRegion, ShowRegionMask"
-			                             + " FROM clientsdata as cd, accessright.regionaladmins"
-			                             + " where cd.regioncode & regionaladmins.regionmask > 0 and UserName='"
-			                             + Session["UserName"] + "'"
-			                             +
-			                             " and FirmType=if(AlowCreateRetail+AlowCreateVendor=2, FirmType, if(AlowCreateRetail=1, 1, 0))"
-			                             + " and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)"
-			                             + "\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" +
-			                             " and AlowManage=1 and cd.firmcode=" + ClientCode;
-			HomeRegionCode = Convert.ToInt32(myMySqlCommand.ExecuteScalar());
-			if (Convert.ToInt32(HomeRegionCode) < 1)
+			if (!IsPostBack)
 			{
-				return;
-			}
-			if (!(IsPostBack))
-			{
+				myMySqlConnection.Open();
+				myTrans = myMySqlConnection.BeginTransaction();
+				myMySqlCommand.Transaction = myTrans;
+				myMySqlCommand.CommandText = " SELECT RegionCode, MaskRegion, ShowRegionMask"
+											 + " FROM clientsdata as cd, accessright.regionaladmins"
+											 + " where cd.regioncode & regionaladmins.regionmask > 0 and UserName='"
+											 + Session["UserName"] + "'"
+											 + " and FirmType=if(AlowCreateRetail+AlowCreateVendor=2, FirmType, if(AlowCreateRetail=1, 1, 0))"
+											 + " and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)"
+											 + "\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" +
+											 " and AlowManage=1 and cd.firmcode=" + ClientCode;
+				HomeRegionCode = Convert.ToInt32(myMySqlCommand.ExecuteScalar());
+				if (Convert.ToInt32(HomeRegionCode) < 1)
+				{
+					return;
+				}
 				Func.SelectTODS(
 					"select regions.regioncode, regions.region from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
 					Session["UserName"] + "' order by region", "admin", DS1);
@@ -446,32 +425,38 @@ namespace AddUser
 					if (RegionDD.Items[i].Value == HomeRegionCode)
 					{
 						RegionDD.SelectedIndex = i;
-						goto exitForStatement0;
+						break;
 					}
 				}
-				exitForStatement0:
-				;
 				SetWorkRegions(Convert.ToInt64(HomeRegionCode), true, false);
 				myMySqlCommand.CommandText =
-					" select InvisibleOnFirm, AlowRegister, AlowRejection, AlowDocuments, MultiUserLevel," +
-					" AdvertisingLevel, AlowWayBill, retclientsset.AlowChangeSegment, EnableUpdate, CheckCopyID," +
-					" AlowCumulativeUpdate, AlowCreateInvisible, length(UniqueCopyID)=0 from retclientsset, accessright.regionaladmins where clientcode=" +
+					" select InvisibleOnFirm, AlowRegister, AlowRejection, MultiUserLevel, " +
+					" AdvertisingLevel, AlowWayBill, retclientsset.AlowChangeSegment, EnableUpdate, " +
+					" AlowCumulativeUpdate, AlowCreateInvisible, length(UniqueCopyID)=0 as Length, " +
+					" CryptSynonym as EncryptSynonym, CalculateLeader, AllowSubmitOrders, " +
+					" SubmitOrders, ServiceClient, OrdersVisualizationMode, ShowMessageCount " +
+					"from retclientsset, accessright.regionaladmins where clientcode=" +
 					ClientCode + " and username='" + Session["UserName"] + "'";
 				myMySqlDataReader = myMySqlCommand.ExecuteReader();
 				myMySqlDataReader.Read();
-				InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader[0]);
-				InvisibleCB.Enabled = Convert.ToBoolean(myMySqlDataReader[11]);
-				RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader[1]);
-				RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader[2]);
-				DocumentsCB.Checked = Convert.ToBoolean(myMySqlDataReader[3]);
-				MultiUserLevelTB.Text = myMySqlDataReader[4].ToString();
-				AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader[5]);
-				WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader[6]);
-				ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader[7]);
-				EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader[8]);
-				CheckCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader[9]);
-				AlowCumulativeCB.Checked = Convert.ToBoolean(myMySqlDataReader[10]);
-				ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader[12]);
+				InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader["InvisibleOnFirm"]);
+				InvisibleCB.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
+				RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
+				RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
+				MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
+				AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
+				WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
+				ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
+				EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
+				AlowCumulativeCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowCumulativeUpdate"]);
+				ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader["Length"]);
+				EncryptSynonymCB.Checked = Convert.ToBoolean(myMySqlDataReader["EncryptSynonym"]);
+				CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
+				AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
+				SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
+				ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
+				OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
+				MessageLeftL.Visible = (Convert.ToInt32(myMySqlDataReader["ShowMessageCount"]) > 0);
 				if (!(AlowCumulativeCB.Checked))
 				{
 					AlowCumulativeCB.Enabled = true;
@@ -485,9 +470,16 @@ namespace AddUser
 					IDSetL.Visible = false;
 				}
 				myMySqlDataReader.Close();
+				myTrans.Commit();
+				myMySqlConnection.Close();
 			}
-			myTrans.Commit();
-			myMySqlConnection.Close();
 		}
-	}
+
+		protected void GeneratePasswords_Click(object sender, EventArgs e)
+		{
+			CommandsFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
+			ResultL.Text = "Пароли сгенерированны";
+		}
+
+}
 }

@@ -49,7 +49,6 @@ namespace AddUser
 			SelCommand.Connection = MyCn;
 			SelCommand.Transaction = null;
 			SelCommand.UpdatedRowSource = UpdateRowSource.Both;
-			MyCn.ConnectionString = Literals.GetConnectionString();
 			UpdCommand.CommandText = null;
 			UpdCommand.CommandTimeout = 0;
 			UpdCommand.CommandType = CommandType.Text;
@@ -95,59 +94,55 @@ namespace AddUser
 			try
 			{
 				MyCn.Open();
+				FillDataSet();
 				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-			}
-			catch (Exception err)
-			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + err.Message +
-				             "]";
-				return;
-			}
-			try
-			{
-				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+
 				foreach (DataGridItem Itm in CostsDG.Items)
 				{
 					for (int i = 0; i <= DS.Tables[0].Rows.Count - 1; i++)
 					{
-						if (DS.Tables[0].Rows[i]["CostCode"] == Itm.Cells[4].Text)
+						if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Itm.Cells[5].Text)
 						{
-							if (DS.Tables[0].Rows[i]["CostName"] != ((TextBox) (Itm.Cells[0].FindControl("CostName"))).Text)
-							{
+							if (DS.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox) (Itm.FindControl("CostName"))).Text)
 								DS.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.Cells[0].FindControl("CostName"))).Text;
-							}
-							if (DS.Tables[0].Rows[i]["CostCode"] == Request.Form["uid"].ToString())
-							{
+							if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"].ToString())
 								DS.Tables[0].Rows[i]["BaseCost"] = true;
-							}
 							else
-							{
 								DS.Tables[0].Rows[i]["BaseCost"] = false;
-							}
+							if (Convert.ToInt32(DS.Tables[0].Rows[i]["Enabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked))
+								DS.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox) (Itm.FindControl("Ena"))).Checked);
+							if (Convert.ToInt32(DS.Tables[0].Rows[i]["AgencyEnabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked))
+								DS.Tables[0].Rows[i]["AgencyEnabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked);
 						}
 					}
 				}
-				UpdCommand.Parameters.Add(new MySqlParameter("OperatorName", MySqlDbType.String));
-				UpdCommand.Parameters.Add(new MySqlParameter("OperatorHost", MySqlDbType.String));
 				UpdCommand.Parameters.Add(new MySqlParameter("CostCode", MySqlDbType.Int32));
 				UpdCommand.Parameters["CostCode"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["CostCode"].SourceColumn = "CostCode";
 				UpdCommand.Parameters["CostCode"].SourceVersion = DataRowVersion.Current;
+
 				UpdCommand.Parameters.Add(new MySqlParameter("CostName", MySqlDbType.VarChar));
 				UpdCommand.Parameters["CostName"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["CostName"].SourceColumn = "CostName";
 				UpdCommand.Parameters["CostName"].SourceVersion = DataRowVersion.Current;
+
 				UpdCommand.Parameters.Add(new MySqlParameter("BaseCost", MySqlDbType.Bit));
 				UpdCommand.Parameters["BaseCost"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["BaseCost"].SourceColumn = "BaseCost";
 				UpdCommand.Parameters["BaseCost"].SourceVersion = DataRowVersion.Current;
-				UpdCommand.Parameters["OperatorHost"].Value = StrHost;
-				UpdCommand.Parameters["OperatorName"].Value = StrUser;
-				UpdCommand.CommandText =
-					"Insert into logs.pricescostsupdate(LogTime, OperatorName, OperatorHost, CostCode, CostName, BaseCost)" +
-					" select now(), ?OperatorName, ?OperatorHost, ?CostCode, nullif(?CostName, CostName), nullif(?BaseCost, BaseCost)" +
-					" from (pricescosts) where costcode=?CostCode;";
-				UpdCommand.CommandText += " update pricescosts set BaseCost=?BaseCost, CostName=?CostName where CostCode=?CostCode;";
+
+				UpdCommand.Parameters.Add(new MySqlParameter("Enabled", MySqlDbType.Bit));
+				UpdCommand.Parameters["Enabled"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["Enabled"].SourceColumn = "Enabled";
+				UpdCommand.Parameters["Enabled"].SourceVersion = DataRowVersion.Current;
+
+				UpdCommand.Parameters.Add(new MySqlParameter("AgencyEnabled", MySqlDbType.Bit));
+				UpdCommand.Parameters["AgencyEnabled"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["AgencyEnabled"].SourceColumn = "AgencyEnabled";
+				UpdCommand.Parameters["AgencyEnabled"].SourceVersion = DataRowVersion.Current;
+
+
+				UpdCommand.CommandText = " update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled, AgencyEnabled=?AgencyEnabled where CostCode=?CostCode;";
 				MyDA.Update(DS, "Costs");
 				MyTrans.Commit();
 				CostsDG.DataBind();
@@ -161,10 +156,7 @@ namespace AddUser
 			}
 			finally
 			{
-				if (MyCn.State == ConnectionState.Open)
-				{
-					MyCn.Close();
-				}
+				MyCn.Close();
 			}
 		}
 
@@ -186,8 +178,10 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
+			MyCn.ConnectionString = Literals.GetConnectionString();
 			PriceCode = Convert.ToInt32(Request["pc"]);
-			PostDataToGrid();
+			if (!IsPostBack)
+				PostDataToGrid();
 		}
 
 		protected void CreateCost_Click(object sender, EventArgs e)
@@ -195,21 +189,14 @@ namespace AddUser
 			Int32 FirmCode;
 			string ShortName;
 			string PriceName;
+			UpdCommand.Connection = MyCn;
+			UpdCommand.Transaction = MyTrans;
+
 			try
 			{
 				MyCn.Open();
-				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-			}
-			catch (Exception err)
-			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + err.Message +
-				             "]";
-				return;
-			}
-			UpdCommand.Connection = MyCn;
-			UpdCommand.Transaction = MyTrans;
-			try
-			{
+				MyTrans = MyCn.BeginTransaction();
+
 				UpdCommand.CommandText = "select pd.FirmCode, pd.PriceName, cd.ShortName from pricesdata pd, clientsdata cd" +
 				                         " where cd.firmcode=pd.firmcode and pd.pricecode=" + PriceCode;
 				MyReader = UpdCommand.ExecuteReader();
@@ -242,10 +229,7 @@ namespace AddUser
 			}
 			finally
 			{
-				if (MyCn.State == ConnectionState.Open)
-				{
-					MyCn.Close();
-				}
+				MyCn.Close();
 			}
 		}
 
@@ -254,51 +238,34 @@ namespace AddUser
 			try
 			{
 				if (MyCn.State == ConnectionState.Closed)
-				{
 					MyCn.Open();
-				}
-				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+				FillDataSet();
+				CostsDG.DataBind();
 			}
-			catch (Exception err)
+			catch (Exception ex)
 			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + err.Message +
-				             "]";
-				return;
+				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +"]";
 			}
-			try
+			finally
 			{
-				MyTrans = MyCn.BeginTransaction();
-				SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=" + PriceCode;
-				MyReader = SelCommand.ExecuteReader();
-				MyReader.Read();
-				PriceNameLB.Text = MyReader[0].ToString();
-				MyReader.Close();
-				SelCommand.CommandText =
+				MyCn.Close();
+			}
+		}
+
+		private void FillDataSet()
+		{
+			SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=" + PriceCode;
+			MyReader = SelCommand.ExecuteReader();
+			MyReader.Read();
+			PriceNameLB.Text = MyReader[0].ToString();
+			MyReader.Close();
+			SelCommand.CommandText =
 					" SELECT CostCode, concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F'," +
 					" concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) CostID, CostName, BaseCost, pc.Enabled, pc.AgencyEnabled" +
 					" FROM (farm.costformrules cf, pricescosts pc, pricesdata pd)" +
 					" left join farm.sources s on s.firmcode=pc.pricecode" + " where cf.pc_costcode=pc.costcode" +
 					" and pd.pricecode=showpricecode" + " and ShowPriceCode=" + PriceCode;
-				MyDA.Fill(DS, "Costs");
-				if (!(IsPostBack))
-				{
-					CostsDG.DataBind();
-				}
-				MyTrans.Commit();
-			}
-			catch (Exception ex)
-			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +
-				             "]";
-				MyTrans.Rollback();
-			}
-			finally
-			{
-				if (MyCn.State == ConnectionState.Open)
-				{
-					MyCn.Close();
-				}
-			}
+			MyDA.Fill(DS, "Costs");
 		}
 	}
 }

@@ -6,7 +6,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <title>Информация о клиентах</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 </head>
 <body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
     <form id="Form1" method="post" runat="server" defaultbutton="GoFind">
@@ -31,7 +31,7 @@
                             <td style="width: 181px; height: 117px;">
                                 <p align="center">
                                     &nbsp;&nbsp;
-                                    <asp:TextBox ID="FindTB" runat="server" BorderStyle="None" Font-Names="Verdana" Font-Size="8pt"></asp:TextBox>
+                                    <asp:TextBox ID="FindTB" runat="server" BorderStyle="Groove" Font-Names="Verdana" Font-Size="8pt"></asp:TextBox>
                                     <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="FindTB"
                                         ErrorMessage="*"></asp:RequiredFieldValidator></p>
                             </td>
@@ -69,27 +69,54 @@
             <tr>
                 <td valign="baseline" align="center" colspan="2" style="height: 211px">
                     <p>
-                        <asp:Table ID="Table3" runat="server" BorderStyle="Solid" Font-Names="Verdana" Font-Size="8pt"
-                            BorderColor="#DADADA" CellSpacing="0" CellPadding="0" GridLines="Both" Visible="False"
-                            BackColor="#EBEBEB">
-                            <asp:TableRow VerticalAlign="Middle" HorizontalAlign="Center" BackColor="AliceBlue"
-                                Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">
-                                <asp:TableCell Text="Биллинг&lt;br&gt;код"></asp:TableCell>
-                                <asp:TableCell Width="70px" Text="Код"></asp:TableCell>
-                                <asp:TableCell Text="Наименование"></asp:TableCell>
-                                <asp:TableCell Text="Регион"></asp:TableCell>
-                                <asp:TableCell Text="Текущее&lt;br&gt;(подтвержденное)&lt;br&gt;обновление"></asp:TableCell>
-                                <asp:TableCell Text="Предыдущее&lt;br&gt;(неподтвержденное)&lt;br&gt;обновление"></asp:TableCell>
-                                <asp:TableCell Text="EXE"></asp:TableCell>
-                                <asp:TableCell Text="MDB"></asp:TableCell>
-                                <asp:TableCell Text="Login"></asp:TableCell>
-                                <asp:TableCell Text="Сегмент"></asp:TableCell>
-                                <asp:TableCell Text="Тип"></asp:TableCell>
-                            </asp:TableRow>
-                        </asp:Table>
+						&nbsp;<asp:GridView Width="69%" BorderStyle="Solid" Font-Names="Verdana" Font-Size="8pt" 
+							BorderColor="#DADADA" BackColor="#EBEBEB"  CellPadding="0" ID="ClientsGridView" runat="server" AutoGenerateColumns="False"
+							DataSource='<%# ClientsDataView %>'
+							OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True"
+							OnRowCreated="ClientsGridView_RowCreated" OnSorting="ClientsGridView_Sorting">
+							<Columns>
+								<asp:BoundField DataField="billingcode" HeaderText="Биллинг код" SortExpression="billingcode">
+								</asp:BoundField>
+								<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode">
+								</asp:BoundField>
+								<asp:TemplateField HeaderText="Наименование" SortExpression="ShortName">
+									<ItemTemplate>										
+										<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("ShortName") %>' NavigateUrl='<%# String.Format("info.aspx?cc={0}&ouar={1}",Eval("bfc"), Eval("ouarid")) %>'></asp:HyperLink>
+									</ItemTemplate>
+								</asp:TemplateField>
+								<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region">
+								</asp:BoundField>
+								<asp:TemplateField HeaderText="Текущее (подтвержденное) обновление" SortExpression="FirstUpdate">
+									<ItemTemplate>
+										<asp:Label ID="Label1" runat="server" Text='<%# ((MySql.Data.Types.MySqlDateTime)Eval("FirstUpdate")).IsValidDateTime ? ((MySql.Data.Types.MySqlDateTime)Eval("FirstUpdate")).GetDateTime().ToString("dd.MM.yy HH:mm") : "" %>' ></asp:Label>
+									</ItemTemplate>
+								</asp:TemplateField>
+								<asp:TemplateField HeaderText="Предыдущее (неподтвержденное) обновление" SortExpression="SecondUpdate">
+									<ItemTemplate>
+										<asp:Label ID="Label2" runat="server" Text='<%# ((MySql.Data.Types.MySqlDateTime)Eval("SecondUpdate")).IsValidDateTime ? ((MySql.Data.Types.MySqlDateTime)Eval("SecondUpdate")).GetDateTime().ToString("dd.MM.yy HH:mm") : "" %>'></asp:Label>
+									</ItemTemplate>
+								</asp:TemplateField>
+								<asp:BoundField DataField="EXE" HeaderText="EXE" SortExpression="EXE" >
+								</asp:BoundField>
+								<asp:BoundField DataField="MDB" HeaderText="MDB" SortExpression="MDB" />
+								<asp:BoundField DataField="UserName" HeaderText="Login" SortExpression="UserName" />
+								<asp:TemplateField HeaderText="Сегмент" SortExpression="FirmSegment">
+									<ItemTemplate>
+										<asp:Label ID="Label3" runat="server" Text='<%# Eval("FirmSegment").ToString() == "0" ? "Опт" : "Справка" %>'></asp:Label>
+									</ItemTemplate>
+								</asp:TemplateField>
+								<asp:TemplateField HeaderText="Тип" SortExpression="FirmType">
+									<ItemTemplate>
+										<asp:Label ID="Label4" runat="server" Text='<%# Eval("FirmType").ToString() == "1" ? "Аптека" : "Поставщик" %>'></asp:Label>
+									</ItemTemplate>
+								</asp:TemplateField>
+							</Columns>
+
+						</asp:GridView>
+						&nbsp;
                     </p>
                     <p>
-                        <asp:Label ID="Label1" runat="server" Font-Names="Verdana" Font-Size="9pt" Visible="False"
+                        <asp:Label ID="NotFoundLabel" runat="server" Font-Names="Verdana" Font-Size="9pt" Visible="False"
                             Font-Bold="True">Клиент не найден</asp:Label></p>
                     <p align="center">
                         <asp:Table ID="Table4" runat="server" Font-Names="Verdana" Font-Size="8pt" Width="253px"

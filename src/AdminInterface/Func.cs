@@ -1,7 +1,6 @@
 using System;
 using System.Configuration;
 using System.Data;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Web.Mail;
 using MySql.Data.MySqlClient;
@@ -13,6 +12,7 @@ namespace AddUser
 		public static void Mail(string From, string Subject, MailFormat BodyFormat, string Body, string MessageTo,
 		                        string MessageBCC, Encoding Encoding)
 		{
+#if !DEBUG
 			try
 			{
 				MailMessage message = new MailMessage();
@@ -29,6 +29,7 @@ namespace AddUser
 			catch
 			{
 			}
+#endif
 		}
 
 		public static string GeneratePassword()
@@ -160,7 +161,7 @@ namespace AddUser
 			MySqlCommand MySQLCommand = null;
 			string CommandAdd = String.Empty;
 			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(ConfigurationManager.AppSettings["ConnectionString"]);
+			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
 			MySqlCommand Комманда = new MySqlCommand();
 			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
 			try
