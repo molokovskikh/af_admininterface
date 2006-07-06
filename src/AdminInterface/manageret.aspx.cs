@@ -42,10 +42,10 @@ namespace AddUser
 		MySqlCommand myMySqlCommand = new MySqlCommand();
 		MySqlDataReader myMySqlDataReader;
 		MySqlTransaction myTrans;
-		object ClientCode;
-		object HomeRegionCode;
-		object WorkMask;
-		object ShowMask;
+		int ClientCode;
+		string HomeRegionCode;
+		string WorkMask;
+		string ShowMask;
 		Int64 OrderMask;
 		string InsertCommand;
 
@@ -411,7 +411,7 @@ namespace AddUser
 											 + " and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)"
 											 + "\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" +
 											 " and AlowManage=1 and cd.firmcode=" + ClientCode;
-				HomeRegionCode = Convert.ToInt32(myMySqlCommand.ExecuteScalar());
+				HomeRegionCode = Convert.ToString(myMySqlCommand.ExecuteScalar());
 				if (Convert.ToInt32(HomeRegionCode) < 1)
 				{
 					return;
