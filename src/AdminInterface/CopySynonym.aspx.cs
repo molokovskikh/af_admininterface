@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Text;
+using System.Web;
 using System.Web.Mail;
 using System.Web.UI;
 using MySql.Data.MySqlClient;
@@ -142,6 +143,12 @@ namespace AddUser
 			MySqlTransaction MyTrans = null;
 			try
 			{
+				Query += 
+@"
+set @inHost = ?Host;
+set @inUser = ?UserName;
+";
+
 				Query += " update intersection set MaxSynonymCode=0, MaxSynonymFirmCrCode=0," +
 				         " lastsent='2003-01-01' where clientcode=" + ClientCode + ";";
 				Query += " update retclientsset as a, retclientsset as b" +
@@ -152,6 +159,9 @@ namespace AddUser
 				         " and b.clientcode=" + ParentClientCode + " and a.pricecode=b.pricecode;";
 				Query += " insert into logs.clone (LogTime, UserName, FromClientCode, ToClientCode) values (now(), '" +
 				         Session["UserName"] + "', " + ParentClientCode + ", " + ClientCode + ")";
+				MyCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
+				MyCommand.Parameters.Add("UserName", Session["UserName"]);
+
 				соединение.Open();
 				MyTrans = соединение.BeginTransaction();
 				MyCommand.CommandText = Query;

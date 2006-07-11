@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
@@ -197,7 +198,12 @@ namespace AddUser
 				if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 1)
 				{
 					myTrans = myMySqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-					Запрос = "insert into pricesdata(PriceCode, FirmCode) values(Null, " + ClientCode + "); ";
+					Запрос =
+@"
+set @inHost = ?Host;
+set @inUser = ?UserName;
+";
+					Запрос += "insert into pricesdata(PriceCode, FirmCode) values(Null, " + ClientCode + "); ";
 					Запрос += "select @PriceCode:=Last_insert_id(); ";
 					Запрос += "insert into farm.formrules(Firmcode) values (@PriceCode); ";
 					Запрос += "insert into farm.sources(FirmCode) values (@PriceCode); ";
@@ -226,6 +232,9 @@ namespace AddUser
 						"and pricesregionaldata.pricecode=pricesdata.pricecode; ";
 					myMySqlCommand.Transaction = myTrans;
 					myMySqlCommand.CommandText = Запрос;
+					myMySqlCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
+					myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+
 					myMySqlCommand.ExecuteNonQuery();
 				}
 				myTrans.Commit();

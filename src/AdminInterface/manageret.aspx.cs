@@ -201,6 +201,10 @@ namespace AddUser
 
 			myMySqlCommand.Parameters.Add(new MySqlParameter("OrdersVisualizationMode", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["OrdersVisualizationMode"].Value = OrdersVisualizationModeCB.Checked;
+			
+			myMySqlCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
+			myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+
 
 			HomeRegionCode = RegionDD.SelectedItem.Value;
 			for (int i = 0; i <= ShowList.Items.Count - 1; i++)
@@ -220,7 +224,12 @@ namespace AddUser
 			}
 			try
 			{
-				myMySqlCommand.CommandText = "select RegionCode=?homeRegionCode and ShowRegionMask=?showMask and MaskRegion=?workMask from usersettings.clientsdata where firmcode=?clientCode";
+				myMySqlCommand.CommandText =
+@"
+set @inHost = ?userHostAddress;
+set @inUser = ?userName;
+";
+				myMySqlCommand.CommandText += "select RegionCode=?homeRegionCode and ShowRegionMask=?showMask and MaskRegion=?workMask from usersettings.clientsdata where firmcode=?clientCode";
 
 				myMySqlCommand.Parameters.Add("?clientCode", ClientCode);
 				myMySqlCommand.Parameters.Add("?workMask", WorkMask);

@@ -303,6 +303,15 @@ order by region";
 				}
 			}
 			_command.Transaction = mytrans;
+			_command.CommandText =
+@"
+set @inHost = ?Host;
+set @inUser = ?UserName;
+";
+			_command.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
+			_command.Parameters.Add("UserName", Session["UserName"]);
+			_command.ExecuteNonQuery();
+
 			_command.Parameters.Add(new MySqlParameter("MaskRegion", MySqlDbType.Int64));
 			_command.Parameters["MaskRegion"].Value = MaskRegion;
 			_command.Parameters.Add(new MySqlParameter("OrderMask", MySqlDbType.Int64));

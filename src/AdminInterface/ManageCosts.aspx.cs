@@ -141,8 +141,16 @@ namespace AddUser
 				UpdCommand.Parameters["AgencyEnabled"].SourceColumn = "AgencyEnabled";
 				UpdCommand.Parameters["AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
+				UpdCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
+				UpdCommand.Parameters.Add("UserName", Session["UserName"]);
 
-				UpdCommand.CommandText = " update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled, AgencyEnabled=?AgencyEnabled where CostCode=?CostCode;";
+
+				UpdCommand.CommandText =
+@"
+set @inHost = ?Host;
+set @inUser = ?UserName;
+update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled, AgencyEnabled=?AgencyEnabled where CostCode=?CostCode;
+";
 				MyDA.Update(DS, "Costs");
 				MyTrans.Commit();
 				CostsDG.DataBind();
