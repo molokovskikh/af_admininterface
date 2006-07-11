@@ -179,9 +179,9 @@ namespace AddUser
 			myMySqlCommand.Parameters["EnableUpdate"].Value = EnableUpdateCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("AlowCumulativeUpdate", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["AlowCumulativeUpdate"].Value = AlowCumulativeCB.Checked;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("ResetIDCause", MySqlDbType.String));
+			myMySqlCommand.Parameters.Add(new MySqlParameter("ResetIDCause", MySqlDbType.VarString));
 			myMySqlCommand.Parameters["ResetIDCause"].Value = CopyIDWTB.Text;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("CumulativeUpdateCause", MySqlDbType.String));
+			myMySqlCommand.Parameters.Add(new MySqlParameter("CumulativeUpdateCause", MySqlDbType.VarString));
 			myMySqlCommand.Parameters["CumulativeUpdateCause"].Value = CUWTB.Text;
 
 			myMySqlCommand.Parameters.Add(new MySqlParameter("EncryptSynonym", MySqlDbType.Int16));
@@ -306,7 +306,7 @@ namespace AddUser
 				myMySqlCommand.CommandText = "update retclientsset set ShowMessageCount="
 				                             + SendMessageCountDD.SelectedItem.Value + ", Message=?Message where clientcode="
 				                             + ClientCode;
-				myMySqlCommand.Parameters.Add("Message", MySqlDbType.String);
+				myMySqlCommand.Parameters.Add("Message", MySqlDbType.VarString);
 				myMySqlCommand.Parameters["Message"].Value = MessageTB.Text;
 				myMySqlCommand.ExecuteNonQuery();
 				myTrans.Commit();

@@ -126,7 +126,7 @@ namespace AddUser
 					" and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)" +
 					"\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" + " and username='" + UserName + "'",
 					соединение);
-			DA.SelectCommand.Parameters.Add(new MySqlParameter("NameStr", MySqlDbType.String));
+			DA.SelectCommand.Parameters.Add(new MySqlParameter("NameStr", MySqlDbType.VarString));
 			DA.SelectCommand.Parameters["NameStr"].Value = "%" + NameStr + "%";
 			DA.Fill(DS, Where);
 		}
