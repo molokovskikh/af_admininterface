@@ -302,6 +302,7 @@ order by region";
 					OrderMask += Convert.ToInt64(OrderList.Items[i].Value);
 				}
 			}
+			_command.Connection = _connection;
 			_command.Transaction = mytrans;
 			_command.CommandText =
 @"
@@ -377,7 +378,6 @@ set @inUser = ?UserName;
 			_command.Parameters["OSUserPass"].Value = PassTB.Text;
 			
 			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
-			_command.Connection = _connection;
 			if (InvCB.Checked)
 			{
 				_command.Parameters["invisibleonfirm"].Value = 1;
