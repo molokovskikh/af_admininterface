@@ -229,17 +229,16 @@ namespace AddUser
 set @inHost = ?userHostAddress;
 set @inUser = ?userName;
 ";
-				myMySqlCommand.CommandText += "select RegionCode=?homeRegionCode and ShowRegionMask=?showMask and MaskRegion=?workMask from usersettings.clientsdata where firmcode=?clientCode";
-
+				myMySqlCommand.Parameters.Add("?userName", Session["UserName"]);
+				myMySqlCommand.Parameters.Add("?userHostAddress", HttpContext.Current.Request.UserHostAddress);
+				myMySqlCommand.ExecuteNonQuery();
+				
 				myMySqlCommand.Parameters.Add("?clientCode", ClientCode);
 				myMySqlCommand.Parameters.Add("?workMask", WorkMask);
 				myMySqlCommand.Parameters.Add("?homeRegionCode", HomeRegionCode);
 				myMySqlCommand.Parameters.Add("?showMask", ShowMask);
-				myMySqlCommand.Parameters.Add("?userName", Session["UserName"]);
-				myMySqlCommand.Parameters.Add("?userHostAddress", HttpContext.Current.Request.UserHostAddress);
 				myMySqlCommand.Parameters.Add("?orderMask", OrderMask);
 				
-
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
 				if (myMySqlCommand.ExecuteScalar() == "0")
 				{
