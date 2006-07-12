@@ -79,7 +79,7 @@ namespace AddUser
 		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand, string CommandAdd)
 		{
 			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(ConfigurationManager.AppSettings["ConnectionString"]);
+			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
 			MySqlCommand Комманда = new MySqlCommand();
 			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
 			try
@@ -120,7 +120,7 @@ namespace AddUser
 		{
 			string CommandAdd = String.Empty;
 			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(ConfigurationManager.AppSettings["ConnectionString"]);
+			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
 			MySqlCommand Комманда = new MySqlCommand();
 			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
 			try
