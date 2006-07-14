@@ -240,7 +240,7 @@ set @inUser = ?userName;
 				myMySqlCommand.Parameters.Add("?orderMask", OrderMask);
 				
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
-				if (myMySqlCommand.ExecuteScalar() == "0")
+				if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 0)
 				{
 					InsertCommand = InsertCommand +
 					                " insert into intersection(ClientCode, regioncode, pricecode, invisibleonclient, InvisibleonFirm, CostCode)" +
