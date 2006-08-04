@@ -32,7 +32,7 @@
                             <asp:TemplateColumn HeaderText="Время">
                                 <ItemTemplate>
                                     &nbsp;
-                                    <asp:Label runat="server" Text='<%# Convert.ToDateTime(DataBinder.Eval(Container, "DataItem.LogTime")).ToLongDateString() %>'>
+                                    <asp:Label runat="server" Text='<%# Convert.ToDateTime(DataBinder.Eval(Container, "DataItem.LogTime")).ToString() %>'>
                                     </asp:Label>&nbsp;
                                 </ItemTemplate>
                                 <EditItemTemplate>

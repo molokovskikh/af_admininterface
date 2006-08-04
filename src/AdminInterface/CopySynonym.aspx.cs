@@ -150,12 +150,12 @@ set @inUser = ?UserName;
 ";
 
 				Query += " update intersection set MaxSynonymCode=0, MaxSynonymFirmCrCode=0," +
-				         " lastsent='2003-01-01' where clientcode=" + ClientCode + ";";
+				         " lastsent=default where clientcode=" + ClientCode + ";";
 				Query += " update retclientsset as a, retclientsset as b" +
 				         " set b.updatetime=a.updatetime, b.AlowCumulativeUpdate=0, b.Active=0 where a.clientcode=" +
 				         ParentClientCode + " and b.clientcode=" + ClientCode + ";";
 				Query += " update intersection as a, intersection as b" + " set a.MaxSynonymFirmCrCode=b.MaxSynonymFirmCrCode," +
-				         " a.MaxSynonymCode=b.MaxSynonymCode, a.lastsent=b.lastsent" + " where a.clientcode=" + ClientCode +
+				         " a.MaxSynonymCode=b.MaxSynonymCode" + " where a.clientcode=" + ClientCode +
 				         " and b.clientcode=" + ParentClientCode + " and a.pricecode=b.pricecode;";
 				Query += " insert into logs.clone (LogTime, UserName, FromClientCode, ToClientCode) values (now(), '" +
 				         Session["UserName"] + "', " + ParentClientCode + ", " + ClientCode + ")";

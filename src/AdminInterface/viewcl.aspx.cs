@@ -106,7 +106,20 @@ namespace AddUser
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			MyCn.Open();
 
-			MyCmd.CommandText = " SELECT  Logtime, FirmCode, ShortName, Region, Addition" + " FROM (logs.prgdataex p,  usersettings.clientsdata, accessright.showright, farm.regions r,  usersettings.retclientsset rcs)" + " WHERE p.LogTime>curDate() " + " and rcs.clientcode=p.clientcode " + " and firmcode=p.clientcode " + " and r.regioncode=clientsdata.regioncode " + " and showright.regionmask & maskregion>0";
+			MyCmd.CommandText =			
+@"
+SELECT  Logtime, 
+        FirmCode, 
+        ShortName, 
+        Region, 
+        Addition  
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)  
+WHERE   p.LogTime                            >curDate() 
+        AND rcs.clientcode                   =p.clientcode 
+        AND firmcode                         =p.clientcode 
+        AND r.regioncode                     =clientsdata.regioncode 
+        AND showright.regionmask & maskregion>0 
+";
 
 			if (double.Parse(ID) == 0)
 			{
@@ -147,7 +160,7 @@ namespace AddUser
 			}
 			if (double.Parse(ID) <= 5)
 			{
-				MyCmd.CommandText += " and showright.username='" + Session["UserName"] + "'" + " group by p.rowid" + " order by p.logtime desc";
+				MyCmd.CommandText += " and showright.username='" + Session["UserName"] + "'" + " group by p.rowid" + " order by p.logtime desc ";
 				CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
 				CLList.DataBind();
 			}

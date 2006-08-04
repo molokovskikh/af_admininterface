@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Globalization;
 using System.Web;
@@ -11,149 +12,135 @@ namespace AddUser
 {
 	partial class managep : Page
 	{
-		protected DataSet DS1;
-		protected DataTable Regions;
-		protected DataColumn DataColumn1;
-		protected DataColumn DataColumn2;
-		protected DataTable WorkReg;
-		protected DataColumn DataColumn5;
-		protected DataColumn DataColumn7;
-		protected DataColumn DataColumn8;
-		protected DataColumn DataColumn3;
-
-		MySqlConnection myMySqlConnection = new MySqlConnection();
-
-		MySqlCommand myMySqlCommand = new MySqlCommand();
-		MySqlTransaction myTrans;
-		object ClientCode;
-		object HomeRegionCode;
-		protected DataTable PD;
-		protected DataColumn DataColumn4;
-		protected DataColumn DataColumn6;
-		protected DataColumn PriceCode;
-		protected DataColumn PriceName;
-		protected DataColumn AgencyEnabled;
-		protected DataColumn Enabled;
-		protected DataColumn PriceType;
-		protected DataColumn ShowInWeb;
-		protected DataColumn AlowInt;
-
-		[DebuggerStepThrough()]
-		private void InitializeComponent()
+		private MySqlConnection		_connection = new MySqlConnection();
+		private string				_userName;
+		
+		private DataSet _data
 		{
-			DS1 = new DataSet();
-			Regions = new DataTable();
-			DataColumn1 = new DataColumn();
-			DataColumn2 = new DataColumn();
-			WorkReg = new DataTable();
-			DataColumn5 = new DataColumn();
-			DataColumn7 = new DataColumn();
-			DataColumn8 = new DataColumn();
-			DataColumn3 = new DataColumn();
-			PD = new DataTable();
-			DataColumn4 = new DataColumn();
-			DataColumn6 = new DataColumn();
-			PriceCode = new DataColumn();
-			PriceName = new DataColumn();
-			AgencyEnabled = new DataColumn();
-			Enabled = new DataColumn();
-			PriceType = new DataColumn();
-			ShowInWeb = new DataColumn();
-			AlowInt = new DataColumn();
-			DS1.BeginInit();
-			Regions.BeginInit();
-			WorkReg.BeginInit();
-			PD.BeginInit();
-			DS1.DataSetName = "NewDataSet";
-			DS1.Locale = new CultureInfo("ru-RU");
-			DS1.Tables.AddRange(new DataTable[] {Regions, WorkReg, PD});
-			Regions.Columns.AddRange(new DataColumn[] {DataColumn1, DataColumn2});
-			Regions.TableName = "Regions";
-			DataColumn1.ColumnName = "Region";
-			DataColumn2.ColumnName = "RegionCode";
-			WorkReg.Columns.AddRange(new DataColumn[] {DataColumn5, DataColumn7, DataColumn8, DataColumn3});
-			WorkReg.TableName = "WorkReg";
-			DataColumn5.ColumnName = "RegionCode";
-			DataColumn7.ColumnName = "ShowMask";
-			DataColumn7.DataType = typeof (Boolean);
-			DataColumn8.ColumnName = "RegMask";
-			DataColumn8.DataType = typeof (Boolean);
-			DataColumn3.ColumnName = "Region";
-			PD.Columns.AddRange(
-				new DataColumn[]
-					{DataColumn4, DataColumn6, PriceCode, PriceName, AgencyEnabled, Enabled, PriceType, ShowInWeb, AlowInt});
-			PD.TableName = "PD";
-			DataColumn4.ColumnName = "FirmCode";
-			DataColumn4.DataType = typeof (uint);
-			DataColumn6.ColumnName = "ShortName";
-			PriceCode.ColumnName = "PriceCode";
-			PriceCode.DataType = typeof (uint);
-			PriceName.ColumnName = "PriceName";
-			AgencyEnabled.ColumnName = "AgencyEnabled";
-			AgencyEnabled.DataType = typeof (Boolean);
-			Enabled.ColumnName = "Enabled";
-			Enabled.DataType = typeof (Boolean);
-			PriceType.ColumnName = "PriceType";
-			PriceType.DataType = typeof (Int16);
-			ShowInWeb.ColumnName = "ShowInWeb";
-			ShowInWeb.DataType = typeof (Boolean);
-			AlowInt.ColumnName = "AlowInt";
-			AlowInt.DataType = typeof (Boolean);
-			DS1.EndInit();
-			Regions.EndInit();
-			WorkReg.EndInit();
-			PD.EndInit();
+			get { return (DataSet) Session["RegionalSettingsData"]; }
+			set { Session["RegionalSettingsData"] = value; }
 		}
-
-		protected override void OnInit(EventArgs e)
+		
+		private int _clientCode
 		{
-			base.OnInit(e);
-			InitializeComponent();
+			get { return Convert.ToInt32(Session["ClientCode"]); }
+			set { Session["ClientCode"] = value; }
+		}
+		
+		private MySqlDataAdapter _dataAdapter
+		{
+			get { return (MySqlDataAdapter) Session["DataAdapter"]; }
+			set { Session["DataAdapter"] = value;}
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
-		{
+		{		
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
 				Response.Redirect("default.aspx");
-			}
-			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
-			ClientCode = Convert.ToInt32(Request["cc"]);
-			if (!(IsPostBack))
+
+			_userName = Session["UserName"].ToString();
+
+			int clientCode;
+			if (Int32.TryParse(Request["cc"], out clientCode))
+				_clientCode = clientCode;
+			else
+				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", clientCode), "ClientCode");
+			
+			_connection.ConnectionString = Literals.GetConnectionString();
+					
+			if (!IsPostBack)
 			{
-				PostDataFromDB();
+				GetData();
+				ConnectDataSource();
+				DataBind();
 			}
+			else
+				ConnectDataSource();	
+			
+		}
+		
+		private void ConnectDataSource()
+		{
+			PricesGrid.DataSource = _data;
+			RegionalSettingsGrid.DataSource = _data;
+			ShowRegionList.DataSource = _data;
+			WorkRegionList.DataSource = _data;
+			HomeRegion.DataSource = _data;
 		}
 
-		private void PostDataFromDB()
+		private void GetData()
 		{
-			if (Func.SelectTODS(" set @UserName:='" + Session["UserName"] + "'; set @FirmCode:="
-			                    + ClientCode +
-			                    "; SELECT cd.firmcode, ShortName, pricesdata.PriceCode, PriceName, pricesdata.AgencyEnabled, pricesdata.Enabled, AlowInt," +
-			                    " DateCurPrice, DateLastForm" +
-			                    " FROM (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules fr," +
-			                    " pricescosts pc)" + " where regions.regioncode=cd.regioncode" +
-			                    " and pricesdata.firmcode=cd.firmcode " + " and pricesdata.pricecode=fr.firmcode " +
-			                    " and pc.showpricecode=pricesdata.pricecode " +
-			                    " and cd.regioncode & regionaladmins.regionmask > 0 " + " and regionaladmins.UserName=@UserName" +
-			                    " and if(UseRegistrant=1, Registrant=@UserName, 1=1)" + " and AlowManage=1" +
-			                    " and AlowCreateVendor=1" + " and cd.firmcode=@FirmCode group by 3", "PD", DS1))
-			{
-				R.DataBind();
-			}
-			NameLB.Text = DS1.Tables["PD"].Rows[0]["ShortName"].ToString();
+			_data = new DataSet();
+			string pricesCommandText =
+@"
+SELECT  cd.firmcode, 
+        ShortName, 
+        pricesdata.PriceCode, 
+        PriceName, 
+        pricesdata.AgencyEnabled, 
+        pricesdata.Enabled, 
+        AlowInt,  
+        DateCurPrice, 
+        DateLastForm,
+		UpCost,
+		PriceType
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules fr,  pricescosts pc)
+WHERE   regions.regioncode                            =cd.regioncode  
+        AND pricesdata.firmcode                       =cd.firmcode 
+        AND pricesdata.pricecode                      =fr.firmcode 
+        AND pc.showpricecode                          =pricesdata.pricecode 
+        AND cd.regioncode & regionaladmins.regionmask > 0 
+        AND regionaladmins.UserName                   =?UserName  
+        AND if(UseRegistrant                          =1, Registrant=@UserName, 1=1)  
+        AND AlowManage                                =1  
+        AND AlowCreateVendor                          =1  
+        AND cd.firmcode                               =?ClientCode 
+GROUP BY 3;
+";
+			string regionSettingsCommnadText =
+@"
+SELECT  RowID, 
+        Region,
+        Enabled, 
+        `Storage`, 
+        AdminMail, 
+        TmpMail, 
+        SupportPhone, 
+        ContactInfo, 
+        OperativeInfo  
+FROM    usersettings.regionaldata rd  
+INNER JOIN farm.regions r 
+        ON rd.regioncode = r.regioncode  
+WHERE   rd.FirmCode      = ?ClientCode;
+";
+			string regionsCommandText =
+@"
+SELECT RegionCode, Region
+FROM farm.regions as a
+ORDER BY region 
+";
+
+			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
+			_dataAdapter = dataAdapter;
+			dataAdapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
+			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
+			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
+			
+			dataAdapter.Fill(_data, "Prices");
+			
+			dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
+			dataAdapter.Fill(_data, "RegionSettings");
+
+			dataAdapter.SelectCommand.CommandText = regionsCommandText;
+			dataAdapter.Fill(_data, "Regions");
+		
+			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", _data.Tables["Prices"].Rows[0]["ShortName"].ToString());
 		}
+
 
 		public void SetWorkRegions(Int64 RegCode, bool OldRegion)
 		{
-			Func.SelectTODS(
-				" select a.RegionCode, a.Region, ShowRegionMask & a.regioncode>0 as ShowMask," +
-				" MaskRegion & a.regioncode>0 as RegMask, OrderRegionMask & a.regioncode>0 as OrderMask" +
-				" from (farm.regions as a, farm.regions as b, clientsdata, retclientsset)" + " where b.regioncode=" + RegCode +
-				" and clientsdata.firmcode=" + ClientCode + " and a.regioncode & b.defaultshowregionmask>0 " +
-				" and clientcode=firmcode" + " order by region", "WorkReg", DS1);
-			WRList.DataBind();
-			ShowList.DataBind();
+/*
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (OldRegion)
@@ -170,11 +157,13 @@ namespace AddUser
 					}
 				}
 			}
+*/
 		}
+
 
 		protected void R_ItemCommand(object source, RepeaterCommandEventArgs e)
 		{
-			string Запрос;
+/*			string Запрос;
 			try
 			{
 				myMySqlConnection.Open();
@@ -238,7 +227,7 @@ set @inUser = ?UserName;
 					myMySqlCommand.ExecuteNonQuery();
 				}
 				myTrans.Commit();
-				PostDataFromDB();
+				BindData();
 			}
 			catch (Exception)
 			{
@@ -247,7 +236,28 @@ set @inUser = ?UserName;
 			finally
 			{
 				myMySqlConnection.Close();
-			}
+			}*/
 		}
-	}
+		protected void PricesGrid_RowCommand(object sender, GridViewCommandEventArgs e)
+		{
+			switch (e.CommandName)
+			{
+				case "Add":
+					_data.Tables["Prices"].Rows.Add(_data.Tables["Prices"].NewRow());
+					DataBind();
+					break;
+			}
+			
+		}
+		protected void PricesGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
+		{
+			_data.Tables["Prices"].Rows.RemoveAt(e.RowIndex);
+			DataBind();
+		}
+		
+		protected void SaveButton_Click(object sender, EventArgs e)
+		{
+			
+		}
+}
 }

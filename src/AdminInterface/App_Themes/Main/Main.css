@@ -15,6 +15,12 @@ fieldset
 	margin: 0px 0px 3px 0px;
 }
 
+div
+{
+	margin: 0;
+	padding: 0;
+}
+
 .Legend
 {
 	font-size: 8pt;
@@ -164,3 +170,56 @@ fieldset
 	clear: both;
 	padding: 2px 0px 2px 0px;
 }
+
+/*--------------Managep.aspx-----------------*/
+.MainHeader
+{
+	text-align: center;
+}
+
+.MainBlock
+{
+	width: 90%;
+	border: solid 1px #dadada;
+}
+
+.ContentBlock
+{
+	border: solid 1px #dadada;
+	margin: 1%  1% 1% 1%;
+	padding: 1% 1% 1% 1%;
+	width: 95%;
+}
+
+.BorderedBlock
+{
+	width: 100%;
+	border: solid 1px #dadada;
+}
+
+.BaseLabelForInput
+{
+	display:block; 
+	text-align:right; 
+	float: left;
+}
+
+.Submit
+{
+	padding-top: 10px;
+	text-align:center;
+}
+
+.CopyRight
+{
+	text-align: center;
+	font-size: smaller;
+}
+.Header
+{
+	margin: 0;
+	padding: 0;
+	text-align: center;
+	background-color: #f0f8ff;
+}
+/*--------------Managep.aspx-----------------*/
