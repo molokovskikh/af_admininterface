@@ -35,7 +35,8 @@
 							<asp:BoundField HeaderText="Формализованн" DataField="DateLastForm" />
 							<asp:TemplateField HeaderText="Наценка">
 								<ItemTemplate>
-									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>'>'></asp:TextBox>
+									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
+									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ErrorMessage="*" ValidationExpression="^\d+(\.\d+)?$"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">
@@ -113,16 +114,22 @@
 							<asp:TemplateField HeaderText="Email Администратора">
 								<ItemTemplate>
 									<asp:TextBox ID="AdministratorEmailText" runat="server" Text='<%# Eval("AdminMail") %>' />
+									<asp:RegularExpressionValidator ID="AdministratorEmailValidator" runat="server" ControlToValidate="AdministratorEmailText"
+										ErrorMessage="*" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Email в регионе">
 								<ItemTemplate>
 									<asp:TextBox ID="RegionalEmailText" runat="server" Text='<%# Eval("TmpMail") %>' />
+									<asp:RegularExpressionValidator ID="RegionalEmailValidator" runat="server" ControlToValidate="RegionalEmailText"
+										ErrorMessage="*" ValidationExpression="\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Телефон в регионе">
 								<ItemTemplate>
 									<asp:TextBox ID="SupportPhoneText" runat="server" Text='<%# Eval("SupportPhone") %>' />
+									<asp:RegularExpressionValidator ID="PhoneValidator" runat="server" ControlToValidate="SupportPhoneText"
+										ErrorMessage="*" ValidationExpression="(\d{3,4})-(\d{6,7})"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:HyperLinkField HeaderText="Информация" Text="Информация" DataNavigateUrlFormatString="EditRegionalInfo.aspx?id={0}"
