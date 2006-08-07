@@ -82,19 +82,12 @@ namespace AddUser
 
 		protected void PostB_Click(object sender, EventArgs e)
 		{
-			string StrHost;
-			string StrUser;
 			UpdateLB.Text = "";
-			StrHost = HttpContext.Current.Request.UserHostAddress;
-			StrUser = HttpContext.Current.User.Identity.Name;
-			if (StrUser.Substring(0, 6) == "ANALIT\\")
-			{
-				StrUser = StrUser.Substring(7);
-			}
 			try
 			{
 				MyCn.Open();
 				FillDataSet();
+				PriceRegionSettings.DataSource = DS;
 				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
 
 				foreach (DataGridItem Itm in CostsDG.Items)
@@ -115,6 +108,14 @@ namespace AddUser
 								DS.Tables[0].Rows[i]["AgencyEnabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked);
 						}
 					}
+				}
+
+				for (int i = 0; i < PriceRegionSettings.Rows.Count; i++ )
+				{
+
+					DS.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
+					DS.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
+					DS.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
 				}
 				UpdCommand.Parameters.Add(new MySqlParameter("CostCode", MySqlDbType.Int32));
 				UpdCommand.Parameters["CostCode"].Direction = ParameterDirection.Input;
@@ -149,11 +150,34 @@ namespace AddUser
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
-update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled, AgencyEnabled=?AgencyEnabled where CostCode=?CostCode;
+
+UPDATE pricescosts 
+SET		BaseCost	 =?BaseCost, 
+        CostName     =?CostName, 
+        Enabled      =?Enabled, 
+        AgencyEnabled=?AgencyEnabled 
+WHERE   CostCode     =?CostCode;
 ";
 				MyDA.Update(DS, "Costs");
+
+				UpdCommand.Parameters.Clear();
+				UpdCommand.CommandText =
+@"
+UPDATE PricesRegionalData
+SET UpCost = ?UpCost,
+    MinReq = ?MinReq, 
+    Enabled = ?Enabled
+WHERE RowID = ?Id
+";
+
+				UpdCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
+				UpdCommand.Parameters.Add("MinReq", MySqlDbType.Decimal, 0, "MinReq");
+				UpdCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
+				UpdCommand.Parameters.Add("Id", MySqlDbType.Int32, 0, "RowId");
+				MyDA.Update(DS, "PriceRegionSettings");
+				
 				MyTrans.Commit();
-				CostsDG.DataBind();
+				DataBind();
 				UpdateLB.Text = "Сохранено.";
 			}
 			catch (Exception ex)
@@ -183,9 +207,8 @@ update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled,
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
 				Response.Redirect("default.aspx");
-			}
+
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			PriceCode = Convert.ToInt32(Request["pc"]);
 			if (!IsPostBack)
@@ -248,7 +271,8 @@ update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled,
 				if (MyCn.State == ConnectionState.Closed)
 					MyCn.Open();
 				FillDataSet();
-				CostsDG.DataBind();
+				PriceRegionSettings.DataSource = DS;
+				DataBind();
 			}
 			catch (Exception ex)
 			{
@@ -268,12 +292,37 @@ update pricescosts set BaseCost=?BaseCost, CostName=?CostName, Enabled=?Enabled,
 			PriceNameLB.Text = MyReader[0].ToString();
 			MyReader.Close();
 			SelCommand.CommandText =
-					" SELECT CostCode, concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F'," +
-					" concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) CostID, CostName, BaseCost, pc.Enabled, pc.AgencyEnabled" +
-					" FROM (farm.costformrules cf, pricescosts pc, pricesdata pd)" +
-					" left join farm.sources s on s.firmcode=pc.pricecode" + " where cf.pc_costcode=pc.costcode" +
-					" and pd.pricecode=showpricecode" + " and ShowPriceCode=" + PriceCode;
+@"
+SELECT  CostCode, 
+        concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) CostID, 
+        CostName, 
+        BaseCost, 
+        pc.Enabled, 
+        pc.AgencyEnabled  
+FROM    (farm.costformrules cf, pricescosts pc, pricesdata pd)  
+LEFT JOIN farm.sources s 
+        ON s.firmcode    =pc.pricecode  
+WHERE   cf.pc_costcode   =pc.costcode  
+        AND pd.pricecode =showpricecode  
+        AND ShowPriceCode= ?PriceCode;
+";
+			MyDA.SelectCommand.Parameters.Add("PriceCode", PriceCode);
 			MyDA.Fill(DS, "Costs");
+
+			SelCommand.CommandText =
+@"
+SELECT  RowId, 
+        Region, 
+        UpCost, 
+        MinReq, 
+        Enabled  
+FROM    PricesRegionalData prd   
+INNER JOIN Farm.Regions r 
+        ON prd.RegionCode = r.RegionCode  
+WHERE   PriceCode         = ?PriceCode  
+";
+			
+			MyDA.Fill(DS, "PriceRegionSettings");
 		}
 	}
 }
