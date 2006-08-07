@@ -124,39 +124,39 @@ WHERE   p.LogTime                            >curDate()
 			if (double.Parse(ID) == 0)
 			{
 				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=5";
-				HeaderLB.Text = ":";
+				HeaderLB.Text = "Запреты:";
 			}
 
 			if (double.Parse(ID) == 1)
 			{
 				MyCmd.CommandText += " and UpdateType=2";
-				HeaderLB.Text = " :";
+				HeaderLB.Text = "Кумулятивные обновления:";
 			}
 
 			if (double.Parse(ID) == 2)
 			{
 				MyCmd.CommandText += " and UpdateType=1";
-				HeaderLB.Text = " :";
+				HeaderLB.Text = "Обычные обновления:";
 			}
 
 			if (double.Parse(ID) == 3)
 			{
 				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=6";
-				HeaderLB.Text = "  :";
+				HeaderLB.Text = "Ошибки подготовки данных:";
 			}
 
 			if (double.Parse(ID) == 4)
 			{
 				MyCmd.CommandText += " and UncommittedUpdateTime>=CURDATE() and UpdateTime<>UncommittedUpdateTime";
-				HeaderLB.Text = "    -  ";
-				CountLB.Text = " ";
+				HeaderLB.Text = "В процессе получения обновления - Нет данных";
+				CountLB.Text = "Нет данных";
 				return;
 			}
 
 			if (double.Parse(ID) == 5)
 			{
 				MyCmd.CommandText += " and UpdateType=3";
-				HeaderLB.Text = ":";
+				HeaderLB.Text = "Докачки:";
 			}
 			if (double.Parse(ID) <= 5)
 			{
