@@ -146,12 +146,6 @@ namespace AddUser
 
 		protected void ParametersSave_Click(object sender, EventArgs e)
 		{
-			if ((AlowCumulativeCB.Checked) && (CUWTB.Text.Length < 5) && (AlowCumulativeCB.Enabled))
-			{
-				ResultL.Text = "Изменения не сохранены.<br>Укажите причину кумулятивного обновления.";
-				ResultL.ForeColor = Color.Red;
-				return;
-			}
 			if (ResetCopyIDCB.Checked & CopyIDWTB.Text.Length < 5 & ResetCopyIDCB.Enabled)
 			{
 				ResultL.Text = "Изменения не сохранены.<br>Укажите причину сброса идентификатора.";
@@ -177,15 +171,8 @@ namespace AddUser
 			myMySqlCommand.Parameters["AlowChangeSegment"].Value = ChangeSegmentCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("EnableUpdate", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["EnableUpdate"].Value = EnableUpdateCB.Checked;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("AlowCumulativeUpdate", MySqlDbType.Int16));
-			myMySqlCommand.Parameters["AlowCumulativeUpdate"].Value = AlowCumulativeCB.Checked;
 			myMySqlCommand.Parameters.Add(new MySqlParameter("ResetIDCause", MySqlDbType.VarString));
 			myMySqlCommand.Parameters["ResetIDCause"].Value = CopyIDWTB.Text;
-			myMySqlCommand.Parameters.Add(new MySqlParameter("CumulativeUpdateCause", MySqlDbType.VarString));
-			myMySqlCommand.Parameters["CumulativeUpdateCause"].Value = CUWTB.Text;
-
-			myMySqlCommand.Parameters.Add(new MySqlParameter("EncryptSynonym", MySqlDbType.Int16));
-			myMySqlCommand.Parameters["EncryptSynonym"].Value = EncryptSynonymCB.Checked;
 
 			myMySqlCommand.Parameters.Add(new MySqlParameter("CalculateLeader", MySqlDbType.Int16));
 			myMySqlCommand.Parameters["CalculateLeader"].Value = CalculateLeaderCB.Checked;
@@ -243,22 +230,47 @@ set @inUser = ?userName;
 				if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 0)
 				{
 					InsertCommand = InsertCommand +
-					                " insert into intersection(ClientCode, regioncode, pricecode, invisibleonclient, InvisibleonFirm, CostCode)" +
-					                " SELECT distinct clientsdata2.firmcode, regions.regioncode, pricesdata.pricecode," +
-					                " pricesdata.PriceType=2 as invisibleonclient, a.invisibleonfirm, (SELECT costcode FROM pricescosts pcc WHERE basecost" +
-					                " AND showpricecode=pc.showpricecode)" +
-					                " FROM (clientsdata, farm.regions, pricesdata, pricesregionaldata, pricescosts pc)" +
-									" left join clientsdata as clientsdata2 on clientsdata2.firmcode=?clientCode" +
-					                " LEFT JOIN intersection ON intersection.pricecode=pricesdata.pricecode and intersection.regioncode=regions.regioncode and intersection.clientcode=clientsdata2.firmcode" +
-					                " left join retclientsset as a on a.clientcode=clientsdata2.firmcode" +
-					                " WHERE intersection.pricecode IS NULL and " + " clientsdata.firmstatus=1 " +
-					                " and clientsdata.firmsegment=clientsdata2.firmsegment" + " and clientsdata.firmtype=0" +
-					                " and pricesdata.firmcode=clientsdata.firmcode" +
-					                " and pricesregionaldata.pricecode=pricesdata.pricecode" +
-					                " and pricesregionaldata.regioncode=regions.regioncode" + " and pricesdata.pricetype<>1" +
-					                " AND pricesdata.pricecode=pc.showpricecode " +
-									" and (clientsdata.maskregion & regions.regioncode)>0" + " and (?workMask" +
-					                " & regions.regioncode)>0;";
+					                @"
+INSERT 
+INTO    intersection
+        (
+                ClientCode, 
+                regioncode, 
+                pricecode, 
+                invisibleonclient, 
+                InvisibleonFirm, 
+                CostCode
+        )  
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode,  
+        pricesdata.PriceType=2 as invisibleonclient, 
+        a.invisibleonfirm, 
+        (SELECT costcode 
+        FROM    pricescosts pcc 
+        WHERE   basecost  
+                AND showpricecode=pc.showpricecode
+        )  
+FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, pricescosts pc)  
+LEFT JOIN clientsdata as clientsdata2 
+        ON clientsdata2.firmcode=?clientCode  
+LEFT JOIN intersection 
+        ON intersection.pricecode  =pricesdata.pricecode 
+        AND intersection.regioncode=regions.regioncode 
+        AND intersection.clientcode=clientsdata2.firmcode  
+LEFT JOIN retclientsset as a 
+        ON a.clientcode=clientsdata2.firmcode  
+WHERE   intersection.pricecode IS NULL 
+        AND clientsdata.firmstatus                       =1 
+        AND clientsdata.firmsegment                      =clientsdata2.firmsegment  
+        AND clientsdata.firmtype                         =0  
+        AND pricesdata.firmcode                          =clientsdata.firmcode  
+        AND pricesregionaldata.pricecode                 =pricesdata.pricecode  
+        AND pricesregionaldata.regioncode                =regions.regioncode  
+        AND pricesdata.pricetype                        <>1  
+        AND pricesdata.pricecode                         =pc.showpricecode 
+        AND (clientsdata.maskregion & regions.regioncode)>0  
+        AND (?workMask  & regions.regioncode)            >0;";			
 				}
 				if (InvisibleCB.Enabled)
 				{
@@ -267,19 +279,32 @@ set @inUser = ?userName;
 					{
 						InsertCommand += " update retclientsset, intersection, pricesdata set retclientsset.invisibleonfirm=?InvisibleOnFirm, intersection.invisibleonfirm=?InvisibleOnFirm";
 						if (InvisibleCB.Checked)
-						{
 							InsertCommand += ", DisabledByFirm=if(PriceType=2, 1, 0), InvisibleOnClient=if(PriceType=2, 1, 0)";
-						}
 						InsertCommand += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
 					}
 				}
-				InsertCommand += "update UserSettings.retclientsset, UserSettings.clientsdata set OrderRegionMask=?orderMask, MaskRegion=?workMask" +
-								 ", ShowRegionMask=?showMask, RegionCode=?homeRegionCode" +
-								 ", WorkRegionMask=if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), " +
-								 " AlowRegister=?AlowRegister, AlowRejection=?AlowRejection, MultiUserLevel=?MultiUserLevel, " +
-								 "AdvertisingLevel=?AdvertisingLevel, AlowWayBill=?AlowWayBill, AlowChangeSegment=?AlowChangeSegment, EnableUpdate=?EnableUpdate, AlowCumulativeUpdate=?AlowCumulativeUpdate, " +
-								 " CryptSynonym = ?EncryptSynonym, CalculateLeader = ?CalculateLeader, AllowSubmitOrders = ?AllowSubmitOrders, " +
-								" SubmitOrders = ?SubmitOrders, ServiceClient = ?ServiceClient, OrdersVisualizationMode = ?OrdersVisualizationMode ";
+				InsertCommand +=
+@"
+UPDATE UserSettings.retclientsset, 
+        UserSettings.clientsdata 
+SET OrderRegionMask     =?orderMask, 
+        MaskRegion              =?workMask , 
+        ShowRegionMask          =?showMask, 
+        RegionCode              =?homeRegionCode , 
+        WorkRegionMask          =if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), 
+        AlowRegister            =?AlowRegister, 
+        AlowRejection           =?AlowRejection, 
+        MultiUserLevel          =?MultiUserLevel, 
+        AdvertisingLevel        =?AdvertisingLevel, 
+        AlowWayBill             =?AlowWayBill, 
+        AlowChangeSegment       =?AlowChangeSegment, 
+        EnableUpdate            =?EnableUpdate, 
+        CalculateLeader         = ?CalculateLeader, 
+        AllowSubmitOrders       = ?AllowSubmitOrders, 
+        SubmitOrders            = ?SubmitOrders, 
+        ServiceClient           = ?ServiceClient, 
+        OrdersVisualizationMode = ?OrdersVisualizationMode  
+";
 				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
 				{
 					InsertCommand += ", UniqueCopyID=''";
@@ -339,9 +364,8 @@ set @inUser = ?userName;
 		{
 			bool OldRegion = false;
 			if (RegionDD.SelectedItem.Value == HomeRegionCode)
-			{
 				OldRegion = true;
-			}
+			
 			SetWorkRegions(Convert.ToInt64(RegionDD.SelectedItem.Value), OldRegion, false);
 		}
 
@@ -411,14 +435,24 @@ set @inUser = ?userName;
 				myMySqlConnection.Open();
 				myTrans = myMySqlConnection.BeginTransaction();
 				myMySqlCommand.Transaction = myTrans;
-				myMySqlCommand.CommandText = " SELECT RegionCode, MaskRegion, ShowRegionMask"
-											 + " FROM clientsdata as cd, accessright.regionaladmins"
-											 + " where cd.regioncode & regionaladmins.regionmask > 0 and UserName='"
-											 + Session["UserName"] + "'"
-											 + " and FirmType=if(AlowCreateRetail+AlowCreateVendor=2, FirmType, if(AlowCreateRetail=1, 1, 0))"
-											 + " and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)"
-											 + "\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" +
-											 " and AlowManage=1 and cd.firmcode=" + ClientCode;
+				myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
+				myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+
+				myMySqlCommand.CommandText =
+					@"
+SELECT  RegionCode, 
+        MaskRegion, 
+        ShowRegionMask  
+FROM    clientsdata as cd, 
+        accessright.regionaladmins  
+WHERE   cd.regioncode & regionaladmins.regionmask > 0 
+        AND UserName                              =?UserName 
+        AND FirmType                              =if(AlowCreateRetail+AlowCreateVendor=2, FirmType, if(AlowCreateRetail=1, 1, 0))  
+        AND FirmSegment                           =if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)
+        AND if(UseRegistrant                      =1, Registrant=?UserName, 1=1)  
+        AND AlowManage                            =1 
+        AND cd.firmcode                           =?ClientCode 
+";
 				HomeRegionCode = Convert.ToString(myMySqlCommand.ExecuteScalar());
 				if (Convert.ToInt32(HomeRegionCode) < 1)
 				{
@@ -438,13 +472,28 @@ set @inUser = ?userName;
 				}
 				SetWorkRegions(Convert.ToInt64(HomeRegionCode), true, false);
 				myMySqlCommand.CommandText =
-					" select InvisibleOnFirm, AlowRegister, AlowRejection, MultiUserLevel, " +
-					" AdvertisingLevel, AlowWayBill, retclientsset.AlowChangeSegment, EnableUpdate, " +
-					" AlowCumulativeUpdate, AlowCreateInvisible, length(UniqueCopyID)=0 as Length, " +
-					" CryptSynonym as EncryptSynonym, CalculateLeader, AllowSubmitOrders, " +
-					" SubmitOrders, ServiceClient, OrdersVisualizationMode, ShowMessageCount " +
-					"from retclientsset, accessright.regionaladmins where clientcode=" +
-					ClientCode + " and username='" + Session["UserName"] + "'";
+@"
+SELECT  InvisibleOnFirm, 
+        AlowRegister, 
+        AlowRejection, 
+        MultiUserLevel, 
+        AdvertisingLevel, 
+        AlowWayBill, 
+        retclientsset.AlowChangeSegment, 
+        EnableUpdate, 
+        AlowCreateInvisible, 
+        length(UniqueCopyID)=0 as Length, 
+        CalculateLeader, 
+        AllowSubmitOrders, 
+        SubmitOrders, 
+        ServiceClient, 
+        OrdersVisualizationMode, 
+        ShowMessageCount 
+FROM    retclientsset, 
+        accessright.regionaladmins 
+WHERE   clientcode   = ?ClientCode 
+        AND username = ?UserName 
+";
 				myMySqlDataReader = myMySqlCommand.ExecuteReader();
 				myMySqlDataReader.Read();
 				InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader["InvisibleOnFirm"]);
@@ -456,21 +505,13 @@ set @inUser = ?userName;
 				WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
 				ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
 				EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
-				AlowCumulativeCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowCumulativeUpdate"]);
 				ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader["Length"]);
-				EncryptSynonymCB.Checked = Convert.ToBoolean(myMySqlDataReader["EncryptSynonym"]);
 				CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
 				AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
 				SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
 				ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
 				OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
 				MessageLeftL.Visible = (Convert.ToInt32(myMySqlDataReader["ShowMessageCount"]) > 0);
-				if (!(AlowCumulativeCB.Checked))
-				{
-					AlowCumulativeCB.Enabled = true;
-					CUWTB.Enabled = true;
-					CUSetL.Visible = false;
-				}
 				if (!(ResetCopyIDCB.Checked))
 				{
 					ResetCopyIDCB.Enabled = true;

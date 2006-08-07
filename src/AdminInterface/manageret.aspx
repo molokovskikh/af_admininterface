@@ -86,22 +86,8 @@
 									<asp:Label ID="IDSetL" runat="server" Font-Size="8pt" Font-Names="Verdana" ForeColor="Green">Идентификатор не присвоен</asp:Label></td>
 							</tr>
 							<tr>
-								<td valign="middle" align="left" colspan="3" style="height: 23px">
-									<asp:CheckBox ID="AlowCumulativeCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-										Text="Разрешить 1 кумулятивное обновление, причина обновления:" BorderStyle="None"
-										Enabled="False" Checked="True"></asp:CheckBox><font face="Arial" size="2"><asp:TextBox
-											ID="CUWTB" runat="server" BorderStyle="None" Enabled="False" Font-Names="Verdana"
-											Font-Size="8pt" BackColor="LightGray"></asp:TextBox>
-											<asp:Label ID="CUSetL" runat="server" Font-Size="8pt" Font-Names="Verdana" ForeColor="Green">Кумулятивное обновление разрешено</asp:Label></font></td>
-							</tr>
-							<tr>
-								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="EncryptSynonymCB" Text="Шифровать синонимы" />
-								</td>
-							</tr>
-							<tr>
-								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="CalculateLeaderCB" Text="Pассчиьывать лидеров при получении заказов" />
+								<td class="tdCheckBox" colspan="3" style="height: 22px">
+									<asp:CheckBox runat="server" ID="CalculateLeaderCB" Text="Pассчитывать лидеров при получении заказов" />
 								</td>
 							</tr>
 							<tr>
