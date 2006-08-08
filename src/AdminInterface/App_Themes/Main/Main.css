@@ -1,7 +1,7 @@
 ﻿body 
 {
 	font-family: Verdana;
-	font-size: small;
+	font-size: 8pt;
 }
 
 H3 
@@ -212,6 +212,8 @@ div
 
 .CopyRight
 {
+	margin-top: 10px;
+	padding-top: 10px;
 	text-align: center;
 	font-size: smaller;
 }

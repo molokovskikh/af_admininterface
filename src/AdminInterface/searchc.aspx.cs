@@ -109,19 +109,11 @@ namespace AddUser
 			ClientsGridView.DataBind();
 
 			if (data.Tables[0].Rows.Count > 0)
-			{
-				ClientsGridView.Visible = true;
 				Table4.Visible = true;
-				NotFoundLabel.Visible = false;
-			}
 			else
-			{
-				NotFoundLabel.Visible = true;
-				ClientsGridView.Visible = false;
 				Table4.Visible = false;
-			}
 
-			TimeSLB.Text = (DateTime.Now - startDate).ToString();
+			SearchTimeLabel.Text = string.Format("Время поиска:{0}", (DateTime.Now - startDate).ToString());
 		}
 
 		private void BuildQuery(string orderStatement)
