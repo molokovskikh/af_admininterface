@@ -121,7 +121,7 @@ namespace AddUser
 		{
 			DA.SelectCommand =
 				new MySqlCommand(
-					"select convert(concat(FirmCode, '. ', ShortName) using cp1251) name from clientsdata, accessright.regionaladmins" +
+					"select FirmCode as ClientCode, convert(concat(FirmCode, '. ', ShortName) using cp1251) name from clientsdata, accessright.regionaladmins" +
 					" where regioncode =" + RegionDD.SelectedItem.Value + " and firmtype=1 and firmstatus=1" +
 					" and shortname like ?NameStr" + " and UserName='" + Session["UserName"] + "'" +
 					" and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)" +
