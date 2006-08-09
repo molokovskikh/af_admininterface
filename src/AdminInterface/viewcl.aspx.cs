@@ -70,7 +70,7 @@ namespace AddUser
 			// 
 			DataColumn5.ColumnName = "Region";
 			// 
-			// MyCmd
+			// _command
 			// 
 			MyCmd.CommandText = null;
 			MyCmd.CommandTimeout = 0;
