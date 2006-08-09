@@ -16,6 +16,20 @@ fieldset
 	margin: 0px 0px 3px 0px;
 }
 
+A:active
+{
+	color:#0093e1;
+}
+A:visited
+{
+	color:#ab51cc;
+}
+
+A:link
+{
+	color:#0093e1;
+}
+
 div
 {
 	margin: 0;
