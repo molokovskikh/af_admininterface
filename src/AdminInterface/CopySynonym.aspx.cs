@@ -170,7 +170,7 @@ set @inUser = ?UserName;
 				MyCommand.ExecuteNonQuery();
 				MyTrans.Commit();
 				Func.Mail("register@analit.net", "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
-				          MailFormat.Text,
+				          false,
 				          "От: " + FromDD.SelectedItem.Text + "\nДля: " + ToDD.SelectedItem.Text + "\nОператор: " + UserName,
 				          DS.Tables["Regions"].Rows[0]["email"].ToString(), "RegisterList@subscribe.analit.net", Encoding.UTF8);
 				LabelErr.ForeColor = Color.Green;

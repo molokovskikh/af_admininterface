@@ -183,8 +183,6 @@
 						align="center" border="1">
 						<tr>
 							<td style="height: 18px">
-								<font face="Verdana"><font size="2"><strong>Показываемые регионы:</strong>&nbsp;</font></font></td>
-							<td style="height: 18px">
 								<font face="Verdana" size="2"><strong>Доступные регионы:</strong></font></td>
 							<td style="height: 18px">
 								<font face="Verdana" size="2"><strong>Регионы работы:</strong></font></td>
@@ -192,10 +190,6 @@
 								<font face="Verdana" size="2"><strong>Регионы заказа:</strong></font></td>
 						</tr>
 						<tr>
-							<td>
-								<asp:CheckBoxList ID="ShowList" runat="server" Font-Size="8pt" Font-Names="Verdana"
-									BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode">
-								</asp:CheckBoxList><font face="Verdana" size="2"></font></td>
 							<td>
 								<asp:CheckBoxList ID="WRList" runat="server" Font-Size="8pt" Font-Names="Verdana"
 									BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode">

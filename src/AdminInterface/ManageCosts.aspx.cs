@@ -247,7 +247,7 @@ WHERE RowID = ?Id
 				Func.SelectTODS(
 					"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
 					Session["UserName"] + "' order by region", "admin", DS);
-				Func.Mail("register@analit.net", "\"" + ShortName + "\" - регистрация ценовой колонки", MailFormat.Text,
+				Func.Mail("register@analit.net", "\"" + ShortName + "\" - регистрация ценовой колонки", false,
 				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
 				          "RegisterList@subscribe.analit.net", DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 				PostDataToGrid();

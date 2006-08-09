@@ -174,7 +174,6 @@ namespace AddUser
 		private IADsUser ADUser;
 		private IADs Domain;
 		private MySqlCommand _command = new MySqlCommand();
-		private MySqlDataAdapter _adapter = new MySqlDataAdapter();
 		private MySqlTransaction mytrans;
 
 		//******** InsertOldData *************
@@ -209,10 +208,8 @@ order by region";
 			WRList.DataBind();
 			WRList2.DataBind();
 			OrderList.DataBind();
-			ShowList.DataBind();
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
-				ShowList.Items[i].Selected = true;
 				if (WRList.Items[i].Value == RegCode.ToString())
 				{
 					WRList.Items[i].Selected = true;
@@ -283,12 +280,8 @@ order by region";
 			Int64 ShowRegionMask = 0;
 			Int64 WorkMask = 0;
 			Int64 OrderMask = 0;
-			for (int i = 0; i <= ShowList.Items.Count - 1; i++)
+			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
-				if (ShowList.Items[i].Selected)
-				{
-					ShowRegionMask += Convert.ToInt64(ShowList.Items[i].Value);
-				}
 				if (WRList.Items[i].Selected)
 				{
 					MaskRegion += Convert.ToInt64(WRList.Items[i].Value);
@@ -468,7 +461,7 @@ set @inUser = ?UserName;
 							{
 								Func.Mail("Аналитическая Компания Инфорум <pharm@analit.net>",
 								          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-								          MailFormat.Text,
+										  false,
 								          "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
 								          + ShortNameTB.Text + " в регионе(городе) "
 								          + RegionDD.SelectedItem.Text + "."
@@ -479,7 +472,7 @@ set @inUser = ?UserName;
 							}
 							Func.Mail("register@analit.net",
 							          "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
-							          MailFormat.Text, "Оператор: " + Session["UserName"]
+							          false, "Оператор: " + Session["UserName"]
 							                           + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
 							                           + LoginTB.Text + "\nКод: " + Session["Code"]
 							                           + "\n\nСегмент: " + SegmentDD.SelectedItem.Text + "\nТип: "
@@ -494,7 +487,7 @@ set @inUser = ?UserName;
 					{
 						Func.Mail("register@analit.net",
 						          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
-						          MailFormat.Text, "Оператор: " + Session["UserName"] + "\nРегион: "
+								  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 						                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 						                           + "\nКод: " + Session["Code"] + "\n\nСегмент: "
 						                           + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
@@ -507,7 +500,7 @@ set @inUser = ?UserName;
 				{
 					Func.Mail("register@analit.net",
 					          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
-					          MailFormat.Text, "Оператор: " + Session["UserName"] + "\nРегион: "
+							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 					                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 					                           + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                           + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
@@ -517,33 +510,27 @@ set @inUser = ?UserName;
 				try
 				{
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text + "\" - успешная регистрация",
-					          MailFormat.Text, "Оператор: " + Session["UserName"] + "\nРегион: "
+					          false, "Оператор: " + Session["UserName"] + "\nРегион: "
 					                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 					                           + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                           + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net",
 					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-					Func.Mail("\"" + FullNameTB.Text + "\" <" + EmailTB.Text + ">", "Sub", MailFormat.Text, "",
+					Func.Mail("\"" + FullNameTB.Text + "\" <" + EmailTB.Text + ">", "Sub", false, "",
 					          "FirmEmailList-on@subscribe.analit.net", null, Encoding.UTF8);
 					if (!(TBClientManagerMail.Text == ""))
-					{
-						Func.Mail("\"" + TBClientManagerName.Text + "\" <" + TBClientManagerMail.Text + ">", "Sub", MailFormat.Text, "",
+						Func.Mail("\"" + TBClientManagerName.Text + "\" <" + TBClientManagerMail.Text + ">", "Sub", false, "",
 						          "ClientManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
-					}
 					if (!(TBOrderManagerMail.Text == ""))
-					{
-						Func.Mail("\"" + TBOrderManagerName.Text + "\" <" + TBOrderManagerMail.Text + ">", "Sub", MailFormat.Text, "",
+						Func.Mail("\"" + TBOrderManagerName.Text + "\" <" + TBOrderManagerMail.Text + ">", "Sub", false, "",
 						          "OrderManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
-					}
 					if (!(TBAccountantMail.Text == ""))
-					{
-						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", MailFormat.Text, "",
+						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", false, "",
 						          "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
-					}
 				}
 				catch (Exception err)
 				{
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text
-					                                 + "\" - ошибка подписки поставщиков", MailFormat.Text,
+													 + "\" - ошибка подписки поставщиков", false,
 					          "Оператор: " + Session["UserName"] + "\nРегион: "
 					          + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 					          + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
@@ -653,7 +640,6 @@ set @inUser = ?UserName;
 				TypeDD.Enabled = false;
 				SegmentDD.Enabled = false;
 				InvCB.Enabled = false;
-				ShowList.Enabled = false;
 				WRList.Enabled = false;
 				WRList2.Enabled = false;
 				PayerDDL.Visible = false;
@@ -669,7 +655,6 @@ set @inUser = ?UserName;
 				TypeDD.Enabled = true;
 				SegmentDD.Enabled = true;
 				InvCB.Enabled = true;
-				ShowList.Enabled = true;
 				WRList.Enabled = true;
 				WRList2.Enabled = true;
 				IncludeCB.Text = "Подчиненный клиент";

@@ -1,30 +1,31 @@
 using System;
 using System.Configuration;
 using System.Data;
+using System.Net.Mail;
 using System.Text;
-using System.Web.Mail;
 using MySql.Data.MySqlClient;
+using MailMessage=System.Net.Mail.MailMessage;
 
 namespace AddUser
 {
 	public class Func
 	{
-		public static void Mail(string From, string Subject, MailFormat BodyFormat, string Body, string MessageTo,
+		public static void Mail(string From, string Subject, bool IsBodyHtml, string Body, string MessageTo,
 		                        string MessageBCC, Encoding Encoding)
 		{
 #if !DEBUG
 			try
 			{
 				MailMessage message = new MailMessage();
-				message.From = From;
+				message.From = new MailAddress(From);
+				message.IsBodyHtml = IsBodyHtml;
 				message.Subject = Subject;
-				message.BodyFormat = BodyFormat;
 				message.Body = Body;
-				message.Bcc = MessageBCC;
-				message.To = MessageTo;
+				message.Bcc.Add(MessageBCC);
+				message.To.Add(MessageTo);
 				message.BodyEncoding = Encoding;
-				SmtpMail.SmtpServer = "box.analit.net";
-				SmtpMail.Send(message);
+				SmtpClient client = new SmtpClient("box.analit.net");
+				client.Send(message);
 			}
 			catch
 			{
