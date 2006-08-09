@@ -18,14 +18,15 @@
 					Прайс листы
 				</h3>
 				<div class="ContentBlock">
-					<asp:GridView ID="PricesGrid" runat="server" AutoGenerateColumns="False" DataMember="Prices" OnRowCommand="PricesGrid_RowCommand" OnRowDeleting="PricesGrid_RowDeleting">
+					<asp:GridView ID="PricesGrid" runat="server" AutoGenerateColumns="False" DataMember="Prices"
+						OnRowCommand="PricesGrid_RowCommand" OnRowDeleting="PricesGrid_RowDeleting">
 						<Columns>
 							<asp:TemplateField>
 								<HeaderTemplate>
 									<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить" />
 								</HeaderTemplate>
 								<ItemTemplate>
-									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить"/>
+									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:BoundField HeaderText="Код" DataField="FirmCode" />
@@ -36,7 +37,8 @@
 							<asp:TemplateField HeaderText="Наценка">
 								<ItemTemplate>
 									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
-									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ErrorMessage="*" ValidationExpression="^\d+(\.\d+)?$"></asp:RegularExpressionValidator>
+									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ErrorMessage="*"
+										ValidationExpression="^\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">
@@ -49,17 +51,17 @@
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Вкл.">
 								<ItemTemplate>
-									<asp:CheckBox ID="OnCheck" runat="server" />
+									<asp:CheckBox ID="EnableCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="В работе">
 								<ItemTemplate>
-									<asp:CheckBox ID="InWorkCheck" runat="server" />
+									<asp:CheckBox ID="InWorkCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Интегр.">
 								<ItemTemplate>
-									<asp:CheckBox ID="IntegratedCheck" runat="server" />
+									<asp:CheckBox ID="IntegratedCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("AlowInt")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
@@ -74,27 +76,18 @@
 					<label for="RegionDD">
 						Домашний регион:
 					</label>
-					<asp:DropDownList ID="HomeRegion" runat="server" DataTextField="Region" DataMember="Regions" DataValueField="RegionCode">
+					<asp:DropDownList ID="HomeRegion" runat="server" DataTextField="Region" DataMember="Regions"
+						DataValueField="RegionCode">
 					</asp:DropDownList>
+					<asp:CheckBox ID="ShowAllRegionsCheck" runat="server" Text="Показывать все регионы." AutoPostBack="True" OnCheckedChanged="ShowAllRegionsCheck_CheckedChanged" />
 				</div>
 				<div class="ContentBlock">
-					<div class="TwoColumn">
-						<label for="ShowList">
-							Показываемые регионы:
-						</label>
-						<asp:CheckBoxList ID="ShowRegionList" runat="server" 
-							BorderStyle="None" DataMember="Regions" DataTextField="Region" DataValueField="RegionCode"
-							CellSpacing="0" CellPadding="0">
-						</asp:CheckBoxList>
-					</div>
-					<div class="TwoColumn">
-						<label for="WRList">
-							Доступные регионы:
-						</label>
-						<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="Regions"
-							DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
-						</asp:CheckBoxList>
-					</div>
+					<label for="WRList">
+						Доступные регионы:
+					</label>
+					<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="Regions"
+						DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
+					</asp:CheckBoxList>
 				</div>
 				<div class="ContentBlock">
 					<asp:GridView ID="RegionalSettingsGrid" runat="server" AutoGenerateColumns="False"
@@ -106,7 +99,7 @@
 									<asp:CheckBox ID="EnabledCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Включен">
+							<asp:TemplateField HeaderText="Склад">
 								<ItemTemplate>
 									<asp:CheckBox ID="StorageCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Storage")) %>' />
 								</ItemTemplate>
@@ -129,7 +122,7 @@
 								<ItemTemplate>
 									<asp:TextBox ID="SupportPhoneText" runat="server" Text='<%# Eval("SupportPhone") %>' />
 									<asp:RegularExpressionValidator ID="PhoneValidator" runat="server" ControlToValidate="SupportPhoneText"
-										ErrorMessage="*" ValidationExpression="(\d{3,4})-(\d{6,7})"></asp:RegularExpressionValidator>
+										ErrorMessage="*" ValidationExpression="^(\(\d{3,4}-?\))?(\d{2,3}-\d{2,3}(-\d{2,3})?)$"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:HyperLinkField HeaderText="Информация" Text="Информация" DataNavigateUrlFormatString="EditRegionalInfo.aspx?id={0}"
