@@ -43,10 +43,10 @@ namespace AddUser
 		MySqlDataReader myMySqlDataReader;
 		MySqlTransaction myTrans;
 		int ClientCode;
-		string HomeRegionCode;
-		string WorkMask;
-		string ShowMask;
-		Int64 OrderMask;
+		long HomeRegionCode;
+		long WorkMask;
+		long ShowMask;
+		long OrderMask;
 		string InsertCommand;
 
 
@@ -193,20 +193,20 @@ namespace AddUser
 			myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
 
 
-			HomeRegionCode = RegionDD.SelectedItem.Value;
+			HomeRegionCode = Convert.ToInt64(RegionDD.SelectedItem.Value);
 			for (int i = 0; i <= ShowList.Items.Count - 1; i++)
 			{
 				if (ShowList.Items[i].Selected)
 				{
-					ShowMask = ShowMask + ShowList.Items[i].Value;
+					ShowMask = ShowMask + Convert.ToInt64(ShowList.Items[i].Value);
 				}
 				if (WRList.Items[i].Selected)
 				{
-					WorkMask = WorkMask + WRList.Items[i].Value;
+					WorkMask = WorkMask + Convert.ToInt64(WRList.Items[i].Value);
 				}
 				if (OrderList.Items[i].Selected)
 				{
-					OrderMask = OrderMask + Convert.ToInt32(OrderList.Items[i].Value);
+					OrderMask = OrderMask + Convert.ToInt64(OrderList.Items[i].Value);
 				}
 			}
 			try
@@ -363,7 +363,7 @@ SET OrderRegionMask     =?orderMask,
 		protected void RegionDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			bool OldRegion = false;
-			if (RegionDD.SelectedItem.Value == HomeRegionCode)
+			if (Convert.ToInt64(RegionDD.SelectedItem.Value) == HomeRegionCode)
 				OldRegion = true;
 			
 			SetWorkRegions(Convert.ToInt64(RegionDD.SelectedItem.Value), OldRegion, false);
@@ -453,7 +453,7 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
         AND AlowManage                            =1 
         AND cd.firmcode                           =?ClientCode 
 ";
-				HomeRegionCode = Convert.ToString(myMySqlCommand.ExecuteScalar());
+				HomeRegionCode = Convert.ToInt64(myMySqlCommand.ExecuteScalar());
 				if (Convert.ToInt32(HomeRegionCode) < 1)
 				{
 					return;
@@ -464,7 +464,7 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
 				RegionDD.DataBind();
 				for (int i = 0; i <= RegionDD.Items.Count - 1; i++)
 				{
-					if (RegionDD.Items[i].Value == HomeRegionCode)
+					if (Convert.ToInt64(RegionDD.Items[i].Value) == HomeRegionCode)
 					{
 						RegionDD.SelectedIndex = i;
 						break;
