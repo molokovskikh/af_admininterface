@@ -276,6 +276,9 @@ Set @InUser = ?UserName;
 DELETE FROM PricesData
 WHERE PriceCode = ?PriceCode;
 
+DELETE FROM PricesData
+WHERE PriceCode in (select PriceCode from PricesCosts where ShowPriceCode = ?PriceCode);
+
 DELETE FROM Intersection
 WHERE PriceCode = ?PriceCode;
 
