@@ -241,7 +241,7 @@ WHERE RowID = ?Id
 				                         " insert into farm.sources(FirmCode) values(@NewPriceCode);";
 				UpdCommand.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
 				                          " Select @NewPriceCode, @NewPriceCode, 0, " + PriceCode + ";" +
-				                          " Insert into farm.costformrules(PC_CostCode) Select @NewPriceCode;";
+										  " Insert into farm.costformrules(PC_CostCode, FR_ID) Select @NewPriceCode, @NewPriceCode;";
 				UpdCommand.ExecuteNonQuery();
 				MyTrans.Commit();
 				Func.SelectTODS(
