@@ -360,16 +360,25 @@ SET OrderRegionMask     =?orderMask,
 
 		private void SetWorkRegions(Int64 RegCode, bool OldRegion, bool AllRegions)
 		{
-			string SQLTXT;
-			SQLTXT = " select a.RegionCode, a.Region, ShowRegionMask & a.regioncode>0 as ShowMask," +
-			         " MaskRegion & a.regioncode>0 as RegMask, OrderRegionMask & a.regioncode>0 as OrderMask" +
-			         " from farm.regions as a, farm.regions as b, clientsdata, retclientsset, accessright.regionaladmins" +
-			         " where";
+			string SQLTXT =
+@"
+SELECT  a.RegionCode, 
+        a.Region, 
+        ShowRegionMask & a.regioncode >0 as ShowMask,  
+        MaskRegion & a.regioncode     >0 as RegMask, 
+        OrderRegionMask & a.regioncode>0 as OrderMask  
+FROM    farm.regions                     as a, 
+        farm.regions                     as b, 
+        clientsdata, 
+        retclientsset, 
+        accessright.regionaladmins  
+WHERE 
+";
 			if (!(AllRegions))
 			{
 				SQLTXT += " b.regioncode=" + RegCode + " and";
 			}
-			SQLTXT += " clientsdata.firmcode=" + ClientCode + " and a.regioncode & b.defaultshowregionmask>0 "
+			SQLTXT += " clientsdata.firmcode=" + ClientCode + " and a.regioncode & (b.defaultshowregionmask | MaskRegion)>0 "
 			          + " and clientcode=firmcode" + " and regionaladmins.username='"
 			          + Session["UserName"] + "'" + " and a.regioncode & regionaladmins.RegionMask > 0"
 			          + " group by regioncode" + " order by region";
@@ -407,9 +416,8 @@ SET OrderRegionMask     =?orderMask,
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
 				Response.Redirect("default.aspx");
-			}
+
 			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
 			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
@@ -423,10 +431,9 @@ SET OrderRegionMask     =?orderMask,
 				myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
 
 				myMySqlCommand.CommandText =
-					@"
+@"
 SELECT  RegionCode, 
-        MaskRegion, 
-        ShowRegionMask  
+        MaskRegion
 FROM    clientsdata as cd, 
         accessright.regionaladmins  
 WHERE   cd.regioncode & regionaladmins.regionmask > 0 
@@ -439,9 +446,8 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
 ";
 				HomeRegionCode = Convert.ToInt64(myMySqlCommand.ExecuteScalar());
 				if (Convert.ToInt32(HomeRegionCode) < 1)
-				{
 					return;
-				}
+
 				Func.SelectTODS(
 					"select regions.regioncode, regions.region from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
 					Session["UserName"] + "' order by region", "admin", DS1);
