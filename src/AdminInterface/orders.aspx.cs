@@ -1,5 +1,5 @@
 using System;
-using System.Drawing;
+using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
@@ -8,56 +8,62 @@ namespace AddUser
 {
 	partial class orders : Page
 	{
-		MySqlConnection соединение = new MySqlConnection();
-		MySqlCommand Комманда = new MySqlCommand();
-		MySqlDataReader Reader;
-		Int64 ClientCode;
-		TableRow row = new TableRow();
-		TableCell cell = new TableCell();
+		private MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
+		
+		private string _sortExpression
+		{
+			get { return (string) Session["OrdersSortExpression"] ?? String.Empty; }
+			set { Session["OrdersSortExpression"] = value; }
+		}
+		
+		private SortDirection _sortDirection
+		{
+			get { return (SortDirection) (Session["OrdersSortDirection"] ?? SortDirection.Ascending); }
+			set{ Session["OrdersSortDirection"] = value;}
+		}
+
+		private DataSet _data
+		{
+			get { return (DataSet) Session["OrdersDataSet"]; }
+			set { Session["OrdersDataSet"] = value;}
+		}
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
-			соединение.Open();
-			ClientCode = Convert.ToInt32(Request["cc"]);
-			Комманда.Connection = соединение;
-			Комманда.CommandText =
-				" SELECT ordershead.rowid, WriteTime, PriceDate, client.shortname, firm.shortname, PriceName, RowCount, Processed" +
-				" FROM orders.ordershead, usersettings.pricesdata, usersettings.clientsdata as firm, usersettings.clientsdata as client, usersettings.clientsdata as sel where " +
-				" clientcode=client.firmcode" + " and client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)" +
-				" and firm.firmcode=if(sel.firmtype=0, sel.firmcode, firm.firmcode)" +
-				" and writetime between ?FromDate and ?ToDate and pricesdata.pricecode=ordershead.pricecode" +
-				" and firm.firmcode=pricesdata.firmcode and sel.firmcode=?clientCode order by writetime desc";
-			Комманда.Parameters.Add(new MySqlParameter("FromDate", MySqlDbType.Datetime));
-			Комманда.Parameters["FromDate"].Value = CalendarFrom.SelectedDate;
-			Комманда.Parameters.Add(new MySqlParameter("ToDate", MySqlDbType.Datetime));
-			Комманда.Parameters["ToDate"].Value = CalendarTo.SelectedDate;
-			Комманда.Parameters.Add("?clientCode", ClientCode);
-			Reader = Комманда.ExecuteReader();
-			while (Reader.Read())
-			{
-				row = new TableRow();
-				if (Convert.ToInt32(Reader[6]) == 0)
-				{
-					row.BackColor = Color.Red;
-				}
-				for (int i = 0; i <= Table3.Rows[0].Cells.Count - 1; i++)
-				{
-					cell = new TableCell();
-					if (i == 1 | i == 2)
-					{
-						cell.Text = Convert.ToDateTime(Reader[i]).ToString();
-						cell.HorizontalAlign = HorizontalAlign.Center;
-					}
-					else
-					{
-						cell.Text = Reader[i].ToString();
-					}
-					row.Cells.Add(cell);
-				}
-				Table3.Rows.Add(row);
-			}
-			Reader.Close();
-			соединение.Close();
+			MySqlDataAdapter adapter = new MySqlDataAdapter(
+@"
+SELECT  ordershead.rowid, 
+        WriteTime, 
+        PriceDate, 
+        client.shortname as Customer, 
+        firm.shortname as Supplier, 
+        PriceName, 
+        RowCount, 
+        Processed  
+FROM    orders.ordershead, 
+        usersettings.pricesdata, 
+        usersettings.clientsdata as firm, 
+        usersettings.clientsdata as client, 
+        usersettings.clientsdata as sel 
+WHERE   clientcode         =client.firmcode  
+        AND client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)  
+        AND firm.firmcode  =if(sel.firmtype=0, sel.firmcode, firm.firmcode)  
+        AND writetime BETWEEN ?FromDate AND ?ToDate 
+        AND pricesdata.pricecode=ordershead.pricecode  
+        AND firm.firmcode       =pricesdata.firmcode 
+        AND sel.firmcode        =?clientCode 
+ORDER BY writetime desc;
+", _connection);
+			adapter.SelectCommand.Parameters.Add("FromDate", CalendarFrom.SelectedDate);
+			adapter.SelectCommand.Parameters.Add("ToDate", CalendarTo.SelectedDate);
+			adapter.SelectCommand.Parameters.Add("?clientCode", Convert.ToUInt32(Request["cc"]));
+
+			_data = new DataSet();
+			_connection.Open();
+			adapter.Fill(_data);
+			_connection.Close();
+			OrdersGrid.DataSource = _data.DefaultViewManager.CreateDataView(_data.Tables[0]); 
+			DataBind();
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
@@ -66,12 +72,39 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
-			соединение.ConnectionString = Literals.GetConnectionString();
-			if (!(Page.IsPostBack))
+			if (!Page.IsPostBack)
 			{
-				CalendarFrom.SelectedDate = DateTime.Now.AddDays(-7);
-				CalendarTo.SelectedDate = DateTime.Now.AddDays(1);
+				CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-7));
+				CalendarTo.SelectedDates.Add(DateTime.Now.AddDays(-2));
 			}
 		}
-	}
+		protected void OrdersGrid_RowCreated(object sender, GridViewRowEventArgs e)
+		{
+			if ((e.Row.RowType == DataControlRowType.Header) && (!String.IsNullOrEmpty(_sortExpression)))
+			{
+				GridView grid = sender as GridView;
+				foreach (DataControlField field in grid.Columns)
+				{
+					if (field.SortExpression == _sortExpression)
+					{
+						Image sortIcon = new Image();
+						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "arrow-down-blue.gif" : "arrow-down-blue-reversed.gif";
+						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
+					}
+				}
+			}
+		}
+		
+		protected void OrdersGrid_Sorting(object sender, GridViewSortEventArgs e)
+		{
+			if (_sortExpression == e.SortExpression)
+				_sortDirection = _sortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
+			_sortExpression = e.SortExpression;
+
+			_data.Tables[0].DefaultView.Sort = _sortExpression + (_sortDirection == SortDirection.Ascending ? " ASC" : " DESC");
+
+			OrdersGrid.DataSource = _data.Tables[0].DefaultView;
+			DataBind();
+		}
+}
 }
