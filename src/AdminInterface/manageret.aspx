@@ -132,19 +132,11 @@
 									<table id="Table3" cellspacing="0" cellpadding="0" border="0">
 										<tr>
 											<td width="200">
-												<font face="Arial" size="2"><strong><font face="Verdana">Показываемые регионы:</font></strong><font
-													face="Times New Roman" size="3">&nbsp;</font></font></td>
-											<td width="200">
 												<font face="Verdana" size="2"><strong>Доступные регионы:</strong></font></td>
 											<td width="200">
 												<font face="Verdana" size="2"><strong>Регионы заказа:</strong></font></td>
 										</tr>
 										<tr>
-											<td valign="top" align="left" width="200">
-												<asp:CheckBoxList ID="ShowList" runat="server" Font-Names="Verdana" Font-Size="8pt"
-													BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode"
-													CellSpacing="0" CellPadding="0">
-												</asp:CheckBoxList></td>
 											<td valign="top" align="left" width="200">
 												<asp:CheckBoxList ID="WRList" runat="server" Font-Names="Verdana" Font-Size="8pt"
 													BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode"

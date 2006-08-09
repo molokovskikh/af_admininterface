@@ -45,7 +45,6 @@ namespace AddUser
 		int ClientCode;
 		long HomeRegionCode;
 		long WorkMask;
-		long ShowMask;
 		long OrderMask;
 		string InsertCommand;
 
@@ -194,20 +193,12 @@ namespace AddUser
 
 
 			HomeRegionCode = Convert.ToInt64(RegionDD.SelectedItem.Value);
-			for (int i = 0; i <= ShowList.Items.Count - 1; i++)
+			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
-				if (ShowList.Items[i].Selected)
-				{
-					ShowMask = ShowMask + Convert.ToInt64(ShowList.Items[i].Value);
-				}
 				if (WRList.Items[i].Selected)
-				{
 					WorkMask = WorkMask + Convert.ToInt64(WRList.Items[i].Value);
-				}
 				if (OrderList.Items[i].Selected)
-				{
 					OrderMask = OrderMask + Convert.ToInt64(OrderList.Items[i].Value);
-				}
 			}
 			try
 			{
@@ -223,7 +214,6 @@ set @inUser = ?userName;
 				myMySqlCommand.Parameters.Add("?clientCode", ClientCode);
 				myMySqlCommand.Parameters.Add("?workMask", WorkMask);
 				myMySqlCommand.Parameters.Add("?homeRegionCode", HomeRegionCode);
-				myMySqlCommand.Parameters.Add("?showMask", ShowMask);
 				myMySqlCommand.Parameters.Add("?orderMask", OrderMask);
 				
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
@@ -289,7 +279,6 @@ UPDATE UserSettings.retclientsset,
         UserSettings.clientsdata 
 SET OrderRegionMask     =?orderMask, 
         MaskRegion              =?workMask , 
-        ShowRegionMask          =?showMask, 
         RegionCode              =?homeRegionCode , 
         WorkRegionMask          =if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), 
         AlowRegister            =?AlowRegister, 
@@ -387,22 +376,17 @@ SET OrderRegionMask     =?orderMask,
 			Func.SelectTODS(SQLTXT, "WorkReg", DS1);
 			WRList.DataBind();
 			OrderList.DataBind();
-			ShowList.DataBind();
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (OldRegion)
 				{
 					WRList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["RegMask"]);
 					OrderList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["OrderMask"]);
-					ShowList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["ShowMask"]);
 				}
 				else
 				{
-					ShowList.Items[i].Selected = true;
 					if (WRList.Items[i].Value == RegCode.ToString())
-					{
 						WRList.Items[i].Selected = true;
-					}
 					OrderList.Items[i].Selected = WRList.Items[i].Selected;
 				}
 			}
