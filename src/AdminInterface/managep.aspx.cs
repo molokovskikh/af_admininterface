@@ -3,6 +3,7 @@ using System.Data;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using DAL;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -61,7 +62,10 @@ namespace AddUser
 
 		private void GetData()
 		{
-			_data = new DataSet();
+			if (_data == null)
+				_data = new DataSet();
+			else 
+				_data.Clear();
 			string pricesCommandText =
 @"
 SELECT  cd.firmcode, 
@@ -109,7 +113,7 @@ WHERE   rd.FirmCode      = ?ClientCode;
 SELECT  r.RegionCode,   
         r.Region,   
 		cd.MaskRegion,
-		cd.RegionCode,
+		cd.RegionCode HomeRegion,
         (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
 FROM    farm.regions as r, 
         ClientsData cd  
@@ -120,7 +124,6 @@ ORDER BY region
 
 			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
 			dataAdapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
-			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
 			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
 
 			dataAdapter.Fill(_data, "Prices");
@@ -137,111 +140,11 @@ ORDER BY region
 
 		private void SetRegions()
 		{
-			HomeRegion.SelectedValue = _data.Tables["Regions"].Rows[0]["RegionCode"].ToString();
+			HomeRegion.SelectedValue = _data.Tables["Regions"].Rows[0]["HomeRegion"].ToString();
 			for (int i = 0; i < _data.Tables["Regions"].Rows.Count; i++)
-				WorkRegionList.Items[i].Selected = Convert.ToBoolean(_data.Tables["Regions"].Rows[i]["WorkRegion"]);				
+				WorkRegionList.Items[i].Selected = Convert.ToBoolean(_data.Tables["Regions"].Rows[i]["WorkRegion"]);
 		}
 
-		public void SetWorkRegions(Int64 RegCode, bool OldRegion)
-		{
-			/*
-						for (int i = 0; i <= WRList.Items.Count - 1; i++)
-						{
-							if (OldRegion)
-							{
-								WRList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["RegMask"]);
-								ShowList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["ShowMask"]);
-							}
-							else
-							{
-								ShowList.Items[i].Selected = true;
-								if (WRList.Items[i].Value == RegCode.ToString())
-								{
-									WRList.Items[i].Selected = true;
-								}
-							}
-						}
-			*/
-		}
-
-
-		protected void R_ItemCommand(object source, RepeaterCommandEventArgs e)
-		{
-			/*			string Запрос;
-						try
-						{
-							myMySqlConnection.Open();
-						}
-						catch (Exception)
-						{
-							goto exitTryCatchStatement0;
-						}
-						exitTryCatchStatement0:
-						;
-						try
-						{
-							myMySqlCommand.Connection = myMySqlConnection;
-							myMySqlCommand.CommandText = " set @UserName:='" + Session["UserName"]
-														 + "'; set @FirmCode:=" + ClientCode
-														 + "; SELECT max(cd.regioncode & regionaladmins.regionmask > 0"
-														 + " and regionaladmins.UserName=@UserName "
-														 + " and if(UseRegistrant=1, Registrant=@UserName, 1=1) " + " and AlowManage=1 "
-														 + " and AlowCreateVendor=1 "
-														 + " and cd.firmcode=@FirmCode) FROM (clientsdata as cd, accessright.regionaladmins) ";
-							if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 1)
-							{
-								myTrans = myMySqlConnection.BeginTransaction(IsolationLevel.ReadCommitted);
-								Запрос =
-			@"
-			set @inHost = ?Host;
-			set @inUser = ?UserName;
-			";
-								Запрос += "insert into pricesdata(PriceCode, FirmCode) values(Null, " + ClientCode + "); ";
-								Запрос += "select @PriceCode:=Last_insert_id(); ";
-								Запрос += "insert into farm.formrules(Firmcode) values (@PriceCode); ";
-								Запрос += "insert into farm.sources(FirmCode) values (@PriceCode); ";
-								Запрос += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
-										  " Select @PriceCode, @PriceCode, 1, @PriceCode;" +
-										  " Insert into farm.costformrules(PC_CostCode) Select @PriceCode; ";
-								Запрос += "insert into pricesregionaldata(regioncode, pricecode, enabled) " +
-										  "SELECT regions.regioncode, pricesdata.pricecode, if(pricesdata.pricetype<>1, 1, 0) " +
-										  "FROM (clientsdata, farm.regions, pricesdata) " +
-										  "left join pricesregionaldata on pricesregionaldata.pricecode=pricesdata.pricecode and pricesregionaldata.regioncode=regions.regioncode " +
-										  "where pricesdata.firmcode=clientsdata.firmcode " + "and clientsdata.firmstatus=1 " +
-										  "and clientsdata.firmtype=0 " + "and pricesdata.pricecode=@PriceCode " +
-										  "and (clientsdata.maskregion & regions.regioncode)>0 " + "and pricesregionaldata.pricecode is null; ";
-								Запрос +=
-									"insert into intersection(regioncode, clientcode, pricecode, invisibleonfirm, invisibleonclient, CostCode) " +
-									"select regions.regioncode, clientsdata.firmcode, pricesdata.pricecode, retclientsset.invisibleonfirm, " +
-									" 1 as invisibleonclient, pricesdata.PriceCode " +
-									"from (clientsdata, farm.regions, pricesdata, pricesregionaldata, retclientsset) " +
-									"left join intersection on intersection.clientcode=clientsdata.firmcode and intersection.pricecode=pricesdata.pricecode and intersection.regioncode=regions.regioncode " +
-									"left join clientsdata as b on b.firmcode=pricesdata.firmcode " +
-									"where clientsdata.firmstatus=1 and clientsdata.firmsegment=b.firmsegment " + "and clientsdata.firmtype=1 " +
-									"and (clientsdata.maskregion & regions.regioncode)>0 " + "and (b.maskregion & regions.regioncode)>0 " +
-									"and retclientsset.clientcode=clientsdata.firmcode " + "and pricesdata.PriceCode=@PriceCode " +
-									"and intersection.pricecode is null " + "and pricesdata.pricetype<>1 " +
-									"and pricesregionaldata.regioncode=regions.regioncode " +
-									"and pricesregionaldata.pricecode=pricesdata.pricecode; ";
-								myMySqlCommand.Transaction = myTrans;
-								myMySqlCommand.CommandText = Запрос;
-								myMySqlCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
-								myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
-
-								myMySqlCommand.ExecuteNonQuery();
-							}
-							myTrans.Commit();
-							BindData();
-						}
-						catch (Exception)
-						{
-							myTrans.Rollback();
-						}
-						finally
-						{
-							myMySqlConnection.Close();
-						}*/
-		}
 		protected void PricesGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
 			switch (e.CommandName)
@@ -266,6 +169,8 @@ ORDER BY region
 
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
+			UpdateHomeRegion();
+			UpdateMaskRegion();
 			ChangesToDataSet();
 			MySqlDataAdapter pricesDataAdapter = new MySqlDataAdapter("", _connection);
 			pricesDataAdapter.DeleteCommand = new MySqlCommand(
@@ -285,7 +190,7 @@ WHERE PriceCode = ?PriceCode;
 DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
 ", _connection);
-			
+
 			pricesDataAdapter.DeleteCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.DeleteCommand.Parameters.Add("UserName", Session["UserName"]);
 			pricesDataAdapter.DeleteCommand.Parameters.Add("PriceCode", MySqlDbType.Int32, 0, "PriceCode");
@@ -455,23 +360,23 @@ WHERE RowId = ?Id;
 			{
 				_connection.Open();
 				transaction = _connection.BeginTransaction();
-				
+
 				pricesDataAdapter.InsertCommand.Transaction = transaction;
 				pricesDataAdapter.UpdateCommand.Transaction = transaction;
 				pricesDataAdapter.DeleteCommand.Transaction = transaction;
 				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
-				
+
 				pricesDataAdapter.Update(_data.Tables["Prices"]);
 				regionalSettingsDataAdapter.Update(_data.Tables["RegionSettings"]);
-				
+
 				transaction.Commit();
-				
+
 				GetData();
 				ConnectDataSource();
 				DataBind();
 				SetRegions();
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
 				if (transaction != null)
 					transaction.Rollback();
@@ -524,7 +429,7 @@ WHERE RowId = ?Id;
 SELECT  r.RegionCode,   
         r.Region,   
 		cd.MaskRegion,
-		cd.RegionCode,
+		cd.RegionCode HomeRegion,
         (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
 FROM    farm.regions as r, 
         ClientsData cd  
@@ -538,7 +443,7 @@ ORDER BY region";
 SELECT  r.RegionCode,   
         r.Region,   
 		cd.MaskRegion,
-		cd.RegionCode,
+		cd.RegionCode HomeRegion,
         (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
 FROM    farm.regions as r, 
         ClientsData cd  
@@ -553,5 +458,155 @@ ORDER BY region";
 			DataBind();
 			SetRegions();
 		}
-}
+		
+		private void UpdateMaskRegion()
+		{
+			ScalarCommand maskRegionCommand = new ScalarCommand(
+@"
+SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;
+");
+			maskRegionCommand.Parameters.Add("ClientCode", _clientCode);
+			maskRegionCommand.Execute();
+			ulong oldMaskRegion = Convert.ToUInt64(maskRegionCommand.Result);
+			ulong newMaskRegion = oldMaskRegion;
+			foreach (ListItem item in WorkRegionList.Items)
+				newMaskRegion = item.Selected ? newMaskRegion | Convert.ToUInt64(item.Value) : newMaskRegion & ~Convert.ToUInt64(item.Value);
+
+			if(oldMaskRegion != newMaskRegion)
+			{
+				ParametericCommand updateCommand = new ParametericCommand(
+@"
+SET @InHost = ?UserHost;
+SET @InUser = ?UserName;
+
+UPDATE ClientsData
+SET MaskRegion = ?MaskRegion
+WHERE FirmCode = ?ClientCode;
+
+INSERT 
+INTO    intersection
+        (
+                ClientCode, 
+                regioncode, 
+                pricecode, 
+                invisibleonclient, 
+                InvisibleonFirm, 
+                costcode
+        )    
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode,    
+        pricesdata.PriceType=2 as invisibleonclient, 
+        a.invisibleonfirm, 
+        (SELECT costcode 
+        FROM    pricescosts pcc 
+        WHERE   basecost    
+                AND showpricecode=pc.showpricecode
+        )    
+FROM    (clientsdata, 
+        farm.regions, 
+        pricesdata, 
+        pricesregionaldata, 
+        clientsdata as clientsdata2, 
+        pricescosts pc)
+LEFT JOIN intersection 
+        ON intersection.pricecode  =pricesdata.pricecode 
+        AND intersection.regioncode=regions.regioncode 
+        AND intersection.clientcode=clientsdata2.firmcode    
+LEFT JOIN retclientsset as a 
+        ON a.clientcode=clientsdata2.firmcode    
+WHERE   clientsdata2.FirmCode							  = ?ClientCode
+		AND intersection.pricecode IS NULL    
+        AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
+        AND clientsdata.firmtype                          =0    
+        AND pricesdata.firmcode                           =clientsdata.firmcode    
+        AND pricesregionaldata.pricecode                  =pricesdata.pricecode    
+        AND pricesregionaldata.regioncode                 =regions.regioncode    
+        AND pricesdata.pricetype                         <>1    
+        AND pricesdata.pricecode                          =pc.showpricecode    
+        AND (clientsdata.maskregion & regions.regioncode) >0    
+        AND (clientsdata2.maskregion & regions.regioncode)>0    
+        AND clientsdata2.firmtype                         =1;
+
+INSERT 
+INTO    pricesregionaldata
+        (
+                regioncode, 
+                pricecode, 
+                enabled
+        )    
+SELECT  r.RegionCode,
+		p.PriceCode, 
+        if(p.pricetype<>1, 1, 0) 
+FROM    pricesdata p,   
+        clientsdata cd,   
+        farm.regions r  
+WHERE     cd.FirmCode  = ?ClientCode  
+        AND p.FirmCode = cd.FirmCode  
+        AND exists
+        (SELECT * 
+        FROM    pricescosts pc 
+        WHERE   pc.ShowPriceCode = p.PriceCode
+        )  
+        AND (r.RegionCode & cd.MaskRegion > 0)  
+        AND not exists
+        (SELECT * 
+        FROM    pricesregionaldata prd 
+        WHERE   prd.PriceCode      = p.PriceCode 
+                AND prd.RegionCode = r.RegionCode
+        );
+
+INSERT INTO regionaldata  (   FirmCode,   RegionCode  )  
+SELECT  cd.FirmCode, 
+        r.RegionCode 
+FROM    ClientsData cd, 
+        Farm.Regions r 
+WHERE   cd.FirmCode                       = ?ClientCode 
+        AND(r.RegionCode & cd.MaskRegion) > 0 
+        AND NOT exists 
+        (SELECT * 
+        FROM    regionaldata rd 
+        WHERE   rd.FirmCode       = cd.FirmCode 
+                AND rd.RegionCode = r.RegionCode
+);
+"
+				);
+				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
+				updateCommand.Parameters.Add("ClientCode", _clientCode);
+				updateCommand.Execute();
+			}
+		}
+		
+		private void UpdateHomeRegion()
+		{
+			ScalarCommand homeRegionCommand = new ScalarCommand(
+@"
+SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
+");
+			homeRegionCommand.Parameters.Add("ClientCode", _clientCode);
+			homeRegionCommand.Execute();
+
+			ulong oldHomeRegion = Convert.ToUInt64(homeRegionCommand.Result);
+			ulong currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
+			if (oldHomeRegion != currentHomeRegion)
+			{
+				ParametericCommand command = new ParametericCommand(
+@"
+SET @InHost = ?UserHost;
+SET @InUser = ?UserName;
+
+UPDATE ClientsData 
+SET RegionCode = ?RegionCode
+WHERE FirmCode = ?ClientCode;
+");
+				command.Parameters.Add("RegionCode", currentHomeRegion);
+				command.Parameters.Add("ClientCode", _clientCode);
+				command.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
+				command.Parameters.Add("UserName", Session["UserName"]);
+				command.Execute();
+			}
+			
+		}
+		
+	}
 }
