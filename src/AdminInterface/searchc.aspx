@@ -3,12 +3,13 @@
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
+<head runat="server" >
 	<title>Информация о клиентах</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
 </head>
 <body>
-	<form id="Form1" method="post" runat="server" defaultbutton="GoFind">
+	<form id="Form1" method="post" runat="server"  defaultbutton="GoFind">
 		<h3>
 			Статистика работы клиента:
 		</h3>

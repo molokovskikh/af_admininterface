@@ -5,14 +5,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
 	<title>Управление региональными администраторами</title>
+	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
 </head>
 <body>
-	<script type="text/javascript">
-		function SetClass(control, className)
-		{
-			control.className = className;
-		}
-	</script>
 	<form id="form1" runat="server">
 		<div>
 			<h3>Региональные администраторы</h3>
