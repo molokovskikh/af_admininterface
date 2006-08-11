@@ -55,7 +55,7 @@
 								<font face="Verdana" size="2"><strong>Обновления:</strong></font></td>
 						</tr>
 						<tr>
-							<td style="height: 18px" align="right" bgcolor="#d8f1ff">
+							<td style="height: 18px; width: 229px;" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Приготовлено обычных:&nbsp;</font>
 							</td>
 							<td style="width: 76px; height: 18px" bgcolor="#d8f1ff" height="18">
@@ -68,7 +68,7 @@
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff">
+							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
 								<font face="Verdana" size="2">Приготовлено КО:</font>&nbsp;</td>
 							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
 								<asp:HyperLink ID="CUHL" runat="server" NavigateUrl="viewcl.aspx?id=1" Enabled="False"
@@ -80,20 +80,20 @@
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 						</tr>
 						<tr>
-							<td style="height: 19px" align="right" bgcolor="#d8f1ff">
+							<td style="height: 19px; width: 229px;" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Ошибок:&nbsp;</font>
 							</td>
-							<td style="width: 76px; height: 19px" align="left" bgcolor="#d8f1ff" height="19">
+							<td style="width: 76px; text-align:center;" bgcolor="#d8f1ff" height="19">
 								<asp:HyperLink ID="ErrUpHL" runat="server" NavigateUrl="viewcl.aspx?id=3" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 							<td style="height: 19px" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Запретов:&nbsp;</font></td>
-							<td style="height: 19px" align="left" bgcolor="#d8f1ff" height="19">
+							<td style="height: 19px" bgcolor="#d8f1ff" height="19">
 								<asp:HyperLink ID="ADHL" runat="server" NavigateUrl="viewcl.aspx?id=0" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff">
+							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
 								<font face="Verdana" size="2">Последнее обновление:</font>&nbsp;</td>
 							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
 								<asp:Label ID="MaxUpdateTime" runat="server" Enabled="False" Font-Size="8pt" Font-Names="Verdana"
@@ -108,7 +108,7 @@
 								<font face="Verdana" size="2"><strong>Заказы:</strong></font></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#ebebeb">
+							<td align="right" bgcolor="#ebebeb" style="width: 229px">
 								<font face="Verdana" size="2">Принято:&nbsp;</font>
 							</td>
 							<td style="width: 76px" bgcolor="#ebebeb" height="20">
@@ -119,7 +119,7 @@
 								<asp:HyperLink ID="OADHL" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#ebebeb">
+							<td align="right" bgcolor="#ebebeb" style="width: 229px">
 								<font face="Verdana" size="2">Очередь:</font>&nbsp;</td>
 							<td style="width: 76px" bgcolor="#ebebeb" height="20">
 								<asp:Label ID="OprLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
@@ -129,7 +129,7 @@
 								<asp:HyperLink ID="OErrHL" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#ebebeb">
+							<td align="right" bgcolor="#ebebeb" style="width: 229px">
 								<font face="Verdana" size="2">Последний заказ:</font>&nbsp;</td>
 							<td style="width: 76px" bgcolor="#ebebeb" height="20">
 								<asp:Label ID="LOT" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
@@ -145,7 +145,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td style="height: 20px" align="right" bgcolor="#d8f1ff">
+							<td style="height: 20px; width: 229px;" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Получено:&nbsp;</font></td>
 							<td style="width: 76px; height: 20px" bgcolor="#d8f1ff" height="20">
 								<asp:Label ID="PriceDOKLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
@@ -155,7 +155,7 @@
 								<asp:Label ID="PriceDERRLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff">
+							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
 								<font face="Verdana" size="2">Последнее получение:</font>&nbsp;</td>
 							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
 								<asp:Label ID="DownPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
@@ -165,7 +165,7 @@
 								<asp:Label ID="DownErrLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff">
+							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
 								<font face="Verdana" size="2">Формализовано:&nbsp;</font></td>
 							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
 								<asp:Label ID="PriceFOKLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
@@ -175,7 +175,7 @@
 								<asp:Label ID="FormErrLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
 						</tr>
 						<tr>
-							<td style="height: 19px" align="right" bgcolor="#d8f1ff">
+							<td style="height: 19px; width: 229px;" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Последняя формализация:</font>&nbsp;
 							</td>
 							<td style="width: 76px; height: 19px" bgcolor="#d8f1ff" height="19">
