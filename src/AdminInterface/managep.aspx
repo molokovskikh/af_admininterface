@@ -49,7 +49,7 @@
 									</asp:DropDownList>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Вкл.">
+							<asp:TemplateField HeaderText="Адм.">
 								<ItemTemplate>
 									<asp:CheckBox ID="EnableCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("AgencyEnabled")) %>' />
 								</ItemTemplate>
@@ -85,7 +85,7 @@
 					<label for="WRList">
 						Доступные регионы:
 					</label>
-					<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="Regions"
+					<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="EnableRegions"
 						DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
 					</asp:CheckBoxList>
 				</div>
@@ -122,7 +122,7 @@
 								<ItemTemplate>
 									<asp:TextBox ID="SupportPhoneText" runat="server" Text='<%# Eval("SupportPhone") %>' />
 									<asp:RegularExpressionValidator ID="PhoneValidator" runat="server" ControlToValidate="SupportPhoneText"
-										ErrorMessage="*" ValidationExpression="^(\(\d{3,4}-?\))?(\d{2,3}-\d{2,3}(-\d{2,3})?)$"></asp:RegularExpressionValidator>
+										ErrorMessage="*" ValidationExpression="(\d{3,4})-(\d{6,7})"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:HyperLinkField HeaderText="Информация" Text="Информация" DataNavigateUrlFormatString="EditRegionalInfo.aspx?id={0}"

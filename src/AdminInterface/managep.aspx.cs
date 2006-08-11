@@ -24,6 +24,12 @@ namespace AddUser
 			get { return Convert.ToInt32(Session["ClientCode"]); }
 			set { Session["ClientCode"] = value; }
 		}
+		
+		private ulong _homeRegion
+		{
+			get { return (ulong) Session["RegionalSettingsHomeRegion"]; }
+			set { Session["RegionalSettingsHomeRegion"] = value;}
+		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -62,6 +68,7 @@ namespace AddUser
 
 		private void GetData()
 		{
+			_homeRegion = GetHomeRegion();
 			if (_data == null)
 				_data = new DataSet();
 			else 
@@ -110,22 +117,34 @@ WHERE   rd.FirmCode      = ?ClientCode;
 ";
 			string regionsCommandText =
 @"
-SELECT  r.RegionCode,   
-        r.Region,   
-		cd.MaskRegion,
-		cd.RegionCode HomeRegion,
-        (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
-FROM    farm.regions as r, 
-        ClientsData cd  
-WHERE   cd.firmcode = ?ClientCode  
-		AND (cd.MaskRegion & r.RegionCode)	> 0
-ORDER BY region 
+SELECT  RegionCode,   
+        Region
+FROM Farm.Regions
+ORDER BY region;
+";
+			string enableRegionsCommandText =
+@"
+SELECT  a.RegionCode,
+        a.Region, 
+        MaskRegion & a.regioncode     >0 as Enable
+FROM    farm.regions                     as a, 
+        farm.regions                     as b, 
+        clientsdata, 
+        accessright.regionaladmins
+WHERE   b.regioncode                                             =?HomeRegion
+        AND  clientsdata.firmcode                                =?ClientCode
+        AND a.regioncode & (b.defaultshowregionmask | MaskRegion)>0
+        AND regionaladmins.username                              =?UserName
+        AND a.regioncode & regionaladmins.RegionMask             > 0
+GROUP BY regioncode
+ORDER BY region;
 ";
 
 			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
 			dataAdapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
 			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
-
+			dataAdapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
+			
 			dataAdapter.Fill(_data, "Prices");
 
 			dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
@@ -134,15 +153,19 @@ ORDER BY region
 			dataAdapter.SelectCommand.CommandText = regionsCommandText;
 			dataAdapter.Fill(_data, "Regions");
 
+			dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
+			dataAdapter.Fill(_data, "EnableRegions");
+
+
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", _data.Tables["Prices"].Rows[0]["ShortName"].ToString());
 		}
 
 
 		private void SetRegions()
 		{
-			HomeRegion.SelectedValue = _data.Tables["Regions"].Rows[0]["HomeRegion"].ToString();
-			for (int i = 0; i < _data.Tables["Regions"].Rows.Count; i++)
-				WorkRegionList.Items[i].Selected = Convert.ToBoolean(_data.Tables["Regions"].Rows[i]["WorkRegion"]);
+			HomeRegion.SelectedValue = _homeRegion.ToString();
+			for (int i = 0; i < _data.Tables["EnableRegions"].Rows.Count; i++)
+				WorkRegionList.Items[i].Selected = Convert.ToBoolean(_data.Tables["EnableRegions"].Rows[i]["Enable"]);
 		}
 
 		protected void PricesGrid_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -156,7 +179,7 @@ ORDER BY region
 					row["AgencyEnabled"] = false;
 					row["AlowInt"] = false;
 					_data.Tables["Prices"].Rows.Add(row);
-					DataBind();
+					((GridView)sender).DataBind();
 					break;
 			}
 
@@ -164,7 +187,7 @@ ORDER BY region
 		protected void PricesGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			_data.Tables["Prices"].Rows[e.RowIndex].Delete();
-			DataBind();
+			((GridView)sender).DataBind();
 		}
 
 		protected void SaveButton_Click(object sender, EventArgs e)
@@ -206,8 +229,7 @@ SET UpCost = ?UpCost,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
 	AlowInt = ?AlowInt,
-	FirmCode = ?ClientCode,
-	RegionMask = ?MaskRegion;
+	FirmCode = ?ClientCode;
 
 SET @InsertedPriceCode = Last_Insert_ID();
 INSERT INTO farm.formrules(firmcode) VALUES(@InsertedPriceCode); 
@@ -303,7 +325,6 @@ WHERE   PricesData.PriceCode							  = @InsertedPriceCode
 			pricesDataAdapter.InsertCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.InsertCommand.Parameters.Add("UserName", Session["UserName"]);
 			pricesDataAdapter.InsertCommand.Parameters.Add("ClientCode", _clientCode);
-			pricesDataAdapter.InsertCommand.Parameters.Add("MaskRegion", _data.Tables["Regions"].Rows[0]["MaskRegion"]);
 			pricesDataAdapter.InsertCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.InsertCommand.Parameters.Add("PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.InsertCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
@@ -370,11 +391,6 @@ WHERE RowId = ?Id;
 				regionalSettingsDataAdapter.Update(_data.Tables["RegionSettings"]);
 
 				transaction.Commit();
-
-				GetData();
-				ConnectDataSource();
-				DataBind();
-				SetRegions();
 			}
 			catch (Exception ex)
 			{
@@ -386,7 +402,11 @@ WHERE RowId = ?Id;
 			{
 				_connection.Close();
 			}
-
+			
+			GetData();
+			ConnectDataSource();
+			DataBind();
+			SetRegions();
 		}
 
 		private void ChangesToDataSet()
@@ -426,36 +446,45 @@ WHERE RowId = ?Id;
 			{
 				commandText =
 @"
-SELECT  r.RegionCode,   
-        r.Region,   
-		cd.MaskRegion,
-		cd.RegionCode HomeRegion,
-        (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
-FROM    farm.regions as r, 
-        ClientsData cd  
-WHERE   cd.firmcode = ?ClientCode  
-ORDER BY region";
+SELECT  a.RegionCode,   
+        a.Region,   
+        MaskRegion & a.regioncode >0 as `Enable`  
+FROM    farm.regions                 as a,   
+        clientsdata,   
+        accessright.regionaladmins  
+WHERE   clientsdata.firmcode                         =?ClientCode
+        AND regionaladmins.username                  =?UserName   
+        AND a.regioncode & regionaladmins.RegionMask > 0  
+ORDER BY region;
+";
 			}
 			else
 			{
 				commandText =
 @"
-SELECT  r.RegionCode,   
-        r.Region,   
-		cd.MaskRegion,
-		cd.RegionCode HomeRegion,
-        (cd.MaskRegion & r.RegionCode)	> 0 as WorkRegion 
-FROM    farm.regions as r, 
-        ClientsData cd  
-WHERE   cd.firmcode = ?ClientCode  
-		AND (cd.MaskRegion & r.RegionCode)	> 0
-ORDER BY region";
+SELECT  a.RegionCode,
+        a.Region, 
+        MaskRegion & a.regioncode     >0 as Enable
+FROM    farm.regions                     as a, 
+        farm.regions                     as b, 
+        clientsdata, 
+        accessright.regionaladmins
+WHERE   b.regioncode                                             =?HomeRegion
+        AND  clientsdata.firmcode                                =?ClientCode
+        AND a.regioncode & (b.defaultshowregionmask | MaskRegion)>0
+        AND regionaladmins.username                              =?UserName
+        AND a.regioncode & regionaladmins.RegionMask             > 0
+GROUP BY regioncode
+ORDER BY region;
+";
 			}
 			MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
 			adapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
-			_data.Tables["Regions"].Clear();
-			adapter.Fill(_data, "Regions");
-			DataBind();
+			adapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
+			adapter.SelectCommand.Parameters.Add("UserName", _userName);
+			_data.Tables["EnableRegions"].Clear();
+			adapter.Fill(_data, "EnableRegions");
+			WorkRegionList.DataBind();
 			SetRegions();
 		}
 		
@@ -573,22 +602,16 @@ WHERE   cd.FirmCode                       = ?ClientCode
 				);
 				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
 				updateCommand.Parameters.Add("ClientCode", _clientCode);
+				updateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
+				updateCommand.Parameters.Add("UserName", Session["UserName"]);
 				updateCommand.Execute();
 			}
 		}
 		
 		private void UpdateHomeRegion()
 		{
-			ScalarCommand homeRegionCommand = new ScalarCommand(
-@"
-SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
-");
-			homeRegionCommand.Parameters.Add("ClientCode", _clientCode);
-			homeRegionCommand.Execute();
-
-			ulong oldHomeRegion = Convert.ToUInt64(homeRegionCommand.Result);
 			ulong currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
-			if (oldHomeRegion != currentHomeRegion)
+			if (_homeRegion != currentHomeRegion)
 			{
 				ParametericCommand command = new ParametericCommand(
 @"
@@ -606,6 +629,18 @@ WHERE FirmCode = ?ClientCode;
 				command.Execute();
 			}
 			
+		}
+		
+		private ulong GetHomeRegion()
+		{
+			ScalarCommand homeRegionCommand = new ScalarCommand(
+@"
+SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
+");
+			homeRegionCommand.Parameters.Add("ClientCode", _clientCode);
+			homeRegionCommand.Execute();
+
+			return Convert.ToUInt64(homeRegionCommand.Result);
 		}
 		
 	}
