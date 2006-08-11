@@ -24,7 +24,7 @@ public partial class EditAdministrator : Page
 			Response.Redirect("default.aspx");
 
 		if (Convert.ToInt32(Request["id"]) > 0)
-			_current = CommandsFactory.GetAdministrator(Convert.ToInt32(Request["id"]));
+			_current = CommandFactory.GetAdministrator(Convert.ToInt32(Request["id"]));
 		else 
 			_current = new Administrator();
 		if (!IsPostBack)
@@ -63,9 +63,9 @@ public partial class EditAdministrator : Page
 		_current.UseRegistrant = UseRegistrant.Checked;
 
 		if (_current.ID != -1)
-			CommandsFactory.UpdateAdministrator(_current);
+			CommandFactory.UpdateAdministrator(_current);
 		else
-			CommandsFactory.AddAdministrator(_current);
+			CommandFactory.AddAdministrator(_current);
 
 		Response.Redirect("ViewAdministrators.aspx");
 	}

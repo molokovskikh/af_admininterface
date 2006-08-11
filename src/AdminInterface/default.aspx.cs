@@ -2,6 +2,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Web.UI;
 using ActiveDs;
+using DAL;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -60,6 +61,7 @@ namespace AddUser
 				Session["ClInf"] = Reader[4];
 				ClManageHL.Visible = Convert.ToBoolean(Reader[1]);
 				Session["ClManage"] = Reader[1];
+				ViewAdministrators.Visible = Session["Administrator"] != null ? ((Administrator)Session["Administrator"]).AllowManageAdminAccounts : false;
 				Reader.Close();
 
 				command.CommandText = " select sum(UncommittedUpdateTime>=CURDATE() and UpdateTime<>UncommittedUpdateTime) as request," +

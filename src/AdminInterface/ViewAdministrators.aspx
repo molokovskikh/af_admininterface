@@ -12,7 +12,7 @@
 		<div>
 			<h3>Региональные администраторы</h3>
 			<asp:ObjectDataSource ID="ObjectDataSource1" runat="server"
-				SelectMethod="GetAdministratorList" TypeName="DAL.CommandsFactory" DataObjectTypeName="DAL.Administrator" DeleteMethod="DeleteAdministrator" ConflictDetection="CompareAllValues"></asp:ObjectDataSource>
+				SelectMethod="GetAdministratorList" TypeName="DAL.CommandFactory" DataObjectTypeName="DAL.Administrator" DeleteMethod="DeleteAdministrator" ConflictDetection="CompareAllValues"></asp:ObjectDataSource>
 			<asp:GridView ID="Administrators" runat="server" AutoGenerateColumns="False" DataSourceID="ObjectDataSource1" OnRowCommand="Administrators_RowCommand" OnRowCreated="Administrators_RowCreated" DataKeyNames="ID">
 				<Columns>
 					<asp:TemplateField ShowHeader="False">

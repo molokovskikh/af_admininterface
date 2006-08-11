@@ -3,6 +3,7 @@ using System.Web;
 using System.Web.SessionState;
 using System.Runtime.InteropServices;
 using ActiveDs;
+using DAL;
 
 namespace AddUser
 {
@@ -37,8 +38,13 @@ namespace AddUser
 			#else
 				UserName = UserName.Substring(7);
 			#endif
+
+			Administrator administrator = CommandFactory.GetAdministrator(UserName);
+			if (administrator != null)
+				Session["Administrator"] = administrator;
+			
 			Session["UserName"] = UserName;
-			Session["SessionID"] = this.Session.SessionID;
+			Session["SessionID"] = Session.SessionID;
 		}
 
 		void Application_BeginRequest(object sender, EventArgs e)

@@ -80,7 +80,7 @@
 				<asp:Button runat="server" ID="Save" Text="Сохранить" OnClick="Save_Click" />
 				<asp:Button runat="server" ID="Cancel" Text="Отменить" OnClick="Cancel_Click" />
 				<asp:ObjectDataSource ID="RegionsDataSource" runat="server" SelectMethod="GetRegionList"
-					TypeName="DAL.CommandsFactory"></asp:ObjectDataSource>
+					TypeName="DAL.CommandFactory"></asp:ObjectDataSource>
 			</div>
 		</div>
 	</form>

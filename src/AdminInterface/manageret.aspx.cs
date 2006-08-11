@@ -516,7 +516,7 @@ WHERE   clientcode   = ?ClientCode
 
 		protected void GeneratePasswords_Click(object sender, EventArgs e)
 		{
-			CommandsFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
+			CommandFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
 			ResultL.Text = "Пароли сгенерированны";
 		}
 
