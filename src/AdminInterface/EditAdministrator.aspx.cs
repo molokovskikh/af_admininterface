@@ -10,7 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using DAL;
 
-public partial class EditAdministrator : System.Web.UI.Page
+public partial class EditAdministrator : Page
 {
 	protected Administrator _current
 	{
@@ -49,6 +49,7 @@ public partial class EditAdministrator : System.Web.UI.Page
 			if (item.Selected)
 				_current.RegionMask = _current.RegionMask | Convert.ToUInt64(item.Value);
 
+		_current.AllowManageAdminAccounts = AllowManageAdminAccounts.Checked;
 		_current.AllowCreateRetail = AllowCreateRetail.Checked;
 		_current.AllowCreateVendor = AllowCreateVendor.Checked;
 		_current.AllowRetailInterface = AllowRetailInterface.Checked;

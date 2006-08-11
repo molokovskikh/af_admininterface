@@ -35,6 +35,7 @@
 					</asp:TemplateField>
 					<asp:BoundField DataField="Email" HeaderText="E-mail" SortExpression="Email" />
 					<asp:BoundField DataField="Phone" HeaderText="Телефон" SortExpression="Phone" />
+					<asp:CheckBoxField DataField="AllowManageAdminAccounts" HeaderText="MAC" SortExpression="AllowManageAdminAccounts" />
 					<asp:CheckBoxField DataField="AllowCreateRetail" HeaderText="CR" SortExpression="AllowCreateRetail" />
 					<asp:CheckBoxField DataField="AllowRetailInterface" HeaderText="RI" SortExpression="AllowRetailInterface" />
 					<asp:CheckBoxField DataField="AllowCreateVendor" HeaderText="CV" SortExpression="AllowCreateVendor" />
@@ -49,6 +50,7 @@
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">
+				<li>MAC - Разрешить управлять аккаунтами региональных администраторов</li>
 				<li>CR - Разрешить регистрировать аптеки</li>
 				<li>RI - Разрешить управление интерфейсом аптеки</li>
 				<li>CV - Разрешить создавать поставщиков</li>

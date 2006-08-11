@@ -51,6 +51,8 @@
 			</fieldset>
 			<fieldset>
 				<legend>Права:</legend>
+				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.AllowManageAdminAccounts %>' ID="AllowManageAdminAccounts"
+					runat="server" Text="Разрешить управлять региональными администраторами" />
 				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.AllowCreateRetail %>'
 					ID="AllowCreateRetail" runat="server" Text="Разрешить регистрировать аптеки" />
 				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.AllowCreateVendor %>'

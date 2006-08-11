@@ -10,7 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using DAL;
 
-public partial class ViewAdministrators : System.Web.UI.Page
+public partial class ViewAdministrators : Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
