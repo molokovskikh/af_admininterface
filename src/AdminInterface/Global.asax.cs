@@ -1,9 +1,11 @@
 using System;
+using System.Text;
 using System.Web;
 using System.Web.SessionState;
 using System.Runtime.InteropServices;
 using ActiveDs;
 using DAL;
+using Microsoft.Practices.EnterpriseLibrary.Logging;
 
 namespace AddUser
 {
@@ -57,7 +59,20 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
+			StringBuilder builder = new StringBuilder();
+			Exception exception = Server.GetLastError();
+			do
+			{
+				builder.AppendLine("Message:");
+				builder.AppendLine(exception.Message);
+				builder.AppendLine("Stack Trace:");
+				builder.AppendLine(exception.StackTrace);
+				builder.AppendLine("--------------");
+				exception = exception.InnerException;
+			} while (exception != null);
 
+
+			Logger.Write(builder.ToString(), "Error");
 		}
 
 		void Session_End(object sender, EventArgs e)
