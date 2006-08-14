@@ -91,7 +91,7 @@
 				</div>
 				<div class="ContentBlock">
 					<asp:GridView ID="RegionalSettingsGrid" runat="server" AutoGenerateColumns="False"
-						DataMember="RegionSettings">
+						DataMember="RegionSettings" OnRowCreated="RegionalSettingsGrid_RowCreated">
 						<Columns>
 							<asp:BoundField DataField="Region" HeaderText="Регион" />
 							<asp:TemplateField HeaderText="Включен">
