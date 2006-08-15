@@ -656,10 +656,19 @@ SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
 		{
+			
 			if (e.Row.RowType == DataControlRowType.DataRow)
 			{
-				if ((Convert.ToUInt64(_data.Tables["RegionSettings"].Rows[e.Row.DataItemIndex]["RegionCode"]) & _homeRegion) == 0)
+				DataRow[] rows = _data.Tables["EnableRegions"].Select(String.Format("RegionCode = {0}", _data.Tables["RegionSettings"].Rows[e.Row.DataItemIndex]["RegionCode"]));
+				if (rows.Length > 0)
+				{
+					if (Convert.ToBoolean(rows[0]["Enable"]) == false)
+						e.Row.BackColor = Color.FromArgb(239, 236, 201);
+				}
+				else
+				{
 					e.Row.BackColor = Color.FromArgb(239, 236, 201);
+				}
 			}
 		}
 }
