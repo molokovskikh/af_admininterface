@@ -9,7 +9,7 @@ using Microsoft.Practices.EnterpriseLibrary.Logging;
 
 namespace AddUser
 {
-	public class Global : System.Web.HttpApplication
+	public class Global : HttpApplication
 	{
 		private System.ComponentModel.IContainer components;
 		
@@ -59,6 +59,7 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
+#if !DEBUG
 			StringBuilder builder = new StringBuilder();
 			Exception exception = Server.GetLastError();
 			do
@@ -73,12 +74,15 @@ namespace AddUser
 
 
 			Logger.Write(builder.ToString(), "Error");
+#endif
 		}
 
 		void Session_End(object sender, EventArgs e)
 		{
+/*
 			Response.Cookies["Inforoom.Admins.ShowStatsC"].Value = Session["MaxID"].ToString();
 			Response.Cookies["Inforoom.Admins.ShowStatsC"].Expires = DateTime.Now.AddYears(2);
+*/
 		}
 
 		void Application_End(object sender, EventArgs e)

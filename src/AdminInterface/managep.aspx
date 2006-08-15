@@ -38,7 +38,7 @@
 								<ItemTemplate>
 									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
 									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ErrorMessage="*"
-										ValidationExpression="^\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
+										ValidationExpression="^([-+])?\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">

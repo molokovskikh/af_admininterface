@@ -519,6 +519,48 @@ SET MaskRegion = ?MaskRegion
 WHERE FirmCode = ?ClientCode;
 
 INSERT 
+INTO    pricesregionaldata
+        (
+                regioncode, 
+                pricecode, 
+                enabled
+        )    
+SELECT  r.RegionCode,
+		p.PriceCode, 
+        if(p.pricetype<>1, 1, 0) 
+FROM    pricesdata p,   
+        clientsdata cd,   
+        farm.regions r  
+WHERE     cd.FirmCode  = ?ClientCode  
+        AND p.FirmCode = cd.FirmCode  
+        AND exists
+        (SELECT * 
+        FROM    pricescosts pc 
+        WHERE   pc.ShowPriceCode = p.PriceCode
+        )  
+        AND (r.RegionCode & cd.MaskRegion > 0)  
+        AND not exists
+        (SELECT * 
+        FROM    pricesregionaldata prd 
+        WHERE   prd.PriceCode      = p.PriceCode 
+                AND prd.RegionCode = r.RegionCode
+        );
+
+INSERT INTO regionaldata  (   FirmCode,   RegionCode  )  
+SELECT  cd.FirmCode, 
+        r.RegionCode 
+FROM    ClientsData cd, 
+        Farm.Regions r 
+WHERE   cd.FirmCode                       = ?ClientCode 
+        AND(r.RegionCode & cd.MaskRegion) > 0 
+        AND NOT exists 
+        (SELECT * 
+        FROM    regionaldata rd 
+        WHERE   rd.FirmCode       = cd.FirmCode 
+                AND rd.RegionCode = r.RegionCode
+);
+
+INSERT 
 INTO    intersection
         (
                 ClientCode, 
@@ -562,48 +604,6 @@ WHERE   clientsdata2.FirmCode							  = ?ClientCode
         AND (clientsdata.maskregion & regions.regioncode) >0    
         AND (clientsdata2.maskregion & regions.regioncode)>0    
         AND clientsdata2.firmtype                         =1;
-
-INSERT 
-INTO    pricesregionaldata
-        (
-                regioncode, 
-                pricecode, 
-                enabled
-        )    
-SELECT  r.RegionCode,
-		p.PriceCode, 
-        if(p.pricetype<>1, 1, 0) 
-FROM    pricesdata p,   
-        clientsdata cd,   
-        farm.regions r  
-WHERE     cd.FirmCode  = ?ClientCode  
-        AND p.FirmCode = cd.FirmCode  
-        AND exists
-        (SELECT * 
-        FROM    pricescosts pc 
-        WHERE   pc.ShowPriceCode = p.PriceCode
-        )  
-        AND (r.RegionCode & cd.MaskRegion > 0)  
-        AND not exists
-        (SELECT * 
-        FROM    pricesregionaldata prd 
-        WHERE   prd.PriceCode      = p.PriceCode 
-                AND prd.RegionCode = r.RegionCode
-        );
-
-INSERT INTO regionaldata  (   FirmCode,   RegionCode  )  
-SELECT  cd.FirmCode, 
-        r.RegionCode 
-FROM    ClientsData cd, 
-        Farm.Regions r 
-WHERE   cd.FirmCode                       = ?ClientCode 
-        AND(r.RegionCode & cd.MaskRegion) > 0 
-        AND NOT exists 
-        (SELECT * 
-        FROM    regionaldata rd 
-        WHERE   rd.FirmCode       = cd.FirmCode 
-                AND rd.RegionCode = r.RegionCode
-);
 "
 				);
 				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
