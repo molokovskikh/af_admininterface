@@ -12,7 +12,12 @@ namespace AddUser
 	partial class managep : Page
 	{
 		private MySqlConnection _connection = new MySqlConnection();
-		private string _userName;
+		
+		private string _userName
+		{
+			get { return (string) Session["UserName"]; }
+			set { Session["UserName"] = value; }
+		}
 
 		private DataSet _data
 		{
@@ -47,7 +52,6 @@ namespace AddUser
 				else
 					throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", clientCode), "ClientCode");
 
-				_userName = Session["UserName"].ToString();
 				GetData();
 				ConnectDataSource();
 				DataBind();
@@ -193,6 +197,7 @@ ORDER BY region;
 
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
+			ShowAllRegionsCheck.Checked = false;
 			UpdateHomeRegion();
 			UpdateMaskRegion();
 			ChangesToDataSet();
@@ -216,7 +221,7 @@ WHERE PriceCode = ?PriceCode;
 ", _connection);
 
 			pricesDataAdapter.DeleteCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.DeleteCommand.Parameters.Add("UserName", Session["UserName"]);
+			pricesDataAdapter.DeleteCommand.Parameters.Add("UserName", _userName);
 			pricesDataAdapter.DeleteCommand.Parameters.Add("PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			pricesDataAdapter.InsertCommand = new MySqlCommand(
@@ -324,7 +329,7 @@ WHERE   PricesData.PriceCode							  = @InsertedPriceCode
         AND clientsdata2.firmtype                         =1;
 ", _connection);
 			pricesDataAdapter.InsertCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.InsertCommand.Parameters.Add("UserName", Session["UserName"]);
+			pricesDataAdapter.InsertCommand.Parameters.Add("UserName", _userName);
 			pricesDataAdapter.InsertCommand.Parameters.Add("ClientCode", _clientCode);
 			pricesDataAdapter.InsertCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.InsertCommand.Parameters.Add("PriceType", MySqlDbType.Int32, 0, "PriceType");
@@ -347,7 +352,7 @@ SET UpCost = ?UpCost,
 WHERE PriceCode = ?PriceCode;
 ", _connection);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.UpdateCommand.Parameters.Add("UserName", Session["UserName"]);
+			pricesDataAdapter.UpdateCommand.Parameters.Add("UserName", _userName);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
@@ -376,7 +381,7 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("Id", MySqlDbType.Int32, 0, "RowID");
 
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("UserName", Session["UserName"]);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("UserName", _userName);
 			MySqlTransaction transaction = null;
 			try
 			{
@@ -604,7 +609,7 @@ WHERE   cd.FirmCode                       = ?ClientCode
 				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
 				updateCommand.Parameters.Add("ClientCode", _clientCode);
 				updateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.Add("UserName", Session["UserName"]);
+				updateCommand.Parameters.Add("UserName", _userName);
 				updateCommand.Execute();
 			}
 		}
@@ -626,7 +631,7 @@ WHERE FirmCode = ?ClientCode;
 				command.Parameters.Add("RegionCode", currentHomeRegion);
 				command.Parameters.Add("ClientCode", _clientCode);
 				command.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.Add("UserName", Session["UserName"]);
+				command.Parameters.Add("UserName", _userName);
 				command.Execute();
 			}
 			
