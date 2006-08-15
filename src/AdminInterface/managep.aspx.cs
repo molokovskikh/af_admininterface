@@ -260,7 +260,6 @@ SELECT  @NewPriceCode,
         @InsertedPriceCode;  
 INSERT INTO farm.costformrules(PC_CostCode, FR_ID) SELECT @NewPriceCode, @NewPriceCode;
 
-
 INSERT 
 INTO    pricesregionaldata
         (
@@ -268,20 +267,26 @@ INTO    pricesregionaldata
                 pricecode, 
                 enabled
         )    
-SELECT  r.regioncode, 
-        pd.pricecode, 
-        if(pd.pricetype<>1, 1, 0)    
-FROM    (clientsdata cd, 
-        farm.regions r,  
-        pricesdata pd)
-LEFT JOIN pricesregionaldata prd
-        ON prd.pricecode                    = pd.pricecode 
-        AND prd.regioncode                  = r.regioncode    
-WHERE   pd.PriceCode						= @InsertedPriceCode
-		AND pd.firmcode                     = cd.firmcode    
-        AND cd.firmtype                     = 0    
-        AND (cd.ShowRegionMask& r.regioncode)> 0    
-        AND prd.pricecode is null;
+SELECT  r.RegionCode,
+		p.PriceCode, 
+        if(p.pricetype<>1, 1, 0) 
+FROM    pricesdata p,   
+        clientsdata cd,   
+        farm.regions r  
+WHERE   p.PriceCode  = @InsertedPriceCode
+        AND p.FirmCode = cd.FirmCode  
+        AND exists
+        (SELECT * 
+        FROM    pricescosts pc 
+        WHERE   pc.ShowPriceCode = p.PriceCode
+        )  
+        AND (r.RegionCode & cd.MaskRegion > 0)  
+        AND not exists
+        (SELECT * 
+        FROM    pricesregionaldata prd 
+        WHERE   prd.PriceCode      = p.PriceCode 
+                AND prd.RegionCode = r.RegionCode
+        );
 
 INSERT 
 INTO    intersection
