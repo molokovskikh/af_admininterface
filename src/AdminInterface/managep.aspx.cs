@@ -36,19 +36,18 @@ namespace AddUser
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
-
-			_userName = Session["UserName"].ToString();
-
-			int clientCode;
-			if (Int32.TryParse(Request["cc"], out clientCode))
-				_clientCode = clientCode;
-			else
-				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", clientCode), "ClientCode");
-
+		
 			_connection.ConnectionString = Literals.GetConnectionString();
 
 			if (!IsPostBack)
 			{
+				int clientCode;
+				if (Int32.TryParse(Request["cc"], out clientCode))
+					_clientCode = clientCode;
+				else
+					throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", clientCode), "ClientCode");
+
+				_userName = Session["UserName"].ToString();
 				GetData();
 				ConnectDataSource();
 				DataBind();
