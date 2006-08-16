@@ -151,7 +151,7 @@ WHERE   formrules.firmcode                       = pricesdata.pricecode
         and if(UseRegistrant                     = 1, Registrant= showright.UserName, 1)
 ";
 			string secondPart = String.Empty;
-			string thirdPart = 
+			string thirdPart =
 @"
 group by cd.firmcode union 
 SELECT  cd. billingcode, 
@@ -177,7 +177,7 @@ LEFT JOIN includeregulation
 LEFT JOIN clientsdata incd 
         ON incd.firmcode= includeregulation.PrimaryClientCode 
 LEFT JOIN osuseraccessright as ouar2 
-		ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null or IncludeRegulation.IncludeType = 0, cd.FirmCode, IncludeRegulation.PrimaryClientCode) 
+		ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null or IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode)
 --        ON ouar2.clientcode= ifnull(IncludeRegulation.PrimaryClientCode, cd.FirmCode) 
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
@@ -189,7 +189,7 @@ LEFT JOIN logs.prgdataex
         WHERE   clientcode= ifnull(includeregulation.PrimaryClientCode, cd.firmcode) 
                 and updatetype in(1,2)
         ) 
-WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null or IncludeRegulation.IncludeType = 0, cd.FirmCode, IncludeRegulation.PrimaryClientCode) 
+WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null or IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode)
         and regions.regioncode                   = cd.regioncode 
         and cd.regioncode & showright.regionmask > 0 
         and showright.UserName                   = ?UserName 
