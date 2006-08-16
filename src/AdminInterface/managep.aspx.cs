@@ -597,7 +597,7 @@ LEFT JOIN intersection
         AND intersection.clientcode=clientsdata2.firmcode    
 LEFT JOIN retclientsset as a 
         ON a.clientcode=clientsdata2.firmcode    
-WHERE   clientsdata2.FirmCode							  = ?ClientCode
+WHERE   clientsdata.FirmCode							  = ?ClientCode
 		AND intersection.pricecode IS NULL    
         AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
         AND clientsdata.firmtype                          =0    
