@@ -19,7 +19,7 @@ namespace AddUser
 			_connection.Open();
 			try
 			{
-/*
+				
 				ADUser = Marshal.BindToMoniker(@"WinNT://adc.analit.net/" + Convert.ToString(Session["UserName"])) as IADsUser;
 				if ((ADUser.PasswordExpirationDate >= DateTime.Now) || (Convert.ToString(Session["UserName"]) == "michail"))
 				{
@@ -41,7 +41,6 @@ namespace AddUser
 					              ". <br>Доступ к системе будет открыт после изменения пароля.";
 					return;
 				}
-*/
 				Session["AccessGrant"] = 1;
 				
 				MySqlCommand command = new MySqlCommand();

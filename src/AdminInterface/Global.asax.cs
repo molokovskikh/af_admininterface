@@ -59,7 +59,7 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
-//#if !DEBUG
+#if !DEBUG
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
@@ -83,7 +83,7 @@ namespace AddUser
 			builder.AppendLine("--------------");
 
 			Logger.Write(builder.ToString(), "Error");
-//#endif
+#endif
 		}
 
 		void Session_End(object sender, EventArgs e)
