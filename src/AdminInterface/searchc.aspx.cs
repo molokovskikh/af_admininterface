@@ -2,11 +2,12 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ActiveDs;
 using MySql.Data.MySqlClient;
-using Image=System.Web.UI.WebControls.Image;
+using Image = System.Web.UI.WebControls.Image;
 
 namespace AddUser
 {
@@ -23,33 +24,33 @@ namespace AddUser
 
 		private string _sortExpression
 		{
-			get {return (string) (ViewState["SortExpression"] ?? String.Empty);}
-			set {ViewState["SortExpression"] = value;}
+			get { return (string)(ViewState["SortExpression"] ?? String.Empty); }
+			set { ViewState["SortExpression"] = value; }
 		}
 
 		private SortDirection _sortDirection
 		{
-			get { return (SortDirection) (ViewState["SortDirection"] ?? SortDirection.Ascending); }
-			set {ViewState["SortDirection"] = value;}
+			get { return (SortDirection)(ViewState["SortDirection"] ?? SortDirection.Ascending); }
+			set { ViewState["SortDirection"] = value; }
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			    Response.Redirect("default.aspx");
+				Response.Redirect("default.aspx");
 			_connection.ConnectionString = Literals.GetConnectionString();
 			_connection.Open();
 			_command.CommandText = "select max(UserName='" + Session["UserName"] + "') from accessright.showright";
 			_command.Connection = _connection;
 			if (_command.ExecuteScalar().ToString() == "0")
 			{
-			    Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
-			    _connection.Close();
-			    Response.Redirect("error.aspx");
+				Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
+				_connection.Close();
+				Response.Redirect("error.aspx");
 			}
 			_connection.Close();
 		}
-		
+
 		protected void GoFind_Click(object sender, EventArgs e)
 		{
 			BuildQuery("order by 3, 4");
@@ -80,7 +81,7 @@ namespace AddUser
 		protected void ClientsGridView_Sorting(object sender, GridViewSortEventArgs e)
 		{
 			if (_sortExpression == e.SortExpression)
-			    _sortDirection = _sortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;			
+				_sortDirection = _sortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
 			_sortExpression = e.SortExpression;
 
 			ClientsDataView.Sort = _sortExpression + (_sortDirection == SortDirection.Ascending ? " ASC" : " DESC");
@@ -100,7 +101,7 @@ namespace AddUser
 			adapter.SelectCommand = _command;
 			adapter.Fill(data);
 			_connection.Close();
-			
+
 			if (ADCB.Checked)
 				GetADUserStatus(data.Tables[0]);
 
@@ -118,7 +119,7 @@ namespace AddUser
 
 		private void BuildQuery(string orderStatement)
 		{
-			string firstPart = 
+			string firstPart =
 @"
 SELECT  cd. billingcode, 
         cd.firmcode, 
@@ -200,37 +201,37 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 			switch (FindRB.SelectedItem.Value)
 			{
 				case "0":
-				{
-					secondPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-					fourthPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-					_command.Parameters.Add(new MySqlParameter("Name", MySqlDbType.VarChar));
-					_command.Parameters["Name"].Value = "%" + FindTB.Text + "%";
-					break;
-				}
+					{
+						secondPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
+						fourthPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
+						_command.Parameters.Add(new MySqlParameter("Name", MySqlDbType.VarChar));
+						_command.Parameters["Name"].Value = "%" + FindTB.Text + "%";
+						break;
+					}
 				case "1":
-				{
-					secondPart = " and cd.firmcode=?ClientCode";
-					fourthPart = " and cd.firmcode=?ClientCode";
-					_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int32));
-					_command.Parameters["ClientCode"].Value = FindTB.Text;
-					break;
-				}
+					{
+						secondPart = " and cd.firmcode=?ClientCode";
+						fourthPart = " and cd.firmcode=?ClientCode";
+						_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int32));
+						_command.Parameters["ClientCode"].Value = FindTB.Text;
+						break;
+					}
 				case "2":
-				{
-					secondPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-					fourthPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-					_command.Parameters.Add(new MySqlParameter("Login", MySqlDbType.VarChar));
-					_command.Parameters["Login"].Value = "%" + FindTB.Text + "%";
-					break;
-				}
+					{
+						secondPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
+						fourthPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
+						_command.Parameters.Add(new MySqlParameter("Login", MySqlDbType.VarChar));
+						_command.Parameters["Login"].Value = "%" + FindTB.Text + "%";
+						break;
+					}
 				case "3":
-				{
-					secondPart = " and cd.billingcode=?BillingCode";
-					fourthPart = " and cd.billingcode=?BillingCode";
-					_command.Parameters.Add(new MySqlParameter("BillingCode", MySqlDbType.Int32));
-					_command.Parameters["BillingCode"].Value = FindTB.Text;
-					break;
-				}
+					{
+						secondPart = " and cd.billingcode=?BillingCode";
+						fourthPart = " and cd.billingcode=?BillingCode";
+						_command.Parameters.Add(new MySqlParameter("BillingCode", MySqlDbType.Int32));
+						_command.Parameters["BillingCode"].Value = FindTB.Text;
+						break;
+					}
 			}
 			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new string[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
 			_command.Parameters.Add("UserName", Convert.ToString(Session["UserName"]));
@@ -245,16 +246,16 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 			}
 			if ((e.Row.RowType == DataControlRowType.Header) && (_sortExpression != String.Empty))
 			{
-			    GridView grid = sender as GridView;
-			    foreach (DataControlField field in  grid.Columns)
-			    {
-			        if (field.SortExpression == _sortExpression)
-			        {
-			            Image sortIcon = new Image();
+				GridView grid = sender as GridView;
+				foreach (DataControlField field in grid.Columns)
+				{
+					if (field.SortExpression == _sortExpression)
+					{
+						Image sortIcon = new Image();
 						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "arrow-down-blue.gif" : "arrow-down-blue-reversed.gif";
-			            e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
-			        }
-			    }
+						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
+					}
+				}
 			}
 		}
 
@@ -283,6 +284,23 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					}
 				}
 			}
+		}
+		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
+		{
+
+			Regex reg = null;
+			if (FindRB.SelectedIndex == 1)
+				reg = new Regex("^\\d{1,10}$");
+			if (FindRB.SelectedIndex == 2)
+				reg = new Regex("^\\d{1,10}$");
+			if (FindRB.SelectedIndex == 3)
+				reg = new Regex("^.+$");
+			if (FindRB.SelectedIndex == 0)
+				reg = new Regex("^.+$");
+			if (reg.IsMatch(args.Value))
+				args.IsValid = true;
+			else
+				args.IsValid = false;
 		}
 	}
 }
