@@ -441,10 +441,10 @@ WHERE RowId = ?Id;
 					_data.Tables["Prices"].Rows[i]["UpCost"] = ((TextBox)PricesGrid.Rows[i].FindControl("UpCostText")).Text;
 				if (Convert.ToString(_data.Tables["Prices"].Rows[i]["PriceType"]) != ((DropDownList)PricesGrid.Rows[i].FindControl("PriceTypeList")).SelectedValue)
 					_data.Tables["Prices"].Rows[i]["PriceType"] = ((DropDownList)PricesGrid.Rows[i].FindControl("PriceTypeList")).SelectedValue;
-				if (Convert.ToBoolean(_data.Tables["Prices"].Rows[i]["Enabled"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("EnableCheck")).Checked)
-					_data.Tables["Prices"].Rows[i]["Enabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("EnableCheck")).Checked;
-				if (Convert.ToBoolean(_data.Tables["Prices"].Rows[i]["AgencyEnabled"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked)
-					_data.Tables["Prices"].Rows[i]["AgencyEnabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked;
+				if (Convert.ToBoolean(_data.Tables["Prices"].Rows[i]["AgencyEnabled"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("EnableCheck")).Checked)
+					_data.Tables["Prices"].Rows[i]["AgencyEnabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("EnableCheck")).Checked;
+				if (Convert.ToBoolean(_data.Tables["Prices"].Rows[i]["Enabled"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked)
+					_data.Tables["Prices"].Rows[i]["Enabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked;
 				if (Convert.ToBoolean(_data.Tables["Prices"].Rows[i]["AlowInt"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("IntegratedCheck")).Checked)
 					_data.Tables["Prices"].Rows[i]["AlowInt"] = ((CheckBox)PricesGrid.Rows[i].FindControl("IntegratedCheck")).Checked;
 			}
@@ -663,11 +663,11 @@ SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
 				if (rows.Length > 0)
 				{
 					if (Convert.ToBoolean(rows[0]["Enable"]) == false)
-						e.Row.BackColor = Color.FromArgb(239, 236, 201);
+						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5"); ;
 				}
 				else
 				{
-					e.Row.BackColor = Color.FromArgb(239, 236, 201);
+					e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5");
 				}
 			}
 		}
