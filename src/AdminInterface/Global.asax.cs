@@ -59,8 +59,17 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
-#if !DEBUG
+//#if !DEBUG
 			StringBuilder builder = new StringBuilder();
+			builder.AppendLine("----Url-------");
+			builder.AppendLine(Request.Url.ToString());
+			builder.AppendLine("--------------");
+			builder.AppendLine("----Params----");
+			foreach (string name in Request.QueryString)
+				builder.AppendLine(String.Format("{0}: {1}", name, Request.QueryString[name]));
+			builder.AppendLine("--------------");
+			
+			builder.AppendLine("----Error-----");
 			Exception exception = Server.GetLastError();
 			do
 			{
@@ -71,10 +80,10 @@ namespace AddUser
 				builder.AppendLine("--------------");
 				exception = exception.InnerException;
 			} while (exception != null);
-
+			builder.AppendLine("--------------");
 
 			Logger.Write(builder.ToString(), "Error");
-#endif
+//#endif
 		}
 
 		void Session_End(object sender, EventArgs e)
