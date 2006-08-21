@@ -48,7 +48,7 @@ FROM    orders.ordershead,
 WHERE   clientcode         =client.firmcode  
         AND client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)  
         AND firm.firmcode  =if(sel.firmtype=0, sel.firmcode, firm.firmcode)  
-        AND writetime BETWEEN ?FromDate AND ?ToDate 
+        AND writetime BETWEEN ?FromDate AND ADDDATE(?ToDate, INTERVAL 1 DAY)
         AND pricesdata.pricecode=ordershead.pricecode  
         AND firm.firmcode       =pricesdata.firmcode 
         AND sel.firmcode        =?clientCode 
@@ -74,8 +74,8 @@ ORDER BY writetime desc;
 			}
 			if (!Page.IsPostBack)
 			{
-				CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-7));
-				CalendarTo.SelectedDates.Add(DateTime.Now.AddDays(-2));
+				CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-1));
+				CalendarTo.SelectedDates.Add(DateTime.Now);
 			}
 		}
 		protected void OrdersGrid_RowCreated(object sender, GridViewRowEventArgs e)
