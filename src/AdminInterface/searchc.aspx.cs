@@ -135,7 +135,8 @@ SELECT  cd. billingcode,
         (Firmstatus     = 0 
         or Billingstatus= 0) Firmstatus, 
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
-        cd.firmcode                                      as bfc 
+        cd.firmcode                                      as bfc,
+		NULL AS IncludeType
 FROM    (clientsdata as cd, farm.regions, accessright.showright, pricesdata, farm.formrules) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
@@ -169,7 +170,13 @@ SELECT  cd. billingcode,
         (cd.Firmstatus     = 0 
         or cd.Billingstatus= 0) Firmstatus, 
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
-        cd.firmcode                                      as bfc 
+        cd.firmcode                                      as bfc,
+		CASE IncludeRegulation.IncludeType
+			WHEN 0 THEN 'Базовый'
+			WHEN 1 THEN 'Сеть'
+			WHEN 2 THEN 'Невидимы'
+		END AS IncludeType
+		
 FROM    (clientsdata as cd, farm.regions, accessright.showright, retclientsset as rts) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 

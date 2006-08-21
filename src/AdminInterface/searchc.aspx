@@ -83,8 +83,10 @@
 							<asp:Label ID="Label4" runat="server" Text='<%# Eval("FirmType").ToString() == "1" ? "Аптека" : "Поставщик" %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
+					<asp:BoundField DataField="IncludeType" HeaderText="Тип подчинения" NullDisplayText="Не подчинен"
+						SortExpression="IncludeType" />
 				</Columns>
-				<EmptyDataRowStyle Font-Bold="true" HorizontalAlign="Center" />
+				<EmptyDataRowStyle Font-Bold="True" HorizontalAlign="Center" />
 				<EmptyDataTemplate>
 					Клиент не найден
 				</EmptyDataTemplate>
