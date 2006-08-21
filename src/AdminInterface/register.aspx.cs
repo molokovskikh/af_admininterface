@@ -2,7 +2,10 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Web;
@@ -98,26 +101,26 @@ namespace AddUser
 			Incudes.BeginInit();
 			DS1.DataSetName = "NewDataSet";
 			DS1.Locale = new CultureInfo("ru-RU");
-			DS1.Tables.AddRange(new DataTable[] {Regions, FreeCodes, WorkReg, Clientsdata, admin, DataTable1, Incudes});
-			Regions.Columns.AddRange(new DataColumn[] {DataColumn1, DataColumn2});
+			DS1.Tables.AddRange(new DataTable[] { Regions, FreeCodes, WorkReg, Clientsdata, admin, DataTable1, Incudes });
+			Regions.Columns.AddRange(new DataColumn[] { DataColumn1, DataColumn2 });
 			Regions.TableName = "Regions";
 			DataColumn1.ColumnName = "Region";
 			DataColumn2.ColumnName = "RegionCode";
-			DataColumn2.DataType = typeof (Int64);
-			FreeCodes.Columns.AddRange(new DataColumn[] {DataColumn3, DataColumn4});
+			DataColumn2.DataType = typeof(Int64);
+			FreeCodes.Columns.AddRange(new DataColumn[] { DataColumn3, DataColumn4 });
 			FreeCodes.TableName = "FreeCodes";
 			DataColumn3.ColumnName = "FirmCode";
-			DataColumn3.DataType = typeof (Int32);
+			DataColumn3.DataType = typeof(Int32);
 			DataColumn4.ColumnName = "ShortName";
-			WorkReg.Columns.AddRange(new DataColumn[] {DataColumn5, DataColumn6, DataColumn7, DataColumn8});
+			WorkReg.Columns.AddRange(new DataColumn[] { DataColumn5, DataColumn6, DataColumn7, DataColumn8 });
 			WorkReg.TableName = "WorkReg";
 			DataColumn5.ColumnName = "RegionCode";
-			DataColumn5.DataType = typeof (Int32);
+			DataColumn5.DataType = typeof(Int32);
 			DataColumn6.ColumnName = "Region";
 			DataColumn7.ColumnName = "ShowMask";
-			DataColumn7.DataType = typeof (Boolean);
+			DataColumn7.DataType = typeof(Boolean);
 			DataColumn8.ColumnName = "RegMask";
-			DataColumn8.DataType = typeof (Boolean);
+			DataColumn8.DataType = typeof(Boolean);
 			Clientsdata.Columns.AddRange(
 				new DataColumn[]
 					{
@@ -128,31 +131,31 @@ namespace AddUser
 			DataColumn9.ColumnName = "adress";
 			DataColumn12.ColumnName = "fax";
 			DataColumn13.ColumnName = "firmsegment";
-			DataColumn13.DataType = typeof (Int16);
+			DataColumn13.DataType = typeof(Int16);
 			DataColumn14.ColumnName = "firmtype";
-			DataColumn14.DataType = typeof (Int16);
+			DataColumn14.DataType = typeof(Int16);
 			DataColumn15.ColumnName = "oldcode";
-			DataColumn15.DataType = typeof (Int16);
+			DataColumn15.DataType = typeof(Int16);
 			DataColumn16.ColumnName = "phone";
 			DataColumn17.ColumnName = "regioncode";
-			DataColumn17.DataType = typeof (Int64);
+			DataColumn17.DataType = typeof(Int64);
 			DataColumn18.ColumnName = "shortname";
 			DataColumn19.ColumnName = "url";
 			DataColumn20.ColumnName = "fullname";
 			DataColumn21.ColumnName = "mail";
 			admin.TableName = "admin";
-			DataTable1.Columns.AddRange(new DataColumn[] {DataColumn22, DataColumn23});
+			DataTable1.Columns.AddRange(new DataColumn[] { DataColumn22, DataColumn23 });
 			DataTable1.TableName = "Payers";
 			DataColumn22.ColumnName = "PayerID";
-			DataColumn22.DataType = typeof (Int32);
+			DataColumn22.DataType = typeof(Int32);
 			DataColumn23.ColumnName = "PayerName";
-			Incudes.Columns.AddRange(new DataColumn[] {DataColumn24, DataColumn25, DataColumn26});
+			Incudes.Columns.AddRange(new DataColumn[] { DataColumn24, DataColumn25, DataColumn26 });
 			Incudes.TableName = "Includes";
 			DataColumn24.ColumnName = "FirmCode";
-			DataColumn24.DataType = typeof (uint);
+			DataColumn24.DataType = typeof(uint);
 			DataColumn25.ColumnName = "ShortName";
 			DataColumn26.ColumnName = "RegionCode";
-			DataColumn26.DataType = typeof (ulong);
+			DataColumn26.DataType = typeof(ulong);
 			DS1.EndInit();
 			Regions.EndInit();
 			FreeCodes.EndInit();
@@ -168,7 +171,7 @@ namespace AddUser
 			base.OnInit(e);
 			InitializeComponent();
 		}
-			
+
 		private MySqlConnection _connection = new MySqlConnection();
 		private MySqlDataReader _reader;
 		private IADsUser ADUser;
@@ -192,7 +195,7 @@ namespace AddUser
 			//если мы хотим выбрать все регионы тогда коментируем ту часть которая отвечает за выбор текущего региона
 			//т.е. -> "{1} b.regioncode={0} and" форматируем так что {1} заменяется на коментарий -> "--"
 			//если выбираем конкретный регион то форматируем  так что {1} заменяется на пустую строке -> ""
-			string commandText = 
+			string commandText =
 @"select a.RegionCode, a.Region,
 	(b.defaultshowregionmask & {0})>0 as ShowMask,
 	a.regioncode={0} as RegMask
@@ -235,7 +238,7 @@ order by region";
 			_connection.Open();
 			_reader =
 				new MySqlCommand("select Max(osusername='" + LoginTB.Text + "') as Present from (osuseraccessright)",
-				                 _connection).ExecuteReader();
+								 _connection).ExecuteReader();
 			_reader.Read();
 			if (_reader.Read())
 			{
@@ -369,7 +372,7 @@ set @inUser = ?UserName;
 			_command.Parameters["OSUserName"].Value = LoginTB.Text;
 			_command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.VarString));
 			_command.Parameters["OSUserPass"].Value = PassTB.Text;
-			
+
 			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
 			if (InvCB.Checked)
 			{
@@ -382,7 +385,7 @@ set @inUser = ?UserName;
 				{
 					_reader =
 						new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue,
-						                 _connection).ExecuteReader();
+										 _connection).ExecuteReader();
 					if (_reader.Read())
 					{
 						Session["DogN"] = Convert.ToInt32(_reader[0].ToString());
@@ -443,6 +446,7 @@ set @inUser = ?UserName;
 					ADUser.SetInfo();
 					ADUser = null;
 				}
+				CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
 				mytrans.Commit();
 				Session["strStatus"] = "Yes";
 				try
@@ -460,83 +464,83 @@ set @inUser = ?UserName;
 							foreach (DataRow Row in DS1.Tables["FirmEmail"].Rows)
 							{
 								Func.Mail("Аналитическая Компания Инфорум <pharm@analit.net>",
-								          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+										  "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 										  false,
-								          "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
-								          + ShortNameTB.Text + " в регионе(городе) "
-								          + RegionDD.SelectedItem.Text + "."
-								          +
-								          "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net)."
-								          + "С уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
-								          + "\n4732-206000", "\"" + Row[0] + "\"<" + Row[1] + ">", null, Encoding.GetEncoding(1251));
+										  "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
+										  + ShortNameTB.Text + " в регионе(городе) "
+										  + RegionDD.SelectedItem.Text + "."
+										  +
+										  "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net)."
+										  + "С уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
+										  + "\n4732-206000", "\"" + Row[0] + "\"<" + Row[1] + ">", null, Encoding.GetEncoding(1251));
 							}
 							Func.Mail("register@analit.net",
-							          "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
-							          false, "Оператор: " + Session["UserName"]
-							                           + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
-							                           + LoginTB.Text + "\nКод: " + Session["Code"]
-							                           + "\n\nСегмент: " + SegmentDD.SelectedItem.Text + "\nТип: "
-							                           + TypeDD.SelectedItem.Text + "О Регистрации уведомлено поставщиков: "
-							                           + Convert.ToString(DS1.Tables["FirmEmail"].Rows.Count - 1),
-							          "RegisterList@subscribe.analit.net",
-							          DS1.Tables["admin"].Rows[0]["email"].ToString(),
-							          Encoding.UTF8);
+									  "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
+									  false, "Оператор: " + Session["UserName"]
+													   + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
+													   + LoginTB.Text + "\nКод: " + Session["Code"]
+													   + "\n\nСегмент: " + SegmentDD.SelectedItem.Text + "\nТип: "
+													   + TypeDD.SelectedItem.Text + "О Регистрации уведомлено поставщиков: "
+													   + Convert.ToString(DS1.Tables["FirmEmail"].Rows.Count - 1),
+									  "RegisterList@subscribe.analit.net",
+									  DS1.Tables["admin"].Rows[0]["email"].ToString(),
+									  Encoding.UTF8);
 						}
 					}
 					else
 					{
 						Func.Mail("register@analit.net",
-						          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
+								  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 								  false, "Оператор: " + Session["UserName"] + "\nРегион: "
-						                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
-						                           + "\nКод: " + Session["Code"] + "\n\nСегмент: "
-						                           + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
-						                           + "Ошибка: Ничего не получилось выбрать из базы",
-						          "RegisterList@subscribe.analit.net",
-						          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+												   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+												   + "\nКод: " + Session["Code"] + "\n\nСегмент: "
+												   + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
+												   + "Ошибка: Ничего не получилось выбрать из базы",
+								  "RegisterList@subscribe.analit.net",
+								  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 					}
 				}
 				catch (Exception err)
 				{
 					Func.Mail("register@analit.net",
-					          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
+							  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
-					                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
-					                           + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					                           + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-					                           + err.Message, "RegisterList@subscribe.analit.net",
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
+											   + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
+											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
+											   + err.Message, "RegisterList@subscribe.analit.net",
+							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 				}
 				try
 				{
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text + "\" - успешная регистрация",
-					          false, "Оператор: " + Session["UserName"] + "\nРегион: "
-					                           + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
-					                           + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					                           + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net",
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
+											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+											   + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
+											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net",
+							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 					Func.Mail("\"" + FullNameTB.Text + "\" <" + EmailTB.Text + ">", "Sub", false, "",
-					          "FirmEmailList-on@subscribe.analit.net", null, Encoding.UTF8);
+							  "FirmEmailList-on@subscribe.analit.net", null, Encoding.UTF8);
 					if (!(TBClientManagerMail.Text == ""))
 						Func.Mail("\"" + TBClientManagerName.Text + "\" <" + TBClientManagerMail.Text + ">", "Sub", false, "",
-						          "ClientManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
+								  "ClientManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
 					if (!(TBOrderManagerMail.Text == ""))
 						Func.Mail("\"" + TBOrderManagerName.Text + "\" <" + TBOrderManagerMail.Text + ">", "Sub", false, "",
-						          "OrderManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
+								  "OrderManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
 					if (!(TBAccountantMail.Text == ""))
 						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", false, "",
-						          "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
+								  "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
 				}
 				catch (Exception err)
 				{
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text
 													 + "\" - ошибка подписки поставщиков", false,
-					          "Оператор: " + Session["UserName"] + "\nРегион: "
-					          + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
-					          + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					          + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-					          + err.Message, "RegisterList@subscribe.analit.net",
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+							  "Оператор: " + Session["UserName"] + "\nРегион: "
+							  + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
+							  + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
+							  + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
+							  + err.Message, "RegisterList@subscribe.analit.net",
+							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 				}
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
@@ -605,13 +609,13 @@ set @inUser = ?UserName;
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
 			Func.SelectTODS(" SELECT distinct PayerID, convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName"
-			                + " FROM clientsdata as cd, accessright.showright, billing.payers p "
-			                + " where p.payerid=cd.billingcode and cd.regioncode & showright.regionmask > 0 "
-			                + " and showright.UserName='" + Session["UserName"]
-			                + "' and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
-			                + " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1) "
-			                + " and firmstatus=1 and billingstatus=1 " + " and p.ShortName like '%"
-			                + PayerFTB.Text + "%' " + " order by p.shortname", "Payers", DS1);
+							+ " FROM clientsdata as cd, accessright.showright, billing.payers p "
+							+ " where p.payerid=cd.billingcode and cd.regioncode & showright.regionmask > 0 "
+							+ " and showright.UserName='" + Session["UserName"]
+							+ "' and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
+							+ " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1) "
+							+ " and firmstatus=1 and billingstatus=1 " + " and p.ShortName like '%"
+							+ PayerFTB.Text + "%' " + " order by p.shortname", "Payers", DS1);
 			PayerDDL.DataBind();
 			PayerCountLB.Text = "[" + PayerDDL.Items.Count + "]";
 			PayerCountLB.Visible = true;
@@ -669,15 +673,15 @@ set @inUser = ?UserName;
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
 			Func.SelectTODS(" SELECT distinct cd.FirmCode, convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, cd.RegionCode" +
-			                " FROM (accessright.showright, clientsdata as cd)"
-			                + " left join includeregulation ir on ir.includeclientcode=cd.firmcode"
-			                + " where cd.regioncode & showright.regionmask > 0"
-			                + " and showright.UserName='" + Session["UserName"] + "'"
-			                + " and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
-			                + " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)"
-			                + " and cd.ShortName like '%" + IncludeSTB.Text + "%' "
-			                + " and FirmStatus=1" + " and billingstatus=1" + " And FirmType=1"
-			                + " and ir.primaryclientcode is null" + " order by cd.shortname", "Includes", DS1);
+							" FROM (accessright.showright, clientsdata as cd)"
+							+ " left join includeregulation ir on ir.includeclientcode=cd.firmcode"
+							+ " where cd.regioncode & showright.regionmask > 0"
+							+ " and showright.UserName='" + Session["UserName"] + "'"
+							+ " and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
+							+ " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)"
+							+ " and cd.ShortName like '%" + IncludeSTB.Text + "%' "
+							+ " and FirmStatus=1" + " and billingstatus=1" + " And FirmType=1"
+							+ " and ir.primaryclientcode is null" + " order by cd.shortname", "Includes", DS1);
 			IncludeSDD.DataBind();
 			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
 			IncludeCountLB.Visible = true;
@@ -736,22 +740,22 @@ set @inUser = ?UserName;
 			_command.CommandText =
 				"INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask); ";
 			_command.CommandText += " INSERT " + " INTO intersection" + " (" + " ClientCode, " + " regioncode, " +
-			                          " pricecode, " + " InvisibleonFirm, " + " costcode" + " ) " + " SELECT DISTINCT " +
-			                          " clientsdata2.firmcode, " + " regions.regioncode, " + " pc.showpricecode, " +
-			                          " a.invisibleonfirm, " + " (" + " SELECT " + " costcode " + " FROM pricescosts pcc " +
-			                          " WHERE basecost " + " AND showpricecode=pc.showpricecode" + " ) " + " FROM (clientsdata, " +
-			                          " farm.regions, " + " pricescosts pc, " + " pricesdata) " + " LEFT JOIN " +
-			                          " clientsdata AS clientsdata2 " + " ON clientsdata2.firmcode=?ClientCode " + " LEFT JOIN " +
-			                          " intersection " + " ON intersection.pricecode=pc.showpricecode " +
-			                          " AND intersection.regioncode=regions.regioncode " +
-			                          " AND intersection.clientcode=clientsdata2.firmcode " + " LEFT JOIN " +
-			                          " retclientsset AS a " + " ON a.clientcode=clientsdata2.firmcode " +
-			                          " WHERE intersection.pricecode IS NULL " + " AND clientsdata.firmstatus=1 " +
-			                          " AND clientsdata.firmsegment=clientsdata2.firmsegment " + " AND clientsdata.firmtype=0 " +
-			                          " AND pricesdata.firmcode=clientsdata.firmcode " +
-			                          " AND pricesdata.pricecode=pc.showpricecode " + " AND " + " ( " +
-			                          " clientsdata.maskregion & regions.regioncode " + " ) " + " >0 " + " AND " + " ( " +
-			                          " clientsdata2.maskregion & regions.regioncode " + " ) " + " >0;";
+									  " pricecode, " + " InvisibleonFirm, " + " costcode" + " ) " + " SELECT DISTINCT " +
+									  " clientsdata2.firmcode, " + " regions.regioncode, " + " pc.showpricecode, " +
+									  " a.invisibleonfirm, " + " (" + " SELECT " + " costcode " + " FROM pricescosts pcc " +
+									  " WHERE basecost " + " AND showpricecode=pc.showpricecode" + " ) " + " FROM (clientsdata, " +
+									  " farm.regions, " + " pricescosts pc, " + " pricesdata) " + " LEFT JOIN " +
+									  " clientsdata AS clientsdata2 " + " ON clientsdata2.firmcode=?ClientCode " + " LEFT JOIN " +
+									  " intersection " + " ON intersection.pricecode=pc.showpricecode " +
+									  " AND intersection.regioncode=regions.regioncode " +
+									  " AND intersection.clientcode=clientsdata2.firmcode " + " LEFT JOIN " +
+									  " retclientsset AS a " + " ON a.clientcode=clientsdata2.firmcode " +
+									  " WHERE intersection.pricecode IS NULL " + " AND clientsdata.firmstatus=1 " +
+									  " AND clientsdata.firmsegment=clientsdata2.firmsegment " + " AND clientsdata.firmtype=0 " +
+									  " AND pricesdata.firmcode=clientsdata.firmcode " +
+									  " AND pricesdata.pricecode=pc.showpricecode " + " AND " + " ( " +
+									  " clientsdata.maskregion & regions.regioncode " + " ) " + " >0 " + " AND " + " ( " +
+									  " clientsdata2.maskregion & regions.regioncode " + " ) " + " >0;";
 			if (!(Invisible))
 			{
 				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
@@ -762,25 +766,25 @@ set @inUser = ?UserName;
 		private void CreatePriceRecords()
 		{
 			_command.CommandText = "INSERT INTO pricesdata(Firmcode, PriceCode) values(?ClientCode, null); " +
-			                         " set @NewPriceCode:=Last_Insert_ID(); insert into farm.formrules(firmcode) values(@NewPriceCode); " +
-			                         " insert into farm.sources(FirmCode) values(@NewPriceCode);";
+									 " set @NewPriceCode:=Last_Insert_ID(); insert into farm.formrules(firmcode) values(@NewPriceCode); " +
+									 " insert into farm.sources(FirmCode) values(@NewPriceCode);";
 			_command.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
-			                          " Select @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;" +
-			                          " Insert into farm.costformrules(PC_CostCode) Select @NewPriceCode;";
+									  " Select @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;" +
+									  " Insert into farm.costformrules(PC_CostCode) Select @NewPriceCode;";
 			_command.CommandText += " insert into regionaldata(regioncode, firmcode)" +
-			                          " SELECT distinct regions.regioncode, clientsdata.firmcode" +
-			                          " FROM (clientsdata, farm.regions, pricesdata)" +
-			                          " left join regionaldata on regionaldata.firmcode=clientsdata.firmcode and regionaldata.regioncode= regions.regioncode" +
-			                          " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
-			                          " and (clientsdata.maskregion & regions.regioncode)>0" +
-			                          " and regionaldata.firmcode is null;";
+									  " SELECT distinct regions.regioncode, clientsdata.firmcode" +
+									  " FROM (clientsdata, farm.regions, pricesdata)" +
+									  " left join regionaldata on regionaldata.firmcode=clientsdata.firmcode and regionaldata.regioncode= regions.regioncode" +
+									  " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
+									  " and (clientsdata.maskregion & regions.regioncode)>0" +
+									  " and regionaldata.firmcode is null;";
 			_command.CommandText += " insert into pricesregionaldata(regioncode, pricecode)" +
-			                          " SELECT distinct regions.regioncode, pricesdata.pricecode" +
-			                          " FROM (clientsdata, farm.regions, pricesdata, clientsdata as a)" +
-			                          " left join pricesregionaldata on pricesregionaldata.pricecode=pricesdata.pricecode and pricesregionaldata.regioncode= regions.regioncode" +
-			                          " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
-			                          " and (clientsdata.maskregion & regions.regioncode)>0" +
-			                          " and pricesregionaldata.pricecode is null;";
+									  " SELECT distinct regions.regioncode, pricesdata.pricecode" +
+									  " FROM (clientsdata, farm.regions, pricesdata, clientsdata as a)" +
+									  " left join pricesregionaldata on pricesregionaldata.pricecode=pricesdata.pricecode and pricesregionaldata.regioncode= regions.regioncode" +
+									  " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
+									  " and (clientsdata.maskregion & regions.regioncode)>0" +
+									  " and pricesregionaldata.pricecode is null;";
 			_command.CommandText +=
 				" insert into intersection(clientcode, regioncode, pricecode, invisibleonclient, InvisibleonFirm, CostCode) " +
 				" SELECT distinct clientsdata2.firmcode, regions.regioncode, pricesdata.pricecode," +
@@ -799,9 +803,9 @@ set @inUser = ?UserName;
 		private void CreateClientOnShowInclude(int PrimaryClientCode)
 		{
 			_command.CommandText = "INSERT INTO showregulation" + "(PrimaryClientCode, ShowClientCode, Addition)" + " VALUES (" +
-			                         PrimaryClientCode + ", ?ClientCode, ?ShortName);" + "INSERT INTO includeregulation" +
-			                         "(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)" + "VALUES(NULL," + PrimaryClientCode +
-			                         ", ?ClientCode, ?ShortName, ?IncludeType)";
+									 PrimaryClientCode + ", ?ClientCode, ?ShortName);" + "INSERT INTO includeregulation" +
+									 "(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)" + "VALUES(NULL," + PrimaryClientCode +
+									 ", ?ClientCode, ?ShortName, ?IncludeType)";
 			_command.ExecuteNonQuery();
 		}
 
@@ -896,10 +900,20 @@ set @inUser = ?UserName;
 			}
 			Session["strStatus"] = "Yes";
 		}
+
 		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
 		{
 			CheckBox checkBox = sender as CheckBox;
 			SetWorkRegions(RegionDD.SelectedItem.Value, checkBox.Checked);
+		}
+
+		private void CreateFtpDirectory(string directory, string userName)
+		{
+			DirectoryInfo info = Directory.CreateDirectory(directory);
+			DirectorySecurity security = info.GetAccessControl();
+			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Read, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			info.SetAccessControl(security);
 		}
 	}
 }
