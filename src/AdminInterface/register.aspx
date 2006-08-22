@@ -108,11 +108,11 @@
 								<asp:DropDownList ID="IncludeType" runat="server" Visible="False">
 									<asp:ListItem Value="0">Базовый</asp:ListItem>
 									<asp:ListItem Value="1">Сеть</asp:ListItem>
-									<asp:ListItem Value="2">Невидимый</asp:ListItem>
+									<asp:ListItem Value="2">Скрытый</asp:ListItem>
 								</asp:DropDownList>
 							</div>
 							<div>
-								<asp:CheckBox ID="InvCB" runat="server" Text="&quot;Невидимый&quot; клиент" Visible="False" />
+								<asp:CheckBox ID="InvCB" runat="server" Text="Запретить изменять наценки" Visible="False" />
 							</div>
 						</div>
 						<div class="TwoColumn">

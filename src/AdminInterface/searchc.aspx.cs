@@ -174,7 +174,7 @@ SELECT  cd. billingcode,
 		CASE IncludeRegulation.IncludeType
 			WHEN 0 THEN 'Базовый'
 			WHEN 1 THEN 'Сеть'
-			WHEN 2 THEN 'Невидимы'
+			WHEN 2 THEN 'Скрытый'
 		END AS IncludeType
 		
 FROM    (clientsdata as cd, farm.regions, accessright.showright, retclientsset as rts) 
