@@ -446,7 +446,8 @@ set @inUser = ?UserName;
 					ADUser.SetInfo();
 					ADUser = null;
 				}
-				CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+
+				//CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
 				mytrans.Commit();
 				Session["strStatus"] = "Yes";
 				try
@@ -738,24 +739,45 @@ set @inUser = ?UserName;
 		private void CreateClientOnRCS_and_I(bool Invisible)
 		{
 			_command.CommandText =
-				"INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask); ";
-			_command.CommandText += " INSERT " + " INTO intersection" + " (" + " ClientCode, " + " regioncode, " +
-									  " pricecode, " + " InvisibleonFirm, " + " costcode" + " ) " + " SELECT DISTINCT " +
-									  " clientsdata2.firmcode, " + " regions.regioncode, " + " pc.showpricecode, " +
-									  " a.invisibleonfirm, " + " (" + " SELECT " + " costcode " + " FROM pricescosts pcc " +
-									  " WHERE basecost " + " AND showpricecode=pc.showpricecode" + " ) " + " FROM (clientsdata, " +
-									  " farm.regions, " + " pricescosts pc, " + " pricesdata) " + " LEFT JOIN " +
-									  " clientsdata AS clientsdata2 " + " ON clientsdata2.firmcode=?ClientCode " + " LEFT JOIN " +
-									  " intersection " + " ON intersection.pricecode=pc.showpricecode " +
-									  " AND intersection.regioncode=regions.regioncode " +
-									  " AND intersection.clientcode=clientsdata2.firmcode " + " LEFT JOIN " +
-									  " retclientsset AS a " + " ON a.clientcode=clientsdata2.firmcode " +
-									  " WHERE intersection.pricecode IS NULL " + " AND clientsdata.firmstatus=1 " +
-									  " AND clientsdata.firmsegment=clientsdata2.firmsegment " + " AND clientsdata.firmtype=0 " +
-									  " AND pricesdata.firmcode=clientsdata.firmcode " +
-									  " AND pricesdata.pricecode=pc.showpricecode " + " AND " + " ( " +
-									  " clientsdata.maskregion & regions.regioncode " + " ) " + " >0 " + " AND " + " ( " +
-									  " clientsdata2.maskregion & regions.regioncode " + " ) " + " >0;";
+@"
+INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask);
+
+INSERT 
+INTO    intersection  
+        (  
+                ClientCode, 
+                regioncode, 
+                pricecode, 
+                InvisibleonFirm, 
+                costcode  
+        ) 
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pc.showpricecode, 
+        a.invisibleonfirm, 
+        ( SELECT costcode 
+        FROM    pricescosts pcc 
+        WHERE   basecost 
+                AND showpricecode=pc.showpricecode  
+        ) 
+FROM    (clientsdata, farm.regions, pricescosts pc, pricesdata) 
+LEFT JOIN clientsdata AS clientsdata2 
+        ON clientsdata2.firmcode=?ClientCode 
+LEFT JOIN intersection 
+        ON intersection.pricecode  =pc.showpricecode 
+        AND intersection.regioncode=regions.regioncode 
+        AND intersection.clientcode=clientsdata2.firmcode 
+LEFT JOIN retclientsset AS a 
+        ON a.clientcode=clientsdata2.firmcode 
+WHERE   intersection.pricecode IS NULL 
+        AND clientsdata.firmstatus                           =1 
+        AND clientsdata.firmsegment                          =clientsdata2.firmsegment 
+        AND clientsdata.firmtype                             =0 
+        AND pricesdata.firmcode                              =clientsdata.firmcode 
+        AND pricesdata.pricecode                             =pc.showpricecode 
+        AND ( clientsdata.maskregion & regions.regioncode )  >0 
+        AND ( clientsdata2.maskregion & regions.regioncode ) >0;
+";
 			if (!(Invisible))
 			{
 				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
@@ -829,12 +851,10 @@ set @inUser = ?UserName;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-#if !DEBUG
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 			{
 				Response.Redirect("default.aspx");
 			}
-#endif
 			_connection.ConnectionString = Literals.GetConnectionString();
 			Func.SelectTODS(
 				"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
