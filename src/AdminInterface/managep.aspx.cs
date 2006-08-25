@@ -241,11 +241,6 @@ SET @InsertedPriceCode = Last_Insert_ID();
 INSERT INTO farm.formrules(firmcode) VALUES(@InsertedPriceCode); 
 INSERT INTO farm.sources(FirmCode) VALUES(@InsertedPriceCode);  
 
-INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode , null);  
-set @NewPriceCode:=Last_Insert_ID(); 
-INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode); 
-INSERT INTO farm.sources(FirmCode) VALUES(@NewPriceCode);  
-			
 INSERT 
 INTO    PricesCosts
         (
@@ -254,11 +249,11 @@ INTO    PricesCosts
                 BaseCost, 
                 ShowPriceCode
         ) 
-SELECT  @NewPriceCode, 
-        @NewPriceCode, 
+SELECT  @InsertedPriceCode, 
+        @InsertedPriceCode, 
         1, 
         @InsertedPriceCode;  
-INSERT INTO farm.costformrules(PC_CostCode, FR_ID) SELECT @NewPriceCode, @NewPriceCode;
+INSERT INTO farm.costformrules(PC_CostCode, FR_ID) SELECT @InsertedPriceCode, @InsertedPriceCode;
 
 INSERT 
 INTO    pricesregionaldata

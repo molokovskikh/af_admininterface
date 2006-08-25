@@ -843,7 +843,7 @@ WHERE	dst.clientcode        = ?ClientCode
 									 " insert into farm.sources(FirmCode) values(@NewPriceCode);";
 			_command.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
 									  " Select @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;" +
-									  " Insert into farm.costformrules(PC_CostCode) Select @NewPriceCode;";
+									  " Insert into farm.costformrules(PC_CostCode, FR_ID) Select @NewPriceCode, @NewPriceCode;";
 			_command.CommandText += " insert into regionaldata(regioncode, firmcode)" +
 									  " SELECT distinct regions.regioncode, clientsdata.firmcode" +
 									  " FROM (clientsdata, farm.regions, pricesdata)" +
