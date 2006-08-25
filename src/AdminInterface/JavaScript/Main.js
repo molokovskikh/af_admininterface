@@ -26,10 +26,13 @@ function ValidateLogin(source, args)
 {
 	if (document.getElementById("IncludeCB").checked)
 	{
-		if (document.getElementById("IncludeType").children.item(document.getElementById("IncludeType").selectedIndex).text != "Базовый")
-			args.IsValid = args.Value.length > 0;
-		else
-			args.IsValid = true;
+		if (document.getElementById("IncludeType") != null)
+		{
+			if (document.getElementById("IncludeType").children.item(document.getElementById("IncludeType").selectedIndex).text != "Базовый")
+				args.IsValid = args.Value.length > 0;
+			else
+				args.IsValid = true;
+		}
 	}
 	else
 	{

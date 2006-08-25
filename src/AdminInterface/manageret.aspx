@@ -1,89 +1,79 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.manageret" CodePage="1251"
-	CodeFile="manageret.aspx.cs" MaintainScrollPositionOnPostback="true" %>
+	CodeFile="manageret.aspx.cs" MaintainScrollPositionOnPostback="true" Theme="Main" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+<head runat="server">
 	<title>Конфигурация пользователя</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 	<style type="text/css">
-		.tdCheckBox {vertical-align: middle; text-align: left; font-size: 8pt; font-family: Verdana;}
+		.tdCheckBox {vertical-align: middle; text-align: left;}
 	</style>
 </head>
-<body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
+<body>
 	<form id="Form1" method="post" runat="server">
 		<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 			<tr>
 				<td valign="top" align="center" style="height: 754px">
 					<div align="center">
-						<font face="Verdana"><font size="2"><strong>Конфигурация клиента</strong> </font></font>
-						<asp:Label ID="Name" runat="server" Font-Names="Verdana" Font-Bold="True" Font-Size="10pt"></asp:Label></div>
+						<strong>Конфигурация клиента</strong>
+						<asp:Label ID="Name" runat="server" Font-Bold="True" />
+					</div>
 					<div align="center">
 						<table id="Table2" bordercolor="#dadada" cellspacing="0" cellpadding="0" width="95%"
 							align="center" border="1">
 							<tr align="center" bgcolor="mintcream">
 								<td bgcolor="aliceblue" height="20">
-									<font face="Verdana" size="2"><strong>Общая настройка</strong></font></td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3" style="height: 22px">
-									<asp:CheckBox ID="InvisibleCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="&#34;Невидимый&#34; клиент" BorderStyle="None"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="RegisterCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Реестр"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="RejectsCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Забраковка"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-									<font face="Arial" size="2">
-										<div>
-											<asp:TextBox ID="MultiUserLevelTB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												BorderStyle="None" Width="33px" BackColor="LightGray"></asp:TextBox><font face="Verdana">&nbsp;-
-													одновременных сеансов</font></div>
-									</font>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="AdvertisingLevelCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Реклама" BorderStyle="None"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="WayBillCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Накладные" BorderStyle="None" Enabled="False"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="ChangeSegmentCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Изменение сегмента" BorderStyle="None"></asp:CheckBox>
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
-											<asp:CheckBox ID="EnableUpdateCB" runat="server" Font-Names="Verdana" Font-Size="8pt"
-												Text="Автоматическое обновление версий" BorderStyle="None"></asp:CheckBox>
+									<strong>Общая настройка</strong>
 								</td>
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3" style="height: 22px">
-									<asp:CheckBox ID="ResetCopyIDCB" runat="server" Font-Names="Verdana" Text="Сбросить уникальный идентификатор, причина:"
-										Font-Size="8pt" Enabled="False"></asp:CheckBox>
-									<asp:TextBox ID="CopyIDWTB" runat="server" Font-Names="Verdana" BorderStyle="None"
-										Font-Size="8pt" BackColor="LightGray" Enabled="False"></asp:TextBox>
-									<asp:Label ID="IDSetL" runat="server" Font-Size="8pt" Font-Names="Verdana" ForeColor="Green">Идентификатор не присвоен</asp:Label></td>
+									<asp:CheckBox ID="InvisibleCB" runat="server" Text="&#34;Невидимый&#34; клиент" BorderStyle="None" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="RegisterCB" runat="server" Text="Реестр"></asp:CheckBox>
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="RejectsCB" runat="server" Text="Забраковка" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:TextBox ID="MultiUserLevelTB" runat="server" BorderStyle="None" Width="33px"
+										BackColor="LightGray" />-одновременных сеансов
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="AdvertisingLevelCB" runat="server" Text="Реклама" BorderStyle="None" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="WayBillCB" runat="server"	Text="Накладные" BorderStyle="None" Enabled="False" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="ChangeSegmentCB" runat="server" Text="Изменение сегмента" BorderStyle="None" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3">
+									<asp:CheckBox ID="EnableUpdateCB" runat="server" Text="Автоматическое обновление версий" BorderStyle="None" />
+								</td>
+							</tr>
+							<tr>
+								<td valign="middle" align="left" colspan="3" style="height: 22px">
+									<asp:CheckBox ID="ResetCopyIDCB" runat="server" Text="Сбросить уникальный идентификатор, причина:" Enabled="False" />
+									<asp:TextBox ID="CopyIDWTB" runat="server" BorderStyle="None" BackColor="LightGray" Enabled="False" />
+									<asp:Label ID="IDSetL" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
+								</td>
 							</tr>
 							<tr>
 								<td class="tdCheckBox" colspan="3" style="height: 22px">
@@ -96,7 +86,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td class="tdCheckBox" colspan="3">
+								<td class="tdCheckBox" colspan="3" style="height: 22px">
 									<asp:CheckBox runat="server" ID="SubmitOrdersCB" Text="Разрешить подтверждение заказов" />
 								</td>
 							</tr>
@@ -111,8 +101,46 @@
 								</td>
 							</tr>
 							<tr>
+								<td style="text-align:center; background-color:#f0f8ff;">
+									Таблица подчинений:
+								</td>
+							</tr>
+							<tr>
+								<td style="height: 184px">
+									<asp:GridView ID="IncludeGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="IncludeGrid_RowCommand" OnRowDeleting="IncludeGrid_RowDeleting" OnRowDataBound="IncludeGrid_RowDataBound">
+										<Columns>
+											<asp:TemplateField ItemStyle-Width="10%">
+												<HeaderTemplate>
+													<asp:Button ID="AddButton" runat="server" Text="Добавить" CommandName="Add" />
+												</HeaderTemplate>
+												<ItemTemplate>
+													<asp:Button ID="DeleteButton" runat="server" Text="Удалить" CommandName="Delete" />
+												</ItemTemplate>
+											</asp:TemplateField>
+											<asp:TemplateField HeaderText="Родитель">
+												<ItemTemplate>
+													<asp:TextBox ID="SearchText" runat="server"></asp:TextBox>
+													<asp:Button ID="SearchButton" runat="server" CommandName="Search" Text="Найти" />
+													<asp:DropDownList ID="ParentList" runat="server" DataTextField="ShortName" DataValueField="FirmCode" Width="200px" >
+													</asp:DropDownList>
+												</ItemTemplate>
+											</asp:TemplateField>
+											<asp:TemplateField HeaderText="Тип подчинения">
+												<ItemTemplate>
+													<asp:DropDownList ID="IncludeTypeList" runat="server">
+														<asp:ListItem Value="0">Базовый</asp:ListItem >
+														<asp:ListItem Value="1">Сеть</asp:ListItem>
+														<asp:ListItem Value="2">Скрытый</asp:ListItem>
+													</asp:DropDownList>
+												</ItemTemplate>
+											</asp:TemplateField>
+										</Columns>
+									</asp:GridView>
+								</td>
+							</tr>
+							<tr>
 								<td valign="middle" align="left" bgcolor="#f0f8ff" colspan="3">
-									<p style="font-size: small; font-family: Verdana; text-align: center;">
+									<p style="text-align: center;">
 										<strong>Региональная настройка</strong></p>
 								</td>
 							</tr>
@@ -120,11 +148,11 @@
 								<td style="height: 8px" valign="middle" align="left" colspan="3">
 									<font face="Arial" size="2">Домашний регион:</font>
 									<asp:DropDownList ID="RegionDD" runat="server" OnSelectedIndexChanged="RegionDD_SelectedIndexChanged"
-										Font-Names="Verdana" Font-Size="8pt" AutoPostBack="True" DataSource="<%# admin %>"
+										AutoPostBack="True" DataSource="<%# admin %>"
 										DataTextField="Region" DataValueField="RegionCode">
 									</asp:DropDownList>
 									<asp:CheckBox ID="AllRegCB" runat="server" OnCheckedChanged="AllRegCB_CheckedChanged"
-										Font-Size="8pt" Font-Names="Verdana" Text="Показать все регионы" AutoPostBack="True">
+										Text="Показать все регионы" AutoPostBack="True">
 									</asp:CheckBox></td>
 							</tr>
 							<tr>
@@ -132,18 +160,20 @@
 									<table id="Table3" cellspacing="0" cellpadding="0" border="0">
 										<tr>
 											<td width="200">
-												<font face="Verdana" size="2"><strong>Доступные регионы:</strong></font></td>
+												<strong>Доступные регионы:</strong>
+												</td>
 											<td width="200">
-												<font face="Verdana" size="2"><strong>Регионы заказа:</strong></font></td>
+												<strong>Регионы заказа:</strong>
+												</td>
 										</tr>
 										<tr>
 											<td valign="top" align="left" width="200">
-												<asp:CheckBoxList ID="WRList" runat="server" Font-Names="Verdana" Font-Size="8pt"
+												<asp:CheckBoxList ID="WRList" runat="server" 
 													BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode"
 													CellSpacing="0" CellPadding="0">
 												</asp:CheckBoxList></td>
 											<td valign="top" align="left" width="200">
-												<asp:CheckBoxList ID="OrderList" runat="server" Font-Names="Verdana" Font-Size="8pt"
+												<asp:CheckBoxList ID="OrderList" runat="server" 
 													BorderStyle="None" DataSource="<%# WorkReg %>" DataTextField="Region" DataValueField="RegionCode"
 													CellSpacing="0" CellPadding="0">
 												</asp:CheckBoxList></td>
@@ -153,17 +183,19 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="right" colspan="3" style="height: 17px">
-									<asp:Button ID="ParametersSave" runat="server" OnClick="ParametersSave_Click" Font-Names="Verdana"
-										Font-Size="8pt" Text="Применить" BorderStyle="None"></asp:Button></td>
+									<asp:Button ID="ParametersSave" runat="server" OnClick="ParametersSave_Click" 
+										Text="Применить" BorderStyle="None"></asp:Button>
+										</td>
 							</tr>
 							<tr>
 								<td colspan="3" style="height: 22px">
-									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" BorderStyle="Groove" Font-Names="Verdana" Font-Size="8pt" OnClick="GeneratePasswords_Click" />
+									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" BorderStyle="Groove"
+										OnClick="GeneratePasswords_Click" />
 								</td>
 							</tr>
 							<tr>
 								<td valign="middle" align="center" colspan="3" style="height: 15px">
-									<asp:Label ID="ResultL" runat="server" Font-Names="Verdana" Font-Bold="True" Font-Size="8pt"
+									<asp:Label ID="ResultL" runat="server" Font-Bold="True"
 										ForeColor="Green" Font-Italic="True"></asp:Label></td>
 							</tr>
 						</table>
@@ -191,13 +223,14 @@
 														<tr>
 															<td>
 																<p align="left">
-																	<font face="Verdana" size="2">Показать</font>
+																	Показать
 																	<asp:DropDownList ID="SendMessageCountDD" runat="server">
 																		<asp:ListItem Value="1" Selected="True">1</asp:ListItem>
 																		<asp:ListItem Value="2">2</asp:ListItem>
 																		<asp:ListItem Value="5">5</asp:ListItem>
 																		<asp:ListItem Value="10">10</asp:ListItem>
-																	</asp:DropDownList>&nbsp;<font face="Verdana" size="2">раз.</font></p>
+																	</asp:DropDownList>раз.
+																	</p>
 															</td>
 														</tr>
 														<tr>
@@ -210,10 +243,10 @@
 													</tbody>
 												</table>
 												<p align="center">
-													<asp:Label ID="StatusL" runat="server" Font-Bold="True" ForeColor="Green" Font-Names="Verdana"
-														Font-Size="8pt" Font-Italic="True"> Cообщение отправленно.</asp:Label><br /> 
-														<asp:Label ID="MessageLeftL" runat="Server" ForeColor="Green" Font-Names="Verdana"
-														Font-Size="8pt" Font-Italic="True" Text="Остались не показанные сообщения" /></p>
+													<asp:Label ID="StatusL" runat="server" Font-Bold="True" ForeColor="Green" 
+														Font-Italic="True"> Cообщение отправленно.</asp:Label><br />
+													<asp:Label ID="MessageLeftL" runat="Server" ForeColor="Green"
+														Font-Italic="True" Text="Остались не показанные сообщения" /></p>
 											</td>
 										</tr>
 									</tbody>
@@ -221,10 +254,9 @@
 							</p>
 						</strong></font>
 					</div>
-					<p align="center">
-						<font face="Verdana"><font size="1"><font color="#000000">© АК "</font> </font></font>
-						<a href="http://www.analit.net/"><font color="#800080" size="1" face="Verdana">Инфорум</font></a><font
-							color="#000000" size="1" face="Verdana">" 2005</font></p>
+					<div class="CopyRight">
+						© АК <a href="http://www.analit.net/">"Инфорум"</a>2005
+					</div>
 				</td>
 			</tr>
 		</table>
