@@ -25,7 +25,7 @@
 					<td style="width: 181px; height: 117px;">
 						<asp:TextBox ID="FindTB" runat="server" />&nbsp;
 						<asp:CustomValidator ID="SearchTextValidator" runat="server" ControlToValidate="FindTB"
-							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate"></asp:CustomValidator></td>
+							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True"></asp:CustomValidator></td>
 					<td style="height: 117px; text-align: left;">
 						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="81px">
 							<asp:ListItem Value="0" Selected="True">Имя</asp:ListItem>

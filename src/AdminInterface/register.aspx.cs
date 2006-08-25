@@ -372,6 +372,10 @@ set @inUser = ?UserName;
 			_command.Parameters["OSUserName"].Value = LoginTB.Text;
 			_command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.VarString));
 			_command.Parameters["OSUserPass"].Value = PassTB.Text;
+			
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
+				_command.Parameters.Add("PrimaryClientCode", IncludeSDD.SelectedValue);
+			
 
 			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
 			if (InvCB.Checked)
@@ -397,7 +401,7 @@ set @inUser = ?UserName;
 				}
 				else
 				{
-					if (!(PayerPresentCB.Checked))
+					if (!PayerPresentCB.Checked)
 					{
 						Session["DogN"] = CreateClientOnBilling();
 					}
@@ -425,8 +429,10 @@ set @inUser = ?UserName;
 				{
 					CreatePriceRecords();
 				}
-				if (!(IncludeCB.Checked))
+				
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
 				{
+#if !DEBUG
 					Domain = Marshal.BindToMoniker("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net") as IADs;
 					ADUser = (Domain as IADsContainer).Create("user", "cn=" + _command.Parameters["OSUserName"].Value) as IADsUser;
 					ADUser.Put("samAccountName", _command.Parameters["OSUserName"].Value);
@@ -445,13 +451,14 @@ set @inUser = ?UserName;
 					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-				}
-
-				//CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+#endif
+				}				
 				mytrans.Commit();
 				Session["strStatus"] = "Yes";
 				try
 				{
+#if !DEBUG
 					if (!((InvCB.Checked) || (TypeDD.SelectedItem.Value == "0")))
 					{
 						if (
@@ -500,6 +507,7 @@ set @inUser = ?UserName;
 								  "RegisterList@subscribe.analit.net",
 								  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 					}
+#endif
 				}
 				catch (Exception err)
 				{
@@ -549,17 +557,17 @@ set @inUser = ?UserName;
 				Session["Password"] = PassTB.Text;
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
-				if (IncludeCB.Checked)
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
+				{
+					Response.Redirect("report.aspx");
+				}
+				else
 				{
 					Page.Controls.Clear();
 					Label LB = new Label();
 					LB.Text = "Регистрация завершена успешно.";
 					LB.Font.Name = "Verdana";
-					Page.Controls.Add(LB);
-				}
-				else
-				{
-					Response.Redirect("report.aspx");
+					Page.Controls.Add(LB);					
 				}
 			}
 			catch (Exception excL)
@@ -639,10 +647,9 @@ set @inUser = ?UserName;
 				PayerPresentCB.Visible = false;
 				PayerFTB.Visible = false;
 				FindPayerB.Visible = false;
-				LoginTB.Enabled = false;
-				Requiredfieldvalidator4.Enabled = false;
 				RegionDD.Enabled = false;
 				TypeDD.Enabled = false;
+				TypeDD.SelectedIndex = 0;
 				SegmentDD.Enabled = false;
 				InvCB.Enabled = false;
 				WRList.Enabled = false;
@@ -654,8 +661,6 @@ set @inUser = ?UserName;
 			}
 			else
 			{
-				LoginTB.Enabled = true;
-				Requiredfieldvalidator4.Enabled = true;
 				RegionDD.Enabled = true;
 				TypeDD.Enabled = true;
 				SegmentDD.Enabled = true;
@@ -713,7 +718,7 @@ set @inUser = ?UserName;
 		{
 			_command.CommandText =
 				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Phone, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, Mail, OrderManagerName, OrderManagerPhone, OrderManagerMail, ClientManagerName, ClientManagerPhone, ClientManagerMail, AccountantName, AccountantPhone, AccountantMail, FirmStatus, registrant, BillingCode, BillingStatus) ";
-			if (!(IncludeCB.Checked))
+			if (!IncludeCB.Checked)
 			{
 				_command.CommandText +=
 					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, " +
@@ -743,45 +748,91 @@ set @inUser = ?UserName;
 INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask);
 
 INSERT 
-INTO    intersection  
-        (  
+INTO    intersection 
+        ( 
                 ClientCode, 
                 regioncode, 
                 pricecode, 
                 InvisibleonFirm, 
-                costcode  
+                costcode 
         ) 
 SELECT  DISTINCT clientsdata2.firmcode, 
         regions.regioncode, 
         pc.showpricecode, 
         a.invisibleonfirm, 
-        ( SELECT costcode 
+        (SELECT costcode 
         FROM    pricescosts pcc 
         WHERE   basecost 
-                AND showpricecode=pc.showpricecode  
+                AND showpricecode = pc.showpricecode 
         ) 
 FROM    (clientsdata, farm.regions, pricescosts pc, pricesdata) 
 LEFT JOIN clientsdata AS clientsdata2 
-        ON clientsdata2.firmcode=?ClientCode 
+        ON clientsdata2.firmcode = ?ClientCode 
 LEFT JOIN intersection 
-        ON intersection.pricecode  =pc.showpricecode 
-        AND intersection.regioncode=regions.regioncode 
-        AND intersection.clientcode=clientsdata2.firmcode 
+        ON intersection.pricecode   = pc.showpricecode 
+        AND intersection.regioncode = regions.regioncode 
+        AND intersection.clientcode = clientsdata2.firmcode 
 LEFT JOIN retclientsset AS a 
-        ON a.clientcode=clientsdata2.firmcode 
+        ON a.clientcode = clientsdata2.firmcode 
 WHERE   intersection.pricecode IS NULL 
-        AND clientsdata.firmstatus                           =1 
-        AND clientsdata.firmsegment                          =clientsdata2.firmsegment 
-        AND clientsdata.firmtype                             =0 
-        AND pricesdata.firmcode                              =clientsdata.firmcode 
-        AND pricesdata.pricecode                             =pc.showpricecode 
-        AND ( clientsdata.maskregion & regions.regioncode )  >0 
-        AND ( clientsdata2.maskregion & regions.regioncode ) >0;
+        AND clientsdata.firmstatus                           = 1 
+        AND clientsdata.firmsegment                          = clientsdata2.firmsegment 
+        AND clientsdata.firmtype                             = 0 
+        AND pricesdata.firmcode                              = clientsdata.firmcode 
+        AND pricesdata.pricecode                             = pc.showpricecode 
+        AND ( clientsdata.maskregion & regions.regioncode )  > 0 
+        AND ( clientsdata2.maskregion & regions.regioncode ) > 0;
 ";
-			if (!(Invisible))
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
 			{
-				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
+				if (IncludeType.SelectedItem.Text == "Сеть")
+				{
+					_command.CommandText +=
+@"
+UPDATE includeregulation i, 
+        intersection as src, 
+        intersection as dst 
+        SET dst.costcode      = src.costcode, 
+        dst.firmcostcorr      = src.firmcostcorr, 
+        dst.publiccostcorr    = src.publiccostcorr, 
+        dst.minreq            = src.minreq, 
+        dst.controlminreq     = src.controlminreq, 
+        dst.invisibleonclient = src.invisibleonclient 
+WHERE   dst.clientcode        = ?ClientCode    
+        AND src.clientcode    = ?PrimaryClientCode    
+		AND	dst.regioncode    = src.regioncode 
+        AND dst.pricecode     = src.pricecode 
+        AND src.clientcode    = i.primaryclientcode 
+        AND dst.clientcode    = i.includeclientcode;
+";
+				}
+				else
+				{
+					_command.CommandText +=
+@"
+UPDATE includeregulation i, 
+        intersection as src, 
+        intersection as dst 
+        SET dst.costcode      = src.costcode, 
+        dst.firmcostcorr      = src.firmcostcorr, 
+        dst.publiccostcorr    = src.publiccostcorr, 
+        dst.minreq            = src.minreq, 
+        dst.controlminreq     = src.controlminreq, 
+        dst.invisibleonclient = src.invisibleonclient, 
+        dst.FirmClientCode    = src.FirmClientCode, 
+        dst.FirmClientCode2   = src.FirmClientCode2, 
+        dst.FirmClientCode3   = src.FirmClientCode3
+WHERE	dst.clientcode        = ?ClientCode    
+        AND src.clientcode    = ?PrimaryClientCode
+		ADN dst.regioncode    = src.regioncode 
+        AND dst.pricecode     = src.pricecode 
+        AND src.clientcode    = i.primaryclientcode 
+        AND dst.clientcode    = i.includeclientcode;  
+";
+				}
 			}
+			if (!Invisible)
+				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
 			_command.ExecuteNonQuery();
 		}
 
@@ -935,5 +986,22 @@ WHERE   intersection.pricecode IS NULL
 			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
 			info.SetAccessControl(security);
 		}
-	}
+		
+		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
+		{
+			if (IncludeCB.Checked)
+			{
+				if (IncludeCB.Checked && TypeDD.SelectedValue != "Базовый")
+					args.IsValid = args.Value.Length > 0;
+				else
+					args.IsValid = true;
+			}
+			else
+				args.IsValid = args.Value.Length > 0;
+		}
+		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)
+		{
+			args.IsValid = args.Value == "Поставщик" && !IncludeCB.Checked;
+		}
+}
 }

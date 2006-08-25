@@ -18,7 +18,7 @@
                             <tr>
                                 <td valign="top" align="left" width="230">
                                     <p>
-                                        <img src="logo_sm.gif"></p>
+                                        <img src="./Images/logo.gif"></p>
                                 </td>
                                 <td valign="top" align="center">
                                     <font face="Verdana" size="2"><strong>Регистрационная карта №</strong>&nbsp; </font>

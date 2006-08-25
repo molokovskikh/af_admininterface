@@ -21,3 +21,18 @@ function ValidateSearch(source, args)
 	else 
 		args.IsValid = false;
 }
+
+function ValidateLogin(source, args)
+{
+	if (document.getElementById("IncludeCB").checked)
+	{
+		if (document.getElementById("IncludeType").children.item(document.getElementById("IncludeType").selectedIndex).text != "Базовый")
+			args.IsValid = args.Value.length > 0;
+		else
+			args.IsValid = true;
+	}
+	else
+	{
+		args.IsValid = args.Value.length > 0;
+	}
+}
