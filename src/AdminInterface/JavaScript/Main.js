@@ -39,3 +39,9 @@ function ValidateLogin(source, args)
 		args.IsValid = args.Value.length > 0;
 	}
 }
+
+function ValidateParent(source, args)
+{
+	if (args.Value == null || args.Value == "")
+		args.IsValid = false;
+}

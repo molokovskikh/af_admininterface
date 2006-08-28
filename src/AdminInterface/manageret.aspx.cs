@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
@@ -443,7 +444,7 @@ WHERE
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
-
+		
 			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
 			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
@@ -550,7 +551,7 @@ WHERE   ir.IncludeClientCode =  ?ClientCode;
 				adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
 				adapter.Fill(_includeData);
 
-				IncludeGrid.DataSource = _includeData;
+				IncludeGrid.DataSource = _includeData.Tables[0].DefaultView;				
 				IncludeGrid.DataBind();
 
 				myMySqlConnection.Close();
@@ -566,7 +567,7 @@ WHERE   ir.IncludeClientCode =  ?ClientCode;
 		protected void IncludeGrid_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
 		{
 			ProcessChanges();
-			_includeData.Tables[0].Rows[e.RowIndex].Delete();
+			_includeData.Tables[0].DefaultView[e.RowIndex].Delete();
 			IncludeGrid.DataSource = _includeData;
 			IncludeGrid.DataBind();
 		}
@@ -619,12 +620,13 @@ ORDER BY cd.shortname;
 		{
 			foreach (GridViewRow row in IncludeGrid.Rows)
 			{
-				if (_includeData.Tables[0].Rows[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
-					_includeData.Tables[0].Rows[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
-				if (_includeData.Tables[0].Rows[row.RowIndex]["ShortName"].ToString()  != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
+				if (_includeData.Tables[0].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
+					_includeData.Tables[0].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
+				
+				if (_includeData.Tables[0].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
 				{
-					_includeData.Tables[0].Rows[row.RowIndex]["ShortName"] = ((DropDownList) row.FindControl("ParentList")).SelectedItem.Text;
-					_includeData.Tables[0].Rows[row.RowIndex]["FirmCode"] = ((DropDownList) row.FindControl("ParentList")).SelectedValue;
+					_includeData.Tables[0].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
+					_includeData.Tables[0].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
 				}
 				
 			}
@@ -639,5 +641,9 @@ ORDER BY cd.shortname;
 				((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
 			}
 		}
-}
+		protected void ParentValidator_ServerValidate(object source, ServerValidateEventArgs args)
+		{
+			args.IsValid = !String.IsNullOrEmpty(args.Value);
+		}
+	}
 }
