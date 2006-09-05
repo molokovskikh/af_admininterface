@@ -195,11 +195,23 @@ namespace AddUser
 
 			try
 			{
-				myMySqlCommand.CommandText =
+				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
+				{
+					myMySqlCommand.CommandText =
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
+set @ResetIdCause = ?ResetIdCause;
 ";
+				}
+				else
+				{
+					myMySqlCommand.CommandText =
+@"
+set @inHost = ?Host;
+set @inUser = ?UserName;
+";					
+				}
 				myMySqlCommand.ExecuteNonQuery();
 
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
