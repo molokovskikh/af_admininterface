@@ -189,7 +189,7 @@ LEFT JOIN osuseraccessright as ouar2
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
 LEFT JOIN logs.prgdataex 
-        ON prgdataex.clientcode= ifnull(includeregulation.PrimaryClientCode, cd.firmcode) 
+        ON prgdataex.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
         and prgdataex.rowid    = 
         (SELECT max(rowid) 
         FROM    logs.prgdataex 
