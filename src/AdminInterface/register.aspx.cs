@@ -414,6 +414,8 @@ set @inUser = ?UserName;
 				Session["Code"] = _command.Parameters["ClientCode"].Value;
 				if (IncludeCB.Checked)
 				{
+					if (IncludeType.SelectedItem.Text != "Базовый")
+						CreateClientOnOSUserAccessRight();
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
 				}
 				else
