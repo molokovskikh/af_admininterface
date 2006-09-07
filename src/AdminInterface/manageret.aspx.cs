@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Collections;
 using System.Data;
 using System.Diagnostics;
@@ -456,10 +457,11 @@ WHERE
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
-		
+
 			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
 			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
+			DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 			myMySqlCommand.Connection = myMySqlConnection;
 			if (!IsPostBack)
 			{
@@ -653,9 +655,16 @@ ORDER BY cd.shortname;
 				((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
 			}
 		}
+
 		protected void ParentValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			args.IsValid = !String.IsNullOrEmpty(args.Value);
 		}
-	}
+
+		protected void DeletePrepareDataButton_Click(object sender, EventArgs e)
+		{
+			File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
+			DeletePrepareDataButton.Enabled = false;
+		}
+}
 }

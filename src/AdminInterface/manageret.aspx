@@ -204,6 +204,11 @@
 								</td>
 							</tr>
 							<tr>
+								<td colspan="3">
+									<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="0" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
+								</td>
+							</tr>
+							<tr>
 								<td valign="middle" align="center" colspan="3" style="height: 15px">
 									<asp:Label ID="ResultL" runat="server" Font-Bold="True" ForeColor="Green" Font-Italic="True"></asp:Label></td>
 							</tr>
