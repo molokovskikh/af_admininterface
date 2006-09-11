@@ -98,15 +98,17 @@ namespace AddUser
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToDouble(Session["AccessGrant"]) != 1)
-			{
-				Response.Redirect("default.aspx");
-			}
+			    Response.Redirect("default.aspx");
 
-			ID = Request["id"];
+			uint actionType = Convert.ToUInt32(Request["id"]);
+			if (actionType > 5)
+				throw new ArgumentException("id", "Значение id, значение id не может быть больше 5.");
+
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			MyCn.Open();
 
-			MyCmd.CommandText =			
+			if (actionType != 4)
+				MyCmd.CommandText =			
 @"
 SELECT  Logtime, 
         FirmCode, 
@@ -121,49 +123,71 @@ WHERE   p.LogTime                            >curDate()
         AND showright.regionmask & maskregion>0 
 ";
 
-			if (double.Parse(ID) == 0)
+			if (actionType == 0)
 			{
 				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=5";
 				HeaderLB.Text = "Запреты:";
 			}
 
-			if (double.Parse(ID) == 1)
+			if (actionType == 1)
 			{
 				MyCmd.CommandText += " and UpdateType=2";
 				HeaderLB.Text = "Кумулятивные обновления:";
 			}
 
-			if (double.Parse(ID) == 2)
+			if (actionType == 2)
 			{
 				MyCmd.CommandText += " and UpdateType=1";
 				HeaderLB.Text = "Обычные обновления:";
 			}
 
-			if (double.Parse(ID) == 3)
+			if (actionType == 3)
 			{
 				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=6";
 				HeaderLB.Text = "Ошибки подготовки данных:";
 			}
 
-			if (double.Parse(ID) == 4)
+			if (actionType == 4)
 			{
-				MyCmd.CommandText += " and UncommittedUpdateTime>=CURDATE() and UpdateTime<>UncommittedUpdateTime";
-				HeaderLB.Text = "В процессе получения обновления - Нет данных";
-				CountLB.Text = "Нет данных";
-				return;
+				MyCmd.CommandText = 
+@" 
+SELECT  showright.RowID,   
+        p.Logtime,   
+        clientsdata.FirmCode,   
+        clientsdata.ShortName,   
+        r.Region,   
+        p.Addition  
+FROM      (usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)   
+LEFT JOIN logs.prgdataex p 
+        ON p.clientcode                                   = rcs.clientcode 
+        AND p.Logtime                                     > curdate()  
+WHERE     clientsdata.firmcode                            = rcs.clientcode  
+        AND r.regioncode                                  = clientsdata.regioncode  
+        AND showright.username                            = ?UserName
+        AND showright.regionmask & clientsdata.maskregion > 0  
+        AND rcs.UncommittedUpdateTime                    >= CURDATE()  
+        AND rcs.UpdateTime                               <> rcs.UncommittedUpdateTime  
+        AND p.RowID                                       = 
+        (SELECT max(pl.RowID) 
+        FROM    logs.prgdataex pl 
+        WHERE   pl.clientcode = rcs.clientcode
+        )  
+ORDER BY p.Logtime desc;
+";
+				MyCmd.Parameters.Add("UserName", Session["UserName"]);
+				HeaderLB.Text = "В процессе получения обновления:";
 			}
 
-			if (double.Parse(ID) == 5)
+			if (actionType == 5)
 			{
 				MyCmd.CommandText += " and UpdateType=3";
 				HeaderLB.Text = "Докачки:";
 			}
-			if (double.Parse(ID) <= 5)
-			{
+			if (actionType != 4)
 				MyCmd.CommandText += " and showright.username='" + Session["UserName"] + "'" + " group by p.rowid" + " order by p.logtime desc ";
-				CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
-				CLList.DataBind();
-			}
+
+			CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
+			CLList.DataBind();
 			MyCn.Close();
 		}
 	}
