@@ -605,8 +605,7 @@ WHERE   cd.regioncode & showright.regionmask > 0
         AND cd.ShortName like ?SearchText
         AND FirmStatus   =1  
         AND billingstatus=1  
-        AND FirmType     =1  
-        AND ir.primaryclientcode is null  
+        AND FirmType     =1
 ORDER BY cd.shortname;
 ", Literals.GetConnectionString());
 					adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
