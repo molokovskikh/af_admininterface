@@ -747,7 +747,8 @@ set @inUser = ?UserName;
 		{
 			_command.CommandText =
 @"
-INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask);
+INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask, GeneratePassword());
+INSERT INTO usersettings.ret_update_info (ClientCode) Values(?ClientCode);
 
 INSERT 
 INTO    intersection 
@@ -784,6 +785,33 @@ WHERE   intersection.pricecode IS NULL
         AND pricesdata.pricecode                             = pc.showpricecode 
         AND ( clientsdata.maskregion & regions.regioncode )  > 0 
         AND ( clientsdata2.maskregion & regions.regioncode ) > 0;
+
+INSERT 
+INTO    intersection_update_info
+        ( 
+                ClientCode, 
+                regioncode, 
+                pricecode
+        ) 
+SELECT  DISTINCT clientsdata2.firmcode,
+        regions.regioncode, 
+        pc.showpricecode
+FROM    (clientsdata, farm.regions, pricescosts pc, pricesdata)
+LEFT JOIN clientsdata AS clientsdata2
+        ON clientsdata2.firmcode = ?ClientCode
+LEFT JOIN intersection_update_info
+        ON intersection_update_info.pricecode   = pc.showpricecode
+        AND intersection_update_info.regioncode = regions.regioncode
+        AND intersection_update_info.clientcode = clientsdata2.firmcode
+WHERE   intersection_update_info.pricecode IS NULL
+        AND clientsdata.firmstatus                           = 1 
+        AND clientsdata.firmsegment                          = clientsdata2.firmsegment
+        AND clientsdata.firmtype                             = 0
+        AND pricesdata.firmcode                              = clientsdata.firmcode 
+        AND pricesdata.pricecode                             = pc.showpricecode 
+        AND ( clientsdata.maskregion & regions.regioncode )  > 0 
+        AND ( clientsdata2.maskregion & regions.regioncode ) > 0;
+
 ";
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
 			{
@@ -826,7 +854,7 @@ UPDATE includeregulation i,
         dst.FirmClientCode3   = src.FirmClientCode3
 WHERE	dst.clientcode        = ?ClientCode    
         AND src.clientcode    = ?PrimaryClientCode
-		ADN dst.regioncode    = src.regioncode 
+		AND dst.regioncode    = src.regioncode 
         AND dst.pricecode     = src.pricecode 
         AND src.clientcode    = i.primaryclientcode 
         AND dst.clientcode    = i.includeclientcode;  
@@ -840,38 +868,124 @@ WHERE	dst.clientcode        = ?ClientCode
 
 		private void CreatePriceRecords()
 		{
-			_command.CommandText = "INSERT INTO pricesdata(Firmcode, PriceCode) values(?ClientCode, null); " +
-									 " set @NewPriceCode:=Last_Insert_ID(); insert into farm.formrules(firmcode) values(@NewPriceCode); " +
-									 " insert into farm.sources(FirmCode) values(@NewPriceCode);";
-			_command.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
-									  " Select @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;" +
-									  " Insert into farm.costformrules(PC_CostCode, FR_ID) Select @NewPriceCode, @NewPriceCode;";
-			_command.CommandText += " insert into regionaldata(regioncode, firmcode)" +
-									  " SELECT distinct regions.regioncode, clientsdata.firmcode" +
-									  " FROM (clientsdata, farm.regions, pricesdata)" +
-									  " left join regionaldata on regionaldata.firmcode=clientsdata.firmcode and regionaldata.regioncode= regions.regioncode" +
-									  " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
-									  " and (clientsdata.maskregion & regions.regioncode)>0" +
-									  " and regionaldata.firmcode is null;";
-			_command.CommandText += " insert into pricesregionaldata(regioncode, pricecode)" +
-									  " SELECT distinct regions.regioncode, pricesdata.pricecode" +
-									  " FROM (clientsdata, farm.regions, pricesdata, clientsdata as a)" +
-									  " left join pricesregionaldata on pricesregionaldata.pricecode=pricesdata.pricecode and pricesregionaldata.regioncode= regions.regioncode" +
-									  " where pricesdata.firmcode=clientsdata.firmcode" + " and clientsdata.firmcode=?ClientCode" +
-									  " and (clientsdata.maskregion & regions.regioncode)>0" +
-									  " and pricesregionaldata.pricecode is null;";
-			_command.CommandText +=
-				" insert into intersection(clientcode, regioncode, pricecode, invisibleonclient, InvisibleonFirm, CostCode) " +
-				" SELECT distinct clientsdata2.firmcode, regions.regioncode, pricesdata.pricecode," +
-				" 0 as invisibleonclient, a.invisibleonfirm, pricesdata.pricecode" +
-				" FROM (clientsdata, farm.regions, pricesdata, pricesregionaldata, clientsdata as clientsdata2, retclientsset as a)" +
-				" LEFT JOIN intersection ON intersection.pricecode=pricesdata.pricecode and intersection.regioncode=regions.regioncode and intersection.clientcode=clientsdata2.firmcode" +
-				" WHERE intersection.pricecode IS NULL and" +
-				" clientsdata.firmstatus=1 and clientsdata.firmsegment=clientsdata2.firmsegment" +
-				" and clientsdata.firmcode=?ClientCode" + " and clientsdata2.firmtype=1" + " and a.clientcode=clientsdata2.firmcode" +
-				" and pricesdata.firmcode=clientsdata.firmcode" + " and pricesregionaldata.pricecode=pricesdata.pricecode" +
-				" and pricesregionaldata.regioncode=regions.regioncode" + " and (clientsdata.maskregion & regions.regioncode)>0" +
-				" and (clientsdata2.maskregion & regions.regioncode)>0;";
+            _command.CommandText =
+@"
+INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
+set @NewPriceCode:=Last_Insert_ID(); 
+INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode);   
+INSERT INTO farm.sources(FirmCode) VALUES(@NewPriceCode); 
+
+INSERT 
+INTO    PricesCosts
+        (
+                CostCode, 
+                PriceCode, 
+                BaseCost, 
+                ShowPriceCode
+        )   
+SELECT @NewPriceCode, @NewPriceCode, 1, @NewPriceCode;  
+INSERT 
+INTO    farm.costformrules
+        (
+                PC_CostCode, 
+                FR_ID
+        ) 
+SELECT @NewPriceCode, @NewPriceCode; 
+
+INSERT 
+INTO    regionaldata
+        (
+                regioncode, 
+                firmcode
+        )  
+SELECT  DISTINCT regions.regioncode, 
+        clientsdata.firmcode  
+FROM    (clientsdata, farm.regions, pricesdata)  
+LEFT JOIN regionaldata 
+        ON regionaldata.firmcode                         =clientsdata.firmcode 
+        AND regionaldata.regioncode                      = regions.regioncode  
+WHERE   pricesdata.firmcode                              =clientsdata.firmcode  
+        AND clientsdata.firmcode                         =?ClientCode  
+        AND (clientsdata.maskregion & regions.regioncode)>0  
+        AND regionaldata.firmcode is null; 
+
+INSERT 
+INTO    pricesregionaldata
+        (
+                regioncode, 
+                pricecode
+        )  
+SELECT  DISTINCT regions.regioncode, 
+        pricesdata.pricecode  
+FROM    (clientsdata, farm.regions, pricesdata, clientsdata as a)  
+LEFT JOIN pricesregionaldata 
+        ON pricesregionaldata.pricecode                  =pricesdata.pricecode 
+        AND pricesregionaldata.regioncode                = regions.regioncode  
+WHERE   pricesdata.firmcode                              =clientsdata.firmcode  
+        AND clientsdata.firmcode                         =?ClientCode  
+        AND (clientsdata.maskregion & regions.regioncode)>0  
+        AND pricesregionaldata.pricecode is null; 
+
+INSERT 
+INTO    intersection
+        (
+                clientcode, 
+                regioncode, 
+                pricecode, 
+                invisibleonclient, 
+                InvisibleonFirm, 
+                CostCode
+        )   
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode,  
+        0 as invisibleonclient, 
+        a.invisibleonfirm, 
+        pricesdata.pricecode  
+FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, clientsdata as clientsdata2, retclientsset as a)  
+LEFT JOIN intersection 
+        ON intersection.pricecode  =pricesdata.pricecode 
+        AND intersection.regioncode=regions.regioncode 
+        AND intersection.clientcode=clientsdata2.firmcode  
+WHERE   intersection.pricecode IS NULL 
+        AND  clientsdata.firmstatus                       =1 
+        AND clientsdata.firmsegment                       =clientsdata2.firmsegment  
+        AND clientsdata.firmcode                          =?ClientCode  
+        AND clientsdata2.firmtype                         =1  
+        AND a.clientcode                                  =clientsdata2.firmcode  
+        AND pricesdata.firmcode                           =clientsdata.firmcode  
+        AND pricesregionaldata.pricecode                  =pricesdata.pricecode  
+        AND pricesregionaldata.regioncode                 =regions.regioncode  
+        AND (clientsdata.maskregion & regions.regioncode) >0  
+        AND (clientsdata2.maskregion & regions.regioncode)>0;
+
+INSERT 
+INTO    intersection_update_info
+        ( 
+                ClientCode, 
+                regioncode, 
+                pricecode
+        ) 
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode
+FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, clientsdata as clientsdata2, retclientsset as a)  
+LEFT JOIN intersection_update_info 
+        ON intersection_update_info.pricecode  =pricesdata.pricecode 
+        AND intersection_update_info.regioncode=regions.regioncode 
+        AND intersection_update_info.clientcode=clientsdata2.firmcode  
+WHERE   intersection_update_info.pricecode IS NULL 
+        AND  clientsdata.firmstatus                       =1 
+        AND clientsdata.firmsegment                       =clientsdata2.firmsegment  
+        AND clientsdata.firmcode                          =?ClientCode  
+        AND clientsdata2.firmtype                         =1  
+        AND a.clientcode                                  =clientsdata2.firmcode  
+        AND pricesdata.firmcode                           =clientsdata.firmcode  
+        AND pricesregionaldata.pricecode                  =pricesdata.pricecode  
+        AND pricesregionaldata.regioncode                 =regions.regioncode  
+        AND (clientsdata.maskregion & regions.regioncode) >0  
+        AND (clientsdata2.maskregion & regions.regioncode)>0;
+";
 			_command.ExecuteNonQuery();
 		}
 

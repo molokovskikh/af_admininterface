@@ -192,7 +192,7 @@ LEFT JOIN logs.prgdataex
         and prgdataex.rowid    = 
         (SELECT max(rowid) 
         FROM    logs.prgdataex 
-        WHERE   clientcode= ifnull(includeregulation.PrimaryClientCode, cd.firmcode) 
+        WHERE   clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
                 and updatetype in(1,2)
         ) 
 WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
