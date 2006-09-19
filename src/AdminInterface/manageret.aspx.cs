@@ -204,6 +204,8 @@ namespace AddUser
 set @inHost = ?Host;
 set @inUser = ?UserName;
 set @ResetIdCause = ?ResetIdCause;
+
+UPDATE ret_update_info  SET UniqueCopyID = ''  WHERE clientcode=?clientCode;
 ";
 				}
 				else
@@ -260,7 +262,38 @@ WHERE   intersection.pricecode IS NULL
         AND pricesdata.pricetype                        <>1  
         AND pricesdata.pricecode                         =pc.showpricecode 
         AND (clientsdata.maskregion & regions.regioncode)>0  
-        AND (?workMask  & regions.regioncode)            >0;";
+        AND (?workMask  & regions.regioncode)            >0;
+
+INSERT 
+INTO    intersection_update_info
+        ( 
+                ClientCode, 
+                regioncode, 
+                pricecode
+        ) 
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode
+FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, pricescosts pc)  
+LEFT JOIN clientsdata as clientsdata2 
+        ON clientsdata2.firmcode=?clientCode  
+LEFT JOIN intersection_update_info
+        ON intersection_update_info.pricecode  =pricesdata.pricecode 
+        AND intersection_update_info.regioncode=regions.regioncode 
+        AND intersection_update_info.clientcode=clientsdata2.firmcode  
+WHERE   intersection_update_info.pricecode IS NULL 
+        AND clientsdata.firmstatus                       =1 
+        AND clientsdata.firmsegment                      =clientsdata2.firmsegment  
+        AND clientsdata.firmtype                         =0  
+        AND pricesdata.firmcode                          =clientsdata.firmcode  
+        AND pricesregionaldata.pricecode                 =pricesdata.pricecode  
+        AND pricesregionaldata.regioncode                =regions.regioncode  
+        AND pricesdata.pricetype                        <>1  
+        AND pricesdata.pricecode                         =pc.showpricecode 
+        AND (clientsdata.maskregion & regions.regioncode)>0  
+        AND (?workMask  & regions.regioncode)            >0;
+";
+
 				}
 				if (InvisibleCB.Enabled)
 				{
