@@ -191,22 +191,59 @@ namespace AddUser
 
 		private void SetWorkRegions(string RegCode, bool AllRegions)
 		{
-			//здесь применяется хитрожопый способ что бы модифицировать запрос для выбора всех регионов
-			//если мы хотим выбрать все регионы тогда коментируем ту часть которая отвечает за выбор текущего региона
-			//т.е. -> "{1} b.regioncode={0} and" форматируем так что {1} заменяется на коментарий -> "--"
-			//если выбираем конкретный регион то форматируем  так что {1} заменяется на пустую строке -> ""
-			string commandText =
-@"select a.RegionCode, a.Region,
-	(b.defaultshowregionmask & {0})>0 as ShowMask,
-	a.regioncode={0} as RegMask
-from farm.regions as a, farm.regions as b, accessright.regionaladmins
-where {1} b.regioncode={0} and
-	a.regioncode & b.defaultshowregionmask>0 and
-	regionaladmins.username='michail' and
-	a.regioncode & regionaladmins.RegionMask > 0
-group by regioncode
-order by region";
-			Func.SelectTODS(String.Format(commandText, RegCode, AllRegions ? "-- " : ""), "WorkReg", DS1);
+            string commandText;
+            if (AllRegions)
+            {
+                commandText =
+@"
+SELECT  a.RegionCode, 
+        a.Region, 
+        (b.defaultshowregionmask & ?RegionCode) > 0           as ShowMask, 
+        a.regioncode                            = ?RegionCode as RegMask 
+FROM    farm.regions                                          as a, 
+        farm.regions                                          as b, 
+        accessright.regionaladmins 
+WHERE   a.regioncode & b.defaultshowregionmask       > 0 
+        AND regionaladmins.username                  = ?UserName 
+        AND a.regioncode & regionaladmins.RegionMask > 0 
+GROUP BY regioncode 
+ORDER BY region;
+";
+            }
+            else
+            {
+                commandText =
+@"
+SELECT  a.RegionCode, 
+        a.Region, 
+        (b.defaultshowregionmask & ?RegionCode) > 0           as ShowMask, 
+        a.regioncode                            = ?RegionCode as RegMask 
+FROM    farm.regions                                          as a, 
+        farm.regions                                          as b, 
+        accessright.regionaladmins 
+WHERE   b.regioncode                                 = ?RegionCode 
+        AND a.regioncode & b.defaultshowregionmask   > 0 
+        AND regionaladmins.username                  = ?UserName 
+        AND a.regioncode & regionaladmins.RegionMask > 0 
+GROUP BY regioncode 
+ORDER BY region;
+";
+            }
+
+            MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
+            try
+            {
+                _connection.Open();
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                adapter.SelectCommand.Parameters.Add("RegionCode", RegCode);
+                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+                adapter.Fill(DS1, "WorkReg");
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 
 			WRList.DataBind();
 			WRList2.DataBind();
@@ -278,7 +315,7 @@ order by region";
 				return;
 			}
 			_connection.Open();
-			mytrans = _connection.BeginTransaction();
+			mytrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 			Int64 MaskRegion = 0;
 			Int64 ShowRegionMask = 0;
 			Int64 WorkMask = 0;
@@ -513,6 +550,7 @@ set @inUser = ?UserName;
 				}
 				catch (Exception err)
 				{
+#if !DEBUG
 					Func.Mail("register@analit.net",
 							  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
@@ -521,9 +559,11 @@ set @inUser = ?UserName;
 											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 											   + err.Message, "RegisterList@subscribe.analit.net",
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+#endif
 				}
 				try
 				{
+#if !DEBUG
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text + "\" - успешная регистрация",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
@@ -541,9 +581,11 @@ set @inUser = ?UserName;
 					if (!(TBAccountantMail.Text == ""))
 						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", false, "",
 								  "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
-				}
+#endif
+                }
 				catch (Exception err)
 				{
+#if !DEBUG
 					Func.Mail("register@analit.net", "\"" + FullNameTB.Text
 													 + "\" - ошибка подписки поставщиков", false,
 							  "Оператор: " + Session["UserName"] + "\nРегион: "
@@ -552,7 +594,8 @@ set @inUser = ?UserName;
 							  + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 							  + err.Message, "RegisterList@subscribe.analit.net",
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-				}
+#endif
+                }
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
 				Session["Login"] = LoginTB.Text;
@@ -619,14 +662,36 @@ set @inUser = ?UserName;
 
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
-			Func.SelectTODS(" SELECT distinct PayerID, convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName"
-							+ " FROM clientsdata as cd, accessright.showright, billing.payers p "
-							+ " where p.payerid=cd.billingcode and cd.regioncode & showright.regionmask > 0 "
-							+ " and showright.UserName='" + Session["UserName"]
-							+ "' and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
-							+ " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1) "
-							+ " and firmstatus=1 and billingstatus=1 " + " and p.ShortName like '%"
-							+ PayerFTB.Text + "%' " + " order by p.shortname", "Payers", DS1);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(@"
+SELECT  DISTINCT PayerID, 
+        convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
+FROM    clientsdata as cd, 
+        accessright.showright, 
+        billing.payers p 
+WHERE   p.payerid                                = cd.billingcode 
+        AND cd.regioncode & showright.regionmask > 0 
+        AND showright.UserName                   = ?UserName  
+        AND FirmType                             = if(ShowRet+ShowOpt = 2, FirmType, if(ShowRet = 1, 1, 0)) 
+        AND if(UseRegistrant                     = 1, Registrant = ?UserName, 1 = 1) 
+        AND firmstatus                           = 1 
+        AND billingstatus                        = 1 
+        AND p.ShortName like ?SearchText  
+ORDER BY p.shortname;
+", _connection);
+            try
+            {
+                _connection.Open();
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+                adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", PayerFTB.Text));
+                adapter.Fill(DS1, "Payers");
+
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 			PayerDDL.DataBind();
 			PayerCountLB.Text = "[" + PayerDDL.Items.Count + "]";
 			PayerCountLB.Visible = true;
@@ -680,16 +745,39 @@ set @inUser = ?UserName;
 
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
-			Func.SelectTODS(" SELECT distinct cd.FirmCode, convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, cd.RegionCode" +
-							" FROM (accessright.showright, clientsdata as cd)"
-							+ " left join includeregulation ir on ir.includeclientcode=cd.firmcode"
-							+ " where cd.regioncode & showright.regionmask > 0"
-							+ " and showright.UserName='" + Session["UserName"] + "'"
-							+ " and FirmType=if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) "
-							+ " and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)"
-							+ " and cd.ShortName like '%" + IncludeSTB.Text + "%' "
-							+ " and FirmStatus=1" + " and billingstatus=1" + " And FirmType=1"
-							+ " and ir.primaryclientcode is null" + " order by cd.shortname", "Includes", DS1);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(
+@"
+SELECT  DISTINCT cd.FirmCode, 
+        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
+        cd.RegionCode  
+FROM    (accessright.showright, clientsdata as cd)  
+LEFT JOIN includeregulation ir 
+        ON ir.includeclientcode              = cd.firmcode  
+WHERE   cd.regioncode & showright.regionmask > 0  
+        AND showright.UserName               = ?UserName  
+        AND FirmType                         = if(ShowRet+ShowOpt = 2, FirmType, if(ShowRet = 1, 1, 0)) 
+        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)  
+        AND cd.ShortName like ?SearchText 
+        AND FirmStatus    = 1  
+        AND billingstatus = 1  
+        AND FirmType      = 1  
+        AND ir.primaryclientcode is null  
+ORDER BY cd.shortname;
+", _connection);
+            try
+            {
+                _connection.Open();
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+                adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", IncludeSTB.Text));
+                adapter.Fill(DS1, "Includes");
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
 			IncludeSDD.DataBind();
 			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
 			IncludeCountLB.Visible = true;
@@ -1000,19 +1088,22 @@ WHERE   intersection_update_info.pricecode IS NULL
 
 		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			_connection.Open();
-			_reader =
-				new MySqlCommand("select RegionCode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, _connection)
-					.ExecuteReader();
-			if (_reader.Read())
-			{
-				RegionDD.SelectedValue = _reader[0].ToString();
-			}
-			if (!(_reader.IsClosed))
-			{
-				_reader.Close();
-			}
-			_connection.Close();
+            try
+            {
+                _connection.Open();
+                MySqlCommand command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
+                command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                _reader = command.ExecuteReader();
+                if (_reader.Read())
+                    RegionDD.SelectedValue = _reader[0].ToString();
+
+                command.Transaction.Commit();
+                _reader.Close();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
@@ -1023,15 +1114,41 @@ WHERE   intersection_update_info.pricecode IS NULL
 				Response.Redirect("default.aspx");
 			}
 			_connection.ConnectionString = Literals.GetConnectionString();
-			Func.SelectTODS(
-				"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
-				Session["UserName"] + "' order by region", "admin", DS1);
+            try
+            {
+                _connection.Open();
+                MySqlDataAdapter adapter = new MySqlDataAdapter(
+@"
+SELECT  regionaladmins.username, 
+        regions.regioncode, 
+        regions.region, 
+        regionaladmins.alowcreateretail, 
+        regionaladmins.alowcreatevendor, 
+        regionaladmins.alowchangesegment, 
+        regionaladmins.defaultsegment, 
+        AlowCreateInvisible, 
+        regionaladmins.email 
+FROM    accessright.regionaladmins, 
+        farm.regions 
+WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
+        AND username                                                    = ?UserName 
+ORDER BY region;
+", _connection);
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+                adapter.Fill(DS1, "admin");
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 			if (DS1.Tables["admin"].Rows.Count < 1)
 			{
 				Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
 				Response.Redirect("error.aspx");
 			}
-			if (!(IsPostBack))
+			if (!IsPostBack)
 			{
 				if (Convert.ToInt32(DS1.Tables["admin"].Rows[0]["AlowCreateInvisible"]) == 1)
 				{

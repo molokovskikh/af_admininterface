@@ -227,6 +227,9 @@ WHERE PriceCode in (select PriceCode from PricesCosts where ShowPriceCode = ?Pri
 DELETE FROM Intersection
 WHERE PriceCode = ?PriceCode;
 
+DELETE FROM intersection_update_info
+WHERE PriceCode = ?PriceCode;
+
 DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
 ", _connection);
@@ -328,6 +331,39 @@ LEFT JOIN retclientsset as a
         ON a.clientcode=clientsdata2.firmcode    
 WHERE   PricesData.PriceCode							  = @InsertedPriceCode
 		AND intersection.pricecode IS NULL    
+        AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
+        AND clientsdata.firmtype                          =0    
+        AND pricesdata.firmcode                           =clientsdata.firmcode    
+        AND pricesregionaldata.pricecode                  =pricesdata.pricecode    
+        AND pricesregionaldata.regioncode                 =regions.regioncode    
+        AND pricesdata.pricetype                         <>1    
+        AND pricesdata.pricecode                          =pc.showpricecode    
+        AND (clientsdata.maskregion & regions.regioncode) >0    
+        AND (clientsdata2.maskregion & regions.regioncode)>0    
+        AND clientsdata2.firmtype                         =1;
+
+INSERT 
+INTO    intersection_update_info
+        (
+                ClientCode, 
+                regioncode, 
+                pricecode
+        )    
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode  
+FROM    (clientsdata, 
+        farm.regions, 
+        pricesdata, 
+        pricesregionaldata, 
+        clientsdata as clientsdata2, 
+        pricescosts pc)
+LEFT JOIN intersection_update_info 
+        ON intersection_update_info.pricecode  =pricesdata.pricecode 
+        AND intersection_update_info.regioncode=regions.regioncode 
+        AND intersection_update_info.clientcode=clientsdata2.firmcode    
+WHERE   PricesData.PriceCode							  = @InsertedPriceCode
+		AND intersection_update_info.pricecode IS NULL    
         AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
         AND clientsdata.firmtype                          =0    
         AND pricesdata.firmcode                           =clientsdata.firmcode    
@@ -617,6 +653,38 @@ LEFT JOIN retclientsset as a
         ON a.clientcode=clientsdata2.firmcode    
 WHERE   clientsdata.FirmCode							  = ?ClientCode
 		AND intersection.pricecode IS NULL    
+        AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
+        AND clientsdata.firmtype                          =0    
+        AND pricesdata.firmcode                           =clientsdata.firmcode    
+        AND pricesregionaldata.pricecode                  =pricesdata.pricecode    
+        AND pricesregionaldata.regioncode                 =regions.regioncode    
+        AND pricesdata.pricetype                         <>1    
+        AND pricesdata.pricecode                          =pc.showpricecode    
+        AND (clientsdata.maskregion & regions.regioncode) >0    
+        AND (clientsdata2.maskregion & regions.regioncode)>0    
+        AND clientsdata2.firmtype                         =1;
+INSERT 
+INTO    intersection_update_info
+        (
+                ClientCode, 
+                regioncode, 
+                pricecode
+        )    
+SELECT  DISTINCT clientsdata2.firmcode, 
+        regions.regioncode, 
+        pricesdata.pricecode  
+FROM    (clientsdata, 
+        farm.regions, 
+        pricesdata, 
+        pricesregionaldata, 
+        clientsdata as clientsdata2, 
+        pricescosts pc)
+LEFT JOIN intersection_update_info 
+        ON intersection_update_info.pricecode  =pricesdata.pricecode 
+        AND intersection_update_info.regioncode=regions.regioncode 
+        AND intersection_update_info.clientcode=clientsdata2.firmcode    
+WHERE   clientsdata.FirmCode							  = ?ClientCode
+		AND intersection_update_info.pricecode IS NULL    
         AND clientsdata.firmsegment                       =clientsdata2.firmsegment    
         AND clientsdata.firmtype                          =0    
         AND pricesdata.firmcode                           =clientsdata.firmcode    
