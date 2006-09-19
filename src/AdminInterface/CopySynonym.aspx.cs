@@ -17,7 +17,7 @@ namespace AddUser
 		protected DataTable Regions;
 		protected DataColumn DataColumn1;
 		protected DataColumn DataColumn2;
-		MySqlConnection соединение = new MySqlConnection();
+		MySqlConnection _connection = new MySqlConnection();
 		MySqlDataAdapter DA = new MySqlDataAdapter();
 		protected DataTable From;
 		protected DataColumn DataColumn3;
@@ -119,102 +119,157 @@ namespace AddUser
 
 		public void FindClient(string NameStr, string Where)
 		{
-			DA.SelectCommand =
-				new MySqlCommand(
-					"select FirmCode as ClientCode, convert(concat(FirmCode, '. ', ShortName) using cp1251) name from clientsdata, accessright.regionaladmins" +
-					" where regioncode =" + RegionDD.SelectedItem.Value + " and firmtype=1 and firmstatus=1" +
-					" and shortname like ?NameStr" + " and UserName='" + Session["UserName"] + "'" +
-					" and FirmSegment=if(regionaladmins.AlowChangeSegment=1, FirmSegment, DefaultSegment)" +
-					"\n and if(UseRegistrant=1, Registrant='" + Session["UserName"] + "', 1=1)" + " and username='" + UserName + "'",
-					соединение);
-			DA.SelectCommand.Parameters.Add(new MySqlParameter("NameStr", MySqlDbType.VarString));
-			DA.SelectCommand.Parameters["NameStr"].Value = "%" + NameStr + "%";
-			DA.Fill(DS, Where);
+			DA.SelectCommand = new MySqlCommand(
+@"
+SELECT  FirmCode as ClientCode, 
+        convert(concat(FirmCode, '. ', ShortName) using cp1251) name 
+FROM    clientsdata, 
+        accessright.regionaladmins 
+WHERE   regioncode     = ?RegionCode 
+        AND firmtype   = 1 
+        AND firmstatus = 1 
+        AND shortname like ?NameStr  
+        AND UserName         = ?UserName 
+        AND FirmSegment      = if(regionaladmins.AlowChangeSegment = 1, FirmSegment, DefaultSegment) 
+        AND if(UseRegistrant = 1, Registrant = ?UserName, 1 = 1)  
+        AND username         = ?UserName;
+", _connection);
+			DA.SelectCommand.Parameters.Add("NameStr", String.Format("%{0}%", NameStr));
+			DA.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+			DA.SelectCommand.Parameters.Add("RegionCode", RegionDD.SelectedItem.Value);
+			try
+			{
+				_connection.Open();
+				DA.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				DA.Fill(DS, Where);
+				DA.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 		}
 
 		protected void SetBT_Click(object sender, EventArgs e)
 		{
-			Int32 ClientCode;
-			Int32 ParentClientCode;
-			string Query = String.Empty;
-			ClientCode = Convert.ToInt32(ToDD.SelectedItem.Value);
-			ParentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
+			int ClientCode = Convert.ToInt32(ToDD.SelectedItem.Value); 
+			int ParentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
 			MySqlCommand MyCommand = new MySqlCommand();
 			MySqlTransaction MyTrans = null;
 			try
 			{
-				Query += 
+				MyCommand.CommandText =
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
-";
 
-				Query += " update intersection set MaxSynonymCode=0, MaxSynonymFirmCrCode=0," +
-				         " lastsent=default where clientcode=" + ClientCode + ";";
-				Query += " update retclientsset as a, retclientsset as b" +
-				         " set b.updatetime=a.updatetime, b.AlowCumulativeUpdate=0, b.Active=0 where a.clientcode=" +
-				         ParentClientCode + " and b.clientcode=" + ClientCode + ";";
-				Query += " update intersection as a, intersection as b" + " set a.MaxSynonymFirmCrCode=b.MaxSynonymFirmCrCode," +
-				         " a.MaxSynonymCode=b.MaxSynonymCode" + " where a.clientcode=" + ClientCode +
-				         " and b.clientcode=" + ParentClientCode + " and a.pricecode=b.pricecode;";
-				Query += " insert into logs.clone (LogTime, UserName, FromClientCode, ToClientCode) values (now(), '" +
-				         Session["UserName"] + "', " + ParentClientCode + ", " + ClientCode + ")";
+UPDATE intersection 
+        SET MaxSynonymCode   = 0, 
+        MaxSynonymFirmCrCode = 0,   
+        lastsent             = default 
+WHERE   clientcode           = ?ClientCode;  
+UPDATE retclientsset  as a, 
+        retclientsset as b  
+        SET b.updatetime       = a.updatetime, 
+        b.AlowCumulativeUpdate = 0, 
+        b.Active               = 0 
+WHERE   a.clientcode           = ?ParentClientCode  
+        AND b.clientcode       = ?ClientCode;  
+UPDATE intersection  as a, 
+        intersection as b  
+        SET a.MaxSynonymFirmCrCode = b.MaxSynonymFirmCrCode,   
+        a.MaxSynonymCode           = b.MaxSynonymCode  
+WHERE   a.clientcode               = ?ClientCode  
+        AND b.clientcode           = ?ParentClientCode 
+        AND a.pricecode            = b.pricecode;  
+INSERT 
+INTO    logs.clone 
+        (
+                LogTime, 
+                UserName, 
+                FromClientCode, 
+                ToClientCode
+        ) 
+        VALUES 
+        (
+                now(), 
+                ?UserName, 
+                ?ParentClientCode, 
+                ?ClientCode
+        );
+";
 				MyCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
 				MyCommand.Parameters.Add("UserName", Session["UserName"]);
+				MyCommand.Parameters.Add("ClientCode", ClientCode);
+				MyCommand.Parameters.Add("ParentClientCode", ParentClientCode);
 
-				соединение.Open();
-				MyTrans = соединение.BeginTransaction();
-				MyCommand.CommandText = Query;
+				_connection.Open();
+				MyTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 				MyCommand.Transaction = MyTrans;
-				MyCommand.Connection = соединение;
+				MyCommand.Connection = _connection;
 				MyCommand.ExecuteNonQuery();
 				MyTrans.Commit();
-				Func.Mail("register@analit.net", "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
-				          false,
-				          "От: " + FromDD.SelectedItem.Text + "\nДля: " + ToDD.SelectedItem.Text + "\nОператор: " + UserName,
-				          DS.Tables["Regions"].Rows[0]["email"].ToString(), "RegisterList@subscribe.analit.net", Encoding.UTF8);
-				LabelErr.ForeColor = Color.Green;
-				LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;
-				FromDD.Visible = false;
-				ToDD.Visible = false;
-				FromTB.Visible = true;
-				ToTB.Visible = true;
-				FindBT.Visible = true;
-				FindBT.Enabled = true;
-				SetBT.Visible = false;
 			}
-			catch (Exception err)
+			catch (Exception ex)
 			{
-				LabelErr.Text = err.Message;
 				if (MyTrans != null)
 					MyTrans.Rollback();
+				throw new Exception("Ошибка сохранения данных на форме CopySynonym.aspx", ex);
 			}
 			finally
 			{
-				соединение.Close();
+				_connection.Close();
 			}
+#if !DEBUG
+			Func.Mail("register@analit.net", "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
+					false,
+					"От: " + FromDD.SelectedItem.Text + "\nДля: " + ToDD.SelectedItem.Text + "\nОператор: " + UserName,
+					DS.Tables["Regions"].Rows[0]["email"].ToString(), "RegisterList@subscribe.analit.net", Encoding.UTF8);
+#endif
+			LabelErr.ForeColor = Color.Green;
+			LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;
+			FromDD.Visible = false;
+			ToDD.Visible = false;
+			FromTB.Visible = true;
+			ToTB.Visible = true;
+			FindBT.Visible = true;
+			FindBT.Enabled = true;
+			SetBT.Visible = false;
+
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
 				Response.Redirect("default.aspx");
-			}
-			соединение.ConnectionString = Literals.GetConnectionString();
+
+			_connection.ConnectionString = Literals.GetConnectionString();
 			UserName = Session["UserName"].ToString();
-			DA.SelectCommand =
-				new MySqlCommand(
-					"select regions.region, regions.regioncode, Email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
-					UserName + "' order by region", соединение);
-			DA.Fill(DS, "Regions");
-			if (DS.Tables["Regions"].Rows.Count < 1)
+			DA.SelectCommand = new MySqlCommand(
+@"
+SELECT  regions.region, 
+        regions.regioncode, 
+        Email 
+FROM    accessright.regionaladmins, 
+        farm.regions 
+WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
+        AND username                                                    = ?UserName 
+ORDER BY region;
+", _connection);
+            DA.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+			try
 			{
+				_connection.Open();
+				DA.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				DA.Fill(DS, "Regions");
+				DA.SelectCommand.Transaction.Commit();
 			}
-			if (!(IsPostBack))
+			finally
 			{
+				_connection.Close();
+			}
+			if (!IsPostBack)
 				RegionDD.DataBind();
-			}
 		}
 	}
 }

@@ -38,17 +38,8 @@ namespace AddUser
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
-			_connection.ConnectionString = Literals.GetConnectionString();
-			_connection.Open();
-			_command.CommandText = "select max(UserName='" + Session["UserName"] + "') from accessright.showright";
-			_command.Connection = _connection;
-			if (_command.ExecuteScalar().ToString() == "0")
-			{
-				Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
-				_connection.Close();
-				Response.Redirect("error.aspx");
-			}
-			_connection.Close();
+
+            _connection.ConnectionString = Literals.GetConnectionString();
 		}
 
 		protected void GoFind_Click(object sender, EventArgs e)
@@ -95,12 +86,20 @@ namespace AddUser
 
 			MySqlDataAdapter adapter = new MySqlDataAdapter();
 			DataSet data = new DataSet();
-			_connection.Open();
 
-			_command.Connection = _connection;
-			adapter.SelectCommand = _command;
-			adapter.Fill(data);
-			_connection.Close();
+			try
+			{
+				_connection.Open();
+				_command.Connection = _connection;
+				_command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.SelectCommand = _command;
+				adapter.Fill(data);
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
 			if (ADCB.Checked)
 				GetADUserStatus(data.Tables[0]);
@@ -277,13 +276,9 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					{
 						IADsUser ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + row["UserName"].ToString()) as IADsUser;
 						if (ADUser.IsAccountLocked)
-						{
 							row["ADUserStatus"] = Color.Violet.Name;
-						}
 						if (ADUser.AccountDisabled)
-						{
 							row["ADUserStatus"] = Color.Aqua.Name;
-						}
 					}
 					catch
 					{
@@ -294,7 +289,6 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 		}
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-
 			Regex reg = null;
 			if (FindRB.SelectedIndex == 1)
 				reg = new Regex("^\\d{1,10}$");

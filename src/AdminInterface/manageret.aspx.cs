@@ -41,7 +41,7 @@ namespace AddUser
 		protected DataColumn DataColumn3;
 		protected DataColumn DataColumn4;
 		protected DataTable RetClientsSet;
-		MySqlConnection myMySqlConnection = new MySqlConnection();
+		MySqlConnection _connection = new MySqlConnection();
 		MySqlCommand myMySqlCommand = new MySqlCommand();
 		MySqlDataReader myMySqlDataReader;
 		MySqlTransaction myTrans;
@@ -161,9 +161,6 @@ namespace AddUser
 				return;
 			}
 			ProcessChanges();
-			myMySqlConnection.Open();
-			myTrans = myMySqlConnection.BeginTransaction();
-			myMySqlCommand.Transaction = myTrans;
 			myMySqlCommand.Parameters.Add("InvisibleOnFirm", InvisibleCB.Checked);
 			myMySqlCommand.Parameters.Add("AlowRegister", RegisterCB.Checked);
 			myMySqlCommand.Parameters.Add("AlowRejection", RejectsCB.Checked);
@@ -196,6 +193,10 @@ namespace AddUser
 
 			try
 			{
+                _connection.Open();
+                myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+                myMySqlCommand.Transaction = myTrans;
+
 				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
 				{
 					myMySqlCommand.CommandText =
@@ -307,7 +308,7 @@ INTO    UserSettings.IncludeRegulation
         IncludeType           = ?IncludeType;
 
 CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
-", myMySqlConnection);
+", _connection);
 				adapter.InsertCommand.Parameters.Add("ClientCode", ClientCode);
 				adapter.InsertCommand.Parameters.Add("IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.InsertCommand.Parameters.Add("PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
@@ -325,7 +326,7 @@ INTO    UserSettings.IncludeRegulation
         IncludeType           = ?IncludeType;
 
 CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
-", myMySqlConnection);
+", _connection);
 				adapter.UpdateCommand.Parameters.Add("ClientCode", ClientCode);
 				adapter.UpdateCommand.Parameters.Add("IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.UpdateCommand.Parameters.Add("PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
@@ -336,7 +337,7 @@ CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 @"
 DELETE FROM UserSettings.IncludeRegulation 
 WHERE	id = ?id;
-", myMySqlConnection);
+", _connection);
 				adapter.DeleteCommand.Parameters.Add("id", MySqlDbType.UInt32, 0, "id");
 
 				adapter.DeleteCommand.Transaction = myTrans;
@@ -356,7 +357,7 @@ WHERE	id = ?id;
 			}
 			finally
 			{
-				myMySqlConnection.Close();
+				_connection.Close();
 			}
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
@@ -364,16 +365,23 @@ WHERE	id = ?id;
 
 		protected void SendMessage_Click(object sender, EventArgs e)
 		{
-			myMySqlConnection.Open();
-			myTrans = myMySqlConnection.BeginTransaction();
-			myMySqlCommand.Transaction = myTrans;
 			try
 			{
-				myMySqlCommand.CommandText = "update retclientsset set ShowMessageCount="
-											 + SendMessageCountDD.SelectedItem.Value + ", Message=?Message where clientcode="
-											 + ClientCode;
-				myMySqlCommand.Parameters.Add("Message", MySqlDbType.VarString);
-				myMySqlCommand.Parameters["Message"].Value = MessageTB.Text;
+				_connection.Open();
+				myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+				myMySqlCommand.Transaction = myTrans;
+
+				myMySqlCommand.CommandText =
+@"
+UPDATE retclientsset 
+        SET ShowMessageCount=?ShowCount, 
+        Message             =?Message 
+WHERE   clientcode          =?ClientCode;
+";
+				myMySqlCommand.Parameters.Add("Message", MessageTB.Text);
+				myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
+				myMySqlCommand.Parameters.Add("ShowCount", SendMessageCountDD.SelectedItem.Value);
+
 				myMySqlCommand.ExecuteNonQuery();
 				myTrans.Commit();
 				MessageTB.Text = "";
@@ -389,7 +397,7 @@ WHERE	id = ?id;
 			}
 			finally
 			{
-				myMySqlConnection.Close();
+				_connection.Close();
 			}
 		}
 
@@ -404,7 +412,8 @@ WHERE	id = ?id;
 
 		private void SetWorkRegions(Int64 RegCode, bool OldRegion, bool AllRegions)
 		{
-			string SQLTXT =
+			
+			string sqlCommand =
 @"
 SELECT  a.RegionCode, 
         a.Region, 
@@ -418,15 +427,28 @@ FROM    farm.regions                     as a,
         accessright.regionaladmins  
 WHERE 
 ";
-			if (!(AllRegions))
-			{
-				SQLTXT += " b.regioncode=" + RegCode + " and";
-			}
-			SQLTXT += " clientsdata.firmcode=" + ClientCode + " and a.regioncode & (b.defaultshowregionmask | MaskRegion)>0 "
-					  + " and clientcode=firmcode" + " and regionaladmins.username='"
-					  + Session["UserName"] + "'" + " and a.regioncode & regionaladmins.RegionMask > 0"
+			if (!AllRegions)
+				sqlCommand += " b.regioncode=?RegCode and";
+			sqlCommand += " clientsdata.firmcode=?ClientCode and a.regioncode & (b.defaultshowregionmask | MaskRegion)>0 "
+					  + " and clientcode=firmcode" + " and regionaladmins.username=?UserName"
+					  + " and a.regioncode & regionaladmins.RegionMask > 0"
 					  + " group by regioncode" + " order by region";
-			Func.SelectTODS(SQLTXT, "WorkReg", DS1);
+			MySqlDataAdapter adapter = new MySqlDataAdapter(sqlCommand, _connection);
+			adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
+			adapter.SelectCommand.Parameters.Add("RegCode", RegCode);
+			adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+            try
+            {
+                _connection.Open();
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                adapter.Fill(DS1, "WorkReg");
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
+
 			WRList.DataBind();
 			OrderList.DataBind();
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
@@ -458,19 +480,23 @@ WHERE
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
 
-			myMySqlConnection.ConnectionString = Literals.GetConnectionString();
+			_connection.ConnectionString = Literals.GetConnectionString();
 			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
 			DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
-			myMySqlCommand.Connection = myMySqlConnection;
+			myMySqlCommand.Connection = _connection;
 			if (!IsPostBack)
 			{
-				myMySqlConnection.Open();
-				myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
-				myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+				try
+				{
+					_connection.Open();
+					MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 
-				myMySqlCommand.CommandText =
-@"
+					myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
+					myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+					
+					myMySqlCommand.CommandText =
+	@"
 SELECT  RegionCode, 
         MaskRegion
 FROM    clientsdata as cd, 
@@ -483,24 +509,34 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
         AND AlowManage                            =1 
         AND cd.firmcode                           =?ClientCode 
 ";
-				HomeRegionCode = Convert.ToInt64(myMySqlCommand.ExecuteScalar());
-				if (Convert.ToInt32(HomeRegionCode) < 1)
-					return;
+					myMySqlCommand.Transaction = transaction;
+					HomeRegionCode = Convert.ToInt64(myMySqlCommand.ExecuteScalar());
+					if (Convert.ToInt32(HomeRegionCode) < 1)
+						return;
 
-				Func.SelectTODS(
-					"select regions.regioncode, regions.region from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
-					Session["UserName"] + "' order by region", "admin", DS1);
-				RegionDD.DataBind();
-				for (int i = 0; i <= RegionDD.Items.Count - 1; i++)
-				{
-					if (Convert.ToInt64(RegionDD.Items[i].Value) == HomeRegionCode)
+					MySqlDataAdapter regionAdapter = new MySqlDataAdapter(
+@"
+SELECT  regions.regioncode, 
+        regions.region 
+FROM    accessright.regionaladmins, 
+        farm.regions 
+WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode >0 
+        AND username                                                    =?UserName 
+ORDER BY region;
+", _connection);
+					regionAdapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+					regionAdapter.SelectCommand.Transaction = transaction;
+					regionAdapter.Fill(DS1, "admin");
+					RegionDD.DataBind();
+					for (int i = 0; i <= RegionDD.Items.Count - 1; i++)
 					{
-						RegionDD.SelectedIndex = i;
-						break;
+						if (Convert.ToInt64(RegionDD.Items[i].Value) == HomeRegionCode)
+						{
+							RegionDD.SelectedIndex = i;
+							break;
+						}
 					}
-				}
-				SetWorkRegions(Convert.ToInt64(HomeRegionCode), true, false);
-				myMySqlCommand.CommandText =
+					myMySqlCommand.CommandText =
 @"
 SELECT  InvisibleOnFirm, 
         AlowRegister, 
@@ -523,34 +559,34 @@ FROM    retclientsset,
 WHERE   clientcode   = ?ClientCode 
         AND username = ?UserName 
 ";
-				myMySqlDataReader = myMySqlCommand.ExecuteReader();
-				myMySqlDataReader.Read();
-				InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader["InvisibleOnFirm"]);
-				InvisibleCB.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
-				RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
-				RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
-				MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
-				AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
-				WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
-				ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
-				EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
-				ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader["Length"]);
-				CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
-				AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
-				SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
-				ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
-				OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
-				MessageLeftL.Visible = (Convert.ToInt32(myMySqlDataReader["ShowMessageCount"]) > 0);
-				if (!ResetCopyIDCB.Checked)
-				{
-					ResetCopyIDCB.Enabled = true;
-					CopyIDWTB.Enabled = true;
-					IDSetL.Visible = false;
-				}
-				myMySqlDataReader.Close();
+					myMySqlDataReader = myMySqlCommand.ExecuteReader();
+					myMySqlDataReader.Read();
+					InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader["InvisibleOnFirm"]);
+					InvisibleCB.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
+					RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
+					RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
+					MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
+					AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
+					WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
+					ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
+					EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
+					ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader["Length"]);
+					CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
+					AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
+					SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
+					ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
+					OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
+					MessageLeftL.Visible = (Convert.ToInt32(myMySqlDataReader["ShowMessageCount"]) > 0);
+					if (!ResetCopyIDCB.Checked)
+					{
+						ResetCopyIDCB.Enabled = true;
+						CopyIDWTB.Enabled = true;
+						IDSetL.Visible = false;
+					}
+					myMySqlDataReader.Close();
 
-				MySqlDataAdapter adapter = new MySqlDataAdapter(
-@"
+					MySqlDataAdapter adapter = new MySqlDataAdapter(
+	@"
 SELECT  id,
 		cd.FirmCode,
         convert(concat(cd.FirmCode ,'. ' ,cd.ShortName) using cp1251) ShortName,
@@ -559,16 +595,22 @@ FROM    IncludeRegulation ir
 INNER JOIN ClientsData cd 
         ON cd.firmcode       = ir.PrimaryClientCode  
 WHERE   ir.IncludeClientCode =  ?ClientCode;
-", Literals.GetConnectionString());
+", _connection);
 
-				_includeData = new DataSet();
-				adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
-				adapter.Fill(_includeData);
+					_includeData = new DataSet();
+					adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
+					adapter.SelectCommand.Transaction = transaction;
+					adapter.Fill(_includeData);
 
-				IncludeGrid.DataSource = _includeData.Tables[0].DefaultView;				
-				IncludeGrid.DataBind();
-
-				myMySqlConnection.Close();
+					IncludeGrid.DataSource = _includeData.Tables[0].DefaultView;
+					IncludeGrid.DataBind();
+					transaction.Commit();
+				}
+				finally
+				{
+					_connection.Close();
+				}
+                SetWorkRegions(HomeRegionCode, true, false);
 			}
 		}
 
@@ -607,13 +649,22 @@ WHERE   cd.regioncode & showright.regionmask > 0
         AND billingstatus=1  
         AND FirmType     =1
 ORDER BY cd.shortname;
-", Literals.GetConnectionString());
+", _connection);
 					adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
 					adapter.SelectCommand.Parameters.Add("SearchText", string.Format("%{0}%", ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
-
-
 					DataSet data = new DataSet();
-					adapter.Fill(data);
+
+                    try
+                    {
+                        _connection.Open();
+                        adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                        adapter.Fill(data);
+                        adapter.SelectCommand.Transaction.Commit();
+                    }
+                    finally
+                    {
+                        _connection.Close();
+                    }
 
 					DropDownList ParentList = ((DropDownList) IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
 					ParentList.DataSource = data;

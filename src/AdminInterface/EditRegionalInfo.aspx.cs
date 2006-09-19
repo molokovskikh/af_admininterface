@@ -54,7 +54,7 @@ FROM usersettings.regionaldata rd
 		INNER JOIN farm.regions r on r.RegionCode = rd.RegionCode
 WHERE RowID = ?Id
 ";
-		IDataCommand command = new DataCommand(commandText);
+		IDataCommand command = new DataCommand(commandText, IsolationLevel.ReadCommitted);
 		command.Parameters.Add("Id", _regionalSettingsCode);
 		command.Execute();
 		
@@ -75,9 +75,9 @@ WHERE RowID = ?Id
 UPDATE usersettings.regionaldata
 SET ContactInfo = ?ContactInformation, 
 	OperativeInfo = ?Information
-WHERE RowId = ?Id
+WHERE RowId = ?Id;
 ";
-		IParametericCommand command = new ParametericCommand(commandText);
+		IParametericCommand command = new ParametericCommand(commandText, IsolationLevel.RepeatableRead);
 		command.Parameters.Add("Id", _regionalSettingsCode);
 		command.Parameters.Add("ContactInformation", ContactInfoText.Text);
 		command.Parameters.Add("Information", OperativeInfoText.Text);

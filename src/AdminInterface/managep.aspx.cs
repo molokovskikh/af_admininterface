@@ -149,18 +149,29 @@ ORDER BY region;
 			dataAdapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
 			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
 			dataAdapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
-			
-			dataAdapter.Fill(_data, "Prices");
 
-			dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
-			dataAdapter.Fill(_data, "RegionSettings");
+            try
+            {
+                _connection.Open();
 
-			dataAdapter.SelectCommand.CommandText = regionsCommandText;
-			dataAdapter.Fill(_data, "Regions");
+                dataAdapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+                dataAdapter.Fill(_data, "Prices");
 
-			dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
-			dataAdapter.Fill(_data, "EnableRegions");
+                dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
+                dataAdapter.Fill(_data, "RegionSettings");
 
+                dataAdapter.SelectCommand.CommandText = regionsCommandText;
+                dataAdapter.Fill(_data, "Regions");
+
+                dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
+                dataAdapter.Fill(_data, "EnableRegions");
+
+                dataAdapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", _data.Tables["Prices"].DefaultView[0]["ShortName"].ToString());
 		}
@@ -204,7 +215,7 @@ ORDER BY region;
 			MySqlDataAdapter pricesDataAdapter = new MySqlDataAdapter("", _connection);
 			pricesDataAdapter.DeleteCommand = new MySqlCommand(
 @"
-SET @InHost = ?UserHost;
+Set @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
 DELETE FROM PricesData
@@ -386,7 +397,7 @@ WHERE RowId = ?Id;
 			try
 			{
 				_connection.Open();
-				transaction = _connection.BeginTransaction();
+                transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 
 				pricesDataAdapter.InsertCommand.Transaction = transaction;
 				pricesDataAdapter.UpdateCommand.Transaction = transaction;
@@ -484,12 +495,24 @@ GROUP BY regioncode
 ORDER BY region;
 ";
 			}
-			MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
-			adapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
-			adapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
-			adapter.SelectCommand.Parameters.Add("UserName", _userName);
-			_data.Tables["EnableRegions"].Clear();
-			adapter.Fill(_data, "EnableRegions");
+            try
+            {
+                MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
+                _connection.Open();
+                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+
+                adapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
+                adapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
+                adapter.SelectCommand.Parameters.Add("UserName", _userName);
+                _data.Tables["EnableRegions"].Clear();
+                adapter.Fill(_data, "EnableRegions");
+
+                adapter.SelectCommand.Transaction.Commit();
+            }
+            finally
+            {
+                _connection.Close();
+            }
 			WorkRegionList.DataBind();
 			SetRegions();
 		}
@@ -499,7 +522,7 @@ ORDER BY region;
 			ScalarCommand maskRegionCommand = new ScalarCommand(
 @"
 SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;
-");
+", IsolationLevel.ReadCommitted);
 			maskRegionCommand.Parameters.Add("ClientCode", _clientCode);
 			maskRegionCommand.Execute();
 			ulong oldMaskRegion = Convert.ToUInt64(maskRegionCommand.Result);
@@ -604,8 +627,7 @@ WHERE   clientsdata.FirmCode							  = ?ClientCode
         AND (clientsdata.maskregion & regions.regioncode) >0    
         AND (clientsdata2.maskregion & regions.regioncode)>0    
         AND clientsdata2.firmtype                         =1;
-"
-				);
+", IsolationLevel.RepeatableRead);
 				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
 				updateCommand.Parameters.Add("ClientCode", _clientCode);
 				updateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
@@ -627,7 +649,7 @@ SET @InUser = ?UserName;
 UPDATE ClientsData 
 SET RegionCode = ?RegionCode
 WHERE FirmCode = ?ClientCode;
-");
+", IsolationLevel.RepeatableRead);
 				command.Parameters.Add("RegionCode", currentHomeRegion);
 				command.Parameters.Add("ClientCode", _clientCode);
 				command.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
@@ -642,7 +664,7 @@ WHERE FirmCode = ?ClientCode;
 			ScalarCommand homeRegionCommand = new ScalarCommand(
 @"
 SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
-");
+", IsolationLevel.ReadCommitted);
 			homeRegionCommand.Parameters.Add("ClientCode", _clientCode);
 			homeRegionCommand.Execute();
 

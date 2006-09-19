@@ -14,13 +14,13 @@ namespace AddUser
 			{
 				Response.Redirect("default.aspx");
 			}
-			const string ResPath = "\\\\offdc\\Data\\Общего пользования\\";
+			const string ResPath = @"\\offdc\Data\Общего пользования\";
 			string[] FileList;
 			TableRow Row;
 			TableCell Cel;
 			FileInfo FileInfo;
 			HyperLink HL;
-			if ((String.IsNullOrEmpty(Request["doc"])) || (Request["doc"].Length < 5))
+			if (String.IsNullOrEmpty(Request["doc"]) || Request["doc"].Length < 5)
 			{
 				FileList = Directory.GetFiles(ResPath);
 				foreach (string FileName in FileList)

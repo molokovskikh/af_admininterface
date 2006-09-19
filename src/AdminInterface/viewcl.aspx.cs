@@ -104,9 +104,6 @@ namespace AddUser
 			if (actionType > 5)
 				throw new ArgumentException("id", "Значение id, значение id не может быть больше 5.");
 
-			MyCn.ConnectionString = Literals.GetConnectionString();
-			MyCn.Open();
-
 			if (actionType != 4)
 				MyCmd.CommandText =			
 @"
@@ -185,10 +182,19 @@ ORDER BY p.Logtime desc;
 			}
 			if (actionType != 4)
 				MyCmd.CommandText += " and showright.username='" + Session["UserName"] + "'" + " group by p.rowid" + " order by p.logtime desc ";
-
-			CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
-			CLList.DataBind();
-			MyCn.Close();
+			try
+			{
+				MyCn.ConnectionString = Literals.GetConnectionString();
+				MyCn.Open();
+				MyDA.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+				CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
+				MyDA.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				MyCn.Close();
+			}
+            CLList.DataBind();
 		}
 	}
 

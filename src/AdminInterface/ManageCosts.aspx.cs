@@ -61,7 +61,6 @@ namespace AddUser
 
 		MySqlTransaction MyTrans;
 		Int32 PriceCode;
-		MySqlDataReader MyReader;
 		protected DataSet DS;
 		protected MySqlDataAdapter MyDA;
 		protected MySqlConnection MyCn;
@@ -85,8 +84,8 @@ namespace AddUser
 			UpdateLB.Text = "";
 			try
 			{
+                FillDataSet();
 				MyCn.Open();
-				FillDataSet();
 				PriceRegionSettings.DataSource = DS;
 				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
 
@@ -112,7 +111,6 @@ namespace AddUser
 
 				for (int i = 0; i < PriceRegionSettings.Rows.Count; i++ )
 				{
-
 					DS.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
 					DS.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
 					DS.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
@@ -226,11 +224,11 @@ WHERE RowID = ?Id
 			try
 			{
 				MyCn.Open();
-				MyTrans = MyCn.BeginTransaction();
+                MyTrans = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
 				UpdCommand.CommandText = "select pd.FirmCode, pd.PriceName, cd.ShortName from pricesdata pd, clientsdata cd" +
 				                         " where cd.firmcode=pd.firmcode and pd.pricecode=" + PriceCode;
-				MyReader = UpdCommand.ExecuteReader();
+				MySqlDataReader MyReader = UpdCommand.ExecuteReader();
 				MyReader.Read();
 				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
 				ShortName = MyReader["ShortName"].ToString();
@@ -247,9 +245,11 @@ WHERE RowID = ?Id
 				Func.SelectTODS(
 					"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
 					Session["UserName"] + "' order by region", "admin", DS);
+#if !DEBUG
 				Func.Mail("register@analit.net", "\"" + ShortName + "\" - регистрация ценовой колонки", false,
 				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
 				          "RegisterList@subscribe.analit.net", DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+#endif
 				PostDataToGrid();
 			}
 			catch (Exception ex)
@@ -268,8 +268,6 @@ WHERE RowID = ?Id
 		{
 			try
 			{
-				if (MyCn.State == ConnectionState.Closed)
-					MyCn.Open();
 				FillDataSet();
 				PriceRegionSettings.DataSource = DS;
 				DataBind();
@@ -278,20 +276,19 @@ WHERE RowID = ?Id
 			{
 				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +"]";
 			}
-			finally
-			{
-				MyCn.Close();
-			}
 		}
 
 		private void FillDataSet()
-		{
-			SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=" + PriceCode;
-			MyReader = SelCommand.ExecuteReader();
-			MyReader.Read();
-			PriceNameLB.Text = MyReader[0].ToString();
-			MyReader.Close();
-			SelCommand.CommandText =
+        {
+            try
+            {
+                MyCn.Open();
+                MySqlTransaction transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+                MyDA.SelectCommand.Parameters.Add("PriceCode", PriceCode);
+                SelCommand.Transaction = transaction;
+                SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=?PriceCode";
+                PriceNameLB.Text = SelCommand.ExecuteScalar().ToString();
+                SelCommand.CommandText =
 @"
 SELECT  CostCode, 
         concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) CostID, 
@@ -306,10 +303,10 @@ WHERE   cf.pc_costcode   =pc.costcode
         AND pd.pricecode =showpricecode  
         AND ShowPriceCode= ?PriceCode;
 ";
-			MyDA.SelectCommand.Parameters.Add("PriceCode", PriceCode);
-			MyDA.Fill(DS, "Costs");
+                
+                MyDA.Fill(DS, "Costs");
 
-			SelCommand.CommandText =
+                SelCommand.CommandText =
 @"
 SELECT  RowId, 
         Region, 
@@ -321,8 +318,14 @@ INNER JOIN Farm.Regions r
         ON prd.RegionCode = r.RegionCode  
 WHERE   PriceCode         = ?PriceCode  
 ";
-			
-			MyDA.Fill(DS, "PriceRegionSettings");
-		}
+
+                MyDA.Fill(DS, "PriceRegionSettings");
+                transaction.Commit();
+            }
+            finally
+            {
+                MyCn.Close();
+            }
+        }
 	}
 }

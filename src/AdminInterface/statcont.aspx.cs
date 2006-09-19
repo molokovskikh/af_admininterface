@@ -59,7 +59,17 @@ ORDER BY WriteTime
 			adapter.SelectCommand.Parameters.Add("ToDate", CalendarTo.SelectedDate.AddDays(1));			
 			
 			DataSet data = new DataSet();
-			adapter.Fill(data);
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.Fill(data);
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 			_view = data.Tables[0].DefaultView;
 			
 			StatisticGrid.DataSource = _view;

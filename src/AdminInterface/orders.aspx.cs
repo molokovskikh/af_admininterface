@@ -59,9 +59,17 @@ ORDER BY writetime desc;
 			adapter.SelectCommand.Parameters.Add("?clientCode", Convert.ToUInt32(Request["cc"]));
 
 			_data = new DataSet();
-			_connection.Open();
-			adapter.Fill(_data);
-			_connection.Close();
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.Fill(_data);
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 			OrdersGrid.DataSource = _data.DefaultViewManager.CreateDataView(_data.Tables[0]); 
 			DataBind();
 		}
