@@ -850,7 +850,7 @@ INTO    intersection
 SELECT  DISTINCT clientsdata2.firmcode, 
         regions.regioncode, 
         pc.showpricecode, 
-        a.invisibleonfirm, 
+        if (a.invisibleonfirm = 1, 1, if(PricesData.PriceType = 2, 1, 0)), 
         (SELECT costcode 
         FROM    pricescosts pcc 
         WHERE   basecost 
@@ -872,7 +872,8 @@ WHERE   intersection.pricecode IS NULL
         AND pricesdata.firmcode                              = clientsdata.firmcode 
         AND pricesdata.pricecode                             = pc.showpricecode 
         AND ( clientsdata.maskregion & regions.regioncode )  > 0 
-        AND ( clientsdata2.maskregion & regions.regioncode ) > 0;
+        AND ( clientsdata2.maskregion & regions.regioncode ) > 0
+        AND PricesData.PriceType <> 1;
 
 INSERT 
 INTO    intersection_update_info
@@ -898,7 +899,8 @@ WHERE   intersection_update_info.pricecode IS NULL
         AND pricesdata.firmcode                              = clientsdata.firmcode 
         AND pricesdata.pricecode                             = pc.showpricecode 
         AND ( clientsdata.maskregion & regions.regioncode )  > 0 
-        AND ( clientsdata2.maskregion & regions.regioncode ) > 0;
+        AND ( clientsdata2.maskregion & regions.regioncode ) > 0
+        AND PricesData.PriceType <> 1;
 
 ";
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")

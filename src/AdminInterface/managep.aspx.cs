@@ -449,7 +449,7 @@ WHERE RowId = ?Id;
 			{
 				if (transaction != null)
 					transaction.Rollback();
-				throw;
+				throw new Exception("Ошибка на странице Managep.aspx", ex);
 			}
 			finally
 			{
