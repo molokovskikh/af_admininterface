@@ -844,13 +844,15 @@ INTO    intersection
                 ClientCode, 
                 regioncode, 
                 pricecode, 
-                InvisibleonFirm, 
+                InvisibleOnClient,
+                InvisibleOnFirm, 
                 costcode 
         ) 
-SELECT  DISTINCT clientsdata2.firmcode, 
-        regions.regioncode, 
-        pc.showpricecode, 
-        if (a.invisibleonfirm = 1, 1, if(PricesData.PriceType = 2, 1, 0)), 
+SELECT  DISTINCT clientsdata2.firmcode,
+        regions.regioncode,
+        pc.showpricecode,
+        PricesData.PriceType=2 as InvisibleOnClient,
+        a.InvisibleOnFirm,
         (SELECT costcode 
         FROM    pricescosts pcc 
         WHERE   basecost 
