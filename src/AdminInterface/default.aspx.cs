@@ -129,17 +129,13 @@ WHERE   oh.rowid                              = orderid
 				Reader.Close();
                 command.CommandText =
 @"
-SELECT  round(sum(UpdateType      = 3)/sum(UpdateType < 3)*100 ,2) ReGet ,  
-        concat(Sum(if(EXEVersion > 0 ,UpdateType = 5 ,null)) ,'(' ,count(DISTINCT if(EXEVersion > 0 
-        AND UpdateType           = 5 ,p.ClientCode ,null)) ,')') AD ,  
-        concat(Sum(if(EXEVersion > 0 ,UpdateType = 6 ,null)) ,'(' ,count(DISTINCT if(EXEVersion > 0 
-        AND UpdateType           = 6 ,p.clientcode ,null)) ,')') Err ,  
-        concat(Sum(if(EXEVersion = 0 ,UpdateType = 6 ,null)) ,'(' ,count(DISTINCT if(EXEVersion = 0 
-        AND UpdateType           = 6 ,p.clientcode ,null)) ,')') OErr ,  
-        concat(Sum(if(EXEVersion = 0 ,UpdateType = 5 ,null)) ,'(' ,count(DISTINCT if(EXEVersion = 0 
-        AND UpdateType           = 5 ,p.clientcode ,null)) ,')') OAD ,  
-        concat(sum(UpdateType    = 2) ,'(' ,count(DISTINCT if(UpdateType = 2 ,p.clientcode ,null)) ,')') CU ,  
-        concat(sum(UpdateType    = 1) ,'(' ,count(DISTINCT if(UpdateType = 1 ,p.clientcode ,null)) ,')') NU 
+SELECT  round(sum(UpdateType = 3)/sum(UpdateType < 3)*100 ,2) ReGet ,  
+        concat(Sum(if(EXEVersion > 0 ,UpdateType = 5 ,null)) ,'(' ,count(DISTINCT if(EXEVersion > 0 AND UpdateType = 5 ,p.ClientCode ,null)) ,')') AD ,
+        concat(Sum(if(EXEVersion > 0 ,UpdateType = 6 ,null)) ,'(' ,count(DISTINCT if(EXEVersion > 0 AND UpdateType = 6 ,p.clientcode ,null)) ,')') Err ,
+        concat(Sum(if(EXEVersion = 0 ,UpdateType = 6 ,null)) ,'(' ,count(DISTINCT if(EXEVersion = 0 AND UpdateType = 6 ,p.clientcode ,null)) ,')') OErr ,
+        concat(Sum(if(EXEVersion = 0 ,UpdateType = 5 ,null)) ,'(' ,count(DISTINCT if(EXEVersion = 0 AND UpdateType = 5 ,p.clientcode ,null)) ,')') OAD ,
+        concat(sum(UpdateType = 2) ,'(' ,count(DISTINCT if(UpdateType = 2 ,p.clientcode ,null)) ,')') CU , 
+        concat(sum(UpdateType = 1) ,'(' ,count(DISTINCT if(UpdateType = 1 ,p.clientcode ,null)) ,')') NU 
 FROM    (logs.prgdataex p ,usersettings.clientsdata ,accessright.showright) 
 WHERE   p.LogTime                             > curDate() 
         AND firmcode                          = clientcode 
