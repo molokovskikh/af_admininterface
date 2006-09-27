@@ -78,11 +78,10 @@ WHERE   a.username     = b.username
 
                 command.CommandText =
 @"
-SELECT  sum(UncommittedUpdateTime >= CURDATE() 
-        AND UpdateTime           <> UncommittedUpdateTime) as request ,  
-        max(UpdateTime)                                    as MaxUpdateTime 
-FROM    (usersettings.retclientsset ,usersettings.clientsdata ,accessright.showright)  
-WHERE   clientsdata.firmcode                  = retclientsset.clientcode  
+SELECT  sum(UncommittedUpdateTime >= CURDATE() AND UpdateTime <> UncommittedUpdateTime) as request,
+        max(UpdateTime) as MaxUpdateTime 
+FROM    (usersettings.ret_update_info, usersettings.clientsdata, accessright.showright)  
+WHERE   clientsdata.firmcode                  = ret_update_info.clientcode  
         AND RegionCode & showright.regionmask > 0  
         AND username                          = ?userName;
 ";
@@ -100,11 +99,11 @@ WHERE   clientsdata.firmcode                  = retclientsset.clientcode
 				Reader.Close();
                 command.CommandText =
 @"
-SELECT  concat(count(DISTINCT oh.rowid) ,'(' ,count(DISTINCT oh.clientcode) ,')') as OrdersCount ,
-        sum(cost*quantity)                                                       as Summ ,
-        count(DISTINCT if(processed = 0 ,orderid ,null))                         as NProc ,
-        Max(WriteTime)                                                           as MaxTime  
-FROM    (orders.ordershead oh ,orders.orderslist ,usersettings.clientsdata cd ,accessright.showright ,usersettings.retclientsset rcs)  
+SELECT  concat(count(DISTINCT oh.rowid), '(', count(DISTINCT oh.clientcode), ')') as OrdersCount,
+        sum(cost*quantity)                                                       as Summ,
+        count(DISTINCT if(processed = 0, orderid, null))                         as NProc,
+        Max(WriteTime)                                                           as MaxTime
+FROM    (orders.ordershead oh, orders.orderslist, usersettings.clientsdata cd, accessright.showright, usersettings.retclientsset rcs)  
 WHERE   oh.rowid                              = orderid 
         AND cd.firmcode                       = oh.clientcode 
         AND rcs.clientcode                    = oh.clientcode  

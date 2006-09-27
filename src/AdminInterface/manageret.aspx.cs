@@ -577,20 +577,22 @@ SELECT  InvisibleOnFirm,
         MultiUserLevel, 
         AdvertisingLevel, 
         AlowWayBill, 
-        retclientsset.AlowChangeSegment, 
+        rcs.AlowChangeSegment, 
         EnableUpdate, 
         AlowCreateInvisible, 
-        length(UniqueCopyID)=0 as Length, 
+        length(rcs.UniqueCopyID) = 0 AND length(rui.UniqueCopyID) = 0 as Length, 
         CalculateLeader, 
         AllowSubmitOrders, 
         SubmitOrders, 
         ServiceClient, 
         OrdersVisualizationMode, 
         ShowMessageCount 
-FROM    retclientsset, 
-        accessright.regionaladmins 
-WHERE   clientcode   = ?ClientCode 
-        AND username = ?UserName 
+FROM    retclientsset rcs, 
+        accessright.regionaladmins, 
+        ret_update_info rui 
+WHERE   rcs.clientcode     = ?ClientCode 
+        AND rui.ClientCode = ?ClientCode 
+        AND username       = ?UserName;
 ";
 					myMySqlDataReader = myMySqlCommand.ExecuteReader();
 					myMySqlDataReader.Read();

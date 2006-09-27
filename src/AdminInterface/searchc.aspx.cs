@@ -176,7 +176,7 @@ SELECT  cd. billingcode,
 			WHEN 2 THEN 'Скрытый'
 		END AS IncludeType
 		
-FROM    (clientsdata as cd, farm.regions, accessright.showright, retclientsset as rts) 
+FROM    (clientsdata as cd, farm.regions, accessright.showright, ret_update_info as rts) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN includeregulation 
