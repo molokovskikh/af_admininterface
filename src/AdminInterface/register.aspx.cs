@@ -1096,13 +1096,15 @@ WHERE   intersection_update_info.pricecode IS NULL
             {
                 _connection.Open();
                 MySqlCommand command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
+				command.Parameters.Add("firmCode", IncludeSDD.SelectedValue);
+				command.Connection = _connection;
                 command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
                 _reader = command.ExecuteReader();
                 if (_reader.Read())
                     RegionDD.SelectedValue = _reader[0].ToString();
 
+				_reader.Close();
                 command.Transaction.Commit();
-                _reader.Close();
             }
             finally
             {
