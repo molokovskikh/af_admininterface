@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using ActiveDs;
 using DAL;
 using Microsoft.Practices.EnterpriseLibrary.Logging;
+using System.Reflection;
 
 namespace AddUser
 {
@@ -82,6 +83,12 @@ namespace AddUser
 			} while (exception != null);
 			builder.AppendLine("--------------");
 
+			builder.AppendLine("----Session---");
+			foreach (string key in Session.Keys)
+				builder.AppendLine(String.Format("{0} - {1}", key, Session["key"].GetType().ToString()));
+			builder.AppendLine("--------------");
+
+			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
 			Logger.Write(builder.ToString(), "Error");
 #endif
 		}
