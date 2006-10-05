@@ -345,10 +345,6 @@ WHERE   logtime                                                           > curd
 				Reader.Close();
                 transaction.Commit();
 			}
-			catch (Exception err)
-			{
-				PassLB.Text = "Что-то не получилось... " + err.Message;
-			}
 			finally
 			{
 				_connection.Close();

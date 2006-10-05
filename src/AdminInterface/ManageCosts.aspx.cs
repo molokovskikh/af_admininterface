@@ -178,11 +178,10 @@ WHERE RowID = ?Id
 				DataBind();
 				UpdateLB.Text = "Сохранено.";
 			}
-			catch (Exception ex)
+			catch
 			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +
-				             "]";
 				MyTrans.Rollback();
+				throw;
 			}
 			finally
 			{
@@ -216,66 +215,100 @@ WHERE RowID = ?Id
 		protected void CreateCost_Click(object sender, EventArgs e)
 		{
 			Int32 FirmCode;
-			string ShortName;
-			string PriceName;
-			UpdCommand.Connection = MyCn;
-			UpdCommand.Transaction = MyTrans;
-
+			MySqlDataAdapter adapter = new MySqlDataAdapter(@"
+SELECT  pd.FirmCode, 
+        pd.PriceName, 
+        cd.ShortName 
+FROM    pricesdata pd, 
+        clientsdata cd  
+WHERE   cd.firmcode      = pd.firmcode 
+        AND pd.pricecode =  ?PriceCode;
+", MyCn);
 			try
 			{
 				MyCn.Open();
-                MyTrans = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
-				UpdCommand.CommandText = "select pd.FirmCode, pd.PriceName, cd.ShortName from pricesdata pd, clientsdata cd" +
-				                         " where cd.firmcode=pd.firmcode and pd.pricecode=" + PriceCode;
-				MySqlDataReader MyReader = UpdCommand.ExecuteReader();
+				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
+
+				adapter.SelectCommand.Parameters.Add("PriceCode", PriceCode);
+				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				
+
+				MySqlDataReader MyReader = adapter.SelectCommand.ExecuteReader();
 				MyReader.Read();
 				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
-				ShortName = MyReader["ShortName"].ToString();
-				PriceName = MyReader["PriceName"].ToString();
+				string ShortName = MyReader["ShortName"].ToString();
+				string PriceName = MyReader["PriceName"].ToString();
 				MyReader.Close();
-				UpdCommand.CommandText = "INSERT INTO pricesdata(Firmcode, PriceCode) values(" + FirmCode + ", null); " +
-				                         " set @NewPriceCode:=Last_Insert_ID(); insert into farm.formrules(firmcode) values(@NewPriceCode); " +
-				                         " insert into farm.sources(FirmCode) values(@NewPriceCode);";
-				UpdCommand.CommandText += "Insert into PricesCosts(CostCode, PriceCode, BaseCost, ShowPriceCode) " +
-				                          " Select @NewPriceCode, @NewPriceCode, 0, " + PriceCode + ";" +
-										  " Insert into farm.costformrules(PC_CostCode, FR_ID) Select @NewPriceCode, @NewPriceCode;";
-				UpdCommand.ExecuteNonQuery();
-				MyTrans.Commit();
-				Func.SelectTODS(
-					"select regionaladmins.username, regions.regioncode, regions.region, regionaladmins.alowcreateretail, regionaladmins.alowcreatevendor, regionaladmins.alowchangesegment, regionaladmins.defaultsegment, AlowCreateInvisible, regionaladmins.email from accessright.regionaladmins, farm.regions where accessright.regionaladmins.regionmask & farm.regions.regioncode >0 and username='" +
-					Session["UserName"] + "' order by region", "admin", DS);
+
+				adapter.SelectCommand.Parameters.Add("FirmCode", FirmCode);
+				adapter.SelectCommand.CommandText = 
+@"
+INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?FirmCode, null); 
+set @NewPriceCode := Last_Insert_ID(); 
+INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode); 
+INSERT INTO farm.sources(FirmCode) VALUES(@NewPriceCode); 
+INSERT 
+INTO    PricesCosts
+        (
+                CostCode, 
+                PriceCode, 
+                BaseCost, 
+                ShowPriceCode
+        ) 
+SELECT @NewPriceCode, @NewPriceCode, 0, ?PriceCode;  
+INSERT 
+INTO    farm.costformrules
+        (
+                PC_CostCode, 
+                FR_ID
+        ) 
+SELECT @NewPriceCode, @NewPriceCode; 
+";
+				adapter.SelectCommand.ExecuteNonQuery();
+				adapter.SelectCommand.CommandText =
+@"
+SELECT  regionaladmins.username, 
+        regions.regioncode, 
+        regions.region, 
+        regionaladmins.alowcreateretail, 
+        regionaladmins.alowcreatevendor, 
+        regionaladmins.alowchangesegment, 
+        regionaladmins.defaultsegment, 
+        AlowCreateInvisible, 
+        regionaladmins.email 
+FROM    accessright.regionaladmins, 
+        farm.regions 
+WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
+        AND username                                                    = ?UserName 
+ORDER BY region;
+";
+
+				adapter.Fill(DS, "admin");
+				adapter.SelectCommand.Transaction.Commit();
 #if !DEBUG
 				Func.Mail("register@analit.net", "\"" + ShortName + "\" - регистрация ценовой колонки", false,
 				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
 				          "RegisterList@subscribe.analit.net", DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
-				PostDataToGrid();
 			}
-			catch (Exception ex)
+			catch
 			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +
-				             "]";
-				MyTrans.Rollback();
+				adapter.SelectCommand.Transaction.Rollback();
+				throw;
 			}
 			finally
 			{
 				MyCn.Close();
 			}
+			PostDataToGrid();
 		}
 
 		private void PostDataToGrid()
 		{
-			try
-			{
-				FillDataSet();
-				PriceRegionSettings.DataSource = DS;
-				DataBind();
-			}
-			catch (Exception ex)
-			{
-				ErrLB.Text = "Извините, доступ временно закрыт.Пожалуйста повторите попытку через несколько минут.[" + ex.Message +"]";
-			}
+			FillDataSet();
+			PriceRegionSettings.DataSource = DS;
+			DataBind();
 		}
 
 		private void FillDataSet()

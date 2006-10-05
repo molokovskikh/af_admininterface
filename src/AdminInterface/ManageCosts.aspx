@@ -16,7 +16,7 @@
 						Font-Size="9pt"></asp:Label></td>
 			</tr>
 			<tr>
-				<td align="center">
+				<td align="center" style="height: 163px">
 					<asp:DataGrid ID="CostsDG" runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA"
 						DataSource="<%# Costs %>" HorizontalAlign="Center" AutoGenerateColumns="False">
 						<FooterStyle HorizontalAlign="Center"></FooterStyle>

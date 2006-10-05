@@ -617,19 +617,17 @@ set @inUser = ?UserName;
 			}
 			catch (Exception excL)
 			{
-				if (!((excL) is ThreadAbortException))
+				if (!(excL is ThreadAbortException))
 				{
-					if (!(_reader.IsClosed))
-					{
+					if (!_reader.IsClosed)
 						_reader.Close();
-					}
-					Label3.Text = "Ошибка при регистрации клиента: " + excL.Message;
 					mytrans.Rollback();
 				}
+				throw;
 			}
 			finally
 			{
-				if (!(_reader.IsClosed))
+				if (!_reader.IsClosed)
 				{
 					_reader.Close();
 				}

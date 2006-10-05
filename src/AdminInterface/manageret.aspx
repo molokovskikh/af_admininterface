@@ -193,13 +193,12 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="right" colspan="3" style="height: 17px">
-									<asp:Button ID="ParametersSave" runat="server" OnClick="ParametersSave_Click" Text="Применить"
-										BorderStyle="None" ValidationGroup="1"></asp:Button>
+									<asp:Button ID="ParametersSave" runat="server" OnClick="ParametersSave_Click" Text="Применить" ValidationGroup="1"></asp:Button>
 								</td>
 							</tr>
 							<tr>
 								<td colspan="3" style="height: 22px">
-									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" BorderStyle="Groove"
+									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли"
 										OnClick="GeneratePasswords_Click" ValidationGroup="0" />
 								</td>
 							</tr>
@@ -250,7 +249,7 @@
 														<td>
 															<p align="right">
 																<asp:Button ID="SendMessage" runat="server" OnClick="SendMessage_Click" Font-Names="Arial"
-																	Font-Size="10pt" Text="Отправить" BorderStyle="None" ValidationGroup="0"></asp:Button></p>
+																	Font-Size="10pt" Text="Отправить" ValidationGroup="0"></asp:Button></p>
 														</td>
 													</tr>
 												</tbody>

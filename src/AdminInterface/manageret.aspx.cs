@@ -420,13 +420,10 @@ WHERE   clientcode          =?ClientCode;
 				MessageTB.Text = "";
 				StatusL.Visible = true;
 			}
-			catch (Exception err)
+			catch
 			{
 				myTrans.Rollback();
-				StatusL.Text = err.Message;
-				StatusL.ForeColor = Color.Red;
-				StatusL.Visible = true;
-				return;
+				throw;
 			}
 			finally
 			{

@@ -38,43 +38,36 @@ namespace AddUser
 			Random random = new Random();
 			Int16 r;
 			string PassStr = String.Empty;
-			try
+			for (int i = 0; i <= 7; i++)
 			{
-				for (int i = 0; i <= 7; i++)
+				r = Convert.ToInt16((62 * Convert.ToSingle(random.NextDouble())) + 1);
+				if ((r >= 0) && (r < 26))
 				{
-					r = Convert.ToInt16((62*Convert.ToSingle(random.NextDouble())) + 1);
-					if ((r >= 0) && (r < 26))
-					{
-						if ((65 + r) == 73)
-							r = Convert.ToInt16(r + 1);
-						PassStr = PassStr + (char) (65 + r);
-					}
-					if ((r >= 26) && (r < 52))
-					{
-						if ((71 + Convert.ToInt32(r)) == 108)
-							r = Convert.ToInt16(r + 1);
-						PassStr = PassStr + (char) (71 + r);
-					}
-					if (r >= 52)
-					{
-						PassStr = PassStr + (char) (48 + Convert.ToInt32(Convert.ToSingle(random.NextDouble())*9));
-					}
-				}
-				if (PassStr.Length < 8)
-				{
-					r = Convert.ToInt16(97 + (DateTime.Now.Second/3));
-					if (Convert.ToInt32(r) == 108)
-					{
+					if ((65 + r) == 73)
 						r = Convert.ToInt16(r + 1);
-					}
-					PassStr = PassStr + (char) r;
+					PassStr = PassStr + (char)(65 + r);
 				}
-				return PassStr;
+				if ((r >= 26) && (r < 52))
+				{
+					if ((71 + Convert.ToInt32(r)) == 108)
+						r = Convert.ToInt16(r + 1);
+					PassStr = PassStr + (char)(71 + r);
+				}
+				if (r >= 52)
+				{
+					PassStr = PassStr + (char)(48 + Convert.ToInt32(Convert.ToSingle(random.NextDouble()) * 9));
+				}
 			}
-			catch
+			if (PassStr.Length < 8)
 			{
-				return "[Ошибка формирования пароля]";
+				r = Convert.ToInt16(97 + (DateTime.Now.Second / 3));
+				if (Convert.ToInt32(r) == 108)
+				{
+					r = Convert.ToInt16(r + 1);
+				}
+				PassStr = PassStr + (char)r;
 			}
+			return PassStr;
 		}
 
 		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand, string CommandAdd)
