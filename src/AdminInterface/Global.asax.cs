@@ -60,7 +60,7 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
-#if !DEBUG
+//#if !DEBUG
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
@@ -85,12 +85,12 @@ namespace AddUser
 
 			builder.AppendLine("----Session---");
 			foreach (string key in Session.Keys)
-				builder.AppendLine(String.Format("{0} - {1}", key, Session["key"].GetType().ToString()));
+				builder.AppendLine(String.Format("{0} - {1}", key, Session[key].GetType().ToString()));
 			builder.AppendLine("--------------");
 
 			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
 			Logger.Write(builder.ToString(), "Error");
-#endif
+//#endif
 		}
 
 		void Session_End(object sender, EventArgs e)
