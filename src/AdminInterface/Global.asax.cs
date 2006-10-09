@@ -85,7 +85,12 @@ namespace AddUser
 
 			builder.AppendLine("----Session---");
 			foreach (string key in Session.Keys)
-				builder.AppendLine(String.Format("{0} - {1}", key, Session[key].GetType().ToString()));
+			{
+				if (Session[key] == null)
+					builder.AppendLine(String.Format("{0} - null", key));
+				else
+					builder.AppendLine(String.Format("{0} - {1}", key, Session[key].GetType().ToString()));
+			}
 			builder.AppendLine("--------------");
 
 			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
