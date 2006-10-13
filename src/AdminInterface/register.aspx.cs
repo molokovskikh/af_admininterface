@@ -490,7 +490,7 @@ set @inUser = ?UserName;
 					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"]), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
 #endif
 				}				
 				mytrans.Commit();
