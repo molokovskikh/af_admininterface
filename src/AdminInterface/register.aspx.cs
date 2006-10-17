@@ -191,10 +191,10 @@ namespace AddUser
 
 		private void SetWorkRegions(string RegCode, bool AllRegions)
 		{
-            string commandText;
-            if (AllRegions)
-            {
-                commandText =
+			string commandText;
+			if (AllRegions)
+			{
+				commandText =
 @"
 SELECT  a.RegionCode, 
         a.Region, 
@@ -209,10 +209,10 @@ WHERE   a.regioncode & b.defaultshowregionmask       > 0
 GROUP BY regioncode 
 ORDER BY region;
 ";
-            }
-            else
-            {
-                commandText =
+			}
+			else
+			{
+				commandText =
 @"
 SELECT  a.RegionCode, 
         a.Region, 
@@ -228,22 +228,22 @@ WHERE   b.regioncode                                 = ?RegionCode
 GROUP BY regioncode 
 ORDER BY region;
 ";
-            }
+			}
 
-            MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
-            try
-            {
-                _connection.Open();
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                adapter.SelectCommand.Parameters.Add("RegionCode", RegCode);
-                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-                adapter.Fill(DS1, "WorkReg");
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+			MySqlDataAdapter adapter = new MySqlDataAdapter(commandText, _connection);
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.SelectCommand.Parameters.Add("RegionCode", RegCode);
+				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.Fill(DS1, "WorkReg");
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
 			WRList.DataBind();
 			WRList2.DataBind();
@@ -409,10 +409,10 @@ set @inUser = ?UserName;
 			_command.Parameters["OSUserName"].Value = LoginTB.Text;
 			_command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.VarString));
 			_command.Parameters["OSUserPass"].Value = PassTB.Text;
-			
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
+
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
 				_command.Parameters.Add("PrimaryClientCode", IncludeSDD.SelectedValue);
-			
+
 
 			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
 			if (InvCB.Checked)
@@ -451,7 +451,7 @@ set @inUser = ?UserName;
 				Session["Code"] = _command.Parameters["ClientCode"].Value;
 				if (IncludeCB.Checked)
 				{
-					if (IncludeType.SelectedItem.Text != "Базовый")
+					if (IncludeType.SelectedItem.Text != "0")
 						CreateClientOnOSUserAccessRight();
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
 				}
@@ -468,8 +468,8 @@ set @inUser = ?UserName;
 				{
 					CreatePriceRecords();
 				}
-				
-				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
+
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0"))
 				{
 #if !DEBUG
 					Domain = Marshal.BindToMoniker("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net") as IADs;
@@ -492,13 +492,13 @@ set @inUser = ?UserName;
 					ADUser = null;
 					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
 #endif
-				}				
+				}
 				mytrans.Commit();
 				Session["strStatus"] = "Yes";
 				try
 				{
 #if !DEBUG
-					if (!((InvCB.Checked) || (TypeDD.SelectedItem.Value == "0")))
+					if (!(InvCB.Checked || TypeDD.SelectedItem.Value == "0" || (TypeDD.SelectedItem.Value == "1" && IncludeCB.Checked && IncludeType.SelectedItem.Value == "2")))
 					{
 						if (
 							Func.SelectTODS(
@@ -533,18 +533,18 @@ set @inUser = ?UserName;
 									  DS1.Tables["admin"].Rows[0]["email"].ToString(),
 									  Encoding.UTF8);
 						}
-					}
-					else
-					{
-						Func.Mail("register@analit.net",
-								  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
-								  false, "Оператор: " + Session["UserName"] + "\nРегион: "
-												   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
-												   + "\nКод: " + Session["Code"] + "\n\nСегмент: "
-												   + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
-												   + "Ошибка: Ничего не получилось выбрать из базы",
-								  "RegisterList@subscribe.analit.net",
-								  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+						else
+						{
+							Func.Mail("register@analit.net",
+									  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
+									  false, "Оператор: " + Session["UserName"] + "\nРегион: "
+													   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+													   + "\nКод: " + Session["Code"] + "\n\nСегмент: "
+													   + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
+													   + "Ошибка: Ничего не получилось выбрать из базы",
+									  "RegisterList@subscribe.analit.net",
+									  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+						}
 					}
 #endif
 				}
@@ -582,7 +582,7 @@ set @inUser = ?UserName;
 						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", false, "",
 								  "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
 #endif
-                }
+				}
 				catch (Exception err)
 				{
 #if !DEBUG
@@ -595,14 +595,14 @@ set @inUser = ?UserName;
 							  + err.Message, "RegisterList@subscribe.analit.net",
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
-                }
+				}
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
 				Session["Login"] = LoginTB.Text;
 				Session["Password"] = PassTB.Text;
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
-				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0"))
 				{
 					Response.Redirect("report.aspx");
 				}
@@ -612,7 +612,7 @@ set @inUser = ?UserName;
 					Label LB = new Label();
 					LB.Text = "Регистрация завершена успешно.";
 					LB.Font.Name = "Verdana";
-					Page.Controls.Add(LB);					
+					Page.Controls.Add(LB);
 				}
 			}
 			catch (Exception excL)
@@ -660,7 +660,7 @@ set @inUser = ?UserName;
 
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
-            MySqlDataAdapter adapter = new MySqlDataAdapter(@"
+			MySqlDataAdapter adapter = new MySqlDataAdapter(@"
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
 FROM    clientsdata as cd, 
@@ -676,20 +676,20 @@ WHERE   p.payerid                                = cd.billingcode
         AND p.ShortName like ?SearchText  
 ORDER BY p.shortname;
 ", _connection);
-            try
-            {
-                _connection.Open();
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-                adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", PayerFTB.Text));
-                adapter.Fill(DS1, "Payers");
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", PayerFTB.Text));
+				adapter.Fill(DS1, "Payers");
 
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 			PayerDDL.DataBind();
 			PayerCountLB.Text = "[" + PayerDDL.Items.Count + "]";
 			PayerCountLB.Visible = true;
@@ -743,7 +743,7 @@ ORDER BY p.shortname;
 
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
-            MySqlDataAdapter adapter = new MySqlDataAdapter(
+			MySqlDataAdapter adapter = new MySqlDataAdapter(
 @"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
@@ -762,19 +762,19 @@ WHERE   cd.regioncode & showright.regionmask > 0
         AND ir.primaryclientcode is null  
 ORDER BY cd.shortname;
 ", _connection);
-            try
-            {
-                _connection.Open();
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-                adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", IncludeSTB.Text));
-                adapter.Fill(DS1, "Includes");
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", IncludeSTB.Text));
+				adapter.Fill(DS1, "Includes");
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
 			IncludeSDD.DataBind();
 			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
@@ -903,9 +903,9 @@ WHERE   intersection_update_info.pricecode IS NULL
         AND PricesData.PriceType <> 1;
 
 ";
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0")
 			{
-				if (IncludeType.SelectedItem.Text == "Сеть")
+				if (IncludeType.SelectedItem.Text == "1")
 				{
 					_command.CommandText +=
 @"
@@ -958,7 +958,7 @@ WHERE	dst.clientcode        = ?ClientCode
 
 		private void CreatePriceRecords()
 		{
-            _command.CommandText =
+			_command.CommandText =
 @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 
@@ -1090,24 +1090,24 @@ WHERE   intersection_update_info.pricecode IS NULL
 
 		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
-            try
-            {
-                _connection.Open();
-                MySqlCommand command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
+			try
+			{
+				_connection.Open();
+				MySqlCommand command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
 				command.Parameters.Add("firmCode", IncludeSDD.SelectedValue);
 				command.Connection = _connection;
-                command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                _reader = command.ExecuteReader();
-                if (_reader.Read())
-                    RegionDD.SelectedValue = _reader[0].ToString();
+				command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				_reader = command.ExecuteReader();
+				if (_reader.Read())
+					RegionDD.SelectedValue = _reader[0].ToString();
 
 				_reader.Close();
-                command.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+				command.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
@@ -1118,10 +1118,10 @@ WHERE   intersection_update_info.pricecode IS NULL
 				Response.Redirect("default.aspx");
 			}
 			_connection.ConnectionString = Literals.GetConnectionString();
-            try
-            {
-                _connection.Open();
-                MySqlDataAdapter adapter = new MySqlDataAdapter(
+			try
+			{
+				_connection.Open();
+				MySqlDataAdapter adapter = new MySqlDataAdapter(
 @"
 SELECT  regionaladmins.username, 
         regions.regioncode, 
@@ -1138,15 +1138,15 @@ WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0
         AND username                                                    = ?UserName 
 ORDER BY region;
 ", _connection);
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-                adapter.Fill(DS1, "admin");
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.Fill(DS1, "admin");
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 			if (DS1.Tables["admin"].Rows.Count < 1)
 			{
 				Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
@@ -1223,12 +1223,12 @@ ORDER BY region;
 			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
 			info.SetAccessControl(security);
 		}
-		
+
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			if (IncludeCB.Checked)
 			{
-				if (IncludeCB.Checked && TypeDD.SelectedValue != "Базовый")
+				if (IncludeCB.Checked && TypeDD.SelectedValue != "0")
 					args.IsValid = args.Value.Length > 0;
 				else
 					args.IsValid = true;
@@ -1240,5 +1240,5 @@ ORDER BY region;
 		{
 			args.IsValid = args.Value == "Поставщик" && !IncludeCB.Checked;
 		}
-}
+	}
 }
