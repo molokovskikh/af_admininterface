@@ -451,7 +451,7 @@ set @inUser = ?UserName;
 				Session["Code"] = _command.Parameters["ClientCode"].Value;
 				if (IncludeCB.Checked)
 				{
-					if (IncludeType.SelectedItem.Text != "0")
+					if (IncludeType.SelectedItem.Value != "0")
 						CreateClientOnOSUserAccessRight();
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
 				}
@@ -469,7 +469,7 @@ set @inUser = ?UserName;
 					CreatePriceRecords();
 				}
 
-				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0"))
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0"))
 				{
 #if !DEBUG
 					Domain = Marshal.BindToMoniker("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net") as IADs;
@@ -602,7 +602,7 @@ set @inUser = ?UserName;
 				Session["Password"] = PassTB.Text;
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
-				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0"))
+				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0"))
 				{
 					Response.Redirect("report.aspx");
 				}
@@ -903,9 +903,9 @@ WHERE   intersection_update_info.pricecode IS NULL
         AND PricesData.PriceType <> 1;
 
 ";
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "0")
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
 			{
-				if (IncludeType.SelectedItem.Text == "1")
+				if (IncludeType.SelectedItem.Value == "1")
 				{
 					_command.CommandText +=
 @"
