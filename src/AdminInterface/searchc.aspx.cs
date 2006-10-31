@@ -258,7 +258,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					if (field.SortExpression == _sortExpression)
 					{
 						Image sortIcon = new Image();
-						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue.gif" : "./Images/arrow-down-blue-reversed.gif";
+						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
 						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
 					}
 				}

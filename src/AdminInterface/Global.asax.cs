@@ -60,7 +60,7 @@ namespace AddUser
 
 		void Application_Error(object sender, EventArgs e)
 		{
-//#if !DEBUG
+#if !DEBUG
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
@@ -95,15 +95,11 @@ namespace AddUser
 
 			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
 			Logger.Write(builder.ToString(), "Error");
-//#endif
+#endif
 		}
 
 		void Session_End(object sender, EventArgs e)
 		{
-/*
-			Response.Cookies["Inforoom.Admins.ShowStatsC"].Value = Session["MaxID"].ToString();
-			Response.Cookies["Inforoom.Admins.ShowStatsC"].Expires = DateTime.Now.AddYears(2);
-*/
 		}
 
 		void Application_End(object sender, EventArgs e)
