@@ -214,7 +214,7 @@
 					<strong>Дополнительные сведения о клиенте</strong>
 					<div id="Phones" class="Fields">
 						<div class="FreeColumn">
-							<span>Менджер заказов:</span>
+							<span>Менеджер прайс-листов (заказов):</span>
 							<div class="SimpleField">
 								<label for="TBOrderManagerName">
 									Имя:</label>
@@ -232,7 +232,7 @@
 							</div>
 						</div>
 						<div class="FreeColumn">
-							<span>Менджер клиентов:</span>
+							<span>Менеджер клиентов:</span>
 							<div class="SimpleField">
 								<label for="TBClientManagerName">
 									Имя:</label>
