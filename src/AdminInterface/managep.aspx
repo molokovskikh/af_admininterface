@@ -29,7 +29,6 @@
 									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:BoundField HeaderText="Код" DataField="FirmCode" />
 							<asp:HyperLinkField HeaderText="Наименование" DataTextField="PriceName" DataNavigateUrlFormatString="managecosts.aspx?pc={0}"
 								DataNavigateUrlFields="PriceCode" />
 							<asp:BoundField HeaderText="Получен" DataField="DateCurPrice" />
