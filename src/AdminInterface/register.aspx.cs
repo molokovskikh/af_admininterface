@@ -267,53 +267,10 @@ ORDER BY region;
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
-		private object CheckLogin()
-		{
-			float rc;
-			float rc1;
-			Label2.Text = "";
-			_connection.Open();
-			_reader =
-				new MySqlCommand("select Max(osusername='" + LoginTB.Text + "') as Present from (osuseraccessright)",
-								 _connection).ExecuteReader();
-			_reader.Read();
-			if (_reader.Read())
-			{
-				rc = Convert.ToInt32(_reader[0]);
-			}
-			else
-			{
-				rc = 0;
-			}
-			_reader.Close();
-			_connection.Close();
-			try
-			{
-				ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + LoginTB.Text) as IADsUser;
-				rc1 = 1;
-			}
-			catch
-			{
-				rc1 = 0;
-			}
-			ADUser = null;
-			if (rc > 0 | rc1 > 0)
-			{
-				Label2.Text = "Учетное имя '" + LoginTB.Text + "' существует в системе.";
-				LoginTB.Text = "";
-				return -1;
-			}
-			PassTB.Text = Func.GeneratePassword();
-			return 0;
-		}
-
 		protected void Register_Click(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(CheckLogin()) == -1 & !(IncludeCB.Checked))
-			{
-				Label3.Text = "Ошибка в Учетном имени!";
+			if (!IsValid)
 				return;
-			}
 			_connection.Open();
 			mytrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 			Int64 MaskRegion = 0;
@@ -421,7 +378,6 @@ set @inUser = ?UserName;
 			}
 			try
 			{
-				Label3.Text = "";
 				if (IncludeCB.Checked)
 				{
 					_reader =
@@ -490,7 +446,7 @@ set @inUser = ?UserName;
 					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}", _command.Parameters["ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}\", _command.Parameters["ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
 #endif
 				}
 				mytrans.Commit();
@@ -619,7 +575,7 @@ set @inUser = ?UserName;
 			{
 				if (!(excL is ThreadAbortException))
 				{
-					if (!_reader.IsClosed)
+					if (_reader != null)
 						_reader.Close();
 					mytrans.Rollback();
 				}
@@ -627,7 +583,7 @@ set @inUser = ?UserName;
 			}
 			finally
 			{
-				if (!_reader.IsClosed)
+				if (_reader!= null)
 				{
 					_reader.Close();
 				}
@@ -960,6 +916,8 @@ WHERE	dst.clientcode        = ?ClientCode
 		{
 			_command.CommandText =
 @"
+INSERT INTO Suppliers(Firmcode) VALUES(?ClientCode); 
+
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 
 INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode);   
@@ -1217,25 +1175,59 @@ ORDER BY region;
 
 		private void CreateFtpDirectory(string directory, string userName)
 		{
-			DirectoryInfo info = Directory.CreateDirectory(directory);
-			DirectorySecurity security = info.GetAccessControl();
-			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Read, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-			security.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-			info.SetAccessControl(security);
+			DirectoryInfo supplierDirectory = Directory.CreateDirectory(directory);
+			DirectorySecurity supplierDirectorySecurity = supplierDirectory.GetAccessControl();
+			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Read, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.ListDirectory, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			supplierDirectory.SetAccessControl(supplierDirectorySecurity);
+
+			DirectoryInfo ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
+			DirectorySecurity ordersDirectorySecurity = supplierDirectory.GetAccessControl();
+			ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
+			ordersDirectorySecurity.RemoveAccessRuleAll(new FileSystemAccessRule("Analit\\Клиенты", FileSystemRights.FullControl, AccessControlType.Allow));
+			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
+
 		}
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			if (IncludeCB.Checked)
+			if (!IncludeCB.Checked || (IncludeCB.Checked && TypeDD.SelectedValue != "0"))
 			{
-				if (IncludeCB.Checked && TypeDD.SelectedValue != "0")
-					args.IsValid = args.Value.Length > 0;
+				args.IsValid = args.Value.Length > 0;
+
+				if (args.IsValid)
+				{
+					bool isUserExists = false;
+					_connection.Open();
+					isUserExists = new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar() != DBNull.Value;
+					_connection.Close();
+					try
+					{
+						ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + args.Value) as IADsUser;
+						isUserExists = true;
+					}
+					catch
+					{
+						isUserExists = false;
+					}
+					ADUser = null;
+					args.IsValid = !isUserExists;
+					if (isUserExists)
+						LoginValidator.ErrorMessage = String.Format("Учетное имя '{0}' существует в системе.", args.Value);
+					else
+						PassTB.Text = Func.GeneratePassword();
+				}
 				else
-					args.IsValid = true;
+				{
+					LoginValidator.ErrorMessage = "Поле «Login» должно быть заполнено";
+				}
 			}
 			else
-				args.IsValid = args.Value.Length > 0;
+				args.IsValid = true;
+
 		}
+
 		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			args.IsValid = args.Value == "Поставщик" && !IncludeCB.Checked;
