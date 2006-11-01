@@ -34,10 +34,13 @@ FROM AccessRight.RegionalAdmins ra
   INNER JOIN Farm.Regions r on r.RegionCode & ra.RegionMask > 0
 WHERE UserName = ?UserName) as RegionCode , 'Все регионы' as Region
 UNION
-SELECT RegionCode, Region
+SELECT *
+FROM
+(SELECT RegionCode, Region
 FROM AccessRight.RegionalAdmins ra
   INNER JOIN Farm.Regions r on r.RegionCode & ra.RegionMask > 0
-WHERE UserName = ?UserName;
+WHERE UserName = ?UserName ORDER BY Region) tmp;
+;
 ", _connection);
 					adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
 					adapter.Fill(data);
@@ -46,7 +49,7 @@ WHERE UserName = ?UserName;
 					RegionList.DataSource = data;
 					RegionList.DataBind();
 
-					GetStatistics(Convert.ToUInt64(RegionList.SelectedValue), FromCalendar.SelectedDate, ToCalendar.SelectedDate);
+					//GetStatistics(Convert.ToUInt64(RegionList.SelectedValue), FromCalendar.SelectedDate, ToCalendar.SelectedDate);
 				}
 			}
 			else
