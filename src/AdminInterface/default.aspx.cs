@@ -25,7 +25,7 @@ namespace AddUser
 				Session["AccessGrant"] = 1;
 				if (!IsPostBack)
 				{
-					ToCalendar.SelectedDates.Add(DateTime.Now.AddDays(1));
+					ToCalendar.SelectedDates.Add(DateTime.Now);
 					FromCalendar.SelectedDates.Add(DateTime.Now);
 					DataSet data = new DataSet();
 					MySqlDataAdapter adapter = new MySqlDataAdapter(@"
@@ -81,7 +81,7 @@ WHERE UserName = ?UserName;
 				adapter.SelectCommand.Transaction = transaction;
 				adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
 				adapter.SelectCommand.Parameters.Add("StartDateParam", fromDate);
-				adapter.SelectCommand.Parameters.Add("EndDateParam", toDate);
+				adapter.SelectCommand.Parameters.Add("EndDateParam", toDate.AddDays(1));
 				adapter.SelectCommand.Parameters.Add("RegionMaskParam", regionMask);
 				adapter.SelectCommand.Parameters.Add("UserNameParam", Session["UserName"]);
 				DataSet data = new DataSet();
