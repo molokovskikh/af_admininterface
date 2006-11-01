@@ -17,7 +17,7 @@
 			<p>
 			Сообщение об ошибке было отправленно разработчикам. Повторите ваши действия.
 			</p>
-			<asp:Button ID="BackButton" runat="server" Text="Вернусться на страницу" OnClick="BackButton_Click" />
+			<asp:Button ID="BackButton" runat="server" Text="Вернуться на страницу" OnClick="BackButton_Click" />
         </div>
     </form>
 </body>
