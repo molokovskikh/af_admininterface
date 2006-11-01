@@ -87,7 +87,7 @@
 						<tr>
 							<td bgcolor="#eef8ff" colspan="4" height="30">
 								<p align="center">
-									<strong><font face="Verdana" size="2">Статистика текущего дня:</font></strong></p>
+									<strong><font face="Verdana" size="2">Статистика:</font></strong></p>
 							</td>
 						</tr>
 						<tr>
