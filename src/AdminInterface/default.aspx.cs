@@ -49,7 +49,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 					RegionList.DataSource = data;
 					RegionList.DataBind();
 
-					//GetStatistics(Convert.ToUInt64(RegionList.SelectedValue), FromCalendar.SelectedDate, ToCalendar.SelectedDate);
+					GetStatistics(Convert.ToUInt64(RegionList.SelectedValue), FromCalendar.SelectedDate, ToCalendar.SelectedDate);
 				}
 			}
 			else
