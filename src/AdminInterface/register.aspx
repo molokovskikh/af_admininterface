@@ -78,7 +78,7 @@
 								<label for="LoginTB">
 									Login:</label>
 								<asp:TextBox ID="LoginTB" runat="server" />
-								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено" ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate" ValidationGroup="0" EnableClientScript="False">*</asp:CustomValidator>
+								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено" ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate" ValidationGroup="0" EnableClientScript="False" ValidateEmptyText="True">*</asp:CustomValidator>
 							</div>
 						</div>
 					</div>
