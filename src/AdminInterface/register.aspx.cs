@@ -1185,7 +1185,6 @@ ORDER BY region;
 			DirectoryInfo ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
 			DirectorySecurity ordersDirectorySecurity = supplierDirectory.GetAccessControl();
 			ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.DeleteSubdirectoriesAndFiles, InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, PropagationFlags.None, AccessControlType.Allow));
-			ordersDirectorySecurity.RemoveAccessRuleAll(new FileSystemAccessRule("Analit\\Клиенты", FileSystemRights.FullControl, AccessControlType.Allow));
 			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
 
 		}
