@@ -153,6 +153,17 @@
 								</td>
 							</tr>
 							<tr>
+								<td  style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
+									Права экспорта
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align:left;">
+									<asp:CheckBoxList ID="ExportRulesList" runat="server" DataTextField="DisplayName" DataValueField="Id" BorderStyle="None">
+									</asp:CheckBoxList>
+								</td>
+							</tr>
+							<tr>
 								<td valign="middle" align="left" bgcolor="#f0f8ff" colspan="3">
 									<p style="text-align: center;">
 										<strong>Региональная настройка</strong></p>

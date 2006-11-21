@@ -146,7 +146,7 @@ namespace AddUser
 			InitializeComponent();
 		}
 
-		private DataSet _includeData
+		private DataSet _data
 		{
 			get { return (DataSet)Session["IncludeData"]; }
 			set { Session["IncludeData"] = value; }
@@ -376,8 +376,19 @@ WHERE	id = ?id;
 				adapter.DeleteCommand.Transaction = myTrans;
 				adapter.UpdateCommand.Transaction = myTrans;
 				adapter.InsertCommand.Transaction = myTrans;
-				
-				adapter.Update(_includeData);
+
+				adapter.Update(_data.Tables["Include"]);
+
+				MySqlDataAdapter exportRulesAdapter = new MySqlDataAdapter();
+				exportRulesAdapter.UpdateCommand = new MySqlCommand(@"
+UPDATE Usersettings.Ret_Save_Grids
+SET Enabled = ?Enabled
+WHERE Id = ?Id;
+", _connection, myTrans);
+				exportRulesAdapter.UpdateCommand.Parameters.Add("Enabled", MySqlDbType.UInt16, 0, "Enabled");
+				exportRulesAdapter.UpdateCommand.Parameters.Add("Id", MySqlDbType.UInt32, 0, "Id");
+
+				exportRulesAdapter.Update(_data.Tables["ExportRules"]);
 
 				myMySqlCommand.CommandText = InsertCommand;
 				myMySqlCommand.ExecuteNonQuery();
@@ -386,7 +397,7 @@ WHERE	id = ?id;
 			catch (Exception ex)
 			{
 				myTrans.Rollback();
-				throw new Exception("Ошибка на странице manageret.aspx", ex);
+				throw;
 			}
 			finally
 			{
@@ -629,13 +640,27 @@ INNER JOIN ClientsData cd
 WHERE   ir.IncludeClientCode =  ?ClientCode;
 ", _connection);
 
-					_includeData = new DataSet();
+					_data = new DataSet();
 					adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
 					adapter.SelectCommand.Transaction = transaction;
-					adapter.Fill(_includeData);
+					adapter.Fill(_data, "Include");
 
-					IncludeGrid.DataSource = _includeData.Tables[0].DefaultView;
+					adapter.SelectCommand.CommandText = @"
+SELECT rsg.ID, sg.DisplayName, rsg.Enabled
+FROM UserSettings.Save_Grids sg
+	JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId
+WHERE rsg.ClientCode = ?ClientCode
+ORDER BY sg.DisplayName;
+";
+					adapter.Fill(_data, "ExportRules");
+
+					IncludeGrid.DataSource = _data.Tables["Include"].DefaultView;
 					IncludeGrid.DataBind();
+					ExportRulesList.DataSource = _data.Tables["ExportRules"].DefaultView;
+					ExportRulesList.DataBind();
+
+					for (int i = 0; i < ExportRulesList.Items.Count; i++)
+						ExportRulesList.Items[i].Selected = Convert.ToBoolean(_data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
 					transaction.Commit();
 				}
 				finally
@@ -655,8 +680,8 @@ WHERE   ir.IncludeClientCode =  ?ClientCode;
 		protected void IncludeGrid_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
 		{
 			ProcessChanges();
-			_includeData.Tables[0].DefaultView[e.RowIndex].Delete();
-			IncludeGrid.DataSource = _includeData;
+			_data.Tables["Include"].DefaultView[e.RowIndex].Delete();
+			IncludeGrid.DataSource = _data;
 			IncludeGrid.DataBind();
 		}
 
@@ -705,8 +730,8 @@ ORDER BY cd.shortname;
 					break;
 				case "Add":
 					ProcessChanges();
-					_includeData.Tables[0].Rows.Add(_includeData.Tables[0].NewRow());
-					IncludeGrid.DataSource = _includeData;
+					_data.Tables["Include"].Rows.Add(_data.Tables["Include"].NewRow());
+					IncludeGrid.DataSource = _data;
 					IncludeGrid.DataBind();
 					break;
 			}
@@ -716,15 +741,21 @@ ORDER BY cd.shortname;
 		{
 			foreach (GridViewRow row in IncludeGrid.Rows)
 			{
-				if (_includeData.Tables[0].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
-					_includeData.Tables[0].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
+				if (_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
+					_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
 				
-				if (_includeData.Tables[0].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
+				if (_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
 				{
-					_includeData.Tables[0].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
-					_includeData.Tables[0].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
+					_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
+					_data.Tables["Include"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
 				}
-				
+			}
+			int i = 0;
+			foreach (ListItem item in ExportRulesList.Items)
+			{ 
+				if (Convert.ToBoolean(_data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
+					_data.Tables["ExportRules"].DefaultView[i]["Enabled"] = Convert.ToInt32(item.Selected);
+				i++;
 			}
 		}
 
