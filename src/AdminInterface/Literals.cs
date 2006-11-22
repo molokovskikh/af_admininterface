@@ -2,10 +2,24 @@ using System.Configuration;
 using System;
 using System.Web;
 
-public class Literals
+
+namespace AddUser
 {
-	public static string GetConnectionString()
+	public class Literals
 	{
-		return ConfigurationManager.AppSettings["ConnectionString"];
+		public static string GetConnectionString()
+		{
+			return ConfigurationManager.AppSettings["ConnectionString"];
+		}
+	}
+
+	public enum StatisticsType
+	{
+		UpdateCumulative = 2,
+		UpdateNormal = 1,
+		UpdateError = 3,
+		UpdateBan = 0,
+		InUpdateProcess = 4,
+		Download = 5
 	}
 }

@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Web.UI;
 using MySql.Data.MySqlClient;
+using System.Text;
 
 namespace AddUser
 {
-
 	public partial class viewcl : Page
 	{
 
@@ -95,59 +95,123 @@ namespace AddUser
 			base.OnInit(e);
 			InitializeComponent();
 		}
+
+		protected DateTime BeginDate
+		{
+			get { return Convert.ToDateTime(Request["BeginDate"]); }
+		}
+
+		protected DateTime EndDate
+		{
+			get { return Convert.ToDateTime(Request["EndDate"]); }
+		}
+
+		protected ulong RegionMask
+		{
+			get { return Convert.ToUInt64(Request["RegionMask"]); }
+		}
+
+		protected StatisticsType RequestType
+		{
+			get { return (StatisticsType)Convert.ToUInt32(Request["id"]); }
+		}
+
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToDouble(Session["AccessGrant"]) != 1)
 			    Response.Redirect("default.aspx");
 
-			uint actionType = Convert.ToUInt32(Request["id"]);
-			if (actionType > 5)
-				throw new ArgumentException("id", "Значение id, значение id не может быть больше 5.");
-
-			if (actionType != 4)
-				MyCmd.CommandText =			
-@"
+			string headerText = String.Empty;
+			switch (RequestType)
+			{ 
+				case StatisticsType.UpdateBan:
+					headerText = "Запреты:";
+					MyCmd.CommandText = @"
 SELECT  Logtime, 
         FirmCode, 
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)  
-WHERE   p.LogTime                            >curDate() 
-        AND rcs.clientcode                   =p.clientcode 
-        AND firmcode                         =p.clientcode 
-        AND r.regioncode                     =clientsdata.regioncode 
-        AND showright.regionmask & maskregion>0 
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+WHERE   rcs.clientcode						  = p.clientcode 
+        AND firmcode                          = p.clientcode 
+        AND r.regioncode                      = clientsdata.regioncode 
+		AND EXEVersion						  > 0 
+		AND UpdateType						  = 5
+        AND showright.regionmask & maskregion > 0 
+		AND showright.username = ?UserName 
+		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
+		AND r.regioncode & ?RegionMask > 0
+GROUP by p.rowid 
+ORDER by p.logtime desc;
 ";
-
-			if (actionType == 0)
-			{
-				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=5";
-				HeaderLB.Text = "Запреты:";
-			}
-
-			if (actionType == 1)
-			{
-				MyCmd.CommandText += " and UpdateType=2";
-				HeaderLB.Text = "Кумулятивные обновления:";
-			}
-
-			if (actionType == 2)
-			{
-				MyCmd.CommandText += " and UpdateType=1";
-				HeaderLB.Text = "Обычные обновления:";
-			}
-
-			if (actionType == 3)
-			{
-				MyCmd.CommandText += " and EXEVersion>0 and UpdateType=6";
-				HeaderLB.Text = "Ошибки подготовки данных:";
-			}
-
-			if (actionType == 4)
-			{
-				MyCmd.CommandText = 
-@" 
+					break;
+				case StatisticsType.UpdateCumulative:
+					headerText = "Кумулятивные обновления:";
+					MyCmd.CommandText = @"
+SELECT  Logtime, 
+        FirmCode, 
+        ShortName, 
+        Region, 
+        Addition  
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+WHERE   rcs.clientcode						  = p.clientcode 
+        AND firmcode                          = p.clientcode 
+        AND r.regioncode                      = clientsdata.regioncode 
+		AND UpdateType					  = 1
+        AND showright.regionmask & maskregion > 0 
+		AND showright.username = ?UserName 
+		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
+		AND r.regioncode & ?RegionMask > 0
+GROUP by p.rowid 
+ORDER by p.logtime desc;
+";
+					break;
+				case StatisticsType.UpdateError:
+					headerText = "Ошибки подготовки данных:";
+					MyCmd.CommandText = @"
+SELECT  Logtime, 
+        FirmCode, 
+        ShortName, 
+        Region, 
+        Addition  
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+WHERE   rcs.clientcode						  = p.clientcode 
+        AND firmcode                          = p.clientcode 
+        AND r.regioncode                      = clientsdata.regioncode 
+		AND EXEVersion						  > 0 
+		AND UpdateType						  = 6
+        AND showright.regionmask & maskregion > 0 
+		AND showright.username = ?UserName 
+		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
+		AND r.regioncode & ?RegionMask > 0
+GROUP by p.rowid 
+ORDER by p.logtime desc;
+";
+					break;
+				case StatisticsType.UpdateNormal:
+					headerText = "Обычные обновления:";
+					MyCmd.CommandText = @"
+SELECT  Logtime, 
+        FirmCode, 
+        ShortName, 
+        Region, 
+        Addition  
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+WHERE   rcs.clientcode						  = p.clientcode 
+        AND firmcode                          = p.clientcode 
+        AND r.regioncode                      = clientsdata.regioncode 
+		AND UpdateType						  = 2
+        AND showright.regionmask & maskregion > 0 
+		AND showright.username = ?UserName 
+		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
+		AND r.regioncode & ?RegionMask > 0
+GROUP by p.rowid 
+ORDER by p.logtime desc;
+";
+					break;
+				case StatisticsType.InUpdateProcess:
+					MyCmd.CommandText = @" 
 SELECT  showright.RowID,   
         p.Logtime,   
         clientsdata.FirmCode,   
@@ -158,7 +222,7 @@ FROM      (usersettings.clientsdata, accessright.showright, farm.regions r, user
 LEFT JOIN logs.prgdataex p 
         ON p.clientcode                                   = rcs.clientcode 
         AND p.Logtime                                     > curdate()  
-WHERE     clientsdata.firmcode                            = rcs.clientcode  
+WHERE   clientsdata.firmcode                            = rcs.clientcode  
         AND r.regioncode                                  = clientsdata.regioncode  
         AND showright.username                            = ?UserName
         AND showright.regionmask & clientsdata.maskregion > 0  
@@ -171,22 +235,40 @@ WHERE     clientsdata.firmcode                            = rcs.clientcode
         )  
 ORDER BY p.Logtime desc;
 ";
-				MyCmd.Parameters.Add("UserName", Session["UserName"]);
-				HeaderLB.Text = "В процессе получения обновления:";
+					headerText = "В процессе получения обновления:";
+					break;
+				case StatisticsType.Download:
+					MyCmd.CommandText = @"
+SELECT  Logtime, 
+        FirmCode, 
+        ShortName, 
+        Region, 
+        Addition  
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+WHERE   p.LogTime > curDate()
+		AND rcs.clientcode						  = p.clientcode 
+        AND firmcode                          = p.clientcode 
+        AND r.regioncode                      = clientsdata.regioncode 
+		AND UpdateType						  = 3
+        AND showright.regionmask & maskregion > 0 
+		AND showright.username = ?UserName 
+GROUP by p.rowid 
+ORDER by p.logtime desc;
+";
+					headerText = "Докачки:";
+					break;
 			}
-
-			if (actionType == 5)
-			{
-				MyCmd.CommandText += " and UpdateType=3";
-				HeaderLB.Text = "Докачки:";
-			}
-			if (actionType != 4)
-				MyCmd.CommandText += " and showright.username='" + Session["UserName"] + "'" + " group by p.rowid" + " order by p.logtime desc ";
 			try
 			{
+				HeaderLB.Text = headerText;
 				MyCn.ConnectionString = Literals.GetConnectionString();
 				MyCn.Open();
 				MyDA.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+				MyDA.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+				MyDA.SelectCommand.Parameters.Add("?BeginDate", BeginDate);
+				MyDA.SelectCommand.Parameters.Add("?EndDate", EndDate);
+				MyDA.SelectCommand.Parameters.Add("?RegionMask", RegionMask);
+
 				CountLB.Text = Convert.ToString(MyDA.Fill(DS, "Table"));
 				MyDA.SelectCommand.Transaction.Commit();
 			}
@@ -194,10 +276,8 @@ ORDER BY p.Logtime desc;
 			{
 				MyCn.Close();
 			}
-            CLList.DataBind();
+			CLList.DataBind();
 		}
 	}
-
-
 }
 

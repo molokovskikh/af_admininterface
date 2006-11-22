@@ -78,6 +78,12 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 		{
 			try
 			{
+				string urlTemplate = String.Format("BeginDate={0}&EndDate={1}&RegionMask={2}", fromDate, toDate.AddDays(1), regionMask);
+				CUHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateCumulative, urlTemplate);
+				ErrUpHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateError, urlTemplate);
+				ADHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateBan, urlTemplate);
+				ConfHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateNormal, urlTemplate);
+				
 				_connection.Open();
 				MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				MySqlDataAdapter adapter = new MySqlDataAdapter("GetShowStat", _connection);
