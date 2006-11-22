@@ -158,7 +158,7 @@ FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType					  = 1
+		AND UpdateType					  = 2
         AND showright.regionmask & maskregion > 0 
 		AND showright.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
@@ -201,7 +201,7 @@ FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType						  = 2
+		AND UpdateType						  = 1
         AND showright.regionmask & maskregion > 0 
 		AND showright.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
