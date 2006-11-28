@@ -1,9 +1,8 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.manageret" CodePage="1251"
-	CodeFile="manageret.aspx.cs" MaintainScrollPositionOnPostback="true" Theme="Main" %>
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.manageret" CodePage="1251" MaintainScrollPositionOnPostback="true" Theme="Main" Codebehind="manageret.aspx.cs" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
+<head id="Head" runat="server">
 	<title>Конфигурация пользователя</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 	<style type="text/css">
@@ -32,7 +31,11 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3" style="height: 22px">
-									<asp:CheckBox ID="InvisibleCB" runat="server" Text="&#34;Невидимый&#34; клиент" BorderStyle="None" />
+									<asp:DropDownList ID="VisileStateList" runat="server">
+										<asp:ListItem Text="Видимый" Value="0"></asp:ListItem>
+										<asp:ListItem Text="Не видимый" Value="1"></asp:ListItem>
+										<asp:ListItem Text="Скрытый" Value="2"></asp:ListItem>
+									</asp:DropDownList>
 								</td>
 							</tr>
 							<tr>

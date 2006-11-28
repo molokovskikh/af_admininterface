@@ -161,7 +161,7 @@ namespace AddUser
 				return;
 			}
 			ProcessChanges();
-			myMySqlCommand.Parameters.Add("InvisibleOnFirm", InvisibleCB.Checked);
+			myMySqlCommand.Parameters.Add("InvisibleOnFirm", VisileStateList.SelectedItem.Value);
 			myMySqlCommand.Parameters.Add("AlowRegister", RegisterCB.Checked);
 			myMySqlCommand.Parameters.Add("AlowRejection", RejectsCB.Checked);
 			myMySqlCommand.Parameters.Add("MultiUserLevel", MultiUserLevelTB.Text);
@@ -193,9 +193,9 @@ namespace AddUser
 
 			try
 			{
-                _connection.Open();
-                myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-                myMySqlCommand.Transaction = myTrans;
+				_connection.Open();
+				myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+				myMySqlCommand.Transaction = myTrans;
 
 				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
 				{
@@ -214,7 +214,7 @@ UPDATE ret_update_info  SET UniqueCopyID = ''  WHERE clientcode=?clientCode;
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
-";					
+";
 				}
 				myMySqlCommand.ExecuteNonQuery();
 
@@ -295,13 +295,13 @@ WHERE   intersection_update_info.pricecode IS NULL
 ";
 
 				}
-				if (InvisibleCB.Enabled)
+				if (VisileStateList.Enabled)
 				{
 					myMySqlCommand.CommandText = "select InvisibleOnFirm=?InvisibleOnFirm from retclientsset where clientcode=?clientCode";
 					if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 0)
 					{
 						InsertCommand += " update retclientsset, intersection, pricesdata set retclientsset.invisibleonfirm=?InvisibleOnFirm, intersection.invisibleonfirm=?InvisibleOnFirm";
-						if (InvisibleCB.Checked)
+						if (Convert.ToInt32(VisileStateList.SelectedValue) != 0)
 							InsertCommand += ", DisabledByFirm=if(PriceType=2, 1, 0), InvisibleOnClient=if(PriceType=2, 1, 0)";
 						InsertCommand += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
 					}
@@ -345,7 +345,7 @@ CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 				adapter.InsertCommand.Parameters.Add("ClientCode", ClientCode);
 				adapter.InsertCommand.Parameters.Add("IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.InsertCommand.Parameters.Add("PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-				
+
 				adapter.UpdateCommand = new MySqlCommand(
 @"
 DELETE FROM UserSettings.IncludeRegulation 
@@ -453,7 +453,7 @@ WHERE   clientcode          =?ClientCode;
 
 		private void SetWorkRegions(Int64 RegCode, bool OldRegion, bool AllRegions)
 		{
-			
+
 			string sqlCommand =
 @"
 SELECT  a.RegionCode, 
@@ -478,17 +478,17 @@ WHERE
 			adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
 			adapter.SelectCommand.Parameters.Add("RegCode", RegCode);
 			adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-            try
-            {
-                _connection.Open();
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                adapter.Fill(DS1, "WorkReg");
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+			try
+			{
+				_connection.Open();
+				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				adapter.Fill(DS1, "WorkReg");
+				adapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
 			WRList.DataBind();
 			OrderList.DataBind();
@@ -535,7 +535,7 @@ WHERE
 
 					myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
 					myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
-					
+
 					myMySqlCommand.CommandText =
 	@"
 SELECT  RegionCode, 
@@ -604,8 +604,8 @@ WHERE   rcs.clientcode     = ?ClientCode
 ";
 					myMySqlDataReader = myMySqlCommand.ExecuteReader();
 					myMySqlDataReader.Read();
-					InvisibleCB.Checked = Convert.ToBoolean(myMySqlDataReader["InvisibleOnFirm"]);
-					InvisibleCB.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
+					VisileStateList.SelectedValue = myMySqlDataReader["InvisibleOnFirm"].ToString();
+					VisileStateList.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
 					RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
 					RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
 					MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
@@ -667,7 +667,7 @@ ORDER BY sg.DisplayName;
 				{
 					_connection.Close();
 				}
-                SetWorkRegions(HomeRegionCode, true, false);
+				SetWorkRegions(HomeRegionCode, true, false);
 			}
 		}
 
@@ -676,7 +676,7 @@ ORDER BY sg.DisplayName;
 			CommandFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
 			ResultL.Text = "Пароли сгенерированны";
 		}
-		
+
 		protected void IncludeGrid_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
 		{
 			ProcessChanges();
@@ -711,19 +711,19 @@ ORDER BY cd.shortname;
 					adapter.SelectCommand.Parameters.Add("SearchText", string.Format("%{0}%", ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 					DataSet data = new DataSet();
 
-                    try
-                    {
-                        _connection.Open();
-                        adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                        adapter.Fill(data);
-                        adapter.SelectCommand.Transaction.Commit();
-                    }
-                    finally
-                    {
-                        _connection.Close();
-                    }
+					try
+					{
+						_connection.Open();
+						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+						adapter.Fill(data);
+						adapter.SelectCommand.Transaction.Commit();
+					}
+					finally
+					{
+						_connection.Close();
+					}
 
-					DropDownList ParentList = ((DropDownList) IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
+					DropDownList ParentList = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
 					ParentList.DataSource = data;
 					ParentList.DataBind();
 					ParentList.Visible = data.Tables[0].Rows.Count > 0;
@@ -743,7 +743,7 @@ ORDER BY cd.shortname;
 			{
 				if (_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
 					_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
-				
+
 				if (_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
 				{
 					_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
@@ -752,7 +752,7 @@ ORDER BY cd.shortname;
 			}
 			int i = 0;
 			foreach (ListItem item in ExportRulesList.Items)
-			{ 
+			{
 				if (Convert.ToBoolean(_data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
 					_data.Tables["ExportRules"].DefaultView[i]["Enabled"] = Convert.ToInt32(item.Selected);
 				i++;
@@ -764,7 +764,7 @@ ORDER BY cd.shortname;
 			if (e.Row.RowType == DataControlRowType.DataRow)
 			{
 				((DropDownList)e.Row.FindControl("ParentList")).Items.Add(new ListItem(((DataRowView)e.Row.DataItem)["ShortName"].ToString(), ((DataRowView)e.Row.DataItem)["FirmCode"].ToString()));
-				((DropDownList) e.Row.FindControl("IncludetypeList")).SelectedValue = ((DataRowView) e.Row.DataItem)["IncludeType"].ToString();
+				((DropDownList)e.Row.FindControl("IncludetypeList")).SelectedValue = ((DataRowView)e.Row.DataItem)["IncludeType"].ToString();
 				((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
 			}
 		}
@@ -779,5 +779,5 @@ ORDER BY cd.shortname;
 			File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 			DeletePrepareDataButton.Enabled = false;
 		}
-}
+	}
 }
