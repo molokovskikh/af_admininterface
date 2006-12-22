@@ -916,7 +916,7 @@ WHERE	dst.clientcode        = ?ClientCode
 		{
 			_command.CommandText =
 @"
-INSERT INTO Suppliers(Firmcode) VALUES(?ClientCode); 
+INSERT INTO order_send_config(Firmcode) VALUES(?ClientCode); 
 
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 

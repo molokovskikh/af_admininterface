@@ -64,6 +64,9 @@
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
+						<EmptyDataTemplate>
+							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить прайс лист" />
+						</EmptyDataTemplate>
 					</asp:GridView>
 				</div>
 			</div>
