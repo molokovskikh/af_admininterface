@@ -136,7 +136,7 @@ SELECT  cd. billingcode,
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
 		NULL AS IncludeType
-FROM    (clientsdata as cd, farm.regions, accessright.showright, pricesdata, farm.formrules) 
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN osuseraccessright as ouar2 
@@ -146,10 +146,10 @@ LEFT JOIN osuseraccessright as ouar
 WHERE   formrules.firmcode                       = pricesdata.pricecode 
         and pricesdata.firmcode                  = cd.firmcode 
         and regions.regioncode                   = cd.regioncode 
-        and cd.regioncode & showright.regionmask > 0 
-        and showright.UserName                   = ?UserName 
-        and if(ShowOpt                           = 1, FirmType= 0, 0) 
-        and if(UseRegistrant                     = 1, Registrant= showright.UserName, 1)
+        and cd.regioncode & regionaladmins.regionmask > 0 
+        and regionaladmins.UserName                   = ?UserName 
+        and if(ShowVendor                           = 1, FirmType= 0, 0) 
+        and if(UseRegistrant                     = 1, Registrant= regionaladmins.UserName, 1)
 ";
 			string secondPart = String.Empty;
 			string thirdPart =
@@ -176,7 +176,7 @@ SELECT  cd. billingcode,
 			WHEN 2 THEN 'Скрытый'
 		END AS IncludeType
 		
-FROM    (clientsdata as cd, farm.regions, accessright.showright, ret_update_info as rts) 
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, ret_update_info as rts) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN includeregulation 
@@ -197,10 +197,10 @@ LEFT JOIN logs.prgdataex
         ) 
 WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
         and regions.regioncode                   = cd.regioncode 
-        and cd.regioncode & showright.regionmask > 0 
-        and showright.UserName                   = ?UserName 
-        and if(ShowRet                           = 1, cd.FirmType= 1, 0) 
-        and if(UseRegistrant                     = 1, cd.Registrant= showright.UserName, 1)
+        and cd.regioncode & regionaladmins.regionmask > 0 
+        and regionaladmins.UserName                   = ?UserName 
+        and if(ShowRetail                           = 1, cd.FirmType= 1, 0) 
+        and if(UseRegistrant                     = 1, cd.Registrant= regionaladmins.UserName, 1)
 ";
 			string fourthPart = String.Empty;
 

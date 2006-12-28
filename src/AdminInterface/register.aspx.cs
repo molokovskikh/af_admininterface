@@ -620,12 +620,12 @@ set @inUser = ?UserName;
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
 FROM    clientsdata as cd, 
-        accessright.showright, 
+        accessright.regionaladmins, 
         billing.payers p 
 WHERE   p.payerid                                = cd.billingcode 
-        AND cd.regioncode & showright.regionmask > 0 
-        AND showright.UserName                   = ?UserName  
-        AND FirmType                             = if(ShowRet+ShowOpt = 2, FirmType, if(ShowRet = 1, 1, 0)) 
+        AND cd.regioncode & regionaladmins.regionmask > 0 
+        AND regionaladmins.UserName                   = ?UserName  
+        AND FirmType                             = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
         AND if(UseRegistrant                     = 1, Registrant = ?UserName, 1 = 1) 
         AND firmstatus                           = 1 
         AND billingstatus                        = 1 
@@ -704,12 +704,12 @@ ORDER BY p.shortname;
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
         cd.RegionCode  
-FROM    (accessright.showright, clientsdata as cd)  
+FROM    (accessright.regionaladmins, clientsdata as cd)  
 LEFT JOIN includeregulation ir 
         ON ir.includeclientcode              = cd.firmcode  
-WHERE   cd.regioncode & showright.regionmask > 0  
-        AND showright.UserName               = ?UserName  
-        AND FirmType                         = if(ShowRet+ShowOpt = 2, FirmType, if(ShowRet = 1, 1, 0)) 
+WHERE   cd.regioncode & regionaladmins.regionmask > 0  
+        AND regionaladmins.UserName               = ?UserName  
+        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
         AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)  
         AND cd.ShortName like ?SearchText 
         AND FirmStatus    = 1  

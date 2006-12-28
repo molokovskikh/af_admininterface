@@ -694,12 +694,12 @@ ORDER BY sg.DisplayName;
 (@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
-FROM    (accessright.showright, clientsdata as cd)  
+FROM    (accessright.regionaladmins, clientsdata as cd)  
 LEFT JOIN includeregulation ir 
         ON ir.includeclientcode              =cd.firmcode  
-WHERE   cd.regioncode & showright.regionmask > 0  
-        AND showright.UserName               =?UserName  
-        AND FirmType                         =if(ShowRet+ShowOpt=2, FirmType, if(ShowRet=1, 1, 0)) 
+WHERE   cd.regioncode & regionaladmins.regionmask > 0  
+        AND regionaladmins.UserName               =?UserName  
+        AND FirmType                         =if(ShowRetail+ShowVendor=2, FirmType, if(ShowRetail=1, 1, 0)) 
         AND if(UseRegistrant                 =1, Registrant=?UserName, 1=1)  
         AND cd.ShortName like ?SearchText
         AND FirmStatus   =1  

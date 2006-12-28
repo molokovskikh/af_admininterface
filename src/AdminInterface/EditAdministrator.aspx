@@ -75,6 +75,11 @@
 					runat="server" Text="Посылать оповещения на E-mail" />
 				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.UseRegistrant %>' ID="UseRegistrant"
 					runat="server" Text="Использовать информацию о регистраторе при управлении клиентом" />
+				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.ShowRetail %>' ID="ShowRetail"
+					runat="server" Text="Показывать аптеки" />
+				<asp:CheckBox CssClass="InputCheckBox" Checked='<%# _current.ShowVendor %>' ID="ShowVendor"
+					runat="server" Text="Показывать поставщиков" />
+
 			</fieldset>
 			<div class="Buttons">
 				<asp:Button runat="server" ID="Save" Text="Сохранить" OnClick="Save_Click" />

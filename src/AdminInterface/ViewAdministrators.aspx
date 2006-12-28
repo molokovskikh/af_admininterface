@@ -47,6 +47,8 @@
 					<asp:CheckBoxField DataField="AllowChangePassword" HeaderText="CP" SortExpression="AllowChangePassword" />
 					<asp:CheckBoxField DataField="AllowManage" HeaderText="M" SortExpression="AllowManage" />
 					<asp:CheckBoxField DataField="AllowClone" HeaderText="C" SortExpression="AllowClone" />
+					<asp:CheckBoxField DataField="ShowRetail" HeaderText="SR" SortExpression="ShowRetail" />
+					<asp:CheckBoxField DataField="ShowVendor" HeaderText="SV" SortExpression="ShowVendor" />
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">
@@ -61,8 +63,9 @@
 				<li>SA - Посылать оповещения на E-mail</li>
 				<li>CP - Разрешить измененять пароль</li>
 				<li>M - Разрешить управление клиентом</li>
-				<li>C - Разрешить клонирование&nbsp;
-				</li>
+				<li>C - Разрешить клонирование</li>
+				<li>SR - Показывать аптеки</li>
+				<li>SV - Показывать поставщиков</li>
 			</ul>
 		</div>
 	</form>

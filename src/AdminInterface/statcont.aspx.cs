@@ -43,15 +43,15 @@ SELECT  WriteTime,
         clientsinfo.rowid  
 FROM    logs.clientsinfo, 
         usersettings.clientsdata, 
-        accessright.showright, 
+        accessright.regionaladmins, 
         usersettings.osuseraccessright, 
         farm.regions  
 WHERE   clientsinfo.clientcode                            =firmcode 
         AND osuseraccessright.clientcode                  =clientsinfo.clientcode  
-        AND showright.RegionMask & clientsdata.RegionCode > 0 
+        AND regionaladmins.RegionMask & clientsdata.RegionCode > 0 
         AND writetime BETWEEN ?FromDate AND ?ToDate  
         AND regions.regioncode=clientsdata.RegionCode 
-        AND showright.username=?userName 
+        AND regionaladmins.username=?userName 
 ORDER BY WriteTime
 ", _connection);
 			adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);

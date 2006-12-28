@@ -61,6 +61,8 @@ public partial class EditAdministrator : Page
 		_current.AllowCreateInvisible = AllowCreateInvisible.Checked;
 		_current.SendAlert = SendAlert.Checked;
 		_current.UseRegistrant = UseRegistrant.Checked;
+		_current.ShowRetail = ShowRetail.Checked;
+		_current.ShowVendor = ShowVendor.Checked;
 
 		if (_current.ID != -1)
 			CommandFactory.UpdateAdministrator(_current);

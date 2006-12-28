@@ -132,14 +132,14 @@ SELECT  Logtime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
 		AND EXEVersion						  > 0 
 		AND UpdateType						  = 5
-        AND showright.regionmask & maskregion > 0 
-		AND showright.username = ?UserName 
+        AND regionaladmins.regionmask & maskregion > 0 
+		AND regionaladmins.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
 		AND r.regioncode & ?RegionMask > 0
 GROUP by p.rowid 
@@ -154,13 +154,13 @@ SELECT  Logtime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
 		AND UpdateType					  = 2
-        AND showright.regionmask & maskregion > 0 
-		AND showright.username = ?UserName 
+        AND regionaladmins.regionmask & maskregion > 0 
+		AND regionaladmins.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
 		AND r.regioncode & ?RegionMask > 0
 GROUP by p.rowid 
@@ -175,14 +175,14 @@ SELECT  Logtime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
 		AND EXEVersion						  > 0 
 		AND UpdateType						  = 6
-        AND showright.regionmask & maskregion > 0 
-		AND showright.username = ?UserName 
+        AND regionaladmins.regionmask & maskregion > 0 
+		AND regionaladmins.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
 		AND r.regioncode & ?RegionMask > 0
 GROUP by p.rowid 
@@ -197,13 +197,13 @@ SELECT  Logtime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
 		AND UpdateType						  = 1
-        AND showright.regionmask & maskregion > 0 
-		AND showright.username = ?UserName 
+        AND regionaladmins.regionmask & maskregion > 0 
+		AND regionaladmins.username = ?UserName 
 		AND p.LogTime BETWEEN ?BeginDate AND ?EndDate
 		AND r.regioncode & ?RegionMask > 0
 GROUP by p.rowid 
@@ -212,20 +212,20 @@ ORDER by p.logtime desc;
 					break;
 				case StatisticsType.InUpdateProcess:
 					MyCmd.CommandText = @" 
-SELECT  showright.RowID,   
+SELECT  regionaladmins.RowID,   
         p.Logtime,   
         clientsdata.FirmCode,   
         clientsdata.ShortName,   
         r.Region,   
         p.Addition  
-FROM      (usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)   
+FROM      (usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)   
 LEFT JOIN logs.prgdataex p 
         ON p.clientcode                                   = rcs.clientcode 
         AND p.Logtime                                     > curdate()  
 WHERE   clientsdata.firmcode                            = rcs.clientcode  
         AND r.regioncode                                  = clientsdata.regioncode  
-        AND showright.username                            = ?UserName
-        AND showright.regionmask & clientsdata.maskregion > 0  
+        AND regionaladmins.username                            = ?UserName
+        AND regionaladmins.regionmask & clientsdata.maskregion > 0  
         AND rcs.UncommittedUpdateTime                    >= CURDATE()  
         AND rcs.UpdateTime                               <> rcs.UncommittedUpdateTime  
         AND p.RowID                                       = 
@@ -244,14 +244,14 @@ SELECT  Logtime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.showright, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.prgdataex p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
 WHERE   p.LogTime > curDate()
 		AND rcs.clientcode						  = p.clientcode 
         AND firmcode                          = p.clientcode 
         AND r.regioncode                      = clientsdata.regioncode 
 		AND UpdateType						  = 3
-        AND showright.regionmask & maskregion > 0 
-		AND showright.username = ?UserName 
+        AND regionaladmins.regionmask & maskregion > 0 
+		AND regionaladmins.username = ?UserName 
 GROUP by p.rowid 
 ORDER by p.logtime desc;
 ";

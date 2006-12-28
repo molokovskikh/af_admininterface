@@ -158,10 +158,9 @@ SELECT  AlowChangePassword,
         AlowManage,
         (alowCreateRetail   = 1 OR AlowCreateVendor = 1) as AlowRegister,
         AlowClone,  
-        (ShowRet   = 1 OR ShowOpt = 1) as ShowInfo
-FROM    (accessright.showright as a, accessright.regionaladmins as b)  
-WHERE   a.username     = b.username 
-        AND a.username = ?userName;
+        (ShowRetail   = 1 OR ShowVendor = 1) as ShowInfo
+FROM    accessright.regionaladmins  
+WHERE	UserName = ?userName
 ";
 				MySqlDataReader Reader = command.ExecuteReader();
 
