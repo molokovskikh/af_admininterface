@@ -14,6 +14,7 @@ namespace AddUser
 		public static void Mail(string From, string Subject, bool IsBodyHtml, string Body, string MessageTo,
 		                        string MessageBCC, Encoding Encoding)
 		{
+#if !DEBUG
 			try
 			{
 				MailMessage message = new MailMessage();
@@ -32,6 +33,7 @@ namespace AddUser
 			{
 				Logger.Write(ex);
 			}
+#endif 
 		}
 
 		public static string GeneratePassword()
