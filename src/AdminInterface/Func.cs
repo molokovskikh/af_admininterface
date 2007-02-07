@@ -5,6 +5,7 @@ using System.Net.Mail;
 using System.Text;
 using MySql.Data.MySqlClient;
 using MailMessage=System.Net.Mail.MailMessage;
+using Microsoft.Practices.EnterpriseLibrary.Logging;
 
 namespace AddUser
 {
@@ -13,7 +14,6 @@ namespace AddUser
 		public static void Mail(string From, string Subject, bool IsBodyHtml, string Body, string MessageTo,
 		                        string MessageBCC, Encoding Encoding)
 		{
-#if !DEBUG
 			try
 			{
 				MailMessage message = new MailMessage();
@@ -21,16 +21,17 @@ namespace AddUser
 				message.IsBodyHtml = IsBodyHtml;
 				message.Subject = Subject;
 				message.Body = Body;
-				message.Bcc.Add(MessageBCC);
+				if (!String.IsNullOrEmpty(MessageBCC))
+					message.Bcc.Add(MessageBCC);
 				message.To.Add(MessageTo);
 				message.BodyEncoding = Encoding;
 				SmtpClient client = new SmtpClient("box.analit.net");
 				client.Send(message);
 			}
-			catch
+			catch(Exception ex)
 			{
+				Logger.Write(ex);
 			}
-#endif
 		}
 
 		public static string GeneratePassword()
@@ -96,8 +97,9 @@ namespace AddUser
 				myMySqlDataAdapter.Fill(DS, Table);
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Logger.Write(ex);
 				return false;
 			}
 			finally
@@ -137,8 +139,9 @@ namespace AddUser
 				myMySqlDataAdapter.Fill(DS, Table);
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Logger.Write(ex);
 				return false;
 			}
 			finally
@@ -178,8 +181,9 @@ namespace AddUser
 				myMySqlDataAdapter.Fill(DS, Table);
 				return true;
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
+				Logger.Write(ex);
 				return false;
 			}
 			finally
