@@ -26,8 +26,10 @@ namespace AddUser
 				message.BodyEncoding = encoding;				
 				if (!String.IsNullOrEmpty(bcc))
 					message.Bcc.Add(bcc);
-				foreach(string toAddress in to.Split(","));
+
+				foreach(string toAddress in to.Split(",".ToCharArray()))
 					message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
+
 				SmtpClient client = new SmtpClient("box.analit.net");
 				client.Send(message);
 			}
