@@ -241,10 +241,10 @@ INTO    logs.clone
 				_connection.Close();
 			}
 #if !DEBUG
-			Func.Mail("register@analit.net", "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
+			Func.Mail("register@analit.net", String.Empty, "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
 					false,
 					"От: " + FromDD.SelectedItem.Text + "\nДля: " + ToDD.SelectedItem.Text + "\nОператор: " + UserName,
-					DS.Tables["Regions"].Rows[0]["email"].ToString(), "RegisterList@subscribe.analit.net", Encoding.UTF8);
+					DS.Tables["Regions"].Rows[0]["email"].ToString(), String.Empty, "RegisterList@subscribe.analit.net", Encoding.UTF8);
 #endif
 			LabelErr.ForeColor = Color.Green;
 			LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;

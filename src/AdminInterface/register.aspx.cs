@@ -9,7 +9,6 @@ using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Web;
-using System.Web.Mail;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ActiveDs;
@@ -466,18 +465,18 @@ set @inUser = ?UserName;
 						{
 							foreach (DataRow Row in DS1.Tables["FirmEmail"].Rows)
 							{
-								Func.Mail("Аналитическая Компания Инфорум <pharm@analit.net>",
+								Func.Mail("pharm@analit.net", "Аналитическая Компания Инфорум",
 										  "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 										  false,
 										  "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
 										  + ShortNameTB.Text + " в регионе(городе) "
 										  + RegionDD.SelectedItem.Text + "."
 										  +
-										  "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net)."
+										  "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net ).\n"
 										  + "С уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
-										  + "\n4732-206000", "\"" + Row[0] + "\"<" + Row[1] + ">", null, Encoding.GetEncoding(1251));
+										  + "\n4732-206000", Row[1].ToString(), Row[0].ToString(), null, Encoding.UTF8);
 							}
-							Func.Mail("register@analit.net",
+							Func.Mail("register@analit.net", String.Empty,
 									  "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
 									  false, "Оператор: " + Session["UserName"]
 													   + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
@@ -485,20 +484,20 @@ set @inUser = ?UserName;
 													   + "\n\nСегмент: " + SegmentDD.SelectedItem.Text + "\nТип: "
 													   + TypeDD.SelectedItem.Text + "О Регистрации уведомлено поставщиков: "
 													   + Convert.ToString(DS1.Tables["FirmEmail"].Rows.Count - 1),
-									  "RegisterList@subscribe.analit.net",
+									  "RegisterList@subscribe.analit.net", String.Empty,
 									  DS1.Tables["admin"].Rows[0]["email"].ToString(),
 									  Encoding.UTF8);
 						}
 						else
 						{
-							Func.Mail("register@analit.net",
+							Func.Mail("register@analit.net", String.Empty, 
 									  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 									  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 													   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 													   + "\nКод: " + Session["Code"] + "\n\nСегмент: "
 													   + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
 													   + "Ошибка: Ничего не получилось выбрать из базы",
-									  "RegisterList@subscribe.analit.net",
+									  "RegisterList@subscribe.analit.net", String.Empty,
 									  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 						}
 					}
@@ -507,48 +506,48 @@ set @inUser = ?UserName;
 				catch (Exception err)
 				{
 #if !DEBUG
-					Func.Mail("register@analit.net",
+					Func.Mail("register@analit.net", String.Empty,
 							  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 											   + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-											   + err.Message, "RegisterList@subscribe.analit.net",
+											   + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
 				}
 				try
 				{
 #if !DEBUG
-					Func.Mail("register@analit.net", "\"" + FullNameTB.Text + "\" - успешная регистрация",
+					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 											   + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net",
+											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-					Func.Mail("\"" + FullNameTB.Text + "\" <" + EmailTB.Text + ">", "Sub", false, "",
-							  "FirmEmailList-on@subscribe.analit.net", null, Encoding.UTF8);
-					if (!(TBClientManagerMail.Text == ""))
-						Func.Mail("\"" + TBClientManagerName.Text + "\" <" + TBClientManagerMail.Text + ">", "Sub", false, "",
-								  "ClientManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
-					if (!(TBOrderManagerMail.Text == ""))
-						Func.Mail("\"" + TBOrderManagerName.Text + "\" <" + TBOrderManagerMail.Text + ">", "Sub", false, "",
-								  "OrderManagerList-on@subscribe.analit.net", null, Encoding.UTF8);
-					if (!(TBAccountantMail.Text == ""))
-						Func.Mail("\"" + TBAccountantName.Text + "\" <" + TBAccountantMail.Text + ">", "Sub", false, "",
-								  "AccountantList-on@subscribe.analit.net", null, Encoding.UTF8);
+					Func.Mail(EmailTB.Text, FullNameTB.Text, "Sub", false, "",
+							  "FirmEmailList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
+					if (!String.IsNullOrEmpty(TBClientManagerMail.Text))
+						Func.Mail(TBClientManagerMail.Text, TBClientManagerName.Text, "Sub", false, "",
+								  "ClientManagerList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
+					if (!String.IsNullOrEmpty(TBOrderManagerMail.Text))
+						Func.Mail(TBOrderManagerMail.Text, TBOrderManagerName.Text, "Sub", false, "",
+								  "OrderManagerList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
+					if (!String.IsNullOrEmpty(TBAccountantMail.Text))
+						Func.Mail(TBAccountantMail.Text, TBAccountantName.Text, "Sub", false, "",
+								  "AccountantList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
 #endif
 				}
 				catch (Exception err)
 				{
 #if !DEBUG
-					Func.Mail("register@analit.net", "\"" + FullNameTB.Text
+					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text
 													 + "\" - ошибка подписки поставщиков", false,
 							  "Оператор: " + Session["UserName"] + "\nРегион: "
 							  + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 							  + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 							  + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-							  + err.Message, "RegisterList@subscribe.analit.net",
+							  + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
 				}

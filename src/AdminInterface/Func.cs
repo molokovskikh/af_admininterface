@@ -11,27 +11,28 @@ namespace AddUser
 {
 	public class Func
 	{
-		public static void Mail(string From, string Subject, bool IsBodyHtml, string Body, string MessageTo,
-		                        string MessageBCC, Encoding Encoding)
+		public static void Mail(string from, string fromDisplayName, string subject, bool isBodyHtml, 
+			string body, string to, string toDisplayName, string bcc, Encoding encoding)
 		{
 #if !DEBUG
 			try
 			{
 				MailMessage message = new MailMessage();
-				message.From = new MailAddress(From);
-				message.IsBodyHtml = IsBodyHtml;
-				message.Subject = Subject;
-				message.Body = Body;
+				message.From = new MailAddress(from, fromDisplayName, encoding);
+				message.IsBodyHtml = isBodyHtml;
+				message.Subject = subject;
+				message.SubjectEncoding = encoding;
+				message.Body = body;
+				message.BodyEncoding = encoding;				
 				if (!String.IsNullOrEmpty(MessageBCC))
 					message.Bcc.Add(MessageBCC);
-				message.To.Add(MessageTo);
-				message.BodyEncoding = Encoding;
+				message.To.Add(new MailAddress(to, toDisplayName, encoding));
 				SmtpClient client = new SmtpClient("box.analit.net");
 				client.Send(message);
 			}
 			catch(Exception ex)
 			{
-				Logger.Write(ex);
+				Logger.Write(Utils.ExceptionToString(ex), "Error");
 			}
 #endif 
 		}
@@ -82,13 +83,6 @@ namespace AddUser
 			try
 			{
 				myMySqlConnection.Open();
-			}
-			catch
-			{
-				return false;
-			}
-			try
-			{
 				if (!(MySQLCommand == null))
 				{
 					myMySqlCommand = MySQLCommand;
@@ -101,7 +95,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(ex);
+				Logger.Write(Utils.ExceptionToString(ex), "Error");
 				return false;
 			}
 			finally
@@ -124,13 +118,6 @@ namespace AddUser
 			try
 			{
 				myMySqlConnection.Open();
-			}
-			catch
-			{
-				return false;
-			}
-			try
-			{
 				if (!(MySQLCommand == null))
 				{
 					myMySqlCommand = MySQLCommand;
@@ -143,7 +130,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(ex);
+				Logger.Write(Utils.ExceptionToString(ex), "Error");
 				return false;
 			}
 			finally
@@ -166,13 +153,6 @@ namespace AddUser
 			try
 			{
 				myMySqlConnection.Open();
-			}
-			catch
-			{
-				return false;
-			}
-			try
-			{
 				if (!(MySQLCommand == null))
 				{
 					myMySqlCommand = MySQLCommand;
@@ -185,7 +165,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(ex);
+				Logger.Write(Utils.ExceptionToString(ex), "Error");
 				return false;
 			}
 			finally

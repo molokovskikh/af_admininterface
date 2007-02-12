@@ -287,9 +287,9 @@ ORDER BY region;
 				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
 #if !DEBUG
-				Func.Mail("register@analit.net", "\"" + ShortName + "\" - регистрация ценовой колонки", false,
+				Func.Mail("register@analit.net", String.Empty, "\"" + ShortName + "\" - регистрация ценовой колонки", false,
 				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
-				          "RegisterList@subscribe.analit.net", DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
 			}
 			catch
