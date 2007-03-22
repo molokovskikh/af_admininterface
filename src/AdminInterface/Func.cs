@@ -17,21 +17,24 @@ namespace AddUser
 #if !DEBUG
 			try
 			{
-				MailMessage message = new MailMessage();
-				message.From = new MailAddress(from, fromDisplayName, encoding);
-				message.IsBodyHtml = isBodyHtml;
-				message.Subject = subject;
-				message.SubjectEncoding = encoding;
-				message.Body = body;
-				message.BodyEncoding = encoding;				
-				if (!String.IsNullOrEmpty(bcc))
-					message.Bcc.Add(bcc);
+				if (!String.IsNullOrEmpty(to))
+				{
+					MailMessage message = new MailMessage();
+					message.From = new MailAddress(from, fromDisplayName, encoding);
+					message.IsBodyHtml = isBodyHtml;
+					message.Subject = subject;
+					message.SubjectEncoding = encoding;
+					message.Body = body;
+					message.BodyEncoding = encoding;
+					if (!String.IsNullOrEmpty(bcc))
+						message.Bcc.Add(bcc);
 
-				foreach(string toAddress in to.Split(",".ToCharArray()))
-					message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
+					foreach (string toAddress in to.Split(",".ToCharArray()))
+						message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
 
-				SmtpClient client = new SmtpClient("box.analit.net");
-				client.Send(message);
+					SmtpClient client = new SmtpClient("box.analit.net");
+					client.Send(message);
+				}
 			}
 			catch(Exception ex)
 			{
