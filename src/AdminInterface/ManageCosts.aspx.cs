@@ -115,27 +115,27 @@ namespace AddUser
 					DS.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
 					DS.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
 				}
-				UpdCommand.Parameters.Add(new MySqlParameter("CostCode", MySqlDbType.Int32));
+				UpdCommand.Parameters.Add(new MySqlParameter("?CostCode", MySqlDbType.Int32));
 				UpdCommand.Parameters["?CostCode"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["?CostCode"].SourceColumn = "CostCode";
 				UpdCommand.Parameters["?CostCode"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("CostName", MySqlDbType.VarChar));
+				UpdCommand.Parameters.Add(new MySqlParameter("?CostName", MySqlDbType.VarChar));
 				UpdCommand.Parameters["?CostName"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["?CostName"].SourceColumn = "CostName";
 				UpdCommand.Parameters["?CostName"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("BaseCost", MySqlDbType.Bit));
+				UpdCommand.Parameters.Add(new MySqlParameter("?BaseCost", MySqlDbType.Bit));
 				UpdCommand.Parameters["?BaseCost"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["?BaseCost"].SourceColumn = "BaseCost";
 				UpdCommand.Parameters["?BaseCost"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("Enabled", MySqlDbType.Bit));
+				UpdCommand.Parameters.Add(new MySqlParameter("?Enabled", MySqlDbType.Bit));
 				UpdCommand.Parameters["?Enabled"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["?Enabled"].SourceColumn = "Enabled";
 				UpdCommand.Parameters["?Enabled"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("AgencyEnabled", MySqlDbType.Bit));
+				UpdCommand.Parameters.Add(new MySqlParameter("?AgencyEnabled", MySqlDbType.Bit));
 				UpdCommand.Parameters["?AgencyEnabled"].Direction = ParameterDirection.Input;
 				UpdCommand.Parameters["?AgencyEnabled"].SourceColumn = "AgencyEnabled";
 				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;

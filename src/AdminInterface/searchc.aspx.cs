@@ -210,7 +210,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					{
 						secondPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						fourthPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-						_command.Parameters.Add(new MySqlParameter("Name", MySqlDbType.VarChar));
+						_command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
 						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
@@ -218,7 +218,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					{
 						secondPart = " and cd.firmcode=?ClientCode";
 						fourthPart = " and cd.firmcode=?ClientCode";
-						_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int32));
+						_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int32));
 						_command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
@@ -226,7 +226,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					{
 						secondPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						fourthPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-						_command.Parameters.Add(new MySqlParameter("Login", MySqlDbType.VarChar));
+						_command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
 						_command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
@@ -234,7 +234,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					{
 						secondPart = " and cd.billingcode=?BillingCode";
 						fourthPart = " and cd.billingcode=?BillingCode";
-						_command.Parameters.Add(new MySqlParameter("BillingCode", MySqlDbType.Int32));
+						_command.Parameters.Add(new MySqlParameter("?BillingCode", MySqlDbType.Int32));
 						_command.Parameters["?BillingCode"].Value = FindTB.Text;
 						break;
 					}
