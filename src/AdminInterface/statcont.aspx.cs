@@ -54,9 +54,9 @@ WHERE   clientsinfo.clientcode                            =firmcode
         AND regionaladmins.username=?userName 
 ORDER BY WriteTime
 ", _connection);
-			adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-			adapter.SelectCommand.Parameters.Add("FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.Add("ToDate", CalendarTo.SelectedDate.AddDays(1));			
+			adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			adapter.SelectCommand.Parameters.Add("?FromDate", CalendarFrom.SelectedDate);
+			adapter.SelectCommand.Parameters.Add("?ToDate", CalendarTo.SelectedDate.AddDays(1));			
 			
 			DataSet data = new DataSet();
 			try

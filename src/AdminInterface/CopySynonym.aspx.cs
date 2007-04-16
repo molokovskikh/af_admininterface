@@ -134,9 +134,9 @@ WHERE   regioncode     = ?RegionCode
         AND if(UseRegistrant = 1, Registrant = ?UserName, 1 = 1)  
         AND username         = ?UserName;
 ", _connection);
-			DA.SelectCommand.Parameters.Add("NameStr", String.Format("%{0}%", NameStr));
-			DA.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-			DA.SelectCommand.Parameters.Add("RegionCode", RegionDD.SelectedItem.Value);
+			DA.SelectCommand.Parameters.Add("?NameStr", String.Format("%{0}%", NameStr));
+			DA.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			DA.SelectCommand.Parameters.Add("?RegionCode", RegionDD.SelectedItem.Value);
 			try
 			{
 				_connection.Open();
@@ -218,10 +218,10 @@ INTO    logs.clone
                 ?ClientCode
         );
 ";
-				MyCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
-				MyCommand.Parameters.Add("UserName", Session["UserName"]);
-				MyCommand.Parameters.Add("ClientCode", ClientCode);
-				MyCommand.Parameters.Add("ParentClientCode", ParentClientCode);
+				MyCommand.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
+				MyCommand.Parameters.Add("?UserName", Session["UserName"]);
+				MyCommand.Parameters.Add("?ClientCode", ClientCode);
+				MyCommand.Parameters.Add("?ParentClientCode", ParentClientCode);
 
 				_connection.Open();
 				MyTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
@@ -276,7 +276,7 @@ WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0
         AND username                                                    = ?UserName 
 ORDER BY region;
 ", _connection);
-            DA.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+            DA.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 			try
 			{
 				_connection.Open();

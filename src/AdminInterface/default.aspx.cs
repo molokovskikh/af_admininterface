@@ -42,7 +42,7 @@ FROM AccessRight.RegionalAdmins ra
 WHERE UserName = ?UserName ORDER BY Region) tmp;
 ;
 ", _connection);
-					adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 					adapter.Fill(data);
 					RegionList.DataTextField = "Region";
 					RegionList.DataValueField = "RegionCode";
@@ -89,10 +89,10 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				MySqlDataAdapter adapter = new MySqlDataAdapter("GetShowStat", _connection);
 				adapter.SelectCommand.Transaction = transaction;
 				adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
-				adapter.SelectCommand.Parameters.Add("StartDateParam", fromDate);
-				adapter.SelectCommand.Parameters.Add("EndDateParam", toDate.AddDays(1));
-				adapter.SelectCommand.Parameters.Add("RegionMaskParam", regionMask);
-				adapter.SelectCommand.Parameters.Add("UserNameParam", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?StartDateParam", fromDate);
+				adapter.SelectCommand.Parameters.Add("?EndDateParam", toDate.AddDays(1));
+				adapter.SelectCommand.Parameters.Add("?RegionMaskParam", regionMask);
+				adapter.SelectCommand.Parameters.Add("?UserNameParam", Session["UserName"]);
 				DataSet data = new DataSet();
 				adapter.Fill(data);
 				//Заказы
@@ -148,10 +148,10 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				command.Connection = _connection;
 				command.Transaction = transaction;
 
-				command.Parameters.Add("RegionMask", regionMask);
-				command.Parameters.Add("ToDate", toDate);
-				command.Parameters.Add("FromDate", fromDate);
-				command.Parameters.Add("UserName", Session["UserName"]);
+				command.Parameters.Add("?RegionMask", regionMask);
+				command.Parameters.Add("?ToDate", toDate);
+				command.Parameters.Add("?FromDate", fromDate);
+				command.Parameters.Add("?UserName", Session["UserName"]);
 				command.CommandText =
 @"
 SELECT  AlowChangePassword,

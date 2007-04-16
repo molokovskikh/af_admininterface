@@ -234,8 +234,8 @@ ORDER BY region;
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.Add("RegionCode", RegCode);
-				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?RegionCode", RegCode);
+				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 				adapter.Fill(DS1, "WorkReg");
 				adapter.SelectCommand.Transaction.Commit();
 			}
@@ -298,82 +298,82 @@ ORDER BY region;
 set @inHost = ?Host;
 set @inUser = ?UserName;
 ";
-			_command.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
-			_command.Parameters.Add("UserName", Session["UserName"]);
+			_command.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
+			_command.Parameters.Add("?UserName", Session["UserName"]);
 			_command.ExecuteNonQuery();
 
 			_command.Parameters.Add(new MySqlParameter("MaskRegion", MySqlDbType.Int64));
-			_command.Parameters["MaskRegion"].Value = MaskRegion;
+			_command.Parameters["?MaskRegion"].Value = MaskRegion;
 			_command.Parameters.Add(new MySqlParameter("OrderMask", MySqlDbType.Int64));
-			_command.Parameters["OrderMask"].Value = OrderMask;
+			_command.Parameters["?OrderMask"].Value = OrderMask;
 			_command.Parameters.Add(new MySqlParameter("ShowRegionMask", MySqlDbType.Int64));
-			_command.Parameters["ShowRegionMask"].Value = ShowRegionMask;
+			_command.Parameters["?ShowRegionMask"].Value = ShowRegionMask;
 			_command.Parameters.Add(new MySqlParameter("WorkMask", MySqlDbType.Int64));
-			_command.Parameters["WorkMask"].Value = WorkMask;
+			_command.Parameters["?WorkMask"].Value = WorkMask;
 			_command.Parameters.Add(new MySqlParameter("fullname", MySqlDbType.VarString));
-			_command.Parameters["fullname"].Value = FullNameTB.Text;
+			_command.Parameters["?fullname"].Value = FullNameTB.Text;
 			_command.Parameters.Add(new MySqlParameter("shortname", MySqlDbType.VarString));
-			_command.Parameters["shortname"].Value = ShortNameTB.Text;
+			_command.Parameters["?shortname"].Value = ShortNameTB.Text;
 			_command.Parameters.Add(new MySqlParameter("BeforeNamePrefix", MySqlDbType.VarString));
-			_command.Parameters["BeforeNamePrefix"].Value = "";
+			_command.Parameters["?BeforeNamePrefix"].Value = "";
 			if (TypeDD.SelectedItem.Value == "1")
 			{
-				_command.Parameters["BeforeNamePrefix"].Value = "Аптека";
+				_command.Parameters["?BeforeNamePrefix"].Value = "Аптека";
 			}
 			_command.Parameters.Add(new MySqlParameter("phone", MySqlDbType.VarString));
-			_command.Parameters["phone"].Value = PhoneTB.Text;
+			_command.Parameters["?phone"].Value = PhoneTB.Text;
 			_command.Parameters.Add(new MySqlParameter("fax", MySqlDbType.VarString));
-			_command.Parameters["fax"].Value = FaxTB.Text;
+			_command.Parameters["?fax"].Value = FaxTB.Text;
 			_command.Parameters.Add(new MySqlParameter("url", MySqlDbType.VarString));
-			_command.Parameters["url"].Value = URLTB.Text;
+			_command.Parameters["?url"].Value = URLTB.Text;
 			_command.Parameters.Add(new MySqlParameter("firmsegment", MySqlDbType.Int24));
-			_command.Parameters["firmsegment"].Value = SegmentDD.SelectedItem.Value;
+			_command.Parameters["?firmsegment"].Value = SegmentDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("RegionCode", MySqlDbType.Int24));
-			_command.Parameters["RegionCode"].Value = RegionDD.SelectedItem.Value;
+			_command.Parameters["?RegionCode"].Value = RegionDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("adress", MySqlDbType.VarString));
-			_command.Parameters["adress"].Value = AddressTB.Text;
+			_command.Parameters["?adress"].Value = AddressTB.Text;
 			_command.Parameters.Add(new MySqlParameter("firmtype", MySqlDbType.Int24));
-			_command.Parameters["firmtype"].Value = TypeDD.SelectedItem.Value;
+			_command.Parameters["?firmtype"].Value = TypeDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("registrant", MySqlDbType.VarString));
-			_command.Parameters["registrant"].Value = Session["UserName"];
+			_command.Parameters["?registrant"].Value = Session["UserName"];
 			_command.Parameters.Add(new MySqlParameter("mail", MySqlDbType.VarString));
-			_command.Parameters["mail"].Value = EmailTB.Text;
+			_command.Parameters["?mail"].Value = EmailTB.Text;
 			_command.Parameters.Add(new MySqlParameter("InvisibleOnFirm", MySqlDbType.Byte));
-			_command.Parameters["InvisibleOnFirm"].Value = 0;
+			_command.Parameters["?InvisibleOnFirm"].Value = 0;
 			_command.Parameters.Add(new MySqlParameter("OrderManagerName", MySqlDbType.VarString));
-			_command.Parameters["OrderManagerName"].Value = TBOrderManagerName.Text;
+			_command.Parameters["?OrderManagerName"].Value = TBOrderManagerName.Text;
 			_command.Parameters.Add(new MySqlParameter("OrderManagerPhone", MySqlDbType.VarString));
-			_command.Parameters["OrderManagerPhone"].Value = TBOrderManagerPhone.Text;
+			_command.Parameters["?OrderManagerPhone"].Value = TBOrderManagerPhone.Text;
 			_command.Parameters.Add(new MySqlParameter("OrderManagerMail", MySqlDbType.VarString));
-			_command.Parameters["OrderManagerMail"].Value = TBOrderManagerMail.Text;
+			_command.Parameters["?OrderManagerMail"].Value = TBOrderManagerMail.Text;
 			_command.Parameters.Add(new MySqlParameter("ClientManagerName", MySqlDbType.VarString));
-			_command.Parameters["ClientManagerName"].Value = TBClientManagerName.Text;
+			_command.Parameters["?ClientManagerName"].Value = TBClientManagerName.Text;
 			_command.Parameters.Add(new MySqlParameter("ClientManagerPhone", MySqlDbType.VarString));
-			_command.Parameters["ClientManagerPhone"].Value = TBClientManagerPhone.Text;
+			_command.Parameters["?ClientManagerPhone"].Value = TBClientManagerPhone.Text;
 			_command.Parameters.Add(new MySqlParameter("ClientManagerMail", MySqlDbType.VarString));
-			_command.Parameters["ClientManagerMail"].Value = TBClientManagerMail.Text;
+			_command.Parameters["?ClientManagerMail"].Value = TBClientManagerMail.Text;
 			_command.Parameters.Add(new MySqlParameter("AccountantName", MySqlDbType.VarString));
-			_command.Parameters["AccountantName"].Value = TBAccountantName.Text;
+			_command.Parameters["?AccountantName"].Value = TBAccountantName.Text;
 			_command.Parameters.Add(new MySqlParameter("AccountantPhone", MySqlDbType.VarString));
-			_command.Parameters["AccountantPhone"].Value = TBAccountantPhone.Text;
+			_command.Parameters["?AccountantPhone"].Value = TBAccountantPhone.Text;
 			_command.Parameters.Add(new MySqlParameter("AccountantMail", MySqlDbType.VarString));
-			_command.Parameters["AccountantMail"].Value = TBAccountantMail.Text;
+			_command.Parameters["?AccountantMail"].Value = TBAccountantMail.Text;
 			_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int24));
 			_command.Parameters.Add(new MySqlParameter("AllowGetData", MySqlDbType.Int24));
-			_command.Parameters["AllowGetData"].Value = TypeDD.SelectedItem.Value;
+			_command.Parameters["?AllowGetData"].Value = TypeDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("OSUserName", MySqlDbType.VarString));
-			_command.Parameters["OSUserName"].Value = LoginTB.Text;
+			_command.Parameters["?OSUserName"].Value = LoginTB.Text;
 			_command.Parameters.Add(new MySqlParameter("OSUserPass", MySqlDbType.VarString));
-			_command.Parameters["OSUserPass"].Value = PassTB.Text;
+			_command.Parameters["?OSUserPass"].Value = PassTB.Text;
 
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
-				_command.Parameters.Add("PrimaryClientCode", IncludeSDD.SelectedValue);
+				_command.Parameters.Add("?PrimaryClientCode", IncludeSDD.SelectedValue);
 
 
-			_command.Parameters.Add("IncludeType", IncludeType.SelectedValue);
+			_command.Parameters.Add("?IncludeType", IncludeType.SelectedValue);
 			if (InvCB.Checked)
 			{
-				_command.Parameters["invisibleonfirm"].Value = 1;
+				_command.Parameters["?invisibleonfirm"].Value = 1;
 			}
 			try
 			{
@@ -402,8 +402,8 @@ set @inUser = ?UserName;
 						Session["DogN"] = PayerDDL.SelectedItem.Value;
 					}
 				}
-				_command.Parameters["ClientCode"].Value = CreateClientOnClientsData();
-				Session["Code"] = _command.Parameters["ClientCode"].Value;
+				_command.Parameters["?ClientCode"].Value = CreateClientOnClientsData();
+				Session["Code"] = _command.Parameters["?ClientCode"].Value;
 				if (IncludeCB.Checked)
 				{
 					if (IncludeType.SelectedItem.Value != "0")
@@ -428,24 +428,24 @@ set @inUser = ?UserName;
 				{
 #if !DEBUG
 					Domain = Marshal.BindToMoniker("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net") as IADs;
-					ADUser = (Domain as IADsContainer).Create("user", "cn=" + _command.Parameters["OSUserName"].Value) as IADsUser;
-					ADUser.Put("samAccountName", _command.Parameters["OSUserName"].Value);
+					ADUser = (Domain as IADsContainer).Create("user", "cn=" + _command.Parameters["?OSUserName"].Value) as IADsUser;
+					ADUser.Put("samAccountName", _command.Parameters["?OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value) as IADsUser;
-					ADUser.SetPassword(_command.Parameters["OSUserPass"].Value.ToString());
+					ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + _command.Parameters["?OSUserName"].Value) as IADsUser;
+					ADUser.SetPassword(_command.Parameters["?OSUserPass"].Value.ToString());
 					ADUser.SetInfo();
 					Int32 fl = 66049;
 					ADUser.Put("userFlags", fl);
-					ADUser.Description = _command.Parameters["ClientCode"].Value.ToString();
+					ADUser.Description = _command.Parameters["?ClientCode"].Value.ToString();
 					ADUser.AccountDisabled = false;
 					ADUser.LoginWorkstations = "ISRV";
 					IADsGroup grp;
 					grp = Marshal.BindToMoniker("WinNT://adc.analit.net/Базовая группа клиентов - получателей данных") as IADsGroup;
-					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["OSUserName"].Value);
+					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["?OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}\", _command.Parameters["ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["OSUserName"].Value));
+					CreateFtpDirectory(String.Format(@"\\isrv\ftp\optbox\{0}\", _command.Parameters["?ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["?OSUserName"].Value));
 #endif
 				}
 				mytrans.Commit();
@@ -635,8 +635,8 @@ ORDER BY p.shortname;
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-				adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", PayerFTB.Text));
+				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?SearchText", String.Format("%{0}%", PayerFTB.Text));
 				adapter.Fill(DS1, "Payers");
 
 				adapter.SelectCommand.Transaction.Commit();
@@ -721,8 +721,8 @@ ORDER BY cd.shortname;
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-				adapter.SelectCommand.Parameters.Add("SearchText", String.Format("%{0}%", IncludeSTB.Text));
+				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
 				adapter.Fill(DS1, "Includes");
 				adapter.SelectCommand.Transaction.Commit();
 			}
@@ -1051,7 +1051,7 @@ WHERE   intersection_update_info.pricecode IS NULL
 			{
 				_connection.Open();
 				MySqlCommand command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
-				command.Parameters.Add("firmCode", IncludeSDD.SelectedValue);
+				command.Parameters.Add("?firmCode", IncludeSDD.SelectedValue);
 				command.Connection = _connection;
 				command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				_reader = command.ExecuteReader();
@@ -1096,7 +1096,7 @@ WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0
 ORDER BY region;
 ", _connection);
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 				adapter.Fill(DS1, "admin");
 				adapter.SelectCommand.Transaction.Commit();
 			}

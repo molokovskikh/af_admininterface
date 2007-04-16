@@ -116,32 +116,32 @@ namespace AddUser
 					DS.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
 				}
 				UpdCommand.Parameters.Add(new MySqlParameter("CostCode", MySqlDbType.Int32));
-				UpdCommand.Parameters["CostCode"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["CostCode"].SourceColumn = "CostCode";
-				UpdCommand.Parameters["CostCode"].SourceVersion = DataRowVersion.Current;
+				UpdCommand.Parameters["?CostCode"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["?CostCode"].SourceColumn = "CostCode";
+				UpdCommand.Parameters["?CostCode"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.Add(new MySqlParameter("CostName", MySqlDbType.VarChar));
-				UpdCommand.Parameters["CostName"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["CostName"].SourceColumn = "CostName";
-				UpdCommand.Parameters["CostName"].SourceVersion = DataRowVersion.Current;
+				UpdCommand.Parameters["?CostName"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["?CostName"].SourceColumn = "CostName";
+				UpdCommand.Parameters["?CostName"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.Add(new MySqlParameter("BaseCost", MySqlDbType.Bit));
-				UpdCommand.Parameters["BaseCost"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["BaseCost"].SourceColumn = "BaseCost";
-				UpdCommand.Parameters["BaseCost"].SourceVersion = DataRowVersion.Current;
+				UpdCommand.Parameters["?BaseCost"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["?BaseCost"].SourceColumn = "BaseCost";
+				UpdCommand.Parameters["?BaseCost"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.Add(new MySqlParameter("Enabled", MySqlDbType.Bit));
-				UpdCommand.Parameters["Enabled"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["Enabled"].SourceColumn = "Enabled";
-				UpdCommand.Parameters["Enabled"].SourceVersion = DataRowVersion.Current;
+				UpdCommand.Parameters["?Enabled"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["?Enabled"].SourceColumn = "Enabled";
+				UpdCommand.Parameters["?Enabled"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.Add(new MySqlParameter("AgencyEnabled", MySqlDbType.Bit));
-				UpdCommand.Parameters["AgencyEnabled"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["AgencyEnabled"].SourceColumn = "AgencyEnabled";
-				UpdCommand.Parameters["AgencyEnabled"].SourceVersion = DataRowVersion.Current;
+				UpdCommand.Parameters["?AgencyEnabled"].Direction = ParameterDirection.Input;
+				UpdCommand.Parameters["?AgencyEnabled"].SourceColumn = "AgencyEnabled";
+				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
-				UpdCommand.Parameters.Add("UserName", Session["UserName"]);
+				UpdCommand.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
+				UpdCommand.Parameters.Add("?UserName", Session["UserName"]);
 
 
 				UpdCommand.CommandText =
@@ -168,10 +168,10 @@ SET UpCost = ?UpCost,
 WHERE RowID = ?Id
 ";
 
-				UpdCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
-				UpdCommand.Parameters.Add("MinReq", MySqlDbType.Decimal, 0, "MinReq");
-				UpdCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
-				UpdCommand.Parameters.Add("Id", MySqlDbType.Int32, 0, "RowId");
+				UpdCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
+				UpdCommand.Parameters.Add("?MinReq", MySqlDbType.Decimal, 0, "MinReq");
+				UpdCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
+				UpdCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowId");
 				MyDA.Update(DS, "PriceRegionSettings");
 				
 				MyTrans.Commit();
@@ -230,8 +230,8 @@ WHERE   cd.firmcode      = pd.firmcode
 
 				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
-				adapter.SelectCommand.Parameters.Add("PriceCode", PriceCode);
-				adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.Add("?PriceCode", PriceCode);
+				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 				
 
 				MySqlDataReader MyReader = adapter.SelectCommand.ExecuteReader();
@@ -241,7 +241,7 @@ WHERE   cd.firmcode      = pd.firmcode
 				string PriceName = MyReader["PriceName"].ToString();
 				MyReader.Close();
 
-				adapter.SelectCommand.Parameters.Add("FirmCode", FirmCode);
+				adapter.SelectCommand.Parameters.Add("?FirmCode", FirmCode);
 				adapter.SelectCommand.CommandText = 
 @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?FirmCode, null); 
@@ -317,7 +317,7 @@ ORDER BY region;
             {
                 MyCn.Open();
                 MySqlTransaction transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-                MyDA.SelectCommand.Parameters.Add("PriceCode", PriceCode);
+                MyDA.SelectCommand.Parameters.Add("?PriceCode", PriceCode);
                 SelCommand.Transaction = transaction;
                 SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=?PriceCode";
                 PriceNameLB.Text = SelCommand.ExecuteScalar().ToString();

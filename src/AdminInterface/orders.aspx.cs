@@ -54,8 +54,8 @@ WHERE   clientcode         =client.firmcode
         AND sel.firmcode        =?clientCode 
 ORDER BY writetime desc;
 ", _connection);
-			adapter.SelectCommand.Parameters.Add("FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.Add("ToDate", CalendarTo.SelectedDate);
+			adapter.SelectCommand.Parameters.Add("?FromDate", CalendarFrom.SelectedDate);
+			adapter.SelectCommand.Parameters.Add("?ToDate", CalendarTo.SelectedDate);
 			adapter.SelectCommand.Parameters.Add("?clientCode", Convert.ToUInt32(Request["cc"]));
 
 			_data = new DataSet();

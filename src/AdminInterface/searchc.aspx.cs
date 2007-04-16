@@ -211,7 +211,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						secondPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						fourthPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						_command.Parameters.Add(new MySqlParameter("Name", MySqlDbType.VarChar));
-						_command.Parameters["Name"].Value = "%" + FindTB.Text + "%";
+						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case "1":
@@ -219,7 +219,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						secondPart = " and cd.firmcode=?ClientCode";
 						fourthPart = " and cd.firmcode=?ClientCode";
 						_command.Parameters.Add(new MySqlParameter("ClientCode", MySqlDbType.Int32));
-						_command.Parameters["ClientCode"].Value = FindTB.Text;
+						_command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
 				case "2":
@@ -227,7 +227,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						secondPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						fourthPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						_command.Parameters.Add(new MySqlParameter("Login", MySqlDbType.VarChar));
-						_command.Parameters["Login"].Value = "%" + FindTB.Text + "%";
+						_command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case "3":
@@ -235,12 +235,12 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						secondPart = " and cd.billingcode=?BillingCode";
 						fourthPart = " and cd.billingcode=?BillingCode";
 						_command.Parameters.Add(new MySqlParameter("BillingCode", MySqlDbType.Int32));
-						_command.Parameters["BillingCode"].Value = FindTB.Text;
+						_command.Parameters["?BillingCode"].Value = FindTB.Text;
 						break;
 					}
 			}
 			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new string[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
-			_command.Parameters.Add("UserName", Convert.ToString(Session["UserName"]));
+			_command.Parameters.Add("?UserName", Convert.ToString(Session["UserName"]));
 		}
 
 		protected void ClientsGridView_RowCreated(object sender, GridViewRowEventArgs e)

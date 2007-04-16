@@ -146,9 +146,9 @@ ORDER BY region;
 ";
 
 			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
-			dataAdapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
-			dataAdapter.SelectCommand.Parameters.Add("UserName", _userName);
-			dataAdapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
+			dataAdapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
+			dataAdapter.SelectCommand.Parameters.Add("?UserName", _userName);
+			dataAdapter.SelectCommand.Parameters.Add("?HomeRegion", _homeRegion);
 
             try
             {
@@ -234,9 +234,9 @@ DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
 ", _connection);
 
-			pricesDataAdapter.DeleteCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.DeleteCommand.Parameters.Add("UserName", _userName);
-			pricesDataAdapter.DeleteCommand.Parameters.Add("PriceCode", MySqlDbType.Int32, 0, "PriceCode");
+			pricesDataAdapter.DeleteCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.DeleteCommand.Parameters.Add("?UserName", _userName);
+			pricesDataAdapter.DeleteCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			pricesDataAdapter.InsertCommand = new MySqlCommand(
 @"
@@ -375,15 +375,15 @@ WHERE   PricesData.PriceCode							  = @InsertedPriceCode
         AND (clientsdata2.maskregion & regions.regioncode)>0    
         AND clientsdata2.firmtype                         =1;
 ", _connection);
-			pricesDataAdapter.InsertCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.InsertCommand.Parameters.Add("UserName", _userName);
-			pricesDataAdapter.InsertCommand.Parameters.Add("ClientCode", _clientCode);
-			pricesDataAdapter.InsertCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
-			pricesDataAdapter.InsertCommand.Parameters.Add("PriceType", MySqlDbType.Int32, 0, "PriceType");
-			pricesDataAdapter.InsertCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
-			pricesDataAdapter.InsertCommand.Parameters.Add("AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
-			pricesDataAdapter.InsertCommand.Parameters.Add("AlowInt", MySqlDbType.Bit, 0, "AlowInt");
-			pricesDataAdapter.InsertCommand.Parameters.Add("PriceCode", MySqlDbType.Int32, 0, "PriceCode");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.InsertCommand.Parameters.Add("?UserName", _userName);
+			pricesDataAdapter.InsertCommand.Parameters.Add("?ClientCode", _clientCode);
+			pricesDataAdapter.InsertCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?AlowInt", MySqlDbType.Bit, 0, "AlowInt");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			pricesDataAdapter.UpdateCommand = new MySqlCommand(
 @"
@@ -398,14 +398,14 @@ SET UpCost = ?UpCost,
 	AlowInt = ?AlowInt
 WHERE PriceCode = ?PriceCode;
 ", _connection);
-			pricesDataAdapter.UpdateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.UpdateCommand.Parameters.Add("UserName", _userName);
-			pricesDataAdapter.UpdateCommand.Parameters.Add("UpCost", MySqlDbType.Decimal, 0, "UpCost");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("PriceType", MySqlDbType.Int32, 0, "PriceType");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("AlowInt", MySqlDbType.Bit, 0, "AlowInt");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("PriceCode", MySqlDbType.Int32, 0, "PriceCode");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?UserName", _userName);
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?AlowInt", MySqlDbType.Bit, 0, "AlowInt");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			MySqlDataAdapter regionalSettingsDataAdapter = new MySqlDataAdapter("", _connection);
 			regionalSettingsDataAdapter.UpdateCommand = new MySqlCommand(
@@ -420,15 +420,15 @@ SET AdminMail = ?AdminMail,
 	`Storage` = ?Storage
 WHERE RowId = ?Id;
 ", _connection);
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("AdminMail", MySqlDbType.VarString, 0, "AdminMail");
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("TmpMail", MySqlDbType.VarString, 0, "TmpMail");
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("SupportPhone", MySqlDbType.VarString, 0, "SupportPhone");
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("Enabled", MySqlDbType.Bit, 0, "Enabled");
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("Storage", MySqlDbType.Bit, 0, "Storage");
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("Id", MySqlDbType.Int32, 0, "RowID");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?AdminMail", MySqlDbType.VarString, 0, "AdminMail");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?TmpMail", MySqlDbType.VarString, 0, "TmpMail");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?SupportPhone", MySqlDbType.VarString, 0, "SupportPhone");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Storage", MySqlDbType.Bit, 0, "Storage");
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowID");
 
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("UserName", _userName);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?UserName", _userName);
 			MySqlTransaction transaction = null;
 			try
 			{
@@ -537,9 +537,9 @@ ORDER BY region;
                 _connection.Open();
                 adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 
-                adapter.SelectCommand.Parameters.Add("ClientCode", _clientCode);
-                adapter.SelectCommand.Parameters.Add("HomeRegion", _homeRegion);
-                adapter.SelectCommand.Parameters.Add("UserName", _userName);
+                adapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
+                adapter.SelectCommand.Parameters.Add("?HomeRegion", _homeRegion);
+                adapter.SelectCommand.Parameters.Add("?UserName", _userName);
                 _data.Tables["EnableRegions"].Clear();
                 adapter.Fill(_data, "EnableRegions");
 
@@ -559,7 +559,7 @@ ORDER BY region;
 @"
 SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;
 ", IsolationLevel.ReadCommitted);
-			maskRegionCommand.Parameters.Add("ClientCode", _clientCode);
+			maskRegionCommand.Parameters.Add("?ClientCode", _clientCode);
 			maskRegionCommand.Execute();
 			ulong oldMaskRegion = Convert.ToUInt64(maskRegionCommand.Result);
 			ulong newMaskRegion = oldMaskRegion;
@@ -696,10 +696,10 @@ WHERE   clientsdata.FirmCode							  = ?ClientCode
         AND (clientsdata2.maskregion & regions.regioncode)>0    
         AND clientsdata2.firmtype                         =1;
 ", IsolationLevel.RepeatableRead);
-				updateCommand.Parameters.Add("MaskRegion", newMaskRegion);
-				updateCommand.Parameters.Add("ClientCode", _clientCode);
-				updateCommand.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.Add("UserName", _userName);
+				updateCommand.Parameters.Add("?MaskRegion", newMaskRegion);
+				updateCommand.Parameters.Add("?ClientCode", _clientCode);
+				updateCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				updateCommand.Parameters.Add("?UserName", _userName);
 				updateCommand.Execute();
 			}
 		}
@@ -718,10 +718,10 @@ UPDATE ClientsData
 SET RegionCode = ?RegionCode
 WHERE FirmCode = ?ClientCode;
 ", IsolationLevel.RepeatableRead);
-				command.Parameters.Add("RegionCode", currentHomeRegion);
-				command.Parameters.Add("ClientCode", _clientCode);
-				command.Parameters.Add("UserHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.Add("UserName", _userName);
+				command.Parameters.Add("?RegionCode", currentHomeRegion);
+				command.Parameters.Add("?ClientCode", _clientCode);
+				command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				command.Parameters.Add("?UserName", _userName);
 				command.Execute();
 			}
 			
@@ -733,7 +733,7 @@ WHERE FirmCode = ?ClientCode;
 @"
 SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
 ", IsolationLevel.ReadCommitted);
-			homeRegionCommand.Parameters.Add("ClientCode", _clientCode);
+			homeRegionCommand.Parameters.Add("?ClientCode", _clientCode);
 			homeRegionCommand.Execute();
 
 			return Convert.ToUInt64(homeRegionCommand.Result);

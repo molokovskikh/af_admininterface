@@ -55,7 +55,7 @@ FROM usersettings.regionaldata rd
 WHERE RowID = ?Id
 ";
 		IDataCommand command = new DataCommand(commandText, IsolationLevel.ReadCommitted);
-		command.Parameters.Add("Id", _regionalSettingsCode);
+		command.Parameters.Add("?Id", _regionalSettingsCode);
 		command.Execute();
 		
 		if (command.Data.Tables[0].Rows.Count == 0)
@@ -78,9 +78,9 @@ SET ContactInfo = ?ContactInformation,
 WHERE RowId = ?Id;
 ";
 		IParametericCommand command = new ParametericCommand(commandText, IsolationLevel.RepeatableRead);
-		command.Parameters.Add("Id", _regionalSettingsCode);
-		command.Parameters.Add("ContactInformation", ContactInfoText.Text);
-		command.Parameters.Add("Information", OperativeInfoText.Text);
+		command.Parameters.Add("?Id", _regionalSettingsCode);
+		command.Parameters.Add("?ContactInformation", ContactInfoText.Text);
+		command.Parameters.Add("?Information", OperativeInfoText.Text);
 		command.Execute();
 		Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));
 	}

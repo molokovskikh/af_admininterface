@@ -161,24 +161,24 @@ namespace AddUser
 				return;
 			}
 			ProcessChanges();
-			myMySqlCommand.Parameters.Add("InvisibleOnFirm", VisileStateList.SelectedItem.Value);
-			myMySqlCommand.Parameters.Add("AlowRegister", RegisterCB.Checked);
-			myMySqlCommand.Parameters.Add("AlowRejection", RejectsCB.Checked);
-			myMySqlCommand.Parameters.Add("MultiUserLevel", MultiUserLevelTB.Text);
-			myMySqlCommand.Parameters.Add("AdvertisingLevel", AdvertisingLevelCB.Checked);
-			myMySqlCommand.Parameters.Add("AlowWayBill", WayBillCB.Checked);
-			myMySqlCommand.Parameters.Add("AlowChangeSegment", ChangeSegmentCB.Checked);
-			myMySqlCommand.Parameters.Add("EnableUpdate", EnableUpdateCB.Checked);
-			myMySqlCommand.Parameters.Add("ResetIDCause", CopyIDWTB.Text);
-			myMySqlCommand.Parameters.Add("CalculateLeader", CalculateLeaderCB.Checked);
-			myMySqlCommand.Parameters.Add("AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
-			myMySqlCommand.Parameters.Add("SubmitOrders", SubmitOrdersCB.Checked);
-			myMySqlCommand.Parameters.Add("ServiceClient", ServiceClientCB.Checked);
-			myMySqlCommand.Parameters.Add("OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
-			myMySqlCommand.Parameters.Add("Host", HttpContext.Current.Request.UserHostAddress);
-			myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
-			myMySqlCommand.Parameters.Add("HomeRegionCode", RegionDD.SelectedItem.Value);
-			myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
+			myMySqlCommand.Parameters.Add("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
+			myMySqlCommand.Parameters.Add("?AlowRegister", RegisterCB.Checked);
+			myMySqlCommand.Parameters.Add("?AlowRejection", RejectsCB.Checked);
+			myMySqlCommand.Parameters.Add("?MultiUserLevel", MultiUserLevelTB.Text);
+			myMySqlCommand.Parameters.Add("?AdvertisingLevel", AdvertisingLevelCB.Checked);
+			myMySqlCommand.Parameters.Add("?AlowWayBill", WayBillCB.Checked);
+			myMySqlCommand.Parameters.Add("?AlowChangeSegment", ChangeSegmentCB.Checked);
+			myMySqlCommand.Parameters.Add("?EnableUpdate", EnableUpdateCB.Checked);
+			myMySqlCommand.Parameters.Add("?ResetIDCause", CopyIDWTB.Text);
+			myMySqlCommand.Parameters.Add("?CalculateLeader", CalculateLeaderCB.Checked);
+			myMySqlCommand.Parameters.Add("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
+			myMySqlCommand.Parameters.Add("?SubmitOrders", SubmitOrdersCB.Checked);
+			myMySqlCommand.Parameters.Add("?ServiceClient", ServiceClientCB.Checked);
+			myMySqlCommand.Parameters.Add("?OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
+			myMySqlCommand.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
+			myMySqlCommand.Parameters.Add("?UserName", Session["UserName"]);
+			myMySqlCommand.Parameters.Add("?HomeRegionCode", RegionDD.SelectedItem.Value);
+			myMySqlCommand.Parameters.Add("?ClientCode", ClientCode);
 
 			for (int i = 0; i <= WRList.Items.Count - 1; i++)
 			{
@@ -188,8 +188,8 @@ namespace AddUser
 					OrderMask = OrderMask + Convert.ToInt64(OrderList.Items[i].Value);
 			}
 
-			myMySqlCommand.Parameters.Add("WorkMask", WorkMask);
-			myMySqlCommand.Parameters.Add("OrderMask", OrderMask);
+			myMySqlCommand.Parameters.Add("?WorkMask", WorkMask);
+			myMySqlCommand.Parameters.Add("?OrderMask", OrderMask);
 
 			try
 			{
@@ -342,9 +342,9 @@ INTO    UserSettings.IncludeRegulation
 
 CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 ", _connection);
-				adapter.InsertCommand.Parameters.Add("ClientCode", ClientCode);
-				adapter.InsertCommand.Parameters.Add("IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-				adapter.InsertCommand.Parameters.Add("PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+				adapter.InsertCommand.Parameters.Add("?ClientCode", ClientCode);
+				adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+				adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
 
 				adapter.UpdateCommand = new MySqlCommand(
 @"
@@ -360,18 +360,18 @@ INTO    UserSettings.IncludeRegulation
 
 CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 ", _connection);
-				adapter.UpdateCommand.Parameters.Add("ClientCode", ClientCode);
-				adapter.UpdateCommand.Parameters.Add("IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-				adapter.UpdateCommand.Parameters.Add("PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-				adapter.UpdateCommand.Parameters.Add("OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-				adapter.UpdateCommand.Parameters["OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
+				adapter.UpdateCommand.Parameters.Add("?ClientCode", ClientCode);
+				adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+				adapter.UpdateCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+				adapter.UpdateCommand.Parameters.Add("?OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+				adapter.UpdateCommand.Parameters["?OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
 
 				adapter.DeleteCommand = new MySqlCommand(
 @"
 DELETE FROM UserSettings.IncludeRegulation 
 WHERE	id = ?id;
 ", _connection);
-				adapter.DeleteCommand.Parameters.Add("id", MySqlDbType.UInt32, 0, "id");
+				adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 
 				adapter.DeleteCommand.Transaction = myTrans;
 				adapter.UpdateCommand.Transaction = myTrans;
@@ -385,8 +385,8 @@ UPDATE Usersettings.Ret_Save_Grids
 SET Enabled = ?Enabled
 WHERE Id = ?Id;
 ", _connection, myTrans);
-				exportRulesAdapter.UpdateCommand.Parameters.Add("Enabled", MySqlDbType.UInt16, 0, "Enabled");
-				exportRulesAdapter.UpdateCommand.Parameters.Add("Id", MySqlDbType.UInt32, 0, "Id");
+				exportRulesAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.UInt16, 0, "Enabled");
+				exportRulesAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.UInt32, 0, "Id");
 
 				exportRulesAdapter.Update(_data.Tables["ExportRules"]);
 
@@ -422,9 +422,9 @@ UPDATE retclientsset
         Message             =?Message 
 WHERE   clientcode          =?ClientCode;
 ";
-				myMySqlCommand.Parameters.Add("Message", MessageTB.Text);
-				myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
-				myMySqlCommand.Parameters.Add("ShowCount", SendMessageCountDD.SelectedItem.Value);
+				myMySqlCommand.Parameters.Add("?Message", MessageTB.Text);
+				myMySqlCommand.Parameters.Add("?ClientCode", ClientCode);
+				myMySqlCommand.Parameters.Add("?ShowCount", SendMessageCountDD.SelectedItem.Value);
 
 				myMySqlCommand.ExecuteNonQuery();
 				myTrans.Commit();
@@ -475,9 +475,9 @@ WHERE
 					  + " and a.regioncode & regionaladmins.RegionMask > 0"
 					  + " group by regioncode" + " order by region";
 			MySqlDataAdapter adapter = new MySqlDataAdapter(sqlCommand, _connection);
-			adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
-			adapter.SelectCommand.Parameters.Add("RegCode", RegCode);
-			adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+			adapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
+			adapter.SelectCommand.Parameters.Add("?RegCode", RegCode);
+			adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 			try
 			{
 				_connection.Open();
@@ -533,8 +533,8 @@ WHERE
 					_connection.Open();
 					MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 
-					myMySqlCommand.Parameters.Add("ClientCode", ClientCode);
-					myMySqlCommand.Parameters.Add("UserName", Session["UserName"]);
+					myMySqlCommand.Parameters.Add("?ClientCode", ClientCode);
+					myMySqlCommand.Parameters.Add("?UserName", Session["UserName"]);
 
 					myMySqlCommand.CommandText =
 	@"
@@ -565,7 +565,7 @@ WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode >0
         AND username                                                    =?UserName 
 ORDER BY region;
 ", _connection);
-					regionAdapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
+					regionAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 					regionAdapter.SelectCommand.Transaction = transaction;
 					regionAdapter.Fill(DS1, "admin");
 					RegionDD.DataBind();
@@ -641,7 +641,7 @@ WHERE   ir.IncludeClientCode =  ?ClientCode;
 ", _connection);
 
 					_data = new DataSet();
-					adapter.SelectCommand.Parameters.Add("ClientCode", ClientCode);
+					adapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
 					adapter.SelectCommand.Transaction = transaction;
 					adapter.Fill(_data, "Include");
 
@@ -707,8 +707,8 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
         AND FirmType     =1
 ORDER BY cd.shortname;
 ", _connection);
-					adapter.SelectCommand.Parameters.Add("UserName", Session["UserName"]);
-					adapter.SelectCommand.Parameters.Add("SearchText", string.Format("%{0}%", ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
+					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+					adapter.SelectCommand.Parameters.Add("?SearchText", string.Format("%{0}%", ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 					DataSet data = new DataSet();
 
 					try
