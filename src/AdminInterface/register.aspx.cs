@@ -471,9 +471,9 @@ set @inUser = ?UserName;
 										  "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
 										  + ShortNameTB.Text + " в регионе(городе) "
 										  + RegionDD.SelectedItem.Text + "."
-										  +
-										  "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net ).\n"
-										  + "С уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
+										  + "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net )."
+										  + String.Format("\nАдрес доставки накладных: {0}@waybills.analit.net", _command.Parameters["?ClientCode"].Value)
+										  + "\nС уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
 										  + "\n4732-206000", Row[1].ToString(), Row[0].ToString(), null, Encoding.UTF8);
 							}
 							Func.Mail("register@analit.net", String.Empty,
@@ -915,7 +915,10 @@ WHERE	dst.clientcode        = ?ClientCode
 		{
 			_command.CommandText =
 @"
-INSERT INTO order_send_config(Firmcode) VALUES(?ClientCode); 
+INSERT INTO orders.order_send_rules(Firmcode, FormaterId, SenderId)
+VALUES(?ClientCode,
+		(SELECT id FROM orders.order_handlers o WHERE ClassName = 'DefaultFormater'),
+		(SELECT id FROM orders.order_handlers o WHERE ClassName = 'EmailSender'));
 
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 
