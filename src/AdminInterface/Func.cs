@@ -48,7 +48,7 @@ namespace AddUser
 			string  availableChars = "23456789qwertyuiopasdfghjkzxcvbnmQWERTYUOPASDFGHJKLZXCVBNM";
 			string password = String.Empty;
 			Random random = new Random();
-			while(password.Length <= 8)
+			while(password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length)];
 			return password;
 		}
