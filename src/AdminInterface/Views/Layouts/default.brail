@@ -1,0 +1,9 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>${Title}</title>
+	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+${ChildOutput}
+</body>
+</html>

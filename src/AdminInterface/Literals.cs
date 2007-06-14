@@ -9,7 +9,7 @@ namespace AddUser
 	{
 		public static string GetConnectionString()
 		{
-			return ConfigurationManager.AppSettings["ConnectionString"];
+			return ConfigurationManager.ConnectionStrings["Default"].ConnectionString;
 		}
 	}
 

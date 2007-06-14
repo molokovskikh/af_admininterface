@@ -4,6 +4,8 @@ using System.Web;
 using System.Web.SessionState;
 using System.Runtime.InteropServices;
 using ActiveDs;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Config;
 using DAL;
 using Microsoft.Practices.EnterpriseLibrary.Logging;
 using System.Reflection;
@@ -27,6 +29,9 @@ namespace AddUser
 
 		void Application_Start(object sender, EventArgs e)
 		{
+			ActiveRecordStarter.Initialize(Assembly.Load("AdminInterface"),
+										   ActiveRecordSectionHandler.Instance);
+
 		}
 
 		void Session_Start(object sender, EventArgs e)

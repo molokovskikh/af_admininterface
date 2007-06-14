@@ -1,0 +1,131 @@
+	<form action="update.rails" method="post">
+>
+<%if IsDefined("UpdateMessage"):
+	output UpdateMessage
+"
+end
+%		${FormHelper.HiddenField("Instance.PayerID")}
+		<p>
+			<label for="Instance_ShortName">
+				Краткое наименование:</label><br/>
+			${FormHelper.TextField("Instance.ShortName")}
+		</p>
+		<p>
+			<label for="Instance_JuridicalName">
+				Полное наименование:</label><br/>
+			${FormHelper.TextField("Instance.JuridicalName")}
+		</p>
+		<p>
+			<label for="Instance_JuridicalAddress">
+				Юридический адресс:</label><br/>
+			${FormHelper.TextField("Instance.JuridicalAddress")}
+		</p>
+		<p>
+			<label for="Instance_KPP">
+				КПП:</label><br/>
+			${FormHelper.TextField("Instance.KPP")}
+		</p>
+		<p>
+			<label for="Instance_INN">
+				ИНН:</label><br/>
+			${FormHelper.TextField("Instance.INN")}
+		</p>
+		<p>
+			<label for="Instance_AccountantName">
+				Контактное лицо:</label><br/>
+			${FormHelper.TextField("Instance.AccountantName")}
+		</p>
+		<p>
+			<label for="Instance_AccountantEmail">
+				E-mail:</label><br/>
+			${FormHelper.TextField("Instance.AccountantEmail")}
+		</p>
+		<p>
+			<label for="Instance_AccountantPhone">
+				Телефон:</label><br/>
+			${FormHelper.TextField("Instance.AccountantPhone")}
+		</p>
+		<p>
+			Выставлять счет:<br/>
+			${FormHelper.Select("Instance.AutoInvoice", {1:"Автоматически", 0:"По запросу"}, {"value":"Key", "text":"Value"})}
+		</p>
+		<p>
+			Категория счета:<br/>
+			${FormHelper.Select("Instance.DetailInvoice", {0:"Стандартный", 1:"Детализированный"}, {"value":"Key", "text":"Value"})}
+		</p>
+		<p>
+			Периодичность выставления счетов:<br/>
+			${FormHelper.Select("Instance.PayCycle", {0:"Помесячно", 1:"Поквартально"}, {"value":"Key", "text":"Value"})}
+		</p>
+		<fieldset>
+			<legend>Доставка корреспонденции</legend>
+			<p>
+				<label for="Instance_ActualAddressCountry">
+					Страна:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressCountry")}
+			</p>
+			<p>
+				<label for="Instance_ActualAddressIndex">
+					Индекс:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressIndex")}
+			</p>
+			<p>
+				<label for="Instance_ActualAddressProvince">
+					Область:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressProvince")}
+			</p>
+			<p>
+				<label for="Instance_ActualAddressTown">
+					Город:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressTown")}
+			</p>
+			<p>
+				<label for="Instance_ActualAddressStreet">
+					Улица:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressStreet")}
+			</p>
+			<p>
+				<label for="Instance_AccountantEmail">
+					Дом:</label><br/>
+				${FormHelper.TextField("Instance.ActualAddressHouse")}
+			</p>
+			<p>
+				${FormHelper.LabelFor("Instance.ActualAddressOffice", "Офис:")} <br/>
+				${FormHelper.TextField("Instance.ActualAddressOffice")}
+			</p>
+			<p>
+				${FormHelper.LabelFor("Instance.BeforeNamePrefix", "Префикс перед \"Кому\":")} <br/>
+				${FormHelper.TextField("Instance.BeforeNamePrefix")}
+			</p>
+			<p>
+				${FormHelper.LabelFor("Instance.AfterNamePrefix", "Надпись после \"Кому\":")} <br/>
+				${FormHelper.TextField("Instance.AfterNamePrefix")}
+			</p>
+		</fieldset>
+		${FormHelper.LabelFor("Instance.Comment", "Комментарий:")} <br/>
+		${FormHelper.TextArea("Instance.Comment", {'cols':'50', 'rows':'20'})}
+}		<p>
+			<input type="submit" value="Обновить" />
+		</p>
+	</form>
+	<form action="sendMessage.rails">
+		${FormHelper.HiddenField("Instance.PayerID")}
+		Сообщение клиенту:<br/>
+		<textarea name="message" rows="20" cols="50"></textarea>
+		<br/>
+		Показать <select name="ShowCount">
+			<option>1</option>
+			<option>2</option>
+			<option>5</option>
+			<option>10</option>
+		</select> раз.
+>
+<if Controller.IsContainsNotSendedMessage():
+	output "Остались не показанные сообщения"
+"
+end	if IsDefined("SendMessage"):
+	output SendMessage
+"
+end
+%		<input type="submit" value="Отправить сообщение" />
+	</form>
