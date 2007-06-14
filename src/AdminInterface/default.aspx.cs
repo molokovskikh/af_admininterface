@@ -125,6 +125,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				//Обновлений в процессе
 				ReqHL.Text = data.Tables[0].Rows[0]["InProc"].ToString();
 
+#if !DEBUG
 				//прайсы
 				//Не формализовано
 				FormErrLB.Text = data.Tables[0].Rows[0]["NoForm"].ToString();
@@ -142,7 +143,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				PriceDERRLB.Text = data.Tables[0].Rows[0]["NoPriceCount"].ToString();
 				//Формализовано прайсов
 				PriceFOKLB.Text = data.Tables[0].Rows[0]["FormCount"].ToString();
-
+#endif
 
 				MySqlCommand command = new MySqlCommand();
 				command.Connection = _connection;
