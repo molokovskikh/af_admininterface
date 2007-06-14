@@ -1,0 +1,358 @@
+﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.50727</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>AdminInterface</RootNamespace>
+    <AssemblyName>AdminInterface</AssemblyName>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
+    <Reference Include="Interop.ActiveDs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\Interop.ActiveDs.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.EnterpriseLibrary.Logging, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\Microsoft.Practices.EnterpriseLibrary.Logging.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Practices.ObjectBuilder, Version=1.0.51205.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\Microsoft.Practices.ObjectBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=1.0.9.2, Culture=neutral, PublicKeyToken=0bcd676a4d410f98, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Web.Services" />
+    <Reference Include="System.EnterpriseServices" />
+    <Reference Include="System.Web.Mobile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="billingset.aspx.cs">
+      <DependentUpon>billingset.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="billingset.aspx.designer.cs">
+      <DependentUpon>billingset.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="billingst.aspx.cs">
+      <DependentUpon>billingst.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="billingst.aspx.designer.cs">
+      <DependentUpon>billingst.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="chpassgo.aspx.cs">
+      <DependentUpon>chpassgo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="chpassgo.aspx.designer.cs">
+      <DependentUpon>chpassgo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="clchpass.aspx.cs">
+      <DependentUpon>clchpass.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="clchpass.aspx.designer.cs">
+      <DependentUpon>clchpass.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CopySynonym.aspx.cs">
+      <DependentUpon>CopySynonym.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CopySynonym.aspx.designer.cs">
+      <DependentUpon>CopySynonym.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="DAL\Administrator.cs" />
+    <Compile Include="DAL\Command.cs" />
+    <Compile Include="DAL\CommandFactory\CommandFactory.cs" />
+    <Compile Include="DAL\CommandFactory\RegionFactory.cs" />
+    <Compile Include="DAL\Commands.cs" />
+    <Compile Include="DAL\DataCommand.cs" />
+    <Compile Include="DAL\ParametericCommand.cs" />
+    <Compile Include="DAL\Region.cs" />
+    <Compile Include="DAL\ScalarCommand.cs" />
+    <Compile Include="debetors.aspx.cs">
+      <DependentUpon>debetors.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="debetors.aspx.designer.cs">
+      <DependentUpon>debetors.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="default.aspx.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="default.aspx.designer.cs">
+      <DependentUpon>default.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Docs.aspx.cs">
+      <DependentUpon>Docs.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Docs.aspx.designer.cs">
+      <DependentUpon>Docs.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="EditAdministrator.aspx.cs">
+      <DependentUpon>EditAdministrator.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="EditAdministrator.aspx.designer.cs">
+      <DependentUpon>EditAdministrator.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="EditRegionalInfo.aspx.cs">
+      <DependentUpon>EditRegionalInfo.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="EditRegionalInfo.aspx.designer.cs">
+      <DependentUpon>EditRegionalInfo.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="error.aspx.cs">
+      <DependentUpon>error.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="error.aspx.designer.cs">
+      <DependentUpon>error.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Func.cs" />
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Info.aspx.cs">
+      <DependentUpon>Info.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Info.aspx.designer.cs">
+      <DependentUpon>Info.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="InvoiceO.aspx.cs">
+      <DependentUpon>InvoiceO.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="InvoiceO.aspx.designer.cs">
+      <DependentUpon>InvoiceO.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="InvoiceP.aspx.cs">
+      <DependentUpon>InvoiceP.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="InvoiceP.aspx.designer.cs">
+      <DependentUpon>InvoiceP.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="InvoiceR.aspx.cs">
+      <DependentUpon>InvoiceR.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="InvoiceR.aspx.designer.cs">
+      <DependentUpon>InvoiceR.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Literals.cs" />
+    <Compile Include="manage.aspx.cs">
+      <DependentUpon>manage.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="manage.aspx.designer.cs">
+      <DependentUpon>manage.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="ManageCosts.aspx.cs">
+      <DependentUpon>ManageCosts.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ManageCosts.aspx.designer.cs">
+      <DependentUpon>ManageCosts.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="managep.aspx.cs">
+      <DependentUpon>managep.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="managep.aspx.designer.cs">
+      <DependentUpon>managep.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="manageret.aspx.cs">
+      <DependentUpon>manageret.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="manageret.aspx.designer.cs">
+      <DependentUpon>manageret.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="orders.aspx.cs">
+      <DependentUpon>orders.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="orders.aspx.designer.cs">
+      <DependentUpon>orders.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="passchst.aspx.cs">
+      <DependentUpon>passchst.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="passchst.aspx.designer.cs">
+      <DependentUpon>passchst.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="register.aspx.cs">
+      <DependentUpon>register.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="register.aspx.designer.cs">
+      <DependentUpon>register.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="report.aspx.cs">
+      <DependentUpon>report.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="report.aspx.designer.cs">
+      <DependentUpon>report.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="searchc.aspx.cs">
+      <DependentUpon>searchc.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="searchc.aspx.designer.cs">
+      <DependentUpon>searchc.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="showcllog.aspx.cs">
+      <DependentUpon>showcllog.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="showcllog.aspx.designer.cs">
+      <DependentUpon>showcllog.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="statcont.aspx.cs">
+      <DependentUpon>statcont.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="statcont.aspx.designer.cs">
+      <DependentUpon>statcont.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="updates.aspx.cs">
+      <DependentUpon>updates.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="updates.aspx.designer.cs">
+      <DependentUpon>updates.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Utils.cs" />
+    <Compile Include="ViewAdministrators.aspx.cs">
+      <DependentUpon>ViewAdministrators.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="ViewAdministrators.aspx.designer.cs">
+      <DependentUpon>ViewAdministrators.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="viewcl.aspx.cs">
+      <DependentUpon>viewcl.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="viewcl.aspx.designer.cs">
+      <DependentUpon>viewcl.aspx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="billingset.aspx" />
+    <Content Include="billingst.aspx" />
+    <Content Include="chpassgo.aspx" />
+    <Content Include="clchpass.aspx" />
+    <Content Include="CopySynonym.aspx" />
+    <Content Include="debetors.aspx" />
+    <Content Include="default.aspx" />
+    <Content Include="Docs.aspx" />
+    <Content Include="EditAdministrator.aspx" />
+    <Content Include="EditRegionalInfo.aspx" />
+    <Content Include="error.aspx" />
+    <Content Include="Global.asax" />
+    <Content Include="Images\arrow-down-blue-reversed.gif" />
+    <Content Include="Images\arrow-down-blue.gif" />
+    <Content Include="Images\logo.gif" />
+    <Content Include="Info.aspx" />
+    <Content Include="InvoiceO.aspx" />
+    <Content Include="InvoiceP.aspx" />
+    <Content Include="InvoiceR.aspx" />
+    <Content Include="JavaScript\Main.js" />
+    <Content Include="manage.aspx" />
+    <Content Include="ManageCosts.aspx" />
+    <Content Include="managep.aspx" />
+    <Content Include="manageret.aspx" />
+    <Content Include="orders.aspx" />
+    <Content Include="passchst.aspx" />
+    <Content Include="register.aspx" />
+    <Content Include="report.aspx" />
+    <Content Include="searchc.aspx" />
+    <Content Include="showcllog.aspx" />
+    <Content Include="statcont.aspx" />
+    <Content Include="updates.aspx" />
+    <Content Include="ViewAdministrators.aspx" />
+    <Content Include="viewcl.aspx" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Themes\Main\Main.css" />
+    <Content Include="Web.Config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="App_Themes\Main\Main.skin" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v8.0\WebApplications\Microsoft.WebApplication.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>False</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>4893</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>
+          </IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
