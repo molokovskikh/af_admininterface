@@ -120,7 +120,7 @@ end
 			<option>10</option>
 		</select> раз.
 >
-<if Controller.IsContainsNotSendedMessage():
+<if controller.IsContainsNotSendedMessage():
 	output "Остались не показанные сообщения"
 "
 end	if IsDefined("SendMessage"):
