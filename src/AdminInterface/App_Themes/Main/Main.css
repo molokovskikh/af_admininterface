@@ -5,16 +5,10 @@
 	font-size: 8pt;
 }
 
-
 H3 
 {
 	font-size: larger;
 	text-align: center;
-}
-
-fieldset
-{
-	margin: 0px 0px 3px 0px;
 }
 
 A:active
@@ -31,10 +25,32 @@ A:link
 	color:#0093e1;
 }
 
+fieldset
+{
+	margin: 0px 0px 3px 0px;
+}
+
 div
 {
 	margin: 0;
 	padding: 0;
+}
+
+.ValidationErrorMessage
+{
+	color: #ff0000;
+}
+
+.Message
+{
+	color: green;
+}
+
+.InputGroupHeader
+{
+	background-color: #f0f8ff; 
+	text-align: center; 
+	vertical-align: middle;
 }
 
 .Legend

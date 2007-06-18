@@ -252,7 +252,7 @@
     </Compile>
     <Compile Include="Model\BillingInstance.cs" />
     <Compile Include="Model\ClientInfo.cs" />
-    <Compile Include="Model\SelectDataSourceItem.cs" />
+    <Compile Include="Model\ClientMessage.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
