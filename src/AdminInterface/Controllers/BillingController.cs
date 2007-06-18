@@ -8,9 +8,11 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using AdminInterface.Model;
 using Billing.Model;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
@@ -21,77 +23,48 @@ namespace Billing.Controllers
 	[Layout("default")]
 	public class BillingController : SmartDispatcherController
 	{
-		public void Edit(uint clientCode, uint billingCode)
+		public void Edit(uint clientCode)
 		{
-			BillingInstance billingInstance = BillingInstance.GetById(billingCode);
+			BillingInstance billingInstance = BillingInstance.GetByClientCode(clientCode);
+			ClientMessage clientMessage = ClientMessage.TryFind(clientCode);
+			if (clientMessage != null)
+				PropertyBag.Add("ClientMessage", clientMessage);
+
+			PropertyBag.Add("ClientCode", clientCode);
 			PropertyBag.Add("Instance", billingInstance);
 			SetTitle(billingInstance);
 		}
 
-		public void Update([DataBind("Instance")] BillingInstance billingInstance)
+		public void Update([DataBind("Instance")] BillingInstance billingInstance, uint clientCode)
 		{
-			billingInstance.Update();
-			PropertyBag.Add("UpdateMessage", "Изменения сохранены");
-			PropertyBag.Add("Instance", billingInstance);
-			SetTitle(billingInstance);
-			RenderView("Edit");
+			billingInstance.UpdateAndFlush();
+			Flash.Add("UpdateMessage", "Изменения сохранены");
+			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
 
-		public void SendMessage([DataBind("Instance")] BillingInstance instance, string message, uint showCount)
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage)
 		{
-			ISessionFactoryHolder holder = ActiveRecordMediator.GetSessionFactoryHolder();
-			ISession session = holder.CreateSession(typeof (void));
-				try
-				{
-					session.BeginTransaction(IsolationLevel.ReadCommitted);
-					IDbCommand command = session.Connection.CreateCommand();
-					command.CommandText = @"
-UPDATE usersettings.retclientsset 
-        SET ShowMessageCount=?ShowCount, 
-        Message             =?Message 
-WHERE   clientcode          =?ClientCode;";
-					IDbDataParameter parameter = command.CreateParameter();
-					parameter.ParameterName = "?ShowCount";
-					parameter.Value = showCount;
-					command.Parameters.Add(parameter);
-
-					parameter = command.CreateParameter();
-					parameter.ParameterName = "?Message ";
-					parameter.Value = message;
-					command.Parameters.Add(parameter);
-
-					parameter = command.CreateParameter();
-					parameter.ParameterName = "?ClientCode";
-					parameter.Value = instance.PayerID;
-					command.Parameters.Add(parameter);
-
-					command.ExecuteNonQuery();
-					session.Flush();
-					session.Transaction.Commit();
-				}
-				catch(Exception)
-				{
-					session.Transaction.Rollback();
-					throw;
-				}
-				finally
-				{
-					holder.ReleaseSession(session);
-				}
-
-			PropertyBag.Add("SendMessage", "Сообщение отправленно");
-			RedirectToAction("Edit", "payerID=" + instance.PayerID);
+			try
+			{
+				clientMessage.UpdateAndFlush();
+				Flash.Add("SendMessage", "Сообщение отправленно");
+			}
+			catch(ValidationException exception)
+			{
+				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
+			}
+			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
 		}
 
 		private void SetTitle(BillingInstance billingInstance)
 		{
-			PropertyBag.Add("Title", String.Format("Детаьная информация о платильщике {0}", 
+			PropertyBag.Add("Title", String.Format("Детальная информация о платильщике {0}",
 												   billingInstance.ShortName));
 		}
 
-		public bool IsContainsNotSendedMessage()
+		public bool IsContainsNotShowedMessage()
 		{
-			return true;
+			return ((ClientMessage) PropertyBag["ClientMessage"]).ShowMessageCount > 0;
 		}
 	}
 }
