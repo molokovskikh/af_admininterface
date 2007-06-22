@@ -7,16 +7,10 @@
 		i = 0
 		for contact in contacts:
 			if contact.Type  == 1:
-				phones += "<a href=\"sip:8${contact.ContactText}\">${contact.ContactText}</a>" 
-				if i != contacts.Count - 1:
-					phones += ", "
-				end
+				phones += "<a href=\"sip:8${contact.ContactText}\">${contact.ContactText}</a>, " 
 			end
 			if contact.Type == 2:
-				emails += "<a href=\"mailto:8${contact.ContactText}\">${contact.ContactText}</a>" 
-				if i != contacts.Count - 1:
-					emails += ", "
-				end
+				emails += "<a href=\"mailto:8${contact.ContactText}\">${contact.ContactText}</a>, " 
 			end
 			i++
 		end
@@ -27,7 +21,7 @@
 					E-mail:
 				</td>
 				<td class="ContactText">
-				${emails}
+				${emails.Substring(0, emails.Length - 2)}
 				</td>
 			</tr>
 <%
@@ -39,7 +33,7 @@
 					Телефоны:
 				</td>
 				<td class="ContactText">
-					${phones}
+					${phones.Substring(0, phones.Length - 2)}
 				</td>
 			</tr>		
 <%
