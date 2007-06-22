@@ -1,0 +1,96 @@
+﻿<%
+	import Boo.Lang
+	
+	def WriteContacts(contacts):
+		emails as string = ""
+		phones as string = ""
+		i = 0
+		for contact in contacts:
+			if contact.Type  == 1:
+				phones += "<a href=\"sip:8${contact.ContactText}\">${contact.ContactText}</a>" 
+				if i != contacts.Count - 1:
+					phones += ", "
+				end
+			end
+			if contact.Type == 2:
+				emails += "<a href=\"mailto:8${contact.ContactText}\">${contact.ContactText}</a>" 
+				if i != contacts.Count - 1:
+					emails += ", "
+				end
+			end
+			i++
+		end
+		if emails != "":
+%>
+			<tr>
+				<td class="ContactLabel">
+					E-mail:
+				</td>
+				<td class="ContactText">
+				${emails}
+				</td>
+			</tr>
+<%
+		end
+		if phones != "":
+%>
+			<tr>
+				<td class="ContactLabel">
+					Телефоны:
+				</td>
+				<td class="ContactText">
+					${phones}
+				</td>
+			</tr>		
+<%
+		end
+		return ""
+	end	
+%>
+<style>
+	.ContactLabel
+	{
+		padding: 3px;
+		text-align:right;
+		border-bottom-width: 1px;
+		border-bottom-color: Gray;
+		border-bottom-style: double;
+	}
+	.ContactText
+	{	
+		padding: 3px;
+		border-bottom-width: 1px;
+		border-bottom-color: Gray;
+		border-bottom-style: double;	
+	}
+	.ContactRow
+	{
+	}
+</style>
+<table width="100%"  cellpadding="0" cellspacing="0">
+<% 
+	for contactGroup in ContactGroups:
+%>
+		<tr>
+			<td class="InputGroupHeader" colspan="2">
+				<a href="../Contact/EditContactGroup.rails?contactGroupId=${contactGroup.Id}">${contactGroup.Name}</a>
+			</td>
+		</tr>
+		${WriteContacts(contactGroup.Contacts)}
+<%
+		for person in contactGroup.Persons:
+%>
+		<tr class="ContactRow">
+			<td class="ContactLabel">
+				Ф.И.О.:
+			</td>
+			<td class="ContactText">
+				<a href="../Contact/EditPerson.rails?personId=${person.Id}">${person.Name}</a>
+			</td>
+		</tr>			
+<%
+			output WriteContacts(person.Contacts)
+		end
+	end
+%>
+</table>
