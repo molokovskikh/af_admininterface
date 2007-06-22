@@ -139,10 +139,10 @@ INTO    logs.clientsinfo VALUES
 			{
 				_clientCode = Convert.ToUInt32(Request["cc"]);
 
-				OrderHistoryHL.NavigateUrl = "orders.aspx?cc=" + _clientCode;
-				OrderHistoryHL.NavigateUrl = "orders.aspx?cc=" + _clientCode;
-				UpdateListHL.NavigateUrl = "updates.aspx?cc=" + _clientCode;
-				ChPass.NavigateUrl = "chpassgo.aspx?cc=" + _clientCode + "&ouar=" + Request["ouar"];
+				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + _clientCode;
+				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + _clientCode;
+				UpdateListHL.NavigateUrl = "~/updates.aspx?cc=" + _clientCode;
+				ChPass.NavigateUrl = "~/chpassgo.aspx?cc=" + _clientCode + "&ouar=" + Request["ouar"];
 				ChPass.Enabled = Convert.ToBoolean(Session["ChPass"]);
 				UserInterfaceHL.NavigateUrl = "https://stat.analit.net/ci/auth/logon.aspx?sid=" + _clientCode;
 				
@@ -192,7 +192,7 @@ INTO    logs.clientsinfo VALUES
 			else
 				ConfigHL.NavigateUrl = "managep";
 			ConfigHL.NavigateUrl += ".aspx?cc=" + _clientCode;
-			BillingLink.NavigateUrl = String.Format("Billing/edit.rails?ClientCode={0}", 
+			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", 
 													_clientCode);
 		}
 
