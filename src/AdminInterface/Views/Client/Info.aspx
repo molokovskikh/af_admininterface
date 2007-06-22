@@ -162,6 +162,18 @@
 
 						</td>
 					</tr>
+					<tr style="text-align: center;">
+						<td colspan="2">
+							<asp:Label ID="IsInfoSavedLabel" runat="server" Visible="False" Text="Сохранено"
+								ForeColor="Green"></asp:Label>
+						</td>
+					</tr>
+					<tr style="text-align: center;">
+						<td colspan="2">
+							<asp:Button ID="SaveButton" runat="server" Text="Применить" OnClick="SaveButton_Click"
+								ValidationGroup="1" />
+						</td>
+					</tr>
 				</table>
 			</div>
 			<div class="TwoColumn" style="text-align: center;">
