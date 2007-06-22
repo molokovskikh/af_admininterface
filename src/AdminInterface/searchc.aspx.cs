@@ -40,6 +40,29 @@ namespace AddUser
 				Response.Redirect("default.aspx");
 
             _connection.ConnectionString = Literals.GetConnectionString();
+
+			if(!IsPostBack)
+				BindUserRegions();
+		}
+
+		private void BindUserRegions()
+		{
+			DataSet dataSet = new DataSet();
+			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(
+@"select (select sum(regioncode) from farm.regions) as RegionCode, 'Все' as Region, 1 as IsAll
+union
+SELECT  r.RegionCode,
+        r.Region,
+        0 as IsAll
+FROM    farm.regions as r,
+        accessright.regionaladmins as ra
+WHERE   ra.username = ?UserName
+        and ra.RegionMask & r.regioncode > 0
+ORDER BY IsAll Desc, Region;", _connection);
+			dataAdapter.SelectCommand.Parameters.Add("?UserName", Convert.ToString(Session["UserName"]));
+			dataAdapter.Fill(dataSet);
+			ClientRegion.DataSource = dataSet.Tables[0];
+			ClientRegion.DataBind();
 		}
 
 		protected void GoFind_Click(object sender, EventArgs e)
@@ -113,16 +136,17 @@ namespace AddUser
 			else
 				Table4.Visible = false;
 
-			SearchTimeLabel.Text = string.Format("Время поиска:{0}", (DateTime.Now - startDate).ToString());
+			SearchTimeLabel.Text = string.Format("Время поиска:{0}", (DateTime.Now - startDate));
+			SearchTimeLabel.Visible = true;
 		}
 
 		private void BuildQuery(string orderStatement)
 		{
 			string firstPart =
 @"
-SELECT  cd. billingcode, 
+SELECT  cd.billingcode, 
         cd.firmcode, 
-        ShortName, 
+        cd.ShortName, 
         region, 
         max(datecurprice) FirstUpdate, 
         max(dateprevprice) SecondUpdate, 
@@ -136,7 +160,7 @@ SELECT  cd. billingcode,
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
 		NULL AS IncludeType
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules) 
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules, billing.payers p) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN osuseraccessright as ouar2 
@@ -144,12 +168,15 @@ LEFT JOIN osuseraccessright as ouar2
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode                       = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
 WHERE   formrules.firmcode                       = pricesdata.pricecode 
+		and cd.BillingCode						 = p.PayerID
         and pricesdata.firmcode                  = cd.firmcode 
         and regions.regioncode                   = cd.regioncode 
-        and cd.regioncode & regionaladmins.regionmask > 0 
-        and regionaladmins.UserName                   = ?UserName 
-        and if(ShowVendor                           = 1, FirmType= 0, 0) 
-        and if(UseRegistrant                     = 1, Registrant= regionaladmins.UserName, 1)
+		and regionaladmins.UserName              = ?UserName 
+        and (cd.regioncode & regionaladmins.regionmask) > 0 
+		and (cd.regionCode & ?RegionMask) > 0
+        and if(ShowVendor = 1, FirmType= 0, 0) 
+        and if(UseRegistrant = 1, Registrant= regionaladmins.UserName, 1)
+		
 ";
 			string secondPart = String.Empty;
 			string thirdPart =
@@ -176,7 +203,7 @@ SELECT  cd. billingcode,
 			WHEN 2 THEN 'Скрытый'
 		END AS IncludeType
 		
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, ret_update_info as rts) 
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, ret_update_info as rts, billing.payers p) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN includeregulation 
@@ -197,50 +224,91 @@ LEFT JOIN logs.prgdataex
         ) 
 WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
         and regions.regioncode                   = cd.regioncode 
-        and cd.regioncode & regionaladmins.regionmask > 0 
-        and regionaladmins.UserName                   = ?UserName 
-        and if(ShowRetail                           = 1, cd.FirmType= 1, 0) 
-        and if(UseRegistrant                     = 1, cd.Registrant= regionaladmins.UserName, 1)
-";
+		and cd.BillingCode						 = p.PayerID
+        and regionaladmins.UserName              = ?UserName 
+		and (cd.regioncode & regionaladmins.regionmask) > 0 
+		and (cd.regionCode & ?RegionMask) > 0
+        and if(ShowRetail = 1, cd.FirmType= 1, 0) 
+        and if(UseRegistrant = 1, cd.Registrant= regionaladmins.UserName, 1)";
+
 			string fourthPart = String.Empty;
+
+			switch(ClientState.SelectedValue)
+			{
+				case "Все":
+					break;
+				case "Включен":
+					secondPart += " and (cd.Firmstatus = 1 and cd.Billingstatus= 1) ";
+					fourthPart += " and (cd.Firmstatus = 1 and cd.Billingstatus= 1) ";
+					break;
+				case "Отключен":
+					secondPart += " and (cd.Firmstatus = 0 or cd.Billingstatus= 0) ";
+					fourthPart += " and (cd.Firmstatus = 0 or cd.Billingstatus= 0) ";
+					break;
+				default:
+					throw new Exception(String.Format("Не известное состояние клиента {0}", ClientState.SelectedValue));
+			}
+
+			switch (ClientType.SelectedValue)
+			{
+				case "Все":
+					break;
+				case "Аптеки":
+					secondPart += " and cd.firmtype=1";
+					fourthPart += " and cd.firmtype=1";
+					break;
+				case "Поставщики":
+					secondPart += " and cd.firmtype=0";
+					fourthPart += " and cd.firmcode=0";
+					break;
+				default:
+					throw new Exception(String.Format("Не известный тип клиента {0}", ClientType.SelectedValue));
+			}
 
 			switch (FindRB.SelectedItem.Value)
 			{
 				case "0":
 					{
-						secondPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-						fourthPart = " and (cd.shortname like ?Name or cd.fullname like ?Name)";
+						secondPart += " and (cd.shortname like ?Comment or cd.fullname like ?Name)";
+						fourthPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						_command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
 						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case "1":
 					{
-						secondPart = " and cd.firmcode=?ClientCode";
-						fourthPart = " and cd.firmcode=?ClientCode";
+						secondPart += " and cd.firmcode=?ClientCode";
+						fourthPart += " and cd.firmcode=?ClientCode";
 						_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int32));
 						_command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
 				case "2":
 					{
-						secondPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-						fourthPart = " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
+						secondPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
+						fourthPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						_command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
 						_command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case "3":
 					{
-						secondPart = " and cd.billingcode=?BillingCode";
-						fourthPart = " and cd.billingcode=?BillingCode";
+						secondPart += " and cd.billingcode=?BillingCode";
+						fourthPart += " and cd.billingcode=?BillingCode";
 						_command.Parameters.Add(new MySqlParameter("?BillingCode", MySqlDbType.Int32));
 						_command.Parameters["?BillingCode"].Value = FindTB.Text;
 						break;
 					}
+				case "4":
+					secondPart += " and p.JuridicalName like ?JuridicalName";
+					fourthPart += " and p.JuridicalName like ?JuridicalName";
+					_command.Parameters.Add("?JuridicalName", MySqlDbType.VarChar);
+					_command.Parameters["?JuridicalName"].Value = "%" + FindTB.Text + "%";
+					break;
 			}
 			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new string[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
 			_command.Parameters.Add("?UserName", Convert.ToString(Session["UserName"]));
+			_command.Parameters.Add("?RegionMask", ClientRegion.SelectedItem.Value);
 		}
 
 		protected void ClientsGridView_RowCreated(object sender, GridViewRowEventArgs e)
@@ -297,6 +365,8 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 			if (FindRB.SelectedIndex == 3)
 				reg = new Regex("^.+$");
 			if (FindRB.SelectedIndex == 0)
+				reg = new Regex("^.+$");
+			if (FindRB.SelectedIndex == 4)
 				reg = new Regex("^.+$");
 			if (reg.IsMatch(args.Value))
 				args.IsValid = true;

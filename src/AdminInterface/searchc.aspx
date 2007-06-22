@@ -15,7 +15,7 @@
 		</h3>
 		<div style="text-align: center;">
 			<table style="background-color: #e7f6e0;" id="Table2" cellspacing="0" cellpadding="0"
-				width="350" border="0">
+				width="450" border="0">
 				<tr>
 					<td colspan="3">
 						Выполните поиск клиента:
@@ -32,7 +32,23 @@
 							<asp:ListItem Value="1">ID</asp:ListItem>
 							<asp:ListItem Value="3">Billing ID</asp:ListItem>
 							<asp:ListItem Value="2">Логин</asp:ListItem>
+							<asp:ListItem Value="4">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
+						<br />
+						<asp:DropDownList ID="ClientType" runat="server">
+							<asp:ListItem>Все</asp:ListItem>
+							<asp:ListItem>Аптеки</asp:ListItem>
+							<asp:ListItem>Поставщики</asp:ListItem>
+						</asp:DropDownList>
+						<br />
+						<asp:DropDownList ID="ClientState" runat="server">
+							<asp:ListItem>Все</asp:ListItem>
+							<asp:ListItem>Включен</asp:ListItem>
+							<asp:ListItem>Отключен</asp:ListItem>
+						</asp:DropDownList>
+						<br />
+						<asp:DropDownList ID="ClientRegion" runat="server" DataTextField="Region" DataValueField="RegionCode">
+						</asp:DropDownList>
 					</td>
 					<td style="height: 117px">
 						<asp:Button ID="GoFind" runat="server" Text="Найти" OnClick="GoFind_Click" CausesValidation="true" />
@@ -51,12 +67,15 @@
 				OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True" OnRowCreated="ClientsGridView_RowCreated"
 				OnSorting="ClientsGridView_Sorting">
 				<Columns>
-					<asp:BoundField DataField="billingcode" HeaderText="Биллинг код" SortExpression="billingcode">
-					</asp:BoundField>
+					<asp:TemplateField HeaderText="Биллинг код" SortExpression="billingcode">
+						<ItemTemplate>
+							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("BillingCode") %>' NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}",Eval("firmcode")) %>'></asp:HyperLink>
+						</ItemTemplate>
+					</asp:TemplateField>
 					<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode"></asp:BoundField>
 					<asp:TemplateField HeaderText="Наименование" SortExpression="ShortName">
 						<ItemTemplate>
-							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("ShortName") %>' NavigateUrl='<%# String.Format("info.aspx?cc={0}&ouar={1}",Eval("bfc"), Eval("ouarid")) %>'></asp:HyperLink>
+							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("ShortName") %>' NavigateUrl='<%# String.Format("Client/info.rails?cc={0}&ouar={1}",Eval("bfc"), Eval("ouarid")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>
