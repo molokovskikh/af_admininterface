@@ -232,16 +232,7 @@ SELECT  cd.FullName,
         cd.Adress,   
         cd.Fax,   
         cd.Mail,   
-        cd.URL,   
-        cd.OrderManagerName,   
-        cd.OrderManagerPhone,   
-        cd.OrderManagerMail,   
-        cd.ClientManagerName,   
-        cd.ClientManagerPhone,   
-        cd.ClientManagerMail,   
-        cd.AccountantName,   
-        cd.AccountantPhone,   
-        cd.AccountantMail,   
+        cd.URL,    
         (if(regionaladmins.UseRegistrant                =1, Registrant=?UserName, 1=1))   
         AND (regionaladmins.regionmask & cd.regioncode  >0)   
         AND (if(AlowRetailInterface+AlowVendorInterface =2, 1=1, if(Alowretailinterface=1, firmtype=Alowretailinterface, if(AlowVendorInterface=1, firmtype=0, 0)))) as AlowInterface,   
@@ -330,10 +321,7 @@ SET FullName = ?FullName,
 	ShortName = ?ShortName,
 	Adress = ?Address,
 	Fax = ?Fax,
-	URL = ?Url, 
-	OrderManagerName = ?OrderManagerName,
-	ClientManagerName = ?ClientManagerName,
-	AccountantName = ?AccountantName
+	URL = ?Url
 WHERE firmcode = ?ClientCode  
 ";
 				_command.Parameters.Add("?ClientCode", _clientCode);
