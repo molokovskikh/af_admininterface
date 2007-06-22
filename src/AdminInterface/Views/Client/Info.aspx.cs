@@ -188,9 +188,9 @@ INTO    logs.clientsinfo VALUES
 			UserInterfaceHL.Enabled = Convert.ToBoolean(_data.Tables["Info"].Rows[0]["AlowInterface"]);
 			UpdateListHL.Enabled = Convert.ToBoolean(_data.Tables["Info"].Rows[0]["FirmType"]);
 			if (Convert.ToInt32(_data.Tables["Info"].Rows[0]["FirmType"]) == 1)
-				ConfigHL.NavigateUrl = "~manageret";
+				ConfigHL.NavigateUrl = "~/manageret";
 			else
-				ConfigHL.NavigateUrl = "~managep";
+				ConfigHL.NavigateUrl = "~/managep";
 			ConfigHL.NavigateUrl += ".aspx?cc=" + _clientCode;
 			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", 
 													_clientCode);
