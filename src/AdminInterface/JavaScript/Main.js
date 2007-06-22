@@ -15,7 +15,9 @@ function ValidateSearch(source, args)
 	if (document.getElementById("FindRB_0").checked)
 		reg = new RegExp("^.+$");	
 	if (document.getElementById("FindRB_3").checked)
-		reg = new RegExp("^.+$");		
+		reg = new RegExp("^.+$");
+	if (document.getElementById("FindRB_4").checked)
+		reg = new RegExp("^.+$");
 	if (reg.test(args.Value))
 		args.IsValid = true;
 	else 
