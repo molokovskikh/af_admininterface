@@ -69,6 +69,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Interop.ActiveDs.dll</HintPath>
     </Reference>
+    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\lib\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Practices.EnterpriseLibrary.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Microsoft.Practices.EnterpriseLibrary.Common.dll</HintPath>
@@ -128,9 +132,13 @@
     <Compile Include="clchpass.aspx.designer.cs">
       <DependentUpon>clchpass.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Components\ContactEditor.cs" />
+    <Compile Include="Components\ContactViewer.cs" />
+    <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Model\Client.cs" />
+    <Compile Include="Model\ContactGroup.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\ClientInfoController.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="CopySynonym.aspx.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -193,13 +201,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Info.aspx.cs">
-      <DependentUpon>Info.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Info.aspx.designer.cs">
-      <DependentUpon>Info.aspx</DependentUpon>
-    </Compile>
     <Compile Include="InvoiceO.aspx.cs">
       <DependentUpon>InvoiceO.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -253,6 +254,11 @@
     <Compile Include="Model\BillingInstance.cs" />
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\ClientMessage.cs" />
+    <Compile Include="Model\Contact.cs" />
+    <Compile Include="Model\ContactGroupOwner.cs" />
+    <Compile Include="Model\ContactOwner.cs" />
+    <Compile Include="Helpers\Helper.cs" />
+    <Compile Include="Model\Person.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -325,6 +331,14 @@
     <Compile Include="viewcl.aspx.designer.cs">
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Controllers\ContactController.cs" />
+    <Compile Include="Views\Client\Info.aspx.cs">
+      <DependentUpon>Info.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Views\Client\Info.aspx.designer.cs">
+      <DependentUpon>Info.aspx</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="billingset.aspx" />
@@ -342,7 +356,6 @@
     <Content Include="Images\arrow-down-blue-reversed.gif" />
     <Content Include="Images\arrow-down-blue.gif" />
     <Content Include="Images\logo.gif" />
-    <Content Include="Info.aspx" />
     <Content Include="InvoiceO.aspx" />
     <Content Include="InvoiceP.aspx" />
     <Content Include="InvoiceR.aspx" />
@@ -368,10 +381,17 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />
+    <Content Include="Views\Client\Info.aspx" />
+    <None Include="Views\Contact\AddPerson.brail" />
+    <None Include="Views\Contact\EditContactGroup.brail" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Views\Billing\edit.brail" />
     <None Include="Views\ClientInfo\edit.brail" />
+    <None Include="Views\Client\ContactViewer.brail" />
+    <None Include="Views\Components\ContactEditor\default.brail" />
+    <None Include="Views\Components\ContactViewer\default.brail" />
+    <None Include="Views\Contact\EditPerson.brail" />
     <None Include="Views\Layouts\default.brail" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -389,7 +409,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>4893</DevelopmentServerPort>
+          <DevelopmentServerPort>4674</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>
           </IISUrl>
