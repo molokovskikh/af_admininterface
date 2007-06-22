@@ -9,7 +9,6 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using AdminInterface.Model;
-using Billing.Model;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -18,7 +17,7 @@ using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
 using NHibernate;
 
-namespace Billing.Controllers
+namespace AdminInterface.Controllers
 {
 	[Layout("default")]
 	public class BillingController : SmartDispatcherController
