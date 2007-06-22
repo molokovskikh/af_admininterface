@@ -40,7 +40,7 @@
                                     </asp:TextBox>
                                 </EditItemTemplate>
                             </asp:TemplateColumn>
-                            <asp:HyperLinkColumn DataNavigateUrlField="FirmCode" DataNavigateUrlFormatString="info.aspx?cc={0}"
+                            <asp:HyperLinkColumn DataNavigateUrlField="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}"
                                 DataTextField="ShortName" HeaderText="Клиент"></asp:HyperLinkColumn>
                             <asp:BoundColumn DataField="Region" SortExpression="Region" HeaderText="Регион"></asp:BoundColumn>
                             <asp:BoundColumn DataField="Addition" HeaderText="Описание"></asp:BoundColumn>
