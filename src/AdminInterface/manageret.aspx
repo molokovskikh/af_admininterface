@@ -227,57 +227,6 @@
 							</tr>
 						</table>
 					</div>
-					<div align="center">
-						<strong>
-							<table id="Table4" cellspacing="0" cellpadding="0" border="0">
-								<tbody>
-									<tr>
-										<td colspan="2">
-											<p align="center">
-												<strong><font face="Verdana" size="2">Сообщение клиенту:</font></strong></p>
-										</td>
-									</tr>
-									<tr>
-										<td valign="middle" align="center" colspan="2" style="height: 228px">
-											<table id="Table5" cellspacing="0" cellpadding="0" width="300" border="0">
-												<tbody>
-													<tr>
-														<td>
-															<asp:TextBox ID="MessageTB" runat="server" BorderStyle="None" Width="400px" Height="150px"
-																TextMode="MultiLine" Font-Names="Verdana" Font-Size="8pt" BackColor="LightGray"></asp:TextBox></td>
-													</tr>
-													<tr>
-														<td>
-															<p align="left">
-																Показать
-																<asp:DropDownList ID="SendMessageCountDD" runat="server">
-																	<asp:ListItem Value="1" Selected="True">1</asp:ListItem>
-																	<asp:ListItem Value="2">2</asp:ListItem>
-																	<asp:ListItem Value="5">5</asp:ListItem>
-																	<asp:ListItem Value="10">10</asp:ListItem>
-																</asp:DropDownList>раз.
-															</p>
-														</td>
-													</tr>
-													<tr>
-														<td>
-															<p align="right">
-																<asp:Button ID="SendMessage" runat="server" OnClick="SendMessage_Click" Font-Names="Arial"
-																	Font-Size="10pt" Text="Отправить" ValidationGroup="0"></asp:Button></p>
-														</td>
-													</tr>
-												</tbody>
-											</table>
-											<p align="center">
-												<asp:Label ID="StatusL" runat="server" Font-Bold="True" ForeColor="Green" Font-Italic="True"> Cообщение отправленно.</asp:Label><br />
-												<asp:Label ID="MessageLeftL" runat="Server" ForeColor="Green" Font-Italic="True"
-													Text="Остались не показанные сообщения" /></p>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</strong>
-					</div>
 					<div class="CopyRight">
 						© АК <a href="http://www.analit.net/">"Инфорум"</a>2005
 					</div>

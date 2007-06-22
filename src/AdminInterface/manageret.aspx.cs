@@ -407,41 +407,6 @@ WHERE Id = ?Id;
 			ResultL.Text = "Сохранено.";
 		}
 
-		protected void SendMessage_Click(object sender, EventArgs e)
-		{
-			try
-			{
-				_connection.Open();
-				myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				myMySqlCommand.Transaction = myTrans;
-
-				myMySqlCommand.CommandText =
-@"
-UPDATE retclientsset 
-        SET ShowMessageCount=?ShowCount, 
-        Message             =?Message 
-WHERE   clientcode          =?ClientCode;
-";
-				myMySqlCommand.Parameters.Add("?Message", MessageTB.Text);
-				myMySqlCommand.Parameters.Add("?ClientCode", ClientCode);
-				myMySqlCommand.Parameters.Add("?ShowCount", SendMessageCountDD.SelectedItem.Value);
-
-				myMySqlCommand.ExecuteNonQuery();
-				myTrans.Commit();
-				MessageTB.Text = "";
-				StatusL.Visible = true;
-			}
-			catch
-			{
-				myTrans.Rollback();
-				throw;
-			}
-			finally
-			{
-				_connection.Close();
-			}
-		}
-
 		protected void RegionDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			bool OldRegion = false;
@@ -522,7 +487,6 @@ WHERE
 				Response.Redirect("default.aspx");
 
 			_connection.ConnectionString = Literals.GetConnectionString();
-			StatusL.Visible = false;
 			ClientCode = Convert.ToInt32(Request["cc"]);
 			DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 			myMySqlCommand.Connection = _connection;
@@ -619,7 +583,6 @@ WHERE   rcs.clientcode     = ?ClientCode
 					SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
 					ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
 					OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
-					MessageLeftL.Visible = (Convert.ToInt32(myMySqlDataReader["ShowMessageCount"]) > 0);
 					if (!ResetCopyIDCB.Checked)
 					{
 						ResetCopyIDCB.Enabled = true;
