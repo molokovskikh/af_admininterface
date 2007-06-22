@@ -48,6 +48,7 @@ div
 
 .InputGroupHeader
 {
+	padding: 5px;
 	background-color: #f0f8ff; 
 	text-align: center; 
 	vertical-align: middle;
