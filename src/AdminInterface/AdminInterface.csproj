@@ -259,6 +259,7 @@
     <Compile Include="Model\ContactOwner.cs" />
     <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Model\Person.cs" />
+    <Compile Include="Model\Validators\ContactTypeValidator.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
