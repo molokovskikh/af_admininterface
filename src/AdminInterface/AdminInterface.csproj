@@ -45,6 +45,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Tools\Castle\bin\Castle.ActiveRecord.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Binder, Version=0.0.1.1, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Tools\Castle\bin\Castle.Components.Binder.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Components.Validator, Version=0.0.1.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Tools\Castle\bin\Castle.Components.Validator.dll</HintPath>
@@ -134,7 +138,9 @@
     </Compile>
     <Compile Include="Components\ContactEditor.cs" />
     <Compile Include="Components\ContactViewer.cs" />
+    <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Model\Client.cs" />
     <Compile Include="Model\ContactGroup.cs" />
     <Compile Include="Controllers\BillingController.cs" />
@@ -259,7 +265,8 @@
     <Compile Include="Model\ContactOwner.cs" />
     <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Model\Person.cs" />
-    <Compile Include="Model\Validators\ContactTypeValidator.cs" />
+    <Compile Include="Model\Validators\ContactTextValidationAttribute.cs" />
+    <Compile Include="Model\Validators\ContactTextValidator.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -383,7 +390,7 @@
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />
     <Content Include="Views\Client\Info.aspx" />
-    <None Include="Views\Contact\AddPerson.brail" />
+    <None Include="Views\Contact\NewPerson.brail" />
     <None Include="Views\Contact\EditContactGroup.brail" />
   </ItemGroup>
   <ItemGroup>
@@ -392,6 +399,7 @@
     <None Include="Views\Client\ContactViewer.brail" />
     <None Include="Views\Components\ContactEditor\default.brail" />
     <None Include="Views\Components\ContactViewer\default.brail" />
+    <None Include="Views\Components\ValidationErrorViewer\default.brail" />
     <None Include="Views\Contact\EditPerson.brail" />
     <None Include="Views\Layouts\default.brail" />
   </ItemGroup>
