@@ -137,6 +137,7 @@
       <DependentUpon>clchpass.aspx</DependentUpon>
     </Compile>
     <Compile Include="Components\ContactEditor.cs" />
+    <Compile Include="Components\ContactEditor2.cs" />
     <Compile Include="Components\ContactViewer.cs" />
     <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
@@ -397,9 +398,11 @@
     <None Include="Views\Billing\edit.brail" />
     <None Include="Views\ClientInfo\edit.brail" />
     <None Include="Views\Client\ContactViewer.brail" />
+    <None Include="Views\Components\ContactEditor2\default.brail" />
     <None Include="Views\Components\ContactEditor\default.brail" />
     <None Include="Views\Components\ContactViewer\default.brail" />
     <None Include="Views\Components\ValidationErrorViewer\default.brail" />
+    <None Include="Views\Contact\EditContactGroupEx.brail" />
     <None Include="Views\Contact\EditPerson.brail" />
     <None Include="Views\Layouts\default.brail" />
   </ItemGroup>
