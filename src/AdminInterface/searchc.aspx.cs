@@ -269,7 +269,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 			{
 				case "0":
 					{
-						secondPart += " and (cd.shortname like ?Comment or cd.fullname like ?Name)";
+						secondPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						fourthPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						_command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
 						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
