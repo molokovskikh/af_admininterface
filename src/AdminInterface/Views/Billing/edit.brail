@@ -75,22 +75,14 @@ end
 
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
 																	"ИНН:"),												FormHelper.TextField("Instance.INN"))}
-										
-					${WriteInputGroupHeader("Контактная информация")}
-							
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AccountantName", 
-																	"Контактное лицо:"), 
-												FormHelper.TextField("Instance.AccountantName"))}
-}
-																${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AccountantEmail", 
-																	"E-mail:"), 
-												FormHelper.TextField("Instance.AccountantEmail"))}
-}
-																${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AccountantPhone", 
-																	"Телефон:"), 
-												FormHelper.TextField("Instance.AccountantPhone"))}
-}
-												
+														
+>
+					<tr						<td colspan="2">
+							<% component ContactViewer %>
+.
+						</td>
+					</tr>
+																		
 					${WriteInputGroupHeader("Опции выставки счета")}
 					
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
@@ -155,7 +147,7 @@ end
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Comment", 
 																	"Комментарий:"),												FormHelper.TextArea("Instance.Comment", {"cols":"50", "rows":"20"}))}
 }
-																${WriteSubmitButton(FormHelper.Submit("Обновить"))}
+																${WriteSubmitButton(FormHelper.Submit("Сохранить"))}
 					</table>
 				</form>
 </div>
