@@ -915,10 +915,10 @@ WHERE	dst.clientcode        = ?ClientCode
 		{
 			_command.CommandText =
 @"
-INSERT INTO orders.order_send_rules(Firmcode, FormaterId, SenderId)
+INSERT INTO OrderSendRules.order_send_rules(Firmcode, FormaterId, SenderId)
 VALUES(?ClientCode,
-		(SELECT id FROM orders.order_handlers o WHERE ClassName = 'DefaultFormater'),
-		(SELECT id FROM orders.order_handlers o WHERE ClassName = 'EmailSender'));
+		(SELECT id FROM OrderSendRules.order_handlers o WHERE ClassName = 'DefaultFormater'),
+		(SELECT id FROM OrderSendRules.order_handlers o WHERE ClassName = 'EmailSender'));
 
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 
