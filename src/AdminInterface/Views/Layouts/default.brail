@@ -9,6 +9,7 @@ if IsDefined("Title"):
 end
 %>
 	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Contacts.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 ${ChildOutput}
