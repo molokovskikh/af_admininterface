@@ -31,6 +31,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag.Add("ClientCode", clientCode);
 			PropertyBag.Add("Instance", billingInstance);
+			PropertyBag["ContactGroups"] = billingInstance.ContactGroupOwner.ContactGroups;
 			SetTitle(billingInstance);
 		}
 
