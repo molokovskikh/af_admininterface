@@ -11,16 +11,6 @@ H3
 	text-align: center;
 }
 
-input
-{
-	border-style: groove;
-}
-
-select 
-{
-	border-style: groove;
-}
-
 A:active
 {
 	color:#0093e1;
@@ -59,7 +49,7 @@ div
 .InputGroupHeader
 {
 	padding: 5px;
-	background-color: #f0f8ff; 
+	background-color: #d8f1ff;
 	text-align: center; 
 	vertical-align: middle;
 }
