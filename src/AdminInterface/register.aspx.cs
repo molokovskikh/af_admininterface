@@ -320,8 +320,6 @@ set @inUser = ?UserName;
 			{
 				_command.Parameters["?BeforeNamePrefix"].Value = "Аптека";
 			}
-			_command.Parameters.Add(new MySqlParameter("?phone", MySqlDbType.VarString));
-			_command.Parameters["?phone"].Value = PhoneTB.Text;
 			_command.Parameters.Add(new MySqlParameter("?fax", MySqlDbType.VarString));
 			_command.Parameters["?fax"].Value = FaxTB.Text;
 			_command.Parameters.Add(new MySqlParameter("?url", MySqlDbType.VarString));
@@ -336,28 +334,9 @@ set @inUser = ?UserName;
 			_command.Parameters["?firmtype"].Value = TypeDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("?registrant", MySqlDbType.VarString));
 			_command.Parameters["?registrant"].Value = Session["UserName"];
-			_command.Parameters.Add(new MySqlParameter("?mail", MySqlDbType.VarString));
-			_command.Parameters["?mail"].Value = EmailTB.Text;
 			_command.Parameters.Add(new MySqlParameter("?InvisibleOnFirm", MySqlDbType.Byte));
 			_command.Parameters["?InvisibleOnFirm"].Value = 0;
-			_command.Parameters.Add(new MySqlParameter("?OrderManagerName", MySqlDbType.VarString));
-			_command.Parameters["?OrderManagerName"].Value = TBOrderManagerName.Text;
-			_command.Parameters.Add(new MySqlParameter("?OrderManagerPhone", MySqlDbType.VarString));
-			_command.Parameters["?OrderManagerPhone"].Value = TBOrderManagerPhone.Text;
-			_command.Parameters.Add(new MySqlParameter("?OrderManagerMail", MySqlDbType.VarString));
-			_command.Parameters["?OrderManagerMail"].Value = TBOrderManagerMail.Text;
-			_command.Parameters.Add(new MySqlParameter("?ClientManagerName", MySqlDbType.VarString));
-			_command.Parameters["?ClientManagerName"].Value = TBClientManagerName.Text;
-			_command.Parameters.Add(new MySqlParameter("?ClientManagerPhone", MySqlDbType.VarString));
-			_command.Parameters["?ClientManagerPhone"].Value = TBClientManagerPhone.Text;
-			_command.Parameters.Add(new MySqlParameter("?ClientManagerMail", MySqlDbType.VarString));
-			_command.Parameters["?ClientManagerMail"].Value = TBClientManagerMail.Text;
-			_command.Parameters.Add(new MySqlParameter("?AccountantName", MySqlDbType.VarString));
-			_command.Parameters["?AccountantName"].Value = TBAccountantName.Text;
-			_command.Parameters.Add(new MySqlParameter("?AccountantPhone", MySqlDbType.VarString));
-			_command.Parameters["?AccountantPhone"].Value = TBAccountantPhone.Text;
-			_command.Parameters.Add(new MySqlParameter("?AccountantMail", MySqlDbType.VarString));
-			_command.Parameters["?AccountantMail"].Value = TBAccountantMail.Text;
+
 			_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int24));
 			_command.Parameters.Add(new MySqlParameter("?AllowGetData", MySqlDbType.Int24));
 			_command.Parameters["?AllowGetData"].Value = TypeDD.SelectedItem.Value;
@@ -525,17 +504,6 @@ set @inUser = ?UserName;
 											   + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-					Func.Mail(EmailTB.Text, FullNameTB.Text, "Sub", false, "",
-							  "FirmEmailList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
-					if (!String.IsNullOrEmpty(TBClientManagerMail.Text))
-						Func.Mail(TBClientManagerMail.Text, TBClientManagerName.Text, "Sub", false, "",
-								  "ClientManagerList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
-					if (!String.IsNullOrEmpty(TBOrderManagerMail.Text))
-						Func.Mail(TBOrderManagerMail.Text, TBOrderManagerName.Text, "Sub", false, "",
-								  "OrderManagerList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
-					if (!String.IsNullOrEmpty(TBAccountantMail.Text))
-						Func.Mail(TBAccountantMail.Text, TBAccountantName.Text, "Sub", false, "",
-								  "AccountantList-on@subscribe.analit.net", String.Empty, null, Encoding.UTF8);
 #endif
 				}
 				catch (Exception err)
@@ -751,26 +719,28 @@ ORDER BY cd.shortname;
 		private int CreateClientOnBilling()
 		{
 			_command.CommandText =
-				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, BeforeNamePrefix) values(0, now(), 'Дата регистрации: " +
-				DateTime.Now + "', null, ?ShortName, ?BeforeNamePrefix); ";
+				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
+				DateTime.Now + "', null, ?ShortName, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
+			_command.Parameters.Add("?BillingContactGroupOwnerId", CreateContactsForBilling(_command.Connection));
 			return Convert.ToInt32(_command.ExecuteScalar());
 		}
 
 		private int CreateClientOnClientsData()
 		{
 			_command.CommandText =
-				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Phone, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, Mail, OrderManagerName, OrderManagerPhone, OrderManagerMail, ClientManagerName, ClientManagerPhone, ClientManagerMail, AccountantName, AccountantPhone, AccountantMail, FirmStatus, registrant, BillingCode, BillingStatus) ";
+				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId) ";
+			_command.Parameters.Add("?ClientContactGroupOwnerId", CreateContactsForClientsData(_command.Connection));
 			if (!IncludeCB.Checked)
 			{
 				_command.CommandText +=
-					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, " +
-					Session["DogN"] + ", 1); ";
+					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, 1, ?registrant, " +
+					Session["DogN"] + ", 1, ?ClientContactGroupOwnerId); ";
 			}
 			else
 			{
 				_command.CommandText +=
-					" select 0, maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Phone, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, FirmType, ?Mail, ?OrderManagerName, ?OrderManagerPhone, ?OrderManagerMail, ?ClientManagerName, ?ClientManagerPhone, ?ClientManagerMail, ?AccountantName, ?AccountantPhone, ?AccountantMail, 1, ?registrant, BillingCode, BillingStatus" +
+					" select 0, maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId" +
 					" from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
@@ -1232,6 +1202,121 @@ ORDER BY region;
 		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			args.IsValid = args.Value == "Поставщик" && !IncludeCB.Checked;
+		}
+
+		private object CreateContactsForClientsData(MySqlConnection connection)
+		{
+			object contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
+
+			CreateContactGroup("Общая контактная информация",
+							   PhoneTB.Text, 
+							   EmailTB.Text, 
+							   null, 
+							   connection, 
+							   contactGroupOwnerId);
+			CreateContactGroup("Менеджер прайс листов(заказов)", 
+							   TBOrderManagerPhone.Text, 
+							   TBOrderManagerMail.Text, 
+							   TBOrderManagerName.Text, 
+							   connection, 
+							   contactGroupOwnerId);
+			CreateContactGroup("Администратор клиентов в автоматизированной системе", 
+							   TBClientManagerPhone.Text, 
+							   TBClientManagerMail.Text, 
+							   TBClientManagerName.Text, 
+							   connection, 
+							   contactGroupOwnerId);
+			CreateContactGroup("Бухгалтер по расчетам с АК \"Инфорум\"", 
+							   TBAccountantPhone.Text, 
+							   TBAccountantMail.Text, 
+							   TBAccountantName.Text, 
+							   connection, 
+							   contactGroupOwnerId);
+
+			return contactGroupOwnerId;
+		}
+
+
+		private object CreateContactsForBilling(MySqlConnection connection)
+		{
+			object contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
+			CreateContactGroup("Контактная информация для биллинга",
+							   null,
+							   null,
+							   null,
+							   connection,
+							   contactGroupOwnerId);
+			return contactGroupOwnerId;
+		}
+
+		private static void CreateContactGroup(string name,
+									   string phone,
+									   string email,
+									   string person,
+									   MySqlConnection connection,
+									   object contactGroupOwnerId)
+		{
+			MySqlCommand innerCommand = connection.CreateCommand();
+			object contactGroupID = GetNewContactsOwnerId(connection);
+			innerCommand.CommandText = @"
+insert into contacts.contact_groups(Id, Name, ContactGroupOwnerId) 
+values(?ID, ?Name, ?ContactGroupOwnerId);";
+
+			innerCommand.Parameters.Add("?Name", name);
+			innerCommand.Parameters.Add("?ContactGroupOwnerId", contactGroupOwnerId);
+			innerCommand.Parameters.Add("?ID", contactGroupID);
+			innerCommand.ExecuteNonQuery();
+
+			innerCommand = connection.CreateCommand();
+			innerCommand.CommandText = @"
+insert into contacts.contacts(Type, ContactText, ContactOwnerId) 
+values(?Type, ?Contact, ?ContactOwnerId);";
+
+			innerCommand.Parameters.Add("?ContactOwnerId", contactGroupID);
+			innerCommand.Parameters.Add("?Contact", phone);
+			innerCommand.Parameters.Add("?Type", 1);
+			if (!String.IsNullOrEmpty(phone))
+				innerCommand.ExecuteNonQuery();
+
+			if (!String.IsNullOrEmpty(email))
+			{
+				innerCommand.Parameters["?Contact"].Value = email;
+				innerCommand.Parameters["?Type"].Value = 0;
+				innerCommand.ExecuteNonQuery();
+			}
+
+			if (!String.IsNullOrEmpty(person))
+			{
+				innerCommand = connection.CreateCommand();
+				innerCommand.CommandText =
+					@"
+insert into contacts.persons(Id, Name, ContactGroupId) 
+values(?Id, ?Name, ?ContactGroupId);";
+
+				innerCommand.Parameters.Add("?ContactGroupId", contactGroupID);
+				innerCommand.Parameters.Add("?Id", GetNewContactsOwnerId(connection));
+				innerCommand.Parameters.Add("?Name", person);
+				innerCommand.ExecuteNonQuery();
+			}
+		}
+
+		private static object GetNewContactsOwnerId(MySqlConnection connection)
+		{
+			MySqlCommand command = connection.CreateCommand();
+			command.CommandText = @"
+insert into contacts.contact_owners values();
+select Last_Insert_ID();";
+			return command.ExecuteScalar();
+		}
+
+		private static object GetNewContactsGroupOwnerId(MySqlConnection connection)
+		{
+			MySqlCommand innerCommand = connection.CreateCommand();
+			innerCommand.CommandText = @"
+insert into contacts.contact_group_owners values();
+select Last_Insert_ID();";
+
+			return innerCommand.ExecuteScalar();
 		}
 	}
 }
