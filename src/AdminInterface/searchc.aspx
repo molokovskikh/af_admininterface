@@ -69,7 +69,7 @@
 				<Columns>
 					<asp:TemplateField HeaderText="Биллинг код" SortExpression="billingcode">
 						<ItemTemplate>
-							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("BillingCode") %>' NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}",Eval("firmcode")) %>'></asp:HyperLink>
+							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("BillingCode") %>' NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}",Eval("bfc")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode"></asp:BoundField>
