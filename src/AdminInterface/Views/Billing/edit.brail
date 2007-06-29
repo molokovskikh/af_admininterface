@@ -71,6 +71,9 @@ end
 				<td>
 					${client.HomeRegion.Name}
 				</td>
+				<td>
+					${BindingHelper.GetDescription(client.Type)}
+				</td>
 			</tr>
 >
 			<% 
