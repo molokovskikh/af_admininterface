@@ -12,6 +12,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ActiveDs;
+using AdminInterface.Model;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -434,13 +435,46 @@ set @inUser = ?UserName;
 #if !DEBUG
 					if (!(InvCB.Checked || TypeDD.SelectedItem.Value == "0" || (TypeDD.SelectedItem.Value == "1" && IncludeCB.Checked && IncludeType.SelectedItem.Value == "2")))
 					{
-						if (
-							Func.SelectTODS(
-								"SELECT ClientManagerName, ClientManagerMail" + " FROM clientsdata" + " where MaskRegion & " +
-								RegionDD.SelectedItem.Value + ">0" + " and firmsegment=0" + " and LENGTH(ClientManagerMail)>0" +
-								" and firmtype=0" + " and firmstatus=1" + " and firmcode in (select pd.FirmCode from" +
-								" pricesdata as pd, pricesregionaldata as prd where regioncode=" + RegionDD.SelectedItem.Value +
-								" and pd.enabled=1 and prd.enabled=1)" + " group by ClientManagerMail", "FirmEmail", DS1))
+						MySqlDataAdapter dataAdapter = new MySqlDataAdapter(@"
+select c.contactText
+from usersettings.clientsdata cd
+  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+    join contacts.contacts c on cg.Id = c.ContactOwnerId
+where length(c.contactText) > 0
+      and firmcode in (select pd.FirmCode
+                        from pricesdata as pd, pricesregionaldata as prd
+                        where pd.enabled = 1
+                              and prd.enabled = 1
+                              and firmstatus = 1
+                              and firmtype = 0
+                              and firmsegment = 0
+                              and MaskRegion & ?Region >0)
+      and cg.Type = ?ContactGroupType
+      and c.Type = ?ContactType
+
+union
+
+select c.contactText
+from usersettings.clientsdata cd
+  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+    join contacts.persons p on cg.id = p.ContactGroupId
+      join contacts.contacts c on p.Id = c.ContactOwnerId
+where length(c.contactText) > 0
+      and firmcode in (select pd.FirmCode
+                        from pricesdata as pd, pricesregionaldata as prd
+                        where pd.enabled = 1
+                              and prd.enabled = 1
+                              and firmstatus = 1
+                              and firmtype = 0
+                              and firmsegment = 0
+                              and MaskRegion & ?Region > 0)
+      and cg.Type = ?ContactGroupType
+      and c.Type = ?ContactType;", _connection);
+						dataAdapter.SelectCommand.Parameters.Add("?Region", RegionDD.SelectedItem.Value);
+						dataAdapter.SelectCommand.Parameters.Add("?ContactGroupType", ContactGroupType.ClientManagers);
+						dataAdapter.SelectCommand.Parameters.Add("?ContactType", ContactType.Email);
+						dataAdapter.Fill(DS1, "FirmEmail");
+						if (DS1.Tables["FirmEmail"].Rows.Count > 0)
 						{
 							foreach (DataRow Row in DS1.Tables["FirmEmail"].Rows)
 							{
@@ -453,7 +487,7 @@ set @inUser = ?UserName;
 										  + "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net )."
 										  + String.Format("\nАдрес доставки накладных: {0}@waybills.analit.net", _command.Parameters["?ClientCode"].Value)
 										  + "\nС уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
-										  + "\n4732-206000", Row[1].ToString(), Row[0].ToString(), null, Encoding.UTF8);
+										  + "\n4732-206000", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
 							}
 							Func.Mail("register@analit.net", String.Empty,
 									  "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
@@ -469,7 +503,7 @@ set @inUser = ?UserName;
 						}
 						else
 						{
-							Func.Mail("register@analit.net", String.Empty, 
+							Func.Mail("register@analit.net", String.Empty,
 									  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 									  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 													   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
