@@ -1,0 +1,20 @@
+.DataTable
+{
+	background-color: #EBEBEB;
+	border: solid 1px #DADADA;
+}
+
+.DataTable .EvenRow
+{
+	background-color: #F6F6F6;
+}
+
+.DataTable .OddRow
+{
+	background-color: #EEF8FF;
+}
+
+.BillingInput
+{
+	width: 99%;
+}

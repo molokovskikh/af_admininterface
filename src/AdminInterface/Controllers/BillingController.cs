@@ -8,6 +8,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using AdminInterface.Helpers;
 using AdminInterface.Model;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -19,23 +20,26 @@ using NHibernate;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("default")]
-	public class BillingController : SmartDispatcherController
+	[Layout("billing"), Helper(typeof(BindingHelper))]
+	public class BillingController : ARSmartDispatcherController
 	{
 		public void Edit(uint clientCode)
 		{
-			BillingInstance billingInstance = BillingInstance.GetByClientCode(clientCode);
+			Client client = Client.Find(clientCode);
 			ClientMessage clientMessage = ClientMessage.TryFind(clientCode);
+
 			if (clientMessage != null)
 				PropertyBag.Add("ClientMessage", clientMessage);
 
-			PropertyBag.Add("ClientCode", clientCode);
-			PropertyBag.Add("Instance", billingInstance);
-			PropertyBag["ContactGroups"] = billingInstance.ContactGroupOwner.ContactGroups;
-			SetTitle(billingInstance);
+			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(clientCode);
+			PropertyBag["Client"] = client;
+			PropertyBag["Instance"] = client.BillingInstance;
+			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
+
+			SetTitle(client.BillingInstance);
 		}
 
-		public void Update([DataBind("Instance")] BillingInstance billingInstance, uint clientCode)
+		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] BillingInstance billingInstance, uint clientCode)
 		{
 			billingInstance.UpdateAndFlush();
 			Flash.Add("UpdateMessage", "Изменения сохранены");
@@ -54,6 +58,25 @@ namespace AdminInterface.Controllers
 				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
 			}
 			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
+		}
+
+		public void ChangeClientState(uint clientCode)
+		{
+			Client client = Client.Find(clientCode);
+			if (client.Status == ClientStatus.On)
+				client.Status = ClientStatus.Off;
+			else
+				client.Status = ClientStatus.On;
+			client.SaveAndFlush();
+			RedirectToAction("Edit", "clientCode=" + clientCode);
+		}
+
+		public string GetChangeStatusButtonText(Client client)
+		{
+			if (client.Status == ClientStatus.On)
+				return "Отключить клиента";
+			else
+				return "Включить клиента";
 		}
 
 		private void SetTitle(BillingInstance billingInstance)

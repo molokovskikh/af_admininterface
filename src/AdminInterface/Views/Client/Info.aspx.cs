@@ -228,10 +228,8 @@ INTO    logs.clientsinfo VALUES
 @"
 SELECT  cd.FullName,   
         cd.ShortName,   
-        cd.Phone,   
         cd.Adress,   
         cd.Fax,   
-        cd.Mail,   
         cd.URL,    
         (if(regionaladmins.UseRegistrant                =1, Registrant=?UserName, 1=1))   
         AND (regionaladmins.regionmask & cd.regioncode  >0)   

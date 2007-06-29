@@ -142,6 +142,7 @@
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Model\Client.cs" />
+    <Compile Include="Model\ClientLogRecord.cs" />
     <Compile Include="Model\ContactGroup.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\ClientInfoController.cs" />
@@ -265,6 +266,7 @@
     <Compile Include="Model\ContactOwner.cs" />
     <Compile Include="Helpers\Helper.cs" />
     <Compile Include="Model\Person.cs" />
+    <Compile Include="Model\Region.cs" />
     <Compile Include="Model\Validators\ContactTextValidationAttribute.cs" />
     <Compile Include="Model\Validators\ContactTextValidator.cs" />
     <Compile Include="orders.aspx.cs">
@@ -389,6 +391,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />
+    <Content Include="Css\Billing.css" />
     <Content Include="Css\Contacts.css" />
     <Content Include="Views\Client\Info.aspx" />
     <None Include="Views\Contact\EditContactGroup.brail" />
@@ -402,6 +405,7 @@
     <None Include="Views\Contact\EditPerson.brail" />
     <None Include="Views\Contact\EditPersonSubView.brail" />
     <None Include="Views\Contact\NewPerson.brail" />
+    <None Include="Views\Layouts\billing.brail" />
     <None Include="Views\Layouts\default.brail" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
