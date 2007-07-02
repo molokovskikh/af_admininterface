@@ -36,6 +36,12 @@ div
 	padding: 0;
 }
 
+.SearchTitle
+{
+	color: Gray;
+	font-style: italic;
+}
+
 .ValidationErrorMessage
 {
 	color: #ff0000;

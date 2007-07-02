@@ -6,9 +6,11 @@
 <head runat="server" >
 	<title>Информация о клиентах</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" /></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" /></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/search.js" /></script>
 </head>
-<body>
+<body onload="return SetSearchTitle();">
 	<form id="Form1" method="post" runat="server"  defaultbutton="GoFind">
 		<h3>
 			Статистика работы клиента:
@@ -23,16 +25,16 @@
 				</tr>
 				<tr>
 					<td style="width: 181px; height: 117px;">
-						<asp:TextBox ID="FindTB" runat="server" />&nbsp;
+						<asp:TextBox ID="FindTB" runat="server" onclick="return CheckAndIfNeedClean(this);" />&nbsp;
 						<asp:CustomValidator ID="SearchTextValidator" runat="server" ControlToValidate="FindTB"
 							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True"></asp:CustomValidator></td>
 					<td style="height: 117px; text-align: left;">
 						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="81px">
-							<asp:ListItem Value="0" Selected="True">Имя</asp:ListItem>
-							<asp:ListItem Value="1">ID</asp:ListItem>
-							<asp:ListItem Value="3">Billing ID</asp:ListItem>
-							<asp:ListItem Value="2">Логин</asp:ListItem>
-							<asp:ListItem Value="4">Юридическое наименование</asp:ListItem>
+							<asp:ListItem Value="0" Selected="True" onclick="return SetSearchTitle();">Имя</asp:ListItem>
+							<asp:ListItem Value="1" onclick="return SetSearchTitle();">ID</asp:ListItem>
+							<asp:ListItem Value="3" onclick="return SetSearchTitle();">Billing ID</asp:ListItem>
+							<asp:ListItem Value="2" onclick="return SetSearchTitle();">Логин</asp:ListItem>
+							<asp:ListItem Value="4" onclick="return SetSearchTitle();">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
 						<br />
 						<asp:DropDownList ID="ClientType" runat="server">
