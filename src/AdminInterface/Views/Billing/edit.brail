@@ -119,12 +119,32 @@ end
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
 																	"ИНН:"), 
 												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))														
+							<%
+							component ContactViewer, {"ContactGroups" : ContactGroups}:
+								section ContactGroupHeader:
+								%>
 >
-					<tr						<td colspan="2">
-							<% component ContactViewer %>
+					<tr						<td colspan="2" class="InputGroupHeader">
+							${ContactGroupName}
 .
 						</td>
-					</tr>
+					</tr								<%
+								end
+								section Item:
+								%>
+>
+					<tr>
+						<td							${Label}:
+}
+						</td>
+						<td							${Value}
+.
+						</td>
+					</tr								<%
+								end
+							end
+							%>
+>
 																		
 					${WriteInputGroupHeader("Опции выставки счета")}
 					
