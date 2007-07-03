@@ -67,7 +67,7 @@ namespace AdminInterface.Controllers
 				client.Status = ClientStatus.Off;
 			else
 				client.Status = ClientStatus.On;
-			client.SaveAndFlush();
+			DbLogHelper.SavePersistentWithLogParams(Session["UserName"].ToString(), HttpContext.Current.Request.UserHostAddress, client);
 			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
 
