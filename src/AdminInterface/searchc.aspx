@@ -24,19 +24,28 @@
 					</td>
 				</tr>
 				<tr>
-					<td style="width: 181px; height: 117px;">
+					<td style="width: 181px;">
 						<asp:TextBox ID="FindTB" runat="server" onclick="return CheckAndIfNeedClean(this);" />&nbsp;
 						<asp:CustomValidator ID="SearchTextValidator" runat="server" ControlToValidate="FindTB"
 							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True"></asp:CustomValidator></td>
-					<td style="height: 117px; text-align: left;">
-						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="81px">
-							<asp:ListItem Value="0" Selected="True" onclick="return SetSearchTitle();">Имя</asp:ListItem>
-							<asp:ListItem Value="1" onclick="return SetSearchTitle();">ID</asp:ListItem>
-							<asp:ListItem Value="3" onclick="return SetSearchTitle();">Billing ID</asp:ListItem>
-							<asp:ListItem Value="2" onclick="return SetSearchTitle();">Логин</asp:ListItem>
-							<asp:ListItem Value="4" onclick="return SetSearchTitle();">Юридическое наименование</asp:ListItem>
+					<td style="text-align: left;">
+						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="120px">
+							<asp:ListItem Value="Automate" Selected="True" onclick="return SetSearchTitle();">Автоматический</asp:ListItem>
+							<asp:ListItem Value="ShortName" onclick="return SetSearchTitle();">Имя</asp:ListItem>
+							<asp:ListItem Value="Code" onclick="return SetSearchTitle();">ID</asp:ListItem>
+							<asp:ListItem Value="BillingCode" onclick="return SetSearchTitle();">Billing ID</asp:ListItem>
+							<asp:ListItem Value="Login" onclick="return SetSearchTitle();">Логин</asp:ListItem>
+							<asp:ListItem Value="JuridicalName" onclick="return SetSearchTitle();">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
-						<br />
+					</td>
+					<td rowspan="2">
+						<asp:Button ID="GoFind" runat="server" Text="Найти" OnClick="GoFind_Click" CausesValidation="true" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+					</td>
+					<td colspan="2" style="text-align:left;">
 						<asp:DropDownList ID="ClientType" runat="server">
 							<asp:ListItem>Все</asp:ListItem>
 							<asp:ListItem>Аптеки</asp:ListItem>
@@ -51,9 +60,6 @@
 						<br />
 						<asp:DropDownList ID="ClientRegion" runat="server" DataTextField="Region" DataValueField="RegionCode">
 						</asp:DropDownList>
-					</td>
-					<td style="height: 117px">
-						<asp:Button ID="GoFind" runat="server" Text="Найти" OnClick="GoFind_Click" CausesValidation="true" />
 					</td>
 				</tr>
 				<tr>

@@ -56,6 +56,15 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.RadioButtonList FindRB;
         
         /// <summary>
+        /// GoFind control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button GoFind;
+        
+        /// <summary>
         /// ClientType control.
         /// </summary>
         /// <remarks>
@@ -81,15 +90,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList ClientRegion;
-        
-        /// <summary>
-        /// GoFind control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button GoFind;
         
         /// <summary>
         /// ADCB control.

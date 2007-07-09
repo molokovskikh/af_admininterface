@@ -6,24 +6,6 @@
 			control.children.item(i).className = className;
 }
 
-function ValidateSearch(source, args)
-{
-	if (document.getElementById("FindRB_1").checked)
-		reg = new RegExp("^\\d{1,10}$");
-	if (document.getElementById("FindRB_2").checked)
-		reg = new RegExp("^\\d{1,10}$");	
-	if (document.getElementById("FindRB_0").checked)
-		reg = new RegExp("^.+$");	
-	if (document.getElementById("FindRB_3").checked)
-		reg = new RegExp("^.+$");
-	if (document.getElementById("FindRB_4").checked)
-		reg = new RegExp("^.+$");
-	if (reg.test(args.Value))
-		args.IsValid = true;
-	else 
-		args.IsValid = false;
-}
-
 function ValidateLogin(source, args)
 {
 	if (document.getElementById("IncludeCB").checked)

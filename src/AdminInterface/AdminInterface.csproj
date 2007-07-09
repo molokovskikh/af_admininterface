@@ -299,13 +299,6 @@
     <Compile Include="report.aspx.designer.cs">
       <DependentUpon>report.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Search2.aspx.cs">
-      <SubType>ASPXCodeBehind</SubType>
-      <DependentUpon>Search2.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Search2.aspx.designer.cs">
-      <DependentUpon>Search2.aspx</DependentUpon>
-    </Compile>
     <Compile Include="searchc.aspx.cs">
       <DependentUpon>searchc.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -403,7 +396,6 @@
     <Content Include="Css\Contacts.css" />
     <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\Search.js" />
-    <Content Include="Search2.aspx" />
     <Content Include="Views\Client\Info.aspx" />
     <None Include="Views\Contact\EditContactGroup.brail" />
   </ItemGroup>

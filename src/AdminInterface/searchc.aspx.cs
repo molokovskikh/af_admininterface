@@ -11,6 +11,15 @@ using Image = System.Web.UI.WebControls.Image;
 
 namespace AddUser
 {
+	public enum SearchType
+	{
+		ShortName,
+		Login,
+		Code,
+		BillingCode,
+		JuridicalName
+	}
+
 	partial class searchc : Page
 	{
 		MySqlConnection _connection = new MySqlConnection();
@@ -67,7 +76,34 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		protected void GoFind_Click(object sender, EventArgs e)
 		{
-			BuildQuery("order by 3, 4");
+			SearchType searchType = SearchType.ShortName;
+			switch(FindRB.SelectedValue)
+			{
+				case "Code":
+					searchType = SearchType.Code;
+					break;
+				case "BillingCode":
+					searchType = SearchType.BillingCode;
+					break;
+				case "ShortName":
+					searchType = SearchType.ShortName;
+					break;
+				case "JuridicalName":
+					searchType = SearchType.JuridicalName;
+					break;
+				case "Login":
+					searchType = SearchType.Login;
+					break;
+				case "Automate":
+					if (char.IsDigit(FindTB.Text[0]))
+						searchType = SearchType.Code;
+					else if (FindTB.Text[0] < 128)
+						searchType = SearchType.Login;
+					else
+						searchType = SearchType.ShortName;
+					break;
+			}
+			BuildQuery("order by 3, 4", searchType);
 			BindData();
 		}
 
@@ -140,7 +176,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 			SearchTimeLabel.Visible = true;
 		}
 
-		private void BuildQuery(string orderStatement)
+		private void BuildQuery(string orderStatement, SearchType searchType)
 		{
 			string firstPart =
 @"
@@ -265,9 +301,9 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					throw new Exception(String.Format("Не известный тип клиента {0}", ClientType.SelectedValue));
 			}
 
-			switch (FindRB.SelectedItem.Value)
+			switch (searchType)
 			{
-				case "0":
+				case SearchType.ShortName:
 					{
 						secondPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						fourthPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
@@ -275,7 +311,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
-				case "1":
+				case SearchType.Code:
 					{
 						secondPart += " and cd.firmcode=?ClientCode";
 						fourthPart += " and cd.firmcode=?ClientCode";
@@ -283,7 +319,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						_command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
-				case "2":
+				case SearchType.Login:
 					{
 						secondPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						fourthPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
@@ -291,7 +327,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						_command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
-				case "3":
+				case SearchType.BillingCode:
 					{
 						secondPart += " and cd.billingcode=?BillingCode";
 						fourthPart += " and cd.billingcode=?BillingCode";
@@ -299,7 +335,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 						_command.Parameters["?BillingCode"].Value = FindTB.Text;
 						break;
 					}
-				case "4":
+				case SearchType.JuridicalName:
 					secondPart += " and p.JuridicalName like ?JuridicalName";
 					fourthPart += " and p.JuridicalName like ?JuridicalName";
 					_command.Parameters.Add("?JuridicalName", MySqlDbType.VarChar);
@@ -358,15 +394,13 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			Regex reg = null;
-			if (FindRB.SelectedIndex == 1)
+			if (FindRB.SelectedValue == "Code" 
+				|| FindRB.SelectedValue == "BillingCode")
 				reg = new Regex("^\\d{1,10}$");
-			if (FindRB.SelectedIndex == 2)
-				reg = new Regex("^\\d{1,10}$");
-			if (FindRB.SelectedIndex == 3)
-				reg = new Regex("^.+$");
-			if (FindRB.SelectedIndex == 0)
-				reg = new Regex("^.+$");
-			if (FindRB.SelectedIndex == 4)
+			if (FindRB.SelectedValue == "Name" 
+				|| FindRB.SelectedValue == "JuridicalName"
+				|| FindRB.SelectedValue == "Login"
+				|| FindRB.SelectedValue == "Automate")
 				reg = new Regex("^.+$");
 			if (reg.IsMatch(args.Value))
 				args.IsValid = true;
