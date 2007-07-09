@@ -79,6 +79,11 @@ namespace AdminInterface.Controllers
 				return "Включить клиента";
 		}
 
+		public bool IsClientActive(Client client)
+		{
+			return client.Status == ClientStatus.On;
+		}
+
 		private void SetTitle(BillingInstance billingInstance)
 		{
 			PropertyBag.Add("Title", String.Format("Детальная информация о платильщике {0}",

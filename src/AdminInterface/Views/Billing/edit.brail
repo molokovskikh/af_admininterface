@@ -13,6 +13,15 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string):
 	return ""
 end
 
+def GetClientStyle(client) as string	if controller.IsClientActive(client):
+:
+		return ""
+	else:
+		return "background-color:#ff6600;"
+	end
+	return ""
+end
+
 def WriteInputGroupHeader(localHeader as string):
 	return "<tr><td class=\"InputGroupHeader\" colspan=\"2\">" + localHeader + "</td></tr>"
 en}def WriteSubmitButton(submitButton as string):
@@ -54,37 +63,10 @@ end
 	}
 </style
 
-<div class="Main">	<div style="padding-bottom: 10px;width: 57%">
-		<div class="InputGroupHeader" style="margin-bottom:10px;">
-			Клиенты плательщика "${Instance.ShortName}"
->
-		</div		<table class="DataTable" style="width:100%">
->
-			<%:
-				i = 				for client in Instance.Clients:
-:
-					i++
-			%			<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
-				<td>	
-					<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
-				</td>
-				<td>
-					${client.HomeRegion.Name}
-				</td>
-				<td>
-					${BindingHelper.GetDescription(client.Type)}
-				</td>
-			</tr>
->
-			<% 
-				end
-			%		</table>
-	
-	</div>
+<div class="Main">
 
-
-	<div class="Left"		<form action="update.rails" method="post">
->
+	<div class="Left"	
+		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			${FormHelper.HiddenField("Instance.PayerID")}
 			<table					<% 
@@ -213,45 +195,47 @@ end
 																${WriteSubmitButton(FormHelper.Submit("Сохранить"))}
 	
 			</table>
-		</form>
-	</div	
+		</form		
+	
+		<div style="padding-bottom: 10px;width: 100%">
+			<div class="InputGroupHeader" style="margin-bottom:10px;"				Клиенты плательщика "${Instance.ShortName}"
+�
+			</div			<table class="DataTable" style="width:100%">
+>
+			<%:
+				i = 				for client in Instance.Clients:
+:
+					i++
+			%			<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+				<td style="${GetClientStyle(client)}">
+				<% if client.Id == Client.Id: %>
+					<strong>${client.ShortName}</strong>
+				<% else: %>
+					<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
+				<% end %>
+				</td>
+				<td style="${GetClientStyle(client)}">
+					${client.HomeRegion.Name}
+				</td>
+				<td style="${GetClientStyle(client)}">
+					${BindingHelper.GetDescription(client.Type)}
+				</td>
+			</tr>
+>
+			<% 
+				end
+			%>
+			</table>
+		</div		
+	
+	</div>
+	
 	<div class="Right">
 		<div style="margin-bottom:10px;">
 >
-			<div class="InputGroupHeader" style="margin-bottom:10px;">
-				Статистика включений/выключений
-			</div>
-			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
-			<% 
-			if LogRecords.Count > 0:
-				i = 0
-				for logRecord in LogRecords:
-					i++
-			%					<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
->
-						<td>
-							${logRecord.LogTime}
-						</td>
-						<td>
-							${logRecord.OperatorName}
-						</td							<td>
-								${BindingHelper.GetDescription(logRecord.ClientStatus)}
-}
-							</td>
-					</tr>
-			<% 
-				end
-			else:
-			%>
-				<tr>
-					<td style="text-align:center;">
-						Клиент не отключался
-					</td>
-				</tr>				
-			<%
-			end
-			%>
-			</table			<div style="text-align:right;">
+			<div class="InputGroupHeader" style="margin-bottom:10px;"				${Client.ShortName}, ${Client.HomeRegion.Name}, ${BindingHelper.GetDescription(Client.Type)}
+�
+			</div			<div style="text-align:right;">
 				<input type="button" value="${controller.GetChangeStatusButtonText(Client)}" onclick="return window.location = 'ChangeClientState.rails?ClientCode=${Client.Id}';" />
 >
 			</div>
@@ -259,7 +243,7 @@ end
 	
 <%
 if IsDefined("ClientMessage"):
-%		<form action="sendMessage.rails" method="post">			
+%		<form action="sendMessage.rails" method="post" style="margin-bottom:10px;>			
 			<input type="hidden" value="${ClientCode}" name="NewClientMessage.ClientCode" />
 >
 			<table style="width:100%">
@@ -311,5 +295,41 @@ end
 <% 
 end 
 %>
+		<div>
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				Статистика включений/выключений
+			</div>
+			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
+			<% 
+			if LogRecords.Count > 0:
+				i = 0
+				for logRecord in LogRecords:
+					i++
+			%					<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+>
+						<td>
+							${logRecord.LogTime}
+						</td>
+						<td>
+							${logRecord.OperatorName}
+						</td							<td>
+								${BindingHelper.GetDescription(logRecord.ClientStatus)}
+}
+							</td>
+					</tr>
+			<% 
+				end
+			else:
+			%>
+				<tr>
+					<td style="text-align:center;">
+						Клиент не отключался
+					</td>
+				</tr>				
+			<%
+			end
+			%>
+			</table>
+		</div>
 	</div>
 </d
