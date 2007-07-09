@@ -46,5 +46,5 @@ function ValidateSearch(source, args)
 		args.IsValid = false
 	if (document.getElementById("FindRB_3").checked 
 		|| document.getElementById("FindRB_2").checked)		
-		args.IsValid = new RegExp("^.{1, 100}$").test(args.Value);
+		args.IsValid = new RegExp("^\\d{1,10}$$").test(args.Value);
 }
