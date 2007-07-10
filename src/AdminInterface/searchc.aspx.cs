@@ -393,19 +393,14 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 		}
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			Regex reg = null;
 			if (FindRB.SelectedValue == "Code" 
 				|| FindRB.SelectedValue == "BillingCode")
-				reg = new Regex("^\\d{1,10}$");
-			if (FindRB.SelectedValue == "Name" 
+				args.IsValid = new Regex("^\\d{1,10}$").IsMatch(args.Value);
+			if (FindRB.SelectedValue == "ShortName"
 				|| FindRB.SelectedValue == "JuridicalName"
 				|| FindRB.SelectedValue == "Login"
 				|| FindRB.SelectedValue == "Automate")
-				reg = new Regex("^.+$");
-			if (reg.IsMatch(args.Value))
-				args.IsValid = true;
-			else
-				args.IsValid = false;
+				args.IsValid = args.Value.Length > 0;
 		}
 	}
 }
