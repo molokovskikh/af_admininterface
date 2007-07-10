@@ -1,5 +1,5 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.report" CodePage="1251"
-    CodeFile="report.aspx.cs" %>
+    CodeBehind="report.aspx.cs" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 

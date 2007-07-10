@@ -1,5 +1,5 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="Views.Client.Info" CodePage="1251"
-	CodeFile="Info.aspx.cs" Theme="Main" %>
+	CodeBehind="Info.aspx.cs" Theme="Main" %>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
 <%@ Import namespace="AdminInterface.Components"%>
