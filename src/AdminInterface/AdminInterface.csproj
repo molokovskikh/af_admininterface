@@ -402,10 +402,8 @@
   <ItemGroup>
     <Content Include="Views\Billing\edit.brail">
     </Content>
-    <Content Include="Views\ClientInfo\edit.brail" />
     <Content Include="Views\Client\ContactViewer.brail" />
     <Content Include="Views\Components\ContactEditor\default.brail" />
-    <Content Include="Views\Components\ContactViewer\default.brail" />
     <Content Include="Views\Contact\EditPerson.brail" />
     <Content Include="Views\Contact\EditPersonSubView.brail" />
     <Content Include="Views\Contact\NewPerson.brail" />
