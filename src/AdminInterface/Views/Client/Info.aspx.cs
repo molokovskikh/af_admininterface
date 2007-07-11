@@ -130,10 +130,8 @@ INTO    logs.clientsinfo VALUES
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-#if !DEBUG
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
-#endif
+				Response.Redirect("~/default.aspx");
 
 			if (!IsPostBack)
 			{
@@ -387,13 +385,13 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 				if (rowView.Row.RowState == DataRowState.Added)
 				{
 					((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
-					((Button)e.Row.FindControl("SearchButton")).Visible = true;
-					((TextBox)e.Row.FindControl("SearchText")).Visible = true;
+					e.Row.FindControl("SearchButton").Visible = true;
+					e.Row.FindControl("SearchText").Visible = true;
 				}
 				else
 				{
-					((Button)e.Row.FindControl("SearchButton")).Visible = false;
-					((TextBox)e.Row.FindControl("SearchText")).Visible = false;
+					e.Row.FindControl("SearchButton").Visible = false;
+					e.Row.FindControl("SearchText").Visible = false;
 				}
 				DropDownList list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
 				list.Items.Add(new ListItem(rowView["ShortName"].ToString(), rowView["FirmCode"].ToString()));
