@@ -88,7 +88,7 @@
 								<ItemTemplate>
 									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
 									<asp:RegularExpressionValidator ID="UpCostValidator" runat="server" ControlToValidate="UpCostText"
-										ErrorMessage="*" ValidationExpression="^\d+(\,\d+)?$" />
+										ErrorMessage="*" ValidationExpression="^(-)?\d+(\,\d+)?$" />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Сумма минимально заказа">
