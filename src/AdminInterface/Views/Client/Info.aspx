@@ -1,4 +1,4 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="Views.Client.Info" CodePage="1251"
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AdminInterface.Views.Client.Info" CodePage="1251"
 	CodeBehind="Info.aspx.cs" Theme="Main" %>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
