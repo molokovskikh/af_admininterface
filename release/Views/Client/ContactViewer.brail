@@ -1,0 +1,4 @@
+﻿<% 
+	component ContactViewer, {"ContactGroups" : ContactGroups}:
+	end
+%>

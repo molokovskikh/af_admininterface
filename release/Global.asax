@@ -1,0 +1,1 @@
+<%@ Application Inherits="AddUser.Global" Language="c#" %>
