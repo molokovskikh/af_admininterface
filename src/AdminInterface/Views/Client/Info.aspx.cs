@@ -12,13 +12,13 @@ using AddUser;
 using Castle.MonoRail.Framework;
 using MySql.Data.MySqlClient;
 
-namespace Views.Client
+namespace AdminInterface.Views.Client
 {
 	partial class Info : Page, IControllerAware
 	{
 		private uint _clientCode
 		{
-			get { return (uint)(Session["ClientCode"] != null ? Session["ClientCode"] : 0u); }
+			get { return (uint)(Session["ClientCode"] ?? 0u); }
 			set { Session["ClientCode"] = value; }
 		}
 
@@ -39,10 +39,10 @@ namespace Views.Client
 
 		private void GetMessages()
 		{
-            try
-            {
-                MySqlDataAdapter logsDataAddapter = new MySqlDataAdapter(
-    @"
+			try
+			{
+				MySqlDataAdapter logsDataAddapter = new MySqlDataAdapter(
+					@"
 create temporary table Info(Date DateTime, UserName varchar(50), Message text); 
         INSERT 
         INTO    info 
@@ -68,31 +68,31 @@ create temporary table Info(Date DateTime, UserName varchar(50), Message text);
         SELECT * FROM info; 
         DROP temporary table info;
 ", _connection);
-                logsDataAddapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-                logsDataAddapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
+				logsDataAddapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+				logsDataAddapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
 
-                if (_data.Tables["Logs"] != null)
-                    _data.Tables["Logs"].Clear();
-                _connection.Open();
-                logsDataAddapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                logsDataAddapter.Fill(_data, "Logs");
-                logsDataAddapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+				if (_data.Tables["Logs"] != null)
+					_data.Tables["Logs"].Clear();
+				_connection.Open();
+				logsDataAddapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				logsDataAddapter.Fill(_data, "Logs");
+				logsDataAddapter.SelectCommand.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 		}
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
-            try
-            {
-                _connection.Open();
-                _command.Connection = _connection;
-                _command.Transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-                _command.CommandText =
-@"
+			try
+			{
+				_connection.Open();
+				_command.Connection = _connection;
+				_command.Transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+				_command.CommandText =
+					@"
 SET @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
@@ -106,18 +106,18 @@ INTO    logs.clientsinfo VALUES
                 ?Problem
         );
 ";
-                _command.Parameters.Add("?Problem", ProblemTB.Text);
-                _command.Parameters.Add("?UserName", Session["UserName"]);
-                _command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-                _command.Parameters.Add("?ClientCode", _clientCode);
+				_command.Parameters.Add("?Problem", ProblemTB.Text);
+				_command.Parameters.Add("?UserName", Session["UserName"]);
+				_command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				_command.Parameters.Add("?ClientCode", _clientCode);
 
-                _command.ExecuteNonQuery();
-                _command.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+				_command.ExecuteNonQuery();
+				_command.Transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
 			ProblemTB.Text = String.Empty;
 			IsMessafeSavedLabel.Visible = true;
@@ -158,31 +158,10 @@ INTO    logs.clientsinfo VALUES
 			FullNameText.Text = _data.Tables["Info"].Rows[0]["FullName"].ToString();
 			ShortNameText.Text = _data.Tables["Info"].Rows[0]["ShortName"].ToString();
 			ShortNameLB.Text = _data.Tables["Info"].Rows[0]["ShortName"].ToString();
-//			PhoneText.Text = _data.Tables["Info"].Rows[0]["Phone"].ToString();
-//			SetSipLink(PhoneText, PhoneText.Text);
 			AddressText.Text = _data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = _data.Tables["Info"].Rows[0]["Fax"].ToString();
-//			EmailText.Text = _data.Tables["Info"].Rows[0]["Mail"].ToString();
-//			SetEmailLink(EmailText);
 			UrlText.Text = _data.Tables["Info"].Rows[0]["URL"].ToString();
-
-//			OrderManagerPhoneText.Text = _data.Tables["Info"].Rows[0]["OrderManagerPhone"].ToString();
-//			SetSipLink(OrderManagerPhoneText, OrderManagerPhoneText.Text);
-//			SetEmailLink(OrderManagerEmailText);
-			
-
-//			ClientManagerPhoneText.Text = _data.Tables["Info"].Rows[0]["ClientManagerPhone"].ToString();
-//			SetSipLink(ClientManagerPhoneText, ClientManagerPhoneText.Text);
-//			ClientManagerEmailText.Text = _data.Tables["Info"].Rows[0]["ClientManagerMail"].ToString();
-//			SetEmailLink(ClientManagerEmailText);
-			
-
-//			AccountantEmailText.Text = _data.Tables["Info"].Rows[0]["AccountantMail"].ToString();
-//			SetEmailLink(AccountantEmailText);
-//			AccountantPhoneText.Text = _data.Tables["Info"].Rows[0]["AccountantPhone"].ToString();
-//			SetSipLink(AccountantPhoneText, AccountantPhoneText.Text);
-			
-
+	
 			UserInterfaceHL.Enabled = Convert.ToBoolean(_data.Tables["Info"].Rows[0]["AlowInterface"]);
 			UpdateListHL.Enabled = Convert.ToBoolean(_data.Tables["Info"].Rows[0]["FirmType"]);
 			if (Convert.ToInt32(_data.Tables["Info"].Rows[0]["FirmType"]) == 1)
@@ -191,39 +170,17 @@ INTO    logs.clientsinfo VALUES
 				ConfigHL.NavigateUrl = "~/managep";
 			ConfigHL.NavigateUrl += ".aspx?cc=" + _clientCode;
 			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", 
-													_clientCode);
-		}
-
-		private static void SetSipLink(HyperLink button, string phoneNumber)
-        {
-            if (!String.IsNullOrEmpty(phoneNumber))
-            {
-                button.Visible = true;
-                button.NavigateUrl = String.Format("sip:8{0}", phoneNumber.Replace("-", ""));
-            }
-            else
-                button.Visible = false;
-        }
-
-		private static void SetEmailLink(HyperLink hyperLink)
-		{
-			if (!String.IsNullOrEmpty(hyperLink.Text))
-			{
-				hyperLink.Visible = true;
-				hyperLink.NavigateUrl = String.Format("mailto:{0}", hyperLink.Text);
-			}
-			else
-				hyperLink.Visible = false;
+			                                        _clientCode);
 		}
 
 		private void GetData()
 		{
-            _data = new DataSet();
+			_data = new DataSet();
 
-            GetMessages();
+			GetMessages();
 
-            MySqlDataAdapter infoDataAdapter = new MySqlDataAdapter(
-@"
+			MySqlDataAdapter infoDataAdapter = new MySqlDataAdapter(
+				@"
 SELECT  cd.FullName,   
         cd.ShortName,   
         cd.Adress,   
@@ -243,11 +200,11 @@ WHERE   FirmType                                 =if(ShowRetail + ShowVendor=2, 
         AND firmcode                             =?ClientCode   
         AND regionaladmins.username              =?UserName;
 ", _connection);
-            infoDataAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-            infoDataAdapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
+			infoDataAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			infoDataAdapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
 				
 			MySqlDataAdapter showClientsAdapter = new MySqlDataAdapter(
-@"
+				@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName     
 FROM    (accessright.regionaladmins, clientsdata as cd) 
@@ -265,23 +222,23 @@ ORDER BY cd.shortname;
 			showClientsAdapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
 			showClientsAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
             
-            try
-            {
-                _connection.Open();
-                MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                showClientsAdapter.SelectCommand.Transaction = transaction;
-                infoDataAdapter.SelectCommand.Transaction = transaction;
-                showClientsAdapter.Fill(_data, "ShowClients");
-                infoDataAdapter.Fill(_data, "Info");
-                transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+			try
+			{
+				_connection.Open();
+				MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				showClientsAdapter.SelectCommand.Transaction = transaction;
+				infoDataAdapter.SelectCommand.Transaction = transaction;
+				showClientsAdapter.Fill(_data, "ShowClients");
+				infoDataAdapter.Fill(_data, "Info");
+				transaction.Commit();
+			}
+			finally
+			{
+				_connection.Close();
+			}
 
-            if (_data.Tables["Info"].Rows[0]["OsUserName"] != DBNull.Value || !String.IsNullOrEmpty(_data.Tables["Info"].Rows[0]["OsUserName"].ToString()))
-            {
+			if (_data.Tables["Info"].Rows[0]["OsUserName"] != DBNull.Value || !String.IsNullOrEmpty(_data.Tables["Info"].Rows[0]["OsUserName"].ToString()))
+			{
 				try
 				{
 					IADsUser ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + _data.Tables["Info"].Rows[0]["OsUserName"]) as IADsUser;
@@ -292,9 +249,9 @@ ORDER BY cd.shortname;
 				{
 					UnlockRow.Visible = false;
 				}
-            }
-            else
-                UnlockRow.Visible = false;
+			}
+			else
+				UnlockRow.Visible = false;
 
 		}
 
@@ -339,7 +296,7 @@ WHERE PrimaryClientCode = ?PrimaryClientCode AND ShowClientCode = ?ShowClientCod
 				showClientsAdapter.DeleteCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
 
 				showClientsAdapter.InsertCommand = new MySqlCommand(
-	@"
+					@"
 INSERT INTO showregulation 
 SET PrimaryClientCode = ?PrimaryClientCode,
 	ShowClientCode = ?ShowClientCode;
@@ -411,7 +368,7 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 					break;
 				case "Search":
 					MySqlDataAdapter adapter = new MySqlDataAdapter
-(@"
+						(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
 FROM    (accessright.regionaladmins, clientsdata as cd)  
@@ -430,17 +387,17 @@ ORDER BY cd.shortname;
 					adapter.SelectCommand.Parameters.Add("?SearchText", string.Format("%{0}%", ((TextBox)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 
 					DataSet data = new DataSet();
-                    try
-                    {
-                        _connection.Open();
-                        adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                        adapter.Fill(data);
-                        adapter.SelectCommand.Transaction.Commit();
-                    }
-                    finally
-                    {
-                        _connection.Close();
-                    }
+					try
+					{
+						_connection.Open();
+						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+						adapter.Fill(data);
+						adapter.SelectCommand.Transaction.Commit();
+					}
+					finally
+					{
+						_connection.Close();
+					}
 
 					DropDownList ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
 					ShowList.DataSource = data;
