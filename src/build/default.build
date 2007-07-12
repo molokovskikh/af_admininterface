@@ -1,0 +1,68 @@
+﻿<?xml version="1.0"?>
+<project name="MyProject" default="compile" basedir=".">
+
+	<property name="VssUser" value="Kvasov" />
+	<property name="VssPassword" value="Kvasov" />
+	<property name="VssDbPath" value="\\offdc\VSS\Inforoom\srcsafe.ini" />
+	<property name="VssPath" value="$/inforoom/net2.0/AdminInterface/release/" />
+	<property name="ReleasePath" value="..\release\" />
+		
+
+	<target name="compile">
+
+		<loadtasks assembly="D:\Tools\nantcontrib-0.85\bin\NAnt.Contrib.Tasks.dll" />
+
+	      <msbuild project="AdminInterface.sln">
+			<arg value="/property:Configuration=release" />                                  
+			<arg value="/t:Rebuild" />
+	      </msbuild>
+
+		<delete dir="${ReleasePath}" failonerror="false" />
+		<copy todir="${ReleasePath}">
+			<fileset basedir="AdminInterface">
+				<includes name="**.as?x" />
+				<includes name="**.brail" />
+				<includes name="**.js" />
+				<includes name="**.css" />
+				<includes name="**.skin" />
+				<includes name="**.gif" />
+				<includes name="bin\*.*" />
+			</fileset>
+		</copy>
+
+		<copy 
+			file="AdminInterface\Web.Release.config"
+			tofile="${ReleasePath}Web.config"
+		/>
+
+            <vsscheckout 
+                  user="${VssUser}"
+                  password="${VssPassword}" 
+                  localpath="${ReleasePath}"
+                  recursive="true"
+                  writable="true"
+                  dbpath="${VssDbPath}"
+                  path="${VssPath}" 
+		/>
+
+
+		<vssadd dbpath="${VssDbPath}" user="${VssUser}" password="${VssPassword}" path="${VssPath}">
+                  <fileset basedir="${ReleasePath}">
+				<include name="**.*"/>
+			</fileset>
+		</vssadd>
+
+		<vsscheckin 
+                  user="${VssUser}"
+                  password="${VssPassword}" 
+                  localpath="${ReleasePath}"
+                  recursive="true"
+                  writable="true"
+                  dbpath="${VssDbPath}"
+                  path="${VssPath}" 
+                  comment="Build script checkin"
+                />
+
+
+	</target>	
+</project>
