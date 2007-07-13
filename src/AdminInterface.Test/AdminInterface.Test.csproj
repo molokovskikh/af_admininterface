@@ -44,6 +44,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\AdminInterface\bin\Castle.MicroKernel.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MonoRail.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.MonoRail.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Windsor, Version=1.0.0.5, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\AdminInterface\bin\Castle.Windsor.dll</HintPath>
@@ -67,6 +75,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BindingHelperTests.cs" />
+    <Compile Include="ControllerTest\BillingControllerTest.cs" />
+    <Compile Include="IntegrationTests\ClientTest.cs" />
     <Compile Include="IntegrationTests\DbLogHelperTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

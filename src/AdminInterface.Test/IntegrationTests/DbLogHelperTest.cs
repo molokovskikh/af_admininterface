@@ -7,8 +7,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Model;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
-using Castle.Windsor;
-using Castle.Windsor.Configuration.Interpreters;
 using NHibernate;
 using NHibernate.Expression;
 using NUnit.Framework;
