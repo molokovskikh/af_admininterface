@@ -72,7 +72,6 @@ namespace AddUser
 			// 
 			// _command
 			// 
-			MyCmd.CommandText = null;
 			MyCmd.CommandTimeout = 0;
 			MyCmd.CommandType = CommandType.Text;
 			MyCmd.Connection = MyCn;
