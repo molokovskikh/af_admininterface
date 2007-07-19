@@ -181,7 +181,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 			string firstPart =
 @"
 SELECT  cd.billingcode, 
-        cd.firmcode, 
+        cast(cd.firmcode as CHAR) as firmcode, 
         cd.ShortName, 
         region, 
         max(datecurprice) FirstUpdate, 
@@ -219,7 +219,7 @@ WHERE   formrules.firmcode                       = pricesdata.pricecode
 @"
 group by cd.firmcode union 
 SELECT  cd. billingcode, 
-        if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')), 
+        cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode, 
         if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')), 
         region, 
         UpdateTime FirstUpdate, 

@@ -43,13 +43,11 @@ namespace AddUser
 			MyDA.InsertCommand = null;
 			MyDA.SelectCommand = SelCommand;
 			MyDA.UpdateCommand = UpdCommand;
-			SelCommand.CommandText = null;
 			SelCommand.CommandTimeout = 0;
 			SelCommand.CommandType = CommandType.Text;
 			SelCommand.Connection = MyCn;
 			SelCommand.Transaction = null;
 			SelCommand.UpdatedRowSource = UpdateRowSource.Both;
-			UpdCommand.CommandText = null;
 			UpdCommand.CommandTimeout = 0;
 			UpdCommand.CommandType = CommandType.Text;
 			UpdCommand.Connection = MyCn;
@@ -324,7 +322,7 @@ ORDER BY region;
                 SelCommand.CommandText =
 @"
 SELECT  CostCode, 
-        concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('¹', right(Fieldname, length(FieldName)-1)), Fieldname))) CostID, 
+        cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('¹', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
         CostName, 
         BaseCost, 
         pc.Enabled, 
