@@ -419,13 +419,13 @@ set @inUser = ?UserName;
 					ADUser.Put("userFlags", fl);
 					ADUser.Description = _command.Parameters["?ClientCode"].Value.ToString();
 					ADUser.AccountDisabled = false;
-					ADUser.LoginWorkstations = "acdcsrv";
+					ADUser.LoginWorkstations = "acdcserv";
 					IADsGroup grp;
 					grp = Marshal.BindToMoniker("WinNT://adc.analit.net/Базовая группа клиентов - получателей данных") as IADsGroup;
 					grp.Add("WinNT://adc.analit.net/" + _command.Parameters["?OSUserName"].Value);
 					ADUser.SetInfo();
 					ADUser = null;
-					CreateFtpDirectory(String.Format(@"\\acdcsrv\ftp\optbox\{0}\", _command.Parameters["?ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["?OSUserName"].Value));
+					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", _command.Parameters["?ClientCode"].Value), String.Format(@"ANALIT\{0}", _command.Parameters["?OSUserName"].Value));
 #endif
 				}
 				mytrans.Commit();
