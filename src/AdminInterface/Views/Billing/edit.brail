@@ -243,9 +243,9 @@ end
 	
 <%
 if IsDefined("ClientMessage"):
-%		<form action="sendMessage.rails" method="post" style="margin-bottom:10px;>			
-			<input type="hidden" value="${ClientCode}" name="NewClientMessage.ClientCode" />
->
+%>
+		<form action="sendMessage.rails" method="post" style="margin-bottom:10px;">			
+			<input type="hidden" value="${Client.Id}" name="NewClientMessage.ClientCode" />
 			<table style="width:100%">
 					<tr>
 						<td class="InputGroupHeader">
