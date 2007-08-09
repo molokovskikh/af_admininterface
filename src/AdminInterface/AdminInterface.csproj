@@ -63,11 +63,15 @@
     </Reference>
     <Reference Include="Castle.MonoRail.Framework, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.MonoRail.Framework.dll</HintPath>
+      <HintPath>..\..\..\..\Tools\Monorail-build-4096\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.MonoRail.Views.Brail.dll</HintPath>
+    </Reference>
+    <Reference Include="Common.Web.Ui, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Common.Web.Ui.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
@@ -140,18 +144,14 @@
     <Compile Include="clchpass.aspx.designer.cs">
       <DependentUpon>clchpass.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Components\ContactEditor.cs" />
-    <Compile Include="Components\ContactViewer.cs" />
     <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
-    <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
     <Compile Include="Model\BillingSearchProperties.cs" />
     <Compile Include="Model\Client.cs" />
     <Compile Include="Model\ClientLogRecord.cs" />
-    <Compile Include="Model\ContactGroup.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\ClientInfoController.cs" />
     <Compile Include="CopySynonym.aspx.cs">
@@ -269,14 +269,7 @@
     <Compile Include="Model\BillingInstance.cs" />
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\ClientMessage.cs" />
-    <Compile Include="Model\Contact.cs" />
-    <Compile Include="Model\ContactGroupOwner.cs" />
-    <Compile Include="Model\ContactOwner.cs" />
-    <Compile Include="Helpers\Helper.cs" />
-    <Compile Include="Model\Person.cs" />
     <Compile Include="Model\Region.cs" />
-    <Compile Include="Model\Validators\ContactTextValidationAttribute.cs" />
-    <Compile Include="Model\Validators\ContactTextValidator.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -349,7 +342,6 @@
     <Compile Include="viewcl.aspx.designer.cs">
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Views\Client\Info.aspx.cs">
       <DependentUpon>Info.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -404,16 +396,11 @@
     <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\Search.js" />
     <Content Include="Views\Client\Info.aspx" />
-    <Content Include="Views\Contact\EditContactGroup.brail" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Billing\edit.brail">
     </Content>
     <Content Include="Views\Client\ContactViewer.brail" />
-    <Content Include="Views\Components\ContactEditor\default.brail" />
-    <Content Include="Views\Contact\EditPerson.brail" />
-    <Content Include="Views\Contact\EditPersonSubView.brail" />
-    <Content Include="Views\Contact\NewPerson.brail" />
     <Content Include="Views\Layouts\billing.brail" />
     <Content Include="Views\Layouts\default.brail" />
   </ItemGroup>

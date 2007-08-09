@@ -30,7 +30,8 @@ namespace AddUser
 		void Application_Start(object sender, EventArgs e)
 		{
 			log4net.Config.XmlConfigurator.Configure();
-			ActiveRecordStarter.Initialize(Assembly.Load("AdminInterface"),
+			ActiveRecordStarter.Initialize(new Assembly[] {Assembly.Load("AdminInterface"),
+														   Assembly.Load("Common.Web.Ui")},
 										   ActiveRecordSectionHandler.Instance);
 
 		}

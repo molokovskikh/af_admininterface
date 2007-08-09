@@ -17,6 +17,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
 using NHibernate;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Controllers
 {
