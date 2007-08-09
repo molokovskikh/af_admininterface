@@ -71,6 +71,32 @@ namespace AdminInterface.Controllers
 			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
 
+		public void Search()
+		{
+			IList<BillingSearchItem> searchResults = BillingSearchItem.FindAll();
+						
+			PropertyBag["searchResults"] = searchResults;
+			PropertyBag["sortColumnName"] = "ShortName";
+			PropertyBag["sortDirection"] = "Ascending";
+			Context.Cache.Store("searchResults", searchResults);
+		}
+
+		public void OrderBy(string columnName, string sortDirection)
+		{
+			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
+			List<BillingSearchItem> searchResults;
+			if (Context.Cache.HasKey("searchResults"))
+				searchResults = (List<BillingSearchItem>)Context.Cache.Get("searchResults");
+			else
+				searchResults = (List<BillingSearchItem>)BillingSearchItem.FindAll();
+
+			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
+			PropertyBag["searchResults"] = searchResults;
+			PropertyBag["sortColumnName"] = columnName;
+			PropertyBag["sortDirection"] = sortDirection.ToString();
+			RenderView("search");
+		}
+
 		public string GetChangeStatusButtonText(Client client)
 		{
 			if (client.Status == ClientStatus.On)

@@ -53,6 +53,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.Components.Validator.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=1.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Tools\MonoRail\build\net-2.0\release\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
@@ -89,9 +93,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Microsoft.Practices.ObjectBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data.5, Version=5.1.2.1, Culture=neutral, PublicKeyToken=0bcd676a4d410f98, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=5.1.2.1, Culture=neutral, PublicKeyToken=0bcd676a4d410f98, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\MySql.Data.5.dll</HintPath>
+      <HintPath>..\lib\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=1.2.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -141,7 +145,10 @@
     <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
+    <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
+    <Compile Include="Model\BillingSearchItem.cs" />
+    <Compile Include="Model\BillingSearchProperties.cs" />
     <Compile Include="Model\Client.cs" />
     <Compile Include="Model\ClientLogRecord.cs" />
     <Compile Include="Model\ContactGroup.cs" />
@@ -411,6 +418,7 @@
     <Content Include="Views\Layouts\default.brail" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Views\Billing\search.brail" />
     <Content Include="Web.Release.Config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

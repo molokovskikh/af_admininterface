@@ -1,0 +1,92 @@
+﻿<% 
+def EvenOrOdd(i as int, ifEven as string, ifOdd as string) as string:
+	if i % 2 == 0:
+		return ifEven
+	else:
+		return ifOdd
+	end
+end
+
+def WriteHeader(text as string, columnName as string):
+	currentSortDirection = "Ascending";
+	if SortColumnName == columnName:
+		if sortDirection == "Descending":
+			currentSortDirection = "Ascending"
+		else:
+			currentSortDirection = "Descending"
+		end
+		if sortDirection == "Ascending":
+			url = "../Images/arrow-down-blue-reversed.gif"
+		else:
+			url = "../Images/arrow-down-blue.gif"
+		end
+	end
+	%>
+	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}">
+		${text}
+		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortColumnName == columnName %>
+	</a>
+	<%
+	return ""
+end
+%>
+<div class="InputGroupHeader" style="font-weight:bold; margin-bottom:10px;">
+	Биллинг
+</div>
+
+<table class="DataTable" style="width:100%">
+	<tr>
+		<th>
+			${WriteHeader("№ договора", "BillingCode")}
+		</th>
+		<th>
+			${WriteHeader("Краткое наименование", "ShortName")}
+		</th>
+		<th>
+			${WriteHeader("Сумма платежа", "PaySum")}
+		</th>
+		<th>
+			${WriteHeader("Дата платежа", "PayDate")}
+		</th>
+		<th>
+			${WriteHeader("Дата регистрации", "RegistrationDate")}
+		</th>
+		<th>
+			${WriteHeader("Отключенных клиентов", "DisabledClientsCount")}
+		</th>
+		<th>
+			${WriteHeader("Работающих клиентов", "EnabledClientsCount")}
+		</th>
+	</tr>
+    <% 
+		i = 0
+        for searchResult in searchResults:
+    %>
+        <tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+            <td>
+				${searchResult.BillingCode}
+            </td>
+            <td>
+                ${searchResult.ShortName}
+            </td>
+			<td>
+                ${searchResult.PaySum}
+            </td>
+            <td>
+                ${searchResult.PayDate.ToShortDateString()}
+			</td>
+			<td>
+                ${searchResult.RegistrationDate.ToShortDateString()}
+			</td>
+			<td>
+                ${searchResult.DisabledClientsCount}
+			</td>
+			<td>
+                ${searchResult.EnabledClientsCount}
+			</td>
+        </tr>
+    <%
+			i++
+        end
+    %>
+</table>
