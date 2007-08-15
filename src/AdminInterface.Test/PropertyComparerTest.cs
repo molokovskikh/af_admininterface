@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using AdminInterface.Helpers;
 using System.Web.UI.WebControls;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace AdminInterface.Test
 {
@@ -48,10 +49,10 @@ namespace AdminInterface.Test
 		{
 			List<TestEntity> data = GetData();
 			data.Sort(new PropertyComparer<TestEntity>(SortDirection.Descending, "I"));
-			Assert.AreEqual(100, data[0].I);
-			Assert.AreEqual(50, data[1].I);
-			Assert.AreEqual(10, data[2].I);
-			Assert.AreEqual(10, data[3].I);
+			Assert.That(data[0].I, Is.EqualTo(100));
+			Assert.That(data[1].I, Is.EqualTo(50));
+			Assert.That(data[2].I, Is.EqualTo(10));
+			Assert.That(data[3].I, Is.EqualTo(10));
 		}
 
 		[Test]
