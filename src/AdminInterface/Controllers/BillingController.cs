@@ -74,28 +74,58 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
-			IList<BillingSearchItem> searchResults = BillingSearchItem.FindAll();
-						
-			PropertyBag["searchResults"] = searchResults;
-			PropertyBag["sortColumnName"] = "ShortName";
-			PropertyBag["sortDirection"] = "Ascending";
-			Context.Cache.Store("searchResults", searchResults);
+			PropertyBag["regions"] = GetRegions();
 		}
 
-		public void OrderBy(string columnName, string sortDirection)
+		public void Search([DataBind("SearchBy")] BillingSearchProperties searchProperties)
 		{
+			IList<BillingSearchItem> searchResults = BillingSearchItem.FindBy(searchProperties);
+			Context.Cache.Store("searchResults", searchResults);
+
+			PropertyBag["regions"] = GetRegions();
+			PropertyBag["sortColumnName"] = "ShortName";
+			PropertyBag["sortDirection"] = "Ascending";
+			PropertyBag["FindBy"] = searchProperties;
+			PropertyBag["searchResults"] = searchResults;
+		}
+
+		public void OrderBy(string columnName, 
+							string sortDirection,
+							string shortName,
+							ulong regionId,
+							PayerStateFilter payerState)
+		{
+			BillingSearchProperties searchProperties = new BillingSearchProperties();
+			searchProperties.PayerState = payerState;
+			searchProperties.ShortName = shortName;
+			searchProperties.RegionId = regionId;
 			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 			List<BillingSearchItem> searchResults;
 			if (Context.Cache.HasKey("searchResults"))
 				searchResults = (List<BillingSearchItem>)Context.Cache.Get("searchResults");
 			else
-				searchResults = (List<BillingSearchItem>)BillingSearchItem.FindAll();
+				searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
 
 			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
+
+			PropertyBag["FindBy"] = searchProperties;
+			PropertyBag["regions"] = GetRegions();
 			PropertyBag["searchResults"] = searchResults;
 			PropertyBag["sortColumnName"] = columnName;
 			PropertyBag["sortDirection"] = sortDirection.ToString();
 			RenderView("search");
+		}
+
+		public bool IsDebitor(BillingSearchItem item)
+		{
+			return DateTime.Now - item.PayDate > TimeSpan.FromDays(1);
+		}
+
+		private IList<Region> GetRegions()
+		{
+			if (!Context.Cache.HasKey("clientRegions"))
+				Context.Cache.Store("clientRegions", Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name));
+			return (IList<Region>)Context.Cache.Get("clientRegions");
 		}
 
 		public string GetChangeStatusButtonText(Client client)

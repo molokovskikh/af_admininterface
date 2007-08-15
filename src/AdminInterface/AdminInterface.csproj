@@ -146,8 +146,10 @@
     </Compile>
     <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
+    <Compile Include="Model\ArHelper.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
     <Compile Include="Model\BillingSearchProperties.cs" />
     <Compile Include="Model\Client.cs" />
@@ -269,6 +271,7 @@
     <Compile Include="Model\BillingInstance.cs" />
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\ClientMessage.cs" />
+    <Compile Include="Model\DocumentRecieveLogEntity.cs" />
     <Compile Include="Model\Region.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>

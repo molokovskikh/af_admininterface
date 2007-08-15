@@ -22,7 +22,7 @@ def WriteHeader(text as string, columnName as string):
 		end
 	end
 	%>
-	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}">
+	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&regionCode=${FindBy.RegionId}&shortName=${FindBy.ShortName}&payerState=${FindBy.PayerState}">
 		${text}
 		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortColumnName == columnName %>
 	</a>
@@ -34,6 +34,53 @@ end
 	Биллинг
 </div>
 
+<div style="text-align:center;background-color: #e7f6e0; padding-top: 10px; padding-bottom: 10px; margin-left:33%; margin-right:33%; margin-bottom: 10px">
+	<span style="font-weight:bold;">
+		Фильтр платильщиков
+	</span>
+	<form action="Search.rails" method="post">
+		<table>
+		<tr>
+			<td style="text-align:left;">
+				Название:
+			</td>
+			<td style="text-align:left;">
+				<input type="text" name="SearchBy.ShortName" />
+			</td>
+			<td rowspan="4" style="vertical-align:middle;">
+				${FormHelper.Submit("Найти")}
+			</td>
+		</tr>
+		<tr>
+			<td style="text-align:left;">
+				Должен\Недолжен:
+			</td>
+			<td style="text-align:left;">
+				${FormHelper.Select("SearchBy.PayerState",
+									"Все",
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.PayerStateFilter, AdminInterface"),
+									BindingHelper.GetDictionaryMapping())}
+			</td>
+		</tr>
+		<tr style="text-align:left;">
+			<td style="text-align:left;">
+				Регион:
+			</td>
+			<td style="text-align:left;">
+				${FormHelper.Select("SearchBy.RegionId",
+									regions[0].Name,
+									regions, 
+									{"value":"Id", "text":"Name"})}					
+			</td>
+		</tr>					
+		</table>
+	</form>
+</div>
+
+<%
+	if IsDefined("searchResults"):
+%>
+<div>
 <table class="DataTable" style="width:100%">
 	<tr>
 		<th>
@@ -61,27 +108,35 @@ end
     <% 
 		i = 0
         for searchResult in searchResults:
+        
+        if controller.IsDebitor(searchResult):
+			payerStyle = "width:1%;background-color: #ffa642;"
+		else:
+			payerStyle = "width:1%;"
+		end
     %>
         <tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
-            <td>
-				${searchResult.BillingCode}
+            <td style="width:1%;">
+				<a href="edit.rails?clientCode=${searchResult.LastRegistredClientId}">
+					${searchResult.BillingCode}
+				</a>
             </td>
             <td>
                 ${searchResult.ShortName}
             </td>
-			<td>
-                ${searchResult.PaySum}
+			<td style="${payerStyle}">
+				${searchResult.PaySum}
             </td>
-            <td>
-                ${searchResult.PayDate.ToShortDateString()}
+            <td style="${payerStyle}">
+				${searchResult.PayDate.ToShortDateString()}
 			</td>
-			<td>
-                ${searchResult.RegistrationDate.ToShortDateString()}
+			<td style="width:1%">
+                ${searchResult.LastClientRegistrationDate.ToShortDateString()}
 			</td>
-			<td>
+			<td style="width:1%">
                 ${searchResult.DisabledClientsCount}
 			</td>
-			<td>
+			<td style="width:1%">
                 ${searchResult.EnabledClientsCount}
 			</td>
         </tr>
@@ -90,3 +145,7 @@ end
         end
     %>
 </table>
+</div>
+<%
+	end
+%>
