@@ -172,13 +172,6 @@
     <Compile Include="DAL\ParametericCommand.cs" />
     <Compile Include="DAL\Region.cs" />
     <Compile Include="DAL\ScalarCommand.cs" />
-    <Compile Include="debetors.aspx.cs">
-      <DependentUpon>debetors.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="debetors.aspx.designer.cs">
-      <DependentUpon>debetors.aspx</DependentUpon>
-    </Compile>
     <Compile Include="default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -240,13 +233,6 @@
       <DependentUpon>InvoiceR.aspx</DependentUpon>
     </Compile>
     <Compile Include="Literals.cs" />
-    <Compile Include="manage.aspx.cs">
-      <DependentUpon>manage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="manage.aspx.designer.cs">
-      <DependentUpon>manage.aspx</DependentUpon>
-    </Compile>
     <Compile Include="ManageCosts.aspx.cs">
       <DependentUpon>ManageCosts.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -359,7 +345,6 @@
     <Content Include="chpassgo.aspx" />
     <Content Include="clchpass.aspx" />
     <Content Include="CopySynonym.aspx" />
-    <Content Include="debetors.aspx" />
     <Content Include="default.aspx" />
     <Content Include="Docs.aspx" />
     <Content Include="EditAdministrator.aspx" />
@@ -373,7 +358,6 @@
     <Content Include="InvoiceP.aspx" />
     <Content Include="InvoiceR.aspx" />
     <Content Include="JavaScript\Main.js" />
-    <Content Include="manage.aspx" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
     <Content Include="manageret.aspx" />
