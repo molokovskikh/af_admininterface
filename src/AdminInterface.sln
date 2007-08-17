@@ -16,9 +16,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface.Test", "Admi
 		{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60} = {656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui", "..\..\Common.Web.Ui\Src\Common.Web.Ui\Common.Web.Ui.csproj", "{95E2C313-46FA-4B4B-9EFF-3228662908F4}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui.Test", "..\..\Common.Web.Ui\Src\Common.Web.Ui.Test\Common.Web.Ui.Test.csproj", "{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SourceCodeControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 5
 		SccLocalPath0 = .
 		CanCheckoutShared = false
 		SccProjectUniqueName1 = AdminInterface\\AdminInterface.csproj
@@ -29,6 +41,14 @@ Global
 		SccLocalPath2 = .
 		CanCheckoutShared = false
 		SccProjectFilePathRelativizedFromConnection2 = AdminInterface.Test\\
+		SccProjectUniqueName3 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui\\Common.Web.Ui.csproj
+		SccProjectName3 = \u0022$/Inforoom/Kvasov/Common.Web.Ui/Src/Common.Web.Ui\u0022,\u0020ONMAAAAA
+		SccLocalPath3 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui
+		CanCheckoutShared = false
+		SccProjectUniqueName4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test\\Common.Web.Ui.Test.csproj
+		SccProjectName4 = \u0022$/Inforoom/Kvasov/Common.Web.Ui/Src/Common.Web.Ui.Test\u0022,\u0020RNMAAAAA
+		SccLocalPath4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test
+		CanCheckoutShared = false
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +63,14 @@ Global
 		{7ED64626-EF5D-40C5-9237-AA93EF397C99}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7ED64626-EF5D-40C5-9237-AA93EF397C99}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7ED64626-EF5D-40C5-9237-AA93EF397C99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
