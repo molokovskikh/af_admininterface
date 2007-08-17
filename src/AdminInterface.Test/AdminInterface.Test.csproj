@@ -105,6 +105,12 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common.Web.Ui\Src\Common.Web.Ui\Common.Web.Ui.csproj">
+      <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
+      <Name>Common.Web.Ui</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
