@@ -59,7 +59,6 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				CloneHL.Visible = false;
 				ChPassHL.Visible = false;
 				ClInfHL.Visible = false;
-				ClManageHL.Visible = false;
 				ShowStatHL.Visible = false;
 				BillingHL.Visible = false;
 				PassLB.Text = String.Format(
@@ -174,8 +173,6 @@ WHERE	UserName = ?userName
 				Session["ChPass"] = Reader[0];
 				ClInfHL.Visible = Convert.ToBoolean(Reader[4]);
 				Session["ClInf"] = Reader[4];
-				ClManageHL.Visible = Convert.ToBoolean(Reader[1]);
-				Session["ClManage"] = Reader[1];
 				ViewAdministrators.Visible = Session["Administrator"] != null ? ((Administrator)Session["Administrator"]).AllowManageAdminAccounts : false;
 				Reader.Close();
 

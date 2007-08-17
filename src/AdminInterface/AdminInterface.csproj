@@ -71,7 +71,7 @@
     </Reference>
     <Reference Include="Common.Web.Ui, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Common.Web.Ui.dll</HintPath>
+      <HintPath>..\..\..\Common.Web.Ui\Src\Common.Web.Ui\bin\$(Configuration)\Common.Web.Ui.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
@@ -149,10 +149,8 @@
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
-    <Compile Include="Model\ArHelper.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
     <Compile Include="Model\BillingSearchProperties.cs" />
-    <Compile Include="Model\Client.cs" />
     <Compile Include="Model\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\ClientInfoController.cs" />
@@ -254,11 +252,9 @@
     <Compile Include="manageret.aspx.designer.cs">
       <DependentUpon>manageret.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Model\BillingInstance.cs" />
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\ClientMessage.cs" />
     <Compile Include="Model\DocumentRecieveLogEntity.cs" />
-    <Compile Include="Model\Region.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -393,6 +389,13 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Views\Billing\search.brail" />
+    <None Include="Views\Layouts\logs.brail" />
+    <None Include="Views\Logs\DocumentLog.brail" />
+    <Content Include="Css\calendar-blue.css" />
+    <Content Include="Images\menuarrow.gif" />
+    <Content Include="JavaScript\calendar-ru_win_.js" />
+    <Content Include="JavaScript\calendar-setup.js" />
+    <Content Include="JavaScript\calendar.js" />
     <Content Include="Web.Release.Config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

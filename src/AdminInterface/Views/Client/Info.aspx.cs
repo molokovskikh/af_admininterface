@@ -140,6 +140,7 @@ INTO    logs.clientsinfo VALUES
 				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + _clientCode;
 				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + _clientCode;
 				UpdateListHL.NavigateUrl = "~/updates.aspx?cc=" + _clientCode;
+				DocumentLog.NavigateUrl = "~/Logs/DocumentLog.rails?clientCode=" + _clientCode;
 				ChPass.NavigateUrl = "~/chpassgo.aspx?cc=" + _clientCode + "&ouar=" + Request["ouar"];
 				ChPass.Enabled = Convert.ToBoolean(Session["ChPass"]);
 				UserInterfaceHL.NavigateUrl = "https://stat.analit.net/ci/auth/logon.aspx?sid=" + _clientCode;

@@ -1,21 +1,26 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using AdminInterface.Model;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Controllers
 {
-	public class LogsController : Controller
+	[Layout("logs"), Helper(typeof(BindingHelper))]
+	public class LogsController : SmartDispatcherController
 	{
-		public void DocumentsLog(uint clientCode)
+		public void DocumentLog(uint clientCode)
 		{
-			
+			DocumentLog(clientCode, DateTime.Now.AddDays(-1), DateTime.Now);
+		}
+
+		public void DocumentLog(uint clientCode, DateTime beginDate, DateTime endDate)
+		{
+			PropertyBag["logEntities"] = DocumentRecieveLogEntity.GetEnitiesForClient(clientCode, 
+																					  beginDate, 
+																					  endDate);
+			PropertyBag["beginDate"] = beginDate;
+			PropertyBag["endDate"] = endDate;
+			PropertyBag["clientCode"] = clientCode;
 		}
 	}
 }

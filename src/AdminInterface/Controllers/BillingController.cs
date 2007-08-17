@@ -16,6 +16,7 @@ using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate;
 using Common.Web.Ui.Helpers;
 

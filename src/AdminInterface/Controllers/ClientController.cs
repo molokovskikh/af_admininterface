@@ -7,8 +7,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
-using AdminInterface.Model;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
