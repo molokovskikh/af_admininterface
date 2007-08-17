@@ -144,7 +144,6 @@
     <Compile Include="clchpass.aspx.designer.cs">
       <DependentUpon>clchpass.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Components\ValidationErrorViewer.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
