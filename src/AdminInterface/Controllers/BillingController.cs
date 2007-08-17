@@ -81,7 +81,6 @@ namespace AdminInterface.Controllers
 		public void Search([DataBind("SearchBy")] BillingSearchProperties searchProperties)
 		{
 			IList<BillingSearchItem> searchResults = BillingSearchItem.FindBy(searchProperties);
-			Context.Cache.Store("searchResults", searchResults);
 
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["sortColumnName"] = "ShortName";
@@ -102,10 +101,8 @@ namespace AdminInterface.Controllers
 			searchProperties.RegionId = regionId;
 			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 			List<BillingSearchItem> searchResults;
-			if (Context.Cache.HasKey("searchResults"))
-				searchResults = (List<BillingSearchItem>)Context.Cache.Get("searchResults");
-			else
-				searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
+
+			searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
 
 			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
 
@@ -113,7 +110,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["searchResults"] = searchResults;
 			PropertyBag["sortColumnName"] = columnName;
-			PropertyBag["sortDirection"] = sortDirection.ToString();
+			PropertyBag["sortDirection"] = sortDirection;
 			RenderView("search");
 		}
 
@@ -124,9 +121,7 @@ namespace AdminInterface.Controllers
 
 		private IList<Region> GetRegions()
 		{
-			if (!Context.Cache.HasKey("clientRegions"))
-				Context.Cache.Store("clientRegions", Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name));
-			return (IList<Region>)Context.Cache.Get("clientRegions");
+			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
 		}
 
 		public string GetChangeStatusButtonText(Client client)
