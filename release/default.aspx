@@ -25,13 +25,10 @@
 						<asp:HyperLink ID="ClInfHL" runat="server" NavigateUrl="searchc.aspx">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Информация о клиентах</font></asp:HyperLink></p>
 					<p>
-						<asp:HyperLink ID="ClManageHL" runat="server" NavigateUrl="manage.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Управление клиентами</font></asp:HyperLink></p>
-					<p>
 						<asp:HyperLink ID="ShowStatHL" runat="server" NavigateUrl="statcont.aspx">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Статистика обращений</font></asp:HyperLink></p>
 					<p>
-						<asp:HyperLink ID="BillingHL" runat="server" NavigateUrl="debetors.aspx">
+						<asp:HyperLink ID="BillingHL" runat="server" NavigateUrl="~/Billing/Search.rails">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Билинг</font></asp:HyperLink></p>
 					<p>
 						<asp:HyperLink ID="FTPHL" runat="server" NavigateUrl="docs.aspx">

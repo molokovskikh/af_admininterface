@@ -2,7 +2,6 @@
 	CodeBehind="Info.aspx.cs" Theme="Main" %>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
-<%@ Import namespace="AdminInterface.Components"%>
 <%@ Import namespace="System.IO"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -38,17 +37,22 @@
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="ChPassHL" runat="server">Статистика изменения пароля</asp:HyperLink>
+							<asp:HyperLink ID="ChPassHL" Target="_blank" runat="server">Статистика изменения пароля</asp:HyperLink>
 						</td>
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="UpdateListHL" runat="server">Статистика обновлений</asp:HyperLink>
+							<asp:HyperLink ID="UpdateListHL" Target="_blank" runat="server">Статистика обновлений</asp:HyperLink>
 						</td>
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="OrderHistoryHL" runat="server">История заказов</asp:HyperLink>
+							<asp:HyperLink ID="DocumentLog" Target="_blank" runat="server">Статистика документов</asp:HyperLink>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" height="20">
+							<asp:HyperLink ID="OrderHistoryHL" Target="_blank" runat="server">История заказов</asp:HyperLink>
 						</td>
 					</tr>
 					<tr>
