@@ -22,24 +22,14 @@
             <tr>
                 <td align="center">
                     <asp:DataGrid ID="CLList" runat="server" Font-Names="Verdana" Font-Size="8pt" CellPadding="0"
-                        AutoGenerateColumns="False" BorderColor="#DADADA" PageSize="20" DataSource="<%# DataTable1 %>">
+                        AutoGenerateColumns="False" BorderColor="#DADADA" PageSize="20" >
                         <FooterStyle Font-Names="Verdana"></FooterStyle>
                         <AlternatingItemStyle BackColor="#F6F6F6"></AlternatingItemStyle>
                         <ItemStyle HorizontalAlign="Center" BackColor="#EEF8FF"></ItemStyle>
                         <HeaderStyle Font-Size="8pt" Font-Names="Verdana" Font-Bold="True" HorizontalAlign="Center"
                             VerticalAlign="Middle" BackColor="#EBEBEB"></HeaderStyle>
                         <Columns>
-                            <asp:TemplateColumn HeaderText="Время">
-                                <ItemTemplate>
-                                    &nbsp;
-                                    <asp:Label runat="server" Text='<%# Convert.ToDateTime(DataBinder.Eval(Container, "DataItem.LogTime")).ToString() %>'>
-                                    </asp:Label>&nbsp;
-                                </ItemTemplate>
-                                <EditItemTemplate>
-                                    <asp:TextBox runat="server" Text='<%# DataBinder.Eval(Container, "DataItem.LogTime") %>'>
-                                    </asp:TextBox>
-                                </EditItemTemplate>
-                            </asp:TemplateColumn>
+							<asp:BoundColumn HeaderText="Время" DataField="RequestTime" />
                             <asp:HyperLinkColumn DataNavigateUrlField="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}"
                                 DataTextField="ShortName" HeaderText="Клиент"></asp:HyperLinkColumn>
                             <asp:BoundColumn DataField="Region" SortExpression="Region" HeaderText="Регион"></asp:BoundColumn>
