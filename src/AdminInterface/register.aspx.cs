@@ -5,14 +5,13 @@ using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security.AccessControl;
-using System.Security.Principal;
 using System.Text;
 using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ActiveDs;
-using AdminInterface.Model;
+using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
