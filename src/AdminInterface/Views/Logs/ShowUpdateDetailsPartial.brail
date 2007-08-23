@@ -1,0 +1,36 @@
+﻿<% 
+def EvenOrOdd(i as int, ifEven as string, ifOdd as string) as string:
+	if i % 2 == 0:
+		return ifEven
+	else:
+		return ifOdd
+	end
+end
+%>
+<table class="DataTable" style="width:100%">
+	<tr class="${EvenOrOdd(1, "EvenRow", "OddRow")}">
+		<th>Дата</th>
+		<th>Начиная с байта</th>
+		<th>Отправленно байт</th>
+	</tr>
+	<% 
+		i = 0
+		for logEntity in logEntities:
+			
+	%>
+		<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+			<td>
+				${logEntity.LogTime}
+			</td>
+			<td>
+				${logEntity.GetBeginByteNubmer()}
+			</td>
+			<td>
+				${logEntity.BytesSent}
+			</td>
+		</tr>
+	<%
+			i++
+		end
+	%>
+</table>

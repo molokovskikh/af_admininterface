@@ -224,8 +224,8 @@ SELECT  cd. billingcode,
         region, 
         UpdateTime FirstUpdate, 
         UncommittedUpdateTime SecondUpdate, 
-        EXEVersion as EXE, 
-        MDBVersion MDB, 
+        AppVersion as EXE, 
+        DBVersion MDB, 
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
         cd.FirmSegment, 
         cd.FirmType, 
@@ -250,11 +250,11 @@ LEFT JOIN osuseraccessright as ouar2
 		ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
-LEFT JOIN logs.prgdataex 
-        ON prgdataex.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and prgdataex.rowid    = 
-        (SELECT max(rowid) 
-        FROM    logs.prgdataex 
+LEFT JOIN logs.AnalitFUpdates
+        ON AnalitFUpdates.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+        and AnalitFUpdates.UpdateId    = 
+        (SELECT max(UpdateId) 
+        FROM    logs.AnalitFUpdates
         WHERE   clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
                 and updatetype in(1,2)
         ) 

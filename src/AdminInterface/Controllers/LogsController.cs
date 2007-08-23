@@ -22,5 +22,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 			PropertyBag["clientCode"] = clientCode;
 		}
+
+		public void ShowUpdateDetails(string userName, DateTime beginDate, DateTime endDate)
+		{
+			PropertyBag["logEntities"] = InternetLogEntity.GetUpdateSession(userName, beginDate, endDate);
+		}
 	}
 }
