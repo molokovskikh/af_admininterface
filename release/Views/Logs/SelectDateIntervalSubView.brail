@@ -1,0 +1,64 @@
+﻿<div style="text-align:center;">
+	<form action="" method="get">
+		${FormHelper.HiddenField("clientCode", client.Id)}
+		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
+		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+		<table>
+			<tr>
+				<td colspan="2" style="font-weight:bold;">
+					Выберите период:
+				</td>
+			</tr>
+			<tr style="font-weight:bold;">
+				<td>
+					С:
+				</td>
+				<td>
+					По:
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="width:100%; border: none;" id="beginDateCalendarHolder"></div>
+				</td>
+				<td>
+					<div style="width:100%; border: none;" id="endDateCalendarHolder"></div>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:right;" colspan="2">
+					${FormHelper.Submit("Показать")}
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<script type="text/javascript">
+  function beginDateCallBack(cal) 
+  {
+    if (cal.dateClicked) 
+		document.getElementById("beginDate").value = cal.date.print("%d.%m.%Y");
+  };
+
+  function endDateCallBack(cal) 
+  {
+    if (cal.dateClicked) 
+		document.getElementById("endDate").value = cal.date.print("%d.%m.%Y");
+  };
+
+  
+  Calendar.setup({
+	date: "${beginDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "beginDateCalendarHolder",
+    flatCallback: beginDateCallBack
+  });
+  
+  Calendar.setup({
+	date: "${endDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "endDateCalendarHolder",
+    flatCallback: endDateCallBack
+  });
+</script>
