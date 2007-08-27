@@ -148,6 +148,8 @@
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
+    <Compile Include="Helpers\ViewHelper.cs" />
+    <Compile Include="Model\UpdateLogEntity.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
     <Compile Include="Model\BillingSearchProperties.cs" />
     <Compile Include="Model\ClientLogRecord.cs" />
@@ -253,7 +255,7 @@
     </Compile>
     <Compile Include="Model\ClientInfo.cs" />
     <Compile Include="Model\ClientMessage.cs" />
-    <Compile Include="Model\DocumentRecieveLogEntity.cs" />
+    <Compile Include="Model\DocumentLogEntity.cs" />
     <Compile Include="Model\InternetLogEntity.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
@@ -290,13 +292,6 @@
     </Compile>
     <Compile Include="statcont.aspx.designer.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="updates.aspx.cs">
-      <DependentUpon>updates.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="updates.aspx.designer.cs">
-      <DependentUpon>updates.aspx</DependentUpon>
     </Compile>
     <Compile Include="Utils.cs" />
     <Compile Include="ViewAdministrators.aspx.cs">
@@ -348,7 +343,6 @@
     <Content Include="report.aspx" />
     <Content Include="searchc.aspx" />
     <Content Include="statcont.aspx" />
-    <Content Include="updates.aspx" />
     <Content Include="ViewAdministrators.aspx" />
     <Content Include="viewcl.aspx" />
   </ItemGroup>
@@ -375,12 +369,24 @@
     <None Include="Views\Billing\search.brail" />
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
-    <None Include="Views\Logs\ShowUpdateDetails.brail" />
+    <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
+    <None Include="Views\ShowUpdateDetails.brail" />
+    <None Include="Views\Logs\ShowUpdateDetails.brailjs" />
+    <None Include="Views\Logs\UpdateLog.brail" />
+    <None Include="Views\Logs\_ShowUpdateDetails.brail" />
     <Content Include="Css\calendar-blue.css" />
+    <Content Include="Css\Common.css" />
     <Content Include="Images\menuarrow.gif" />
+    <Content Include="JavaScript\builder.js" />
     <Content Include="JavaScript\calendar-ru_win_.js" />
     <Content Include="JavaScript\calendar-setup.js" />
     <Content Include="JavaScript\calendar.js" />
+    <Content Include="JavaScript\controls.js" />
+    <Content Include="JavaScript\dragdrop.js" />
+    <Content Include="JavaScript\effects.js" />
+    <Content Include="JavaScript\scriptaculous.js" />
+    <Content Include="JavaScript\slider.js" />
+    <Content Include="JavaScript\unittest.js" />
     <Content Include="Web.Release.Config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

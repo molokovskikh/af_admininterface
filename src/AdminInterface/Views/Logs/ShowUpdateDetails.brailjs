@@ -1,0 +1,2 @@
+﻿page.Replace('UpdateDetails' + updateLogEntityId, {@partial : 'logs/_ShowUpdateDetails.brail' });
+page.VisualEffect('SlideDown', 'UpdateDetails' + updateLogEntityId);

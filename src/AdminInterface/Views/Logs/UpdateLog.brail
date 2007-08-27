@@ -1,0 +1,125 @@
+﻿<script type="text/javascript">
+	function ShowUpdateDetails(id)
+	{
+		$("UpdateLink" + id).onclick = function() { return false; }
+		
+		new Insertion.After($("logRow" + id), "<tr id='UpdateDetailsRow" + id +"'><td></td><td colspan='4'><div id='UpdateDetails" + id + "'>Download!!</div></td></tr>");
+		new Effect.SlideDown("UpdateDetailsRow" + id, {});
+		
+		new Ajax.Request('ShowUpdateDetails.rails?updateLogEntityId=' + id,
+			{
+				method: 'get',
+				onSuccess: function()
+							{
+									$("UpdateLink" + id).onclick = function()
+									{
+										HideUpdateDetails(id);
+										return false;
+									}
+							}
+			});
+			
+		return false;
+	}
+	
+	function HideUpdateDetails(id)
+	{
+		$("UpdateLink" + id).onclick = function() { return false; }
+		new Effect.SlideUp('UpdateDetails' + id, 
+						   { afterFinish: function()
+											{ 
+												$("UpdateDetailsRow" + id).remove();
+												$("UpdateLink" + id).onclick = function()
+																					{
+																						ShowUpdateDetails(id);
+																						return false;
+																					}
+											}
+							});
+	}
+</script>
+
+<div class="PageHeader">
+	Статистика обновления клиента ${client.ShortName}
+</div>
+
+<% 
+	OutputSubView("SelectDateIntervalSubView")
+%>
+
+<div>
+
+	<table class="DataTable">
+	
+	<% 
+		if logEntities.Count != 0:
+	%>
+	
+		<tr>
+			<th>
+				Дата
+			</th>
+			<th>
+				Тип обновления
+			</th>
+			<th>
+				Версия EXE
+			</th>
+			<th>
+				Версия базы
+			</th>
+			<th>
+				Размер приготовленных данных
+			</th>
+			<th>
+				Дополнительно
+			</th>
+		</tr>
+	
+	<%
+			i = 0
+			for logEntity in logEntities:
+				requestTimeStyle = "background-color:#ffa642" if not logEntity.Commit
+	%>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
+			<td style="${requestTimeStyle}">
+				${logEntity.RequestTime}
+			</td>
+			<td>
+			<% if logEntity.IsDataTransferUpdateType():	%>
+				<a id="UpdateLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowUpdateDetails(${logEntity.Id});">
+					${BindingHelper.GetDescription(logEntity.UpdateType)}
+				</a>
+			<% else: %>
+				${BindingHelper.GetDescription(logEntity.UpdateType)}
+			<% end %>
+			</td>
+			<td>
+				${logEntity.AppVersion}
+			</td>
+			<td>	
+				${logEntity.DbVersion}
+			</td>
+			<td>
+				${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
+			</td>
+			<td style="text-align:center;">
+				${logEntity.Addition}
+			</td>	
+		</tr>
+	<% 
+				i++
+			end
+		else:
+	%>
+		<tr class="EmptyData">
+			<td style="width:1%;">
+				За указанный период клиент не обновлялся
+			</td>
+		</tr>
+	<% 
+		end
+	%>
+	
+	</table>
+</div>
