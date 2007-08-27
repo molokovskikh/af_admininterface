@@ -36,6 +36,7 @@
 			<fileset basedir="AdminInterface">
 				<includes name="**.as?x" />
 				<includes name="**.brail" />
+				<includes name="**.brailjs" />
 				<includes name="**.js" />
 				<includes name="**.css" />
 				<includes name="**.skin" />
