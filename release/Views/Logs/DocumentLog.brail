@@ -74,10 +74,10 @@
 				${logEntity.FileName}
 			</td>
 			<td>
-				${VisualizationHelper.ConverToUserFriendlySize(logEntity.DocumentSize) if logEntity.SendLogEntity != null}
+				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize)}
 			</td>
 			<td>
-				${logEntity.SendLogEntity.AnalitFUpdateLogEntity.RequestTime if logEntity.SendLogEntity != null}
+				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
 			</td>
 		</tr>
 	<%		
