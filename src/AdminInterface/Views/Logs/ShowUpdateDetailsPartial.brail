@@ -1,7 +1,8 @@
 ﻿<div id="UpdateDetails${updateLogEntityId}">
+
 	<table class="DataTable" style="width:100%;">
 		<tr>
-			<th>Дата</th>
+			<th>Дата1</th>
 			<th>Начиная с байта</th>
 			<th>Отправленно байт</th>
 		</tr>
@@ -20,10 +21,20 @@
 				<td>
 					${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.BytesSent)}
 				</td>
+				
 			</tr>
 		<%
 				i++
 			end
 		%>
+		
+		<% if allDownloaded: %>
+		<tr>
+			<td colspan="3" style="text-align:right;">
+				Все данные загружены.	
+			</td>
+		</tr>
+		<% end %>
 	</table>
+	
 </div>

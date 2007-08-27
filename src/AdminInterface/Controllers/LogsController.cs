@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
 using Castle.MonoRail.Framework;
@@ -31,7 +32,14 @@ namespace AdminInterface.Controllers
 		{
 			UpdateLogEntity logEntity = UpdateLogEntity.Find(updateLogEntityId);
 			PropertyBag["updateLogEntityId"] = logEntity.Id;
-			PropertyBag["detailLogEntities"] = InternetLogEntity.GetUpdateSession(logEntity.UserName, logEntity.RequestTime, logEntity.Id);
+			IList<InternetLogEntity> detailsLogEntities= InternetLogEntity.GetUpdateSession(logEntity.UserName, logEntity.RequestTime, logEntity.Id);
+			PropertyBag["detailLogEntities"] = detailsLogEntities;
+
+			uint totalByteDownloaded = 0;
+			foreach (InternetLogEntity entity in detailsLogEntities)
+				totalByteDownloaded += entity.BytesSent;
+
+			PropertyBag["allDownloaded"] = 200 < totalByteDownloaded - logEntity.ResultSize && totalByteDownloaded - logEntity.ResultSize < 300;
 		}
 
 		public void UpdateLog(uint clientCode)
