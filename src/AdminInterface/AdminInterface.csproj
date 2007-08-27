@@ -370,10 +370,9 @@
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
-    <None Include="Views\ShowUpdateDetails.brail" />
     <None Include="Views\Logs\ShowUpdateDetails.brailjs" />
     <None Include="Views\Logs\UpdateLog.brail" />
-    <None Include="Views\Logs\_ShowUpdateDetails.brail" />
+    <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
     <Content Include="Images\menuarrow.gif" />
