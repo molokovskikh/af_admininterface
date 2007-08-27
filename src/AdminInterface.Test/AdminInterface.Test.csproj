@@ -93,6 +93,8 @@
     <Compile Include="Common\BaseModelIntegrationTest.cs" />
     <Compile Include="Common\BaseViewTest.cs" />
     <Compile Include="ControllerTest\BillingControllerTest.cs" />
+    <Compile Include="Helpers\ViewHelperFixture.cs" />
+    <Compile Include="InternetLogEntityFixture.cs" />
     <Compile Include="ModelIntegrationTests\BillingSearchItemTest.cs" />
     <Compile Include="ModelIntegrationTests\ClientTest.cs" />
     <Compile Include="ModelIntegrationTests\DbLogHelperTest.cs" />
