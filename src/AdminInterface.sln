@@ -6,6 +6,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface", "AdminInte
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
 	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {95E2C313-46FA-4B4B-9EFF-3228662908F4}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface.Test", "AdminInterface.Test\AdminInterface.Test.csproj", "{7ED64626-EF5D-40C5-9237-AA93EF397C99}"
 	ProjectSection(WebsiteProperties) = preProject
@@ -26,6 +29,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui.Test", "..\..
 	ProjectSection(WebsiteProperties) = preProject
 		Debug.AspNetCompiler.Debug = "True"
 		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {95E2C313-46FA-4B4B-9EFF-3228662908F4}
 	EndProjectSection
 EndProject
 Global
