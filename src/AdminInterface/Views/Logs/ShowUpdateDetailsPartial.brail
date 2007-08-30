@@ -1,4 +1,7 @@
-﻿<div id="UpdateDetails${updateLogEntityId}">
+﻿<tr id='UpdateDetailsRow${updateLogEntityId}'>
+	<td />
+	<td colspan='4'>
+		<div id='UpdateDetails${updateLogEntityId}'>
 
 	<table class="DataTable" style="width:100%;">
 		<tr>
@@ -37,4 +40,6 @@
 		<% end %>
 	</table>
 	
-</div>
+		</div>
+	</td>
+</tr>

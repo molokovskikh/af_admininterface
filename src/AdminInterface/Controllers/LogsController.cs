@@ -42,6 +42,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["allDownloaded"] = 200 < totalByteDownloaded - logEntity.ResultSize && totalByteDownloaded - logEntity.ResultSize < 300;
 		}
 
+		public void ShowDownloadLog(uint updateLogEntityId)
+		{
+			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
+			PropertyBag["log"] = UpdateDownloadLogEntity.Find(updateLogEntityId).Log;
+		}
+
 		public void UpdateLog(uint clientCode)
 		{
 			UpdateLog(clientCode, DateTime.Now.AddDays(-1), DateTime.Now);

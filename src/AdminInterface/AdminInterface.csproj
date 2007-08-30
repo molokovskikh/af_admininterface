@@ -149,6 +149,7 @@
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ViewHelper.cs" />
+    <Compile Include="Model\UpdateDownloadLogEntity.cs" />
     <Compile Include="Model\UpdateLogEntity.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
     <Compile Include="Model\BillingSearchProperties.cs" />
@@ -370,6 +371,8 @@
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
+    <None Include="Views\Logs\ShowDownloadLog.brailjs" />
+    <None Include="Views\Logs\ShowDownloadLogPartial.brail" />
     <None Include="Views\Logs\ShowUpdateDetails.brailjs" />
     <None Include="Views\Logs\UpdateLog.brail" />
     <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
