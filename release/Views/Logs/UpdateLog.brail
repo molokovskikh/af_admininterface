@@ -1,41 +1,46 @@
 ﻿<script type="text/javascript">
-	function ShowUpdateDetails(id)
+	function ShowDownloadResult(id, url, description)
 	{
-		$("UpdateLink" + id).onclick = function() { return false; }
-		
-		new Insertion.After($("logRow" + id), "<tr id='UpdateDetailsRow" + id +"'><td></td><td colspan='4'><div id='UpdateDetails" + id + "'>Download!!</div></td></tr>");
-		new Effect.SlideDown("UpdateDetailsRow" + id, {});
-		
-		new Ajax.Request('ShowUpdateDetails.rails?updateLogEntityId=' + id,
-			{
-				method: 'get',
-				onSuccess: function()
-							{
-									$("UpdateLink" + id).onclick = function()
-									{
-										HideUpdateDetails(id);
-										return false;
-									}
-							}
-			});
-			
-		return false;
+		//DisableAction(id);
+		Hide(id, 
+			 function ()
+				{
+					Download(url)
+				});
+	}
+
+	function Hide(id, action, description)
+	{
+		if ($("UpdateDetails" + id) != null)
+			HideCurrent(id, "UpdateDetails", description, action);
+		else if ($("DownloadLog" + id) != null)
+			HideCurrent(id, "DownloadLog", description, action);
+		else
+			action();
 	}
 	
-	function HideUpdateDetails(id)
+	function DisableAction(id)
 	{
-		$("UpdateLink" + id).onclick = function() { return false; }
-		new Effect.SlideUp('UpdateDetails' + id, 
+		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
+		$("ShowLogLink" + id).onclick = function () { return false; }
+	}
+	
+	function HideCurrent(id, description, callerDescription, action)
+	{
+		new Effect.SlideUp(description + id, 
 						   { afterFinish: function()
 											{ 
-												$("UpdateDetailsRow" + id).remove();
-												$("UpdateLink" + id).onclick = function()
-																					{
-																						ShowUpdateDetails(id);
-																						return false;
-																					}
-											}
-							});
+												$(description + "Row" + id)
+													.remove();
+												if (callerDescription == description)
+													action();
+											},
+							 duration: 0.5 });
+	}
+	
+	function Download(url)
+	{
+		new Ajax.Request(url, { method: 'get' });
 	}
 </script>
 
@@ -48,7 +53,6 @@
 %>
 
 <div>
-
 	<table class="DataTable">
 	
 	<% 
@@ -74,12 +78,19 @@
 			<th>
 				Дополнительно
 			</th>
+			<th>	
+				Лог
+			</th>
 		</tr>
 	
 	<%
 			i = 0
 			for logEntity in logEntities:
-				requestTimeStyle = "background-color:#ffa642" if not logEntity.Commit
+				if logEntity.Commit:
+					requestTimeStyle = ""
+				else:
+					requestTimeStyle = "background-color:#ffa642"
+				end
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
 			<td style="${requestTimeStyle}">
@@ -87,7 +98,7 @@
 			</td>
 			<td>
 			<% if logEntity.IsDataTransferUpdateType():	%>
-				<a id="UpdateLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowUpdateDetails(${logEntity.Id});">
+				<a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
 					${BindingHelper.GetDescription(logEntity.UpdateType)}
 				</a>
 			<% else: %>
@@ -105,6 +116,15 @@
 			</td>
 			<td style="text-align:center;">
 				${logEntity.Addition}
+			</td>
+			<td>
+				<% if not string.IsNullOrEmpty(logEntity.Log): %>
+				<a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
+					Лог
+				</a>
+				<% else: %>
+				-
+				<% end %>
 			</td>	
 		</tr>
 	<% 
