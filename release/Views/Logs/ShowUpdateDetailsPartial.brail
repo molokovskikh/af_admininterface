@@ -1,0 +1,45 @@
+﻿<tr id='UpdateDetailsRow${updateLogEntityId}'>
+	<td />
+	<td colspan='4'>
+		<div id='UpdateDetails${updateLogEntityId}'>
+
+	<table class="DataTable" style="width:100%;">
+		<tr>
+			<th>Дата1</th>
+			<th>Начиная с байта</th>
+			<th>Отправленно байт</th>
+		</tr>
+		<% 
+			i = 0
+			for detailLogEntity in detailLogEntities:
+			
+		%>
+			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td>
+					${detailLogEntity.LogTime}
+				</td>
+				<td>
+					${detailLogEntity.GetBeginByteNubmer()}
+				</td>
+				<td>
+					${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.BytesSent)}
+				</td>
+				
+			</tr>
+		<%
+				i++
+			end
+		%>
+		
+		<% if allDownloaded: %>
+		<tr>
+			<td colspan="3" style="text-align:right;">
+				Все данные загружены.	
+			</td>
+		</tr>
+		<% end %>
+	</table>
+	
+		</div>
+	</td>
+</tr>
