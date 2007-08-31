@@ -43,6 +43,9 @@
 			<th>
 				Дата отправки
 			</th>
+			<th>
+				Комментарий
+			</th>
 		</tr>
 	<%
 		i = 0
@@ -50,6 +53,7 @@
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
 			<td>
+				${logEntity.Id}
 				${logEntity.LogTime}
 			</td>
 			<td>
@@ -59,13 +63,13 @@
 			if client.IsDrugStore():
 		%>
 				<td>
-					${logEntity.FromSupplier.ShortName}	
+					${logEntity.FromSupplier.ShortName if logEntity.FromSupplier != null}	
 				</td>
 		<%
 			else:
 		%>
 				<td>
-					${logEntity.ForClient.ShortName}
+					${logEntity.ForClient.ShortName if logEntity.ForClient != null}
 				</td>
 		<% 
 			end
@@ -78,6 +82,9 @@
 			</td>
 			<td>
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
+			</td>
+			<td>
+				<pre>${logEntity.Addition}</pre>
 			</td>
 		</tr>
 	<%		
