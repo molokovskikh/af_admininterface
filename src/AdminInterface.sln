@@ -48,11 +48,11 @@ Global
 		CanCheckoutShared = false
 		SccProjectFilePathRelativizedFromConnection2 = AdminInterface.Test\\
 		SccProjectUniqueName3 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui\\Common.Web.Ui.csproj
-		SccProjectName3 = \u0022$/Inforoom/Kvasov/Common.Web.Ui/Src/Common.Web.Ui\u0022,\u0020ONMAAAAA
+		SccProjectName3 = \u0022$/Inforoom/NET2.0/Common.Web.Ui/Src/Common.Web.Ui\u0022,\u0020ONMAAAAA
 		SccLocalPath3 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui
 		CanCheckoutShared = false
 		SccProjectUniqueName4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test\\Common.Web.Ui.Test.csproj
-		SccProjectName4 = \u0022$/Inforoom/Kvasov/Common.Web.Ui/Src/Common.Web.Ui.Test\u0022,\u0020RNMAAAAA
+		SccProjectName4 = \u0022$/Inforoom//Common.Web.Ui/Src/Common.Web.Ui.Test\u0022,\u0020RNMAAAAA
 		SccLocalPath4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test
 		CanCheckoutShared = false
 	EndGlobalSection
