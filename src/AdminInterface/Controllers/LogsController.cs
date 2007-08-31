@@ -13,7 +13,7 @@ namespace AdminInterface.Controllers
 	{
 		public void DocumentLog(uint clientCode)
 		{
-			DocumentLog(clientCode, DateTime.Now.AddDays(-1), DateTime.Now);
+			DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public void DocumentLog(uint clientCode, DateTime beginDate, DateTime endDate)
@@ -21,8 +21,8 @@ namespace AdminInterface.Controllers
 			Client client = Client.Find(clientCode);
 
 			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
-			                                                                          beginDate,
-			                                                                          endDate);
+			                                                                   beginDate,
+			                                                                   endDate);
 			PropertyBag["client"] = client;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
@@ -50,7 +50,7 @@ namespace AdminInterface.Controllers
 
 		public void UpdateLog(uint clientCode)
 		{
-			UpdateLog(clientCode, DateTime.Now.AddDays(-1), DateTime.Now);
+			UpdateLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public void UpdateLog(uint clientCode, DateTime beginDate, DateTime endDate)
