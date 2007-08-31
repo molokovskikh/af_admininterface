@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
-using System.Text;
-using NUnit.Framework;
-using AdminInterface.Helpers;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 
 namespace AdminInterface.Test
