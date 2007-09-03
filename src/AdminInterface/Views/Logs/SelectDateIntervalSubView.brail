@@ -52,13 +52,15 @@
 	date: "${beginDate.ToString("MM\"/\"dd\"/\"yyyy")}",
 	weekNumbers: false,
     flat: "beginDateCalendarHolder",
-    flatCallback: beginDateCallBack
+    flatCallback: beginDateCallBack,
+    showOthers: true
   });
   
   Calendar.setup({
 	date: "${endDate.ToString("MM\"/\"dd\"/\"yyyy")}",
 	weekNumbers: false,
     flat: "endDateCalendarHolder",
-    flatCallback: endDateCallBack
+    flatCallback: endDateCallBack,
+    showOthers: true
   });
 </script>

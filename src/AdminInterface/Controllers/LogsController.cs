@@ -22,7 +22,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
 			                                                                   beginDate,
-			                                                                   endDate);
+			                                                                   endDate.AddDays(1));
 			PropertyBag["client"] = client;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
@@ -57,7 +57,7 @@ namespace AdminInterface.Controllers
 		{
 			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(clientCode, 
 																			   beginDate, 
-																			   endDate);
+																			   endDate.AddDays(1));
 
 			PropertyBag["client"] = Client.Find(clientCode);
 			PropertyBag["beginDate"] = beginDate;
