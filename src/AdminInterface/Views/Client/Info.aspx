@@ -9,12 +9,14 @@
 <head runat="server">
 	<title>Информация о клиентах</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+	
 	<style>
-.InfoRow
-{
-	height: 20px;
-}
-</style>
+	.InfoRow
+	{
+		height: 20px;
+	}
+	</style>
+	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
 </head>
 <body>
 	<form id="Form1" method="post" runat="server">

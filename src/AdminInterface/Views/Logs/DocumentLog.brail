@@ -1,4 +1,14 @@
-﻿<div class="PageHeader">
+﻿<% 
+	[Html]
+	def WriteAddition(log) as string:
+		if log.Addition == null:
+			return ""
+		else:
+			return log.Addition
+		end
+	end
+%>
+<div class="PageHeader">
 	Статистика получения\отправки документов клиента ${client.ShortName}
 </div>
 
@@ -53,7 +63,6 @@
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
 			<td>
-				${logEntity.Id}
 				${logEntity.LogTime}
 			</td>
 			<td>
@@ -84,7 +93,7 @@
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
 			</td>
 			<td>
-				<pre>${logEntity.Addition}</pre>
+				<pre>${WriteAddition(logEntity)}</pre>
 			</td>
 		</tr>
 	<%		
