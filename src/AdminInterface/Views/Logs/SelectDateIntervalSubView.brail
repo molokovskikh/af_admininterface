@@ -35,17 +35,15 @@
 </div>
 
 <script type="text/javascript">
-  function beginDateCallBack(cal) 
-  {
-    if (cal.dateClicked) 
+	function beginDateCallBack(cal) 
+	{
 		document.getElementById("beginDate").value = cal.date.print("%d.%m.%Y");
-  };
+	};
 
-  function endDateCallBack(cal) 
-  {
-    if (cal.dateClicked) 
+	function endDateCallBack(cal) 
+	{
 		document.getElementById("endDate").value = cal.date.print("%d.%m.%Y");
-  };
+	};
 
   
   Calendar.setup({
