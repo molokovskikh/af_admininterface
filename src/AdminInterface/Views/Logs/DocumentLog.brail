@@ -24,6 +24,9 @@
 	%>
 		<tr>
 			<th>
+				Номер документа
+			</th>
+			<th>
 				Дата получения
 			</th>
 			<th>
@@ -62,6 +65,9 @@
 		for logEntity in logEntities:
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				${logEntity.Id}
+			</td>
 			<td>
 				${logEntity.LogTime}
 			</td>
