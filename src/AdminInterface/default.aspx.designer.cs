@@ -164,13 +164,13 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.HyperLink CUHL;
         
         /// <summary>
-        /// ReGetHL control.
+        /// ADHL control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink ReGetHL;
+        protected global::System.Web.UI.WebControls.HyperLink ADHL;
         
         /// <summary>
         /// ErrUpHL control.
@@ -182,13 +182,13 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.HyperLink ErrUpHL;
         
         /// <summary>
-        /// ADHL control.
+        /// DownloadDataSize control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink ADHL;
+        protected global::System.Web.UI.WebControls.Label DownloadDataSize;
         
         /// <summary>
         /// MaxUpdateTime control.
@@ -198,6 +198,15 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label MaxUpdateTime;
+        
+        /// <summary>
+        /// DownloadDocumentSize control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label DownloadDocumentSize;
         
         /// <summary>
         /// OPLB control.

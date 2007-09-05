@@ -3,6 +3,7 @@ using System.Data;
 using System.Runtime.InteropServices;
 using System.Web.UI;
 using ActiveDs;
+using AdminInterface.Helpers;
 using DAL;
 using MySql.Data.MySqlClient;
 
@@ -88,10 +89,10 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				MySqlDataAdapter adapter = new MySqlDataAdapter("GetShowStat", _connection);
 				adapter.SelectCommand.Transaction = transaction;
 				adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
-				adapter.SelectCommand.Parameters.Add("?StartDateParam", fromDate);
-				adapter.SelectCommand.Parameters.Add("?EndDateParam", toDate.AddDays(1));
-				adapter.SelectCommand.Parameters.Add("?RegionMaskParam", regionMask);
-				adapter.SelectCommand.Parameters.Add("?UserNameParam", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
+				adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
+				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserNameParam", Session["UserName"]);
 				DataSet data = new DataSet();
 				adapter.Fill(data);
 				//Заказы
@@ -117,12 +118,14 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				CUHL.Text = data.Tables[0].Rows[0]["CumulativeUpdates"].ToString();
 				//Обычных обновлений
 				ConfHL.Text = data.Tables[0].Rows[0]["Updates"].ToString();
-				//% докачки
-				ReGetHL.Text = data.Tables[0].Rows[0]["ReGet"].ToString();
 				//Время последнего обновления
 				MaxUpdateTime.Text = Convert.ToDateTime(data.Tables[0].Rows[0]["MaxUpdateTime"]).ToLongTimeString();
 				//Обновлений в процессе
 				ReqHL.Text = data.Tables[0].Rows[0]["InProc"].ToString();
+
+
+				DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DataSize"]));
+				DownloadDocumentSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DocSize"]));
 
 #if !DEBUG
 				//прайсы
@@ -198,12 +201,6 @@ WHERE	UserName = ?userName
 				{
 					if (Convert.ToInt32(ReqHL.Text) > 0)
 						ReqHL.Enabled = true;
-				}
-				catch (Exception){}
-				try
-				{
-					if (Convert.ToInt32(ReGetHL.Text) > 0)
-						ReGetHL.Enabled = true;
 				}
 				catch (Exception){}
 				try
