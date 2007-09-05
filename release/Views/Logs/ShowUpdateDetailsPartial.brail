@@ -5,7 +5,7 @@
 
 	<table class="DataTable" style="width:100%;">
 		<tr>
-			<th>Дата1</th>
+			<th>Дата</th>
 			<th>Начиная с байта</th>
 			<th>Отправленно байт</th>
 		</tr>

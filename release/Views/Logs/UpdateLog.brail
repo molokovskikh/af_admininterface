@@ -1,41 +1,56 @@
 ﻿<script type="text/javascript">
-	function ShowDownloadResult(id, url, description)
+	function ShowDownloadResult(id, url, callerDescription)
 	{
 		//DisableAction(id);
-		Hide(id, 
-			 function ()
+		var isCallerVisible = IsVisible(id, callerDescription)
+		HideAll(id,
+				function ()
 				{
-					Download(url)
+					if (!isCallerVisible)
+						Download(url)
 				});
 	}
 
-	function Hide(id, action, description)
-	{
-		if ($("UpdateDetails" + id) != null)
-			HideCurrent(id, "UpdateDetails", description, action);
-		else if ($("DownloadLog" + id) != null)
-			HideCurrent(id, "DownloadLog", description, action);
-		else
-			action();
-	}
-	
-	function DisableAction(id)
-	{
-		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
-		$("ShowLogLink" + id).onclick = function () { return false; }
-	}
-	
-	function HideCurrent(id, description, callerDescription, action)
+	function Hide(id, description, afterFinish)
 	{
 		new Effect.SlideUp(description + id, 
 						   { afterFinish: function()
 											{ 
 												$(description + "Row" + id)
 													.remove();
-												if (callerDescription == description)
-													action();
+												afterFinish();
 											},
 							 duration: 0.5 });
+	}
+	
+	function HideAll(id, afterFinish)
+	{
+		if (IsVisible(id, "DownloadLog"))
+		{
+			Hide(id, "DownloadLog", afterFinish);
+		}
+		else
+		{
+			if (IsVisible(id, "UpdateDetails"))
+			{
+				Hide(id, "UpdateDetails", afterFinish);
+			}
+			else
+			{
+				afterFinish();
+			}
+		}
+	}
+	
+	function IsVisible(id, description)
+	{
+		return $(description + id) != null;
+	}
+	
+	function DisableAction(id)
+	{
+		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
+		$("ShowLogLink" + id).onclick = function () { return false; }
 	}
 	
 	function Download(url)
