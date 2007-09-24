@@ -926,6 +926,7 @@ VALUES(?ClientCode,
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
 set @NewPriceCode:=Last_Insert_ID(); 
 INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode);   
+INSERT INTO usersettings.price_update_info(pricecode) VALUES(@NewPriceCode);
 INSERT INTO farm.sources(FirmCode) VALUES(@NewPriceCode); 
 
 INSERT 
