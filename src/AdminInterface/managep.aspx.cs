@@ -86,14 +86,14 @@ SELECT  cd.firmcode,
         pricesdata.AgencyEnabled, 
         pricesdata.Enabled, 
         AlowInt,  
-        DateCurPrice, 
-        DateLastForm,
+        pui.DateCurPrice, 
+        pui.DateLastForm,
 		UpCost,
 		PriceType
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules fr,  pricescosts pc)
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, usersettings.price_update_info pui,  pricescosts pc)
 WHERE   regions.regioncode                            =cd.regioncode  
         AND pricesdata.firmcode                       =cd.firmcode 
-        AND pricesdata.pricecode                      =fr.firmcode 
+        AND pricesdata.pricecode                      =pui.pricecode 
         AND pc.showpricecode                          =pricesdata.pricecode 
         AND cd.regioncode & regionaladmins.regionmask > 0 
         AND regionaladmins.UserName                   =?UserName  

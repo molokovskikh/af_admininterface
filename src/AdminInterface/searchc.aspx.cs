@@ -184,8 +184,8 @@ SELECT  cd.billingcode,
         cast(cd.firmcode as CHAR) as firmcode, 
         cd.ShortName, 
         region, 
-        max(datecurprice) FirstUpdate, 
-        max(dateprevprice) SecondUpdate, 
+        max(pui.datecurprice) FirstUpdate, 
+        max(pui.dateprevprice) SecondUpdate, 
         null EXE, 
         null MDB, 
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
@@ -196,14 +196,14 @@ SELECT  cd.billingcode,
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
 		NULL AS IncludeType
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, farm.formrules, billing.payers p) 
+FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, usersettings.price_update_info pui, billing.payers p) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN osuseraccessright as ouar2 
         ON ouar2.clientcode= cd.firmcode 
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode                       = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
-WHERE   formrules.firmcode                       = pricesdata.pricecode 
+WHERE   pui.pricecode	                         = pricesdata.pricecode 
 		and cd.BillingCode						 = p.PayerID
         and pricesdata.firmcode                  = cd.firmcode 
         and regions.regioncode                   = cd.regioncode 
