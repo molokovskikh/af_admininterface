@@ -41,11 +41,7 @@ namespace AdminInterface.Views.Client
 		{
 			try
 			{
-				MySqlDataAdapter logsDataAddapter = new MySqlDataAdapter(
-					@"
-create temporary table Info(Date DateTime, UserName varchar(50), Message text); 
-        INSERT 
-        INTO    info 
+				MySqlDataAdapter logsDataAddapter = new MySqlDataAdapter(@"
 		SELECT	LogTime as Date,
 				OperatorName as UserName,
 				Concat('$$$Изменение УИН: ', ResetIDCause) as Message
@@ -56,17 +52,8 @@ create temporary table Info(Date DateTime, UserName varchar(50), Message text);
                 UserName, 
                 Message 
         FROM    logs.clientsinfo 
-        WHERE   clientcode=?ClientCode 
-        UNION  
-        SELECT  LogTime Date, 
-                OperatorName UserName, 
-                concat('###Сообщение: ', Message, '###, Показов:', ShowMessageCount) Message  
-        FROM    logs.retclientssetupdate 
-        WHERE   Message is not null 
-                AND clientcode=?ClientCode  
-        ORDER BY Date desc; 
-        SELECT * FROM info; 
-        DROP temporary table info;
+        WHERE   clientcode=?ClientCode
+		ORDER BY date DESC;
 ", _connection);
 				logsDataAddapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 				logsDataAddapter.SelectCommand.Parameters.Add("?ClientCode", _clientCode);
