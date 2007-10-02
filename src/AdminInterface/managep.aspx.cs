@@ -269,6 +269,8 @@ SELECT  @InsertedPriceCode,
         @InsertedPriceCode;  
 INSERT INTO farm.costformrules(PC_CostCode, FR_ID) SELECT @InsertedPriceCode, @InsertedPriceCode;
 
+INSERT INTO usersettings.price_update_info(pricecode) VALUES(@InsertedPriceCode);
+
 INSERT 
 INTO    pricesregionaldata
         (
