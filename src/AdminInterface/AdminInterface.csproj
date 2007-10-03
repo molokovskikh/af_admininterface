@@ -379,6 +379,8 @@
     <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
+    <Content Include="Images\icon_minus.gif" />
+    <Content Include="Images\icon_plus.gif" />
     <Content Include="Images\menuarrow.gif" />
     <Content Include="JavaScript\builder.js" />
     <Content Include="JavaScript\calendar-ru_win_.js" />

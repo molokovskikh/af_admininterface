@@ -29,3 +29,17 @@ function ValidateParent(source, args)
 	if (args.Value == null || args.Value == "")
 		args.IsValid = false;
 }
+
+function ShowHiden(sender)
+{
+	$$(".ShowHiden").first().className = "HideVisible";
+	sender.onclick = function() { HideVisible(sender); } 
+	$$(".HidenFolder").first().className = "VisibleFolder";
+}
+
+function HideVisible(sender)
+{
+	$$(".HideVisible").first().className = "ShowHiden";
+	sender.onclick = function() { ShowHiden(sender); } 
+	$$(".VisibleFolder").first().className = "HidenFolder";
+}

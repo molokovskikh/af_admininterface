@@ -65,7 +65,42 @@ end
 
 <div class="Main">
 
-	<div class="Left"	
+	<div class="Left">
+	
+		<div style="padding-bottom: 10px;width: 100%"			<div class="InputGroupHeader" style="margin-bottom:10px;" onclick="return ShowHiden(this);">
+>
+				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div				<div class="HidenFolder">			
+					<table class="DataTable" style="width:100%">
+					<% 
+					i = 0
+					for client in Instance.Clients:
+						i++
+d
+					%						<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+							<td style="${GetClientStyle(client)}">
+								${client.Id}
+}
+							</td							<td style="${GetClientStyle(client)}">
+							<% if client.Id == Client.Id: %>
+								<strong>${client.ShortName}</strong>
+>
+							<% else: %								<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
+>
+							<% end %}
+							</td							<td style="${GetClientStyle(client)}">
+								${client.HomeRegion.Name}
+}
+							</td							<td style="${GetClientStyle(client)}">
+								${BindingHelper.GetDescription(client.Type)}
+}
+							</td>
+						</tr>
+					<% end %					</table>
+>
+				</div>
+			</div>
+		</div>
+	
 		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			${FormHelper.HiddenField("Instance.PayerID")}
@@ -89,44 +124,47 @@ end
 																	"Полное наименование:"), 
 												FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
 												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress",																	"Юридический адресс:"), 
- 
+					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+																	"Юридический адрес:"), 
 												FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
-																	"КПП:"), 
-												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-											
+
+					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+																	"Адрес получателя:"), 
+												FormHelper.TextField("Instance.ReceiverAddress", {"class" : "BillingInput"}))}
 
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
 																	"ИНН:"), 
-												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))														
-							<%
-							component ContactViewer, {"ContactGroups" : ContactGroups}:
-								section ContactGroupHeader:
-								%>
+												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
+												
+					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
+																	"КПП:"), 
+												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))																										
+	
+					<0
+					component ContactViewer, {"ContactGroups" : ContactGroups}:
+						section ContactGroupHeaderd
+					%>
+							<tr								<td colspan="2" class="InputGroupHeader">
 >
-					<tr						<td colspan="2" class="InputGroupHeader">
-							${ContactGroupName}
-.
-						</td>
-					</tr								<%
-								end
-								section Item:
-								%>
->
-					<tr>
-						<td							${Label}:
-}
-						</td>
-						<td							${Value}
-.
-						</td>
-					</tr								<%
-								end
-							end
-							%>
->
+								${ContactGroupName}
+							</td>
+						</tr	
+					<d
+					en					section Item:
+d
+					%>
+							<tr>
+								<td>
+									${Label}:
+								</td>
+								<td>
+									${Value}
+								</td>
+							</tr	
+					<%
+						end
+					end
+					%>
 																		
 					${WriteInputGroupHeader("Опции выставки счета")}
 					
@@ -195,39 +233,8 @@ end
 																${WriteSubmitButton(FormHelper.Submit("Сохранить"))}
 	
 			</table>
-		</form		
-	
-		<div style="padding-bottom: 10px;width: 100%">
-			<div class="InputGroupHeader" style="margin-bottom:10px;"				Клиенты плательщика "${Instance.ShortName}"
-�
-			</div			<table class="DataTable" style="width:100%">
->
-			<%:
-				i = 				for client in Instance.Clients:
-:
-					i++
-			%			<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
-				<td style="${GetClientStyle(client)}">
-				<% if client.Id == Client.Id: %>
-					<strong>${client.ShortName}</strong>
-				<% else: %>
-					<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
-				<% end %>
-				</td>
-				<td style="${GetClientStyle(client)}">
-					${client.HomeRegion.Name}
-				</td>
-				<td style="${GetClientStyle(client)}">
-					${BindingHelper.GetDescription(client.Type)}
-				</td>
-			</tr>
->
-			<% 
-				end
-			%>
-			</table>
-		</div		
-	
+		</form>
+			
 	</div>
 	
 	<div class="Right">
