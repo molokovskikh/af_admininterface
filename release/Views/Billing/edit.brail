@@ -9,12 +9,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string):
 			${editControlText}
 		</td>
 	</tr>
-	<%
+	<% 	
 	return ""
 end
 
 def GetClientStyle(client) as string:
-	if controller.IsClientActive(client):
+	if client.IsClientActive():
 		return ""
 	else:
 		return "background-color:#ff6600;"
@@ -25,23 +25,11 @@ end
 def WriteInputGroupHeader(localHeader as string):
 	return "<tr><td class=\"InputGroupHeader\" colspan=\"2\">" + localHeader + "</td></tr>"
 end
-
-def WriteSubmitButton(submitButton as string):
-	return "<tr style=\"text-align:right\"><td colspan=\"2\">" + submitButton + "</td></tr>"
-end
-
-def WriteMessage(message as string):
-	return "<div class=\"Message\">" + message + "</div>"
-end
-
-def EvenOrOdd(i as int, ifEven as string, ifOdd as string) as string:
-	if i % 2 == 0:
-		return ifEven
-	else:
-		return ifOdd
-	end
-end
 %>
+
+<% component CaptureFor, {"Id" : "Title"}:%>
+	Детальная информация о платильщике {billingInstance.ShortName}
+<% end %>
 <style>
 	.Main
 	{
@@ -67,18 +55,51 @@ end
 <div class="Main">
 
 	<div class="Left">
+	
+		<div style="padding-bottom: 10px;width: 100%">
+			<div class="InputGroupHeader" style="margin-bottom:10px;" onclick="return ShowHiden(this);">
+				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="HidenFolder">			
+					<table class="DataTable" style="width:100%">
+					<% 
+					i = 0
+					for client in Instance.Clients:
+						i++
+					%>
+						<tr class="${ViewHelper.GetRowStyle(i)}">
+							<td style="${GetClientStyle(client)}">
+								${client.Id}
+							</td>
+							<td style="${GetClientStyle(client)}">
+							<% if client.Id == Client.Id: %>
+								<strong>${client.ShortName}</strong>
+							<% else: %>
+								<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
+							<% end %>
+							</td>
+							<td style="${GetClientStyle(client)}">
+								${client.HomeRegion.Name}
+							</td>
+							<td style="${GetClientStyle(client)}">
+								${BindingHelper.GetDescription(client.Type)}
+							</td>
+						</tr>
+					<% end %>
+					</table>
+				</div>
+			</div>
+		</div>
+	
 		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			${FormHelper.HiddenField("Instance.PayerID")}
 			<table>
-					<% 
-						if IsDefined("UpdateMessage"):
-							output WriteMessage(UpdateMessage)
-						end	
-						if IsDefined("SendMessage"):
-							output WriteMessage(SendMessage)
-						end
-					%>
+					<% if IsDefined("UpdateMessage"):%>
+						<div class="Message">${UpdateMessage}</div>
+					<% end %>
+					<% if IsDefined("SendMessage"): %>
+						<div class="Message">${SendMessage}</div>
+					<% end %>
 					${WriteInputGroupHeader("Общая информация")}
 
 					
@@ -91,42 +112,46 @@ end
 												FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
 												
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-																	"Юридический адресс:"), 
+																	"Юридический адрес:"), 
 												FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+
+					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+																	"Адрес получателя:"), 
+												FormHelper.TextField("Instance.ReceiverAddress", {"class" : "BillingInput"}))}
+
+					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
+																	"ИНН:"), 
+												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
 												
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
 																	"КПП:"), 
 												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
-																	"ИНН:"), 
-												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
-														
-							<%
-							component ContactViewer, {"ContactGroups" : ContactGroups}:
-								section ContactGroupHeader:
-								%>
-					<tr>
-						<td colspan="2" class="InputGroupHeader">
-							${ContactGroupName}
-						</td>
-					</tr>
-								<%
-								end
-								section Item:
-								%>
-					<tr>
-						<td>
-							${Label}:
-						</td>
-						<td>
-							${Value}
-						</td>
-					</tr>
-								<%
-								end
-							end
-							%>
+																										
+					<%
+					component ContactViewer, {"ContactGroups" : ContactGroups}:
+						section ContactGroupHeader:
+					%>
+							<tr>
+								<td colspan="2" class="InputGroupHeader">
+								${ContactGroupName}
+							</td>
+						</tr>
+					<%
+					end
+					section Item:
+					%>
+							<tr>
+								<td>
+									${Label}:
+								</td>
+								<td>
+									${Value}
+								</td>
+							</tr>
+					<%
+						end
+					end
+					%>
 																		
 					${WriteInputGroupHeader("Опции выставки счета")}
 					
@@ -192,42 +217,15 @@ end
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Comment", 
 																	"Комментарий:"), 
 												FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" }))}
-												
-					${WriteSubmitButton(FormHelper.Submit("Сохранить"))}
+										
+					<tr style="text-align:right">
+						<td colspan="2">
+							FormHelper.Submit("Сохранить")
+						</td>
+					</tr>		
 			</table>
 		</form>
-		
-		<div style="padding-bottom: 10px;width: 100%">
-			<div class="InputGroupHeader" style="margin-bottom:10px;">
-				Клиенты плательщика "${Instance.ShortName}"
-			</div>
-			<table class="DataTable" style="width:100%">
-			<% 
-				i = 0
-				for client in Instance.Clients:
-					i++
-			%>
-			<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
-				<td style="${GetClientStyle(client)}">
-				<% if client.Id == Client.Id: %>
-					<strong>${client.ShortName}</strong>
-				<% else: %>
-					<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
-				<% end %>
-				</td>
-				<td style="${GetClientStyle(client)}">
-					${client.HomeRegion.Name}
-				</td>
-				<td style="${GetClientStyle(client)}">
-					${BindingHelper.GetDescription(client.Type)}
-				</td>
-			</tr>
-			<% 
-				end
-			%>
-			</table>
-		</div>
-		
+			
 	</div>
 	
 	<div class="Right">
@@ -264,7 +262,7 @@ if IsDefined("SendError"):
 end	
 %>
 <%
-if controller.IsContainsNotShowedMessage():
+if ClientMessage.IsContainsNotShowedMessage():
 	output "<tr><td class=\"Message\">Остались не показанные сообщения</td></tr>"
 end		
 %>
@@ -286,10 +284,10 @@ end
 						</td>
 					</tr>
 					<tr style="text-align:right">
-					<td>
-						<input type="submit" value="Отправить сообщение" />
-					</td>
-				</tr>
+						<td>
+							<input type="submit" value="Отправить сообщение" />
+						</td>
+					</tr>
 			</table>
 		</form>
 <% 
@@ -306,16 +304,16 @@ end
 				for logRecord in LogRecords:
 					i++
 			%>
-					<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+					<tr class="${ViewHelper.GetRowStyle(i)}">
 						<td>
 							${logRecord.LogTime}
 						</td>
 						<td>
 							${logRecord.OperatorName}
 						</td>
-							<td>
-								${BindingHelper.GetDescription(logRecord.ClientStatus)}
-							</td>
+						<td>
+							${BindingHelper.GetDescription(logRecord.ClientStatus)}
+						</td>
 					</tr>
 			<% 
 				end
