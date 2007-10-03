@@ -43,3 +43,18 @@ function HideVisible(sender)
 	sender.onclick = function() { ShowHiden(sender); } 
 	$$(".VisibleFolder").first().className = "HidenFolder";
 }
+
+function SetupCalendarElements()
+{
+  $$(".CalendarInput")
+	.each(function(value, index)
+			{
+				value.id = "CalendarInput" + index;
+				Calendar.setup({
+					ifFormat: "%d.%m.%Y",
+					inputField: value.id,
+					weekNumbers: false,
+					showOthers: true
+				})
+			});
+}

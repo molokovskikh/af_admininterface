@@ -150,6 +150,7 @@
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ViewHelper.cs" />
+    <Compile Include="Model\PaymentInstance.cs" />
     <Compile Include="Model\UpdateDownloadLogEntity.cs" />
     <Compile Include="Model\UpdateLogEntity.cs" />
     <Compile Include="Model\BillingSearchItem.cs" />
@@ -368,7 +369,8 @@
     <Content Include="Views\Layouts\default.brail" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Views\Billing\search.brail" />
+    <None Include="Views\Billing\Search.brail" />
+    <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
@@ -381,6 +383,7 @@
     <Content Include="Css\Common.css" />
     <Content Include="Images\icon_minus.gif" />
     <Content Include="Images\icon_plus.gif" />
+    <Content Include="Images\calendar.gif" />
     <Content Include="Images\menuarrow.gif" />
     <Content Include="JavaScript\builder.js" />
     <Content Include="JavaScript\calendar-ru_win_.js" />

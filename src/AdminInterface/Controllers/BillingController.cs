@@ -1,28 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Configuration;
+using System.Collections.Specialized;
 using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Helpers;
-using Common.Web.Ui.Models;
-using NHibernate;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("billing"), Helper(typeof(BindingHelper))]
+	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
 	public class BillingController : ARSmartDispatcherController
 	{
 		public void Edit(uint clientCode)
@@ -37,8 +29,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = client.BillingInstance;
 			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
-
-			SetTitle(client.BillingInstance);
 		}
 
 		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] BillingInstance billingInstance, uint clientCode)
@@ -55,10 +45,11 @@ namespace AdminInterface.Controllers
 				clientMessage.UpdateAndFlush();
 				Flash.Add("SendMessage", "Сообщение отправленно");
 			}
-			catch(ValidationException exception)
+			catch (ValidationException exception)
 			{
 				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
 			}
+
 			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
 		}
 
@@ -76,9 +67,10 @@ namespace AdminInterface.Controllers
 		public void Search()
 		{
 			PropertyBag["regions"] = GetRegions();
+			PropertyBag["FindBy"] = new BillingSearchProperties();
 		}
 
-		public void Search([DataBind("SearchBy")] BillingSearchProperties searchProperties)
+		public void SearchBy([DataBind("SearchBy")] BillingSearchProperties searchProperties)
 		{
 			IList<BillingSearchItem> searchResults = BillingSearchItem.FindBy(searchProperties);
 
@@ -93,12 +85,14 @@ namespace AdminInterface.Controllers
 							string sortDirection,
 							string shortName,
 							ulong regionId,
-							PayerStateFilter payerState)
+							PayerStateFilter payerState,
+							Segment segment)
 		{
 			BillingSearchProperties searchProperties = new BillingSearchProperties();
 			searchProperties.PayerState = payerState;
 			searchProperties.ShortName = shortName;
 			searchProperties.RegionId = regionId;
+			searchProperties.Segment = segment;
 			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 			List<BillingSearchItem> searchResults;
 
@@ -111,12 +105,20 @@ namespace AdminInterface.Controllers
 			PropertyBag["searchResults"] = searchResults;
 			PropertyBag["sortColumnName"] = columnName;
 			PropertyBag["sortDirection"] = sortDirection;
-			RenderView("search");
+			RenderView("SearchBy");
 		}
 
-		public bool IsDebitor(BillingSearchItem item)
+		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
+						 [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
-			return DateTime.Now - item.PayDate > TimeSpan.FromDays(1);
+			using (TransactionScope scope = new TransactionScope())
+			{
+				foreach (PaymentInstance instance in paymentInstances)
+					instance.Save();				
+				scope.Flush();
+			}		
+			SearchBy(searchProperties);
+			RenderView("SearchBy");
 		}
 
 		private IList<Region> GetRegions()
@@ -130,22 +132,6 @@ namespace AdminInterface.Controllers
 				return "Отключить клиента";
 			else
 				return "Включить клиента";
-		}
-
-		public bool IsClientActive(Client client)
-		{
-			return client.Status == ClientStatus.On;
-		}
-
-		private void SetTitle(BillingInstance billingInstance)
-		{
-			PropertyBag.Add("Title", String.Format("Детальная информация о платильщике {0}",
-												   billingInstance.ShortName));
-		}
-
-		public bool IsContainsNotShowedMessage()
-		{
-			return ((ClientMessage) PropertyBag["ClientMessage"]).ShowMessageCount > 0;
 		}
 	}
 }

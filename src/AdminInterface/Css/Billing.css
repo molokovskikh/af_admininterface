@@ -21,6 +21,13 @@
 	background-color: #F6F6F6;
 }
 
+.EmptyData2
+{
+	text-align:center;
+	background-color: #F6F6F6;
+	border: solid 1px #DADADA;
+}
+
 .BillingInput
 {
 	width: 99%;
@@ -39,12 +46,23 @@
 	background:transparent url(../images/icon_minus.gif) no-repeat scroll left center;
 	display:block;
 	padding-left:14px;
-	cursor:pointer;	
+	cursor: pointer;
+}
+
+.ShowCalendar
+{
+	cursor: pointer;
 }
 
 .HidenFolder
 {
 	display:none;
+}
+
+.CalendarInput
+{
+	background:  transparent url(../images/calendar.gif) no-repeat scroll right center;
+	cursor:pointer;
 }
 
 .VisibleFolder

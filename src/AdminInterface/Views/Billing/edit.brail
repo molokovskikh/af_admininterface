@@ -8,13 +8,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string):
 		<td style="width: 70%">
 			${editControlText}
 		</td>
-	</tr	<%
-	
+	</tr>
+	<% 	
 	return ""
 end
 
-def GetClientStyle(client) as string	if controller.IsClientActive(client):
-:
+def GetClientStyle(client) as string:
+	if client.IsClientActive():
 		return ""
 	else:
 		return "background-color:#ff6600;"
@@ -24,21 +24,11 @@ end
 
 def WriteInputGroupHeader(localHeader as string):
 	return "<tr><td class=\"InputGroupHeader\" colspan=\"2\">" + localHeader + "</td></tr>"
-en}def WriteSubmitButton(submitButton as string):
-	return "<tr style=\"text-align:right\"><td colspan=\"2\">" + submitButton + "</td></tr>"
-"
-enddef WriteMessage(message as string):
-	return "<div class=\"Message\">" + message + "</div>"
-"
-enddef EvenOrOdd(i as int, ifEven as string, ifOdd as string) as string:
-	if i % 2 == 0:
-		return ifEven
-"
-	else		return ifOdd
-"
-	en"
 end
-%
+%><% component CaptureFor, {"Id" : "Title"}:%>
+	Детальная информация о платильщике {billingInstance.ShortName}
+}
+<% end %
 
 <style>
 	.Main
@@ -76,7 +66,7 @@ end
 					for client in Instance.Clients:
 						i++
 d
-					%						<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
+					%						<tr class="${ViewHelper.GetRowStyle(i)}">
 							<td style="${GetClientStyle(client)}">
 								${client.Id}
 }
@@ -104,15 +94,13 @@ d
 		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			${FormHelper.HiddenField("Instance.PayerID")}
-			<table					<% 
-						if IsDefined("UpdateMessage"):
-							output WriteMessage(UpdateMessage)
-						end	
-						if IsDefined("SendMessage"):
-							output WriteMessage(SendMessage)
-%
-						end
-					%>
+			<table>
+					<% if IsDefined("UpdateMessage"):%>
+						<div class="Message">${UpdateMessage}</div>
+					<% end %>
+					<% if IsDefined("SendMessage"): %>
+						<div class="Message">${SendMessage}</div>
+					<% end %>
 					${WriteInputGroupHeader("Общая информация")}
 
 					
@@ -230,8 +218,12 @@ d
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Comment", 
 																	"Комментарий:"), 
 												FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" }))}
-																${WriteSubmitButton(FormHelper.Submit("Сохранить"))}
-	
+										
+					<tr style="text-align:right">
+						<td colspan="2"							FormHelper.Submit("Сохранить")
+}
+						</td>
+					</tr>		
 			</table>
 		</form>
 			
@@ -270,8 +262,8 @@ if IsDefined("SendError"):
 <%		
 end	
 %>
-<if controller.IsContainsNotShowedMessage():
-:
+<%
+if ClientMessage.IsContainsNotShowedMessage():
 	output "<tr><td class=\"Message\">Остались не показанные сообщения</td></tr>"
 end		
 %>
@@ -292,11 +284,11 @@ end
 							раз.
 						</td>
 					</tr>
-					<tr style="text-align:right"					<td>
-						<input type="submit" value="Отправить сообщение" />
-�
-					</td				</tr>
->
+					<tr style="text-align:right">
+						<td>
+							<input type="submit" value="Отправить сообщение" />
+						</td>
+					</tr>
 			</table>
 		</form>
 <% 
@@ -312,17 +304,17 @@ end
 				i = 0
 				for logRecord in LogRecords:
 					i++
-			%					<tr class="${EvenOrOdd(i, "EvenRow", "OddRow")}">
->
+			%>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
 						<td>
 							${logRecord.LogTime}
 						</td>
 						<td>
 							${logRecord.OperatorName}
-						</td							<td>
-								${BindingHelper.GetDescription(logRecord.ClientStatus)}
-}
-							</td>
+						</td>
+						<td>
+							${BindingHelper.GetDescription(logRecord.ClientStatus)}
+						</td>
 					</tr>
 			<% 
 				end
