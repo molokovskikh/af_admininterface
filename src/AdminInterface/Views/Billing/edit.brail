@@ -220,8 +220,8 @@ d
 												FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" }))}
 										
 					<tr style="text-align:right">
-						<td colspan="2"							FormHelper.Submit("Сохранить")
-}
+						<td colspan="2">
+							${FormHelper.Submit("Сохранить")}
 						</td>
 					</tr>		
 			</table>
