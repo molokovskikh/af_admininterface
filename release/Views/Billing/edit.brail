@@ -220,7 +220,7 @@ end
 										
 					<tr style="text-align:right">
 						<td colspan="2">
-							FormHelper.Submit("Сохранить")
+							${FormHelper.Submit("Сохранить")}
 						</td>
 					</tr>		
 			</table>
