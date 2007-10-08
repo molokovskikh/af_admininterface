@@ -762,12 +762,12 @@ ORDER BY cd.shortname;
 		private int CreateClientOnClientsData()
 		{
 			_command.CommandText =
-				"INSERT INTO usersettings.clientsdata (regionmask, MaskRegion, ShowRegionMask, FullName, ShortName, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId) ";
+				"INSERT INTO usersettings.clientsdata (MaskRegion, ShowRegionMask, FullName, ShortName, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId) ";
 			_command.Parameters.Add("?ClientContactGroupOwnerId", CreateContactsForClientsData(_command.Connection));
 			if (!IncludeCB.Checked)
 			{
 				_command.CommandText +=
-					" Values(0, ?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, 1, ?registrant, " +
+					" Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, 1, ?registrant, " +
 					Session["DogN"] + ", 1, ?ClientContactGroupOwnerId); ";
 			}
 			else
