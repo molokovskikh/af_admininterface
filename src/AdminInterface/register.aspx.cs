@@ -524,8 +524,7 @@ where length(c.contactText) > 0
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 											   + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-											   + err.Message, "RegisterList
-					subscribe.analit.net", String.Empty,
+											   + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
 				}
