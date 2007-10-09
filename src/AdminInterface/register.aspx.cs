@@ -524,7 +524,8 @@ where length(c.contactText) > 0
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 											   + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-											   + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
+											   + err.Message, "RegisterList
+					subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 #endif
 				}
@@ -762,19 +763,24 @@ ORDER BY cd.shortname;
 		private int CreateClientOnClientsData()
 		{
 			_command.CommandText =
-				"INSERT INTO usersettings.clientsdata (MaskRegion, ShowRegionMask, FullName, ShortName, Fax, URL, FirmSegment, RegionCode, Adress, FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId) ";
+@"INSERT INTO usersettings.clientsdata (
+MaskRegion, ShowRegionMask, FullName, ShortName, Fax, URL, FirmSegment, RegionCode, Adress, 
+FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId, RegistrationDate) ";
 			_command.Parameters.Add("?ClientContactGroupOwnerId", CreateContactsForClientsData(_command.Connection));
 			if (!IncludeCB.Checked)
 			{
 				_command.CommandText +=
-					" Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, ?FirmType, 1, ?registrant, " +
-					Session["DogN"] + ", 1, ?ClientContactGroupOwnerId); ";
+@" Values(
+?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, ?FirmSegment, ?RegionCode, ?Adress, 
+?FirmType, 1, ?registrant, " + Session["DogN"] + ", 1, ?ClientContactGroupOwnerId, now()); ";
 			}
 			else
 			{
 				_command.CommandText +=
-					" select 0, maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId" +
-					" from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
+@"select 
+maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, 
+FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
+from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
 			return Convert.ToInt32(_command.ExecuteScalar());

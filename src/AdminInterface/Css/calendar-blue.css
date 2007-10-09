@@ -141,7 +141,8 @@ div.calendar
 }
 
 .calendar tfoot .ttip { /* Tooltip (status bar) cell <TD> */
-  background: #fff;
+  display: none;
+/*  background: #fff;*/
   color: #445;
   border-top: 1px solid #556;
   padding: 1px;
