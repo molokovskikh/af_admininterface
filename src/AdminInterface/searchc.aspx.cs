@@ -123,8 +123,9 @@ ORDER BY IsAll Desc, Region;", _connection);
 			if (ADCB.Checked)
 				row.Cells[8].BackColor = Color.FromName(data.Row["ADUserStatus"].ToString());
 
-			if ((DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2)
-				&& (data.Row["FirmStatus"].ToString() == "0"))
+			if ((data.Row["FirstUpdate"] == DBNull.Value 
+					|| DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2)
+				&& data.Row["FirmStatus"].ToString() == "0")
 				row.Cells[4].BackColor = Color.Gray;
 
 		}
