@@ -40,6 +40,7 @@
 										ValidationExpression="^([-+])?\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
+							<asp:BoundField HeaderText="Тип ценовых колонок" DataField="CostType" />
 							<asp:TemplateField HeaderText="Тип прайса">
 								<ItemTemplate>
 									<asp:DropDownList ID="PriceTypeList" runat="server" DataValueField='<%# Eval("PriceType") %>'>
