@@ -89,7 +89,12 @@ SELECT  cd.firmcode,
         pui.DateCurPrice, 
         pui.DateLastForm,
 		UpCost,
-		PriceType
+		PriceType,
+		CASE CostType
+			WHEN 0 THEN 'Мультиколоночный'
+			WHEN 1 THEN 'Многофайловый'
+			ELSE 'Не настроенный'
+		END AS CostType
 FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, usersettings.price_update_info pui,  pricescosts pc)
 WHERE   regions.regioncode                            =cd.regioncode  
         AND pricesdata.firmcode                       =cd.firmcode 

@@ -216,7 +216,8 @@ WHERE RowID = ?Id
 			MySqlDataAdapter adapter = new MySqlDataAdapter(@"
 SELECT  pd.FirmCode, 
         pd.PriceName, 
-        cd.ShortName 
+        cd.ShortName, 
+		pd.CostType
 FROM    pricesdata pd, 
         clientsdata cd  
 WHERE   cd.firmcode      = pd.firmcode 
@@ -237,10 +238,12 @@ WHERE   cd.firmcode      = pd.firmcode
 				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
 				string ShortName = MyReader["ShortName"].ToString();
 				string PriceName = MyReader["PriceName"].ToString();
+				int costType = Convert.ToInt32(MyReader["CostType"]);
 				MyReader.Close();
 
 				adapter.SelectCommand.Parameters.Add("?FirmCode", FirmCode);
-				adapter.SelectCommand.CommandText = 
+
+				adapter.SelectCommand.CommandText += 
 @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?FirmCode, null); 
 set @NewPriceCode := Last_Insert_ID(); 
@@ -263,7 +266,14 @@ INTO    farm.costformrules
         ) 
 SELECT @NewPriceCode, @NewPriceCode; 
 ";
+
+				if (costType == 1)
+					adapter.SelectCommand.CommandText += @"
+INSERT INTO usersettings.price_update_info(PriceCode)
+VALUES (@NewPriceCode);";
+
 				adapter.SelectCommand.ExecuteNonQuery();
+
 				adapter.SelectCommand.CommandText =
 @"
 SELECT  regionaladmins.username, 
@@ -284,11 +294,9 @@ ORDER BY region;
 
 				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
-#if !DEBUG
 				Func.Mail("register@analit.net", String.Empty, "\"" + ShortName + "\" - регистрация ценовой колонки", false,
 				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
 				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-#endif
 			}
 			catch
 			{
