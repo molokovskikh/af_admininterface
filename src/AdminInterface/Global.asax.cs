@@ -95,7 +95,7 @@ namespace AddUser
 				if (Session[key] == null)
 					builder.AppendLine(String.Format("{0} - null", key));
 				else
-					builder.AppendLine(String.Format("{0} - {1}", key, Session[key].GetType().ToString()));
+					builder.AppendLine(String.Format("{0} - {1}", key, Session[key]));
 			}
 			builder.AppendLine("--------------");
 
