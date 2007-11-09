@@ -57,7 +57,7 @@ OutputSubView("Search")
 			${WriteHeader("Дата платежа", "PayDate")}
 		</th>
 		<th>
-			${WriteHeader("Дата регистрации", "RegistrationDate")}
+			${WriteHeader("Дата регистрации", "LastClientRegistrationDate")}
 		</th>
 		<th>
 			${WriteHeader("Отключенных клиентов", "DisabledClientsCount")}
