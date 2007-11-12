@@ -11,6 +11,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ActiveDs;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 
@@ -1247,25 +1248,25 @@ ORDER BY region;
 		{
 			object contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
 
-			CreateContactGroup("Общая контактная информация",
+			CreateContactGroup(ContactGroupType.General,
 							   PhoneTB.Text, 
 							   EmailTB.Text, 
 							   null, 
 							   connection, 
 							   contactGroupOwnerId);
-			CreateContactGroup("Менеджер прайс листов(заказов)", 
+			CreateContactGroup(ContactGroupType.OrderManagers,
 							   TBOrderManagerPhone.Text, 
 							   TBOrderManagerMail.Text, 
 							   TBOrderManagerName.Text, 
 							   connection, 
 							   contactGroupOwnerId);
-			CreateContactGroup("Администратор клиентов в автоматизированной системе", 
+			CreateContactGroup(ContactGroupType.ClientManagers,
 							   TBClientManagerPhone.Text, 
 							   TBClientManagerMail.Text, 
 							   TBClientManagerName.Text, 
 							   connection, 
 							   contactGroupOwnerId);
-			CreateContactGroup("Бухгалтер по расчетам с АК \"Инфорум\"", 
+			CreateContactGroup(ContactGroupType.AccountantManagers, 
 							   TBAccountantPhone.Text, 
 							   TBAccountantMail.Text, 
 							   TBAccountantName.Text, 
@@ -1279,7 +1280,7 @@ ORDER BY region;
 		private object CreateContactsForBilling(MySqlConnection connection)
 		{
 			object contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
-			CreateContactGroup("Контактная информация для биллинга",
+			CreateContactGroup(ContactGroupType.Billing,
 							   null,
 							   null,
 							   null,
@@ -1288,20 +1289,21 @@ ORDER BY region;
 			return contactGroupOwnerId;
 		}
 
-		private static void CreateContactGroup(string name,
-									   string phone,
-									   string email,
-									   string person,
-									   MySqlConnection connection,
-									   object contactGroupOwnerId)
+		private static void CreateContactGroup(ContactGroupType contactGroupType,
+		                                       string phone,
+		                                       string email,
+		                                       string person,
+		                                       MySqlConnection connection,
+		                                       object contactGroupOwnerId)
 		{
 			MySqlCommand innerCommand = connection.CreateCommand();
 			object contactGroupID = GetNewContactsOwnerId(connection);
 			innerCommand.CommandText = @"
-insert into contacts.contact_groups(Id, Name, ContactGroupOwnerId) 
-values(?ID, ?Name, ?ContactGroupOwnerId);";
+insert into contacts.contact_groups(Id, Name, Type, ContactGroupOwnerId) 
+values(?ID, ?Name, ?Type, ?ContactGroupOwnerId);";
 
-			innerCommand.Parameters.Add("?Name", name);
+			innerCommand.Parameters.Add("?Type", contactGroupType);
+			innerCommand.Parameters.Add("?Name", BindingHelper.GetDescription(contactGroupType));
 			innerCommand.Parameters.Add("?ContactGroupOwnerId", contactGroupOwnerId);
 			innerCommand.Parameters.Add("?ID", contactGroupID);
 			innerCommand.ExecuteNonQuery();
