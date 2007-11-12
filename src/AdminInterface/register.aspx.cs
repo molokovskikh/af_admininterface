@@ -432,7 +432,6 @@ set @inUser = ?UserName;
 				Session["strStatus"] = "Yes";
 				try
 				{
-#if !DEBUG
 					if (!(InvCB.Checked || TypeDD.SelectedItem.Value == "0" || (TypeDD.SelectedItem.Value == "1" && IncludeCB.Checked && IncludeType.SelectedItem.Value == "2")))
 					{
 						MySqlDataAdapter dataAdapter = new MySqlDataAdapter(@"
@@ -486,8 +485,12 @@ where length(c.contactText) > 0
 										  + RegionDD.SelectedItem.Text + "."
 										  + "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net )."
 										  + String.Format("\nАдрес доставки накладных: {0}@waybills.analit.net", _command.Parameters["?ClientCode"].Value)
-										  + "\nС уважением," + "\nАналитическая компания \"Инфорум\", г. Воронеж"
-										  + "\n4732-206000", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
+										  + "С уважением, Аналитическая компания \"Инфорум\", г. Воронеж"
+										  + @"Москва  +7 495 6628727
+С.-Петербург +7 812 3090521
+Воронеж +7 4732 206000
+Челябинск +7 351 729 8143"
+										  + "\n", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
 							}
 							Func.Mail("register@analit.net", String.Empty,
 									  "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
@@ -514,11 +517,9 @@ where length(c.contactText) > 0
 									  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 						}
 					}
-#endif
 				}
 				catch (Exception err)
 				{
-#if !DEBUG
 					Func.Mail("register@analit.net", String.Empty,
 							  "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
@@ -527,22 +528,18 @@ where length(c.contactText) > 0
 											   + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 											   + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-#endif
 				}
 				try
 				{
-#if !DEBUG
 					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
 							  false, "Оператор: " + Session["UserName"] + "\nРегион: "
 											   + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 											   + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-#endif
 				}
 				catch (Exception err)
 				{
-#if !DEBUG
 					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text
 													 + "\" - ошибка подписки поставщиков", false,
 							  "Оператор: " + Session["UserName"] + "\nРегион: "
@@ -551,7 +548,6 @@ where length(c.contactText) > 0
 							  + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 							  + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-#endif
 				}
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
@@ -1209,23 +1205,27 @@ ORDER BY region;
 
 				if (args.IsValid)
 				{
-					bool isUserExists = false;
+					bool existsInDataBase;
+					bool existsInActiveDirectory;
 					_connection.Open();
-					isUserExists = new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar() != DBNull.Value;
+					existsInDataBase = new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar() != DBNull.Value;
 					_connection.Close();
 					try
 					{
 						ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + args.Value) as IADsUser;
-						isUserExists = true;
+						existsInActiveDirectory = true;
 					}
 					catch
 					{
-						isUserExists = false;
+						existsInActiveDirectory = false;
 					}
 					ADUser = null;
-					args.IsValid = !isUserExists;
-					if (isUserExists)
+					args.IsValid = !(existsInActiveDirectory || existsInDataBase);
+					if (existsInActiveDirectory || existsInDataBase)
+					{
+						args.IsValid = false;
 						LoginValidator.ErrorMessage = String.Format("Учетное имя '{0}' существует в системе.", args.Value);
+					}
 					else
 						PassTB.Text = Func.GeneratePassword();
 				}
@@ -1236,6 +1236,11 @@ ORDER BY region;
 			}
 			else
 				args.IsValid = true;
+
+			if (args.IsValid)
+				LoginValidator.Visible = false;
+			else
+				LoginValidator.Visible = true;
 
 		}
 

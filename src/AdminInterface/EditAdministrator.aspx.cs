@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Configuration;
 using System.Collections;
+using System.DirectoryServices;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -38,6 +39,9 @@ public partial class EditAdministrator : Page
 
 	protected void Save_Click(object sender, EventArgs e)
 	{
+		if (!IsValid)
+			return;
+
 		_current.Login = Login.Text;
 		_current.FIO = FIO.Text;
 		_current.Phone = Phone.Text;
@@ -67,13 +71,57 @@ public partial class EditAdministrator : Page
 		if (_current.ID != -1)
 			CommandFactory.UpdateAdministrator(_current);
 		else
+		{
+			CheckUserGroup(_current.Login);
 			CommandFactory.AddAdministrator(_current);
+		}
 
 		Response.Redirect("ViewAdministrators.aspx");
+	}
+
+		private void CheckUserGroup(string userName)
+	{
+		string group = "Региональные администраторы";
+		bool finded = false;
+		using (DirectorySearcher searcher = new DirectorySearcher(String.Format("(&(objectClass=user)(name={0}))", userName)))
+		{
+			SearchResult searchResult = searcher.FindOne();
+			using (DirectoryEntry directoryEntry  = searchResult.GetDirectoryEntry())
+			{
+				foreach (string value in directoryEntry.Properties["MemberOf"])
+				{
+					if (value.IndexOf(group, StringComparison.CurrentCultureIgnoreCase) > 0)
+					{
+						finded = true;
+						break;
+					}
+				}
+
+				if (!finded)
+					directoryEntry.Properties["MemberOf"].Add("CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
+
+				directoryEntry.CommitChanges();
+			}
+		}
 	}
 
 	protected void Cancel_Click(object sender, EventArgs e)
 	{
 		Response.Redirect("ViewAdministrators.aspx");
+	}
+
+	protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
+	{
+		using (DirectorySearcher searcher = new DirectorySearcher(String.Format("(&(objectClass=user)(name={0}))", args.Value)))
+		{
+			SearchResult searchResult = searcher.FindOne();
+			if (searchResult == null)
+			{
+				args.IsValid = false;
+				return;
+			}
+		}
+		args.IsValid = true;
+		return;
 	}
 }
