@@ -79,18 +79,25 @@ public partial class EditAdministrator : Page
 		Response.Redirect("ViewAdministrators.aspx");
 	}
 
-		private void CheckUserGroup(string userName)
+	private void CheckUserGroup(string userName)
 	{
-		string group = "Региональные администраторы";
+		string groupName = "Региональные администраторы";
 		bool finded = false;
-		using (DirectorySearcher searcher = new DirectorySearcher(String.Format("(&(objectClass=user)(name={0}))", userName)))
+		using (DirectorySearcher searcher = new DirectorySearcher())
 		{
+			searcher.Filter = String.Format("(&(objectClass=user)(name={0}))", userName);
 			SearchResult searchResult = searcher.FindOne();
-			using (DirectoryEntry directoryEntry  = searchResult.GetDirectoryEntry())
+
+			searcher.Filter = "(&(objectClass=group)(name=Региональные администраторы))";
+			SearchResult groupResult = searcher.FindOne();
+			
+			using(DirectoryEntry group = groupResult.GetDirectoryEntry())
+			using (DirectoryEntry user  = searchResult.GetDirectoryEntry())
 			{
-				foreach (string value in directoryEntry.Properties["MemberOf"])
+				
+				foreach (string value in user.Properties["MemberOf"])
 				{
-					if (value.IndexOf(group, StringComparison.CurrentCultureIgnoreCase) > 0)
+					if (value.IndexOf(groupName, StringComparison.CurrentCultureIgnoreCase) > 0)
 					{
 						finded = true;
 						break;
@@ -98,9 +105,9 @@ public partial class EditAdministrator : Page
 				}
 
 				if (!finded)
-					directoryEntry.Properties["MemberOf"].Add("CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
+					group.Invoke("Add", user.Path);
 
-				directoryEntry.CommitChanges();
+				user.CommitChanges();
 			}
 		}
 	}

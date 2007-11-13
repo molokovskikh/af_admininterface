@@ -1208,7 +1208,7 @@ ORDER BY region;
 					bool existsInDataBase;
 					bool existsInActiveDirectory;
 					_connection.Open();
-					existsInDataBase = new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar() != DBNull.Value;
+					existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar()) == 1;
 					_connection.Close();
 					try
 					{
