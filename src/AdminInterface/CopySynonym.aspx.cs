@@ -177,31 +177,14 @@ WHERE   a.clientcode     = ?ParentClientCode
 
 UPDATE intersection_update_info  as a,  
         intersection_update_info as b   
-        SET a.MaxSynonymFirmCrCode = b.MaxSynonymFirmCrCode,  
-        a.MaxSynonymCode           = b.MaxSynonymCode  
+SET a.MaxSynonymFirmCrCode = b.MaxSynonymFirmCrCode,  
+    a.MaxSynonymCode = b.MaxSynonymCode,
+	a.LastSent = b.LastSent,
+	a.UncommittedLastSent = b.UncommittedLastSent
 WHERE   a.clientcode               = ?ClientCode   
         AND b.clientcode           = ?ParentClientCode   
         AND a.pricecode            = b.pricecode;   
 
-UPDATE intersection 
-        SET MaxSynonymCode   = 0, 
-        MaxSynonymFirmCrCode = 0,   
-        lastsent             = default 
-WHERE   clientcode           = ?ClientCode;  
-UPDATE retclientsset  as a, 
-        retclientsset as b  
-        SET b.updatetime       = a.updatetime, 
-        b.AlowCumulativeUpdate = 0, 
-        b.Active               = 0 
-WHERE   a.clientcode           = ?ParentClientCode  
-        AND b.clientcode       = ?ClientCode;  
-UPDATE intersection  as a, 
-        intersection as b  
-        SET a.MaxSynonymFirmCrCode = b.MaxSynonymFirmCrCode,   
-        a.MaxSynonymCode           = b.MaxSynonymCode  
-WHERE   a.clientcode               = ?ClientCode  
-        AND b.clientcode           = ?ParentClientCode 
-        AND a.pricecode            = b.pricecode;  
 INSERT 
 INTO    logs.clone 
         (
