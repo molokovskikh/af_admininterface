@@ -130,20 +130,20 @@ SELECT  regionaladmins.RowID,
         clientsdata.ShortName,   
         r.Region,   
         p.Addition  
-FROM (usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM (usersettings.clientsdata, accessright.regionaladmins, farm.regions r)
+	JOIN usersettings.ret_update_info rui ON rui.ClientCode = clientsdata.firmcode
 LEFT JOIN logs.AnalitFUpdates p
-        ON p.clientcode                                   = rcs.clientcode 
+        ON p.clientcode                                   = rui.clientcode 
         AND p.RequestTime                                 > curdate()  
-WHERE   clientsdata.firmcode	                          = rcs.clientcode  
-        AND r.regioncode                                  = clientsdata.regioncode  
+WHERE   r.regioncode                                  = clientsdata.regioncode  
         AND regionaladmins.username                       = ?UserName
         AND regionaladmins.regionmask & clientsdata.maskregion > 0  
-        AND rcs.UncommittedUpdateTime                    >= CURDATE()  
-        AND rcs.UpdateTime                               <> rcs.UncommittedUpdateTime  
+        AND rui.UncommittedUpdateTime                    >= CURDATE()  
+        AND rui.UpdateTime                               <> rui.UncommittedUpdateTime  
         AND p.UpdateId                                   = 
         (SELECT max(pl.UpdateId) 
         FROM    logs.AnalitFUpdates pl 
-        WHERE   pl.clientcode = rcs.clientcode)  
+        WHERE   pl.clientcode = rui.clientcode)  
 ORDER BY p.RequestTime desc;
 ";
 					headerText = "В процессе получения обновления:";
