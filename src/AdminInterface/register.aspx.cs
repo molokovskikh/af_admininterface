@@ -384,16 +384,10 @@ set @inUser = ?UserName;
 				}
 				_command.Parameters["?ClientCode"].Value = CreateClientOnClientsData();
 				Session["Code"] = _command.Parameters["?ClientCode"].Value;
+
+				CreateClientOnOSUserAccessRight();
 				if (IncludeCB.Checked)
-				{
-					if (IncludeType.SelectedItem.Value != "0")
-						CreateClientOnOSUserAccessRight();
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
-				}
-				else
-				{
-					CreateClientOnOSUserAccessRight();
-				}
 
 				if (TypeDD.SelectedItem.Value == "1")
 				{
