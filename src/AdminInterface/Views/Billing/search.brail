@@ -55,7 +55,18 @@
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.Segment, AdminInterface"),
 									BindingHelper.GetDictionaryMapping())}
 			</td>
-		</tr>					
+		</tr>
+		<tr style="text-align:left;">
+			<td>
+				Тип:
+			</td>
+			<td>
+				${FormHelper.Select("SearchBy.ClientType",
+									FindBy.ClientType,
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchClientType, AdminInterface"),
+									BindingHelper.GetDictionaryMapping())}
+			</td>
+		</tr>				
 		</table>
 	</form>
 </div>
