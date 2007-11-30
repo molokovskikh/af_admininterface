@@ -788,7 +788,12 @@ from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; "
 			_command.CommandText =
 @"
 INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask, GeneratePassword());
-INSERT INTO usersettings.ret_update_info (ClientCode) Values(?ClientCode);
+
+INSERT INTO usersettings.ret_update_info (ClientCode, CurrentExeVersion) 
+Values(?ClientCode, (SELECT max(currentExeVersion)
+FROM usersettings.ret_update_info r
+  join usersettings.clientsdata cd on cd.firmcode = r.clientcode
+where billingcode <> 921));
 
 INSERT 
 INTO    intersection 
