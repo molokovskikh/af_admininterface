@@ -61,8 +61,8 @@
 
 .CalendarInput
 {
-	background:  transparent url(../images/calendar.gif) no-repeat scroll right center;
-	cursor:pointer;
+	background:  transparent url(../images/calendar.gif) no-repeat scroll center center;
+	width: 25px;
 }
 
 .VisibleFolder

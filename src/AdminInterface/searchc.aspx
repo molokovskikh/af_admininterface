@@ -6,9 +6,9 @@
 <head runat="server" >
 	<title>Информация о клиентах</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" /></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" /></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/search.js" /></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/search.js" ></script>
 </head>
 <body onload="return SetSearchTitle();">
 	<form id="Form1" method="post" runat="server"  defaultbutton="GoFind">
@@ -71,7 +71,7 @@
 			</table>
 		</div>
 		<div style="margin-top: 20px;">
-			<asp:GridView ID="ClientsGridView" runat="server" AutoGenerateColumns="False" DataSource='<%# ClientsDataView %>'
+			<asp:GridView ID="ClientsGridView" CssClass="HighLightCurrentRow" runat="server" AutoGenerateColumns="False" DataSource='<%# ClientsDataView %>'
 				OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True" OnRowCreated="ClientsGridView_RowCreated"
 				OnSorting="ClientsGridView_Sorting">
 				<Columns>

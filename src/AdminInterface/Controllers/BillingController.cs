@@ -66,8 +66,10 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
+			BillingSearchProperties billingSearchProperties = new BillingSearchProperties();
+			billingSearchProperties.ClientStatus = SearchClientStatus.Enabled;
 			PropertyBag["regions"] = GetRegions();
-			PropertyBag["FindBy"] = new BillingSearchProperties();
+			PropertyBag["FindBy"] = billingSearchProperties;
 		}
 
 		public void SearchBy([DataBind("SearchBy")] BillingSearchProperties searchProperties)
@@ -86,13 +88,17 @@ namespace AdminInterface.Controllers
 							string shortName,
 							ulong regionId,
 							PayerStateFilter payerState,
-							Segment segment)
+							Segment segment,
+							SearchClientType clientType,
+							SearchClientStatus clientStatus)
 		{
 			BillingSearchProperties searchProperties = new BillingSearchProperties();
 			searchProperties.PayerState = payerState;
 			searchProperties.ShortName = shortName;
 			searchProperties.RegionId = regionId;
 			searchProperties.Segment = segment;
+			searchProperties.ClientStatus = clientStatus;
+			searchProperties.ClientType = clientType;
 			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 			List<BillingSearchItem> searchResults;
 

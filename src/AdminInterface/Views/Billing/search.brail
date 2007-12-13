@@ -8,7 +8,7 @@
 
 <div style="text-align:center;background-color: #e7f6e0; padding: 10px; margin-left:34%; margin-right:34%; margin-bottom: 10px">
 	<span style="font-weight:bold;">
-		Фильтр платильщиков
+		Фильтр плательщиков
 	</span>
 	<form action="SearchBy.rails" method="post">
 		<table>
@@ -66,7 +66,18 @@
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchClientType, AdminInterface"),
 									BindingHelper.GetDictionaryMapping())}
 			</td>
-		</tr>				
+		</tr>	
+		<tr style="text-align:left;">
+			<td>
+				Отключен\Не отключен:
+			</td>
+			<td>
+				${FormHelper.Select("SearchBy.ClientStatus",
+									FindBy.ClientStatus,
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchClientStatus, AdminInterface"),
+									BindingHelper.GetDictionaryMapping())}
+			</td>
+		</tr>			
 		</table>
 	</form>
 </div>

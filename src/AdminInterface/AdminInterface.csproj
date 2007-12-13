@@ -358,7 +358,6 @@
     <Content Include="App_Themes\Main\Main.skin" />
     <Content Include="Css\Billing.css" />
     <Content Include="Css\Contacts.css" />
-    <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\Search.js" />
     <Content Include="Views\Client\Info.aspx" />
   </ItemGroup>
@@ -393,6 +392,7 @@
     <Content Include="JavaScript\controls.js" />
     <Content Include="JavaScript\dragdrop.js" />
     <Content Include="JavaScript\effects.js" />
+    <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\scriptaculous.js" />
     <Content Include="JavaScript\slider.js" />
     <Content Include="JavaScript\unittest.js" />

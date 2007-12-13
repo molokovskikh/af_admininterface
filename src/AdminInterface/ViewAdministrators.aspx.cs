@@ -35,13 +35,4 @@ public partial class ViewAdministrators : Page
 				}
 		}
 	}
-
-	protected void Administrators_RowCreated(object sender, GridViewRowEventArgs e)
-	{
-		if (e.Row.RowType == DataControlRowType.DataRow)
-		{ 
-			e.Row.Attributes.Add("onmouseout","return SetClass(this, '');");
-			e.Row.Attributes.Add("onmouseover", "return SetClass(this, 'SelectedRow');");
-		}
-	}
 }

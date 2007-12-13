@@ -26,7 +26,7 @@ function GetTitleText()
 	TitlesAndIds.keys().each(function(id)
 		{
 			if ($(id).checked)
-				result = TitlesAndIds[id];
+				result = TitlesAndIds.get(id);
 		});
 	return result;
 }

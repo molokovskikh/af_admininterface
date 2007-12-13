@@ -1,9 +1,41 @@
-﻿function SetClass(control, className)
+﻿var havePrototype = true;
+try
 {
-	i = 0;
-	for (i = 0; i < control.children.length; i++)
-		if (control.children.item(i).tagName == 'TD')
-			control.children.item(i).className = className;
+	Prototype.Version;
+}
+catch(er)
+{
+	havePrototype = false;
+}
+
+
+if (havePrototype)
+{
+	document.observe("dom:loaded", function() {
+		$$('.HighLightCurrentRow').each(function(table) {
+			join(table);
+		});
+	});
+}
+
+function join(control)
+{
+	control.select('tr').each(function(row){
+	
+		row.observe('mouseout', function() { 
+				row.childElements().each(function(cell)	{
+					if (cell.tagName == 'TD')
+						cell.removeClassName('SelectedRow')
+				});
+		});
+		
+		row.observe('mouseover', function() {
+				row.childElements().each(function(cell)	{
+					if (cell.tagName == 'TD')
+						cell.addClassName('SelectedRow');
+				});
+		});
+	});
 }
 
 function ValidateLogin(source, args)

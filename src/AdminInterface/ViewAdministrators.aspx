@@ -6,6 +6,7 @@
 <head runat="server">
 	<title>Управление региональными администраторами</title>
 	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" /></script>
 </head>
 <body>
 	<form id="form1" runat="server">
@@ -13,7 +14,7 @@
 			<h3>Региональные администраторы</h3>
 			<asp:ObjectDataSource ID="ObjectDataSource1" runat="server"
 				SelectMethod="GetAdministratorList" TypeName="DAL.CommandFactory" DataObjectTypeName="DAL.Administrator" DeleteMethod="DeleteAdministrator" ConflictDetection="CompareAllValues"></asp:ObjectDataSource>
-			<asp:GridView ID="Administrators" runat="server" AutoGenerateColumns="False" DataSourceID="ObjectDataSource1" OnRowCommand="Administrators_RowCommand" OnRowCreated="Administrators_RowCreated" DataKeyNames="ID">
+			<asp:GridView ID="Administrators" runat="server" AutoGenerateColumns="False" DataSourceID="ObjectDataSource1" OnRowCommand="Administrators_RowCommand" CssClass="HighLightCurrentRow" DataKeyNames="ID">
 				<Columns>
 					<asp:TemplateField ShowHeader="False">
 						<HeaderTemplate>
