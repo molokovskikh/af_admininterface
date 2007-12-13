@@ -88,7 +88,7 @@ namespace AdminInterface.Controllers
 							string shortName,
 							ulong regionId,
 							PayerStateFilter payerState,
-							Segment segment,
+							SearchSegment segment,
 							SearchClientType clientType,
 							SearchClientStatus clientStatus)
 		{

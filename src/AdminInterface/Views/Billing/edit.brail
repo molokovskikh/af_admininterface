@@ -83,6 +83,9 @@ d
 							</td							<td style="${GetClientStyle(client)}">
 								${BindingHelper.GetDescription(client.Type)}
 }
+							</td							<td style="${GetClientStyle(client)}">
+								${BindingHelper.GetDescription(client.Segment)}
+}
 							</td>
 						</tr>
 					<% end %					</table>

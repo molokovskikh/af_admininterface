@@ -52,7 +52,7 @@
 			<td>
 				${FormHelper.Select("SearchBy.Segment",
 									FindBy.Segment,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.Segment, AdminInterface"),
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchSegment, AdminInterface"),
 									BindingHelper.GetDictionaryMapping())}
 			</td>
 		</tr>
