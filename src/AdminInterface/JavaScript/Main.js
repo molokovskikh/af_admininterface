@@ -15,7 +15,16 @@ if (havePrototype)
 		$$('.HighLightCurrentRow').each(function(table) {
 			join(table);
 		});
-	});
+		
+		$$(".ShowHiden").each(function(element){
+			element.onclick = function() { ShowHidden(element); } 
+		});
+	
+		$$(".HideVisible").each(function(element){
+			element.onclick = function() { HideVisible(element); } 
+		});
+
+	});	
 }
 
 function join(control)
@@ -62,7 +71,7 @@ function ValidateParent(source, args)
 		args.IsValid = false;
 }
 
-function ShowHiden(sender)
+function ShowHidden(sender)
 {
 	$$(".ShowHiden").first().className = "HideVisible";
 	sender.onclick = function() { HideVisible(sender); } 
@@ -72,7 +81,7 @@ function ShowHiden(sender)
 function HideVisible(sender)
 {
 	$$(".HideVisible").first().className = "ShowHiden";
-	sender.onclick = function() { ShowHiden(sender); } 
+	sender.onclick = function() { ShowHidden(sender); } 
 	$$(".VisibleFolder").first().className = "HidenFolder";
 }
 

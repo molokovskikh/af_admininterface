@@ -57,10 +57,15 @@ end
 
 	<div class="Left">
 	
-		<div style="padding-bottom: 10px;width: 100%"			<div class="InputGroupHeader" style="margin-bottom:10px;" onclick="return ShowHiden(this);">
+		<div style="padding-bottom: 10px;width: 100%">
+			<div class="InputGroupHeader" style="margin-bottom:10px;"				<% if Instance.Clients.Count > 100: %>
 >
-				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div				<div class="HidenFolder">			
-					<table class="DataTable" style="width:100%">
+				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="HidenFolder">
+				<% else: %>
+				<div class="HideVisible">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="VisibleFolder">
+				<% end %					<table class="DataTable" style="width:100%">
 					<% 
 					i = 0
 					for client in Instance.Clients:
