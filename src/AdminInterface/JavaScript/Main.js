@@ -91,9 +91,11 @@ function SetupCalendarElements()
 	.each(function(value, index)
 			{
 				value.id = "CalendarInput" + index;
+				value.previous().id = "CalendarInputField" + index;
 				Calendar.setup({
 					ifFormat: "%d.%m.%Y",
-					inputField: value.id,
+					inputField: value.previous().id,
+					button: value.id,
 					weekNumbers: false,
 					showOthers: true
 				})
