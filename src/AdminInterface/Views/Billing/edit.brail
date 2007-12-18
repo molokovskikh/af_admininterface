@@ -25,10 +25,11 @@ end
 def WriteInputGroupHeader(localHeader as string):
 	return "<tr><td class=\"InputGroupHeader\" colspan=\"2\">" + localHeader + "</td></tr>"
 end
-%><% component CaptureFor, {"Id" : "Title"}:%>
-	Детальная информация о платильщике {billingInstance.ShortName}
-}
-<% end %
+%>
+
+<% component CaptureFor, {"Id" : "Title"}: %>
+	Детальная информация о платильщике ${Instance.ShortName}
+<% end %>
 
 <style>
 	.Main
@@ -51,7 +52,21 @@ end
 		margin: 0;
 		padding: 0;
 	}
-</style
+</style>
+
+<div class="Navigation">
+	<ul>
+		<li>
+			<a href="../default.aspx">Административный интерфейс</a> > 
+		</li>
+		<li>
+			<a href="Search.rails">Биллинг</a> >
+		</li>
+		<li>
+			Редактирование информации плательщика
+		</li>
+	</ul>
+</div>
 
 <div class="Main">
 
@@ -140,14 +155,14 @@ d
 					component ContactViewer, {"ContactGroups" : ContactGroups}:
 						section ContactGroupHeaderd
 					%>
-							<tr								<td colspan="2" class="InputGroupHeader">
+						<tr							<td colspan="2" class="InputGroupHeader">
 >
 								${ContactGroupName}
 							</td>
-						</tr	
-					<d
-					en					section Item:
-d
+						</tr					<% 
+;
+						end
+						section Itemd
 					%>
 							<tr>
 								<td>
@@ -156,7 +171,12 @@ d
 								<td>
 									${Value}
 								</td>
-							</tr	
+							</tr					<% 
+%
+						end
+						section ContactGroupHeaderLinkd
+					%							<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+	
 					<%
 						end
 					end

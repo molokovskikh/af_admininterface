@@ -1,14 +1,8 @@
-<%@ Page Theme="Main" Language="C#" AutoEventWireup="true" CodeBehind="ViewAdministrators.aspx.cs"
+<%@ Page Theme="Main" Language="C#" AutoEventWireup="true" CodeBehind="ViewAdministrators.aspx.cs" MasterPageFile="~/Main.Master"
 	Inherits="ViewAdministrators" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-	<title>Управление региональными администраторами</title>
-	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" /></script>
-</head>
-<body>
+
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<form id="form1" runat="server">
 		<div>
 			<h3>Региональные администраторы</h3>
@@ -70,5 +64,4 @@
 			</ul>
 		</div>
 	</form>
-</body>
-</html>
+</asp:Content>

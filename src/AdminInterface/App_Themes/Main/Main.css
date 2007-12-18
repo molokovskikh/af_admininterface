@@ -264,3 +264,32 @@ div
 	background-color: #f0f8ff;
 }
 /*--------------Managep.aspx-----------------*/
+.Navigation
+{
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	border-bottom-style: double;
+	border-bottom-width: 1px;
+	border-bottom-color: Gray;
+}
+
+.Navigation ul
+{
+	margin: 0;
+	padding: 0;
+	display:inline;
+	list-style-type:none;	
+	width: 100%;
+}
+
+.Navigation li
+{
+	display:inline;
+}
+
+.Navigation li.Current
+{
+	display:inline;
+	font-weight:bold;
+}

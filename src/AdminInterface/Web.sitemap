@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
+    <siteMapNode url="default.aspx" title="Административный интерфейс" >
+		<siteMapNode url="CopySynonym.aspx" title="Клонирование"  />
+		<siteMapNode url="searchc.aspx" title="Информация о клиентах">
+			<siteMapNode url="client/info.rails" title="Информация о клиенте">
+				<siteMapNode url="manageret.aspx" title="Настройка аптеки" />
+				<siteMapNode url="managep.aspx" title="Настройка поставщика">
+					<siteMapNode url="EditRegionalInfo.aspx" title="Информация о прайс листе" />
+					<siteMapNode url="managecosts.aspx" title="Настройка ценовых колонок" />
+				</siteMapNode>
+			</siteMapNode>
+		</siteMapNode>
+		<siteMapNode url="statcont.aspx" title="Статистика обращений" />
+        <siteMapNode url="docs.aspx" title="Общие документы" />
+		<siteMapNode url="ViewAdministrators.aspx" title="Региональные администраторы">
+			<siteMapNode url="EditAdministrator.aspx" title="Редактирование регионального администратора" />
+		</siteMapNode>
+    </siteMapNode>
+</siteMap>

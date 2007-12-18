@@ -24,6 +24,12 @@ if (havePrototype)
 			element.onclick = function() { HideVisible(element); } 
 		});
 
+		textBox = $("ctl00_MainContentPlaceHolder_FindTB");
+		if (textBox && IsTitleText(textBox.value))
+		{
+			textBox.value = GetTitleText();
+			textBox.className = "SearchTitle";
+		}
 	});	
 }
 

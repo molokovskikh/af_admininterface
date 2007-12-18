@@ -2,24 +2,42 @@
 	Поиск плательщиков
 <% end %>
 
-<div class="InputGroupHeader" style="font-weight:bold; margin-bottom:10px;">
-	Биллинг
+<div class="Navigation">
+	<ul>
+		<li>
+			<a href="../default.aspx">Административный интерфейс</a> > 
+		</li>
+		<li class="Current">
+			Биллинг
+		</li>
+	</ul>
 </div>
 
-<div style="text-align:center;background-color: #e7f6e0; padding: 10px; margin-left:34%; margin-right:34%; margin-bottom: 10px">
+
+<div class="CenterBlock" style="text-align:center; width:40%; background-color:rgb(216, 241, 255); margin-bottom:10px; ">
+	<div class="CornerHolder">
+		<div class="TopLeftCorner">
+		</div>
+		<div class="TopRightCorner">
+		</div>
+	</div>
 	<span style="font-weight:bold;">
 		Фильтр плательщиков
 	</span>
 	<form action="SearchBy.rails" method="post">
-		<table>
+		<table class="Full CenterBlock">
+		<col style="width: 40%" />
+		<col style="width: 40%" />
+		<col style="width: 20%" />
+
 		<tr style="text-align:left;">
 			<td>
 				Название:
 			</td>
 			<td>
-				<input type="text" name="SearchBy.ShortName" value="${FindBy.ShortName}" />
+				<input type="text" name="SearchBy.ShortName" value="${FindBy.ShortName}" style="width:100%;" />
 			</td>
-			<td rowspan="4" style="vertical-align:middle;">
+			<td rowspan="6" style="vertical-align:middle;">
 				${FormHelper.Submit("Найти")}
 			</td>
 		</tr>
@@ -31,7 +49,7 @@
 				${FormHelper.Select("SearchBy.PayerState",
 									FindBy.PayerState,
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.PayerStateFilter, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>
 		<tr style="text-align:left;">
@@ -42,7 +60,7 @@
 				${FormHelper.Select("SearchBy.RegionId",
 									FindBy.RegionId,
 									regions, 
-									{"value":"Id", "text":"Name"})}
+									{"value":"Id", "text":"Name", "class" : "Full"})}
 			</td>
 		</tr>
 		<tr style="text-align:left;">
@@ -53,7 +71,7 @@
 				${FormHelper.Select("SearchBy.Segment",
 									FindBy.Segment,
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchSegment, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>
 		<tr style="text-align:left;">
@@ -64,7 +82,7 @@
 				${FormHelper.Select("SearchBy.ClientType",
 									FindBy.ClientType,
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchClientType, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>	
 		<tr style="text-align:left;">
@@ -75,9 +93,15 @@
 				${FormHelper.Select("SearchBy.ClientStatus",
 									FindBy.ClientStatus,
 									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.SearchClientStatus, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>			
 		</table>
 	</form>
+	<div class="CornerHolder">
+		<div class="BottomLeftCorner">
+		</div>
+		<div class="BottomRightCorner">
+		</div>
+	</div>
 </div>

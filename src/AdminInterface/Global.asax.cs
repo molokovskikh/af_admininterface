@@ -9,6 +9,7 @@ using Castle.ActiveRecord.Framework.Config;
 using DAL;
 using Microsoft.Practices.EnterpriseLibrary.Logging;
 using System.Reflection;
+using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
@@ -33,7 +34,49 @@ namespace AddUser
 			ActiveRecordStarter.Initialize(new Assembly[] {Assembly.Load("AdminInterface"),
 														   Assembly.Load("Common.Web.Ui")},
 										   ActiveRecordSectionHandler.Instance);
+			SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
+		}
 
+		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
+		{
+			SiteMapNode currentNode = e.Provider.CurrentNode.Clone(true);
+			if (currentNode.Url == "/manageret.aspx")
+				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
+			else if (currentNode.Url == "/managep.aspx")
+				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
+			else if (currentNode.Url == "/EditRegionalInfo.aspx")
+			{
+				uint firmCode;
+				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
+				{
+					connection.Open();
+					MySqlCommand command = new MySqlCommand(@"
+SELECT FirmCode
+FROM usersettings.regionaldata rd
+WHERE RowID = ?Id", connection);
+					command.Parameters.AddWithValue("?Id", Convert.ToUInt32(e.Context.Request["id"]));
+					firmCode = Convert.ToUInt32(command.ExecuteScalar());
+				}
+				currentNode.ParentNode.Url += "?cc="+firmCode;
+				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmCode;
+			}
+			else if (currentNode.Url == "/managecosts.aspx")
+			{
+				uint firmCode;
+				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
+				{
+					connection.Open();
+					MySqlCommand command = new MySqlCommand(@"
+SELECT FirmCode
+FROM usersettings.PricesData pd
+WHERE PriceCode = ?Id", connection);
+					command.Parameters.AddWithValue("?Id", Convert.ToUInt32(e.Context.Request["pc"]));
+					firmCode = Convert.ToUInt32(command.ExecuteScalar());
+				}
+				currentNode.ParentNode.Url += "?cc=" + firmCode;
+				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmCode;				
+			}
+			return currentNode;
 		}
 
 		void Session_Start(object sender, EventArgs e)

@@ -1,14 +1,8 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
-	Theme="Main" %>
+	Theme="Main" MasterPageFile="~/Main.Master" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-	<title>Конфигурация пользователя</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-</head>
-<body>
-	<form id="Form1" method="post" runat="server">
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<form id="form1" runat="server">
 		<div class="MainBlock">
 			<h4 class="MainHeader">
 				<asp:Label ID="HeaderLabel" runat="server" />
@@ -137,10 +131,6 @@
 			<div class="Submit">
 				<asp:Button ID="SaveButton" runat="server" Text="Применить" OnClick="SaveButton_Click" />
 			</div>
-			<div class="CopyRight">
-				© АК <a href="http://www.analit.net/">"Инфорум"</a> 2004
-			</div>
 		</div>
 	</form>
-</body>
-</html>
+</asp:Content>

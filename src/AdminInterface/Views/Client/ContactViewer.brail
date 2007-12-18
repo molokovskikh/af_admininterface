@@ -1,4 +1,9 @@
 ﻿<% 
 	component ContactViewer, {"ContactGroups" : ContactGroups}:
+		section ContactGroupHeaderLink:
+		%>
+			<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+		<%
+		end
 	end
 %>

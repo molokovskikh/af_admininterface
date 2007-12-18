@@ -1,0 +1,25 @@
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Main.master.cs" Inherits="AdminInterface.Main"  %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>Административный интерфейс</title>
+	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
+	<script type="text/javascript" language="javascript" src="./JavaScript/search.js" ></script>
+	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
+</head>
+<body>
+	<div>
+		<asp:SiteMapPath ID="SiteMapPath" runat="server" SiteMapProvider="SiteMapProvider">
+			<CurrentNodeStyle Font-Bold="True" />
+		</asp:SiteMapPath>
+	</div>
+	<div>
+		<asp:ContentPlaceHolder ID="MainContentPlaceHolder" runat="server" />
+	</div>
+    <div class="CopyRight">
+		© АК <a href="http://www.analit.net/">"Инфорум"</a> 2004
+	</div>
+</body>
+</html>

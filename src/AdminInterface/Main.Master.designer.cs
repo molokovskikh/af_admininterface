@@ -8,33 +8,33 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AddUser {
+namespace AdminInterface {
     
     
     /// <summary>
-    /// Documents class.
+    /// Main class.
     /// </summary>
     /// <remarks>
     /// Auto-generated class.
     /// </remarks>
-    public partial class Documents {
+    public partial class Main {
         
         /// <summary>
-        /// form1 control.
+        /// SiteMapPath control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        protected global::System.Web.UI.WebControls.SiteMapPath SiteMapPath;
         
         /// <summary>
-        /// FileListTab control.
+        /// MainContentPlaceHolder control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.Table FileListTab;
+        protected global::System.Web.UI.WebControls.ContentPlaceHolder MainContentPlaceHolder;
     }
 }

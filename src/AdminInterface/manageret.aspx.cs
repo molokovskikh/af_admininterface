@@ -484,10 +484,12 @@ WHERE
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
+			    Response.Redirect("default.aspx");
 
 			_connection.ConnectionString = Literals.GetConnectionString();
+
 			ClientCode = Convert.ToInt32(Request["cc"]);
+
 			DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 			myMySqlCommand.Connection = _connection;
 			if (!IsPostBack)

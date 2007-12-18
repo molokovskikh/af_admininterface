@@ -1,23 +1,14 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.searchc" CodePage="1251"
-	CodeBehind="searchc.aspx.cs" Theme="Main" %>
+	CodeBehind="searchc.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server" >
-	<title>Информация о клиентах</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/search.js" ></script>
-</head>
-<body onload="return SetSearchTitle();">
-	<form id="Form1" method="post" runat="server"  defaultbutton="GoFind">
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
+	<form id="form1" runat="server" defaultbutton="GoFind">
 		<h3>
 			Статистика работы клиента:
 		</h3>
 		<div style="text-align: center;">
 			<table style="background-color: #e7f6e0;" id="Table2" cellspacing="0" cellpadding="0"
-				width="450" border="0">
+				width="450" border="0" onload="return SetSearchTitle();">
 				<tr>
 					<td colspan="3">
 						Выполните поиск клиента:
@@ -146,9 +137,5 @@
 				</div>
 			</div>
 		</div>
-		<div class="CopyRight">
-			© АК <a href="http://www.analit.net/">"Инфорум"</a>2004
-		</div>
 	</form>
-</body>
-</html>
+</asp:Content>
