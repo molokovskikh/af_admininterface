@@ -741,8 +741,17 @@ ORDER BY cd.shortname;
 
 		protected void DeletePrepareDataButton_Click(object sender, EventArgs e)
 		{
-			File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
-			DeletePrepareDataButton.Enabled = false;
+			try
+			{
+				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
+				DeletePrepareDataButton.Enabled = false;
+				ResultL.Text = "";
+			}
+			catch
+			{
+				ResultL.Text = "Ошибка удаления подготовленных данных, попробуйте позднее.";
+				ResultL.ForeColor = Color.Red;
+			}
 		}
 	}
 }

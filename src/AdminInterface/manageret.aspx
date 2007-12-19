@@ -15,8 +15,7 @@
 						<asp:Label ID="Name" runat="server" Font-Bold="True" />
 					</div>
 					<div align="center">
-						<table id="Table2" bordercolor="#dadada" cellspacing="0" cellpadding="0" width="95%"
-							align="center" border="1">
+						<table id="Table2" style="width: 95%;" cellspacing="0" cellpadding="0" align="center" border="1">
 							<tr align="center" bgcolor="mintcream">
 								<td bgcolor="aliceblue" height="20">
 									<strong>Общая настройка</strong>
