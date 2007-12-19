@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
+using AdminInterface.Models.Logs;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -60,6 +61,19 @@ namespace AdminInterface.Controllers
 																			   endDate.AddDays(1));
 
 			PropertyBag["client"] = Client.Find(clientCode);
+			PropertyBag["beginDate"] = beginDate;
+			PropertyBag["endDate"] = endDate;
+		}
+
+		public void PasswordChangeLog(string login)
+		{
+			PasswordChangeLog(login, DateTime.Today.AddDays(-1), DateTime.Today);
+		}
+
+		public void PasswordChangeLog(string login, DateTime beginDate, DateTime endDate)
+		{
+			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(login, beginDate, endDate);
+			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}

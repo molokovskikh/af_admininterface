@@ -1,6 +1,6 @@
 ﻿<div style="text-align:center;">
 	<form action="" method="get">
-		${FormHelper.HiddenField("clientCode", client.Id)}
+		${PostToServer}
 		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
 		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
 		<table>

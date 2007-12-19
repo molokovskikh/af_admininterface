@@ -293,3 +293,30 @@ div
 	display:inline;
 	font-weight:bold;
 }
+
+.Title
+{
+	background-color: #f0f8ff;
+	font-weight: bold;
+	text-align: center;
+}
+
+table.Test
+{
+	padding: 0;
+	margin: 0;
+	border-collapse:collapse;
+	border-width: 1px;
+	border-color: #dadada;
+	border-style:solid;
+}
+
+.Test td
+{
+	padding: 0;
+	margin: 0;
+	border-width: 1px;
+	border-color: #dadada;
+	border-collapse:collapse;
+	border-style:solid;
+}

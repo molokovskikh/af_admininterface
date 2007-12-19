@@ -14,11 +14,13 @@ namespace AddUser
 		public static void Mail(string from, string fromDisplayName, string subject, bool isBodyHtml, 
 			string body, string to, string toDisplayName, string bcc, Encoding encoding)
 		{
-#if !DEBUG
 			try
 			{
 				if (!String.IsNullOrEmpty(to))
 				{
+#if DEBUG
+					to = "r.kvasov@analit.net";
+#endif
 					MailMessage message = new MailMessage();
 					message.From = new MailAddress(from, fromDisplayName, encoding);
 					message.IsBodyHtml = isBodyHtml;
@@ -40,7 +42,7 @@ namespace AddUser
 			{
 				Logger.Write(Utils.ExceptionToString(ex), "Error");
 			}
-#endif 
+ 
 		}
 
 		public static string GeneratePassword()

@@ -117,20 +117,6 @@
     <Reference Include="System.Web.Mobile" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="billingset.aspx.cs">
-      <DependentUpon>billingset.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="billingset.aspx.designer.cs">
-      <DependentUpon>billingset.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="billingst.aspx.cs">
-      <DependentUpon>billingst.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="billingst.aspx.designer.cs">
-      <DependentUpon>billingst.aspx</DependentUpon>
-    </Compile>
     <Compile Include="chpassgo.aspx.cs">
       <DependentUpon>chpassgo.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -138,17 +124,11 @@
     <Compile Include="chpassgo.aspx.designer.cs">
       <DependentUpon>chpassgo.aspx</DependentUpon>
     </Compile>
-    <Compile Include="clchpass.aspx.cs">
-      <DependentUpon>clchpass.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="clchpass.aspx.designer.cs">
-      <DependentUpon>clchpass.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Components\NavigationComponent.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
+    <Compile Include="Filters\AuthorizeFilter.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ViewHelper.cs" />
@@ -159,12 +139,14 @@
     <Compile Include="Main.Master.designer.cs">
       <DependentUpon>Main.Master</DependentUpon>
     </Compile>
-    <Compile Include="Model\PaymentInstance.cs" />
-    <Compile Include="Model\UpdateDownloadLogEntity.cs" />
-    <Compile Include="Model\UpdateLogEntity.cs" />
-    <Compile Include="Model\BillingSearchItem.cs" />
-    <Compile Include="Model\BillingSearchProperties.cs" />
-    <Compile Include="Model\ClientLogRecord.cs" />
+    <Compile Include="Models\Administrator.cs" />
+    <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
+    <Compile Include="Models\PaymentInstance.cs" />
+    <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
+    <Compile Include="Models\Logs\UpdateLogEntity.cs" />
+    <Compile Include="Models\BillingSearchItem.cs" />
+    <Compile Include="Models\BillingSearchProperties.cs" />
+    <Compile Include="Models\Logs\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="Controllers\ClientInfoController.cs" />
     <Compile Include="CopySynonym.aspx.cs">
@@ -222,27 +204,6 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="InvoiceO.aspx.cs">
-      <DependentUpon>InvoiceO.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="InvoiceO.aspx.designer.cs">
-      <DependentUpon>InvoiceO.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="InvoiceP.aspx.cs">
-      <DependentUpon>InvoiceP.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="InvoiceP.aspx.designer.cs">
-      <DependentUpon>InvoiceP.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="InvoiceR.aspx.cs">
-      <DependentUpon>InvoiceR.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="InvoiceR.aspx.designer.cs">
-      <DependentUpon>InvoiceR.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Literals.cs" />
     <Compile Include="ManageCosts.aspx.cs">
       <DependentUpon>ManageCosts.aspx</DependentUpon>
@@ -265,10 +226,10 @@
     <Compile Include="manageret.aspx.designer.cs">
       <DependentUpon>manageret.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Model\ClientInfo.cs" />
-    <Compile Include="Model\ClientMessage.cs" />
-    <Compile Include="Model\DocumentLogEntity.cs" />
-    <Compile Include="Model\InternetLogEntity.cs" />
+    <Compile Include="Models\ClientInfo.cs" />
+    <Compile Include="Models\ClientMessage.cs" />
+    <Compile Include="Models\Logs\DocumentLogEntity.cs" />
+    <Compile Include="Models\Logs\InternetLogEntity.cs" />
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -320,6 +281,7 @@
     <Compile Include="viewcl.aspx.designer.cs">
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
+    <None Include="Views\Client\ClientLoginsView.brail" />
     <Compile Include="Views\Client\Info.aspx.cs">
       <DependentUpon>Info.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -329,10 +291,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="billingset.aspx" />
-    <Content Include="billingst.aspx" />
     <Content Include="chpassgo.aspx" />
-    <Content Include="clchpass.aspx" />
     <Content Include="CopySynonym.aspx" />
     <Content Include="default.aspx" />
     <Content Include="Docs.aspx" />
@@ -343,9 +302,6 @@
     <Content Include="Images\arrow-down-blue-reversed.gif" />
     <Content Include="Images\arrow-down-blue.gif" />
     <Content Include="Images\logo.gif" />
-    <Content Include="InvoiceO.aspx" />
-    <Content Include="InvoiceP.aspx" />
-    <Content Include="InvoiceR.aspx" />
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
@@ -386,6 +342,7 @@
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
+    <None Include="Views\Logs\PasswordChangeLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
     <None Include="Views\Logs\ShowDownloadLog.brailjs" />
     <None Include="Views\Logs\ShowDownloadLogPartial.brail" />

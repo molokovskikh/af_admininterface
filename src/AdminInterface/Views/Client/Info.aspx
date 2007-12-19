@@ -6,6 +6,7 @@
 
 	
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<form id="form1" runat="server">
 	<style>
 		.InfoRow
 		{
@@ -31,11 +32,6 @@
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="ChPassHL" Target="_blank" runat="server">Статистика изменения пароля</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
 							<asp:HyperLink ID="UpdateListHL" Target="_blank" runat="server">Статистика обновлений</asp:HyperLink>
 						</td>
 					</tr>
@@ -51,16 +47,20 @@
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="ChPass" runat="server">Изменение пароля</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
 							<asp:HyperLink ID="UserInterfaceHL" runat="server">Интерфейс пользователя</asp:HyperLink>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2" style="background-color: #f0f8ff; text-align: center; vertical-align: middle; font-weight:bold;">
+						<td colspan="2">
+<% 
+	TextWriter textWriter = new StringWriter();
+	Controller.InPlaceRenderView(textWriter, "ClientLoginsView");
+	Response.Write(textWriter.ToString());		
+%>							
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="Title">
 							Показываемые клиенты:
 						</td>
 					</tr>
@@ -101,8 +101,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td style="background-color: #f0f8ff; text-align: center; vertical-align: middle;
-							height: 30px;" colspan="2">
+						<td class="Title" style="height: 30px;" colspan="2">
 							<strong>Общая информация</strong>
 						</td>
 					</tr>
@@ -152,7 +151,7 @@
 					<tr>
 						<td colspan="2">
 <% 
-	TextWriter textWriter = new StringWriter();
+	textWriter = new StringWriter();
 	Controller.InPlaceRenderView(textWriter, "ContactViewer");
 	Response.Write(textWriter.ToString());		
 %>
@@ -196,4 +195,5 @@
 				</p>
 			</div>
 		</div>
+	</form>
 </asp:Content>

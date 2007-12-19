@@ -20,6 +20,15 @@ namespace AdminInterface.Views.Client {
     public partial class Info {
         
         /// <summary>
+        /// form1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlForm form1;
+        
+        /// <summary>
         /// ShortNameLB control.
         /// </summary>
         /// <remarks>
@@ -47,15 +56,6 @@ namespace AdminInterface.Views.Client {
         protected global::System.Web.UI.WebControls.HyperLink BillingLink;
         
         /// <summary>
-        /// ChPassHL control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink ChPassHL;
-        
-        /// <summary>
         /// UpdateListHL control.
         /// </summary>
         /// <remarks>
@@ -81,15 +81,6 @@ namespace AdminInterface.Views.Client {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.HyperLink OrderHistoryHL;
-        
-        /// <summary>
-        /// ChPass control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.HyperLink ChPass;
         
         /// <summary>
         /// UserInterfaceHL control.
