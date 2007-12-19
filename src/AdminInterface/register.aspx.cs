@@ -531,6 +531,20 @@ where length(c.contactText) > 0
 											   + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 											   + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
 							  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+
+					Func.Mail("register@analit.net",
+					          "",
+					          "Регистрация нового клиента",
+					          false,
+					          String.Format(@"Зарегистрирован новый клиент
+Название: {0}
+Код: {1}
+Биллинг код: {2}
+Кем зарегистрирован: {3}", ShortNameTB.Text, Session["Code"], Session["DogN"], Session["UserName"]),
+					          "billing@analit.net",
+					          "",
+					          "",
+					          Encoding.UTF8);
 				}
 				catch (Exception err)
 				{
