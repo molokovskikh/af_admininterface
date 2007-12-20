@@ -217,12 +217,12 @@ WHERE RowID = ?Id
 SELECT  pd.FirmCode, 
         pd.PriceName, 
         cd.ShortName, 
-		pd.CostType
-FROM    pricesdata pd, 
-        clientsdata cd  
-WHERE   cd.firmcode      = pd.firmcode 
-        AND pd.pricecode =  ?PriceCode;
-", MyCn);
+		pd.CostType,
+		r.Region
+FROM pricesdata pd
+	JOIN clientsdata cd on cd.firmcode = pd.firmcode 
+		JOIN farm.Regions r on r.RegionCode = cd.RegionCode
+WHERE pd.pricecode = ?PriceCode;", MyCn);
 			try
 			{
 				MyCn.Open();
@@ -238,6 +238,7 @@ WHERE   cd.firmcode      = pd.firmcode
 				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
 				string ShortName = MyReader["ShortName"].ToString();
 				string PriceName = MyReader["PriceName"].ToString();
+				string region = MyReader["Region"].ToString();
 				int costType = Convert.ToInt32(MyReader["CostType"]);
 				MyReader.Close();
 
@@ -295,7 +296,11 @@ ORDER BY region;
 				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
 				Func.Mail("register@analit.net", String.Empty, "\"" + ShortName + "\" - регистрация ценовой колонки", false,
-				          "Оператор: " + Session["UserName"] + "\nПрайс-лист: " + PriceName + "\n",
+						  String.Format(@"Оператор: {0} 
+Поставщик: {1}
+Регион: {2}
+Прайс-лист: {3}
+", Session["UserName"], ShortName, region, PriceName),
 				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 			}
 			catch
