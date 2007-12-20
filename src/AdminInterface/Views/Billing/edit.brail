@@ -92,9 +92,9 @@ d
 }
 							</td							<td style="${GetClientStyle(client)}">
 							<% if client.Id == Client.Id: %>
-								<strong>${client.ShortName}</strong>
+								<strong>${client.GetNameWithParents()}</strong>
 >
-							<% else: %								<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
+							<% else: %								<a href="edit.rails?ClientCode=${client.Id}">${client.GetNameWithParents()}</a>
 >
 							<% end %}
 							</td							<td style="${GetClientStyle(client)}">
