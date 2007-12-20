@@ -52,9 +52,13 @@ WHERE   clientsinfo.clientcode                            =firmcode
         AND writetime BETWEEN ?FromDate AND ?ToDate  
         AND regions.regioncode=clientsdata.RegionCode 
         AND regionaladmins.username=?userName 
+		and (ShortName like ?SearchText 
+			or Message like ?SearchText 
+			or clientsinfo.UserName like ?SearchText)
 ORDER BY WriteTime
 ", _connection);
 			adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
 			adapter.SelectCommand.Parameters.Add("?FromDate", CalendarFrom.SelectedDate);
 			adapter.SelectCommand.Parameters.Add("?ToDate", CalendarTo.SelectedDate.AddDays(1));			
 			
@@ -129,6 +133,11 @@ ORDER BY WriteTime
 					}
 				}
 			}
+		}
+
+		protected void Button1_Click(object sender, EventArgs e)
+		{
+			ShowStatistic();
 		}
 }
 }

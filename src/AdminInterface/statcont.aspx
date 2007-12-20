@@ -8,14 +8,19 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 </head>
 <body>
-	<form id="Form1" method="post" runat="server">
+	<form id="Form1" method="post" runat="server" defaultbutton="Button1">
 		<div align="center">
 			<table id="Table2" cellspacing="0" cellpadding="0" width="320" align="center" border="0">
 				<tr>
-					<td colspan="2">
+					<td colspan="2">	
 						<p align="center">
-							<strong>Выберите период</strong>
+							<strong>Выберите период или введите текст для поиска:</strong>
 						</p>
+					</td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<asp:TextBox runat="server" ID="SearchText" Width="100%" />
 					</td>
 				</tr>
 				<tr>
@@ -47,7 +52,7 @@
 				<tr>
 					<td colspan="2">
 						<p align="right">
-							<asp:Button ID="Button1" runat="server" Text="Показать" BorderStyle="None" />
+							<asp:Button ID="Button1" runat="server" Text="Показать" BorderStyle="None" OnClick="Button1_Click" />
 						</p>
 					</td>
 				</tr>
