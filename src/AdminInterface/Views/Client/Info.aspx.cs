@@ -75,6 +75,9 @@ namespace AdminInterface.Views.Client
 		{
 			try
 			{
+				if (String.IsNullOrEmpty(ProblemTB.Text))
+					return;
+
 				_connection.Open();
 				_command.Connection = _connection;
 				_command.Transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
