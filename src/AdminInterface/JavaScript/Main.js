@@ -37,19 +37,15 @@ function join(control)
 {
 	control.select('tr').each(function(row){
 	
-		row.observe('mouseout', function() { 
-				row.childElements().each(function(cell)	{
-					if (cell.tagName == 'TD')
-						cell.removeClassName('SelectedRow')
-				});
-		});
+		row.observe('mouseout', 
+					function() { 				
+						row.removeClassName('SelectedRow');
+					});
 		
-		row.observe('mouseover', function() {
-				row.childElements().each(function(cell)	{
-					if (cell.tagName == 'TD')
-						cell.addClassName('SelectedRow');
-				});
-		});
+		row.observe('mouseover', 
+					function() {
+						row.addClassName('SelectedRow');
+					});
 	});
 }
 
