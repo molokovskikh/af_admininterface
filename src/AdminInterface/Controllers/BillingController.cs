@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
+using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -85,20 +86,22 @@ namespace AdminInterface.Controllers
 
 		public void OrderBy(string columnName, 
 							string sortDirection,
-							string shortName,
+							string searchText,
 							ulong regionId,
 							PayerStateFilter payerState,
 							SearchSegment segment,
 							SearchClientType clientType,
-							SearchClientStatus clientStatus)
+							SearchClientStatus clientStatus,
+							SearchBy searchBy)
 		{
 			BillingSearchProperties searchProperties = new BillingSearchProperties();
 			searchProperties.PayerState = payerState;
-			searchProperties.ShortName = shortName;
+			searchProperties.SearchText = searchText;
 			searchProperties.RegionId = regionId;
 			searchProperties.Segment = segment;
 			searchProperties.ClientStatus = clientStatus;
 			searchProperties.ClientType = clientType;
+			searchProperties.SearchBy = searchBy;
 			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 			List<BillingSearchItem> searchResults;
 

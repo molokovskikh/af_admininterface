@@ -1,17 +1,6 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.ComponentModel;
-using Common.Web.Ui.Models;
-using NHibernate.Expression;
 
-namespace AdminInterface.Model
+namespace AdminInterface.Models
 {
 	public enum PayerStateFilter
 	{
@@ -41,6 +30,13 @@ namespace AdminInterface.Model
 		[Description("¬ключеные")] Enabled
 	}
 
+	public enum SearchBy
+	{
+		Name,
+		Code,
+		BillingCode,
+	}
+
 	public class BillingSearchProperties
 	{
 		private string _shortName;
@@ -49,6 +45,7 @@ namespace AdminInterface.Model
 		private SearchSegment _segment;
 		private SearchClientType _clientType;
 		private SearchClientStatus _clientStatus;
+		private SearchBy _searchBy;
 
 		public ulong RegionId
 		{
@@ -56,7 +53,7 @@ namespace AdminInterface.Model
 			set { _regionId = value; }
 		}
 
-		public string ShortName
+		public string SearchText
 		{
 			get { return _shortName; }
 			set { _shortName = value; }
@@ -84,6 +81,27 @@ namespace AdminInterface.Model
 		{
 			get { return _clientStatus; }
 			set { _clientStatus = value; }
+		}
+
+		public SearchBy SearchBy
+		{
+			get { return _searchBy; }
+			set { _searchBy = value; }
+		}
+		
+		public bool IsSearchByName()
+		{
+			return _searchBy == SearchBy.Name;
+		}
+
+		public bool IsSearchByCode()
+		{
+			return _searchBy == SearchBy.Code;
+		}
+
+		public bool IsSearchByBillingCode()
+		{
+			return _searchBy == SearchBy.BillingCode;
 		}
 	}
 }

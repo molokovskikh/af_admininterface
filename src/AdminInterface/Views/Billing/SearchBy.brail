@@ -14,11 +14,11 @@ def WriteHeader(text as string, columnName as string):
 		end
 	end
 	%>
-	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&regionId=${FindBy.RegionId}&shortName=${FindBy.ShortName}&payerState=${FindBy.PayerState}&segment=${FindBy.Segment}&clientType=${FindBy.ClientType}&clientStatus=${FindBy.ClientStatus}">
+	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&regionId=${FindBy.RegionId}&searchText=${FindBy.SearchText}&payerState=${FindBy.PayerState}&segment=${FindBy.Segment}&clientType=${FindBy.ClientType}&clientStatus=${FindBy.ClientStatus}&searchBy=${FindBy.SearchBy}">
 		${text}
 		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortColumnName == columnName %>
 	</a>
-	<%
+	<% 
 	return ""
 end
 
@@ -31,14 +31,15 @@ OutputSubView("Search")
 %>
 
 <% if searchResults.Count == 0: %>
-	<div class="EmptyData2">
+	<div class="EmptyData">
 		Повашему запросу ничего не найдено
 	</div>
 <% else: %>
 	<div>
 	<form action="Save.rails" method="post">
 		<input type="hidden" name="SearchBy.RegionId" value="${FindBy.RegionId}" />
-		<input type="hidden" name="SearchBy.ShortName" value="${FindBy.ShortName}" />
+		<input type="hidden" name="SearchBy.SearchText" value="${FindBy.SearchText}" />
+		<input type="hidden" name="SearchBy.SearchBy" value="${FindBy.SearchBy}" />
 		<input type="hidden" name="SearchBy.PayerState" value="${FindBy.PayerState}" />
 		<input type="hidden" name="SearchBy.Segment" value="${FindBy.Segment}" />
 		
@@ -75,14 +76,20 @@ OutputSubView("Search")
 		<% 
 		i = 0
         for searchResult in searchResults:
+
+			if searchResult.IsDisabled:
+				payerStyle = "background-color: #ffa642;"
+			else:
+				payerStyle = ""
+			end
         
-        if searchResult.IsDebitor():
-			payerStyle = "background-color: #ffa642;"
-		else:
-			payerStyle = ""
-		end
+			if searchResult.IsDebitor():
+				paymentStyle = "background-color: #ff4b42;"
+			else:
+				paymentStyle = ""
+			end
 		%>
-        <tr class="${ViewHelper.GetRowStyle(i)}">
+        <tr class="${ViewHelper.GetRowStyle(i)}" style="${payerStyle}">
             <td style="width:1%;">
 				<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}" />
 				<a href="edit.rails?clientCode=${searchResult.LastRegistredClientId}">
@@ -93,10 +100,10 @@ OutputSubView("Search")
                 ${searchResult.ShortName}
             </td>
 			<td style="width:1%">
-				<input style="${payerStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}" />
+				<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}" />
             </td>
             <td>
-				<input style="${payerStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}" />
+				<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}" />
 				<input type="button" class="CalendarInput" />
 			</td>
 			<td style="width:1%">

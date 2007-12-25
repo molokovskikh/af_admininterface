@@ -330,16 +330,21 @@
     </Content>
     <Content Include="Views\Client\ContactViewer.brail" />
     <Content Include="Views\Layouts\billing.brail" />
-    <Content Include="Views\Layouts\default.brail" />
+    <Content Include="Views\Layouts\contact.brail" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Css\Block.css" />
+    <Content Include="Css\Table.css" />
     <Content Include="Images\BottomLeftCorner.png" />
     <Content Include="Images\BottomRightCorner.png" />
     <Content Include="Images\TopLeftCorner.png" />
     <Content Include="Images\TopRightCorner.png" />
+    <Content Include="Css\ValidationStyles.css" />
+    <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Billing\SearchBy.brail" />
+    <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
@@ -349,6 +354,7 @@
     <None Include="Views\Logs\ShowUpdateDetails.brailjs" />
     <None Include="Views\Logs\UpdateLog.brail" />
     <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
+    <None Include="Views\Contact\NewContactGroup.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />

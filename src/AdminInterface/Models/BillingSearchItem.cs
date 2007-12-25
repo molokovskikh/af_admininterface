@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 
-namespace AdminInterface.Model
+namespace AdminInterface.Models
 {
 	[ActiveRecord]
 	public class BillingSearchItem : ActiveRecordBase
@@ -19,8 +20,8 @@ namespace AdminInterface.Model
 		private uint		_disabledClientCount;
 		private uint		_enableClientCount;
 		private string		_regions;
-		private bool _hasRetailSegment;
-		private bool _hasWholesaleSegment;
+		private bool		_hasRetailSegment;
+		private bool		_hasWholesaleSegment;
 
 		[PrimaryKey]
 		public uint BillingCode
@@ -104,6 +105,11 @@ namespace AdminInterface.Model
 			return DateTime.Now - _payDate > TimeSpan.FromDays(1);
 		}
 
+		public bool IsDisabled
+		{
+			get { return EnabledClientsCount == 0; }
+		}
+
 		public string GetSegments()
 		{
 			if (_hasWholesaleSegment && _hasRetailSegment)
@@ -125,6 +131,24 @@ namespace AdminInterface.Model
 				string segmentFilterBlock = "";
 				string typeFilterBlock = "";
 				string clientStatusFilterBlock = "";
+				string searchBlock = "";
+
+				switch(properties.SearchBy)
+				{
+					case SearchBy.Name:
+						searchBlock = String.Format(
+@"and (p.ShortName like '{0}'
+or p.JuridicalName like '{0}'
+or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + properties.SearchText + "%");
+						break;
+					case SearchBy.Code:
+						searchBlock = String.Format("and sum(if(cd.FirmCode = {0}, 1, 0)) > 0", properties.SearchText);
+						break;
+					case SearchBy.BillingCode:
+						searchBlock = String.Format("and p.payerId = {0}", properties.SearchText);
+						break;
+				}
+
 				switch (properties.PayerState)
 				{
 					case PayerStateFilter.All:
@@ -141,7 +165,7 @@ namespace AdminInterface.Model
 				{
 					case SearchSegment.All:
 						break;
-                    case SearchSegment.Retail:
+					case SearchSegment.Retail:
 						segmentFilterBlock = "where sum(if(cd.firmsegment = 1, 1, 0)) > 0";
 						break;
 					case SearchSegment.Wholesale:
@@ -195,18 +219,15 @@ from billing.payers p
 {0}
 group by p.payerId
 having bit_or(cd.MaskRegion) & :RegionId > 0
-		and (p.ShortName like :Name 
-			or p.JuridicalName like :Name
-			or sum(if(cd.ShortName like :Name or cd.FullName like :Name, 1, 0)) > 0)
 		{1}
 		{2}
 		{3}
+		{4}
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, segmentFilterBlock, typeFilterBlock, clientStatusFilterBlock))
-													.AddEntity(typeof(BillingSearchItem))
-													.SetParameter("RegionId", properties.RegionId)
-													.SetParameter("Name", "%" + properties.ShortName + "%")
-													.List<BillingSearchItem>();
+", debitorFilterBlock, segmentFilterBlock, typeFilterBlock, clientStatusFilterBlock, searchBlock))
+					.AddEntity(typeof(BillingSearchItem))
+					.SetParameter("RegionId", properties.RegionId)
+					.List<BillingSearchItem>();
 				ArHelper.Evict(session, result);
 				return result;
 			}

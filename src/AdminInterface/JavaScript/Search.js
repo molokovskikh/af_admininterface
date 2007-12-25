@@ -1,38 +1,56 @@
-var TitlesAndIds = $H({	"ctl00_MainContentPlaceHolder_FindRB_0" : "Автоматический выбор типа поиска", 
-						"ctl00_MainContentPlaceHolder_FindRB_1" : "Поиска по имени", 
-						"ctl00_MainContentPlaceHolder_FindRB_2" : "Поиска по коду",
-						"ctl00_MainContentPlaceHolder_FindRB_3" : "Поиска по биллинг коду",
-						"ctl00_MainContentPlaceHolder_FindRB_4" : "Поиска по логину",
-						"ctl00_MainContentPlaceHolder_FindRB_5" : "Поиска по юридическому наименованию"});
-
-function IsTitleText(text)
+function joinSearchHelper(textBox, titlesAndIds)
 {
-	return  text == "" || TitlesAndIds.values().indexOf(text) != -1;
+	textBox.observe("click", function(){
+		checkAndIfNeedClean(textBox, titlesAndIds);
+	});
+	
+	titlesAndIds.keys().each(function(id)
+	{
+			$(id).observe("click", function(){
+				setSearchTitle(textBox, titlesAndIds);
+			});
+	});
+	
+	setSearchTitle(textBox, titlesAndIds);
+}
+						
+function setSearchTitle(textBox, titlesAndIds)
+{
+	if (isTitleText(textBox.value, titlesAndIds))
+	{
+		textBox.value = getTitleText(titlesAndIds);
+		textBox.addClassName("SearchTitle");
+	}
 }
 
-function GetTitleText()
+function isTitleText(text, titlesAndIds)
+{
+	return  text == "" || titlesAndIds.values().indexOf(text) != -1;
+}
+
+function getTitleText(titlesAndIds)
 {
 	var result;
-	TitlesAndIds.keys().each(function(id)
+	titlesAndIds.keys().each(function(id)
 		{
 			if ($(id).checked)
-				result = TitlesAndIds.get(id);
+				result = titlesAndIds.get(id);
 		});
 	return result;
 }
 
-function CheckAndIfNeedClean(textBox)
+function checkAndIfNeedClean(textBox, titlesAndIds)
 {
-	if (IsTitleText(textBox.value))
+	if (isTitleText(textBox.value, titlesAndIds))
 	{
 		textBox.value = "";
-		textBox.className = "";
+		textBox.removeClassName("SearchTitle");
 	}
 }
 
 function ValidateSearch(source, args)
 {
-	if (IsTitleText(args.Value))
+	if (isTitleText(args.Value, titlesAndIds))
 		args.IsValid = false
 	if (document.getElementById("ctl00_MainContentPlaceHolder_FindRB_3").checked 
 		|| document.getElementById("ctl00_MainContentPlaceHolder_FindRB_2").checked)		

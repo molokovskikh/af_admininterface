@@ -1,33 +1,3 @@
-.DataTable
-{
-	background-color: #EBEBEB;
-	border: solid 1px #DADADA;
-	width: 100%
-}
-
-.DataTable .EvenRow
-{
-	background-color: #F6F6F6;
-}
-
-.DataTable .OddRow
-{
-	background-color: #EEF8FF;
-}
-
-.DataTable .EmptyData
-{
-	text-align:center;
-	background-color: #F6F6F6;
-}
-
-.EmptyData2
-{
-	text-align:center;
-	background-color: #F6F6F6;
-	border: solid 1px #DADADA;
-}
-
 .BillingInput
 {
 	width: 99%;
@@ -65,10 +35,6 @@
 	width: 25px;
 }
 
-.VisibleFolder
-{
-}
-
 .CenterBlock
 {
 	margin-left:auto;
@@ -80,41 +46,3 @@
 	width:80%;
 }
 
-.CornerHolder
-{
-	width: 100%;
-	height: 10px;
-	background-color: rgb(216, 241, 255);	
-}
-
-.TopLeftCorner
-{
-	background: transparent url(../images/TopLeftCorner.png) no-repeat scroll center center;
-	float: left;
-	width: 10px;
-	height: 10px;
-}
-
-.TopRightCorner
-{
-	background: transparent url(../images/TopRightCorner.png) no-repeat scroll center center;	
-	float: right;
-	width: 10px;
-	height: 10px;
-}
-
-.BottomLeftCorner
-{
-	background: transparent url(../images/BottomLeftCorner.png) no-repeat scroll center center;
-	float: left;
-	width: 10px;
-	height: 10px;
-}
-
-.BottomRightCorner
-{
-	background: transparent url(../images/BottomRightCorner.png) no-repeat scroll center center;	
-	float: right;
-	width: 10px;
-	height: 10px;
-}

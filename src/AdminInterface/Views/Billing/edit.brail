@@ -149,21 +149,32 @@ d
 												
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
 																	"КПП:"), 
-												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))																										
-	
-					<0
+												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+																		
+					<%
+					contactGroupIndex = 0
 					component ContactViewer, {"ContactGroups" : ContactGroups}:
-						section ContactGroupHeaderd
-					%>
-						<tr							<td colspan="2" class="InputGroupHeader">
->
+						section ContactGroupHeader:
+						%>
+						<tr>
+							<% if contactGroupIndex == 0: %>
+							<td class="InputGroupHeader">
+								<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+							</td>
+							<td class="InputGroupHeader">
 								${ContactGroupName}
 							</td>
-						</tr					<% 
-;
+							<% else: %>
+							<td class="InputGroupHeader" colspan="2">
+								${ContactGroupName}
+							</td>
+							<% end %>
+						</tr>
+						<% 
+							contactGroupIndex++;
 						end
-						section Itemd
-					%>
+						section Item:
+						%>
 							<tr>
 								<td>
 									${Label}:
@@ -171,13 +182,18 @@ d
 								<td>
 									${Value}
 								</td>
-							</tr					<% 
-%
+							</tr>
+						<% 
 						end
-						section ContactGroupHeaderLinkd
-					%							<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
-	
-					<%
+						section Person:
+						%>
+							<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+						<%
+						end
+						section ContactGroupHeaderLink:
+						%>
+							<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+						<%
 						end
 					end
 					%>

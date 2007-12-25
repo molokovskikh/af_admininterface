@@ -2,6 +2,21 @@
 	CodeBehind="searchc.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
+<script type="text/javascript">
+
+	var titlesAndIds = $H({	"ctl00_MainContentPlaceHolder_FindRB_0" : "Автоматический выбор типа поиска", 
+							"ctl00_MainContentPlaceHolder_FindRB_1" : "Поиска по имени", 
+							"ctl00_MainContentPlaceHolder_FindRB_2" : "Поиска по коду",
+							"ctl00_MainContentPlaceHolder_FindRB_3" : "Поиска по биллинг коду",
+							"ctl00_MainContentPlaceHolder_FindRB_4" : "Поиска по логину",
+							"ctl00_MainContentPlaceHolder_FindRB_5" : "Поиска по юридическому наименованию"});
+
+
+	document.observe("dom:loaded", function() {		
+		joinSearchHelper($("ctl00_MainContentPlaceHolder_FindTB"), titlesAndIds);
+	});
+
+</script>
 	<form id="form1" runat="server" defaultbutton="GoFind">
 		<h3>
 			Статистика работы клиента:
@@ -16,17 +31,17 @@
 				</tr>
 				<tr>
 					<td style="width: 181px;">
-						<asp:TextBox ID="FindTB" runat="server" onclick="return CheckAndIfNeedClean(this);" />&nbsp;
+						<asp:TextBox ID="FindTB" runat="server" />&nbsp;
 						<asp:CustomValidator ID="SearchTextValidator" runat="server" ControlToValidate="FindTB"
 							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True"></asp:CustomValidator></td>
 					<td style="text-align: left;">
 						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="120px">
-							<asp:ListItem Value="Automate" Selected="True" onclick="return SetSearchTitle();">Автоматический</asp:ListItem>
-							<asp:ListItem Value="ShortName" onclick="return SetSearchTitle();">Имя</asp:ListItem>
-							<asp:ListItem Value="Code" onclick="return SetSearchTitle();">ID</asp:ListItem>
-							<asp:ListItem Value="BillingCode" onclick="return SetSearchTitle();">Billing ID</asp:ListItem>
-							<asp:ListItem Value="Login" onclick="return SetSearchTitle();">Логин</asp:ListItem>
-							<asp:ListItem Value="JuridicalName" onclick="return SetSearchTitle();">Юридическое наименование</asp:ListItem>
+							<asp:ListItem Value="Automate" Selected="True">Автоматический</asp:ListItem>
+							<asp:ListItem Value="ShortName">Имя</asp:ListItem>
+							<asp:ListItem Value="Code">ID</asp:ListItem>
+							<asp:ListItem Value="BillingCode">Billing ID</asp:ListItem>
+							<asp:ListItem Value="Login">Логин</asp:ListItem>
+							<asp:ListItem Value="JuridicalName">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
 					</td>
 					<td rowspan="2">
