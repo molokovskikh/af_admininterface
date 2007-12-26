@@ -140,6 +140,7 @@
       <DependentUpon>Main.Master</DependentUpon>
     </Compile>
     <Compile Include="Models\Administrator.cs" />
+    <Compile Include="Models\ClientStatus.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\PaymentInstance.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
@@ -148,7 +149,6 @@
     <Compile Include="Models\BillingSearchProperties.cs" />
     <Compile Include="Models\Logs\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
-    <Compile Include="Controllers\ClientInfoController.cs" />
     <Compile Include="CopySynonym.aspx.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -226,7 +226,6 @@
     <Compile Include="manageret.aspx.designer.cs">
       <DependentUpon>manageret.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Models\ClientInfo.cs" />
     <Compile Include="Models\ClientMessage.cs" />
     <Compile Include="Models\Logs\DocumentLogEntity.cs" />
     <Compile Include="Models\Logs\InternetLogEntity.cs" />

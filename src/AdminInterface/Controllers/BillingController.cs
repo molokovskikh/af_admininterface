@@ -18,7 +18,7 @@ namespace AdminInterface.Controllers
 	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
 	public class BillingController : ARSmartDispatcherController
 	{
-		public void Edit(uint clientCode)
+		public void Edit(uint clientCode, bool showClients)
 		{
 			Client client = Client.Find(clientCode);
 			ClientMessage clientMessage = ClientMessage.TryFind(clientCode);
@@ -26,13 +26,17 @@ namespace AdminInterface.Controllers
 			if (clientMessage != null)
 				PropertyBag.Add("ClientMessage", clientMessage);
 
+			if (showClients)
+				PropertyBag["ShowClients"] = showClients;
+
 			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(clientCode);
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = client.BillingInstance;
 			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
 		}
 
-		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] BillingInstance billingInstance, uint clientCode)
+		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] BillingInstance billingInstance, 
+						   uint clientCode)
 		{
 			billingInstance.UpdateAndFlush();
 			Flash.Add("UpdateMessage", "Изменения сохранены");
@@ -54,15 +58,18 @@ namespace AdminInterface.Controllers
 			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
 		}
 
-		public void ChangeClientState(uint clientCode)
+		public void UpdateClientsStatus(uint clientCode, [DataBind("Status")] ClientWithStatus[] clients)
 		{
-			Client client = Client.Find(clientCode);
-			if (client.Status == ClientStatus.On)
-				client.Status = ClientStatus.Off;
-			else
-				client.Status = ClientStatus.On;
-			DbLogHelper.SavePersistentWithLogParams(Session["UserName"].ToString(), HttpContext.Current.Request.UserHostAddress, client);
-			RedirectToAction("Edit", "clientCode=" + clientCode);
+			using(TransactionScope scope = new TransactionScope(OnDispose.Rollback))
+			{
+				DbLogHelper.SavePersistentWithLogParams(Session["UserName"].ToString(),
+				                                        HttpContext.Current.Request.UserHostAddress,
+				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
+				foreach (ClientWithStatus client in clients)
+					client.Update();
+				scope.VoteCommit();
+			}
+			RedirectToAction("Edit", "clientCode=" + clientCode, "showClients=true");
 		}
 
 		public void Search()

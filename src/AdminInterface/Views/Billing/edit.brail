@@ -73,43 +73,53 @@ end
 	<div class="Left">
 	
 		<div style="padding-bottom: 10px;width: 100%">
-			<div class="InputGroupHeader" style="margin-bottom:10px;"				<% if Instance.Clients.Count > 100: %>
->
-				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
-				<div class="HidenFolder">
-				<% else: %>
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				<% if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10: %>
 				<div class="HideVisible">Клиенты плательщика "${Instance.ShortName}"</div>
 				<div class="VisibleFolder">
-				<% end %					<table class="DataTable" style="width:100%">
-					<% 
-					i = 0
-					for client in Instance.Clients:
-						i++
-d
-					%						<tr class="${ViewHelper.GetRowStyle(i)}">
-							<td style="${GetClientStyle(client)}">
-								${client.Id}
-}
-							</td							<td style="${GetClientStyle(client)}">
-							<% if client.Id == Client.Id: %>
-								<strong>${client.GetNameWithParents()}</strong>
->
-							<% else: %								<a href="edit.rails?ClientCode=${client.Id}">${client.GetNameWithParents()}</a>
->
-							<% end %}
-							</td							<td style="${GetClientStyle(client)}">
-								${client.HomeRegion.Name}
-}
-							</td							<td style="${GetClientStyle(client)}">
-								${BindingHelper.GetDescription(client.Type)}
-}
-							</td							<td style="${GetClientStyle(client)}">
-								${BindingHelper.GetDescription(client.Segment)}
-}
-							</td>
-						</tr>
-					<% end %					</table>
->
+				<% else: %>
+				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="HidenFolder">
+				<% end %>
+					<form action="UpdateClientsStatus.rails" method="post">
+						<input type="hidden" name="clientCode" value="${ClientCode}" />
+						<table class="DataTable" style="width:100%">
+						<% 
+						i = 0
+						for client in Instance.Clients:
+							i++
+						%>
+							<tr class="${ViewHelper.GetRowStyle(i)}">
+								<td style="${GetClientStyle(client)}">
+									<input type="checkbox" ${"checked" if client.IsClientActive()} name="Status[${i}].Status" />
+									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${client.Id}
+								</td>
+								<td style="${GetClientStyle(client)}">
+								<% if client.Id == Client.Id: %>
+									<strong>${client.GetNameWithParents()}</strong>
+								<% else: %>
+									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">${client.GetNameWithParents()}</a>
+								<% end %>
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${client.HomeRegion.Name}
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${BindingHelper.GetDescription(client.Type)}
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${BindingHelper.GetDescription(client.Segment)}
+								</td>
+							</tr>
+						<% end %>
+						</table>
+						<div style="text-align:right;">
+							<input type="submit" value="Сохранить" />
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -274,15 +284,6 @@ d
 	</div>
 	
 	<div class="Right">
-		<div style="margin-bottom:10px;">
->
-			<div class="InputGroupHeader" style="margin-bottom:10px;"				${Client.ShortName}, ${Client.HomeRegion.Name}, ${BindingHelper.GetDescription(Client.Type)}
-�
-			</div			<div style="text-align:right;">
-				<input type="button" value="${controller.GetChangeStatusButtonText(Client)}" onclick="return window.location = 'ChangeClientState.rails?ClientCode=${Client.Id}';" />
->
-			</div>
-		</div>
 	
 <%
 if IsDefined("ClientMessage"):
@@ -375,4 +376,4 @@ end
 			</table>
 		</div>
 	</div>
-</d
+</div>

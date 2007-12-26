@@ -14,29 +14,24 @@ namespace AdminInterface.Helpers
 {
 	public class DbLogHelper
 	{
-		public static void SavePersistentWithLogParams(string user, string host, ActiveRecordBase persistent)
+		public static void SavePersistentWithLogParams(string user, string host, ISession session)
 		{
-			using (new TransactionScope())
+			using (IDbCommand command = session.Connection.CreateCommand())
 			{
-				ISession session = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(persistent.GetType());
-				using (IDbCommand command = session.Connection.CreateCommand())
-				{
-					command.CommandText = @"
+				command.CommandText = @"
 SET @InHost = ?UserHost;
 Set @InUser = ?UserName;";
-					IDbDataParameter parameter = command.CreateParameter();
-					parameter.Value = user;
-					parameter.ParameterName = "?UserName";
-					command.Parameters.Add(parameter);
+				IDbDataParameter parameter = command.CreateParameter();
+				parameter.Value = user;
+				parameter.ParameterName = "?UserName";
+				command.Parameters.Add(parameter);
 
-					parameter = command.CreateParameter();
-					parameter.Value = host;
-					parameter.ParameterName = "?UserHost";
-					command.Parameters.Add(parameter);
+				parameter = command.CreateParameter();
+				parameter.Value = host;
+				parameter.ParameterName = "?UserHost";
+				command.Parameters.Add(parameter);
 
-					command.ExecuteNonQuery();
-				}
-				persistent.SaveAndFlush();
+				command.ExecuteNonQuery();
 			}
 		}
 	}
