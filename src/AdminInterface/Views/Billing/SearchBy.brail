@@ -54,7 +54,7 @@ OutputSubView("Search")
 		<th>
 			${WriteHeader("Сумма платежа", "PaySum")}
 		</th>
-		<th>
+		<th style="width:190px;">
 			${WriteHeader("Дата платежа", "PayDate")}
 		</th>
 		<th>
