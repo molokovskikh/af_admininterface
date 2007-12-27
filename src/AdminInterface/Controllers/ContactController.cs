@@ -16,12 +16,12 @@ namespace AdminInterface.Controllers
 		}
 
 		public void AddContactGroup(uint billingCode,
-									[DataBind("ContactGroup")] ContactGroup contactGroup,
-								    [DataBind("Contacts")] Contact[] contacts)
+		                            [DataBind("ContactGroup")] ContactGroup contactGroup,
+		                            [DataBind("Contacts")] Contact[] contacts)
 		{
 			PopulateValidatorErrorSummary(contactGroup);
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
-				|| ValidationHelper.IsCollectionHasNotValideObject(contacts))
+			    || ValidationHelper.IsCollectionHasNotValideObject(contacts))
 			{
 				contactGroup.Contacts = CleanUp(contacts);
 				PropertyBag["ValidationErrors"] = ValidationSummaryPerInstance;
@@ -39,6 +39,36 @@ namespace AdminInterface.Controllers
 				contactGroup.Save();
 			}
 
+			RenderView(@"..\Common\CloseWindow");
+		}
+
+		public override void AddPerson(uint contactGroupId,
+		                               [DataBind("CurrentPerson")] Person person,
+		                               [DataBind("Contacts")] Contact[] contacts)
+		{
+			base.AddPerson(contactGroupId, person, contacts);
+			if (Response.StatusCode == 302)
+				RedirectToAction("CloseWindow");
+		}
+
+		public override void UpdateContactGroup(uint contactGroupId,
+		                                        [DataBind("Contacts")] Contact[] contacts)
+		{
+			base.UpdateContactGroup(contactGroupId, contacts);
+			if (Response.StatusCode == 302)
+				RedirectToAction("CloseWindow");
+		}
+
+		public override void UpdatePerson([DataBind("CurrentPerson")] Person person,
+		                                  [DataBind("Contacts")] Contact[] contacts)
+		{
+			base.UpdatePerson(person, contacts);
+			if (Response.StatusCode == 302)
+				RedirectToAction("CloseWindow");
+		}
+
+		public void CloseWindow()
+		{
 			RenderView(@"..\Common\CloseWindow");
 		}
 	}
