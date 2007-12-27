@@ -124,7 +124,6 @@
     <Compile Include="chpassgo.aspx.designer.cs">
       <DependentUpon>chpassgo.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Components\NavigationComponent.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
