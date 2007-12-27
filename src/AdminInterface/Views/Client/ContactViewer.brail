@@ -5,5 +5,10 @@
 			<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
 		<%
 		end
+		section Person:
+		%>
+			<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+		<%
+		end
 	end
 %>
