@@ -28,9 +28,6 @@
 						<asp:HyperLink ID="CloneHL" runat="server" NavigateUrl="CopySynonym.aspx">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Клонирование</font></asp:HyperLink></p>
 					<p>
-						<asp:HyperLink ID="ChPassHL" runat="server" NavigateUrl="clchpass.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Изменение паролей</font></asp:HyperLink></p>
-					<p>
 						<asp:HyperLink ID="ClInfHL" runat="server" NavigateUrl="searchc.aspx">
 								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Информация о клиентах</font></asp:HyperLink></p>
 					<p>
