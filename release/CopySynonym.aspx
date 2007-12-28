@@ -1,14 +1,9 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.CopySynonym" CodePage="1251"
-	CodeBehind="CopySynonym.aspx.cs" %>
+	CodeBehind="CopySynonym.aspx.cs" MasterPageFile="~/Main.Master" Theme="Main" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<head xmlns="http://www.w3.org/1999/xhtml">
-	<title>Система присвоения максимальных значений синонимов</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-</head>
-<body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
-	<form id="Form1" method="post" runat="server">
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
+<form id="form1" runat="server">
 		<p align="center">
 			<font face="Verdana" size="2"><strong>Создание предварительного набора данных для клиента</strong></font></p>
 		<table id="Table1" bordercolor="#dadada" cellspacing="0" cellpadding="0" width="300"
@@ -59,7 +54,7 @@
 				</td>
 			</tr>
 		</table>
-	</form>
 	<asp:Label ID="LabelErr" runat="server" Font-Size="9pt" Font-Names="Verdana" ForeColor="Red"
 		Font-Bold="True"></asp:Label>
-</body>
+</form>
+</asp:Content>

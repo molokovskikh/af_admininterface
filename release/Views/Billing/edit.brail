@@ -27,9 +27,10 @@ def WriteInputGroupHeader(localHeader as string):
 end
 %>
 
-<% component CaptureFor, {"Id" : "Title"}:%>
-	Детальная информация о платильщике {billingInstance.ShortName}
+<% component CaptureFor, {"Id" : "Title"}: %>
+	Детальная информация о платильщике ${Instance.ShortName}
 <% end %>
+
 <style>
 	.Main
 	{
@@ -52,40 +53,73 @@ end
 		padding: 0;
 	}
 </style>
+
+<div class="Navigation">
+	<ul>
+		<li>
+			<a href="../default.aspx">Административный интерфейс</a> > 
+		</li>
+		<li>
+			<a href="Search.rails">Биллинг</a> >
+		</li>
+		<li>
+			Редактирование информации плательщика
+		</li>
+	</ul>
+</div>
+
 <div class="Main">
 
 	<div class="Left">
 	
 		<div style="padding-bottom: 10px;width: 100%">
-			<div class="InputGroupHeader" style="margin-bottom:10px;" onclick="return ShowHiden(this);">
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				<% if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10: %>
+				<div class="HideVisible">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="VisibleFolder">
+				<% else: %>
 				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
-				<div class="HidenFolder">			
-					<table class="DataTable" style="width:100%">
-					<% 
-					i = 0
-					for client in Instance.Clients:
-						i++
-					%>
-						<tr class="${ViewHelper.GetRowStyle(i)}">
-							<td style="${GetClientStyle(client)}">
-								${client.Id}
-							</td>
-							<td style="${GetClientStyle(client)}">
-							<% if client.Id == Client.Id: %>
-								<strong>${client.ShortName}</strong>
-							<% else: %>
-								<a href="edit.rails?ClientCode=${client.Id}">${client.ShortName}</a>
-							<% end %>
-							</td>
-							<td style="${GetClientStyle(client)}">
-								${client.HomeRegion.Name}
-							</td>
-							<td style="${GetClientStyle(client)}">
-								${BindingHelper.GetDescription(client.Type)}
-							</td>
-						</tr>
-					<% end %>
-					</table>
+				<div class="HidenFolder">
+				<% end %>
+					<form action="UpdateClientsStatus.rails" method="post">
+						<input type="hidden" name="clientCode" value="${ClientCode}" />
+						<table class="DataTable" style="width:100%">
+						<% 
+						i = 0
+						for client in Instance.Clients:
+							i++
+						%>
+							<tr class="${ViewHelper.GetRowStyle(i)}">
+								<td style="${GetClientStyle(client)}">
+									<input type="checkbox" ${"checked" if client.IsClientActive()} name="Status[${i}].Status" />
+									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${client.Id}
+								</td>
+								<td style="${GetClientStyle(client)}">
+								<% if client.Id == Client.Id: %>
+									<strong>${client.GetNameWithParents()}</strong>
+								<% else: %>
+									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">${client.GetNameWithParents()}</a>
+								<% end %>
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${client.HomeRegion.Name}
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${BindingHelper.GetDescription(client.Type)}
+								</td>
+								<td style="${GetClientStyle(client)}">
+									${BindingHelper.GetDescription(client.Segment)}
+								</td>
+							</tr>
+						<% end %>
+						</table>
+						<div style="text-align:right;">
+							<input type="submit" value="Сохранить" />
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -126,20 +160,31 @@ end
 					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
 																	"КПП:"), 
 												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-																										
+																		
 					<%
+					contactGroupIndex = 0
 					component ContactViewer, {"ContactGroups" : ContactGroups}:
 						section ContactGroupHeader:
-					%>
-							<tr>
-								<td colspan="2" class="InputGroupHeader">
+						%>
+						<tr>
+							<% if contactGroupIndex == 0: %>
+							<td class="InputGroupHeader">
+								<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+							</td>
+							<td class="InputGroupHeader">
 								${ContactGroupName}
 							</td>
+							<% else: %>
+							<td class="InputGroupHeader" colspan="2">
+								${ContactGroupName}
+							</td>
+							<% end %>
 						</tr>
-					<%
-					end
-					section Item:
-					%>
+						<% 
+							contactGroupIndex++;
+						end
+						section Item:
+						%>
 							<tr>
 								<td>
 									${Label}:
@@ -148,7 +193,17 @@ end
 									${Value}
 								</td>
 							</tr>
-					<%
+						<% 
+						end
+						section Person:
+						%>
+							<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+						<%
+						end
+						section ContactGroupHeaderLink:
+						%>
+							<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+						<%
 						end
 					end
 					%>
@@ -229,15 +284,6 @@ end
 	</div>
 	
 	<div class="Right">
-	
-		<div style="margin-bottom:10px;">
-			<div class="InputGroupHeader" style="margin-bottom:10px;">
-				${Client.ShortName}, ${Client.HomeRegion.Name}, ${BindingHelper.GetDescription(Client.Type)}
-			</div>
-			<div style="text-align:right;">
-				<input type="button" value="${controller.GetChangeStatusButtonText(Client)}" onclick="return window.location = 'ChangeClientState.rails?ClientCode=${Client.Id}';" />
-			</div>
-		</div>
 	
 <%
 if IsDefined("ClientMessage"):

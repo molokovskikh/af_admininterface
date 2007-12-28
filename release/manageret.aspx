@@ -1,19 +1,12 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.manageret" CodePage="1251" CodeBehind="manageret.aspx.cs" MaintainScrollPositionOnPostback="true" Theme="Main"  %>
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.manageret" 
+	CodePage="1251" CodeBehind="manageret.aspx.cs" 
+	MaintainScrollPositionOnPostback="true" Theme="Main" MasterPageFile="~/Main.Master" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head id="Head" runat="server">
-	<title>Конфигурация пользователя</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<form id="form1" runat="server">
 	<style type="text/css">
 		.tdCheckBox {vertical-align: middle; text-align: left;}
 	</style>
-
-	<script language="javascript" type="text/javascript" src="JavaScript/Main.js"></script>
-
-</head>
-<body>
-	<form id="Form1" method="post" runat="server">
 		<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 			<tr>
 				<td valign="top" align="center" style="height: 754px">
@@ -22,8 +15,7 @@
 						<asp:Label ID="Name" runat="server" Font-Bold="True" />
 					</div>
 					<div align="center">
-						<table id="Table2" bordercolor="#dadada" cellspacing="0" cellpadding="0" width="95%"
-							align="center" border="1">
+						<table id="Table2" style="width: 95%;" cellspacing="0" cellpadding="0" align="center" border="1">
 							<tr align="center" bgcolor="mintcream">
 								<td bgcolor="aliceblue" height="20">
 									<strong>Общая настройка</strong>
@@ -227,13 +219,8 @@
 							</tr>
 						</table>
 					</div>
-					<div class="CopyRight">
-						© АК <a href="http://www.analit.net/">"Инфорум"</a>2005
-					</div>
 				</td>
 			</tr>
 		</table>
-		&nbsp;
 	</form>
-</body>
-</html>
+</asp:Content>

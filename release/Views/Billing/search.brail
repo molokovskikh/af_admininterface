@@ -2,27 +2,83 @@
 	Поиск плательщиков
 <% end %>
 
-<div class="InputGroupHeader" style="font-weight:bold; margin-bottom:10px;">
-	Биллинг
+<script type="text/javascript">
+	var titlesAndIds = $H({	"SearchByName" : "Поиска по названию", 
+							"SearchById" : "Поиска по коду",
+							"SearchByBillingId" : "Поиска по биллинг коду"});
+						
+	document.observe("dom:loaded", function() {
+		joinSearchHelper($("SearchText"), titlesAndIds);
+		
+		Validation.add("ValidateSearch", "Код не верный", function(v){
+			if ($("SearchByName").checked)
+				return true;
+			else 
+				return isTitleText($("SearchText"), titlesAndIds) || new RegExp("^\\d{1,10}$$").test(v);
+		});		
+		var val = new Validation("SearchForm", 
+								{ onFormValidate : function(result, form){
+									if (result && isTitleText($("SearchText").value, titlesAndIds))
+										$("SearchText").value = "";
+								}});
+	});
+</script>
+
+
+<div class="Navigation">
+	<ul>
+		<li>
+			<a href="../default.aspx">Административный интерфейс</a> > 
+		</li>
+		<li class="Current">
+			Биллинг
+		</li>
+	</ul>
 </div>
 
-<div style="text-align:center;background-color: #e7f6e0; padding: 10px; margin-left:34%; margin-right:34%; margin-bottom: 10px">
-	<span style="font-weight:bold;">
-		Фильтр платильщиков
-	</span>
-	<form action="SearchBy.rails" method="post">
-		<table>
-		<tr style="text-align:left;">
-			<td>
-				Название:
-			</td>
-			<td>
-				<input type="text" name="SearchBy.ShortName" value="${FindBy.ShortName}" />
-			</td>
-			<td rowspan="4" style="vertical-align:middle;">
-				${FormHelper.Submit("Найти")}
-			</td>
-		</tr>
+
+<div class="CenterBlock" style="width:40%; background-color:rgb(216, 241, 255); margin-bottom:10px; ">
+	<div class="CornerHolder">
+		<div class="TopLeftCorner">
+		</div>
+		<div class="TopRightCorner">
+		</div>
+	</div>
+	<h3>
+		Фильтр плательщиков
+	</h3>
+	
+	<form id="SearchForm" action="SearchBy.rails" method="post">
+	
+	<fieldset style="padding: 0; margin: 0;">
+		<legend>Искать по:</legend>
+		<table style="width:100%">
+			<col style="width:60%" />
+			<col style="width:40%" />
+			<tr>
+				<td>
+					<input id="SearchText" class="ValidateSearch" type="text" name="SearchBy.SearchText" value="${FindBy.SearchText}" style="width: 99%;" />
+				</td>
+				<td>
+					<input id="SearchByName" type="radio" name="SearchBy.SearchBy" value="Name" ${"checked" if FindBy.IsSearchByName()} />
+					<label for="SearchByName">Наименование</label>
+					<br />
+					<input id="SearchById" type="radio" name="SearchBy.SearchBy" value="Code" ${"checked" if FindBy.IsSearchByCode()} />
+					<label for="SearchById">ID</label>
+					<br />
+					<input id="SearchByBillingId" type="radio" name="SearchBy.SearchBy" value="BillingCode" ${"checked" if FindBy.IsSearchByBillingCode()} />
+					<label for="SearchByBillingId">Billing ID</label>
+				</td>
+			</tr>
+		</table>
+	</fieldset>	
+	
+	<fieldset style="padding: 0; margin: 0;">
+		<legend>Фильтры:</legend>
+		<table style="width: 100%;" >
+		<col style="width:40%" />
+		<col style="width:60%" />
+
 		<tr style="text-align:left;">
 			<td>
 				Должен\Недолжен:
@@ -30,8 +86,8 @@
 			<td>
 				${FormHelper.Select("SearchBy.PayerState",
 									FindBy.PayerState,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.PayerStateFilter, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.PayerStateFilter, AdminInterface"),
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>
 		<tr style="text-align:left;">
@@ -42,7 +98,7 @@
 				${FormHelper.Select("SearchBy.RegionId",
 									FindBy.RegionId,
 									regions, 
-									{"value":"Id", "text":"Name"})}
+									{"value":"Id", "text":"Name", "class" : "Full"})}
 			</td>
 		</tr>
 		<tr style="text-align:left;">
@@ -52,10 +108,42 @@
 			<td>
 				${FormHelper.Select("SearchBy.Segment",
 									FindBy.Segment,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Model.Segment, AdminInterface"),
-									BindingHelper.GetDictionaryMapping())}
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchSegment, AdminInterface"),
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
-		</tr>					
+		</tr>
+		<tr style="text-align:left;">
+			<td>
+				Тип:
+			</td>
+			<td>
+				${FormHelper.Select("SearchBy.ClientType",
+									FindBy.ClientType,
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientType, AdminInterface"),
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+			</td>
+		</tr>	
+		<tr style="text-align:left;">
+			<td>
+				Отключен\Не отключен:
+			</td>
+			<td>
+				${FormHelper.Select("SearchBy.ClientStatus",
+									FindBy.ClientStatus,
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientStatus, AdminInterface"),
+									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+			</td>
+		</tr>
 		</table>
-	</form>
+		</fieldset>
+		<div style="text-align:right; margin-top: 10px;">
+			${FormHelper.Submit("Найти")}
+		</div>
+	</form>		
+	<div class="CornerHolder">
+		<div class="BottomLeftCorner">
+		</div>
+		<div class="BottomRightCorner">
+		</div>
+	</div>
 </div>

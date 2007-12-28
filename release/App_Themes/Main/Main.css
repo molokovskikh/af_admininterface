@@ -69,10 +69,7 @@ div
 	margin: 0px;
 }
 
-.SelectedRow
-{
-	background-color: #B5B5B5;
-}
+
 
 .LabelForInput
 {
@@ -264,3 +261,59 @@ div
 	background-color: #f0f8ff;
 }
 /*--------------Managep.aspx-----------------*/
+.Navigation
+{
+	padding-bottom: 10px;
+	margin-bottom: 10px;
+	width: 100%;
+	border-bottom-style: double;
+	border-bottom-width: 1px;
+	border-bottom-color: Gray;
+}
+
+.Navigation ul
+{
+	margin: 0;
+	padding: 0;
+	display:inline;
+	list-style-type:none;	
+	width: 100%;
+}
+
+.Navigation li
+{
+	display:inline;
+}
+
+.Navigation li.Current
+{
+	display:inline;
+	font-weight:bold;
+}
+
+.Title
+{
+	background-color: #f0f8ff;
+	font-weight: bold;
+	text-align: center;
+}
+
+table.Test
+{
+	padding: 0;
+	margin: 0;
+	border-collapse:collapse;
+	border-width: 1px;
+	border-color: #dadada;
+	border-style:solid;
+}
+
+.Test td
+{
+	padding: 0;
+	margin: 0;
+	border-width: 1px;
+	border-color: #dadada;
+	border-collapse:collapse;
+	border-style:solid;
+}

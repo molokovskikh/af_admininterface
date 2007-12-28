@@ -1,9 +1,45 @@
-﻿function SetClass(control, className)
+﻿var havePrototype = true;
+try
 {
-	i = 0;
-	for (i = 0; i < control.children.length; i++)
-		if (control.children.item(i).tagName == 'TD')
-			control.children.item(i).className = className;
+	Prototype.Version;
+}
+catch(er)
+{
+	havePrototype = false;
+}
+
+
+if (havePrototype)
+{
+	document.observe("dom:loaded", function() {
+		$$('.HighLightCurrentRow').each(function(table) {
+			join(table);
+		});
+		
+		$$(".ShowHiden").each(function(element){
+			element.onclick = function() { ShowHidden(element); } 
+		});
+	
+		$$(".HideVisible").each(function(element){
+			element.onclick = function() { HideVisible(element); } 
+		});
+	});	
+}
+
+function join(control)
+{
+	control.select('tr').each(function(row){
+	
+		row.observe('mouseout', 
+					function() { 				
+						row.removeClassName('SelectedRow');
+					});
+		
+		row.observe('mouseover', 
+					function() {
+						row.addClassName('SelectedRow');
+					});
+	});
 }
 
 function ValidateLogin(source, args)
@@ -30,7 +66,7 @@ function ValidateParent(source, args)
 		args.IsValid = false;
 }
 
-function ShowHiden(sender)
+function ShowHidden(sender)
 {
 	$$(".ShowHiden").first().className = "HideVisible";
 	sender.onclick = function() { HideVisible(sender); } 
@@ -40,7 +76,7 @@ function ShowHiden(sender)
 function HideVisible(sender)
 {
 	$$(".HideVisible").first().className = "ShowHiden";
-	sender.onclick = function() { ShowHiden(sender); } 
+	sender.onclick = function() { ShowHidden(sender); } 
 	$$(".VisibleFolder").first().className = "HidenFolder";
 }
 
@@ -50,9 +86,11 @@ function SetupCalendarElements()
 	.each(function(value, index)
 			{
 				value.id = "CalendarInput" + index;
+				value.previous().id = "CalendarInputField" + index;
 				Calendar.setup({
 					ifFormat: "%d.%m.%Y",
-					inputField: value.id,
+					inputField: value.previous().id,
+					button: value.id,
 					weekNumbers: false,
 					showOthers: true
 				})

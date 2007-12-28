@@ -1,33 +1,3 @@
-.DataTable
-{
-	background-color: #EBEBEB;
-	border: solid 1px #DADADA;
-	width: 100%
-}
-
-.DataTable .EvenRow
-{
-	background-color: #F6F6F6;
-}
-
-.DataTable .OddRow
-{
-	background-color: #EEF8FF;
-}
-
-.DataTable .EmptyData
-{
-	text-align:center;
-	background-color: #F6F6F6;
-}
-
-.EmptyData2
-{
-	text-align:center;
-	background-color: #F6F6F6;
-	border: solid 1px #DADADA;
-}
-
 .BillingInput
 {
 	width: 99%;
@@ -61,10 +31,18 @@
 
 .CalendarInput
 {
-	background:  transparent url(../images/calendar.gif) no-repeat scroll right center;
-	cursor:pointer;
+	background:  transparent url(../images/calendar.gif) no-repeat scroll center center;
+	width: 25px;
 }
 
-.VisibleFolder
+.CenterBlock
 {
+	margin-left:auto;
+	margin-right:auto;
 }
+
+.Full
+{
+	width:80%;
+}
+

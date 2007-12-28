@@ -1,25 +1,18 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AdminInterface.Views.Client.Info" CodePage="1251"
-	CodeBehind="Info.aspx.cs" Theme="Main" %>
+	CodeBehind="Info.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
 <%@ Import namespace="System.IO"%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-	<title>Информация о клиентах</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 	
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<form id="form1" runat="server">
 	<style>
-	.InfoRow
-	{
-		height: 20px;
-	}
+		.InfoRow
+		{
+			height: 20px;
+		}
 	</style>
-	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
-</head>
-<body>
-	<form id="Form1" method="post" runat="server">
 		<h3>
 			<asp:Label ID="ShortNameLB" runat="server" />
 		</h3>
@@ -39,11 +32,6 @@
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="ChPassHL" Target="_blank" runat="server">Статистика изменения пароля</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
 							<asp:HyperLink ID="UpdateListHL" Target="_blank" runat="server">Статистика обновлений</asp:HyperLink>
 						</td>
 					</tr>
@@ -59,16 +47,20 @@
 					</tr>
 					<tr>
 						<td colspan="2" height="20">
-							<asp:HyperLink ID="ChPass" runat="server">Изменение пароля</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
 							<asp:HyperLink ID="UserInterfaceHL" runat="server">Интерфейс пользователя</asp:HyperLink>
 						</td>
 					</tr>
 					<tr>
-						<td colspan="2" style="background-color: #f0f8ff; text-align: center; vertical-align: middle; font-weight:bold;">
+						<td colspan="2">
+<% 
+	TextWriter textWriter = new StringWriter();
+	Controller.InPlaceRenderView(textWriter, "ClientLoginsView");
+	Response.Write(textWriter.ToString());		
+%>							
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" class="Title">
 							Показываемые клиенты:
 						</td>
 					</tr>
@@ -109,8 +101,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td style="background-color: #f0f8ff; text-align: center; vertical-align: middle;
-							height: 30px;" colspan="2">
+						<td class="Title" style="height: 30px;" colspan="2">
 							<strong>Общая информация</strong>
 						</td>
 					</tr>
@@ -160,7 +151,7 @@
 					<tr>
 						<td colspan="2">
 <% 
-	TextWriter textWriter = new StringWriter();
+	textWriter = new StringWriter();
 	Controller.InPlaceRenderView(textWriter, "ContactViewer");
 	Response.Write(textWriter.ToString());		
 %>
@@ -204,9 +195,5 @@
 				</p>
 			</div>
 		</div>
-		<div class="CopyRight">
-			© АК<a href="http://www.analit.net/">"Инфорум"</a>2005
-		</div>
 	</form>
-</body>
-</html>
+</asp:Content>

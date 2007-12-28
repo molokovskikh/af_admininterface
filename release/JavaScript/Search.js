@@ -1,50 +1,58 @@
-var TitlesAndIds = $H({	"FindRB_0" : "Автоматический выбор типа поиска", 
-						"FindRB_1" : "Поиска по имени", 
-						"FindRB_2" : "Поиска по коду",
-						"FindRB_3" : "Поиска по биллинг коду",
-						"FindRB_4" : "Поиска по логину",
-						"FindRB_5" : "Поиска по юридическому наименованию"});
-
-function SetSearchTitle()
+function joinSearchHelper(textBox, titlesAndIds)
 {
-	textBox = document.getElementById("FindTB");
-	if (IsTitleText(textBox.value))
+	textBox.observe("click", function(){
+		checkAndIfNeedClean(textBox, titlesAndIds);
+	});
+	
+	titlesAndIds.keys().each(function(id)
 	{
-		textBox.value = GetTitleText();
-		textBox.className = "SearchTitle";
+			$(id).observe("click", function(){
+				setSearchTitle(textBox, titlesAndIds);
+			});
+	});
+	
+	setSearchTitle(textBox, titlesAndIds);
+}
+						
+function setSearchTitle(textBox, titlesAndIds)
+{
+	if (isTitleText(textBox.value, titlesAndIds))
+	{
+		textBox.value = getTitleText(titlesAndIds);
+		textBox.addClassName("SearchTitle");
 	}
 }
 
-function IsTitleText(text)
+function isTitleText(text, titlesAndIds)
 {
-	return  text == "" || TitlesAndIds.values().indexOf(text) != -1;
+	return  text == "" || titlesAndIds.values().indexOf(text) != -1;
 }
 
-function GetTitleText()
+function getTitleText(titlesAndIds)
 {
 	var result;
-	TitlesAndIds.keys().each(function(id)
+	titlesAndIds.keys().each(function(id)
 		{
 			if ($(id).checked)
-				result = TitlesAndIds[id];
+				result = titlesAndIds.get(id);
 		});
 	return result;
 }
 
-function CheckAndIfNeedClean(textBox)
+function checkAndIfNeedClean(textBox, titlesAndIds)
 {
-	if (IsTitleText(textBox.value))
+	if (isTitleText(textBox.value, titlesAndIds))
 	{
 		textBox.value = "";
-		textBox.className = "";
+		textBox.removeClassName("SearchTitle");
 	}
 }
 
 function ValidateSearch(source, args)
 {
-	if (IsTitleText(args.Value))
+	if (isTitleText(args.Value, titlesAndIds))
 		args.IsValid = false
-	if (document.getElementById("FindRB_3").checked 
-		|| document.getElementById("FindRB_2").checked)		
+	if (document.getElementById("ctl00_MainContentPlaceHolder_FindRB_3").checked 
+		|| document.getElementById("ctl00_MainContentPlaceHolder_FindRB_2").checked)		
 		args.IsValid = new RegExp("^\\d{1,10}$$").test(args.Value);
 }

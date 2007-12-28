@@ -2,10 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>${?Title}</title>
 	<script type="text/javascript" src="../JavaScript/calendar.js"></script>
 	<script type="text/javascript" src="../JavaScript/calendar-ru_win_.js"></script>
 	<script type="text/javascript" src="../JavaScript/calendar-setup.js"></script>
-	<script type="text/javascript" src="../JavaScript/prototype.js" /></script>
+	<script type="text/javascript" src="../JavaScript/prototype.js"></script>
 	<script type="text/javascript" src="../JavaScript/scriptaculous.js"></script>
 
 	<style type="text/css">
@@ -15,6 +16,8 @@
 	<link href="../Css/Contacts.css" type="text/css" rel="stylesheet" />
 	<link href="../Css/Billing.css" type="text/css" rel="stylesheet" />
 	<link href="../Css/Common.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Table.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Block.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 ${ChildOutput}
