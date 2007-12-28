@@ -1,0 +1,44 @@
+﻿<% component CaptureFor, {"Id" : "Title"}: %>
+	Добавление новой группы контактной информации
+<% end %>
+<div class="ContactBaseDiv" style="width: 500px">
+	<form method="post" action="AddContactGroup.rails">
+		<input type="hidden" value=${billingCode} name="billingCode" />
+		<div class="ContactHeaderDiv">
+			Добавление новой группы контактной информации
+		</div>
+		<div>
+			<table cellpadding="3px" cellspacing="3px" style="width:100%">
+				<tr>
+					<td class="Line" style="width: 20%">
+						Название:
+					</td>
+					<td class="Line" style="width: 80%">
+						<input type=text style="width: 90%" name="ContactGroup.Name" value="${contactGroup.Name}" />
+						<%
+						if IsDefined("ValidationErrors"):
+							component ValidationErrorViewer, { "instance" : contactGroup, "validationErrors" : ValidationErrors }:
+								section item:
+						%> 
+									<tr class="ContactValidationErrorMessage">
+										<td colspan="2"> 
+											${ValidationError}
+										</td>
+									</tr>
+						<%
+								end
+							end
+						end
+						%>
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div>
+			<% component ContactEditor, {"Contacts" : contactGroup.Contacts ,"ShowMailingAddress" : true} %>
+		</div>
+		<div class="ContactSubmitDiv">
+			<input type=submit value="Сохранить" />
+		</div>
+	</form>
+</div>
