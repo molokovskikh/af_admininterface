@@ -234,7 +234,7 @@
 						</tr>
 						<tr>
 							<td style="height: 19px" align="center" bgcolor="#eef8ff" colspan="4">
-								<font face="Verdana" size="2">В скобках указанно колличество уникальных клиентов.</font></td>
+								<font face="Verdana" size="2">В скобках указанно количество уникальных клиентов.</font></td>
 						</tr>
 					</table>
 				</td>
