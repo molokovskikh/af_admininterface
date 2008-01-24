@@ -154,10 +154,10 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 					case PayerStateFilter.All:
 						break;
 					case PayerStateFilter.Debitors:
-						debitorFilterBlock = "and p.oldpaydate <= curDate()";
+						debitorFilterBlock = "where p.oldpaydate <= curDate()";
 						break;
 					case PayerStateFilter.NotDebitors:
-						debitorFilterBlock = "and p.oldpaydate > curDate()";
+						debitorFilterBlock = "where p.oldpaydate > curDate()";
 						break;
 				}
 
@@ -166,10 +166,10 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 					case SearchSegment.All:
 						break;
 					case SearchSegment.Retail:
-						segmentFilterBlock = "where sum(if(cd.firmsegment = 1, 1, 0)) > 0";
+						segmentFilterBlock = "and sum(if(cd.firmsegment = 1, 1, 0)) > 0";
 						break;
 					case SearchSegment.Wholesale:
-						segmentFilterBlock = "where sum(if(cd.firmsegment = 0, 1, 0)) > 0";
+						segmentFilterBlock = "and sum(if(cd.firmsegment = 0, 1, 0)) > 0";
 						break;
 				}
 
