@@ -40,11 +40,11 @@ namespace AddUser
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
 		{
 			SiteMapNode currentNode = e.Provider.CurrentNode.Clone(true);
-			if (currentNode.Url == "/manageret.aspx")
+			if (currentNode.Url.EndsWith("/manageret.aspx"))
 				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
-			else if (currentNode.Url == "/managep.aspx")
+			else if (currentNode.Url.EndsWith("/managep.aspx"))
 				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
-			else if (currentNode.Url == "/EditRegionalInfo.aspx")
+			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
 			{
 				uint firmCode;
 				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
@@ -60,7 +60,7 @@ WHERE RowID = ?Id", connection);
 				currentNode.ParentNode.Url += "?cc="+firmCode;
 				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmCode;
 			}
-			else if (currentNode.Url == "/managecosts.aspx")
+			else if (currentNode.Url.EndsWith("/managecosts.aspx"))
 			{
 				uint firmCode;
 				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
