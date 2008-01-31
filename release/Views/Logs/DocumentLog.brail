@@ -81,7 +81,7 @@
 				${logEntity.LogTime}
 			</td>
 			<td>
-				${BindingHelper.GetDescription(logEntity.DocumentType)}
+				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
 			</td>
 		<% 
 			if client.IsDrugStore():
@@ -102,7 +102,7 @@
 				${logEntity.FileName}
 			</td>
 			<td>
-				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize)}
+				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize) if logEntity.DocumentSize != null}
 			</td>
 			<td>
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
