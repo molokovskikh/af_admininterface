@@ -21,11 +21,11 @@ namespace AdminInterface.Model
 	{
 		private uint _id;
 		private DateTime _logTime;
-		private DocumentType _documentType;
+		private DocumentType? _documentType;
 		private Client _forClient;
 		private Client _fromSupplier;
 		private string _fileName;
-		private uint _docuemtFileSize;
+		private uint? _docuemtFileSize;
 		private UpdateLogEntity _updateLogEntity;
 		private string _addition;
 
@@ -44,7 +44,7 @@ namespace AdminInterface.Model
 		}
 
 		[Property]
-		public DocumentType DocumentType
+		public DocumentType? DocumentType
 		{
 			get { return _documentType; }
 			set { _documentType = value; }
@@ -72,7 +72,7 @@ namespace AdminInterface.Model
 		}
 
 		[Property]
-		public uint DocumentSize
+		public uint? DocumentSize
 		{
 			get { return _docuemtFileSize; }
 			set { _docuemtFileSize = value; }
