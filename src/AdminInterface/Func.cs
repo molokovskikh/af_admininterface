@@ -34,7 +34,7 @@ namespace AddUser
 					foreach (string toAddress in to.Split(",".ToCharArray()))
 						message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
 
-					SmtpClient client = new SmtpClient("box.analit.net");
+					SmtpClient client = new SmtpClient("mail.adc.analit.net");
 					client.Send(message);
 				}
 			}
