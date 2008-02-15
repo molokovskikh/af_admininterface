@@ -25,7 +25,7 @@ namespace AdminInterface.Model
 		private Client _forClient;
 		private Client _fromSupplier;
 		private string _fileName;
-		private uint? _docuemtFileSize;
+		private uint? _documentFileSize;
 		private UpdateLogEntity _updateLogEntity;
 		private string _addition;
 
@@ -74,8 +74,8 @@ namespace AdminInterface.Model
 		[Property]
 		public uint? DocumentSize
 		{
-			get { return _docuemtFileSize; }
-			set { _docuemtFileSize = value; }
+			get { return _documentFileSize; }
+			set { _documentFileSize = value; }
 		}
 
 		[BelongsTo(Column = "UpdateId")]
