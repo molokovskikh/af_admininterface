@@ -110,6 +110,7 @@ WHERE PriceCode = ?Id", connection);
 
 		void Application_Error(object sender, EventArgs e)
 		{
+#if !DEBUG
 			StringBuilder builder = new StringBuilder();
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
@@ -144,6 +145,7 @@ WHERE PriceCode = ?Id", connection);
 
 			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
 			Logger.Write(builder.ToString(), "Error");
+#endif
 		}
 
 		void Session_End(object sender, EventArgs e)

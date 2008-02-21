@@ -61,43 +61,28 @@
 					</tr>
 					<tr>
 						<td colspan="2" class="Title">
-							Показываемые клиенты:
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
-							<asp:GridView ID="ShowClientsGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="ShowClientsGrid_RowCommand" OnRowDataBound="ShowClientsGrid_RowDataBound" OnRowDeleting="ShowClientsGrid_RowDeleting">
-								<EmptyDataTemplate>
-									<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить клиента" />
-								</EmptyDataTemplate>
-								<Columns>
-									<asp:TemplateField>
-										<HeaderTemplate>
-											<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Добавить" />
-										</HeaderTemplate>
-										<ItemTemplate>
-											<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="Удалить" />
-										</ItemTemplate>
-										<ItemStyle Width="10%" />
-									</asp:TemplateField>
-									<asp:TemplateField HeaderText="Клиент">
-										<ItemTemplate>
-											<asp:TextBox ID="SearchText" runat="server" />
-											<asp:Button ID="SearchButton" CommandName="Search" runat="server" Text="Найти" ValidationGroup="3" />
-											<asp:DropDownList ID="ShowClientsList" runat="server" DataTextField="ShortName" DataValueField="FirmCode">
-											</asp:DropDownList>
-											<asp:CustomValidator ID="ShowCleintsValidator" runat="server" ControlToValidate="ShowClientsList"
-												ErrorMessage="Необходимо выбрать клиента." ValidateEmptyText="True" ValidationGroup="1" OnServerValidate="ShowCleintsValidator_ServerValidate" Width="13px">*</asp:CustomValidator>
-										</ItemTemplate>
-									</asp:TemplateField>
-								</Columns>
-							</asp:GridView>
+							Операции:
 						</td>
 					</tr>
 					<tr id="UnlockRow" runat="server">
 						<td colspan="2">
 							<asp:Button ID="UnlockButton" runat="server" Text="Разблокировать" OnClick="UnlockButton_Click" ValidationGroup="2" />
 							<asp:Label ID="UnlockedLabel" runat="server" Text="Разблокированно" ForeColor="Green" />
+						</td>
+					</tr>
+					<tr id="DeletePrepareDataRow" runat="server">
+						<td colspan="2">
+							<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="0" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
+							<asp:Label ID="DeleteLabel" runat="server" />
+						</td>
+					</tr>
+					<tr id="ResetUINRow" runat="server">
+						<td valign="middle" align="left" colspan="3" style="height: 22px">
+							<asp:Button ID="ResetCopyIDCB" runat="server" Text="Сбросить УИН" Enabled="False" ValidationGroup="1" OnClick="ResetUniqueCopyID" />
+							<asp:Label ID="IsUniqueCopyIDSet" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
+							<label id="ResearReasonLable" runat="server">Причина:</label>
+							<asp:TextBox ID="ResetIDCause" runat="server" BorderStyle="None" BackColor="LightGray" Enabled="False" />
+							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." ValidationGroup="1" />
 						</td>
 					</tr>
 					<tr>

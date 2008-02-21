@@ -1,15 +1,14 @@
 using System;
-using System.IO;
-using System.Collections;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
+using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using MySql.Data.MySqlClient;
 using DAL;
+using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
@@ -52,7 +51,7 @@ namespace AddUser
 		string InsertCommand;
 
 
-		[DebuggerStepThrough()]
+		[DebuggerStepThrough]
 		private void InitializeComponent()
 		{
 			DS1 = new DataSet();
@@ -146,7 +145,7 @@ namespace AddUser
 			InitializeComponent();
 		}
 
-		private DataSet _data
+		private DataSet Data
 		{
 			get { return (DataSet)Session["IncludeData"]; }
 			set { Session["IncludeData"] = value; }
@@ -154,12 +153,8 @@ namespace AddUser
 
 		protected void ParametersSave_Click(object sender, EventArgs e)
 		{
-			if (ResetCopyIDCB.Checked & CopyIDWTB.Text.Length < 5 & ResetCopyIDCB.Enabled)
-			{
-				ResultL.Text = "Изменения не сохранены.<br>Укажите причину сброса идентификатора.";
-				ResultL.ForeColor = Color.Red;
+			if (!IsValid)
 				return;
-			}
 			ProcessChanges();
 			myMySqlCommand.Parameters.Add("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
 			myMySqlCommand.Parameters.Add("?AlowRegister", RegisterCB.Checked);
@@ -169,7 +164,6 @@ namespace AddUser
 			myMySqlCommand.Parameters.Add("?AlowWayBill", WayBillCB.Checked);
 			myMySqlCommand.Parameters.Add("?AlowChangeSegment", ChangeSegmentCB.Checked);
 			myMySqlCommand.Parameters.Add("?EnableUpdate", EnableUpdateCB.Checked);
-			myMySqlCommand.Parameters.Add("?ResetIDCause", CopyIDWTB.Text);
 			myMySqlCommand.Parameters.Add("?CalculateLeader", CalculateLeaderCB.Checked);
 			myMySqlCommand.Parameters.Add("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
 			myMySqlCommand.Parameters.Add("?SubmitOrders", SubmitOrdersCB.Checked);
@@ -196,26 +190,11 @@ namespace AddUser
 				_connection.Open();
 				myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 				myMySqlCommand.Transaction = myTrans;
-
-				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
-				{
-					myMySqlCommand.CommandText =
-@"
-set @inHost = ?Host;
-set @inUser = ?UserName;
-set @ResetIdCause = ?ResetIdCause;
-
-UPDATE ret_update_info  SET UniqueCopyID = ''  WHERE clientcode=?clientCode;
-";
-				}
-				else
-				{
-					myMySqlCommand.CommandText =
+				myMySqlCommand.CommandText =
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
 ";
-				}
 				myMySqlCommand.ExecuteNonQuery();
 
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
@@ -327,8 +306,7 @@ SET OrderRegionMask     =?orderMask,
         ServiceClient           = ?ServiceClient, 
         OrdersVisualizationMode = ?OrdersVisualizationMode  
 ";
-				if (ResetCopyIDCB.Enabled & ResetCopyIDCB.Checked)
-					InsertCommand += ", UniqueCopyID=''";
+
 				InsertCommand += " where clientcode=firmcode and firmcode=?clientCode";
 
 				MySqlDataAdapter adapter = new MySqlDataAdapter();
@@ -377,21 +355,40 @@ WHERE	id = ?id;
 				adapter.UpdateCommand.Transaction = myTrans;
 				adapter.InsertCommand.Transaction = myTrans;
 
-				adapter.Update(_data.Tables["Include"]);
+				adapter.Update(Data.Tables["Include"]);
 
 				MySqlDataAdapter exportRulesAdapter = new MySqlDataAdapter();
 				exportRulesAdapter.UpdateCommand = new MySqlCommand(@"
 UPDATE Usersettings.Ret_Save_Grids
 SET Enabled = ?Enabled
-WHERE Id = ?Id;
-", _connection, myTrans);
+WHERE Id = ?Id;", _connection, myTrans);
 				exportRulesAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.UInt16, 0, "Enabled");
 				exportRulesAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.UInt32, 0, "Id");
 
-				exportRulesAdapter.Update(_data.Tables["ExportRules"]);
+				exportRulesAdapter.Update(Data.Tables["ExportRules"]);
 
 				myMySqlCommand.CommandText = InsertCommand;
 				myMySqlCommand.ExecuteNonQuery();
+
+				MySqlDataAdapter showClientsAdapter = new MySqlDataAdapter();
+				showClientsAdapter.DeleteCommand = new MySqlCommand(@"
+DELETE FROM showregulation 
+WHERE PrimaryClientCode = ?PrimaryClientCode AND ShowClientCode = ?ShowClientCode;
+", _connection);
+				showClientsAdapter.DeleteCommand.Parameters.AddWithValue("?PrimaryClientCode", ClientCode);
+				showClientsAdapter.DeleteCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
+
+				showClientsAdapter.InsertCommand = new MySqlCommand(@"
+INSERT INTO showregulation 
+SET PrimaryClientCode = ?PrimaryClientCode,
+	ShowClientCode = ?ShowClientCode;
+", _connection);
+				showClientsAdapter.InsertCommand.Parameters.AddWithValue("?PrimaryClientCode", ClientCode);
+				showClientsAdapter.InsertCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
+
+				showClientsAdapter.Update(Data, "ShowClients");
+				Data.Tables["ShowClients"].AcceptChanges();
+
 				myTrans.Commit();
 			}
 			catch (Exception ex)
@@ -490,7 +487,6 @@ WHERE
 
 			ClientCode = Convert.ToInt32(Request["cc"]);
 
-			DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 			myMySqlCommand.Connection = _connection;
 			if (!IsPostBack)
 			{
@@ -568,30 +564,24 @@ WHERE   rcs.clientcode     = ?ClientCode
         AND rui.ClientCode = ?ClientCode 
         AND username       = ?UserName;
 ";
-					myMySqlDataReader = myMySqlCommand.ExecuteReader();
-					myMySqlDataReader.Read();
-					VisileStateList.SelectedValue = myMySqlDataReader["InvisibleOnFirm"].ToString();
-					VisileStateList.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
-					RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
-					RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
-					MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
-					AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
-					WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
-					ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
-					EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
-					ResetCopyIDCB.Checked = Convert.ToBoolean(myMySqlDataReader["Length"]);
-					CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
-					AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
-					SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
-					ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
-					OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
-					if (!ResetCopyIDCB.Checked)
+					using (myMySqlDataReader = myMySqlCommand.ExecuteReader())
 					{
-						ResetCopyIDCB.Enabled = true;
-						CopyIDWTB.Enabled = true;
-						IDSetL.Visible = false;
+						myMySqlDataReader.Read();
+						VisileStateList.SelectedValue = myMySqlDataReader["InvisibleOnFirm"].ToString();
+						VisileStateList.Enabled = Convert.ToBoolean(myMySqlDataReader["AlowCreateInvisible"]);
+						RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
+						RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
+						MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
+						AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
+						WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
+						ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
+						EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
+						CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
+						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
+						SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
+						ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
+						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
 					}
-					myMySqlDataReader.Close();
 
 					MySqlDataAdapter adapter = new MySqlDataAdapter(
 	@"
@@ -605,10 +595,10 @@ INNER JOIN ClientsData cd
 WHERE   ir.IncludeClientCode =  ?ClientCode;
 ", _connection);
 
-					_data = new DataSet();
+					Data = new DataSet();
 					adapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
 					adapter.SelectCommand.Transaction = transaction;
-					adapter.Fill(_data, "Include");
+					adapter.Fill(Data, "Include");
 
 					adapter.SelectCommand.CommandText = @"
 SELECT rsg.ID, sg.DisplayName, rsg.Enabled
@@ -617,15 +607,34 @@ FROM UserSettings.Save_Grids sg
 WHERE rsg.ClientCode = ?ClientCode
 ORDER BY sg.DisplayName;
 ";
-					adapter.Fill(_data, "ExportRules");
+					adapter.Fill(Data, "ExportRules");
 
-					IncludeGrid.DataSource = _data.Tables["Include"].DefaultView;
+					adapter.SelectCommand.CommandText = @"
+SELECT  DISTINCT cd.FirmCode, 
+        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName     
+FROM    (accessright.regionaladmins, clientsdata as cd) 
+	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
+WHERE   sr.PrimaryClientCode				 = ?ClientCode
+		AND cd.regioncode & regionaladmins.regionmask > 0 
+        AND regionaladmins.UserName               = ?UserName 
+        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
+        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)   
+        AND FirmStatus    = 1 
+        AND billingstatus = 1 
+ORDER BY cd.shortname;";
+
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+					adapter.Fill(Data, "ShowClients");
+
+					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
+					ShowClientsGrid.DataBind();
+					IncludeGrid.DataSource = Data.Tables["Include"].DefaultView;
 					IncludeGrid.DataBind();
-					ExportRulesList.DataSource = _data.Tables["ExportRules"].DefaultView;
+					ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
 					ExportRulesList.DataBind();
 
 					for (int i = 0; i < ExportRulesList.Items.Count; i++)
-						ExportRulesList.Items[i].Selected = Convert.ToBoolean(_data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
+						ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
 					transaction.Commit();
 				}
 				finally
@@ -642,15 +651,15 @@ ORDER BY sg.DisplayName;
 			ResultL.Text = "Пароли сгенерированны";
 		}
 
-		protected void IncludeGrid_RowDeleting(object sender, System.Web.UI.WebControls.GridViewDeleteEventArgs e)
+		protected void IncludeGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			ProcessChanges();
-			_data.Tables["Include"].DefaultView[e.RowIndex].Delete();
-			IncludeGrid.DataSource = _data;
+			Data.Tables["Include"].DefaultView[e.RowIndex].Delete();
+			IncludeGrid.DataSource = Data;
 			IncludeGrid.DataBind();
 		}
 
-		protected void IncludeGrid_RowCommand(object sender, System.Web.UI.WebControls.GridViewCommandEventArgs e)
+		protected void IncludeGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
 			switch (e.CommandName)
 			{
@@ -695,8 +704,8 @@ ORDER BY cd.shortname;
 					break;
 				case "Add":
 					ProcessChanges();
-					_data.Tables["Include"].Rows.Add(_data.Tables["Include"].NewRow());
-					IncludeGrid.DataSource = _data;
+					Data.Tables["Include"].Rows.Add(Data.Tables["Include"].NewRow());
+					IncludeGrid.DataSource = Data;
 					IncludeGrid.DataBind();
 					break;
 			}
@@ -706,21 +715,31 @@ ORDER BY cd.shortname;
 		{
 			foreach (GridViewRow row in IncludeGrid.Rows)
 			{
-				if (_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
-					_data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
+				if (Data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
+					Data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
 
-				if (_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
+				if (Data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
 				{
-					_data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
-					_data.Tables["Include"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
+					Data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
+					Data.Tables["Include"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
 				}
 			}
+
 			int i = 0;
 			foreach (ListItem item in ExportRulesList.Items)
 			{
-				if (Convert.ToBoolean(_data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
-					_data.Tables["ExportRules"].DefaultView[i]["Enabled"] = Convert.ToInt32(item.Selected);
+				if (Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
+					Data.Tables["ExportRules"].DefaultView[i]["Enabled"] = Convert.ToInt32(item.Selected);
 				i++;
+			}
+
+			foreach (GridViewRow row in ShowClientsGrid.Rows)
+			{
+				if (Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text)
+				{
+					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text;
+					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedValue;
+				}
 			}
 		}
 
@@ -739,19 +758,85 @@ ORDER BY cd.shortname;
 			args.IsValid = !String.IsNullOrEmpty(args.Value);
 		}
 
-		protected void DeletePrepareDataButton_Click(object sender, EventArgs e)
+		protected void ShowClientsGrid_RowDataBound(object sender, GridViewRowEventArgs e)
 		{
-			try
+			if (e.Row.RowType == DataControlRowType.DataRow)
 			{
-				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
-				DeletePrepareDataButton.Enabled = false;
-				ResultL.Text = "";
+				DataRowView rowView = (DataRowView)e.Row.DataItem;
+				if (rowView.Row.RowState == DataRowState.Added)
+				{
+					((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
+					e.Row.FindControl("SearchButton").Visible = true;
+					e.Row.FindControl("SearchText").Visible = true;
+				}
+				else
+				{
+					e.Row.FindControl("SearchButton").Visible = false;
+					e.Row.FindControl("SearchText").Visible = false;
+				}
+				DropDownList list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
+				list.Items.Add(new ListItem(rowView["ShortName"].ToString(), rowView["FirmCode"].ToString()));
+				list.Width = new Unit(90, UnitType.Percentage);
 			}
-			catch
+		}
+
+		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
+		{
+			switch (e.CommandName)
 			{
-				ResultL.Text = "Ошибка удаления подготовленных данных, попробуйте позднее.";
-				ResultL.ForeColor = Color.Red;
+				case "Add":
+					ProcessChanges();
+					Data.Tables["ShowClients"].Rows.Add(Data.Tables["ShowClients"].NewRow());
+					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
+					ShowClientsGrid.DataBind();
+					break;
+				case "Search":
+					MySqlDataAdapter adapter = new MySqlDataAdapter
+						(@"
+SELECT  DISTINCT cd.FirmCode, 
+        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
+FROM    (accessright.regionaladmins, clientsdata as cd)  
+LEFT JOIN showregulation sr
+        ON sr.ShowClientCode	             =cd.firmcode  
+WHERE   cd.regioncode & regionaladmins.regionmask > 0  
+        AND regionaladmins.UserName               =?UserName  
+        AND FirmType                         =if(ShowRetail+ShowVendor=2, FirmType, if(ShowRetail=1, 1, 0)) 
+        AND if(UseRegistrant                 =1, Registrant=?UserName, 1=1)  
+        AND cd.ShortName like ?SearchText
+        AND FirmStatus   =1  
+        AND billingstatus=1  
+ORDER BY cd.shortname;
+", Literals.GetConnectionString());
+					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+					adapter.SelectCommand.Parameters.Add("?SearchText", string.Format("%{0}%", ((TextBox)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
+
+					DataSet data = new DataSet();
+					try
+					{
+						_connection.Open();
+						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+						adapter.Fill(data);
+						adapter.SelectCommand.Transaction.Commit();
+					}
+					finally
+					{
+						_connection.Close();
+					}
+
+					DropDownList ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
+					ShowList.DataSource = data;
+					ShowList.DataBind();
+					ShowList.Visible = data.Tables[0].Rows.Count > 0;
+					break;
 			}
+		}
+
+		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
+		{
+			ProcessChanges();
+			Data.Tables["ShowClients"].DefaultView[e.RowIndex].Delete();
+			ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
+			ShowClientsGrid.DataBind();
 		}
 	}
 }

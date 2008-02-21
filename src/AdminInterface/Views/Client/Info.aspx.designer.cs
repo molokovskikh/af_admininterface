@@ -11,12 +11,6 @@
 namespace AdminInterface.Views.Client {
     
     
-    /// <summary>
-    /// Info class.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated class.
-    /// </remarks>
     public partial class Info {
         
         /// <summary>
@@ -92,15 +86,6 @@ namespace AdminInterface.Views.Client {
         protected global::System.Web.UI.WebControls.HyperLink UserInterfaceHL;
         
         /// <summary>
-        /// ShowClientsGrid control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView ShowClientsGrid;
-        
-        /// <summary>
         /// UnlockRow control.
         /// </summary>
         /// <remarks>
@@ -126,6 +111,87 @@ namespace AdminInterface.Views.Client {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label UnlockedLabel;
+        
+        /// <summary>
+        /// DeletePrepareDataRow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow DeletePrepareDataRow;
+        
+        /// <summary>
+        /// DeletePrepareDataButton control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button DeletePrepareDataButton;
+        
+        /// <summary>
+        /// DeleteLabel control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label DeleteLabel;
+        
+        /// <summary>
+        /// ResetUINRow control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlTableRow ResetUINRow;
+        
+        /// <summary>
+        /// ResetCopyIDCB control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ResetCopyIDCB;
+        
+        /// <summary>
+        /// IsUniqueCopyIDSet control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label IsUniqueCopyIDSet;
+        
+        /// <summary>
+        /// ResearReasonLable control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl ResearReasonLable;
+        
+        /// <summary>
+        /// ResetIDCause control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox ResetIDCause;
+        
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         
         /// <summary>
         /// FullNameText control.

@@ -11,12 +11,6 @@
 namespace AddUser {
     
     
-    /// <summary>
-    /// manageret class.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated class.
-    /// </remarks>
     public partial class manageret {
         
         /// <summary>
@@ -38,6 +32,15 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.Label Name;
         
         /// <summary>
+        /// GeneratePasswords control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button GeneratePasswords;
+        
+        /// <summary>
         /// VisileStateList control.
         /// </summary>
         /// <remarks>
@@ -45,6 +48,15 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.DropDownList VisileStateList;
+        
+        /// <summary>
+        /// ServiceClientCB control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox ServiceClientCB;
         
         /// <summary>
         /// RegisterCB control.
@@ -110,42 +122,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox EnableUpdateCB;
         
         /// <summary>
-        /// ResetCopyIDCB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox ResetCopyIDCB;
-        
-        /// <summary>
-        /// CopyIDWTB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox CopyIDWTB;
-        
-        /// <summary>
-        /// IDSetL control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label IDSetL;
-        
-        /// <summary>
-        /// CalculateLeaderCB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox CalculateLeaderCB;
-        
-        /// <summary>
         /// AllowSubmitOrdersCB control.
         /// </summary>
         /// <remarks>
@@ -164,15 +140,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox SubmitOrdersCB;
         
         /// <summary>
-        /// ServiceClientCB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox ServiceClientCB;
-        
-        /// <summary>
         /// OrdersVisualizationModeCB control.
         /// </summary>
         /// <remarks>
@@ -182,6 +149,15 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox OrdersVisualizationModeCB;
         
         /// <summary>
+        /// CalculateLeaderCB control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox CalculateLeaderCB;
+        
+        /// <summary>
         /// IncludeGrid control.
         /// </summary>
         /// <remarks>
@@ -189,6 +165,15 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView IncludeGrid;
+        
+        /// <summary>
+        /// ShowClientsGrid control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView ShowClientsGrid;
         
         /// <summary>
         /// ExportRulesList control.
@@ -243,24 +228,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button ParametersSave;
-        
-        /// <summary>
-        /// GeneratePasswords control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button GeneratePasswords;
-        
-        /// <summary>
-        /// DeletePrepareDataButton control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button DeletePrepareDataButton;
         
         /// <summary>
         /// ResultL control.
