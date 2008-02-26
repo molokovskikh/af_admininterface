@@ -1,5 +1,6 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AdminInterface.Views.Client.Info" CodePage="1251"
 	CodeBehind="Info.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
+<%@ Import namespace="AdminInterface.Helpers"%>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
 <%@ Import namespace="System.IO"%>
@@ -171,7 +172,11 @@
 						<Columns>
 							<asp:BoundField DataField="Date" HeaderText="Дата" />
 							<asp:BoundField DataField="UserName" HeaderText="Оператор" />
-							<asp:BoundField DataField="Message" HeaderText="Событие" />
+							<asp:TemplateField HeaderText="Событие">
+								<ItemTemplate>
+									<%# ViewHelper.FormaMessage(Eval("Message").ToString())%>
+								</ItemTemplate>
+							</asp:TemplateField>
 						</Columns>
 						<EmptyDataTemplate>
 							Сообщений нет.
