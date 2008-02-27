@@ -41,6 +41,9 @@
 				<includes name="**.css" />
 				<includes name="**.skin" />
 				<includes name="**.gif" />
+				<includes name="**.png" />
+				<include name="**.master" />
+				<include name="**.sitemap" />
 				<includes name="bin\*.dll" />
 			</fileset>
 		</copy>
