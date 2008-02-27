@@ -127,75 +127,67 @@ namespace AdminInterface.Models
 			ISession session = sessionHolder.CreateSession(typeof(BillingSearchItem));
 			try
 			{
-				string debitorFilterBlock = "";
-				string segmentFilterBlock = "";
-				string typeFilterBlock = "";
-				string clientStatusFilterBlock = "";
-				string searchBlock = "";
+				var debitorFilterBlock = "";
+				var searchBlock = "";
+				var groupFilter = "";
 
 				switch(properties.SearchBy)
 				{
 					case SearchBy.Name:
 						searchBlock = String.Format(
-@"and (p.ShortName like '{0}'
+@"(p.ShortName like '{0}'
 or p.JuridicalName like '{0}'
 or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + properties.SearchText + "%");
 						break;
 					case SearchBy.Code:
-						searchBlock = String.Format("and sum(if(cd.FirmCode = {0}, 1, 0)) > 0", properties.SearchText);
+						searchBlock = String.Format("sum(if(cd.FirmCode = {0}, 1, 0)) > 0", properties.SearchText);
 						break;
 					case SearchBy.BillingCode:
-						searchBlock = String.Format("and p.payerId = {0}", properties.SearchText);
+						searchBlock = String.Format("p.payerId = {0}", properties.SearchText);
 						break;
 				}
 
 				switch (properties.PayerState)
 				{
-					case PayerStateFilter.All:
-						break;
 					case PayerStateFilter.Debitors:
 						debitorFilterBlock = "where p.oldpaydate <= curDate()";
 						break;
 					case PayerStateFilter.NotDebitors:
 						debitorFilterBlock = "where p.oldpaydate > curDate()";
 						break;
-				}
+				}				
 
 				switch(properties.Segment)
 				{
-					case SearchSegment.All:
-						break;
 					case SearchSegment.Retail:
-						segmentFilterBlock = "and sum(if(cd.firmsegment = 1, 1, 0)) > 0";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.firmsegment = 1");
 						break;
 					case SearchSegment.Wholesale:
-						segmentFilterBlock = "and sum(if(cd.firmsegment = 0, 1, 0)) > 0";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.firmsegment = 0");
 						break;
 				}
 
 				switch(properties.ClientType)
 				{
-					case SearchClientType.All:
-						break;
 					case SearchClientType.Drugstore:
-						typeFilterBlock = "and sum(if(cd.FirmType = 1, 1, 0)) > 0";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.FirmType = 1");
 						break;
 					case SearchClientType.Supplier:
-						typeFilterBlock = "and sum(if(cd.FirmType = 0, 1, 0)) > 0";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.FirmType = 0");
 						break;
 				}
 
 				switch(properties.ClientStatus)
 				{
-					case SearchClientStatus.All:
-						break;
 					case SearchClientStatus.Enabled:
-						clientStatusFilterBlock = "and sum(if(cd.Firmstatus = 1 and cd.Billingstatus = 1, 1, 0)) > 0";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Firmstatus = 1 and cd.Billingstatus = 1");
 						break;
 					case SearchClientStatus.Disabled:
-						clientStatusFilterBlock = "and count(*) = sum(if(cd.Firmstatus = 0 or cd.Billingstatus = 0, 1, 0))";
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Firmstatus = 0 or cd.Billingstatus = 0");
 						break;
 				}
+
+				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
 
 				IList<BillingSearchItem> result = session.CreateSQLQuery(String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
@@ -218,13 +210,10 @@ from billing.payers p
 	join usersettings.clientsdata cd on p.payerid = cd.billingcode
 {0}
 group by p.payerId
-having bit_or(cd.MaskRegion) & :RegionId > 0
-		{1}
-		{2}
-		{3}
-		{4}
+having 	{1}
+		and sum(if({2}, 1, 0)) > 0
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, segmentFilterBlock, typeFilterBlock, clientStatusFilterBlock, searchBlock))
+", debitorFilterBlock, searchBlock, groupFilter))
 					.AddEntity(typeof(BillingSearchItem))
 					.SetParameter("RegionId", properties.RegionId)
 					.List<BillingSearchItem>();
@@ -235,6 +224,14 @@ order by {{BillingSearchItem.ShortName}}
 			{
 				sessionHolder.ReleaseSession(session);
 			}
+		}
+
+		private static string AddFilterCriteria(string filter, string criteria)
+		{
+			if (String.IsNullOrEmpty(filter))
+				return criteria;
+
+			return filter + " and " + criteria;
 		}
 	}
 }

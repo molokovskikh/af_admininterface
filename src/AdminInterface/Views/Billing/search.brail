@@ -3,9 +3,9 @@
 <% end %>
 
 <script type="text/javascript">
-	var titlesAndIds = $H({	"SearchByName" : "Поиска по названию", 
-							"SearchById" : "Поиска по коду",
-							"SearchByBillingId" : "Поиска по биллинг коду"});
+	var titlesAndIds = $H({	"SearchByName" : "Наименованию", 
+							"SearchById" : "Коду",
+							"SearchByBillingId" : "Биллинг коду"});
 						
 	document.observe("dom:loaded", function() {
 		joinSearchHelper($("SearchText"), titlesAndIds);
