@@ -55,7 +55,7 @@ WHERE   clientsinfo.clientcode                            =firmcode
 		and (ShortName like ?SearchText 
 			or Message like ?SearchText 
 			or clientsinfo.UserName like ?SearchText)
-ORDER BY WriteTime
+ORDER BY WriteTime DESC
 ", _connection);
 			adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
