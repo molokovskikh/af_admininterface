@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Models.Logs;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate;

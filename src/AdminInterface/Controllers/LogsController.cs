@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic;
+using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
 using AdminInterface.Models.Logs;
@@ -10,6 +10,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("logs"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
+	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
 	public class LogsController : SmartDispatcherController
 	{
 		public void DocumentLog(uint clientCode)
@@ -31,22 +32,28 @@ namespace AdminInterface.Controllers
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
 		{
-			UpdateLogEntity logEntity = UpdateLogEntity.Find(updateLogEntityId);
+			DateTime begin = DateTime.Now;
+			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
 			PropertyBag["updateLogEntityId"] = logEntity.Id;
-			IList<InternetLogEntity> detailsLogEntities= InternetLogEntity.GetUpdateSession(logEntity.UserName, logEntity.RequestTime, logEntity.Id);
+			var detailsLogEntities = logEntity.UpdateDownload;
 			PropertyBag["detailLogEntities"] = detailsLogEntities;
 
-			uint totalByteDownloaded = 0;
-			foreach (InternetLogEntity entity in detailsLogEntities)
-				totalByteDownloaded += entity.BytesSent;
+			ulong totalByteDownloaded = 0;
+			ulong totalBytes = 1;
+			foreach (var entity in detailsLogEntities)
+			{
+				totalByteDownloaded += entity.SendBytes;
+				totalBytes = entity.TotalBytes;
+			}
 
-			PropertyBag["allDownloaded"] = 200 < totalByteDownloaded - logEntity.ResultSize && totalByteDownloaded - logEntity.ResultSize < 300;
+			System.Diagnostics.Trace.WriteLine(begin - DateTime.Now);
+			PropertyBag["allDownloaded"] = totalByteDownloaded >= totalBytes;
 		}
 
 		public void ShowDownloadLog(uint updateLogEntityId)
 		{
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			PropertyBag["log"] = UpdateDownloadLogEntity.Find(updateLogEntityId).Log;
+			PropertyBag["log"] = AnalitFDownloadLogEntity.Find(updateLogEntityId).Log;
 		}
 
 		public void UpdateLog(uint clientCode)

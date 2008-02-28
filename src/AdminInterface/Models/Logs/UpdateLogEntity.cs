@@ -6,7 +6,7 @@ using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Expression;
 
-namespace AdminInterface.Model
+namespace AdminInterface.Models.Logs
 {
 	public enum UpdateType
 	{
@@ -109,24 +109,26 @@ namespace AdminInterface.Model
 			set { _log = value; }
 		}
 
+		[HasMany(typeof(UpdateDownloadLogEntity), Lazy = true, Inverse = true, OrderBy = "LogTime")]
+		public IList<UpdateDownloadLogEntity> UpdateDownload { get; set; }
+
 		public bool IsDataTransferUpdateType()
 		{
 			return _updateType == UpdateType.Accumulative || _updateType == UpdateType.Cumulative;
 		}
 
-
 		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode, 
-																		  DateTime beginDate, 
-																		  DateTime endDate)
+		                                                           DateTime beginDate, 
+		                                                           DateTime endDate)
 		{
 			return ArHelper.WithSession<UpdateLogEntity>(
 				delegate(ISession session)
 					{
 						return session.CreateCriteria(typeof (UpdateLogEntity))
-									.Add(Expression.Eq("ClientCode", clientCode))
-									.Add(Expression.Between("RequestTime", beginDate, endDate))
-									.AddOrder(Order.Desc("RequestTime"))
-									.List<UpdateLogEntity>();
+							.Add(Expression.Eq("ClientCode", clientCode))
+							.Add(Expression.Between("RequestTime", beginDate, endDate))
+							.AddOrder(Order.Desc("RequestTime"))
+							.List<UpdateLogEntity>();
 					});
 		}
 	}

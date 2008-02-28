@@ -1,34 +1,39 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+﻿using System;
+using System.Net;
 using Castle.ActiveRecord;
 
-namespace AdminInterface.Model
+namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Table = "logs.AnalitFUpdates")]
-	public class UpdateDownloadLogEntity : ActiveRecordBase<UpdateDownloadLogEntity>
+	[ActiveRecord(Table = "logs.UpdateDownloadLogs")]
+	public class UpdateDownloadLogEntity : ActiveRecordBase<AnalitFDownloadLogEntity>
 	{
-		private uint _id;
-		private string _log;
-
-		[PrimaryKey("UpdateId")]
-		public uint Id
-		{
-			get { return _id; }
-			set { _id = value; }
-		}
+		[PrimaryKey]
+		public int Id { get; set; }
 
 		[Property]
-		public string Log
+		public string IP { get; set; }
+
+		[Property]
+		public DateTime LogTime { get; set; }
+
+		[Property]
+		public ulong FromByte { get; set; }
+
+		[Property]
+		public ulong SendBytes { get; set; }
+
+		[Property]
+		public ulong TotalBytes { get; set; }
+
+		[BelongsTo("UpdateId")]
+		public UpdateLogEntity UpdateLog { get; set; }
+
+		public string ResolveHost()
 		{
-			get { return _log; }
-			set { _log = value; }
+			var host = Dns.GetHostEntry(IP);
+			if (host == null)
+				return "-";
+			return host.HostName;
 		}
 	}
 }
