@@ -1,16 +1,7 @@
-using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 
-namespace AdminInterface.Model
+namespace AdminInterface.Models
 {
 	[ActiveRecord(Table = "Usersettings.retclientsset")]
 	public class ClientMessage : ActiveRecordValidationBase<ClientMessage>
@@ -28,7 +19,7 @@ namespace AdminInterface.Model
 		}
 
 		[Property]
-		[ValidateRange(1, 10, "Количество показов долюно быть больше 1 но меньше 10")]
+		[ValidateRange(1, 10, "Количество показов должно быть больше 1 но меньше 10")]
 		public uint ShowMessageCount
 		{
 			get { return _showCount; }
