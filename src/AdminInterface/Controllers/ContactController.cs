@@ -1,3 +1,4 @@
+using AdminInterface.Filters;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
@@ -7,6 +8,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("contact")]
+	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
 	public class ContactController : AbstractContactController
 	{
 		public void NewContactGroup(uint billingCode)
@@ -30,7 +32,7 @@ namespace AdminInterface.Controllers
 				RenderView("NewContactGroup");
 				return;
 			}
-			BillingInstance billingInstance = BillingInstance.Find(billingCode);
+			Payer billingInstance = Payer.Find(billingCode);
 			contactGroup.Type = ContactGroupType.Custom;
 			contactGroup.ContactGroupOwner = billingInstance.ContactGroupOwner;
 			using (new TransactionScope())
