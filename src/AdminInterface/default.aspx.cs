@@ -2,7 +2,6 @@ using System;
 using System.Data;
 using System.Runtime.InteropServices;
 using System.Web.UI;
-using ActiveDs;
 using AdminInterface.Helpers;
 using DAL;
 using MySql.Data.MySqlClient;
@@ -16,13 +15,13 @@ namespace AddUser
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			_connection.ConnectionString = Literals.GetConnectionString();
-			IADsUser ADUser = Marshal.BindToMoniker(@"WinNT://adc.analit.net/" + Convert.ToString(Session["UserName"])) as IADsUser;
-			if (ADUser.PasswordExpirationDate >= DateTime.Now || Convert.ToString(Session["UserName"]) == "michail")
+			var expirationDate = ADHelper.GetPasswordExpirationDate(Session["UserName"].ToString());
+			if (expirationDate >= DateTime.Now || Convert.ToString(Session["UserName"]) == "michail")
 			{
 				PassLB.Text = String.Format(
 					"Срок действия Вашего пароля истекает {0} в {1}.<br>Пожалуйста не забывайте изменять пароль.",
-					ADUser.PasswordExpirationDate.ToShortDateString(),
-					ADUser.PasswordExpirationDate.ToShortTimeString());
+					expirationDate.ToShortDateString(),
+					expirationDate.ToShortTimeString());
 				Session["AccessGrant"] = 1;
 				if (!IsPostBack)
 				{
@@ -63,8 +62,8 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				BillingHL.Visible = false;
 				PassLB.Text = String.Format(
 					"Срок действия Вашего пароля истек {0} в {1}.<br>Доступ к системе будет открыт после изменения пароля.",
-					ADUser.PasswordExpirationDate.ToShortDateString(),
-					ADUser.PasswordExpirationDate.ToShortTimeString());
+					expirationDate.ToShortDateString(),
+					expirationDate.ToShortTimeString());
 			}
 		}
 
