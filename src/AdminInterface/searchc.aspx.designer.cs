@@ -11,12 +11,6 @@
 namespace AddUser {
     
     
-    /// <summary>
-    /// searchc class.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated class.
-    /// </remarks>
     public partial class searchc {
         
         /// <summary>

@@ -6,8 +6,8 @@ using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ActiveDs;
 using AddUser;
+using AdminInterface.Helpers;
 using Castle.MonoRail.Framework;
 using MySql.Data.MySqlClient;
 
@@ -235,8 +235,7 @@ ORDER BY cd.shortname;
 			{
 				try
 				{
-					IADsUser ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + Data.Tables["Info"].Rows[0]["OsUserName"]) as IADsUser;
-					UnlockButton.Enabled = ADUser.IsAccountLocked;
+					UnlockButton.Enabled = ADHelper.IsLocked(Data.Tables["Info"].Rows[0]["OsUserName"].ToString());
 					UnlockedLabel.Visible = false;
 				}
 				catch
@@ -298,9 +297,7 @@ WHERE firmcode = ?ClientCode
 
 		protected void UnlockButton_Click(object sender, EventArgs e)
 		{
-			IADsUser ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + Data.Tables["Info"].Rows[0]["OsUserName"]) as IADsUser;
-			ADUser.IsAccountLocked = false;
-			ADUser.SetInfo();
+			ADHelper.Unlock(Data.Tables["Info"].Rows[0]["OsUserName"].ToString());
 			UnlockButton.Visible = false;
 			UnlockedLabel.Visible = true;
 		}

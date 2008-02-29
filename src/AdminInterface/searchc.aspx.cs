@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using ActiveDs;
+using AdminInterface.Helpers;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -374,10 +374,9 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 				{
 					try
 					{
-						IADsUser ADUser = Marshal.BindToMoniker("WinNT://adc.analit.net/" + row["UserName"].ToString()) as IADsUser;
-						if (ADUser.IsAccountLocked)
+						if (ADHelper.IsLocked(row["UserName"].ToString()))
 							row["ADUserStatus"] = Color.Violet.Name;
-						if (ADUser.AccountDisabled)
+						if (ADHelper.IsDisabled(row["UserName"].ToString()))
 							row["ADUserStatus"] = Color.Aqua.Name;
 					}
 					catch

@@ -21,6 +21,8 @@
 			<div class="TwoColumn" align="left">
 				<table align="center" border="1" bordercolor="#dadada" cellpadding="0" cellspacing="0"
 					id="Table2" width="90%">
+					<col style="width:50%" />
+					<col style="width:50%" />
 					<tr>
 						<td colspan="2" height="20">
 							<asp:HyperLink ID="ConfigHL" runat="server">Настройка</asp:HyperLink>
@@ -67,23 +69,23 @@
 					</tr>
 					<tr id="UnlockRow" runat="server">
 						<td colspan="2">
-							<asp:Button ID="UnlockButton" runat="server" Text="Разблокировать" OnClick="UnlockButton_Click" ValidationGroup="2" />
+							<asp:Button ID="UnlockButton" runat="server" Text="Разблокировать" OnClick="UnlockButton_Click" ValidationGroup="4" />
 							<asp:Label ID="UnlockedLabel" runat="server" Text="Разблокированно" ForeColor="Green" />
 						</td>
 					</tr>
 					<tr id="DeletePrepareDataRow" runat="server">
 						<td colspan="2">
-							<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="0" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
+							<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="4" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
 							<asp:Label ID="DeleteLabel" runat="server" />
 						</td>
 					</tr>
 					<tr id="ResetUINRow" runat="server">
-						<td valign="middle" align="left" colspan="3" style="height: 22px">
-							<asp:Button ID="ResetCopyIDCB" runat="server" Text="Сбросить УИН" Enabled="False" ValidationGroup="1" OnClick="ResetUniqueCopyID" />
+						<td valign="middle" align="left" colspan="2" style="height: 22px">
+							<asp:Button ID="ResetCopyIDCB" runat="server" Text="Сбросить УИН" Enabled="False" ValidationGroup="3" OnClick="ResetUniqueCopyID" />
 							<asp:Label ID="IsUniqueCopyIDSet" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
 							<label id="ResearReasonLable" runat="server">Причина:</label>
 							<asp:TextBox ID="ResetIDCause" runat="server" BorderStyle="None" BackColor="LightGray" Enabled="False" />
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." ValidationGroup="1" />
+							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." ValidationGroup="3" />
 						</td>
 					</tr>
 					<tr>
