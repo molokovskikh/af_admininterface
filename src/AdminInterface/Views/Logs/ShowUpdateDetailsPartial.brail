@@ -20,7 +20,7 @@
 					${detailLogEntity.LogTime}
 				</td>
 				<td>
-					${detailLogEntity.ResolveHost()} ( ${detailLogEntity.IP} )
+					${detailLogEntity.ResolveHost()} ( ${detailLogEntity.ClientHost} )
 				</td>
 				<td>
 					${detailLogEntity.FromByte}

@@ -11,7 +11,7 @@ namespace AdminInterface.Models.Logs
 		public int Id { get; set; }
 
 		[Property]
-		public string IP { get; set; }
+		public string ClientHost { get; set; }
 
 		[Property]
 		public DateTime LogTime { get; set; }
@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Logs
 
 		public string ResolveHost()
 		{
-			var host = Dns.GetHostEntry(IP);
+			var host = Dns.GetHostEntry(ClientHost);
 			if (host == null)
 				return "-";
 			return host.HostName;
