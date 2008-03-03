@@ -438,7 +438,7 @@ where length(c.contactText) > 0
 								          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 								          false,
 								          "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
-								          + ShortNameTB.Text + " в регионе(городе) "
+								          + String.Format("{0} ( {1} ) в регионе(городе)", FullNameTB.Text, ShortNameTB.Text)
 								          + RegionDD.SelectedItem.Text + "."
 								          +
 								          "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net )."
@@ -454,7 +454,7 @@ where length(c.contactText) > 0
 								          + "\n", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
 							}
 							Func.Mail("register@analit.net", String.Empty,
-							          "\"Debug: " + FullNameTB.Text + "\" - Уведомления поставщиков",
+									  "\"Debug: " + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - Уведомления поставщиков",
 							          false, "Оператор: " + Session["UserName"]
 							                 + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
 							                 + LoginTB.Text + "\nКод: " + Session["Code"]
@@ -468,7 +468,7 @@ where length(c.contactText) > 0
 						else
 						{
 							Func.Mail("register@analit.net", String.Empty,
-							          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
+									  "\"" + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - ошибка уведомления поставщиков",
 							          false, "Оператор: " + Session["UserName"] + "\nРегион: "
 							                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 							                 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
