@@ -216,10 +216,10 @@ end
 		</div>
 		
 		<div>
-			<form>
+			<form method="post" action="SentMail.rails">
 				${FormHelper.HiddenField("ClientCode", Client.Id)}
-				<textarea name="Comment" rows="20" style="width:100%">
-				</textarea>
+				${FormHelper.HiddenField("PayerId", Instance.PayerID)}
+				<textarea name="Comment" rows="20" style="width:100%"></textarea>
 				<input type="submit" value="Корреспонденция отправлена" />
 			</form>
 		</div>
@@ -231,9 +231,9 @@ end
 			<div>
 			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
 			<% 
-			if LogRecords.Count > 0:
+			if MailSentHistory.Length > 0:
 				i = 0
-				for mailSentEntity in mailSentHistory:
+				for mailSentEntity in MailSentHistory:
 					i++
 			%>
 					<tr class="${ViewHelper.GetRowStyle(i)}">
