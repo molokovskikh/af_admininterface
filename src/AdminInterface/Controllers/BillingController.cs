@@ -46,7 +46,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = client.BillingInstance;
 			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
-			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory();
+			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(client.BillingInstance.PayerID);
 		}
 
 		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
@@ -152,12 +152,13 @@ namespace AdminInterface.Controllers
 			RenderView("SearchBy");
 		}
 
-		public void SentMail(uint clientCode, string comment)
+		public void SentMail(uint clientCode, uint payerId, string comment)
 		{
 			if (!String.IsNullOrEmpty(comment))
 			{
 				var mailSentEntity = new MailSentEntity
 				                     	{
+											PayerId =  payerId,
 				                     		Comment = comment,
 				                     		UserName = ((Administrator) Session["Admin"]).UserName
 				                     	};
