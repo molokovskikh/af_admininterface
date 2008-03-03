@@ -1,0 +1,11 @@
+﻿<% component CaptureFor, {"Id" : "Title"}:%>
+	Реистрация клиента, шаг 2: Заполнения информации о плательщике
+<% end %>
+
+<h3>
+	Реистрация клиента, шаг 2: Заполнения информации о плательщике
+</h3>
+
+<form action="registered.rails" method="post">
+	<% OutputSubView("Common/PayerEdit") %>
+</form>
