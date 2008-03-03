@@ -3,10 +3,11 @@
 	MaintainScrollPositionOnPostback="true" Theme="Main" MasterPageFile="~/Main.Master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
-<form id="form1" runat="server">
 	<style type="text/css">
 		.tdCheckBox {vertical-align: middle; text-align: left;}
 	</style>
+	
+<form id="form1" runat="server">
 		<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 			<tr>
 				<td valign="top" align="center" style="height: 754px">
@@ -18,16 +19,32 @@
 						<table id="Table2" style="width: 95%;" cellspacing="0" cellpadding="0" align="center" border="1">
 							<tr align="center" bgcolor="mintcream">
 								<td bgcolor="aliceblue" height="20">
+									<strong>Операции</strong>
+								</td>
+							</tr>
+							<tr>
+								<td colspan="3" style="height: 22px; text-align: left;">
+									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" OnClick="GeneratePasswords_Click" ValidationGroup="0" />
+								</td>
+							</tr>
+							<tr align="center" bgcolor="mintcream">
+								<td bgcolor="aliceblue" height="20">
 									<strong>Общая настройка</strong>
 								</td>
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3" style="height: 22px">
 									<asp:DropDownList ID="VisileStateList" runat="server">
-										<asp:ListItem Text="Видимый" Value="0"></asp:ListItem>
-										<asp:ListItem Text="Не видимый" Value="1"></asp:ListItem>
+										<asp:ListItem Text="Стандартный" Value="0"></asp:ListItem>
+										<asp:ListItem Text="Недоступный для настроек" Value="1"></asp:ListItem>
 										<asp:ListItem Text="Скрытый" Value="2"></asp:ListItem>
 									</asp:DropDownList>
+									Тип клиента в интерфейсе поставщика
+								</td>
+							</tr>
+							<tr>
+								<td class="tdCheckBox" colspan="3">
+									<asp:CheckBox runat="server" ID="ServiceClientCB" Text="Сотрудник АК Инфорум" />
 								</td>
 							</tr>
 							<tr>
@@ -68,20 +85,6 @@
 								</td>
 							</tr>
 							<tr>
-								<td valign="middle" align="left" colspan="3" style="height: 22px">
-									<asp:CheckBox ID="ResetCopyIDCB" runat="server" Text="Сбросить уникальный идентификатор, причина:"
-										Enabled="False" />
-									<asp:TextBox ID="CopyIDWTB" runat="server" BorderStyle="None" BackColor="LightGray"
-										Enabled="False" />
-									<asp:Label ID="IDSetL" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
-								</td>
-							</tr>
-							<tr>
-								<td class="tdCheckBox" colspan="3" style="height: 22px">
-									<asp:CheckBox runat="server" ID="CalculateLeaderCB" Text="Pассчитывать лидеров при получении заказов" />
-								</td>
-							</tr>
-							<tr>
 								<td class="tdCheckBox" colspan="3">
 									<asp:CheckBox runat="server" ID="AllowSubmitOrdersCB" Text="Разрешить управление подтверждением заказов" />
 								</td>
@@ -93,12 +96,12 @@
 							</tr>
 							<tr>
 								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="ServiceClientCB" Text="Служебный клиент" />
+									<asp:CheckBox runat="server" ID="OrdersVisualizationModeCB" Text="Показывать заказы подробно" />
 								</td>
 							</tr>
 							<tr>
-								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="OrdersVisualizationModeCB" Text="Показывать заказы подробно" />
+								<td class="tdCheckBox" colspan="3" style="height: 22px">
+									<asp:CheckBox runat="server" ID="CalculateLeaderCB" Text="Pассчитывать лидеров при получении заказов" />
 								</td>
 							</tr>
 							<tr>
@@ -142,14 +145,58 @@
 											</asp:TemplateField>
 										</Columns>
 										<EmptyDataTemplate>
-											<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Подчинить клиента." />
+											<div style="text-align:left">
+												<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Подчинить клиента." />
+											</div>
 										</EmptyDataTemplate>
 									</asp:GridView>
 								</td>
 							</tr>
 							<tr>
+								<td class="Title">
+									Показываемые клиенты:
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<asp:GridView ID="ShowClientsGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="ShowClientsGrid_RowCommand" OnRowDataBound="ShowClientsGrid_RowDataBound" OnRowDeleting="ShowClientsGrid_RowDeleting">
+										<EmptyDataTemplate>
+											<div style="text-align:left">
+												<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить клиента" />
+											</div>
+										</EmptyDataTemplate>
+										<Columns>
+											<asp:TemplateField>
+												<HeaderTemplate>
+													<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Добавить" />
+												</HeaderTemplate>
+												<ItemTemplate>
+													<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="Удалить" />
+												</ItemTemplate>
+												<ItemStyle Width="10%" />
+											</asp:TemplateField>
+											<asp:TemplateField HeaderText="Клиент">
+												<ItemTemplate>
+													<asp:TextBox ID="SearchText" runat="server" />
+													<asp:Button ID="SearchButton" CommandName="Search" runat="server" Text="Найти" ValidationGroup="3" />
+													<asp:DropDownList ID="ShowClientsList" runat="server" DataTextField="ShortName" DataValueField="FirmCode">
+													</asp:DropDownList>
+													<asp:CustomValidator ID="ShowCleintsValidator" 
+																		 runat="server" 
+																		 ControlToValidate="ShowClientsList" 
+																		 ErrorMessage="Необходимо выбрать клиента." 
+																		 OnServerValidate="ParentValidator_ServerValidate" 
+																		 ValidateEmptyText="True" 
+																		 ValidationGroup="1">*</asp:CustomValidator>
+												</ItemTemplate>
+											</asp:TemplateField>
+										</Columns>
+									</asp:GridView>
+								</td>
+							</tr>
+							<tr>
 								<td  style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
-									Права экспорта
+									Выгрузка в Excel из программы АналитФармация
 								</td>
 							</tr>
 							<tr>
@@ -200,17 +247,6 @@
 							<tr>
 								<td valign="middle" align="right" colspan="3" style="height: 17px">
 									<asp:Button ID="ParametersSave" runat="server" OnClick="ParametersSave_Click" Text="Применить" ValidationGroup="1"></asp:Button>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3" style="height: 22px">
-									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли"
-										OnClick="GeneratePasswords_Click" ValidationGroup="0" />
-								</td>
-							</tr>
-							<tr>
-								<td colspan="3">
-									<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="0" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
 								</td>
 							</tr>
 							<tr>

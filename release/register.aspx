@@ -27,14 +27,16 @@
 						<div class="TwoColumn">
 							<div class="SimpleField">
 								<label class="Required" for="FullNameTB">
-									Полное наименование:</label>
+									Полное наименование:
+								</label>
 								<asp:TextBox ID="FullNameTB" runat="server"></asp:TextBox>
 								<asp:RegularExpressionValidator ID="FullNameValidator" runat="server" ErrorMessage="Длинна строки не может быть больше чем 40 символов" ValidationExpression="^.{1,40}$" ValidationGroup="0" ControlToValidate="FullNameTB" Display="Dynamic">*</asp:RegularExpressionValidator>
 								<asp:RequiredFieldValidator ID="RequiredFullName" runat="server" ControlToValidate="FullNameTB"
 									ErrorMessage="Поле «Полное наименование» должно быть заполнено" ValidationGroup="0" Display="Dynamic">*</asp:RequiredFieldValidator></div>
 							<div class="SimpleField">
 								<label class="Required" for="ShortNameTB">
-									Краткое наименование:</label>
+									Краткое наименование:
+								</label>
 								<asp:TextBox ID="ShortNameTB" runat="server" />
 								<asp:RegularExpressionValidator ID="ShortNameValidator" runat="server"
 									ErrorMessage="Длинна строки не может быть больше чем 50 символов" ValidationExpression="^.{1,50}$" ValidationGroup="0" ControlToValidate="ShortNameTB" Display="Dynamic">*</asp:RegularExpressionValidator>
@@ -42,43 +44,45 @@
 									ErrorMessage="Поле «Краткое наименование» должно быть заполнено" ValidationGroup="0" Display="Dynamic">*</asp:RequiredFieldValidator></div>
 							<div class="SimpleField">
 								<label class="Required" for="AddressTB">
-									Адрес доставки медикаментов:</label>
+									Адрес доставки медикаментов:
+								</label>
 								<asp:TextBox ID="AddressTB" runat="server" />
 								<asp:RegularExpressionValidator ID="AddressValidator" runat="server"
 									ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationExpression="^.{1,100}$" ValidationGroup="0" ControlToValidate="AddressTB" Display="Dynamic">*</asp:RegularExpressionValidator>
 								<asp:RequiredFieldValidator ID="RequiredAddress" runat="server" ControlToValidate="AddressTB"
 									ErrorMessage="Поле «Адрес доставки медикаментов» должно быть заполнено" ValidationGroup="0" Display="Dynamic">*</asp:RequiredFieldValidator></div>
-							<div class="SimpleField">
+<%--							<div class="SimpleField">
 								<label class="Required" for="PhoneTB">
-									Телефон:</label>
+									Телефон:
+								</label>
 								<asp:TextBox ID="PhoneTB" runat="server" />
 								<asp:RequiredFieldValidator ID="RequiredPhone" runat="server" ControlToValidate="PhoneTB"
-									ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator></div>
-						</div>
+									ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator>
+							</div>
+--%>						</div>
 						<div class="TwoColumn">
 							<div class="SimpleField">
-								<label for="FaxTB">
-									Факс:</label>
-								<asp:TextBox ID="FaxTB" runat="server" Text='<%# DataBinder.Eval(DS1, "Tables[Clientsdata].DefaultView.[0].fax") %>' />
-								<asp:RegularExpressionValidator ID="FaxValidator" runat="server"
-									ErrorMessage="Длинна строки не может быть больше чем 20 символов" ValidationExpression="^.{1,20}$" ValidationGroup="0" ControlToValidate="FaxTB">*</asp:RegularExpressionValidator></div>
+								<label class="Required" for="PhoneTB">
+									Телефон:
+								</label>
+								<asp:TextBox ID="PhoneTB" runat="server" />
+								<asp:RequiredFieldValidator ID="RequiredPhone" runat="server" ControlToValidate="PhoneTB"
+									ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator>
+							</div>
 							<div class="SimpleField">
-								<label class="Required" for="EmailTB">
-									E-mail:</label>
+								<label for="EmailTB">
+									E-mail:
+								</label>
 								<asp:TextBox ID="EmailTB" runat="server" />
-								<asp:RequiredFieldValidator ID="RequiredEmail" runat="server" ControlToValidate="EmailTB"
-									ErrorMessage="Поле «E-mail» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator></div>
-							<div class="SimpleField">
-								<label for="URLTB">
-									URL:</label>
-								<asp:TextBox ID="URLTB" runat="server" Text='<%# DataBinder.Eval(DS1, "Tables[Clientsdata].DefaultView.[0].url") %>' />
-								<asp:RegularExpressionValidator ID="UrlValidator" runat="server"
-									ErrorMessage="Длинна строки не может быть больше чем 35 символов" ValidationExpression="^.{1,35}$" ValidationGroup="0" ControlToValidate="URLTB">*</asp:RegularExpressionValidator></div>
+							</div>
 							<div class="SimpleField">
 								<label for="LoginTB">
-									Login:</label>
+									Login:
+								</label>
 								<asp:TextBox ID="LoginTB" runat="server" />
-								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено" ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate" ValidationGroup="0" EnableClientScript="False" ValidateEmptyText="True">*</asp:CustomValidator>
+								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено"
+									ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate"
+									ValidationGroup="0" EnableClientScript="False" ValidateEmptyText="True">*</asp:CustomValidator>
 							</div>
 						</div>
 					</div>
@@ -93,6 +97,9 @@
 								<asp:DropDownList ID="PayerDDL" runat="server" Visible="False" DataSource="<%# DataTable1 %>"
 									DataTextField="PayerName" DataValueField="PayerID" />
 								<asp:Label ID="PayerCountLB" runat="server" ForeColor="Green" Visible="False" />
+							</div>
+							<div>
+								<asp:CheckBox ID="EnterBillingInfo" runat="server" Text="Заполнять информацию для биллинга" Checked="true" />
 							</div>
 							<div class="ComplexField">
 								<asp:CheckBox ID="IncludeCB" runat="server" OnCheckedChanged="IncludeCB_CheckedChanged"
@@ -111,7 +118,11 @@
 								</asp:DropDownList>
 							</div>
 							<div>
-								<asp:CheckBox ID="InvCB" runat="server" Text="Запретить изменять наценки" Visible="False" />
+								<asp:DropDownList ID="CustomerType" runat="server" Visible="true">
+									<asp:ListItem Value="0" Text="Стандартный" />
+									<asp:ListItem Value="1" Text="Недоступный для настроек" />
+									<asp:ListItem Value="2" Text="Скрытый" />
+								</asp:DropDownList> Тип клиента в интерфейсе поставщика
 							</div>
 						</div>
 						<div class="TwoColumn">
@@ -119,7 +130,8 @@
 								<asp:TextBox ID="PassTB" runat="server" Visible="False" Width="10px" />
 								<label for="TypeDD">
 									Тип:</label>
-								<asp:DropDownList ID="TypeDD" runat="server" />
+								<asp:DropDownList ID="TypeDD" runat="server" 
+									onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
 								</div>
 							<div class="DropDownField">
 								<label for="RegionDD">
@@ -140,29 +152,27 @@
 				<td align="right" height="25">
 					<asp:RegularExpressionValidator ID="RegularExpressionValidator3" runat="server" ControlToValidate="EmailTB"
 						ErrorMessage="Ошибка в e-mail" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator ID="RegularExpressionValidator2"
-							runat="server" ControlToValidate="PhoneTB" ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-							ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator
-								ID="RegularExpressionValidator7" runat="server" ControlToValidate="TBAccountantPhone"
-								ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-								ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator
-									ID="RegularExpressionValidator8" runat="server" ControlToValidate="TBClientManagerPhone"
-									ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-									ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator
-										ID="Regularexpressionvalidator4" runat="server" ControlToValidate="TBOrderManagerMail"
-										ErrorMessage="Ошибка в e-mail Order Manager" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-										Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator ID="Regularexpressionvalidator5"
-											runat="server" ControlToValidate="TBClientManagerMail" ErrorMessage="Ошибка в e-mail Client Manager"
-											ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator
-												ID="Regularexpressionvalidator6" runat="server" ControlToValidate="TBAccountantMail"
-												ErrorMessage="Ошибка в e-mail Accountant" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-												Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><asp:RegularExpressionValidator ID="RegularExpressionValidator9"
-													runat="server" ControlToValidate="TBOrderManagerPhone" ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-													ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator><font
-														face="Verdana" size="2"></font></td>
+						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" ControlToValidate="PhoneTB"
+						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<asp:RegularExpressionValidator ID="RegularExpressionValidator8" runat="server" ControlToValidate="TBClientManagerPhone"
+						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<asp:RegularExpressionValidator ID="Regularexpressionvalidator4" runat="server" ControlToValidate="TBOrderManagerMail"
+						ErrorMessage="Ошибка в e-mail Order Manager" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
+						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<asp:RegularExpressionValidator ID="Regularexpressionvalidator5" runat="server" ControlToValidate="TBClientManagerMail"
+						ErrorMessage="Ошибка в e-mail Client Manager" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
+						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<asp:RegularExpressionValidator ID="RegularExpressionValidator9" runat="server" ControlToValidate="TBOrderManagerPhone"
+						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
+					<font face="Verdana" size="2"></font>
+				</td>
 				<td height="25">
 					<asp:ValidationSummary ID="ValidationSummary1" runat="server" HeaderText="При регистрации возникли ошибки:"
-						ShowSummary="False" ShowMessageBox="True" ValidationGroup="0"></asp:ValidationSummary>
+						ShowSummary="False" ShowMessageBox="True" ValidationGroup="0" />
 				</td>
 			</tr>
 			<tr>
@@ -177,7 +187,7 @@
 							<td style="height: 18px">
 								<strong>Доступные регионы:</strong>
 							</td>
-							<td style="height: 18px">
+							<td id="WorkRegionLable" runat="server" visible="false" style="height: 18px">
 								<strong>Регионы работы:</strong>
 							</td>
 							<td style="height: 18px">
@@ -189,7 +199,7 @@
 								<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
 									DataTextField="Region" DataValueField="RegionCode" />
 							</td>
-							<td>
+							<td id="WorkRegion" runat="server" visible="false">
 								<asp:CheckBoxList ID="WRList2" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
 									DataTextField="Region" DataValueField="RegionCode" />
 							</td>
@@ -206,61 +216,52 @@
 				<td style="background-color: #dadada" colspan="4">
 					<strong>Дополнительные сведения о клиенте</strong>
 					<div id="Phones" class="Fields">
-						<div class="FreeColumn">
-							<span>Менеджер прайс-листов (заказов):</span>
+						<div class="TwoColumn">
+							<span id="OrderManagerGroupLabel" runat="server">
+								Ответственный за работу с программой:
+							</span>
 							<div class="SimpleField">
 								<label for="TBOrderManagerName">
-									Имя:</label>
+									Имя:
+								</label>
 								<asp:TextBox ID="TBOrderManagerName" runat="server" />
 								<asp:RegularExpressionValidator ID="OrderManagerNameValidator" runat="server" ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationGroup="0" ValidationExpression="^.{1,100}$" ControlToValidate="TBOrderManagerName" Display="Dynamic" >*</asp:RegularExpressionValidator>
 							</div>
 							<div class="SimpleField">
 								<label for="TBOrderManagerPhone">
-									Тел.:</label>
+									Тел.:
+								</label>
 								<asp:TextBox ID="TBOrderManagerPhone" runat="server" />
 							</div>
 							<div class="SimpleField">
 								<label for="TBOrderManagerMail">
-									E-mail:</label>
+									E-mail:
+								</label>
 								<asp:TextBox ID="TBOrderManagerMail" runat="server" />
 							</div>
 						</div>
-						<div class="FreeColumn">
-							<span>Менеджер клиентов:</span>
+						<div class="TwoColumn" id="ClientManagerGropBlock" runat="server" visible="false">
+							<span>
+								Управляющий в интерфейсе:
+							</span>
 							<div class="SimpleField">
 								<label for="TBClientManagerName">
-									Имя:</label>
+									Имя:
+								</label>
 								<asp:TextBox ID="TBClientManagerName" runat="server" />
 								<asp:RegularExpressionValidator ID="ClientManagerNameValidator" runat="server"	ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationGroup="0" ValidationExpression="^.{1,100}$" ControlToValidate="TBClientManagerName" Display="Dynamic" >*</asp:RegularExpressionValidator>
 							</div>
 							<div class="SimpleField">
 								<label for="TBClientManagerPhone">
-									Тел.:</label>
+									Тел.:
+								</label>
 								<asp:TextBox ID="TBClientManagerPhone" runat="server" />
 							</div>
 							<div class="SimpleField">
 								<label for="TBClientManagerMail">
-									E-mail:</label>
+									E-mail:
+								</label>
 								<asp:TextBox ID="TBClientManagerMail" runat="server" />
-							</div>
-						</div>
-						<div class="FreeColumn">
-							<span>Бухгалтерия:</span>
-							<div class="SimpleField">
-								<label for="TBAccountantName">
-									Имя:</label>
-								<asp:TextBox ID="TBAccountantName" runat="server" />
-								<asp:RegularExpressionValidator ID="AccountantNameValidator" runat="server"	ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationGroup="0" ValidationExpression="^.{1,100}$" ControlToValidate="TBAccountantName" Display="Dynamic" >*</asp:RegularExpressionValidator>
-							</div>
-							<div class="SimpleField">
-								<label for="TBAccountantPhone">
-									Тел.:</label>
-								<asp:TextBox ID="TBAccountantPhone" runat="server" />
-							</div>
-							<div class="SimpleField">
-								<label for="TBAccountantMail">
-									E-mail:</label>
-								<asp:TextBox ID="TBAccountantMail" runat="server" />
 							</div>
 						</div>
 					</div>
