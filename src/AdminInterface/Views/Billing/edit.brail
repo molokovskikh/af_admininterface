@@ -1,18 +1,4 @@
 ﻿<%
-def WriteLabelAndEditControle(labelText as string, editControlText as string):
-	%>
-	<tr>
-		<td style="width: 30%">
-			${labelText}
-		</td>
-		<td style="width: 70%">
-			${editControlText}
-		</td>
-	</tr>
-	<% 	
-	return ""
-end
-
 def GetClientStyle(client) as string:
 	if client.IsClientActive():
 		return ""
@@ -22,9 +8,6 @@ def GetClientStyle(client) as string:
 	return ""
 end
 
-def WriteInputGroupHeader(localHeader as string):
-	return "<tr><td class=\"InputGroupHeader\" colspan=\"2\">" + localHeader + "</td></tr>"
-end
 %>
 
 <% component CaptureFor, {"Id" : "Title"}: %>
@@ -123,162 +106,17 @@ end
 				</div>
 			</div>
 		</div>
-	
+		
+		<% if IsDefined("UpdateMessage"):%>
+			<div class="Message">${UpdateMessage}</div>
+		<% end %>
+		<% if IsDefined("SendMessage"): %>
+			<div class="Message">${SendMessage}</div>
+		<% end %>	
+		
 		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
-			${FormHelper.HiddenField("Instance.PayerID")}
-			<table>
-					<% if IsDefined("UpdateMessage"):%>
-						<div class="Message">${UpdateMessage}</div>
-					<% end %>
-					<% if IsDefined("SendMessage"): %>
-						<div class="Message">${SendMessage}</div>
-					<% end %>
-					${WriteInputGroupHeader("Общая информация")}
-
-					
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
-																	"Краткое наименование:"), 
-												FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
-																	"Полное наименование:"), 
-												FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-																	"Юридический адрес:"), 
-												FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
-
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-																	"Адрес получателя:"), 
-												FormHelper.TextField("Instance.ReceiverAddress", {"class" : "BillingInput"}))}
-
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
-																	"ИНН:"), 
-												FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
-																	"КПП:"), 
-												FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-																		
-					<%
-					contactGroupIndex = 0
-					component ContactViewer, {"ContactGroups" : ContactGroups}:
-						section ContactGroupHeader:
-						%>
-						<tr>
-							<% if contactGroupIndex == 0: %>
-							<td class="InputGroupHeader">
-								<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
-							</td>
-							<td class="InputGroupHeader">
-								${ContactGroupName}
-							</td>
-							<% else: %>
-							<td class="InputGroupHeader" colspan="2">
-								${ContactGroupName}
-							</td>
-							<% end %>
-						</tr>
-						<% 
-							contactGroupIndex++;
-						end
-						section Item:
-						%>
-							<tr>
-								<td>
-									${Label}:
-								</td>
-								<td>
-									${Value}
-								</td>
-							</tr>
-						<% 
-						end
-						section Person:
-						%>
-							<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
-						<%
-						end
-						section ContactGroupHeaderLink:
-						%>
-							<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
-						<%
-						end
-					end
-					%>
-																		
-					${WriteInputGroupHeader("Опции выставки счета")}
-					
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
-																	"Выставлять счет:"), 
-												FormHelper.Select("Instance.AutoInvoice", 
-																  {1:"Автоматически", 0:"По запросу"},
-																  {"value":"Key", "text":"Value"}))}
-
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", 
-																	"Категория счета:"), 
-												FormHelper.Select("Instance.DetailInvoice", 
-																  {0:"Стандартный", 1:"Детализированный"},
-																  {"value":"Key", "text":"Value"}))}
-																  
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", 
-																	"Периодичность выставления счетов:"), 
-												FormHelper.Select("Instance.PayCycle", 
-																  {0:"Помесячно", 1:"Поквартально"}, 
-																  {"value":"Key", "text":"Value"}))}
-
-					${WriteInputGroupHeader("Доставка корреспонденции")}
-
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressCountry", 
-																	"Страна:"), 
-												FormHelper.TextField("Instance.ActualAddressCountry", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressIndex", 
-																	"Индекс:"), 
-												FormHelper.TextField("Instance.ActualAddressIndex", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressProvince", 
-																	"Область:"), 
-												FormHelper.TextField("Instance.ActualAddressProvince", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressTown", 
-																	"Город:"), 
-												FormHelper.TextField("Instance.ActualAddressTown", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressStreet", 
-																	"Улица:"), 
-												FormHelper.TextField("Instance.ActualAddressStreet", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressHouse", 
-																	"Дом:"), 
-												FormHelper.TextField("Instance.ActualAddressHouse", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressOffice", 
-																	"Офис:"), 
-												FormHelper.TextField("Instance.ActualAddressOffice", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeforeNamePrefix", 
-																	"Префикс перед \"Кому\":"), 
-												FormHelper.TextField("Instance.BeforeNamePrefix", {"class" : "BillingInput"}))}
-												
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
-																	"Надпись после \"Кому\":"), 
-												FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
-												
-
-					${WriteInputGroupHeader("Комментарий")}
-
-					${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Comment", 
-																	"Комментарий:"), 
-												FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" }))}
-										
-					<tr style="text-align:right">
-						<td colspan="2">
-							${FormHelper.Submit("Сохранить")}
-						</td>
-					</tr>		
-			</table>
+			<% OutputSubView("Common/PayerEdit") %>
 		</form>
 			
 	</div>
@@ -374,6 +212,56 @@ end
 			end
 			%>
 			</table>
+			
 		</div>
+		
+		<div>
+			<form>
+				${FormHelper.HiddenField("ClientCode", Client.Id)}
+				<textarea name="Comment" rows="20" style="width:100%">
+				</textarea>
+				<input type="submit" value="Корреспонденция отправлена" />
+			</form>
+		</div>
+		
+		<div>
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				История отправки корреспонденции
+			</div>
+			<div>
+			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
+			<% 
+			if LogRecords.Count > 0:
+				i = 0
+				for mailSentEntity in mailSentHistory:
+					i++
+			%>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td>
+							${mailSentEntity.SentDate}
+						</td>
+						<td>
+							${mailSentEntity.UserName}
+						</td>
+						<td>
+							${ViewHelper.FormatMessage(mailSentEntity.Comment)}
+						</td>
+					</tr>
+			<% 
+				end
+			else:
+			%>
+				<tr>
+					<td style="text-align:center;">
+						Корреспонденции не отправлялась
+					</td>
+				</tr>				
+			<%
+			end
+			%>
+			</table>
+			</div>
+		</div>
+		
 	</div>
 </div>

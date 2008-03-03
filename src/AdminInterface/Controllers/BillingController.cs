@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Web;
 using System.Web.UI.WebControls;
+using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
 using AdminInterface.Models;
@@ -16,8 +16,21 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
+	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
 	public class BillingController : ARSmartDispatcherController
 	{
+		public void Register(uint id)
+		{
+			var instance = Payer.Find(id);
+			PropertyBag["Instance"] = instance;
+		}
+
+		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer)
+		{
+			payer.UpdateAndFlush();
+			Redirect("../report.aspx");
+		}
+
 		public void Edit(uint clientCode, bool showClients)
 		{
 			Client client = Client.Find(clientCode);
@@ -33,9 +46,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = client.BillingInstance;
 			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
+			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory();
 		}
 
-		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] BillingInstance billingInstance, 
+		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
 						   uint clientCode)
 		{
 			billingInstance.UpdateAndFlush();
@@ -58,7 +72,8 @@ namespace AdminInterface.Controllers
 			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
 		}
 
-		public void UpdateClientsStatus(uint clientCode, [DataBind("Status")] ClientWithStatus[] clients)
+		public void UpdateClientsStatus(uint clientCode, 
+										[DataBind("Status")] ClientWithStatus[] clients)
 		{
 			using(TransactionScope scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -127,9 +142,9 @@ namespace AdminInterface.Controllers
 		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
 						 [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
-			using (TransactionScope scope = new TransactionScope())
+			using (var scope = new TransactionScope())
 			{
-				foreach (PaymentInstance instance in paymentInstances)
+				foreach (var instance in paymentInstances)
 					instance.Save();				
 				scope.Flush();
 			}		
@@ -137,17 +152,23 @@ namespace AdminInterface.Controllers
 			RenderView("SearchBy");
 		}
 
-		private IList<Region> GetRegions()
+		public void SentMail(uint clientCode, string comment)
 		{
-			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
+			if (!String.IsNullOrEmpty(comment))
+			{
+				var mailSentEntity = new MailSentEntity
+				                     	{
+				                     		Comment = comment,
+				                     		UserName = ((Administrator) Session["Admin"]).UserName
+				                     	};
+				mailSentEntity.SaveAndFlush();
+			}
+			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
 
-		public string GetChangeStatusButtonText(Client client)
+		private static IList<Region> GetRegions()
 		{
-			if (client.Status == ClientStatus.On)
-				return "Отключить клиента";
-			else
-				return "Включить клиента";
+			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
 		}
 	}
 }
