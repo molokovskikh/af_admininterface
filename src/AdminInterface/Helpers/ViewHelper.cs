@@ -23,7 +23,7 @@ namespace AdminInterface.Helpers
 			return rowIndex % 2 == 0 ? "EvenRow" : "OddRow";
 		}
 
-		public static string FormaMessage(string message)
+		public static string FormatMessage(string message)
 		{
 			return message.Replace(Environment.NewLine, "<br>");
 		}

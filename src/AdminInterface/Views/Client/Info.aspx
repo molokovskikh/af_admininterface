@@ -176,7 +176,7 @@
 							<asp:BoundField DataField="UserName" HeaderText="Оператор" />
 							<asp:TemplateField HeaderText="Событие">
 								<ItemTemplate>
-									<%# ViewHelper.FormaMessage(Eval("Message").ToString())%>
+									<%# ViewHelper.FormatMessage(Eval("Message").ToString())%>
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>
