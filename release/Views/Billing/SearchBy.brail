@@ -42,6 +42,8 @@ OutputSubView("Search")
 		<input type="hidden" name="SearchBy.SearchBy" value="${FindBy.SearchBy}" />
 		<input type="hidden" name="SearchBy.PayerState" value="${FindBy.PayerState}" />
 		<input type="hidden" name="SearchBy.Segment" value="${FindBy.Segment}" />
+		<input type="hidden" name="SearchBy.ClientType" value="${FindBy.ClientType}" />
+		<input type="hidden" name="SearchBy.ClientStatus" value="${FindBy.ClientStatus}" />
 		<table class="HighLightCurrentRow DataTable" style="width: 100%">
 			<tr>
 				<th>
