@@ -85,7 +85,9 @@
 							<asp:Label ID="IsUniqueCopyIDSet" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
 							<label id="ResearReasonLable" runat="server">Причина:</label>
 							<asp:TextBox ID="ResetIDCause" runat="server" BorderStyle="None" BackColor="LightGray" Enabled="False" />
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." ValidationGroup="3" />
+							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" 
+								ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." 
+								ValidationGroup="3" Display="Dynamic"  />
 						</td>
 					</tr>
 					<tr>
@@ -133,7 +135,7 @@
 							<asp:TextBox ID="UrlText" runat="server" Width="90%" />
 							<asp:RegularExpressionValidator ID="UrlValidator" runat="server" ErrorMessage="*"
 								ControlToValidate="UrlText" ValidationExpression="http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?"
-								ValidationGroup="1"></asp:RegularExpressionValidator>
+								ValidationGroup="1" Display="Dynamic"></asp:RegularExpressionValidator>
 						</td>
 					</tr>
 					<tr>
