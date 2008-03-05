@@ -41,7 +41,8 @@ namespace AdminInterface.Helpers
 
 		public static DateTime GetPasswordExpirationDate(string login)
 		{
-			return Convert.ToDateTime(GetDirectoryEntry(login).InvokeGet("PasswordExpirationDate"));
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(CN={0}))", login)))
+				return DateTime.FromFileTime((long)searcher.FindOne().Properties["pwdLastSet"][0]) + GetMaxPasswordAge();
 		}
 
 		public static bool IsLocked(string login)
@@ -80,6 +81,12 @@ namespace AdminInterface.Helpers
 			if (entry == null)
 				throw new Exception(String.Format("Учетная запись Active Directory {0} не найдена", login));
 			return entry;
+		}
+
+		private static TimeSpan GetMaxPasswordAge()
+		{
+			using (var searcher = new DirectorySearcher("(objectClass=domainDNS)"))
+				return TimeSpan.FromTicks(Math.Abs((long) searcher.FindOne().Properties["maxPwdAge"][0]));
 		}
 	}
 }
