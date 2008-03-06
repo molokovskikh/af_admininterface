@@ -753,7 +753,7 @@ Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?FirmSegment, ?Regio
 			else
 			{
 				_command.CommandText += @"
-select maskregion, ShowRegionMask, ?FullName, ?ShortName, ?Fax, ?URL, FirmSegment, RegionCode, ?Adress, 
+select maskregion, ShowRegionMask, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
 FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
 from usersettings.clientsdata where firmcode=" +
 					IncludeSDD.SelectedValue + "; ";
