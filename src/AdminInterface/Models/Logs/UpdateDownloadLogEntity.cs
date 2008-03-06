@@ -30,10 +30,14 @@ namespace AdminInterface.Models.Logs
 
 		public string ResolveHost()
 		{
-			var host = Dns.GetHostEntry(ClientHost);
-			if (host == null)
+			try
+			{
+				return Dns.GetHostEntry(ClientHost).HostName;
+			}
+			catch
+			{
 				return "-";
-			return host.HostName;
+			}
 		}
 	}
 }
