@@ -10,7 +10,7 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property(Insert = false)]
 		public DateTime SentDate { get; set; }
 
 		[Property]
