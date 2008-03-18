@@ -4,6 +4,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
+	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
 	public class ClientController : SmartDispatcherController
 	{
 		public void Info(uint cc)
