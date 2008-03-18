@@ -160,7 +160,6 @@ namespace AdminInterface.Controllers
 				                     	{
 											PayerId =  payerId,
 				                     		Comment = comment,
-                                            SentDate = DateTime.Now,
 				                     		UserName = ((Administrator) Session["Admin"]).UserName
 				                     	};
 				mailSentEntity.SaveAndFlush();
