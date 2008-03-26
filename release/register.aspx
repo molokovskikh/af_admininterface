@@ -118,14 +118,20 @@
 								</asp:DropDownList>
 							</div>
 							<div>
+								<asp:CheckBox runat="server" ID="ServiceClient" Text="Сотрудник АК Инфорум" />
+							</div>
+						</div>
+						<div class="TwoColumn">
+							<div class="DropDownField">
+								<label for="">
+									Тип клиента в интерфейсе поставщика:
+								</label>
 								<asp:DropDownList ID="CustomerType" runat="server" Visible="true">
 									<asp:ListItem Value="0" Text="Стандартный" />
 									<asp:ListItem Value="1" Text="Недоступный для настроек" />
 									<asp:ListItem Value="2" Text="Скрытый" />
-								</asp:DropDownList> Тип клиента в интерфейсе поставщика
+								</asp:DropDownList>
 							</div>
-						</div>
-						<div class="TwoColumn">
 							<div class="DropDownField">
 								<asp:TextBox ID="PassTB" runat="server" Visible="False" Width="10px" />
 								<label for="TypeDD">
