@@ -338,6 +338,7 @@ set @inUser = ?UserName;
 			_command.Parameters["?OSUserName"].Value = LoginTB.Text;
 			_command.Parameters.Add(new MySqlParameter("?OSUserPass", MySqlDbType.VarString));
 			_command.Parameters["?OSUserPass"].Value = PassTB.Text;
+			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
 
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
 				_command.Parameters.AddWithValue("?PrimaryClientCode", IncludeSDD.SelectedValue);
@@ -383,9 +384,12 @@ set @inUser = ?UserName;
 				try
 				{
 					if (TypeDD.SelectedItem.Text == "Аптека"
-					    && CustomerType.SelectedItem.Text != "Стандартный"
+						&& !IncludeCB.Checked
+						&& !ServiceClient.Checked
+					    && CustomerType.SelectedItem.Text == "Стандартный"
 					    || (TypeDD.SelectedItem.Text == "Аптека"
 					        && IncludeCB.Checked
+							&& !ServiceClient.Checked
 					        && IncludeType.SelectedItem.Text != "Скрытый"))
 					{
 						var dataAdapter =
@@ -445,25 +449,14 @@ where length(c.contactText) > 0
 								          +
 								          String.Format("\nАдрес доставки накладных: {0}@waybills.analit.net",
 								                        _command.Parameters["?ClientCode"].Value)
-								          + "С уважением, Аналитическая компания \"Инфорум\", г. Воронеж"
-								          +
-								          @"Москва  +7 495 6628727
+								          + "\r\nС уважением, Аналитическая компания \"Инфорум\", г. Воронеж"
+								          + @"
+Москва  +7 495 6628727
 С.-Петербург +7 812 3090521
 Воронеж +7 4732 206000
 Челябинск +7 351 729 8143"
 								          + "\n", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
 							}
-							Func.Mail("register@analit.net", String.Empty,
-									  "\"Debug: " + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - Уведомления поставщиков",
-							          false, "Оператор: " + Session["UserName"]
-							                 + "\nРегион: " + RegionDD.SelectedItem.Text + "\nLogin: "
-							                 + LoginTB.Text + "\nКод: " + Session["Code"]
-							                 + "\n\nСегмент: " + SegmentDD.SelectedItem.Text + "\nТип: "
-							                 + TypeDD.SelectedItem.Text + "О Регистрации уведомлено поставщиков: "
-							                 + Convert.ToString(DS1.Tables["FirmEmail"].Rows.Count - 1),
-							          "RegisterList@subscribe.analit.net", String.Empty,
-							          DS1.Tables["admin"].Rows[0]["email"].ToString(),
-							          Encoding.UTF8);
 						}
 						else
 						{
@@ -490,42 +483,30 @@ where length(c.contactText) > 0
 					                 + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
 					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 				}
-				try
-				{
-					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
-					          false, "Оператор: " + Session["UserName"] + "\nРегион: "
-					                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
-					                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 
-					Func.Mail("register@analit.net",
-					          "",
-					          "Регистрация нового клиента",
-					          false,
-					          String.Format(
-					          	@"Зарегистрирован новый клиент
+				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
+				          false, "Оператор: " + Session["UserName"] + "\nРегион: "
+				                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
+				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
+				          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+
+				Func.Mail("register@analit.net",
+				          "",
+				          "Регистрация нового клиента",
+				          false,
+				          String.Format(
+				          	@"Зарегистрирован новый клиент
 Название: {0}
 Код: {1}
 Биллинг код: {2}
 Кем зарегистрирован: {3}",
-					          	ShortNameTB.Text, Session["Code"], Session["DogN"], Session["UserName"]),
-					          "billing@analit.net",
-					          "",
-					          "",
-					          Encoding.UTF8);
-				}
-				catch (Exception err)
-				{
-					Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text
-					                                               + "\" - ошибка подписки поставщиков", false,
-					          "Оператор: " + Session["UserName"] + "\nРегион: "
-					          + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
-					          + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					          + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-					          + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
-				}
+				          	ShortNameTB.Text, Session["Code"], Session["DogN"], Session["UserName"]),
+				          "billing@analit.net",
+				          "",
+				          "",
+				          Encoding.UTF8);
+
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
 				Session["Login"] = LoginTB.Text;
@@ -899,9 +880,9 @@ WHERE   intersection_update_info.pricecode IS NULL
 
 		private void CreateClientOnRCS_and_I(bool Invisible)
 		{
-			_command.CommandText =
-				@"
-INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword) Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask, GeneratePassword());
+			_command.CommandText = @"
+INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword, ServiceClient) 
+Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask, GeneratePassword(), ?ServiceClient);
 
 INSERT INTO usersettings.ret_update_info (ClientCode, CurrentExeVersion) 
 Values(?ClientCode, (SELECT max(currentExeVersion)
@@ -1063,12 +1044,9 @@ WHERE	dst.clientcode        = ?ClientCode
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-#if !DEBUG
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
 				Response.Redirect("default.aspx");
-			}
-#endif
+
 			_connection.ConnectionString = Literals.GetConnectionString();
 			try
 			{
@@ -1354,6 +1332,7 @@ select Last_Insert_ID();";
 		{
 			var isCusomer = TypeDD.SelectedItem.Text == "Аптека";
 			CustomerType.Enabled = isCusomer;
+			ServiceClient.Enabled = isCusomer;
 			IncludeCB.Enabled = isCusomer;
 			if (!isCusomer)
 				IncludeCB.Checked = false;

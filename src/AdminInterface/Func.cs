@@ -20,6 +20,7 @@ namespace AddUser
 				{
 #if DEBUG
 					to = "r.kvasov@analit.net";
+					bcc = "";
 #endif
 					MailMessage message = new MailMessage();
 					message.From = new MailAddress(from, fromDisplayName, encoding);
