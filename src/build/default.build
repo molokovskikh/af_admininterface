@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0"?>
-<project name="MyProject" default="compile" basedir=".">
+<project name="MyProject" default="compile" basedir="..">
 
 	<property name="VssDbPath" value="\\offdc\VSS\Inforoom\srcsafe.ini" />
 	<property name="VssPath" value="$/inforoom/net2.0/AdminInterface/release/" />
-	<property name="ReleasePath" value="..\release\" />
+	<property name="ReleasePath" value="..\..\release\" />
 		
 
 	<target name="compile">
 
-		<loadtasks assembly="D:\Tools\nantcontrib-0.85\bin\NAnt.Contrib.Tasks.dll" />
+		<loadtasks assembly=".\build\NAnt.Contrib.Tasks.dll" />
 
             <vsscheckout 
                   user="${User}"
