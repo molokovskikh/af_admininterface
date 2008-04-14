@@ -9,6 +9,8 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using AddUser;
+using AdminInterface.Helpers;
 using DAL;
 
 public partial class EditAdministrator : Page
@@ -72,44 +74,35 @@ public partial class EditAdministrator : Page
 			CommandFactory.UpdateAdministrator(_current);
 		else
 		{
-			CheckUserGroup(_current.Login);
 			CommandFactory.AddAdministrator(_current);
+			CreateUserInAD(_current);
+			Response.Redirect("OfficeUserRegistrationReport.aspx");
 		}
 
 		Response.Redirect("ViewAdministrators.aspx");
 	}
 
-	private void CheckUserGroup(string userName)
+	private void CreateUserInAD(Administrator administrator)
 	{
-		string groupName = "Региональные администраторы";
-		bool finded = false;
-		using (DirectorySearcher searcher = new DirectorySearcher())
-		{
-			searcher.Filter = String.Format("(&(objectClass=user)(name={0}))", userName);
-			SearchResult searchResult = searcher.FindOne();
+		var password = Func.GeneratePassword();
+#if !DEBUG
+		var root = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+		var userGroup = new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
+		var user = root.Children.Add("CN=" + administrator.Login, "user");
+		user.Properties["samAccountName"].Value = administrator.Login;
+		user.Properties["sn"].Value = administrator.FIO;
+		user.Properties["logonHours"].Value = ADHelper.LogonHours();
+		user.CommitChanges();
+		user.Invoke("SetPassword", password);
+		user.CommitChanges();
+		userGroup.Invoke("Add", user.Path);
+		userGroup.CommitChanges();
+		root.CommitChanges();
+#endif
 
-			searcher.Filter = "(&(objectClass=group)(name=Региональные администраторы))";
-			SearchResult groupResult = searcher.FindOne();
-			
-			using(DirectoryEntry group = groupResult.GetDirectoryEntry())
-			using (DirectoryEntry user  = searchResult.GetDirectoryEntry())
-			{
-				
-				foreach (string value in user.Properties["MemberOf"])
-				{
-					if (value.IndexOf(groupName, StringComparison.CurrentCultureIgnoreCase) > 0)
-					{
-						finded = true;
-						break;
-					}
-				}
-
-				if (!finded)
-					group.Invoke("Add", user.Path);
-
-				user.CommitChanges();
-			}
-		}
+		Session["Password"] = password;
+		Session["FIO"] = administrator.FIO;
+		Session["Login"] = administrator.Login;
 	}
 
 	protected void Cancel_Click(object sender, EventArgs e)
