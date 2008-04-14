@@ -64,6 +64,21 @@ namespace AdminInterface.Helpers
 			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("AccountDisabled")); 
 		}
 
+		public static byte[] LogonHours()
+		{
+			var hours = new byte[]
+			            	{
+			            		0, 0, 0,
+			            		224, 255, 3,
+			            		224, 255, 3,
+			            		224, 255, 3,
+			            		224, 255, 3,
+			            		224, 255, 3,
+								0, 0, 0,
+			            	};
+			return hours;
+		}
+
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
 			using(var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(CN={0}))", login)))
@@ -87,6 +102,24 @@ namespace AdminInterface.Helpers
 		{
 			using (var searcher = new DirectorySearcher("(objectClass=domainDNS)"))
 				return TimeSpan.FromTicks(Math.Abs((long) searcher.FindOne().Properties["maxPwdAge"][0]));
+		}
+
+		public static void Block(string login)
+		{
+#if !DEBUG
+			var entry = GetDirectoryEntry(login);
+			entry.InvokeSet("IsAccountLocked", true);
+			entry.CommitChanges();
+#endif
+		}
+
+		public static void Delete(string login)
+		{
+#if !DEBUG
+			var entry = GetDirectoryEntry(login);
+			entry.DeleteTree();
+			entry.CommitChanges();
+#endif
 		}
 	}
 }
