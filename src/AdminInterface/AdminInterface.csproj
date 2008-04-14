@@ -232,6 +232,13 @@
     <Compile Include="Models\ClientMessage.cs" />
     <Compile Include="Models\Logs\DocumentLogEntity.cs" />
     <Compile Include="Models\Logs\InternetLogEntity.cs" />
+    <Compile Include="OfficeUserRegistrationReport.aspx.cs">
+      <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="OfficeUserRegistrationReport.aspx.designer.cs">
+      <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
+    </Compile>
     <Compile Include="orders.aspx.cs">
       <DependentUpon>orders.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -359,6 +366,7 @@
     <None Include="Views\Logs\UpdateLog.brail" />
     <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
     <None Include="Views\Contact\NewContactGroup.brail" />
+    <Content Include="OfficeUserRegistrationReport.aspx" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
