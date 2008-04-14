@@ -5,7 +5,7 @@
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<form id="form1" runat="server">
 		<div>
-			<h3>Региональные администраторы</h3>
+			<h3>Пользователи офиса</h3>
 			<asp:ObjectDataSource ID="ObjectDataSource1" runat="server"
 				SelectMethod="GetAdministratorList" TypeName="DAL.CommandFactory" DataObjectTypeName="DAL.Administrator" DeleteMethod="DeleteAdministrator" ConflictDetection="CompareAllValues"></asp:ObjectDataSource>
 			<asp:GridView ID="Administrators" runat="server" AutoGenerateColumns="False" DataSourceID="ObjectDataSource1" OnRowCommand="Administrators_RowCommand" CssClass="HighLightCurrentRow" DataKeyNames="ID">
@@ -16,11 +16,16 @@
 						</HeaderTemplate>
 						<ItemTemplate>
 							<asp:Button ID="Button1" CommandArgument='<%# Bind("ID")%>' runat="server" CausesValidation="False" CommandName="Delete"
-								Text="Удалить" />
+								Text="Удалить" Visible='<%# GetDeleteBlockButtonVisibiliti((Eval("Login").ToString())) %>' />
 						</ItemTemplate>
 						<ItemStyle HorizontalAlign="Left" />
 						<HeaderStyle HorizontalAlign="Left" />
 					</asp:TemplateField>
+					<asp:TemplateField>
+						<ItemTemplate>
+							<asp:Button ID="Button3" runat="server" CommandName='<%# GetButtonCommand((Eval("Login").ToString())) %>' CausesValidation="False" Text='<%# GetButtonLabel(Eval("Login").ToString()) %>' CommandArgument='<%# Bind("Login") %>' Visible='<%# GetDeleteBlockButtonVisibiliti((Eval("Login").ToString())) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>					
 					<asp:BoundField DataField="ID" HeaderText="AdministratorID" SortExpression="ID" Visible="False" />
 					<asp:BoundField DataField="FIO" HeaderText="ФИО" SortExpression="FIO" />
 					<asp:TemplateField HeaderText="Login" SortExpression="Login">

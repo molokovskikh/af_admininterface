@@ -10,12 +10,6 @@
 
 
 
-/// <summary>
-/// ViewAdministrators class.
-/// </summary>
-/// <remarks>
-/// Auto-generated class.
-/// </remarks>
 public partial class ViewAdministrators {
     
     /// <summary>

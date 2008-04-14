@@ -1,14 +1,7 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using DAL;
+using AdminInterface.Helpers;
 
 public partial class ViewAdministrators : Page
 {
@@ -33,6 +26,39 @@ public partial class ViewAdministrators : Page
 					Response.Redirect(String.Format("EditAdministrator.aspx?id={0}", e.CommandArgument));
 					break;
 				}
+			case "Block":
+				{
+					ADHelper.Block(e.CommandArgument.ToString());
+					Response.Redirect("ViewAdministrators.aspx");
+					break;
+				}
+			case "Unblock":
+				{
+					ADHelper.Unlock(e.CommandArgument.ToString());
+					Response.Redirect("ViewAdministrators.aspx");
+					break;
+				}
 		}
+	}
+
+	protected string GetButtonLabel(string login)
+	{
+		if (ADHelper.IsLocked(login))
+			return "Разблокировать";
+		return "Блокировать";
+	}
+
+	protected string GetButtonCommand(string login)
+	{
+		if (ADHelper.IsLocked(login))
+			return "Unblock";
+		return "Block";
+	}
+
+	protected bool GetDeleteBlockButtonVisibiliti(string login)
+	{
+		if (login == "Boss" || login == "michail")
+			return false;
+		return true;
 	}
 }
