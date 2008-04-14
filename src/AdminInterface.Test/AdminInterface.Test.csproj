@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{7ED64626-EF5D-40C5-9237-AA93EF397C99}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -86,6 +86,7 @@
     <Compile Include="Common\BaseModelIntegrationTest.cs" />
     <Compile Include="Common\BaseViewTest.cs" />
     <Compile Include="ControllerTest\BillingControllerTest.cs" />
+    <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="Helpers\ViewHelperFixture.cs" />
     <Compile Include="InternetLogEntityFixture.cs" />
     <Compile Include="ModelIntegrationTests\BillingSearchItemTest.cs" />
