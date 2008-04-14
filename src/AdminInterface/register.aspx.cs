@@ -1146,30 +1146,35 @@ ORDER BY region;
 
 		private void CreateFtpDirectory(string directory, string userName)
 		{
-			DirectoryInfo supplierDirectory = Directory.CreateDirectory(directory);
-			DirectorySecurity supplierDirectorySecurity = supplierDirectory.GetAccessControl();
-			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Read,
-			                                                                 InheritanceFlags.ContainerInherit |
-			                                                                 InheritanceFlags.ObjectInherit,
-			                                                                 PropagationFlags.None, AccessControlType.Allow));
-			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.Write,
-			                                                                 InheritanceFlags.ContainerInherit |
-			                                                                 InheritanceFlags.ObjectInherit,
-			                                                                 PropagationFlags.None, AccessControlType.Allow));
-			supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName, FileSystemRights.ListDirectory,
-			                                                                 InheritanceFlags.ContainerInherit |
-			                                                                 InheritanceFlags.ObjectInherit,
-			                                                                 PropagationFlags.None, AccessControlType.Allow));
+			var supplierDirectory = Directory.CreateDirectory(directory);
+			var supplierDirectorySecurity = supplierDirectory.GetAccessControl();
+		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+		                                                                     FileSystemRights.Read,
+		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+		                                                                     PropagationFlags.None,
+		                                                                     AccessControlType.Allow));
+		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+		                                                                     FileSystemRights.Write,
+		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+		                                                                     PropagationFlags.None,
+		                                                                     AccessControlType.Allow));
+		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+		                                                                     FileSystemRights.ListDirectory,
+		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+		                                                                     PropagationFlags.None, 
+                                                                             AccessControlType.Allow));
 			supplierDirectory.SetAccessControl(supplierDirectorySecurity);
 
-			DirectoryInfo ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
-			DirectorySecurity ordersDirectorySecurity = supplierDirectory.GetAccessControl();
+			var ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
+			var ordersDirectorySecurity = supplierDirectory.GetAccessControl();
 			ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
 			                                                               FileSystemRights.DeleteSubdirectoriesAndFiles,
-			                                                               InheritanceFlags.ContainerInherit |
-			                                                               InheritanceFlags.ObjectInherit, PropagationFlags.None,
+			                                                               InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, 
+                                                                           PropagationFlags.None,
 			                                                               AccessControlType.Allow));
 			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
+
+		    Directory.CreateDirectory(directory + "Docs\\");
 		}
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
