@@ -213,7 +213,7 @@ WHERE RowID = ?Id
 		protected void CreateCost_Click(object sender, EventArgs e)
 		{
 			Int32 FirmCode;
-			MySqlDataAdapter adapter = new MySqlDataAdapter(@"
+			var adapter = new MySqlDataAdapter(@"
 SELECT  pd.FirmCode, 
         pd.PriceName, 
         cd.ShortName, 
@@ -229,51 +229,56 @@ WHERE pd.pricecode = ?PriceCode;", MyCn);
 
 				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
-				adapter.SelectCommand.Parameters.Add("?PriceCode", PriceCode);
-				adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+                adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
 				
 
-				MySqlDataReader MyReader = adapter.SelectCommand.ExecuteReader();
+				var MyReader = adapter.SelectCommand.ExecuteReader();
 				MyReader.Read();
 				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
-				string ShortName = MyReader["ShortName"].ToString();
-				string PriceName = MyReader["PriceName"].ToString();
-				string region = MyReader["Region"].ToString();
-				int costType = Convert.ToInt32(MyReader["CostType"]);
+				var ShortName = MyReader["ShortName"].ToString();
+				var PriceName = MyReader["PriceName"].ToString();
+				var region = MyReader["Region"].ToString();
+				var costType = Convert.ToInt32(MyReader["CostType"]);
 				MyReader.Close();
 
-				adapter.SelectCommand.Parameters.Add("?FirmCode", FirmCode);
+                adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", FirmCode);
 
-				adapter.SelectCommand.CommandText += 
+
+
+                if (costType == 0)
+                    adapter.SelectCommand.CommandText +=
 @"
-INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?FirmCode, null); 
-set @NewPriceCode := Last_Insert_ID(); 
-INSERT INTO farm.formrules(firmcode) VALUES(@NewPriceCode); 
-INSERT INTO farm.sources(FirmCode) VALUES(@NewPriceCode); 
-INSERT 
-INTO    PricesCosts
-        (
-                CostCode, 
-                PriceCode, 
-                BaseCost, 
-                ShowPriceCode
-        ) 
-SELECT @NewPriceCode, @NewPriceCode, 0, ?PriceCode;  
-INSERT 
-INTO    farm.costformrules
-        (
-                PC_CostCode, 
-                FR_ID
-        ) 
-SELECT @NewPriceCode, @NewPriceCode; 
+SELECT pc.PriceItemId
+FROM Usersettings.PricesData pd
+    JOIN Usersettings.PricesCosts pc on pd.PriceCode = pc.PriceCode
+WHERE pd.PriceCode = ?PriceCode and pc.BaseCost = 1
+INTO @NewPriceItemId;
+
+INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT ?PriceCode, 0, @NewPriceItemId;
+SET @NewPriceCostId:=Last_Insert_ID(); 
+
+INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
+";
+                else
+                    adapter.SelectCommand.CommandText +=
+@"
+INSERT INTO farm.formrules() VALUES();   
+SET @NewFormRulesId = Last_Insert_ID();
+
+INSERT INTO farm.sources() VALUES(); 
+SET @NewSourceId = Last_Insert_ID();
+
+INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
+SET @NewPriceItemId = Last_Insert_ID();
+
+INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT ?PriceCode, 0, @NewPriceItemId;
+SET @NewPriceCostId:=Last_Insert_ID(); 
+
+INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 ";
 
-				if (costType == 1)
-					adapter.SelectCommand.CommandText += @"
-INSERT INTO usersettings.price_update_info(PriceCode)
-VALUES (@NewPriceCode);";
-
-				adapter.SelectCommand.ExecuteNonQuery();
+			    adapter.SelectCommand.ExecuteNonQuery();
 
 				adapter.SelectCommand.CommandText =
 @"
@@ -289,14 +294,15 @@ SELECT  regionaladmins.username,
 FROM    accessright.regionaladmins, 
         farm.regions 
 WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
-        AND username                                                    = ?UserName 
+        AND username = ?UserName 
 ORDER BY region;
 ";
 
 				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
 				Func.Mail("register@analit.net", String.Empty, "\"" + ShortName + "\" - регистрация ценовой колонки", false,
-						  String.Format(@"Оператор: {0} 
+						  String.Format(
+@"Оператор: {0} 
 Поставщик: {1}
 Регион: {2}
 Прайс-лист: {3}
@@ -327,25 +333,24 @@ ORDER BY region;
             try
             {
                 MyCn.Open();
-                MySqlTransaction transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-                MyDA.SelectCommand.Parameters.Add("?PriceCode", PriceCode);
+                var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+                MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
                 SelCommand.Transaction = transaction;
                 SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=?PriceCode";
                 PriceNameLB.Text = SelCommand.ExecuteScalar().ToString();
                 SelCommand.CommandText =
 @"
-SELECT  CostCode, 
+SELECT  pc.CostCode, 
         cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
-        CostName, 
-        BaseCost, 
+        pc.CostName, 
+        pc.BaseCost, 
         pc.Enabled, 
         pc.AgencyEnabled  
-FROM    (farm.costformrules cf, pricescosts pc, pricesdata pd)  
-LEFT JOIN farm.sources s 
-        ON s.firmcode    =pc.pricecode  
-WHERE   cf.pc_costcode   =pc.costcode  
-        AND pd.pricecode =showpricecode  
-        AND ShowPriceCode= ?PriceCode;
+FROM usersettings.pricescosts pc
+    JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+        JOIN farm.sources s on pi.SourceId = s.Id
+    JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
+WHERE pc.PriceCode = ?PriceCode;
 ";
                 
                 MyDA.Fill(DS, "Costs");
@@ -357,10 +362,9 @@ SELECT  RowId,
         UpCost, 
         MinReq, 
         Enabled  
-FROM    PricesRegionalData prd   
-INNER JOIN Farm.Regions r 
-        ON prd.RegionCode = r.RegionCode  
-WHERE   PriceCode         = ?PriceCode  
+FROM PricesRegionalData prd   
+    JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode  
+WHERE   PriceCode = ?PriceCode  
 ";
 
                 MyDA.Fill(DS, "PriceRegionSettings");
