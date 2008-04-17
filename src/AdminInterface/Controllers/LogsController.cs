@@ -32,7 +32,6 @@ namespace AdminInterface.Controllers
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
 		{
-			DateTime begin = DateTime.Now;
 			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
 			PropertyBag["updateLogEntityId"] = logEntity.Id;
 			var detailsLogEntities = logEntity.UpdateDownload;
@@ -46,7 +45,6 @@ namespace AdminInterface.Controllers
 				totalBytes = entity.TotalBytes;
 			}
 
-			System.Diagnostics.Trace.WriteLine(begin - DateTime.Now);
 			PropertyBag["allDownloaded"] = totalByteDownloaded >= totalBytes;
 		}
 
