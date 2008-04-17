@@ -22,8 +22,8 @@ namespace AddUser
 
 	partial class searchc : Page
 	{
-		MySqlConnection _connection = new MySqlConnection();
-		MySqlCommand _command = new MySqlCommand();
+	    private MySqlConnection _connection = new MySqlConnection();
+	    private readonly MySqlCommand _command = new MySqlCommand();
 
 		public DataView ClientsDataView
 		{
@@ -56,8 +56,8 @@ namespace AddUser
 
 		private void BindUserRegions()
 		{
-			DataSet dataSet = new DataSet();
-			MySqlDataAdapter dataAdapter = new MySqlDataAdapter(
+			var dataSet = new DataSet();
+			var dataAdapter = new MySqlDataAdapter(
 @"select (select sum(regioncode) from farm.regions) as RegionCode, 'Все' as Region, 1 as IsAll
 union
 SELECT  r.RegionCode,
@@ -76,7 +76,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		protected void GoFind_Click(object sender, EventArgs e)
 		{
-			SearchType searchType = SearchType.ShortName;
+			var searchType = SearchType.ShortName;
 			switch(FindRB.SelectedValue)
 			{
 				case "Code":
@@ -115,7 +115,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		private void FormatRow(GridViewRow row)
 		{
-			DataRowView data = row.DataItem as DataRowView;
+			var data = row.DataItem as DataRowView;
 
 			if (data.Row["FirmStatus"].ToString() == "1")
 				row.BackColor = Color.FromArgb(255, 102, 0);
@@ -123,8 +123,10 @@ ORDER BY IsAll Desc, Region;", _connection);
 			if (ADCB.Checked)
 				row.Cells[8].BackColor = Color.FromName(data.Row["ADUserStatus"].ToString());
 
-			if ((data.Row["FirstUpdate"] == DBNull.Value 
-					|| DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2)
+            if (data.Row["FirstUpdate"] == DBNull.Value)
+                return;
+
+			if (DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2
 				&& data.Row["FirmStatus"].ToString() == "0")
 				row.Cells[4].BackColor = Color.Gray;
 
@@ -142,10 +144,10 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		private void BindData()
 		{
-			DateTime startDate = DateTime.Now;
+			var startDate = DateTime.Now;
 
-			MySqlDataAdapter adapter = new MySqlDataAdapter();
-			DataSet data = new DataSet();
+			var adapter = new MySqlDataAdapter();
+			var data = new DataSet();
 
 			try
 			{
@@ -179,14 +181,14 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		private void BuildQuery(string orderStatement, SearchType searchType)
 		{
-			string firstPart =
+			var firstPart =
 @"
 SELECT  cd.billingcode, 
         cast(cd.firmcode as CHAR) as firmcode, 
         cd.ShortName, 
         region, 
-        max(pui.datecurprice) FirstUpdate, 
-        max(pui.dateprevprice) SecondUpdate, 
+        null FirstUpdate, 
+        null SecondUpdate, 
         null EXE, 
         null MDB, 
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
@@ -197,26 +199,21 @@ SELECT  cd.billingcode,
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
 		NULL AS IncludeType
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata, usersettings.price_update_info pui, billing.payers p) 
-LEFT JOIN showregulation 
-        ON ShowClientCode= cd.firmcode 
-LEFT JOIN osuseraccessright as ouar2 
-        ON ouar2.clientcode= cd.firmcode 
-LEFT JOIN osuseraccessright as ouar 
-        ON ouar.clientcode                       = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
-WHERE   pui.pricecode	                         = pricesdata.pricecode 
-		and cd.BillingCode						 = p.PayerID
-        and pricesdata.firmcode                  = cd.firmcode 
-        and regions.regioncode                   = cd.regioncode 
-		and regionaladmins.UserName              = ?UserName 
-        and (cd.regioncode & regionaladmins.regionmask) > 0 
+FROM clientsdata as cd
+    JOIN farm.regions ON regions.regioncode = cd.regioncode 
+    JOIN accessright.regionaladmins ON regionaladmins.UserName = ?UserName 
+    JOIN billing.payers p on cd.BillingCode = p.PayerID
+    LEFT JOIN showregulation ON ShowClientCode= cd.firmcode 
+    LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode 
+    LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
+WHERE   (cd.regioncode & regionaladmins.regionmask) > 0 
 		and (cd.regionCode & ?RegionMask) > 0
         and if(ShowVendor = 1, FirmType= 0, 0) 
         and if(UseRegistrant = 1, Registrant= regionaladmins.UserName, 1)
 		
 ";
-			string secondPart = String.Empty;
-			string thirdPart =
+			var secondPart = String.Empty;
+			var thirdPart =
 @"
 group by cd.firmcode union 
 SELECT  cd. billingcode, 
@@ -268,7 +265,7 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
         and if(ShowRetail = 1, cd.FirmType= 1, 0) 
         and if(UseRegistrant = 1, cd.Registrant= regionaladmins.UserName, 1)";
 
-			string fourthPart = String.Empty;
+			var fourthPart = String.Empty;
 
 			switch(ClientState.SelectedValue)
 			{
@@ -343,47 +340,50 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					_command.Parameters["?JuridicalName"].Value = "%" + FindTB.Text + "%";
 					break;
 			}
-			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new string[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
-			_command.Parameters.Add("?UserName", Convert.ToString(Session["UserName"]));
-			_command.Parameters.Add("?RegionMask", ClientRegion.SelectedItem.Value);
+			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
+			_command.Parameters.AddWithValue("?UserName", Convert.ToString(Session["UserName"]));
+			_command.Parameters.AddWithValue("?RegionMask", ClientRegion.SelectedItem.Value);
 		}
 
 		protected void ClientsGridView_RowCreated(object sender, GridViewRowEventArgs e)
 		{
-			if ((e.Row.RowType == DataControlRowType.Header) && (_sortExpression != String.Empty))
-			{
-				GridView grid = sender as GridView;
-				foreach (DataControlField field in grid.Columns)
-				{
-					if (field.SortExpression == _sortExpression)
-					{
-						Image sortIcon = new Image();
-						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
-						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
-					}
-				}
-			}
+		    if ((e.Row.RowType != DataControlRowType.Header) || (_sortExpression == String.Empty)) 
+                return;
+		    var grid = sender as GridView;
+		    foreach (DataControlField field in grid.Columns)
+		    {
+		        if (field.SortExpression != _sortExpression) 
+                    continue;
+		        var sortIcon = new Image
+		                             {
+		                                 ImageUrl =
+		                                     (_sortDirection == SortDirection.Ascending
+		                                          ? "./Images/arrow-down-blue-reversed.gif"
+		                                          : "./Images/arrow-down-blue.gif")
+		                             };
+		        e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
+		    }
 		}
 
-		private void GetADUserStatus(DataTable data)
+		private static void GetADUserStatus(DataTable data)
 		{
 			data.Columns.Add("ADUserStatus", typeof(String));
 			foreach (DataRow row in data.Rows)
 			{
-				if (row["UserName"].ToString().Length > 0)
-				{
-					try
-					{
-						if (ADHelper.IsLocked(row["UserName"].ToString()))
-							row["ADUserStatus"] = Color.Violet.Name;
-						if (ADHelper.IsDisabled(row["UserName"].ToString()))
-							row["ADUserStatus"] = Color.Aqua.Name;
-					}
-					catch
-					{
-						row["aduserstatus"] = Color.Red.Name;
-					}
-				}
+			    if (row["UserName"].ToString().Length <= 0) 
+                    continue;
+
+			    try
+			    {
+			        if (ADHelper.IsLocked(row["UserName"].ToString()))
+			            row["ADUserStatus"] = Color.Violet.Name;
+			        if (ADHelper.IsDisabled(row["UserName"].ToString()))
+			            row["ADUserStatus"] = Color.Aqua.Name;
+			    }
+			    catch
+			    {
+			        row["aduserstatus"] = Color.Red.Name;
+			    }
 			}
 		}
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
