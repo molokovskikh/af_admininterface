@@ -32,6 +32,7 @@
 										Visible="true"></asp:RequiredFieldValidator>
 								</ItemTemplate>
 							</asp:TemplateColumn>
+							<asp:BoundColumn HeaderText="Дата ценовой колонки" DataField="PriceDate" />
 							<asp:TemplateColumn HeaderText="Включить">
 								<HeaderStyle Width="100px"></HeaderStyle>
 								<ItemTemplate>

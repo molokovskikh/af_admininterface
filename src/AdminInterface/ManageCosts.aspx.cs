@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Text;
 using System.Web;
-using System.Web.Mail;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
@@ -30,8 +29,8 @@ namespace AddUser
 			Costs.BeginInit();
 			DS.DataSetName = "NewDataSet";
 			DS.Locale = new CultureInfo("ru-RU");
-			DS.Tables.AddRange(new DataTable[] {Costs});
-			Costs.Columns.AddRange(new DataColumn[] {DataColumn1, DataColumn2, DataColumn3, DataColumn4});
+			DS.Tables.AddRange(new[] {Costs});
+			Costs.Columns.AddRange(new[] {DataColumn1, DataColumn2, DataColumn3, DataColumn4});
 			Costs.TableName = "Costs";
 			DataColumn1.ColumnName = "CostCode";
 			DataColumn1.DataType = typeof (Int32);
@@ -89,7 +88,7 @@ namespace AddUser
 
 				foreach (DataGridItem Itm in CostsDG.Items)
 				{
-					for (int i = 0; i <= DS.Tables[0].Rows.Count - 1; i++)
+					for (var i = 0; i <= DS.Tables[0].Rows.Count - 1; i++)
 					{
 						if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Itm.Cells[5].Text)
 						{
@@ -107,7 +106,7 @@ namespace AddUser
 					}
 				}
 
-				for (int i = 0; i < PriceRegionSettings.Rows.Count; i++ )
+				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++ )
 				{
 					DS.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
 					DS.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
@@ -138,8 +137,8 @@ namespace AddUser
 				UpdCommand.Parameters["?AgencyEnabled"].SourceColumn = "AgencyEnabled";
 				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
-				UpdCommand.Parameters.Add("?UserName", Session["UserName"]);
+				UpdCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
+                UpdCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
 
 
 				UpdCommand.CommandText =
@@ -189,25 +188,21 @@ WHERE RowID = ?Id
 
 		public string IsChecked(bool Checked)
 		{
-			if (Checked)
-			{
+		    if (Checked)
 				return "checked";
-			}
-			else
-			{
-				return "";
-			}
+
+		    return "";
 		}
 
-		protected void Page_Load(object sender, EventArgs e)
+	    protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
 
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			PriceCode = Convert.ToInt32(Request["pc"]);
-			if (!IsPostBack)
-				PostDataToGrid();
+            if (!IsPostBack)
+                PostDataToGrid();
 		}
 
 		protected void CreateCost_Click(object sender, EventArgs e)
@@ -336,13 +331,33 @@ ORDER BY region;
                 var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
                 MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
                 SelCommand.Transaction = transaction;
-                SelCommand.CommandText = "select PriceName from (pricesdata) where PriceCode=?PriceCode";
-                PriceNameLB.Text = SelCommand.ExecuteScalar().ToString();
+                SelCommand.CommandText = "select PriceName, CostType from pricesdata where PriceCode=?PriceCode";
+                int costType;
+                using (var reader = SelCommand.ExecuteReader())
+                {
+                    reader.Read();
+                    PriceNameLB.Text = reader.GetString("PriceName");
+                    costType = reader.GetInt32("CostType");
+                }
+
+                if (costType == 0)
+                {
+                    foreach (DataGridColumn column in CostsDG.Columns)
+                    {
+                        if (column.HeaderText == "Дата ценовой колонки")
+                        {
+                            column.Visible = false;
+                            break;
+                        }
+                    }
+                }
+
                 SelCommand.CommandText =
 @"
 SELECT  pc.CostCode, 
         cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
-        pc.CostName, 
+        pc.CostName,
+        pi.PriceDate, 
         pc.BaseCost, 
         pc.Enabled, 
         pc.AgencyEnabled  
