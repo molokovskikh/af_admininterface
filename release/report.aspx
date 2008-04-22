@@ -114,7 +114,7 @@
                                 <tr>
                                     <td valign="top" height="60">
                                         <p>
-                                            <font size="1"><font face="Verdana">Централизованная служба тел.: (4732) 206-000(Пн.
+                                            <font size="1"><font face="Verdana">Централизованная служба тел.: (4732) 606-000(Пн.
                                                 - Птн. 9.00 - 18.00 MSK), e-mail: <a>tech@analit.net</a></font><br>
                                             </font>
                                             <asp:Label ID="SupportPhoneLB" runat="server" Font-Size="7pt" Font-Names="Verdana"
