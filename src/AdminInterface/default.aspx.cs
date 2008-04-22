@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using System.Runtime.InteropServices;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using DAL;
@@ -10,7 +9,7 @@ namespace AddUser
 {
 	partial class _default : Page
 	{
-		private MySqlConnection _connection = new MySqlConnection();
+		private readonly MySqlConnection _connection = new MySqlConnection();
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -27,8 +26,8 @@ namespace AddUser
 				{
 					ToCalendar.SelectedDates.Add(DateTime.Now);
 					FromCalendar.SelectedDates.Add(DateTime.Now);
-					DataSet data = new DataSet();
-					MySqlDataAdapter adapter = new MySqlDataAdapter(@"
+					var data = new DataSet();
+					var adapter = new MySqlDataAdapter(@"
 SELECT (SELECT bit_or(RegionCode)
 FROM AccessRight.RegionalAdmins ra
   INNER JOIN Farm.Regions r on r.RegionCode & ra.RegionMask > 0
@@ -42,7 +41,7 @@ FROM AccessRight.RegionalAdmins ra
 WHERE UserName = ?UserName ORDER BY Region) tmp;
 ;
 ", _connection);
-					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
 					adapter.Fill(data);
 					RegionList.DataTextField = "Region";
 					RegionList.DataValueField = "RegionCode";
@@ -76,22 +75,27 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 		{
 			try
 			{
-				string urlTemplate = String.Format("BeginDate={0}&EndDate={1}&RegionMask={2}", fromDate, toDate.AddDays(1), regionMask);
+				var urlTemplate = String.Format("BeginDate={0}&EndDate={1}&RegionMask={2}", fromDate, toDate.AddDays(1), regionMask);
 				CUHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateCumulative, urlTemplate);
 				ErrUpHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateError, urlTemplate);
 				ADHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateBan, urlTemplate);
 				ConfHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateNormal, urlTemplate);
-				
-				_connection.Open();
-				MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				MySqlDataAdapter adapter = new MySqlDataAdapter("GetShowStat", _connection);
-				adapter.SelectCommand.Transaction = transaction;
-				adapter.SelectCommand.CommandType = CommandType.StoredProcedure;
-				adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
+
+			    _connection.Open();
+				var transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+				var adapter = new MySqlDataAdapter("GetShowStat", _connection)
+				                  {
+				                      SelectCommand =
+				                          {
+				                              Transaction = transaction,
+				                              CommandType = CommandType.StoredProcedure
+				                          }
+				                  };
+			    adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 				adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask);
 				adapter.SelectCommand.Parameters.AddWithValue("?UserNameParam", Session["UserName"]);
-				DataSet data = new DataSet();
+				var data = new DataSet();
 				adapter.Fill(data);
 				//Заказы
 				//Количество принятых заказов
@@ -124,7 +128,6 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 
 				DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DataSize"]));
 				DownloadDocumentSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DocSize"]));
-
 #if !DEBUG
 				//прайсы
 				//Не формализовано
@@ -145,14 +148,12 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				PriceFOKLB.Text = data.Tables[0].Rows[0]["FormCount"].ToString();
 #endif
 
-				MySqlCommand command = new MySqlCommand();
-				command.Connection = _connection;
-				command.Transaction = transaction;
+                var command = new MySqlCommand {Connection = _connection, Transaction = transaction};
 
-				command.Parameters.Add("?RegionMask", regionMask);
-				command.Parameters.Add("?ToDate", toDate);
-				command.Parameters.Add("?FromDate", fromDate);
-				command.Parameters.Add("?UserName", Session["UserName"]);
+                command.Parameters.AddWithValue("?RegionMask", regionMask);
+				command.Parameters.AddWithValue("?ToDate", toDate);
+                command.Parameters.AddWithValue("?FromDate", fromDate);
+                command.Parameters.AddWithValue("?UserName", Session["UserName"]);
 				command.CommandText =
 @"
 SELECT  AlowChangePassword,
@@ -163,7 +164,7 @@ SELECT  AlowChangePassword,
 FROM    accessright.regionaladmins  
 WHERE	UserName = ?userName
 ";
-				MySqlDataReader Reader = command.ExecuteReader();
+				var Reader = command.ExecuteReader();
 
 				Reader.Read();
 				RegisterHL.Visible = Convert.ToBoolean(Reader[2]);
