@@ -360,28 +360,6 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @InsertedPriceCode
 		AND clientsdata2.firmtype = 1;
-
-INSERT 
-INTO    intersection_update_info
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode
-        )    
-SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode
-FROM pricesdata 
-	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
-		JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
-        AND clientsdata.firmtype = 0
-		AND pricesdata.PriceCode = @InsertedPriceCode
-		AND clientsdata2.firmtype = 1;
 ", _connection);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", _userName);
@@ -690,28 +668,6 @@ FROM clientsdata
 	JOIN pricesdata on pricesdata.firmcode = clientsdata.firmcode
 	JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
 		JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
-        AND clientsdata.firmtype = 0
-		AND clientsdata.firmcode = ?ClientCode
-		AND clientsdata2.FirmType = 1;
-
-INSERT 
-INTO    intersection_update_info
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode
-        )    
-SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode
-FROM clientsdata
-	JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
-		JOIN pricesdata on pricesdata.firmcode = clientsdata.firmcode
 	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
