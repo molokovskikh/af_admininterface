@@ -1,10 +1,14 @@
 using System;
 using System.Data;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
+	public class SessionOutDateException : ApplicationException
+	{}
+
 	public partial class viewcl : Page
 	{
 		protected DateTime BeginDate
@@ -27,14 +31,37 @@ namespace AddUser
 			get { return (StatisticsType)Convert.ToUInt32(Request["id"]); }
 		}
 
+		protected DataView StatisticsDataView
+		{
+			get
+			{
+				if (Session["StatisticsDataView"] == null)
+					throw new SessionOutDateException();
+				return (DataView)Session["StatisticsDataView"];
+			}
+			set { Session["StatisticsDataView"] = value; }
+		}
+
+		protected string SortExpression
+		{
+			get { return (string)(ViewState["SortExpression"] ?? String.Empty); }
+			set { ViewState["SortExpression"] = value; }
+		}
+
+		protected SortDirection SortDirection
+		{
+			get { return (SortDirection)(ViewState["SortDirection"] ?? SortDirection.Ascending); }
+			set { ViewState["SortDirection"] = value; }
+		}
+
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			if (Convert.ToDouble(Session["AccessGrant"]) != 1)
 			    Response.Redirect("default.aspx");
 
-			string headerText = String.Empty;
+			var headerText = String.Empty;
 
-			MySqlDataAdapter adapter = new MySqlDataAdapter("", Literals.GetConnectionString()); 
+			var adapter = new MySqlDataAdapter("", Literals.GetConnectionString()); 
 
 			switch (RequestType)
 			{ 
@@ -175,11 +202,44 @@ ORDER by p.RequestTime desc;
 			adapter.SelectCommand.Parameters.AddWithValue("?EndDate", EndDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?RegionMask", RegionMask);
 
-			DataSet data = new DataSet();
+			var data = new DataSet();
+
 			CountLB.Text = Convert.ToString(adapter.Fill(data));
-			CLList.DataSource = data;
+			StatisticsDataView = data.Tables[0].DefaultView;
 			CLList.DataBind();
+		}
+
+		protected void CLList_Sorting(object sender, GridViewSortEventArgs e)
+		{
+			var grid = (GridView)sender;
+
+			if (SortExpression == e.SortExpression)
+				SortDirection = SortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
+			SortExpression = e.SortExpression;
+
+			StatisticsDataView.Sort = SortExpression + (SortDirection == SortDirection.Ascending ? " ASC" : " DESC");
+
+			grid.DataBind();
+		}
+
+		protected void CLList_RowCreated(object sender, GridViewRowEventArgs e)
+		{
+			if ((e.Row.RowType != DataControlRowType.Header) || (SortExpression == String.Empty))
+				return;
+			var grid = (GridView)sender;
+			foreach (DataControlField field in grid.Columns)
+			{
+				if (field.SortExpression != SortExpression)
+					continue;
+				var sortIcon = new Image
+				{
+					ImageUrl =
+						(SortDirection == SortDirection.Ascending
+							 ? "./Images/arrow-down-blue-reversed.gif"
+							 : "./Images/arrow-down-blue.gif")
+				};
+				e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
+			}
 		}
 	}
 }
-

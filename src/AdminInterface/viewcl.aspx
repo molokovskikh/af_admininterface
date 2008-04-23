@@ -1,11 +1,14 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.viewcl" CodeBehind="viewcl.aspx.cs" %>
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.viewcl" CodeBehind="viewcl.aspx.cs" Theme="Main" %>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head>
+<head runat="server">
     <title>Интерфейс управления клиентами</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <link rel="stylesheet" type="text/css" href="~/Css/Table.css" />
+	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
+	<link rel="stylesheet" type="text/css" href="~/Css/Billing.css" />
 </head>
 <body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
     <form id="Form1" method="post" runat="server">
@@ -21,25 +24,20 @@
             </tr>
             <tr>
                 <td align="center">
-                    <asp:DataGrid ID="CLList" runat="server" Font-Names="Verdana" Font-Size="8pt" CellPadding="0"
-                        AutoGenerateColumns="False" BorderColor="#DADADA" PageSize="20" >
-                        <FooterStyle Font-Names="Verdana"></FooterStyle>
-                        <AlternatingItemStyle BackColor="#F6F6F6"></AlternatingItemStyle>
-                        <ItemStyle HorizontalAlign="Center" BackColor="#EEF8FF"></ItemStyle>
-                        <HeaderStyle Font-Size="8pt" Font-Names="Verdana" Font-Bold="True" HorizontalAlign="Center"
-                            VerticalAlign="Middle" BackColor="#EBEBEB"></HeaderStyle>
-                        <Columns>
-							<asp:BoundColumn HeaderText="Время" DataField="RequestTime" />
-                            <asp:HyperLinkColumn DataNavigateUrlField="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}"
-                                DataTextField="ShortName" HeaderText="Клиент"></asp:HyperLinkColumn>
-                            <asp:BoundColumn DataField="Region" SortExpression="Region" HeaderText="Регион"></asp:BoundColumn>
-                            <asp:BoundColumn DataField="Addition" HeaderText="Описание"></asp:BoundColumn>
-                        </Columns>
-                        <PagerStyle VerticalAlign="Middle" Font-Size="9pt" Font-Names="Verdana" Font-Bold="True"
-                            HorizontalAlign="Center" Position="TopAndBottom" Mode="NumericPages"></PagerStyle>
-                    </asp:DataGrid></td>
+                    &nbsp;</td>
             </tr>
         </table>
+                    <asp:GridView ID="CLList" runat="server" 
+			CellPadding="0" AutoGenerateColumns="False" 
+			AllowSorting="True" DataSource='<%# StatisticsDataView %>' onrowcreated="CLList_RowCreated" 
+			onsorting="CLList_Sorting" >
+                        <Columns>
+							<asp:BoundField DataField="RequestTime" HeaderText="Время" SortExpression="RequestTime" />
+							<asp:HyperLinkField DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}" DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" />
+							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="Region" />
+							<asp:BoundField DataField="Addition" HeaderText="Описание" />
+                        </Columns>
+                    </asp:GridView>
     </form>
 </body>
 </html>
