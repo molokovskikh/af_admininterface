@@ -162,7 +162,6 @@ namespace AddUser
 			myMySqlCommand.Parameters.Add("?MultiUserLevel", MultiUserLevelTB.Text);
 			myMySqlCommand.Parameters.Add("?AdvertisingLevel", AdvertisingLevelCB.Checked);
 			myMySqlCommand.Parameters.Add("?AlowWayBill", WayBillCB.Checked);
-			myMySqlCommand.Parameters.Add("?AlowChangeSegment", ChangeSegmentCB.Checked);
 			myMySqlCommand.Parameters.Add("?EnableUpdate", EnableUpdateCB.Checked);
 			myMySqlCommand.Parameters.Add("?CalculateLeader", CalculateLeaderCB.Checked);
 			myMySqlCommand.Parameters.Add("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
@@ -263,7 +262,6 @@ SET OrderRegionMask     =?orderMask,
         MultiUserLevel          =?MultiUserLevel, 
         AdvertisingLevel        =?AdvertisingLevel, 
         AlowWayBill             =?AlowWayBill, 
-        AlowChangeSegment       =?AlowChangeSegment, 
         EnableUpdate            =?EnableUpdate, 
         CalculateLeader         = ?CalculateLeader, 
         AllowSubmitOrders       = ?AllowSubmitOrders, 
@@ -511,7 +509,6 @@ SELECT  InvisibleOnFirm,
         MultiUserLevel, 
         AdvertisingLevel, 
         AlowWayBill, 
-        rcs.AlowChangeSegment, 
         EnableUpdate, 
         AlowCreateInvisible, 
         length(rui.UniqueCopyID) = 0 as Length, 
@@ -538,7 +535,6 @@ WHERE   rcs.clientcode     = ?ClientCode
 						MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
 						AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
 						WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
-						ChangeSegmentCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowChangeSegment"]);
 						EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
 						CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
 						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);

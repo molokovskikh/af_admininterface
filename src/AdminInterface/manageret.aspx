@@ -75,11 +75,6 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3">
-									<asp:CheckBox ID="ChangeSegmentCB" runat="server" Text="Изменение сегмента" BorderStyle="None" />
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
 									<asp:CheckBox ID="EnableUpdateCB" runat="server" Text="Автоматическое обновление версий"
 										BorderStyle="None" />
 								</td>
