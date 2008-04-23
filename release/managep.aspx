@@ -23,11 +23,14 @@
 									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:HyperLinkField HeaderText="Наименование" DataTextField="PriceName" DataNavigateUrlFormatString="managecosts.aspx?pc={0}"
-								DataNavigateUrlFields="PriceCode" />
+							<asp:TemplateField  HeaderText="Наименование">
+								<ItemTemplate>
+									<asp:HyperLink runat="server" Text='<%# Eval("PriceName") %>' NavigateUrl='<%# Eval("CostType").Equals(DBNull.Value) ? "" : String.Format("managecosts.aspx?pc={0}", Eval("PriceCode")) %>'  />
+								</ItemTemplate>
+							</asp:TemplateField>
 							<asp:TemplateField  HeaderText="Дата прайс листа">
 								<ItemTemplate>
-									<asp:Label runat="server"><%# Convert.ToInt32(Eval("CostType")) == 1 ? "-" : Eval("PriceDate")%></asp:Label>
+									<asp:Label runat="server"><%# Eval("CostType").Equals(1) || Eval("CostType").Equals(DBNull.Value) ? "-" : Eval("PriceDate") %></asp:Label>
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Наценка">
@@ -39,11 +42,7 @@
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип ценовых колонок">
 								<ItemTemplate>
-									<asp:DropDownList ID="CostType" runat="server" SelectedValue='<%# Eval("CostType") %>'>
-										<asp:ListItem Value="0">Мультиколоночный</asp:ListItem>
-										<asp:ListItem Value="1">Многофайловый</asp:ListItem>
-										<asp:ListItem Value="2">Не настроенный</asp:ListItem>
-									</asp:DropDownList>
+									<asp:DropDownList ID="CostType" runat="server" SelectedValue='<%# Eval("CostType") %>' DataSource='<%# GetCostTypeSource(Eval("CostType")) %>' DataTextField="Value" DataValueField="Key" />
 								</ItemTemplate>
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">
@@ -51,6 +50,7 @@
 									<asp:DropDownList ID="PriceTypeList" runat="server" SelectedValue='<%# Eval("PriceType") %>'>
 										<asp:ListItem Value="0">Обычный</asp:ListItem>
 										<asp:ListItem Value="1">Ассортиментный</asp:ListItem>
+										<asp:ListItem Value="2">VIP</asp:ListItem>
 									</asp:DropDownList>
 								</ItemTemplate>
 							</asp:TemplateField>
