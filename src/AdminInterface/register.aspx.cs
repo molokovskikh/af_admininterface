@@ -433,40 +433,23 @@ where length(c.contactText) > 0
 						dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
 						dataAdapter.Fill(DS1, "FirmEmail");
 						if (DS1.Tables["FirmEmail"].Rows.Count > 0)
-						{
 							foreach (DataRow Row in DS1.Tables["FirmEmail"].Rows)
-							{
-								Func.Mail("pharm@analit.net", "Аналитическая Компания Инфорум",
-								          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-								          false,
-								          "Добрый день. \n\nВ информационной системе \"АналитФАРМАЦИЯ\", участником которой является Ваша организация, зарегистрирован новый клиент: "
-								          + String.Format("{0} ( {1} ) в регионе(городе)", FullNameTB.Text, ShortNameTB.Text)
-								          + RegionDD.SelectedItem.Text + "."
-								          +
-								          "\nПожалуйста произведите настройки для данного клиента (Раздел \"Для зарегистрированных пользователей\" на сайте www.analit.net )."
-								          +
-								          String.Format("\nАдрес доставки накладных: {0}@waybills.analit.net",
-								                        _command.Parameters["?ClientCode"].Value)
-								          + "\r\nС уважением, Аналитическая компания \"Инфорум\", г. Воронеж"
-								          + @"
-Москва  +7 495 6628727
-С.-Петербург +7 812 3090521
-Воронеж +7 4732 606000
-Челябинск +7 351 729 8143"
-								          + "\n", Row["ContactText"].ToString(), "", null, Encoding.UTF8);
-							}
-						}
+								NotificationHelper.NotifySupplierAboutDrugstoreRegistration(_command.Parameters["?ClientCode"].Value.ToString(),
+								                                                            FullNameTB.Text,
+								                                                            ShortNameTB.Text,
+								                                                            RegionDD.SelectedItem.Text,
+								                                                            Row["ContactText"].ToString());
 						else
 						{
 							Func.Mail("register@analit.net", String.Empty,
 									  "\"" + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - ошибка уведомления поставщиков",
-							          false, "Оператор: " + Session["UserName"] + "\nРегион: "
-							                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
-							                 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
-							                 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
-							                 + "Ошибка: Ничего не получилось выбрать из базы",
-							          "RegisterList@subscribe.analit.net", String.Empty,
-							          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+									  false, "Оператор: " + Session["UserName"] + "\nРегион: "
+											 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+											 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
+											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
+											 + "Ошибка: Ничего не получилось выбрать из базы",
+									  "RegisterList@subscribe.analit.net", String.Empty,
+									  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
 						}
 					}
 				}

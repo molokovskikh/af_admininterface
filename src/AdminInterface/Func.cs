@@ -1,5 +1,4 @@
 using System;
-using System.Configuration;
 using System.Data;
 using System.Net.Mail;
 using System.Text;
@@ -22,20 +21,22 @@ namespace AddUser
 					to = "r.kvasov@analit.net";
 					bcc = "";
 #endif
-					MailMessage message = new MailMessage();
-					message.From = new MailAddress(from, fromDisplayName, encoding);
-					message.IsBodyHtml = isBodyHtml;
-					message.Subject = subject;
-					message.SubjectEncoding = encoding;
-					message.Body = body;
-					message.BodyEncoding = encoding;
+					var message = new MailMessage
+					              	{
+					              		From = new MailAddress(from, fromDisplayName, encoding),
+					              		IsBodyHtml = isBodyHtml,
+					              		Subject = subject,
+					              		SubjectEncoding = encoding,
+					              		Body = body,
+					              		BodyEncoding = encoding
+					              	};
 					if (!String.IsNullOrEmpty(bcc))
 						message.Bcc.Add(bcc);
 
 					foreach (string toAddress in to.Split(",".ToCharArray()))
 						message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
 
-					SmtpClient client = new SmtpClient("mail.adc.analit.net");
+					var client = new SmtpClient("mail.adc.analit.net");
 					client.Send(message);
 				}
 			}
@@ -48,9 +49,9 @@ namespace AddUser
 
 		public static string GeneratePassword()
 		{
-			string  availableChars = "23456789qwertyuiopasdfghjkzxcvbnmQWERTYUOPASDFGHJKLZXCVBNM";
-			string password = String.Empty;
-			Random random = new Random();
+			var availableChars = "23456789qwertyuiopasdfghjkzxcvbnmQWERTYUOPASDFGHJKLZXCVBNM";
+			var password = String.Empty;
+			var random = new Random();
 			while(password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length - 1)];
 			return password;
