@@ -137,7 +137,6 @@ INTO    logs.clientsinfo VALUES
 			ShortNameLB.Text = Data.Tables["Info"].Rows[0]["ShortName"].ToString();
 			AddressText.Text = Data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = Data.Tables["Info"].Rows[0]["Fax"].ToString();
-			UrlText.Text = Data.Tables["Info"].Rows[0]["URL"].ToString();
 	
 			UserInterfaceHL.Enabled = Convert.ToBoolean(Data.Tables["Info"].Rows[0]["AlowInterface"]);
 			UpdateListHL.Enabled = Convert.ToBoolean(Data.Tables["Info"].Rows[0]["FirmType"]);
@@ -161,7 +160,6 @@ SELECT  cd.FullName,
         cd.ShortName,   
         cd.Adress,   
         cd.Fax,   
-        cd.URL,    
         (if(regionaladmins.UseRegistrant                =1, Registrant=?UserName, 1=1))   
         AND (regionaladmins.regionmask & cd.regioncode  >0)   
         AND (if(AlowRetailInterface+AlowVendorInterface =2, 1=1, if(Alowretailinterface=1, firmtype=Alowretailinterface, if(AlowVendorInterface=1, firmtype=0, 0)))) as AlowInterface,   
@@ -265,18 +263,16 @@ UPDATE ClientsData
 SET FullName = ?FullName,
 	ShortName = ?ShortName,
 	Adress = ?Address,
-	Fax = ?Fax,
-	URL = ?Url
+	Fax = ?Fax
 WHERE firmcode = ?ClientCode  
 ";
-				_command.Parameters.Add("?ClientCode", ClientCode);
-				_command.Parameters.Add("?FullName", FullNameText.Text);
-				_command.Parameters.Add("?ShortName", ShortNameText.Text);
-				_command.Parameters.Add("?Address", AddressText.Text);
-				_command.Parameters.Add("?Fax", FaxText.Text);
-				_command.Parameters.Add("?Url", UrlText.Text);
-				_command.Parameters.Add("?UserName", Session["UserName"]);
-				_command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				_command.Parameters.AddWithValue("?ClientCode", ClientCode);
+				_command.Parameters.AddWithValue("?FullName", FullNameText.Text);
+				_command.Parameters.AddWithValue("?ShortName", ShortNameText.Text);
+				_command.Parameters.AddWithValue("?Address", AddressText.Text);
+				_command.Parameters.AddWithValue("?Fax", FaxText.Text);
+				_command.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				_command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 				_command.ExecuteNonQuery();
 
 				transaction.Commit();

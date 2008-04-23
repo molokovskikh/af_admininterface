@@ -127,17 +127,6 @@
 							<asp:TextBox ID="FaxText" runat="server" Width="90%" />
 						</td>
 					</tr>
-					<tr class="InfoRow">
-						<td align="right">
-							URL:
-						</td>
-						<td align="left">
-							<asp:TextBox ID="UrlText" runat="server" Width="90%" />
-							<asp:RegularExpressionValidator ID="UrlValidator" runat="server" ErrorMessage="*"
-								ControlToValidate="UrlText" ValidationExpression="http(s)?://([\w-]+\.)+[\w-]+(/[\w- ./?%&=]*)?"
-								ValidationGroup="1" Display="Dynamic"></asp:RegularExpressionValidator>
-						</td>
-					</tr>
 					<tr>
 						<td colspan="2">
 <% 
