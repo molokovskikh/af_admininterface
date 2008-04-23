@@ -23,10 +23,16 @@
 									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:HyperLinkField HeaderText="Наименование" DataTextField="PriceName" DataNavigateUrlFormatString="managecosts.aspx?pc={0}"
-								DataNavigateUrlFields="PriceCode" />
-							<asp:BoundField HeaderText="Получен" DataField="DateCurPrice" />
-							<asp:BoundField HeaderText="Формализованн" DataField="DateLastForm" />
+							<asp:TemplateField  HeaderText="Наименование">
+								<ItemTemplate>
+									<asp:HyperLink runat="server" Text='<%# Eval("PriceName") %>' NavigateUrl='<%# Eval("CostType").Equals(DBNull.Value) ? "" : String.Format("managecosts.aspx?pc={0}", Eval("PriceCode")) %>'  />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField  HeaderText="Дата прайс листа">
+								<ItemTemplate>
+									<asp:Label runat="server"><%# Eval("CostType").Equals(1) || Eval("CostType").Equals(DBNull.Value) ? "-" : Eval("PriceDate") %></asp:Label>
+								</ItemTemplate>
+							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Наценка">
 								<ItemTemplate>
 									<asp:TextBox ID="UpCostText" runat="server" Text='<%# Eval("UpCost") %>' />
@@ -34,12 +40,17 @@
 										ValidationExpression="^([-+])?\d+(\,\d+)?$" ControlToValidate="UpCostText"></asp:RegularExpressionValidator>
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:BoundField HeaderText="Тип ценовых колонок" DataField="CostType" />
+							<asp:TemplateField HeaderText="Тип ценовых колонок">
+								<ItemTemplate>
+									<asp:DropDownList ID="CostType" runat="server" SelectedValue='<%# Eval("CostType") %>' DataSource='<%# GetCostTypeSource(Eval("CostType")) %>' DataTextField="Value" DataValueField="Key" />
+								</ItemTemplate>
+							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">
 								<ItemTemplate>
-									<asp:DropDownList ID="PriceTypeList" runat="server" DataValueField='<%# Eval("PriceType") %>'>
+									<asp:DropDownList ID="PriceTypeList" runat="server" SelectedValue='<%# Eval("PriceType") %>'>
 										<asp:ListItem Value="0">Обычный</asp:ListItem>
 										<asp:ListItem Value="1">Ассортиментный</asp:ListItem>
+										<asp:ListItem Value="2">VIP</asp:ListItem>
 									</asp:DropDownList>
 								</ItemTemplate>
 							</asp:TemplateField>

@@ -90,11 +90,11 @@ namespace AddUser
 				{
 					for (var i = 0; i <= DS.Tables[0].Rows.Count - 1; i++)
 					{
-						if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Itm.Cells[5].Text)
+						if (DS.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value)
 						{
 							if (DS.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox) (Itm.FindControl("CostName"))).Text)
-								DS.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.Cells[0].FindControl("CostName"))).Text;
-							if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"].ToString())
+								DS.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.FindControl("CostName"))).Text;
+							if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"])
 								DS.Tables[0].Rows[i]["BaseCost"] = true;
 							else
 								DS.Tables[0].Rows[i]["BaseCost"] = false;

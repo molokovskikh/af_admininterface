@@ -50,6 +50,7 @@
 							<asp:TemplateColumn SortExpression="BaseCost" HeaderText="Базовая&lt;br&gt;цена">
 								<HeaderStyle Width="80px"></HeaderStyle>
 								<ItemTemplate>
+									<asp:HiddenField ID="CostCode" runat="server" Value='<%# Eval("CostCode") %>' />
 									<input value='<%# DataBinder.Eval(Container, "DataItem.CostCode")%>' type="radio" <%# IsChecked(Convert.ToBoolean(DataBinder.Eval(Container, "DataItem.BaseCost"))) %> name="uid" />
 								</ItemTemplate>
 							</asp:TemplateColumn>

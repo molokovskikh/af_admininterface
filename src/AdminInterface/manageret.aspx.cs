@@ -188,7 +188,7 @@ namespace AddUser
 			try
 			{
 				_connection.Open();
-				myTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+				myTrans = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				myMySqlCommand.Transaction = myTrans;
 				myMySqlCommand.CommandText =
 @"
@@ -200,8 +200,10 @@ set @inUser = ?UserName;
 				myMySqlCommand.CommandText = "select MaskRegion=?workMask from clientsdata where firmcode=?clientCode";
 				if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 0)
 				{
-					InsertCommand +=
+					InsertCommand =
 @"
+UPDATE clientsdata SET MaskRegion = ?workMask WHERE FirmCode = ?ClientCode;
+
 INSERT 
 INTO    intersection
         (
@@ -210,67 +212,53 @@ INTO    intersection
                 pricecode, 
                 invisibleonclient, 
                 InvisibleonFirm, 
-                CostCode
-        )  
-SELECT  DISTINCT clientsdata2.firmcode, 
+                costcode
+        )
+SELECT  DISTINCT clientsdata2.firmcode,
         regions.regioncode, 
         pricesdata.pricecode,  
-        pricesdata.PriceType=2 as invisibleonclient, 
-        a.invisibleonfirm, 
-        (SELECT costcode 
-        FROM    pricescosts pcc 
-        WHERE   basecost  
-                AND showpricecode=pc.showpricecode
-        )  
-FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, pricescosts pc)  
-LEFT JOIN clientsdata as clientsdata2 
-        ON clientsdata2.firmcode=?clientCode  
-LEFT JOIN intersection 
-        ON intersection.pricecode  =pricesdata.pricecode 
-        AND intersection.regioncode=regions.regioncode 
-        AND intersection.clientcode=clientsdata2.firmcode  
-LEFT JOIN retclientsset as a 
-        ON a.clientcode=clientsdata2.firmcode  
-WHERE   intersection.pricecode IS NULL 
-        AND clientsdata.firmstatus                       =1 
-        AND clientsdata.firmsegment                      =clientsdata2.firmsegment  
-        AND clientsdata.firmtype                         =0  
-        AND pricesdata.firmcode                          =clientsdata.firmcode  
-        AND pricesregionaldata.pricecode                 =pricesdata.pricecode  
-        AND pricesregionaldata.regioncode                =regions.regioncode  
-        AND pricesdata.pricetype                        <>1  
-        AND pricesdata.pricecode                         =pc.showpricecode 
-        AND (clientsdata.maskregion & regions.regioncode)>0  
-        AND (?workMask  & regions.regioncode)            >0;
+        if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
+        a.invisibleonfirm,
+        (
+          SELECT costcode
+          FROM    pricescosts pcc
+          WHERE   basecost
+                  AND pcc.PriceCode = pricesdata.PriceCode
+        ) as CostCode
+FROM clientsdata as clientsdata2
+	JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
+	JOIN clientsdata ON clientsdata.firmsegment = clientsdata2.firmsegment
+		JOIN pricesdata ON pricesdata.firmcode = clientsdata.firmcode
+	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
+		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
+	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
+WHERE   intersection.pricecode IS NULL
+        AND clientsdata.firmstatus = 1
+        AND clientsdata.firmtype = 0
+		AND clientsdata2.FirmCode = ?clientCode
+		AND clientsdata2.firmtype = 1;
 
 INSERT 
 INTO    intersection_update_info
-        ( 
+        (
                 ClientCode, 
                 regioncode, 
                 pricecode
-        ) 
-SELECT  DISTINCT clientsdata2.firmcode, 
+        )    
+SELECT  DISTINCT clientsdata2.firmcode,
         regions.regioncode, 
         pricesdata.pricecode
-FROM    (clientsdata, farm.regions, pricesdata, pricesregionaldata, pricescosts pc)  
-LEFT JOIN clientsdata as clientsdata2 
-        ON clientsdata2.firmcode=?clientCode  
-LEFT JOIN intersection_update_info
-        ON intersection_update_info.pricecode  =pricesdata.pricecode 
-        AND intersection_update_info.regioncode=regions.regioncode 
-        AND intersection_update_info.clientcode=clientsdata2.firmcode  
-WHERE   intersection_update_info.pricecode IS NULL 
-        AND clientsdata.firmstatus                       =1 
-        AND clientsdata.firmsegment                      =clientsdata2.firmsegment  
-        AND clientsdata.firmtype                         =0  
-        AND pricesdata.firmcode                          =clientsdata.firmcode  
-        AND pricesregionaldata.pricecode                 =pricesdata.pricecode  
-        AND pricesregionaldata.regioncode                =regions.regioncode  
-        AND pricesdata.pricetype                        <>1  
-        AND pricesdata.pricecode                         =pc.showpricecode 
-        AND (clientsdata.maskregion & regions.regioncode)>0  
-        AND (?workMask  & regions.regioncode)            >0;
+FROM clientsdata as clientsdata2
+	JOIN clientsdata ON clientsdata.firmsegment = clientsdata2.firmsegment
+		JOIN pricesdata ON pricesdata.firmcode = clientsdata.firmcode
+	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
+		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
+	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
+WHERE   intersection.pricecode IS NULL
+        AND clientsdata.firmstatus = 1
+        AND clientsdata.firmtype = 0
+		AND clientsdata2.firmtype = 1
+		AND clientsdata2.FirmCode = ?clientCode;
 ";
 
 				}
@@ -290,7 +278,6 @@ WHERE   intersection_update_info.pricecode IS NULL
 UPDATE UserSettings.retclientsset, 
         UserSettings.clientsdata 
 SET OrderRegionMask     =?orderMask, 
-        MaskRegion              =?workMask , 
         RegionCode              =?homeRegionCode , 
         WorkRegionMask          =if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), 
         AlowRegister            =?AlowRegister, 
@@ -320,7 +307,7 @@ INTO    UserSettings.IncludeRegulation
 
 CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 ", _connection);
-				adapter.InsertCommand.Parameters.Add("?ClientCode", ClientCode);
+				adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 				adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
 
@@ -498,8 +485,7 @@ WHERE
 					myMySqlCommand.Parameters.Add("?ClientCode", ClientCode);
 					myMySqlCommand.Parameters.Add("?UserName", Session["UserName"]);
 
-					myMySqlCommand.CommandText =
-	@"
+					myMySqlCommand.CommandText = @"
 SELECT  RegionCode, 
         MaskRegion
 FROM    clientsdata as cd, 
@@ -774,7 +760,7 @@ ORDER BY cd.shortname;
 					e.Row.FindControl("SearchButton").Visible = false;
 					e.Row.FindControl("SearchText").Visible = false;
 				}
-				DropDownList list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
+				var list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
 				list.Items.Add(new ListItem(rowView["ShortName"].ToString(), rowView["FirmCode"].ToString()));
 				list.Width = new Unit(90, UnitType.Percentage);
 			}
@@ -791,7 +777,7 @@ ORDER BY cd.shortname;
 					ShowClientsGrid.DataBind();
 					break;
 				case "Search":
-					MySqlDataAdapter adapter = new MySqlDataAdapter
+					var adapter = new MySqlDataAdapter
 						(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
@@ -810,7 +796,7 @@ ORDER BY cd.shortname;
 					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
 					adapter.SelectCommand.Parameters.Add("?SearchText", string.Format("%{0}%", ((TextBox)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 
-					DataSet data = new DataSet();
+					var data = new DataSet();
 					try
 					{
 						_connection.Open();
@@ -823,7 +809,7 @@ ORDER BY cd.shortname;
 						_connection.Close();
 					}
 
-					DropDownList ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
+					var ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
 					ShowList.DataSource = data;
 					ShowList.DataBind();
 					ShowList.Visible = data.Tables[0].Rows.Count > 0;
