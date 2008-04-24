@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
 using DAL;
 using MySql.Data.MySqlClient;
 
@@ -162,21 +163,6 @@ GROUP BY regioncode
 ORDER BY region;
 ";
 
-			var getShowClient = @"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName     
-FROM    (accessright.regionaladmins, clientsdata as cd) 
-	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
-WHERE   sr.PrimaryClientCode				 = ?ClientCode
-		AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName               = ?UserName 
-        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)   
-        AND FirmStatus    = 1 
-        AND billingstatus = 1 
-ORDER BY cd.shortname;
-";
-
 			var dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?UserName", _userName);
@@ -198,8 +184,7 @@ ORDER BY cd.shortname;
                 dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
                 dataAdapter.Fill(Data, "EnableRegions");
 
-            	dataAdapter.SelectCommand.CommandText = getShowClient;
-            	dataAdapter.Fill(Data, "ShowClients");
+				ShowRegulationHelper.Load(dataAdapter, Data, _userName);
 
                 dataAdapter.SelectCommand.Transaction.Commit();
             }
@@ -420,24 +405,6 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", _userName);
 
-			var showClientsAdapter = new MySqlDataAdapter();
-			showClientsAdapter.DeleteCommand = new MySqlCommand(@"
-DELETE FROM showregulation 
-WHERE PrimaryClientCode = ?PrimaryClientCode AND ShowClientCode = ?ShowClientCode;
-", _connection);
-			showClientsAdapter.DeleteCommand.Parameters.AddWithValue("?PrimaryClientCode", _clientCode);
-			showClientsAdapter.DeleteCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
-
-			showClientsAdapter.InsertCommand = new MySqlCommand(@"
-INSERT INTO showregulation 
-SET PrimaryClientCode = ?PrimaryClientCode,
-	ShowClientCode = ?ShowClientCode;
-", _connection);
-			showClientsAdapter.InsertCommand.Parameters.AddWithValue("?PrimaryClientCode", _clientCode);
-			showClientsAdapter.InsertCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
-
-			showClientsAdapter.Update(Data, "ShowClients");
-
 			MySqlTransaction transaction = null;
 			try
 			{
@@ -448,12 +415,10 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 				pricesDataAdapter.UpdateCommand.Transaction = transaction;
 				pricesDataAdapter.DeleteCommand.Transaction = transaction;
 				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
-				showClientsAdapter.DeleteCommand.Transaction = transaction;
-				showClientsAdapter.InsertCommand.Transaction = transaction;
 
 				pricesDataAdapter.Update(Data.Tables["Prices"]);
 				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
-				showClientsAdapter.Update(Data.Tables["ShowClients"]);
+				ShowRegulationHelper.Update(_connection, transaction, Data, _clientCode);
 
 				transaction.Commit();
 			}
@@ -511,14 +476,7 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 				}
 			}
 
-			foreach (GridViewRow row in ShowClientsGrid.Rows)
-			{
-				if (Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text)
-				{
-					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text;
-					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedValue;
-				}
-			}
+			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
 		}
 
 		protected void ShowAllRegionsCheck_CheckedChanged(object sender, EventArgs e)
@@ -705,7 +663,6 @@ WHERE FirmCode = ?ClientCode;
 				command.Parameters.Add("?UserName", _userName);
 				command.Execute();
 			}
-			
 		}
 		
 		private ulong GetHomeRegion()
@@ -739,83 +696,17 @@ SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
 
 		protected void ShowClientsGrid_RowDataBound(object sender, GridViewRowEventArgs e)
 		{
-			if (e.Row.RowType == DataControlRowType.DataRow)
-			{
-				var rowView = (DataRowView)e.Row.DataItem;
-				if (rowView.Row.RowState == DataRowState.Added)
-				{
-					((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
-					e.Row.FindControl("SearchButton").Visible = true;
-					e.Row.FindControl("SearchText").Visible = true;
-				}
-				else
-				{
-					e.Row.FindControl("SearchButton").Visible = false;
-					e.Row.FindControl("SearchText").Visible = false;
-				}
-				var list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
-				list.Items.Add(new ListItem(rowView["ShortName"].ToString(), rowView["FirmCode"].ToString()));
-				list.Width = new Unit(90, UnitType.Percentage);
-			}
+			ShowRegulationHelper.ShowClientsGrid_RowDataBound(sender, e);
 		}
 
 		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			switch (e.CommandName)
-			{
-				case "Add":
-					ProcessChanges();
-					Data.Tables["ShowClients"].Rows.Add(Data.Tables["ShowClients"].NewRow());
-					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
-					ShowClientsGrid.DataBind();
-					break;
-				case "Search":
-					var adapter = new MySqlDataAdapter
-						(@"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
-FROM    (accessright.regionaladmins, clientsdata as cd)  
-LEFT JOIN showregulation sr
-        ON sr.ShowClientCode	             =cd.firmcode  
-WHERE   cd.regioncode & regionaladmins.regionmask > 0  
-        AND regionaladmins.UserName               =?UserName  
-        AND FirmType                         =if(ShowRetail+ShowVendor=2, FirmType, if(ShowRetail=1, 1, 0)) 
-        AND if(UseRegistrant                 =1, Registrant=?UserName, 1=1)  
-        AND cd.ShortName like ?SearchText
-        AND FirmStatus   =1  
-        AND billingstatus=1  
-ORDER BY cd.shortname;
-", Literals.GetConnectionString());
-					adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
-                    adapter.SelectCommand.Parameters.AddWithValue("?SearchText", string.Format("%{0}%", ((TextBox)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
-
-					var data = new DataSet();
-					try
-					{
-						_connection.Open();
-						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-						adapter.Fill(data);
-						adapter.SelectCommand.Transaction.Commit();
-					}
-					finally
-					{
-						_connection.Close();
-					}
-
-					var ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
-					ShowList.DataSource = data;
-					ShowList.DataBind();
-					ShowList.Visible = data.Tables[0].Rows.Count > 0;
-					break;
-			}
+			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender, e, Data, _userName);
 		}
 
 		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
-			ProcessChanges();
-			Data.Tables["ShowClients"].DefaultView[e.RowIndex].Delete();
-			ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
-			ShowClientsGrid.DataBind();
+			ShowRegulationHelper.ShowClientsGrid_RowDeleting(sender, e, Data);
 		}
 
 		protected void ParentValidator_ServerValidate(object source, ServerValidateEventArgs args)

@@ -1,35 +1,19 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 9.00
-# Visual Studio 2005
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface", "AdminInterface\AdminInterface.csproj", "{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {95E2C313-46FA-4B4B-9EFF-3228662908F4}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface.Test", "AdminInterface.Test\AdminInterface.Test.csproj", "{7ED64626-EF5D-40C5-9237-AA93EF397C99}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60} = {656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui", "..\..\Common.Web.Ui\Src\Common.Web.Ui\Common.Web.Ui.csproj", "{95E2C313-46FA-4B4B-9EFF-3228662908F4}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui.Test", "..\..\Common.Web.Ui\Src\Common.Web.Ui.Test\Common.Web.Ui.Test.csproj", "{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}"
-	ProjectSection(WebsiteProperties) = preProject
-		Debug.AspNetCompiler.Debug = "True"
-		Release.AspNetCompiler.Debug = "False"
-	EndProjectSection
 	ProjectSection(ProjectDependencies) = postProject
 		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {95E2C313-46FA-4B4B-9EFF-3228662908F4}
 	EndProjectSection
@@ -52,7 +36,7 @@ Global
 		SccLocalPath3 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui
 		CanCheckoutShared = false
 		SccProjectUniqueName4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test\\Common.Web.Ui.Test.csproj
-		SccProjectName4 = \u0022$/Inforoom//Common.Web.Ui/Src/Common.Web.Ui.Test\u0022,\u0020RNMAAAAA
+		SccProjectName4 = \u0022$/Inforoom/NET2.0/Common.Web.Ui/Src/Common.Web.Ui.Test\u0022,\u0020RNMAAAAA
 		SccLocalPath4 = ..\\..\\Common.Web.Ui\\Src\\Common.Web.Ui.Test
 		CanCheckoutShared = false
 	EndGlobalSection

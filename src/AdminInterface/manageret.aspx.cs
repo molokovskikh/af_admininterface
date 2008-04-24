@@ -7,6 +7,7 @@ using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
 using DAL;
 using MySql.Data.MySqlClient;
 
@@ -320,7 +321,7 @@ WHERE	id = ?id;
 
 				adapter.Update(Data.Tables["Include"]);
 
-				MySqlDataAdapter exportRulesAdapter = new MySqlDataAdapter();
+				var exportRulesAdapter = new MySqlDataAdapter();
 				exportRulesAdapter.UpdateCommand = new MySqlCommand(@"
 UPDATE Usersettings.Ret_Save_Grids
 SET Enabled = ?Enabled
@@ -333,24 +334,7 @@ WHERE Id = ?Id;", _connection, myTrans);
 				myMySqlCommand.CommandText = InsertCommand;
 				myMySqlCommand.ExecuteNonQuery();
 
-				MySqlDataAdapter showClientsAdapter = new MySqlDataAdapter();
-				showClientsAdapter.DeleteCommand = new MySqlCommand(@"
-DELETE FROM showregulation 
-WHERE PrimaryClientCode = ?PrimaryClientCode AND ShowClientCode = ?ShowClientCode;
-", _connection);
-				showClientsAdapter.DeleteCommand.Parameters.AddWithValue("?PrimaryClientCode", ClientCode);
-				showClientsAdapter.DeleteCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
-
-				showClientsAdapter.InsertCommand = new MySqlCommand(@"
-INSERT INTO showregulation 
-SET PrimaryClientCode = ?PrimaryClientCode,
-	ShowClientCode = ?ShowClientCode;
-", _connection);
-				showClientsAdapter.InsertCommand.Parameters.AddWithValue("?PrimaryClientCode", ClientCode);
-				showClientsAdapter.InsertCommand.Parameters.Add("?ShowClientCode", MySqlDbType.Int32, 0, "FirmCode");
-
-				showClientsAdapter.Update(Data, "ShowClients");
-				Data.Tables["ShowClients"].AcceptChanges();
+				ShowRegulationHelper.Update(_connection, myTrans, Data, ClientCode);
 
 				myTrans.Commit();
 			}
@@ -569,22 +553,7 @@ ORDER BY sg.DisplayName;
 ";
 					adapter.Fill(Data, "ExportRules");
 
-					adapter.SelectCommand.CommandText = @"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName     
-FROM    (accessright.regionaladmins, clientsdata as cd) 
-	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
-WHERE   sr.PrimaryClientCode				 = ?ClientCode
-		AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName               = ?UserName 
-        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)   
-        AND FirmStatus    = 1 
-        AND billingstatus = 1 
-ORDER BY cd.shortname;";
-
-					adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
-					adapter.Fill(Data, "ShowClients");
+					ShowRegulationHelper.Load(adapter, Data, Session["UserName"].ToString());
 
 					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
 					ShowClientsGrid.DataBind();
@@ -624,7 +593,7 @@ ORDER BY cd.shortname;";
 			switch (e.CommandName)
 			{
 				case "Search":
-					MySqlDataAdapter adapter = new MySqlDataAdapter
+					var adapter = new MySqlDataAdapter
 (@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
@@ -657,7 +626,7 @@ ORDER BY cd.shortname;
 						_connection.Close();
 					}
 
-					DropDownList ParentList = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
+					var ParentList = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
 					ParentList.DataSource = data;
 					ParentList.DataBind();
 					ParentList.Visible = data.Tables[0].Rows.Count > 0;
@@ -685,7 +654,7 @@ ORDER BY cd.shortname;
 				}
 			}
 
-			int i = 0;
+			var i = 0;
 			foreach (ListItem item in ExportRulesList.Items)
 			{
 				if (Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
@@ -693,14 +662,7 @@ ORDER BY cd.shortname;
 				i++;
 			}
 
-			foreach (GridViewRow row in ShowClientsGrid.Rows)
-			{
-				if (Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text)
-				{
-					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedItem.Text;
-					Data.Tables["ShowClients"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ShowClientsList")).SelectedValue;
-				}
-			}
+			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
 		}
 
 		protected void IncludeGrid_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -720,83 +682,20 @@ ORDER BY cd.shortname;
 
 		protected void ShowClientsGrid_RowDataBound(object sender, GridViewRowEventArgs e)
 		{
-			if (e.Row.RowType == DataControlRowType.DataRow)
-			{
-				DataRowView rowView = (DataRowView)e.Row.DataItem;
-				if (rowView.Row.RowState == DataRowState.Added)
-				{
-					((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
-					e.Row.FindControl("SearchButton").Visible = true;
-					e.Row.FindControl("SearchText").Visible = true;
-				}
-				else
-				{
-					e.Row.FindControl("SearchButton").Visible = false;
-					e.Row.FindControl("SearchText").Visible = false;
-				}
-				var list = ((DropDownList)e.Row.FindControl("ShowClientsList"));
-				list.Items.Add(new ListItem(rowView["ShortName"].ToString(), rowView["FirmCode"].ToString()));
-				list.Width = new Unit(90, UnitType.Percentage);
-			}
+			ShowRegulationHelper.ShowClientsGrid_RowDataBound(sender, e);
 		}
 
 		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			switch (e.CommandName)
-			{
-				case "Add":
-					ProcessChanges();
-					Data.Tables["ShowClients"].Rows.Add(Data.Tables["ShowClients"].NewRow());
-					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
-					ShowClientsGrid.DataBind();
-					break;
-				case "Search":
-					var adapter = new MySqlDataAdapter
-						(@"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
-FROM    (accessright.regionaladmins, clientsdata as cd)  
-LEFT JOIN showregulation sr
-        ON sr.ShowClientCode	             =cd.firmcode  
-WHERE   cd.regioncode & regionaladmins.regionmask > 0  
-        AND regionaladmins.UserName               =?UserName  
-        AND FirmType                         =if(ShowRetail+ShowVendor=2, FirmType, if(ShowRetail=1, 1, 0)) 
-        AND if(UseRegistrant                 =1, Registrant=?UserName, 1=1)  
-        AND cd.ShortName like ?SearchText
-        AND FirmStatus   =1  
-        AND billingstatus=1  
-ORDER BY cd.shortname;
-", Literals.GetConnectionString());
-					adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-					adapter.SelectCommand.Parameters.Add("?SearchText", string.Format("%{0}%", ((TextBox)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
-
-					var data = new DataSet();
-					try
-					{
-						_connection.Open();
-						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-						adapter.Fill(data);
-						adapter.SelectCommand.Transaction.Commit();
-					}
-					finally
-					{
-						_connection.Close();
-					}
-
-					var ShowList = ((DropDownList)ShowClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
-					ShowList.DataSource = data;
-					ShowList.DataBind();
-					ShowList.Visible = data.Tables[0].Rows.Count > 0;
-					break;
-			}
+			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender,
+			                                                e,
+			                                                Data,
+			                                                Session["UserName"].ToString());
 		}
 
 		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
-			ProcessChanges();
-			Data.Tables["ShowClients"].DefaultView[e.RowIndex].Delete();
-			ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
-			ShowClientsGrid.DataBind();
+			ShowRegulationHelper.ShowClientsGrid_RowDeleting(sender, e, Data);
 		}
 	}
 }
