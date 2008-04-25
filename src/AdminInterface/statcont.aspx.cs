@@ -30,8 +30,8 @@ namespace AddUser
 		
 		private void ShowStatistic()
 		{
-			MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
-			MySqlDataAdapter adapter = new MySqlDataAdapter(
+			var _connection = new MySqlConnection(Literals.GetConnectionString());
+			var adapter = new MySqlDataAdapter(
 @"
 SELECT  WriteTime, 
         clientsinfo.UserName, 
@@ -39,30 +39,27 @@ SELECT  WriteTime,
         Region, 
         Message, 
         FirmCode, 
-        osuseraccessright.rowid OSUserID, 
         clientsinfo.rowid  
 FROM    logs.clientsinfo, 
         usersettings.clientsdata, 
         accessright.regionaladmins, 
-        usersettings.osuseraccessright, 
         farm.regions  
-WHERE   clientsinfo.clientcode                            =firmcode 
-        AND osuseraccessright.clientcode                  =clientsinfo.clientcode  
+WHERE   clientsinfo.clientcode = firmcode 
         AND regionaladmins.RegionMask & clientsdata.RegionCode > 0 
         AND writetime BETWEEN ?FromDate AND ?ToDate  
-        AND regions.regioncode=clientsdata.RegionCode 
-        AND regionaladmins.username=?userName 
+        AND regions.regioncode = clientsdata.RegionCode 
+        AND regionaladmins.username = ?userName 
 		and (ShortName like ?SearchText 
 			or Message like ?SearchText 
 			or clientsinfo.UserName like ?SearchText)
 ORDER BY WriteTime DESC
 ", _connection);
-			adapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
 			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
-			adapter.SelectCommand.Parameters.Add("?FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.Add("?ToDate", CalendarTo.SelectedDate.AddDays(1));			
+			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
+			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));			
 			
-			DataSet data = new DataSet();
+			var data = new DataSet();
 			try
 			{
 				_connection.Open();
@@ -106,7 +103,7 @@ ORDER BY WriteTime DESC
 		}
 		protected void StatisticGrid_Sorting(object sender, GridViewSortEventArgs e)
 		{
-			GridView grid = (GridView) sender;
+			var grid = (GridView) sender;
 			
 			if (_sortExpression == e.SortExpression)
 				_sortDirection = _sortDirection == SortDirection.Ascending ? SortDirection.Descending : SortDirection.Ascending;
@@ -122,12 +119,12 @@ ORDER BY WriteTime DESC
 		{
 			if ((e.Row.RowType == DataControlRowType.Header) && (_sortExpression != String.Empty))
 			{
-				GridView grid = sender as GridView;
+				var grid = sender as GridView;
 				foreach (DataControlField field in grid.Columns)
 				{
 					if (field.SortExpression == _sortExpression)
 					{
-						Image sortIcon = new Image();
+						var sortIcon = new Image();
 						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
 						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
 					}
