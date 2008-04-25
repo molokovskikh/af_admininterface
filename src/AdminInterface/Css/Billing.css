@@ -46,3 +46,23 @@
 	width:80%;
 }
 
+.DisabledClient td
+{
+	background-color: #ff6600;
+}
+
+.Error
+{
+	background-color:Red;
+}
+
+.Success
+{
+	background-color: #D3FFA8;
+}
+
+.Notification
+{
+	background-color: #FFF1A8;
+}
+

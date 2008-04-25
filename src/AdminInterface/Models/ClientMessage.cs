@@ -6,36 +6,18 @@ namespace AdminInterface.Models
 	[ActiveRecord(Table = "Usersettings.retclientsset")]
 	public class ClientMessage : ActiveRecordValidationBase<ClientMessage>
 	{
-		private uint _showCount;
-		private string _message;
-		private uint _clientCode;
+		[Property]
+		public string Message { get; set; }
 
 		[Property]
-		[ValidateNonEmpty("—ообщение не может быть пустым")]
-		public string Message
-		{
-			get { return _message; }
-			set { _message = value; }
-		}
-
-		[Property]
-		[ValidateRange(1, 10, " оличество показов должно быть больше 1 но меньше 10")]
-		public uint ShowMessageCount
-		{
-			get { return _showCount; }
-			set { _showCount = value; }
-		}
+		public uint ShowMessageCount { get; set; }
 
 		[PrimaryKey]
-		public uint ClientCode
-		{
-			get { return _clientCode; }
-			set { _clientCode = value; }
-		}
+		public uint ClientCode { get; set; }
 
 		public bool IsContainsNotShowedMessage()
 		{
-			return _showCount > 0;
+			return ShowMessageCount > 0;
 		}
 	}
 }

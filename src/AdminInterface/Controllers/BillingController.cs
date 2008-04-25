@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Filters;
@@ -33,8 +34,8 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint clientCode, bool showClients)
 		{
-			Client client = Client.Find(clientCode);
-			ClientMessage clientMessage = ClientMessage.TryFind(clientCode);
+			var client = Client.Find(clientCode);
+			var clientMessage = ClientMessage.TryFind(clientCode);
 
 			if (clientMessage != null)
 				PropertyBag.Add("ClientMessage", clientMessage);
@@ -53,7 +54,7 @@ namespace AdminInterface.Controllers
 						   uint clientCode)
 		{
 			billingInstance.UpdateAndFlush();
-			Flash.Add("UpdateMessage", "Изменения сохранены");
+			Flash.Add("Message", new Message("Изменения сохранены"));
 			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
 
@@ -62,7 +63,7 @@ namespace AdminInterface.Controllers
 			try
 			{
 				clientMessage.UpdateAndFlush();
-				Flash.Add("SendMessage", "Сообщение отправленно");
+				Flash.Add("Message", new Message("Сообщение сохранено"));
 			}
 			catch (ValidationException exception)
 			{
@@ -75,12 +76,12 @@ namespace AdminInterface.Controllers
 		public void UpdateClientsStatus(uint clientCode, 
 										[DataBind("Status")] ClientWithStatus[] clients)
 		{
-			using(TransactionScope scope = new TransactionScope(OnDispose.Rollback))
+			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SavePersistentWithLogParams(Session["UserName"].ToString(),
 				                                        HttpContext.Current.Request.UserHostAddress,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
-				foreach (ClientWithStatus client in clients)
+				foreach (var client in clients)
 					client.Update();
 				scope.VoteCommit();
 			}
@@ -89,15 +90,17 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
-			BillingSearchProperties billingSearchProperties = new BillingSearchProperties();
-			billingSearchProperties.ClientStatus = SearchClientStatus.Enabled;
+			var billingSearchProperties = new BillingSearchProperties
+			                              	{
+			                              		ClientStatus = SearchClientStatus.Enabled
+			                              	};
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["FindBy"] = billingSearchProperties;
 		}
 
 		public void SearchBy([DataBind("SearchBy")] BillingSearchProperties searchProperties)
 		{
-			IList<BillingSearchItem> searchResults = BillingSearchItem.FindBy(searchProperties);
+			var searchResults = BillingSearchItem.FindBy(searchProperties);
 
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["sortColumnName"] = "ShortName";
@@ -116,18 +119,19 @@ namespace AdminInterface.Controllers
 							SearchClientStatus clientStatus,
 							SearchBy searchBy)
 		{
-			BillingSearchProperties searchProperties = new BillingSearchProperties();
-			searchProperties.PayerState = payerState;
-			searchProperties.SearchText = searchText;
-			searchProperties.RegionId = regionId;
-			searchProperties.Segment = segment;
-			searchProperties.ClientStatus = clientStatus;
-			searchProperties.ClientType = clientType;
-			searchProperties.SearchBy = searchBy;
-			SortDirection direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
-			List<BillingSearchItem> searchResults;
+			var searchProperties = new BillingSearchProperties
+			                       	{
+			                       		PayerState = payerState,
+			                       		SearchText = searchText,
+			                       		RegionId = regionId,
+			                       		Segment = segment,
+			                       		ClientStatus = clientStatus,
+			                       		ClientType = clientType,
+			                       		SearchBy = searchBy
+			                       	};
+			var direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 
-			searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
+			var searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
 
 			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
 
@@ -165,6 +169,21 @@ namespace AdminInterface.Controllers
 				mailSentEntity.SaveAndFlush();
 			}
 			RedirectToAction("Edit", "clientCode=" + clientCode);
+		}
+
+		public void ShowMessageForClient(uint clientCode)
+		{
+			var message = ClientMessage.Find(clientCode);
+			PropertyBag["Message"] = message;
+		}
+
+		public void CancelMessage(uint clientCode)
+		{
+			var message = ClientMessage.Find(clientCode);
+			message.Message = null;
+			message.ShowMessageCount = 0;
+			message.Save();
+			CancelView();
 		}
 
 		private static IList<Region> GetRegions()
