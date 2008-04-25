@@ -7,6 +7,7 @@
 	<link href="../Css/Table.css" type="text/css" rel="stylesheet" />
 	<link href="../Css/Block.css" type="text/css" rel="stylesheet" />
 	<link href="../Css/Billing.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Highlight.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 ${ChildOutput}

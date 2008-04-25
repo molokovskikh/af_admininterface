@@ -1,9 +1,11 @@
-﻿<div style="text-align:center;">
+﻿<div>
 	<form action="" method="get">
-		${PostToServer}
+		<% if IsDefined("PostToServer"): %>
+			${PostToServer}
+		<% end %>
 		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
 		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
-		<table>
+		<table class="CenterBlock">
 			<tr>
 				<td colspan="2" style="font-weight:bold;">
 					Выберите период:

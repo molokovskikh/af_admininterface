@@ -1,0 +1,39 @@
+﻿.OldUpdate
+{
+	background-color: Gray;
+}
+
+.HaveOnlyNotCommitedUpdates
+{
+	background-color: #ff7f7f;
+}
+
+.Debtor
+{
+	background-color: #ff4b42;
+}
+
+.PayerDisabled
+{
+	background-color: #ffa642;
+}
+
+.DisabledClient td
+{
+	background-color: #ff6600;
+}
+
+.Error
+{
+	background-color:Red;
+}
+
+.Success
+{
+	background-color: #D3FFA8;
+}
+
+.Notification
+{
+	background-color: #FFF1A8;
+}

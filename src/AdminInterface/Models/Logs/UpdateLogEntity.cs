@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using NHibernate;
 using NHibernate.Expression;
 
 namespace AdminInterface.Models.Logs
@@ -20,101 +19,45 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Table = "logs.AnalitFUpdates")]
 	public class UpdateLogEntity : ActiveRecordBase<UpdateLogEntity>
 	{
-		private uint _id;
-		private DateTime _logTime;
-		private string _appVersion;
-		private string _dbVersion;
-		private UpdateType _updateType;
-		private uint _resultSize;
-		private string _addition;
-		private uint _clientCode;
-		private bool _commit;
-		private string _userName;
-		private string _log;
-
 		[PrimaryKey("UpdateId")]
-		public uint Id
-		{
-			get { return _id; }
-			set { _id = value; }
-		}
+		public uint Id { get; set; }
 
 		[Property]
-		public DateTime RequestTime
-		{
-			get { return _logTime; }
-			set { _logTime = value; }
-		}
+		public DateTime RequestTime { get; set; }
 
 		[Property]
-		public string AppVersion
-		{
-			get { return _appVersion; }
-			set { _appVersion = value; }
-		}
+		public string AppVersion { get; set; }
 
 		[Property]
-		public string DbVersion
-		{
-			get { return _dbVersion; }
-			set { _dbVersion = value; }
-		}
+		public string DbVersion { get; set; }
 
 		[Property]
-		public UpdateType UpdateType
-		{
-			get { return _updateType; }
-			set { _updateType = value; }
-		}
+		public UpdateType UpdateType { get; set; }
 
 		[Property]
-		public uint ResultSize
-		{
-			get { return _resultSize; }
-			set { _resultSize = value; }
-		}
+		public uint ResultSize { get; set; }
 
 		[Property]
-		public string Addition
-		{
-			get { return _addition; }
-			set { _addition = value; }
-		}
+		public string Addition { get; set; }
 
 		[Property]
-		public uint ClientCode
-		{
-			get { return _clientCode; }
-			set { _clientCode = value; }
-		}
+		public uint ClientCode { get; set; }
 
 		[Property]
-		public bool Commit
-		{
-			get { return _commit; }
-			set { _commit = value; }
-		}
+		public bool Commit { get; set; }
 
 		[Property]
-		public string UserName
-		{
-			get { return _userName; }
-			set { _userName = value; }
-		}
+		public string UserName { get; set; }
 
 		[Property]
-		public string Log
-		{
-			get { return _log; }
-			set { _log = value; }
-		}
+		public string Log { get; set; }
 
 		[HasMany(typeof(UpdateDownloadLogEntity), Lazy = true, Inverse = true, OrderBy = "LogTime")]
 		public IList<UpdateDownloadLogEntity> UpdateDownload { get; set; }
 
 		public bool IsDataTransferUpdateType()
 		{
-			return _updateType == UpdateType.Accumulative || _updateType == UpdateType.Cumulative;
+			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative;
 		}
 
 		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode, 
@@ -122,14 +65,11 @@ namespace AdminInterface.Models.Logs
 		                                                           DateTime endDate)
 		{
 			return ArHelper.WithSession<UpdateLogEntity>(
-				delegate(ISession session)
-					{
-						return session.CreateCriteria(typeof (UpdateLogEntity))
-							.Add(Expression.Eq("ClientCode", clientCode))
-							.Add(Expression.Between("RequestTime", beginDate, endDate))
-							.AddOrder(Order.Desc("RequestTime"))
-							.List<UpdateLogEntity>();
-					});
+				session => session.CreateCriteria(typeof (UpdateLogEntity))
+				           	.Add(Expression.Eq("ClientCode", clientCode))
+				           	.Add(Expression.Between("RequestTime", beginDate, endDate))
+				           	.AddOrder(Order.Desc("RequestTime"))
+				           	.List<UpdateLogEntity>());
 		}
 	}
 }

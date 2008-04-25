@@ -15,12 +15,12 @@ namespace AdminInterface.Controllers
 	{
 		public void DocumentLog(uint clientCode)
 		{
-			DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
+		    DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public void DocumentLog(uint clientCode, DateTime beginDate, DateTime endDate)
 		{
-			Client client = Client.Find(clientCode);
+			var client = Client.Find(clientCode);
 
 			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
 			                                                                   beginDate,
@@ -51,7 +51,7 @@ namespace AdminInterface.Controllers
 		public void ShowDownloadLog(uint updateLogEntityId)
 		{
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			PropertyBag["log"] = AnalitFDownloadLogEntity.Find(updateLogEntityId).Log;
+			PropertyBag["log"] = UpdateLogEntity.Find(updateLogEntityId).Log;
 		}
 
 		public void UpdateLog(uint clientCode)
@@ -81,6 +81,19 @@ namespace AdminInterface.Controllers
 			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
+		}
+
+		public void ClientRegistrationLog()
+		{
+			ClientRegistrationLog(DateTime.Today.AddDays(-1), DateTime.Today, 0);
+		}
+
+		public void ClientRegistrationLog(DateTime beginDate, DateTime endDate, int dayWithoutUpdate)
+		{
+			PropertyBag["beginDate"] = beginDate;
+			PropertyBag["endDate"] = endDate;
+			PropertyBag["dayWithoutUpdate"] = dayWithoutUpdate;
+			PropertyBag["logEntities"] = ClientRegistrationLogEntity.GetEntitiesForPeriond(beginDate, endDate, dayWithoutUpdate);
 		}
 	}
 }

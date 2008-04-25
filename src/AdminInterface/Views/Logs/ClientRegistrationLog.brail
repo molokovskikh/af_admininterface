@@ -1,0 +1,169 @@
+﻿<% component CaptureFor, {"Id" : "Title"}: %>
+	Статистика обновления клиентов зарегистрированных за период с ${beginDate.ToString("dd.MM.yyyy")} по ${endDate.ToString("dd.MM.yyyy")}
+<% end %>
+
+<div class="Navigation">
+	<ul>
+		<li>
+			<a href="../default.aspx">Административный интерфейс</a> > 
+		</li>
+		<li>
+			Мониторинг обновления клиентов
+		</li>
+	</ul>
+</div>
+
+<div class="CenterBlock FilterBlock">
+
+	<div class="CornerHolder">
+		<div class="TopLeftCorner">
+		</div>
+		<div class="TopRightCorner">
+		</div>
+	</div>
+	
+	<h3>
+		Статистика обновления клиентов зарегистрированных за период с ${beginDate.ToString("dd.MM.yyyy")} по ${endDate.ToString("dd.MM.yyyy")}
+	</h3>
+	<form action="" method="get">
+		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
+		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+		<table class="CenterBlock" style="text-align:center;">
+			<tr>
+				<td colspan="2">
+					Показывать только тех клиентов которые ни разу успешно не обновились за последнии <input name="DayWithoutUpdate" type="text" value="${dayWithoutUpdate if dayWithoutUpdate > 0}" /> дней
+				</td>
+			</tr>
+		</table>
+
+		<table class="CenterBlock" style="text-align:center;">
+			<tr>
+				<td colspan="2">
+					Зарегестрированные за период
+				</td>
+			</tr>
+			<tr>
+				<td>
+					С:
+				</td>
+				<td>
+					По:
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div style="border: none;" id="beginDateCalendarHolder"></div>
+				</td>
+				<td>
+					<div style="border: none;" id="endDateCalendarHolder"></div>
+				</td>
+			</tr>
+			<tr>
+				<td style="text-align:right;" colspan="2">
+					${FormHelper.Submit("Показать")}
+				</td>
+			</tr>
+		</table>
+	</form>	
+	
+	<div class="CornerHolder">
+		<div class="BottomLeftCorner">
+		</div>
+		<div class="BottomRightCorner">
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	function beginDateCallBack(cal) 
+	{
+		document.getElementById("beginDate").value = cal.date.print("%d.%m.%Y");
+	};
+
+	function endDateCallBack(cal) 
+	{
+		document.getElementById("endDate").value = cal.date.print("%d.%m.%Y");
+	};
+
+  
+  Calendar.setup({
+	date: "${beginDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "beginDateCalendarHolder",
+    flatCallback: beginDateCallBack,
+    showOthers: true
+  });
+  
+  Calendar.setup({
+	date: "${endDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "endDateCalendarHolder",
+    flatCallback: endDateCallBack,
+    showOthers: true
+  });
+</script>
+
+
+<div>
+
+	<table class="DataTable">
+	<% if logEntities.Count != 0: %>
+		<tr>
+			<th>
+				Оператор
+			</th>
+			<th>
+				Дата регистрации
+			</th>
+			<th>
+				Клиент
+			</th>
+			<th>
+				Дата последнего обновления
+			</th>
+		</tr>
+	<%
+		i = 0
+		for logEntity in logEntities:
+	%>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				${logEntity.RegistredBy}
+			</td>
+			<td>
+				${logEntity.RegistrationDate}
+			</td>
+			<td>
+				<a href="../Client/info.rails?cc=${logEntity.ClientCode}">${logEntity.ClientName}</a>
+			</td>
+			<% if logEntity.LastUpdateDate == null: %>
+				<td class="${"HaveOnlyNotCommitedUpdates" if logEntity.HaveOnlyNotCommitedUpdates()}">
+					${logEntity.LastUncommitedUpdate}
+				</td>
+			<% else: %>
+				<td class="${"OldUpdate" if logEntity.IsUpdateToOld()}">
+					${logEntity.LastUpdateDate}
+				</td>
+			<% end %>
+		</tr>
+	<%		
+			i++
+		end
+		else:
+	%>
+		<tr class="EmptyData">
+			<td>
+				За указанный период клиенты не регистрировались
+			</td>
+		</tr>
+	<% end %>
+	</table>
+
+</div>
+
+<% 
+if logEntities.Count > 0:
+	component Legend, { "LegendItems" : {	"Обновение более 2 суток назад" : "OldUpdate", 
+											"У клиента не было ни одного подтвержденного обновления" : "HaveOnlyNotCommitedUpdates" } } 
+end
+%>

@@ -7,6 +7,7 @@ using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;

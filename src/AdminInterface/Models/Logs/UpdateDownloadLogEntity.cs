@@ -5,7 +5,7 @@ using Castle.ActiveRecord;
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord(Table = "logs.UpdateDownloadLogs")]
-	public class UpdateDownloadLogEntity : ActiveRecordBase<AnalitFDownloadLogEntity>
+	public class UpdateDownloadLogEntity : ActiveRecordBase<UpdateDownloadLogEntity>
 	{
 		[PrimaryKey]
 		public int Id { get; set; }
