@@ -78,7 +78,7 @@
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Плказываемые клиенты
+					Показываемые клиенты
 				</h3>
 				<div class="ContentBlock">
 					<asp:GridView ID="ShowClientsGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="ShowClientsGrid_RowCommand" DataMember="ShowClients"
