@@ -6,7 +6,7 @@ using NHibernate.Expression;
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord("logs.passwordchange")]
-	public class PasswordChangeLogEntity
+	public class PasswordChangeLogEntity : ActiveRecordBase<PasswordChangeLogEntity>
 	{
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }

@@ -302,7 +302,7 @@ ORDER BY region;
 Регион: {2}
 Прайс-лист: {3}
 ", Session["UserName"], ShortName, region, PriceName),
-				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString());
 			}
 			catch
 			{

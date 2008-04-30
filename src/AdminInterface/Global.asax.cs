@@ -1,34 +1,22 @@
 using System;
-using System.Text;
 using System.Web;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using DAL;
 using System.Reflection;
-using Microsoft.Practices.EnterpriseLibrary.Logging;
+using log4net;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
 	public class Global : HttpApplication
 	{
-		private System.ComponentModel.IContainer components;
-		
-		public Global()
-		{
-			InitializeComponent();
-		}
-		
-		[System.Diagnostics.DebuggerStepThrough()]
-		private void InitializeComponent()
-		{
-			components = new System.ComponentModel.Container();
-		}
+		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
 		void Application_Start(object sender, EventArgs e)
 		{
 			log4net.Config.XmlConfigurator.Configure();
-			ActiveRecordStarter.Initialize(new Assembly[] {Assembly.Load("AdminInterface"),
+			ActiveRecordStarter.Initialize(new[] {Assembly.Load("AdminInterface"),
 														   Assembly.Load("Common.Web.Ui")},
 										   ActiveRecordSectionHandler.Instance);
 			SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
@@ -36,7 +24,7 @@ namespace AddUser
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
 		{
-			SiteMapNode currentNode = e.Provider.CurrentNode.Clone(true);
+			var currentNode = e.Provider.CurrentNode.Clone(true);
 			if (currentNode.Url.EndsWith("/manageret.aspx"))
 				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
 			else if (currentNode.Url.EndsWith("/managep.aspx"))
@@ -44,10 +32,10 @@ namespace AddUser
 			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
 			{
 				uint firmCode;
-				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
+				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 				{
 					connection.Open();
-					MySqlCommand command = new MySqlCommand(@"
+					var command = new MySqlCommand(@"
 SELECT FirmCode
 FROM usersettings.regionaldata rd
 WHERE RowID = ?Id", connection);
@@ -60,10 +48,10 @@ WHERE RowID = ?Id", connection);
 			else if (currentNode.Url.EndsWith("/managecosts.aspx"))
 			{
 				uint firmCode;
-				using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
+				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 				{
 					connection.Open();
-					MySqlCommand command = new MySqlCommand(@"
+					var command = new MySqlCommand(@"
 SELECT FirmCode
 FROM usersettings.PricesData pd
 WHERE PriceCode = ?Id", connection);
@@ -78,8 +66,6 @@ WHERE PriceCode = ?Id", connection);
 
 		void Session_Start(object sender, EventArgs e)
 		{
-			Session["strStatus"] = "No";
-			Session["strError"] = "";
 			string UserName;
 			UserName = HttpContext.Current.User.Identity.Name;
 			if (UserName.Substring(0, 7) == "ANALIT\\")
@@ -89,12 +75,11 @@ WHERE PriceCode = ?Id", connection);
 				UserName = UserName.Substring(7);
 			#endif
 
-			Administrator administrator = CommandFactory.GetAdministrator(UserName);
+			var administrator = CommandFactory.GetAdministrator(UserName);
 			if (administrator != null)
 				Session["Administrator"] = administrator;
 			
 			Session["UserName"] = UserName;
-			Session["SessionID"] = Session.SessionID;
 		}
 
 		void Application_BeginRequest(object sender, EventArgs e)
@@ -141,7 +126,7 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
-			Logger.Write(builder.ToString(), "Error");
+			_log.Error(builder.ToString());
 #endif
 		}
 

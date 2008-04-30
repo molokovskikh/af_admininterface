@@ -77,7 +77,7 @@ namespace AdminInterface.Controllers
 
 		public void PasswordChangeLog(string login, DateTime beginDate, DateTime endDate)
 		{
-			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(login, beginDate, endDate);
+			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(login, beginDate, endDate.AddDays(1));
 			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;

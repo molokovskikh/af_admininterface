@@ -14,22 +14,16 @@ namespace AddUser
 			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
 				Response.Redirect("default.aspx");
 
-			string str = Session["strStatus"].ToString();
-			string Code = Session["Code"].ToString();
-			string DogN = Session["DogN"].ToString();
-			string Name = Session["Name"].ToString();
-			string ShortName = Session["ShortName"].ToString();
-			string Login = Session["Login"].ToString();
-			string Password = Session["Password"].ToString();
-			bool IsRegister = Convert.ToBoolean(Session["Register"]);
-			string Tariff = Session["Tariff"].ToString();
+			var Code = Session["Code"].ToString();
+			var DogN = Session["DogN"].ToString();
+			var Name = Session["Name"].ToString();
+			var ShortName = Session["ShortName"].ToString();
+			var Login = Session["Login"].ToString();
+			var Password = Session["Password"].ToString();
+			var IsRegister = Convert.ToBoolean(Session["Register"]);
+			var Tariff = Session["Tariff"].ToString();
 			ChPassMessLB.Visible = !IsRegister;
 			RepLb.Visible = !IsRegister;
-			if (str != "Yes")
-			{
-				Server.Transfer("default.aspx");
-				return;
-			}
 
 			LBClient.Text = Name;
 			LBCCard.Text = Name;

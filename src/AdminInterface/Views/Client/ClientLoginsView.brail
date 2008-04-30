@@ -18,7 +18,7 @@
 	<tr>
 		<td>
 			<% if admin.AlowChangePassword: %>
-				<a href="../chpassgo.aspx?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
+				<a href="./ChangePassword.rails?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
 			<% else: %>
 				${user.Login}
 			<% end %>

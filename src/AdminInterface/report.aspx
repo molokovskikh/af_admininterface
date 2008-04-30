@@ -109,18 +109,22 @@
                                 border="1">
                                 <tr>
                                     <td align="center" height="30">
-                                        <font face="Verdana" size="1"><strong>Поддержка пользователей:</strong></font></td>
+                                        <font face="Verdana" size="1"><strong>Служба поддержки пользователей:</strong></font></td>
                                 </tr>
                                 <tr>
-                                    <td valign="top" height="60">
-                                        <p>
-                                            <font size="1"><font face="Verdana">Централизованная служба тел.: (4732) 606-000(Пн.
-                                                - Птн. 9.00 - 18.00 MSK), e-mail: <a>tech@analit.net</a></font><br>
-                                            </font>
-                                            <asp:Label ID="SupportPhoneLB" runat="server" Font-Size="7pt" Font-Names="Verdana"
-                                                Visible="False"> Представитель в Вашем регионе. Тел.: </asp:Label><br>
-                                            <asp:Label ID="SupportNameLB" runat="server" Font-Size="7pt" Font-Names="Verdana"
-                                                Visible="False">Ваш персональный менеджер: </asp:Label></p>
+                                    <td valign="top" height="60" style="text-align:left; ">
+                                        <font size="1" face="Verdana">
+											Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени
+											<br />
+											Телефоны:
+                                            <ul style="list-style-type:none;  margin:0 0 0 10px; ">
+												<li>Москва:	+7 495 6628727</li>
+												<li>С.-Петербург: +7 812 3090521</li>
+												<li>Воронеж: +7 4732 606000</li>
+												<li>Челябинск: +7 351 7298143</li>
+                                            </ul>
+                                            e-mail: <a>tech@analit.net</a>
+                                        </font>
                                     </td>
                                 </tr>
                             </table>

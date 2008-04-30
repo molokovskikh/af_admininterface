@@ -6,30 +6,17 @@ namespace AdminInterface.Models
 	[ActiveRecord("accessright.regionaladmins")]
 	public class Administrator
 	{
-		private bool _alowChangePassword;
-		private uint _id;
-		private string _userName;
-
 		[PrimaryKey("RowId")]
-		public uint Id
-		{
-			get { return _id; }
-			set { _id = value; }
-		}
+		public uint Id { get; set; }
 
 		[Property]
-		public virtual bool AlowChangePassword
-		{
-			get { return _alowChangePassword; }
-			set { _alowChangePassword = value; }
-		}
+		public virtual bool AlowChangePassword { get; set; }
 
 		[Property]
-		public virtual string UserName
-		{
-			get { return _userName; }
-			set { _userName = value; }
-		}
+		public virtual string UserName { get; set; }
+
+		[Property]
+		public string Email { get; set; }
 
 		public static Administrator GetByName(string name)
 		{

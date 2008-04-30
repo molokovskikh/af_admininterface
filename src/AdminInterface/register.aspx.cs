@@ -378,7 +378,6 @@ set @inUser = ?UserName;
 #endif
 				}
 				mytrans.Commit();
-				Session["strStatus"] = "Yes";
 				try
 				{
 					if (TypeDD.SelectedItem.Text == "Аптека"
@@ -449,7 +448,7 @@ where length(c.contactText) > 0
 											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
 											 + "Ошибка: Ничего не получилось выбрать из базы",
 									  "RegisterList@subscribe.analit.net", String.Empty,
-									  DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+									  DS1.Tables["admin"].Rows[0]["email"].ToString());
 						}
 					}
 				}
@@ -462,7 +461,7 @@ where length(c.contactText) > 0
 					                 + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                 + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 					                 + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
-					          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+					          DS1.Tables["admin"].Rows[0]["email"].ToString());
 				}
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
@@ -470,7 +469,7 @@ where length(c.contactText) > 0
 				                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
-				          DS1.Tables["admin"].Rows[0]["email"].ToString(), Encoding.UTF8);
+				          DS1.Tables["admin"].Rows[0]["email"].ToString());
 
 				Func.Mail("register@analit.net",
 				          "",
@@ -485,8 +484,7 @@ where length(c.contactText) > 0
 				          	ShortNameTB.Text, Session["Code"], Session["DogN"], Session["UserName"]),
 				          "billing@analit.net",
 				          "",
-				          "",
-				          Encoding.UTF8);
+				          "");
 
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
@@ -992,10 +990,8 @@ ORDER BY region;
 				_connection.Close();
 			}
 			if (DS1.Tables["admin"].Rows.Count < 1)
-			{
-				Session["strError"] = "Пользователь " + Session["UserName"] + " не найден!";
-				Response.Redirect("error.aspx");
-			}
+				throw new Exception("Пользователь " + Session["UserName"] + " не найден!");
+
 			if (!IsPostBack)
 			{
 				if (Convert.ToInt32(DS1.Tables["admin"].Rows[0]["AlowCreateInvisible"]) == 1)
@@ -1049,7 +1045,6 @@ ORDER BY region;
 					SegmentDD.Enabled = false;
 				}
 			}
-			Session["strStatus"] = "Yes";
 		}
 
 		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)

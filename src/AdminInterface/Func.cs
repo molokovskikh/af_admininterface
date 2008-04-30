@@ -2,16 +2,17 @@ using System;
 using System.Data;
 using System.Net.Mail;
 using System.Text;
+using log4net;
 using MySql.Data.MySqlClient;
-using MailMessage=System.Net.Mail.MailMessage;
-using Microsoft.Practices.EnterpriseLibrary.Logging;
 
 namespace AddUser
 {
 	public class Func
 	{
-		public static void Mail(string from, string fromDisplayName, string subject, bool isBodyHtml, 
-			string body, string to, string toDisplayName, string bcc, Encoding encoding)
+		private static readonly ILog _log = LogManager.GetLogger(typeof (Func));
+
+		public static void Mail(string from, string fromDisplayName, string subject, bool isBodyHtml,
+		                        string body, string to, string toDisplayName, string bcc)
 		{
 			try
 			{
@@ -23,46 +24,47 @@ namespace AddUser
 #endif
 					var message = new MailMessage
 					              	{
-					              		From = new MailAddress(from, fromDisplayName, encoding),
+										From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
 					              		IsBodyHtml = isBodyHtml,
 					              		Subject = subject,
-					              		SubjectEncoding = encoding,
+					              		SubjectEncoding = Encoding.UTF8,
 					              		Body = body,
-					              		BodyEncoding = encoding
+										BodyEncoding = Encoding.UTF8,
 					              	};
 					if (!String.IsNullOrEmpty(bcc))
 						message.Bcc.Add(bcc);
 
-					foreach (string toAddress in to.Split(",".ToCharArray()))
-						message.To.Add(new MailAddress(toAddress, toDisplayName, encoding));
+					foreach (var toAddress in to.Split(",".ToCharArray()))
+						message.To.Add(new MailAddress(toAddress, toDisplayName, Encoding.UTF8));
 
 					var client = new SmtpClient("mail.adc.analit.net");
 					client.Send(message);
 				}
 			}
-			catch(Exception ex)
+			catch (Exception ex)
 			{
-				Logger.Write(Utils.ExceptionToString(ex), "Error");
+				_log.Error(Utils.ExceptionToString(ex));
 			}
- 
 		}
+
+
 
 		public static string GeneratePassword()
 		{
 			var availableChars = "23456789qwertyuiopasdfghjkzxcvbnmQWERTYUOPASDFGHJKLZXCVBNM";
 			var password = String.Empty;
 			var random = new Random();
-			while(password.Length < 8)
+			while (password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length - 1)];
 			return password;
 		}
 
 		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand, string CommandAdd)
 		{
-			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			MySqlCommand Комманда = new MySqlCommand();
-			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
+			var myMySqlCommand = new MySqlCommand();
+			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
+			var Комманда = new MySqlCommand();
+			var myMySqlDataAdapter = new MySqlDataAdapter();
 			try
 			{
 				myMySqlConnection.Open();
@@ -78,7 +80,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(Utils.ExceptionToString(ex), "Error");
+				_log.Error(Utils.ExceptionToString(ex));
 				return false;
 			}
 			finally
@@ -94,10 +96,10 @@ namespace AddUser
 		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand)
 		{
 			string CommandAdd = String.Empty;
-			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			MySqlCommand Комманда = new MySqlCommand();
-			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
+			var myMySqlCommand = new MySqlCommand();
+			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
+			var Комманда = new MySqlCommand();
+			var myMySqlDataAdapter = new MySqlDataAdapter();
 			try
 			{
 				myMySqlConnection.Open();
@@ -113,7 +115,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(Utils.ExceptionToString(ex), "Error");
+				_log.Error(Utils.ExceptionToString(ex));
 				return false;
 			}
 			finally
@@ -129,10 +131,10 @@ namespace AddUser
 		{
 			MySqlCommand MySQLCommand = null;
 			string CommandAdd = String.Empty;
-			MySqlCommand myMySqlCommand = new MySqlCommand();
-			MySqlConnection myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			MySqlCommand Комманда = new MySqlCommand();
-			MySqlDataAdapter myMySqlDataAdapter = new MySqlDataAdapter();
+			var myMySqlCommand = new MySqlCommand();
+			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
+			var Комманда = new MySqlCommand();
+			var myMySqlDataAdapter = new MySqlDataAdapter();
 			try
 			{
 				myMySqlConnection.Open();
@@ -148,7 +150,7 @@ namespace AddUser
 			}
 			catch (Exception ex)
 			{
-				Logger.Write(Utils.ExceptionToString(ex), "Error");
+				_log.Error(Utils.ExceptionToString(ex));
 				return false;
 			}
 			finally
@@ -164,19 +166,16 @@ namespace AddUser
 		{
 			if (InputStr.Length < 1)
 				return 0;
-			else
+			try
 			{
-				try
-				{
-					return Convert.ToDecimal(InputStr);
-				}
-				catch
-				{
-					new Exception(
-						String.Format(
-							"Не верно указанна скидка {0}. Для указания десятичных долей используйте знаки \".\" или \",\", к примеру 5.54",
-							InputStr));
-				}
+				return Convert.ToDecimal(InputStr);
+			}
+			catch
+			{
+				new Exception(
+					String.Format(
+						"Не верно указанна скидка {0}. Для указания десятичных долей используйте знаки \".\" или \",\", к примеру 5.54",
+						InputStr));
 			}
 			return 0;
 		}
@@ -195,10 +194,21 @@ namespace AddUser
 		public bool CalcDays(DateTime CurContDate)
 		{
 			if (DateTime.Now.Subtract(CurContDate).TotalDays > 3)
-			{
 				return false;
-			}
 			return true;
+		}
+
+		public static void Send(MailMessage message)
+		{
+			try
+			{
+				var client = new SmtpClient("mail.adc.analit.net");
+				client.Send(message);
+			}
+			catch (Exception ex)
+			{
+				_log.Error(Utils.ExceptionToString(ex));
+			}
 		}
 	}
 }

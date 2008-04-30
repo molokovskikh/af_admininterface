@@ -1,21 +1,12 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using System.Text;
-using Microsoft.Practices.EnterpriseLibrary.Logging;
 using System.Reflection;
 
 public class Utils
 {
 	public static string ExceptionToString(Exception exception)
 	{
-		StringBuilder builder = new StringBuilder();
+		var builder = new StringBuilder();
 
 		builder.AppendLine("----Error-----");
 		do
