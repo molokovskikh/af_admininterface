@@ -85,7 +85,7 @@ namespace AdminInterface.Controllers
 			PrepareSessionForReport(user, password, client);
 
 			if (isSendClientCard)
-				ReportHelper.SendRegistrationCard(client, user, password, additionEmailsToNotify, false);
+				ReportHelper.SendClientCard(client, user, password, additionEmailsToNotify, false);
 
 			Redirect("../report.aspx");
 		}

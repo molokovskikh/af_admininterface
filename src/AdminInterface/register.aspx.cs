@@ -492,22 +492,23 @@ where length(c.contactText) > 0
 				Session["Password"] = PassTB.Text;
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
+
+				ClientCardIfNeeded();
+
 				if (!IncludeCB.Checked 
 					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
-						Response.Redirect(String.Format("Billing/Register.rails?id={0}", Session["DogN"]));
-					else
+						Response.Redirect(String.Format("Billing/Register.rails?id={0}&showRegistrationCard={1}",
+						                                Session["DogN"],
+						                                ShowRegistrationCard.Checked));
+					else if (ShowRegistrationCard.Checked)
 						Response.Redirect("report.aspx");
+					else
+						Response.Redirect("Billing/SuccessRegistration.rails");
 				}
 				else
-				{
-					Page.Controls.Clear();
-					var LB = new Label();
-					LB.Text = "Регистрация завершена успешно.";
-					LB.Font.Name = "Verdana";
-					Page.Controls.Add(LB);
-				}
+					Response.Redirect("Billing/SuccessRegistration.rails");
 			}
 			catch (Exception excL)
 			{
@@ -523,6 +524,34 @@ where length(c.contactText) > 0
 				_command.Dispose();
 				_connection.Dispose();
 			}
+		}
+
+		private void ClientCardIfNeeded()
+		{
+			if (!SendRegistrationCard.Checked)
+				return;
+
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
+				return;
+
+			string mailTo;
+
+			if (TBOrderManagerMail.Text.Trim().Length == 0 && TBClientManagerMail.Text.Trim().Length == 0)
+				mailTo = EmailTB.Text;
+			else
+				mailTo = TBClientManagerMail.Text.Trim() + ", " + TBOrderManagerMail.Text.Trim();
+
+
+			ReportHelper.SendClientCard(Convert.ToUInt32(Session["Code"]),
+			                                  Convert.ToUInt32(Session["DogN"]),
+			                                  ShortNameTB.Text,
+			                                  FullNameTB.Text,
+			                                  TypeDD.SelectedItem.Text,
+			                                  LoginTB.Text,
+			                                  PassTB.Text,
+			                                  mailTo,
+			                                  AdditionEmailToSendRegistrationCard.Text, 
+											  true);
 		}
 
 		protected void PayerPresentCB_CheckedChanged(object sender, EventArgs e)

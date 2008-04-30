@@ -25,7 +25,7 @@ namespace AdminInterface.Helpers
 		{
 			var report = new LocalReport
 			{
-				ReportEmbeddedResource = "AdminInterface.Registration.rdlc",
+				ReportEmbeddedResource = "AdminInterface.ClientCard.rdlc",
 			};
 			var deviceInfo =
   @"<DeviceInfo>
@@ -61,15 +61,38 @@ namespace AdminInterface.Helpers
 			return stream;
 		}
 
-		public static void SendRegistrationCard(Client client, User user, string password, string additionTo, bool isRegistration)
+		public static void SendClientCard(Client client, User user, string password, string additionTo, bool isRegistration)
 		{
-			
-			using (var stream = CreateReport(client.Id,
-											 client.BillingInstance.PayerID,
-											 client.ShortName,
-											 client.FullName,
-											 BindingHelper.GetDescription(client.Type),
-											 user.Login,
+			SendClientCard(client.Id,
+			                     client.BillingInstance.PayerID,
+			                     client.ShortName,
+			                     client.FullName,
+			                     BindingHelper.GetDescription(client.Type),
+			                     user.Login,
+			                     password,
+								 client.GetAddressForSendingClientCard(),
+			                     additionTo,
+			                     isRegistration);
+		}
+
+		public static void SendClientCard(uint clietCode,
+		                                        uint billingCode,
+		                                        string clientShortName,
+		                                        string clientFullName,
+		                                        string clientType,
+		                                        string login,
+		                                        string password,
+												string generalTo,
+		                                        string additionTo,
+		                                        bool isRegistration)
+		{
+
+			using (var stream = CreateReport(clietCode,
+											 billingCode,
+											 clientShortName,
+											 clientFullName,
+											 clientType,
+											 login,
 											 password,
 											 DateTime.Now,
 											 isRegistration))
@@ -82,7 +105,7 @@ namespace AdminInterface.Helpers
 			})
 			{
 				EmailHelper.BuildAttachementFromString(additionTo, message);
-				EmailHelper.BuildAttachementFromString(client.GetPasswordChangeNotificationAddress(), message);
+				EmailHelper.BuildAttachementFromString(generalTo, message);
 				Func.Send(message);
 			}
 		}

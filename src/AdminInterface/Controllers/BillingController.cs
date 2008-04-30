@@ -27,10 +27,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["Instance"] = instance;
 		}
 
-		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer)
+		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer, bool showRegistrationCard)
 		{
 			payer.UpdateAndFlush();
-			Redirect("../report.aspx");
+			if (showRegistrationCard)
+				Redirect("../report.aspx");
+			else
+				RedirectToAction("SuccessRegistration");
+		}
+
+		public void SuccessRegistration()
+		{
+
 		}
 
 		public void Edit(uint clientCode, bool showClients)
