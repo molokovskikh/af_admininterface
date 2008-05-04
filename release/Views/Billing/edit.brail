@@ -1,18 +1,45 @@
-﻿<%
-def GetClientStyle(client) as string:
-	if client.IsClientActive():
-		return ""
-	else:
-		return "background-color:#ff6600;"
-	end
-	return ""
-end
-
-%>
-
-<% component CaptureFor, {"Id" : "Title"}: %>
+﻿<% component CaptureFor, {"Id" : "Title"}: %>
 	Детальная информация о платильщике ${Instance.ShortName}
 <% end %>
+
+<script>
+	
+	function RemoveMessage(clientCode)
+	{
+		SetStatusBarMessage("Удаление...", "Notification");
+		$("CurrentMessage").remove();
+		new Ajax.Request("CancelMessage.rails?clientCode=" + clientCode, { 
+			method: 'get',
+			onFailure: function()
+			{
+				SetStatusBarMessage("Ошибка при удалении сообщения", "Error");
+			},
+			onSuccess: function()
+			{
+				SetStatusBarMessage("Сообщение удалено", "Success");
+			}
+		});
+	}
+	
+	function SetStatusBarMessage(message, className)
+	{
+		$$("#StatusBar td").first().update(message);
+		$$("#StatusBar table").first().removeClassName("Notification").removeClassName("Error").removeClassName("Success").addClassName(className);
+	}
+	
+	function ShowMessage(clientCode)
+	{
+		SetStatusBarMessage("Загрузка...", "Notification");
+		new Ajax.Request("ShowMessageForClient.rails?clientCode=" + clientCode, { 
+			method: 'get',
+			onSuccess: function()
+			{
+				SetStatusBarMessage("", "");
+			}
+		});
+	}
+	
+</script>
 
 <style>
 	.Main
@@ -51,11 +78,23 @@ end
 	</ul>
 </div>
 
+<div id="StatusBar" style="padding-bottom: 10px;">
+	<table Class="CenterBlock ${Message.GetClass() if IsDefined("Message")}">
+		<tr>
+			<td>
+				<% if IsDefined("Message"): %>
+					${Message.MessageText}
+				<% end %>
+			</td>
+		</tr>
+	</table>
+</div>
+
 <div class="Main">
 
 	<div class="Left">
 	
-		<div style="padding-bottom: 10px;width: 100%">
+		<div style="width: 100%">
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				<% if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10: %>
 				<div class="HideVisible">Клиенты плательщика "${Instance.ShortName}"</div>
@@ -72,28 +111,28 @@ end
 						for client in Instance.Clients:
 							i++
 						%>
-							<tr class="${ViewHelper.GetRowStyle(i)}">
-								<td style="${GetClientStyle(client)}">
+							<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if not client.IsClientActive()}">
+								<td>
 									<input type="checkbox" ${"checked" if client.IsClientActive()} name="Status[${i}].Status" />
 									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
 								</td>
-								<td style="${GetClientStyle(client)}">
+								<td>
 									${client.Id}
 								</td>
-								<td style="${GetClientStyle(client)}">
+								<td>
 								<% if client.Id == Client.Id: %>
 									<strong>${client.GetNameWithParents()}</strong>
 								<% else: %>
 									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">${client.GetNameWithParents()}</a>
 								<% end %>
 								</td>
-								<td style="${GetClientStyle(client)}">
+								<td>
 									${client.HomeRegion.Name}
 								</td>
-								<td style="${GetClientStyle(client)}">
+								<td>
 									${BindingHelper.GetDescription(client.Type)}
 								</td>
-								<td style="${GetClientStyle(client)}">
+								<td>
 									${BindingHelper.GetDescription(client.Segment)}
 								</td>
 							</tr>
@@ -106,14 +145,7 @@ end
 				</div>
 			</div>
 		</div>
-		
-		<% if IsDefined("UpdateMessage"):%>
-			<div class="Message">${UpdateMessage}</div>
-		<% end %>
-		<% if IsDefined("SendMessage"): %>
-			<div class="Message">${SendMessage}</div>
-		<% end %>	
-		
+			
 		<form action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			<% OutputSubView("Common/PayerEdit") %>
@@ -123,9 +155,7 @@ end
 	
 	<div class="Right">
 	
-<%
-if IsDefined("ClientMessage"):
-%>
+	<% if IsDefined("ClientMessage"): %>
 		<form action="sendMessage.rails" method="post" style="margin-bottom:10px;">			
 			<input type="hidden" value="${Client.Id}" name="NewClientMessage.ClientCode" />
 			<table style="width:100%">
@@ -134,22 +164,20 @@ if IsDefined("ClientMessage"):
 							Сообщение клиенту:
 						</td>
 					</tr>
-<%
-if IsDefined("SendError"):
-%>
+					<% if IsDefined("SendError"): %>
 					<tr>
 						<td class="ValidationErrorMessage">
 							${SendError}
 						</td>
 					</tr>
-<%		
-end	
-%>
-<%
-if ClientMessage.IsContainsNotShowedMessage():
-	output "<tr><td class=\"Message\">Остались не показанные сообщения</td></tr>"
-end		
-%>
+					<% end %>
+					<% if ClientMessage.IsContainsNotShowedMessage(): %>
+					<tr>
+						<td id="CurrentMessage">
+							Остались не показанные сообщения. <a href="javascript:void(0);" onclick="return ShowMessage(${Client.Id});">Просмотреть сообщение</a>
+						</td>
+					</tr>
+					<% end %>
 					<tr>
 						<td>
 							<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
@@ -174,9 +202,7 @@ end
 					</tr>
 			</table>
 		</form>
-<% 
-end 
-%>
+	<% end %>
 		<div>
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				Статистика включений/выключений
@@ -208,9 +234,7 @@ end
 						Клиент не отключался
 					</td>
 				</tr>				
-			<%
-			end
-			%>
+			<% end %>
 			</table>
 			
 		</div>
@@ -256,9 +280,7 @@ end
 						Корреспонденции не отправлялась
 					</td>
 				</tr>				
-			<%
-			end
-			%>
+			<% end %>
 			</table>
 			</div>
 		</div>

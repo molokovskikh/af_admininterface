@@ -51,15 +51,7 @@
 									ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationExpression="^.{1,100}$" ValidationGroup="0" ControlToValidate="AddressTB" Display="Dynamic">*</asp:RegularExpressionValidator>
 								<asp:RequiredFieldValidator ID="RequiredAddress" runat="server" ControlToValidate="AddressTB"
 									ErrorMessage="Поле «Адрес доставки медикаментов» должно быть заполнено" ValidationGroup="0" Display="Dynamic">*</asp:RequiredFieldValidator></div>
-<%--							<div class="SimpleField">
-								<label class="Required" for="PhoneTB">
-									Телефон:
-								</label>
-								<asp:TextBox ID="PhoneTB" runat="server" />
-								<asp:RequiredFieldValidator ID="RequiredPhone" runat="server" ControlToValidate="PhoneTB"
-									ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator>
 							</div>
---%>						</div>
 						<div class="TwoColumn">
 							<div class="SimpleField">
 								<label class="Required" for="PhoneTB">
@@ -98,9 +90,6 @@
 									DataTextField="PayerName" DataValueField="PayerID" />
 								<asp:Label ID="PayerCountLB" runat="server" ForeColor="Green" Visible="False" />
 							</div>
-							<div>
-								<asp:CheckBox ID="EnterBillingInfo" runat="server" Text="Заполнять информацию для биллинга" Checked="true" />
-							</div>
 							<div class="ComplexField">
 								<asp:CheckBox ID="IncludeCB" runat="server" OnCheckedChanged="IncludeCB_CheckedChanged"
 									Text="Подчиненный клиент" AutoPostBack="True" />
@@ -119,6 +108,29 @@
 							</div>
 							<div>
 								<asp:CheckBox runat="server" ID="ServiceClient" Text="Сотрудник АК Инфорум" />
+							</div>
+							<div>
+								<asp:CheckBox ID="EnterBillingInfo" runat="server" Text="Заполнять информацию для биллинга" Checked="true" />
+							</div>
+							<div>
+								<asp:CheckBox ID="ShowRegistrationCard" runat="server" Checked="true" Text="Показывать регистрационную карту" />
+							</div>
+							<div>
+								<fieldset>
+								<legend>
+									<asp:CheckBox ID="SendRegistrationCard" runat="server" Checked="true" Text="Отправлять регистационную карту клиенту" />
+								</legend>
+								<table>
+									<tr>
+										<td style="width: 40%">
+											Дополнительные адреса для отправки регистрационной карты:
+										</td>
+										<td style="width: 40%">
+											<asp:TextBox ID="AdditionEmailToSendRegistrationCard" runat="server" TextMode="MultiLine" Width="100%"></asp:TextBox>
+										</td>
+									</tr>
+								</table>
+								</fieldset>
 							</div>
 						</div>
 						<div class="TwoColumn">

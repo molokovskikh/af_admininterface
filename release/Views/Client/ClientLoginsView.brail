@@ -1,17 +1,30 @@
 ﻿<table style="width:100%;" class="Test">
 	<tr>
-		<td class="Title" colspan="2">
+		<td class="Title" colspan="3">
 			Учетные записи пользователя:
+		</td>
+	</tr>
+	<tr>
+		<td class="Title">
+			Имя учетной записи
+		</td>
+		<td class="Title">
+			Дата последнего входа
+		</td>
+		<td class="Title">
 		</td>
 	</tr>
 <% for user in Client.Users: %>
 	<tr>
 		<td>
 			<% if admin.AlowChangePassword: %>
-				<a href="../chpassgo.aspx?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
+				<a href="./ChangePassword.rails?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
 			<% else: %>
 				${user.Login}
 			<% end %>
+		</td>
+		<td>
+			${ADHelper.GetLastLogOnDate(user.Login)}
 		</td>
 		<td>
 			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>

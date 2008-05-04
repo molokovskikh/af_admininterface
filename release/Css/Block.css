@@ -1,3 +1,16 @@
+.CenterBlock
+{
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.FilterBlock
+{
+	width:40%; 
+	background-color:rgb(216, 241, 255); 
+	margin-bottom:10px;
+}
+
 .CornerHolder
 {
 	width: 100%;

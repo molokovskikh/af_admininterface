@@ -75,11 +75,6 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3">
-									<asp:CheckBox ID="ChangeSegmentCB" runat="server" Text="Изменение сегмента" BorderStyle="None" />
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
 									<asp:CheckBox ID="EnableUpdateCB" runat="server" Text="Автоматическое обновление версий"
 										BorderStyle="None" />
 								</td>
@@ -188,6 +183,15 @@
 																		 OnServerValidate="ParentValidator_ServerValidate" 
 																		 ValidateEmptyText="True" 
 																		 ValidationGroup="1">*</asp:CustomValidator>
+												</ItemTemplate>
+											</asp:TemplateField>
+											<asp:TemplateField HeaderText="Тип показываемого клиента">
+												<ItemTemplate>
+													<asp:DropDownList ID="ShowType" runat="server" SelectedValue='<%# Eval("ShowType") %>'>
+														<asp:ListItem Value="0">Базовый</asp:ListItem>
+														<asp:ListItem Value="1">Заказы</asp:ListItem>
+														<asp:ListItem Value="2">Все</asp:ListItem>
+													</asp:DropDownList>
 												</ItemTemplate>
 											</asp:TemplateField>
 										</Columns>

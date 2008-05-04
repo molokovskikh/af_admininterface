@@ -78,7 +78,7 @@
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Плказываемые клиенты
+					Показываемые клиенты
 				</h3>
 				<div class="ContentBlock">
 					<asp:GridView ID="ShowClientsGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="ShowClientsGrid_RowCommand" DataMember="ShowClients"
@@ -105,6 +105,15 @@
 									<asp:CustomValidator ID="ShowCleintsValidator" runat="server" ControlToValidate="ShowClientsList"
 										ErrorMessage="Необходимо выбрать клиента." OnServerValidate="ParentValidator_ServerValidate"
 										ValidateEmptyText="True" ValidationGroup="1">*</asp:CustomValidator>
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Тип показываемого клиента">
+								<ItemTemplate>
+									<asp:DropDownList ID="ShowType" runat="server" SelectedValue='<%# Eval("ShowType") %>'>
+										<asp:ListItem Value="0">Базовый</asp:ListItem>
+										<asp:ListItem Value="1">Заказы</asp:ListItem>
+										<asp:ListItem Value="2">Все</asp:ListItem>
+									</asp:DropDownList>
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>

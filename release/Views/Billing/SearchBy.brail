@@ -136,24 +136,11 @@ OutputSubView("Search")
 	</script>
 
 </div>
+
+	<% 
+	component Legend, { "LegendItems" : {	"Плательщик отключен" : "PayerDisabled", 
+											"Должник" : "Debtor" } } 
+	%>
 	
-	<div class="CenterBlock" style="width:30%;">
-		<table>
-			<tr>
-				<td style="background-color:#ffa642; width: 20px;">
-				</td>
-				<td>
-				- Плательщик отключен
-				</td>
-			</tr>
-			<tr>
-				<td style="background-color:#ff4b42; width: 20px;">
-				</td>
-				<td>
-					- Должник
-				</td>
-			</tr>
-		</table>
-	</div>
 
 <% end %>

@@ -43,6 +43,9 @@
 						<asp:HyperLink ID="ViewAdministrators" Font-Names="Verdana, Arial, Helvetica, sans-serif"
 							Font-Size="small" runat="server" NavigateUrl="ViewAdministrators.aspx">Региональные администраторы</asp:HyperLink>
 					</p>
+					<p>
+						<asp:HyperLink ID="HyperLink1" Font-Names="Verdana, Arial, Helvetica, sans-serif" Font-Size="small" runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</asp:HyperLink>
+					</p>
 				</td>
 				<td align="center" style="height: 427px">
 					<fieldset style="width:20%;float:right;background-color:#d8f1ff;border:0;padding:3px 3px 3px 3px;">
