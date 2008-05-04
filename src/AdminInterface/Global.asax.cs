@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Web;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
