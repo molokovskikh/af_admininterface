@@ -3,6 +3,7 @@ using System.Data;
 using System.Net.Mail;
 using System.Text;
 using log4net;
+using LumiSoft.Net.SMTP.Client;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -198,7 +199,7 @@ namespace AddUser
 			return true;
 		}
 
-		public static void Send(MailMessage message)
+		public static int Send(MailMessage message)
 		{
 			try
 			{
@@ -209,6 +210,7 @@ namespace AddUser
 			{
 				_log.Error(Utils.ExceptionToString(ex));
 			}
+			return 0;
 		}
 	}
 }

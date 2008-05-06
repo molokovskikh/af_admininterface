@@ -4,6 +4,7 @@ using System.Configuration;
 using System.IO;
 using System.Net.Mail;
 using AddUser;
+using AdminInterface.Models.Logs;
 using AdminInterface.Properties;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -61,30 +62,31 @@ namespace AdminInterface.Helpers
 			return stream;
 		}
 
-		public static void SendClientCard(Client client, User user, string password, string additionTo, bool isRegistration)
+		public static int SendClientCardAfterPasswordChange(Client client, User user, string password, string additionTo)
 		{
-			SendClientCard(client.Id,
-			                     client.BillingInstance.PayerID,
-			                     client.ShortName,
-			                     client.FullName,
-			                     BindingHelper.GetDescription(client.Type),
-			                     user.Login,
-			                     password,
-								 client.GetAddressForSendingClientCard(),
-			                     additionTo,
-			                     isRegistration);
+			var generalTo = client.GetAddressForSendingClientCard();
+			return SendClientCard(client.Id,
+			                      client.BillingInstance.PayerID,
+			                      client.ShortName,
+			                      client.FullName,
+			                      BindingHelper.GetDescription(client.Type),
+			                      user.Login,
+			                      password,
+			                      generalTo,
+			                      additionTo,
+			                      false);
 		}
 
-		public static void SendClientCard(uint clietCode,
-		                                        uint billingCode,
-		                                        string clientShortName,
-		                                        string clientFullName,
-		                                        string clientType,
-		                                        string login,
-		                                        string password,
-												string generalTo,
-		                                        string additionTo,
-		                                        bool isRegistration)
+		public static int SendClientCard(uint clietCode,
+		                                  uint billingCode,
+		                                  string clientShortName,
+		                                  string clientFullName,
+		                                  string clientType,
+		                                  string login,
+		                                  string password,
+		                                  string generalTo,
+		                                  string additionTo,
+		                                  bool isRegistration)
 		{
 
 			using (var stream = CreateReport(clietCode,
@@ -101,12 +103,12 @@ namespace AdminInterface.Helpers
 				From = new MailAddress("tech@analit.net"),
 				Subject = "Регистрационная карта для работы в системе АналитФармация",
 				Body = Settings.Default.RegistrationCardEmailBody,
-				Attachments = { new Attachment(stream, "Регистрационная катра.jpg") },
+				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
 			})
 			{
 				EmailHelper.BuildAttachementFromString(additionTo, message);
 				EmailHelper.BuildAttachementFromString(generalTo, message);
-				Func.Send(message);
+				return Func.Send(message);
 			}
 		}
 	}

@@ -17,9 +17,11 @@ namespace AddUser
 		void Application_Start(object sender, EventArgs e)
 		{
 			log4net.Config.XmlConfigurator.Configure();
+			GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
 			ActiveRecordStarter.Initialize(new[] {Assembly.Load("AdminInterface"),
 														   Assembly.Load("Common.Web.Ui")},
 										   ActiveRecordSectionHandler.Instance);
+
 			SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 		}
 
@@ -126,7 +128,6 @@ WHERE PriceCode = ?Id", connection);
 			}
 			builder.AppendLine("--------------");
 
-			builder.AppendLine(String.Format("Version : {0}", Assembly.GetExecutingAssembly().GetName().Version));
 			_log.Error(builder.ToString());
 #endif
 		}

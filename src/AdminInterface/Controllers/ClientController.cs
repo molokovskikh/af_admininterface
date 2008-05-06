@@ -46,31 +46,30 @@ namespace AdminInterface.Controllers
 			var userName = administrator.UserName;
 			var host = Context.Request.UserHostAddress;
 			var reason = isFree ? freeReason : payReason;
-
-			ADHelper.ChangePassword(user.Login, password);
 		
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				ADHelper.ChangePassword(user.Login, password);
+
 				DbLogHelper.SavePersistentWithLogParams(userName,
 				                                        host,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (ClientInfoLogEntity)));
-				
 				new ClientInfoLogEntity
 				{
-					UserName = userName,
-					ClientCode = clientCode,
+					UserName = administrator.UserName,
+					ClientCode = client.Id,
 					WriteTime = DateTime.Now
 				}.SetProblem(isFree, reason)
 				.Save();
 
 				new PasswordChangeLogEntity
 				{
-					ClientHost = Context.Request.UserHostAddress,
+					ClientHost = host,
 					LogTime = DateTime.Now,
 					TargetUserName = user.Login,
-					UserName = userName,
-				}.Save();
-
+					UserName = administrator.UserName,
+				}.Save();		
+				
 				scope.VoteCommit();
 			}
 
@@ -82,13 +81,21 @@ namespace AdminInterface.Controllers
 			                                             Context.Request.UserHostAddress,
 			                                             reason);
 
-			PrepareSessionForReport(user, password, client);
-
 			if (isSendClientCard)
-				ReportHelper.SendClientCard(client, user, password, additionEmailsToNotify, false);
-
-			Redirect("../report.aspx");
+			{
+				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(client, user, password, additionEmailsToNotify);
+				new ClientCardSendLogEntity(client.GetAddressForSendingClientCard(), additionEmailsToNotify, smtpId, administrator.UserName).Save();
+				RedirectToAction("SuccessPasswordChanged");
+			}
+			else
+			{
+				PrepareSessionForReport(user, password, client);
+				Redirect("../report.aspx");
+			}
 		}
+
+		public void SuccessPasswordChanged()
+		{}
 
 		private void PrepareSessionForReport(User user, string password, Client client)
 		{
