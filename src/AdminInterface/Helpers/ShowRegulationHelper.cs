@@ -133,9 +133,9 @@ ORDER BY cd.shortname;
 					}
 
 					var ShowList = ((DropDownList)showClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ShowClientsList"));
-					ShowList.DataSource = data;
+					ShowList.DataSource = searchData;
 					ShowList.DataBind();
-					ShowList.Visible = data.Tables[0].Rows.Count > 0;
+					ShowList.Visible = searchData.Tables[0].Rows.Count > 0;
 					break;
 			}
 		}
