@@ -46,7 +46,7 @@ where firmtype = 1
       and (updatetype = 1 or updatetype = 2 or updatetype is null)
 	
 group by cd.firmcode
-having day(now()) - day({ClientRegistrationLogEntity.LastUpdateDate}) > :dayWithoutUpdate or {ClientRegistrationLogEntity.LastUpdateDate} is null
+having DATEDIFF(now(), {ClientRegistrationLogEntity.LastUpdateDate}) > :dayWithoutUpdate or {ClientRegistrationLogEntity.LastUpdateDate} is null
 order by cd.RegistrationDate
 ")
 							.AddEntity(typeof(ClientRegistrationLogEntity))
