@@ -29,6 +29,7 @@ namespace AdminInterface.Controllers
 			var user = User.Find(ouar);
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
+			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 		}
 
 		public void DoPasswordChange(uint clientCode, 

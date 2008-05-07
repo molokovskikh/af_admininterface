@@ -4,7 +4,9 @@
 	<title>${?Title}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<script type="text/javascript" src="../JavaScript/prototype.js"></script>
+	<script type="text/javascript" src="../JavaScript/validation.js"></script>
 	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet"></link>
+	<link href="../Css/ValidationStyles.css" type="text/css" rel="stylesheet"></link>
 	<link href="../Css/Table.css" type="text/css" rel="stylesheet"></link>
 	<link href="../Css/Block.css" type="text/css" rel="stylesheet"></link>
 	<link href="../Css/Common.css" type="text/css" rel="stylesheet"></link>
