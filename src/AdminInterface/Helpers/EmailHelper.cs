@@ -12,12 +12,12 @@ namespace AdminInterface.Helpers
 
 			foreach (var email in to.Split(','))
 			{
-				var normilizedEmail = email.Trim();
+				var normilizedEmail = email.Trim('\r', '\n', '\t', ' ');
 				if (normilizedEmail.Length == 0)
 					continue;
 
 				if (!IsEmailExists(message, normilizedEmail))
-					message.To.Add(email);
+					message.To.Add(normilizedEmail);
 			}
 		}
 
