@@ -7,5 +7,6 @@
 </h3>
 
 <form action="registered.rails" method="post">
+	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
 	<% OutputSubView("Common/PayerEdit") %>
 </form>

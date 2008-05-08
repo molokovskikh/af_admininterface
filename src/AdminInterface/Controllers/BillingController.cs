@@ -21,10 +21,11 @@ namespace AdminInterface.Controllers
 	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
 	public class BillingController : ARSmartDispatcherController
 	{
-		public void Register(uint id)
+		public void Register(uint id, bool showRegistrationCard)
 		{
 			var instance = Payer.Find(id);
 			PropertyBag["Instance"] = instance;
+			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer, bool showRegistrationCard)
