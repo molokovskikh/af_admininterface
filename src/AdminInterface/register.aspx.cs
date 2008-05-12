@@ -531,7 +531,7 @@ where length(c.contactText) > 0
 			if (!SendRegistrationCard.Checked)
 				return;
 
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый")
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый")
 				return;
 
 			string mailTo;
@@ -543,15 +543,15 @@ where length(c.contactText) > 0
 
 
 			ReportHelper.SendClientCard(Convert.ToUInt32(Session["Code"]),
-			                                  Convert.ToUInt32(Session["DogN"]),
-			                                  ShortNameTB.Text,
-			                                  FullNameTB.Text,
-			                                  TypeDD.SelectedItem.Text,
-			                                  LoginTB.Text,
-			                                  PassTB.Text,
-			                                  mailTo,
-			                                  AdditionEmailToSendRegistrationCard.Text, 
-											  true);
+			                            Convert.ToUInt32(Session["DogN"]),
+			                            ShortNameTB.Text,
+			                            FullNameTB.Text,
+			                            TypeDD.SelectedItem.Text,
+			                            LoginTB.Text,
+			                            PassTB.Text,
+			                            mailTo,
+			                            AdditionEmailToSendRegistrationCard.Text,
+			                            true);
 		}
 
 		protected void PayerPresentCB_CheckedChanged(object sender, EventArgs e)
