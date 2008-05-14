@@ -12,8 +12,7 @@
 				<asp:TextBox ID="Login" Text='<%# _current.Login %>' runat="server"></asp:TextBox>
 				<asp:RequiredFieldValidator ID="LoginRequired" runat="server" ControlToValidate="Login"
 					ErrorMessage="*"></asp:RequiredFieldValidator>
-				<asp:CustomValidator ID="LoginValidator" runat="server" ControlToValidate="Login"
-					ErrorMessage="Клиент для данного имени пользователя не зарегестрирован" OnServerValidate="LoginValidator_ServerValidate"></asp:CustomValidator></div>
+			</div>
 			<div>
 				<label class="LabelForInput" for="FIO">
 					ФИО:</label>
