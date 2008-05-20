@@ -118,8 +118,33 @@ namespace AdminInterface.Helpers
 #if !DEBUG
 			var entry = GetDirectoryEntry(login);
 			entry.DeleteTree();
-			entry.CommitChanges();
+			entry.CaommitChanges();
 #endif
+		}
+
+		public static DateTime? GetLastLogOnDate(string login)
+		{
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			{
+				var result = searcher.FindOne();
+				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
+					return null;
+				return DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
+			}
+		}
+
+		public static void Disable(string login)
+		{
+			var entity = GetDirectoryEntry(login);
+			entity.InvokeSet("AccountDisabled", true);
+			entity.CommitChanges();
+		}
+
+		public static void Enable(string login)
+		{
+			var entiry = GetDirectoryEntry(login);
+			entiry.InvokeSet("AccountDisabled", false);
+			entiry.CommitChanges();
 		}
 	}
 }

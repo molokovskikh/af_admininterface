@@ -1,14 +1,7 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Collections;
 using System.DirectoryServices;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
 using AddUser;
 using AdminInterface.Helpers;
 using DAL;
@@ -85,21 +78,27 @@ public partial class EditAdministrator : Page
 	private void CreateUserInAD(Administrator administrator)
 	{
 		var password = Func.GeneratePassword();
+		var isLoginExists = ADHelper.IsLoginExists(administrator.Login);
+		if (!isLoginExists)
+		{
 #if !DEBUG
-		var root = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-		var userGroup = new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
-		var user = root.Children.Add("CN=" + administrator.Login, "user");
-		user.Properties["samAccountName"].Value = administrator.Login;
-		user.Properties["sn"].Value = administrator.FIO;
-		user.Properties["logonHours"].Value = ADHelper.LogonHours();
-		user.CommitChanges();
-		user.Invoke("SetPassword", password);
-		user.CommitChanges();
-		userGroup.Invoke("Add", user.Path);
-		userGroup.CommitChanges();
-		root.CommitChanges();
+			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var user = root.Children.Add("CN=" + administrator.Login, "user");
+			user.Properties["samAccountName"].Value = administrator.Login;
+			if (!String.IsNullOrEmpty(administrator.FIO.Trim()))
+				user.Properties["sn"].Value = administrator.FIO;
+			user.Properties["logonHours"].Value = ADHelper.LogonHours();
+			user.CommitChanges();
+			user.Invoke("SetPassword", password);
+			user.CommitChanges();
+			userGroup.Invoke("Add", user.Path);
+			userGroup.CommitChanges();
+			root.CommitChanges();
 #endif
+		}
 
+		Session["IsLoginCreate"] = !isLoginExists;
 		Session["Password"] = password;
 		Session["FIO"] = administrator.FIO;
 		Session["Login"] = administrator.Login;
@@ -108,20 +107,5 @@ public partial class EditAdministrator : Page
 	protected void Cancel_Click(object sender, EventArgs e)
 	{
 		Response.Redirect("ViewAdministrators.aspx");
-	}
-
-	protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
-	{
-		using (DirectorySearcher searcher = new DirectorySearcher(String.Format("(&(objectClass=user)(name={0}))", args.Value)))
-		{
-			SearchResult searchResult = searcher.FindOne();
-			if (searchResult == null)
-			{
-				args.IsValid = false;
-				return;
-			}
-		}
-		args.IsValid = true;
-		return;
 	}
 }
