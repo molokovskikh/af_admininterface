@@ -79,24 +79,18 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\BaseModelIntegrationTest.cs" />
-    <Compile Include="Common\BaseViewTest.cs" />
-    <Compile Include="ControllerTest\BillingControllerTest.cs" />
+    <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
+    <Compile Include="Helpers\EmailHelperFixture.cs" />
     <Compile Include="Helpers\ViewHelperFixture.cs" />
     <Compile Include="InternetLogEntityFixture.cs" />
-    <Compile Include="ModelIntegrationTests\BillingSearchItemTest.cs" />
-    <Compile Include="ModelIntegrationTests\ClientTest.cs" />
-    <Compile Include="ModelIntegrationTests\DbLogHelperTest.cs" />
-    <Compile Include="ModelIntegrationTests\RegionTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyComparerTest.cs" />
-    <Compile Include="ViewsTests\BillingTests\SearchTest.cs" />
-    <Compile Include="ViewsTests\BillingTests\WatinTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
