@@ -1,5 +1,7 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.searchc" CodePage="1251"
 	CodeBehind="searchc.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
+<%@ Import Namespace="AdminInterface.Models"%>
+<%@ Import Namespace="AdminInterface.Helpers"%>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 <script type="text/javascript">
@@ -83,13 +85,19 @@
 				<Columns>
 					<asp:TemplateField HeaderText="Биллинг код" SortExpression="billingcode">
 						<ItemTemplate>
-							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("BillingCode") %>' NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}",Eval("bfc")) %>'></asp:HyperLink>
+							<asp:HyperLink ID="HyperLink1" 
+											runat="server" 
+											Enabled='<%# SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision) %>' 
+											Text='<%# Bind("BillingCode") %>' 
+											NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}", Eval("bfc")) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode"></asp:BoundField>
 					<asp:TemplateField HeaderText="Наименование" SortExpression="ShortName">
 						<ItemTemplate>
-							<asp:HyperLink ID="HyperLink1" runat="server" Text='<%# Bind("ShortName") %>' NavigateUrl='<%# String.Format("Client/info.rails?cc={0}&ouar={1}",Eval("bfc"), Eval("ouarid")) %>'></asp:HyperLink>
+							<asp:HyperLink ID="HyperLink1" runat="server" 
+								Text='<%# Bind("ShortName") %>' 
+								NavigateUrl='<%# String.Format("Client/info.rails?cc={0}", Eval("bfc")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>

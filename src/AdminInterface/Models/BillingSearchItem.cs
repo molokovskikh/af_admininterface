@@ -2,47 +2,27 @@ using System;
 using System.Collections.Generic;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
-using NHibernate;
+using Common.Web.Ui.Models;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
 	[ActiveRecord]
 	public class BillingSearchItem : ActiveRecordBase
 	{
-		private uint		_billingCode;
-		private string		_shortName;
-		private double		_paySum;
 		private DateTime	_payDate;
-		private DateTime	_lastClientRegistrationDate;
-		private uint		_lastRegistredClientId;
-		private uint		_disabledClientCount;
-		private uint		_enableClientCount;
-		private string		_regions;
 		private bool		_hasRetailSegment;
 		private bool		_hasWholesaleSegment;
 
 		[PrimaryKey]
-		public uint BillingCode
-		{
-			get { return _billingCode; }
-			set { _billingCode = value; }
-		}
+		public uint BillingCode { get; set; }
 
 		[Property]
-		public string ShortName
-		{
-			get { return _shortName; }
-			set { _shortName = value; }
-		}
+		public string ShortName { get; set; }
 
 		[Property]
-		public double PaySum
-		{
-			get { return _paySum; }
-			set { _paySum = value; }
-		}
+		public double PaySum { get; set; }
 
 		[Property]
 		public DateTime PayDate
@@ -52,39 +32,19 @@ namespace AdminInterface.Models
 		}
 
 		[Property]
-		public DateTime LastClientRegistrationDate
-		{
-			get { return _lastClientRegistrationDate; }
-			set { _lastClientRegistrationDate = value; }
-		}
+		public DateTime LastClientRegistrationDate { get; set; }
 
 		[Property]
-		public uint LastRegistredClientId
-		{
-			get { return _lastRegistredClientId; }
-			set { _lastRegistredClientId = value; }
-		}
+		public uint LastRegistredClientId { get; set; }
 
 		[Property]
-		public uint DisabledClientsCount
-		{
-			get { return _disabledClientCount; }
-			set { _disabledClientCount = value; }
-		}
+		public uint DisabledClientsCount { get; set; }
 
 		[Property]
-		public uint EnabledClientsCount
-		{
-			get { return _enableClientCount; }
-			set { _enableClientCount = value; }
-		}
+		public uint EnabledClientsCount { get; set; }
 
 		[Property]
-		public string Regions
-		{
-			get { return _regions; }
-			set { _regions = value; }
-		}
+		public string Regions { get; set; }
 
 		[Property]
 		public bool HasWholesaleSegment
@@ -123,8 +83,8 @@ namespace AdminInterface.Models
 
 		public static IList<BillingSearchItem> FindBy(BillingSearchProperties properties)
 		{
-			ISessionFactoryHolder sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			ISession session = sessionHolder.CreateSession(typeof(BillingSearchItem));
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
 			try
 			{
 				var debitorFilterBlock = "";
@@ -189,7 +149,7 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 
 				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
 
-				IList<BillingSearchItem> result = session.CreateSQLQuery(String.Format(@"
+				var result = session.CreateSQLQuery(String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
         p.shortname as {{BillingSearchItem.ShortName}},
@@ -232,6 +192,156 @@ order by {{BillingSearchItem.ShortName}}
 				return criteria;
 
 			return filter + " and " + criteria;
+		}
+
+		public static IList<BillingSearchItem> FindBy2(BillingSearchProperties properties)
+		{
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
+			try
+			{
+				AbstractCriterion groupFilter = Expression.Ge(Projections2.BitOr("cd.MaskRegion", 0), 0);
+
+				switch (properties.Segment)
+				{
+					case SearchSegment.Retail:
+						groupFilter = groupFilter & Expression.Eq("cd.Segment", Segment.Retail);
+						break;
+					case SearchSegment.Wholesale:
+						groupFilter = groupFilter & Expression.Eq("cd.Segment", Segment.Wholesale);
+						break;
+				}
+
+				switch (properties.ClientType)
+				{
+					case SearchClientType.Drugstore:
+						groupFilter = groupFilter & Expression.Eq("cd.Segment", ClientType.Drugstore);
+						break;
+					case SearchClientType.Supplier:
+						groupFilter = groupFilter & Expression.Eq("cd.Segment", ClientType.Supplier);
+						break;
+				}
+
+				switch (properties.ClientStatus)
+				{
+					case SearchClientStatus.Enabled:
+						groupFilter = groupFilter
+						              & Expression.Eq("cd.Status", ClientStatus.On)
+						              & Expression.Eq("cd.BillingStatus", ClientStatus.On);
+						break;
+					case SearchClientStatus.Disabled:
+						groupFilter = groupFilter
+						              & (Expression.Eq("cd.Status", ClientStatus.Off)
+						                 | Expression.Eq("cd.BillingStatus", ClientStatus.Off));
+						break;
+				}
+
+				var criteria = session.CreateCriteria(typeof (Payer), "p")
+					.CreateAlias("Clients", "cd")
+					.SetProjection(
+					Projections.ProjectionList()
+						.Add(Projections.Property("p.PayerID"))
+						.Add(Projections.Property("p.JuridicalName"))
+						.Add(Projections.Property("p.ShortName"))
+						.Add(Projections.Property("p.OldPayDate"))
+						.Add(Projections.Property("p.OldTariff"))
+						.Add(Projections.Max("cd.RegistrationDate"))
+						.Add(Projections.Max("cd.Id"))
+//						.Add(Projections.)
+						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Status",
+						                                                            ClientStatus.Off),
+						                                              Projections.Constant(1),
+						                                              Projections.Constant(0))))
+						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Status",
+						                                                            ClientStatus.On),
+						                                              Projections.Constant(1),
+						                                              Projections.Constant(0))))
+						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Segment",
+						                                                            Segment.Wholesale),
+						                                              Projections.Constant(1),
+						                                              Projections.Constant(0))))
+						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Segment",
+						                                                            Segment.Retail),
+						                                              Projections.Constant(1),
+						                                              Projections.Constant(0))))
+						.Add(Projections.GroupProperty("p.PayerID"))
+					)
+					.AddOrder(Order.Asc("p.ShortName"));
+
+
+				switch (properties.SearchBy)
+				{
+					case SearchBy.Name:
+						criteria.Add(Restrictions.Like(Projections.GroupProperty("p.ShortName"),
+						                               properties.SearchText)
+						             | Restrictions.Like(Projections.GroupProperty("p.JuridicalName"),
+						                                  properties.SearchText)
+						             | Restrictions.Ge(Projections2.Sum(Projections.Conditional(
+																			Expression.Like("cd.FullName", properties.SearchText)
+						                                                 	| Expression.Like("cd.ShortName", properties.SearchText),
+						                                                 	Projections.Constant(1),
+						                                                 	Projections.Constant(0))),
+						                                0));
+						break;
+					case SearchBy.Code:
+						criteria.Add(
+							Restrictions.Ge(Projections2.Sum(Projections.Conditional(
+							                                 	Expression.Eq("cd.id", properties.SearchText),
+							                                 	Projections.Constant(1),
+							                                 	Projections.Constant(0))), 0));
+						break;
+					case SearchBy.BillingCode:
+						criteria.Add(Restrictions.Eq(Projections.GroupProperty("p.PayerID"), Convert.ToUInt32(properties.SearchText)));
+						break;
+				}
+
+
+				switch (properties.PayerState)
+				{
+					case PayerStateFilter.Debitors:
+						criteria.Add(Expression.Le("p.OldPayDate", DateTime.Now));
+						break;
+					case PayerStateFilter.NotDebitors:
+						criteria.Add(Expression.Gt("p.OldPayDate", DateTime.Now));
+						break;
+				}
+
+				criteria.Add(Expression.Ge(Projections2.Sum(Projections.Conditional(groupFilter,
+				                                                                    Projections.Constant(1),
+				                                                                    Projections.Constant(0))),
+				                           0));
+
+				var s = criteria.List();
+
+//                var result = session.CreateQuery(String.Format(@"
+//select p.PayerID,
+//		p.JuridicalName,
+//        p.ShortName,
+//        p.OldPayDate,
+//        p.OldTariff,
+//		max(cd.RegistrationDate),
+//        max(cd.Id),
+//        sum(if(cd.Status = 0, 1, 0)),
+//        sum(if(cd.Status = 1, 1, 0)),
+//
+//		(select count(r.*) from Region r),
+//
+//		sum(if(cd.Segment = 1, 1, 0)),
+//		sum(if(cd.Segment = 0, 1, 0))
+//from Payer p
+//	join p.Clients cd
+//{0}
+//group by p.PayerID
+//", debitorFilterBlock, searchBlock, groupFilter))
+////					.SetParameter("RegionId", properties.RegionId)
+//                    .List();
+				ArHelper.Evict(session, s);
+				return null;
+			}
+			finally
+			{
+				sessionHolder.ReleaseSession(session);
+			}
 		}
 	}
 }

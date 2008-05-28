@@ -44,7 +44,9 @@
 							Font-Size="small" runat="server" NavigateUrl="ViewAdministrators.aspx">Региональные администраторы</asp:HyperLink>
 					</p>
 					<p>
-						<asp:HyperLink ID="HyperLink1" Font-Names="Verdana, Arial, Helvetica, sans-serif" Font-Size="small" runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</asp:HyperLink>
+						<asp:HyperLink ID="MonitorUpdates" 
+							Font-Names="Verdana,Arial,Helvetica,sans-serif" Font-Size="Small" 
+							runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</asp:HyperLink>
 					</p>
 				</td>
 				<td align="center" style="height: 427px">

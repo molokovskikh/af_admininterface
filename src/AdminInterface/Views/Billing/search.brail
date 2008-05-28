@@ -1,4 +1,4 @@
-﻿<% component CaptureFor, {"Id" : "Title"}:%>
+﻿<% component CaptureFor, {"id" : "Title"}:%>
 	Поиск плательщиков
 <% end %>
 

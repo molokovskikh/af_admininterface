@@ -3,6 +3,8 @@ using System.Data;
 using System.Drawing;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -31,33 +33,29 @@ namespace AddUser
 		private void ShowStatistic()
 		{
 			var _connection = new MySqlConnection(Literals.GetConnectionString());
-			var adapter = new MySqlDataAdapter(
-@"
-SELECT  WriteTime, 
-        clientsinfo.UserName, 
-        ShortName, 
-        Region, 
-        Message, 
-        FirmCode, 
-        clientsinfo.rowid  
-FROM    logs.clientsinfo, 
-        usersettings.clientsdata, 
-        accessright.regionaladmins, 
-        farm.regions  
-WHERE   clientsinfo.clientcode = firmcode 
-        AND regionaladmins.RegionMask & clientsdata.RegionCode > 0 
-        AND writetime BETWEEN ?FromDate AND ?ToDate  
-        AND regions.regioncode = clientsdata.RegionCode 
-        AND regionaladmins.username = ?userName 
-		and (ShortName like ?SearchText 
-			or Message like ?SearchText 
-			or clientsinfo.UserName like ?SearchText)
+			var adapter = new MySqlDataAdapter(String.Format(@"
+SELECT  ci.WriteTime, 
+        ci.UserName, 
+        cd.ShortName, 
+        r.Region, 
+        ci.Message, 
+        cd.FirmCode, 
+        ci.rowid  
+FROM    logs.clientsinfo ci
+	JOIN usersettings.clientsdata cd ON ci.clientcode = firmcode 
+        JOIN farm.regions r ON r.regioncode = cd.RegionCode 
+WHERE   ci.WriteTime BETWEEN ?FromDate AND ?ToDate  
+		and (cd.ShortName like ?SearchText 
+			or ci.Message like ?SearchText 
+			or ci.UserName like ?SearchText)
+		and cd.RegionCode & ?AdminMaskRegion > 0
+		{0}
 ORDER BY WriteTime DESC
-", _connection);
-			adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+", SecurityContext.Administrator.ClientTypeFilter("cd")), _connection);
 			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
 			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));			
+			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));
+			adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 			
 			var data = new DataSet();
 			try
@@ -90,17 +88,18 @@ ORDER BY WriteTime DESC
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
-			
-			if (!IsPostBack)
-			{
-				CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-14));		
-				CalendarTo.SelectedDates.Add(DateTime.Now);
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore);
 
-				ShowStatistic();
-			}
+			if (IsPostBack) 
+				return;
+
+			CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-14));		
+			CalendarTo.SelectedDates.Add(DateTime.Now);
+
+			ShowStatistic();
 		}
+
 		protected void StatisticGrid_Sorting(object sender, GridViewSortEventArgs e)
 		{
 			var grid = (GridView) sender;
@@ -117,17 +116,17 @@ ORDER BY WriteTime DESC
 		
 		protected void StatisticGrid_RowCreated(object sender, GridViewRowEventArgs e)
 		{
-			if ((e.Row.RowType == DataControlRowType.Header) && (_sortExpression != String.Empty))
+			if ((e.Row.RowType != DataControlRowType.Header) || (_sortExpression == String.Empty)) 
+				return;
+
+			var grid = sender as GridView;
+			foreach (DataControlField field in grid.Columns)
 			{
-				var grid = sender as GridView;
-				foreach (DataControlField field in grid.Columns)
+				if (field.SortExpression == _sortExpression)
 				{
-					if (field.SortExpression == _sortExpression)
-					{
-						var sortIcon = new Image();
-						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
-						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
-					}
+					var sortIcon = new Image();
+					sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
+					e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
 				}
 			}
 		}

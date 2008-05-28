@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Web.UI;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using DAL;
 using MySql.Data.MySqlClient;
 
@@ -13,9 +14,11 @@ namespace AddUser
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
+			SecurityContext.CheckIsUserAuthorized();
+
 			_connection.ConnectionString = Literals.GetConnectionString();
-			var expirationDate = ADHelper.GetPasswordExpirationDate(Session["UserName"].ToString());
-			if (expirationDate >= DateTime.Now || Convert.ToString(Session["UserName"]) == "michail")
+			var expirationDate = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
+			if (expirationDate >= DateTime.Now || SecurityContext.Administrator.UserName == "michail")
 			{
 				PassLB.Text = String.Format(
 					"Срок действия Вашего пароля истекает {0} в {1}.<br>Пожалуйста не забывайте изменять пароль.",
@@ -41,7 +44,7 @@ FROM AccessRight.RegionalAdmins ra
 WHERE UserName = ?UserName ORDER BY Region) tmp;
 ;
 ", _connection);
-					adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 					adapter.Fill(data);
 					RegionList.DataTextField = "Region";
 					RegionList.DataValueField = "RegionCode";
@@ -94,7 +97,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 			    adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 				adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserNameParam", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserNameParam", SecurityContext.Administrator.UserName);
 				var data = new DataSet();
 				adapter.Fill(data);
 				//Заказы
@@ -128,7 +131,6 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 
 				DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DataSize"]));
 				DownloadDocumentSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DocSize"]));
-#if !DEBUG
 				//прайсы
 				//Не формализовано
 				FormErrLB.Text = data.Tables[0].Rows[0]["NoForm"].ToString();
@@ -146,67 +148,47 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				PriceDERRLB.Text = data.Tables[0].Rows[0]["NoPriceCount"].ToString();
 				//Формализовано прайсов
 				PriceFOKLB.Text = data.Tables[0].Rows[0]["FormCount"].ToString();
-#endif
 
-                var command = new MySqlCommand {Connection = _connection, Transaction = transaction};
-
-                command.Parameters.AddWithValue("?RegionMask", regionMask);
-				command.Parameters.AddWithValue("?ToDate", toDate);
-                command.Parameters.AddWithValue("?FromDate", fromDate);
-                command.Parameters.AddWithValue("?UserName", Session["UserName"]);
-				command.CommandText =
-@"
-SELECT  AlowChangePassword,
-        AlowManage,
-        (alowCreateRetail   = 1 OR AlowCreateVendor = 1) as AlowRegister,
-        AlowClone,  
-        (ShowRetail   = 1 OR ShowVendor = 1) as ShowInfo
-FROM    accessright.regionaladmins  
-WHERE	UserName = ?userName
-";
-				var Reader = command.ExecuteReader();
-
-				Reader.Read();
-				RegisterHL.Visible = Convert.ToBoolean(Reader[2]);
-				Session["Register"] = Reader[2];
-				CloneHL.Visible = Convert.ToBoolean(Reader[3]);
-				Session["Clone"] = Reader[3];
-				Session["ChPass"] = Reader[0];
-				ClInfHL.Visible = Convert.ToBoolean(Reader[4]);
-				Session["ClInf"] = Reader[4];
-				ViewAdministrators.Visible = Session["Administrator"] != null ? ((Administrator)Session["Administrator"]).AllowManageAdminAccounts : false;
-				Reader.Close();
+				RegisterHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore);
+				CloneHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.CopySynonyms);
+				ClInfHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
+				                                                                     PermissionType.ViewDrugstore);
+				BillingHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision);
+				MonitorUpdates.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.MonitorUpdates);
+				ViewAdministrators.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageAdministrators);
+				ShowStatHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
+				                                                                        PermissionType.ViewDrugstore);
 
 				try
 				{
 					if (Convert.ToInt32(ADHL.Text.Substring(0, 1)) > 0)
 						ADHL.Enabled = true;
 				}
-				catch (Exception){}
+				catch (Exception) { }
 				try
 				{
 					if (Convert.ToInt32(CUHL.Text.Substring(0, 1)) > 0)
 						CUHL.Enabled = true;
 				}
-				catch (Exception){}
+				catch (Exception) { }
 				try
 				{
 					if (Convert.ToInt32(ErrUpHL.Text.Substring(0, 1)) > 0)
 						ErrUpHL.Enabled = true;
 				}
-				catch (Exception){}
+				catch (Exception) { }
 				try
 				{
 					if (Convert.ToInt32(ReqHL.Text) > 0)
 						ReqHL.Enabled = true;
 				}
-				catch (Exception){}
+				catch (Exception) { }
 				try
 				{
 					if (Convert.ToInt32(ConfHL.Text.Substring(0, 1)) > 0)
 						ConfHL.Enabled = true;
 				}
-				catch (Exception){}
+				catch (Exception) { }
 				transaction.Commit();
 			}
 			finally

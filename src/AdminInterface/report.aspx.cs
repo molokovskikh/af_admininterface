@@ -1,6 +1,7 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
 
 namespace AddUser
 {
@@ -11,9 +12,6 @@ namespace AddUser
 
 		protected void Page_Load(object sender, EventArgs e) 
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
-
 			var Code = Session["Code"].ToString();
 			var DogN = Session["DogN"].ToString();
 			var Name = Session["Name"].ToString();

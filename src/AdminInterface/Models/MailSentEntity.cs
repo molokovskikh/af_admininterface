@@ -1,6 +1,6 @@
 ﻿using System;
 using Castle.ActiveRecord;
-using NHibernate.Expression;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {

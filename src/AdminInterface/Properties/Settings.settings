@@ -3,7 +3,18 @@
   <Profiles />
   <Settings>
     <Setting Name="RegistrationCardEmailBody" Type="System.String" Scope="Application">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">
+          Добрый день.
+
+          Во вложении данного письма находится регистрационна карта участника информационной системы "АналитФАРМАЦИЯ".
+
+          С уважением, Аналитическая компания "Инфорум", г. Воронеж
+
+          Москва +7 495 6628727
+          С.-Петербург +7 812 3090521
+          Воронеж +7 4732 606000
+          Челябинск +7 351 7298143
+        </Value>
     </Setting>
   </Settings>
 </SettingsFile>

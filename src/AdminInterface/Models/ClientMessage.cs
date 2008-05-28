@@ -6,14 +6,14 @@ namespace AdminInterface.Models
 	[ActiveRecord(Table = "Usersettings.retclientsset")]
 	public class ClientMessage : ActiveRecordValidationBase<ClientMessage>
 	{
+		[PrimaryKey("ClientCode")]
+		public uint ClientCode { get; set; }
+
 		[Property]
 		public string Message { get; set; }
 
 		[Property]
 		public uint ShowMessageCount { get; set; }
-
-		[PrimaryKey]
-		public uint ClientCode { get; set; }
 
 		public bool IsContainsNotShowedMessage()
 		{

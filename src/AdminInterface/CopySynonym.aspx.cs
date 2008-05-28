@@ -7,6 +7,8 @@ using System.Text;
 using System.Web;
 using System.Web.Mail;
 using System.Web.UI;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -25,7 +27,6 @@ namespace AddUser
 		protected DataColumn DataColumn5;
 		protected DataColumn DataColumn6;
 		protected DataTable ToT;
-		string UserName;
 		protected DataColumn DataColumn7;
 
 		[DebuggerStepThrough()]
@@ -123,20 +124,14 @@ namespace AddUser
 @"
 SELECT  FirmCode as ClientCode, 
         convert(concat(FirmCode, '. ', ShortName) using cp1251) name 
-FROM    clientsdata, 
-        accessright.regionaladmins 
-WHERE   regioncode     = ?RegionCode 
-        AND firmtype   = 1 
+FROM    clientsdata
+WHERE   MaskRegion & ?MaskRegion > 0
+        AND firmtype = 1 
         AND firmstatus = 1 
         AND shortname like ?NameStr  
-        AND UserName         = ?UserName 
-        AND FirmSegment      = if(regionaladmins.AlowChangeSegment = 1, FirmSegment, DefaultSegment) 
-        AND if(UseRegistrant = 1, Registrant = ?UserName, 1 = 1)  
-        AND username         = ?UserName;
 ", _connection);
-			DA.SelectCommand.Parameters.Add("?NameStr", String.Format("%{0}%", NameStr));
-			DA.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-			DA.SelectCommand.Parameters.Add("?RegionCode", RegionDD.SelectedItem.Value);
+			DA.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", NameStr));
+			DA.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
 			try
 			{
 				_connection.Open();
@@ -152,9 +147,9 @@ WHERE   regioncode     = ?RegionCode
 
 		protected void SetBT_Click(object sender, EventArgs e)
 		{
-			int ClientCode = Convert.ToInt32(ToDD.SelectedItem.Value); 
-			int ParentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
-			MySqlCommand MyCommand = new MySqlCommand();
+			var ClientCode = Convert.ToInt32(ToDD.SelectedItem.Value); 
+			var ParentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
+			var MyCommand = new MySqlCommand();
 			MySqlTransaction MyTrans = null;
 			try
 			{
@@ -201,10 +196,10 @@ INTO    logs.clone
                 ?ClientCode
         );
 ";
-				MyCommand.Parameters.Add("?Host", HttpContext.Current.Request.UserHostAddress);
-				MyCommand.Parameters.Add("?UserName", Session["UserName"]);
-				MyCommand.Parameters.Add("?ClientCode", ClientCode);
-				MyCommand.Parameters.Add("?ParentClientCode", ParentClientCode);
+				MyCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
+				MyCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				MyCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+				MyCommand.Parameters.AddWithValue("?ParentClientCode", ParentClientCode);
 
 				_connection.Open();
 				MyTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
@@ -213,22 +208,24 @@ INTO    logs.clone
 				MyCommand.ExecuteNonQuery();
 				MyTrans.Commit();
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				if (MyTrans != null)
 					MyTrans.Rollback();
-				throw new Exception("Ошибка сохранения данных на форме CopySynonym.aspx", ex);
+				throw;
 			}
 			finally
 			{
 				_connection.Close();
 			}
-#if !DEBUG
-			Func.Mail("register@analit.net", String.Empty, "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
-					false,
-					"От: " + FromDD.SelectedItem.Text + "\nДля: " + ToDD.SelectedItem.Text + "\nОператор: " + UserName,
-					DS.Tables["Regions"].Rows[0]["email"].ToString(), String.Empty, "RegisterList@subscribe.analit.net");
-#endif
+			Func.Mail("register@analit.net",
+			          String.Empty,
+			          "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
+			          false,
+					  String.Format("От: {0} \nДля: {1} \nОператор: {2}", FromDD.SelectedItem.Text, ToDD.SelectedItem.Text, SecurityContext.Administrator.UserName),
+			          DS.Tables["Regions"].Rows[0]["email"].ToString(),
+			          String.Empty,
+			          "RegisterList@subscribe.analit.net");
 			LabelErr.ForeColor = Color.Green;
 			LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;
 			FromDD.Visible = false;
@@ -243,23 +240,16 @@ INTO    logs.clone
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
-
+			SecurityContext.Administrator.CheckPermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore);
+			
 			_connection.ConnectionString = Literals.GetConnectionString();
-			UserName = Session["UserName"].ToString();
-			DA.SelectCommand = new MySqlCommand(
-@"
-SELECT  regions.region, 
-        regions.regioncode, 
-        Email 
-FROM    accessright.regionaladmins, 
-        farm.regions 
-WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
-        AND username                                                    = ?UserName 
-ORDER BY region;
-", _connection);
-            DA.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
+			DA.SelectCommand = new MySqlCommand(@"
+SELECT  r.region, 
+        r.regioncode
+FROM farm.regions r
+WHERE r.RegionCode & ?MaskRegion > 0
+ORDER BY region;", _connection);
+            DA.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
 			try
 			{
 				_connection.Open();

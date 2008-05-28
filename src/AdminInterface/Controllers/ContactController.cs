@@ -8,7 +8,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("contact")]
-	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
+	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
 	public class ContactController : AbstractContactController
 	{
 		public void NewContactGroup(uint billingCode)
@@ -21,12 +21,13 @@ namespace AdminInterface.Controllers
 		                            [DataBind("ContactGroup")] ContactGroup contactGroup,
 		                            [DataBind("Contacts")] Contact[] contacts)
 		{
-			PopulateValidatorErrorSummary(contactGroup);
+
+			PopulateValidatorErrorSummary(contactGroup, Binder.GetValidationSummary(contactGroup));
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
 			    || ValidationHelper.IsCollectionHasNotValideObject(contacts))
 			{
 				contactGroup.Contacts = CleanUp(contacts);
-				PropertyBag["ValidationErrors"] = ValidationSummaryPerInstance;
+//				PropertyBag["ValidationErrors"] = ValidationSummaryPerInstance;
 				PropertyBag["billingCode"] = billingCode;
 				PropertyBag["contactGroup"] = contactGroup;
 				RenderView("NewContactGroup");

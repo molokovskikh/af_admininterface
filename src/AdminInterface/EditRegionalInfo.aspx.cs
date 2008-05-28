@@ -1,15 +1,9 @@
 using System;
 using System.Data;
-using System.Configuration;
-using System.Collections;
-using System.Web;
-using System.Web.Security;
 using System.Web.UI;
-using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using DAL;
-using MySql.Data.MySqlClient;
 
 public partial class EditRegionalInfo : Page
 {
@@ -27,9 +21,8 @@ public partial class EditRegionalInfo : Page
 	
     protected void Page_Load(object sender, EventArgs e)
     {
-		if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			Response.Redirect("default.aspx");
-    	
+		StateHelper.CheckSession(this, ViewState);
+		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageSuppliers, PermissionType.ViewSuppliers);
 		
 		if (!IsPostBack)
 		{
@@ -48,7 +41,7 @@ public partial class EditRegionalInfo : Page
 	{	
 		string commandText =
 @"
-SELECT Region, ShortName, ContactInfo, OperativeInfo, rd.FirmCode
+SELECT Region, rd.RegionCode, ShortName, ContactInfo, OperativeInfo, rd.FirmCode
 FROM usersettings.regionaldata rd
 	INNER JOIN usersettings.clientsdata cd ON cd.FirmCode = rd.FirmCode
 		INNER JOIN farm.regions r on r.RegionCode = rd.RegionCode
@@ -66,6 +59,9 @@ WHERE RowID = ?Id
 		_clientCode = Convert.ToInt32(command.Data.Tables[0].Rows[0]["FirmCode"]);
 		ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", command.Data.Tables[0].Rows[0]["ShortName"]);
 		RegionInfoLabel.Text = String.Format("В регионе: {0}", command.Data.Tables[0].Rows[0]["Region"]);
+
+		var regionCode = Convert.ToUInt64(command.Data.Tables[0].Rows[0]["RegionCode"]);
+		SecurityContext.Administrator.CheckClientHomeRegion(regionCode);
 	}
 	
 	protected void SaveButton_Click(object sender, EventArgs e)

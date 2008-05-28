@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Filters;
 using AdminInterface.Helpers;
-using AdminInterface.Model;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
@@ -18,30 +17,10 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
+	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
+	[RequiredPermission(PermissionType.BillingPermision)]
 	public class BillingController : ARSmartDispatcherController
 	{
-		public void Register(uint id, bool showRegistrationCard)
-		{
-			var instance = Payer.Find(id);
-			PropertyBag["Instance"] = instance;
-			PropertyBag["showRegistrationCard"] = showRegistrationCard;
-		}
-
-		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer, bool showRegistrationCard)
-		{
-			payer.UpdateAndFlush();
-			if (showRegistrationCard)
-				Redirect("../report.aspx");
-			else
-				RedirectToAction("SuccessRegistration");
-		}
-
-		public void SuccessRegistration()
-		{
-
-		}
-
 		public void Edit(uint clientCode, bool showClients)
 		{
 			var client = Client.Find(clientCode);
@@ -88,7 +67,7 @@ namespace AdminInterface.Controllers
 		{
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SavePersistentWithLogParams(Session["UserName"].ToString(),
+				DbLogHelper.SavePersistentWithLogParams(SecurityContext.Administrator.UserName,
 				                                        HttpContext.Current.Request.UserHostAddress,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
 				foreach (var client in clients)
@@ -199,6 +178,14 @@ namespace AdminInterface.Controllers
 		private static IList<Region> GetRegions()
 		{
 			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
+		}
+	}
+
+	public class RequiredPermissionAttribute : Attribute
+	{
+		public RequiredPermissionAttribute(PermissionType permissionType)
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

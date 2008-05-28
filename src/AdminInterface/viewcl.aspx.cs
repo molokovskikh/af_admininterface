@@ -2,6 +2,8 @@ using System;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -33,12 +35,7 @@ namespace AddUser
 
 		protected DataView StatisticsDataView
 		{
-			get
-			{
-				if (Session["StatisticsDataView"] == null)
-					throw new SessionOutDateException();
-				return (DataView)Session["StatisticsDataView"];
-			}
+			get { return (DataView)Session["StatisticsDataView"]; }
 			set { Session["StatisticsDataView"] = value; }
 		}
 
@@ -56,8 +53,8 @@ namespace AddUser
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToDouble(Session["AccessGrant"]) != 1)
-			    Response.Redirect("default.aspx");
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewDrugstore);
 
 			var headerText = String.Empty;
 
@@ -73,15 +70,14 @@ SELECT  RequestTime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
-        AND firmcode                          = p.clientcode 
-        AND r.regioncode                      = clientsdata.regioncode 
-		AND p.UpdateType					  = 5
-        AND regionaladmins.regionmask & maskregion > 0 
-		AND regionaladmins.username = ?UserName 
-		AND p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		AND r.regioncode & ?RegionMask > 0
+        and firmcode                          = p.clientcode 
+        and r.regioncode                      = clientsdata.regioncode 
+		and p.UpdateType					  = 5
+		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
+		and r.regioncode & ?RegionMask > 0
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
 GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
@@ -94,15 +90,14 @@ SELECT  RequestTime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
-        AND firmcode                          = p.clientcode 
-        AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType						  = 2
-        AND regionaladmins.regionmask & maskregion > 0 
-		AND regionaladmins.username = ?UserName 
-		AND p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		AND r.regioncode & ?RegionMask > 0
+        and firmcode                          = p.clientcode 
+        and r.regioncode                      = clientsdata.regioncode 
+		and UpdateType						  = 2
+		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
+		and r.regioncode & ?RegionMask > 0
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
 GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
@@ -115,15 +110,14 @@ SELECT  RequestTime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
-        AND firmcode                          = p.clientcode 
-        AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType						  = 6
-        AND regionaladmins.regionmask & maskregion > 0 
-		AND regionaladmins.username = ?UserName 
-		AND p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		AND r.regioncode & ?RegionMask > 0
+        and firmcode                          = p.clientcode 
+        and r.regioncode                      = clientsdata.regioncode 
+		and UpdateType						  = 6
+		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
+		and r.regioncode & ?RegionMask > 0
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
 GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
@@ -136,15 +130,14 @@ SELECT  RequestTime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
-        AND firmcode                          = p.clientcode 
-        AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType						  = 1
-        AND regionaladmins.regionmask & maskregion > 0 
-		AND regionaladmins.username = ?UserName 
-		AND p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		AND r.regioncode & ?RegionMask > 0
+        and firmcode                          = p.clientcode 
+        and r.regioncode                      = clientsdata.regioncode 
+		and UpdateType						  = 1
+		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
+		and r.regioncode & ?RegionMask > 0
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
 GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
@@ -157,23 +150,23 @@ SELECT  regionaladmins.RowID,
         clientsdata.ShortName,   
         r.Region,   
         p.Addition  
-FROM (usersettings.clientsdata, accessright.regionaladmins, farm.regions r)
+FROM (usersettings.clientsdata, farm.regions r)
 	JOIN usersettings.ret_update_info rui ON rui.ClientCode = clientsdata.firmcode
-LEFT JOIN logs.AnalitFUpdates p
-        ON p.clientcode                                   = rui.clientcode 
-        AND p.RequestTime                                 > curdate()  
+LEFT JOIN logs.AnalitFUpdates p ON p.clientcode = rui.clientcode AND p.RequestTime > curdate()  
 WHERE   r.regioncode                                  = clientsdata.regioncode  
-        AND regionaladmins.username                       = ?UserName
-        AND regionaladmins.regionmask & clientsdata.maskregion > 0  
-        AND rui.UncommittedUpdateTime                    >= CURDATE()  
-        AND rui.UpdateTime                               <> rui.UncommittedUpdateTime  
-        AND p.UpdateId                                   = 
-        (SELECT max(pl.UpdateId) 
-        FROM    logs.AnalitFUpdates pl 
-        WHERE   pl.clientcode = rui.clientcode)  
+        and rui.UncommittedUpdateTime                    >= CURDATE()  
+        and rui.UpdateTime                               <> rui.UncommittedUpdateTime  
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
+        AND p.UpdateId = 
+			(
+				SELECT max(pl.UpdateId) 
+				FROM logs.AnalitFUpdates pl 
+				WHERE pl.clientcode = rui.clientcode
+			)
 ORDER BY p.RequestTime desc;
 ";
 					headerText = "В процессе получения обновления:";
+					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 					break;
 				case StatisticsType.Download:
 					adapter.SelectCommand.CommandText = @"
@@ -182,14 +175,13 @@ SELECT  RequestTime,
         ShortName, 
         Region, 
         Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, accessright.regionaladmins, farm.regions r, usersettings.retclientsset rcs)
+FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   p.RequestTime > curDate()
-		AND rcs.clientcode					  = p.clientcode 
-        AND firmcode                          = p.clientcode 
-        AND r.regioncode                      = clientsdata.regioncode 
-		AND UpdateType						  = 3
-        AND regionaladmins.regionmask & maskregion > 0 
-		AND regionaladmins.username = ?UserName 
+		and rcs.clientcode					  = p.clientcode 
+        and firmcode                          = p.clientcode 
+        and r.regioncode                      = clientsdata.regioncode 
+		and UpdateType						  = 3
+		and clientsdata.RegionCode & ?AdminMaskRegion > 0
 GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
@@ -197,10 +189,11 @@ ORDER by p.RequestTime desc;
 					break;
 			}
 			HeaderLB.Text = headerText;
-			adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+			adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			adapter.SelectCommand.Parameters.AddWithValue("?BeginDate", BeginDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?EndDate", EndDate);
-			adapter.SelectCommand.Parameters.AddWithValue("?RegionMask", RegionMask);
+			adapter.SelectCommand.Parameters.AddWithValue("?RegionMask", RegionMask & SecurityContext.Administrator.RegionMask);
+			adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 
 			var data = new DataSet();
 

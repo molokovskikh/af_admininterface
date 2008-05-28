@@ -4,8 +4,8 @@ using System.ComponentModel;
 using AdminInterface.Models.Logs;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using NHibernate.Expression;
 using Castle.ActiveRecord;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Model
 {

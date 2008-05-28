@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 
 namespace AdminInterface
 {
@@ -8,6 +10,8 @@ namespace AdminInterface
 	{
 		protected void Page_Load(object sender, EventArgs e)
 		{
+			SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
+
 			if (!Convert.ToBoolean(Session["IsLoginCreate"]))
 			{
 				var label = new Label

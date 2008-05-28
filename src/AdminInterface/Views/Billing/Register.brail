@@ -1,4 +1,4 @@
-﻿<% component CaptureFor, {"Id" : "Title"}:%>
+﻿<% component CaptureFor, {"id" : "Title"}:%>
 	Реистрация клиента, шаг 2: Заполнения информации о плательщике
 <% end %>
 

@@ -2,13 +2,13 @@ using System;
 using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Web;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Views.Client
@@ -29,27 +29,23 @@ namespace AdminInterface.Views.Client
 
 		private readonly MySqlCommand _command = new MySqlCommand();
 		private readonly MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
-		private Controller _controller;
-
-		public Controller Controller
-		{
-			get { return _controller; }
-		}
+		protected Controller Controller;
+		protected IControllerContext ControllerContext;
 
 		private void GetMessages()
 		{
 			try
 			{
-				MySqlDataAdapter logsDataAddapter = new MySqlDataAdapter(@"
-        SELECT  WriteTime as Date, 
-                UserName, 
-                Message 
-        FROM    logs.clientsinfo 
-        WHERE   clientcode=?ClientCode
-		ORDER BY date DESC;
+				var logsDataAddapter = new MySqlDataAdapter(@"
+SELECT  WriteTime as Date, 
+		UserName, 
+        Message 
+FROM  logs.clientsinfo 
+WHERE clientcode=?ClientCode
+ORDER BY date DESC;
 ", _connection);
-				logsDataAddapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-				logsDataAddapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
+				logsDataAddapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				logsDataAddapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
 				if (Data.Tables["Logs"] != null)
 					Data.Tables["Logs"].Clear();
@@ -74,8 +70,7 @@ namespace AdminInterface.Views.Client
 				_connection.Open();
 				_command.Connection = _connection;
 				_command.Transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				_command.CommandText =
-					@"
+				_command.CommandText = @"
 SET @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
@@ -89,10 +84,10 @@ INTO    logs.clientsinfo VALUES
                 ?Problem
         );
 ";
-				_command.Parameters.Add("?Problem", ProblemTB.Text);
-				_command.Parameters.Add("?UserName", Session["UserName"]);
-				_command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				_command.Parameters.Add("?ClientCode", ClientCode);
+				_command.Parameters.AddWithValue("?Problem", ProblemTB.Text);
+				_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				_command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				_command.Parameters.AddWithValue("?ClientCode", ClientCode);
 
 				_command.ExecuteNonQuery();
 				_command.Transaction.Commit();
@@ -112,20 +107,23 @@ INTO    logs.clientsinfo VALUES
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (!IsPostBack)
-			{
-				ClientCode = Convert.ToUInt32(Request["cc"]);
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewSuppliers,
+			                                                    PermissionType.ViewDrugstore);
 
-				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + ClientCode;
-				OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + ClientCode;
-				UpdateListHL.NavigateUrl = "~/Logs/UpdateLog.rails?clientCode=" + ClientCode;
-				DocumentLog.NavigateUrl = "~/Logs/DocumentLog.rails?clientCode=" + ClientCode;
-				UserInterfaceHL.NavigateUrl = "https://stat.analit.net/ci/auth/logon.aspx?sid=" + ClientCode;
+			if (IsPostBack) 
+				return;
+
+			ClientCode = Convert.ToUInt32(Request["cc"]);
+
+			OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + ClientCode;
+			UpdateListHL.NavigateUrl = "~/Logs/UpdateLog.rails?clientCode=" + ClientCode;
+			DocumentLog.NavigateUrl = "~/Logs/DocumentLog.rails?clientCode=" + ClientCode;
+			UserInterfaceHL.NavigateUrl = "https://stat.analit.net/ci/auth/logon.aspx?sid=" + ClientCode;
 				
-				GetData();
-				ConnectDataSource();
-				DataBind();
-			}
+			GetData();
+			ConnectDataSource();
+			DataBind();
 		}
 
 		private void ConnectDataSource()
@@ -137,15 +135,26 @@ INTO    logs.clientsinfo VALUES
 			ShortNameLB.Text = Data.Tables["Info"].Rows[0]["ShortName"].ToString();
 			AddressText.Text = Data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = Data.Tables["Info"].Rows[0]["Fax"].ToString();
-	
-			UserInterfaceHL.Enabled = Convert.ToBoolean(Data.Tables["Info"].Rows[0]["AlowInterface"]);
-			UpdateListHL.Enabled = Convert.ToBoolean(Data.Tables["Info"].Rows[0]["FirmType"]);
-			if (Convert.ToInt32(Data.Tables["Info"].Rows[0]["FirmType"]) == 1)
-				ConfigHL.NavigateUrl = "~/manageret";
+
+			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
+			if (clientType == ClientType.Supplier)
+				UpdateListHL.Enabled = false;
+
+			if (clientType == ClientType.Drugstore)
+			{
+				ConfigHL.NavigateUrl = "~/manageret.aspx?cc=" + ClientCode;
+				ConfigHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageDrugstore);
+				UserInterfaceHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.DrugstoreInterface);
+			}
 			else
-				ConfigHL.NavigateUrl = "~/managep";
-			ConfigHL.NavigateUrl += ".aspx?cc=" + ClientCode;
+			{
+				ConfigHL.NavigateUrl = "~/managep.aspx?cc=" + ClientCode;
+				ConfigHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageSuppliers);
+				UserInterfaceHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.SupplierInterface);
+			}
+
 			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", ClientCode);
+			BillingLink.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision);
 		}
 
 		private void GetData()
@@ -154,55 +163,27 @@ INTO    logs.clientsinfo VALUES
 
 			GetMessages();
 
-			MySqlDataAdapter infoDataAdapter = new MySqlDataAdapter(
-				@"
+			var infoDataAdapter = new MySqlDataAdapter(@"
 SELECT  cd.FullName,   
         cd.ShortName,   
         cd.Adress,   
         cd.Fax,   
-        (if(regionaladmins.UseRegistrant                =1, Registrant=?UserName, 1=1))   
-        AND (regionaladmins.regionmask & cd.regioncode  >0)   
-        AND (if(AlowRetailInterface+AlowVendorInterface =2, 1=1, if(Alowretailinterface=1, firmtype=Alowretailinterface, if(AlowVendorInterface=1, firmtype=0, 0)))) as AlowInterface,   
+		cd.RegionCode,
         FirmType,   
         ouar.OsUserName,
 		length(rui.UniqueCopyID) = 0 as Length
-FROM    (clientsdata cd, accessright.regionaladmins)     
-	LEFT JOIN OsUserAccessRight ouar ON ouar.ClientCode = cd.FirmCode  
+FROM  clientsdata cd
 	LEFT JOIN ret_update_info rui ON rui.ClientCode = cd.FirmCode
-WHERE   FirmType                                 =if(ShowRetail + ShowVendor=2, FirmType, if(ShowRetail = 1, 1, 0))   
-        AND cd.regioncode & regionaladmins.regionmask > 0   
-        AND if(regionaladmins.UseRegistrant      =1, Registrant=?UserName, 1=1)   
-        AND firmcode                             =?ClientCode   
-        AND regionaladmins.username              =?UserName;
+	LEFT JOIN OsUserAccessRight ouar ON ouar.ClientCode = cd.FirmCode  
+WHERE firmcode = ?ClientCode;
 ", _connection);
-			infoDataAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-			infoDataAdapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
-				
-			MySqlDataAdapter showClientsAdapter = new MySqlDataAdapter(@"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName     
-FROM    (accessright.regionaladmins, clientsdata as cd) 
-	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
-WHERE   sr.PrimaryClientCode				 = ?ClientCode
-		AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName               = ?UserName 
-        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)   
-        AND FirmStatus    = 1 
-        AND billingstatus = 1 
-ORDER BY cd.shortname;
-", _connection);
-
-			showClientsAdapter.SelectCommand.Parameters.Add("?ClientCode", ClientCode);
-			showClientsAdapter.SelectCommand.Parameters.Add("?UserName", Session["UserName"]);
-            
+			infoDataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+				        
 			try
 			{
 				_connection.Open();
-				MySqlTransaction transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				showClientsAdapter.SelectCommand.Transaction = transaction;
+				var transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				infoDataAdapter.SelectCommand.Transaction = transaction;
-				showClientsAdapter.Fill(Data, "ShowClients");
 				infoDataAdapter.Fill(Data, "Info");
 				transaction.Commit();
 			}
@@ -211,7 +192,13 @@ ORDER BY cd.shortname;
 				_connection.Close();
 			}
 
-			if (Data.Tables["Info"].Rows[0]["FirmType"].ToString() == "1")
+
+			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
+			var homeRegion = Convert.ToUInt64(Data.Tables["Info"].Rows[0]["RegionCode"]);
+			SecurityContext.Administrator.CheckClientType(clientType);
+			SecurityContext.Administrator.CheckClientHomeRegion(homeRegion);
+
+			if (clientType == ClientType.Drugstore)
 			{
 				DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
 				bool isNotSet = false;
@@ -271,7 +258,7 @@ WHERE firmcode = ?ClientCode
 				_command.Parameters.AddWithValue("?ShortName", ShortNameText.Text);
 				_command.Parameters.AddWithValue("?Address", AddressText.Text);
 				_command.Parameters.AddWithValue("?Fax", FaxText.Text);
-				_command.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				_command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 				_command.ExecuteNonQuery();
 
@@ -298,11 +285,6 @@ WHERE firmcode = ?ClientCode
 			UnlockedLabel.Visible = true;
 		}
 
-		public void SetController(Controller controller)
-		{
-			_controller = controller;
-		}
-
 		protected void DeletePrepareDataButton_Click(object sender, EventArgs e)
 		{
 			try
@@ -321,10 +303,10 @@ WHERE firmcode = ?ClientCode
 
 		protected void ResetUniqueCopyID(object sender, EventArgs e)
 		{
-			using (MySqlConnection connection = new MySqlConnection(Literals.GetConnectionString()))
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
 				connection.Open();
-				MySqlCommand command = connection.CreateCommand();
+				var command = connection.CreateCommand();
 				command.CommandText = @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
@@ -338,10 +320,16 @@ UPDATE ret_update_info SET UniqueCopyID = ''  WHERE clientcode=?clientCode;
 				command.Parameters.AddWithValue("?ClientCode", ClientCode);
 				command.Parameters.AddWithValue("?ResetIdCause", ResetIDCause.Text);
 				command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				command.ExecuteNonQuery();
 				Response.Redirect(String.Format("info.rails?cc={0}", ClientCode));
 			}
+		}
+
+		public void SetController(IController controller, IControllerContext context)
+		{
+			Controller = (Controller) controller;
+			ControllerContext = context;
 		}
 	}
 }

@@ -39,49 +39,19 @@ namespace AdminInterface.Models
 
 	public class BillingSearchProperties
 	{
-		private string _shortName;
-		private ulong _regionId;
-		private PayerStateFilter _payerState;
-		private SearchSegment _segment;
-		private SearchClientType _clientType;
-		private SearchClientStatus _clientStatus;
 		private SearchBy _searchBy;
 
-		public ulong RegionId
-		{
-			get { return _regionId; }
-			set { _regionId = value; }
-		}
+		public ulong RegionId { get; set; }
 
-		public string SearchText
-		{
-			get { return _shortName; }
-			set { _shortName = value; }
-		}
+		public string SearchText { get; set; }
 
-		public PayerStateFilter PayerState
-		{
-			get { return _payerState; }
-			set { _payerState = value; }
-		}
+		public PayerStateFilter PayerState { get; set; }
 
-		public SearchSegment Segment
-		{
-			get { return _segment; }
-			set { _segment = value; }
-		}
+		public SearchSegment Segment { get; set; }
 
-		public SearchClientType ClientType
-		{
-			get { return _clientType; }
-			set { _clientType = value; }
-		}
+		public SearchClientType ClientType { get; set; }
 
-		public SearchClientStatus ClientStatus
-		{
-			get { return _clientStatus; }
-			set { _clientStatus = value; }
-		}
+		public SearchClientStatus ClientStatus { get; set; }
 
 		public SearchBy SearchBy
 		{

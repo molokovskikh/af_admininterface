@@ -25,7 +25,18 @@ namespace AdminInterface.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute(@"
+          Добрый день.
+
+          Во вложении данного письма находится регистрационна карта участника информационной системы ""АналитФАРМАЦИЯ"".
+
+          С уважением, Аналитическая компания ""Инфорум"", г. Воронеж
+
+          Москва +7 495 6628727
+          С.-Петербург +7 812 3090521
+          Воронеж +7 4732 606000
+          Челябинск +7 351 7298143
+        ")]
         public string RegistrationCardEmailBody {
             get {
                 return ((string)(this["RegistrationCardEmailBody"]));

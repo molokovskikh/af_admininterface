@@ -2,13 +2,15 @@ using System;
 using System.Data;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
 	partial class orders : Page
 	{
-		private MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
+		private readonly MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
 		
 		private string _sortExpression
 		{
@@ -30,33 +32,35 @@ namespace AddUser
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
-			MySqlDataAdapter adapter = new MySqlDataAdapter(
+			var adapter = new MySqlDataAdapter(
 @"
-SELECT  ordershead.rowid, 
-        WriteTime, 
+SELECT  oh.rowid, 
+        oh.WriteTime, 
         PriceDate, 
         client.shortname as Customer, 
         firm.shortname as Supplier, 
         PriceName, 
-        RowCount, 
-        Processed  
-FROM    orders.ordershead, 
+        oh.RowCount, 
+        oh.Processed  
+FROM    orders.ordershead oh, 
         usersettings.pricesdata, 
         usersettings.clientsdata as firm, 
         usersettings.clientsdata as client, 
         usersettings.clientsdata as sel 
-WHERE   clientcode         =client.firmcode  
-        AND client.firmcode=if(sel.firmtype=1, sel.firmcode, client.firmcode)  
-        AND firm.firmcode  =if(sel.firmtype=0, sel.firmcode, firm.firmcode)  
-        AND writetime BETWEEN ?FromDate AND ADDDATE(?ToDate, INTERVAL 1 DAY)
-        AND pricesdata.pricecode=ordershead.pricecode  
-        AND firm.firmcode       =pricesdata.firmcode 
-        AND sel.firmcode        =?clientCode 
+WHERE   clientcode = client.firmcode  
+        AND client.firmcode = if(sel.firmtype = 1, sel.firmcode, client.firmcode)  
+        AND firm.firmcode = if(sel.firmtype = 0, sel.firmcode, firm.firmcode)  
+        AND oh.writetime BETWEEN ?FromDate AND ADDDATE(?ToDate, INTERVAL 1 DAY)
+        AND pricesdata.pricecode = oh.pricecode  
+        AND firm.firmcode = pricesdata.firmcode 
+        AND sel.firmcode = ?clientCode 
+		AND oh.RegionCode & ?RegionCode > 0
 ORDER BY writetime desc;
 ", _connection);
-			adapter.SelectCommand.Parameters.Add("?FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.Add("?ToDate", CalendarTo.SelectedDate);
-			adapter.SelectCommand.Parameters.Add("?clientCode", Convert.ToUInt32(Request["cc"]));
+			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
+			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate);
+			adapter.SelectCommand.Parameters.AddWithValue("?clientCode", Convert.ToUInt32(Request["cc"]));
+			adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", SecurityContext.Administrator.RegionMask);
 
 			_data = new DataSet();
 			try
@@ -76,29 +80,28 @@ ORDER BY writetime desc;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
-				Response.Redirect("default.aspx");
-			}
-			if (!Page.IsPostBack)
-			{
-				CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-1));
-				CalendarTo.SelectedDates.Add(DateTime.Now);
-			}
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers);
+
+			if (Page.IsPostBack) 
+				return;
+
+			CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-1));
+			CalendarTo.SelectedDates.Add(DateTime.Now);
 		}
 		protected void OrdersGrid_RowCreated(object sender, GridViewRowEventArgs e)
 		{
-			if ((e.Row.RowType == DataControlRowType.Header) && (!String.IsNullOrEmpty(_sortExpression)))
+			if ((e.Row.RowType != DataControlRowType.Header) || (String.IsNullOrEmpty(_sortExpression))) 
+				return;
+
+			var grid = sender as GridView;
+			foreach (DataControlField field in grid.Columns)
 			{
-				GridView grid = sender as GridView;
-				foreach (DataControlField field in grid.Columns)
+				if (field.SortExpression == _sortExpression)
 				{
-					if (field.SortExpression == _sortExpression)
-					{
-						Image sortIcon = new Image();
-						sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
-						e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
-					}
+					var sortIcon = new Image();
+					sortIcon.ImageUrl = _sortDirection == SortDirection.Ascending ? "./Images/arrow-down-blue-reversed.gif" : "./Images/arrow-down-blue.gif";
+					e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
 				}
 			}
 		}

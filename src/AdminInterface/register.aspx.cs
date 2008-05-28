@@ -9,6 +9,7 @@ using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
@@ -233,7 +234,7 @@ ORDER BY region;
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
 				adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", RegCode);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				adapter.Fill(DS1, "WorkReg");
 				adapter.SelectCommand.Transaction.Commit();
 			}
@@ -298,7 +299,7 @@ set @inHost = ?Host;
 set @inUser = ?UserName;
 ";
 			_command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-			_command.Parameters.AddWithValue("?UserName", Session["UserName"]);
+			_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			_command.ExecuteNonQuery();
 
 			_command.Parameters.Add(new MySqlParameter("?MaskRegion", MySqlDbType.Int64));
@@ -328,7 +329,7 @@ set @inUser = ?UserName;
 			_command.Parameters.Add(new MySqlParameter("?firmtype", MySqlDbType.Int24));
 			_command.Parameters["?firmtype"].Value = TypeDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("?registrant", MySqlDbType.VarString));
-			_command.Parameters["?registrant"].Value = Session["UserName"];
+			_command.Parameters["?registrant"].Value = SecurityContext.Administrator.UserName;
 			_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int24));
 			_command.Parameters.Add(new MySqlParameter("?AllowGetData", MySqlDbType.Int24));
 			_command.Parameters["?AllowGetData"].Value = TypeDD.SelectedItem.Value;
@@ -442,7 +443,7 @@ where length(c.contactText) > 0
 						{
 							Func.Mail("register@analit.net", String.Empty,
 									  "\"" + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - ошибка уведомления поставщиков",
-									  false, "Оператор: " + Session["UserName"] + "\nРегион: "
+									  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
 											 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 											 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
 											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
@@ -456,7 +457,7 @@ where length(c.contactText) > 0
 				{
 					Func.Mail("register@analit.net", String.Empty,
 					          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
-					          false, "Оператор: " + Session["UserName"] + "\nРегион: "
+							  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
 					                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
 					                 + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                 + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
@@ -465,7 +466,7 @@ where length(c.contactText) > 0
 				}
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
-				          false, "Оператор: " + Session["UserName"] + "\nРегион: "
+						  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
 				                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
@@ -481,7 +482,7 @@ where length(c.contactText) > 0
 Код: {1}
 Биллинг код: {2}
 Кем зарегистрирован: {3}",
-				          	ShortNameTB.Text, Session["Code"], Session["DogN"], Session["UserName"]),
+							ShortNameTB.Text, Session["Code"], Session["DogN"], SecurityContext.Administrator.UserName),
 				          "billing@analit.net",
 				          "",
 				          "");
@@ -597,7 +598,7 @@ ORDER BY p.shortname;
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", PayerFTB.Text));
 				adapter.Fill(DS1, "Payers");
 
@@ -685,7 +686,7 @@ ORDER BY cd.shortname;
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
 				adapter.Fill(DS1, "Includes");
 				adapter.SelectCommand.Transaction.Commit();
@@ -985,8 +986,7 @@ WHERE	dst.clientcode        = ?ClientCode
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
+			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier);
 
 			_connection.ConnectionString = Literals.GetConnectionString();
 			try
@@ -1010,7 +1010,7 @@ ORDER BY region;
 ",
 					_connection);
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				adapter.Fill(DS1, "admin");
 				adapter.SelectCommand.Transaction.Commit();
 			}
@@ -1019,7 +1019,7 @@ ORDER BY region;
 				_connection.Close();
 			}
 			if (DS1.Tables["admin"].Rows.Count < 1)
-				throw new Exception("Пользователь " + Session["UserName"] + " не найден!");
+				throw new Exception("Пользователь " + SecurityContext.Administrator.UserName + " не найден!");
 
 			if (!IsPostBack)
 			{

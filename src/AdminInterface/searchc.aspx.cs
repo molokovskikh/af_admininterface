@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -44,9 +45,9 @@ namespace AddUser
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
-		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
+		{			
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore);
 
             _connection.ConnectionString = Literals.GetConnectionString();
 
@@ -58,17 +59,15 @@ namespace AddUser
 		{
 			var dataSet = new DataSet();
 			var dataAdapter = new MySqlDataAdapter(
-@"select (select sum(regioncode) from farm.regions) as RegionCode, 'Все' as Region, 1 as IsAll
+@"select (select sum(regioncode) from farm.regions where RegionCode & ?AdminMaskRegion > 0) as RegionCode, 'Все' as Region, 1 as IsAll
 union
 SELECT  r.RegionCode,
         r.Region,
         0 as IsAll
-FROM    farm.regions as r,
-        accessright.regionaladmins as ra
-WHERE   ra.username = ?UserName
-        and ra.RegionMask & r.regioncode > 0
+FROM farm.regions as r
+WHERE r.RegionCode & ?AdminMaskRegion > 0
 ORDER BY IsAll Desc, Region;", _connection);
-			dataAdapter.SelectCommand.Parameters.Add("?UserName", Convert.ToString(Session["UserName"]));
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 			dataAdapter.Fill(dataSet);
 			ClientRegion.DataSource = dataSet.Tables[0];
 			ClientRegion.DataBind();
@@ -181,8 +180,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		private void BuildQuery(string orderStatement, SearchType searchType)
 		{
-			var firstPart =
-@"
+			var firstPart = String.Format(@"
 SELECT  cd.billingcode, 
         cast(cd.firmcode as CHAR) as firmcode, 
         cd.ShortName, 
@@ -194,27 +192,22 @@ SELECT  cd.billingcode,
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
         FirmSegment, 
         FirmType, 
-        (Firmstatus     = 0 
-        or Billingstatus= 0) Firmstatus, 
+        (Firmstatus = 0 or Billingstatus= 0) Firmstatus, 
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
 		NULL AS IncludeType
 FROM clientsdata as cd
     JOIN farm.regions ON regions.regioncode = cd.regioncode 
-    JOIN accessright.regionaladmins ON regionaladmins.UserName = ?UserName 
     JOIN billing.payers p on cd.BillingCode = p.PayerID
     LEFT JOIN showregulation ON ShowClientCode= cd.firmcode 
     LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode 
     LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
-WHERE   (cd.regioncode & regionaladmins.regionmask) > 0 
-		and (cd.regionCode & ?RegionMask) > 0
-        and if(ShowVendor = 1, FirmType= 0, 0) 
-        and if(UseRegistrant = 1, Registrant= regionaladmins.UserName, 1)
-		
-";
+WHERE   (cd.RegionCode & ?RegionMask) > 0
+		and (cd.RegionCode & ?AdminMaskRegion) > 0
+		and FirmType = 0
+		{0}", SecurityContext.Administrator.ClientTypeFilter("cd")) ;
 			var secondPart = String.Empty;
-			var thirdPart =
-@"
+			var thirdPart = String.Format(@"
 group by cd.firmcode union 
 SELECT  cd. billingcode, 
         cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode, 
@@ -237,7 +230,7 @@ SELECT  cd. billingcode,
 			WHEN 2 THEN 'Скрытый'
 		END AS IncludeType
 		
-FROM    (clientsdata as cd, farm.regions, accessright.regionaladmins, ret_update_info as rts, billing.payers p) 
+FROM    (clientsdata as cd, farm.regions, ret_update_info as rts, billing.payers p) 
 LEFT JOIN showregulation 
         ON ShowClientCode= cd.firmcode 
 LEFT JOIN includeregulation 
@@ -249,21 +242,20 @@ LEFT JOIN osuseraccessright as ouar2
 LEFT JOIN osuseraccessright as ouar 
         ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
 LEFT JOIN logs.AnalitFUpdates
-        ON AnalitFUpdates.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and AnalitFUpdates.UpdateId    = 
-        (SELECT max(UpdateId) 
-        FROM    logs.AnalitFUpdates
-        WHERE   clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-                and updatetype in(1,2)
+        ON AnalitFUpdates.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+        and AnalitFUpdates.UpdateId = 
+        (
+			SELECT max(UpdateId) 
+			FROM logs.AnalitFUpdates
+			WHERE clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+				  and updatetype in(1,2)
         ) 
-WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and regions.regioncode                   = cd.regioncode 
-		and cd.BillingCode						 = p.PayerID
-        and regionaladmins.UserName              = ?UserName 
-		and (cd.regioncode & regionaladmins.regionmask) > 0 
-		and (cd.regionCode & ?RegionMask) > 0
-        and if(ShowRetail = 1, cd.FirmType= 1, 0) 
-        and if(UseRegistrant = 1, cd.Registrant= regionaladmins.UserName, 1)";
+WHERE   rts.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+        and regions.regioncode = cd.regioncode 
+		and cd.BillingCode = p.PayerID
+		and (cd.RegionCode & ?RegionMask) > 0
+		and (cd.RegionCode & ?AdminMaskRegion) > 0
+		{0}", SecurityContext.Administrator.ClientTypeFilter("cd"));
 
 			var fourthPart = String.Empty;
 
@@ -341,8 +333,8 @@ WHERE   rts.clientcode                           = if(IncludeRegulation.PrimaryC
 					break;
 			}
 			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
-			_command.Parameters.AddWithValue("?UserName", Convert.ToString(Session["UserName"]));
-			_command.Parameters.AddWithValue("?RegionMask", ClientRegion.SelectedItem.Value);
+			_command.Parameters.AddWithValue("?RegionMask", Convert.ToUInt64(ClientRegion.SelectedItem.Value) & SecurityContext.Administrator.RegionMask);
+			_command.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 		}
 
 		protected void ClientsGridView_RowCreated(object sender, GridViewRowEventArgs e)

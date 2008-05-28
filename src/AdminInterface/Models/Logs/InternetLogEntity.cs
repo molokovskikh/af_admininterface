@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using NHibernate.Expression;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {

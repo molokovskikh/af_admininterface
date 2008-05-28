@@ -1,12 +1,17 @@
 using System;
 using System.Text;
 using System.Web;
+using AdminInterface.Filters;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Config;
 using DAL;
 using System.Reflection;
 using log4net;
+using log4net.Config;
 using MySql.Data.MySqlClient;
+using NHibernate.Cfg;
+using NHibernate.Dialect.Function;
 
 namespace AddUser
 {
@@ -16,13 +21,31 @@ namespace AddUser
 
 		void Application_Start(object sender, EventArgs e)
 		{
-			log4net.Config.XmlConfigurator.Configure();
-			GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
-			ActiveRecordStarter.Initialize(new[] {Assembly.Load("AdminInterface"),
-														   Assembly.Load("Common.Web.Ui")},
-										   ActiveRecordSectionHandler.Instance);
+			try
+			{
+				XmlConfigurator.Configure();
+				GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
+				ActiveRecordStarter.Initialize(new[]
+				                               	{
+				                               		Assembly.Load("AdminInterface"),
+				                               		Assembly.Load("Common.Web.Ui")
+				                               	},
+				                               ActiveRecordSectionHandler.Instance);
 
-			SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
+				ActiveRecordMediator
+					.GetSessionFactoryHolder()
+					.GetAllConfigurations()[0]
+					.SqlFunctions
+					.Add("if", new SQLFunctionTemplate(null, "if(?1, ?2, ?3"));
+
+
+				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
+
+			}
+			catch(Exception ex)
+			{
+				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
+			}
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
@@ -68,35 +91,31 @@ WHERE PriceCode = ?Id", connection);
 		}
 
 		void Session_Start(object sender, EventArgs e)
-		{
-			string UserName;
-			UserName = HttpContext.Current.User.Identity.Name;
-			if (UserName.Substring(0, 7) == "ANALIT\\")
-			#if DEBUG
-				UserName = "michail";
-			#else
-				UserName = UserName.Substring(7);
-			#endif
-
-			var administrator = CommandFactory.GetAdministrator(UserName);
-			if (administrator != null)
-				Session["Administrator"] = administrator;
-			
-			Session["UserName"] = UserName;
-		}
+		{}
 
 		void Application_BeginRequest(object sender, EventArgs e)
-		{
-		}
+		{}
 
 		void Application_AuthenticateRequest(object sender, EventArgs e)
-		{
-		}
+		{}
 
 		void Application_Error(object sender, EventArgs e)
 		{
 #if !DEBUG
-			StringBuilder builder = new StringBuilder();
+			var exception = Server.GetLastError();
+
+			if (exception.InnerException is NotAuthorizedException)
+			{
+				Response.Redirect("/Rescue/NotAuthorized.aspx");
+				return;
+			}
+			if (exception.InnerException is NotHavePermissionException)
+			{
+				Response.Redirect("/Rescue/NotAllowed.aspx");
+				return;
+			}
+
+			var builder = new StringBuilder();
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
 			builder.AppendLine("--------------");
@@ -106,7 +125,6 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 			
 			builder.AppendLine("----Error-----");
-			Exception exception = Server.GetLastError();
 			do
 			{
 				builder.AppendLine("Message:");
@@ -129,15 +147,14 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			_log.Error(builder.ToString());
+			Response.Redirect("/Rescue/Error.aspx");
 #endif
 		}
 
 		void Session_End(object sender, EventArgs e)
-		{
-		}
+		{}
 
 		void Application_End(object sender, EventArgs e)
-		{
-		}
+		{}
 	}
 }

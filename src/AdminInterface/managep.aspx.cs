@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using DAL;
 using MySql.Data.MySqlClient;
 
@@ -30,12 +31,6 @@ namespace AddUser
 
 		private readonly MySqlConnection _connection = new MySqlConnection();
 
-		private string _userName
-		{
-			get { return (string) Session["UserName"]; }
-			set { Session["UserName"] = value; }
-		}
-
 		private DataSet Data
 		{
 			get { return (DataSet)Session["RegionalSettingsData"]; }
@@ -56,8 +51,8 @@ namespace AddUser
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
+			StateHelper.CheckSession(this, ViewState);
+			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 		
 			_connection.ConnectionString = Literals.GetConnectionString();
 
@@ -91,6 +86,7 @@ namespace AddUser
 		private void GetData()
 		{
 			_homeRegion = GetHomeRegion();
+			SecurityContext.Administrator.CheckClientHomeRegion(_homeRegion);
 			if (Data == null)
 				Data = new DataSet();
 			else 
@@ -108,16 +104,11 @@ SELECT  cd.firmcode,
 		UpCost,
 		PriceType,
 		CostType
-FROM (clientsdata as cd, farm.regions, accessright.regionaladmins, pricesdata)
+FROM (clientsdata as cd, farm.regions, pricesdata)
     JOIN usersettings.pricescosts pc on pricesdata.PriceCode = pc.PriceCode and pc.BaseCost = 1
         JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE   regions.regioncode                            =cd.regioncode  
         AND pricesdata.firmcode                       =cd.firmcode 
-        AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName                   =?UserName  
-        AND if(UseRegistrant                          =1, Registrant=@UserName, 1=1)  
-        AND AlowManage                                =1  
-        AND AlowCreateVendor                          =1  
         AND cd.firmcode                               =?ClientCode 
 GROUP BY pricesdata.PriceCode;
 ";
@@ -134,44 +125,42 @@ SELECT  RowID,
         ContactInfo, 
         OperativeInfo  
 FROM    usersettings.regionaldata rd  
-INNER JOIN farm.regions r 
-        ON rd.regioncode = r.regioncode  
-WHERE   rd.FirmCode      = ?ClientCode;
+	JOIN farm.regions r ON rd.regioncode = r.regioncode  
+WHERE rd.FirmCode      = ?ClientCode
+	  and r.regionCode & ?AdminRegionMask;
 ";
 			var regionsCommandText =
 @"
 SELECT  RegionCode,   
         Region
 FROM Farm.Regions
+WHERE regionCode & ?AdminRegionMask > 0
 ORDER BY region;
 ";
 			var enableRegionsCommandText =
 @"
 SELECT  a.RegionCode,
-        a.Region, 
-        MaskRegion & a.regioncode     >0 as Enable
-FROM    farm.regions                     as a, 
-        farm.regions                     as b, 
-        clientsdata, 
-        accessright.regionaladmins
-WHERE   b.regioncode                                             =?HomeRegion
-        AND  clientsdata.firmcode                                =?ClientCode
-        AND a.regioncode & (b.defaultshowregionmask | MaskRegion)>0
-        AND regionaladmins.username                              =?UserName
-        AND a.regioncode & regionaladmins.RegionMask             > 0
+        a.Region,
+		cd.MaskRegion & a.regioncode > 0 as Enable
+FROM    farm.regions as a, 
+        farm.regions as b, 
+        clientsdata as cd
+WHERE   b.regioncode = ?HomeRegion
+        AND cd.firmcode = ?ClientCode
+        AND a.regioncode & b.defaultshowregionmask > 0
+		and a.RegionCode & ?AdminRegionMask > 0
 GROUP BY regioncode
 ORDER BY region;
 ";
 
 			var dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?UserName", _userName);
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
 
             try
             {
                 _connection.Open();
-
                 dataAdapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
                 dataAdapter.Fill(Data, "Prices");
 
@@ -184,7 +173,7 @@ ORDER BY region;
                 dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
                 dataAdapter.Fill(Data, "EnableRegions");
 
-				ShowRegulationHelper.Load(dataAdapter, Data, _userName);
+				ShowRegulationHelper.Load(dataAdapter, Data);
 
                 dataAdapter.SelectCommand.Transaction.Commit();
             }
@@ -253,7 +242,7 @@ WHERE PriceCode = ?PriceCode;
 ", _connection);
 
 			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserName", _userName);
+			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.DeleteCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			pricesDataAdapter.InsertCommand = new MySqlCommand(
@@ -347,7 +336,7 @@ WHERE   intersection.pricecode IS NULL
 		AND clientsdata2.firmtype = 1;
 ", _connection);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", _userName);
+			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 			pricesDataAdapter.InsertCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
@@ -373,7 +362,7 @@ WHERE PriceCode = ?PriceCode;
 call UpdateCostType(?PriceCode, ?CostType);
 ", _connection);
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", _userName);
+			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
@@ -403,7 +392,7 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowID");
 
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", _userName);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 			MySqlTransaction transaction = null;
 			try
@@ -484,39 +473,29 @@ WHERE RowId = ?Id;
 			string commandText;
 			if (((CheckBox)sender).Checked)
 			{
-				commandText =
-@"
+				commandText = @"
 SELECT  a.RegionCode,   
-        a.Region,   
-        MaskRegion & a.regioncode >0 as `Enable`  
-FROM    farm.regions                 as a,   
-        clientsdata,   
-        accessright.regionaladmins  
-WHERE   clientsdata.firmcode                         =?ClientCode
-        AND regionaladmins.username                  =?UserName   
-        AND a.regioncode & regionaladmins.RegionMask > 0  
-ORDER BY region;
-";
+        a.Region,
+		cd.MaskRegion & a.regioncode > 0 as Enable
+FROM farm.regions as a, clientsdata as cd
+WHERE a.regionCode & ?AdminRegionMask > 0 and cd.firmcode = ?ClientCode
+ORDER BY region;";
 			}
 			else
 			{
-				commandText =
-@"
+				commandText = @"
 SELECT  a.RegionCode,
-        a.Region, 
-        MaskRegion & a.regioncode     >0 as Enable
-FROM    farm.regions                     as a, 
-        farm.regions                     as b, 
-        clientsdata, 
-        accessright.regionaladmins
-WHERE   b.regioncode                                             =?HomeRegion
-        AND  clientsdata.firmcode                                =?ClientCode
-        AND a.regioncode & (b.defaultshowregionmask | MaskRegion)>0
-        AND regionaladmins.username                              =?UserName
-        AND a.regioncode & regionaladmins.RegionMask             > 0
+        a.Region,
+		cd.MaskRegion & a.regioncode > 0 as Enable
+FROM    farm.regions as a, 
+        farm.regions as b, 
+        clientsdata as cd
+WHERE   b.regioncode = ?HomeRegion
+        and cd.firmcode = ?ClientCode
+        and a.regioncode & b.defaultshowregionmask > 0
+		and a.regionCode & ?AdminRegionMask > 0
 GROUP BY regioncode
-ORDER BY region;
-";
+ORDER BY region;";
 			}
             try
             {
@@ -526,7 +505,7 @@ ORDER BY region;
 
                 adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
                 adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
-                adapter.SelectCommand.Parameters.AddWithValue("?UserName", _userName);
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
                 Data.Tables["EnableRegions"].Clear();
                 adapter.Fill(Data, "EnableRegions");
 
@@ -638,7 +617,7 @@ WHERE   intersection.pricecode IS NULL
 				updateCommand.Parameters.Add("?MaskRegion", newMaskRegion);
 				updateCommand.Parameters.Add("?ClientCode", _clientCode);
 				updateCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.Add("?UserName", _userName);
+				updateCommand.Parameters.Add("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.Execute();
 			}
 		}
@@ -648,8 +627,7 @@ WHERE   intersection.pricecode IS NULL
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
 			if (_homeRegion != currentHomeRegion)
 			{
-				var command = new ParametericCommand(
-@"
+				var command = new ParametericCommand(@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -660,17 +638,14 @@ WHERE FirmCode = ?ClientCode;
 				command.Parameters.Add("?RegionCode", currentHomeRegion);
 				command.Parameters.Add("?ClientCode", _clientCode);
 				command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.Add("?UserName", _userName);
+				command.Parameters.Add("?UserName", SecurityContext.Administrator.UserName);
 				command.Execute();
 			}
 		}
 		
 		private ulong GetHomeRegion()
 		{
-			var homeRegionCommand = new ScalarCommand(
-@"
-SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
-", IsolationLevel.ReadCommitted);
+			var homeRegionCommand = new ScalarCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;");
 			homeRegionCommand.Parameters.Add("?ClientCode", _clientCode);
 			homeRegionCommand.Execute();
 
@@ -701,7 +676,7 @@ SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;
 
 		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender, e, Data, _userName);
+			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender, e, Data);
 		}
 
 		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)

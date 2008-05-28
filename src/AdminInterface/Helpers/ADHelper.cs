@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.DirectoryServices;
+using DAL;
 
 namespace AdminInterface.Helpers
 {
@@ -145,6 +146,25 @@ namespace AdminInterface.Helpers
 			var entiry = GetDirectoryEntry(login);
 			entiry.InvokeSet("AccountDisabled", false);
 			entiry.CommitChanges();
+		}
+
+		public static void CreateAdministratorInAd(Administrator administrator)
+		{
+#if !DEBUG
+			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var user = root.Children.Add("CN=" + administrator.Login, "user");
+			user.Properties["samAccountName"].Value = administrator.Login;
+			if (!String.IsNullOrEmpty(administrator.FIO.Trim()))
+				user.Properties["sn"].Value = administrator.FIO;
+			user.Properties["logonHours"].Value = ADHelper.LogonHours();
+			user.CommitChanges();
+			user.Invoke("SetPassword", password);
+			user.CommitChanges();
+			userGroup.Invoke("Add", user.Path);
+			userGroup.CommitChanges();
+			root.CommitChanges();
+#endif
 		}
 	}
 }

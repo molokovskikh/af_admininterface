@@ -8,6 +8,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyProduct("")]
 [assembly: AssemblyCopyright("")]
 [assembly: AssemblyTrademark("")]
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 [assembly: Guid("4772D607-0C91-4FB5-8751-CAC46FC4FA89")]
 [assembly: AssemblyVersion("1.4.1.*")]

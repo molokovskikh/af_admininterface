@@ -8,7 +8,7 @@ namespace AdminInterface.Helpers
 {
 	public class ShowRegulationHelper
 	{
-		public static void Load(MySqlDataAdapter adapter, DataSet data, string userName)
+		public static void Load(MySqlDataAdapter adapter, DataSet data)
 		{
 			adapter.SelectCommand.CommandText = @"
 SELECT  DISTINCT cd.FirmCode, 
@@ -27,7 +27,7 @@ WHERE   sr.PrimaryClientCode				 = ?ClientCode
 ORDER BY cd.shortname;";
 
 			if (adapter.SelectCommand.Parameters.IndexOf("?UserName") < 0)
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", userName);
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			adapter.Fill(data, "ShowClients");
 		}
 
@@ -91,7 +91,7 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 			showClientsGrid.DataBind();
 		}
 
-		public static void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e, DataSet data, string userName)
+		public static void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e, DataSet data)
 		{
 			var showClientsGrid = (GridView)sender;
 			var showClientsTable = data.Tables["ShowClients"];
@@ -122,7 +122,7 @@ WHERE   cd.regioncode & regionaladmins.regionmask > 0
         AND billingstatus=1  
 ORDER BY cd.shortname;
 ", Literals.GetConnectionString());
-					adapter.SelectCommand.Parameters.AddWithValue("?UserName", userName);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 					adapter.SelectCommand.Parameters.AddWithValue("?SearchText", string.Format("%{0}%", ((TextBox)showClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 
 					var searchData = new DataSet();

@@ -11,18 +11,26 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter)), Helper(typeof(ADHelper))]
+	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter)), Helper(typeof(ADHelper))]
 	public class ClientController : SmartDispatcherController
 	{
+		public override void PreSendView(object view)
+		{
+			if (view is IControllerAware)
+				((IControllerAware)view).SetController(this, ControllerContext);
+			base.PreSendView(view);
+		}
+
 		public void Info(uint cc)
 		{
 			var client = Client.Find(cc);
 			PropertyBag["Client"] = client;
-			PropertyBag["Admin"] = Session["Admin"];
+			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 		}
 
 		[Layout("Common")]
+		[RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint cc, uint ouar)
 		{
 			var client = Client.Find(cc);
@@ -32,6 +40,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 		}
 
+		[RequiredPermission(PermissionType.ChangePassword)]
 		public void DoPasswordChange(uint clientCode, 
 									 uint userId, 
 									 string additionEmailsToNotify, 
@@ -42,7 +51,7 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.Find(clientCode);
 			var user = User.Find(userId);
-			var administrator = ((Administrator) Session["Admin"]);
+			var administrator = SecurityContext.Administrator;
 			var password = Func.GeneratePassword();
 			var userName = administrator.UserName;
 			var host = Context.Request.UserHostAddress;
@@ -91,7 +100,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PrepareSessionForReport(user, password, client);
-				Redirect("../report.aspx");
+				RedirectToUrl("../report.aspx");
 			}
 		}
 

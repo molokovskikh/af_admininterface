@@ -10,7 +10,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("logs"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Filter(ExecuteEnum.BeforeAction, typeof(AuthorizeFilter))]
+	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
 	public class LogsController : SmartDispatcherController
 	{
 		public void DocumentLog(uint clientCode)

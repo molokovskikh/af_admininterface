@@ -5,19 +5,20 @@ namespace AdminInterface.Filters
 {
 	public class AuthorizeFilter : IFilter
 	{
-		public bool Perform(ExecuteEnum exec, IRailsEngineContext context, Controller controller)
+		public bool Perform(ExecuteWhen exec, IEngineContext context, IController controller,
+		                    IControllerContext controllerContext)
 		{
-			if (controller.Context.Session["Admin"] == null)
+			if (context.Session["Admin"] == null)
 			{
 				var admin = Administrator.GetByName(context.CurrentUser.Identity.Name);
 				if (admin == null)
 				{
-					controller.Response.StatusCode = 403;
+					context.Response.StatusCode = 403;
 					return false;
 				}
-				controller.Context.Session["Admin"] = admin;
+				context.Session["Admin"] = admin;
 			}
-			return true;
+			return true;			
 		}
 	}
 }

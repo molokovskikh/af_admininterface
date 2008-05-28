@@ -7,21 +7,10 @@ namespace AdminInterface.Models
 	[ActiveRecord(Table = "usersettings.ClientsData")]
 	public class ClientWithStatus : ActiveRecordBase<ClientWithStatus>
 	{
-		private uint _firmCode;
-		private ClientStatus _status;
-
 		[PrimaryKey]
-		public uint FirmCode
-		{
-			get { return _firmCode; }
-			set { _firmCode = value; }
-		}
+		public uint FirmCode { get; set; }
 
 		[Property("FirmStatus")]
-		public virtual ClientStatus Status
-		{
-			get { return _status; }
-			set { _status = value; }
-		}
+		public virtual ClientStatus Status { get; set; }
 	}
 }

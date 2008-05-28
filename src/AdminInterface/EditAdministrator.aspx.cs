@@ -1,10 +1,11 @@
 using System;
-using System.DirectoryServices;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using DAL;
+using Administrator=DAL.Administrator;
 
 public partial class EditAdministrator : Page
 {
@@ -16,8 +17,8 @@ public partial class EditAdministrator : Page
 
     protected void Page_Load(object sender, EventArgs e)
     {
-		if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			Response.Redirect("default.aspx");
+		StateHelper.CheckSession(this, ViewState);
+		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
 
 		if (Convert.ToInt32(Request["id"]) > 0)
 			_current = CommandFactory.GetAdministrator(Convert.ToInt32(Request["id"]));
@@ -80,23 +81,7 @@ public partial class EditAdministrator : Page
 		var password = Func.GeneratePassword();
 		var isLoginExists = ADHelper.IsLoginExists(administrator.Login);
 		if (!isLoginExists)
-		{
-#if !DEBUG
-			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
-			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-			var user = root.Children.Add("CN=" + administrator.Login, "user");
-			user.Properties["samAccountName"].Value = administrator.Login;
-			if (!String.IsNullOrEmpty(administrator.FIO.Trim()))
-				user.Properties["sn"].Value = administrator.FIO;
-			user.Properties["logonHours"].Value = ADHelper.LogonHours();
-			user.CommitChanges();
-			user.Invoke("SetPassword", password);
-			user.CommitChanges();
-			userGroup.Invoke("Add", user.Path);
-			userGroup.CommitChanges();
-			root.CommitChanges();
-#endif
-		}
+			ADHelper.CreateAdministratorInAd(administrator);
 
 		Session["IsLoginCreate"] = !isLoginExists;
 		Session["Password"] = password;

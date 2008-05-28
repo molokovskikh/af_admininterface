@@ -2,10 +2,11 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
-using System.Text;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -138,7 +139,7 @@ namespace AddUser
 				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-                UpdCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
+                UpdCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 
 				UpdCommand.CommandText =
@@ -196,8 +197,7 @@ WHERE RowID = ?Id
 
 	    protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-				Response.Redirect("default.aspx");
+			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			PriceCode = Convert.ToInt32(Request["pc"]);
@@ -217,7 +217,7 @@ SELECT  pd.FirmCode,
 FROM pricesdata pd
 	JOIN clientsdata cd on cd.firmcode = pd.firmcode 
 		JOIN farm.Regions r on r.RegionCode = cd.RegionCode
-WHERE pd.pricecode = ?PriceCode;", MyCn);
+WHERE pd.pricecode = ?PriceCode; ", MyCn);
 			try
 			{
 				MyCn.Open();
@@ -225,8 +225,7 @@ WHERE pd.pricecode = ?PriceCode;", MyCn);
 				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
                 adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", Session["UserName"]);
-				
+				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 				var MyReader = adapter.SelectCommand.ExecuteReader();
 				MyReader.Read();
@@ -278,30 +277,23 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 				adapter.SelectCommand.CommandText =
 @"
 SELECT  regionaladmins.username, 
-        regions.regioncode, 
-        regions.region, 
-        regionaladmins.alowcreateretail, 
-        regionaladmins.alowcreatevendor, 
-        regionaladmins.alowchangesegment, 
-        regionaladmins.defaultsegment, 
-        AlowCreateInvisible, 
         regionaladmins.email 
-FROM    accessright.regionaladmins, 
-        farm.regions 
-WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
-        AND username = ?UserName 
-ORDER BY region;
+FROM accessright.regionaladmins
+WHERE  username = ?UserName;
 ";
 
 				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
-				Func.Mail("register@analit.net", String.Empty, "\"" + ShortName + "\" - регистрация ценовой колонки", false,
-						  String.Format(
+				Func.Mail("register@analit.net", 
+					String.Empty, 
+					"\"" + ShortName + "\" - регистрация ценовой колонки", 
+					false, 
+					String.Format(
 @"Оператор: {0} 
 Поставщик: {1}
 Регион: {2}
 Прайс-лист: {3}
-", Session["UserName"], ShortName, region, PriceName),
+", SecurityContext.Administrator.UserName, ShortName, region, PriceName),
 				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString());
 			}
 			catch
@@ -331,13 +323,18 @@ ORDER BY region;
                 var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
                 MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
                 SelCommand.Transaction = transaction;
-                SelCommand.CommandText = "select PriceName, CostType from pricesdata where PriceCode=?PriceCode";
+                SelCommand.CommandText = @"
+select pd.PriceName, pd.CostType, cd.regioncode
+from pricesdata pd
+	join clientsdata cd on cd.firmcode = pd.firmcode
+where PriceCode=?PriceCode";
                 int costType;
                 using (var reader = SelCommand.ExecuteReader())
                 {
                     reader.Read();
                     PriceNameLB.Text = reader.GetString("PriceName");
                     costType = reader.GetInt32("CostType");
+					SecurityContext.Administrator.CheckClientHomeRegion(reader.GetUInt64("RegionCode"));
                 }
 
                 if (costType == 0)
@@ -365,13 +362,11 @@ FROM usersettings.pricescosts pc
     JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
         JOIN farm.sources s on pi.SourceId = s.Id
     JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
-WHERE pc.PriceCode = ?PriceCode;
-";
+WHERE pc.PriceCode = ?PriceCode;";
                 
                 MyDA.Fill(DS, "Costs");
 
-                SelCommand.CommandText =
-@"
+                SelCommand.CommandText = @"
 SELECT  RowId, 
         Region, 
         UpCost, 
@@ -379,9 +374,10 @@ SELECT  RowId,
         Enabled  
 FROM PricesRegionalData prd   
     JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode  
-WHERE   PriceCode = ?PriceCode  
-";
+WHERE PriceCode = ?PriceCode  
+	  and r.RegionCode & ?AdminRegionMask > 0;";
 
+            	SelCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
                 MyDA.Fill(DS, "PriceRegionSettings");
                 transaction.Commit();
             }

@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using AdminInterface.Helpers;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace AddUser
@@ -10,10 +11,8 @@ namespace AddUser
 	{
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			{
-				Response.Redirect("default.aspx");
-			}
+			SecurityContext.CheckIsUserAuthorized();
+
 			const string ResPath = @"\\offdc\Data\Общего пользования\";
 			string[] FileList;
 			TableRow Row;
