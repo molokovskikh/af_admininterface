@@ -92,7 +92,7 @@ namespace AdminInterface.Models
 
 		}
 
-		public string ClientTypeFilter(string alias)
+		public string GetClientFilterByType(string alias)
 		{
 			var allowViewSuppliers = HavePermisions(PermissionType.ViewSuppliers);
 			var allowViewDrugstore = HavePermisions(PermissionType.ViewDrugstore);

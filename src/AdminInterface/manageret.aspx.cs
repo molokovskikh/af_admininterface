@@ -548,7 +548,7 @@ FROM  IncludeRegulation ir
 WHERE ir.IncludeClientCode = ?ClientCode
 	  and cd.RegionCode & ?AdminMaskRegion
 	  {0};
-", SecurityContext.Administrator.ClientTypeFilter("cd")), _connection);
+", SecurityContext.Administrator.GetClientFilterByType("cd")), _connection);
 
 				Data = new DataSet();
 				adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);

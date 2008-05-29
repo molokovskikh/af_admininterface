@@ -52,7 +52,7 @@ WHERE   ci.WriteTime BETWEEN ?FromDate AND ?ToDate
 		and cd.RegionCode & ?AdminMaskRegion > 0
 		{0}
 ORDER BY WriteTime DESC
-", SecurityContext.Administrator.ClientTypeFilter("cd")), _connection);
+", SecurityContext.Administrator.GetClientFilterByType("cd")), _connection);
 			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
 			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));

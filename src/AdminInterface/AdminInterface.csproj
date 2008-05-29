@@ -138,6 +138,7 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="Security\SecurityAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
     <Compile Include="Security\RequiredPermissionAttribute.cs" />
@@ -164,7 +165,6 @@
     <Compile Include="Models\PermissionType.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
     <Compile Include="Models\ClientStatus.cs" />
-    <Compile Include="NHibernateExtentions\IfProjection.cs" />
     <Compile Include="Models\Logs\ClientCardSendLogEntity.cs" />
     <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
     <Compile Include="Models\Logs\ClientRegistrationLogEntity.cs" />

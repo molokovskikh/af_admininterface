@@ -206,7 +206,7 @@ FROM clientsdata as cd
 WHERE   (cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0
 		and FirmType = 0
-		{0}", SecurityContext.Administrator.ClientTypeFilter("cd")) ;
+		{0}", SecurityContext.Administrator.GetClientFilterByType("cd")) ;
 			var secondPart = String.Empty;
 			var thirdPart = String.Format(@"
 group by cd.firmcode union 
@@ -256,7 +256,7 @@ WHERE   rts.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.Firm
 		and cd.BillingCode = p.PayerID
 		and (cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0
-		{0}", SecurityContext.Administrator.ClientTypeFilter("cd"));
+		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
 			var fourthPart = String.Empty;
 

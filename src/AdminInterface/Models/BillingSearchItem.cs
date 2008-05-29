@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -110,10 +111,10 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 				switch (properties.PayerState)
 				{
 					case PayerStateFilter.Debitors:
-						debitorFilterBlock = "where p.oldpaydate <= curDate()";
+						debitorFilterBlock = "and p.oldpaydate <= curDate()";
 						break;
 					case PayerStateFilter.NotDebitors:
-						debitorFilterBlock = "where p.oldpaydate > curDate()";
+						debitorFilterBlock = "and p.oldpaydate > curDate()";
 						break;
 				}				
 
@@ -162,20 +163,23 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r
-		where r.regioncode & bit_or(cd.maskregion) > 0) as {{BillingSearchItem.Regions}},
+		where r.regioncode & bit_or(cd.maskregion) > 0 and r.RegionCode & :AdminRegionMask > 0 ) as {{BillingSearchItem.Regions}},
 
 		sum(if(cd.firmsegment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
 		sum(if(cd.firmsegment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
 from billing.payers p
 	join usersettings.clientsdata cd on p.payerid = cd.billingcode
-{0}
+where cd.RegionCode & :AdminRegionMask > 0
+	  {3}
+	  {0}	
 group by p.payerId
 having 	{1}
 		and sum(if({2}, 1, 0)) > 0
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, searchBlock, groupFilter))
+", debitorFilterBlock, searchBlock, groupFilter, SecurityContext.Administrator.GetClientFilterByType("cd")))
 					.AddEntity(typeof(BillingSearchItem))
 					.SetParameter("RegionId", properties.RegionId)
+					.SetParameter("AdminRegionMask", SecurityContext.Administrator.RegionMask)
 					.List<BillingSearchItem>();
 				ArHelper.Evict(session, result);
 				return result;

@@ -1,12 +1,15 @@
 using System;
 using System.Web;
+#if !DEBUG
+using System.Text;
+using AdminInterface.Security;
+#endif
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;
-using NHibernate.Dialect.Function;
 
 namespace AddUser
 {
@@ -26,13 +29,6 @@ namespace AddUser
 				                               		Assembly.Load("Common.Web.Ui")
 				                               	},
 				                               ActiveRecordSectionHandler.Instance);
-
-				ActiveRecordMediator
-					.GetSessionFactoryHolder()
-					.GetAllConfigurations()[0]
-					.SqlFunctions
-					.Add("if", new SQLFunctionTemplate(null, "if(?1, ?2, ?3"));
-
 
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 
@@ -107,6 +103,11 @@ WHERE PriceCode = ?Id", connection);
 			if (exception.InnerException is NotHavePermissionException)
 			{
 				Response.Redirect("/Rescue/NotAllowed.aspx");
+				return;
+			}
+			if (exception.InnerException is SessionOutDateException)
+			{
+				Response.Redirect("default.aspx");
 				return;
 			}
 
