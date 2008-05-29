@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Reflection;
 using AdminInterface.Models;
 using Castle.MonoRail.Framework;
@@ -32,7 +33,13 @@ namespace AdminInterface.Security
 				return false;
 			}
 
-			var action = (MethodInfo)controllerContext.ControllerDescriptor.Actions[controllerContext.Action];
+			var mayBeActions = controllerContext.ControllerDescriptor.Actions[controllerContext.Action];
+			MethodInfo action;
+			if (mayBeActions is ArrayList)
+				action = (MethodInfo) ((ArrayList) mayBeActions)[0];
+			else
+				action = (MethodInfo) mayBeActions;
+
 			var attributes = action.GetCustomAttributes(typeof (RequiredPermissionAttribute), true);
 
 			foreach (RequiredPermissionAttribute attribute in attributes)
