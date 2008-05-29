@@ -1,6 +1,6 @@
 using System;
 using System.Web.UI;
-using AdminInterface.Filters;
+using AdminInterface.Security;
 
 namespace AddUser
 {

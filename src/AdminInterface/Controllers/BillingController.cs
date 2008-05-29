@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Web;
 using System.Web.UI.WebControls;
-using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -178,14 +177,6 @@ namespace AdminInterface.Controllers
 		private static IList<Region> GetRegions()
 		{
 			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
-		}
-	}
-
-	public class RequiredPermissionAttribute : Attribute
-	{
-		public RequiredPermissionAttribute(PermissionType permissionType)
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

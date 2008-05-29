@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AdminInterface.Helpers;
+using AdminInterface.Security;
 using ICSharpCode.SharpZipLib.Zip;
 
 namespace AddUser

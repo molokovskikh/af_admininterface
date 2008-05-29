@@ -1,9 +1,9 @@
 using System;
 using AddUser;
-using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
@@ -24,6 +24,10 @@ namespace AdminInterface.Controllers
 		public void Info(uint cc)
 		{
 			var client = Client.Find(cc);
+
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+
 			PropertyBag["Client"] = client;
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
@@ -31,10 +35,14 @@ namespace AdminInterface.Controllers
 
 		[Layout("Common")]
 		[RequiredPermission(PermissionType.ChangePassword)]
-		public void ChangePassword(uint cc, uint ouar)
+		public void ChangePassword(uint ouar)
 		{
-			var client = Client.Find(cc);
-			var user = User.Find(ouar);
+			var user = User.GetById(ouar);
+			var client = user.Client;
+
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
@@ -50,7 +58,7 @@ namespace AdminInterface.Controllers
 									 string freeReason)
 		{
 			var client = Client.Find(clientCode);
-			var user = User.Find(userId);
+			var user = User.GetById(userId);
 			var administrator = SecurityContext.Administrator;
 			var password = Func.GeneratePassword();
 			var userName = administrator.UserName;

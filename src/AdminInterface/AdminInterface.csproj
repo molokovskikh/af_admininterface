@@ -138,12 +138,14 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
-    <Compile Include="Filters\AuthorizeFilter.cs" />
+    <Compile Include="Security\SecurityContext.cs" />
+    <Compile Include="Security\RequiredPermissionAttribute.cs" />
+    <Compile Include="Security\AuthorizeFilter.cs" />
     <Compile Include="Helpers\ADHelper.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
-    <Compile Include="Filters\NotHavePermissionException.cs" />
-    <Compile Include="Filters\NotAuthorizedException.cs" />
+    <Compile Include="Security\NotHavePermissionException.cs" />
+    <Compile Include="Security\NotAuthorizedException.cs" />
     <Compile Include="Helpers\NotificationHelper.cs" />
     <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ReportHelper.cs" />

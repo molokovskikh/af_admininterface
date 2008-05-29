@@ -1,4 +1,4 @@
-﻿using AdminInterface.Filters;
+﻿using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
@@ -15,7 +15,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 		}
 
-		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer, bool showRegistrationCard)
+		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
+		                       bool showRegistrationCard)
 		{
 			payer.UpdateAndFlush();
 			if (showRegistrationCard)

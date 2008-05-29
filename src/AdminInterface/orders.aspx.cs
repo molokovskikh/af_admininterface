@@ -4,6 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -32,8 +33,7 @@ namespace AddUser
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
-			var adapter = new MySqlDataAdapter(
-@"
+			var adapter = new MySqlDataAdapter(@"
 SELECT  oh.rowid, 
         oh.WriteTime, 
         PriceDate, 

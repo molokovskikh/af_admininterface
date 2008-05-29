@@ -1,7 +1,8 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.searchc" CodePage="1251"
 	CodeBehind="searchc.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
+<%@ Import Namespace="AdminInterface.Security"%>
 <%@ Import Namespace="AdminInterface.Models"%>
-<%@ Import Namespace="AdminInterface.Helpers"%>
+
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 <script type="text/javascript">

@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;

@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using AdminInterface.Filters;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using NHibernate.Criterion;

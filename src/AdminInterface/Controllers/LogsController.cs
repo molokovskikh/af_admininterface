@@ -1,8 +1,9 @@
 using System;
-using AdminInterface.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Model;
+using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -22,6 +23,9 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.Find(clientCode);
 
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+
 			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
 			                                                                   beginDate,
 			                                                                   endDate.AddDays(1));
@@ -33,9 +37,7 @@ namespace AdminInterface.Controllers
 		public void ShowUpdateDetails(uint updateLogEntityId)
 		{
 			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
-			PropertyBag["updateLogEntityId"] = logEntity.Id;
 			var detailsLogEntities = logEntity.UpdateDownload;
-			PropertyBag["detailLogEntities"] = detailsLogEntities;
 
 			ulong totalByteDownloaded = 0;
 			ulong totalBytes = 1;
@@ -45,6 +47,8 @@ namespace AdminInterface.Controllers
 				totalBytes = entity.TotalBytes;
 			}
 
+			PropertyBag["updateLogEntityId"] = logEntity.Id;
+			PropertyBag["detailLogEntities"] = detailsLogEntities;
 			PropertyBag["allDownloaded"] = totalByteDownloaded >= totalBytes;
 		}
 
@@ -61,11 +65,16 @@ namespace AdminInterface.Controllers
 
 		public void UpdateLog(uint clientCode, DateTime beginDate, DateTime endDate)
 		{
-			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(clientCode, 
+			var client = Client.Find(clientCode);
+
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+
+			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id, 
 																			   beginDate, 
 																			   endDate.AddDays(1));
 
-			PropertyBag["client"] = Client.Find(clientCode);
+			PropertyBag["client"] = client;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}
@@ -77,23 +86,33 @@ namespace AdminInterface.Controllers
 
 		public void PasswordChangeLog(string login, DateTime beginDate, DateTime endDate)
 		{
-			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(login, beginDate, endDate.AddDays(1));
+			var user = User.GetByLogin(login);
+			SecurityContext.Administrator.CheckClientType(user.Client.Type);
+			SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
+
+			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
+			                                                                beginDate,
+			                                                                endDate.AddDays(1));
 			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}
 
+		[RequiredPermission(PermissionType.MonitorUpdates)]
 		public void ClientRegistrationLog()
 		{
 			ClientRegistrationLog(DateTime.Today.AddDays(-1), DateTime.Today, 0);
 		}
 
+		[RequiredPermission(PermissionType.MonitorUpdates)]
 		public void ClientRegistrationLog(DateTime beginDate, DateTime endDate, int dayWithoutUpdate)
 		{
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 			PropertyBag["dayWithoutUpdate"] = dayWithoutUpdate;
-			PropertyBag["logEntities"] = ClientRegistrationLogEntity.GetEntitiesForPeriond(beginDate, endDate, dayWithoutUpdate);
+			PropertyBag["logEntities"] = ClientRegistrationLogEntity.GetEntitiesForPeriond(beginDate,
+			                                                                               endDate.AddDays(1),
+			                                                                               dayWithoutUpdate);
 		}
 	}
 }
