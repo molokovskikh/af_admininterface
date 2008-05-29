@@ -22,6 +22,10 @@ namespace AdminInterface.Controllers
 		public void Edit(uint clientCode, bool showClients)
 		{
 			var client = Client.Find(clientCode);
+
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+
 			var clientMessage = ClientMessage.TryFind(clientCode);
 
 			if (clientMessage != null)
