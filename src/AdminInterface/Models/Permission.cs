@@ -1,4 +1,6 @@
-﻿using Castle.ActiveRecord;
+﻿using System.Collections.Generic;
+using Castle.ActiveRecord;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
@@ -13,5 +15,13 @@ namespace AdminInterface.Models
 
 		[Property]
 		public PermissionType Type { get; set; }
+
+		[Property]
+		public string Shortcut { get; set; }
+
+		public static IList<Permission> FindAll()
+		{
+			return ActiveRecordMediator<Permission>.FindAll(new [] { Order.Asc("Name") });
+		}
 	}
 }

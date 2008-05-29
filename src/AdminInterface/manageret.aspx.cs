@@ -3,13 +3,11 @@ using System.Data;
 using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
-using System.IO;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
-using DAL;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -48,8 +46,6 @@ namespace AddUser
 		MySqlTransaction myTrans;
 		int ClientCode;
 		ulong HomeRegionCode;
-		ulong WorkMask;
-		ulong OrderMask;
 		string InsertCommand;
 
 
@@ -176,14 +172,6 @@ namespace AddUser
 			myMySqlCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
 			myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
-			for (var i = 0; i <= WRList.Items.Count - 1; i++)
-			{
-				if (WRList.Items[i].Selected)
-					WorkMask = WorkMask + Convert.ToUInt64(WRList.Items[i].Value);
-				if (OrderList.Items[i].Selected)
-					OrderMask = OrderMask + Convert.ToUInt64(OrderList.Items[i].Value);
-			}
-
 			try
 			{
 				_connection.Open();
@@ -196,24 +184,44 @@ set @inUser = ?UserName;
 ";
 				myMySqlCommand.ExecuteNonQuery();
 
-				myMySqlCommand.CommandText = "select MaskRegion from clientsdata where firmcode=?clientCode";
-				var currentRegionMask = Convert.ToUInt64(myMySqlCommand.ExecuteScalar());
-				//хитрая фиговина!: суть в том что если региональному администратору доступно меньше 
-				//регионов чем есть у клиента то при изменении регионов клиента, регионы которые
-				//не доступны администратору будут потерты, что бы избежать этого сначала 
-				//вычисляем те регионы которые не доступны региональному администратору 
-				//делается это так currentRegionMask & ~SecurityContext.Administrator.RegionMask
-				//а затем объединяем с тем что имеем
-				WorkMask |= (currentRegionMask & ~SecurityContext.Administrator.RegionMask);
+				myMySqlCommand.CommandText = @"
+select MaskRegion, OrderRegionMask
+from clientsdata cd
+	join retclientsset rcs on cd.FirmCode = rcs.ClientCode
+where firmcode=?clientCode";
 
-				myMySqlCommand.CommandText = "select OrderRegionMask from retclientsset where clientcode=?clientCode";
-				var currentOrderMask = Convert.ToUInt64(myMySqlCommand.ExecuteScalar());
-				OrderMask |= (currentOrderMask & ~SecurityContext.Administrator.RegionMask);
+				ulong workRegionMask;
+				ulong orderRegionMask;
+				using (var reader = myMySqlCommand.ExecuteReader())
+				{
+					reader.Read();
+					workRegionMask = reader.GetUInt64("MaskRegion");
+					orderRegionMask = reader.GetUInt64("WorkRegionMask");
+				}
 
-				myMySqlCommand.Parameters.AddWithValue("?WorkMask", WorkMask);
-				myMySqlCommand.Parameters.AddWithValue("?OrderMask", OrderMask);
+				var currentWorkRegionMask = workRegionMask;
+				var currentOrderRegionMask = orderRegionMask;
 
-				if (WorkMask != currentRegionMask)
+				foreach (ListItem item in WRList.Items)
+				{
+					if (item.Selected)
+						currentWorkRegionMask |= Convert.ToUInt64(item.Value);
+					else
+						currentWorkRegionMask &= ~Convert.ToUInt64(item.Value);
+				}
+
+				foreach (ListItem item in OrderList.Items)
+				{
+					if (item.Selected)
+						currentOrderRegionMask |= Convert.ToUInt64(item.Value);
+					else
+						currentOrderRegionMask &= ~Convert.ToUInt64(item.Value);
+				}
+
+				myMySqlCommand.Parameters.AddWithValue("?WorkMask", currentWorkRegionMask);
+				myMySqlCommand.Parameters.AddWithValue("?OrderMask", currentOrderRegionMask);
+
+				if (currentWorkRegionMask != workRegionMask)
 				{
 					InsertCommand =
 @"
@@ -398,7 +406,7 @@ WHERE
 					  + " and clientcode=firmcode" + " and regionaladmins.username=?UserName"
 					  + " and a.regioncode & regionaladmins.RegionMask > 0"
 					  + " group by regioncode" + " order by region";
-			MySqlDataAdapter adapter = new MySqlDataAdapter(sqlCommand, _connection);
+			var adapter = new MySqlDataAdapter(sqlCommand, _connection);
 			adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 			adapter.SelectCommand.Parameters.AddWithValue("?RegCode", RegCode);
 			adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
@@ -514,7 +522,7 @@ WHERE   rcs.clientcode     = ?ClientCode
 				{
 					myMySqlDataReader.Read();
 					VisileStateList.SelectedValue = myMySqlDataReader["InvisibleOnFirm"].ToString();
-					VisileStateList.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.CreateInvisible);
+					VisileStateList.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible);
 
 					RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
 					RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
@@ -578,7 +586,7 @@ ORDER BY sg.DisplayName;
 
 		protected void GeneratePasswords_Click(object sender, EventArgs e)
 		{
-			CommandFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
+			//CommandFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
 			ResultL.Text = "Пароли сгенерированны";
 		}
 

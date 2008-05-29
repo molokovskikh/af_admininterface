@@ -22,12 +22,49 @@ namespace AdminInterface.Models
 		[Property]
 		public ulong RegionMask { get; set; }
 
-		[HasAndBelongsToMany(typeof(Permission), RelationType.Bag, Table = "accessright.AdminsPermissions", ColumnKey = "AdminId", ColumnRef = "PermissionId", Lazy = false)]
+		[Property]
+		public string ManagerName { get; set; }
+
+		[Property]
+		public string PhoneSupport { get; set; }
+
+		[HasAndBelongsToMany(typeof(Permission), 
+							 RelationType.Bag, 
+							 Table = "accessright.AdminsPermissions", 
+							 ColumnKey = "AdminId", 
+							 ColumnRef = "PermissionId", 
+							 Cascade = ManyRelationCascadeEnum.All,
+							 Lazy = false)]
 		public IList<Permission> AllowedPermissions { get; set; }
 
 		public static Administrator GetByName(string name)
 		{
 			return ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
+		}
+
+		public static Administrator GetById(uint id)
+		{
+			return ActiveRecordMediator<Administrator>.FindByPrimaryKey(id);
+		}
+
+		public static IList<Administrator> FindAll()
+		{
+			return ActiveRecordMediator<Administrator>.FindAll(new[] { Order.Asc("UserName") });
+		}
+
+		public void Delete()
+		{
+			ActiveRecordMediator<Administrator>.Delete(this);
+		}
+
+		public void Save()
+		{
+			ActiveRecordMediator<Administrator>.Save(this);
+		}
+
+		public void Update()
+		{
+			ActiveRecordMediator<Administrator>.Update(this);
 		}
 
 		private bool HavePermision(PermissionType permission)

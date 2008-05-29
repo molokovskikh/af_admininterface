@@ -87,7 +87,7 @@
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" 
 											runat="server" 
-											Enabled='<%# SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision) %>' 
+											Enabled='<%# SecurityContext.Administrator.HavePermisions(PermissionType.Billing) %>' 
 											Text='<%# Bind("BillingCode") %>' 
 											NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}", Eval("bfc")) %>' />
 						</ItemTemplate>

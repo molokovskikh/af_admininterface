@@ -1,9 +1,11 @@
 using System;
 using System.Data;
 using System.Web.UI;
+using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
-using DAL;
+using MySql.Data.MySqlClient;
+
 
 public partial class EditRegionalInfo : Page
 {
@@ -24,60 +26,58 @@ public partial class EditRegionalInfo : Page
 		StateHelper.CheckSession(this, ViewState);
 		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageSuppliers, PermissionType.ViewSuppliers);
 		
-		if (!IsPostBack)
-		{
-			int regionalSettingsCode = -1;
-			if (int.TryParse(Request["id"], out regionalSettingsCode))
-			{
-				_regionalSettingsCode = regionalSettingsCode;
-				BindData();
-			}
-			else
-				throw new ArgumentException(string.Format("Не верный аргумент id = {0}", Request["id"]), "id");
-		}
+		if (IsPostBack)
+			return;
+		int regionalSettingsCode;
+    	if (!int.TryParse(Request["id"], out regionalSettingsCode))
+    		throw new ArgumentException(string.Format("Не верный аргумент id = {0}", Request["id"]), "id");
+
+    	_regionalSettingsCode = regionalSettingsCode;
+    	BindData();
     }
 
 	private void BindData()
 	{	
-		string commandText =
-@"
+		var commandText = @"
 SELECT Region, rd.RegionCode, ShortName, ContactInfo, OperativeInfo, rd.FirmCode
 FROM usersettings.regionaldata rd
 	INNER JOIN usersettings.clientsdata cd ON cd.FirmCode = rd.FirmCode
 		INNER JOIN farm.regions r on r.RegionCode = rd.RegionCode
-WHERE RowID = ?Id
-";
-		IDataCommand command = new DataCommand(commandText, IsolationLevel.ReadCommitted);
-		command.Parameters.Add("?Id", _regionalSettingsCode);
-		command.Execute();
-		
-		if (command.Data.Tables[0].Rows.Count == 0)
-			throw new ArgumentException(string.Format("Записи с id = {0}, не существует", _clientCode), "id");
-		
-		ContactInfoText.Text = command.Data.Tables[0].Rows[0]["ContactInfo"].ToString();
-		OperativeInfoText.Text = command.Data.Tables[0].Rows[0]["OperativeInfo"].ToString();
-		_clientCode = Convert.ToInt32(command.Data.Tables[0].Rows[0]["FirmCode"]);
-		ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", command.Data.Tables[0].Rows[0]["ShortName"]);
-		RegionInfoLabel.Text = String.Format("В регионе: {0}", command.Data.Tables[0].Rows[0]["Region"]);
+WHERE RowID = ?Id";
 
-		var regionCode = Convert.ToUInt64(command.Data.Tables[0].Rows[0]["RegionCode"]);
-		SecurityContext.Administrator.CheckClientHomeRegion(regionCode);
+		using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+		{
+			connection.Open();
+			var command = new MySqlCommand(commandText);
+			command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
+			using (var reader = command.ExecuteReader())
+			{
+				reader.Read();
+
+				ContactInfoText.Text = reader.GetString("ContactInfo");
+				OperativeInfoText.Text = reader.GetString("OperativeInfo");
+				_clientCode = reader.GetInt32("FirmCode");
+				ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", reader.GetString("ShortName"));
+				RegionInfoLabel.Text = String.Format("В регионе: {0}", reader.GetString("Region"));
+
+				var regionCode = reader.GetUInt64("RegionCode");
+				SecurityContext.Administrator.CheckClientHomeRegion(regionCode);
+			}
+		}
 	}
 	
 	protected void SaveButton_Click(object sender, EventArgs e)
 	{
-		string commandText =
-@"
+		var commandText = @"
 UPDATE usersettings.regionaldata
 SET ContactInfo = ?ContactInformation, 
 	OperativeInfo = ?Information
-WHERE RowId = ?Id;
-";
-		IParametericCommand command = new ParametericCommand(commandText, IsolationLevel.RepeatableRead);
-		command.Parameters.Add("?Id", _regionalSettingsCode);
-		command.Parameters.Add("?ContactInformation", ContactInfoText.Text);
-		command.Parameters.Add("?Information", OperativeInfoText.Text);
-		command.Execute();
+WHERE RowId = ?Id;";
+		var command = new MySqlCommand(commandText);
+		command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
+		command.Parameters.AddWithValue("?ContactInformation", ContactInfoText.Text);
+		command.Parameters.AddWithValue("?Information", OperativeInfoText.Text);
+		command.ExecuteNonQuery();
 		Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));
 	}
 	

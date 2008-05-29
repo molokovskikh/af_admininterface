@@ -1,16 +1,11 @@
 using System;
-using System.Text;
 using System.Web;
-using AdminInterface.Filters;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Config;
-using DAL;
 using System.Reflection;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;
-using NHibernate.Cfg;
 using NHibernate.Dialect.Function;
 
 namespace AddUser

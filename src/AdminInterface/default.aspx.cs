@@ -3,7 +3,6 @@ using System.Data;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
-using DAL;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -153,7 +152,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				CloneHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.CopySynonyms);
 				ClInfHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
 				                                                                     PermissionType.ViewDrugstore);
-				BillingHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision);
+				BillingHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.Billing);
 				MonitorUpdates.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.MonitorUpdates);
 				ViewAdministrators.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageAdministrators);
 				ShowStatHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,

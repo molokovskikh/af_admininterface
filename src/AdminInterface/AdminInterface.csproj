@@ -182,15 +182,6 @@
     <Compile Include="CopySynonym.aspx.designer.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
     </Compile>
-    <Compile Include="DAL\Administrator.cs" />
-    <Compile Include="DAL\Command.cs" />
-    <Compile Include="DAL\CommandFactory\CommandFactory.cs" />
-    <Compile Include="DAL\CommandFactory\RegionFactory.cs" />
-    <Compile Include="DAL\Commands.cs" />
-    <Compile Include="DAL\DataCommand.cs" />
-    <Compile Include="DAL\ParametericCommand.cs" />
-    <Compile Include="DAL\Region.cs" />
-    <Compile Include="DAL\ScalarCommand.cs" />
     <Compile Include="default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

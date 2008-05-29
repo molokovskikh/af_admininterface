@@ -154,7 +154,7 @@ INTO    logs.clientsinfo VALUES
 			}
 
 			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", ClientCode);
-			BillingLink.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.BillingPermision);
+			BillingLink.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.Billing);
 		}
 
 		private void GetData()

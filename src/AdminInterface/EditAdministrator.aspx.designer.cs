@@ -85,148 +85,22 @@ public partial class EditAdministrator {
     protected global::System.Web.UI.WebControls.RegularExpressionValidator EmailValidator;
     
     /// <summary>
-    /// DefaultSegment control.
+    /// RegionSelector control.
     /// </summary>
     /// <remarks>
     /// Auto-generated field.
     /// To modify move field declaration from designer file to code-behind file.
     /// </remarks>
-    protected global::System.Web.UI.WebControls.DropDownList DefaultSegment;
+    protected global::System.Web.UI.WebControls.CheckBoxList RegionSelector;
     
     /// <summary>
-    /// Regions control.
+    /// PermissionSelector control.
     /// </summary>
     /// <remarks>
     /// Auto-generated field.
     /// To modify move field declaration from designer file to code-behind file.
     /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBoxList Regions;
-    
-    /// <summary>
-    /// AllowManageAdminAccounts control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowManageAdminAccounts;
-    
-    /// <summary>
-    /// AllowCreateRetail control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowCreateRetail;
-    
-    /// <summary>
-    /// AllowCreateVendor control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowCreateVendor;
-    
-    /// <summary>
-    /// AllowRetailInterface control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowRetailInterface;
-    
-    /// <summary>
-    /// AllowVendorInterface control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowVendorInterface;
-    
-    /// <summary>
-    /// AllowChangeSegment control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowChangeSegment;
-    
-    /// <summary>
-    /// AllowManage control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowManage;
-    
-    /// <summary>
-    /// AllowClone control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowClone;
-    
-    /// <summary>
-    /// AllowChangePassword control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowChangePassword;
-    
-    /// <summary>
-    /// AllowCreateInvisible control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox AllowCreateInvisible;
-    
-    /// <summary>
-    /// SendAlert control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox SendAlert;
-    
-    /// <summary>
-    /// UseRegistrant control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox UseRegistrant;
-    
-    /// <summary>
-    /// ShowRetail control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox ShowRetail;
-    
-    /// <summary>
-    /// ShowVendor control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.CheckBox ShowVendor;
+    protected global::System.Web.UI.WebControls.CheckBoxList PermissionSelector;
     
     /// <summary>
     /// Save control.
@@ -245,13 +119,4 @@ public partial class EditAdministrator {
     /// To modify move field declaration from designer file to code-behind file.
     /// </remarks>
     protected global::System.Web.UI.WebControls.Button Cancel;
-    
-    /// <summary>
-    /// RegionsDataSource control.
-    /// </summary>
-    /// <remarks>
-    /// Auto-generated field.
-    /// To modify move field declaration from designer file to code-behind file.
-    /// </remarks>
-    protected global::System.Web.UI.WebControls.ObjectDataSource RegionsDataSource;
 }

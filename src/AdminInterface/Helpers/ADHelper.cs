@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.DirectoryServices;
-using DAL;
+using AdminInterface.Models;
 
 namespace AdminInterface.Helpers
 {

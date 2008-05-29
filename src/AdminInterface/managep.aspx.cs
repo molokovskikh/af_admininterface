@@ -7,7 +7,6 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
-using DAL;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -182,7 +181,7 @@ ORDER BY region;
                 _connection.Close();
             }
 
-			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", Data.Tables["Prices"].DefaultView[0]["ShortName"].ToString());
+			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", Data.Tables["Prices"].DefaultView[0]["ShortName"]);
 		}
 
 
@@ -521,21 +520,22 @@ ORDER BY region;";
 		
 		private void UpdateMaskRegion()
 		{
-			var maskRegionCommand = new ScalarCommand(
-@"
-SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;
-", IsolationLevel.ReadCommitted);
-			maskRegionCommand.Parameters.Add("?ClientCode", _clientCode);
-			maskRegionCommand.Execute();
-			var oldMaskRegion = Convert.ToUInt64(maskRegionCommand.Result);
+			var maskRegionCommand = new MySqlCommand(@"SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;");
+			maskRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+			var oldMaskRegion = Convert.ToUInt64(maskRegionCommand.ExecuteScalar());
 			var newMaskRegion = oldMaskRegion;
 			foreach (ListItem item in WorkRegionList.Items)
-				newMaskRegion = item.Selected ? newMaskRegion | Convert.ToUInt64(item.Value) : newMaskRegion & ~Convert.ToUInt64(item.Value);
-
-			if(oldMaskRegion != newMaskRegion)
 			{
-				var updateCommand = new ParametericCommand(
-@"
+				if (item.Selected)
+					newMaskRegion |= Convert.ToUInt64(item.Value);
+				else
+					newMaskRegion &= ~Convert.ToUInt64(item.Value);
+			}
+
+			if (oldMaskRegion == newMaskRegion) 
+				return;
+
+			var updateCommand = new MySqlCommand(@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -612,14 +612,12 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND clientsdata.firmcode = ?ClientCode
-		AND clientsdata2.FirmType = 1;
-", IsolationLevel.RepeatableRead);
-				updateCommand.Parameters.Add("?MaskRegion", newMaskRegion);
-				updateCommand.Parameters.Add("?ClientCode", _clientCode);
-				updateCommand.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				updateCommand.Parameters.Add("?UserName", SecurityContext.Administrator.UserName);
-				updateCommand.Execute();
-			}
+		AND clientsdata2.FirmType = 1;");
+			updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
+			updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+			updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+			updateCommand.ExecuteNonQuery();
 		}
 		
 		private void UpdateHomeRegion()
@@ -627,29 +625,27 @@ WHERE   intersection.pricecode IS NULL
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
 			if (_homeRegion != currentHomeRegion)
 			{
-				var command = new ParametericCommand(@"
+				var command = new MySqlCommand(@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
 UPDATE ClientsData 
 SET RegionCode = ?RegionCode
-WHERE FirmCode = ?ClientCode;
-", IsolationLevel.RepeatableRead);
-				command.Parameters.Add("?RegionCode", currentHomeRegion);
-				command.Parameters.Add("?ClientCode", _clientCode);
-				command.Parameters.Add("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.Add("?UserName", SecurityContext.Administrator.UserName);
-				command.Execute();
+WHERE FirmCode = ?ClientCode;");
+				command.Parameters.AddWithValue("?RegionCode", currentHomeRegion);
+				command.Parameters.AddWithValue("?ClientCode", _clientCode);
+				command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				command.ExecuteNonQuery();
 			}
 		}
 		
 		private ulong GetHomeRegion()
 		{
-			var homeRegionCommand = new ScalarCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;");
-			homeRegionCommand.Parameters.Add("?ClientCode", _clientCode);
-			homeRegionCommand.Execute();
+			var homeRegionCommand = new MySqlCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;");
+			homeRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 
-			return Convert.ToUInt64(homeRegionCommand.Result);
+			return Convert.ToUInt64(homeRegionCommand.ExecuteScalar());
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
@@ -660,7 +656,7 @@ WHERE FirmCode = ?ClientCode;
 				if (rows.Length > 0)
 				{
 					if (Convert.ToBoolean(rows[0]["Enable"]) == false)
-						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5"); ;
+						e.Row.BackColor = ColorTranslator.FromHtml("#B5B5B5"); 
 				}
 				else
 				{

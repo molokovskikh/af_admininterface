@@ -1,15 +1,28 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 
 public partial class ViewAdministrators : Page
 {
+	private IList<Permission> permissions;
+
     protected void Page_Load(object sender, EventArgs e)
     {
 		System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
-		if (Convert.ToInt32(Session["AccessGrant"]) != 1)
-			Response.Redirect("default.aspx");
+		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
+
+    	permissions = Permission.FindAll();
+
+		if (IsPostBack)
+			return;
+
+    	var administrators = Administrator.FindAll();
+    	Administrators.DataSource = administrators;
+		DataBind();
     }
 
 	protected void Administrators_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -26,18 +39,23 @@ public partial class ViewAdministrators : Page
 					Response.Redirect(String.Format("EditAdministrator.aspx?id={0}", e.CommandArgument));
 					break;
 				}
-			case "Block":
+			case "Disable":
 				{
-					ADHelper.Block(e.CommandArgument.ToString());
+					ADHelper.Disable(e.CommandArgument.ToString());
 					Response.Redirect("ViewAdministrators.aspx");
 					break;
 				}
-			case "Unblock":
+			case "Enable":
 				{
-					ADHelper.Unlock(e.CommandArgument.ToString());
+					ADHelper.Enable(e.CommandArgument.ToString());
 					Response.Redirect("ViewAdministrators.aspx");
 					break;
 				}
+			case "Del":
+				var administrator = Administrator.GetById(Convert.ToUInt32(e.CommandArgument));
+				administrator.Delete();
+				Response.Redirect("ViewAdministrators.aspx");
+				break;
 		}
 	}
 
@@ -50,9 +68,9 @@ public partial class ViewAdministrators : Page
 
 	protected string GetButtonCommand(string login)
 	{
-		if (ADHelper.IsLocked(login))
-			return "Unblock";
-		return "Block";
+		if (ADHelper.IsDisabled(login))
+			return "Enable";
+		return "Disable";
 	}
 
 	protected bool GetDeleteBlockButtonVisibiliti(string login)
@@ -60,5 +78,19 @@ public partial class ViewAdministrators : Page
 		if (login == "Boss" || login == "michail")
 			return false;
 		return true;
+	}
+
+	protected string GetPermissionShortcut(PermissionType permissionType)
+	{
+		return (from permission in permissions
+		       where permissionType == permission.Type
+		       select permission.Shortcut).First();
+	}
+
+	protected string GetPermissionName(PermissionType permissionType)
+	{
+		return (from permission in permissions
+				where permissionType == permission.Type
+				select permission.Name).First();
 	}
 }
