@@ -138,9 +138,10 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Security\SecurityAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
     <Compile Include="Security\RequiredPermissionAttribute.cs" />
-    <Compile Include="Security\AuthorizeFilter.cs" />
+    <Compile Include="Security\SecurityFilter.cs" />
     <Compile Include="Helpers\ADHelper.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />

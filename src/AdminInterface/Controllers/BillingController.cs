@@ -16,8 +16,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
-	[RequiredPermission(PermissionType.Billing)]
+	[Security(PermissionType.Billing)]
 	public class BillingController : ARSmartDispatcherController
 	{
 		public void Edit(uint clientCode, bool showClients)

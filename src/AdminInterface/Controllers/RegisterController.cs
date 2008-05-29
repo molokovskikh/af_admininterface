@@ -1,11 +1,12 @@
-﻿using AdminInterface.Security;
+﻿using AdminInterface.Models;
+using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
+	[Security(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf)]
 	public class RegisterController : SmartDispatcherController
 	{
 		public void Register(uint id, bool showRegistrationCard)

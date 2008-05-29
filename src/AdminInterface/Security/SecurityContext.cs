@@ -25,6 +25,7 @@ namespace AdminInterface.Security
 				{
 					administrator = Administrator.GetByName(HttpContext.Current.User.Identity.Name);
 #if !DEBUG
+					HttpContext.Current.Session["UserName"] = administrator.UserName;
 					HttpContext.Current.Session[AdministratorKey] = administrator;
 #endif
 				}

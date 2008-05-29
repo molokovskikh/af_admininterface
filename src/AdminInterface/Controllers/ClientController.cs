@@ -11,7 +11,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter)), Helper(typeof(ADHelper))]
+	[Security, Helper(typeof(ADHelper))]
 	public class ClientController : SmartDispatcherController
 	{
 		public override void PreSendView(object view)

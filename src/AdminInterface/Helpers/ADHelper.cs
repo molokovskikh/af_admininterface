@@ -135,16 +135,20 @@ namespace AdminInterface.Helpers
 
 		public static void Disable(string login)
 		{
+#if !DEBUG
 			var entity = GetDirectoryEntry(login);
 			entity.InvokeSet("AccountDisabled", true);
 			entity.CommitChanges();
+#endif
 		}
 
 		public static void Enable(string login)
 		{
+#if !DEBUG
 			var entiry = GetDirectoryEntry(login);
 			entiry.InvokeSet("AccountDisabled", false);
 			entiry.CommitChanges();
+#endif
 		}
 
 		public static void CreateAdministratorInAd(Administrator administrator)

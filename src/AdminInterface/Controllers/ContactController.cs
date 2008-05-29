@@ -8,7 +8,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("contact")]
-	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
+	[Security]
 	public class ContactController : AbstractContactController
 	{
 		public void NewContactGroup(uint billingCode)
@@ -27,7 +27,6 @@ namespace AdminInterface.Controllers
 			    || ValidationHelper.IsCollectionHasNotValideObject(contacts))
 			{
 				contactGroup.Contacts = CleanUp(contacts);
-//				PropertyBag["ValidationErrors"] = ValidationSummaryPerInstance;
 				PropertyBag["billingCode"] = billingCode;
 				PropertyBag["contactGroup"] = contactGroup;
 				RenderView("NewContactGroup");

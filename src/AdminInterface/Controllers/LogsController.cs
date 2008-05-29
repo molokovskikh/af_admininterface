@@ -11,7 +11,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Layout("logs"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Filter(ExecuteWhen.BeforeAction, typeof(AuthorizeFilter))]
+	[Security]
 	public class LogsController : SmartDispatcherController
 	{
 		public void DocumentLog(uint clientCode)
@@ -87,6 +87,7 @@ namespace AdminInterface.Controllers
 		public void PasswordChangeLog(string login, DateTime beginDate, DateTime endDate)
 		{
 			var user = User.GetByLogin(login);
+
 			SecurityContext.Administrator.CheckClientType(user.Client.Type);
 			SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
 
