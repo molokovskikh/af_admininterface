@@ -294,11 +294,9 @@ ORDER BY region;
 			}
 			_command.Connection = _connection;
 			_command.Transaction = mytrans;
-			_command.CommandText =
-				@"
+			_command.CommandText = @"
 set @inHost = ?Host;
-set @inUser = ?UserName;
-";
+set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
 			_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			_command.ExecuteNonQuery();
@@ -450,7 +448,7 @@ where length(c.contactText) > 0
 											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
 											 + "Ошибка: Ничего не получилось выбрать из базы",
 									  "RegisterList@subscribe.analit.net", String.Empty,
-									  DS1.Tables["admin"].Rows[0]["email"].ToString());
+									  SecurityContext.Administrator.Email);
 						}
 					}
 				}
@@ -463,7 +461,7 @@ where length(c.contactText) > 0
 					                 + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                 + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 					                 + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
-					          DS1.Tables["admin"].Rows[0]["email"].ToString());
+							  SecurityContext.Administrator.Email);
 				}
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
@@ -471,7 +469,7 @@ where length(c.contactText) > 0
 				                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
 				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
-				          DS1.Tables["admin"].Rows[0]["email"].ToString());
+						  SecurityContext.Administrator.Email);
 
 				Func.Mail("register@analit.net",
 				          "",
@@ -576,8 +574,7 @@ where length(c.contactText) > 0
 
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
-			var adapter =
-				new MySqlDataAdapter(
+			var adapter = new MySqlDataAdapter(
 					@"
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
@@ -990,6 +987,7 @@ WHERE	dst.clientcode        = ?ClientCode
 			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier);
 
 			_connection.ConnectionString = Literals.GetConnectionString();
+
 			try
 			{
 				_connection.Open();
@@ -1006,7 +1004,7 @@ SELECT  regionaladmins.username,
 FROM    accessright.regionaladmins, 
         farm.regions 
 WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
-        AND username                                                    = ?UserName 
+        AND username = ?UserName 
 ORDER BY region;
 ",
 					_connection);
@@ -1018,63 +1016,49 @@ ORDER BY region;
 			finally
 			{
 				_connection.Close();
-			}
-			if (DS1.Tables["admin"].Rows.Count < 1)
-				throw new Exception("Пользователь " + SecurityContext.Administrator.UserName + " не найден!");
 
-			if (!IsPostBack)
+			}
+
+			if (IsPostBack) 
+				return;
+
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible))
+				CustomerType.Visible = true;
+
+			RegionDD.DataBind();
+
+			for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
 			{
-				if (Convert.ToInt32(DS1.Tables["admin"].Rows[0]["AlowCreateInvisible"]) == 1)
-					CustomerType.Visible = true;
-
-				RegionDD.DataBind();
-				for (int i = 0; i <= RegionDD.Items.Count - 1; i++)
+				if (RegionDD.Items[i].Text == DS1.Tables["admin"].Rows[0][2].ToString())
 				{
-					if (RegionDD.Items[i].Text == DS1.Tables["admin"].Rows[0][2].ToString())
-					{
-						RegionDD.SelectedIndex = i;
-						break;
-					}
-				}
-				string iInt = DS1.Tables["admin"].Rows[0][1].ToString();
-				SetWorkRegions(iInt, CheckBox1.Checked);
-				if (DS1.Tables["admin"].Rows[0][3].ToString() == "1")
-				{
-					TypeDD.Items.Add("Аптека");
-					TypeDD.Items[0].Value = "1";
-				}
-				if (DS1.Tables["admin"].Rows[0][4].ToString() == "1")
-				{
-					TypeDD.Items.Add("Поставщик");
-					TypeDD.Items[TypeDD.Items.Count - 1].Value = "0";
-				}
-				if (TypeDD.Items.Count == 1)
-				{
-					TypeDD.Enabled = false;
-				}
-				if (DS1.Tables["admin"].Rows[0][5].ToString() == "1")
-				{
-					SegmentDD.Items.Add("Опт");
-					SegmentDD.Items[0].Value = "0";
-					SegmentDD.Items.Add("Розница");
-					SegmentDD.Items[1].Value = "1";
-					SegmentDD.SelectedIndex = Convert.ToInt32(DS1.Tables["admin"].Rows[0][6]);
-				}
-				else
-				{
-					if (DS1.Tables["admin"].Rows[0][6].ToString() == "0")
-					{
-						SegmentDD.Items.Add("Опт");
-						SegmentDD.Items[0].Value = "0";
-					}
-					else
-					{
-						SegmentDD.Items.Add("Розница");
-						SegmentDD.Items[0].Value = "1";
-					}
-					SegmentDD.Enabled = false;
+					RegionDD.SelectedIndex = i;
+					break;
 				}
 			}
+
+			string iInt = DS1.Tables["admin"].Rows[0][1].ToString();
+			SetWorkRegions(iInt, CheckBox1.Checked);
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterDrugstore))
+			{
+				TypeDD.Items.Add("Аптека");
+				TypeDD.Items[0].Value = "1";
+			}
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterSupplier))
+			{
+				TypeDD.Items.Add("Поставщик");
+				TypeDD.Items[TypeDD.Items.Count - 1].Value = "0";
+			}
+			if (TypeDD.Items.Count == 1)
+				TypeDD.Enabled = false;
+
+			if (!SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible))
+				CustomerType.Items.Remove(CustomerType.Items[2]);
+
+			SegmentDD.Items.Add("Опт");
+			SegmentDD.Items[0].Value = "0";
+			SegmentDD.Items.Add("Розница");
+			SegmentDD.Items[1].Value = "1";
+			ClientTypeChanged(null, EventArgs.Empty);
 		}
 
 		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
