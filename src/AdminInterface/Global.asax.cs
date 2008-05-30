@@ -1,15 +1,22 @@
 using System;
+using System.Collections.Generic;
 using System.Web;
 #if !DEBUG
 using System.Text;
 using AdminInterface.Security;
 #endif
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Common.Web.Ui.Models;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;
+using NHibernate;
+using NHibernate.Engine;
+using NHibernate.Mapping;
+using NHibernate.Type;
 
 namespace AddUser
 {
@@ -32,6 +39,25 @@ namespace AddUser
 
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 
+				var configuration = ActiveRecordMediator
+					.GetSessionFactoryHolder()
+					.GetAllConfigurations()[0];
+
+				configuration.FilterDefinitions.Add("HomeRegionFilter",
+				                                    new FilterDefinition("HomeRegionFilter",
+				                                                         "",
+				                                                         new Dictionary<string, IType>{{"AdminRegionMask", NHibernateUtil.UInt64}}));
+				configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
+				                                    new FilterDefinition("DrugstoreOnlyFilter", "", null));
+				configuration.FilterDefinitions.Add("SupplierOnlyFilter",
+				                                    new FilterDefinition("SupplierOnlyFilter", "", null));
+
+				var classMapping = configuration.GetClassMapping(typeof (Payer));
+				var colection = (Collection) classMapping.GetProperty("Clients").Value;
+
+				colection.AddFilter("HomeRegionFilter", "RegionCode & :AdminRegionMask > 0");
+				colection.AddFilter("DrugstoreOnlyFilter", "FirmType = 1");
+				colection.AddFilter("SupplierOnlyFilter", "FirmType = 0");
 			}
 			catch(Exception ex)
 			{

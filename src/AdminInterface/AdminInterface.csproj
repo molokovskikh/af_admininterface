@@ -139,6 +139,7 @@
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
+    <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecurityAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
     <Compile Include="Security\RequiredPermissionAttribute.cs" />
@@ -396,12 +397,12 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Views\Billing\Common\PayerEdit.brail" />
-    <None Include="Views\Billing\Register.brail" />
+    <None Include="Views\Register\Register.brail" />
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Billing\ShowMessageForClientPartial.brail" />
     <None Include="Views\Billing\ShowMessageForClient.brailjs" />
-    <None Include="Views\Billing\SuccessRegistration.brail" />
+    <None Include="Views\Register\SuccessRegistration.brail" />
     <None Include="Views\Client\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Layouts\Common.brail" />

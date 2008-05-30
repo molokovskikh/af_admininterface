@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
-using AdminInterface.Filters;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
@@ -28,15 +28,15 @@ namespace AdminInterface.Test.Models
 			          	{
 			          		AllowedPermissions = new List<Permission> { new Permission { Type = PermissionType.ViewDrugstore } }
 			          	};
-			Assert.That(adm.ClientTypeFilter("cd"), Is.EqualTo(" and cd.FirmType = 1 "));
+			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" and cd.FirmType = 1 "));
 
 			adm.AllowedPermissions.Clear();
 
 			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
-			Assert.That(adm.ClientTypeFilter("cd"), Is.EqualTo(" and cd.FirmType = 0 "));
+			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" and cd.FirmType = 0 "));
 
 			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
-			Assert.That(adm.ClientTypeFilter("cd"), Is.EqualTo(" "));
+			Assert.That(adm.GetClientFilterByType("cd"), Is.EqualTo(" "));
 		}
 
 		[Test]
@@ -46,12 +46,12 @@ namespace AdminInterface.Test.Models
 			{
 				AllowedPermissions = new List<Permission> { new Permission { Type = PermissionType.ViewDrugstore } }
 			};
-			Assert.That(adm.ClientTypeFilter(null), Is.EqualTo(" and FirmType = 1 "));
+			Assert.That(adm.GetClientFilterByType(null), Is.EqualTo(" and FirmType = 1 "));
 
 			adm.AllowedPermissions.Clear();
 
 			adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
-			Assert.That(adm.ClientTypeFilter(null), Is.EqualTo(" and FirmType = 0 "));
+			Assert.That(adm.GetClientFilterByType(null), Is.EqualTo(" and FirmType = 0 "));
 		}
 
 		[Test]
@@ -62,7 +62,7 @@ namespace AdminInterface.Test.Models
 			          	{
 			          		AllowedPermissions = new List<Permission>()
 			          	};
-			adm.ClientTypeFilter("cd");
+			adm.GetClientFilterByType("cd");
 		}
 
 		[Test]
@@ -72,11 +72,11 @@ namespace AdminInterface.Test.Models
 			           	{
 							AllowedPermissions = new List<Permission>
 							                     	{
-							                     		new Permission { Type = PermissionType.BillingPermision },
+							                     		new Permission { Type = PermissionType.Billing },
 														new Permission { Type = PermissionType.ManageAdministrators },
 							                     	}
 			           	};
-			adm.CheckPermisions(PermissionType.BillingPermision, PermissionType.ManageAdministrators);
+			adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators);
 		}
 
 		[Test]
@@ -87,10 +87,10 @@ namespace AdminInterface.Test.Models
 			{
 				AllowedPermissions = new List<Permission>
 							                     	{
-							                     		new Permission { Type = PermissionType.BillingPermision },
+							                     		new Permission { Type = PermissionType.Billing },
 							                     	}
 			};
-			adm.CheckPermisions(PermissionType.BillingPermision, PermissionType.ManageAdministrators);
+			adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators);
 		}
 
 		[Test]
@@ -100,10 +100,10 @@ namespace AdminInterface.Test.Models
 			          	{
 			          		AllowedPermissions = new List<Permission>
 			          		                     	{
-			          		                     		new Permission { Type = PermissionType.BillingPermision },
+			          		                     		new Permission { Type = PermissionType.Billing },
 			          		                     	}
 			          	};
-			adm.CheckAnyOfPermissions(PermissionType.BillingPermision, PermissionType.ManageAdministrators);
+			adm.CheckAnyOfPermissions(PermissionType.Billing, PermissionType.ManageAdministrators);
 		}
 
 		[Test]
@@ -114,7 +114,7 @@ namespace AdminInterface.Test.Models
 			{
 				AllowedPermissions = new List<Permission>()
 			};
-			adm.CheckAnyOfPermissions(PermissionType.BillingPermision, PermissionType.ManageAdministrators);
+			adm.CheckAnyOfPermissions(PermissionType.Billing, PermissionType.ManageAdministrators);
 		}
 
 		[Test]
