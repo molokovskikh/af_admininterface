@@ -118,7 +118,7 @@ namespace AdminInterface.Helpers
 #if !DEBUG
 			var entry = GetDirectoryEntry(login);
 			entry.DeleteTree();
-			entry.CaommitChanges();
+			entry.CommitChanges();
 #endif
 		}
 
@@ -151,15 +151,15 @@ namespace AdminInterface.Helpers
 #endif
 		}
 
-		public static void CreateAdministratorInAd(Administrator administrator)
+		public static void CreateAdministratorInAd(Administrator administrator, string password)
 		{
 #if !DEBUG
 			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
 			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-			var user = root.Children.Add("CN=" + administrator.Login, "user");
-			user.Properties["samAccountName"].Value = administrator.Login;
-			if (!String.IsNullOrEmpty(administrator.FIO.Trim()))
-				user.Properties["sn"].Value = administrator.FIO;
+			var user = root.Children.Add("CN=" + administrator.UserName, "user");
+			user.Properties["samAccountName"].Value = administrator.UserName;
+			if (!String.IsNullOrEmpty(administrator.ManagerName.Trim()))
+				user.Properties["sn"].Value = administrator.ManagerName;
 			user.Properties["logonHours"].Value = ADHelper.LogonHours();
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);

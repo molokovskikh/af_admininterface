@@ -12,9 +12,9 @@ namespace AdminInterface.Security
 		{
 			get
 			{
-				Administrator administrator = null;
+				Administrator administrator;
 #if !DEBUG
-				var administrator = (Administrator)HttpContext.Current.Session[AdministratorKey];
+				administrator = (Administrator)HttpContext.Current.Session[AdministratorKey];
 #endif
 				if (administrator == null)
 				{

@@ -111,7 +111,7 @@ public partial class EditAdministrator : Page
 		var isLoginExists = ADHelper.IsLoginExists(administrator.UserName);
 
 		if (!isLoginExists)
-			ADHelper.CreateAdministratorInAd(administrator);
+			ADHelper.CreateAdministratorInAd(administrator, password);
 
 		Session["IsLoginCreate"] = !isLoginExists;
 		Session["Password"] = password;
