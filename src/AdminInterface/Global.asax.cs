@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Web;
 #if !DEBUG
 using System.Text;
 using AdminInterface.Security;
 #endif
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
 using Common.Web.Ui.Models;

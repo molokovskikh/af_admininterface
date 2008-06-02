@@ -12,7 +12,7 @@ namespace AdminInterface.Security
 		{
 			get
 			{
-				Administrator administrator;
+				Administrator administrator = null;
 #if !DEBUG
 				administrator = (Administrator)HttpContext.Current.Session[AdministratorKey];
 #endif
@@ -20,9 +20,12 @@ namespace AdminInterface.Security
 				{
 					administrator = Administrator.GetByName(HttpContext.Current.User.Identity.Name);
 #if !DEBUG
-					HttpContext.Current.Session["UserName"] = administrator.UserName;
-					HttpContext.Current.Session[AdministratorKey] = administrator;
-#endif
+					if (administrator != null)
+					{
+						HttpContext.Current.Session["UserName"] = administrator.UserName;
+						HttpContext.Current.Session[AdministratorKey] = administrator;
+					}
+#endif			
 				}
 				
 				return administrator;
