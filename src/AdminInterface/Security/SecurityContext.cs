@@ -8,15 +8,10 @@ namespace AdminInterface.Security
 	{
 		private const string AdministratorKey = "Admin";
 
-		[ThreadStatic] 
-		private static Administrator _administrator;
-
 		public static Administrator Administrator
 		{
 			get
 			{
-				if (_administrator != null)
-					return _administrator;
 				Administrator administrator = null;
 #if !DEBUG
 				var administrator = (Administrator)HttpContext.Current.Session[AdministratorKey];
@@ -29,9 +24,8 @@ namespace AdminInterface.Security
 					HttpContext.Current.Session[AdministratorKey] = administrator;
 #endif
 				}
-
-				_administrator = administrator;
-				return _administrator;
+				
+				return administrator;
 			}
 		}
 

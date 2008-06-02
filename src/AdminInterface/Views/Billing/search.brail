@@ -117,10 +117,17 @@
 				Тип:
 			</td>
 			<td>
+				<%
+					clientTypesValues = FindBy.GetClientTypeDescriptions()
+					attr = BindingHelper.GetDictionaryMapping({"class" : "Full"})
+					if clientTypesValues.Count == 1:
+						attr.Add("disabled", "disabled")
+					end
+				%>
 				${FormHelper.Select("SearchBy.ClientType",
 									FindBy.ClientType,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientType, AdminInterface"),
-									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+									clientTypesValues,
+									attr)}
 			</td>
 		</tr>	
 		<tr style="text-align:left;">

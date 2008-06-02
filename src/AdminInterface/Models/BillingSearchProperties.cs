@@ -1,4 +1,7 @@
+using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Security;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
 {
@@ -72,6 +75,22 @@ namespace AdminInterface.Models
 		public bool IsSearchByBillingCode()
 		{
 			return _searchBy == SearchBy.BillingCode;
+		}
+
+		public Dictionary<object, string> GetClientTypeDescriptions()
+		{
+			var description = BindingHelper.GetDescriptionsDictionary(typeof (SearchClientType));
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers))
+				return description;
+
+			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore))
+				description.Remove((int)SearchClientType.Drugstore);
+
+			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
+				description.Remove((int)SearchClientType.Supplier);
+
+			description.Remove((int)SearchClientType.All);
+			return description;
 		}
 	}
 }

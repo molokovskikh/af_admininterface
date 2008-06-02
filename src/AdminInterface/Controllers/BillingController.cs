@@ -15,9 +15,12 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Security(PermissionType.Billing, ExecutionOrder = 0)]
-	[Filter(ExecuteWhen.BeforeAction, typeof(PayerFilterActivationFilter), ExecutionOrder = 1)]
+	[Layout("billing"), Helper(typeof (BindingHelper)), Helper(typeof (ViewHelper))]
+	[
+		Security(PermissionType.Billing, ExecutionOrder = 0),
+		Security(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore, Required = Required.AnyOf, ExecutionOrder = 1),
+		Filter(ExecuteWhen.BeforeAction, typeof (PayerFilterActivationFilter), ExecutionOrder = 2)
+	]
 	public class BillingController : ARSmartDispatcherController
 	{
 		public void Edit(uint clientCode, bool showClients)
@@ -86,6 +89,7 @@ namespace AdminInterface.Controllers
 			                              	{
 			                              		ClientStatus = SearchClientStatus.Enabled
 			                              	};
+			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["FindBy"] = billingSearchProperties;
 		}
@@ -94,6 +98,7 @@ namespace AdminInterface.Controllers
 		{
 			var searchResults = BillingSearchItem.FindBy(searchProperties);
 
+			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["sortColumnName"] = "ShortName";
 			PropertyBag["sortDirection"] = "Ascending";

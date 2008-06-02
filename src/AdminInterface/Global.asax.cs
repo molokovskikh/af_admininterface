@@ -48,9 +48,9 @@ namespace AddUser
 				                                                         "",
 				                                                         new Dictionary<string, IType>{{"AdminRegionMask", NHibernateUtil.UInt64}}));
 				configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
-				                                    new FilterDefinition("DrugstoreOnlyFilter", "", null));
+													new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
 				configuration.FilterDefinitions.Add("SupplierOnlyFilter",
-				                                    new FilterDefinition("SupplierOnlyFilter", "", null));
+				                                    new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
 
 				var classMapping = configuration.GetClassMapping(typeof (Payer));
 				var colection = (Collection) classMapping.GetProperty("Clients").Value;

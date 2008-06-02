@@ -150,11 +150,20 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				PriceFOKLB.Text = data.Tables[0].Rows[0]["FormCount"].ToString();
 
 				RegisterHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore);
-				CloneHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.CopySynonyms);
+				CloneHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.CopySynonyms,
+				                                                               PermissionType.ViewDrugstore);
+
 				ClInfHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
 				                                                                     PermissionType.ViewDrugstore);
-				BillingHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.Billing);
-				MonitorUpdates.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.MonitorUpdates);
+
+				BillingHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.Billing)
+				                    && SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
+				                                                                          PermissionType.ViewDrugstore);
+
+				MonitorUpdates.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.MonitorUpdates)
+				                         && SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
+				                                                                               PermissionType.ViewDrugstore);
+
 				ViewAdministrators.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageAdministrators);
 				ShowStatHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
 				                                                                        PermissionType.ViewDrugstore);

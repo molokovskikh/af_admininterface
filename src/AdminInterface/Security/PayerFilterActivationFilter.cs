@@ -17,7 +17,8 @@ namespace AdminInterface.Security
 			var session = holder.CreateSession(typeof (Payer));
 			try
 			{
-				session.EnableFilter("HomeRegionFilter").SetParameter("AdminRegionMask", SecurityContext.Administrator.RegionMask);
+				var regionMask = SecurityContext.Administrator.RegionMask;
+				session.EnableFilter("HomeRegionFilter").SetParameter("AdminRegionMask", regionMask);
 				if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore)
 					&& SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
 					return true;

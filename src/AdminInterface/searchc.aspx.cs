@@ -52,8 +52,22 @@ namespace AddUser
 
             _connection.ConnectionString = Literals.GetConnectionString();
 
-			if(!IsPostBack)
-				BindUserRegions();
+			if(IsPostBack)
+				return;
+
+			BindUserRegions();
+
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers))
+				return;
+
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore))
+				ClientType.Items.Remove(ClientType.Items[2]);
+
+			if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
+				ClientType.Items.Remove(ClientType.Items[1]);
+
+			ClientType.Items.Remove(ClientType.Items[0]);
+			ClientType.Enabled = false;
 		}
 
 		private void BindUserRegions()
