@@ -1,4 +1,4 @@
-﻿<% component CaptureFor, {"Id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Добавление новой группы контактной информации
 <% end %>
 <div class="ContactBaseDiv" style="width: 500px">

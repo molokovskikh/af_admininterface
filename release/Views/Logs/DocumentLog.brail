@@ -9,11 +9,11 @@
 	end
 %>
 
-<% component CaptureFor, {"Id" : "Title"}: %>
+<% component CaptureFor, {"id" : "Title"}: %>
 	Статистика получения\отправки документов клиента ${client.ShortName}
 <% end %>
 
-<% component CaptureFor, {"Id" : "PostToServer"}: %>
+<% component CaptureFor, {"id" : "PostToServer"}: %>
 	${FormHelper.HiddenField("clientCode", client.Id)}
 <% end %>
 

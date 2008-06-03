@@ -22,7 +22,7 @@ def WriteHeader(text as string, columnName as string):
 	return ""
 end
 
-component CaptureFor, {"Id" : "Title"}: %>
+component CaptureFor, {"id" : "Title"}: %>
 	Поиск плательщиков
 <% end
 

@@ -317,3 +317,30 @@ table.Test
 	border-collapse:collapse;
 	border-style:solid;
 }
+
+.Warning, .Error 
+{
+    border: 1px solid;
+    margin: 10px 0px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+    font-size:13px;
+}
+
+.Warning p, .Error p 
+{
+    padding: 0px 50px;
+}
+
+.Warning
+{
+	color: #9F6000;
+    background-color: #FEEFB3;
+    background-image: url('../../Images/warning.png');
+}
+
+.Error {
+    color: #D8000C;
+    background-color: #FFBABA;
+    background-image: url('../../images/error.png');
+}

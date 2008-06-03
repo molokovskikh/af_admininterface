@@ -1,4 +1,4 @@
-﻿<% component CaptureFor, {"Id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Статистика обновления клиентов зарегистрированных за период с ${beginDate.ToString("dd.MM.yyyy")} по ${endDate.ToString("dd.MM.yyyy")}
 <% end %>
 

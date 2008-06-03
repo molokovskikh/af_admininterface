@@ -59,11 +59,11 @@
 	}
 </script>
 
-<% component CaptureFor, {"Id" : "Title"}: %>
+<% component CaptureFor, {"id" : "Title"}: %>
 	Статистика обновления клиента ${client.ShortName}
 <% end %>
 
-<% component CaptureFor, {"Id" : "PostToServer"}: %>
+<% component CaptureFor, {"id" : "PostToServer"}: %>
 	${FormHelper.HiddenField("clientCode", client.Id)}
 <% end %>
 
