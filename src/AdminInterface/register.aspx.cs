@@ -499,16 +499,16 @@ where length(c.contactText) > 0
 					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
-						Response.Redirect(String.Format("Billing/Register.rails?id={0}&showRegistrationCard={1}",
+						Response.Redirect(String.Format("Register/Register.rails?id={0}&showRegistrationCard={1}",
 						                                Session["DogN"],
 						                                ShowRegistrationCard.Checked));
 					else if (ShowRegistrationCard.Checked)
 						Response.Redirect("report.aspx");
 					else
-						Response.Redirect("Billing/SuccessRegistration.rails");
+						Response.Redirect("Register/SuccessRegistration.rails");
 				}
 				else
-					Response.Redirect("Billing/SuccessRegistration.rails");
+					Response.Redirect("Register/SuccessRegistration.rails");
 			}
 			catch (Exception excL)
 			{
