@@ -123,17 +123,17 @@ WHERE PriceCode = ?Id", connection);
 
 			if (exception.InnerException is NotAuthorizedException)
 			{
-				Response.Redirect("/Rescue/NotAuthorized.aspx");
+				Response.Redirect("~/Rescue/NotAuthorized.aspx");
 				return;
 			}
 			if (exception.InnerException is NotHavePermissionException)
 			{
-				Response.Redirect("/Rescue/NotAllowed.aspx");
+				Response.Redirect("~/Rescue/NotAllowed.aspx");
 				return;
 			}
 			if (exception.InnerException is SessionOutDateException)
 			{
-				Response.Redirect("default.aspx");
+				Response.Redirect("~/default.aspx");
 				return;
 			}
 

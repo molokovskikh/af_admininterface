@@ -71,14 +71,13 @@ namespace AdminInterface.Controllers
 		public void UpdateClientsStatus(uint clientCode, 
 										[DataBind("Status")] ClientWithStatus[] clients)
 		{
-			using(var scope = new TransactionScope(OnDispose.Rollback))
+			using(new TransactionScope())
 			{
 				DbLogHelper.SavePersistentWithLogParams(SecurityContext.Administrator.UserName,
 				                                        HttpContext.Current.Request.UserHostAddress,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
 				foreach (var client in clients)
 					client.Update();
-				scope.VoteCommit();
 			}
 			RedirectToAction("Edit", "clientCode=" + clientCode, "showClients=true");
 		}
@@ -143,11 +142,10 @@ namespace AdminInterface.Controllers
 		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
 						 [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
-			using (var scope = new TransactionScope())
+			using (new TransactionScope())
 			{
 				foreach (var instance in paymentInstances)
 					instance.Save();				
-				scope.Flush();
 			}		
 			SearchBy(searchProperties);
 			RenderView("SearchBy");

@@ -65,7 +65,7 @@ namespace AdminInterface.Controllers
 			var host = Context.Request.UserHostAddress;
 			var reason = isFree ? freeReason : payReason;
 		
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			using (new TransactionScope())
 			{
 				ADHelper.ChangePassword(user.Login, password);
 
@@ -86,9 +86,7 @@ namespace AdminInterface.Controllers
 					LogTime = DateTime.Now,
 					TargetUserName = user.Login,
 					UserName = administrator.UserName,
-				}.Save();		
-				
-				scope.VoteCommit();
+				}.Save();						
 			}
 
 			NotificationHelper.NotifyAboutPasswordChange(client,
