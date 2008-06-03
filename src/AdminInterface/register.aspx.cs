@@ -995,11 +995,6 @@ WHERE	dst.clientcode        = ?ClientCode
 SELECT  regionaladmins.username, 
         regions.regioncode, 
         regions.region, 
-        regionaladmins.alowcreateretail, 
-        regionaladmins.alowcreatevendor, 
-        regionaladmins.alowchangesegment, 
-        regionaladmins.defaultsegment, 
-        AlowCreateInvisible, 
         regionaladmins.email 
 FROM    accessright.regionaladmins, 
         farm.regions 
