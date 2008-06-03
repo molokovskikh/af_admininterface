@@ -49,7 +49,7 @@ WHERE RowID = ?Id";
 		using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 		{
 			connection.Open();
-			var command = new MySqlCommand(commandText);
+			var command = new MySqlCommand(commandText, connection);
 			command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
 			using (var reader = command.ExecuteReader())
 			{
@@ -69,17 +69,22 @@ WHERE RowID = ?Id";
 	
 	protected void SaveButton_Click(object sender, EventArgs e)
 	{
-		var commandText = @"
+		using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+		{
+			connection.Open();
+
+			var commandText = @"
 UPDATE usersettings.regionaldata
 SET ContactInfo = ?ContactInformation, 
 	OperativeInfo = ?Information
 WHERE RowId = ?Id;";
-		var command = new MySqlCommand(commandText);
-		command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
-		command.Parameters.AddWithValue("?ContactInformation", ContactInfoText.Text);
-		command.Parameters.AddWithValue("?Information", OperativeInfoText.Text);
-		command.ExecuteNonQuery();
-		Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));
+			var command = new MySqlCommand(commandText, connection);
+			command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
+			command.Parameters.AddWithValue("?ContactInformation", ContactInfoText.Text);
+			command.Parameters.AddWithValue("?Information", OperativeInfoText.Text);
+			command.ExecuteNonQuery();
+			Response.Redirect(String.Format("managep.aspx?cc={0}", _clientCode));
+		}
 	}
 	
 	protected void CancelButton_Click(object sender, EventArgs e)

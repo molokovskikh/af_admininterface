@@ -197,7 +197,7 @@ where firmcode=?clientCode";
 				{
 					reader.Read();
 					workRegionMask = reader.GetUInt64("MaskRegion");
-					orderRegionMask = reader.GetUInt64("WorkRegionMask");
+					orderRegionMask = reader.GetUInt64("OrderRegionMask");
 				}
 
 				var currentWorkRegionMask = workRegionMask;

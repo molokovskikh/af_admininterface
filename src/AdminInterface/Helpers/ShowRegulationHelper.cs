@@ -11,21 +11,18 @@ namespace AdminInterface.Helpers
 	{
 		public static void Load(MySqlDataAdapter adapter, DataSet data)
 		{
-			adapter.SelectCommand.CommandText = @"
+			adapter.SelectCommand.CommandText = String.Format(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName,
 		sr.IncludeType as ShowType,
 		sr.Id
-FROM    (accessright.regionaladmins, clientsdata as cd) 
+FROM clientsdata as cd
 	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
-WHERE   sr.PrimaryClientCode				 = ?ClientCode
-		AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName               = ?UserName 
-        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)   
+WHERE   sr.PrimaryClientCode = ?ClientCode
         AND FirmStatus    = 1 
         AND billingstatus = 1 
-ORDER BY cd.shortname;";
+		{0}
+ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
 			if (adapter.SelectCommand.Parameters.IndexOf("?UserName") < 0)
 				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
@@ -107,22 +104,17 @@ SET PrimaryClientCode = ?PrimaryClientCode,
 					showClientsGrid.DataBind();
 					break;
 				case "Search":
-					var adapter = new MySqlDataAdapter
-						(@"
+					var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
-FROM    (accessright.regionaladmins, clientsdata as cd)  
+FROM clientsdata as cd
 LEFT JOIN showregulation sr
-        ON sr.ShowClientCode	             =cd.firmcode  
-WHERE   cd.regioncode & regionaladmins.regionmask > 0  
-        AND regionaladmins.UserName               =?UserName  
-        AND FirmType                         =if(ShowRetail+ShowVendor=2, FirmType, if(ShowRetail=1, 1, 0)) 
-        AND if(UseRegistrant                 =1, Registrant=?UserName, 1=1)  
-        AND cd.ShortName like ?SearchText
-        AND FirmStatus   =1  
-        AND billingstatus=1  
-ORDER BY cd.shortname;
-", Literals.GetConnectionString());
+        ON sr.ShowClientCode = cd.firmcode  
+WHERE   cd.ShortName like ?SearchText
+        AND FirmStatus    = 1  
+        AND billingstatus = 1  
+		{0}
+ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), Literals.GetConnectionString());
 					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 					adapter.SelectCommand.Parameters.AddWithValue("?SearchText", string.Format("%{0}%", ((TextBox)showClientsGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
 

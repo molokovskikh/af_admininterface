@@ -521,22 +521,27 @@ ORDER BY region;";
 		
 		private void UpdateMaskRegion()
 		{
-			var maskRegionCommand = new MySqlCommand(@"SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;");
-			maskRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-			var oldMaskRegion = Convert.ToUInt64(maskRegionCommand.ExecuteScalar());
-			var newMaskRegion = oldMaskRegion;
-			foreach (ListItem item in WorkRegionList.Items)
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
-				if (item.Selected)
-					newMaskRegion |= Convert.ToUInt64(item.Value);
-				else
-					newMaskRegion &= ~Convert.ToUInt64(item.Value);
-			}
+				connection.Open();
+				var maskRegionCommand = new MySqlCommand(@"SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;", connection);
+				maskRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+				var oldMaskRegion = Convert.ToUInt64(maskRegionCommand.ExecuteScalar());
+				var newMaskRegion = oldMaskRegion;
+				foreach (ListItem item in WorkRegionList.Items)
+				{
+					if (item.Selected)
+						newMaskRegion |= Convert.ToUInt64(item.Value);
+					else
+						newMaskRegion &= ~Convert.ToUInt64(item.Value);
+				}
 
-			if (oldMaskRegion == newMaskRegion) 
-				return;
+				if (oldMaskRegion == newMaskRegion)
+					return;
 
-			var updateCommand = new MySqlCommand(@"
+				var updateCommand =
+					new MySqlCommand(
+						@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -613,26 +618,31 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND clientsdata.firmcode = ?ClientCode
-		AND clientsdata2.FirmType = 1;");
-			updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-			updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-			updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-			updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-			updateCommand.ExecuteNonQuery();
+		AND clientsdata2.FirmType = 1;", connection);
+				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
+				updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				updateCommand.ExecuteNonQuery();
+			}
 		}
 		
 		private void UpdateHomeRegion()
 		{
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
-			if (_homeRegion != currentHomeRegion)
+			if (_homeRegion == currentHomeRegion) 
+				return;
+
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
+				connection.Open();
 				var command = new MySqlCommand(@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
 UPDATE ClientsData 
 SET RegionCode = ?RegionCode
-WHERE FirmCode = ?ClientCode;");
+WHERE FirmCode = ?ClientCode;", connection);
 				command.Parameters.AddWithValue("?RegionCode", currentHomeRegion);
 				command.Parameters.AddWithValue("?ClientCode", _clientCode);
 				command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
@@ -643,10 +653,15 @@ WHERE FirmCode = ?ClientCode;");
 		
 		private ulong GetHomeRegion()
 		{
-			var homeRegionCommand = new MySqlCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;");
-			homeRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+			{
+				connection.Open();
+				var homeRegionCommand = new MySqlCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;",
+				                                         connection);
+				homeRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 
-			return Convert.ToUInt64(homeRegionCommand.ExecuteScalar());
+				return Convert.ToUInt64(homeRegionCommand.ExecuteScalar());
+			}
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
