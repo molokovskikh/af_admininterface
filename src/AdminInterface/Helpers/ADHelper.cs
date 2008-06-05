@@ -6,6 +6,8 @@ namespace AdminInterface.Helpers
 {
 	public class ADHelper
 	{
+		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0); 
+
 		public static void CreateUserInAD(string login, string password , string clientCode)
 		{
 #if !DEBUG
@@ -135,20 +137,16 @@ namespace AdminInterface.Helpers
 
 		public static void Disable(string login)
 		{
-#if !DEBUG
 			var entity = GetDirectoryEntry(login);
 			entity.InvokeSet("AccountDisabled", true);
 			entity.CommitChanges();
-#endif
 		}
 
 		public static void Enable(string login)
 		{
-#if !DEBUG
 			var entiry = GetDirectoryEntry(login);
 			entiry.InvokeSet("AccountDisabled", false);
 			entiry.CommitChanges();
-#endif
 		}
 
 		public static void CreateAdministratorInAd(Administrator administrator, string password)
@@ -168,6 +166,22 @@ namespace AdminInterface.Helpers
 			userGroup.CommitChanges();
 			root.CommitChanges();
 #endif
+		}
+
+		public static DateTime? GetBadPasswordDate(string login)
+		{
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			{
+				var result = searcher.FindOne();
+				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
+					return null;
+
+				var badPassworDate = DateTime.FromFileTime((long)searcher.FindOne().Properties["badPasswordTime"][0]);
+				if (badPassworDate == _badPasswordDateIfNotLogin)
+					return null;
+
+				return badPassworDate;
+			}
 		}
 	}
 }

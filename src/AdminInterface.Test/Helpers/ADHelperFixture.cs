@@ -42,42 +42,37 @@ namespace AdminInterface.Test.Helpers
 			}
 		}
 
-
-		[Test]
-		public void IsLoginExistsTest()
+		private static DateTime CreatedAt(string login)
 		{
-			Assert.That(ADHelper.IsLoginExists("kvasov"), Is.True);
-			Assert.That(ADHelper.IsLoginExists("loasdvhuq34y89rhawf"), Is.False);
-		}
-
-		[Test]
-		public void GetPasswordExpirationDate()
-		{
-			Assert.That(ADHelper.GetPasswordExpirationDate("kvasov"), Is.GreaterThan(DateTime.Now));
-		}
-
-		[Test]
-		public void IsLockedTest()
-		{
-			Assert.That(ADHelper.IsLocked("kvasov"), Is.False);
-		}
-
-		[Test]
-		public void IsDisabledTest()
-		{
-			Assert.That(ADHelper.IsDisabled("kvasov"), Is.False);
-		}
-
-		[Test]
-		public void LastLogOnDate()
-		{
-			Assert.That(ADHelper.GetLastLogOnDate("kvasov"), Is.GreaterThan(DateTime.MinValue));
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			{
+				return Convert.ToDateTime(searcher.FindOne().Properties["whenCreated"][0]);
+			}
 		}
 
 		[Test]
 		public void Test()
 		{
-			Log(FindDirectoryEntry("Пользователи офиса"));
+			Console.WriteLine(ADHelper.GetLastLogOnDate("protek2"));
+			Log(FindDirectoryEntry("protek2"));
+		}
+
+		[Test] 
+		public void BadPasswordTimeTest()
+		{
+			using (var user = new TestUser())
+			{
+				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.Null);	
+				try
+				{
+					var directoryEntity = FindDirectoryEntry(user.Login);
+					var directoryEntry = new DirectoryEntry(directoryEntity.Path, user.Login, "1234");
+					Console.WriteLine(directoryEntry.NativeObject.ToString());
+					Assert.Fail("странно но пароль почему то подошел");
+				}
+				catch {}
+				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.GreaterThanOrEqualTo(CreatedAt(user.Login)));	
+			}
 		}
 
 		[Test]

@@ -1,6 +1,6 @@
 ﻿<table style="width:100%;" class="Test">
 	<tr>
-		<td class="Title" colspan="3">
+		<td class="Title" colspan="5">
 			Учетные записи пользователя:
 		</td>
 	</tr>
@@ -10,6 +10,9 @@
 		</td>
 		<td class="Title">
 			Дата последнего входа
+		</td>
+		<td class="Title">
+			Дата последней неудачной регистрации
 		</td>
 		<td class="Title">
 		</td>
@@ -25,6 +28,9 @@
 		</td>
 		<td>
 			${ADHelper.GetLastLogOnDate(user.Login)}
+		</td>
+		<td>
+			${ADHelper.GetBadPasswordDate(user.Login)}
 		</td>
 		<td>
 			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>
