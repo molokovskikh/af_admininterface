@@ -97,10 +97,14 @@
 		<div style="width: 100%">
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				<% if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10: %>
-				<div class="HideVisible">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="HideVisible">
+					<a href="#">Клиенты плательщика "${Instance.ShortName}"</a>
+				</div>
 				<div class="VisibleFolder">
 				<% else: %>
-				<div class="ShowHiden">Клиенты плательщика "${Instance.ShortName}"</div>
+				<div class="ShowHiden">
+					<a href="#">Клиенты плательщика "${Instance.ShortName}"</a>
+				</div>
 				<div class="HidenFolder">
 				<% end %>
 					<form action="UpdateClientsStatus.rails" method="post">
