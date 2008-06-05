@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Test.ForTesting;
+using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
@@ -11,6 +13,12 @@ namespace AdminInterface.Test.Models
 	[TestFixture]
 	public class ClientFixture
 	{
+		[SetUp]
+		public void Setup()
+		{
+			ForTest.InitialzeAR();
+		}
+
 		[Test]
 		public void GetSubordinateTypeTest()
 		{
@@ -30,6 +38,25 @@ namespace AdminInterface.Test.Models
 			Assert.That(client.GetSubordinateType(), Is.EqualTo("Базовый"));
 			Assert.That(client.GetNameWithParents(), Is.EqualTo("Test1[Parent1]"));
 			Assert.That(client.GetIdWithParentId(), Is.EqualTo("1[2]"));
+		}
+
+		[Test]
+		public void ResetUinTest()
+		{
+			var client = ForTest.CreateClient();
+			var retupdate = new RetUpdateInfo { UniqueCopyID = "123" };
+
+			using (new TransactionScope())
+			{
+				client.SaveAndFlush();
+				retupdate.Id = client.Id;
+				retupdate.Save();
+			}
+
+			client.ReseteUin();
+
+			var retUpdateInfo = RetUpdateInfo.Get(client.Id);
+			Assert.That(retUpdateInfo.UniqueCopyID, Is.Empty);
 		}
 	}
 }

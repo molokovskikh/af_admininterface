@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using Castle.MonoRail.TestSupport;
@@ -24,14 +25,7 @@ namespace AdminInterface.Test.Controllers
 		{
 			_controller = new RegisterController();
 			PrepareController(_controller, "Registered");
-
-			XmlConfigurator.Configure();
-			ActiveRecordStarter.Initialize(new[]
-			                                {
-			                                    Assembly.Load("AdminInterface"),
-			                                    Assembly.Load("Common.Web.Ui")
-			                                },
-										   ActiveRecordSectionHandler.Instance);
+			ForTest.InitialzeAR();
 		}
 
 		[Test]
@@ -41,41 +35,16 @@ namespace AdminInterface.Test.Controllers
 			Client client;
 			using (new TransactionScope())
 			{
-				client = new Client();
-				client.ShortName = "Test short name";
-				client.FullName = "Test full name";
-				client.RegistrationDate = DateTime.Now;
+				client = ForTest.CreateClient();
 				client.SaveAndFlush();
 
-				payer = GetTestPayer();
+				payer = ForTest.CreatePayer();
 				payer.SaveAndFlush();
 			}
 
 			_controller.Registered(payer, client.Id, false);
 
 			Assert.That(Payer.Find(payer.PayerID).JuridicalName, Is.EqualTo(client.FullName));
-		}
-
-		private Payer GetTestPayer()
-		{
-			return new Payer
-			       	{
-			       		ShortName = "Test",
-			       		JuridicalName = "",
-			       		JuridicalAddress = "",
-			       		KPP = "",
-			       		INN = "",
-						ActualAddressHouse = "",
-						ActualAddressIndex = "",
-						ActualAddressOffice = "",
-						ActualAddressCountry = "",
-                        ActualAddressProvince = "",
-						ActualAddressRegion = "",
-						ActualAddressStreet = "",
-						ActualAddressTown = "",
-						BeforeNamePrefix = "",
-						AfterNamePrefix = "",
-			       	};
 		}
 	}
 }

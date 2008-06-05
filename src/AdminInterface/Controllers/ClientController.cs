@@ -72,6 +72,10 @@ namespace AdminInterface.Controllers
 				DbLogHelper.SavePersistentWithLogParams(userName,
 				                                        host,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (ClientInfoLogEntity)));
+
+				if (client.Type == ClientType.Drugstore)
+					client.ReseteUin();
+
 				new ClientInfoLogEntity
 				{
 					UserName = administrator.UserName,

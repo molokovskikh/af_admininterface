@@ -86,6 +86,8 @@
   <ItemGroup>
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
+    <Compile Include="ForTesting\ForTest.cs" />
+    <Compile Include="ForTesting\RetUpdateInfo.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="Helpers\EmailHelperFixture.cs" />
     <Compile Include="Helpers\ViewHelperFixture.cs" />
@@ -94,7 +96,6 @@
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
-    <Compile Include="NHibernateExtentions\BaseARTest.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

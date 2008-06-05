@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using AdminInterface.NHibernateExtentions;
+using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using Common.Web.Ui.Models;
@@ -18,13 +19,7 @@ namespace AdminInterface.Test.NHibernateExtentions
 	{
 		public IfProjectionFixture()
 		{
-			XmlConfigurator.Configure();
-			ActiveRecordStarter.Initialize(new[]
-			                               	{
-			                               		Assembly.Load("AdminInterface"),
-			                               		Assembly.Load("Common.Web.Ui")
-			                               	},
-			                               ActiveRecordSectionHandler.Instance);
+			ForTest.InitialzeAR();
 		}
 
 		[Test]
