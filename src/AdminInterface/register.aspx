@@ -118,7 +118,7 @@
 							<div>
 								<fieldset>
 								<legend>
-									<asp:CheckBox ID="SendRegistrationCard" runat="server" Checked="true" Text="Отправлять регистационную карту клиенту" />
+									<asp:CheckBox ID="SendRegistrationCard" runat="server" Checked="true" Text="Отправлять регистрационную карту клиенту" />
 								</legend>
 								<table>
 									<tr>
