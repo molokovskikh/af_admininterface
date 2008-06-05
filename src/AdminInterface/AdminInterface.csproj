@@ -130,6 +130,7 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecurityAttribute.cs" />

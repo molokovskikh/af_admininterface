@@ -117,11 +117,11 @@
 									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
 								</td>
 								<td>
-									${client.Id}
+									${client.GetIdWithParentId()}
 								</td>
 								<td>
 								<% if client.Id == Client.Id: %>
-									<strong>${client.GetNameWithParents()}</strong>
+									<strong>${	client.GetNameWithParents()}</strong>
 								<% else: %>
 									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">${client.GetNameWithParents()}</a>
 								<% end %>
@@ -134,6 +134,9 @@
 								</td>
 								<td>
 									${BindingHelper.GetDescription(client.Segment)}
+								</td>
+								<td>
+									${client.GetSubordinateType()}
 								</td>
 							</tr>
 						<% end %>

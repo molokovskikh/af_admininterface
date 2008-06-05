@@ -46,6 +46,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MonoRail.TestSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\Castle.MonoRail.TestSupport.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net.dll</HintPath>
@@ -70,20 +78,28 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
+    <Reference Include="WatiN.Core, Version=1.1.2.4000, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\WatiN.Core.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
+    <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="Helpers\EmailHelperFixture.cs" />
     <Compile Include="Helpers\ViewHelperFixture.cs" />
     <Compile Include="InternetLogEntityFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
+    <Compile Include="Models\ClientFixture.cs" />
+    <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="NHibernateExtentions\BaseARTest.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyComparerTest.cs" />
+    <Compile Include="Watin\RegistrationFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

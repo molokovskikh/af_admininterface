@@ -27,7 +27,7 @@
 						<div class="TwoColumn">
 							<div class="SimpleField">
 								<label class="Required" for="FullNameTB">
-									Полное наименование:
+									Юридическое наименование:
 								</label>
 								<asp:TextBox ID="FullNameTB" runat="server"></asp:TextBox>
 								<asp:RegularExpressionValidator ID="FullNameValidator" runat="server" ErrorMessage="Длинна строки не может быть больше чем 40 символов" ValidationExpression="^.{1,40}$" ValidationGroup="0" ControlToValidate="FullNameTB" Display="Dynamic">*</asp:RegularExpressionValidator>
