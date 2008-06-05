@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Net.Mail;
 using AddUser;
-using AdminInterface.Models.Logs;
 using AdminInterface.Properties;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -88,7 +86,13 @@ namespace AdminInterface.Helpers
 		                                  string additionTo,
 		                                  bool isRegistration)
 		{
+			string body;
 
+			if (clientType == "Аптека")
+				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
+			else
+				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
+				
 			using (var stream = CreateReport(clietCode,
 											 billingCode,
 											 clientShortName,
@@ -102,7 +106,7 @@ namespace AdminInterface.Helpers
 			{
 				From = new MailAddress("tech@analit.net"),
 				Subject = "Регистрационная карта для работы в системе АналитФармация",
-				Body = Settings.Default.RegistrationCardEmailBody,
+				Body = body,
 				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
 			})
 			{
