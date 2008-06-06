@@ -144,7 +144,7 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 						groupFilter = AddFilterCriteria(groupFilter, "cd.Firmstatus = 1 and cd.Billingstatus = 1");
 						break;
 					case SearchClientStatus.Disabled:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Firmstatus = 0 or cd.Billingstatus = 0");
+						groupFilter = AddFilterCriteria(groupFilter, "(cd.Firmstatus = 0 or cd.Billingstatus = 0)");
 						break;
 				}
 
