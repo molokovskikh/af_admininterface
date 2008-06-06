@@ -140,20 +140,20 @@
 						<asp:TableCell Text=" - Клиент отключен" runat="server"></asp:TableCell>
 					</asp:TableRow>
 					<asp:TableRow runat="server">
-						<asp:TableCell BackColor="Aqua" runat="server"></asp:TableCell>
+						<asp:TableCell CssClass="DisabledLogin" runat="server"></asp:TableCell>
 						<asp:TableCell Text=" - Учетная запись отключена" runat="server"></asp:TableCell>
 					</asp:TableRow>
 					<asp:TableRow runat="server">
-						<asp:TableCell BackColor="Violet" runat="server"></asp:TableCell>
+						<asp:TableCell CssClass="BlockedLogin" runat="server"></asp:TableCell>
 						<asp:TableCell Text=" - Учетная запись заблокированна" runat="server"></asp:TableCell>
+					</asp:TableRow>
+					<asp:TableRow ID="TableRow1" runat="server">
+						<asp:TableCell ID="TableCell1" CssClass="LoginNotExists" runat="server"></asp:TableCell>
+						<asp:TableCell ID="TableCell2" Text=" - Учетной записи не существует" runat="server"></asp:TableCell>
 					</asp:TableRow>
 					<asp:TableRow runat="server">
 						<asp:TableCell BackColor="Gray" runat="server"></asp:TableCell>
 						<asp:TableCell Text=" - Обновение более 2 суток назад" runat="server"></asp:TableCell>
-					</asp:TableRow>
-					<asp:TableRow runat="server">
-						<asp:TableCell BackColor="Red" runat="server"></asp:TableCell>
-						<asp:TableCell Text=" - Ошибка Active Directory" runat="server"></asp:TableCell>
 					</asp:TableRow>
 				</asp:Table>
 				<div style="margin-top: 20px;">

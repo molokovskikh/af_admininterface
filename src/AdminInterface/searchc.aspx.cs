@@ -135,7 +135,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 				row.BackColor = Color.FromArgb(255, 102, 0);
 
 			if (ADCB.Checked)
-				row.Cells[8].BackColor = Color.FromName(data.Row["ADUserStatus"].ToString());
+				row.Cells[8].CssClass = data.Row["ADUserStatus"].ToString();
 
             if (data.Row["FirstUpdate"] == DBNull.Value)
                 return;
@@ -383,13 +383,13 @@ WHERE   rts.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.Firm
 			    try
 			    {
 			        if (ADHelper.IsLocked(row["UserName"].ToString()))
-			            row["ADUserStatus"] = Color.Violet.Name;
+						row["ADUserStatus"] = "BlockedLogin";
 			        if (ADHelper.IsDisabled(row["UserName"].ToString()))
-			            row["ADUserStatus"] = Color.Aqua.Name;
+						row["ADUserStatus"] = "DisabledLogin";
 			    }
 			    catch
 			    {
-			        row["aduserstatus"] = Color.Red.Name;
+					row["aduserstatus"] = "LoginNotExists";
 			    }
 			}
 		}
