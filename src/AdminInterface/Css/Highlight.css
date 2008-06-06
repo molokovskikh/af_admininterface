@@ -23,6 +23,21 @@
 	background-color: #ff6600;
 }
 
+.DisabledLogin
+{
+	background-color: #bbffff;
+}
+
+.BlockedLogin
+{
+	background-color: #f7c4f7;
+}
+
+.LoginNotExists
+{
+	background-color:#FFBABA;
+}
+
 .Error
 {
 	background-color:Red;
