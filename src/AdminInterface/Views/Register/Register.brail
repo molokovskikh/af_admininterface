@@ -1,4 +1,5 @@
-﻿def WriteInputGroupHeader(localHeader as string) as string:
+﻿<%
+def WriteInputGroupHeader(localHeader as string) as string:
 %>
 	<tr>
 		<td class="InputGroupHeader" colspan="2">
@@ -26,11 +27,67 @@ end
 	Реистрация клиента, шаг 2: Заполнения информации о плательщике
 <% end %>
 
+<script>
+	document.observe("dom:loaded", function() {
+		SetupCalendarElements();
+		
+		if ($('PaymentOptions_WorkForFree') != null)
+		{
+			$('PaymentOptions_WorkForFree').observe("change", function() {
+				
+				if (checkBox.checked)
+				{
+					$('CalendarInputField0').disable();
+					$('PaymentOptions_Comment').disable();
+				}
+				else
+				{
+					$('CalendarInputField0').enable();
+					$('PaymentOptions_Comment').enable();
+				}
+			});
+		}
+	
+		Validation.add("CommentValidator", "Клиент слишком долго работает бесплатно, нужно указать причину", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+		
+			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
+		});		
+		
+		Validation.add("CheckDate", "Не корректная дата", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+		
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate != null;
+		});
+		
+		Validation.add("DateInFuture", "Дата начала платного периода меньше текущей", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+		
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate >= Date.today();
+		});		
+
+		new Validation("PayerInfo");
+	});
+</script>
+
 <h3>
 	Реистрация клиента, шаг 2: Заполнения информации о плательщике
 </h3>
 
-<form action="registered.rails" method="post">
+<form id="PayerInfo" action="registered.rails" method="post">
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
 	<input type="hidden" name="clientCode" value="${clientCode}" />
 	${FormHelper.HiddenField("Instance.PayerID")}
@@ -167,7 +224,32 @@ end
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
 														"Надпись после \"Кому\":"), 
 									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
-												
+									
+		${WriteInputGroupHeader("Условия оплаты")}
+		
+	<tr>
+		<td colspan="2">
+			<fieldset>
+				<% if admin.CanRegisterClientWhoWorkForFree: %>
+				<legend>			
+					${FormHelper.LabelFor("PaymentOptions.WorkForFree", "Клиент обслуживается бесплатно:")}
+					${FormHelper.CheckboxField("PaymentOptions.WorkForFree")}
+				</legend>
+				<% end %>
+				<div>
+					${FormHelper.LabelFor("PaymentOptions.PaymentPeriodBeginDate", "Дата начала платного периода:")}
+					<br>
+					${FormHelper.TextFieldValue("PaymentOptions.PaymentPeriodBeginDate", PaymentOptions.PaymentPeriodBeginDate.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
+					<input type="button" class="CalendarInput" />
+				</div>
+				<div>
+				${FormHelper.LabelFor("PaymentOptions.Comment", "Комментарий:")}
+				<br>
+				${FormHelper.TextArea("PaymentOptions.Comment", {"rows":"20", "class" : "BillingInput CommentValidator" })}
+				</div>
+			</fieldset>
+		</td>
+	</tr>		
 	<tr>
 		<tr style="text-align:right">
 			<td colspan="2">

@@ -12,7 +12,7 @@ namespace AdminInterface.Helpers
 
 			foreach (var email in to.Split(','))
 			{
-				var normilizedEmail = email.Trim('\r', '\n', '\t', ' ');
+				var normilizedEmail = NormalizeEmailOrPhone(email);
 				if (normilizedEmail.Length == 0)
 					continue;
 
@@ -28,6 +28,13 @@ namespace AdminInterface.Helpers
 					return true;
 
 			return false;
+		}
+
+		public static string NormalizeEmailOrPhone(string text)
+		{
+			if (text == null)
+				return null;
+			return text.Trim('\r', '\n', '\t', ' ');
 		}
 	}
 }

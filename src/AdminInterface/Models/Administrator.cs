@@ -146,5 +146,10 @@ namespace AdminInterface.Models
 		{
 			get { return HavePermision(PermissionType.ChangePassword); }
 		}
+
+		public bool CanRegisterClientWhoWorkForFree
+		{
+			get { return HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree);  }
+		}
 	}
 }

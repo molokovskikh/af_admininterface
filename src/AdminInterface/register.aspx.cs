@@ -11,6 +11,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Models;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
@@ -333,7 +334,7 @@ set @inUser = ?UserName;";
 			_command.Parameters.Add(new MySqlParameter("?AllowGetData", MySqlDbType.Int24));
 			_command.Parameters["?AllowGetData"].Value = TypeDD.SelectedItem.Value;
 			_command.Parameters.Add(new MySqlParameter("?OSUserName", MySqlDbType.VarString));
-			_command.Parameters["?OSUserName"].Value = LoginTB.Text;
+			_command.Parameters["?OSUserName"].Value = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
 			_command.Parameters.Add(new MySqlParameter("?OSUserPass", MySqlDbType.VarString));
 			_command.Parameters["?OSUserPass"].Value = PassTB.Text;
 			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
@@ -443,7 +444,7 @@ where length(c.contactText) > 0
 							Func.Mail("register@analit.net", String.Empty,
 									  "\"" + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - ошибка уведомления поставщиков",
 									  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-											 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+											 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
 											 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
 											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
 											 + "Ошибка: Ничего не получилось выбрать из базы",
@@ -457,7 +458,7 @@ where length(c.contactText) > 0
 					Func.Mail("register@analit.net", String.Empty,
 					          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
 							  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-					                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text + "\nКод: "
+									 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower() + "\nКод: "
 					                 + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 					                 + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
 					                 + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
@@ -466,29 +467,15 @@ where length(c.contactText) > 0
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
 						  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-				                 + RegionDD.SelectedItem.Text + "\nLogin: " + LoginTB.Text
+								 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
 				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
 						  SecurityContext.Administrator.Email);
 
-				Func.Mail("register@analit.net",
-				          "",
-				          "Регистрация нового клиента",
-				          false,
-				          String.Format(
-				          	@"Зарегистрирован новый клиент
-Название: {0}
-Код: {1}
-Биллинг код: {2}
-Кем зарегистрирован: {3}",
-							ShortNameTB.Text, Session["Code"], Session["DogN"], SecurityContext.Administrator.UserName),
-				          "billing@analit.net",
-				          "",
-				          "");
 
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
-				Session["Login"] = LoginTB.Text;
+				Session["Login"] = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
 				Session["Password"] = PassTB.Text;
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
@@ -510,6 +497,16 @@ where length(c.contactText) > 0
 				}
 				else
 					Response.Redirect("Register/SuccessRegistration.rails");
+
+				if (Response.RedirectLocation == "Register/SuccessRegistration.rails"
+					|| Response.RedirectLocation == "report.aspx")
+					new NotificationService()
+						.SendNotificationToBillingAboutClientRegistration(Convert.ToUInt32(Session["Code"]),
+						                                                  Convert.ToUInt32(Session["DogN"]),
+						                                                  ShortNameTB.Text,
+						                                                  SecurityContext.Administrator.UserName,
+						                                                  (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый"),
+						                                                  null);
 			}
 			catch (Exception excL)
 			{

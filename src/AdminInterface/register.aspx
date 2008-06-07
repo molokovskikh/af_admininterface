@@ -87,9 +87,22 @@
 									Login:
 								</label>
 								<asp:TextBox ID="LoginTB" runat="server" />
-								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено"
-									ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate"
-									ValidationGroup="0" EnableClientScript="False" ValidateEmptyText="True">*</asp:CustomValidator>
+								<asp:CustomValidator ID="LoginValidator" 
+													runat="server" 
+													ErrorMessage="Поле «Login» должно быть заполнено"
+													ControlToValidate="LoginTB" 
+													OnServerValidate="LoginValidator_ServerValidate"
+													ValidationGroup="0" 
+													EnableClientScript="False" 
+													ValidateEmptyText="True">*</asp:CustomValidator>
+													
+								<asp:RegularExpressionValidator ID="LoginValidator1" 
+																runat="server" 
+																ControlToValidate="LoginTB"
+																ErrorMessage="Не корректный логин, логин может содержать буквы латинского алфавита, цифры и символ подчеркивания" 
+																ValidationExpression="\s*[a-z|0-9|_]+\s*"
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 						</div>
 					</div>

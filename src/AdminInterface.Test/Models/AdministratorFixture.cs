@@ -186,5 +186,13 @@ namespace AdminInterface.Test.Models
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ChangePassword });
 			Assert.That(_adm.AlowChangePassword, Is.True);
 		}
+
+		[Test]
+		public void CanRegisterClientWhoWorkForFree()
+		{
+			Assert.That(_adm.CanRegisterClientWhoWorkForFree, Is.False);
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.CanRegisterClientWhoWorkForFree });
+			Assert.That(_adm.CanRegisterClientWhoWorkForFree, Is.True);
+		}
 	}
 }

@@ -12,8 +12,14 @@ namespace AddUser
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Func));
 
-		public static void Mail(string from, string fromDisplayName, string subject, bool isBodyHtml,
-		                        string body, string to, string toDisplayName, string bcc)
+		public static void Mail(string from, 
+								string fromDisplayName, 
+								string subject, 
+								bool isBodyHtml,
+		                        string body, 
+								string to, 
+								string toDisplayName, 
+								string bcc)
 		{
 			try
 			{
@@ -48,7 +54,26 @@ namespace AddUser
 			}
 		}
 
+		public static void SendWitnStandartSender(MailMessage message)
+		{
+			try
+			{
+#if DEBUG
+				message.To.Clear();
+				message.CC.Clear();
+				message.Bcc.Clear();
 
+				message.To.Add("r.kvasov@analit.net");
+#endif
+
+				var client = new SmtpClient("mail.adc.analit.net");
+				client.Send(message);
+			}
+			catch (Exception ex)
+			{
+				_log.Error(Utils.ExceptionToString(ex));
+			}
+		}
 
 		public static string GeneratePassword()
 		{
@@ -58,109 +83,6 @@ namespace AddUser
 			while (password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length - 1)];
 			return password;
-		}
-
-		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand, string CommandAdd)
-		{
-			var myMySqlCommand = new MySqlCommand();
-			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			var Комманда = new MySqlCommand();
-			var myMySqlDataAdapter = new MySqlDataAdapter();
-			try
-			{
-				myMySqlConnection.Open();
-				if (!(MySQLCommand == null))
-				{
-					myMySqlCommand = MySQLCommand;
-				}
-				myMySqlCommand.CommandText = SQLQuery + CommandAdd;
-				myMySqlCommand.Connection = myMySqlConnection;
-				myMySqlDataAdapter.SelectCommand = myMySqlCommand;
-				myMySqlDataAdapter.Fill(DS, Table);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				_log.Error(Utils.ExceptionToString(ex));
-				return false;
-			}
-			finally
-			{
-				Комманда.Dispose();
-				myMySqlDataAdapter.Dispose();
-				myMySqlConnection.Close();
-				myMySqlConnection.Dispose();
-			}
-		}
-
-
-		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS, MySqlCommand MySQLCommand)
-		{
-			string CommandAdd = String.Empty;
-			var myMySqlCommand = new MySqlCommand();
-			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			var Комманда = new MySqlCommand();
-			var myMySqlDataAdapter = new MySqlDataAdapter();
-			try
-			{
-				myMySqlConnection.Open();
-				if (!(MySQLCommand == null))
-				{
-					myMySqlCommand = MySQLCommand;
-				}
-				myMySqlCommand.CommandText = SQLQuery + CommandAdd;
-				myMySqlCommand.Connection = myMySqlConnection;
-				myMySqlDataAdapter.SelectCommand = myMySqlCommand;
-				myMySqlDataAdapter.Fill(DS, Table);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				_log.Error(Utils.ExceptionToString(ex));
-				return false;
-			}
-			finally
-			{
-				Комманда.Dispose();
-				myMySqlDataAdapter.Dispose();
-				myMySqlConnection.Close();
-				myMySqlConnection.Dispose();
-			}
-		}
-
-		public static bool SelectTODS(string SQLQuery, string Table, DataSet DS)
-		{
-			MySqlCommand MySQLCommand = null;
-			string CommandAdd = String.Empty;
-			var myMySqlCommand = new MySqlCommand();
-			var myMySqlConnection = new MySqlConnection(Literals.GetConnectionString());
-			var Комманда = new MySqlCommand();
-			var myMySqlDataAdapter = new MySqlDataAdapter();
-			try
-			{
-				myMySqlConnection.Open();
-				if (!(MySQLCommand == null))
-				{
-					myMySqlCommand = MySQLCommand;
-				}
-				myMySqlCommand.CommandText = SQLQuery + CommandAdd;
-				myMySqlCommand.Connection = myMySqlConnection;
-				myMySqlDataAdapter.SelectCommand = myMySqlCommand;
-				myMySqlDataAdapter.Fill(DS, Table);
-				return true;
-			}
-			catch (Exception ex)
-			{
-				_log.Error(Utils.ExceptionToString(ex));
-				return false;
-			}
-			finally
-			{
-				Комманда.Dispose();
-				myMySqlDataAdapter.Dispose();
-				myMySqlConnection.Close();
-				myMySqlConnection.Dispose();
-			}
 		}
 
 		public static decimal GetDecimal(string InputStr)
@@ -203,6 +125,12 @@ namespace AddUser
 		{
 			try
 			{
+#if DEBUG
+				message.To.Clear();
+				message.To.Add("r.kvasov@analit.net");
+				message.Bcc.Clear();
+				message.CC.Clear();
+#endif
 				var smtpid = SmtpClientEx.QuickSendSmartHostSMTPID("mail.adc.analit.net", "", "", message);
 				if (smtpid == null)
 					return 0;

@@ -300,6 +300,7 @@
     <Compile Include="searchc.aspx.designer.cs">
       <DependentUpon>searchc.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="statcont.aspx.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -383,6 +384,7 @@
     <Content Include="Images\TopRightCorner.png" />
     <Content Include="Css\ValidationStyles.css" />
     <Content Include="Images\warning.png" />
+    <Content Include="JavaScript\date-ru-RU.js" />
     <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
     <None Include="Properties\Settings.settings">
