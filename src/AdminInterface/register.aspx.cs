@@ -499,9 +499,10 @@ where length(c.contactText) > 0
 					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
-						Response.Redirect(String.Format("Register/Register.rails?id={0}&showRegistrationCard={1}",
+						Response.Redirect(String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 						                                Session["DogN"],
-						                                ShowRegistrationCard.Checked));
+						                                ShowRegistrationCard.Checked, 
+														Session["Code"]));
 					else if (ShowRegistrationCard.Checked)
 						Response.Redirect("report.aspx");
 					else
@@ -1142,22 +1143,22 @@ ORDER BY region;
 			var contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
 
 			CreateContactGroup(ContactGroupType.General,
-			                   PhoneTB.Text,
-			                   EmailTB.Text,
+							   EmailHelper.NormalizeEmailOrPhone(PhoneTB.Text),
+							   EmailHelper.NormalizeEmailOrPhone(EmailTB.Text),
 			                   null,
 			                   connection,
 			                   contactGroupOwnerId);
 			CreateContactGroup(ContactGroupType.OrderManagers,
-			                   TBOrderManagerPhone.Text,
-			                   TBOrderManagerMail.Text,
+							   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerPhone.Text),
+							   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerMail.Text),
 			                   TBOrderManagerName.Text,
 			                   connection,
 			                   contactGroupOwnerId);
 
 			if (clientType == ClientType.Supplier)
 				CreateContactGroup(ContactGroupType.ClientManagers,
-				                   TBClientManagerPhone.Text,
-				                   TBClientManagerMail.Text,
+								   EmailHelper.NormalizeEmailOrPhone(TBClientManagerPhone.Text),
+				                   EmailHelper.NormalizeEmailOrPhone(TBClientManagerMail.Text),
 				                   TBClientManagerName.Text,
 				                   connection,
 				                   contactGroupOwnerId);
