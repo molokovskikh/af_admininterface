@@ -19,13 +19,11 @@ namespace AdminInterface.Security
 				if (administrator == null)
 				{
 					administrator = Administrator.GetByName(HttpContext.Current.User.Identity.Name);
-#if !DEBUG
 					if (administrator != null)
 					{
 						HttpContext.Current.Session["UserName"] = administrator.UserName;
 						HttpContext.Current.Session[AdministratorKey] = administrator;
 					}
-#endif			
 				}
 				
 				return administrator;
