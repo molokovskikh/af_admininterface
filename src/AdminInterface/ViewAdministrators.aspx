@@ -121,6 +121,12 @@
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CopySynonyms) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
+					<asp:TemplateField HeaderText="RF">
+						<ItemTemplate>
+							<asp:CheckBox ID="CheckBox14" Enabled="false" runat="server" 
+										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">			
@@ -142,6 +148,7 @@
 				<li><%# GetPermissionShortcut(PermissionType.SendNotification) %> - <%# GetPermissionName(PermissionType.SendNotification)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.ChangePassword) %> - <%# GetPermissionName(PermissionType.ChangePassword)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms)%></li>				
+				<li><%# GetPermissionShortcut(PermissionType.CanRegisterClientWhoWorkForFree)%> - <%# GetPermissionName(PermissionType.CanRegisterClientWhoWorkForFree)%></li>
 			</ul>
 		</div>
 	</form>
