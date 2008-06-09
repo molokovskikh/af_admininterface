@@ -43,6 +43,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Instance"] = client.BillingInstance;
 			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(client.BillingInstance.PayerID);
+			PropertyBag["Today"] = DateTime.Today;
 		}
 
 		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
@@ -151,7 +152,7 @@ namespace AdminInterface.Controllers
 			RenderView("SearchBy");
 		}
 
-		public void SentMail(uint clientCode, uint payerId, string comment)
+		public void SentMail(uint clientCode, uint payerId, string comment, DateTime sentDate)
 		{
 			if (!String.IsNullOrEmpty(comment))
 			{
@@ -159,11 +160,19 @@ namespace AdminInterface.Controllers
 				                     	{
 											PayerId =  payerId,
 				                     		Comment = comment,
-				                     		UserName = ((Administrator) Session["Admin"]).UserName
+				                     		UserName = SecurityContext.Administrator.UserName,
+											SentDate = sentDate,
 				                     	};
 				mailSentEntity.SaveAndFlush();
 			}
 			RedirectToAction("Edit", "clientCode=" + clientCode);
+		}
+
+		public void DeleteMail(uint id)
+		{
+			var mailSend = MailSentEntity.Find(id);
+			mailSend.IsDeleted = true;
+			CancelView();
 		}
 
 		public void ShowMessageForClient(uint clientCode)

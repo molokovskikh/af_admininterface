@@ -10,17 +10,20 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property(Insert = false)]
+		[Property]
 		public DateTime SentDate { get; set; }
+
+		[Property]
+		public bool IsDeleted { get; set; }
+
+		[Property]
+		public string Comment { get; set; }
 
 		[Property]
 		public string UserName { get; set; }
 
 		[Property]
 		public uint PayerId { get; set; }
-
-		[Property]
-		public string Comment { get; set; }
 
 		public static MailSentEntity[] GetHistory(uint payerId)
 		{

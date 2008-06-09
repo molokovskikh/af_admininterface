@@ -4,12 +4,16 @@
 
 <script>
 	
+	document.observe("dom:loaded", function() {
+		SetupCalendarElements();
+	})
+	
 	function RemoveMessage(clientCode)
 	{
 		SetStatusBarMessage("Удаление...", "Notification");
 		$("CurrentMessage").remove();
 		new Ajax.Request("CancelMessage.rails?clientCode=" + clientCode, { 
-			method: 'get',
+			method: 'post',
 			onFailure: function()
 			{
 				SetStatusBarMessage("Ошибка при удалении сообщения", "Error");
@@ -19,6 +23,27 @@
 				SetStatusBarMessage("Сообщение удалено", "Success");
 			}
 		});
+	}
+	
+	function RemoveMailEntity(id)
+	{
+		SetStatusBarMessage("Удаление...", "Notification");
+		new Ajax.Request("DeleteMail.rails?id=" + id, { 
+			method: 'post',
+			onFailure: function()
+			{
+				SetStatusBarMessage("Ошибка при удалении", "Error");
+			},
+			onSuccess: function()
+			{
+				$('mail' + id)
+					.addClassName('DeletedMessage')
+					.select('input')
+					.first()
+					.remove();
+				SetStatusBarMessage("Сообщение удалено", "Success");
+			}
+		});		
 	}
 	
 	function SetStatusBarMessage(message, className)
@@ -61,6 +86,16 @@
 		float:right;
 		margin: 0;
 		padding: 0;
+	}
+	
+	.UseCaseGroup
+	{		
+		margin-bottom: 20px;
+	}
+	
+	.DeletedMessage td
+	{
+		text-decoration: line-through;
 	}
 </style>
 
@@ -163,7 +198,8 @@
 	<div class="Right">
 	
 	<% if IsDefined("ClientMessage"): %>
-		<form action="sendMessage.rails" method="post" style="margin-bottom:10px;">			
+		<div class="UseCaseGroup">
+		<form action="sendMessage.rails" method="post">			
 			<input type="hidden" value="${Client.Id}" name="NewClientMessage.ClientCode" />
 			<table style="width:100%">
 					<tr>
@@ -209,12 +245,14 @@
 					</tr>
 			</table>
 		</form>
+		</div>
 	<% end %>
-		<div>
+	
+		<div class="UseCaseGroup">
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				Статистика включений/выключений
 			</div>
-			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
+			<table class="DataTable" style="width: 100%;">
 			<% 
 			if LogRecords.Count > 0:
 				i = 0
@@ -246,30 +284,42 @@
 			
 		</div>
 		
-		<div>
+		<div class="UseCaseGroup">
+			<div class="InputGroupHeader">
+				Отправка корреспонденции
+			</div>
 			<form method="post" action="SentMail.rails">
 				${FormHelper.HiddenField("ClientCode", Client.Id)}
 				${FormHelper.HiddenField("PayerId", Instance.PayerID)}
-				<textarea name="Comment" rows="20" style="width:100%"></textarea>
+				${FormHelper.LabelFor("sentDate", "Дата отправки:")}
+				<br>
+				${FormHelper.TextFieldValue("sentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
+				<input type="button" class="CalendarInput" />
+				<textarea name="Comment" rows="3" style="width:100%"></textarea>
 				<input type="submit" value="Корреспонденция отправлена" />
 			</form>
 		</div>
 		
-		<div>
+		<div class="UseCaseGroup">
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				История отправки корреспонденции
 			</div>
 			<div>
-			<table class="DataTable" style="width: 100%; margin-bottom: 10px;">
+			<table class="DataTable" style="width: 100%;">
 			<% 
 			if MailSentHistory.Length > 0:
 				i = 0
 				for mailSentEntity in MailSentHistory:
 					i++
 			%>
-					<tr class="${ViewHelper.GetRowStyle(i)}">
+					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)} ${ "DeletedMessage" if mailSentEntity.IsDeleted}">
 						<td>
-							${mailSentEntity.SentDate}
+							<% if not mailSentEntity.IsDeleted: %>
+							<input type="button" value="Удалить" onclick="return RemoveMailEntity(${mailSentEntity.Id});"/>
+							<% end %>
+						</td>
+						<td>
+							${mailSentEntity.SentDate.ToShortDateString()}
 						</td>
 						<td>
 							${mailSentEntity.UserName}
