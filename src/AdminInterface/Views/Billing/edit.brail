@@ -117,7 +117,7 @@
 						%>
 							<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if not client.IsClientActive()}">
 								<td>
-									<input type="checkbox" ${"checked" if client.IsClientActive()} name="Status[${i}].Status" />
+									<input type="checkbox" ${"checked" if client.IsClientActive()} ${"disabled" if not client.CanChangeStatus()} name="Status[${i}].Status" />
 									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
 								</td>
 								<td>
