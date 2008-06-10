@@ -173,7 +173,7 @@ namespace AdminInterface.Helpers
 			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
 			{
 				var result = searcher.FindOne();
-				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
+				if ((result == null) || (result.Properties["badPasswordTime"].Count == 0))
 					return null;
 
 				var badPassworDate = DateTime.FromFileTime((long)searcher.FindOne().Properties["badPasswordTime"][0]);
