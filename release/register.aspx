@@ -27,7 +27,7 @@
 						<div class="TwoColumn">
 							<div class="SimpleField">
 								<label class="Required" for="FullNameTB">
-									Полное наименование:
+									Юридическое наименование:
 								</label>
 								<asp:TextBox ID="FullNameTB" runat="server"></asp:TextBox>
 								<asp:RegularExpressionValidator ID="FullNameValidator" runat="server" ErrorMessage="Длинна строки не может быть больше чем 40 символов" ValidationExpression="^.{1,40}$" ValidationGroup="0" ControlToValidate="FullNameTB" Display="Dynamic">*</asp:RegularExpressionValidator>
@@ -58,23 +58,51 @@
 									Телефон:
 								</label>
 								<asp:TextBox ID="PhoneTB" runat="server" />
-								<asp:RequiredFieldValidator ID="RequiredPhone" runat="server" ControlToValidate="PhoneTB"
-									ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator>
+								<asp:RequiredFieldValidator ID="RequiredPhone" 
+															runat="server" 
+															ControlToValidate="PhoneTB"
+															ErrorMessage="Поле «Телефон» должно быть заполнено" ValidationGroup="0">*</asp:RequiredFieldValidator>
+								<asp:RegularExpressionValidator ID="RegularExpressionValidator2" 
+																runat="server" ControlToValidate="PhoneTB"
+																ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+																ValidationExpression="\s*(\d{3,4})-(\d{6,7})\s*" 
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 							<div class="SimpleField">
 								<label for="EmailTB">
 									E-mail:
 								</label>
 								<asp:TextBox ID="EmailTB" runat="server" />
+								<asp:RegularExpressionValidator ID="RegularExpressionValidator1" 
+																runat="server" 
+																ControlToValidate="EmailTB"
+																ErrorMessage="Ошибка в e-mail" 
+																ValidationExpression="\s*\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\s*"
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 							<div class="SimpleField">
 								<label for="LoginTB">
 									Login:
 								</label>
 								<asp:TextBox ID="LoginTB" runat="server" />
-								<asp:CustomValidator ID="LoginValidator" runat="server" ErrorMessage="Поле «Login» должно быть заполнено"
-									ControlToValidate="LoginTB" OnServerValidate="LoginValidator_ServerValidate"
-									ValidationGroup="0" EnableClientScript="False" ValidateEmptyText="True">*</asp:CustomValidator>
+								<asp:CustomValidator ID="LoginValidator" 
+													runat="server" 
+													ErrorMessage="Поле «Login» должно быть заполнено"
+													ControlToValidate="LoginTB" 
+													OnServerValidate="LoginValidator_ServerValidate"
+													ValidationGroup="0" 
+													EnableClientScript="False" 
+													ValidateEmptyText="True">*</asp:CustomValidator>
+													
+								<asp:RegularExpressionValidator ID="LoginValidator1" 
+																runat="server" 
+																ControlToValidate="LoginTB"
+																ErrorMessage="Не корректный логин, логин может содержать буквы латинского алфавита, цифры и символ подчеркивания" 
+																ValidationExpression="\s*[a-z|0-9|_]+\s*"
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 						</div>
 					</div>
@@ -118,7 +146,7 @@
 							<div>
 								<fieldset>
 								<legend>
-									<asp:CheckBox ID="SendRegistrationCard" runat="server" Checked="true" Text="Отправлять регистационную карту клиенту" />
+									<asp:CheckBox ID="SendRegistrationCard" runat="server" Checked="true" Text="Отправлять регистрационную карту клиенту" />
 								</legend>
 								<table>
 									<tr>
@@ -168,24 +196,6 @@
 			</tr>
 			<tr>
 				<td align="right" height="25">
-					<asp:RegularExpressionValidator ID="RegularExpressionValidator3" runat="server" ControlToValidate="EmailTB"
-						ErrorMessage="Ошибка в e-mail" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
-					<asp:RegularExpressionValidator ID="RegularExpressionValidator2" runat="server" ControlToValidate="PhoneTB"
-						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
-					<asp:RegularExpressionValidator ID="RegularExpressionValidator8" runat="server" ControlToValidate="TBClientManagerPhone"
-						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
-					<asp:RegularExpressionValidator ID="Regularexpressionvalidator4" runat="server" ControlToValidate="TBOrderManagerMail"
-						ErrorMessage="Ошибка в e-mail Order Manager" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
-					<asp:RegularExpressionValidator ID="Regularexpressionvalidator5" runat="server" ControlToValidate="TBClientManagerMail"
-						ErrorMessage="Ошибка в e-mail Client Manager" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"
-						Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
-					<asp:RegularExpressionValidator ID="RegularExpressionValidator9" runat="server" ControlToValidate="TBOrderManagerPhone"
-						ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
-						ValidationExpression="(\d{3,4})-(\d{6,7})" Display="None" ValidationGroup="0"></asp:RegularExpressionValidator>
 					<font face="Verdana" size="2"></font>
 				</td>
 				<td height="25">
@@ -250,12 +260,26 @@
 									Тел.:
 								</label>
 								<asp:TextBox ID="TBOrderManagerPhone" runat="server" />
+								<asp:RegularExpressionValidator ID="RegularExpressionValidator9" 
+																runat="server" 
+																ControlToValidate="TBOrderManagerPhone"
+																ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+																ValidationExpression="\s*(\d{3,4})-(\d{6,7})\s*" 
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 							<div class="SimpleField">
 								<label for="TBOrderManagerMail">
 									E-mail:
 								</label>
 								<asp:TextBox ID="TBOrderManagerMail" runat="server" />
+								<asp:RegularExpressionValidator ID="Regularexpressionvalidator4" 
+																runat="server" 
+																ControlToValidate="TBOrderManagerMail"
+																ErrorMessage="Ошибка в e-mail Order Manager" 
+																ValidationExpression="\s*\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\s*"
+																Display="None" 
+																ValidationGroup="0" />
 							</div>
 						</div>
 						<div class="TwoColumn" id="ClientManagerGropBlock" runat="server" visible="false">
@@ -274,12 +298,27 @@
 									Тел.:
 								</label>
 								<asp:TextBox ID="TBClientManagerPhone" runat="server" />
+								<asp:RegularExpressionValidator ID="RegularExpressionValidator8" 
+																runat="server" 
+																ControlToValidate="TBClientManagerPhone"
+																ErrorMessage="Поле &quot;Телефон&quot; должно быть заполненно как &quot;XXX(X)-XXXXXX(X)&quot;"
+																ValidationExpression="\s*(\d{3,4})-(\d{6,7})\s*"
+																Display="None" 
+																ValidationGroup="0"></asp:RegularExpressionValidator>
 							</div>
 							<div class="SimpleField">
 								<label for="TBClientManagerMail">
 									E-mail:
 								</label>
 								<asp:TextBox ID="TBClientManagerMail" runat="server" />
+								<asp:RegularExpressionValidator ID="Regularexpressionvalidator5" 
+																runat="server" 
+																ControlToValidate="TBClientManagerMail"
+																ErrorMessage="Ошибка в e-mail Client Manager" 
+																ValidationExpression="\s*\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*\s*"
+																Display="None" 
+																ValidationGroup="0" />
+
 							</div>
 						</div>
 					</div>

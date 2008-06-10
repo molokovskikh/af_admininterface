@@ -31,7 +31,7 @@
 		<table class="CenterBlock" style="text-align:center;">
 			<tr>
 				<td colspan="2">
-					Показывать только тех клиентов, которые ни разу успешно не обновились за последнии <input name="DayWithoutUpdate" type="text" value="${dayWithoutUpdate if dayWithoutUpdate > 0}" /> дней
+					Показывать только тех клиентов, которые ни разу успешно не обновились за последние <input name="DayWithoutUpdate" type="text" value="${dayWithoutUpdate if dayWithoutUpdate > 0}" /> дней
 				</td>
 			</tr>
 		</table>

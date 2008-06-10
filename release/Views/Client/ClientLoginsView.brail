@@ -1,6 +1,6 @@
 ﻿<table style="width:100%;" class="Test">
 	<tr>
-		<td class="Title" colspan="3">
+		<td class="Title" colspan="5">
 			Учетные записи пользователя:
 		</td>
 	</tr>
@@ -12,11 +12,15 @@
 			Дата последнего входа
 		</td>
 		<td class="Title">
+			Дата последней неудачной регистрации
+		</td>
+		<td class="Title">
 		</td>
 	</tr>
 <% for user in Client.Users: %>
+	<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
 	<tr>
-		<td>
+		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
 			<% if admin.AlowChangePassword: %>
 				<a href="./ChangePassword.rails?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
 			<% else: %>
@@ -24,7 +28,10 @@
 			<% end %>
 		</td>
 		<td>
-			${ADHelper.GetLastLogOnDate(user.Login)}
+			${ADHelper.GetLastLogOnDate(user.Login) if isLoginExists}
+		</td>
+		<td>
+			${ADHelper.GetBadPasswordDate(user.Login) if isLoginExists}
 		</td>
 		<td>
 			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>

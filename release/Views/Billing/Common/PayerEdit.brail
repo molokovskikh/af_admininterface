@@ -161,7 +161,20 @@ ${FormHelper.HiddenField("Instance.PayerID")}
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
 														"Надпись после \"Кому\":"), 
 									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
-												
+											
+		${WriteInputGroupHeader("Отправка корреспонденции")}
+		
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.HaveContract", 
+														"Договор получен:"), 
+									FormHelper.CheckboxField("Instance.HaveContract"))}
+									
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendRegisteredLetter", 
+														"Отправлять заказным письмом:"), 
+									FormHelper.CheckboxField("Instance.SendRegisteredLetter"))}
+									
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendScannedDocuments", 
+														"Отправлять отсканированные документы:"), 
+									FormHelper.CheckboxField("Instance.SendScannedDocuments"))}
 
 		${WriteInputGroupHeader("Комментарий")}
 
