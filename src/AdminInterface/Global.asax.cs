@@ -169,7 +169,7 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			_log.Error(builder.ToString());
-			Response.Redirect("/Rescue/Error.aspx");
+			Response.Redirect("~/Rescue/Error.aspx");
 #endif
 		}
 
