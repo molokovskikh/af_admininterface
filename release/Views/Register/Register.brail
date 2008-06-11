@@ -53,7 +53,10 @@ end
 			var checkBox = $('PaymentOptions_WorkForFree');
 			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
 				return true;
-		
+				
+			if (!$("PaymentOptions_Comment").empty())
+				return true;
+			
 			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
 			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
 			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
