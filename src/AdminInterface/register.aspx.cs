@@ -712,8 +712,8 @@ ORDER BY cd.shortname;
 		private int CreateClientOnBilling()
 		{
 			_command.CommandText =
-				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
-				DateTime.Now + "', null, ?ShortName, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
+				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, JuridicalName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
+				DateTime.Now + "', null, ?ShortName, ?fullname, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
 			_command.Parameters.AddWithValue("?BillingContactGroupOwnerId", CreateContactsForBilling(_command.Connection));
 			return Convert.ToInt32(_command.ExecuteScalar());

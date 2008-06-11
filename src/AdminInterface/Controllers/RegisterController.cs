@@ -31,12 +31,6 @@ namespace AdminInterface.Controllers
 							   uint clientCode,
 		                       bool showRegistrationCard)
 		{
-			if (String.IsNullOrEmpty(payer.JuridicalName))
-			{
-				var client = Client.Find(clientCode);
-				payer.JuridicalName = client.FullName;
-			}
-
 			if (String.IsNullOrEmpty(payer.Comment))
 				payer.Comment = paymentOptions.GetCommentForPayer();
 			else
