@@ -366,18 +366,14 @@ set @inUser = ?UserName;";
 				else
 					CreatePriceRecords();
 
-				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Стандартный"))
-				{
+				ADHelper.CreateUserInAD(_command.Parameters["?OSUserName"].Value.ToString(),
+				                        _command.Parameters["?OSUserPass"].Value.ToString(),
+				                        _command.Parameters["?ClientCode"].Value.ToString());
 
-					ADHelper.CreateUserInAD(_command.Parameters["?OSUserName"].Value.ToString(),
-					                        _command.Parameters["?OSUserPass"].Value.ToString(),
-					                        _command.Parameters["?ClientCode"].Value.ToString());
-
-					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\",
-					                                 _command.Parameters["?ClientCode"].Value),
-					                   String.Format(@"ANALIT\{0}",
-					                                 _command.Parameters["?OSUserName"].Value));
-				}
+				CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\",
+				                                 _command.Parameters["?ClientCode"].Value),
+				                   String.Format(@"ANALIT\{0}",
+				                                 _command.Parameters["?OSUserName"].Value));
 
 				mytrans.Commit();
 				try
