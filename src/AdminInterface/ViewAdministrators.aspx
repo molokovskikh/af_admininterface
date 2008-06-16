@@ -123,7 +123,7 @@
 					</asp:TemplateField>
 					<asp:TemplateField HeaderText="RF">
 						<ItemTemplate>
-							<asp:CheckBox ID="CheckBox14" Enabled="false" runat="server" 
+							<asp:CheckBox ID="CheckBox15" Enabled="false" runat="server" 
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
