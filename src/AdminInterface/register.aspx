@@ -130,6 +130,7 @@
 									AutoPostBack="True" />
 								<asp:DropDownList ID="IncludeType" runat="server" Visible="False">
 									<asp:ListItem Value="0">Базовый</asp:ListItem>
+									<asp:ListItem Value="3">Базовый+</asp:ListItem>
 									<asp:ListItem Value="1">Сеть</asp:ListItem>
 									<asp:ListItem Value="2">Скрытый</asp:ListItem>
 								</asp:DropDownList>

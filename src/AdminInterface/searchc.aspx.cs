@@ -243,6 +243,7 @@ SELECT  cd. billingcode,
 			WHEN 0 THEN 'Базовый'
 			WHEN 1 THEN 'Сеть'
 			WHEN 2 THEN 'Скрытый'
+			WHEN 3 THEN 'Базовый+'
 		END AS IncludeType
 		
 FROM    (clientsdata as cd, farm.regions, ret_update_info as rts, billing.payers p) 

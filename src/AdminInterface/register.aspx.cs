@@ -339,7 +339,7 @@ set @inUser = ?UserName;";
 			_command.Parameters["?OSUserPass"].Value = PassTB.Text;
 			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
 
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
 				_command.Parameters.AddWithValue("?PrimaryClientCode", IncludeSDD.SelectedValue);
 
 			_command.Parameters.AddWithValue("?IncludeType", IncludeType.SelectedValue);
@@ -368,16 +368,17 @@ set @inUser = ?UserName;";
 
 				if (!IncludeCB.Checked || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Стандартный"))
 				{
+
 					ADHelper.CreateUserInAD(_command.Parameters["?OSUserName"].Value.ToString(),
 					                        _command.Parameters["?OSUserPass"].Value.ToString(),
 					                        _command.Parameters["?ClientCode"].Value.ToString());
-#if !DEBUG
+
 					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\",
 					                                 _command.Parameters["?ClientCode"].Value),
 					                   String.Format(@"ANALIT\{0}",
 					                                 _command.Parameters["?OSUserName"].Value));
-#endif
 				}
+
 				mytrans.Commit();
 				try
 				{
@@ -483,7 +484,7 @@ where length(c.contactText) > 0
 				ClientCardIfNeeded();
 
 				if (!IncludeCB.Checked 
-					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый"))
+					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый" && IncludeType.SelectedItem.Text != "Базовый+"))
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
 						Response.Redirect(String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
@@ -505,7 +506,7 @@ where length(c.contactText) > 0
 						                                                  Convert.ToUInt32(Session["DogN"]),
 						                                                  ShortNameTB.Text,
 						                                                  SecurityContext.Administrator.UserName,
-						                                                  (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый"),
+																		  (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+")),
 						                                                  null);
 			}
 			catch (Exception excL)
@@ -529,7 +530,7 @@ where length(c.contactText) > 0
 			if (!SendRegistrationCard.Checked)
 				return;
 
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый")
+			if (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+"))
 				return;
 
 			string mailTo;
@@ -572,29 +573,23 @@ where length(c.contactText) > 0
 
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
-			var adapter = new MySqlDataAdapter(
-					@"
+			var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
-FROM    clientsdata as cd, 
-        accessright.regionaladmins, 
-        billing.payers p 
-WHERE   p.payerid                                = cd.billingcode 
-        AND cd.regioncode & regionaladmins.regionmask > 0 
-        AND regionaladmins.UserName                   = ?UserName  
-        AND FirmType                             = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                     = 1, Registrant = ?UserName, 1 = 1) 
-        AND firmstatus                           = 1 
-        AND billingstatus                        = 1 
+FROM clientsdata as cd
+	JOIN billing.payers p ON cd.BillingCode = p.PayerId
+WHERE   cd.regioncode & ?AdminRegionCode > 0 
+        AND firmstatus = 1 
+        AND billingstatus = 1 
         AND p.ShortName like ?SearchText  
-ORDER BY p.shortname;
-",
+		{0}
+ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")),
 					_connection);
 			try
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionCode", SecurityContext.Administrator.RegionMask);
 				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", PayerFTB.Text));
 				adapter.Fill(DS1, "Payers");
 
@@ -658,31 +653,26 @@ ORDER BY p.shortname;
 
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
-			var adapter = new MySqlDataAdapter(
-				@"
+			var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
         cd.RegionCode  
-FROM    (accessright.regionaladmins, clientsdata as cd)  
+FROM clientsdata as cd
 LEFT JOIN includeregulation ir 
-        ON ir.includeclientcode              = cd.firmcode  
-WHERE   cd.regioncode & regionaladmins.regionmask > 0  
-        AND regionaladmins.UserName               = ?UserName  
-        AND FirmType                         = if(ShowRetail+ShowVendor = 2, FirmType, if(ShowRetail = 1, 1, 0)) 
-        AND if(UseRegistrant                 = 1, Registrant = ?UserName, 1 = 1)  
-        AND cd.ShortName like ?SearchText 
-        AND FirmStatus    = 1  
-        AND billingstatus = 1  
-        AND FirmType      = 1  
-        AND ir.primaryclientcode is null  
-ORDER BY cd.shortname;
-",
-				_connection);
+        ON ir.includeclientcode = cd.firmcode  
+WHERE cd.regioncode & ?AdminRegionMask > 0  
+      AND FirmStatus = 1  
+      AND billingstatus = 1  
+      AND FirmType = 1  
+      AND ir.primaryclientcode is null  
+	  AND cd.ShortName like ?SearchText 
+	  {0}
+ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), _connection);
 			try
 			{
 				_connection.Open();
 				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
 				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
 				adapter.Fill(DS1, "Includes");
 				adapter.SelectCommand.Transaction.Commit();
@@ -897,7 +887,7 @@ WHERE   intersection.pricecode IS NULL
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;
 ";
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "0")
+			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
 			{
 				if (IncludeType.SelectedItem.Value == "1")
 				{
@@ -1062,6 +1052,7 @@ ORDER BY region;
 
 		private void CreateFtpDirectory(string directory, string userName)
 		{
+#if !DEBUG
 			var supplierDirectory = Directory.CreateDirectory(directory);
 			var supplierDirectorySecurity = supplierDirectory.GetAccessControl();
 		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
@@ -1091,6 +1082,7 @@ ORDER BY region;
 			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
 
 		    Directory.CreateDirectory(directory + "Docs\\");
+#endif
 		}
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)

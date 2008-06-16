@@ -133,6 +133,7 @@
 												<ItemTemplate>
 													<asp:DropDownList ID="IncludeTypeList" runat="server">
 														<asp:ListItem Value="0">Базовый</asp:ListItem>
+														<asp:ListItem Value="3">Базовый+</asp:ListItem>
 														<asp:ListItem Value="1">Сеть</asp:ListItem>
 														<asp:ListItem Value="2">Скрытый</asp:ListItem>
 													</asp:DropDownList>
