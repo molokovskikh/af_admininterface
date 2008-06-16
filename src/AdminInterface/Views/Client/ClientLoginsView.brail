@@ -17,7 +17,7 @@
 		<td class="Title">
 		</td>
 	</tr>
-<% for user in Client.Users: %>
+<% for user in Client.GetUsers(): %>
 	<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
 	<tr>
 		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
