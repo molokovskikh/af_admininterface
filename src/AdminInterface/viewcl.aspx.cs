@@ -145,8 +145,7 @@ ORDER by p.RequestTime desc;
 					break;
 				case StatisticsType.InUpdateProcess:
 					adapter.SelectCommand.CommandText = @" 
-SELECT  regionaladmins.RowID,   
-        p.RequestTime,   
+SELECT  p.RequestTime,   
         clientsdata.FirmCode,   
         clientsdata.ShortName,   
         r.Region,   
@@ -167,7 +166,6 @@ WHERE   r.regioncode                                  = clientsdata.regioncode
 ORDER BY p.RequestTime desc;
 ";
 					headerText = "В процессе получения обновления:";
-					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 					break;
 				case StatisticsType.Download:
 					adapter.SelectCommand.CommandText = @"
