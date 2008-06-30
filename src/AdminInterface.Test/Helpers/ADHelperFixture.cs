@@ -33,7 +33,7 @@ namespace AdminInterface.Test.Helpers
 
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(CN={0})", login)))
+			using (var searcher = new DirectorySearcher(String.Format(@"(sAMAccountName={0})", login)))
 			{
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
@@ -44,17 +44,10 @@ namespace AdminInterface.Test.Helpers
 
 		private static DateTime CreatedAt(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				return Convert.ToDateTime(searcher.FindOne().Properties["whenCreated"][0]);
 			}
-		}
-
-		[Test]
-		public void Test()
-		{
-			Console.WriteLine(ADHelper.GetLastLogOnDate("protek2"));
-			Log(FindDirectoryEntry("protek2"));
 		}
 
 		[Test] 
@@ -94,7 +87,7 @@ namespace AdminInterface.Test.Helpers
 	{
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)

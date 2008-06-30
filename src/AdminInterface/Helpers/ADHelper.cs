@@ -43,7 +43,7 @@ namespace AdminInterface.Helpers
 
 		public static DateTime GetPasswordExpirationDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
 				return DateTime.FromFileTime((long)searcher.FindOne().Properties["pwdLastSet"][0]) + GetMaxPasswordAge();
 		}
 
@@ -83,7 +83,7 @@ namespace AdminInterface.Helpers
 
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using(var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
@@ -126,7 +126,7 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastLogOnDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				var result = searcher.FindOne();
 				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
@@ -170,7 +170,7 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetBadPasswordDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(CN={0}))", login)))
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				var result = searcher.FindOne();
 				if ((result == null) || (result.Properties["badPasswordTime"].Count == 0))
