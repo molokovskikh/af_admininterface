@@ -77,7 +77,7 @@ namespace AddUser
 
 		public static string GeneratePassword()
 		{
-			var availableChars = "23456789qwertyuiopasdfghjkzxcvbnmQWERTYUOPASDFGHJKLZXCVBNM";
+			var availableChars = "23456789qwertyupasdfghjkzxcvbnmQWERTYUPASDFGHJKLZXCVBNM";
 			var password = String.Empty;
 			var random = new Random();
 			while (password.Length < 8)
