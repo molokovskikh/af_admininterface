@@ -147,8 +147,7 @@ FROM    farm.regions as a,
         clientsdata as cd
 WHERE   b.regioncode = ?HomeRegion
         AND cd.firmcode = ?ClientCode
-        AND a.regioncode & b.defaultshowregionmask > 0
-		and a.RegionCode & ?AdminRegionMask > 0
+        AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
 GROUP BY regioncode
 ORDER BY region;
 ";
@@ -492,8 +491,7 @@ FROM    farm.regions as a,
         clientsdata as cd
 WHERE   b.regioncode = ?HomeRegion
         and cd.firmcode = ?ClientCode
-        and a.regioncode & b.defaultshowregionmask > 0
-		and a.regionCode & ?AdminRegionMask > 0
+        and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
 GROUP BY regioncode
 ORDER BY region;";
 			}
