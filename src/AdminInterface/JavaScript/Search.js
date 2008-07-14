@@ -1,12 +1,15 @@
 function joinSearchHelper(textBox, titlesAndIds)
 {
-	textBox.observe("click", function(){
+	textBox.observe("blur", function(event) {
+		setSearchTitle(textBox, titlesAndIds);
+	});
+	
+	textBox.observe("focus", function(event) {
 		checkAndIfNeedClean(textBox, titlesAndIds);
 	});
 	
-	titlesAndIds.keys().each(function(id)
-	{
-			$(id).observe("click", function(){
+	titlesAndIds.keys().each(function(id) {
+			$(id).observe("click", function() {
 				setSearchTitle(textBox, titlesAndIds);
 			});
 	});
@@ -23,6 +26,15 @@ function setSearchTitle(textBox, titlesAndIds)
 	}
 }
 
+function checkAndIfNeedClean(textBox, titlesAndIds)
+{
+	if (isTitleText(textBox.value, titlesAndIds))
+	{
+		textBox.value = "";
+		textBox.removeClassName("SearchTitle");
+	}
+}
+
 function isTitleText(text, titlesAndIds)
 {
 	return  text == "" || titlesAndIds.values().indexOf(text) != -1;
@@ -31,21 +43,11 @@ function isTitleText(text, titlesAndIds)
 function getTitleText(titlesAndIds)
 {
 	var result;
-	titlesAndIds.keys().each(function(id)
-		{
+	titlesAndIds.keys().each(function(id) {
 			if ($(id).checked)
 				result = titlesAndIds.get(id);
 		});
 	return result;
-}
-
-function checkAndIfNeedClean(textBox, titlesAndIds)
-{
-	if (isTitleText(textBox.value, titlesAndIds))
-	{
-		textBox.value = "";
-		textBox.removeClassName("SearchTitle");
-	}
 }
 
 function ValidateSearch(source, args)
