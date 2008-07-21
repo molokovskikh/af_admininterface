@@ -200,6 +200,19 @@
 								</td>
 							</tr>
 							<tr>
+								<td class="Title">
+									Права доступа:
+								</td>
+							</tr>
+							<tr>
+								<td style="text-align:left">
+									<asp:CheckBoxList ID="Permissions" 
+													  runat="server" 
+													  DataValueField="Id" 
+													  DataTextField="Name" />
+								</td>
+							</tr>
+							<tr>
 								<td  style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
 									Выгрузка в Excel из программы АналитФармация
 								</td>

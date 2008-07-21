@@ -33,10 +33,12 @@
 					</td>
 				</tr>
 				<tr>
+				
 					<td style="width: 181px;">
-						<asp:TextBox ID="FindTB" runat="server" />&nbsp;
+						<asp:TextBox ID="FindTB" runat="server" />
 						<asp:CustomValidator ID="SearchTextValidator" runat="server" ControlToValidate="FindTB"
-							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True"></asp:CustomValidator></td>
+							ErrorMessage="*" ClientValidationFunction="ValidateSearch" OnServerValidate="SearchTextValidator_ServerValidate" ValidateEmptyText="True" />
+					</td>
 					<td style="text-align: left;">
 						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="120px">
 							<asp:ListItem Value="Automate" Selected="True">Автоматический</asp:ListItem>
@@ -102,12 +104,12 @@
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>
-					<asp:TemplateField HeaderText="Текущее (подтвержденное) обновление" SortExpression="FirstUpdate">
+					<asp:TemplateField HeaderText="Подтвержденное обновление" SortExpression="FirstUpdate">
 						<ItemTemplate>
 							<asp:Label ID="Label1" runat="server" Text='<%# Eval("FirstUpdate").ToString() %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
-					<asp:TemplateField HeaderText="Предыдущее (неподтвержденное) обновление" SortExpression="SecondUpdate">
+					<asp:TemplateField HeaderText="Неподтвержденное бновление" SortExpression="SecondUpdate">
 						<ItemTemplate>
 							<asp:Label ID="Label2" runat="server" Text='<%# Eval("SecondUpdate").ToString() %>'></asp:Label>
 						</ItemTemplate>
