@@ -58,5 +58,10 @@ namespace AdminInterface.Models
 			return query.Execute();
 */
 		}
+
+		public override string ToString()
+		{
+			return Login;
+		}
 	}
 }

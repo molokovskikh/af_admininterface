@@ -84,6 +84,9 @@ namespace AdminInterface.Models
 			foreach (var user in Users)
 				yield return user;
 
+			if (Type == ClientType.Drugstore)
+				yield break;
+
 			foreach (var client in ShowClients)
 				foreach (var user in client.Parent.Users)
 					yield return user;	

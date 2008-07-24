@@ -20,6 +20,62 @@ namespace AdminInterface.Test.Models
 		}
 
 		[Test]
+		public void For_suppliers_get_users_must_include_users_from_show_clients()
+		{
+			var client
+				= new Client
+				  	{
+				  		Users = new List<User>
+				  		        	{
+				  		        		new User { Login = "test" },
+				  		        	},
+				  		ShowClients = new List<ShowRelationship>
+				  		              	{
+				  		              		new ShowRelationship
+				  		              			{
+				  		              				Parent = new Client
+				  		              				         	{
+				  		              				         		Users = new List<User>
+				  		              				         		        	{
+				  		              				         		        		new User { Login = "test1"}
+				  		              				         		        	}
+				  		              				         	}
+				  		              			}
+				  		              	},
+				  		Type = ClientType.Supplier
+				  	};
+			Assert.That(client.GetUsers(), Is.EquivalentTo(new[] {client.Users[0], client.ShowClients[0].Parent.Users[0]}));
+		}
+
+		[Test]
+		public void For_drug_store_get_users_must_return_only_users_from_os_user_access_right()
+		{
+			var client
+				= new Client
+				  	{
+				  		Users = new List<User>
+				  		        	{
+				  		        		new User { Login = "test"},
+				  		        	},
+				  		ShowClients = new List<ShowRelationship>
+				  		              	{
+				  		              		new ShowRelationship
+				  		              			{
+				  		              				Parent = new Client
+				  		              				         	{
+				  		              				         		Users = new List<User>
+				  		              				         		        	{
+				  		              				         		        		new User { Login = "test1"}
+				  		              				         		        	}
+				  		              				         	}
+				  		              			}
+				  		              	},
+				  		Type = ClientType.Drugstore
+				  	};
+			Assert.That(client.GetUsers(), Is.EquivalentTo( new [] {  client.Users[0] }));
+		}
+
+		[Test]
 		public void GetSubordinateTypeTest()
 		{
 			var client = new Client {Id = 1, ShortName = "Test1", Parents = new List<Relationship>()};
