@@ -173,6 +173,11 @@ namespace AddUser
 			myMySqlCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
 			myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
+			if (NoisedCosts.Visible && NoisedCosts.Checked)
+				myMySqlCommand.Parameters.AddWithValue("?PriceCodeOnly", NotNoisedPrice.SelectedValue);
+			else
+				myMySqlCommand.Parameters.AddWithValue("?PriceCodeOnly", null);
+
 			try
 			{
 				_connection.Open();
@@ -292,22 +297,21 @@ SET OrderRegionMask     = ?orderMask,
     AllowSubmitOrders       = ?AllowSubmitOrders, 
     SubmitOrders            = ?SubmitOrders, 
     ServiceClient           = ?ServiceClient, 
-    OrdersVisualizationMode = ?OrdersVisualizationMode  
+    OrdersVisualizationMode = ?OrdersVisualizationMode,
+	PriceCodeOnly			= ?PriceCodeOnly
 ";
 
 				InsertCommand += " where clientcode=firmcode and firmcode=?clientCode";
 
 				var adapter = new MySqlDataAdapter();
 				adapter.InsertCommand = new MySqlCommand(
-@"
-INSERT 
+@"INSERT 
 INTO    UserSettings.IncludeRegulation  
         SET IncludeClientCode = ?ClientCode,
         PrimaryClientCode     = ?PrimaryClientCode,
         IncludeType           = ?IncludeType;
 
-CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
-", _connection);
+CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);", _connection);
 				adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 				adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
@@ -357,6 +361,36 @@ WHERE Id = ?Id;", _connection, myTrans);
 
 				myMySqlCommand.CommandText = InsertCommand;
 				myMySqlCommand.ExecuteNonQuery();
+
+
+				var permissions = new DataSet();
+				var permissionAdapter = new MySqlDataAdapter(@"
+SELECT up.id, o.RowId, up.name, if(ap.UserId is null, 0, 1) as Enabled
+FROM (UserSettings.OsUserAccessRight O, UserSettings.UserPermissions up)
+  left join UserSettings.AssignedPermissions ap on o.rowid = ap.userid and up.id = ap.PermissionId
+where o.clientcode = ?ClientCode
+order by up.name;", Literals.GetConnectionString());
+				permissionAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+				permissionAdapter.Fill(permissions, "Permissions");
+
+				for(var i = 0; i < Permissions.Items.Count; i++)
+				{
+					if (Convert.ToBoolean(permissions.Tables["Permissions"].DefaultView[i]["Enabled"]) != Permissions.Items[i].Selected)
+					{
+						if (Permissions.Items[i].Selected)
+							myMySqlCommand.CommandText = @"
+insert into UserSettings.AssignedPermissions(UserId, PermissionId)
+values(?UserId, ?PermissionId)";
+						else
+							myMySqlCommand.CommandText = @"
+delete from UserSettings.AssignedPermissions 
+where UserId = ?UserId and PermissionId = ?PermissionId";
+						myMySqlCommand.Parameters.Clear();
+						myMySqlCommand.Parameters.AddWithValue("?UserId", permissions.Tables["Permissions"].DefaultView[i]["RowId"]);
+						myMySqlCommand.Parameters.AddWithValue("?PermissionId", permissions.Tables["Permissions"].DefaultView[i]["Id"]);
+						myMySqlCommand.ExecuteNonQuery();
+					}
+				}
 
 				ShowRegulationHelper.Update(_connection, myTrans, Data, ClientCode);
 
@@ -513,12 +547,14 @@ SELECT  InvisibleOnFirm,
         SubmitOrders, 
         ServiceClient, 
         OrdersVisualizationMode, 
-        ShowMessageCount 
-FROM    retclientsset rcs, 
-        ret_update_info rui 
-WHERE   rcs.clientcode     = ?ClientCode 
-        AND rui.ClientCode = ?ClientCode 
-";
+        ShowMessageCount,
+		pd.PriceCode as NotNoisedPriceCode,
+		concat(pd.PriceName, ' ', cd.ShortName) as NotNoisedPriceName
+FROM retclientsset rcs
+	JOIN ret_update_info rui on rcs.clientcode = rui.ClientCode
+	LEFT JOIN usersettings.pricesdata pd on pd.pricecode = rcs.PriceCodeOnly
+	LEFT JOIN usersettings.clientsdata cd on cd.firmcode = pd.firmcode
+WHERE rcs.clientcode = ?ClientCode";
 				using (myMySqlDataReader = myMySqlCommand.ExecuteReader())
 				{
 					myMySqlDataReader.Read();
@@ -536,6 +572,20 @@ WHERE   rcs.clientcode     = ?ClientCode
 					SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
 					ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
 					OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
+					if (Convert.ToInt32(myMySqlDataReader["InvisibleOnFirm"]) != 0)
+					{
+						var noise = myMySqlDataReader["NotNoisedPriceCode"] != DBNull.Value;
+						SetNoiseStatus(noise);
+						if (noise)
+							NotNoisedPrice.SelectedValue = myMySqlDataReader["NotNoisedPriceCode"].ToString();
+					}
+					else
+					{
+						NoiseRow.Visible = false;
+						NoisedCosts.Visible = false;
+						NotNoisedPriceLabel.Visible = false;
+						NotNoisedPrice.Visible = false;
+					}
 				}
 
 				var adapter = new MySqlDataAdapter(String.Format(@"
@@ -565,6 +615,14 @@ ORDER BY sg.DisplayName;
 ";
 				adapter.Fill(Data, "ExportRules");
 
+				adapter.SelectCommand.CommandText = @"
+SELECT up.id, up.name, if(ap.UserId is null, 0, 1) as Enabled
+FROM (UserSettings.OsUserAccessRight O, UserSettings.UserPermissions up)
+  left join UserSettings.AssignedPermissions ap on o.rowid = ap.userid and up.id = ap.PermissionId
+where o.clientcode = ?ClientCode
+order by up.name;";
+				adapter.Fill(Data, "Permissions");
+
 				ShowRegulationHelper.Load(adapter, Data);
 
 				ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
@@ -573,9 +631,15 @@ ORDER BY sg.DisplayName;
 				IncludeGrid.DataBind();
 				ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
 				ExportRulesList.DataBind();
+				Permissions.DataSource = Data.Tables["Permissions"].DefaultView;
+				Permissions.DataBind();
 
 				for (var i = 0; i < ExportRulesList.Items.Count; i++)
 					ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
+
+				for (var i = 0; i < Permissions.Items.Count; i++)
+					Permissions.Items[i].Selected = Convert.ToBoolean(Data.Tables["Permissions"].DefaultView[i]["Enabled"]);
+
 				transaction.Commit();
 			}
 			finally
@@ -704,6 +768,32 @@ ORDER BY cd.shortname;", _connection);
 		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			ShowRegulationHelper.ShowClientsGrid_RowDeleting(sender, e, Data);
+		}
+
+		protected void NoisedCosts_CheckedChanged(object sender, EventArgs e)
+		{
+			var noise = ((CheckBox) sender).Checked;
+			SetNoiseStatus(noise);
+		}
+
+		private void SetNoiseStatus(bool noise)
+		{
+			NoisedCosts.Checked = noise;
+			NotNoisedPriceLabel.Visible = noise;
+			NotNoisedPrice.Visible = noise;
+
+			var adapter = new MySqlDataAdapter(@"
+SELECT pd.PriceCode,
+       concat(suppliers.ShortName, ' ', pd.PriceName) as PriceName
+FROM Usersettings.ClientsData cd
+  JOIN Usersettings.clientsdata suppliers on cd.BillingCode = suppliers.BillingCode and suppliers.FirmType = 0
+	JOIN Usersettings.pricesdata pd on pd.firmcode = suppliers.firmcode
+WHERE cd.firmcode = ?ClientCode;", Literals.GetConnectionString());
+			adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+			var data = new DataSet();
+			adapter.Fill(data);
+			NotNoisedPrice.DataSource = data;
+			NotNoisedPrice.DataBind();
 		}
 	}
 }
