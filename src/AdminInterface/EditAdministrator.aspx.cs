@@ -7,7 +7,6 @@ using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Security;
-using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 
 public partial class EditAdministrator : Page
@@ -108,10 +107,7 @@ public partial class EditAdministrator : Page
 	private void CreateUserInAD(Administrator administrator)
 	{
 		var password = Func.GeneratePassword();
-		var isLoginExists = ADHelper.IsLoginExists(administrator.UserName);
-
-		if (!isLoginExists)
-			ADHelper.CreateAdministratorInAd(administrator, password);
+		var isLoginExists = administrator.CreateUserInAd(password);
 
 		Session["IsLoginCreate"] = !isLoginExists;
 		Session["Password"] = password;

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.DirectoryServices;
-using AdminInterface.Models;
+//using AdminInterface.Models;
 
 namespace AdminInterface.Helpers
 {
@@ -149,25 +149,6 @@ namespace AdminInterface.Helpers
 			entiry.CommitChanges();
 		}
 
-		public static void CreateAdministratorInAd(Administrator administrator, string password)
-		{
-#if !DEBUG
-			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
-			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-			var user = root.Children.Add("CN=" + administrator.UserName, "user");
-			user.Properties["samAccountName"].Value = administrator.UserName;
-			if (!String.IsNullOrEmpty(administrator.ManagerName.Trim()))
-				user.Properties["sn"].Value = administrator.ManagerName;
-			user.Properties["logonHours"].Value = ADHelper.LogonHours();
-			user.CommitChanges();
-			user.Invoke("SetPassword", password);
-			user.CommitChanges();
-			userGroup.Invoke("Add", user.Path);
-			userGroup.CommitChanges();
-			root.CommitChanges();
-#endif
-		}
-
 		public static DateTime? GetBadPasswordDate(string login)
 		{
 			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
@@ -182,6 +163,12 @@ namespace AdminInterface.Helpers
 
 				return badPassworDate;
 			}
+		}
+
+		public static bool IsBelongsToOfficeContainer(string login)
+		{
+			var entry = FindDirectoryEntry(login);
+			return entry.Path.Contains("OU=Офис");
 		}
 	}
 }

@@ -6,12 +6,15 @@ using AdminInterface.Services;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("billing"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Security(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf)]
+	[
+		Layout("billing"), 
+		Helper(typeof(BindingHelper)), 
+		Helper(typeof(ViewHelper)),
+		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf)
+	]
 	public class RegisterController : SmartDispatcherController
 	{
 		private readonly NotificationService _notificationService = new NotificationService();
@@ -52,8 +55,6 @@ namespace AdminInterface.Controllers
 		}
 
 		public void SuccessRegistration()
-		{
-
-		}
+		{}
 	}
 }

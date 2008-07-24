@@ -1,0 +1,5 @@
+﻿<div class="Error">
+	<p>
+		${context.LastException.Message}
+	</p>
+</div>

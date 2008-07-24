@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
@@ -128,18 +128,22 @@ namespace AdminInterface.Models
 			throw new NotHavePermissionException();
 		}
 
-		public void CheckClientType(ClientType clientType)
+		public Administrator CheckClientType(ClientType clientType)
 		{
 			if (clientType == ClientType.Drugstore && !HavePermisions(PermissionType.ViewDrugstore))
 			    throw new NotHavePermissionException();
 			if (clientType == ClientType.Supplier && !HavePermisions(PermissionType.ViewSuppliers))
 				throw new NotHavePermissionException();
+
+			return this;
 		}
 
-		public void CheckClientHomeRegion(ulong homeRegionId)
+		public Administrator CheckClientHomeRegion(ulong homeRegionId)
 		{
 			if ((homeRegionId & RegionMask) == 0)
 		        throw new NotHavePermissionException();
+
+			return this;
 		}
 
 		public bool AlowChangePassword
@@ -150,6 +154,31 @@ namespace AdminInterface.Models
 		public bool CanRegisterClientWhoWorkForFree
 		{
 			get { return HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree);  }
+		}
+
+		public bool CreateUserInAd(string password)
+		{
+			var isLoginExists = ADHelper.IsLoginExists(UserName);
+
+			if (isLoginExists)
+				return false;
+
+#if !DEBUG
+			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var user = root.Children.Add("CN=" + administrator.UserName, "user");
+			user.Properties["samAccountName"].Value = administrator.UserName;
+			if (!String.IsNullOrEmpty(administrator.ManagerName.Trim()))
+				user.Properties["sn"].Value = administrator.ManagerName;
+			user.Properties["logonHours"].Value = ADHelper.LogonHours();
+			user.CommitChanges();
+			user.Invoke("SetPassword", password);
+			user.CommitChanges();
+			userGroup.Invoke("Add", user.Path);
+			userGroup.CommitChanges();
+			root.CommitChanges();
+#endif
+			return true;
 		}
 	}
 }

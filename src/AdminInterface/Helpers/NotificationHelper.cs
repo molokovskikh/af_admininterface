@@ -2,7 +2,6 @@
 using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Helpers
 {

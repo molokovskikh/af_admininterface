@@ -1,3 +1,4 @@
+using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
@@ -7,8 +8,10 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("contact")]
-	[Security]
+	[
+		Layout("contact"),
+		Secure,
+	]
 	public class ContactController : AbstractContactController
 	{
 		public void NewContactGroup(uint billingCode)

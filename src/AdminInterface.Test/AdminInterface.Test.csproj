@@ -47,6 +47,14 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Binder, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\Castle.Components.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
@@ -62,6 +70,10 @@
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data, Version=5.1.3.3, Culture=neutral, PublicKeyToken=56e353737e921561, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate, Version=2.0.0.1001, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -95,7 +107,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
+    <Compile Include="Controllers\ClientControllerFixture.cs" />
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
+    <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="ForTesting\RetUpdateInfo.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
@@ -105,7 +119,9 @@
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
+    <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
+    <Compile Include="Models\UserFixture.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -4,7 +4,6 @@ using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
@@ -12,10 +11,6 @@ namespace AdminInterface.Models
 	[ActiveRecord]
 	public class BillingSearchItem : ActiveRecordBase
 	{
-		private DateTime	_payDate;
-		private bool		_hasRetailSegment;
-		private bool		_hasWholesaleSegment;
-
 		[PrimaryKey]
 		public uint BillingCode { get; set; }
 
@@ -26,11 +21,7 @@ namespace AdminInterface.Models
 		public double PaySum { get; set; }
 
 		[Property]
-		public DateTime PayDate
-		{
-			get { return _payDate; }
-			set { _payDate = value; }
-		}
+		public DateTime PayDate { get; set; }
 
 		[Property]
 		public DateTime LastClientRegistrationDate { get; set; }
@@ -48,22 +39,14 @@ namespace AdminInterface.Models
 		public string Regions { get; set; }
 
 		[Property]
-		public bool HasWholesaleSegment
-		{
-			get { return _hasWholesaleSegment; }
-			set { _hasWholesaleSegment = value; }
-		}
+		public bool HasWholesaleSegment { get; set; }
 
 		[Property]
-		public bool HasRetailSegment
-		{
-			get { return _hasRetailSegment; }
-			set { _hasRetailSegment = value; }
-		}
+		public bool HasRetailSegment { get; set; }
 
 		public bool IsDebitor()
 		{
-			return DateTime.Now - _payDate > TimeSpan.FromDays(1);
+			return DateTime.Now - PayDate > TimeSpan.FromDays(1);
 		}
 
 		public bool IsDisabled
@@ -73,11 +56,11 @@ namespace AdminInterface.Models
 
 		public string GetSegments()
 		{
-			if (_hasWholesaleSegment && _hasRetailSegment)
+			if (HasWholesaleSegment && HasRetailSegment)
 				return "Опт, Розница";
-			if (_hasWholesaleSegment)
+			if (HasWholesaleSegment)
 				return "Опт";
-			if (_hasRetailSegment)
+			if (HasRetailSegment)
 				return "Розница";
 			return "";
 		}

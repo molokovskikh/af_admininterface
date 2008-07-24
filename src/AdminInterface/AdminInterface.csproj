@@ -71,6 +71,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Services.Logging.Log4netIntegration, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\lib\Castle\Castle.Services.Logging.Log4netIntegration.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.Windsor.dll</HintPath>
@@ -130,10 +134,17 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Models\Client.cs" />
+    <Compile Include="Models\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
+    <Compile Include="Models\Region.cs" />
+    <Compile Include="Models\Relationship.cs" />
+    <Compile Include="Models\ShowRelationship.cs" />
+    <Compile Include="Models\User.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
-    <Compile Include="Security\SecurityAttribute.cs" />
+    <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
     <Compile Include="Security\RequiredPermissionAttribute.cs" />
     <Compile Include="Security\SecurityFilter.cs" />
@@ -392,6 +403,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Views\Billing\Common\PayerEdit.brail" />
+    <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Billing\SearchBy.brail" />

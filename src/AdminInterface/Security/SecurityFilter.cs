@@ -7,7 +7,7 @@ namespace AdminInterface.Security
 {
 	public class SecurityFilter : IFilter, IFilterAttributeAware
 	{
-		private SecurityAttribute _attribute;
+		private SecureAttribute _attribute;
 
 		public bool Perform(ExecuteWhen exec, 
 							IEngineContext context, 
@@ -61,7 +61,7 @@ namespace AdminInterface.Security
 
 		public FilterAttribute Filter
 		{
-			set { _attribute = (SecurityAttribute) value; }
+			set { _attribute = (SecureAttribute) value; }
 		}
 	}
 }

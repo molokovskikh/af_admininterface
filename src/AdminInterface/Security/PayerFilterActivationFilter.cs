@@ -2,7 +2,6 @@
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Security
 {

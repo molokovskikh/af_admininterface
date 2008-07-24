@@ -1,6 +1,5 @@
 using System.Collections;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {

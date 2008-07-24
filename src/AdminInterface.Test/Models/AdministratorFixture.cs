@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Security;
-using Common.Web.Ui.Models;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 

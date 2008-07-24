@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Models;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 
@@ -53,7 +53,7 @@ namespace AdminInterface.Test.Models
 				retupdate.Save();
 			}
 
-			client.ReseteUin();
+			client.ResetUin();
 
 			var retUpdateInfo = RetUpdateInfo.Get(client.Id);
 			Assert.That(retUpdateInfo.UniqueCopyID, Is.Empty);

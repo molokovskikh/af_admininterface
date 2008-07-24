@@ -33,7 +33,7 @@ namespace AdminInterface.Test.Helpers
 
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
-			using (var searcher = new DirectorySearcher(String.Format(@"(sAMAccountName={0})", login)))
+			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login)))
 			{
 				var searchResult = searcher.FindOne();
 				if (searchResult != null)
@@ -50,10 +50,27 @@ namespace AdminInterface.Test.Helpers
 			}
 		}
 
+		[Test]
+		public void Show()
+		{
+			var entry = FindDirectoryEntry("Kvasov");
+			Log(entry);
+		}
+
+		[Test]
+		public void IsUserBelongToOfficeContainer()
+		{
+			using (var user = new TestADUser())
+				Assert.That(ADHelper.IsBelongsToOfficeContainer(user.Login), Is.False);
+
+			using (var user = new TestADUser("LDAP://OU=Офис,DC=adc,DC=analit,DC=net"))
+				Assert.That(ADHelper.IsBelongsToOfficeContainer(user.Login), Is.True);
+		}
+
 		[Test] 
 		public void BadPasswordTimeTest()
 		{
-			using (var user = new TestUser())
+			using (var user = new TestADUser())
 			{
 				Assert.That(ADHelper.GetBadPasswordDate(user.Login), Is.Null);	
 				try
@@ -71,7 +88,7 @@ namespace AdminInterface.Test.Helpers
 		[Test]
 		public void Enable_disable_test()
 		{
-			using (var testUser = new TestUser())
+			using (var testUser = new TestADUser())
 			{
 				var login = testUser.Login;
 				Assert.That(ADHelper.IsDisabled(login), Is.False);
@@ -83,7 +100,7 @@ namespace AdminInterface.Test.Helpers
 		}
 	}
 
-	public class TestUser : IDisposable
+	public class TestADUser : IDisposable
 	{
 		private static DirectoryEntry FindDirectoryEntry(string login)
 		{
@@ -116,13 +133,19 @@ namespace AdminInterface.Test.Helpers
 			entry.CommitChanges();
 		}
 
-		public TestUser()
+		public TestADUser() : this("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net")
+		{}
+
+		public TestADUser(string container) : this("test456", container)
+		{}
+
+		public TestADUser(string userName, string container) 
 		{
-			Login = "test456";
+			Login = userName;
 			if (IsLoginExists(Login))
 				Delete(Login);
 			var password = "12345678";
-			var root = new DirectoryEntry("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");
+			var root = new DirectoryEntry(container);
 			var user = root.Children.Add("CN=" + Login, "user");
 			user.Properties["samAccountName"].Value = Login;
 			user.Properties["userWorkstations"].Add("acdcserv");
@@ -132,6 +155,7 @@ namespace AdminInterface.Test.Helpers
 			user.CommitChanges();
 			root.CommitChanges();
 		}
+
 
 		public string Login { get; set; }
 

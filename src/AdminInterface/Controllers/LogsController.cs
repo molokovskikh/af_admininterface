@@ -6,12 +6,15 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("logs"), Helper(typeof(BindingHelper)), Helper(typeof(ViewHelper))]
-	[Security]
+	[
+		Layout("logs"), 
+		Helper(typeof(BindingHelper)), 
+		Helper(typeof(ViewHelper)),
+		Secure
+	]
 	public class LogsController : SmartDispatcherController
 	{
 		public void DocumentLog(uint clientCode)

@@ -6,10 +6,10 @@ using System.Web;
 using System.Text;
 using AdminInterface.Security;
 #endif
+using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
-using Common.Web.Ui.Models;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;

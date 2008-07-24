@@ -6,12 +6,16 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
+using AdminInterface.Extentions;
 
 namespace AdminInterface.Controllers
 {
-	[Security, Helper(typeof(ADHelper))]
+	[
+		Helper(typeof(ADHelper)), 
+		Rescue("Fail", typeof(LoginNotFoundException)),
+		Rescue("Fail", typeof(CantChangePassword)),
+		Secure, 
+	]
 	public class ClientController : SmartDispatcherController
 	{
 		public override void PreSendView(object view)
@@ -40,8 +44,11 @@ namespace AdminInterface.Controllers
 			var user = User.GetById(ouar);
 			var client = user.Client;
 
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
+			SecurityContext.Administrator
+				.CheckClientHomeRegion(client.HomeRegion.Id)
+				.CheckClientType(client.Type);
+			
+			user.CheckLogin();
 
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
@@ -49,17 +56,22 @@ namespace AdminInterface.Controllers
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
-		public void DoPasswordChange(uint clientCode, 
-									 uint userId, 
+		public void DoPasswordChange(uint userId, 
 									 string additionEmailsToNotify, 
 									 bool isSendClientCard, 
 									 bool isFree, 
 									 string payReason, 
 									 string freeReason)
 		{
-			var client = Client.Find(clientCode);
 			var user = User.GetById(userId);
 			var administrator = SecurityContext.Administrator;
+
+			administrator
+				.CheckClientType(user.Client.Type)
+				.CheckClientHomeRegion(user.Client.HomeRegion.Id);
+
+			user.CheckLogin();
+
 			var password = Func.GeneratePassword();
 			var userName = administrator.UserName;
 			var host = Context.Request.UserHostAddress;
@@ -73,13 +85,13 @@ namespace AdminInterface.Controllers
 				                                        host,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (ClientInfoLogEntity)));
 
-				if (client.Type == ClientType.Drugstore)
-					client.ReseteUin();
+				if (user.Client.Type == ClientType.Drugstore)
+					user.Client.ResetUin();
 
 				new ClientInfoLogEntity
 				{
 					UserName = administrator.UserName,
-					ClientCode = client.Id,
+					ClientCode = user.Client.Id,
 					WriteTime = DateTime.Now
 				}.SetProblem(isFree, reason)
 				.Save();
@@ -93,7 +105,7 @@ namespace AdminInterface.Controllers
 				}.Save();						
 			}
 
-			NotificationHelper.NotifyAboutPasswordChange(client,
+			NotificationHelper.NotifyAboutPasswordChange(user.Client,
 			                                             administrator,
 			                                             user,
 														 password,
@@ -103,13 +115,19 @@ namespace AdminInterface.Controllers
 
 			if (isSendClientCard)
 			{
-				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(client, user, password, additionEmailsToNotify);
-				new ClientCardSendLogEntity(client.GetAddressForSendingClientCard(), additionEmailsToNotify, smtpId, administrator.UserName).Save();
+				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
+				                                                            user,
+				                                                            password,
+				                                                            additionEmailsToNotify);
+				new ClientCardSendLogEntity(user.Client.GetAddressForSendingClientCard(),
+				                            additionEmailsToNotify,
+				                            smtpId,
+				                            administrator.UserName).Save();
 				RedirectToAction("SuccessPasswordChanged");
 			}
 			else
 			{
-				PrepareSessionForReport(user, password, client);
+				PrepareSessionForReport(user, password);
 				RedirectToUrl("../report.aspx");
 			}
 		}
@@ -117,17 +135,17 @@ namespace AdminInterface.Controllers
 		public void SuccessPasswordChanged()
 		{}
 
-		private void PrepareSessionForReport(User user, string password, Client client)
+		private void PrepareSessionForReport(User user, string password)
 		{
 			Session["AccessGrant"] = 1;
 			Session["Register"] = false;
-			Session["Code"] = client.Id;
-			Session["DogN"] = client.BillingInstance.PayerID;
-			Session["Name"] = client.FullName;
-			Session["ShortName"] = client.ShortName;
+			Session["Code"] = user.Client.Id;
+			Session["DogN"] = user.Client.BillingInstance.PayerID;
+			Session["Name"] = user.Client.FullName;
+			Session["ShortName"] = user.Client.ShortName;
 			Session["Login"] = user.Login;
 			Session["Password"] = password;
-			Session["Tariff"] = BindingHelper.GetDescription(client.Type);
+			Session["Tariff"] = user.Client.Type.Description();
 		}
 	}
 }

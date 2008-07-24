@@ -4,9 +4,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using AdminInterface.Controllers;
+using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
-using Common.Web.Ui.Models;
 using log4net.Config;
 
 namespace AdminInterface.Test.ForTesting
