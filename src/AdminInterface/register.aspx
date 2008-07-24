@@ -51,7 +51,7 @@
 									ErrorMessage="Длинна строки не может быть больше чем 100 символов" ValidationExpression="^.{1,100}$" ValidationGroup="0" ControlToValidate="AddressTB" Display="Dynamic">*</asp:RegularExpressionValidator>
 								<asp:RequiredFieldValidator ID="RequiredAddress" runat="server" ControlToValidate="AddressTB"
 									ErrorMessage="Поле «Адрес доставки медикаментов» должно быть заполнено" ValidationGroup="0" Display="Dynamic">*</asp:RequiredFieldValidator></div>
-							</div>
+						</div>
 						<div class="TwoColumn">
 							<div class="SimpleField">
 								<label class="Required" for="PhoneTB">
@@ -192,6 +192,13 @@
 								<asp:DropDownList ID="SegmentDD" runat="server" />
 							</div>
 						</div>
+					</div>
+					<div runat="server" id="PermissionsDiv">
+						<fieldset>
+							<legend>Права доступа</legend>
+							<asp:CheckBoxList ID="Permissions" runat="server" DataValueField="Id" DataTextField="Name">
+							</asp:CheckBoxList>
+						</fieldset>
 					</div>
 				</td>
 			</tr>

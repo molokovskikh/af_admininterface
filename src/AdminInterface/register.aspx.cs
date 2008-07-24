@@ -194,8 +194,7 @@ namespace AddUser
 			string commandText;
 			if (AllRegions)
 			{
-				commandText =
-					@"
+				commandText = @"
 SELECT  a.RegionCode, 
         a.Region, 
         (b.defaultshowregionmask & ?RegionCode) > 0           as ShowMask, 
@@ -207,13 +206,11 @@ WHERE   a.regioncode & b.defaultshowregionmask       > 0
         AND regionaladmins.username                  = ?UserName 
         AND a.regioncode & regionaladmins.RegionMask > 0 
 GROUP BY regioncode 
-ORDER BY region;
-";
+ORDER BY region;";
 			}
 			else
 			{
-				commandText =
-					@"
+				commandText = @"
 SELECT  a.RegionCode, 
         a.Region, 
         (b.defaultshowregionmask & ?RegionCode) > 0           as ShowMask, 
@@ -226,8 +223,7 @@ WHERE   b.regioncode                                 = ?RegionCode
         AND regionaladmins.username                  = ?UserName 
         AND a.regioncode & regionaladmins.RegionMask > 0 
 GROUP BY regioncode 
-ORDER BY region;
-";
+ORDER BY region;";
 			}
 
 			var adapter = new MySqlDataAdapter(commandText, _connection);
@@ -248,16 +244,12 @@ ORDER BY region;
 			WRList.DataBind();
 			WRList2.DataBind();
 			OrderList.DataBind();
-			for (int i = 0; i <= WRList.Items.Count - 1; i++)
+			for (var i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (WRList.Items[i].Value == RegCode)
-				{
 					WRList.Items[i].Selected = true;
-				}
 				if (WRList2.Items[i].Value == RegCode)
-				{
 					WRList2.Items[i].Selected = true;
-				}
 				OrderList.Items[i].Selected = WRList.Items[i].Selected;
 			}
 		}
@@ -278,20 +270,14 @@ ORDER BY region;
 			Int64 ShowRegionMask = 0;
 			Int64 WorkMask = 0;
 			Int64 OrderMask = 0;
-			for (int i = 0; i <= WRList.Items.Count - 1; i++)
+			for (var i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (WRList.Items[i].Selected)
-				{
 					MaskRegion += Convert.ToInt64(WRList.Items[i].Value);
-				}
 				if (WRList2.Items[i].Selected)
-				{
 					WorkMask += Convert.ToInt64(WRList2.Items[i].Value);
-				}
 				if (OrderList.Items[i].Selected)
-				{
 					OrderMask += Convert.ToInt64(OrderList.Items[i].Value);
-				}
 			}
 			_command.Connection = _connection;
 			_command.Transaction = mytrans;
@@ -388,8 +374,7 @@ set @inUser = ?UserName;";
 					        && IncludeType.SelectedItem.Text != "Скрытый"))
 					{
 						var dataAdapter =
-							new MySqlDataAdapter(
-								@"
+							new MySqlDataAdapter(@"
 select c.contactText
 from usersettings.clientsdata cd
   join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
@@ -423,8 +408,7 @@ where length(c.contactText) > 0
                               and firmsegment = 0
                               and MaskRegion & ?Region > 0)
       and cg.Type = ?ContactGroupType
-      and c.Type = ?ContactType;",
-								_connection);
+      and c.Type = ?ContactType;", _connection);
 						dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", RegionDD.SelectedItem.Value);
 						dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
 						dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
@@ -736,8 +720,25 @@ from usersettings.clientsdata where firmcode=" +
 
 		private void CreateClientOnOSUserAccessRight()
 		{
-			_command.CommandText =
-				"INSERT INTO usersettings.osuseraccessright (ClientCode, AllowGetData, OSUserName) Values(?ClientCode, ?AllowGetData, ?OSUserName)";
+			
+			_command.CommandText = @"
+INSERT INTO usersettings.osuseraccessright (ClientCode, AllowGetData, OSUserName) 
+Values(?ClientCode, ?AllowGetData, ?OSUserName);
+";
+			if (TypeDD.SelectedItem.Text == "Аптека")
+			{
+				foreach (ListItem item in Permissions.Items)
+				{
+					if (item.Selected)
+					{
+						_command.CommandText += String.Format(@"
+SET @NewUserId = Last_Insert_ID();
+
+INSERT INTO usersettings.AssignedPermissions(UserId, PermissionId) 
+Values(@NewUserId, {0});", item.Value);
+					}
+				}
+			}
 			_command.ExecuteNonQuery();
 		}
 
@@ -1015,7 +1016,7 @@ ORDER BY region;
 				}
 			}
 
-			string iInt = DS1.Tables["admin"].Rows[0][1].ToString();
+			var iInt = DS1.Tables["admin"].Rows[0][1].ToString();
 			SetWorkRegions(iInt, CheckBox1.Checked);
 			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterDrugstore))
 			{
@@ -1038,6 +1039,15 @@ ORDER BY region;
 			SegmentDD.Items.Add("Розница");
 			SegmentDD.Items[1].Value = "1";
 			ClientTypeChanged(null, EventArgs.Empty);
+
+			var permissionsData = new DataSet();
+			var dataAdapter = new MySqlDataAdapter(@"
+select id, name
+from Usersettings.UserPermissions
+order by name", Literals.GetConnectionString());
+			dataAdapter.Fill(permissionsData);
+			Permissions.DataSource = permissionsData.Tables[0];
+			Permissions.DataBind();
 		}
 
 		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -1243,6 +1253,7 @@ select Last_Insert_ID();";
 			CustomerType.Enabled = isCusomer;
 			ServiceClient.Enabled = isCusomer;
 			IncludeCB.Enabled = isCusomer;
+			PermissionsDiv.Visible = isCusomer;
 			if (!isCusomer)
 				IncludeCB.Checked = false;
 
