@@ -17,7 +17,10 @@ namespace AddUser
 
 		protected void BackButton_Click(object sender, EventArgs e)
 		{
-			Response.Redirect(Request["aspxerrorpath"]);
+			if (Request["aspxerrorpath"] == null)
+				Response.Redirect("~/default.aspx");
+			else
+				Response.Redirect(Request["aspxerrorpath"]);
 		}
 }
 }
