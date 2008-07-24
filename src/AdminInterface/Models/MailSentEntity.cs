@@ -17,10 +17,10 @@ namespace AdminInterface.Models
 		[Property]
 		public bool IsDeleted { get; set; }
 
-		[Property, ValidateNonEmpty("Нужно ввести комментарий")]
+		[Property(NotNull = true), ValidateNonEmpty("Нужно ввести комментарий")]
 		public string Comment { get; set; }
 
-		[Property]
+		[Property(NotNull = true)]
 		public string UserName { get; set; }
 
 		[Property]
