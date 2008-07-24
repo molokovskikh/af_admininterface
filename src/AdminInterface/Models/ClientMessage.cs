@@ -9,7 +9,7 @@ namespace AdminInterface.Models
 		[PrimaryKey("ClientCode")]
 		public uint ClientCode { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty("Нужно ввести текст сообщения")]
 		public string Message { get; set; }
 
 		[Property]

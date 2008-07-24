@@ -1,11 +1,12 @@
 ﻿using System;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
 	[ActiveRecord(Table = "billing.MailSentHistory")]
-	public class MailSentEntity : ActiveRecordBase<MailSentEntity>
+	public class MailSentEntity : ActiveRecordValidationBase<MailSentEntity>
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }
@@ -16,7 +17,7 @@ namespace AdminInterface.Models
 		[Property]
 		public bool IsDeleted { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty("Нужно ввести комментарий")]
 		public string Comment { get; set; }
 
 		[Property]

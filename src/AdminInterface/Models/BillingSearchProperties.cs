@@ -42,8 +42,6 @@ namespace AdminInterface.Models
 
 	public class BillingSearchProperties
 	{
-		private SearchBy _searchBy;
-
 		public ulong RegionId { get; set; }
 
 		public string SearchText { get; set; }
@@ -56,25 +54,21 @@ namespace AdminInterface.Models
 
 		public SearchClientStatus ClientStatus { get; set; }
 
-		public SearchBy SearchBy
-		{
-			get { return _searchBy; }
-			set { _searchBy = value; }
-		}
-		
+		public SearchBy SearchBy { get; set; }
+
 		public bool IsSearchByName()
 		{
-			return _searchBy == SearchBy.Name;
+			return SearchBy == SearchBy.Name;
 		}
 
 		public bool IsSearchByCode()
 		{
-			return _searchBy == SearchBy.Code;
+			return SearchBy == SearchBy.Code;
 		}
 
 		public bool IsSearchByBillingCode()
 		{
-			return _searchBy == SearchBy.BillingCode;
+			return SearchBy == SearchBy.BillingCode;
 		}
 
 		public Dictionary<object, string> GetClientTypeDescriptions()

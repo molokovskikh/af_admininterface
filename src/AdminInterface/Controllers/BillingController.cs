@@ -145,26 +145,23 @@ namespace AdminInterface.Controllers
 						 [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
 			using (new TransactionScope())
-			{
 				foreach (var instance in paymentInstances)
 					instance.Save();				
-			}		
 			SearchBy(searchProperties);
 			RenderView("SearchBy");
 		}
 
-		public void SentMail(uint clientCode, uint payerId, string comment, DateTime sentDate)
+		public void SentMail(uint clientCode, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
 		{
-			if (!String.IsNullOrEmpty(comment))
+			try
 			{
-				var mailSentEntity = new MailSentEntity
-				                     	{
-											PayerId =  payerId,
-				                     		Comment = comment,
-				                     		UserName = SecurityContext.Administrator.UserName,
-											SentDate = sentDate,
-				                     	};
-				mailSentEntity.SaveAndFlush();
+				sentEntity.UserName = SecurityContext.Administrator.UserName;
+				sentEntity.SaveAndFlush();
+				Flash.Add("Message", new Message("Cохранено"));
+			}
+			catch (ValidationException ex)
+			{
+				Flash.Add("SendMailError", ex.ValidationErrorMessages[0]);
 			}
 			RedirectToAction("Edit", "clientCode=" + clientCode);
 		}
