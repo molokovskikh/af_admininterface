@@ -1,4 +1,7 @@
-﻿<div class="Error">
+﻿<% component CaptureFor, {"id" : "Title"}:%>
+	${context.LastException.Message}
+<% end %>
+<div class="Error">
 	<p>
 		${context.LastException.Message}
 	</p>
