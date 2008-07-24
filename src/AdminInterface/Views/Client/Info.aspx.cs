@@ -135,6 +135,7 @@ INTO    logs.clientsinfo VALUES
 			ShortNameLB.Text = Data.Tables["Info"].Rows[0]["ShortName"].ToString();
 			AddressText.Text = Data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = Data.Tables["Info"].Rows[0]["Fax"].ToString();
+			Registred.Text = Data.Tables["Info"].Rows[0]["RegistredBy"].ToString();
 
 			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
 			if (clientType == ClientType.Supplier)
@@ -169,12 +170,14 @@ SELECT  cd.FullName,
         cd.Adress,   
         cd.Fax,   
 		cd.RegionCode,
-        FirmType,   
+        FirmType, 
+		if (ra.ManagerName is null or ra.ManagerName = '', cd.Registrant, ra.ManagerName) as RegistredBy,
         ouar.OsUserName,
 		length(rui.UniqueCopyID) = 0 as Length
 FROM  clientsdata cd
 	LEFT JOIN ret_update_info rui ON rui.ClientCode = cd.FirmCode
 	LEFT JOIN OsUserAccessRight ouar ON ouar.ClientCode = cd.FirmCode  
+	LEFT JOIN accessright.regionaladmins ra on ra.UserName = cd.Registrant
 WHERE firmcode = ?ClientCode;
 ", _connection);
 			infoDataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
