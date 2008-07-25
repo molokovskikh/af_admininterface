@@ -538,17 +538,22 @@ where length(c.contactText) > 0
 				var command = connection.CreateCommand();
 				command.CommandText = @"
 insert into logs.passwordchange(ClientHost, LogTime, UserName, TargetUserName, SmtpId, SentTo)
-values (?ClientHost, now(), ?UserName, ?TargetUserName, SmtpId, SentTo);";
+values (?ClientHost, now(), ?UserName, ?TargetUserName, ?SmtpId, ?SentTo);";
 				command.Parameters.AddWithValue("?ClientHost", HttpContext.Current.Request.UserHostAddress);
 				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				command.Parameters.AddWithValue("?TargetUserName", LoginTB.Text);
 				command.Parameters.AddWithValue("?SmtpId", smtpid);
 				var sentTo = "";
-				if (mailTo != null)
+				if (!String.IsNullOrEmpty(mailTo))
 					sentTo = mailTo;
-				else if (AdditionEmailToSendRegistrationCard.Text != null)
+				if (!String.IsNullOrEmpty(AdditionEmailToSendRegistrationCard.Text))
+				{
+					if (!String.IsNullOrEmpty(sentTo))
+						sentTo += ", ";
 					sentTo += AdditionEmailToSendRegistrationCard.Text;
+				}
 				command.Parameters.AddWithValue("?SentTo", sentTo);
+				command.ExecuteNonQuery();
 			}
 		}
 
