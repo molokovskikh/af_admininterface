@@ -1115,6 +1115,8 @@ order by name", Literals.GetConnectionString());
 			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
 
 		    Directory.CreateDirectory(directory + "Docs\\");
+			Directory.CreateDirectory(directory + "Rejects\\");
+			Directory.CreateDirectory(directory + "Waybills\\");
 #endif
 		}
 
