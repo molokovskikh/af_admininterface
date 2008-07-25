@@ -521,16 +521,35 @@ where length(c.contactText) > 0
 				mailTo = TBClientManagerMail.Text.Trim() + ", " + TBOrderManagerMail.Text.Trim();
 
 
-			ReportHelper.SendClientCard(Convert.ToUInt32(Session["Code"]),
-			                            Convert.ToUInt32(Session["DogN"]),
-			                            ShortNameTB.Text,
-			                            FullNameTB.Text,
-			                            TypeDD.SelectedItem.Text,
-			                            LoginTB.Text,
-			                            PassTB.Text,
-			                            mailTo,
-			                            AdditionEmailToSendRegistrationCard.Text,
-			                            true);
+			var smtpid = ReportHelper.SendClientCard(Convert.ToUInt32(Session["Code"]),
+			                                         Convert.ToUInt32(Session["DogN"]),
+			                                         ShortNameTB.Text,
+			                                         FullNameTB.Text,
+			                                         TypeDD.SelectedItem.Text,
+			                                         LoginTB.Text,
+			                                         PassTB.Text,
+			                                         mailTo,
+			                                         AdditionEmailToSendRegistrationCard.Text,
+			                                         true);
+
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+			{
+				connection.Open();
+				var command = connection.CreateCommand();
+				command.CommandText = @"
+insert into logs.passwordchange(ClientHost, LogTime, UserName, TargetUserName, SmtpId, SentTo)
+values (?ClientHost, now(), ?UserName, ?TargetUserName, SmtpId, SentTo);";
+				command.Parameters.AddWithValue("?ClientHost", HttpContext.Current.Request.UserHostAddress);
+				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				command.Parameters.AddWithValue("?TargetUserName", LoginTB.Text);
+				command.Parameters.AddWithValue("?SmtpId", smtpid);
+				var sentTo = "";
+				if (mailTo != null)
+					sentTo = mailTo;
+				else if (AdditionEmailToSendRegistrationCard.Text != null)
+					sentTo += AdditionEmailToSendRegistrationCard.Text;
+				command.Parameters.AddWithValue("?SentTo", sentTo);
+			}
 		}
 
 		protected void PayerPresentCB_CheckedChanged(object sender, EventArgs e)

@@ -23,6 +23,11 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public string TargetUserName { get; set; }
 
+		[Property]
+		public int SmtpId { get; set; }
+
+		[Property]
+		public string SentTo { get; set; }
 
 		public static IList<PasswordChangeLogEntity> GetByLogin(string login, DateTime beginDate, DateTime endDate)
 		{
@@ -30,6 +35,15 @@ namespace AdminInterface.Models.Logs
 				.FindAll(new[] {Order.Asc("LogTime")},
 				         Expression.Eq("TargetUserName", login)
 				         && Expression.Between("LogTime", beginDate, endDate));
+		}
+
+		public void SetSentTo(string additionEmailsToNotify, string clientEmails)
+		{
+			SentTo = clientEmails;
+			if (String.IsNullOrEmpty(SentTo))
+				SentTo = additionEmailsToNotify;
+			else if (!String.IsNullOrEmpty(additionEmailsToNotify))
+				SentTo += ", " + additionEmailsToNotify;
 		}
 	}
 }

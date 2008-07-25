@@ -96,13 +96,25 @@ namespace AdminInterface.Controllers
 				}.SetProblem(isFree, reason)
 				.Save();
 
-				new PasswordChangeLogEntity
+				var passwordChangeLog = new PasswordChangeLogEntity
 				{
 					ClientHost = host,
 					LogTime = DateTime.Now,
 					TargetUserName = user.Login,
 					UserName = administrator.UserName,
-				}.Save();						
+				};			
+
+				if (isSendClientCard)
+				{
+					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
+					                                                            user,
+					                                                            password,
+					                                                            additionEmailsToNotify);
+					passwordChangeLog.SmtpId = smtpId;
+					passwordChangeLog.SetSentTo(additionEmailsToNotify, user.Client.GetAddressForSendingClientCard());
+				}
+
+				passwordChangeLog.Save();
 			}
 
 			NotificationHelper.NotifyAboutPasswordChange(user.Client,
@@ -114,17 +126,7 @@ namespace AdminInterface.Controllers
 			                                             reason);
 
 			if (isSendClientCard)
-			{
-				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
-				                                                            user,
-				                                                            password,
-				                                                            additionEmailsToNotify);
-				new ClientCardSendLogEntity(user.Client.GetAddressForSendingClientCard(),
-				                            additionEmailsToNotify,
-				                            smtpId,
-				                            administrator.UserName).Save();
 				RedirectToAction("SuccessPasswordChanged");
-			}
 			else
 			{
 				PrepareSessionForReport(user, password);

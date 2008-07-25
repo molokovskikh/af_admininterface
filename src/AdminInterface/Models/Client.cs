@@ -148,16 +148,24 @@ namespace AdminInterface.Models
 		{
 			var emails = new List<string>();
 			foreach (var contactGroup in specialGroup)
-				foreach (var person in contactGroup.Persons)
-					ProcessEmails(emails, person);
+			{
+				if (contactGroup.Persons != null)
+				{
+					foreach (var person in contactGroup.Persons)
+						ProcessEmails(emails, person);
+				}
+			}
 
 			ProcessEmails(emails, specialGroup);
 
 			if (emails.Count > 0)
 				return String.Join(", ", emails.ToArray());
 
-			foreach (var person in generalGroup.Persons)
-				ProcessEmails(emails, person);
+			if (generalGroup.Persons != null)
+			{
+				foreach (var person in generalGroup.Persons)
+					ProcessEmails(emails, person);
+			}
 
 			ProcessEmails(emails, generalGroup);
 			

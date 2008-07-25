@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
@@ -17,6 +18,7 @@ namespace AdminInterface.Test.Controllers
 		public void Setup()
 		{
 			_controller = new RegisterController();
+			SecurityContext.GetAdministrator = () => new Administrator {UserName = "TestAdmin"};
 			PrepareController(_controller, "Registered");
 			ForTest.InitialzeAR();
 		}

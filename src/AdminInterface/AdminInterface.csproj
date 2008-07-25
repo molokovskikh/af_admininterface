@@ -170,7 +170,6 @@
     <Compile Include="Models\PermissionType.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
     <Compile Include="Models\ClientStatus.cs" />
-    <Compile Include="Models\Logs\ClientCardSendLogEntity.cs" />
     <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
     <Compile Include="Models\Logs\ClientRegistrationLogEntity.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />

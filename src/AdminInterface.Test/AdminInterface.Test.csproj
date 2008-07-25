@@ -120,6 +120,7 @@
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
     <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
+    <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
