@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.DirectoryServices;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -166,10 +167,10 @@ namespace AdminInterface.Models
 #if !DEBUG
 			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
 			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-			var user = root.Children.Add("CN=" + administrator.UserName, "user");
-			user.Properties["samAccountName"].Value = administrator.UserName;
-			if (!String.IsNullOrEmpty(administrator.ManagerName.Trim()))
-				user.Properties["sn"].Value = administrator.ManagerName;
+			var user = root.Children.Add("CN=" + UserName, "user");
+			user.Properties["samAccountName"].Value = UserName;
+			if (!String.IsNullOrEmpty(ManagerName.Trim()))
+				user.Properties["sn"].Value = ManagerName;
 			user.Properties["logonHours"].Value = ADHelper.LogonHours();
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
