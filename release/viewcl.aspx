@@ -35,6 +35,8 @@
 							<asp:BoundField DataField="RequestTime" HeaderText="Время" SortExpression="RequestTime" />
 							<asp:HyperLinkField DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}" DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" />
 							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="Region" />
+							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="AppVersion" />
+							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="ResultSize" />
 							<asp:BoundField DataField="Addition" HeaderText="Описание" />
                         </Columns>
                     </asp:GridView>
