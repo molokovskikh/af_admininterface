@@ -134,6 +134,10 @@
 									<asp:ListItem Value="1">Сеть</asp:ListItem>
 									<asp:ListItem Value="2">Скрытый</asp:ListItem>
 								</asp:DropDownList>
+								<asp:CheckBox ID="InheritProperties" runat="server" Text="Наследовать информацию" 
+									Visible="False" AutoPostBack="true" OnCheckedChanged="InheritProperties_CheckedChanged" />
+								<asp:DropDownList ID="InheritFrom" runat="server" DataTextField="Name" DataValueField="FirmCode"
+									Visible="False" AutoPostBack="true" OnSelectedIndexChanged="InheritFrom_SelectedIndexChanged" />
 							</div>
 							<div>
 								<asp:CheckBox runat="server" ID="ServiceClient" Text="Сотрудник АК Инфорум" />

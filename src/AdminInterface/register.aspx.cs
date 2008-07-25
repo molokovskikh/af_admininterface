@@ -597,6 +597,9 @@ ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"
 			PayerPresentCB.Enabled = !IncludeCB.Checked;
 			PayerPresentCB.Checked = false;
 			CustomerType.SelectedIndex = 0;
+			InheritProperties.Visible = false;
+			InheritProperties.Checked = false;
+			InheritFrom.Visible = false;
 			if (IncludeCB.Checked)
 			{
 				IncludeCB.Text = "Подчинен клиенту:";
@@ -669,14 +672,13 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 			{
 				RegionDD.SelectedValue = DS1.Tables["Includes"].Rows[0]["RegionCode"].ToString();
 				SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
-			}
-			if (IncludeSDD.Items.Count > 0)
-			{
+
 				IncludeType.Visible = true;
 				IncludeSDD.Visible = true;
 				IncludeSTB.Visible = false;
 				IncludeSB.Visible = false;
-			}
+				InheritProperties.Visible = true;
+			}	
 		}
 
 		private int CreateClientOnBilling()
@@ -964,6 +966,7 @@ WHERE	dst.clientcode        = ?ClientCode
 			{
 				_connection.Close();
 			}
+			UpdateInherit();
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
@@ -1263,6 +1266,65 @@ select Last_Insert_ID();";
 			                              	? "Ответственный за работу с программой:"
 			                              	: "Ответственный за отправку прайс-листа:";
 			ClientManagerGropBlock.Visible = !isCusomer;
+		}
+
+		protected void InheritProperties_CheckedChanged(object sender, EventArgs e)
+		{
+			InheritFrom.Visible = InheritProperties.Checked;
+			UpdateInherit();
+		}
+
+		private void UpdateInherit()
+		{
+			if (InheritFrom.Visible)
+			{
+				var dataAdapter = new MySqlDataAdapter(@"
+select cd.FirmCode, cd.ShortName as Name
+from usersettings.clientsdata cd
+where cd.firmcode = ?ClientCode
+      or cd.firmcode in (select includeclientcode from includeregulation where primaryclientcode = ?ClientCode)
+      or cd.firmcode in (select primaryclientcode from includeregulation where includeclientcode = ?ClientCode);", Literals.GetConnectionString());
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", IncludeSDD.SelectedValue);
+				var data = new DataSet();
+				dataAdapter.Fill(data);
+				InheritFrom.DataSource = data;
+				InheritFrom.DataBind();
+				InheritClientProperties();
+			}
+		}
+
+		protected void InheritFrom_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			InheritClientProperties();
+		}
+
+		private void InheritClientProperties()
+		{
+			var dataAdapter = new MySqlDataAdapter(@"
+select cd.ShortName, 
+	   cd.FullName, 
+	   cd.Adress,
+	   (select c.ContactText
+       from contacts.contact_groups cg
+         join contacts.contacts c on cg.id = c.ContactOwnerId
+       where c.`Type` = 1 and cg.ContactGroupOwnerId = cd.ContactGroupOwnerId
+       limit 1) as Phone,
+	   (select c.ContactText
+       from contacts.contact_groups cg
+         join contacts.contacts c on cg.id = c.ContactOwnerId
+       where c.`Type` = 0 and cg.ContactGroupOwnerId = cd.ContactGroupOwnerId
+       limit 1) as Email
+from usersettings.clientsdata cd
+where cd.firmcode = ?ClientCode
+", Literals.GetConnectionString());
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", InheritFrom.SelectedValue);
+			var data = new DataSet();
+			dataAdapter.Fill(data);
+			ShortNameTB.Text = data.Tables[0].Rows[0]["ShortName"].ToString();
+			FullNameTB.Text = data.Tables[0].Rows[0]["FullName"].ToString();
+			AddressTB.Text = data.Tables[0].Rows[0]["Adress"].ToString();
+			PhoneTB.Text = data.Tables[0].Rows[0]["Phone"].ToString();
+			EmailTB.Text = data.Tables[0].Rows[0]["Email"].ToString();
 		}
 	}
 }
