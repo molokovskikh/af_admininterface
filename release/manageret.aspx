@@ -42,6 +42,14 @@
 									Тип клиента в интерфейсе поставщика
 								</td>
 							</tr>
+							<tr id="NoiseRow" runat="server">
+								<td valign="middle" align="left" colspan="3" style="height: 22px">
+									<asp:CheckBox runat="server" ID="NoisedCosts" Text="Зашумлять цены"  AutoPostBack="true" oncheckedchanged="NoisedCosts_CheckedChanged" />
+									<br />
+									<label ID="NotNoisedPriceLabel" runat="server">Незашумляемый прайс-лист</label>
+									<asp:DropDownList ID="NotNoisedPrice" runat="server" DataValueField="PriceCode" DataTextField="PriceName" />
+								</td>
+							</tr>
 							<tr>
 								<td class="tdCheckBox" colspan="3">
 									<asp:CheckBox runat="server" ID="ServiceClientCB" Text="Сотрудник АК Инфорум" />

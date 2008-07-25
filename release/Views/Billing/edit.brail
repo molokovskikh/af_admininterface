@@ -292,12 +292,16 @@
 			</div>
 			<form method="post" action="SentMail.rails">
 				${FormHelper.HiddenField("ClientCode", Client.Id)}
-				${FormHelper.HiddenField("PayerId", Instance.PayerID)}
-				${FormHelper.LabelFor("sentDate", "Дата отправки:")}
+				${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.PayerID)}
+				${FormHelper.LabelFor("MailSentEntity.SentDate", "Дата отправки:")}
 				<br>
-				${FormHelper.TextFieldValue("sentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
+				${FormHelper.TextFieldValue("MailSentEntity.SentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
 				<input type="button" class="CalendarInput" />
-				<textarea name="Comment" rows="3" style="width:100%"></textarea>
+				<% if IsDefined("SendMailError"): %>
+					<br />
+					<span class="ValidationErrorMessage">${SendMailError}</span>
+				<% end %>
+				<textarea name="MailSentEntity.Comment" rows="3" style="width:100%"></textarea>
 				<input type="submit" value="Корреспонденция отправлена" />
 			</form>
 		</div>

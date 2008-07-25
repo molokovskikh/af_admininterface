@@ -116,7 +116,7 @@
 				end
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
-			<td style="${requestTimeStyle}">
+			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.RequestTime}
 			</td>
 			<td>
