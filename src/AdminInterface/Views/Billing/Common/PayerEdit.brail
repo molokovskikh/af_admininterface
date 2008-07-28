@@ -175,6 +175,17 @@ ${FormHelper.HiddenField("Instance.PayerID")}
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendScannedDocuments", 
 														"Отправлять отсканированные документы:"), 
 									FormHelper.CheckboxField("Instance.SendScannedDocuments"))}
+									
+		${WriteInputGroupHeader("Оплата")}
+										
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
+														"Дата платежа:"), 
+									FormHelper.TextFieldValue("Instance.OldPayDate", Instance.OldPayDate.ToShortDateString(), {"class" : "ValidateDate"}) + "<input type=\"button\" class=\"CalendarInput\" />")}
+									
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
+														"Сумма платежа:"), 
+									FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
+
 
 		${WriteInputGroupHeader("Комментарий")}
 
