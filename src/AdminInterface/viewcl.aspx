@@ -1,4 +1,5 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.viewcl" CodeBehind="viewcl.aspx.cs" Theme="Main" %>
+<%@ Import Namespace="AdminInterface.Helpers"%>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -35,6 +36,12 @@
 							<asp:BoundField DataField="RequestTime" HeaderText="Время" SortExpression="RequestTime" />
 							<asp:HyperLinkField DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}" DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" />
 							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="Region" />
+							<asp:BoundField DataField="AppVersion" HeaderText="Версия EXE" SortExpression="AppVersion" />
+							<asp:TemplateField HeaderText="Размер приготовленных данных" SortExpression="ResultSize">
+								<ItemTemplate>
+								<%# ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(Eval("ResultSize"))) %>
+								</ItemTemplate>
+							</asp:TemplateField>
 							<asp:BoundField DataField="Addition" HeaderText="Описание" />
                         </Columns>
                     </asp:GridView>

@@ -70,7 +70,9 @@ SELECT  RequestTime,
         FirmCode, 
         ShortName, 
         Region, 
-        Addition  
+		AppVersion,
+		ResultSize,
+        Addition
 FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
         and firmcode                          = p.clientcode 
@@ -90,6 +92,8 @@ SELECT  RequestTime,
         FirmCode, 
         ShortName, 
         Region, 
+		AppVersion,
+		ResultSize,
         Addition  
 FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
@@ -110,6 +114,8 @@ SELECT  RequestTime,
         FirmCode, 
         ShortName, 
         Region, 
+		AppVersion,
+		ResultSize,
         Addition  
 FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
@@ -130,6 +136,8 @@ SELECT  RequestTime,
         FirmCode, 
         ShortName, 
         Region, 
+		AppVersion,
+		ResultSize,
         Addition  
 FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   rcs.clientcode						  = p.clientcode 
@@ -148,7 +156,9 @@ ORDER by p.RequestTime desc;
 SELECT  p.RequestTime,   
         clientsdata.FirmCode,   
         clientsdata.ShortName,   
-        r.Region,   
+        r.Region,  
+		AppVersion,
+		ResultSize, 
         p.Addition  
 FROM (usersettings.clientsdata, farm.regions r)
 	JOIN usersettings.ret_update_info rui ON rui.ClientCode = clientsdata.firmcode
@@ -173,6 +183,8 @@ SELECT  RequestTime,
         FirmCode, 
         ShortName, 
         Region, 
+		AppVersion,
+		ResultSize,
         Addition  
 FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
 WHERE   p.RequestTime > curDate()
