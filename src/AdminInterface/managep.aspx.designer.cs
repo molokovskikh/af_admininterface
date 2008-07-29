@@ -86,6 +86,15 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.GridView RegionalSettingsGrid;
         
         /// <summary>
+        /// OrderSendRules control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.GridView OrderSendRules;
+        
+        /// <summary>
         /// SaveButton control.
         /// </summary>
         /// <remarks>

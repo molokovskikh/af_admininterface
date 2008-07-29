@@ -72,6 +72,23 @@ namespace AddUser
 				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
 			else if (currentNode.Url.EndsWith("/managep.aspx"))
 				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
+			else if (currentNode.Url.EndsWith("/SenderProperties.aspx"))
+			{
+				uint firmcode;
+				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+				{
+					connection.Open();
+					var command = new MySqlCommand(@"
+select firmcode 
+from ordersendrules.order_send_rules osr
+where osr.id = ?ruleId
+", connection);
+					command.Parameters.AddWithValue("?RuleId", e.Context.Request["RuleId"]);
+					firmcode = Convert.ToUInt32(command.ExecuteScalar());
+				}
+				currentNode.ParentNode.Url += "?cc=" + firmcode;
+				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmcode;
+			}
 			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
 			{
 				uint firmCode;

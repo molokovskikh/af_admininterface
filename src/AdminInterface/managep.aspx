@@ -183,6 +183,58 @@
 					</asp:GridView>
 				</div>
 			</div>
+			<div class="BorderedBlock">
+				<h3 class="Header">
+					Настройка отправки заказов
+				</h3>
+				<div class="ContentBlock">
+					<asp:GridView id="OrderSendRules" runat="server" AutoGenerateColumns="false" 
+						DataMember="OrderSendConfig"
+						onrowcommand="OrderSettings_RowCommand" 
+						onrowdeleting="OrderSettings_RowDeleting" onrowdatabound="OrderSettings_RowDataBound">
+						<EmptyDataTemplate>
+							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить настройку отправки заказа" />
+						</EmptyDataTemplate>
+						<Columns>
+							<asp:TemplateField>
+								<HeaderTemplate>
+									<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Добавить" />
+								</HeaderTemplate>
+								<ItemTemplate>
+									<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="Удалить" />
+								</ItemTemplate>
+								<ItemStyle Width="10%" />
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Отправщик">
+								<ItemTemplate>
+									<asp:DropDownList ID="Sender" runat="server" DataTextField="ClassName" DataValueField="Id" />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Форматер">
+								<ItemTemplate>
+									<asp:DropDownList ID="Formater" runat="server" DataTextField="ClassName" DataValueField="Id" />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Регион">
+								<ItemTemplate>
+									<asp:DropDownList ID="Region" runat="server" DataTextField="Region" DataValueField="RegionCode" />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Отправлять дубль заказа в tech@analit.net">
+								<ItemTemplate>
+									<asp:CheckBox ID="SendDebugMessage" runat="server" Checked='<%#  Convert.ToBoolean(Eval("SendDebugMessage")) %>' />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:TemplateField HeaderText="Задерживать отправку sms оповещения об ошибке на заданное число секунд">
+								<ItemTemplate>
+									<asp:TextBox ID="SmsSendDelay" runat="server" Text='<%# Eval("ErrorNotificationDelay")  %>' />
+								</ItemTemplate>
+							</asp:TemplateField>
+							<asp:HyperLinkField Text="Свойства" DataNavigateUrlFields="id" DataNavigateUrlFormatString="~/SenderProperties.aspx?ruleid={0}" />
+						</Columns>
+					</asp:GridView>
+				</div>
+			</div>
 			<div class="Submit">
 				<asp:Button ID="SaveButton" runat="server" Text="Применить" OnClick="SaveButton_Click" />
 			</div>

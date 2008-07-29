@@ -81,6 +81,7 @@ namespace AddUser
 			WorkRegionList.DataSource = Data;
 			HomeRegion.DataSource = Data;
 			ShowClientsGrid.DataSource = Data;
+			OrderSendRules.DataSource = Data;
 		}
 
 		private void GetData()
@@ -112,8 +113,7 @@ WHERE   regions.regioncode                            =cd.regioncode
         AND cd.firmcode                               =?ClientCode 
 GROUP BY pricesdata.PriceCode;
 ";
-			var regionSettingsCommnadText =
-@"
+			var regionSettingsCommnadText = @"
 SELECT  RowID, 
 		r.RegionCode,
         Region,
@@ -127,18 +127,16 @@ SELECT  RowID,
 FROM    usersettings.regionaldata rd  
 	JOIN farm.regions r ON rd.regioncode = r.regioncode  
 WHERE rd.FirmCode      = ?ClientCode
-	  and r.regionCode & ?AdminRegionMask;
-";
-			var regionsCommandText =
-@"
+	  and r.regionCode & ?AdminRegionMask;";
+
+			var regionsCommandText = @"
 SELECT  RegionCode,   
         Region
 FROM Farm.Regions
 WHERE regionCode & ?AdminRegionMask > 0
-ORDER BY region;
-";
-			var enableRegionsCommandText =
-@"
+ORDER BY region;";
+
+			var enableRegionsCommandText = @"
 SELECT  a.RegionCode,
         a.Region,
 		cd.MaskRegion & a.regioncode > 0 as Enable
@@ -149,8 +147,33 @@ WHERE   b.regioncode = ?HomeRegion
         AND cd.firmcode = ?ClientCode
         AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
 GROUP BY regioncode
-ORDER BY region;
-";
+ORDER BY region;";
+
+			var orderSendConfig = @"
+SELECT s.Id, s.SenderId, s.FormaterId, s.SendDebugMessage, s.ErrorNotificationDelay, r.RegionCode
+FROM ordersendrules.order_send_rules s
+	left join farm.regions r on s.regioncode = r.regioncode
+	join usersettings.clientsdata cd on cd.firmcode = s.firmcode
+where s.firmcode = ?ClientCode
+	  and (cd.MaskRegion & ?AdminRegionMask & r.regioncode > 0 or s.regionCode is null)
+order by s.RegionCode;";
+
+			var senders = @"
+SELECT id, classname FROM ordersendrules.order_handlers o
+where o.type = 2
+order by classname;";
+
+			var formaters = @"
+SELECT id, classname FROM ordersendrules.order_handlers o
+where o.type = 1
+order by className;";
+
+			var sendRuleRegions = @"
+SELECT r.regioncode, r.region
+FROM (farm.regions r, usersettings.clientsdata cd)
+where cd.firmcode = ?ClientCode
+	  and cd.MaskRegion & ?AdminRegionMask & r.regioncode > 0
+order by r.Region;";
 
 			var dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
@@ -171,6 +194,22 @@ ORDER BY region;
 
                 dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
                 dataAdapter.Fill(Data, "EnableRegions");
+
+            	dataAdapter.SelectCommand.CommandText = orderSendConfig;
+            	dataAdapter.Fill(Data, "OrderSendConfig");
+
+            	dataAdapter.SelectCommand.CommandText = senders;
+            	dataAdapter.Fill(Data, "Senders");
+
+            	dataAdapter.SelectCommand.CommandText = formaters;
+            	dataAdapter.Fill(Data, "Formaters");
+
+            	dataAdapter.SelectCommand.CommandText = sendRuleRegions;
+            	dataAdapter.Fill(Data, "SenRuleRegions");
+            	var row = Data.Tables["SenRuleRegions"].NewRow();
+            	row["RegionCode"] = DBNull.Value;
+            	row["Region"] = "Любой регион";
+				Data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
 
 				ShowRegulationHelper.Load(dataAdapter, Data);
 
@@ -393,6 +432,37 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
+			var orderSendRulesDataAdapter = new MySqlDataAdapter("", _connection);
+			orderSendRulesDataAdapter.UpdateCommand = new MySqlCommand(@"
+update ordersendrules.order_send_rules
+set SenderId = ?senderId, 
+	FormaterId = ?formaterId, 
+	RegionCode = ?RegionCode, 
+	SendDebugMessage = ?SendDebugMessage, 
+	ErrorNotificationDelay = ?ErrorNotificationDelay
+where id = ?Id;", _connection);
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?SendDebugMessage", MySqlDbType.Bit, 0, "SendDebugMessage");
+			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?ErrorNotificationDelay", MySqlDbType.Bit, 0, "ErrorNotificationDelay");
+
+			orderSendRulesDataAdapter.InsertCommand = new MySqlCommand(@"
+insert into ordersendrules.order_send_rules(FirmCode, SenderId, FormaterId, RegionCode, SendDebugMessage, ErrorNotificationDelay)
+values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?ErrorNotificationDelay);", _connection);
+			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
+			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
+			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
+			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SendDebugMessage", MySqlDbType.Bit, 0, "SendDebugMessage");
+			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?ErrorNotificationDelay", MySqlDbType.Bit, 0, "ErrorNotificationDelay");
+			orderSendRulesDataAdapter.InsertCommand.Parameters.AddWithValue("?FirmCode", _clientCode);
+
+			orderSendRulesDataAdapter.DeleteCommand = new MySqlCommand(@"
+delete FROM ordersendrules.order_send_rules
+where id = ?Id;", _connection);
+			orderSendRulesDataAdapter.DeleteCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
+
 			MySqlTransaction transaction = null;
 			try
 			{
@@ -404,8 +474,13 @@ WHERE RowId = ?Id;
 				pricesDataAdapter.DeleteCommand.Transaction = transaction;
 				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
 
+				orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
+				orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
+				orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
+
 				pricesDataAdapter.Update(Data.Tables["Prices"]);
 				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
+				orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
 				ShowRegulationHelper.Update(_connection, transaction, Data, _clientCode);
 
 				transaction.Commit();
@@ -462,6 +537,33 @@ WHERE RowId = ?Id;
 					else
 						Data.Tables["Prices"].DefaultView[i]["CostType"] = value;
 				}
+			}
+
+			for (var i = 0; i < OrderSendRules.Rows.Count; i++)
+			{
+				var row = OrderSendRules.Rows[i];
+				var dataRow = Data.Tables["OrderSendConfig"].DefaultView[i];
+
+				if (Convert.ToUInt32(((DropDownList)row.FindControl("Sender")).SelectedValue) != Convert.ToUInt32(dataRow["SenderId"]))
+					dataRow["Senderid"] = Convert.ToUInt32(((DropDownList) row.FindControl("Sender")).SelectedValue);
+
+				if (Convert.ToUInt32(((DropDownList)row.FindControl("Formater")).SelectedValue) != Convert.ToUInt32(dataRow["FormaterId"]))
+					dataRow["FormaterId"] = Convert.ToUInt32(((DropDownList)row.FindControl("Formater")).SelectedValue);
+
+				if (((DropDownList)row.FindControl("Region")).SelectedValue != dataRow["RegionCode"].ToString())
+				{
+					var value = ((DropDownList) row.FindControl("Region")).SelectedValue;
+					if (value == DBNull.Value.ToString())
+						dataRow["RegionCode"] = DBNull.Value;
+					else
+						dataRow["RegionCode"] = Convert.ToUInt64(value);
+				}
+
+				if (((CheckBox)row.FindControl("SendDebugMessage")).Checked != Convert.ToBoolean(dataRow["SendDebugMessage"]))
+					dataRow["SendDebugMessage"] = Convert.ToBoolean(((CheckBox)row.FindControl("SendDebugMessage")).Checked);
+
+				if (Convert.ToUInt32(((TextBox)row.FindControl("SmsSendDelay")).Text) != Convert.ToUInt32(dataRow["ErrorNotificationDelay"]))
+					dataRow["ErrorNotificationDelay"] = Convert.ToUInt32(((TextBox)row.FindControl("SmsSendDelay")).Text);
 			}
 
 			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
@@ -704,6 +806,51 @@ WHERE FirmCode = ?ClientCode;", connection);
 			if (costType.Equals(DBNull.Value))
 				return _unconfiguratedCostTypes;
 			return _configuratedCostTypes;				
+		}
+
+		protected void OrderSettings_RowCommand(object sender, GridViewCommandEventArgs e)
+		{
+			switch (e.CommandName)
+			{
+				case "Add":
+					var row = Data.Tables["OrderSendConfig"].NewRow();
+					row["SenderId"] = 1;
+					row["FormaterId"] = 12;
+					row["RegionCode"] = DBNull.Value;
+					row["SendDebugMessage"] = false;
+					row["ErrorNotificationDelay"] = false;
+					Data.Tables["OrderSendConfig"].Rows.Add(row);
+					((GridView)sender).DataBind();
+					break;
+			}
+		}
+
+		protected void OrderSettings_RowDeleting(object sender, GridViewDeleteEventArgs e)
+		{
+			Data.Tables["OrderSendConfig"].DefaultView[e.RowIndex].Delete();
+			((GridView)sender).DataBind();			
+		}
+
+		protected void OrderSettings_RowDataBound(object sender, GridViewRowEventArgs e)
+		{
+			if (e.Row.RowType != DataControlRowType.DataRow)
+				return;
+
+			var orderSender = (DropDownList)e.Row.FindControl("Sender");
+			var orderFormater = (DropDownList)e.Row.FindControl("Formater");
+			var region = (DropDownList)e.Row.FindControl("Region");
+
+			orderSender.DataSource = Data.Tables["Senders"];
+			orderSender.DataBind();
+			orderSender.SelectedValue = ((DataRowView) e.Row.DataItem)["SenderId"].ToString();
+
+			orderFormater.DataSource = Data.Tables["Formaters"];
+			orderFormater.DataBind();
+			orderFormater.SelectedValue = ((DataRowView)e.Row.DataItem)["FormaterId"].ToString();
+
+			region.DataSource = Data.Tables["SenRuleRegions"];
+			region.DataBind();
+			region.SelectedValue = ((DataRowView)e.Row.DataItem)["RegionCode"].ToString();
 		}
 	}
 }
