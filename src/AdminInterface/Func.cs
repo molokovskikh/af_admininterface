@@ -134,6 +134,8 @@ namespace AddUser
 				var smtpid = SmtpClientEx.QuickSendSmartHostSMTPID("mail.adc.analit.net", "", "", message);
 				if (smtpid == null)
 					return 0;
+
+				return smtpid.Value;
 			}
 			catch (Exception ex)
 			{
