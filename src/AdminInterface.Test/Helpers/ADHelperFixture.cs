@@ -58,6 +58,16 @@ namespace AdminInterface.Test.Helpers
 		}
 
 		[Test]
+		public void Block_user()
+		{
+			using (var user = new TestADUser())
+			{
+				ADHelper.Block(user.Login);
+				Assert.That(ADHelper.IsLocked(user.Login));
+			}
+		}
+
+		[Test]
 		public void IsUserBelongToOfficeContainer()
 		{
 			using (var user = new TestADUser())
@@ -136,7 +146,7 @@ namespace AdminInterface.Test.Helpers
 		public TestADUser() : this("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net")
 		{}
 
-		public TestADUser(string container) : this("test456", container)
+		public TestADUser(string container) : this("test" + new Random().Next(), container)
 		{}
 
 		public TestADUser(string userName, string container) 

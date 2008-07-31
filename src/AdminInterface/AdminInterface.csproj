@@ -136,6 +136,8 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Models\Client.cs" />
+    <Compile Include="Models\ISecurityAware.cs" />
+    <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="Models\Region.cs" />
@@ -310,6 +312,13 @@
     <Compile Include="searchc.aspx.designer.cs">
       <DependentUpon>searchc.aspx</DependentUpon>
     </Compile>
+    <Compile Include="SenderProperties.aspx.cs">
+      <DependentUpon>SenderProperties.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="SenderProperties.aspx.designer.cs">
+      <DependentUpon>SenderProperties.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="statcont.aspx.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
@@ -333,7 +342,7 @@
     <Compile Include="viewcl.aspx.designer.cs">
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
-    <None Include="Views\Client\ClientLoginsView.brail" />
+    <None Include="Views\Client\ClientView.brail" />
     <Compile Include="Views\Client\Info.aspx.cs">
       <DependentUpon>Info.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -427,6 +436,7 @@
     <None Include="Views\Client\SuccessPasswordChanged.brail" />
     <Content Include="Rescue\NotAllowed.aspx" />
     <Content Include="Rescue\NotAuthorized.aspx" />
+    <Content Include="SenderProperties.aspx" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
@@ -444,7 +454,6 @@
     <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\scriptaculous.js" />
     <Content Include="JavaScript\slider.js" />
-    <Content Include="JavaScript\unittest.js" />
     <Content Include="Web.Release.Config" />
   </ItemGroup>
   <ItemGroup>

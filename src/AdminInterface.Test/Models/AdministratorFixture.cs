@@ -193,5 +193,44 @@ namespace AdminInterface.Test.Models
 			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.CanRegisterClientWhoWorkForFree });
 			Assert.That(_adm.CanRegisterClientWhoWorkForFree, Is.True);
 		}
+
+		[Test]
+		public void Check_client_permission()
+		{
+			var client = new Client
+			{
+				HomeRegion = new Region { Id = 1 },
+				Type = ClientType.Drugstore,
+			};
+			_adm.RegionMask = 1;
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
+			_adm.CheckClientPermission(client);
+		}
+
+        [Test]
+		[ExpectedException(typeof(NotHavePermissionException))]
+		public void In_client_check_home_region_must_be_checked()
+        {
+        	var client = new Client
+        	             	{
+        	             		HomeRegion = new Region {Id = 1},
+								Type = ClientType.Drugstore,
+        	             	};
+			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore});
+			_adm.CheckClientPermission(client);
+        }
+
+		[Test]
+		[ExpectedException(typeof(NotHavePermissionException))]
+		public void In_client_check_client_type_must_be_checked()
+		{
+			var client = new Client
+			{
+				HomeRegion = new Region { Id = 1 },
+				Type = ClientType.Drugstore,
+			};
+			_adm.RegionMask = 1;
+			_adm.CheckClientPermission(client);
+		}
 	}
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AddUser;
 using AdminInterface.Controllers;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
@@ -132,6 +133,62 @@ namespace AdminInterface.Test.Controllers
 				//не работает тк антивирус задерживает отправку писем
 				//Assert.That(passwordChanges[0].SmtpId, Is.GreaterThan(0));
 				Assert.That(passwordChanges[0].SentTo, Is.EqualTo("r.kvasov@analit.net"));
+			}
+		}
+
+		[Test]
+		public void Unlock_every_locked_login()
+		{
+			using (var adUser1 = new TestADUser())
+			using (var adUser2 = new TestADUser())
+			using (var user = TestUser(adUser1.Login))
+			{
+				ADHelper.Block(adUser1.Login);
+				ADHelper.Block(adUser2.Login);
+
+				ActiveRecordMediator.SaveAndFlush(new User { Login = adUser2.Login, Client = user.Parameter.Client});
+
+				using (new SessionScope())
+					_controller.Unlock(user.Parameter.Client.Id);
+
+				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
+				Assert.That(ADHelper.IsLocked(adUser2.Login), Is.False);
+				Assert.That(Response.RedirectedTo, Is.EqualTo("/Controller/Info.castle?cc=" + user.Parameter.Client.Id));
+				Assert.That(Context.Flash["UnlockMessage"], Is.EqualTo("Разблокировано"));
+			}
+		}
+
+		[Test]
+		public void If_login_not_exists_it_must_be_skiped()
+		{
+			using (var adUser1 = new TestADUser())
+			using (var user = TestUser(adUser1.Login))
+			{
+				ADHelper.Block(adUser1.Login);
+
+				ActiveRecordMediator.SaveAndFlush(new User { Login = "test8779546", Client = user.Parameter.Client });
+
+				using (new SessionScope())
+					_controller.Unlock(user.Parameter.Client.Id);
+
+				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(NotHavePermissionException))]
+		public void Before_unlock_user_permission_must_be_checked()
+		{
+			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };
+			using (var adUser1 = new TestADUser())
+			using (var user = TestUser(adUser1.Login))
+			{
+				ADHelper.Block(adUser1.Login);
+
+				using (new SessionScope())
+					_controller.Unlock(user.Parameter.Client.Id);
+
+				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 			}
 		}
 

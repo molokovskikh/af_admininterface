@@ -113,6 +113,7 @@
     <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="ForTesting\RetUpdateInfo.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
+    <Compile Include="Helpers\DbLogHelperFixture.cs" />
     <Compile Include="Helpers\EmailHelperFixture.cs" />
     <Compile Include="Helpers\ViewHelperFixture.cs" />
     <Compile Include="InternetLogEntityFixture.cs" />

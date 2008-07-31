@@ -1,25 +1,31 @@
+using System;
+using System.Reflection;
 using NHibernate;
 
 namespace AdminInterface.Helpers
 {
 	public class DbLogHelper
 	{
-		public static void SavePersistentWithLogParams(string user, string host, ISession session)
+		public static void SetupParametersForTriggerLogging(string user, string host, ISession session)
+		{
+			SetupParametersForTriggerLogging(new { InUser = user, InHost = host }, session);
+		}
+
+		public static void SetupParametersForTriggerLogging(object parameters, ISession session)
 		{
 			using (var command = session.Connection.CreateCommand())
 			{
-				command.CommandText = @"
-SET @InHost = ?UserHost;
-Set @InUser = ?UserName;";
-				var parameter = command.CreateParameter();
-				parameter.Value = user;
-				parameter.ParameterName = "?UserName";
-				command.Parameters.Add(parameter);
-
-				parameter = command.CreateParameter();
-				parameter.Value = host;
-				parameter.ParameterName = "?UserHost";
-				command.Parameters.Add(parameter);
+				foreach (var property in parameters.GetType().GetProperties(BindingFlags.GetProperty | BindingFlags.Public | BindingFlags.Instance))
+				{
+					var value = property.GetValue(parameters, null);
+					command.CommandText += String.Format(" SET @{0} = ?{0}; ", property.Name);
+					var parameter = command.CreateParameter();
+					parameter.Value = value;
+					parameter.ParameterName = "?" + property.Name;
+					command.Parameters.Add(parameter);
+				}
+				if (command.Parameters.Count == 0)
+					return;
 
 				command.ExecuteNonQuery();
 			}

@@ -1,0 +1,164 @@
+﻿<table cellpadding=0 cellspacing=0 border=1 rules=all 
+		style="width: 90%; padding:0; margin:0; border: solid 1px #dadada; border-collapse:collapse;">
+<tr>
+	<td>
+	<% if Client.IsDrugstore(): %>
+		<a ${"href=../manageret.aspx?cc=${Client.Id}" if admin.ManageDrugstore}>Настройка</a>
+	<% else: %>
+		<a ${"href=../managep.aspx?cc=${Client.Id}" if admin.ManageSuppliers}>Настройка</a>
+	<% end %>
+	</td>
+</tr>
+<tr>
+	<td>
+		<a ${"href=../Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
+	</td>
+</tr>
+<tr>
+	<td>
+	<a ${"href=../Logs/UpdateLog.rails?clientCode=${Client.Id}" if Client.IsDrugstore()} target="_blank">Статистика обновлений</a>
+	</td>
+</tr>
+<tr>
+	<td>
+	<a href="../Logs/DocumentLog.rails?clientCode=${Client.Id}" target="_blank">Статистика документов</a>
+	</td>
+</tr>
+<tr>
+	<td>
+	<a href="../orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
+	</td>
+</tr>
+<tr>
+<td>
+	<% if Client.IsDrugstore(): %>
+		<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
+	<% else: %>
+		<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
+	<% end %>
+	</td>
+</tr>
+<tr>
+<td>
+<table style="width:100%;" class="Test">
+	<tr>
+		<td class="Title" colspan="4">
+			Учетные записи пользователя
+		</td>
+	</tr>
+	<tr>
+		<td class="Title">
+			Имя учетной записи
+		</td>
+		<td class="Title">
+			Дата последнего входа
+		</td>
+		<td class="Title">
+			Дата последней неудачной регистрации
+		</td>
+		<td class="Title">
+		</td>
+	</tr>
+<% for user in Client.GetUsers(): %>
+	<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
+	<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) %>
+	<tr>
+		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
+			<% if isLoginExists and admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
+				<a href="./ChangePassword.rails?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
+			<% else: %>
+				${user.Login}
+			<% end %>
+		</td>
+		<td>
+			${ADHelper.GetLastLogOnDate(user.Login) if isLoginExists}
+		</td>
+		<td>
+			${ADHelper.GetBadPasswordDate(user.Login) if isLoginExists}
+		</td>
+		<td>
+			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>
+		</td>
+	</tr>
+<% end %>
+</table>
+</td>
+</tr>
+
+<tr>
+<td>
+<table style="width:100%;">
+	<tr>
+		<td>
+			Вход в клиентский интерфейс: ${?authorizationLog.CITime}
+			<br />
+			Обновление AnalitF: ${?authorizationLog.AFTime}
+			<br />
+			Последний раз пользовался AnalitOnline: ${?authorizationLog.AOLTime}
+			<br />
+			Последний раз использовал Online сервисы: ${?authorizationLog.IOLTime}
+			<br />
+		</td>
+	</tr>
+</table>
+</td>
+</tr>
+
+<tr>
+	<td class="Title">Операции</td>
+</tr>
+<tr>
+	<td>
+	<form method=post action=unlock.rails style="margin:0; padding:0">
+		<input type=hidden name=clientCode value=${Client.Id} />
+		<input style="border-style:groove;" type=submit ${"disabled" if not containsLockedUsers} value="Разблокировать" />
+		<% if IsDefined("UnlockMessage"): %> 
+			<span style="color:Green;">${UnlockMessage}</span>
+		<% end %>
+	</form>
+	</td>
+</tr>
+
+	<% if Client.IsDrugstore(): %>
+	<tr>
+		<td>
+		<form method=post action=DeletePreparedData.rails style="margin:0; padding:0">
+			<input type=hidden name=clientCode value=${Client.Id} />
+			<input style="border-style:groove;" type=submit ${"disabled" if not Client.HavePreparedData()} value="Удалить подготовленные данные" />
+			<% if IsDefined("DeleteMessage"): %> 
+				<span style="color:Green;">${DeleteMessage}</span>
+			<% end %>
+			<% if IsDefined("DeleteErrorMessage"): %> 
+				<span style="color:Red;">${DeleteErrorMessage}</span>
+			<% end %>
+		</form>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<script>
+			document.observe("dom:loaded", function() {
+			
+				Validation.add("uin-reuired", 
+							   "Нужно указать причину сброса", 
+								function(v) {
+									return !Validation.get('IsEmpty').test(v);
+								});
+								
+				var validation = new Validation("ReseteUin");
+			});
+		</script>
+		<form id=ReseteUin method=post action=ResetUin.rails style="margin:0; padding:0">
+			<input type=hidden name=clientCode value=${Client.Id} />
+			<% haveUin = Client.HaveUin() %>
+			<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+			<% if haveUin: %>
+				Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
+			<% else: %> 
+				<span style="color:Green;">Идентификатор не присвоен</span>
+			<% end %>
+		</form>
+		</td>
+	</tr>
+	<% end %>
+</table>

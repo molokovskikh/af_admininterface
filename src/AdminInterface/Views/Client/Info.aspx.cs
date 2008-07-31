@@ -1,7 +1,5 @@
 using System;
 using System.Data;
-using System.Drawing;
-using System.IO;
 using System.Web;
 using System.Web.UI;
 using AddUser;
@@ -115,12 +113,7 @@ INTO    logs.clientsinfo VALUES
 				return;
 
 			ClientCode = Convert.ToUInt32(Request["cc"]);
-
-			OrderHistoryHL.NavigateUrl = "~/orders.aspx?cc=" + ClientCode;
-			UpdateListHL.NavigateUrl = "~/Logs/UpdateLog.rails?clientCode=" + ClientCode;
-			DocumentLog.NavigateUrl = "~/Logs/DocumentLog.rails?clientCode=" + ClientCode;
-			UserInterfaceHL.NavigateUrl = "https://stat.analit.net/ci/auth/logon.aspx?sid=" + ClientCode;
-				
+		
 			GetData();
 			ConnectDataSource();
 			DataBind();
@@ -136,26 +129,6 @@ INTO    logs.clientsinfo VALUES
 			AddressText.Text = Data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = Data.Tables["Info"].Rows[0]["Fax"].ToString();
 			Registred.Text = Data.Tables["Info"].Rows[0]["RegistredBy"].ToString();
-
-			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
-			if (clientType == ClientType.Supplier)
-				UpdateListHL.Enabled = false;
-
-			if (clientType == ClientType.Drugstore)
-			{
-				ConfigHL.NavigateUrl = "~/manageret.aspx?cc=" + ClientCode;
-				ConfigHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageDrugstore);
-				UserInterfaceHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.DrugstoreInterface);
-			}
-			else
-			{
-				ConfigHL.NavigateUrl = "~/managep.aspx?cc=" + ClientCode;
-				ConfigHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageSuppliers);
-				UserInterfaceHL.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.SupplierInterface);
-			}
-
-			BillingLink.NavigateUrl = String.Format("~/Billing/edit.rails?ClientCode={0}", ClientCode);
-			BillingLink.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.Billing);
 		}
 
 		private void GetData()
@@ -195,45 +168,10 @@ WHERE firmcode = ?ClientCode;
 				_connection.Close();
 			}
 
-
 			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
 			var homeRegion = Convert.ToUInt64(Data.Tables["Info"].Rows[0]["RegionCode"]);
 			SecurityContext.Administrator.CheckClientType(clientType);
 			SecurityContext.Administrator.CheckClientHomeRegion(homeRegion);
-
-			if (clientType == ClientType.Drugstore)
-			{
-				DeletePrepareDataButton.Enabled = File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
-				bool isNotSet = false;
-				if (Data.Tables["Info"].Rows[0]["Length"] != DBNull.Value)
-					isNotSet = Convert.ToBoolean(Data.Tables["Info"].Rows[0]["Length"]);
-				ResetCopyIDCB.Enabled = !isNotSet;
-				ResetIDCause.Enabled = !isNotSet;
-				ResetIDCause.Visible = !isNotSet;
-				ResearReasonLable.Visible = !isNotSet;
-				IsUniqueCopyIDSet.Visible = isNotSet;
-			}
-			else
-			{
-				ResetUINRow.Visible = false;
-				DeletePrepareDataRow.Visible = false;
-			}
-
-			if (Data.Tables["Info"].Rows[0]["OsUserName"] != DBNull.Value || !String.IsNullOrEmpty(Data.Tables["Info"].Rows[0]["OsUserName"].ToString()))
-			{
-				try
-				{
-					UnlockButton.Enabled = ADHelper.IsLocked(Data.Tables["Info"].Rows[0]["OsUserName"].ToString());
-					UnlockedLabel.Visible = false;
-				}
-				catch
-				{
-					UnlockButton.Enabled = false;
-				}
-			}
-			else
-				UnlockButton.Enabled = false;
-
 		}
 
 		protected void SaveButton_Click(object sender, EventArgs e)
@@ -278,54 +216,6 @@ WHERE firmcode = ?ClientCode
 			finally
 			{
 				_connection.Close();
-			}
-		}
-
-		protected void UnlockButton_Click(object sender, EventArgs e)
-		{
-			ADHelper.Unlock(Data.Tables["Info"].Rows[0]["OsUserName"].ToString());
-			UnlockButton.Visible = false;
-			UnlockedLabel.Visible = true;
-		}
-
-		protected void DeletePrepareDataButton_Click(object sender, EventArgs e)
-		{
-			try
-			{
-				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", ClientCode));
-				DeletePrepareDataButton.Enabled = false;
-				DeleteLabel.Text = "Подготовленные данные удалены";
-				DeleteLabel.ForeColor = Color.Green;
-			}
-			catch
-			{
-				DeleteLabel.Text = "Ошибка удаления подготовленных данных, попробуйте позднее.";
-				DeleteLabel.ForeColor = Color.Red;
-			}
-		}
-
-		protected void ResetUniqueCopyID(object sender, EventArgs e)
-		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-				command.CommandText = @"
-set @inHost = ?Host;
-set @inUser = ?UserName;
-set @ResetIdCause = ?ResetIdCause;
-
-INSERT INTO `logs`.clientsinfo (UserName, WriteTime, ClientCode, Message)
-VALUE (?UserName, now(), ?ClientCode, concat('$$$Изменение УИН: ', ?ResetIdCause));
-
-UPDATE ret_update_info SET UniqueCopyID = ''  WHERE clientcode=?clientCode;
-";
-				command.Parameters.AddWithValue("?ClientCode", ClientCode);
-				command.Parameters.AddWithValue("?ResetIdCause", ResetIDCause.Text);
-				command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				command.ExecuteNonQuery();
-				Response.Redirect(String.Format("info.rails?cc={0}", ClientCode));
 			}
 		}
 

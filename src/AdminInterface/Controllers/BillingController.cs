@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 		{
 			using(new TransactionScope())
 			{
-				DbLogHelper.SavePersistentWithLogParams(SecurityContext.Administrator.UserName,
+				DbLogHelper.SetupParametersForTriggerLogging(SecurityContext.Administrator.UserName,
 				                                        HttpContext.Current.Request.UserHostAddress,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
 				foreach (var client in clients)

@@ -1,21 +1,13 @@
 using System;
-using System.Data;
-using System.Configuration;
-using System.Web;
-using System.Web.Security;
-using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.WebControls.WebParts;
-using System.Web.UI.HtmlControls;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace AdminInterface.Helpers
 {
 	public class PropertyComparer<T> : IComparer<T>
 	{
-		private SortDirection _sortDirection;
-		private string _propertyName;
+		private readonly SortDirection _sortDirection;
+		private readonly string _propertyName;
 
 		public PropertyComparer(SortDirection sortDirection, string propertyName)
 		{
@@ -28,11 +20,10 @@ namespace AdminInterface.Helpers
 			if (typeof(T).GetProperty(_propertyName) == null)
 				throw new Exception(String.Format("Given property is not part of the type {0}", _propertyName));
 
-			object objX = typeof(T).GetProperty(_propertyName).GetValue(x, null);
-			object objY = typeof(T).GetProperty(_propertyName).GetValue(y, null);
+			var objX = typeof(T).GetProperty(_propertyName).GetValue(x, null);
+			var objY = typeof(T).GetProperty(_propertyName).GetValue(y, null);
 
-			int retVal = default(int);
-			retVal = ((IComparable)objX).CompareTo((IComparable)objY);
+			int retVal = ((IComparable)objX).CompareTo(objY);
 
 			if (_sortDirection == SortDirection.Descending)
 				retVal = -retVal;

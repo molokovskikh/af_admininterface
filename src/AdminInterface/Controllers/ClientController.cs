@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.IO;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -7,6 +10,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using AdminInterface.Extentions;
+using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Controllers
 {
@@ -28,10 +32,12 @@ namespace AdminInterface.Controllers
 		public void Info(uint cc)
 		{
 			var client = Client.Find(cc);
+			var authorizationLog = AuthorizationLogEntity.TryFind(client.Id);
 
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
+			PropertyBag["authorizationLog"] = authorizationLog;
 			PropertyBag["Client"] = client;
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
@@ -81,7 +87,7 @@ namespace AdminInterface.Controllers
 			{
 				ADHelper.ChangePassword(user.Login, password);
 
-				DbLogHelper.SavePersistentWithLogParams(userName,
+				DbLogHelper.SetupParametersForTriggerLogging(userName,
 				                                        host,
 				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (ClientInfoLogEntity)));
 
@@ -148,6 +154,64 @@ namespace AdminInterface.Controllers
 			Session["Login"] = user.Login;
 			Session["Password"] = password;
 			Session["Tariff"] = user.Client.Type.Description();
+		}
+
+		public void Unlock(uint clientCode)
+		{
+			var client = Client.Find(clientCode);
+			SecurityContext.Administrator.CheckClientPermission(client);
+			foreach(var user in client.GetUsers())
+				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
+					ADHelper.Unlock(user.Login);
+
+			Flash["UnlockMessage"] = "Разблокировано";
+			RedirectToAction("Info", new { cc = client.Id });
+		}
+
+		public void DeletePreparedData(uint clientCode)
+		{
+			var client = Client.Find(clientCode);
+			SecurityContext.Administrator.CheckClientPermission(client);
+
+			try
+			{
+				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", client.Id));
+				Flash["DeleteMessage"] = "Подготовленные данные удалены";
+			}
+			catch
+			{
+				Flash["DeleteFailMessage"] = "Ошибка удаления подготовленных данных, попробуйте позднее.";
+			}
+			RedirectToAction("Info", new { cc = client.Id });
+		}
+
+		public void ResetUin(uint clientCode, string reason)
+		{
+			var client = Client.Find(clientCode);
+			SecurityContext.Administrator.CheckClientPermission(client);
+
+			using (new TransactionScope())
+			{
+				var session = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (Client));
+				DbLogHelper.SetupParametersForTriggerLogging(
+					new
+						{
+							inHost = Request.UserHostAddress,
+							inUser = SecurityContext.Administrator.UserName,
+							ResetIdCause = reason
+						},session);
+				new ClientInfoLogEntity
+					{
+						UserName = "",
+						WriteTime = DateTime.Now,
+						ClientCode = client.Id,
+						Message = String.Format("$$$Изменение УИН: " + reason),
+					}.Save();
+																			
+				client.ResetUin();
+
+				RedirectToAction("Info", new { cc = client.Id });
+			}
 		}
 	}
 }

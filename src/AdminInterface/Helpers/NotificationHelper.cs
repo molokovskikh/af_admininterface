@@ -1,7 +1,6 @@
 ﻿using System;
 using AddUser;
 using AdminInterface.Models;
-using AdminInterface.Models.Logs;
 
 namespace AdminInterface.Helpers
 {

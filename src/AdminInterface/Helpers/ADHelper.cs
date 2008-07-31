@@ -1,6 +1,5 @@
 ﻿using System;
 using System.DirectoryServices;
-//using AdminInterface.Models;
 
 namespace AdminInterface.Helpers
 {
@@ -54,11 +53,9 @@ namespace AdminInterface.Helpers
 
 		public static void Unlock(string login)
 		{
-#if !DEBUG
 			var entry = GetDirectoryEntry(login);
 			entry.InvokeSet("IsAccountLocked", false);
 			entry.CommitChanges();
-#endif
 		}
 
 		public static bool IsDisabled(string login)
@@ -108,11 +105,15 @@ namespace AdminInterface.Helpers
 
 		public static void Block(string login)
 		{
-#if !DEBUG
-			var entry = GetDirectoryEntry(login);
-			entry.InvokeSet("IsAccountLocked", true);
-			entry.CommitChanges();
-#endif
+			for (var i = 0; i < 10; i++)
+			{
+				try
+				{
+					var en = new DirectoryEntry("LDAP://DC=adc,DC=analit,DC=net", login, "123");
+					var n = en.NativeObject;
+				}
+				catch {}
+			}
 		}
 
 		public static void Delete(string login)

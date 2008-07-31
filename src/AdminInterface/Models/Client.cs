@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
@@ -92,7 +93,7 @@ namespace AdminInterface.Models
 					yield return user;	
 		}
 
-		public bool IsDrugStore()
+		public bool IsDrugstore()
 		{
 			return Type == ClientType.Drugstore;
 		}
@@ -205,6 +206,17 @@ namespace AdminInterface.Models
 			                             	.ExecuteUpdate());
 		}
 
+		public bool HaveUin()
+		{
+			var result = ArHelper.WithSession(session =>
+			                                  session
+			                                  	.CreateSQLQuery("select length(rui.UniqueCopyID) = 0 from usersettings.ret_update_info rui where clientcode = :clientcode")
+			                                  	.SetParameter("clientcode", Id)
+			                                  	.UniqueResult<long?>());
+
+			return result != null && result.Value == 0;
+		}
+
 		public bool CanChangeStatus()
 		{
 			if (Type != ClientType.Drugstore)
@@ -223,6 +235,11 @@ namespace AdminInterface.Models
 			}
 
 			return true;
+		}
+
+		public bool HavePreparedData()
+		{
+			return File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", Id));
 		}
 	}
 }

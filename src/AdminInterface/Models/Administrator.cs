@@ -157,6 +157,31 @@ namespace AdminInterface.Models
 			get { return HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree);  }
 		}
 
+		public bool ManageDrugstore
+		{
+			get { return HavePermisions(PermissionType.ManageDrugstore); }
+		}
+
+		public bool ManageSuppliers
+		{
+			get { return HavePermisions(PermissionType.ManageSuppliers); }
+		}
+
+		public bool CanViewBilling
+		{
+			get { return HavePermisions(PermissionType.Billing); }
+		}
+
+		public bool CanViewDrugstoreInterface
+		{
+			get { return HavePermisions(PermissionType.DrugstoreInterface); }
+		}
+
+		public bool CanViewSupplierInterface
+		{
+			get { return HavePermisions(PermissionType.SupplierInterface); }
+		}
+
 		public bool CreateUserInAd(string password)
 		{
 			var isLoginExists = ADHelper.IsLoginExists(UserName);
@@ -180,6 +205,12 @@ namespace AdminInterface.Models
 			root.CommitChanges();
 #endif
 			return true;
+		}
+
+		public void CheckClientPermission(Client client)
+		{
+			CheckClientHomeRegion(client.HomeRegion.Id);
+			CheckClientType(client.Type);
 		}
 	}
 }
