@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AddUser;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Test.ForTesting;
 using AdminInterface.Test.Helpers;
@@ -15,6 +16,7 @@ using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 using NHibernate.Criterion;
+using NHibernate.Mapping;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 
@@ -192,6 +194,44 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
+		[Test]
+		public void ShowUsersPermisions()
+		{
+			using (var user = TestUser())
+			{
+				using (new SessionScope())
+					_controller.ShowUsersPermissions(user.Parameter.Client.Id);
+
+				Assert.That(((Client)ControllerContext.PropertyBag["Client"]).Id, Is.EqualTo(user.Parameter.Client.Id));
+				Assert.That((new ListMapper((ICollection)ControllerContext.PropertyBag["Permissions"])).Property("Id"),
+				            Is.EquivalentTo(new ListMapper(UserPermission.FindPermissionsAvailableFor(user.Parameter.Client)).Property("Id")));
+			}
+		}
+
+		[Test]
+		[ExpectedException(typeof(NotHavePermissionException))]
+		public void Check_permission_on_show_users_permissions()
+		{
+			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };
+			using (var user = TestUser())
+				using (new SessionScope())
+					_controller.ShowUsersPermissions(user.Parameter.Client.Id);
+		}
+
+		[Test]
+		public void Update_user_permissions()
+		{
+			using (var user = TestUser())
+			{
+				using (new SessionScope())
+				{
+					var permissions = UserPermission.FindPermissionsAvailableFor(user.Parameter.Client);
+					user.Parameter.AssignedPermissions = new List<UserPermission> {permissions[0]};
+					_controller.UpdateUsersPermissions(user.Parameter.Client.Id, new [] { user.Parameter });
+				}
+			}
+		}
+
 		public DisposibleAction<User> TestUser()
 		{
 			return TestUser("test" + new Random().Next());
@@ -201,6 +241,7 @@ namespace AdminInterface.Test.Controllers
 		{
 			var client = new Client
 			             	{
+								Type = ClientType.Drugstore,
 								ShortName = "TestClient",
 								FullName = "TestClient",
 								BillingInstance = new Payer

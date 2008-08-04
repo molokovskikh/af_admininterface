@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;

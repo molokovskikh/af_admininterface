@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;

@@ -4,8 +4,10 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Test.Helpers;
 using NUnit.Framework;
+using NUnit.Framework.SyntaxHelpers;
 
 namespace AdminInterface.Test.Models
 {
@@ -30,6 +32,19 @@ namespace AdminInterface.Test.Models
 			var user = new User { Login = "test546116879" };
 			ADHelper.Delete(user.Login);
 			user.CheckLogin();
+		}
+
+		[Test]
+		public void IsPermissionAssignedTest()
+		{
+			var permission = new UserPermission {Shortcut = "AF"};
+			var user = new User
+			           	{
+			           		AssignedPermissions = new List<UserPermission>()
+			           	};
+			Assert.That(user.IsPermissionAssigned(permission), Is.False);
+			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF"});
+			Assert.That(user.IsPermissionAssigned(permission));
 		}
 	}
 }
