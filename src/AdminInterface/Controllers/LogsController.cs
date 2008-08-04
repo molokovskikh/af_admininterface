@@ -3,6 +3,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Model;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;

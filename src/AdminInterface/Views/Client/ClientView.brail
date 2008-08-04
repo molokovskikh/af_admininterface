@@ -11,6 +11,11 @@
 </tr>
 <tr>
 	<td>
+		<a href=ShowUsersPermissions.rails?ClientCode=${Client.Id} target=_blank>Права достпа</a>
+	</td>
+</tr>
+<tr>
+	<td>
 		<a ${"href=../Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
 	</td>
 </tr>

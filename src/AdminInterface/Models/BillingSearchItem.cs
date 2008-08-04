@@ -181,7 +181,7 @@ order by {{BillingSearchItem.ShortName}}
 			return filter + " and " + criteria;
 		}
 
-		public static IList<BillingSearchItem> FindBy2(BillingSearchProperties properties)
+/*		public static IList<BillingSearchItem> FindBy2(BillingSearchProperties properties)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
@@ -329,6 +329,6 @@ order by {{BillingSearchItem.ShortName}}
 			{
 				sessionHolder.ReleaseSession(session);
 			}
-		}
+		}*/
 	}
 }

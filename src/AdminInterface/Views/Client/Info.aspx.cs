@@ -5,6 +5,7 @@ using System.Web.UI;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using MySql.Data.MySqlClient;

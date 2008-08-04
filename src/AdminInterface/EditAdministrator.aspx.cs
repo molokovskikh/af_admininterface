@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using NHibernate.Criterion;
 

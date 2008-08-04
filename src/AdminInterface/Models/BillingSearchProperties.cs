@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
 

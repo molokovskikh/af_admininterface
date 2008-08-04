@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;

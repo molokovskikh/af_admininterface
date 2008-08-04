@@ -5,7 +5,7 @@ using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using MySql.Data.MySqlClient;
 

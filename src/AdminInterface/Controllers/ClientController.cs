@@ -1,26 +1,25 @@
 using System;
-using System.Collections.Specialized;
-using System.Drawing;
 using System.IO;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using AdminInterface.Extentions;
-using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Controllers
 {
 	[
-		Helper(typeof(ADHelper)), 
+		Helper(typeof(ADHelper)),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure, 
 	]
-	public class ClientController : SmartDispatcherController
+	public class ClientController : ARSmartDispatcherController
 	{
 		public override void PreSendView(object view)
 		{
@@ -212,6 +211,29 @@ namespace AdminInterface.Controllers
 
 				RedirectToAction("Info", new { cc = client.Id });
 			}
+		}
+
+		[Layout("Common")]
+		public void ShowUsersPermissions(uint clientCode)
+		{
+			var client = Client.Find(clientCode);
+
+			SecurityContext.Administrator.CheckClientPermission(client);
+
+			PropertyBag["Client"] = client;
+			PropertyBag["Permissions"] = UserPermission.FindPermissionsAvailableFor(client);
+		}
+
+		public void UpdateUsersPermissions(uint ClientCode, [ARDataBind("users", AutoLoad = AutoLoadBehavior.Always)] User[] users)
+		{
+			var client = Client.Find(ClientCode);
+
+			using (new TransactionScope())
+			{
+				foreach (var user in users)
+					user.UpdateAndFlush();
+			}
+			RedirectToAction("ShowUsersPermissions", new { clientCode = client.Id });
 		}
 	}
 }

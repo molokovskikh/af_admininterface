@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
 using Common.Web.Ui.Helpers;
@@ -751,7 +752,7 @@ from usersettings.clientsdata where firmcode=" +
 INSERT INTO usersettings.osuseraccessright (ClientCode, AllowGetData, OSUserName) 
 Values(?ClientCode, ?AllowGetData, ?OSUserName);
 ";
-			if (TypeDD.SelectedItem.Text == "Аптека")
+			if (PermissionsDiv.Visible)
 			{
 				foreach (ListItem item in Permissions.Items)
 				{
@@ -1066,15 +1067,8 @@ ORDER BY region;
 			SegmentDD.Items.Add("Розница");
 			SegmentDD.Items[1].Value = "1";
 			ClientTypeChanged(null, EventArgs.Empty);
-
-			var permissionsData = new DataSet();
-			var dataAdapter = new MySqlDataAdapter(@"
-select id, name
-from Usersettings.UserPermissions
-order by name", Literals.GetConnectionString());
-			dataAdapter.Fill(permissionsData);
-			Permissions.DataSource = permissionsData.Tables[0];
-			Permissions.DataBind();
+			
+			UpdatePermissions();
 		}
 
 		protected void CheckBox1_CheckedChanged(object sender, EventArgs e)
@@ -1282,7 +1276,7 @@ select Last_Insert_ID();";
 			CustomerType.Enabled = isCusomer;
 			ServiceClient.Enabled = isCusomer;
 			IncludeCB.Enabled = isCusomer;
-			PermissionsDiv.Visible = isCusomer;
+			UpdatePermissions();
 			if (!isCusomer)
 				IncludeCB.Checked = false;
 
@@ -1292,6 +1286,22 @@ select Last_Insert_ID();";
 			                              	? "Ответственный за работу с программой:"
 			                              	: "Ответственный за отправку прайс-листа:";
 			ClientManagerGropBlock.Visible = !isCusomer;
+		}
+
+		private void UpdatePermissions()
+		{
+			var clientType = Convert.ToUInt32(TypeDD.SelectedValue);
+			var permissionsData = new DataSet();
+			var dataAdapter = new MySqlDataAdapter(@"
+select id, name
+from Usersettings.UserPermissions
+where AvailableFor = ?ClientType or AvailableFor = 2
+order by name", Literals.GetConnectionString());
+			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientType", clientType);
+			dataAdapter.Fill(permissionsData);
+			Permissions.DataSource = permissionsData.Tables[0];
+			Permissions.DataBind();
+			PermissionsDiv.Visible = permissionsData.Tables[0].Rows.Count > 0;
 		}
 
 		protected void InheritProperties_CheckedChanged(object sender, EventArgs e)

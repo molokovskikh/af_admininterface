@@ -4,7 +4,7 @@ using System.Drawing;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;

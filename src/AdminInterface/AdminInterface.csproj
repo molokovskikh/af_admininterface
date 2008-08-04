@@ -55,10 +55,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.MicroKernel, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MicroKernel.dll</HintPath>
-    </Reference>
     <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
@@ -74,14 +70,6 @@
     <Reference Include="Castle.Services.Logging.Log4netIntegration, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\lib\Castle\Castle.Services.Logging.Log4netIntegration.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.Windsor, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Windsor.dll</HintPath>
-    </Reference>
-    <Reference Include="Common.Web.Ui, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\Common.Web.Ui\Src\Common.Web.Ui\bin\$(Configuration)\Common.Web.Ui.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
@@ -136,12 +124,14 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Models\Client.cs" />
-    <Compile Include="Models\ISecurityAware.cs" />
+    <Compile Include="Models\Pair.cs" />
+    <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Relationship.cs" />
+    <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
@@ -168,8 +158,7 @@
     <Compile Include="Main.Master.designer.cs">
       <DependentUpon>Main.Master</DependentUpon>
     </Compile>
-    <Compile Include="Models\Administrator.cs" />
-    <Compile Include="Models\PermissionType.cs" />
+    <Compile Include="Models\Security\Administrator.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
     <Compile Include="Models\ClientStatus.cs" />
     <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
@@ -255,7 +244,7 @@
     <Compile Include="Models\ClientMessage.cs" />
     <Compile Include="Models\Logs\DocumentLogEntity.cs" />
     <Compile Include="Models\Logs\InternetLogEntity.cs" />
-    <Compile Include="Models\Permission.cs" />
+    <Compile Include="Models\Security\Permission.cs" />
     <Compile Include="NHibernateExtentions\Projections2.cs" />
     <Compile Include="OfficeUserRegistrationReport.aspx.cs">
       <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
@@ -411,6 +400,7 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Views\Billing\Common\PayerEdit.brail" />
+    <None Include="Views\Client\ShowUsersPermissions.brail" />
     <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Billing\Search.brail" />
@@ -461,6 +451,12 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ClientCard.rdlc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Common.Web.Ui\Src\Common.Web.Ui\Common.Web.Ui.csproj">
+      <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
+      <Name>Common.Web.Ui</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />

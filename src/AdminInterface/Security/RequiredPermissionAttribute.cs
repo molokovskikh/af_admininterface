@@ -1,5 +1,5 @@
 using System;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 
 namespace AdminInterface.Security
 {

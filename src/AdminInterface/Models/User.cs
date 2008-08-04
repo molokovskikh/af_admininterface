@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
 
@@ -16,8 +18,8 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("usersettings.OsUserAccessRight")]
-	public class User
-	{
+	public class User : ActiveRecordBase<User>
+	{ 
 		[PrimaryKey("RowId")]
 		public virtual uint Id { get; set; }
 
@@ -26,6 +28,13 @@ namespace AdminInterface.Models
 
 		[BelongsTo("ClientCode", NotNull = true)]
 		public Client Client { get; set; }
+
+		[HasAndBelongsToMany(typeof (UserPermission),
+			Lazy = true,
+			ColumnKey = "UserId",
+			Table = "usersettings.AssignedPermissions",
+			ColumnRef = "PermissionId")]
+		public virtual IList<UserPermission> AssignedPermissions { get; set; }
 
 		public static User GetByLogin(string login)
 		{
@@ -46,22 +55,17 @@ namespace AdminInterface.Models
 				throw new CantChangePassword(String.Format("Ќе возможно изменить пароль дл€ учетной записи {0} поскольку она принадлежит пользователю из офиса", Login));
 		}
 
-		public DateTime? GetLastLogonIntoClientInterface()
-		{
-			return null;
-/*
-			var query = new ScalarQuery<DateTime?>(typeof (User),
-			                                       QueryLanguage.Sql,
-												   "select max(logtime) from logs.internetlog where username like :login or username like :loginWithAnalitPrefix");
-			query.SetParameter("login", Login);
-			query.SetParameter("loginWithAnalitPrefix", "Analit\\" + Login);
-			return query.Execute();
-*/
-		}
-
 		public override string ToString()
 		{
 			return Login;
+		}
+
+		public bool IsPermissionAssigned(UserPermission permission)
+		{
+			foreach (var userPermission in AssignedPermissions)
+				if (permission.Shortcut == userPermission.Shortcut)
+					return true;
+			return false;
 		}
 	}
 }

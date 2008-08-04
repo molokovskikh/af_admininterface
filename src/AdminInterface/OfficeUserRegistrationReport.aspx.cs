@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 
 namespace AdminInterface

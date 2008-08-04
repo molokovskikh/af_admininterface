@@ -1,6 +1,6 @@
 using System;
 using System.Web;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 
 namespace AdminInterface.Security
 {

@@ -1,0 +1,28 @@
+﻿<div class="CenterBlock" style="width: 600px">
+	<h3 style="font-weight: bold; border-bottom: solid 1px Black; text-align: left;">
+		Права доступа для клиента ${client.FullName} 
+	</h3>
+	<form action="UpdateUsersPermissions.rails" method="post">
+		<input type=hidden name=ClientCode value=${Client.Id} />
+		<div style="background-color: #F6F6F6;">
+			<% userIndex = 0 %>
+			<% for user in Client.GetUsers(): %>
+				<fieldset>
+					<input name="users[${userIndex}].Id" type=hidden value=${user.Id} />
+					<legend>Учетная запись: ${user.Login}</legend>
+					<% permissionIndex = 0 %>
+					<% for permission in Permissions: %>
+						<input name=users[${userIndex}].AssignedPermissions[${permissionIndex}].Id type=checkbox value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)} />
+						${permission.Name}
+						<br />
+						<% permissionIndex++ %>
+					<% end %>
+				</fieldset>
+				<% userIndex++ %>
+			<% end %>	
+		<div style="text-align:right; padding-top: 20px">
+			<input type=submit value=Сохранить />
+		</div>
+		</div>
+	</form>
+</div>

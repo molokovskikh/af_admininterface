@@ -3,7 +3,7 @@ using System.Data;
 using System.Web.UI;
 using AddUser;
 using AdminInterface.Helpers;
-using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using MySql.Data.MySqlClient;
 

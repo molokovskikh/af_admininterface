@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 

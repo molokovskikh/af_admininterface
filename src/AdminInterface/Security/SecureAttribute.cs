@@ -1,4 +1,4 @@
-﻿using AdminInterface.Models;
+﻿using AdminInterface.Models.Security;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Security
