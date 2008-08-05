@@ -1,7 +1,8 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.searchc" CodePage="1251"
 	CodeBehind="searchc.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
+<%@ Import Namespace="AdminInterface.Models.Security"%>
 <%@ Import Namespace="AdminInterface.Security"%>
-<%@ Import Namespace="AdminInterface.Models"%>
+
 
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">

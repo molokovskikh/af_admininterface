@@ -42,7 +42,7 @@
 				Тип документа
 			</th>
 		<% 
-			if client.IsDrugStore():
+			if client.IsDrugstore():
 		%>
 			<th>
 				От поставщика
@@ -84,7 +84,7 @@
 				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
 			</td>
 		<% 
-			if client.IsDrugStore():
+			if client.IsDrugstore():
 		%>
 				<td>
 					${logEntity.FromSupplier.ShortName if logEntity.FromSupplier != null}	

@@ -6,6 +6,15 @@
 	
 	document.observe("dom:loaded", function() {
 		SetupCalendarElements();
+	
+		Validation.add("ValidateDate", "Не корректная дата", function(v){	
+				return Validation.get('IsEmpty').test(v) || Date.parse(v) != null;
+			});
+		Validation.add("ValidatePaySum", "Не корректная сумма платежа", function(v){
+				return Validation.get('IsEmpty').test(v) || /^\d+(\,\d*)?$/.test(v);
+			});	
+		
+		new Validation("PayerInfo");
 	})
 	
 	function RemoveMessage(clientCode)
@@ -190,7 +199,7 @@
 			</div>
 		</div>
 			
-		<form action="update.rails" method="post" style="margin-bottom:10px;">
+		<form id="PayerInfo" action="update.rails" method="post" style="margin-bottom:10px;">
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			<% OutputSubView("Common/PayerEdit") %>
 		</form>

@@ -7,7 +7,6 @@
 
 	
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
-<form id="form1" runat="server">
 	<style>
 		.InfoRow
 		{
@@ -17,79 +16,18 @@
 		<h3>
 			<asp:Label ID="ShortNameLB" runat="server" />
 		</h3>
-		<div class="BorderedBlock" style="padding-top: 20px; padding-bottom: 20px;">
-			<div class="TwoColumn" align="left">
-				<table align="center" border="1" bordercolor="#dadada" cellpadding="0" cellspacing="0"
-					id="Table2" width="90%">
-					<col style="width:50%" />
-					<col style="width:50%" />
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="ConfigHL" runat="server">Настройка</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="BillingLink" runat="server">Биллинг</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="UpdateListHL" Target="_blank" runat="server">Статистика обновлений</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="DocumentLog" Target="_blank" runat="server">Статистика документов</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="OrderHistoryHL" Target="_blank" runat="server">История заказов</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" height="20">
-							<asp:HyperLink ID="UserInterfaceHL" runat="server">Интерфейс пользователя</asp:HyperLink>
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2">
+		<div class="BorderedBlock" style="padding: 20px 10px 20px 10px; float:left; width: 95%;">
+			<div class="TwoColumn">
 <% 
 	TextWriter textWriter = new StringWriter();
-	Controller.InPlaceRenderView(textWriter, "ClientLoginsView");
-	Response.Write(textWriter.ToString());		
-%>							
-						</td>
-					</tr>
-					<tr>
-						<td colspan="2" class="Title">
-							Операции:
-						</td>
-					</tr>
-					<tr id="UnlockRow" runat="server">
-						<td colspan="2">
-							<asp:Button ID="UnlockButton" runat="server" Text="Разблокировать" OnClick="UnlockButton_Click" ValidationGroup="4" />
-							<asp:Label ID="UnlockedLabel" runat="server" Text="Разблокированно" ForeColor="Green" />
-						</td>
-					</tr>
-					<tr id="DeletePrepareDataRow" runat="server">
-						<td colspan="2">
-							<asp:Button ID="DeletePrepareDataButton" runat="server" ValidationGroup="4" OnClick="DeletePrepareDataButton_Click" Text="Удалить подготовленные данные" />
-							<asp:Label ID="DeleteLabel" runat="server" />
-						</td>
-					</tr>
-					<tr id="ResetUINRow" runat="server">
-						<td valign="middle" align="left" colspan="2" style="height: 22px">
-							<asp:Button ID="ResetCopyIDCB" runat="server" Text="Сбросить УИН" Enabled="False" ValidationGroup="3" OnClick="ResetUniqueCopyID" />
-							<asp:Label ID="IsUniqueCopyIDSet" runat="server" ForeColor="Green">Идентификатор не присвоен</asp:Label>
-							<label id="ResearReasonLable" runat="server">Причина:</label>
-							<asp:TextBox ID="ResetIDCause" runat="server" BorderStyle="None" BackColor="LightGray" Enabled="False" />
-							<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" 
-								ControlToValidate="ResetIDCause" Text="Укажите причину сброса идентификатора." 
-								ValidationGroup="3" Display="Dynamic"  />
-						</td>
-					</tr>
+	Controller.InPlaceRenderView(textWriter, "ClientView");
+	Response.Write(textWriter.ToString());
+%>	
+				<form id="form1" runat="server" style="padding:0; margin:0;">
+				<table id="Table2" cellpadding=0 cellspacing=0 border=1 rules=all 
+						style="width: 90%; border: solid 1px #dadada; border-collapse:collapse;">
+					<col style="width:50%" />
+					<col style="width:50%" />
 					<tr>
 						<td class="Title" style="height: 30px;" colspan="2">
 							<strong>Общая информация</strong>
@@ -138,7 +76,7 @@
 					<tr>
 						<td colspan="2">
 <% 
-	textWriter = new StringWriter();
+	TextWriter textWriter = new StringWriter();
 	Controller.InPlaceRenderView(textWriter, "ContactViewer");
 	Response.Write(textWriter.ToString());		
 %>

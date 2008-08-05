@@ -1,6 +1,7 @@
-<%@ Import Namespace="AdminInterface.Models"%>
+
 <%@ Page Theme="Main" Language="C#" AutoEventWireup="true" CodeBehind="ViewAdministrators.aspx.cs" MasterPageFile="~/Main.Master"
 	Inherits="ViewAdministrators" %>
+<%@ Import Namespace="AdminInterface.Models.Security"%>
 
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
