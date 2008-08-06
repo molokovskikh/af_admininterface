@@ -1,12 +1,12 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AdminInterface.Views.Client.Info" CodePage="1251"
-	CodeBehind="Info.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
+	CodeBehind="Info.aspx.cs" Theme="Main" MasterPageFile="~/ForAspxInMonorail.Master" %>
 <%@ Import namespace="AdminInterface.Helpers"%>
 <%@ Import namespace="Castle.MonoRail.Framework"%>
 <%@ Import namespace="Castle.MonoRail.Views.Brail"%>
 <%@ Import namespace="System.IO"%>
 
 	
-<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<asp:Content runat="server" ContentPlaceHolderID="ForAspxInMonorail">	
 	<style>
 		.InfoRow
 		{
