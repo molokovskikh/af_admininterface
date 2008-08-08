@@ -1293,7 +1293,7 @@ select Last_Insert_ID();";
 			var clientType = Convert.ToUInt32(TypeDD.SelectedValue);
 			var permissionsData = new DataSet();
 			var dataAdapter = new MySqlDataAdapter(@"
-select id, name
+select id, name, shortcut
 from Usersettings.UserPermissions
 where AvailableFor = ?ClientType or AvailableFor = 2
 order by name", Literals.GetConnectionString());
@@ -1301,6 +1301,21 @@ order by name", Literals.GetConnectionString());
 			dataAdapter.Fill(permissionsData);
 			Permissions.DataSource = permissionsData.Tables[0];
 			Permissions.DataBind();
+
+			if (clientType == 1)
+			{
+				var afPermissionIndex = 0;
+				foreach (DataRow row in permissionsData.Tables[0].Rows)
+				{
+					if (row["shortcut"].ToString() == "AF")
+						break;
+					afPermissionIndex++;
+				}
+
+				if (afPermissionIndex < Permissions.Items.Count)
+					Permissions.Items[afPermissionIndex].Selected = true;
+			}
+
 			PermissionsDiv.Visible = permissionsData.Tables[0].Rows.Count > 0;
 		}
 
