@@ -11,7 +11,7 @@
 </tr>
 <tr>
 	<td>
-		<a href=ShowUsersPermissions.rails?ClientCode=${Client.Id} target=_blank>Права достпа</a>
+		<a href=ShowUsersPermissions.rails?ClientCode=${Client.Id} target=_blank>Права доступа</a>
 	</td>
 </tr>
 <tr>
