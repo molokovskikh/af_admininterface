@@ -1,1 +1,0 @@
-﻿page.ReplaceHtml("CurrentMessage", {@partial : 'Billing/ShowMessageForClientPartial.brail' });

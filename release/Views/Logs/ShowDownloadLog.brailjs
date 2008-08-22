@@ -1,2 +1,0 @@
-﻿page.InsertHtml("after", "logRow${updateLogEntityId}", {@partial : 'logs/ShowDownloadLogPartial.brail' });
-page.VisualEffect("SlideDown", "DownloadLog${updateLogEntityId}", {"duration" : "0.5"});
