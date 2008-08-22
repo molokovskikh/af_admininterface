@@ -201,7 +201,7 @@ namespace AdminInterface.Controllers
 						},session);
 				new ClientInfoLogEntity
 					{
-						UserName = "",
+						UserName = SecurityContext.Administrator.UserName,
 						WriteTime = DateTime.Now,
 						ClientCode = client.Id,
 						Message = String.Format("$$$Изменение УИН: " + reason),

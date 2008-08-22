@@ -738,11 +738,13 @@ Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?FirmSegment, ?Regio
 				_command.CommandText += @"
 select maskregion, ShowRegionMask, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
 FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
-from usersettings.clientsdata where firmcode=" +
-					IncludeSDD.SelectedValue + "; ";
+from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
-			return Convert.ToInt32(_command.ExecuteScalar());
+			var clientCode = Convert.ToInt32(_command.ExecuteScalar());
+			_command.CommandText = "insert into logs.AuthorizationDates(ClientCode) Values(" + clientCode + ")";
+			_command.ExecuteNonQuery();
+			return clientCode;
 		}
 
 		private void CreateClientOnOSUserAccessRight()
@@ -870,6 +872,11 @@ WHERE   intersection.pricecode IS NULL
 			_command.CommandText = @"
 INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword, ServiceClient) 
 Values(?ClientCode, ?InvisibleOnFirm, ?WorkMask, ?OrderMask, GeneratePassword(), ?ServiceClient);
+
+insert into usersettings.ret_save_grids(ClientCode, SaveGridId)
+select ?ClientCode, sg.id
+from usersettings.save_grids sg
+where sg.AssignDefaultValue = 1;
 
 INSERT INTO usersettings.ret_update_info (ClientCode, CurrentExeVersion) 
 Values(?ClientCode, (SELECT max(currentExeVersion)

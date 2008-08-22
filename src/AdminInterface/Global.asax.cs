@@ -2,11 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Web;
-#if !DEBUG
-using System.Text;
-using AdminInterface.Security;
-#endif
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
@@ -135,7 +132,6 @@ WHERE PriceCode = ?Id", connection);
 
 		void Application_Error(object sender, EventArgs e)
 		{
-#if !DEBUG
 			var exception = Server.GetLastError();
 
 			if (exception.InnerException is NotAuthorizedException)
@@ -186,6 +182,7 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			_log.Error(builder.ToString());
+#if !DEBUG
 			Response.Redirect("~/Rescue/Error.aspx");
 #endif
 		}

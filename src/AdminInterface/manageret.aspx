@@ -222,13 +222,31 @@
 							</tr>
 							<tr>
 								<td  style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
-									Выгрузка в Excel из программы АналитФармация
+									Права пользователя программы АналитФармация:
 								</td>
 							</tr>
 							<tr>
 								<td style="text-align:left;">
-									<asp:CheckBoxList ID="ExportRulesList" runat="server" DataTextField="DisplayName" DataValueField="Id" BorderStyle="None">
-									</asp:CheckBoxList>
+									<table cellpadding=0 cellspacing=0 style="border-collapse:collapse; width: 100%">
+									<tr>
+										<tr style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
+											<td style="border: solid 1px black">
+												Выгрузка в Excel
+											</td>
+											<td style="border: solid 1px black">
+												Печать
+											</td>
+										</tr>
+										<td>
+											<asp:CheckBoxList ID="ExportRulesList" runat="server" DataTextField="DisplayName" DataValueField="Id" BorderStyle="None">
+											</asp:CheckBoxList>
+										</td>
+										<td style="vertical-align:top;">
+											<asp:CheckBoxList ID="PrintRulesList" runat="server" DataTextField="DisplayName" DataValueField="Id" BorderStyle="None">
+											</asp:CheckBoxList>
+										</td>
+									</tr>
+									</table>
 								</td>
 							</tr>
 							<tr>

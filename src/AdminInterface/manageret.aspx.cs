@@ -392,6 +392,48 @@ where UserId = ?UserId and PermissionId = ?PermissionId";
 					}
 				}
 
+				for (var i = 0; i < ExportRulesList.Items.Count; i++)
+				{
+					var table = Data.Tables["ExportRules"];
+					var list = ExportRulesList;
+					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
+					{
+						if (list.Items[i].Selected)
+							myMySqlCommand.CommandText = @"
+insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
+values(?ClientCode, ?SaveGridId)";
+						else
+							myMySqlCommand.CommandText = @"
+delete from UserSettings.ret_save_grids
+where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
+						myMySqlCommand.Parameters.Clear();
+						myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+						myMySqlCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
+						myMySqlCommand.ExecuteNonQuery();
+					}
+				}
+
+				for (var i = 0; i < PrintRulesList.Items.Count; i++)
+				{
+					var table = Data.Tables["PrintRules"];
+					var list = PrintRulesList;
+					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
+					{
+						if (list.Items[i].Selected)
+							myMySqlCommand.CommandText = @"
+insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
+values(?ClientCode, ?SaveGridId)";
+						else
+							myMySqlCommand.CommandText = @"
+delete from UserSettings.ret_save_grids
+where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
+						myMySqlCommand.Parameters.Clear();
+						myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+						myMySqlCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
+						myMySqlCommand.ExecuteNonQuery();
+					}
+				}
+
 				ShowRegulationHelper.Update(_connection, myTrans, Data, ClientCode);
 
 				myTrans.Commit();
@@ -607,13 +649,20 @@ WHERE ir.IncludeClientCode = ?ClientCode
 				adapter.Fill(Data, "Include");
 
 				adapter.SelectCommand.CommandText = @"
-SELECT rsg.ID, sg.DisplayName, rsg.Enabled
+SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
 FROM UserSettings.Save_Grids sg
-	JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId
-WHERE rsg.ClientCode = ?ClientCode
-ORDER BY sg.DisplayName;
-";
+	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
+WHERE sg.Id < 32768
+ORDER BY sg.DisplayName;";
 				adapter.Fill(Data, "ExportRules");
+
+				adapter.SelectCommand.CommandText = @"
+SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
+FROM UserSettings.Save_Grids sg
+	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = 2575
+WHERE sg.Id > 16384
+ORDER BY sg.DisplayName;";
+				adapter.Fill(Data, "PrintRules");
 
 				adapter.SelectCommand.CommandText = @"
 SELECT up.id, up.name, if(ap.UserId is null, 0, 1) as Enabled
@@ -627,15 +676,24 @@ order by up.name;";
 
 				ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
 				ShowClientsGrid.DataBind();
+
 				IncludeGrid.DataSource = Data.Tables["Include"].DefaultView;
 				IncludeGrid.DataBind();
+
 				ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
 				ExportRulesList.DataBind();
+
+				PrintRulesList.DataSource = Data.Tables["PrintRules"].DefaultView;
+				PrintRulesList.DataBind();
+
 				Permissions.DataSource = Data.Tables["Permissions"].DefaultView;
 				Permissions.DataBind();
 
 				for (var i = 0; i < ExportRulesList.Items.Count; i++)
 					ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
+
+				for (var i = 0; i < PrintRulesList.Items.Count; i++)
+					PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
 
 				for (var i = 0; i < Permissions.Items.Count; i++)
 					Permissions.Items[i].Selected = Convert.ToBoolean(Data.Tables["Permissions"].DefaultView[i]["Enabled"]);
@@ -725,14 +783,6 @@ ORDER BY cd.shortname;", _connection);
 					Data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
 					Data.Tables["Include"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
 				}
-			}
-
-			var i = 0;
-			foreach (ListItem item in ExportRulesList.Items)
-			{
-				if (Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]) != item.Selected)
-					Data.Tables["ExportRules"].DefaultView[i]["Enabled"] = Convert.ToInt32(item.Selected);
-				i++;
 			}
 
 			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
