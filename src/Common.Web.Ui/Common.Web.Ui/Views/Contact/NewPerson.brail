@@ -1,0 +1,8 @@
+﻿<% component CaptureFor, {"id" : "Title"}:%>
+	Добавление нового контактного лица
+<% end %>
+
+<form action="AddPerson.rails" method="post">
+	${FormHelper.HiddenField("ContactGroupId")}
+	<% OutputSubView("EditPersonSubView") %>
+</form>
