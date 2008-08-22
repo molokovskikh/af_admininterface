@@ -1,32 +1,28 @@
 ﻿<?xml version="1.0"?>
 <project name="MyProject" default="compile" basedir="..">
 
-	<property name="VssDbPath" value="\\offdc\VSS\Inforoom\srcsafe.ini" />
-	<property name="VssPath" value="$/inforoom/net2.0/AdminInterface/release/" />
-	<property name="ReleasePath" value="..\..\release\" />
+	<property name="ProjectName" value="AdminInterface" />
+	<property name="ReleasePath" value="..\..\build\" />
+	<property name="PublishDir" value="\\\offdc\Data\Квасов Роман\AdmInterface" />
 		
 
 	<target name="compile">
 
 		<loadtasks assembly=".\build\NAnt.Contrib.Tasks.dll" />
 
-            <vsscheckout 
-                  user="${User}"
-                  password="${Password}" 
-                  localpath="${ReleasePath}"
-                  recursive="true"
-                  writable="true"
-                  dbpath="${VssDbPath}"
-                  path="${VssPath}" 
-		/>
-
+		<delete>
+            <fileset basedir=".\${ProjectName}\bin\">
+				<include name="**.*"/>
+			</fileset>			
+		</delete>
+		
 	      <msbuild project="AdminInterface.sln">
 			<arg value="/property:Configuration=release" />                                  
 			<arg value="/t:Rebuild" />
 	      </msbuild>
 
 		<delete>
-                  <fileset basedir="${ReleasePath}">
+            <fileset basedir="${ReleasePath}">
 				<include name="**.*"/>
 				<exclude name="**.scc" />
 			</fileset>			
@@ -52,23 +48,14 @@
 			file="AdminInterface\Web.Release.config"
 			tofile="${ReleasePath}Web.config"
 		/>
-
-		<vssadd dbpath="${VssDbPath}" user="${User}" password="${Password}" path="${VssPath}">
-                  <fileset basedir="${ReleasePath}">
+		
+		<delete dir="${PublishDir}" />
+		
+		<copy todir="${PublishDir}">
+			<fileset basedir="${ReleasePath}">
 				<include name="**.*"/>
-				<exclude name="**.scc" />
 			</fileset>
-		</vssadd>
+		</copy>
 
-		<vsscheckin 
-                  user="${User}"
-                  password="${Password}" 
-			localpath="${ReleasePath}"
-                  recursive="true"
-                  writable="true"
-                  dbpath="${VssDbPath}"
-                  path="${VssPath}" 
-                  comment="Build script checkin"
-		/>
 	</target>	
 </project>
