@@ -349,16 +349,6 @@ WHERE	id = ?id;
 
 				adapter.Update(Data.Tables["Include"]);
 
-				var exportRulesAdapter = new MySqlDataAdapter();
-				exportRulesAdapter.UpdateCommand = new MySqlCommand(@"
-UPDATE Usersettings.Ret_Save_Grids
-SET Enabled = ?Enabled
-WHERE Id = ?Id;", _connection, myTrans);
-				exportRulesAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.UInt16, 0, "Enabled");
-				exportRulesAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.UInt32, 0, "Id");
-
-				exportRulesAdapter.Update(Data.Tables["ExportRules"]);
-
 				myMySqlCommand.CommandText = InsertCommand;
 				myMySqlCommand.ExecuteNonQuery();
 
@@ -375,8 +365,12 @@ order by up.name;", Literals.GetConnectionString());
 
 				for(var i = 0; i < Permissions.Items.Count; i++)
 				{
-					if (Convert.ToBoolean(permissions.Tables["Permissions"].DefaultView[i]["Enabled"]) != Permissions.Items[i].Selected)
+					var table = permissions.Tables["Permissions"];
+					var list = Permissions;
+					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
+						!= list.Items[i].Selected)
 					{
+						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
 						if (Permissions.Items[i].Selected)
 							myMySqlCommand.CommandText = @"
 insert into UserSettings.AssignedPermissions(UserId, PermissionId)
@@ -396,8 +390,10 @@ where UserId = ?UserId and PermissionId = ?PermissionId";
 				{
 					var table = Data.Tables["ExportRules"];
 					var list = ExportRulesList;
-					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
+					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
+						!= list.Items[i].Selected)
 					{
+						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
 						if (list.Items[i].Selected)
 							myMySqlCommand.CommandText = @"
 insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
@@ -417,8 +413,10 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 				{
 					var table = Data.Tables["PrintRules"];
 					var list = PrintRulesList;
-					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
+					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
+						!= list.Items[i].Selected)
 					{
+						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
 						if (list.Items[i].Selected)
 							myMySqlCommand.CommandText = @"
 insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
