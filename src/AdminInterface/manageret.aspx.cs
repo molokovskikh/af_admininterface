@@ -657,7 +657,7 @@ ORDER BY sg.DisplayName;";
 				adapter.SelectCommand.CommandText = @"
 SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
 FROM UserSettings.Save_Grids sg
-	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = 2575
+	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
 WHERE sg.Id > 16384
 ORDER BY sg.DisplayName;";
 				adapter.Fill(Data, "PrintRules");
