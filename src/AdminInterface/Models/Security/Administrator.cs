@@ -35,7 +35,6 @@ namespace AdminInterface.Models.Security
 			Table = "accessright.AdminsPermissions", 
 			ColumnKey = "AdminId", 
 			ColumnRef = "PermissionId", 
-			Cascade = ManyRelationCascadeEnum.All,
 			Lazy = false)]
 		public IList<Permission> AllowedPermissions { get; set; }
 
