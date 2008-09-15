@@ -63,31 +63,21 @@
 								<asp:BoundField HeaderText="№" DataField="RowID" SortExpression="RowID" />
 								<asp:BoundField HeaderText="Дата заказа" DataField="WriteTime" SortExpression="WriteTime"/>
 								<asp:BoundField HeaderText="Дата прайса" DataField="PriceDate" SortExpression="PriceDate"/>
-								<asp:BoundField HeaderText="Потребитель" DataField="Customer" SortExpression="Customer"/>
+								<asp:BoundField HeaderText="Аптека" DataField="Customer" SortExpression="Customer"/>
 								<asp:BoundField HeaderText="Поставщик" DataField="Supplier" SortExpression="Supplier" />
 								<asp:BoundField HeaderText="Прайс" DataField="PriceName" SortExpression="PriceName"/>
 								<asp:BoundField HeaderText="Позиций" DataField="RowCount" SortExpression="RowCount"/>
-								<asp:BoundField HeaderText="SMTP ID" DataField="Processed" SortExpression="Processed"/>
+								<asp:TemplateField HeaderText="SmtpID">
+									<ItemTemplate>
+										<asp:Label ID="Label1" runat="server" Text='<%# GetResult((DataRowView) GetDataItem()) %>'></asp:Label>
+									</ItemTemplate>
+								</asp:TemplateField>
 							</Columns>
 							<EmptyDataTemplate>
 								За указанынй период заказов не найдено.
 							</EmptyDataTemplate>
 						</asp:GridView>
-<%--						<asp:Table ID="Table3" runat="server" BorderStyle="Solid" Font-Size="8pt" Font-Names="Arial"
-							CellPadding="0" CellSpacing="0" GridLines="Both" BackColor="#F6F6F6">
-							<asp:TableRow VerticalAlign="Middle" HorizontalAlign="Center" BackColor="AliceBlue"
-								Font-Size="10pt" Font-Bold="True">
-								<asp:TableCell Width="70px" Text="№"></asp:TableCell>
-								<asp:TableCell Width="110px" Text="Дата&lt;br&gt;заказа"></asp:TableCell>
-								<asp:TableCell Width="110px" Text="Дата&lt;br&gt;прайса"></asp:TableCell>
-								<asp:TableCell Width="120px" Text="Потребитель"></asp:TableCell>
-								<asp:TableCell Width="120px" Text="Поставщик"></asp:TableCell>
-								<asp:TableCell Width="100px" Text="Прайс"></asp:TableCell>
-								<asp:TableCell Width="70px" Text="Позиций"></asp:TableCell>
-								<asp:TableCell Width="90px" Text="SMTP ID"></asp:TableCell>
-							</asp:TableRow>
-						</asp:Table>
---%>					</div>
+					</div>
 				</td>
 			</tr>
 		</table>

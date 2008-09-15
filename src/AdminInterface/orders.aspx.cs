@@ -40,21 +40,22 @@ SELECT  oh.rowid,
         client.shortname as Customer, 
         firm.shortname as Supplier, 
         PriceName, 
+		oh.PriceCode,
         oh.RowCount, 
-        oh.Processed  
-FROM    orders.ordershead oh, 
-        usersettings.pricesdata, 
-        usersettings.clientsdata as firm, 
-        usersettings.clientsdata as client, 
-        usersettings.clientsdata as sel 
-WHERE   clientcode = client.firmcode  
-        AND client.firmcode = if(sel.firmtype = 1, sel.firmcode, client.firmcode)  
+        oh.Processed, 
+		o.ResultCode,
+		o.TransportType
+FROM    (orders.ordershead oh, usersettings.clientsdata as sel)
+		join usersettings.pricesdata on pricesdata.pricecode = oh.pricecode
+			join usersettings.clientsdata as firm on firm.firmcode = pricesdata.firmcode 
+        join usersettings.clientsdata as client on oh.clientcode = client.firmcode
+		left join logs.orders o on oh.rowid = o.orderid
+WHERE   client.firmcode = if(sel.firmtype = 1, sel.firmcode, client.firmcode)  
         AND firm.firmcode = if(sel.firmtype = 0, sel.firmcode, firm.firmcode)  
         AND oh.writetime BETWEEN ?FromDate AND ADDDATE(?ToDate, INTERVAL 1 DAY)
-        AND pricesdata.pricecode = oh.pricecode  
-        AND firm.firmcode = pricesdata.firmcode 
         AND sel.firmcode = ?clientCode 
 		AND oh.RegionCode & ?RegionCode > 0
+group by oh.rowid
 ORDER BY writetime desc;
 ", _connection);
 			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
@@ -117,5 +118,26 @@ ORDER BY writetime desc;
 			OrdersGrid.DataSource = _data.Tables[0].DefaultView;
 			DataBind();
 		}
-}
+
+		public static string GetResult(DataRowView row)
+		{
+			if (row["TransportType"] == DBNull.Value || Convert.ToInt32(row["ResultCode"]) == 0)
+				return "Не отправлен";
+
+			if (Convert.ToInt32(row["PriceCode"]) == 2647)
+				return "ok (Обезличенный заказ)";
+
+			switch (Convert.ToInt32(row["TransportType"]))
+			{
+				case 1:
+					return row["ResultCode"].ToString();
+				case 2:
+					return "ok (Ftp Инфорум)";
+				case 4:
+					return "ok (Ftp Поставщика)";
+				default:
+					return "ok (Сообственный отправщик)";
+			}
+		}
+	}
 }
