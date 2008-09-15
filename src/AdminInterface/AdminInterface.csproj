@@ -392,9 +392,12 @@
     <Content Include="Css\Block.css" />
     <Content Include="Css\Highlight.css" />
     <Content Include="Css\Table.css" />
+    <Content Include="Images\bc_bg.png" />
+    <Content Include="Images\bc_separator.png" />
     <Content Include="Images\BottomLeftCorner.png" />
     <Content Include="Images\BottomRightCorner.png" />
     <Content Include="Images\error.png" />
+    <Content Include="Images\home.png" />
     <Content Include="Images\TopLeftCorner.png" />
     <Content Include="Images\TopRightCorner.png" />
     <Content Include="Css\ValidationStyles.css" />
