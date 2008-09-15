@@ -136,7 +136,7 @@ ORDER BY writetime desc;
 				case 4:
 					return "ok (Ftp Поставщика)";
 				default:
-					return "ok (Сообственный отправщик)";
+					return "ok (Собственный отправщик)";
 			}
 		}
 	}
