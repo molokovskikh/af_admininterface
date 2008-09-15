@@ -89,12 +89,12 @@
 							</tr>
 							<tr>
 								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="AllowSubmitOrdersCB" Text="Разрешить управление подтверждением заказов" />
+									<asp:CheckBox runat="server" ID="AllowSubmitOrdersCB" Text="Разрешить пользователю самостоятельно активировать/дезактивировать механизм подтверждения заказов" />
 								</td>
 							</tr>
 							<tr>
 								<td class="tdCheckBox" colspan="3" style="height: 22px">
-									<asp:CheckBox runat="server" ID="SubmitOrdersCB" Text="Разрешить подтверждение заказов" />
+									<asp:CheckBox runat="server" ID="SubmitOrdersCB" Text="Активировать механизм подтверждения заказов" />
 								</td>
 							</tr>
 							<tr>
