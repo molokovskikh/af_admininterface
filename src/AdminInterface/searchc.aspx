@@ -6,21 +6,6 @@
 
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
-<script type="text/javascript">
-
-	var titlesAndIds = $H({	"ctl00_MainContentPlaceHolder_FindRB_0" : "Автоматический выбор типа поиска", 
-							"ctl00_MainContentPlaceHolder_FindRB_1" : "Поиска по имени", 
-							"ctl00_MainContentPlaceHolder_FindRB_2" : "Поиска по коду",
-							"ctl00_MainContentPlaceHolder_FindRB_3" : "Поиска по биллинг коду",
-							"ctl00_MainContentPlaceHolder_FindRB_4" : "Поиска по логину",
-							"ctl00_MainContentPlaceHolder_FindRB_5" : "Поиска по юридическому наименованию"});
-
-
-	document.observe("dom:loaded", function() {		
-		joinSearchHelper($("ctl00_MainContentPlaceHolder_FindTB"), titlesAndIds);
-	});
-
-</script>
 	<form id="form1" runat="server" defaultbutton="GoFind">
 		<h3>
 			Статистика работы клиента:
