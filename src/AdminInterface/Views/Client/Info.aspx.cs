@@ -129,7 +129,13 @@ INTO    logs.clientsinfo VALUES
 			ShortNameLB.Text = Data.Tables["Info"].Rows[0]["ShortName"].ToString();
 			AddressText.Text = Data.Tables["Info"].Rows[0]["Adress"].ToString();
 			FaxText.Text = Data.Tables["Info"].Rows[0]["Fax"].ToString();
-			Registred.Text = Data.Tables["Info"].Rows[0]["RegistredBy"].ToString();
+			if (Data.Tables["Info"].Rows[0]["RegistredBy"] != DBNull.Value)
+				Registred.Text = String.Format("«арегистрирован пользователем {0}, дата регистрации {1}",
+				                               Data.Tables["Info"].Rows[0]["RegistredBy"],
+				                               Data.Tables["Info"].Rows[0]["RegistrationDate"]);
+			else
+				Registred.Text = String.Format("–егистратор не указан, дата регистрации {0}",
+											   Data.Tables["Info"].Rows[0]["RegistrationDate"]);
 		}
 
 		private void GetData()
@@ -146,6 +152,7 @@ SELECT  cd.FullName,
 		cd.RegionCode,
         FirmType, 
 		if (ra.ManagerName is null or ra.ManagerName = '', cd.Registrant, ra.ManagerName) as RegistredBy,
+		cd.RegistrationDate,
         ouar.OsUserName,
 		length(rui.UniqueCopyID) = 0 as Length
 FROM  clientsdata cd

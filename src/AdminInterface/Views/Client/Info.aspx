@@ -34,6 +34,11 @@
 						</td>
 					</tr>
 					<tr class="InfoRow">
+						<td colspan=2>
+							<asp:Label ID="Registred" runat="server"/>
+						</td>
+					</tr
+					<tr class="InfoRow">
 						<td align="right">
 							Полное наименование:
 						</td>
@@ -65,14 +70,6 @@
 							<asp:TextBox ID="FaxText" runat="server" Width="90%" />
 						</td>
 					</tr>
-					<tr class="InfoRow">
-						<td style="text-align: right;">
-							Кем был зарегестрирован:
-						</td>
-						<td>
-							<asp:Label ID="Registred" runat="server" Width="90%" />
-						</td>
-					</tr
 					<tr>
 						<td colspan="2">
 <% 
