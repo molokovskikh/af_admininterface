@@ -52,8 +52,6 @@ function getTitleText(titlesAndIds)
 
 function ValidateSearch(source, args)
 {
-	if (isTitleText(args.Value, titlesAndIds))
-		args.IsValid = false
 	if (document.getElementById("ctl00_MainContentPlaceHolder_FindRB_3").checked 
 		|| document.getElementById("ctl00_MainContentPlaceHolder_FindRB_2").checked)		
 		args.IsValid = new RegExp("^\\d{1,10}$$").test(args.Value);
