@@ -95,7 +95,7 @@
 							<asp:Label ID="Label1" runat="server" Text='<%# Eval("FirstUpdate").ToString() %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
-					<asp:TemplateField HeaderText="Неподтвержденное бновление" SortExpression="SecondUpdate">
+					<asp:TemplateField HeaderText="Неподтвержденное обновление" SortExpression="SecondUpdate">
 						<ItemTemplate>
 							<asp:Label ID="Label2" runat="server" Text='<%# Eval("SecondUpdate").ToString() %>'></asp:Label>
 						</ItemTemplate>

@@ -1,6 +1,6 @@
 ﻿<div class="CenterBlock" style="width: 600px">
 	<h3 style="font-weight: bold; border-bottom: solid 1px Black; text-align: left;">
-		Права доступа для клиента ${client.FullName} 
+		Права доступа для клиента ${client.ShortName} 
 	</h3>
 	<form action="UpdateUsersPermissions.rails" method="post">
 		<input type=hidden name=ClientCode value=${Client.Id} />

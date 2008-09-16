@@ -353,39 +353,6 @@ WHERE	id = ?id;
 				myMySqlCommand.ExecuteNonQuery();
 
 
-				var permissions = new DataSet();
-				var permissionAdapter = new MySqlDataAdapter(@"
-SELECT up.id, o.RowId, up.name, if(ap.UserId is null, 0, 1) as Enabled
-FROM (UserSettings.OsUserAccessRight O, UserSettings.UserPermissions up)
-  left join UserSettings.AssignedPermissions ap on o.rowid = ap.userid and up.id = ap.PermissionId
-where o.clientcode = ?ClientCode
-order by up.name;", Literals.GetConnectionString());
-				permissionAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				permissionAdapter.Fill(permissions, "Permissions");
-
-				for(var i = 0; i < Permissions.Items.Count; i++)
-				{
-					var table = permissions.Tables["Permissions"];
-					var list = Permissions;
-					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
-						!= list.Items[i].Selected)
-					{
-						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
-						if (Permissions.Items[i].Selected)
-							myMySqlCommand.CommandText = @"
-insert into UserSettings.AssignedPermissions(UserId, PermissionId)
-values(?UserId, ?PermissionId)";
-						else
-							myMySqlCommand.CommandText = @"
-delete from UserSettings.AssignedPermissions 
-where UserId = ?UserId and PermissionId = ?PermissionId";
-						myMySqlCommand.Parameters.Clear();
-						myMySqlCommand.Parameters.AddWithValue("?UserId", permissions.Tables["Permissions"].DefaultView[i]["RowId"]);
-						myMySqlCommand.Parameters.AddWithValue("?PermissionId", permissions.Tables["Permissions"].DefaultView[i]["Id"]);
-						myMySqlCommand.ExecuteNonQuery();
-					}
-				}
-
 				for (var i = 0; i < ExportRulesList.Items.Count; i++)
 				{
 					var table = Data.Tables["ExportRules"];
@@ -662,14 +629,6 @@ WHERE sg.Id > 16384
 ORDER BY sg.DisplayName;";
 				adapter.Fill(Data, "PrintRules");
 
-				adapter.SelectCommand.CommandText = @"
-SELECT up.id, up.name, if(ap.UserId is null, 0, 1) as Enabled
-FROM (UserSettings.OsUserAccessRight O, UserSettings.UserPermissions up)
-  left join UserSettings.AssignedPermissions ap on o.rowid = ap.userid and up.id = ap.PermissionId
-where o.clientcode = ?ClientCode
-order by up.name;";
-				adapter.Fill(Data, "Permissions");
-
 				ShowRegulationHelper.Load(adapter, Data);
 
 				ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
@@ -684,17 +643,11 @@ order by up.name;";
 				PrintRulesList.DataSource = Data.Tables["PrintRules"].DefaultView;
 				PrintRulesList.DataBind();
 
-				Permissions.DataSource = Data.Tables["Permissions"].DefaultView;
-				Permissions.DataBind();
-
 				for (var i = 0; i < ExportRulesList.Items.Count; i++)
 					ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
 
 				for (var i = 0; i < PrintRulesList.Items.Count; i++)
 					PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
-
-				for (var i = 0; i < Permissions.Items.Count; i++)
-					Permissions.Items[i].Selected = Convert.ToBoolean(Data.Tables["Permissions"].DefaultView[i]["Enabled"]);
 
 				transaction.Commit();
 			}

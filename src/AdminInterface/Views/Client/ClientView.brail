@@ -56,7 +56,7 @@
 			Имя учетной записи
 		</td>
 		<td class="Title">
-			Дата последнего входа
+			Авторизация на сервере
 		</td>
 		<td class="Title">
 			Дата последней неудачной регистрации
@@ -99,9 +99,9 @@
 			<br />
 			Обновление AnalitF: ${?authorizationLog.AFTime}
 			<br />
-			Последний раз пользовался AnalitOnline: ${?authorizationLog.AOLTime}
+			Использование AnalitOnline: ${?authorizationLog.AOLTime}
 			<br />
-			Последний раз использовал Online сервисы: ${?authorizationLog.IOLTime}
+			Использование Online сервисов: ${?authorizationLog.IOLTime}
 			<br />
 		</td>
 	</tr>
