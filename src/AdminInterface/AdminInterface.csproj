@@ -117,6 +117,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\TariffController.cs" />
     <Compile Include="ForAspxInMonorail.Master.cs">
       <DependentUpon>ForAspxInMonorail.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -130,8 +132,14 @@
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Helpers\Class1.cs" />
+    <Compile Include="Models\Billing\Bill.cs" />
+    <Compile Include="Models\Billing\MoneyMove.cs" />
+    <Compile Include="Models\Billing\Payment.cs" />
+    <Compile Include="Models\Billing\Reciver.cs" />
+    <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
-    <Compile Include="Models\Pair.cs" />
+    <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Payer.cs" />
@@ -391,6 +399,7 @@
   <ItemGroup>
     <Content Include="Css\Block.css" />
     <Content Include="Css\Highlight.css" />
+    <Content Include="Css\Report.css" />
     <Content Include="Css\Table.css" />
     <Content Include="Images\bc_bg.png" />
     <Content Include="Images\bc_separator.png" />
@@ -410,7 +419,13 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Views\Billing\Common\PayerEdit.brail" />
+    <None Include="Views\Billing\Info.brail" />
+    <None Include="Views\Billing\Mail.brail" />
+    <None Include="Views\Layouts\Report.brail" />
+    <None Include="Views\Report\Act.brail" />
+    <None Include="Views\Report\Bill.brail" />
+    <None Include="Views\Report\RevisionAct.brail" />
+    <None Include="Views\Tariff\Show.brail" />
     <None Include="Views\Client\ShowUsersPermissions.brail" />
     <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\Register.brail" />
@@ -438,6 +453,7 @@
     <Content Include="Rescue\NotAllowed.aspx" />
     <Content Include="Rescue\NotAuthorized.aspx" />
     <Content Include="SenderProperties.aspx" />
+    <None Include="Views\Billing\Payments.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />

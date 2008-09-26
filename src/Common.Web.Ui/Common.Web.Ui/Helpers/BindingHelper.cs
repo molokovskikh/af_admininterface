@@ -29,7 +29,14 @@ namespace Common.Web.Ui.Helpers
 
 		public static string GetDescription(object value)
 		{
-			var descriptions = value.GetType().GetField(value.ToString()).GetCustomAttributes(false);
+			if (value == null)
+				return "";
+			var field = value.GetType().GetField(value.ToString());
+			if (field == null)
+				return value.ToString();
+			var descriptions = field.GetCustomAttributes(false);
+			if (descriptions.Length == 0)
+				return value.ToString();
 			return ((DescriptionAttribute)descriptions[0]).Description;
 		}
 

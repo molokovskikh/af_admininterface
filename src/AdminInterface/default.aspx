@@ -48,6 +48,9 @@
 							Font-Names="Verdana,Arial,Helvetica,sans-serif" Font-Size="Small" 
 							runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</asp:HyperLink>
 					</p>
+					<p>
+						<a href="./Tariff/Show.rails">Тарифы</a>
+					</p>
 				</td>
 				<td align="center" style="height: 427px">
 					<fieldset style="width:20%;float:right;background-color:#d8f1ff;border:0;padding:3px 3px 3px 3px;">

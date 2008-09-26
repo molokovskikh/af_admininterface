@@ -1,0 +1,156 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Счет
+<% end %>
+<div style="float: left; display: block;">
+	${payer.Reciver.Name}
+	<br />
+	${payer.Reciver.Address}
+	<br />
+</div>
+<div style="float: right; display: block;">
+	Телефоны:<br />
+	Москва:662-87-27<br />
+	Санкт - Петербург: 309-05-21<br />
+	Воронеж: 606-000<br />
+	Челябинск: 729-81-43<br />
+</div>
+<div style="clear: both;width: 100%;">
+	<h5>
+		Образец заполнения платежного поручения
+	</h5>
+	<table>
+		<tr>
+			<td>
+				ИНН ${payer.Reciver.INN}
+			</td>
+			<td>
+				КПП ${payer.Reciver.KPP}
+			</td>
+			<td rowspan="2" style="vertical-align:bottom;">
+				Сч. №
+			</td>
+			<td rowspan="2" style="vertical-align:bottom;">
+				${payer.Reciver.AccountNumber}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				Получатель ${payer.Reciver.Name}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2" style="border-bottom-style: none;">
+				Банк получателя
+			</td>
+			<td>
+				БИК
+			</td>
+			<td style="border-bottom-style: none;">
+				${payer.Reciver.BIK}
+			</td>
+		</tr>
+		<tr >
+			<td colspan="2" style="border-top-style: none;">
+				${payer.Reciver.BankName}
+			</td>
+			<td>
+				Сч. №
+			</td>
+			<td style="border-top-style: none;">
+				${payer.Reciver.BankAccountNumber}
+			</td>
+		</tr>
+	</table>
+	<h4>
+		Счет № ${number} от ${fromDate}
+	</h4>
+	<p>
+		Плательщик: ${payer.JuridicalName}, ${payer.ActualAddressRegion}
+		<br />
+		Грузополучатель: ${payer.JuridicalName}, ${payer.ActualAddressRegion}
+	</p>
+	<table>
+		<tr>
+			<th>
+				№
+			</th>
+			<th>
+				Наименование товара
+			</th>
+			<th>
+				Удиница измерения
+			</th>
+			<th>
+				Количество
+			</th>
+			<th>
+				Цена
+			</th>
+			<th>
+				Сумма
+			</th>
+		</tr>
+		<% i = 1 %>
+		<% sum = 0 %>
+		<% for bill in bills: %>
+		<tr>
+			<td>
+				${i}
+			</td>
+			<td>
+				${bill.Name}
+			</td>
+			<td>
+				услуга
+			</td>
+			<td>
+				1
+			</td>
+			<td>
+				${bill.Sum}
+			</td>
+			<td>
+				${bill.Sum}
+			</td>
+		</tr>
+		<% sum += bill.Sum %>
+		<% i++ %>
+		<% end %>
+		<tr class="result">
+			<td class="result-label" colspan="5">
+				Итого:
+			</td>
+			<td>
+				${sum}
+			</td>
+		</tr>
+		<tr class="result">
+			<td class="result-label" colspan="5">
+				Без налога (НДС):
+			</td>
+			<td>
+				-
+			</td>
+		</tr>
+		<tr class="result">
+			<td class="result-label" colspan="5">
+				Всего к оплате:
+			</td>
+			<td>
+				${sum}
+			</td>
+		</tr>
+	</table>
+	<p>
+		Всего наименований ${bills.Length}, на сумму ${sum}
+		<br />
+	</p>
+	<div>
+		<p>
+			Руководитель предприятия______________________________________(${payer.Reciver.Boss})
+		</p>
+		<p>
+			Главный бухгалтер____________________________________________(${payer.Reciver.Accountant})
+		</p>
+	</div>
+</div>

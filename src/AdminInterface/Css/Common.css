@@ -42,7 +42,7 @@
 #breadcrumb a
 {
     height:30px;
-    display:block;
+    display:block;    
     background-image:url('../images/bc_separator.png');
     background-repeat:no-repeat;
     background-position:right;
@@ -58,3 +58,64 @@
 }
 
 /*------breadcrumb-------*/
+
+.date-input
+{
+	width: 11ex;
+}
+
+/*------tabs-------*/
+.tabs 
+{
+	height: 2.6em; 
+	border-bottom: 1px solid #bbbbbb; 
+	margin-bottom: 1.2em; 
+	position: relative;
+}
+.tabs ul 
+{
+	margin:0; 
+	position:absolute; 
+	bottom:-2px; 
+	padding-left:1em;
+}
+.tabs>ul  
+{
+	bottom:-1px; 
+} /* others */
+.tabs ul li {
+	float:left;
+	list-style-type:none;
+	white-space:nowrap;
+	margin-right:8px;
+	background:#fff;
+}
+.tabs ul li a{
+	display:block;
+	font-size: 0.9em;
+	text-decoration:none;
+	line-height:1.3em;
+	padding:4px 6px 4px 6px;
+	border: 1px solid #ccc;
+	border-bottom: 1px solid #bbbbbb;
+	background-color: #eeeeee;
+	color:#777;
+	font-weight:bold;
+}
+
+.tabs ul li a:hover 
+{
+	background-color: #ffffdd;
+	text-decoration:none;
+}
+
+.tabs ul li a.selected {
+	background-color: #fff;
+	border: 1px solid #bbbbbb;
+	border-bottom: 1px solid #fff;
+}
+
+.tabs ul li a.selected:hover {
+	background-color: #fff;
+}
+/*------tabs-------*/

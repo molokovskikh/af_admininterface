@@ -1,0 +1,347 @@
+﻿<% def WriteInputGroupHeader(localHeader as string) as string: %>
+	<tr>
+		<td class="InputGroupHeader" colspan="2">
+			${localHeader}
+		</td>
+	</tr>
+<% end
+
+def WriteLabelAndEditControle(labelText as string, editControlText as string) as string: %>
+	<tr>
+		<td style="width: 30%">
+			${labelText}
+		</td>
+		<td style="width: 70%">
+			${editControlText}
+		</td>
+	</tr>
+<% end %>
+
+
+<div class="left">
+
+		<div style="width: 100%">
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				<% if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10: %>
+				<div class="HideVisible">
+					<a href="#">Клиенты плательщика "${Instance.ShortName}"</a>
+				</div>
+				<div class="VisibleFolder">
+				<% else: %>
+				<div class="ShowHiden">
+					<a href="#">Клиенты плательщика "${Instance.ShortName}"</a>
+				</div>
+				<div class="hidden">
+				<% end %>
+					<form action="UpdateClientsStatus.rails" method="post">
+						<input type="hidden" name="clientCode" value="${ClientCode}" />
+						<table class="DataTable" style="width:100%">
+							<tr>
+								<th>Включен</th>
+								<th>ID</th>
+								<th>Название</th>
+								<th>Регион</th>
+								<th>Тип</th>
+								<th>Сегмент</th>
+								<th>Подчинение</th>
+								<th>Дата регистрации</th>
+								<th>Платеж</th>
+							</tr>
+						<% 
+						i = 0
+						sum = 0
+						for client in Instance.Clients:
+							i++
+						%>
+							<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if not client.IsClientActive()}">
+								<td>
+									<input type="checkbox" ${"checked" if client.IsClientActive()} ${"disabled" if not client.CanChangeStatus()} name="Status[${i}].Status" />
+									<% if client.CanChangeStatus(): %>
+									<input type="hidden" name="Status[${i}].FirmCode" value="${client.Id}" />
+									<% end %>
+								</td>
+								<td>
+									${client.GetIdWithParentId()}
+								</td>
+								<td>
+								<% if client.Id == Client.Id: %>
+									<strong>${client.GetNameWithParents()}</strong>
+								<% else: %>
+									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">
+										${client.GetNameWithParents()}
+									</a>
+								<% end %>
+								</td>
+								<td>
+									${client.HomeRegion.Name}
+								</td>
+								<td>
+									${BindingHelper.GetDescription(client.Type)}
+								</td>
+								<td>
+									${BindingHelper.GetDescription(client.Segment)}
+								</td>
+								<td>
+									${client.GetSubordinateType()}
+								</td>
+								<td>
+									${client.RegistrationDate.ToShortDateString()}
+								</td>
+								<td>
+									<% sum += client.GetPayment(tariffs) %>
+									${client.GetPayment(tariffs)}
+								</td>
+							</tr>
+						<% end %>
+							<tr>
+								<td colspan="9" style="text-align:right;">
+									Итого ${sum}
+								</td>
+							</tr>
+						</table>
+						<div style="text-align:right;">
+							<input type="submit" value="Сохранить" />
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	
+
+		<div class="InputGroupHeader">
+			<form action="" method="get">
+				${FormHelper.HiddenField("ClientCode", Client.Id)}
+				${FormHelper.HiddenField("tab", "payments")}
+				Платежи за период с
+				<input value="${paymentsFrom.ToShortDateString()}" name="paymentsFrom" class="date-input" type="text" /><input type="button" class="CalendarInput" />
+				по
+				<input value="${paymentsTo.ToShortDateString()}" name="paymentsTo" class="date-input" type="text" /><input type="button" class="CalendarInput" />
+				<input type=submit value="Показать" />
+			</form>
+		</div>
+		<% if payments.Length > 0: %>
+		<table class="DataTable">
+			<tr>
+				<th>Дата платежа</th>
+				<th>Сумма платежа</th>
+			</tr>
+			<% i = 0 %>
+			<% for payment in payments: %>
+			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td>${payment.PayedOn.ToShortDateString()}</td>
+				<td>${payment.Sum}</td>
+			</tr>
+			<% i++ %>
+			<% end %>
+		</table>
+		<% else: %>
+		<div class="EmptyData">Платежей за указанный период не было</div>
+		<% end %>
+		<fieldset style="width: 20em">
+		<legend>Новый платеж</legend>
+		<form action="AddPayment.rails" method="post">
+			<input type="hidden" name="clientCode" value="${Client.Id}" />
+			<input type="hidden" name="Payment.PayFrom.PayerID" value="${Instance.PayerID}" />
+			Сумма платежа:<br />			
+			<input name="Payment.Sum" type="text" /><br />
+			Дата платежа:<br />
+			<input name="Payment.PayedOn" type="text" /><input type="button" class="CalendarInput" />
+			<br />
+			<input type="submit" value="Добавить" />
+		</form>
+		</fieldset>
+	
+
+	<div style="margin-bottom:10px">
+		<div class="InputGroupHeader">Документы:</div>
+		<form action="../Report/Bill.rails" method="get" target="_blank">
+			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
+			Акт за ${FormHelper.Select("Period",
+									   BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
+									   BindingHelper.GetDictionaryMapping())}
+			<input type="submit" value="Сформировать" />
+		</form>
+		
+		<form action="../Report/Bill.rails" method="get" target="_blank">
+			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
+			Счет за: ${FormHelper.Select("Period",
+										 BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
+										 BindingHelper.GetDictionaryMapping())}
+			<input type="submit" value="Сформировать" />
+		</form>
+		
+		<form action="../Report/RevisionAct.rails" method="get" target="_blank">
+			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
+			Акт сверки за период 
+			с <input class="date-input" name="from" type="text" /><input type="button" class="CalendarInput" />
+			по <input class="date-input" name="to" type="text" /><input type="button" class="CalendarInput" />
+			<input type="submit" value="Сформировать" />
+		</form>
+	</div>
+	
+	<div>
+		<form id="PayerInfo" action="update.rails" method="post">
+			${FormHelper.HiddenField("ClientCode", Client.Id)}
+			${FormHelper.HiddenField("Instance.PayerID")}
+			${FormHelper.HiddenField("tab", "payments")}
+			<table>
+			
+		${WriteInputGroupHeader("Опции выставки счета")}
+				
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
+									FormHelper.Select("Instance.AutoInvoice", 
+													  {1:"Автоматически", 0:"По запросу"},
+													  {"value":"Key", "text":"Value"}))}
+		
+		
+				<tr>
+					<td style="width: 30%">
+						${FormHelper.LabelFor("Instance.Reciver", "Получатель платежей:")}
+					</td>
+					<td style="width: 70%">
+						<select name="Instance.Reciver.Id">
+							<option></option>
+							<% for reciver in recivers: %>
+								<option ${"selected" if Instance.Reciver != null and Instance.Reciver.Id == reciver.Id } value="${reciver.Id}">
+									${reciver.Name}
+								</option>
+							<% end %>
+						</select>
+					</td>
+				</tr>
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", "Категория счета:"), 
+									FormHelper.Select("Instance.DetailInvoice", 
+													  {0:"Стандартный", 1:"Детализированный"},
+													  {"value":"Key", "text":"Value"}))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ChangeServiceNameTo", "Название услуги:"), 
+									FormHelper.TextField("Instance.ChangeServiceNameTo", {"class" : "BillingInput"}))}
+																  
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
+									FormHelper.Select("Instance.PayCycle", 
+													  {0:"Помесячно", 1:"Поквартально"}, 
+													  {"value":"Key", "text":"Value"}))}
+													  
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShowDiscount", "Выделять в документах скидку:"), 
+									FormHelper.CheckboxField("Instance.ShowDiscount"))}
+		
+		<% if Instance.IsManualPayments(): %>							  
+		${WriteInputGroupHeader("Оплата")}
+										
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
+														"Дата платежа:"), 
+									FormHelper.TextFieldValue("Instance.OldPayDate", Instance.OldPayDate.ToShortDateString(), {"class" : "ValidateDate"}) + "<input type=\"button\" class=\"CalendarInput\" />")}
+									
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
+														"Сумма платежа:"), 
+									FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
+		<% end %>
+									
+		${WriteInputGroupHeader("Условия скидки")}
+		
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DiscountValue", "Скидка:"), 
+									FormHelper.TextField("Instance.DiscountValue"))}
+									
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DiscountType", "Тип скидки:"), 
+									FormHelper.Select("Instance.DiscountType", 
+														 BindingHelper.GetDescriptionsDictionary(Instance.DiscountType.GetType()),
+														 BindingHelper.GetDictionaryMapping()))}
+														 
+				<tr style="text-align:right">
+					<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+
+</div>
+
+<div class="right">
+	<% if IsDefined("ClientMessage"): %>
+		<div class="UseCaseGroup">
+		<form action="sendMessage.rails" method="post">			
+			<input type="hidden" value="${Client.Id}" name="NewClientMessage.ClientCode" />
+			<table style="width:100%">
+					<tr>
+						<td class="InputGroupHeader">
+							Сообщение клиенту:
+						</td>
+					</tr>
+					<% if IsDefined("SendError"): %>
+					<tr>
+						<td class="ValidationErrorMessage">
+							${SendError}
+						</td>
+					</tr>
+					<% end %>
+					<% if ClientMessage.IsContainsNotShowedMessage(): %>
+					<tr>
+						<td id="CurrentMessage">
+							Остались не показанные сообщения. <a href="javascript:void(0);" onclick="return ShowMessage(${Client.Id});">Просмотреть сообщение</a>
+						</td>
+					</tr>
+					<% end %>
+					<tr>
+						<td>
+							<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							Показать
+							<select name="NewClientMessage.ShowMessageCount">
+								<option>1</option>
+								<option>2</option>
+								<option>5</option>
+								<option>10</option>
+							</select>
+							раз.
+						</td>
+					</tr>
+					<tr style="text-align:right">
+						<td>
+							<input type="submit" value="Отправить сообщение" />
+						</td>
+					</tr>
+			</table>
+		</form>
+		</div>
+	<% end %>
+	
+		<div class="UseCaseGroup">
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+				Статистика включений/выключений
+			</div>
+			<table class="DataTable" style="width: 100%;">
+			<% 
+			if LogRecords.Count > 0:
+				i = 0
+				for logRecord in LogRecords:
+					i++
+			%>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td>
+							${logRecord.LogTime}
+						</td>
+						<td>
+							${logRecord.OperatorName}
+						</td>
+						<td>
+							${BindingHelper.GetDescription(logRecord.ClientStatus)}
+						</td>
+					</tr>
+			<% 
+				end
+			else:
+			%>
+				<tr>
+					<td style="text-align:center;">
+						Клиент не отключался
+					</td>
+				</tr>				
+			<% end %>
+			</table>
+			
+		</div>
+</div>

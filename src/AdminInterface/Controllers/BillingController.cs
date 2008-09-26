@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -12,6 +14,7 @@ using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers
 {
@@ -25,7 +28,11 @@ namespace AdminInterface.Controllers
 	]
 	public class BillingController : ARSmartDispatcherController
 	{
-		public void Edit(uint clientCode, bool showClients)
+		public void Edit(uint clientCode, 
+						bool showClients, 
+						string tab, 
+						DateTime? paymentsFrom, 
+						DateTime? paymentsTo)
 		{
 			var client = Client.Find(clientCode);
 
@@ -35,25 +42,40 @@ namespace AdminInterface.Controllers
 			var clientMessage = ClientMessage.TryFind(clientCode);
 
 			if (clientMessage != null)
-				PropertyBag.Add("ClientMessage", clientMessage);
+				PropertyBag["ClientMessage"] = clientMessage;
 
 			if (showClients)
 				PropertyBag["ShowClients"] = showClients;
 
+			if (String.IsNullOrEmpty(tab))
+				tab = "info";
+
+			var payer = client.BillingInstance;
+			if (paymentsFrom == null)
+				paymentsFrom = Payment.DefaultBeginPeriod(payer);
+			if (paymentsTo == null)
+				paymentsTo = Payment.DefaultEndPeriod(payer);
+			PropertyBag["tab"] = tab;
+			PropertyBag["paymentsFrom"] = paymentsFrom;
+			PropertyBag["paymentsTo"] = paymentsTo;
 			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(clientCode);
 			PropertyBag["Client"] = client;
-			PropertyBag["Instance"] = client.BillingInstance;
-			PropertyBag["ContactGroups"] = client.BillingInstance.ContactGroupOwner.ContactGroups;
-			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(client.BillingInstance.PayerID);
+			PropertyBag["Instance"] = payer;
+			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
+			PropertyBag["Tariffs"] = Tariff.FindAll();
+			PropertyBag["Payments"] = Payment.FindBetwen(payer, paymentsFrom.Value, paymentsTo.Value);
+			PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
+			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;
 		}
 
 		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
-						   uint clientCode)
+						   uint clientCode,
+						   string tab)
 		{
 			billingInstance.UpdateAndFlush();
 			Flash.Add("Message", new Message("Изменения сохранены"));
-			RedirectToAction("Edit", "clientCode=" + clientCode);
+			RedirectToAction("Edit", new {clientCode, tab});
 		}
 
 		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage)
@@ -187,6 +209,13 @@ namespace AdminInterface.Controllers
 			message.ShowMessageCount = 0;
 			message.Save();
 			CancelView();
+		}
+
+		public void AddPayment(uint clientCode, [DataBind("Payment")] Payment payment)
+		{
+			payment.Save();
+			Flash["Message"] = new Message("Сохранено");
+			RedirectToAction("Edit", new {clientCode, tab = "payments"});
 		}
 
 		private static IList<Region> GetRegions()

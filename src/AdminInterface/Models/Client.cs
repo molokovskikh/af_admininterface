@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -101,6 +103,21 @@ namespace AdminInterface.Models
 		public bool IsClientActive()
 		{
 			return Status == ClientStatus.On;
+		}
+
+		public float GetPayment(IList<Tariff> tariffs)
+		{
+			RelationshipType? includeType = null;
+			if (Parents.Count > 0)
+			    includeType = Parents[0].RelationshipType;
+
+			var tariff = tariffs.FirstOrDefault(t => t.Region.Id == HomeRegion.Id
+			                                         && t.IncludeType == includeType);
+
+			if (tariff == null)
+				return 0;
+
+			return tariff.Pay;
 		}
 
 		public static Client FindClietnForBilling(uint clientCode)

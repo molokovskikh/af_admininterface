@@ -111,6 +111,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
+    <Compile Include="Controllers\BillingControllerFixture.cs" />
     <Compile Include="Controllers\ClientControllerFixture.cs" />
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="PropertyComparerTest.cs" />
     <Compile Include="Services\NotificationFixture.cs" />
     <Compile Include="Watin\RegistrationFixture.cs" />
+    <Compile Include="Watin\ServiceFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

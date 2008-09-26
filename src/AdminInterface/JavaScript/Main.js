@@ -68,16 +68,16 @@ function ValidateParent(source, args)
 
 function ShowHidden(sender)
 {
-	$$(".ShowHiden").first().className = "HideVisible";
+    $$(".ShowHiden").first().className = "HideVisible";
 	sender.onclick = function() { HideVisible(sender); } 
-	$$(".HidenFolder").first().className = "VisibleFolder";
+	$$(".hidden").first().className = "VisibleFolder";
 }
 
 function HideVisible(sender)
 {
-	$$(".HideVisible").first().className = "ShowHiden";
+    $$(".HideVisible").first().className = "ShowHiden";
 	sender.onclick = function() { ShowHidden(sender); } 
-	$$(".VisibleFolder").first().className = "HidenFolder";
+	$$(".VisibleFolder").first().className = "hidden";
 }
 
 function SetupCalendarElements()

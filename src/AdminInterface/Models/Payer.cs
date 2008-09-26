@@ -1,11 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
+	public enum DiscountType
+	{
+		[Description("В рублях")]
+		Currency,
+		[Description("В процентах")]
+		Percent,
+	}
+
 	[ActiveRecord("billing.payers")]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
@@ -72,28 +82,55 @@ namespace AdminInterface.Models
 		public virtual int DetailInvoice { get; set; }
 
 		[Property]
+		public virtual string ChangeServiceNameTo { get; set; }
+
+		[Property]
 		public virtual int AutoInvoice { get; set; }
 
 		[Property]
 		public virtual int PayCycle { get; set; }
 
 		[Property]
-		public DateTime OldPayDate { get; set;}
+		public virtual DateTime OldPayDate { get; set;}
 
 		[Property]
-		public double OldTariff { get; set; }
+		public virtual double OldTariff { get; set; }
 
 		[Property]
-		public bool HaveContract { get; set; }
+		public virtual bool HaveContract { get; set; }
 
 		[Property]
-		public bool SendRegisteredLetter { get; set; }
+		public virtual bool SendRegisteredLetter { get; set; }
 
 		[Property]
-		public bool SendScannedDocuments { get; set; }
+		public virtual bool SendScannedDocuments { get; set; }
+
+		[Property]
+		public virtual uint DiscountValue { get; set; }
+
+		[Property]
+		public virtual DiscountType DiscountType { get; set; }
+
+		[Property]
+		public virtual bool ShowDiscount { get; set; }
+
+		[BelongsTo("ReciverId")]
+		public virtual Reciver Reciver { get; set; }
 
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "ShortName")]
 		public virtual IList<Client> Clients { get; set; }
+
+		public virtual float ApplyDiscount(float sum)
+		{
+			if (DiscountType == DiscountType.Currency)
+				return Math.Max(sum - DiscountValue, 0);
+			return Math.Max(sum - sum * DiscountValue / 100, 0);
+		}
+
+		public virtual bool IsManualPayments()
+		{
+			return AutoInvoice == 0;
+		}
 
 		public static Payer GetByClientCode(uint clientCode)
 		{

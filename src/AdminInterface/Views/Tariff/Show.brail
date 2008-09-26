@@ -1,0 +1,22 @@
+﻿<table class="DataTable">
+	<tr>
+		<th>Стоимость</th>
+		<th>Регион</th>
+		<th>Подчинение</th>
+	</tr>
+	<% i = 0 %>
+	<% for tariff in tariffs: %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			${tariff.Pay}
+		</td>
+		<td>
+			${tariff.Region.Name}
+		</td>
+		<td>
+			${BindingHelper.GetDescription(tariff.IncludeType)}
+		</td>
+	</tr>
+	<% i++ %>
+	<% end %>
+</table>

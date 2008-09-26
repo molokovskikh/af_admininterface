@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
-using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
