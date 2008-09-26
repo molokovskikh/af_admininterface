@@ -28,23 +28,34 @@
 		<th>Кредит</th>
 	</tr>
 <% i = 1 %>
+<% creditSum = 0 %>
+<% debitSum = 0 %>
 <% for move in movements: %>
 	<tr>
 		<td>${i}</td>
 		<td>${move.Name}</td>
-		<td>${move.Debit}</td>
-		<td>${move.Credit}</td>
+		<td>${move.Debit if move.Debit > 0}</td>
+		<td>${move.Credit if move.Credit > 0}</td>
 		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
 	</tr>
+<% creditSum += move.Debit %>
+<% debitSum += move.Credit %>
 <% i++ %>
 <% end %>
 </table>
 
 <p>
-По данным ${payer.Reciver.FullName} на ${fromDate.ToShortDateString()} задолженность в пользу 
+По данным ${payer.Reciver.FullName} <br />
+<span style="font-weight:bold">на ${fromDate.ToShortDateString()} задолженность в пользу
+<% if creditSum > debitSum: %>
+	${payer.Reciver.FullName} ${creditSum - debitSum} руб.
+<% else: %>
+	${payer.JuridicalName} ${debitSum - creditSum} руб.
+<% end %>
+</span>
 </p>
 <pre style="float: left; margin-right: 200px">
 От ${payer.Reciver.FullName}

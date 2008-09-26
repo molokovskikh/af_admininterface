@@ -121,7 +121,7 @@
 				Итого:
 			</td>
 			<td>
-				${sum}
+				${payer.ApplyDiscount(sum)}
 			</td>
 		</tr>
 		<tr class="result">
@@ -132,18 +132,24 @@
 				-
 			</td>
 		</tr>
+		<% if payer.ShowDiscount and (sum - payer.ApplyDiscount(sum) > 0) : %>
+		<tr class="result">
+			<td colspan=5 class="result-label">Скидка</td>
+			<td class="result">${sum - payer.ApplyDiscount(sum)} </td>
+		</tr>
+		<% end %>
 		<tr class="result">
 			<td class="result-label" colspan="5">
 				Всего к оплате:
 			</td>
 			<td>
-				${sum}
+				${payer.ApplyDiscount(sum)}
 			</td>
 		</tr>
 	</table>
 	<p>
-		Всего наименований ${bills.Length}, на сумму ${sum}
-		<br />
+		Всего наименований ${bills.Length}, на сумму ${sum}<br />
+		<span style="font-weight:bold">${ViewHelper.InWords(payer.ApplyDiscount(sum))}</span>
 	</p>
 	<div>
 		<p>

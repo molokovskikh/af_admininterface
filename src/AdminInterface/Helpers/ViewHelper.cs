@@ -27,5 +27,10 @@ namespace AdminInterface.Helpers
 		{
 			return message.Replace(Environment.NewLine, "<br>");
 		}
+
+		public static string InWords(float sum)
+		{
+			return TextUtil.FirstUpper(TextUtil.NumToString(sum));
+		}
 	}
 }

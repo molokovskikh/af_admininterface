@@ -51,19 +51,15 @@ namespace AdminInterface.Controllers
 				tab = "info";
 
 			var payer = client.BillingInstance;
-			if (paymentsFrom == null)
-				paymentsFrom = Payment.DefaultBeginPeriod(payer);
-			if (paymentsTo == null)
-				paymentsTo = Payment.DefaultEndPeriod(payer);
 			PropertyBag["tab"] = tab;
-			PropertyBag["paymentsFrom"] = paymentsFrom;
-			PropertyBag["paymentsTo"] = paymentsTo;
+			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
+			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
 			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(clientCode);
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
 			PropertyBag["Tariffs"] = Tariff.FindAll();
-			PropertyBag["Payments"] = Payment.FindBetwen(payer, paymentsFrom.Value, paymentsTo.Value);
+			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;

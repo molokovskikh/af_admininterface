@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
@@ -151,6 +153,66 @@ where cd.firmcode = :ClientCode")
 			{
 				sessionHolder.ReleaseSession(session);
 			}
+		}
+
+		public Payment[] FindBills(Period period)
+		{
+			CheckReciver();
+
+			var bills = Payment.FindChargeOffs(this, period);
+
+			if (bills.Length == 0)
+				throw new EndUserException(String.Format("Не могу сформировать документ т.к. у платильщика {0} не было отчислений", ShortName));
+
+			if (DetailInvoice == 1)
+			{
+				var totalChargeOff = Payment.ChargeOff();
+				totalChargeOff.Sum = bills.Sum(b => b.Sum);
+				totalChargeOff.PayedOn = bills.Max(b => b.PayedOn);
+				totalChargeOff.Name = ChangeServiceNameTo;
+				return new[] {totalChargeOff};
+			}
+			return bills;
+		}
+
+		public void CheckReciver()
+		{
+			if (Reciver == null)
+				throw new EndUserException(
+					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
+					              ShortName));
+		}
+
+		public Payment[] FindPayments(DateTime from, DateTime to)
+		{
+			CheckReciver();
+
+			var payments = Payment.FindBetwen(this, from, to);
+
+			if (payments.Length == 0)
+				throw new EndUserException(
+					String.Format("Не могу сформировать документ т.к. с платильщиком {0} не было взаиморасчетов",
+								  ShortName));
+
+			return payments;
+		}
+
+		public DateTime DefaultBeginPeriod()
+		{
+			if (PayCycle == 0)
+				return DateTime.Today.AddMonths(-2);
+
+			return DateTime.Today.AddMonths(-2 * 3);
+		}
+
+		public DateTime DefaultEndPeriod()
+		{
+			return DateTime.Today;
+		}
+
+		public static void tets()
+		{
+			throw new EndUserException("123");
 		}
 	}
 }

@@ -177,6 +177,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			по <input class="date-input" name="to" type="text" /><input type="button" class="CalendarInput" />
 			<input type="submit" value="Сформировать" />
 		</form>
+		
+		<form action="../Report/contract.rails" method="get" target="_blank">
+			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
+			Договор 
+			<input type="submit" value="Сформировать" />
+		</form>
 	</div>
 	
 	<div>
@@ -184,15 +190,17 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
 			${FormHelper.HiddenField("Instance.PayerID")}
 			${FormHelper.HiddenField("tab", "payments")}
-			<table>
+			<table style="width: 100%">
 			
 		${WriteInputGroupHeader("Опции выставки счета")}
-				
+		
+		
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
 									FormHelper.Select("Instance.AutoInvoice", 
 													  {1:"Автоматически", 0:"По запросу"},
 													  {"value":"Key", "text":"Value"}))}
-		
+													  
+		<% if not Instance.IsManualPayments(): %>
 		
 				<tr>
 					<td style="width: 30%">
@@ -212,7 +220,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", "Категория счета:"), 
 									FormHelper.Select("Instance.DetailInvoice", 
-													  {0:"Стандартный", 1:"Детализированный"},
+													  {0:"Стандартный", 1:"Объединить все услуги"},
 													  {"value":"Key", "text":"Value"}))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ChangeServiceNameTo", "Название услуги:"), 
@@ -225,6 +233,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 													  
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShowDiscount", "Выделять в документах скидку:"), 
 									FormHelper.CheckboxField("Instance.ShowDiscount"))}
+		<% end %>
 		
 		<% if Instance.IsManualPayments(): %>							  
 		${WriteInputGroupHeader("Оплата")}
@@ -236,7 +245,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
 														"Сумма платежа:"), 
 									FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
-		<% end %>
+		<% else: %>
 									
 		${WriteInputGroupHeader("Условия скидки")}
 		
@@ -247,6 +256,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 									FormHelper.Select("Instance.DiscountType", 
 														 BindingHelper.GetDescriptionsDictionary(Instance.DiscountType.GetType()),
 														 BindingHelper.GetDictionaryMapping()))}
+		<% end %>
 														 
 				<tr style="text-align:right">
 					<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
