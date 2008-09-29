@@ -141,7 +141,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<legend>Новый платеж</legend>
 		<form action="AddPayment.rails" method="post">
 			<input type="hidden" name="clientCode" value="${Client.Id}" />
-			<input type="hidden" name="Payment.PayFrom.PayerID" value="${Instance.PayerID}" />
+			<input type="hidden" name="Payment.Payer.PayerID" value="${Instance.PayerID}" />
 			Сумма платежа:<br />			
 			<input name="Payment.Sum" type="text" /><br />
 			Дата платежа:<br />

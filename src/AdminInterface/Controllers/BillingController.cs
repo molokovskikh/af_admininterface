@@ -209,6 +209,8 @@ namespace AdminInterface.Controllers
 
 		public void AddPayment(uint clientCode, [DataBind("Payment")] Payment payment)
 		{
+			payment.PaymentType = PaymentType.Charge;
+			payment.Name = "Оплата";
 			payment.Save();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectToAction("Edit", new {clientCode, tab = "payments"});
