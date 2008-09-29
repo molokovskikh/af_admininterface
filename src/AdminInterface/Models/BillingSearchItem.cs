@@ -42,6 +42,9 @@ namespace AdminInterface.Models
 		[Property]
 		public bool HasRetailSegment { get; set; }
 
+		[Property]
+		public bool ShowPayDate { get; set; }
+
 		public bool IsDebitor()
 		{
 			return DateTime.Now - PayDate > TimeSpan.FromDays(1);
@@ -141,6 +144,7 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
         max(cd.firmcode) as {{BillingSearchItem.LastRegistredClientId}},
         sum(if(cd.FirmStatus = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
         sum(if(cd.FirmStatus = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
+		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r

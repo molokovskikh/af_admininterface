@@ -2,6 +2,7 @@
 using System.Globalization;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Billing
@@ -102,7 +103,7 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Payments", Schema = "Billing")]
 	public class Payment : ActiveRecordBase<Payment>
 	{
-		protected Payment()
+		public Payment()
 		{}
 
 		[Property] 
@@ -179,6 +180,29 @@ namespace AdminInterface.Models.Billing
 		public static Payment Charge()
 		{
 			return new Payment { PaymentType = PaymentType.ChargeOff, Name = "Оплата"};
+		}
+
+		public static float CreditOn(Payer payer, DateTime on)
+		{
+			return SumFor(on, payer, PaymentType.Charge);
+		}
+
+		private static float SumFor(DateTime on, Payer payer, PaymentType paymentType)
+		{
+			var val = ArHelper.WithSession(session => session.CreateQuery(@"
+select sum(p.Sum)
+from Payment as p 
+where p.PayedOn < :on and p.Payer = :payer and p.PaymentType = :paymentType")
+			                                               	.SetParameter("on", on)
+			                                               	.SetParameter("payer", payer)
+			                                               	.SetParameter("paymentType", paymentType)
+			                                               	.UniqueResult());
+			return Convert.ToSingle(val);
+		}
+
+		public static float DebitOn(Payer payer, DateTime on)
+		{
+			return SumFor(on, payer, PaymentType.ChargeOff);
 		}
 	}
 }

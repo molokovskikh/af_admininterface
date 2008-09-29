@@ -214,5 +214,15 @@ where cd.firmcode = :ClientCode")
 		{
 			throw new EndUserException("123");
 		}
+
+		public float DebitOn(DateTime on)
+		{
+			return Payment.DebitOn(this, on);
+		}
+
+		public float CreditOn(DateTime on)
+		{
+			return Payment.CreditOn(this, on);
+		}
 	}
 }

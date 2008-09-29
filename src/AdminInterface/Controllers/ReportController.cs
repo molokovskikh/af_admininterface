@@ -60,8 +60,11 @@ namespace AdminInterface.Controllers
 		{
 			var payer = Payer.Find(payerId);
 			PropertyBag["payer"] = payer;
+			PropertyBag["credit"] = payer.CreditOn(from);
+			PropertyBag["debit"] = payer.DebitOn(from);
 			PropertyBag["movements"] = payer.FindPayments(from, to);
 			PropertyBag["fromDate"] = from;
+			PropertyBag["toDate"] = to;
 		}
 		
 		public void Contract(uint payerId)
