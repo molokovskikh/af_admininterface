@@ -43,7 +43,7 @@
 <% for move in movements: %>
 	<tr>
 		<td>${i}</td>
-		<td>${move.Name}</td>
+		<td>${move.Name} (${move.PayedOn.ToShortDateString()})</td>
 		<td>${move.Debit if move.Debit > 0}</td>
 		<td>${move.Credit if move.Credit > 0}</td>
 		<td></td>
@@ -65,6 +65,8 @@
 		<td></td>
 		<td></td>
 	</tr>
+<% debitSum = debit + debitSum %>
+<% creditSum = credit + creditSum %>
 	<tr>
 		<td>${i + 2}</td>
 		<td>Сальдо на ${toDate.ToShortDateString()}</td>

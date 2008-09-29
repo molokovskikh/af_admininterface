@@ -71,85 +71,49 @@
 	</p>
 	<table>
 		<tr>
-			<th>
-				№
-			</th>
-			<th>
-				Наименование товара
-			</th>
-			<th>
-				Удиница измерения
-			</th>
-			<th>
-				Количество
-			</th>
-			<th>
-				Цена
-			</th>
-			<th>
-				Сумма
-			</th>
+			<th>№</th>
+			<th>Наименование товара</th>
+			<th>Удиница измерения</th>
+			<th>Количество</th>
+			<th>Цена</th>
+			<% if payer.ShowDiscount: %>
+			<th>Скидка</th>
+			<% end %>
+			<th>Сумма</th>
 		</tr>
 		<% i = 1 %>
-		<% sum = 0 %>
 		<% for bill in bills: %>
 		<tr>
-			<td>
-				${i}
-			</td>
-			<td>
-				${bill.Name}
-			</td>
-			<td>
-				услуга
-			</td>
-			<td>
-				1
-			</td>
-			<td>
-				${bill.Sum}
-			</td>
-			<td>
-				${bill.Sum}
-			</td>
+			<td>${i}</td>
+			<td>${bill.Name}</td>
+			<td>услуга</td>
+			<td>1</td>
+			<% if payer.ShowDiscount: %>
+			<td>${bill.Sum}</td>
+			<td>${bill.Discount if bill.Discount > 0}</td>
+			<% else: %>
+			<td>${bill.Total}</td>
+			<% end %>
+			<td>${bill.Total}</td>
 		</tr>
-		<% sum += bill.Sum %>
 		<% i++ %>
 		<% end %>
 		<tr class="result">
-			<td class="result-label" colspan="5">
-				Итого:
-			</td>
-			<td>
-				${payer.ApplyDiscount(sum)}
-			</td>
+			<td class="result-label" colspan="5">Итого:</td>
+			<td>${total}</td>
 		</tr>
 		<tr class="result">
-			<td class="result-label" colspan="5">
-				Без налога (НДС):
-			</td>
-			<td>
-				-
-			</td>
+			<td class="result-label" colspan="5">Без налога (НДС):</td>
+			<td>-</td>
 		</tr>
-		<% if payer.ShowDiscount and (sum - payer.ApplyDiscount(sum) > 0) : %>
 		<tr class="result">
-			<td colspan=5 class="result-label">Скидка</td>
-			<td class="result">${sum - payer.ApplyDiscount(sum)} </td>
-		</tr>
-		<% end %>
-		<tr class="result">
-			<td class="result-label" colspan="5">
-				Всего к оплате:
-			</td>
-			<td>
-				${payer.ApplyDiscount(sum)}
-			</td>
+			<td class="result-label" colspan="5">Всего к оплате:</td>
+			<td>${total}</td>
 		</tr>
 	</table>
 	<p>
-		Всего наименований ${bills.Length}, на сумму ${sum}<br />
-		<span style="font-weight:bold">${ViewHelper.InWords(payer.ApplyDiscount(sum))}</span>
+		Всего наименований ${bills.Length}, на сумму ${total}<br />
+		<span style="font-weight:bold">${ViewHelper.InWords(total)}</span>
 	</p>
 	<div>
 		<p>

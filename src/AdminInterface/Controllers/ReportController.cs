@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.ComponentModel;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -41,7 +42,9 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(payerId);
 			PropertyBag["payer"] = payer;
 			PropertyBag["fromDate"] = DateTime.Now;
-			PropertyBag["bills"] = payer.FindBills(period);
+			var bills = payer.FindBills(period);
+			PropertyBag["bills"] = bills;
+			PropertyBag["total"] = bills.Sum(p => p.Total);
 			PropertyBag["Number"] = 1;
 		}
 
@@ -51,7 +54,9 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(payerId);
 			PropertyBag["payer"] = payer;
 			PropertyBag["fromDate"] = DateTime.Now;
-			PropertyBag["acts"] = payer.FindBills(period);
+			var bills = payer.FindBills(period);
+			PropertyBag["acts"] = bills;
+			PropertyBag["total"] = bills.Sum(p => p.Total);
 			PropertyBag["Number"] = 1;
 		}
 

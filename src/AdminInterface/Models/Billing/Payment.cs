@@ -52,45 +52,51 @@ namespace AdminInterface.Models.Billing
 
 		public static DateTime GetPeriodEnd(this Period period)
 		{
-			var calendar = CultureInfo.GetCultureInfo("ru-Ru").Calendar;
-			var year = DateTime.Today.Year;
 			switch (period)
 			{
 				case Period.January:
-					return new DateTime(year, 1, calendar.GetDaysInMonth(year, 1));
+					return 1.MonthEnd();
 				case Period.February:
-					return new DateTime(year, 2, calendar.GetDaysInMonth(year, 2));
+					return 2.MonthEnd();
 				case Period.March:
-					return new DateTime(year, 3, calendar.GetDaysInMonth(year, 3));
+					return 3.MonthEnd();
 				case Period.May:
-					return new DateTime(year, 4, calendar.GetDaysInMonth(year, 4));
+					return 4.MonthEnd();
 				case Period.April:
-					return new DateTime(year, 5, calendar.GetDaysInMonth(year, 5));
+					return 5.MonthEnd();
 				case Period.June:
-					return new DateTime(year, 6, calendar.GetDaysInMonth(year, 6));
+					return 6.MonthEnd();
 				case Period.July:
-					return new DateTime(year, 7, calendar.GetDaysInMonth(year, 7));
+					return 7.MonthEnd();
 				case Period.August:
-					return new DateTime(year, 8, calendar.GetDaysInMonth(year, 8));
+					return 8.MonthEnd();
 				case Period.September:
-					return new DateTime(year, 9, calendar.GetDaysInMonth(year, 9));
+					return 9.MonthEnd();
 				case Period.November:
-					return new DateTime(year, 10, calendar.GetDaysInMonth(year, 10));
+					return 10.MonthEnd();
 				case Period.October:
-					return new DateTime(year, 11, calendar.GetDaysInMonth(year, 11));
+					return 11.MonthEnd();
 				case Period.December:
-					return new DateTime(year, 12, calendar.GetDaysInMonth(year, 12));
+					return 12.MonthEnd();
 				case Period.FirstQuarter:
-					return new DateTime(year, 3, calendar.GetDaysInMonth(year, 1));
+					return 3.MonthEnd();
 				case Period.SecondQuarter:
-					return new DateTime(year, 6, calendar.GetDaysInMonth(year, 4));
+					return 6.MonthEnd();
 				case Period.ThirdQuarter:
-					return new DateTime(year, 9, calendar.GetDaysInMonth(year, 7));
+					return 9.MonthEnd();
 				case Period.FourthQuarter:
-					return new DateTime(year, 12, calendar.GetDaysInMonth(year, 10));
+					return 12.MonthEnd();
 				default:
 					throw new NotImplementedException();
 			}
+		}
+
+		public static DateTime MonthEnd(this int month)
+		{
+			var calendar = CultureInfo.GetCultureInfo("ru-Ru").Calendar;
+			var year = DateTime.Today.Year;
+
+			return new DateTime(year, 9, calendar.GetDaysInMonth(year, 9));
 		}
 	}
 
@@ -121,8 +127,16 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public float Sum { get; set; }
 
+		[Property]
+		public float Discount { get; set; }
+
 		[BelongsTo(Column = "PayerId")]
 		public Payer Payer { get; set; }
+
+		public float Total
+		{
+			get { return Sum - Discount; }
+		}
 
 		public static Payment[] FindBetwen(Payer payer, DateTime form, DateTime to)
 		{
@@ -157,7 +171,7 @@ namespace AdminInterface.Models.Billing
 			get
 			{
 				if (PaymentType == PaymentType.ChargeOff)
-					return Sum;
+					return Total;
 				return 0;
 			}
 		}
@@ -167,7 +181,7 @@ namespace AdminInterface.Models.Billing
 			get
 			{
 				if (PaymentType == PaymentType.Charge)
-					return Sum;
+					return Total;
 				return 0;
 			}
 		}
