@@ -6,6 +6,7 @@
 <head>
     <title></title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+    <title>Регистрационная карта</title>
 </head>
 <body>
     <form id="Form1" method="post" runat="server">

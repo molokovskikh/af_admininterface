@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using AdminInterface.Helpers;
@@ -40,7 +41,8 @@ namespace AdminInterface.Models.Security
 
 		public static Administrator GetByName(string name)
 		{
-			return ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
+			return ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName",
+			                                                                 name.Replace("ANALIT\\", "")));
 		}
 
 		public static Administrator GetById(uint id)
@@ -186,12 +188,28 @@ namespace AdminInterface.Models.Security
 		{
 			var isLoginExists = ADHelper.IsLoginExists(UserName);
 
+			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
 			if (isLoginExists)
-				return false;
+			{
+				var entry = ADHelper.FindDirectoryEntry(UserName);
 
-#if !DEBUG
+				var member = entry.Properties["memberOf"]
+					.OfType<string>()
+					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
+
+				if (String.IsNullOrEmpty(member))
+				{
+					var adminGroup = new DirectoryEntry(adminGroupPath);
+					adminGroup.Invoke("Add", entry.Path);
+					adminGroup.CommitChanges();
+					entry.CommitChanges();
+				}
+				return false;
+			}
+//#if !DEBUG
 			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
 			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var adminGroup1 = new DirectoryEntry(adminGroupPath);
 			var user = root.Children.Add("CN=" + UserName, "user");
 			user.Properties["samAccountName"].Value = UserName;
 			if (!String.IsNullOrEmpty(ManagerName.Trim()))
@@ -200,10 +218,15 @@ namespace AdminInterface.Models.Security
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
 			user.CommitChanges();
+
 			userGroup.Invoke("Add", user.Path);
 			userGroup.CommitChanges();
+
+			adminGroup1.Invoke("Add", user.Path);
+			adminGroup1.CommitChanges();
+
 			root.CommitChanges();
-#endif
+//#endif
 			return true;
 		}
 

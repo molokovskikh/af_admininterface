@@ -78,7 +78,7 @@ namespace AdminInterface.Helpers
 			return hours;
 		}
 
-		private static DirectoryEntry FindDirectoryEntry(string login)
+		public static DirectoryEntry FindDirectoryEntry(string login)
 		{
 			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{

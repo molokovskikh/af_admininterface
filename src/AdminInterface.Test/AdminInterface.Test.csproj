@@ -130,6 +130,7 @@
     <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
+    <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

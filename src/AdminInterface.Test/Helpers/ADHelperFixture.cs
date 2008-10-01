@@ -1,6 +1,7 @@
 ﻿using System;
 using System.DirectoryServices;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using NUnit.Framework;
 using System.Collections.Generic;
 using NUnit.Framework.SyntaxHelpers;
@@ -42,6 +43,24 @@ namespace AdminInterface.Test.Helpers
 			}
 		}
 
+
+		private void LogAll(IEnumerable<DirectoryEntry> entries)
+		{
+			foreach (var entry in entries)
+				Log(entry);
+		}
+
+		private static IEnumerable<DirectoryEntry> FindAll(string login)
+		{
+			using (var searcher = new DirectorySearcher(String.Format(@"(name={0})", login)))
+			{
+				foreach(SearchResult result in searcher.FindAll())
+				{
+					yield return result.GetDirectoryEntry();
+				}
+			}
+		}
+
 		private static DateTime CreatedAt(string login)
 		{
 			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
@@ -51,10 +70,42 @@ namespace AdminInterface.Test.Helpers
 		}
 
 		[Test]
-		public void Show()
+		public void t()
 		{
-			var entry = FindDirectoryEntry("Kvasov");
-			Log(entry);
+			Log(FindDirectoryEntry("kvasov"));
+		}
+
+		[Test]
+		public void If_login_exists_but_not_belog_to_admin_group_than_add_user_to_admin_group()
+		{
+			using (var user = new TestADUser())
+			{
+				var adm = new Administrator { UserName = user.Login, ManagerName = "test" };
+				adm.CreateUserInAd("123456789");
+				Assert.That(TestADUser.IsMemberOf(adm.UserName,
+				                                  new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
+				            Is.True);
+			}
+		}
+
+		[Test]
+		public void Create_login_if_not_exists()
+		{
+			var login = "test" + new Random().Next();
+			try
+			{
+				var adm = new Administrator { UserName = login, ManagerName = "test" };
+				adm.CreateUserInAd("123456789");
+				Assert.That(TestADUser.IsLoginExists(login));
+				Assert.That(TestADUser.IsMemberOf(login,
+				                                  new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
+							Is.True);
+			}
+			catch (Exception)
+			{
+				TestADUser.Delete(login);
+				throw;
+			}
 		}
 
 		[Test]
@@ -143,6 +194,18 @@ namespace AdminInterface.Test.Helpers
 			entry.CommitChanges();
 		}
 
+
+		public static bool IsMemberOf(string login, DirectoryEntry entry)
+		{
+			var loginEntry = FindDirectoryEntry(login);
+			foreach (var property in loginEntry.Properties["memberOf"])
+			{
+				if (property.ToString() == entry.Path.Replace("LDAP://", ""))
+					return true;
+			}
+			return false;
+		}
+
 		public TestADUser() : this("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net")
 		{}
 
@@ -175,5 +238,6 @@ namespace AdminInterface.Test.Helpers
 			if (IsLoginExists(Login))
 				throw new Exception("тестовая учетная запись {0} не удалена");
 		}
+
 	}
 }

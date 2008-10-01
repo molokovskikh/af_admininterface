@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Web.UI;
-using System.Web.UI.WebControls;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 
@@ -12,22 +11,10 @@ namespace AdminInterface
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
 
-			if (!Convert.ToBoolean(Session["IsLoginCreate"]))
-			{
-				var label = new Label
-				            	{
-				            		Text = "Учетная запись в ActiveDirectory уже существует",
-				            	};
-				Controls.Clear();
-				Controls.Add(label);
-			}
-			else
-			{
-				LBShortName.Text = Session["FIO"].ToString();
-				LBPassword.Text = Session["Password"].ToString();
-				LBLogin.Text = Session["Login"].ToString();
-				RegDate.Text = DateTime.Now.ToString();
-			}
+			LBShortName.Text = Session["FIO"].ToString();
+			LBPassword.Text = Session["Password"].ToString();
+			LBLogin.Text = Session["Login"].ToString();
+			RegDate.Text = DateTime.Now.ToString();
 		}
 	}
 }

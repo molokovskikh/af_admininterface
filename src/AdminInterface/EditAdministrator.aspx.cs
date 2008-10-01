@@ -88,8 +88,11 @@ public partial class EditAdministrator : Page
 		if (admin.Id == 0)
 		{
 			admin.Save();
-			CreateUserInAD(admin);
-			Response.Redirect("OfficeUserRegistrationReport.aspx");
+			var isLoginCreated = CreateUserInAD(admin);
+			if (!isLoginCreated)
+				Response.Redirect("ViewAdministrators.aspx");
+			else			
+				Response.Redirect("OfficeUserRegistrationReport.aspx");
 		}
 		else
 		{
@@ -105,15 +108,18 @@ public partial class EditAdministrator : Page
 		        select userPermission).FirstOrDefault();
 	}
 
-	private void CreateUserInAD(Administrator administrator)
+	private bool CreateUserInAD(Administrator administrator)
 	{
 		var password = Func.GeneratePassword();
-		var isLoginExists = administrator.CreateUserInAd(password);
+		var isLoginCreated = administrator.CreateUserInAd(password);
 
-		Session["IsLoginCreate"] = !isLoginExists;
+		if (!isLoginCreated)
+			return false;
+
 		Session["Password"] = password;
 		Session["FIO"] = administrator.ManagerName;
 		Session["Login"] = administrator.UserName;
+		return true;
 	}
 
 	protected void Cancel_Click(object sender, EventArgs e)
