@@ -17,10 +17,9 @@
 		<th>Цена</th>
 		<th>Сумма</th>
 	</tr>
-<% i = 1 %>
-<% for act in acts: %>
+<% for i, act in enumerate(acts): %>
 	<tr>
-		<td>${i}</td>
+		<td>${i + 1}</td>
 		<td>${act.Name}</td>
 		<td>услуга</td>
 		<td>1</td>
@@ -32,7 +31,6 @@
 		<% end %>
 		<td>${act.Total}</td>
 	</tr>
-<% i++ %>
 <% end %>
 	<tr class="result">
 		<td colspan=5 class="result-label">Итого:</td>

@@ -1,4 +1,5 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% import Boo.Lang.Builtins %>
+<% component CaptureFor, {"id" : "Title"}: %>
 	Счет
 <% end %>
 <div style="float: left; display: block;">
@@ -81,10 +82,9 @@
 			<% end %>
 			<th>Сумма</th>
 		</tr>
-		<% i = 1 %>
-		<% for bill in bills: %>
+		<% for i, bill in enumerate(bills): %>
 		<tr>
-			<td>${i}</td>
+			<td>${i + 1}</td>
 			<td>${bill.Name}</td>
 			<td>услуга</td>
 			<td>1</td>
@@ -96,7 +96,6 @@
 			<% end %>
 			<td>${bill.Total}</td>
 		</tr>
-		<% i++ %>
 		<% end %>
 		<tr class="result">
 			<td class="result-label" colspan="5">Итого:</td>
