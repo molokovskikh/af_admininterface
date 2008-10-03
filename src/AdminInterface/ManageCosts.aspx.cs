@@ -187,6 +187,14 @@ WHERE RowID = ?Id
 			}
 		}
 
+		public bool CanDelete(object baseCost)
+		{
+			if (Convert.ToBoolean(baseCost))
+				return false;
+
+			return true;
+		}
+
 		public string IsChecked(bool Checked)
 		{
 		    if (Checked)
@@ -386,5 +394,94 @@ WHERE PriceCode = ?PriceCode
                 MyCn.Close();
             }
         }
+
+		protected void CostsDG_DeleteCommand(object source, DataGridCommandEventArgs e)
+		{
+			var costCode = Convert.ToInt32(e.CommandArgument);
+			using (var connection = MyCn)
+			{
+				connection.Open();
+				var transaction = connection.BeginTransaction(IsolationLevel.RepeatableRead);
+				try
+				{
+					var selectCurrentCost = @"
+select pd.CostType, base.CostCode, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId
+from usersettings.PricesCosts pc
+	join usersettings.PricesData pd on pd.PriceCode = pc.PriceCode
+	join usersettings.pricescosts base on base.PriceCode = pc.PriceCode
+		join usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+			join Farm.FormRules f on f.Id = pi.FormRuleId
+			join Farm.sources s on s.Id = pi.SourceId
+where pc.CostCode = ?CostCode and base.BaseCost = 1;";
+
+					var command = new MySqlCommand(selectCurrentCost, connection, transaction);
+					command.Parameters.AddWithValue("?CostCode", costCode);
+					uint costType;
+					uint baseCost;
+					uint sourceId;
+					uint ruleId;
+					uint itemId;
+					using (var reader = command.ExecuteReader())
+					{
+						reader.Read();
+						costType = reader.GetUInt32("CostType");
+						baseCost = reader.GetUInt32("CostCode");
+						sourceId = reader.GetUInt32("SourceId");
+						ruleId = reader.GetUInt32("RuleId");
+						itemId = reader.GetUInt32("ItemId");
+					}
+
+					var deleteCommandText = @"
+update usersettings.intersection
+set CostCode = ?BaseCostCode
+where CostCode = ?CostCode;";
+
+					if (costType == 1)
+					{
+						deleteCommandText += @"
+delete from Farm.FormRules
+where Id = ?RuleId;
+
+delete from Farm.sources
+where Id = ?SourceId;
+
+delete from usersettings.PriceItems
+where Id = ?ItemId;
+
+delete Farm.Core0
+from Farm.Core0
+  join Farm.CoreCosts on Farm.Core0.Id = Farm.CoreCosts.Core_Id
+where Farm.CoreCosts.PC_CostCode = ?CostCode;";
+					}
+
+					deleteCommandText += @"
+delete from Farm.CoreCosts
+where PC_CostCode = ?CostCode;
+
+delete from Orders.Leaders
+where CostCode = ?CostCode or LeaderCostCode = ?CostCode;
+
+delete from Farm.CostFormRules
+where CostCode = ?CostCode;
+
+delete from usersettings.pricescosts where costcode = ?costcode;";
+					command.CommandText = deleteCommandText;
+					command.Parameters.AddWithValue("?BaseCostCode", baseCost);
+					command.Parameters.AddWithValue("?SourceId", sourceId);
+					command.Parameters.AddWithValue("?RuleId", ruleId);
+					command.Parameters.AddWithValue("?ItemId", itemId);
+					command.ExecuteNonQuery();
+
+					transaction.Commit();
+				}
+				catch (Exception)
+				{
+					if (transaction != null)
+						transaction.Rollback();
+					throw;
+				}
+				Response.Redirect("ManageCosts.aspx?pc=" + PriceCode);
+			}
+		}
 	}
 }
