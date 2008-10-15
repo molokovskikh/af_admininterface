@@ -103,7 +103,6 @@ OutputSubView("Search")
 				<% if searchResult.ShowPayDate: %>
 				<td style="width: 1%">
 					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}" />
-					Счет выставляется автоматически
 				</td>
 				<td>
 					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}" />

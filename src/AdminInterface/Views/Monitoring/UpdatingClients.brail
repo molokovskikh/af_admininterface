@@ -1,0 +1,23 @@
+﻿<% import Boo.Lang.Builtins %>
+<table class="DataTable">
+<% if statuses.Length == 0: %>
+	<tr>
+		<td class="EmptyData">Нет обновляющихся клиентов</td>
+	</tr>
+<% else: %>
+	<tr>
+		<th>Код клиента</th>
+		<th>Название</th>
+		<th>Метод</th>
+		<th>Дата начала</th>
+	</tr>
+<% for i, status in enumerate(statuses): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${status.ClientCode}</td>
+		<td>${status.Client.ShortName}</td>
+		<td>${status.MethodName}</td>
+		<td>${status.StartTime}</td>
+	</tr>
+<% end %>
+<% end %>
+</table>

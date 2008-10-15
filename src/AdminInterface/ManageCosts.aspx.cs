@@ -438,7 +438,7 @@ where CostCode = ?CostCode;";
 
 					if (costType == 1)
 					{
-						deleteCommandText += @"
+							deleteCommandText += @"
 delete from Farm.FormRules
 where Id = ?RuleId;
 

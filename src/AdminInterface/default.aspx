@@ -14,6 +14,12 @@
 			font-size: 9pt; 
 			font-family:Verdana;
 		}
+		
+		a
+		{
+			font-family: Verdana, Arial, Helvetica, sans-serif;
+			font-size: small;
+		}
 	</style>
 </head>
 <body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
@@ -23,33 +29,46 @@
 				<td valign="top" align="left" width="200" style="height: 427px">
 					<p>
 						<asp:HyperLink ID="RegisterHL" runat="server" NavigateUrl="register.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Регистрация клиентов</font></asp:HyperLink></p>
+							Регистрация клиентов
+						</asp:HyperLink>
+					</p>
 					<p>
 						<asp:HyperLink ID="CloneHL" runat="server" NavigateUrl="CopySynonym.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Клонирование</font></asp:HyperLink></p>
+							Клонирование
+						</asp:HyperLink>
+					</p>
 					<p>
-						<asp:HyperLink ID="ClInfHL" runat="server" NavigateUrl="searchc.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Информация о клиентах</font></asp:HyperLink></p>
+						<asp:HyperLink ID="ClInfHL" runat="server" NavigateUrl="searchc.aspx">Информация о клиентах</font></asp:HyperLink>
+					</p>
 					<p>
 						<asp:HyperLink ID="ShowStatHL" runat="server" NavigateUrl="statcont.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Статистика обращений</font></asp:HyperLink></p>
+							Статистика обращений
+						</asp:HyperLink>
+					</p>
 					<p>
 						<asp:HyperLink ID="BillingHL" runat="server" NavigateUrl="~/Billing/Search.rails">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Биллинг</font></asp:HyperLink></p>
+							Биллинг
+						</asp:HyperLink>
+					</p>
 					<p>
 						<asp:HyperLink ID="FTPHL" runat="server" NavigateUrl="docs.aspx">
-								<font size="2" face="Verdana, Arial, Helvetica, sans-serif">Общие документы</font></asp:HyperLink></p>
-					<p>
-						<asp:HyperLink ID="ViewAdministrators" Font-Names="Verdana, Arial, Helvetica, sans-serif"
-							Font-Size="small" runat="server" NavigateUrl="ViewAdministrators.aspx">Региональные администраторы</asp:HyperLink>
+							Общие документы
+						</asp:HyperLink>
 					</p>
 					<p>
-						<asp:HyperLink ID="MonitorUpdates" 
-							Font-Names="Verdana,Arial,Helvetica,sans-serif" Font-Size="Small" 
-							runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</asp:HyperLink>
+						<asp:HyperLink ID="ViewAdministrators" runat="server" NavigateUrl="ViewAdministrators.aspx">
+							Региональные администраторы
+						</asp:HyperLink>
 					</p>
 					<p>
-						<a href="./Tariff/Show.rails">Тарифы</a>
+						<asp:HyperLink ID="MonitorUpdates" runat="server" NavigateUrl="./Logs/ClientRegistrationLog.rails">
+							Мониторинг обновления клиентов
+						</asp:HyperLink>
+					</p>
+					<p>
+						<a href="./Monitoring/UpdatingClients.rails">
+							Обновляющиеся клиенты
+						</a>
 					</p>
 				</td>
 				<td align="center" style="height: 427px">

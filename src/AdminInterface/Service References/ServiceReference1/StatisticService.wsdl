@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msc="http://schemas.microsoft.com/ws/2005/12/wsdl/contract" xmlns:tns="http://tempuri.org/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:wsa10="http://www.w3.org/2005/08/addressing" xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" name="StatisticService" targetNamespace="http://tempuri.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsp:Policy wsu:Id="BasicHttpBinding_IStatisticService_policy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+        <http:BasicAuthentication xmlns:http="http://schemas.microsoft.com/ws/06/2004/policy/http" />
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+  <wsdl:types>
+    <xsd:schema targetNamespace="http://tempuri.org/Imports">
+      <xsd:import schemaLocation="http://emkwork.adc.analit.net/8F24BB48/StatisticService.svc?xsd=xsd0" namespace="http://tempuri.org/" />
+      <xsd:import schemaLocation="http://emkwork.adc.analit.net/8F24BB48/StatisticService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+      <xsd:import schemaLocation="http://emkwork.adc.analit.net/8F24BB48/StatisticService.svc?xsd=xsd2" namespace="http://schemas.datacontract.org/2004/07/Counter" />
+    </xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="IStatisticService_GetUpdateInfo_InputMessage">
+    <wsdl:part name="parameters" element="tns:GetUpdateInfo" />
+  </wsdl:message>
+  <wsdl:message name="IStatisticService_GetUpdateInfo_OutputMessage">
+    <wsdl:part name="parameters" element="tns:GetUpdateInfoResponse" />
+  </wsdl:message>
+  <wsdl:portType name="IStatisticService">
+    <wsdl:operation name="GetUpdateInfo">
+      <wsdl:input wsaw:Action="http://tempuri.org/IStatisticService/GetUpdateInfo" message="tns:IStatisticService_GetUpdateInfo_InputMessage" />
+      <wsdl:output wsaw:Action="http://tempuri.org/IStatisticService/GetUpdateInfoResponse" message="tns:IStatisticService_GetUpdateInfo_OutputMessage" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BasicHttpBinding_IStatisticService" type="tns:IStatisticService">
+    <wsp:PolicyReference URI="#BasicHttpBinding_IStatisticService_policy" />
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetUpdateInfo">
+      <soap:operation soapAction="http://tempuri.org/IStatisticService/GetUpdateInfo" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="StatisticService">
+    <wsdl:port name="BasicHttpBinding_IStatisticService" binding="tns:BasicHttpBinding_IStatisticService">
+      <soap:address location="http://emkwork.adc.analit.net/8F24BB48/StatisticService.svc" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

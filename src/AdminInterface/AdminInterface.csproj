@@ -103,6 +103,12 @@
     </Reference>
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.ServiceModel">
+      <RequiredTargetFramework>3.0</RequiredTargetFramework>
+    </Reference>
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions, Version=3.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -117,6 +123,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controllers\MonitoringConrtoller.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
     <Compile Include="ForAspxInMonorail.Master.cs">
@@ -138,6 +145,7 @@
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\EndUserException.cs" />
+    <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
     <Compile Include="Models\Payer.cs" />
@@ -322,6 +330,11 @@
     <Compile Include="SenderProperties.aspx.designer.cs">
       <DependentUpon>SenderProperties.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Service References\ServiceReference1\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="statcont.aspx.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
@@ -418,9 +431,14 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Service References\ServiceReference1\StatisticService.wsdl" />
+    <None Include="Service References\ServiceReference1\StatisticService.xsd" />
+    <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
+    <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Info.brail" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Layouts\Report.brail" />
+    <None Include="Views\Monitoring\UpdatingClients.brail" />
     <None Include="Views\Report\Act.brail" />
     <None Include="Views\Report\Bill.brail" />
     <None Include="Views\Report\Contract.brail" />
@@ -454,6 +472,13 @@
     <Content Include="Rescue\NotAuthorized.aspx" />
     <Content Include="SenderProperties.aspx" />
     <None Include="Views\Billing\Payments.brail" />
+    <None Include="Service References\ServiceReference1\StatisticService.disco" />
+    <None Include="Service References\ServiceReference1\configuration91.svcinfo" />
+    <None Include="Service References\ServiceReference1\configuration.svcinfo" />
+    <None Include="Service References\ServiceReference1\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
@@ -484,6 +509,12 @@
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
       <Name>Common.Web.Ui</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\ServiceReference1\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />
