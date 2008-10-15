@@ -21,6 +21,16 @@ namespace AdminInterface.Controllers
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
+		//Скорбная песнь:
+		/*
+		 * ARбигдер в монорельсе, делает следующиее:
+		 * сначала получает объект из базы затем проходит по всему набору полей и заполняет тем что было в запросе
+		 * но тут возникает засада: коллекции которых нет в запросе это может значить что их вообще не нужно бигдить или то 
+		 * что они должны стать пустые, что бы решить эту проблему есть свойство Expect все коллекции которые в нем перечислены будут
+		 * обнулены перед биндингом, но тут есть новая засада если исходный объект это коллекция то мы в беде 
+		 * потому что нужно указывать индекс для каждого элемента коллекции от сюда и хак
+		*/
+		private const string _hackForBinder = "users.0.AssignedPermissions, users.1.AssignedPermissions, users.2.AssignedPermissions, users.3.AssignedPermissions, users.4.AssignedPermissions, users.5.AssignedPermissions, users.6.AssignedPermissions, users.7.AssignedPermissions, users.8.AssignedPermissions, users.9.AssignedPermissions, users.10.AssignedPermissions";
 		public override void PreSendView(object view)
 		{
 			if (view is IControllerAware)
@@ -224,9 +234,13 @@ namespace AdminInterface.Controllers
 			PropertyBag["Permissions"] = UserPermission.FindPermissionsAvailableFor(client);
 		}
 
-		public void UpdateUsersPermissions(uint ClientCode, [ARDataBind("users", AutoLoad = AutoLoadBehavior.Always)] User[] users)
+		public void UpdateUsersPermissions(uint ClientCode,
+										   [ARDataBind("users", Expect = _hackForBinder, AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] User[] users)
 		{
+			
 			var client = Client.Find(ClientCode);
+
+			SecurityContext.Administrator.CheckClientPermission(client);
 
 			using (new TransactionScope())
 			{

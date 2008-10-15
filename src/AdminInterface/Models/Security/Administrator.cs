@@ -206,7 +206,6 @@ namespace AdminInterface.Models.Security
 				}
 				return false;
 			}
-//#if !DEBUG
 			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
 			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
 			var adminGroup1 = new DirectoryEntry(adminGroupPath);
@@ -226,7 +225,6 @@ namespace AdminInterface.Models.Security
 			adminGroup1.CommitChanges();
 
 			root.CommitChanges();
-//#endif
 			return true;
 		}
 
