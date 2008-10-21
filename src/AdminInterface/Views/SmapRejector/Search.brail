@@ -3,7 +3,7 @@
 	Отклоненные сообщения
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : {"Отклоненные сообщения" : ""}} %>
+<% component Bubble, {"bredcrumbs" : [("Отклоненные сообщения", "")]} %>
 
 <div class="CenterBlock FilterBlock">
 

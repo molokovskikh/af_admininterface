@@ -3,7 +3,7 @@
 	Правила обратного звонка
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : {"Правила обратного звонка" : ""}} %>
+<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
 
 <table class="DataTable">
 <% if callbacks.Length == 0: %>
