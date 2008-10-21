@@ -1,0 +1,106 @@
+﻿<% import Boo.Lang.Builtins %>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Отклоненные сообщения
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : {"Отклоненные сообщения" : ""}} %>
+
+<div class="CenterBlock FilterBlock">
+
+	<div class="CornerHolder">
+		<div class="TopLeftCorner">
+		</div>
+		<div class="TopRightCorner">
+		</div>
+	</div>
+	
+	<h3>
+		Отклоненные сообщения
+	</h3>
+	<form action="search.rails" method="get">
+		${FormHelper.HiddenField("fromDate", fromDate.ToShortDateString())}
+		${FormHelper.HiddenField("toDate", toDate.ToShortDateString())}
+		<table class="CenterBlock" style="text-align:center;">
+			<tr>
+				<td colspan="2">
+					Выберете период или введите текст для поиска по отправителю или теме
+				</td>
+			</tr>
+			<tr>
+				<td colspan=2> <input type=text name="searchText" style="width: 100%" value="${searchText}" /></td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					Отклоненные за период
+				</td>
+			</tr>
+			<tr>
+				<td>С:</td>
+				<td>По:</td>
+			</tr>
+			<tr>
+				<td><div style="border: none;" id="fromDateCalendarHolder"></div></td>
+				<td><div style="border: none;" id="toDateCalendarHolder"></div></td>
+			</tr>
+			<tr>
+				<td style="text-align:right;" colspan="2">
+					${FormHelper.Submit("Показать")}
+				</td>
+			</tr>
+		</table>
+	</form>	
+	
+	<div class="CornerHolder">
+		<div class="BottomLeftCorner">
+		</div>
+		<div class="BottomRightCorner">
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript"> 
+  Calendar.setup({
+	date: "${fromDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "fromDateCalendarHolder",
+    flatCallback: function (cal) {
+		$("fromDate").value = cal.date.print("%d.%m.%Y");
+    },
+    showOthers: true
+  });
+  
+  Calendar.setup({
+	date: "${toDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "toDateCalendarHolder",
+    flatCallback: function (cal) {
+		$("toDate").value = cal.date.print("%d.%m.%Y");
+    },
+    showOthers: true
+  });
+</script>
+
+<table class="DataTable">
+<% if rejects.Length == 0: %>
+	<tr>
+		<td class="EmptyData">Нет отклоненных сообщений</td>
+	</tr>
+<% else: %>
+  <tr>
+    <th>Smtp ID</th>
+    <th>Дата</th>
+    <th>Тема</th>
+    <th>Отправитель</th>
+    <th>Причина</th>
+  </tr>
+  <% for i, reject in enumerate(rejects): %>
+  <tr class="${ViewHelper.GetRowStyle(i)}">
+    <td>${reject.SmtpId}</td>
+    <td>${reject.LogTime}</td>
+    <td>${reject.Subject}</td>
+    <td>${reject.From}</td>
+    <td>${ViewHelper.FormatMessage(reject.Comment)}</td>
+  </tr>
+  <% end %>
+<% end %>
+</table>

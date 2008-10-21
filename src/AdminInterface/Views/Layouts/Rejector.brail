@@ -1,0 +1,47 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<title>${?Title}</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<script type="text/javascript" src="../JavaScript/calendar.js"></script>
+	<script type="text/javascript" src="../JavaScript/calendar-ru_win_.js"></script>
+	<script type="text/javascript" src="../JavaScript/calendar-setup.js"></script>
+	<script type="text/javascript" src="../JavaScript/prototype.js"/></script>
+	<script type="text/javascript" src="../JavaScript/date-ru-RU.js"/></script>
+	<script type="text/javascript" src="../JavaScript/Main.js"></script>
+	<script type="text/javascript" src="../JavaScript/Search.js"></script>
+	<script type="text/javascript" src="../JavaScript/validation.js"></script>
+	
+	<link href="../Css/calendar-blue.css" type="text/css" rel="stylesheet" />
+	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Billing.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Table.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Block.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/ValidationStyles.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Highlight.css" type="text/css" rel="stylesheet" />
+	<link href="../Css/Common.css" type="text/css" rel="stylesheet" />
+</head>
+<body>
+	<% if IsDefined("bredcrumbs"): %>
+	<div class="Navigation">
+		<ul id="breadcrumb">
+			<li>
+				<a title="Административный интерфейс" href="../default.aspx">
+					<img class="home" src="../images/home.png" alt="Административный интерфейс" />
+				</a>
+			</li>
+			<% for crumb in bredcrumbs: %>
+			<li>
+				<% if crumb.Value != "": %>
+				<a href="${crumb.Value}">${crumb.Key}</a>
+				<% else: %>
+				${crumb.Key}
+				<% end %>
+			</li>
+			<% end %>
+		</ul>
+	</div>
+	<% end %>
+	${ChildOutput}
+</body>
+</html>

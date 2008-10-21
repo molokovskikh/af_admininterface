@@ -123,8 +123,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Bubble.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
     <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
     <Compile Include="ForAspxInMonorail.Master.cs">
       <DependentUpon>ForAspxInMonorail.Master</DependentUpon>
@@ -145,6 +147,7 @@
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\EndUserException.cs" />
+    <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
@@ -443,6 +446,7 @@
     <None Include="Views\Report\Bill.brail" />
     <None Include="Views\Report\Contract.brail" />
     <None Include="Views\Report\RevisionAct.brail" />
+    <None Include="Views\SmapRejector\Search.brail" />
     <None Include="Views\Tariff\Show.brail" />
     <None Include="Views\Client\ShowUsersPermissions.brail" />
     <None Include="Views\Rescues\Fail.brail" />
@@ -479,6 +483,7 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Views\Layouts\Rejector.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />

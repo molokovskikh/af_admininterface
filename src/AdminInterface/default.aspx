@@ -66,9 +66,10 @@
 						</asp:HyperLink>
 					</p>
 					<p>
-						<a href="./Monitoring/UpdatingClients.rails">
-							ќбновл€ющиес€ клиенты
-						</a>
+						<a href="./Monitoring/UpdatingClients.rails">ќбновл€ющиес€ клиенты</a>
+					</p>
+					<p>
+						<a href="./SmapRejector/Show.rails">ќтклоненные сообщени€</a>
 					</p>
 				</td>
 				<td align="center" style="height: 427px">

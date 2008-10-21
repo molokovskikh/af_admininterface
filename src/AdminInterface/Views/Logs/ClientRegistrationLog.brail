@@ -3,11 +3,13 @@
 <% end %>
 
 <div class="Navigation">
-	<ul>
+	<ul id="breadcrumb">
 		<li>
-			<a href="../default.aspx">Административный интерфейс</a> > 
+			<a title="Административный интерфейс" href="../default.aspx">
+				<img class="home" src="../images/home.png" alt="Административный интерфейс" />
+			</a>
 		</li>
-		<li>
+		<li class="Current">
 			Мониторинг обновления клиентов
 		</li>
 	</ul>
@@ -74,23 +76,14 @@
 	</div>
 </div>
 
-<script type="text/javascript">
-	function beginDateCallBack(cal) 
-	{
-		document.getElementById("beginDate").value = cal.date.print("%d.%m.%Y");
-	};
-
-	function endDateCallBack(cal) 
-	{
-		document.getElementById("endDate").value = cal.date.print("%d.%m.%Y");
-	};
-
-  
+<script type="text/javascript"> 
   Calendar.setup({
 	date: "${beginDate.ToString("MM\"/\"dd\"/\"yyyy")}",
 	weekNumbers: false,
     flat: "beginDateCalendarHolder",
-    flatCallback: beginDateCallBack,
+    flatCallback: function (cal) {
+		$("beginDate").value = cal.date.print("%d.%m.%Y");
+    },
     showOthers: true
   });
   
@@ -98,7 +91,9 @@
 	date: "${endDate.ToString("MM\"/\"dd\"/\"yyyy")}",
 	weekNumbers: false,
     flat: "endDateCalendarHolder",
-    flatCallback: endDateCallBack,
+    flatCallback: function (cal) {
+		$("endDate").value = cal.date.print("%d.%m.%Y");
+    },
     showOthers: true
   });
 </script>
