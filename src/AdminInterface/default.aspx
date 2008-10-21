@@ -72,7 +72,7 @@
 						<a href="./SmapRejector/Show.rails">Отклоненные сообщения</a>
 					</p>
 					<p>
-						<a href="./Telephony/Show.rails">Правила обратного звонка</a>
+						<asp:HyperLink ID="Telephony" runat=server NavigateUrl="./Telephony/Show.rails">Правила обратного звонка</asp:HyperLink>
 					</p>
 				</td>
 				<td align="center" style="height: 427px">

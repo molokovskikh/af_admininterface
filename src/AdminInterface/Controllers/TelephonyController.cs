@@ -1,4 +1,5 @@
 ﻿using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
@@ -7,7 +8,7 @@ using NHibernate.Criterion;
 namespace AdminInterface.Controllers
 {
 	[
-		Secure,
+		Secure(PermissionType.ManageCallbacks),
 		Helper(typeof(ViewHelper)),
 		Layout("General"),
 	]

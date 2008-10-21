@@ -24,6 +24,7 @@ namespace AdminInterface.Models.Security
 		RegisterInvisible = 14,
 		SendNotification = 15,
 		CanRegisterClientWhoWorkForFree = 16,
+		ManageCallbacks = 17,
 	}
 
 	[ActiveRecord("accessright.permissions", Lazy = false)]

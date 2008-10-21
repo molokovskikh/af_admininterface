@@ -168,6 +168,8 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				ShowStatHL.Enabled = SecurityContext.Administrator.HaveAnyOfPermissions(PermissionType.ViewSuppliers,
 				                                                                        PermissionType.ViewDrugstore);
 
+				Telephony.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.ManageCallbacks);
+
 				try
 				{
 					if (Convert.ToInt32(ADHL.Text.Substring(0, 1)) > 0)
