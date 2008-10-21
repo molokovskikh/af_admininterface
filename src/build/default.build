@@ -2,7 +2,7 @@
 <project name="MyProject" default="compile" basedir="..">
 
 	<property name="ProjectName" value="AdminInterface" />
-	<property name="ReleasePath" value="..\..\build\" />
+	<property name="ReleasePath" value="..\build\" />
 	<property name="PublishDir" value="\\\offdc\Data\Квасов Роман\AdmInterface" />
 		
 
