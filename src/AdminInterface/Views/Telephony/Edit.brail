@@ -9,8 +9,23 @@
 
 <script>
 
-	document.observe("dom:loaded", function() {
-		SetupCalendarElements();
+    document.observe("dom:loaded", function() {
+	
+	    $$(".CalendarInput")
+	        .each(function(value, index) {
+	            value.id = "CalendarInput" + index;
+	            value.previous().id = "CalendarInputField" + index;
+	            Calendar.setup({
+	                ifFormat: "%d.%m.%Y",
+	                inputField: value.previous().id,
+	                onUpdate: function(cal) {
+	                    $("callback_DueDate").value = cal.date.print("%d.%m.%Y")
+                    },
+	                button: value.id,
+	                weekNumbers: false,
+	                showOthers: true
+	            })
+	        });
 
 		Validation.add("validate-phone-is-not-empty", "Нужно указать телефон", function(v) {
 			return !Validation.get('IsEmpty').test(v)
@@ -26,6 +41,7 @@
 </script>
 
 <form method="post" id="Callback" action="update.rails">
+	${FormHelper.HiddenField("callback.Id")}
 	<table>
 		<tr>
 			<td>Телефон:</td>
@@ -36,15 +52,16 @@
 			<td>${FormHelper.CheckboxField("callback.Enabled")}	</td>
 		</tr>
 		<tr>
-			<td>Дата:</td>
+			<td>Дату блокировки:</td>
 			<td>
 				<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
 				${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
+				${FormHelper.HiddenField("callback.DueDate")}
 				<input type="button" class="CalendarInput" />
 			</td>
 		</tr>
 		<tr>
-			<td>Проверять дату:</td>
+			<td>Проверять дату блокировки:</td>
 			<td>${FormHelper.CheckboxField("callback.CheckDate")}</td>
 		</tr>
 		<tr>

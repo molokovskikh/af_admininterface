@@ -17,8 +17,8 @@
 	</td>
     <th>Номер телефона</th>
     <th>Включен</th>
-    <th>Дата</th>
-    <th>Проверять дату</th>
+    <th>Дату блокировки</th>
+    <th>Проверять дату блокировки</th>
     <th>Комментарий</th>
   </tr>
   <% for i, callback in enumerate(callbacks): %>
@@ -29,7 +29,7 @@
 	</td>
     <td>${callback.CallerPhone}</td>
     <td>${ViewHelper.ToHumanReadable(callback.Enabled)}</td>
-    <td>${callback.DueDate}</td>
+    <td>${callback.DueDate.ToShortDateString()}</td>
     <td>${ViewHelper.ToHumanReadable(callback.CheckDate)}</td>
     <td>${callback.Comment}</td>
   </tr>
