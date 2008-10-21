@@ -32,5 +32,13 @@ namespace AdminInterface.Helpers
 		{
 			return TextUtil.FirstUpper(TextUtil.NumToString(sum));
 		}
+
+		public static string ToHumanReadable(bool value)
+		{
+			if (value)
+				return "Да";
+
+			return "Нет";
+		}
 	}
 }

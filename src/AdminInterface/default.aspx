@@ -71,6 +71,9 @@
 					<p>
 						<a href="./SmapRejector/Show.rails">Отклоненные сообщения</a>
 					</p>
+					<p>
+						<a href="./Telephony/Show.rails">Правила обратного звонка</a>
+					</p>
 				</td>
 				<td align="center" style="height: 427px">
 					<fieldset style="width:20%;float:right;background-color:#d8f1ff;border:0;padding:3px 3px 3px 3px;">

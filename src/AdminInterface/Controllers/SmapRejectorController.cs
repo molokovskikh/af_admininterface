@@ -9,7 +9,7 @@ namespace AdminInterface.Controllers
 	[
 		Secure,
 		Helper(typeof(ViewHelper)),
-		Layout("Rejector"),
+		Layout("General"),
 	]
 	public class SmapRejectorController : SmartDispatcherController
 	{

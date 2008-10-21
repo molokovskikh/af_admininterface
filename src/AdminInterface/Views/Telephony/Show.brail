@@ -1,0 +1,38 @@
+﻿<% import Boo.Lang.Builtins %>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Правила обратного звонка
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : {"Правила обратного звонка" : ""}} %>
+
+<table class="DataTable">
+<% if callbacks.Length == 0: %>
+	<tr>
+		<td class="EmptyData">Нет правил обратного звонка. <a href=new.rails>Создать новое?</a></td>
+	</tr>
+<% else: %>
+  <tr>
+	<td>
+		<a href="new.rails">Новый</a>
+	</td>
+    <th>Номер телефона</th>
+    <th>Включен</th>
+    <th>Дата</th>
+    <th>Проверять дату</th>
+    <th>Комментарий</th>
+  </tr>
+  <% for i, callback in enumerate(callbacks): %>
+  <tr class="${ViewHelper.GetRowStyle(i)}">
+	<td>
+		<a href="delete.rails?id=${callback.Id}">Удалить</a>
+		<a href="edit.rails?id=${callback.Id}">Редактировать</a>
+	</td>
+    <td>${callback.CallerPhone}</td>
+    <td>${ViewHelper.ToHumanReadable(callback.Enabled)}</td>
+    <td>${callback.DueDate}</td>
+    <td>${ViewHelper.ToHumanReadable(callback.CheckDate)}</td>
+    <td>${callback.Comment}</td>
+  </tr>
+  <% end %>
+<% end %>
+</table>

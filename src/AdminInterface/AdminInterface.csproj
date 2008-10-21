@@ -128,6 +128,7 @@
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
+    <Compile Include="Controllers\TelephonyController.cs" />
     <Compile Include="ForAspxInMonorail.Master.cs">
       <DependentUpon>ForAspxInMonorail.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -157,6 +158,7 @@
     <Compile Include="Models\Relationship.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
+    <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
@@ -483,7 +485,9 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Views\Layouts\Rejector.brail" />
+    <None Include="Views\Layouts\General.brail" />
+    <None Include="Views\Telephony\Edit.brail" />
+    <None Include="Views\Telephony\Show.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />

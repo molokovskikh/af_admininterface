@@ -1,0 +1,59 @@
+﻿<% import Boo.Lang.Builtins %>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Редактирование обратного звонка
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : {"Правила обратного звонка" : "show.rails", "Редактирование обратного звонка" : ""}} %>
+
+
+<script>
+
+	document.observe("dom:loaded", function() {
+		SetupCalendarElements();
+
+		Validation.add("validate-phone-is-not-empty", "Нужно указать телефон", function(v) {
+			return !Validation.get('IsEmpty').test(v)
+		});
+
+		Validation.add("validate-phone", "Телефон должен быть десяти значный", function(v) {
+			return Validation.get('IsEmpty').test(v) || /^\d{10}$/.test(v);
+		});
+
+		new Validation("Callback");
+	})
+
+</script>
+
+<form method="post" id="Callback" action="update.rails">
+	<table>
+		<tr>
+			<td>Телефон:</td>
+			<td>${FormHelper.TextField("callback.CallerPhone", {"class" : "validate-phone validate-phone-is-not-empty"})}</td>
+		</tr>
+		<tr>
+			<td>Включено:</td>
+			<td>${FormHelper.CheckboxField("callback.Enabled")}	</td>
+		</tr>
+		<tr>
+			<td>Дата:</td>
+			<td>
+				<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
+				${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
+				<input type="button" class="CalendarInput" />
+			</td>
+		</tr>
+		<tr>
+			<td>Проверять дату:</td>
+			<td>${FormHelper.CheckboxField("callback.CheckDate")}</td>
+		</tr>
+		<tr>
+			<td>Комментарий:</td>
+			<td>${FormHelper.TextField("callback.Comment")}</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type=submit value="Сохранить" />
+			</td>
+		</tr>
+	</table>
+</form>
