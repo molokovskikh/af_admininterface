@@ -1,5 +1,4 @@
-﻿<% import Boo.Lang.Builtins %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Счет
 <% end %>
 <div style="float: left; display: block;">

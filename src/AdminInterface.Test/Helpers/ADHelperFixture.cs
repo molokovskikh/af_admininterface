@@ -70,12 +70,6 @@ namespace AdminInterface.Test.Helpers
 		}
 
 		[Test]
-		public void t()
-		{
-			Log(FindDirectoryEntry("kvasov"));
-		}
-
-		[Test]
 		public void If_login_exists_but_not_belog_to_admin_group_than_add_user_to_admin_group()
 		{
 			using (var user = new TestADUser())

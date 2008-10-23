@@ -1,5 +1,4 @@
-﻿<% import Boo.Lang.Builtins %>
-<% component CaptureFor, {"id" : "Title"}:%>
+﻿<% component CaptureFor, {"id" : "Title"}:%>
 	Права доступа для клиента ${client.ShortName} 
 <% end %>
 <div class="CenterBlock" style="width: 600px">

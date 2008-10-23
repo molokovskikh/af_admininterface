@@ -1,16 +1,18 @@
-﻿<% import Boo.Lang.Builtins %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Правила обратного звонка
 <% end %>
 
 <% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
 
-<table class="DataTable">
 <% if callbacks.Length == 0: %>
-	<tr>
-		<td class="EmptyData">Нет правил обратного звонка. <a href=new.rails>Создать новое?</a></td>
-	</tr>
+    <table class="DataTable">
+	    <tr>
+		    <td class="EmptyData">Нет правил обратного звонка. <a href=new.rails>Создать новое?</a></td>
+	    </tr>
+	</table>
 <% else: %>
+<form action="updateCallbacks.rails" method="post">
+<table class="DataTable">
   <tr>
 	<td>
 		<a href="new.rails">Новый</a>
@@ -27,12 +29,21 @@
 		<a href="delete.rails?id=${callback.Id}">Удалить</a>
 		<a href="edit.rails?id=${callback.Id}">Редактировать</a>
 	</td>
-    <td>${callback.CallerPhone}</td>
-    <td>${ViewHelper.ToHumanReadable(callback.Enabled)}</td>
-    <td>${callback.DueDate.ToShortDateString()}</td>
-    <td>${ViewHelper.ToHumanReadable(callback.CheckDate)}</td>
+    <td>
+        ${callback.CallerPhone}
+        ${FormHelper.HiddenField("callbacks[${i}].Id")}
+     </td>
+    <td>${FormHelper.CheckboxField("callbacks[${i}].Enabled")}</td>
+    <td>${callback.DueDate.ToShortDateString() if callback.DueDate != null}</td>
+    <td>${FormHelper.CheckboxField("callbacks[${i}].CheckDate")}</td>
     <td>${callback.Comment}</td>
   </tr>
   <% end %>
-<% end %>
+  <tr>
+    <td colspan="6">
+        <input type=submit value="Сохранить" />
+    </td>
+  </tr>
 </table>
+</form>
+<% end %>

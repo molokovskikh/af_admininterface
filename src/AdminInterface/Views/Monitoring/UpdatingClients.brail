@@ -1,5 +1,4 @@
-﻿<% import Boo.Lang.Builtins %>
-<table class="DataTable">
+﻿<table class="DataTable">
 <% if statuses.Length == 0: %>
 	<tr>
 		<td class="EmptyData">Нет обновляющихся клиентов</td>

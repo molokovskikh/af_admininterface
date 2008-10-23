@@ -1,5 +1,4 @@
-﻿<% import Boo.Lang.Builtins %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Редактирование обратного звонка
 <% end %>
 
@@ -54,9 +53,9 @@
 		<tr>
 			<td>Дату блокировки:</td>
 			<td>
-				<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
+			    <% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
+			    ${FormHelper.HiddenField("callback.DueDate", dueDate)}
 				${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
-				${FormHelper.HiddenField("callback.DueDate")}
 				<input type="button" class="CalendarInput" />
 			</td>
 		</tr>

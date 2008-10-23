@@ -2,6 +2,8 @@
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using NHibernate.Criterion;
 
@@ -12,14 +14,23 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ViewHelper)),
 		Layout("General"),
 	]
-	public class TelephonyController : SmartDispatcherController
+	public class TelephonyController : ARSmartDispatcherController
 	{
 		public void Show()
 		{
 			PropertyBag["callbacks"] = Callback.FindAll(Order.Asc("Comment"));
 		}
 
-		public void Update([DataBind("callback")] Callback callback)
+        public void UpdateCallbacks([ARDataBind("callbacks", AutoLoad = AutoLoadBehavior.Always)] Callback[] callbacks)
+        {
+            using (new TransactionScope())
+                foreach (var callback in callbacks)
+                    callback.Save();
+
+            RedirectToAction("show");
+        }
+
+	    public void Update([DataBind("callback")] Callback callback)
 		{
 			callback.Save();
 			RedirectToAction("Show");

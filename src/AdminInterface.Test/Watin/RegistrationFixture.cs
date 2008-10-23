@@ -50,10 +50,10 @@ namespace AdminInterface.Test.Watin
 			{
 				SetUpTestClient(browser);
 
-				browser.TextField(Find.ById("EmailTB")).TypeText(" \t \r\n " + _randomClientName + "@mail.ru  \t \r\n ");
-				browser.TextField(Find.ById("PhoneTB")).TypeText(" \t \r\n 4732-606000  \t \r\n  \t");
-				browser.TextField(Find.ById("TBOrderManagerPhone")).TypeText(" \t \r\n 4732-606000  \t \r\n  \t");
-				browser.TextField(Find.ById("TBOrderManagerMail")).TypeText(" \t \r\n " + _randomClientName + "@mail.ru  \t \r\n ");
+				browser.TextField(Find.ById("EmailTB")).TypeText(" \t  " + _randomClientName + "@mail.ru  \t  ");
+				browser.TextField(Find.ById("PhoneTB")).TypeText(" \t  4732-606000  \t  \t");
+				browser.TextField(Find.ById("TBOrderManagerPhone")).TypeText(" \t  4732-606000  \t  \t");
+				browser.TextField(Find.ById("TBOrderManagerMail")).TypeText(" \t  " + _randomClientName + "@mail.ru  \t  ");
 
 				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
 				browser.CheckBox(Find.ById("ShowRegistrationCard")).Checked = false;
