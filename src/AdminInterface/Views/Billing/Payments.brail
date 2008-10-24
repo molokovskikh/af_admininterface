@@ -67,7 +67,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<% if client.Id == Client.Id: %>
 									<strong>${client.GetNameWithParents()}</strong>
 								<% else: %>
-									<a href="edit.rails?ClientCode=${client.Id}&showClients=true">
+									<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
 										${client.GetNameWithParents()}
 									</a>
 								<% end %>
@@ -257,7 +257,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 														 BindingHelper.GetDescriptionsDictionary(Instance.DiscountType.GetType()),
 														 BindingHelper.GetDictionaryMapping()))}
 		<% end %>
-														 
+		        ${WriteInputGroupHeader("Комментарий")}
+		        <tr>
+			        <td colspan=2>
+				        ${FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" })}
+			        </td>
+		        </tr>									 
 				<tr style="text-align:right">
 					<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
 				</tr>

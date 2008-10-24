@@ -48,7 +48,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["ShowClients"] = showClients;
 
 			if (String.IsNullOrEmpty(tab))
-				tab = "info";
+				tab = "payments";
 
 			var payer = client.BillingInstance;
 			PropertyBag["tab"] = tab;
@@ -86,7 +86,7 @@ namespace AdminInterface.Controllers
 				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
 			}
 
-			RedirectToAction("Edit", "clientCode=" + clientMessage.ClientCode);
+			RedirectToAction("Edit", new {clientMessage.ClientCode, tab = "payments"});
 		}
 
 		public void UpdateClientsStatus(uint clientCode, 
@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 				foreach (var client in clients)
 					client.Update();
 			}
-			RedirectToAction("Edit", "clientCode=" + clientCode, "showClients=true");
+			RedirectToAction("Edit", new {clientCode, tab = "payments"});
 		}
 
 		public void Search()
@@ -176,13 +176,13 @@ namespace AdminInterface.Controllers
 			{
 				sentEntity.UserName = SecurityContext.Administrator.UserName;
 				sentEntity.SaveAndFlush();
-				Flash.Add("Message", new Message("Cохранено"));
+				Flash["Message"] = new Message("Cохранено");
 			}
 			catch (ValidationException ex)
 			{
-				Flash.Add("SendMailError", ex.ValidationErrorMessages[0]);
+				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			RedirectToAction("Edit", "clientCode=" + clientCode);
+		    RedirectToAction("Edit", new {clientCode, tab = "mail"});
 		}
 
 		public void DeleteMail(uint id)

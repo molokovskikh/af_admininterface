@@ -132,6 +132,8 @@
 	</ul>
 </div>
 
+<H3>Платильщик ${Instance.ShortName}</H3>
+
 <div id="StatusBar" style="padding-bottom: 10px;">
 	<table Class="CenterBlock ${Message.GetClass() if IsDefined("Message")}">
 		<tr>
@@ -147,19 +149,12 @@
 <div class="tabs">
 	<ul>
 		<li>
-			<a id="info" href="#" ${"class='selected'" if tab == "info"}>Информация</a>
-		</li>
-		<li>
 			<a id="payments" href="#" ${"class='selected'" if tab == "payments"}>Платежи</a>
 		</li>
 		<li>
 			<a id="mail" href="#" ${"class='selected'" if tab == "mail"}>Отправка кореспонденции</a>
 		</li>
 	</ul>
-</div>
-
-<div id="info-tab" class="tab" ${"style='display:none'" if tab != "info"}>
-	<% OutputSubView("Info") %>
 </div>
 
 <div id="payments-tab" class="tab" ${"style='display:none'" if tab != "payments"}>

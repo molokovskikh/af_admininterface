@@ -24,6 +24,80 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${FormHelper.HiddenField("tab", "mail")}
 		
 	<table>
+	    ${WriteInputGroupHeader("Общая информация")}
+
+					
+	    ${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
+													    "Краткое наименование:"), 
+								    FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
+												
+	    ${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
+														"Полное наименование:"), 
+									FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+														"Юридический адрес:"), 
+									FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+														"Адрес получателя:"), 
+									FormHelper.TextField("Instance.ReceiverAddress", {"class" : "BillingInput"}))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
+														"ИНН:"), 
+									FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
+														"КПП:"), 
+									FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+																		
+		<%
+		contactGroupIndex = 0
+		component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:
+			section ContactGroupHeader:
+		%>
+			<tr>
+				<% if contactGroupIndex == 0: %>
+					<td class="InputGroupHeader">
+						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+					</td>
+					<td class="InputGroupHeader">
+						${ContactGroupName}
+					</td>
+				<% else: %>
+					<td class="InputGroupHeader" colspan="2">
+						${ContactGroupName}
+					</td>
+				<% end %>
+			</tr>
+		<% 
+				contactGroupIndex++;
+			end
+			section Item:
+			%>
+				<tr>
+					<td>
+						${Label}:
+					</td>
+					<td>
+					${Value}
+					</td>
+				</tr>
+			<% 
+			end
+			section Person:
+			%>
+				<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+			<%
+			end
+			section ContactGroupHeaderLink:
+			%>
+				<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+			<%
+			end
+		end
+		%>
+	
 		${WriteInputGroupHeader("Отправка корреспонденции")}
 		
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.HaveContract", 

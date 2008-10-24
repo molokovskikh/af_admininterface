@@ -441,7 +441,6 @@
     <None Include="Service References\ServiceReference1\StatisticService.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
-    <None Include="Views\Billing\Info.brail" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Monitoring\UpdatingClients.brail" />
