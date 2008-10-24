@@ -4,6 +4,10 @@
 
 <% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
 
+<% if IsDefined("isUpdated"): %>
+<div class="flash notice">Обновление успешно завершено.</div>
+<% end %>
+
 <% if callbacks.Length == 0: %>
     <table class="DataTable">
 	    <tr>

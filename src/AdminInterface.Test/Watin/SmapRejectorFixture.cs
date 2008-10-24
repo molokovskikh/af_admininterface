@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
-using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using AdminInterface.Models.Telephony;
 using Microsoft.VisualStudio.WebHost;
@@ -130,6 +129,22 @@ namespace AdminInterface.Test.Watin
                 Assert.That(callback2.CheckDate, Is.False);
                 Assert.That(callback2.Enabled, Is.True);
                 browser.AssertThatTableContains(callback2, callback1);
+            }
+        }
+
+        [Test]
+        public void After_update_should_show_confirm_message()
+        {
+            var callback = new Callback { CallerPhone = "4732606000", Comment = "Офис" };
+            callback.Save();
+
+            using (var browser = new IE(BuildTestUrl("default.aspx")))
+            {
+                browser.Link(Find.ByText(CallbackLinkText)).Click();
+                browser.FindRow(callback).Input<Callback[]>(callbacks => callbacks[0].CheckDate, true);
+                browser.Button(Find.ByValue("Сохранить")).Click();
+
+                Assert.That(browser.ContainsText("Обновление успешно завершено."), Is.True, "Нет сообщения об успешном сохранении");
             }
         }
 	}

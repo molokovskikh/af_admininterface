@@ -27,12 +27,14 @@ namespace AdminInterface.Controllers
                 foreach (var callback in callbacks)
                     callback.Save();
 
-            RedirectToAction("show");
+            Flash["isUpdated"] = true;
+            RedirectToAction("Show");
         }
 
 	    public void Update([DataBind("callback")] Callback callback)
 		{
 			callback.Save();
+	        Flash["isUpdated"] = true;
 			RedirectToAction("Show");
 		}
 

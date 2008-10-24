@@ -119,3 +119,20 @@
 	background-color: #fff;
 }
 /*------tabs-------*/
+
+/*------messages---*/
+div.flash.notice {
+    background:#DFFFDF url(../images/true.png) no-repeat scroll 8px 5px;
+    border-color:#9FCF9F;
+    color:#005F00;
+}
+div.flash {
+    margin-top:8px;
+}
+#errorExplanation, div.flash, .nodata, .warning {
+    border:2px solid;
+    font-size:1.1em;
+    margin-bottom:12px;
+    padding:4px 4px 4px 30px;
+}
+/*------messages---*/
