@@ -1,16 +1,11 @@
-
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using NHibernate;
 
 namespace Common.Web.Ui.Helpers
 {
-	public delegate IList<T> InSessionReturnListDelegate<T>(ISession session);
-	public delegate T InSessionReturnInstanceDelegate<T>(ISession session);
-	public delegate void InSession(ISession session);
-
 	public class ArHelper
 	{
 		public static void Evict(ISession session, IEnumerable items)
@@ -19,7 +14,7 @@ namespace Common.Web.Ui.Helpers
 				session.Evict(item);
 		}
 
-		public static void WithSession<T>(InSession sessionDelegate)
+		public static void WithSession<T>(Action<ISession> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(T));
@@ -33,7 +28,7 @@ namespace Common.Web.Ui.Helpers
 			}
 		}
 
-		public static IList<T> WithSession<T>(InSessionReturnListDelegate<T> sessionDelegate)
+		public static IList<T> WithSession<T>(Func<ISession, IList<T>> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(T));
@@ -49,7 +44,7 @@ namespace Common.Web.Ui.Helpers
 			}
 		}
 
-		public static T WithSession<T>(InSessionReturnInstanceDelegate<T> sessionDelegate)
+        public static T WithSession<T>(Func<ISession, T> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(T));

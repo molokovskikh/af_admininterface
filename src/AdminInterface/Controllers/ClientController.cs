@@ -96,9 +96,7 @@ namespace AdminInterface.Controllers
 			{
 				ADHelper.ChangePassword(user.Login, password);
 
-				DbLogHelper.SetupParametersForTriggerLogging(userName,
-				                                        host,
-				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (ClientInfoLogEntity)));
+			    DbLogHelper.SetupParametersForTriggerLogging<ClientInfoLogEntity>(userName, host);
 
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
@@ -201,14 +199,13 @@ namespace AdminInterface.Controllers
 
 			using (new TransactionScope())
 			{
-				var session = ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof (Client));
-				DbLogHelper.SetupParametersForTriggerLogging(
+				DbLogHelper.SetupParametersForTriggerLogging<Client>(
 					new
 						{
 							inHost = Request.UserHostAddress,
 							inUser = SecurityContext.Administrator.UserName,
 							ResetIdCause = reason
-						},session);
+						});
 				new ClientInfoLogEntity
 					{
 						UserName = SecurityContext.Administrator.UserName,

@@ -24,8 +24,12 @@ namespace AdminInterface.Controllers
         public void UpdateCallbacks([ARDataBind("callbacks", AutoLoad = AutoLoadBehavior.Always)] Callback[] callbacks)
         {
             using (new TransactionScope())
+            {
+                DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
+                                                                       Request.UserHostAddress);
                 foreach (var callback in callbacks)
                     callback.Save();
+            }
 
             Flash["isUpdated"] = true;
             RedirectToAction("Show");
@@ -33,7 +37,13 @@ namespace AdminInterface.Controllers
 
 	    public void Update([DataBind("callback")] Callback callback)
 		{
-			callback.Save();
+	        using (new TransactionScope())
+	        {
+	            DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
+	                                                                   Request.UserHostAddress);
+                callback.Save();
+	        }
+			
 	        Flash["isUpdated"] = true;
 			RedirectToAction("Show");
 		}
@@ -51,7 +61,12 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			Callback.Find(id).Delete();
+		    using (new TransactionScope())
+		    {
+                DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
+                                                                       Request.UserHostAddress);
+                Callback.Find(id).Delete();		        
+		    }
 			RedirectToAction("Show");
 		}
 	}

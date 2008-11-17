@@ -94,9 +94,8 @@ namespace AdminInterface.Controllers
 		{
 			using(new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging(SecurityContext.Administrator.UserName,
-				                                        HttpContext.Current.Request.UserHostAddress,
-				                                        ActiveRecordMediator.GetSessionFactoryHolder().CreateSession(typeof(ClientWithStatus)));
+			    DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
+			                                                                   Request.UserHostAddress);
 				foreach (var client in clients)
 					client.Update();
 			}
