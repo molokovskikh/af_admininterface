@@ -1,17 +1,7 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.viewcl" CodeBehind="viewcl.aspx.cs" Theme="Main" %>
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.viewcl" CodeBehind="viewcl.aspx.cs" Theme="Main" MasterPageFile="~/Main.Master" %>
 <%@ Import Namespace="AdminInterface.Helpers"%>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-    <title>Интерфейс управления клиентами</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-    <link rel="stylesheet" type="text/css" href="~/Css/Table.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
-	<link rel="stylesheet" type="text/css" href="~/Css/Billing.css" />
-</head>
-<body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
     <form id="Form1" method="post" runat="server">
         <table id="Table1" cellspacing="0" cellpadding="0" width="95%" align="center" border="0">
             <tr>
@@ -46,5 +36,4 @@
                         </Columns>
                     </asp:GridView>
     </form>
-</body>
-</html>
+</asp:Content>
