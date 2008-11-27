@@ -347,7 +347,10 @@ INTO    intersection
                 pricecode, 
                 invisibleonclient, 
                 InvisibleonFirm, 
-                costcode
+                costcode,
+				FirmClientCode,
+				FirmClientCode2,
+				FirmClientCode3
         )
 SELECT  DISTINCT clientsdata2.firmcode,
         regions.regioncode, 
@@ -359,7 +362,10 @@ SELECT  DISTINCT clientsdata2.firmcode,
           FROM    pricescosts pcc
           WHERE   basecost
                   AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
+        ) as CostCode,
+        rootIntersection.FirmClientCode,
+        rootIntersection.FirmClientCode2,
+        rootIntersection.FirmClientCode3
 FROM pricesdata 
 	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
 		JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
@@ -367,6 +373,8 @@ FROM pricesdata
 	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
+	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = clientsdata.FirmCode)
+		LEFT JOIN intersection as rootIntersection on rootIntersection.PriceCode = rootPrice.PriceCode and rootIntersection.RegionCode = Regions.RegionCode and rootIntersection.ClientCode = clientsdata2.FirmCode
 WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
