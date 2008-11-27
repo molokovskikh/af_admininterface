@@ -859,7 +859,6 @@ FROM pricesdata
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;
@@ -913,7 +912,6 @@ FROM clientsdata as clientsdata2
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;

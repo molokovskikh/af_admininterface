@@ -44,11 +44,25 @@ namespace AdminInterface.Test.Watin
 		}
 
 		[Test]
+		public void Try_register_supplier()
+		{
+			using (var browser = new IE(BuildTestUrl("register.aspx")))
+			{
+				SetupGeneralInformation(browser);
+				browser.SelectList(Find.ById("TypeDD")).Select("Поставщик");
+				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
+
+				browser.Button(Find.ById("Register")).Click();
+				Assert.That(browser.ContainsText("Регистрационная карта №"));
+			}
+		}
+
+		[Test]
 		public void Register_client_if_email_or_phone_contains_space_or_tab_or_nextline_at_begin_or_end()
 		{
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{
-				SetUpTestClient(browser);
+				SetupGeneralInformation(browser);
 
 				browser.TextField(Find.ById("EmailTB")).TypeText(" \t  " + _randomClientName + "@mail.ru  \t  ");
 				browser.TextField(Find.ById("PhoneTB")).TypeText(" \t  4732-606000  \t  \t");
@@ -70,7 +84,7 @@ namespace AdminInterface.Test.Watin
 		{
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{
-				SetUpTestClient(browser);
+				SetupGeneralInformation(browser);
 				browser.Button(Find.ById("Register")).Click();
 
 				browser.ContainsText("Реистрация клиента, шаг 2: Заполнения информации о плательщике");
@@ -83,7 +97,7 @@ namespace AdminInterface.Test.Watin
 			}
 		}
 
-		private void SetUpTestClient(IE browser)
+		private void SetupGeneralInformation(IE browser)
 		{
 			browser.TextField(Find.ById("FullNameTB")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("ShortNameTB")).TypeText(_randomClientName);

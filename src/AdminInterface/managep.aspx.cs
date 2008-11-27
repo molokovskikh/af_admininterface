@@ -376,7 +376,6 @@ FROM pricesdata
 	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = clientsdata.FirmCode)
 		LEFT JOIN intersection as rootIntersection on rootIntersection.PriceCode = rootPrice.PriceCode and rootIntersection.RegionCode = Regions.RegionCode and rootIntersection.ClientCode = clientsdata2.FirmCode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @InsertedPriceCode
 		AND clientsdata2.firmtype = 1;
