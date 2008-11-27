@@ -1,19 +1,45 @@
-﻿<table class="DataTable">
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Обновляющиеся клиенты
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Обновляющиеся клиенты", "")]} %>
+
+<table class="DataTable">
 <% if statuses.Length == 0: %>
 	<tr>
-		<td class="EmptyData">Нет обновляющихся клиентов</td>
+		<td class="EmptyData">Никто в данный момент не обновляется</td>
 	</tr>
 <% else: %>
 	<tr>
-		<th>Код клиента</th>
-		<th>Название</th>
-		<th>Метод</th>
-		<th>Дата начала</th>
+		<th>
+			<a href="UpdatingClients.rails?sortBy=ClientCode&direction=${ViewHelper.GetDirection(sortBy, direction, "ClientCode")}">
+				Код клиента
+				${ViewHelper.SortArrow(sortBy, direction, "ClientCode")}
+			</a>
+		</th>
+		<th>
+			<a href="UpdatingClients.rails?sortBy=ShortName&direction=${ViewHelper.GetDirection(sortBy, direction, "ShortName")}">
+				Название
+				${ViewHelper.SortArrow(sortBy, direction, "ShortName")}
+			</a>
+		</th>
+		<th>
+			<a href="UpdatingClients.rails?sortBy=MethodName&direction=${ViewHelper.GetDirection(sortBy, direction, "MethodName")}">
+				Метод
+				${ViewHelper.SortArrow(sortBy, direction, "MethodName")}
+			</a>
+		</th>
+		<th>
+			<a href="UpdatingClients.rails?sortBy=StartTime&direction=${ViewHelper.GetDirection(sortBy, direction, "StartTime")}">
+				Дата начала
+				${ViewHelper.SortArrow(sortBy, direction, "StartTime")}
+			</a>
+		</th>
 	</tr>
 <% for i, status in enumerate(statuses): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>${status.ClientCode}</td>
-		<td>${status.Client.ShortName}</td>
+		<td><a href="../Client/Info.rails?cc=${status.ClientCode}">${status.Client.ShortName}</a></td>
 		<td>${status.MethodName}</td>
 		<td>${status.StartTime}</td>
 	</tr>

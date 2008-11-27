@@ -66,9 +66,6 @@
 						</asp:HyperLink>
 					</p>
 					<p>
-						<a href="./Monitoring/UpdatingClients.rails">Обновляющиеся клиенты</a>
-					</p>
-					<p>
 						<a href="./SmapRejector/Show.rails">Отклоненные сообщения</a>
 					</p>
 					<p>
@@ -138,7 +135,7 @@
 							<td style="height: 18px" align="right" bgcolor="#d8f1ff" height="18">
 								<font face="Verdana" size="2">В процессе:</font></td>
 							<td style="height: 18px; width: 58px;" bgcolor="#d8f1ff" height="18">
-								<asp:HyperLink ID="ReqHL" runat="server" NavigateUrl="viewcl.aspx?id=4" Enabled="False"
+								<asp:HyperLink ID="ReqHL" runat="server" NavigateUrl="./Monitoring/UpdatingClients.rails" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 						</tr>
 						<tr>

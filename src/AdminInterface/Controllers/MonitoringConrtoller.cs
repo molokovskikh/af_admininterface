@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
 using AdminInterface.Helpers;
@@ -12,11 +13,11 @@ namespace AdminInterface.Controllers
 	[
 		Secure,
 		Helper(typeof (ViewHelper)),
-		Layout("Logs")
+		Layout("General")
 	]
 	public class MonitoringController : SmartDispatcherController
 	{
-		public void UpdatingClients()
+		public void UpdatingClients(string sortBy, string direction)
 		{
 			UpdatingClientStatus[] info;
 			//сраная магия, хрен его знает почему и как это работает
@@ -42,8 +43,9 @@ namespace AdminInterface.Controllers
 			foreach (var status in info)
 				status.FetchClient();
 
-			PropertyBag["statuses"] = info;
-
+			PropertyBag["statuses"] = info.Sort(ref sortBy, ref direction, "StartTime").ToArray();
+			PropertyBag["sortBy"] = sortBy;
+			PropertyBag["direction"] = direction;
 		}
 	}
 }

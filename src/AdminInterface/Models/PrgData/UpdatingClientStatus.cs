@@ -23,6 +23,11 @@ namespace AdminInterface.Models.PrgData
 
 		public Client Client { get; set; }
 
+		public string ShortName
+		{
+			get { return Client.ShortName; }
+		}
+
 		public void FetchClient()
 		{
 			Client = Client.Find(ClientCode);

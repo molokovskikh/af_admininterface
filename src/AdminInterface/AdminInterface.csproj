@@ -142,6 +142,7 @@
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />
