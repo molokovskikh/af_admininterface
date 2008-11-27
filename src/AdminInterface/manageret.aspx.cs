@@ -555,12 +555,9 @@ SELECT  InvisibleOnFirm,
         ServiceClient, 
         OrdersVisualizationMode, 
         ShowMessageCount,
-		pd.PriceCode as NotNoisedPriceCode,
-		concat(pd.PriceName, ' ', cd.ShortName) as NotNoisedPriceName
+		rcs.PriceCodeOnly as NotNoisedPriceCode
 FROM retclientsset rcs
 	JOIN ret_update_info rui on rcs.clientcode = rui.ClientCode
-	LEFT JOIN usersettings.pricesdata pd on pd.pricecode = rcs.PriceCodeOnly
-	LEFT JOIN usersettings.clientsdata cd on cd.firmcode = pd.firmcode
 WHERE rcs.clientcode = ?ClientCode";
 				using (myMySqlDataReader = myMySqlCommand.ExecuteReader())
 				{
@@ -784,6 +781,8 @@ ORDER BY cd.shortname;", _connection);
 			NotNoisedPrice.Visible = noise;
 
 			var adapter = new MySqlDataAdapter(@"
+select 0 as PriceCode, 'Зашумлять все прайс листы' as PriceName
+union
 SELECT pd.PriceCode,
        concat(suppliers.ShortName, ' ', pd.PriceName) as PriceName
 FROM Usersettings.ClientsData cd
