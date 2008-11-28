@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
@@ -66,6 +67,12 @@ namespace AdminInterface.Models
 				if (permission.Shortcut == userPermission.Shortcut)
 					return true;
 			return false;
+		}
+
+		public bool IsChangePasswordByOneself()
+		{
+			return PasswordChangeLogEntity.Exists(DetachedCriteria.For<PasswordChangeLogEntity>()
+			                                      	.Add(Expression.EqProperty("TargetUserName", "UserName")));
 		}
 	}
 }

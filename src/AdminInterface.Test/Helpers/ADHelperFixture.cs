@@ -1,5 +1,6 @@
 ﻿using System;
 using System.DirectoryServices;
+using System.Security.Principal;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using NUnit.Framework;
@@ -66,6 +67,18 @@ namespace AdminInterface.Test.Helpers
 			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
 			{
 				return Convert.ToDateTime(searcher.FindOne().Properties["whenCreated"][0]);
+			}
+		}
+
+
+		[Test]
+		public void Get_last_password_change()
+		{
+			var begin = DateTime.Now;
+			using (var user = new TestADUser())
+			{
+				ADHelper.ChangePassword(user.Login, "123456789");
+				Assert.That(ADHelper.GetLastPasswordChange(user.Login), Is.GreaterThanOrEqualTo(begin));
 			}
 		}
 
@@ -184,10 +197,10 @@ namespace AdminInterface.Test.Helpers
 		public static void Delete(string login)
 		{
 			var entry = GetDirectoryEntry(login);
+			entry = new DirectoryEntry(entry.Path);
 			entry.DeleteTree();
 			entry.CommitChanges();
 		}
-
 
 		public static bool IsMemberOf(string login, DirectoryEntry entry)
 		{

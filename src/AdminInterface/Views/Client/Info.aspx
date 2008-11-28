@@ -93,6 +93,11 @@
 						</td>
 					</tr>
 				</table>
+<% 
+	textWriter = new StringWriter();
+	Controller.InPlaceRenderView(textWriter, "LegendView");
+	Response.Write(textWriter.ToString());		
+%>
 			</div>
 			<div class="TwoColumn" style="text-align: center;">
 				Новое обращение(сообщение):

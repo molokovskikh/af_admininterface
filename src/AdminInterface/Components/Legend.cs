@@ -12,13 +12,16 @@ namespace AdminInterface.Components
 		{
 			if (ComponentParams["LegendItems"] == null)
 				throw new Exception("Элементы для заполнения легенды не заданы. Параметер LegendItems пуст.");
-			
+
+			var style = "";
+			if (ComponentParams["ByCenter"] == null || Convert.ToBoolean(ComponentParams["ByCenter"]))
+				style = "class='CenterBlock' style='width:30%;'";
 			var writer = new StringWriter();
 			writer.WriteLine(@"
-	<div class='CenterBlock' style='width:30%;'>
+	<div {0}>
 		<table>
 			<tr>
-");
+", style);
 			var legendItems = (IDictionary) ComponentParams["LegendItems"];
 			foreach (var key in legendItems.Keys)
 				writer.WriteLine(@"

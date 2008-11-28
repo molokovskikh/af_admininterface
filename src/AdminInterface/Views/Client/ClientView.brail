@@ -47,7 +47,7 @@
 <td>
 <table style="width:100%;" class="Test">
 	<tr>
-		<td class="Title" colspan="4">
+		<td class="Title" colspan="5">
 			Учетные записи пользователя
 		</td>
 	</tr>
@@ -60,6 +60,9 @@
 		</td>
 		<td class="Title">
 			Дата последней неудачной регистрации
+		</td>
+		<td class="Title">
+			Последнее изменение пароля
 		</td>
 		<td class="Title">
 		</td>
@@ -80,6 +83,9 @@
 		</td>
 		<td>
 			${ADHelper.GetBadPasswordDate(user.Login) if isLoginExists}
+		</td>
+		<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
+			${ADHelper.GetLastPasswordChange(user.Login) if isLoginExists}
 		</td>
 		<td>
 			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>

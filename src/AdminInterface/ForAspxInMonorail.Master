@@ -10,6 +10,7 @@
 	<script type="text/javascript" language="javascript" src="../JavaScript/search.js" ></script>
 	<link rel="stylesheet" type="text/css" href="~/Css/Table.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
+	<link rel="stylesheet" type="text/css" href="~/Css/Common.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/Billing.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/Highlight.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/ValidationStyles.css" />

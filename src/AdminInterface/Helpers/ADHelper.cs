@@ -171,5 +171,16 @@ namespace AdminInterface.Helpers
 			var entry = FindDirectoryEntry(login);
 			return entry.Path.Contains("OU=Офис");
 		}
+
+		public static DateTime? GetLastPasswordChange(string login)
+		{
+			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
+			{
+				var result = searcher.FindOne();
+				if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
+					return null;
+				return DateTime.FromFileTime((long)searcher.FindOne().Properties["pwdLastSet"][0]);
+			}
+		}
 	}
 }

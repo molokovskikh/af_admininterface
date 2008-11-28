@@ -489,6 +489,7 @@
     <None Include="Views\Layouts\General.brail" />
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
+    <None Include="Views\Client\LegendView.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
