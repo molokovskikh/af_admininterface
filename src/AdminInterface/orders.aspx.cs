@@ -11,7 +11,6 @@ namespace AddUser
 {
 	partial class orders : Page
 	{
-		private readonly MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
 		
 		private string _sortExpression
 		{
@@ -33,6 +32,7 @@ namespace AddUser
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
+			var clientCode = Convert.ToUInt32(Request["cc"]);
 			var adapter = new MySqlDataAdapter(@"
 SELECT  oh.rowid, 
         oh.WriteTime, 
@@ -44,7 +44,8 @@ SELECT  oh.rowid,
         oh.RowCount, 
         oh.Processed, 
 		o.ResultCode,
-		o.TransportType
+		o.TransportType,
+		oh.SubmitDate
 FROM    (orders.ordershead oh, usersettings.clientsdata as sel)
 		join usersettings.pricesdata on pricesdata.pricecode = oh.pricecode
 			join usersettings.clientsdata as firm on firm.firmcode = pricesdata.firmcode 
@@ -57,26 +58,30 @@ WHERE   client.firmcode = if(sel.firmtype = 1, sel.firmcode, client.firmcode)
 		AND oh.RegionCode & ?RegionCode > 0
 group by oh.rowid
 ORDER BY writetime desc;
-", _connection);
+", Literals.GetConnectionString());
 			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate);
-			adapter.SelectCommand.Parameters.AddWithValue("?clientCode", Convert.ToUInt32(Request["cc"]));
+			adapter.SelectCommand.Parameters.AddWithValue("?clientCode", clientCode);
 			adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", SecurityContext.Administrator.RegionMask);
-
 			_data = new DataSet();
-			try
-			{
-				_connection.Open();
-				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.Fill(_data);
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+			adapter.Fill(_data);
+
+			OrdersGrid.Columns[OrdersGrid.Columns.Count - 1].Visible = IsOrderSubmitEnabled(clientCode);
 			OrdersGrid.DataSource = _data.DefaultViewManager.CreateDataView(_data.Tables[0]); 
 			DataBind();
+		}
+
+		private static bool IsOrderSubmitEnabled(uint clientCode)
+		{
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+			{
+				connection.Open();
+				return Convert.ToInt32(MySqlHelper.ExecuteScalar(connection,
+				                          @"
+select SubmitOrders = 1 and AllowSubmitOrders = 1
+from retclientsset 
+where clientcode = ?ClientCode", new MySqlParameter("?ClientCode", clientCode))) == 1;
+			}
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
@@ -117,6 +122,13 @@ ORDER BY writetime desc;
 
 			OrdersGrid.DataSource = _data.Tables[0].DefaultView;
 			DataBind();
+		}
+
+		public static string GetSubmiteDate(DataRowView row)
+		{
+			if (row["SubmitDate"] == DBNull.Value)
+				return "Заказ не подтвержден";
+			return row["SubmitDate"].ToString();
 		}
 
 		public static string GetResult(DataRowView row)
