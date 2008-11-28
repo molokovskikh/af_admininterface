@@ -140,6 +140,9 @@ ORDER BY IsAll Desc, Region;", _connection);
             if (data.Row["FirstUpdate"] == DBNull.Value)
                 return;
 
+			if (data.Row["InvisibleOnFirm"].ToString() == "1" || data.Row["InvisibleOnFirm"].ToString() == "2")
+				row.Cells[2].CssClass = "not-base-client";
+
 			if (DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2
 				&& data.Row["FirmStatus"].ToString() == "0")
 				row.Cells[4].BackColor = Color.Gray;
@@ -210,7 +213,8 @@ SELECT  cd.billingcode,
         (Firmstatus = 0 or Billingstatus= 0) Firmstatus, 
         if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
         cd.firmcode                                      as bfc,
-		NULL AS IncludeType
+		NULL AS IncludeType,
+		NULL AS InvisibleOnFirm
 FROM clientsdata as cd
     JOIN farm.regions ON regions.regioncode = cd.regioncode 
     JOIN billing.payers p on cd.BillingCode = p.PayerID
@@ -244,21 +248,16 @@ SELECT  cd. billingcode,
 			WHEN 1 THEN 'Сеть'
 			WHEN 2 THEN 'Скрытый'
 			WHEN 3 THEN 'Базовый+'
-		END AS IncludeType
-		
-FROM    (clientsdata as cd, farm.regions, ret_update_info as rts, billing.payers p) 
-LEFT JOIN showregulation 
-        ON ShowClientCode= cd.firmcode 
-LEFT JOIN includeregulation 
-        ON includeclientcode= cd.firmcode 
-LEFT JOIN clientsdata incd 
-        ON incd.firmcode= includeregulation.PrimaryClientCode 
-LEFT JOIN osuseraccessright as ouar2 
-		ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-LEFT JOIN osuseraccessright as ouar 
-        ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
-LEFT JOIN logs.AnalitFUpdates
-        ON AnalitFUpdates.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+		END AS IncludeType,
+		rcs.InvisibleOnFirm
+FROM (clientsdata as cd, farm.regions, ret_update_info as rts, billing.payers p) 
+	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
+	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode 
+	LEFT JOIN includeregulation ON includeclientcode= cd.firmcode 
+	LEFT JOIN clientsdata incd ON incd.firmcode= includeregulation.PrimaryClientCode 
+	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
+	LEFT JOIN logs.AnalitFUpdates ON AnalitFUpdates.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
         and AnalitFUpdates.UpdateId = 
         (
 			SELECT max(UpdateId) 

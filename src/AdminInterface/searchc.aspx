@@ -122,28 +122,32 @@
 				</EmptyDataTemplate>
 			</asp:GridView>
 			<div style="text-align: center; margin-top: 20px;">
-				<asp:Table ID="Table4" runat="server" Visible="False">
-					<asp:TableRow runat="server">
-						<asp:TableCell BackColor="#FF6600" Width="30px" runat="server"></asp:TableCell>
-						<asp:TableCell Text=" - Клиент отключен" runat="server"></asp:TableCell>
-					</asp:TableRow>
-					<asp:TableRow runat="server">
-						<asp:TableCell CssClass="DisabledLogin" runat="server"></asp:TableCell>
-						<asp:TableCell Text=" - Учетная запись отключена" runat="server"></asp:TableCell>
-					</asp:TableRow>
-					<asp:TableRow runat="server">
-						<asp:TableCell CssClass="BlockedLogin" runat="server"></asp:TableCell>
-						<asp:TableCell Text=" - Учетная запись заблокированна" runat="server"></asp:TableCell>
-					</asp:TableRow>
-					<asp:TableRow ID="TableRow1" runat="server">
-						<asp:TableCell ID="TableCell1" CssClass="LoginNotExists" runat="server"></asp:TableCell>
-						<asp:TableCell ID="TableCell2" Text=" - Учетной записи не существует" runat="server"></asp:TableCell>
-					</asp:TableRow>
-					<asp:TableRow runat="server">
-						<asp:TableCell BackColor="Gray" runat="server"></asp:TableCell>
-						<asp:TableCell Text=" - Обновение более 2 суток назад" runat="server"></asp:TableCell>
-					</asp:TableRow>
-				</asp:Table>
+				<table runat=server id="Table4">
+					<tr>
+						<td style="background-color:#FF6600; width:30px"></td>
+						<td> - Клиент отключен</td>
+					</tr>
+					<tr>
+						<td class="DisabledLogin"></td>
+						<td> - Учетная запись отключена</td>
+					</tr>
+					<tr>
+						<td class="BlockedLogin"></td>
+						<td> - Учетная запись заблокированна</td>
+					</tr>
+					<tr>
+						<td class="LoginNotExists"></td>
+						<td> - Учетной записи не существует</td>
+					</tr>
+					<tr>
+						<td class="not-base-client"></td>
+						<td> - Скрытый или недоступный клиент</td>
+					</tr>
+					<tr>
+						<td style="background-color:Gray"></td>
+						<td> - Обновение более 2 суток назад</td>
+					</tr>
+				</table>
 				<div style="margin-top: 20px;">
 					<asp:Label ID="SearchTimeLabel" Visible="false" runat="server" />
 				</div>
