@@ -310,8 +310,7 @@ INTO    UserSettings.IncludeRegulation
         SET IncludeClientCode = ?ClientCode,
         PrimaryClientCode     = ?PrimaryClientCode,
         IncludeType           = ?IncludeType;
-
-CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);", _connection);
+", _connection);
 				adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 				adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 				adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
@@ -327,8 +326,6 @@ INTO    UserSettings.IncludeRegulation
         SET IncludeClientCode = ?ClientCode,
         PrimaryClientCode     = ?PrimaryClientCode,
         IncludeType           = ?IncludeType;
-
-CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 ", _connection);
 				adapter.UpdateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 				adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
@@ -338,8 +335,22 @@ CALL UpdateInclude(?PrimaryClientCode, ?ClientCode, ?IncludeType);
 
 				adapter.DeleteCommand = new MySqlCommand(
 @"
+UPDATE includeregulation i
+	JOIN intersection as src on src.clientcode = i.primaryclientcode
+		JOIN intersection as dst on dst.clientcode = i.includeclientcode 
+									and dst.pricecode = src.pricecode 
+									and dst.regioncode = src.regioncode
+SET dst.CostCode = src.CostCode,
+    dst.InvisibleOnClient = src.InvisibleOnClient,
+	dst.DisabledByClient = src.DisabledByClient,
+	dst.DisabledByAgency = src.DisabledByAgency,
+    dst.FirmClientCode = src.FirmClientCode,
+    dst.FirmClientCode2 = src.FirmClientCode2,
+    dst.FirmClientCode3 = src.FirmClientCode3
+WHERE i.Id = ?Id;
+
 DELETE FROM UserSettings.IncludeRegulation 
-WHERE	id = ?id;
+WHERE id = ?id;
 ", _connection);
 				adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 
