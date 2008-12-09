@@ -133,7 +133,7 @@
 					</tr>
 					<tr>
 						<td class="BlockedLogin"></td>
-						<td> - Учетная запись заблокированна</td>
+						<td> - Учетная запись заблокирована</td>
 					</tr>
 					<tr>
 						<td class="LoginNotExists"></td>
@@ -145,7 +145,7 @@
 					</tr>
 					<tr>
 						<td style="background-color:Gray"></td>
-						<td> - Обновение более 2 суток назад</td>
+						<td> - Обновление более 2 суток назад</td>
 					</tr>
 				</table>
 				<div style="margin-top: 20px;">

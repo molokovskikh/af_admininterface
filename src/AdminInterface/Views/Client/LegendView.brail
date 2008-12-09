@@ -1,6 +1,6 @@
 ﻿<% 
 	component Legend, { "LegendItems" : {	"Учетная запись отключена" : "DisabledLogin", 
-											"Учетная запись заблокированна" : "BlockedLogin",
+											"Учетная запись заблокирована" : "BlockedLogin",
 											"Учетной записи не существует" : "LoginNotExists",
 											"Клиент самостоятельно изменял пароль" : "change-password-by-one-self"},
 						"ByCenter" : false}
