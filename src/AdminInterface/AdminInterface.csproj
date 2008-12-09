@@ -243,11 +243,11 @@
     <Compile Include="Rescue\Error.aspx.designer.cs">
       <DependentUpon>Error.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Func.cs" />
+    <Compile Include="Helpers\Func.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Literals.cs" />
+    <Compile Include="Helpers\Literals.cs" />
     <Compile Include="ManageCosts.aspx.cs">
       <DependentUpon>ManageCosts.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -349,7 +349,7 @@
     <Compile Include="statcont.aspx.designer.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Utils.cs" />
+    <Compile Include="Helpers\Utils.cs" />
     <Compile Include="ViewAdministrators.aspx.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

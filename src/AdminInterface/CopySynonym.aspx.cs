@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using System.Web.Mail;
 using System.Web.UI;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using MySql.Data.MySqlClient;

@@ -9,6 +9,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -148,6 +149,11 @@ namespace AddUser
 		{
 			get { return (DataSet)Session["IncludeData"]; }
 			set { Session["IncludeData"] = value; }
+		}
+
+		protected void NotifySuppliers_Click(object sender, EventArgs e)
+		{
+			new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(ClientCode));
 		}
 
 		protected void ParametersSave_Click(object sender, EventArgs e)

@@ -1,5 +1,4 @@
 ﻿using System;
-using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 
@@ -23,11 +22,16 @@ namespace AdminInterface.Helpers
 Челябинск +7 351 7298143
 ".Replace('\'', '\"');
 
-		public static void NotifySupplierAboutDrugstoreRegistration(string clientCode, string fullName, string shortName, string region, string to)
+		public static void NotifySupplierAboutDrugstoreRegistration(string clientCode,
+		                                                            string fullName,
+		                                                            string shortName,
+		                                                            string region,
+		                                                            string to)
 		{
-			Func.Mail("pharm@analit.net",
+			Func.Mail("tech@analit.net",
 			          "Аналитическая Компания Инфорум",
-			          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+						"Новый клиент в системе АналитФАРМАЦИЯ",
+			          //"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 			          false,
 			          String.Format(_messageTemplateForSupplierAfterDrugstoreRegistration, 
 									fullName, 

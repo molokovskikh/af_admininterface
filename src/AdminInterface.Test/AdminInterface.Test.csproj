@@ -142,6 +142,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyComparerTest.cs" />
     <Compile Include="Services\NotificationFixture.cs" />
+    <Compile Include="Watin\ClientFixture.cs" />
     <Compile Include="Watin\RegistrationFixture.cs" />
     <Compile Include="Watin\ServiceFixture.cs" />
     <Compile Include="Watin\SmapRejectorFixture.cs" />

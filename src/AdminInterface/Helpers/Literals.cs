@@ -1,9 +1,6 @@
 using System.Configuration;
-using System;
-using System.Web;
 
-
-namespace AddUser
+namespace AdminInterface.Helpers
 {
 	public class Literals
 	{

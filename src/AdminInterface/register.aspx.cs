@@ -363,89 +363,17 @@ set @inUser = ?UserName;";
 				                                 _command.Parameters["?OSUserName"].Value));
 
 				mytrans.Commit();
-				try
-				{
-					if (TypeDD.SelectedItem.Text == "Аптека"
-						&& !IncludeCB.Checked
+				if (TypeDD.SelectedItem.Text == "Аптека"
+					&& !IncludeCB.Checked
+					&& !ServiceClient.Checked
+					&& CustomerType.SelectedItem.Text == "Стандартный"
+					|| (TypeDD.SelectedItem.Text == "Аптека"
+						&& IncludeCB.Checked
 						&& !ServiceClient.Checked
-					    && CustomerType.SelectedItem.Text == "Стандартный"
-					    || (TypeDD.SelectedItem.Text == "Аптека"
-					        && IncludeCB.Checked
-							&& !ServiceClient.Checked
-					        && IncludeType.SelectedItem.Text != "Скрытый"))
+					    && IncludeType.SelectedItem.Text != "Скрытый"))
 					{
-						var dataAdapter =
-							new MySqlDataAdapter(@"
-select c.contactText
-from usersettings.clientsdata cd
-  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
-    join contacts.contacts c on cg.Id = c.ContactOwnerId
-where length(c.contactText) > 0
-      and firmcode in (select pd.FirmCode
-                        from pricesdata as pd, pricesregionaldata as prd
-                        where pd.enabled = 1
-                              and prd.enabled = 1
-                              and firmstatus = 1
-                              and firmtype = 0
-                              and firmsegment = 0
-                              and MaskRegion & ?Region >0)
-      and cg.Type = ?ContactGroupType
-      and c.Type = ?ContactType
-
-union
-
-select c.contactText
-from usersettings.clientsdata cd
-  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
-    join contacts.persons p on cg.id = p.ContactGroupId
-      join contacts.contacts c on p.Id = c.ContactOwnerId
-where length(c.contactText) > 0
-      and firmcode in (select pd.FirmCode
-                        from pricesdata as pd, pricesregionaldata as prd
-                        where pd.enabled = 1
-                              and prd.enabled = 1
-                              and firmstatus = 1
-                              and firmtype = 0
-                              and firmsegment = 0
-                              and MaskRegion & ?Region > 0)
-      and cg.Type = ?ContactGroupType
-      and c.Type = ?ContactType;", _connection);
-						dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", RegionDD.SelectedItem.Value);
-						dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
-						dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
-						dataAdapter.Fill(DS1, "FirmEmail");
-						if (DS1.Tables["FirmEmail"].Rows.Count > 0)
-							foreach (DataRow Row in DS1.Tables["FirmEmail"].Rows)
-								NotificationHelper.NotifySupplierAboutDrugstoreRegistration(_command.Parameters["?ClientCode"].Value.ToString(),
-								                                                            FullNameTB.Text,
-								                                                            ShortNameTB.Text,
-								                                                            RegionDD.SelectedItem.Text,
-								                                                            Row["ContactText"].ToString());
-						else
-						{
-							Func.Mail("register@analit.net", String.Empty,
-									  "\"" + String.Format("{0} ( {1} )", FullNameTB.Text, ShortNameTB.Text) + "\" - ошибка уведомления поставщиков",
-									  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-											 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
-											 + "\nКод: " + Session["Code"] + "\n\nСегмент: "
-											 + SegmentDD.SelectedItem.Text + "\nТип: " + TypeDD.SelectedItem.Text
-											 + "Ошибка: Ничего не получилось выбрать из базы",
-									  "RegisterList@subscribe.analit.net", String.Empty,
-									  SecurityContext.Administrator.Email);
-						}
+						new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
 					}
-				}
-				catch (Exception err)
-				{
-					Func.Mail("register@analit.net", String.Empty,
-					          "\"" + FullNameTB.Text + "\" - ошибка уведомления поставщиков",
-							  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-									 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower() + "\nКод: "
-					                 + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-					                 + "\nТип: " + TypeDD.SelectedItem.Text + "Ошибка: " + err.Source + ": "
-					                 + err.Message, "RegisterList@subscribe.analit.net", String.Empty,
-							  SecurityContext.Administrator.Email);
-				}
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
 						  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
@@ -492,9 +420,7 @@ where length(c.contactText) > 0
 			}
 			catch (Exception excL)
 			{
-				if (!(excL is ThreadAbortException))
-					mytrans.Rollback();
-				throw;
+				mytrans.Rollback();
 			}
 			finally
 			{

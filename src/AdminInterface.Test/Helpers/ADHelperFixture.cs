@@ -10,6 +10,7 @@ using NUnit.Framework.SyntaxHelpers;
 namespace AdminInterface.Test.Helpers
 {
 	[TestFixture]
+	[Ignore("не работают т.к. нет административных прав")]
 	public class ADHelperFixture
 	{
 		public static void Log(DirectoryEntry entry)

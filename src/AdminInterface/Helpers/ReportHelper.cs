@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
-using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Properties;
 using Common.Web.Ui.Helpers;

@@ -23,8 +23,9 @@
 								</td>
 							</tr>
 							<tr>
-								<td colspan="3" style="height: 22px; text-align: left;">
+								<td style="text-align:left" colspan=3>
 									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" OnClick="GeneratePasswords_Click" ValidationGroup="0" />
+									<asp:Button runat="Server" ID="Button2" Text="Отправить уведомления о регистрации поставщикам" OnClick="NotifySuppliers_Click" ValidationGroup="0" />
 								</td>
 							</tr>
 							<tr align="center" bgcolor="mintcream">

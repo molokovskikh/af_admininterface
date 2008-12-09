@@ -1,25 +1,23 @@
 using System;
-using System.Data;
 using System.Net.Mail;
 using System.Text;
 using log4net;
 using LumiSoft.Net.SMTP.Client;
-using MySql.Data.MySqlClient;
 
-namespace AddUser
+namespace AdminInterface.Helpers
 {
 	public class Func
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Func));
 
 		public static void Mail(string from, 
-								string fromDisplayName, 
-								string subject, 
-								bool isBodyHtml,
+		                        string fromDisplayName, 
+		                        string subject, 
+		                        bool isBodyHtml,
 		                        string body, 
-								string to, 
-								string toDisplayName, 
-								string bcc)
+		                        string to, 
+		                        string toDisplayName, 
+		                        string bcc)
 		{
 			try
 			{
@@ -31,12 +29,12 @@ namespace AddUser
 #endif
 					var message = new MailMessage
 					              	{
-										From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
+					              		From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
 					              		IsBodyHtml = isBodyHtml,
 					              		Subject = subject,
 					              		SubjectEncoding = Encoding.UTF8,
 					              		Body = body,
-										BodyEncoding = Encoding.UTF8,
+					              		BodyEncoding = Encoding.UTF8,
 					              	};
 					if (!String.IsNullOrEmpty(bcc))
 						message.Bcc.Add(bcc);
@@ -83,42 +81,6 @@ namespace AddUser
 			while (password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length - 1)];
 			return password;
-		}
-
-		public static decimal GetDecimal(string InputStr)
-		{
-			if (InputStr.Length < 1)
-				return 0;
-			try
-			{
-				return Convert.ToDecimal(InputStr);
-			}
-			catch
-			{
-				new Exception(
-					String.Format(
-						"Не верно указанна скидка {0}. Для указания десятичных долей используйте знаки \".\" или \",\", к примеру 5.54",
-						InputStr));
-			}
-			return 0;
-		}
-
-
-		public static string GetFirmType(int FrimTypeCode)
-		{
-			string FirmTypeStr;
-			if (FrimTypeCode == 0)
-				FirmTypeStr = "Поставщик";
-			else
-				FirmTypeStr = "Аптека";
-			return FirmTypeStr;
-		}
-
-		public bool CalcDays(DateTime CurContDate)
-		{
-			if (DateTime.Now.Subtract(CurContDate).TotalDays > 3)
-				return false;
-			return true;
 		}
 
 		public static int Send(MailMessage message)

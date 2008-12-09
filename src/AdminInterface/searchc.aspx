@@ -122,7 +122,7 @@
 				</EmptyDataTemplate>
 			</asp:GridView>
 			<div style="text-align: center; margin-top: 20px;">
-				<table runat=server id="Table4">
+				<table runat=server id="Table4" visible=false>
 					<tr>
 						<td style="background-color:#FF6600; width:30px"></td>
 						<td> - Клиент отключен</td>

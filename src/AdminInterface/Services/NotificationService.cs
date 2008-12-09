@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Data;
 using System.Net.Mail;
-using AddUser;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
+using Common.Web.Ui.Models;
+using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Services
 {
@@ -17,6 +20,78 @@ namespace AdminInterface.Services
 		public NotificationService()
 		{
 			_sendMessage = Func.SendWitnStandartSender;
+		}
+
+		public void NotifySupplierAboutDrugstoreRegistration(uint clientCode)
+		{
+			var data = new DataSet();
+			string fullName;
+			string shortName;
+			string region;
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+			{
+				connection.Open();
+				var command = new MySqlCommand(
+@"select cd.RegionCode, cd.FullName, cd.ShortName, r.Region
+from usersettings.clientsdata cd
+	join farm.regions r on r.RegionCode = cd.RegionCode
+where firmcode = ?ClientCode", connection);
+				command.Parameters.AddWithValue("?ClientCode", clientCode);
+				ulong homeRegion;
+				using (var reader = command.ExecuteReader())
+				{
+					reader.Read();
+					fullName = reader.GetString("FullName");
+					shortName = reader.GetString("ShortName");
+					homeRegion = reader.GetUInt64("RegionCode");
+					region = reader.GetString("Region");
+				}
+				var dataAdapter = new MySqlDataAdapter(@"
+select c.contactText
+from usersettings.clientsdata cd
+  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+    join contacts.contacts c on cg.Id = c.ContactOwnerId
+where length(c.contactText) > 0
+      and firmcode in (select pd.FirmCode
+                        from pricesdata as pd, pricesregionaldata as prd
+                        where pd.enabled = 1
+                              and prd.enabled = 1
+                              and firmstatus = 1
+                              and firmtype = 0
+                              and firmsegment = 0
+                              and MaskRegion & ?Region >0)
+      and cg.Type = ?ContactGroupType
+      and c.Type = ?ContactType
+
+union
+
+select c.contactText
+from usersettings.clientsdata cd
+  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+    join contacts.persons p on cg.id = p.ContactGroupId
+      join contacts.contacts c on p.Id = c.ContactOwnerId
+where length(c.contactText) > 0
+      and firmcode in (select pd.FirmCode
+                        from pricesdata as pd, pricesregionaldata as prd
+                        where pd.enabled = 1
+                              and prd.enabled = 1
+                              and firmstatus = 1
+                              and firmtype = 0
+                              and firmsegment = 0
+                              and MaskRegion & ?Region > 0)
+      and cg.Type = ?ContactGroupType
+      and c.Type = ?ContactType;", connection);
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", homeRegion);
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
+				dataAdapter.Fill(data);
+			}
+			foreach (DataRow Row in data.Tables[0].Rows)
+				NotificationHelper.NotifySupplierAboutDrugstoreRegistration(clientCode.ToString(),
+																			fullName,
+																			shortName,
+																			region,
+																			Row["ContactText"].ToString());
 		}
 
 		public void SendNotificationToBillingAboutClientRegistration(uint clientCode,

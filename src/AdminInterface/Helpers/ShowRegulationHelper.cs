@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Web.UI.WebControls;
-using AddUser;
 using AdminInterface.Security;
 using MySql.Data.MySqlClient;
 
