@@ -30,8 +30,7 @@ namespace AdminInterface.Helpers
 		{
 			Func.Mail("tech@analit.net",
 			          "Аналитическая Компания Инфорум",
-						"Новый клиент в системе АналитФАРМАЦИЯ",
-			          //"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+			          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 			          false,
 			          String.Format(_messageTemplateForSupplierAfterDrugstoreRegistration, 
 									fullName, 
