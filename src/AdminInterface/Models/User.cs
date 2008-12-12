@@ -72,7 +72,8 @@ namespace AdminInterface.Models
 		public bool IsChangePasswordByOneself()
 		{
 			return PasswordChangeLogEntity.Exists(DetachedCriteria.For<PasswordChangeLogEntity>()
-			                                      	.Add(Expression.EqProperty("TargetUserName", "UserName")));
+			                                      	.Add(Expression.EqProperty("TargetUserName", "UserName"))
+													.Add(Expression.Eq("TargetUserName", Login)));
 		}
 	}
 }
