@@ -3,7 +3,7 @@
 
 	<property name="ProjectName" value="AdminInterface" />
 	<property name="ReleasePath" value="..\build\" />
-	<property name="PublishDir" value="\\\offdc\Data\Квасов Роман\AdmInterface" />
+	<property name="PublishDir" value="\\\offdc\Data\Квасов Роман\Publish\AdmInterface" />
 		
 
 	<target name="compile">
