@@ -3,6 +3,14 @@ using System.DirectoryServices;
 
 namespace AdminInterface.Helpers
 {
+
+	/*
+	 * заметки на полях обращение к конкретному хосту 
+	 * LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net 
+	 * Поиск на конкретном хосте
+	 * using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
+	 * searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
+	 */
 	public class ADHelper
 	{
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0); 
@@ -127,8 +135,9 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastLogOnDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
+			using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
 			{
+				searcher.Filter = String.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
 				var result = searcher.FindOne();
 				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
 					return null;
