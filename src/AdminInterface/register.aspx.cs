@@ -418,9 +418,10 @@ set @inUser = ?UserName;";
 																		  (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+")),
 						                                                  null);
 			}
-			catch (Exception excL)
+			catch (Exception)
 			{
 				mytrans.Rollback();
+				throw;
 			}
 			finally
 			{
