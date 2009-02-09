@@ -1,9 +1,12 @@
 using System;
 using System.Data;
+using System.Security.Principal;
+using System.ServiceModel;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using ConsoleApplication11.ServiceReference2;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -126,7 +129,25 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				//Время последнего обновления
 				MaxUpdateTime.Text = Convert.ToDateTime(data.Tables[0].Rows[0]["MaxUpdateTime"]).ToLongTimeString();
 				//Обновлений в процессе
-				ReqHL.Text = data.Tables[0].Rows[0]["InProc"].ToString();
+				//ReqHL.Text = data.Tables[0].Rows[0]["InProc"].ToString();
+				using (WindowsIdentity.GetCurrent().Impersonate())
+				{
+					StatisticServiceClient client = null;
+					try
+					{
+						client = new StatisticServiceClient();
+						client.ClientCredentials.Windows.AllowedImpersonationLevel = TokenImpersonationLevel.Impersonation;
+						client.ClientCredentials.Windows.AllowNtlm = true;
+						ReqHL.Text = client.GetUpdatingClientCount().ToString();
+						client.Close();
+					}
+					catch (Exception)
+					{
+						if (client.State != CommunicationState.Closed)
+							client.Abort();
+						throw;
+					}
+				}
 
 
 				DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DataSize"]));

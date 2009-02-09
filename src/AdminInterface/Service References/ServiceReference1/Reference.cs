@@ -23,6 +23,9 @@ namespace ConsoleApplication11.ServiceReference2
 		[OperationContract(Action = "http://tempuri.org/IStatisticService/GetUpdateInfo",
 			ReplyAction = "http://tempuri.org/IStatisticService/GetUpdateInfoResponse")]
 		UpdatingClientStatus[] GetUpdateInfo();
+
+		[OperationContract(Action = "http://tempuri.org/IStatisticService/GetUpdatingClientCount")]
+		int GetUpdatingClientCount();
 	}
 
 	[GeneratedCode("System.ServiceModel", "3.0.0.0")]
@@ -61,6 +64,11 @@ namespace ConsoleApplication11.ServiceReference2
 		public UpdatingClientStatus[] GetUpdateInfo()
 		{
 			return Channel.GetUpdateInfo();
+		}
+
+		public int GetUpdatingClientCount()
+		{
+			return Channel.GetUpdatingClientCount();
 		}
 	}
 }
