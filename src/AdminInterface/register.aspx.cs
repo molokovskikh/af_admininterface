@@ -15,6 +15,7 @@ using AdminInterface.Security;
 using AdminInterface.Services;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using log4net;
 using MySql.Data.MySqlClient;
 using AdminInterface.Helpers;
 
@@ -1012,37 +1013,53 @@ ORDER BY region;
 		private void CreateFtpDirectory(string directory, string userName)
 		{
 #if !DEBUG
-			var supplierDirectory = Directory.CreateDirectory(directory);
-			var supplierDirectorySecurity = supplierDirectory.GetAccessControl();
-		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-		                                                                     FileSystemRights.Read,
-		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-		                                                                     PropagationFlags.None,
-		                                                                     AccessControlType.Allow));
-		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-		                                                                     FileSystemRights.Write,
-		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-		                                                                     PropagationFlags.None,
-		                                                                     AccessControlType.Allow));
-		    supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-		                                                                     FileSystemRights.ListDirectory,
-		                                                                     InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
-		                                                                     PropagationFlags.None, 
-                                                                             AccessControlType.Allow));
-			supplierDirectory.SetAccessControl(supplierDirectorySecurity);
+			try
+			{
+				var supplierDirectory = Directory.CreateDirectory(directory);
+				var supplierDirectorySecurity = supplierDirectory.GetAccessControl();
+				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+				                                                                 FileSystemRights.Read,
+				                                                                 InheritanceFlags.ContainerInherit |
+				                                                                 InheritanceFlags.ObjectInherit,
+				                                                                 PropagationFlags.None,
+				                                                                 AccessControlType.Allow));
+				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+				                                                                 FileSystemRights.Write,
+				                                                                 InheritanceFlags.ContainerInherit |
+				                                                                 InheritanceFlags.ObjectInherit,
+				                                                                 PropagationFlags.None,
+				                                                                 AccessControlType.Allow));
+				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+				                                                                 FileSystemRights.ListDirectory,
+				                                                                 InheritanceFlags.ContainerInherit |
+				                                                                 InheritanceFlags.ObjectInherit,
+				                                                                 PropagationFlags.None,
+				                                                                 AccessControlType.Allow));
+				supplierDirectory.SetAccessControl(supplierDirectorySecurity);
 
-			var ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
-			var ordersDirectorySecurity = supplierDirectory.GetAccessControl();
-			ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-			                                                               FileSystemRights.DeleteSubdirectoriesAndFiles,
-			                                                               InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit, 
-                                                                           PropagationFlags.None,
-			                                                               AccessControlType.Allow));
-			ordersDirectory.SetAccessControl(ordersDirectorySecurity);
+				var ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
+				var ordersDirectorySecurity = supplierDirectory.GetAccessControl();
+				ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
+				                                                               FileSystemRights.DeleteSubdirectoriesAndFiles,
+				                                                               InheritanceFlags.ContainerInherit |
+				                                                               InheritanceFlags.ObjectInherit,
+				                                                               PropagationFlags.None,
+				                                                               AccessControlType.Allow));
+				ordersDirectory.SetAccessControl(ordersDirectorySecurity);
 
-		    Directory.CreateDirectory(directory + "Docs\\");
-			Directory.CreateDirectory(directory + "Rejects\\");
-			Directory.CreateDirectory(directory + "Waybills\\");
+				Directory.CreateDirectory(directory + "Docs\\");
+				Directory.CreateDirectory(directory + "Rejects\\");
+				Directory.CreateDirectory(directory + "Waybills\\");
+			}
+			catch(Exception e)
+			{
+				LogManager.GetLogger(GetType()).Error(String.Format(@"
+Ошибка при создании папки на ftp для клиента, иди и создавай руками.
+Нужно создать папку {0}
+А так же создать под папки Order, Docs, Rejects, Waybills
+Дать логину {1} право читать, писать и получать список директорий и удалять под директории в папке Orders
+", directory, userName), e);
+			}
 #endif
 		}
 
