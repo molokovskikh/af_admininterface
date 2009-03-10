@@ -18,8 +18,8 @@ namespace AdminInterface.Helpers
 		public static void CreateUserInAD(string login, string password , string clientCode)
 		{
 #if !DEBUG
-			var root = new DirectoryEntry("LDAP://OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");
-			var userGroup = new DirectoryEntry("LDAP://CN=Базовая группа клиентов - получателей данных,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
+			var root = new DirectoryEntry("LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://acdcserv/CN=Базовая группа клиентов - получателей данных,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
 			var user = root.Children.Add("CN=" + login, "user");
 			user.Properties["samAccountName"].Value = login;
 			user.Properties["userWorkstations"].Add("acdcserv");
