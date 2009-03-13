@@ -143,6 +143,7 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\Extentions.cs" />
+    <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />
@@ -542,7 +543,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>56231</DevelopmentServerPort>
+          <DevelopmentServerPort>53302</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
