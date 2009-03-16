@@ -21,5 +21,13 @@ namespace AdminInterface.Test.Models
 			var offers = Offer.Search(client, "папа");
 			Assert.That(offers.Count, Is.GreaterThan(0));
 		}
+
+		[Test]
+		public void Request_for_not_exist_name_should_return_zero_elements()
+		{
+			var client = Client.Find(2575u);
+			var offers = Offer.Search(client, "sdfaefawefsdf");
+			Assert.That(offers.Count, Is.EqualTo(0));
+		}
 	}
 }

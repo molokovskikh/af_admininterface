@@ -37,7 +37,9 @@ FROM farm.core0 c0
 	LEFT JOIN Catalogs.ProductProperties pp on pp.ProductId = p.Id
 	LEFT JOIN Catalogs.PropertyValues pv on pv.id = pp.PropertyValueId
 	LEFT JOIN Catalogs.Properties prop on prop.Id = pv.PropertyId
-WHERE s.Synonym like :SearchText")
+WHERE s.Synonym like :SearchText
+GROUP BY c0.Id
+ORDER BY CatalogName")
 							.SetParameter("SearchText", "%" + text + "%")
 							.SetResultTransformer(Transformers.AliasToBean(typeof(Offer)))
 							.List<Offer>();

@@ -65,9 +65,12 @@ namespace AdminInterface.Controllers
 		public void SearchOffers(uint clientCode, string searchText)
 		{
 			var client = Client.FindAndCheck(clientCode);
-			var offers = Offer.Search(client, searchText);
+			if (!String.IsNullOrEmpty(searchText))
+			{
+				var offers = Offer.Search(client, searchText);
+				PropertyBag["Offers"] = offers;
+			}
 			PropertyBag["Client"] = client;
-			PropertyBag["Offers"] = offers;
 		}
 
 		[Layout("Common")]
