@@ -810,6 +810,7 @@ Values(?ClientCode, (SELECT max(currentExeVersion)
 FROM usersettings.ret_update_info r
   join usersettings.clientsdata cd on cd.firmcode = r.clientcode
 where billingcode <> 921));
+INSERT INTO usersettings.UserUpdateInfo(UserId) Values (@NewUserId);
 
 INSERT 
 INTO    intersection
