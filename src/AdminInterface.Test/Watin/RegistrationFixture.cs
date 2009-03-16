@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using System.Text.RegularExpressions;
+using AdminInterface.Helpers;
 using Microsoft.VisualStudio.WebHost;
+using MySql.Data.MySqlClient;
 using NUnit.Framework;
+using NUnit.Framework.SyntaxHelpers;
 using WatiN.Core;
 
 namespace AdminInterface.Test.Watin
@@ -53,7 +57,46 @@ namespace AdminInterface.Test.Watin
 				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
 
 				browser.Button(Find.ById("Register")).Click();
+				CheckForError(browser);
 				Assert.That(browser.ContainsText("Регистрационная карта №"));
+			}
+		}
+
+		private void CheckForError(IE browser)
+		{
+			if (browser.ContainsText("Error"))
+			{
+				Console.WriteLine(browser.Text);
+			}
+		}
+
+		[Test]
+		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
+		{
+			string clientCode;
+			using (var browser = new IE(BuildTestUrl("register.aspx")))
+			{
+				SetupGeneralInformation(browser);
+				browser.SelectList(Find.ById("TypeDD")).Select("Аптека");
+				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
+
+				browser.Button(Find.ById("Register")).Click();
+				Assert.That(browser.ContainsText("Регистрационная карта №"));
+				clientCode = new Regex(@"\d+")
+					.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value;
+				Console.WriteLine(clientCode);
+			}
+			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+			{
+				connection.Open();
+				var command = new MySqlCommand(@"
+select UserId 
+from usersettings.OsUserAccessRight ouar
+	join usersettings.UserUpdateInfo uui on uui.UserId = ouar.RowId
+where clientcode = ?ClientCode", connection);
+				command.Parameters.AddWithValue("?ClientCode", clientCode);
+				var userId = command.ExecuteScalar();
+				Assert.That(userId, Is.Not.EqualTo(""));
 			}
 		}
 
