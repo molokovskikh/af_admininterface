@@ -1,0 +1,33 @@
+﻿<% component CaptureFor, {"id" : "Title"}:%>
+	 Поиск предложений для клиента ${client.ShortName}
+<% end %>
+
+<form action="SearchOffers.rails" method="post">
+	<input type="hidden" name="ClientCode" value="${Client.Id}" />
+	<h5>Введите наименование или форму выпуска</h5>	
+	<input type="text" name="SearchText" />
+	<input type="submit" value="Искать" />
+</form>
+
+<% if IsDefined("Offers"): %>
+	<table class="DataTable">
+		<tr>
+			<th>Каталожное наименование</th>
+			<th>Наименование поставщика</th>
+			<th>Цена</th>
+		</tr>
+		<% for i, offer in enumerate(offers): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				${offer.CatalogName}
+			</td>
+			<td>
+				${offer.Synonym}
+			</td>
+			<td>
+				${offer.Cost}
+			</td>
+		</tr>
+		<% end %>
+	</table>
+<% end %>

@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -118,6 +119,15 @@ namespace AdminInterface.Models
 				return 0;
 
 			return tariff.Pay;
+		}
+
+		public static Client FindAndCheck(uint clientCode)
+		{
+			var client = Find(clientCode);
+
+			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckClientType(client.Type);
+			return client;
 		}
 
 		public static Client FindClietnForBilling(uint clientCode)

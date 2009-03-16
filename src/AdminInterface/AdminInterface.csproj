@@ -151,6 +151,7 @@
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
+    <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
@@ -491,6 +492,7 @@
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
     <None Include="Views\Client\LegendView.brail" />
+    <None Include="Views\Client\SearchOffers.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />

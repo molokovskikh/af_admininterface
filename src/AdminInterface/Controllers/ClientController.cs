@@ -14,6 +14,7 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(ADHelper)),
+		Helper(typeof(ViewHelper)),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure, 
@@ -49,6 +50,24 @@ namespace AdminInterface.Controllers
 			PropertyBag["Client"] = client;
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
+		}
+
+		//[AccessibleThrough(Verb.Get)]
+		[Layout("Common")]
+		public void SearchOffers(uint clientCode)
+		{
+			var client = Client.FindAndCheck(clientCode);
+			PropertyBag["client"] = client;
+		}
+
+		//[AccessibleThrough(Verb.Post)]
+		[Layout("Common")]
+		public void SearchOffers(uint clientCode, string searchText)
+		{
+			var client = Client.FindAndCheck(clientCode);
+			var offers = Offer.Search(client, searchText);
+			PropertyBag["Client"] = client;
+			PropertyBag["Offers"] = offers;
 		}
 
 		[Layout("Common")]

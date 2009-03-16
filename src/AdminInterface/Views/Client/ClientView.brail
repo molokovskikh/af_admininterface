@@ -34,6 +34,13 @@
 	<a href="../orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
 	</td>
 </tr>
+<% if Client.IsDrugstore(): %>
+<tr>
+	<td>
+		<a href="SearchOffers.rails?clientCode=${Client.Id}" target="_blank">Поиск предложений</a>
+	</td>
+</tr>
+<% end %>
 <tr>
 <td>
 	<% if Client.IsDrugstore(): %>
