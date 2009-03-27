@@ -1,8 +1,6 @@
 using System;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -10,140 +8,17 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
 	partial class manageret : Page
 	{
-		protected DataSet DS1;
-		protected DataTable Regions;
-		protected DataColumn DataColumn1;
-		protected DataColumn DataColumn2;
-		protected DataTable WorkReg;
-		protected DataColumn DataColumn5;
-		protected DataColumn DataColumn7;
-		protected DataColumn DataColumn8;
-		protected DataTable Clientsdata;
-		protected DataColumn DataColumn9;
-		protected DataColumn DataColumn10;
-		protected DataColumn DataColumn11;
-		protected DataColumn DataColumn12;
-		protected DataColumn DataColumn13;
-		protected DataColumn DataColumn14;
-		protected DataColumn DataColumn15;
-		protected DataColumn DataColumn16;
-		protected DataColumn DataColumn17;
-		protected DataColumn DataColumn18;
-		protected DataColumn DataColumn19;
-		protected DataColumn DataColumn20;
-		protected DataColumn DataColumn21;
-		protected DataTable admin;
-		protected DataColumn DataColumn3;
-		protected DataColumn DataColumn4;
-		protected DataTable RetClientsSet;
-		MySqlConnection _connection = new MySqlConnection();
-		MySqlCommand myMySqlCommand = new MySqlCommand();
-		MySqlDataReader myMySqlDataReader;
-		MySqlTransaction myTrans;
-		int ClientCode;
-		ulong HomeRegionCode;
-		string InsertCommand;
+		private int ClientCode;
+		private ulong HomeRegionCode;
 
-
-		[DebuggerStepThrough]
-		private void InitializeComponent()
-		{
-			DS1 = new DataSet();
-			Regions = new DataTable();
-			DataColumn1 = new DataColumn();
-			DataColumn2 = new DataColumn();
-			WorkReg = new DataTable();
-			DataColumn5 = new DataColumn();
-			DataColumn7 = new DataColumn();
-			DataColumn8 = new DataColumn();
-			DataColumn3 = new DataColumn();
-			DataColumn4 = new DataColumn();
-			Clientsdata = new DataTable();
-			DataColumn9 = new DataColumn();
-			DataColumn10 = new DataColumn();
-			DataColumn11 = new DataColumn();
-			DataColumn12 = new DataColumn();
-			DataColumn13 = new DataColumn();
-			DataColumn14 = new DataColumn();
-			DataColumn15 = new DataColumn();
-			DataColumn16 = new DataColumn();
-			DataColumn17 = new DataColumn();
-			DataColumn18 = new DataColumn();
-			DataColumn19 = new DataColumn();
-			DataColumn20 = new DataColumn();
-			DataColumn21 = new DataColumn();
-			admin = new DataTable();
-			RetClientsSet = new DataTable();
-			DS1.BeginInit();
-			Regions.BeginInit();
-			WorkReg.BeginInit();
-			Clientsdata.BeginInit();
-			admin.BeginInit();
-			RetClientsSet.BeginInit();
-			DS1.DataSetName = "NewDataSet";
-			DS1.Locale = new CultureInfo("ru-RU");
-			DS1.Tables.AddRange(new DataTable[] { Regions, WorkReg, Clientsdata, admin, RetClientsSet });
-			Regions.Columns.AddRange(new DataColumn[] { DataColumn1, DataColumn2 });
-			Regions.TableName = "Regions";
-			DataColumn1.ColumnName = "Region";
-			DataColumn2.ColumnName = "RegionCode";
-			DataColumn2.DataType = typeof(Int64);
-			WorkReg.Columns.AddRange(new DataColumn[] { DataColumn5, DataColumn7, DataColumn8, DataColumn3, DataColumn4 });
-			WorkReg.TableName = "WorkReg";
-			DataColumn5.ColumnName = "RegionCode";
-			DataColumn5.DataType = typeof(Int32);
-			DataColumn7.ColumnName = "ShowMask";
-			DataColumn7.DataType = typeof(Boolean);
-			DataColumn8.ColumnName = "RegMask";
-			DataColumn8.DataType = typeof(Boolean);
-			DataColumn3.ColumnName = "Region";
-			DataColumn4.ColumnName = "OrderMask";
-			DataColumn4.DataType = typeof(Boolean);
-			Clientsdata.Columns.AddRange(
-				new DataColumn[]
-					{
-						DataColumn9, DataColumn10, DataColumn11, DataColumn12, DataColumn13, DataColumn14, DataColumn15, DataColumn16,
-						DataColumn17, DataColumn18, DataColumn19, DataColumn20, DataColumn21
-					});
-			Clientsdata.TableName = "Clientsdata";
-			DataColumn9.ColumnName = "adress";
-			DataColumn10.ColumnName = "bussinfo";
-			DataColumn11.ColumnName = "bussstop";
-			DataColumn12.ColumnName = "fax";
-			DataColumn13.ColumnName = "firmsegment";
-			DataColumn13.DataType = typeof(Int16);
-			DataColumn14.ColumnName = "firmtype";
-			DataColumn14.DataType = typeof(Int16);
-			DataColumn15.ColumnName = "oldcode";
-			DataColumn15.DataType = typeof(Int16);
-			DataColumn16.ColumnName = "phone";
-			DataColumn17.ColumnName = "regioncode";
-			DataColumn17.DataType = typeof(Int64);
-			DataColumn18.ColumnName = "shortname";
-			DataColumn19.ColumnName = "url";
-			DataColumn20.ColumnName = "fullname";
-			DataColumn21.ColumnName = "mail";
-			admin.TableName = "admin";
-			RetClientsSet.TableName = "RetClientsSet";
-			DS1.EndInit();
-			Regions.EndInit();
-			WorkReg.EndInit();
-			Clientsdata.EndInit();
-			admin.EndInit();
-			RetClientsSet.EndInit();
-		}
-
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-			InitializeComponent();
-		}
+		protected DataSet _data;
 
 		private DataSet Data
 		{
@@ -162,81 +37,84 @@ namespace AddUser
 				return;
 
 			ProcessChanges();
-			myMySqlCommand.Parameters.AddWithValue("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
-			myMySqlCommand.Parameters.AddWithValue("?AlowRegister", RegisterCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?AlowRejection", RejectsCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?MultiUserLevel", MultiUserLevelTB.Text);
-			myMySqlCommand.Parameters.AddWithValue("?AdvertisingLevel", AdvertisingLevelCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?AlowWayBill", WayBillCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?EnableUpdate", EnableUpdateCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?CalculateLeader", CalculateLeaderCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?SubmitOrders", SubmitOrdersCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?ServiceClient", ServiceClientCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
-			myMySqlCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-			myMySqlCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-			myMySqlCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
-			myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+
+			var updateCommand = new MySqlCommand();
+			updateCommand.Parameters.AddWithValue("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
+			updateCommand.Parameters.AddWithValue("?AlowRegister", RegisterCB.Checked);
+			updateCommand.Parameters.AddWithValue("?AlowRejection", RejectsCB.Checked);
+			updateCommand.Parameters.AddWithValue("?MultiUserLevel", MultiUserLevelTB.Text);
+			updateCommand.Parameters.AddWithValue("?AdvertisingLevel", AdvertisingLevelCB.Checked);
+			updateCommand.Parameters.AddWithValue("?AlowWayBill", WayBillCB.Checked);
+			updateCommand.Parameters.AddWithValue("?EnableUpdate", EnableUpdateCB.Checked);
+			updateCommand.Parameters.AddWithValue("?CalculateLeader", CalculateLeaderCB.Checked);
+			updateCommand.Parameters.AddWithValue("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
+			updateCommand.Parameters.AddWithValue("?SubmitOrders", SubmitOrdersCB.Checked);
+			updateCommand.Parameters.AddWithValue("?ServiceClient", ServiceClientCB.Checked);
+			updateCommand.Parameters.AddWithValue("?OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
+			updateCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
+			updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
 			if (NoisedCosts.Visible && NoisedCosts.Checked)
-				myMySqlCommand.Parameters.AddWithValue("?PriceCodeOnly", NotNoisedPrice.SelectedValue);
+				updateCommand.Parameters.AddWithValue("?PriceCodeOnly", NotNoisedPrice.SelectedValue);
 			else
-				myMySqlCommand.Parameters.AddWithValue("?PriceCodeOnly", null);
+				updateCommand.Parameters.AddWithValue("?PriceCodeOnly", null);
 
-			try
-			{
-				_connection.Open();
-				myTrans = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				myMySqlCommand.Transaction = myTrans;
-				myMySqlCommand.CommandText =
-@"
+			With.Transaction(
+				(connection, transaction) => {
+					updateCommand.Connection = connection;
+					updateCommand.Transaction = transaction;
+					var tempCommand = new MySqlCommand("", connection, transaction);
+					tempCommand.CommandText = @"
 set @inHost = ?Host;
-set @inUser = ?UserName;
-";
-				myMySqlCommand.ExecuteNonQuery();
+set @inUser = ?UserName;";
+					tempCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
+					tempCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-				myMySqlCommand.CommandText = @"
+					tempCommand.ExecuteNonQuery();
+
+					tempCommand.CommandText =
+						@"
 select MaskRegion, OrderRegionMask
 from clientsdata cd
 	join retclientsset rcs on cd.FirmCode = rcs.ClientCode
 where firmcode=?clientCode";
+					tempCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
-				ulong workRegionMask;
-				ulong orderRegionMask;
-				using (var reader = myMySqlCommand.ExecuteReader())
-				{
-					reader.Read();
-					workRegionMask = reader.GetUInt64("MaskRegion");
-					orderRegionMask = reader.GetUInt64("OrderRegionMask");
-				}
+					ulong workRegionMask;
+					ulong orderRegionMask;
+					using (var reader = tempCommand.ExecuteReader())
+					{
+						reader.Read();
+						workRegionMask = reader.GetUInt64("MaskRegion");
+						orderRegionMask = reader.GetUInt64("OrderRegionMask");
+					}
 
-				var currentWorkRegionMask = workRegionMask;
-				var currentOrderRegionMask = orderRegionMask;
+					var currentWorkRegionMask = workRegionMask;
+					var currentOrderRegionMask = orderRegionMask;
 
-				foreach (ListItem item in WRList.Items)
-				{
-					if (item.Selected)
-						currentWorkRegionMask |= Convert.ToUInt64(item.Value);
-					else
-						currentWorkRegionMask &= ~Convert.ToUInt64(item.Value);
-				}
+					foreach (ListItem item in WRList.Items)
+					{
+						if (item.Selected)
+							currentWorkRegionMask |= Convert.ToUInt64(item.Value);
+						else
+							currentWorkRegionMask &= ~Convert.ToUInt64(item.Value);
+					}
 
-				foreach (ListItem item in OrderList.Items)
-				{
-					if (item.Selected)
-						currentOrderRegionMask |= Convert.ToUInt64(item.Value);
-					else
-						currentOrderRegionMask &= ~Convert.ToUInt64(item.Value);
-				}
+					foreach (ListItem item in OrderList.Items)
+					{
+						if (item.Selected)
+							currentOrderRegionMask |= Convert.ToUInt64(item.Value);
+						else
+							currentOrderRegionMask &= ~Convert.ToUInt64(item.Value);
+					}
 
-				myMySqlCommand.Parameters.AddWithValue("?WorkMask", currentWorkRegionMask);
-				myMySqlCommand.Parameters.AddWithValue("?OrderMask", currentOrderRegionMask);
+					updateCommand.Parameters.AddWithValue("?WorkMask", currentWorkRegionMask);
+					updateCommand.Parameters.AddWithValue("?OrderMask", currentOrderRegionMask);
 
-				if (currentWorkRegionMask != workRegionMask)
-				{
-					InsertCommand =
-@"
+					if (currentWorkRegionMask != workRegionMask)
+					{
+						updateCommand.CommandText =
+							@"
 UPDATE clientsdata SET MaskRegion = ?workMask WHERE FirmCode = ?ClientCode;
 
 INSERT 
@@ -271,23 +149,23 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmstatus = 1
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
-		AND clientsdata2.firmtype = 1;
-";
-
-				}
-				if (VisileStateList.Enabled)
-				{
-					myMySqlCommand.CommandText = "select InvisibleOnFirm=?InvisibleOnFirm from retclientsset where clientcode=?clientCode";
-					if (Convert.ToInt32(myMySqlCommand.ExecuteScalar()) == 0)
-					{
-						InsertCommand += " update retclientsset, intersection, pricesdata set retclientsset.invisibleonfirm=?InvisibleOnFirm, intersection.invisibleonfirm=?InvisibleOnFirm";
-						if (Convert.ToInt32(VisileStateList.SelectedValue) != 0)
-							InsertCommand += ", DisabledByFirm=if(PriceType=2, 1, 0), InvisibleOnClient=if(PriceType=2, 1, 0)";
-						InsertCommand += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
+		AND clientsdata2.firmtype = 1;";
+						updateCommand.AppendQueryForCreateNotExistsAnalitFReplicationRecordForDrugstore();
 					}
-				}
-				InsertCommand +=
-@"
+					if (VisileStateList.Enabled)
+					{
+						tempCommand.CommandText = "select InvisibleOnFirm=?InvisibleOnFirm from retclientsset where clientcode=?clientCode";
+						tempCommand.Parameters.AddWithValue("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
+						if (Convert.ToInt32(tempCommand.ExecuteScalar()) == 0)
+						{
+							updateCommand.CommandText += " update retclientsset, intersection, pricesdata set retclientsset.invisibleonfirm=?InvisibleOnFirm, intersection.invisibleonfirm=?InvisibleOnFirm";
+							if (Convert.ToInt32(VisileStateList.SelectedValue) != 0)
+								updateCommand.CommandText += ", DisabledByFirm=if(PriceType=2, 1, 0), InvisibleOnClient=if(PriceType=2, 1, 0)";
+							updateCommand.CommandText += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
+						}
+					}
+					updateCommand.CommandText +=
+						@"
 UPDATE UserSettings.retclientsset, 
         UserSettings.clientsdata 
 SET OrderRegionMask     = ?orderMask, 
@@ -305,24 +183,25 @@ SET OrderRegionMask     = ?orderMask,
     ServiceClient           = ?ServiceClient, 
     OrdersVisualizationMode = ?OrdersVisualizationMode,
 	PriceCodeOnly			= ?PriceCodeOnly
-";
+where clientcode=firmcode and firmcode=?clientCode";
 
-				InsertCommand += " where clientcode=firmcode and firmcode=?clientCode";
-
-				var adapter = new MySqlDataAdapter();
-				adapter.InsertCommand = new MySqlCommand(
-@"INSERT 
+					var adapter = new MySqlDataAdapter();
+					adapter.InsertCommand =
+						new MySqlCommand(
+							@"
+INSERT 
 INTO    UserSettings.IncludeRegulation  
         SET IncludeClientCode = ?ClientCode,
         PrimaryClientCode     = ?PrimaryClientCode,
-        IncludeType           = ?IncludeType;
-", _connection);
-				adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-				adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+        IncludeType           = ?IncludeType;",
+							connection, transaction);
+					adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+					adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
 
-				adapter.UpdateCommand = new MySqlCommand(
-@"
+					adapter.UpdateCommand =
+						new MySqlCommand(
+							@"
 DELETE FROM UserSettings.IncludeRegulation 
 WHERE	IncludeClientCode = ?ClientCode 
 		AND PrimaryClientCode = ?OldPrimaryClientCode;
@@ -331,16 +210,16 @@ INSERT
 INTO    UserSettings.IncludeRegulation  
         SET IncludeClientCode = ?ClientCode,
         PrimaryClientCode     = ?PrimaryClientCode,
-        IncludeType           = ?IncludeType;
-", _connection);
-				adapter.UpdateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-				adapter.UpdateCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-				adapter.UpdateCommand.Parameters.Add("?OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-				adapter.UpdateCommand.Parameters["?OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
+        IncludeType           = ?IncludeType;",
+							connection, transaction);
+					adapter.UpdateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+					adapter.UpdateCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+					adapter.UpdateCommand.Parameters.Add("?OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+					adapter.UpdateCommand.Parameters["?OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
 
-				adapter.DeleteCommand = new MySqlCommand(
-@"
+					adapter.DeleteCommand = new MySqlCommand(
+						@"
 UPDATE includeregulation i
 	JOIN intersection as src on src.clientcode = i.primaryclientcode
 		JOIN intersection as dst on dst.clientcode = i.includeclientcode 
@@ -356,79 +235,61 @@ SET dst.CostCode = src.CostCode,
 WHERE i.Id = ?Id;
 
 DELETE FROM UserSettings.IncludeRegulation 
-WHERE id = ?id;
-", _connection);
-				adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
+WHERE id = ?id;",
+						connection, transaction);
+					adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
+					adapter.Update(Data.Tables["Include"]);
 
-				adapter.DeleteCommand.Transaction = myTrans;
-				adapter.UpdateCommand.Transaction = myTrans;
-				adapter.InsertCommand.Transaction = myTrans;
+					updateCommand.ExecuteNonQuery();
 
-				adapter.Update(Data.Tables["Include"]);
-
-				myMySqlCommand.CommandText = InsertCommand;
-				myMySqlCommand.ExecuteNonQuery();
-
-
-				for (var i = 0; i < ExportRulesList.Items.Count; i++)
-				{
-					var table = Data.Tables["ExportRules"];
-					var list = ExportRulesList;
-					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
-						!= list.Items[i].Selected)
+					for (int i = 0; i < ExportRulesList.Items.Count; i++)
 					{
-						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
-						if (list.Items[i].Selected)
-							myMySqlCommand.CommandText = @"
+						DataTable table = Data.Tables["ExportRules"];
+						CheckBoxList list = ExportRulesList;
+						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"])
+						    != list.Items[i].Selected)
+						{
+							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
+							if (list.Items[i].Selected)
+								updateCommand.CommandText = @"
 insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
 values(?ClientCode, ?SaveGridId)";
-						else
-							myMySqlCommand.CommandText = @"
+							else
+								updateCommand.CommandText = @"
 delete from UserSettings.ret_save_grids
 where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
-						myMySqlCommand.Parameters.Clear();
-						myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-						myMySqlCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
-						myMySqlCommand.ExecuteNonQuery();
+							updateCommand.Parameters.Clear();
+							updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+							updateCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
+							updateCommand.ExecuteNonQuery();
+						}
 					}
-				}
 
-				for (var i = 0; i < PrintRulesList.Items.Count; i++)
-				{
-					var table = Data.Tables["PrintRules"];
-					var list = PrintRulesList;
-					if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) 
-						!= list.Items[i].Selected)
+					for (int i = 0; i < PrintRulesList.Items.Count; i++)
 					{
-						table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
-						if (list.Items[i].Selected)
-							myMySqlCommand.CommandText = @"
+						var table = Data.Tables["PrintRules"];
+						var list = PrintRulesList;
+						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"])
+						    != list.Items[i].Selected)
+						{
+							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
+							if (list.Items[i].Selected)
+								updateCommand.CommandText = @"
 insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
 values(?ClientCode, ?SaveGridId)";
-						else
-							myMySqlCommand.CommandText = @"
+							else
+								updateCommand.CommandText = @" 
 delete from UserSettings.ret_save_grids
 where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
-						myMySqlCommand.Parameters.Clear();
-						myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-						myMySqlCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
-						myMySqlCommand.ExecuteNonQuery();
+							updateCommand.Parameters.Clear();
+							updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+							updateCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
+							updateCommand.ExecuteNonQuery();
+						}
 					}
-				}
 
-				ShowRegulationHelper.Update(_connection, myTrans, Data, ClientCode);
-
-				myTrans.Commit();
-			}
-			catch (Exception)
-			{
-				myTrans.Rollback();
-				throw;
-			}
-			finally
-			{
-				_connection.Close();
-			}
+					ShowRegulationHelper.Update(connection, transaction, Data, ClientCode);
+				});
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
 		}
@@ -465,30 +326,25 @@ WHERE
 					  + " and clientcode=firmcode" + " and regionaladmins.username=?UserName"
 					  + " and a.regioncode & regionaladmins.RegionMask > 0"
 					  + " group by regioncode" + " order by region";
-			var adapter = new MySqlDataAdapter(sqlCommand, _connection);
-			adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-			adapter.SelectCommand.Parameters.AddWithValue("?RegCode", RegCode);
-			adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-			try
-			{
-				_connection.Open();
-				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.Fill(DS1, "WorkReg");
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+			With.Connection(
+				c => {
+					var adapter = new MySqlDataAdapter(sqlCommand, c);
+					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?RegCode", RegCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					adapter.Fill(_data, "WorkReg");
+				});
 
+			WRList.DataSource = _data.Tables["WorkReg"];
 			WRList.DataBind();
+			OrderList.DataSource = _data.Tables["WorkReg"];
 			OrderList.DataBind();
 			for (var i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (OldRegion)
 				{
-					WRList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["RegMask"]);
-					OrderList.Items[i].Selected = Convert.ToBoolean(DS1.Tables["Workreg"].Rows[i]["OrderMask"]);
+					WRList.Items[i].Selected = Convert.ToBoolean(_data.Tables["Workreg"].Rows[i]["RegMask"]);
+					OrderList.Items[i].Selected = Convert.ToBoolean(_data.Tables["Workreg"].Rows[i]["OrderMask"]);
 				}
 				else
 				{
@@ -511,53 +367,44 @@ WHERE
 		{
 			StateHelper.CheckSession(this, ViewState);
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewDrugstore, PermissionType.ManageDrugstore);
-
-			_connection.ConnectionString = Literals.GetConnectionString();
-
 			ClientCode = Convert.ToInt32(Request["cc"]);
+			_data = new DataSet();
 
-			myMySqlCommand.Connection = _connection;
 			if (IsPostBack) 
 				return;
 
-			try
-			{
-				_connection.Open();
-				var transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
+			With.Connection(
+				c => {
+					var command = new MySqlCommand("", c);
+					command.Parameters.AddWithValue("?ClientCode", ClientCode);
+					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-				myMySqlCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				myMySqlCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-
-				myMySqlCommand.CommandText = @"
+					command.CommandText = @"
 SELECT  RegionCode
 FROM clientsdata as cd
-WHERE cd.firmcode = ?ClientCode 
-";
-				myMySqlCommand.Transaction = transaction;
-				HomeRegionCode = Convert.ToUInt64(myMySqlCommand.ExecuteScalar());
-				SecurityContext.Administrator.CheckClientHomeRegion(HomeRegionCode);
+WHERE cd.firmcode = ?ClientCode ";
+					HomeRegionCode = Convert.ToUInt64(command.ExecuteScalar());
+					SecurityContext.Administrator.CheckClientHomeRegion(HomeRegionCode);
 
 
-				var regionAdapter = new MySqlDataAdapter(@"
+					var regionAdapter = new MySqlDataAdapter(@"
 SELECT  r.regioncode, 
         r.region 
 FROM farm.regions r
 WHERE r.RegionCode & ?AdminMaskRegion > 0
-ORDER BY r.region;
-", _connection);
-				regionAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-				regionAdapter.SelectCommand.Transaction = transaction;
-				regionAdapter.Fill(DS1, "admin");
-				RegionDD.DataBind();
-				for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
-				{
-					if (Convert.ToUInt64(RegionDD.Items[i].Value) == HomeRegionCode)
+ORDER BY r.region;", c);
+					regionAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+					regionAdapter.Fill(_data, "admin");
+					RegionDD.DataBind();
+					for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
 					{
-						RegionDD.SelectedIndex = i;
-						break;
+						if (Convert.ToUInt64(RegionDD.Items[i].Value) == HomeRegionCode)
+						{
+							RegionDD.SelectedIndex = i;
+							break;
+						}
 					}
-				}
-				myMySqlCommand.CommandText = @"
+					command.CommandText = @"
 SELECT  InvisibleOnFirm, 
         AlowRegister, 
         AlowRejection, 
@@ -576,40 +423,40 @@ SELECT  InvisibleOnFirm,
 FROM retclientsset rcs
 	JOIN ret_update_info rui on rcs.clientcode = rui.ClientCode
 WHERE rcs.clientcode = ?ClientCode";
-				using (myMySqlDataReader = myMySqlCommand.ExecuteReader())
-				{
-					myMySqlDataReader.Read();
-					VisileStateList.SelectedValue = myMySqlDataReader["InvisibleOnFirm"].ToString();
-					VisileStateList.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible);
-
-					RegisterCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRegister"]);
-					RejectsCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowRejection"]);
-					MultiUserLevelTB.Text = myMySqlDataReader["MultiUserLevel"].ToString();
-					AdvertisingLevelCB.Checked = Convert.ToBoolean(myMySqlDataReader["AdvertisingLevel"]);
-					WayBillCB.Checked = Convert.ToBoolean(myMySqlDataReader["AlowWayBill"]);
-					EnableUpdateCB.Checked = Convert.ToBoolean(myMySqlDataReader["EnableUpdate"]);
-					CalculateLeaderCB.Checked = Convert.ToBoolean(myMySqlDataReader["CalculateLeader"]);
-					AllowSubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["AllowSubmitOrders"]);
-					SubmitOrdersCB.Checked = Convert.ToBoolean(myMySqlDataReader["SubmitOrders"]);
-					ServiceClientCB.Checked = Convert.ToBoolean(myMySqlDataReader["ServiceClient"]);
-					OrdersVisualizationModeCB.Checked = Convert.ToBoolean(myMySqlDataReader["OrdersVisualizationMode"]);
-					if (Convert.ToInt32(myMySqlDataReader["InvisibleOnFirm"]) != 0)
+					using (var reader = command.ExecuteReader())
 					{
-						var noise = myMySqlDataReader["NotNoisedPriceCode"] != DBNull.Value;
-						SetNoiseStatus(noise);
-						if (noise)
-							NotNoisedPrice.SelectedValue = myMySqlDataReader["NotNoisedPriceCode"].ToString();
-					}
-					else
-					{
-						NoiseRow.Visible = false;
-						NoisedCosts.Visible = false;
-						NotNoisedPriceLabel.Visible = false;
-						NotNoisedPrice.Visible = false;
-					}
-				}
+						reader.Read();
+						VisileStateList.SelectedValue = reader["InvisibleOnFirm"].ToString();
+						VisileStateList.Enabled = SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible);
 
-				var adapter = new MySqlDataAdapter(String.Format(@"
+						RegisterCB.Checked = Convert.ToBoolean(reader["AlowRegister"]);
+						RejectsCB.Checked = Convert.ToBoolean(reader["AlowRejection"]);
+						MultiUserLevelTB.Text = reader["MultiUserLevel"].ToString();
+						AdvertisingLevelCB.Checked = Convert.ToBoolean(reader["AdvertisingLevel"]);
+						WayBillCB.Checked = Convert.ToBoolean(reader["AlowWayBill"]);
+						EnableUpdateCB.Checked = Convert.ToBoolean(reader["EnableUpdate"]);
+						CalculateLeaderCB.Checked = Convert.ToBoolean(reader["CalculateLeader"]);
+						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(reader["AllowSubmitOrders"]);
+						SubmitOrdersCB.Checked = Convert.ToBoolean(reader["SubmitOrders"]);
+						ServiceClientCB.Checked = Convert.ToBoolean(reader["ServiceClient"]);
+						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(reader["OrdersVisualizationMode"]);
+						if (Convert.ToInt32(reader["InvisibleOnFirm"]) != 0)
+						{
+							var noise = reader["NotNoisedPriceCode"] != DBNull.Value;
+							SetNoiseStatus(noise);
+							if (noise)
+								NotNoisedPrice.SelectedValue = reader["NotNoisedPriceCode"].ToString();
+						}
+						else
+						{
+							NoiseRow.Visible = false;
+							NoisedCosts.Visible = false;
+							NotNoisedPriceLabel.Visible = false;
+							NotNoisedPrice.Visible = false;
+						}
+					}
+
+					var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  id,
 		cd.FirmCode,
         convert(concat(cd.FirmCode ,'. ' ,cd.ShortName) using cp1251) ShortName,
@@ -619,63 +466,54 @@ FROM  IncludeRegulation ir
 WHERE ir.IncludeClientCode = ?ClientCode
 	  and cd.RegionCode & ?AdminMaskRegion
 	  {0};
-", SecurityContext.Administrator.GetClientFilterByType("cd")), _connection);
+", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
 
-				Data = new DataSet();
-				adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-				adapter.SelectCommand.Transaction = transaction;
-				adapter.Fill(Data, "Include");
+					Data = new DataSet();
+					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+					adapter.Fill(Data, "Include");
 
-				adapter.SelectCommand.CommandText = @"
+					adapter.SelectCommand.CommandText = @"
 SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
 FROM UserSettings.Save_Grids sg
 	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
 WHERE sg.Id < 32768
 ORDER BY sg.DisplayName;";
-				adapter.Fill(Data, "ExportRules");
+					adapter.Fill(Data, "ExportRules");
 
-				adapter.SelectCommand.CommandText = @"
+					adapter.SelectCommand.CommandText = @"
 SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
 FROM UserSettings.Save_Grids sg
 	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
 WHERE sg.Id > 16384
 ORDER BY sg.DisplayName;";
-				adapter.Fill(Data, "PrintRules");
+					adapter.Fill(Data, "PrintRules");
 
-				ShowRegulationHelper.Load(adapter, Data);
+					ShowRegulationHelper.Load(adapter, Data);
 
-				ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
-				ShowClientsGrid.DataBind();
+					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
+					ShowClientsGrid.DataBind();
 
-				IncludeGrid.DataSource = Data.Tables["Include"].DefaultView;
-				IncludeGrid.DataBind();
+					IncludeGrid.DataSource = Data.Tables["Include"].DefaultView;
+					IncludeGrid.DataBind();
 
-				ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
-				ExportRulesList.DataBind();
+					ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
+					ExportRulesList.DataBind();
 
-				PrintRulesList.DataSource = Data.Tables["PrintRules"].DefaultView;
-				PrintRulesList.DataBind();
+					PrintRulesList.DataSource = Data.Tables["PrintRules"].DefaultView;
+					PrintRulesList.DataBind();
 
-				for (var i = 0; i < ExportRulesList.Items.Count; i++)
-					ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
+					RegionDD.DataSource = _data.Tables["Admin"].DefaultView;
+					RegionDD.DataBind();
 
-				for (var i = 0; i < PrintRulesList.Items.Count; i++)
-					PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
+					for (var i = 0; i < ExportRulesList.Items.Count; i++)
+						ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
 
-				transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+					for (var i = 0; i < PrintRulesList.Items.Count; i++)
+						PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);            	
+			    });
+
 			SetWorkRegions(HomeRegionCode, true, false);
-		}
-
-		protected void GeneratePasswords_Click(object sender, EventArgs e)
-		{
-			//CommandFactory.SetClientPassword(Convert.ToInt32(ClientCode)).Execute();
-			ResultL.Text = "Пароли сгенерированны";
 		}
 
 		protected void IncludeGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
@@ -691,8 +529,11 @@ ORDER BY sg.DisplayName;";
 			switch (e.CommandName)
 			{
 				case "Search":
-					var adapter = new MySqlDataAdapter
-(@"
+					var data = new DataSet();
+					var searchText = ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText"));
+					With.Connection(
+						c => {
+							var adapter = new MySqlDataAdapter(@"
 SELECT DISTINCT cd.FirmCode, 
        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
 FROM (clientsdata as cd, clientsdata parent)
@@ -704,28 +545,17 @@ WHERE cd.ShortName like ?SearchText
       AND cd.billingstatus= 1  
       AND cd.FirmType = 1
 	  and parent.firmcode = ?ParentRegionCode
-ORDER BY cd.shortname;", _connection);
-					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-					adapter.SelectCommand.Parameters.AddWithValue("?ParentRegionCode", ClientCode);
-					adapter.SelectCommand.Parameters.AddWithValue("?SearchText", string.Format("%{0}%", ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText")).Text));
-					var data = new DataSet();
+ORDER BY cd.shortname;", c);
+							adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+							adapter.SelectCommand.Parameters.AddWithValue("?ParentRegionCode", ClientCode);
+							adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", searchText.Text));
+							adapter.Fill(data);
+						});
 
-					try
-					{
-						_connection.Open();
-						adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-						adapter.Fill(data);
-						adapter.SelectCommand.Transaction.Commit();
-					}
-					finally
-					{
-						_connection.Close();
-					}
-
-					var ParentList = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
-					ParentList.DataSource = data;
-					ParentList.DataBind();
-					ParentList.Visible = data.Tables[0].Rows.Count > 0;
+					var parents = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
+					parents.DataSource = data;
+					parents.DataBind();
+					parents.Visible = data.Tables[0].Rows.Count > 0;
 					break;
 				case "Add":
 					ProcessChanges();

@@ -45,27 +45,35 @@
   <ItemGroup>
     <Reference Include="Castle.ActiveRecord, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Components.Binder, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Components.Binder.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.Components.Binder.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.Components.Validator, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle\Castle.Components.Validator.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Core.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.TestSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.TestSupport.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
     <Reference Include="Interop.SHDocVw, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -100,9 +108,9 @@
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml" />
-    <Reference Include="WatiN.Core, Version=1.1.2.4000, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="WatiN.Core, Version=2.0.2.790, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\WatiN.Core.dll</HintPath>
+      <HintPath>..\..\lib\WatiN.Core.dll</HintPath>
     </Reference>
     <Reference Include="WebDev.WebHost, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -123,6 +131,7 @@
     <Compile Include="ForTesting\RetUpdateInfo.cs" />
     <Compile Include="ForTesting\StringExtentions.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
+    <Compile Include="ForTesting\WatinFixture.cs" />
     <Compile Include="Helpers\ADHelperFixture.cs" />
     <Compile Include="Helpers\DbLogHelperFixture.cs" />
     <Compile Include="Helpers\EmailHelperFixture.cs" />
@@ -143,10 +152,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyComparerTest.cs" />
     <Compile Include="Services\NotificationFixture.cs" />
-    <Compile Include="Watin\ClientFixture.cs" />
+    <Compile Include="Watin\DrugstoreFixture.cs" />
     <Compile Include="Watin\RegistrationFixture.cs" />
     <Compile Include="Watin\ServiceFixture.cs" />
-    <Compile Include="Watin\SmapRejectorFixture.cs" />
+    <Compile Include="Watin\CallbackRulesFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

@@ -45,31 +45,31 @@
   <ItemGroup>
     <Reference Include="Castle.ActiveRecord, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Components.Binder, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Components.Binder.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.Components.Binder.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Components.Validator, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Components.Validator.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.Components.Validator.dll</HintPath>
     </Reference>
     <Reference Include="Castle.Core, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.Core.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.ActiveRecordSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.ActiveRecordSupport.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>
     <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.81.0.1407, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
       <SpecificVersion>False</SpecificVersion>
@@ -144,6 +144,7 @@
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
+    <Compile Include="Helpers\SpesializedQuery.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />
@@ -519,6 +520,10 @@
     <EmbeddedResource Include="ClientCard.rdlc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.MySql\Common.MySql\Common.MySql.csproj">
+      <Project>{8A680813-C83B-497A-85E6-E8F07B7D7650}</Project>
+      <Name>Common.MySql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
       <Name>Common.Web.Ui</Name>

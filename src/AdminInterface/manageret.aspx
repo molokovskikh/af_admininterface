@@ -24,7 +24,6 @@
 							</tr>
 							<tr>
 								<td style="text-align:left" colspan=3>
-									<asp:Button runat="Server" ID="GeneratePasswords" Text="Сгенерировать пароли" OnClick="GeneratePasswords_Click" ValidationGroup="0" />
 									<asp:Button runat="Server" ID="Button2" Text="Отправить уведомления о регистрации поставщикам" OnClick="NotifySuppliers_Click" ValidationGroup="0" />
 								</td>
 							</tr>
@@ -245,9 +244,9 @@
 							</tr>
 							<tr>
 								<td style="height: 8px" valign="middle" align="left" colspan="3">
-									<font face="Arial" size="2">Домашний регион:</font>
+									<label>Домашний регион:</label>
 									<asp:DropDownList ID="RegionDD" runat="server" OnSelectedIndexChanged="RegionDD_SelectedIndexChanged"
-										AutoPostBack="True" DataSource="<%# admin %>" DataTextField="Region" DataValueField="RegionCode">
+										AutoPostBack="True" DataTextField="Region" DataValueField="RegionCode">
 									</asp:DropDownList>
 									<asp:CheckBox ID="AllRegCB" runat="server" OnCheckedChanged="AllRegCB_CheckedChanged"
 										Text="Показать все регионы" AutoPostBack="True"></asp:CheckBox></td>
@@ -265,11 +264,11 @@
 										</tr>
 										<tr>
 											<td valign="top" align="left" width="200">
-												<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
+												<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None"
 													DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
 												</asp:CheckBoxList></td>
 											<td valign="top" align="left" width="200">
-												<asp:CheckBoxList ID="OrderList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
+												<asp:CheckBoxList ID="OrderList" runat="server" BorderStyle="None" 
 													DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
 												</asp:CheckBoxList></td>
 										</tr>

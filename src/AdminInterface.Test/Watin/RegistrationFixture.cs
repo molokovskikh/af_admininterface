@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Configuration;
-using System.IO;
 using System.Text.RegularExpressions;
 using AdminInterface.Helpers;
-using Microsoft.VisualStudio.WebHost;
+using AdminInterface.Test.ForTesting;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
@@ -12,39 +10,15 @@ using WatiN.Core;
 namespace AdminInterface.Test.Watin
 {
 	[TestFixture]
-	public class RegistrationFixture
+	public class RegistrationFixture : WatinFixture
 	{
-		private Server _webServer;
 		private string _randomClientName;
-
-		[TestFixtureSetUp]
-		public void SetupFixture()
-		{
-			var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
-			var webDir = ConfigurationManager.AppSettings["webDirectory"];
-
-			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
-			_webServer.Start();
-		}
-
-		[TestFixtureTearDown]
-		public void TearDownFixture()
-		{
-			_webServer.Stop();
-		}
 
 		[SetUp]
 		public void Setup()
 		{
 			var random = new Random();
 			_randomClientName = "test" + random.Next(100000);
-		}
-
-		private static string BuildTestUrl(string urlPart)
-		{
-			return String.Format("http://localhost:{0}/{1}",
-								 ConfigurationManager.AppSettings["webPort"],
-								 urlPart);
 		}
 
 		[Test]
@@ -59,14 +33,6 @@ namespace AdminInterface.Test.Watin
 				browser.Button(Find.ById("Register")).Click();
 				CheckForError(browser);
 				Assert.That(browser.ContainsText("Регистрационная карта №"));
-			}
-		}
-
-		private void CheckForError(IE browser)
-		{
-			if (browser.ContainsText("Error"))
-			{
-				Console.WriteLine(browser.Text);
 			}
 		}
 

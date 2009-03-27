@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -28,8 +29,6 @@ namespace AddUser
 			  		{1, "Многофайловый"},
 			  		{DBNull.Value, "Не настроенный"},
 			  	};
-
-		private readonly MySqlConnection _connection = new MySqlConnection();
 
 		private DataSet Data
 		{
@@ -54,8 +53,6 @@ namespace AddUser
 			StateHelper.CheckSession(this, ViewState);
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 		
-			_connection.ConnectionString = Literals.GetConnectionString();
-
 			if (!IsPostBack)
 			{
 				int clientCode;
@@ -175,50 +172,43 @@ where cd.firmcode = ?ClientCode
 	  and cd.MaskRegion & ?AdminRegionMask & r.regioncode > 0
 order by r.Region;";
 
-			var dataAdapter = new MySqlDataAdapter(pricesCommandText, _connection);
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
 
-            try
-            {
-                _connection.Open();
-                dataAdapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-                dataAdapter.Fill(Data, "Prices");
+			With.Connection(
+				c => {
+					var dataAdapter = new MySqlDataAdapter(pricesCommandText, c);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
 
-                dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
-                dataAdapter.Fill(Data, "RegionSettings");
+					dataAdapter.Fill(Data, "Prices");
 
-                dataAdapter.SelectCommand.CommandText = regionsCommandText;
-                dataAdapter.Fill(Data, "Regions");
+					dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
+					dataAdapter.Fill(Data, "RegionSettings");
 
-                dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
-                dataAdapter.Fill(Data, "EnableRegions");
+					dataAdapter.SelectCommand.CommandText = regionsCommandText;
+					dataAdapter.Fill(Data, "Regions");
 
-            	dataAdapter.SelectCommand.CommandText = orderSendConfig;
-            	dataAdapter.Fill(Data, "OrderSendConfig");
+					dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
+					dataAdapter.Fill(Data, "EnableRegions");
 
-            	dataAdapter.SelectCommand.CommandText = senders;
-            	dataAdapter.Fill(Data, "Senders");
+					dataAdapter.SelectCommand.CommandText = orderSendConfig;
+					dataAdapter.Fill(Data, "OrderSendConfig");
 
-            	dataAdapter.SelectCommand.CommandText = formaters;
-            	dataAdapter.Fill(Data, "Formaters");
+					dataAdapter.SelectCommand.CommandText = senders;
+					dataAdapter.Fill(Data, "Senders");
 
-            	dataAdapter.SelectCommand.CommandText = sendRuleRegions;
-            	dataAdapter.Fill(Data, "SenRuleRegions");
-            	var row = Data.Tables["SenRuleRegions"].NewRow();
-            	row["RegionCode"] = DBNull.Value;
-            	row["Region"] = "Любой регион";
-				Data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
+					dataAdapter.SelectCommand.CommandText = formaters;
+					dataAdapter.Fill(Data, "Formaters");
 
-				ShowRegulationHelper.Load(dataAdapter, Data);
+					dataAdapter.SelectCommand.CommandText = sendRuleRegions;
+					dataAdapter.Fill(Data, "SenRuleRegions");
+					var row = Data.Tables["SenRuleRegions"].NewRow();
+					row["RegionCode"] = DBNull.Value;
+					row["Region"] = "Любой регион";
+					Data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
 
-                dataAdapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+					ShowRegulationHelper.Load(dataAdapter, Data);
+				});
 
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", Data.Tables["Prices"].DefaultView[0]["ShortName"]);
 		}
@@ -260,7 +250,7 @@ order by r.Region;";
 			UpdateHomeRegion();
 			UpdateMaskRegion();
 			ProcessChanges();
-			var pricesDataAdapter = new MySqlDataAdapter("", _connection);
+			var pricesDataAdapter = new MySqlDataAdapter();
 			pricesDataAdapter.DeleteCommand = new MySqlCommand(
 @"
 Set @InHost = ?UserHost;
@@ -277,7 +267,7 @@ WHERE PriceCode = ?PriceCode;
 
 DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
-", _connection);
+");
 
 			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
@@ -379,7 +369,7 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @InsertedPriceCode
 		AND clientsdata2.firmtype = 1;
-", _connection);
+");
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
@@ -405,7 +395,7 @@ SET UpCost = ?UpCost,
 WHERE PriceCode = ?PriceCode;
 
 call UpdateCostType(?PriceCode, ?CostType);
-", _connection);
+");
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
@@ -416,7 +406,7 @@ call UpdateCostType(?PriceCode, ?CostType);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
 
-			var regionalSettingsDataAdapter = new MySqlDataAdapter("", _connection);
+			var regionalSettingsDataAdapter = new MySqlDataAdapter();
 			regionalSettingsDataAdapter.UpdateCommand = new MySqlCommand(
 @"
 SET @InHost = ?UserHost;
@@ -428,7 +418,7 @@ SET AdminMail = ?AdminMail,
 	Enabled = ?Enabled,
 	`Storage` = ?Storage
 WHERE RowId = ?Id;
-", _connection);
+");
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?AdminMail", MySqlDbType.VarString, 0, "AdminMail");
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?TmpMail", MySqlDbType.VarString, 0, "TmpMail");
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?SupportPhone", MySqlDbType.VarString, 0, "SupportPhone");
@@ -439,7 +429,7 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-			var orderSendRulesDataAdapter = new MySqlDataAdapter("", _connection);
+			var orderSendRulesDataAdapter = new MySqlDataAdapter();
 			orderSendRulesDataAdapter.UpdateCommand = new MySqlCommand(@"
 update ordersendrules.order_send_rules
 set SenderId = ?senderId, 
@@ -447,7 +437,7 @@ set SenderId = ?senderId,
 	RegionCode = ?RegionCode, 
 	SendDebugMessage = ?SendDebugMessage, 
 	ErrorNotificationDelay = ?ErrorNotificationDelay
-where id = ?Id;", _connection);
+where id = ?Id;");
 			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
 			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
 			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
@@ -457,7 +447,7 @@ where id = ?Id;", _connection);
 
 			orderSendRulesDataAdapter.InsertCommand = new MySqlCommand(@"
 insert into ordersendrules.order_send_rules(FirmCode, SenderId, FormaterId, RegionCode, SendDebugMessage, ErrorNotificationDelay)
-values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?ErrorNotificationDelay);", _connection);
+values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?ErrorNotificationDelay);");
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
@@ -467,41 +457,32 @@ values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?Error
 
 			orderSendRulesDataAdapter.DeleteCommand = new MySqlCommand(@"
 delete FROM ordersendrules.order_send_rules
-where id = ?Id;", _connection);
+where id = ?Id;");
 			orderSendRulesDataAdapter.DeleteCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
 
-			MySqlTransaction transaction = null;
-			try
-			{
-				_connection.Open();
-                transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
+			With.Transaction(
+				(connection, transaction) => {
+					pricesDataAdapter.InsertCommand.Connection = connection;
+					pricesDataAdapter.InsertCommand.Transaction = transaction;
+					pricesDataAdapter.UpdateCommand.Connection = connection;
+					pricesDataAdapter.UpdateCommand.Transaction = transaction;
+					pricesDataAdapter.DeleteCommand.Connection = connection;
+					pricesDataAdapter.DeleteCommand.Transaction = transaction;
+					regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
+					regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
 
-				pricesDataAdapter.InsertCommand.Transaction = transaction;
-				pricesDataAdapter.UpdateCommand.Transaction = transaction;
-				pricesDataAdapter.DeleteCommand.Transaction = transaction;
-				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
+					orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
+					orderSendRulesDataAdapter.InsertCommand.Connection = connection;
+					orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
+					orderSendRulesDataAdapter.UpdateCommand.Connection = connection;
+					orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
+					orderSendRulesDataAdapter.DeleteCommand.Connection = connection;
 
-				orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
-				orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
-				orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
-
-				pricesDataAdapter.Update(Data.Tables["Prices"]);
-				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
-				orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
-				ShowRegulationHelper.Update(_connection, transaction, Data, _clientCode);
-
-				transaction.Commit();
-			}
-			catch (Exception ex)
-			{
-				if (transaction != null)
-					transaction.Rollback();
-				throw new Exception("Ошибка на странице Managep.aspx", ex);
-			}
-			finally
-			{
-				_connection.Close();
-			}
+					pricesDataAdapter.Update(Data.Tables["Prices"]);
+					regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
+					orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
+					ShowRegulationHelper.Update(connection, transaction, Data, _clientCode);
+				});
 			
 			GetData();
 			ConnectDataSource();
@@ -604,24 +585,15 @@ WHERE   b.regioncode = ?HomeRegion
 GROUP BY regioncode
 ORDER BY region;";
 			}
-            try
-            {
-                var adapter = new MySqlDataAdapter(commandText, _connection);
-                _connection.Open();
-                adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-
-                adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-                adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
-				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-                Data.Tables["EnableRegions"].Clear();
-                adapter.Fill(Data, "EnableRegions");
-
-                adapter.SelectCommand.Transaction.Commit();
-            }
-            finally
-            {
-                _connection.Close();
-            }
+			Data.Tables["EnableRegions"].Clear();
+			With.Connection(
+				c => {
+					var adapter = new MySqlDataAdapter(commandText, c);
+					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
+					adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+					adapter.Fill(Data, "EnableRegions");
+				});
 			WorkRegionList.DataBind();
 			SetRegions();
 		}
@@ -646,8 +618,7 @@ ORDER BY region;";
 				if (oldMaskRegion == newMaskRegion)
 					return;
 
-				var updateCommand =
-					new MySqlCommand(
+				var updateCommand = new MySqlCommand(
 						@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
@@ -726,6 +697,7 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata.firmcode = ?ClientCode
 		AND clientsdata2.FirmType = 1;", connection);
+				updateCommand.AppendQueryForCreateNotExistsAnalitFReplicationRecordForSupplier();
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
 				updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
@@ -740,22 +712,22 @@ WHERE   intersection.pricecode IS NULL
 			if (_homeRegion == currentHomeRegion) 
 				return;
 
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection.Open();
-				var command = new MySqlCommand(@"
+			With.Transaction(
+				(connection, transaction) =>
+					{
+						var command = new MySqlCommand(@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
 UPDATE ClientsData 
 SET RegionCode = ?RegionCode
-WHERE FirmCode = ?ClientCode;", connection);
-				command.Parameters.AddWithValue("?RegionCode", currentHomeRegion);
-				command.Parameters.AddWithValue("?ClientCode", _clientCode);
-				command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				command.ExecuteNonQuery();
-			}
+WHERE FirmCode = ?ClientCode;", connection, transaction);
+						command.Parameters.AddWithValue("?RegionCode", currentHomeRegion);
+						command.Parameters.AddWithValue("?ClientCode", _clientCode);
+						command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+						command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+						command.ExecuteNonQuery();
+					});
 		}
 		
 		private ulong GetHomeRegion()

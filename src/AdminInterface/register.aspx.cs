@@ -2,10 +2,6 @@ using System;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
-using System.IO;
-using System.Security.AccessControl;
-using System.Text;
-using System.Threading;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -13,15 +9,15 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using Common.MySql;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using log4net;
 using MySql.Data.MySqlClient;
 using AdminInterface.Helpers;
 
-namespace AddUser
+namespace AdminInterface
 {
-	partial class WebForm1 : Page
+	public partial class RegisterPage : Page
 	{
 		private readonly MySqlCommand _command = new MySqlCommand();
 		private readonly MySqlConnection _connection = new MySqlConnection();
@@ -228,20 +224,13 @@ GROUP BY regioncode
 ORDER BY region;";
 			}
 
-			var adapter = new MySqlDataAdapter(commandText, _connection);
-			try
-			{
-				_connection.Open();
-				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", RegCode);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				adapter.Fill(DS1, "WorkReg");
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+			With.Connection(
+				c => {
+					var adapter = new MySqlDataAdapter(commandText, _connection);
+					adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", RegCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					adapter.Fill(DS1, "WorkReg");
+				});
 
 			WRList.DataBind();
 			WRList2.DataBind();
@@ -269,7 +258,6 @@ ORDER BY region;";
 			_connection.Open();
 			mytrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
 			Int64 MaskRegion = 0;
-			Int64 ShowRegionMask = 0;
 			Int64 WorkMask = 0;
 			Int64 OrderMask = 0;
 			for (var i = 0; i <= WRList.Items.Count - 1; i++)
@@ -290,41 +278,24 @@ set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			_command.ExecuteNonQuery();
 
-			_command.Parameters.Add(new MySqlParameter("?MaskRegion", MySqlDbType.Int64));
-			_command.Parameters["?MaskRegion"].Value = MaskRegion;
-			_command.Parameters.Add(new MySqlParameter("?OrderMask", MySqlDbType.Int64));
-			_command.Parameters["?OrderMask"].Value = OrderMask;
-			_command.Parameters.Add(new MySqlParameter("?ShowRegionMask", MySqlDbType.Int64));
-			_command.Parameters["?ShowRegionMask"].Value = ShowRegionMask;
-			_command.Parameters.Add(new MySqlParameter("?WorkMask", MySqlDbType.Int64));
-			_command.Parameters["?WorkMask"].Value = WorkMask;
-			_command.Parameters.Add(new MySqlParameter("?fullname", MySqlDbType.VarString));
-			_command.Parameters["?fullname"].Value = FullNameTB.Text;
-			_command.Parameters.Add(new MySqlParameter("?shortname", MySqlDbType.VarString));
-			_command.Parameters["?shortname"].Value = ShortNameTB.Text;
-			_command.Parameters.Add(new MySqlParameter("?BeforeNamePrefix", MySqlDbType.VarString));
-			_command.Parameters["?BeforeNamePrefix"].Value = "";
+			_command.Parameters.AddWithValue("?MaskRegion", MaskRegion);
+			_command.Parameters.AddWithValue("?OrderMask", OrderMask);
+			_command.Parameters.AddWithValue("?ShowRegionMask", 0);
+			_command.Parameters.AddWithValue("?WorkMask", WorkMask);
+			_command.Parameters.AddWithValue("?fullname", FullNameTB.Text);
+			_command.Parameters.AddWithValue("?shortname", ShortNameTB.Text);
+			_command.Parameters.AddWithValue("?BeforeNamePrefix", "");
 			if (TypeDD.SelectedItem.Text == "Аптека")
-			{
 				_command.Parameters["?BeforeNamePrefix"].Value = "Аптека";
-			}
-			_command.Parameters.Add(new MySqlParameter("?firmsegment", MySqlDbType.Int24));
-			_command.Parameters["?firmsegment"].Value = SegmentDD.SelectedItem.Value;
-			_command.Parameters.Add(new MySqlParameter("?RegionCode", MySqlDbType.Int24));
-			_command.Parameters["?RegionCode"].Value = RegionDD.SelectedItem.Value;
-			_command.Parameters.Add(new MySqlParameter("?adress", MySqlDbType.VarString));
-			_command.Parameters["?adress"].Value = AddressTB.Text;
-			_command.Parameters.Add(new MySqlParameter("?firmtype", MySqlDbType.Int24));
-			_command.Parameters["?firmtype"].Value = TypeDD.SelectedItem.Value;
-			_command.Parameters.Add(new MySqlParameter("?registrant", MySqlDbType.VarString));
-			_command.Parameters["?registrant"].Value = SecurityContext.Administrator.UserName;
-			_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int24));
-			_command.Parameters.Add(new MySqlParameter("?AllowGetData", MySqlDbType.Int24));
-			_command.Parameters["?AllowGetData"].Value = TypeDD.SelectedItem.Value;
-			_command.Parameters.Add(new MySqlParameter("?OSUserName", MySqlDbType.VarString));
-			_command.Parameters["?OSUserName"].Value = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
-			_command.Parameters.Add(new MySqlParameter("?OSUserPass", MySqlDbType.VarString));
-			_command.Parameters["?OSUserPass"].Value = PassTB.Text;
+			_command.Parameters.AddWithValue("?firmsegment", SegmentDD.SelectedItem.Value);
+			_command.Parameters.AddWithValue("?RegionCode", RegionDD.SelectedItem.Value);
+			_command.Parameters.AddWithValue("?adress", AddressTB.Text);
+			_command.Parameters.AddWithValue("?firmtype", TypeDD.SelectedItem.Value);
+			_command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
+			_command.Parameters.Add("?ClientCode", MySqlDbType.Int24);
+			_command.Parameters.AddWithValue("?AllowGetData", TypeDD.SelectedItem.Value);
+			_command.Parameters.AddWithValue("?OSUserName", EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower());
+			_command.Parameters.AddWithValue("?OSUserPass", PassTB.Text);
 			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
 
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
@@ -350,9 +321,9 @@ set @inUser = ?UserName;";
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
 
 				if (TypeDD.SelectedItem.Text == "Аптека")
-					CreateClientOnRCS_and_I(CustomerType.SelectedItem.Text != "Стандартный");
+					CreateDrugstoreSpecific(CustomerType.SelectedItem.Text != "Стандартный");
 				else
-					CreatePriceRecords();
+					CreateSupplierSpecific();
 
 				ADHelper.CreateUserInAD(_command.Parameters["?OSUserName"].Value.ToString(),
 				                        _command.Parameters["?OSUserPass"].Value.ToString(),
@@ -365,23 +336,23 @@ set @inUser = ?UserName;";
 
 				mytrans.Commit();
 				if (TypeDD.SelectedItem.Text == "Аптека"
-					&& !IncludeCB.Checked
-					&& !ServiceClient.Checked
-					&& CustomerType.SelectedItem.Text == "Стандартный"
-					|| (TypeDD.SelectedItem.Text == "Аптека"
-						&& IncludeCB.Checked
-						&& !ServiceClient.Checked
-					    && IncludeType.SelectedItem.Text != "Скрытый"))
-					{
-						new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
-					}
+				    && !IncludeCB.Checked
+				    && !ServiceClient.Checked
+				    && CustomerType.SelectedItem.Text == "Стандартный"
+				    || (TypeDD.SelectedItem.Text == "Аптека"
+				        && IncludeCB.Checked
+				        && !ServiceClient.Checked
+				        && IncludeType.SelectedItem.Text != "Скрытый"))
+				{
+					new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
+				}
 
 				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
-						  false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-								 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
+				          false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
+				                 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
 				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
 				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
-						  SecurityContext.Administrator.Email);
+				          SecurityContext.Administrator.Email);
 
 
 				Session["Name"] = FullNameTB.Text;
@@ -394,13 +365,13 @@ set @inUser = ?UserName;";
 				ClientCardIfNeeded();
 
 				if (!IncludeCB.Checked 
-					|| (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый" && IncludeType.SelectedItem.Text != "Базовый+"))
+				    || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый" && IncludeType.SelectedItem.Text != "Базовый+"))
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
 						Response.Redirect(String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 						                                Session["DogN"],
 						                                ShowRegistrationCard.Checked, 
-														Session["Code"]));
+						                                Session["Code"]));
 					else if (ShowRegistrationCard.Checked)
 						Response.Redirect("report.aspx");
 					else
@@ -410,13 +381,13 @@ set @inUser = ?UserName;";
 					Response.Redirect("Register/SuccessRegistration.rails");
 
 				if (Response.RedirectLocation == "Register/SuccessRegistration.rails"
-					|| Response.RedirectLocation == "report.aspx")
+				    || Response.RedirectLocation == "report.aspx")
 					new NotificationService()
 						.SendNotificationToBillingAboutClientRegistration(Convert.ToUInt32(Session["Code"]),
 						                                                  Convert.ToUInt32(Session["DogN"]),
 						                                                  ShortNameTB.Text,
 						                                                  SecurityContext.Administrator.UserName,
-																		  (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+")),
+						                                                  (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+")),
 						                                                  null);
 			}
 			catch (Exception)
@@ -439,7 +410,8 @@ set @inUser = ?UserName;";
 			if (!SendRegistrationCard.Checked)
 				return;
 
-			if (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+"))
+			if (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" 
+				|| IncludeType.SelectedItem.Text == "Базовый+"))
 				return;
 
 			string mailTo;
@@ -517,7 +489,7 @@ WHERE   cd.regioncode & ?AdminRegionCode > 0
         AND p.ShortName like ?SearchText  
 		{0}
 ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")),
-					_connection);
+			                                   _connection);
 			try
 			{
 				_connection.Open();
@@ -699,7 +671,7 @@ Values(@NewUserId, {0});", item.Value);
 			_command.ExecuteNonQuery();
 		}
 
-		public void CreatePriceRecords()
+		public void CreateSupplierSpecific()
 		{
 			_command.CommandText = @"
 INSERT INTO OrderSendRules.order_send_rules(Firmcode, FormaterId, SenderId)
@@ -789,12 +761,13 @@ FROM pricesdata
 WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @NewPriceCode
-		AND clientsdata2.firmtype = 1;
-";
-			_command.ExecuteNonQuery();
+		AND clientsdata2.firmtype = 1;";
+			_command
+				.AppendQueryForCreateNotExistsAnalitFReplicationRecordForSupplier()
+				.ExecuteNonQuery();
 		}
 
-		private void CreateClientOnRCS_and_I(bool Invisible)
+		private void CreateDrugstoreSpecific(bool invisible)
 		{
 			_command.CommandText = @"
 INSERT INTO usersettings.retclientsset (ClientCode, InvisibleOnFirm, WorkRegionMask, OrderRegionMask, BasecostPassword, ServiceClient) 
@@ -843,8 +816,8 @@ FROM clientsdata as clientsdata2
 WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
-		AND clientsdata2.firmtype = 1;
-";
+		AND clientsdata2.firmtype = 1;";
+			_command.AppendQueryForCreateNotExistsAnalitFReplicationRecordForDrugstore();
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
 			{
 				if (IncludeType.SelectedItem.Value == "1")
@@ -891,7 +864,7 @@ WHERE	dst.clientcode        = ?ClientCode
 ";
 				}
 			}
-			if (!Invisible)
+			if (!invisible)
 				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
 			_command.ExecuteNonQuery();
 		}
@@ -908,23 +881,15 @@ WHERE	dst.clientcode        = ?ClientCode
 
 		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			try
-			{
-				_connection.Open();
-				var command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;");
-				command.Parameters.AddWithValue("?firmCode", IncludeSDD.SelectedValue);
-				command.Connection = _connection;
-				command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				using (var reader = command.ExecuteReader())
-					if (reader.Read())
-						RegionDD.SelectedValue = reader[0].ToString();
-
-				command.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+			With.Connection(c => {
+			                	var command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;", c);
+			                	command.Parameters.AddWithValue("?firmCode", IncludeSDD.SelectedValue);
+			                	using (var reader = command.ExecuteReader())
+			                	{
+			                		if (reader.Read())
+			                			RegionDD.SelectedValue = reader[0].ToString();
+			                	}
+			                });
 			UpdateInherit();
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
@@ -935,10 +900,9 @@ WHERE	dst.clientcode        = ?ClientCode
 
 			_connection.ConnectionString = Literals.GetConnectionString();
 
-			try
-			{
-				_connection.Open();
-				var adapter = new MySqlDataAdapter(@"
+			With.Connection(
+				c => {
+					var adapter = new MySqlDataAdapter( @"
 SELECT  regionaladmins.username, 
         regions.regioncode, 
         regions.region, 
@@ -948,18 +912,11 @@ FROM    accessright.regionaladmins,
 WHERE   accessright.regionaladmins.regionmask & farm.regions.regioncode > 0 
         AND username = ?UserName 
 ORDER BY region;
-",
-					_connection);
-				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				adapter.Fill(DS1, "admin");
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
+", _connection);
+					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					adapter.Fill(DS1, "admin");
+				});
 
-			}
 
 			if (IsPostBack) 
 				return;
@@ -1072,12 +1029,10 @@ ORDER BY region;
 
 				if (args.IsValid)
 				{
-					bool existsInDataBase;
-					bool existsInActiveDirectory;
 					_connection.Open();
-					existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar()) == 1;
+					var existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar()) == 1;
 					_connection.Close();
-					existsInActiveDirectory = ADHelper.IsLoginExists(args.Value);
+					var existsInActiveDirectory = ADHelper.IsLoginExists(args.Value);
 					args.IsValid = !(existsInActiveDirectory || existsInDataBase);
 					if (existsInActiveDirectory || existsInDataBase)
 					{
@@ -1111,21 +1066,21 @@ ORDER BY region;
 			var contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
 
 			CreateContactGroup(ContactGroupType.General,
-							   EmailHelper.NormalizeEmailOrPhone(PhoneTB.Text),
-							   EmailHelper.NormalizeEmailOrPhone(EmailTB.Text),
+			                   EmailHelper.NormalizeEmailOrPhone(PhoneTB.Text),
+			                   EmailHelper.NormalizeEmailOrPhone(EmailTB.Text),
 			                   null,
 			                   connection,
 			                   contactGroupOwnerId);
 			CreateContactGroup(ContactGroupType.OrderManagers,
-							   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerPhone.Text),
-							   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerMail.Text),
+			                   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerPhone.Text),
+			                   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerMail.Text),
 			                   TBOrderManagerName.Text,
 			                   connection,
 			                   contactGroupOwnerId);
 
 			if (clientType == ClientType.Supplier)
 				CreateContactGroup(ContactGroupType.ClientManagers,
-								   EmailHelper.NormalizeEmailOrPhone(TBClientManagerPhone.Text),
+				                   EmailHelper.NormalizeEmailOrPhone(TBClientManagerPhone.Text),
 				                   EmailHelper.NormalizeEmailOrPhone(TBClientManagerMail.Text),
 				                   TBClientManagerName.Text,
 				                   connection,
@@ -1233,8 +1188,8 @@ select Last_Insert_ID();";
 			WorkRegionLable.Visible = !isCusomer;
 			WorkRegion.Visible = !isCusomer;
 			OrderManagerGroupLabel.InnerText = isCusomer
-			                              	? "Ответственный за работу с программой:"
-			                              	: "Ответственный за отправку прайс-листа:";
+			                                   	? "Ответственный за работу с программой:"
+			                                   	: "Ответственный за отправку прайс-листа:";
 			ClientManagerGropBlock.Visible = !isCusomer;
 		}
 

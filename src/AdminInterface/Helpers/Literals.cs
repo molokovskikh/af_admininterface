@@ -6,7 +6,7 @@ namespace AdminInterface.Helpers
 	{
 		public static string GetConnectionString()
 		{
-			return ConfigurationManager.ConnectionStrings["Default"].ConnectionString;
+			return ConfigurationManager.ConnectionStrings["Main"].ConnectionString;
 		}
 	}
 

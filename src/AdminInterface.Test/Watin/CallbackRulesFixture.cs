@@ -11,7 +11,7 @@ using WatiN.Core;
 namespace AdminInterface.Test.Watin
 {
 	[TestFixture]
-	public class SmapRejectorFixture
+	public class CallbackRulesFixture
 	{
 		private Server _webServer;
 	    private const string CallbackLinkText = "Правила обратного звонка";
