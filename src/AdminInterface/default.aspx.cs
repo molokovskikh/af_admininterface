@@ -1,12 +1,9 @@
 using System;
 using System.Data;
-using System.Security.Principal;
-using System.ServiceModel;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using ConsoleApplication11.ServiceReference2;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -194,7 +191,7 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				catch (Exception) { }
 				try
 				{
-					if (Convert.ToInt32(ReqHL.Text) > 0)
+					if (Convert.ToInt32(ReqHL.Text) >= 0)
 						ReqHL.Enabled = true;
 				}
 				catch (Exception) { }
