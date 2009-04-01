@@ -150,7 +150,6 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
-						updateCommand.AppendQueryForCreateNotExistsAnalitFReplicationRecordForDrugstore();
 					}
 					if (VisileStateList.Enabled)
 					{

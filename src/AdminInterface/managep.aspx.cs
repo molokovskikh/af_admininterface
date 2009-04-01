@@ -697,7 +697,6 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata.firmcode = ?ClientCode
 		AND clientsdata2.FirmType = 1;", connection);
-				updateCommand.AppendQueryForCreateNotExistsAnalitFReplicationRecordForSupplier();
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
 				updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);

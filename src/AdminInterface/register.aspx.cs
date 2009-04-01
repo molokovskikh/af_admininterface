@@ -763,7 +763,6 @@ WHERE   intersection.pricecode IS NULL
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
 			_command
-				.AppendQueryForCreateNotExistsAnalitFReplicationRecordForSupplier()
 				.ExecuteNonQuery();
 		}
 
@@ -817,7 +816,6 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
-			_command.AppendQueryForCreateNotExistsAnalitFReplicationRecordForDrugstore();
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
 			{
 				if (IncludeType.SelectedItem.Value == "1")
