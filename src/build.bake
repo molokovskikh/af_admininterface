@@ -3,7 +3,7 @@ import System.IO
 
 buildTo = Path.GetFullPath("..\\build\\")
 projectPath = Path.GetFullPath("AdminInterface")
-projectFile = "${projectPath}AdminInterface.csproj"
+projectFile = "${projectPath}\\AdminInterface.csproj"
 deployTo = "\\\\acdcserv\\AdmInterface\\"
 
 Task @default, [@build]
@@ -28,7 +28,7 @@ Task @build, [@clean]:
 				"**/*.sitemap"], 
 				BaseDirectory: projectPath), 
 		buildTo, true)
-	Cp("${projectPath}Web.release.config", "${buildTo}Web.config")
+	Cp("${projectPath}//Web.release.config", "${buildTo}Web.config")
 	
 Task @clean:
 	MsBuild(projectFile,
