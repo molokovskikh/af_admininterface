@@ -394,15 +394,7 @@ WHERE r.RegionCode & ?AdminMaskRegion > 0
 ORDER BY r.region;", c);
 					regionAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 					regionAdapter.Fill(_data, "admin");
-					RegionDD.DataBind();
-					for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
-					{
-						if (Convert.ToUInt64(RegionDD.Items[i].Value) == HomeRegionCode)
-						{
-							RegionDD.SelectedIndex = i;
-							break;
-						}
-					}
+
 					command.CommandText = @"
 SELECT  InvisibleOnFirm, 
         AlowRegister, 
@@ -504,6 +496,15 @@ ORDER BY sg.DisplayName;";
 
 					RegionDD.DataSource = _data.Tables["Admin"].DefaultView;
 					RegionDD.DataBind();
+
+					for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
+					{
+						if (Convert.ToUInt64(RegionDD.Items[i].Value) == HomeRegionCode)
+						{
+							RegionDD.SelectedIndex = i;
+							break;
+						}
+					}
 
 					for (var i = 0; i < ExportRulesList.Items.Count; i++)
 						ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);

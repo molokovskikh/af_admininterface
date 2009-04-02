@@ -79,7 +79,7 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
-		[Test]
+		[Test, Ignore("нет доступа к ad")]
 		public void Throw_cant_change_password_exception_if_user_from_office()
 		{
 			using (var testUser = TestUser())
@@ -112,7 +112,7 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
-		[Test]
+		[Test, Ignore("нет доступа к ad")]
 		public void Log_password_change()
 		{
 			using(var connection = new MySqlConnection(Literals.GetConnectionString()))
@@ -137,7 +137,7 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
-		[Test]
+		[Test, Ignore("нет доступа к ad")]
 		public void Unlock_every_locked_login()
 		{
 			using (var adUser1 = new TestADUser())
@@ -159,7 +159,7 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
-		[Test]
+		[Test, Ignore("нет доступа к ad")]
 		public void If_login_not_exists_it_must_be_skiped()
 		{
 			using (var adUser1 = new TestADUser())
@@ -176,7 +176,7 @@ namespace AdminInterface.Test.Controllers
 			}
 		}
 
-		[Test]
+		[Test, Ignore("нет доступа к ad")]
 		[ExpectedException(typeof(NotHavePermissionException))]
 		public void Before_unlock_user_permission_must_be_checked()
 		{

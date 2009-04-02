@@ -156,6 +156,7 @@
     <Compile Include="Watin\RegistrationFixture.cs" />
     <Compile Include="Watin\ServiceFixture.cs" />
     <Compile Include="Watin\CallbackRulesFixture.cs" />
+    <Compile Include="Watin\SupplierFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
