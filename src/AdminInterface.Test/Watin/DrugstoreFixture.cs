@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using System.Threading;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
@@ -36,6 +35,19 @@ namespace AdminInterface.Test.Watin
 				browser.GoTo(browser.Url);
 				browser.Refresh();
 				Assert.That(GetHomeRegionSelect(browser).SelectedOption.Text, Is.EqualTo(changeTo));
+			}
+		}
+
+		[Test]
+		public void Try_to_view_orders()
+		{
+			using (var browser = new IE(BuildTestUrl("Client/info.rails?cc=2575")))
+			{
+				browser.Link(l => l.Text == "История заказов").Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Статистика заказов")))
+				{
+					Assert.That(openedWindow.ContainsText("Укажите период"));
+				}
 			}
 		}
 

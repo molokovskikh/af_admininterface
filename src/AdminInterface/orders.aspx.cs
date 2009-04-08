@@ -32,6 +32,11 @@ namespace AddUser
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
+			Update();
+		}
+
+		private void Update()
+		{
 			var clientCode = Convert.ToUInt32(Request["cc"]);
 			var adapter = new MySqlDataAdapter(@"
 SELECT  oh.rowid, 
@@ -56,6 +61,7 @@ WHERE   client.firmcode = if(sel.firmtype = 1, sel.firmcode, client.firmcode)
         AND oh.writetime BETWEEN ?FromDate AND ADDDATE(?ToDate, INTERVAL 1 DAY)
         AND sel.firmcode = ?clientCode 
 		AND oh.RegionCode & ?RegionCode > 0
+		and oh.Deleted = 0
 group by oh.rowid
 ORDER BY writetime desc;
 ", Literals.GetConnectionString());
@@ -94,6 +100,7 @@ where clientcode = ?ClientCode", new MySqlParameter("?ClientCode", clientCode)))
 
 			CalendarFrom.SelectedDates.Add(DateTime.Now.AddDays(-1));
 			CalendarTo.SelectedDates.Add(DateTime.Now);
+			Update();
 		}
 		protected void OrdersGrid_RowCreated(object sender, GridViewRowEventArgs e)
 		{
