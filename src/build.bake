@@ -44,4 +44,4 @@ Task @copy, [@cleanDeploy]:
 	Cp(FileSet("**/*.*", BaseDirectory : buildTo), deployTo, true)
 	
 Task @cleanDeploy:
-	Rm("${deployTo}*", true)
+	Rm(FileSet("*.*", Excludes : ["*.log"], BaseDirectory : deployTo), true)
