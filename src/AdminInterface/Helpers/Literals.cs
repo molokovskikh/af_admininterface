@@ -15,8 +15,6 @@ namespace AdminInterface.Helpers
 		UpdateCumulative = 2,
 		UpdateNormal = 1,
 		UpdateError = 3,
-		UpdateBan = 0,
-		InUpdateProcess = 4,
-		Download = 5
+		UpdateBan = 0
 	}
 }
