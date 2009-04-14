@@ -151,53 +151,6 @@ GROUP by p.UpdateId
 ORDER by p.RequestTime desc;
 ";
 					break;
-				case StatisticsType.InUpdateProcess:
-					adapter.SelectCommand.CommandText = @" 
-SELECT  p.RequestTime,   
-        clientsdata.FirmCode,   
-        clientsdata.ShortName,   
-        r.Region,  
-		AppVersion,
-		ResultSize, 
-        p.Addition  
-FROM (usersettings.clientsdata, farm.regions r)
-	JOIN usersettings.ret_update_info rui ON rui.ClientCode = clientsdata.firmcode
-LEFT JOIN logs.AnalitFUpdates p ON p.clientcode = rui.clientcode AND p.RequestTime > curdate()  
-WHERE   r.regioncode                                  = clientsdata.regioncode  
-        and rui.UncommittedUpdateTime                    >= CURDATE()  
-        and rui.UpdateTime                               <> rui.UncommittedUpdateTime  
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-        AND p.UpdateId = 
-			(
-				SELECT max(pl.UpdateId) 
-				FROM logs.AnalitFUpdates pl 
-				WHERE pl.clientcode = rui.clientcode
-			)
-ORDER BY p.RequestTime desc;
-";
-					headerText = "В процессе получения обновления:";
-					break;
-				case StatisticsType.Download:
-					adapter.SelectCommand.CommandText = @"
-SELECT  RequestTime, 
-        FirmCode, 
-        ShortName, 
-        Region, 
-		AppVersion,
-		ResultSize,
-        Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
-WHERE   p.RequestTime > curDate()
-		and rcs.clientcode					  = p.clientcode 
-        and firmcode                          = p.clientcode 
-        and r.regioncode                      = clientsdata.regioncode 
-		and UpdateType						  = 3
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-GROUP by p.UpdateId
-ORDER by p.RequestTime desc;
-";
-					headerText = "Докачки:";
-					break;
 			}
 			HeaderLB.Text = headerText;
 			adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
