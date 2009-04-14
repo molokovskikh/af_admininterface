@@ -257,15 +257,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.Label PriceDOKLB;
         
         /// <summary>
-        /// PriceDERRLB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label PriceDERRLB;
-        
-        /// <summary>
         /// DownPLB control.
         /// </summary>
         /// <remarks>
@@ -273,15 +264,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label DownPLB;
-        
-        /// <summary>
-        /// DownErrLB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label DownErrLB;
         
         /// <summary>
         /// PriceFOKLB control.
@@ -293,15 +275,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.Label PriceFOKLB;
         
         /// <summary>
-        /// FormErrLB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label FormErrLB;
-        
-        /// <summary>
         /// FormPLB control.
         /// </summary>
         /// <remarks>
@@ -309,15 +282,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Label FormPLB;
-        
-        /// <summary>
-        /// WaitPLB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Label WaitPLB;
         
         /// <summary>
         /// OrderProcStatus control.

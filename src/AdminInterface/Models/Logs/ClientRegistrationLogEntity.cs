@@ -29,7 +29,7 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<ClientRegistrationLogEntity> GetEntitiesForPeriond(DateTime beginDate, DateTime endDate, int dayWithoutUpdate)
 		{
-			return ArHelper.WithSession<ClientRegistrationLogEntity>(
+			return ArHelper.WithSession(
 				session => session.CreateSQLQuery(String.Format(@"
 select	cd.FirmCode as {{ClientRegistrationLogEntity.ClientCode}},
 		cd.ShortName as {{ClientRegistrationLogEntity.ClientName}}, 

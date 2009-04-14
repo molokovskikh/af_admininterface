@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Configuration;
 
 namespace AdminInterface.Helpers
@@ -12,9 +13,9 @@ namespace AdminInterface.Helpers
 
 	public enum StatisticsType
 	{
-		UpdateCumulative = 2,
-		UpdateNormal = 1,
-		UpdateError = 3,
-		UpdateBan = 0
+		[Description("Кумулятивные обновления")] UpdateCumulative = 2,
+		[Description("Обычные обновления")] UpdateNormal = 1,
+		[Description("Ошибки подготовки данных")] UpdateError = 6,
+		[Description("Запреты")] UpdateBan = 5
 	}
 }

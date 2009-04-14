@@ -135,7 +135,7 @@
 								<font face="Verdana" size="2">Приготовлено обычных:&nbsp;</font>
 							</td>
 							<td style="width: 76px; height: 18px" bgcolor="#d8f1ff" height="18">
-								<asp:HyperLink ID="ConfHL" runat="server" NavigateUrl="viewcl.aspx?id=2" Enabled="False"
+								<asp:HyperLink ID="ConfHL" runat="server" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
 							<td style="height: 18px" align="right" bgcolor="#d8f1ff" height="18">
 								<font face="Verdana" size="2">В процессе:</font></td>
@@ -147,12 +147,12 @@
 							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
 								<font face="Verdana" size="2">Приготовлено КО:</font></td>
 							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
-								<asp:HyperLink ID="CUHL" runat="server" NavigateUrl="viewcl.aspx?id=1" Enabled="False"
+								<asp:HyperLink ID="CUHL" runat="server" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
 							<td style="height: 19px" align="right" bgcolor="#d8f1ff">
 								<font face="Verdana" size="2">Запретов:</font></td>
 							<td style="height: 19px; width: 58px;" bgcolor="#d8f1ff" height="19">
-								<asp:HyperLink ID="ADHL" runat="server" NavigateUrl="viewcl.aspx?id=0" Enabled="False"
+								<asp:HyperLink ID="ADHL" runat="server" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>							<td>
 						</tr>
 						<tr>
@@ -160,7 +160,7 @@
 								<font face="Verdana" size="2">Ошибок:</font>
 							</td>
 							<td style="width: 76px; text-align: center;" bgcolor="#d8f1ff" height="19">
-								<asp:HyperLink ID="ErrUpHL" runat="server" NavigateUrl="viewcl.aspx?id=3" Enabled="False"
+								<asp:HyperLink ID="ErrUpHL" runat="server" Enabled="False"
 									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink>
 							</td>
 							<td class="StatisticData">
@@ -230,7 +230,7 @@
 							<td style="height: 20px" align="right" bgcolor="#d8f1ff" height="20">
 								<font face="Verdana" size="2">Не опознано:</font></td>
 							<td style="height: 20px; width: 58px;" bgcolor="#d8f1ff" height="20">
-								<asp:Label ID="PriceDERRLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+							</td>
 						</tr>
 						<tr>
 							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
@@ -240,7 +240,7 @@
 							<td align="right" bgcolor="#d8f1ff" height="20">
 								<font face="Verdana" size="2">Не получено:</font></td>
 							<td bgcolor="#d8f1ff" height="20" style="width: 58px">
-								<asp:Label ID="DownErrLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+							</td>
 						</tr>
 						<tr>
 							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
@@ -250,7 +250,7 @@
 							<td align="right" bgcolor="#d8f1ff" height="20">
 								<font face="Verdana" size="2">Не формализовано:</font></td>
 							<td bgcolor="#d8f1ff" height="20" style="width: 58px">
-								<asp:Label ID="FormErrLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+							</td>
 						</tr>
 						<tr>
 							<td style="height: 19px; width: 229px;" align="right" bgcolor="#d8f1ff">
@@ -261,7 +261,7 @@
 							<td style="height: 19px" align="right" bgcolor="#d8f1ff" height="19">
 								<font face="Verdana" size="2"><font face="Verdana" size="2">Очередь формализации:</font></font></td>
 							<td style="height: 19px; width: 58px;" bgcolor="#d8f1ff" height="19">
-								<asp:Label ID="WaitPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+							</td>
 						</tr>
 						<tr>
 							<td colspan="4" style="text-align:center; background-color:#dadada; font-size: 2; font-weight:bold;">Службы:</td>

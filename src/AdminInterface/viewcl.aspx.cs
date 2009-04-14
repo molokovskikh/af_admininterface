@@ -5,6 +5,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -57,107 +58,32 @@ namespace AddUser
 			StateHelper.CheckSession(this, ViewState);
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewDrugstore);
 
-			var headerText = String.Empty;
-
 			var adapter = new MySqlDataAdapter("", Literals.GetConnectionString()); 
-
-			switch (RequestType)
-			{ 
-				case StatisticsType.UpdateBan:
-					headerText = "Запреты:";
-					adapter.SelectCommand.CommandText = @"
-SELECT  RequestTime, 
-        FirmCode, 
-        ShortName, 
-        Region, 
-		AppVersion,
-		ResultSize,
-        Addition
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
-WHERE   rcs.clientcode						  = p.clientcode 
-        and firmcode                          = p.clientcode 
-        and r.regioncode                      = clientsdata.regioncode 
-		and p.UpdateType					  = 5
-		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		and r.regioncode & ?RegionMask > 0
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-GROUP by p.UpdateId
-ORDER by p.RequestTime desc;
-";
-					break;
-				case StatisticsType.UpdateCumulative:
-					headerText = "Кумулятивные обновления:";
-					adapter.SelectCommand.CommandText = @"
-SELECT  RequestTime, 
-        FirmCode, 
-        ShortName, 
-        Region, 
-		AppVersion,
-		ResultSize,
-        Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
-WHERE   rcs.clientcode						  = p.clientcode 
-        and firmcode                          = p.clientcode 
-        and r.regioncode                      = clientsdata.regioncode 
-		and UpdateType						  = 2
-		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		and r.regioncode & ?RegionMask > 0
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-GROUP by p.UpdateId
-ORDER by p.RequestTime desc;
-";
-					break;
-				case StatisticsType.UpdateError:
-					headerText = "Ошибки подготовки данных:";
-					adapter.SelectCommand.CommandText = @"
-SELECT  RequestTime, 
-        FirmCode, 
-        ShortName, 
-        Region, 
-		AppVersion,
-		ResultSize,
-        Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
-WHERE   rcs.clientcode						  = p.clientcode 
-        and firmcode                          = p.clientcode 
-        and r.regioncode                      = clientsdata.regioncode 
-		and UpdateType						  = 6
-		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		and r.regioncode & ?RegionMask > 0
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-GROUP by p.UpdateId
-ORDER by p.RequestTime desc;
-";
-					break;
-				case StatisticsType.UpdateNormal:
-					headerText = "Обычные обновления:";
-					adapter.SelectCommand.CommandText = @"
-SELECT  RequestTime, 
-        FirmCode, 
-        ShortName, 
-        Region, 
-		AppVersion,
-		ResultSize,
-        Addition  
-FROM    (logs.AnalitFUpdates p, usersettings.clientsdata, farm.regions r, usersettings.retclientsset rcs)
-WHERE   rcs.clientcode						  = p.clientcode 
-        and firmcode                          = p.clientcode 
-        and r.regioncode                      = clientsdata.regioncode 
-		and UpdateType						  = 1
-		and p.RequestTime BETWEEN ?BeginDate AND ?EndDate
-		and r.regioncode & ?RegionMask > 0
-		and clientsdata.RegionCode & ?AdminMaskRegion > 0
-GROUP by p.UpdateId
-ORDER by p.RequestTime desc;
-";
-					break;
-			}
-			HeaderLB.Text = headerText;
+			HeaderLB.Text = BindingHelper.GetDescription(RequestType);
+			adapter.SelectCommand.CommandText = @"
+SELECT  afu.RequestTime, 
+        cd.FirmCode, 
+        cd.ShortName, 
+        r.Region, 
+		afu.AppVersion,
+		afu.ResultSize,
+        afu.Addition
+FROM usersettings.clientsdata cd
+	join farm.regions r on r.regioncode = cd.regioncode 
+	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
+	join logs.AnalitFUpdates afu on afu.UserId = ouar.RowId
+WHERE afu.UpdateType = ?UpdateType
+	  and afu.RequestTime BETWEEN ?BeginDate AND ?EndDate
+	  and r.regioncode & ?RegionMask > 0
+	  and cd.RegionCode & ?AdminMaskRegion > 0
+GROUP by afu.UpdateId
+ORDER by afu.RequestTime desc;";
 			adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			adapter.SelectCommand.Parameters.AddWithValue("?BeginDate", BeginDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?EndDate", EndDate);
 			adapter.SelectCommand.Parameters.AddWithValue("?RegionMask", RegionMask & SecurityContext.Administrator.RegionMask);
 			adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+			adapter.SelectCommand.Parameters.AddWithValue("?UpdateType", RequestType);
 
 			var data = new DataSet();
 
