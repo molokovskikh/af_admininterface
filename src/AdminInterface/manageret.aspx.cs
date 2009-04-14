@@ -403,7 +403,6 @@ SELECT  InvisibleOnFirm,
         AdvertisingLevel, 
         AlowWayBill, 
         EnableUpdate, 
-        length(rui.UniqueCopyID) = 0 as Length, 
         CalculateLeader, 
         AllowSubmitOrders, 
         SubmitOrders, 
@@ -412,7 +411,6 @@ SELECT  InvisibleOnFirm,
         ShowMessageCount,
 		rcs.PriceCodeOnly as NotNoisedPriceCode
 FROM retclientsset rcs
-	JOIN ret_update_info rui on rcs.clientcode = rui.ClientCode
 WHERE rcs.clientcode = ?ClientCode";
 					using (var reader = command.ExecuteReader())
 					{
