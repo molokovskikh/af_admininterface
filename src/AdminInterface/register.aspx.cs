@@ -782,12 +782,12 @@ select ?ClientCode, sg.id
 from usersettings.save_grids sg
 where sg.AssignDefaultValue = 1;
 
-INSERT INTO usersettings.ret_update_info (ClientCode, CurrentExeVersion) 
-Values(?ClientCode, (SELECT max(currentExeVersion)
-FROM usersettings.ret_update_info r
-  join usersettings.clientsdata cd on cd.firmcode = r.clientcode
-where billingcode <> 921));
-INSERT INTO usersettings.UserUpdateInfo(UserId) Values (@NewUserId);
+INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (@NewUserId, 
+(select max(uui.AFAppVersion)
+from usersettings.UserUpdateInfo uui
+	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
+		join usersettings.clientsdata cd on cd.FirmCode = ouar.ClientCode
+where cd.BillingCode <> 921));
 
 INSERT 
 INTO    intersection

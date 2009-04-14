@@ -262,9 +262,6 @@ WHERE PriceCode = ?PriceCode;
 DELETE FROM Intersection
 WHERE PriceCode = ?PriceCode;
 
-DELETE FROM intersection_update_info
-WHERE PriceCode = ?PriceCode;
-
 DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
 ");

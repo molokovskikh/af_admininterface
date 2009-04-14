@@ -13,8 +13,9 @@
 					<p align="center">
 						<font face="Verdana" size="2">Выберите регион:</font>
 						<asp:DropDownList ID="RegionDD" runat="server" Font-Size="8pt" Font-Names="Verdana"
-							DataValueField="RegionCode" DataTextField="Region" DataSource="<%# DS %>">
-						</asp:DropDownList></p>
+							DataValueField="RegionCode" DataTextField="Region">
+						</asp:DropDownList>
+					</p>
 				</td>
 			</tr>
 			<tr>
@@ -24,9 +25,10 @@
 				</td>
 				<td height="35">
 					<p align="left">
-						<asp:TextBox ID="FromTB" runat="server" Font-Size="8pt" Font-Names="Verdana"></asp:TextBox><asp:DropDownList
+						<asp:TextBox ID="FromTB" runat="server" Font-Size="8pt" Font-Names="Verdana"></asp:TextBox>
+						<asp:DropDownList
 							ID="FromDD" runat="server" Font-Size="8pt" Font-Names="Verdana" DataValueField="ClientCode"
-							DataTextField="Name" DataSource="<%# From %>" Visible="False">
+							DataTextField="Name" Visible="False">
 						</asp:DropDownList></p>
 				</td>
 				<td height="35">
@@ -38,9 +40,10 @@
 						<font face="Verdana" size="2">Для:</font></p>
 				</td>
 				<td height="35">
-					<asp:TextBox ID="ToTB" runat="server" Font-Size="8pt" Font-Names="Verdana"></asp:TextBox><asp:DropDownList
+					<asp:TextBox ID="ToTB" runat="server" Font-Size="8pt" Font-Names="Verdana"></asp:TextBox>
+					<asp:DropDownList
 						ID="ToDD" runat="server" Font-Size="8pt" Font-Names="Verdana" DataValueField="ClientCode"
-						DataTextField="Name" DataSource="<%# ToT %>" Visible="False">
+						DataTextField="Name" Visible="False">
 					</asp:DropDownList></td>
 				<td height="35">
 					<asp:Label ID="ToL" runat="server" Font-Size="8pt" Font-Names="Verdana"></asp:Label></td>

@@ -101,7 +101,6 @@
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="EXE" HeaderText="EXE" SortExpression="EXE"></asp:BoundField>
-					<asp:BoundField DataField="MDB" HeaderText="MDB" SortExpression="MDB" />
 					<asp:BoundField DataField="UserName" HeaderText="Login" SortExpression="UserName" />
 					<asp:TemplateField HeaderText="Сегмент" SortExpression="FirmSegment">
 						<ItemTemplate>

@@ -1,7 +1,6 @@
 using System;
 using System.Data;
 using System.Drawing;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -24,7 +23,7 @@ namespace AddUser
 
 	partial class searchc : Page
 	{
-	    private MySqlConnection _connection = new MySqlConnection();
+	    private readonly MySqlConnection _connection = new MySqlConnection();
 	    private readonly MySqlCommand _command = new MySqlCommand();
 
 		public DataView ClientsDataView
@@ -206,13 +205,11 @@ SELECT  cd.billingcode,
         null FirstUpdate, 
         null SecondUpdate, 
         null EXE, 
-        null MDB, 
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
         FirmSegment, 
         FirmType, 
         (Firmstatus = 0 or Billingstatus= 0) Firmstatus, 
-        if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
-        cd.firmcode                                      as bfc,
+        cd.firmcode as bfc,
 		NULL AS IncludeType,
 		NULL AS InvisibleOnFirm
 FROM clientsdata as cd
@@ -224,25 +221,23 @@ FROM clientsdata as cd
 WHERE   (cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0
 		and FirmType = 0
-		{0}", SecurityContext.Administrator.GetClientFilterByType("cd")) ;
+		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 			var secondPart = String.Empty;
 			var thirdPart = String.Format(@"
-group by cd.firmcode union 
-SELECT  cd. billingcode, 
+group by cd.firmcode 
+union 
+SELECT  cd.billingcode, 
         cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode, 
         if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')), 
         region, 
-        UpdateTime FirstUpdate, 
-        UncommittedUpdateTime SecondUpdate, 
-        AppVersion as EXE, 
-        DBVersion MDB, 
+        max(uui2.UpdateDate) FirstUpdate, 
+        max(uui2.UncommitedUpdateDate) SecondUpdate, 
+        afu.AppVersion as EXE, 
         if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
         cd.FirmSegment, 
         cd.FirmType, 
-        (cd.Firmstatus     = 0 
-        or cd.Billingstatus= 0) Firmstatus, 
-        if(ouar2.rowid is null, ouar.rowid, ouar2.rowid) as ouarid, 
-        cd.firmcode                                      as bfc,
+        (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus, 
+        cd.firmcode as bfc,
 		CASE IncludeRegulation.IncludeType
 			WHEN 0 THEN 'Базовый'
 			WHEN 1 THEN 'Сеть'
@@ -250,23 +245,23 @@ SELECT  cd. billingcode,
 			WHEN 3 THEN 'Базовый+'
 		END AS IncludeType,
 		rcs.InvisibleOnFirm
-FROM (clientsdata as cd, farm.regions, ret_update_info as rts, billing.payers p) 
+FROM (clientsdata as cd, farm.regions, billing.payers p) 
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
-	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode 
-	LEFT JOIN includeregulation ON includeclientcode= cd.firmcode 
+	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode 
+	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode 
 	LEFT JOIN clientsdata incd ON incd.firmcode= includeregulation.PrimaryClientCode 
-	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode= ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
-	LEFT JOIN logs.AnalitFUpdates ON AnalitFUpdates.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and AnalitFUpdates.UpdateId = 
+	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
+	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
+	LEFT JOIN logs.AnalitFUpdates afu ON afu.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+        and afu.UpdateId = 
         (
 			SELECT max(UpdateId) 
 			FROM logs.AnalitFUpdates
 			WHERE clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
 				  and updatetype in(1,2)
         ) 
-WHERE   rts.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and regions.regioncode = cd.regioncode 
+WHERE   regions.regioncode = cd.regioncode 
 		and cd.BillingCode = p.PayerID
 		and (cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0

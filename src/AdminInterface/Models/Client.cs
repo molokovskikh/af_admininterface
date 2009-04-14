@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -228,7 +227,11 @@ namespace AdminInterface.Models
 		{
 			ArHelper.WithSession<Client>(session =>
 			                             session
-			                             	.CreateSQLQuery("update usersettings.ret_update_info set UniqueCopyID = '' where clientcode = :clientcode")
+			                             	.CreateSQLQuery(@"
+update usersettings.UserUpdateInfo uui
+	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
+set uui.AFCopyId = '' 
+where ouar.clientcode = :clientcode")
 			                             	.SetParameter("clientcode", Id)
 			                             	.ExecuteUpdate());
 		}
@@ -237,7 +240,12 @@ namespace AdminInterface.Models
 		{
 			var result = ArHelper.WithSession(session =>
 			                                  session
-			                                  	.CreateSQLQuery("select length(rui.UniqueCopyID) = 0 from usersettings.ret_update_info rui where clientcode = :clientcode")
+			                                  	.CreateSQLQuery(@"
+select length(concat(uui.AFCopyId)) = 0
+from usersettings.UserUpdateInfo uui
+	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
+where ouar.clientcode = :clientcode
+group by ouar.clientcode")
 			                                  	.SetParameter("clientcode", Id)
 			                                  	.UniqueResult<long?>());
 

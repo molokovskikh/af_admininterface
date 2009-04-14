@@ -1,113 +1,51 @@
 using System;
 using System.Data;
-using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
-using System.Text;
 using System.Web;
-using System.Web.Mail;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
 	partial class CopySynonym : Page
 	{
-		protected DataSet DS;
-		protected DataTable Regions;
-		protected DataColumn DataColumn1;
-		protected DataColumn DataColumn2;
-		MySqlConnection _connection = new MySqlConnection();
-		MySqlDataAdapter DA = new MySqlDataAdapter();
-		protected DataTable From;
-		protected DataColumn DataColumn3;
-		protected DataColumn DataColumn4;
-		protected DataColumn DataColumn5;
-		protected DataColumn DataColumn6;
-		protected DataTable ToT;
-		protected DataColumn DataColumn7;
-
-		[DebuggerStepThrough()]
-		private void InitializeComponent()
-		{
-			DS = new DataSet();
-			Regions = new DataTable();
-			DataColumn1 = new DataColumn();
-			DataColumn2 = new DataColumn();
-			DataColumn7 = new DataColumn();
-			From = new DataTable();
-			DataColumn3 = new DataColumn();
-			DataColumn4 = new DataColumn();
-			ToT = new DataTable();
-			DataColumn5 = new DataColumn();
-			DataColumn6 = new DataColumn();
-			DS.BeginInit();
-			Regions.BeginInit();
-			From.BeginInit();
-			ToT.BeginInit();
-			DS.DataSetName = "NewDataSet";
-			DS.Locale = new CultureInfo("ru-RU");
-			DS.Tables.AddRange(new DataTable[] {Regions, From, ToT});
-			Regions.Columns.AddRange(new DataColumn[] {DataColumn1, DataColumn2, DataColumn7});
-			Regions.TableName = "Regions";
-			DataColumn1.ColumnName = "Region";
-			DataColumn2.ColumnName = "RegionCode";
-			DataColumn2.DataType = typeof (Int64);
-			DataColumn7.ColumnName = "Email";
-			From.Columns.AddRange(new DataColumn[] {DataColumn3, DataColumn4});
-			From.TableName = "From";
-			DataColumn3.ColumnName = "Name";
-			DataColumn4.ColumnName = "ClientCode";
-			DataColumn4.DataType = typeof (Int32);
-			ToT.Columns.AddRange(new DataColumn[] {DataColumn5, DataColumn6});
-			ToT.TableName = "ToT";
-			DataColumn5.ColumnName = "Name";
-			DataColumn6.ColumnName = "ClientCode";
-			DataColumn6.DataType = typeof (Int32);
-			DS.EndInit();
-			Regions.EndInit();
-			From.EndInit();
-			ToT.EndInit();
-		}
-
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-			InitializeComponent();
-		}
+		private readonly DataSet _data = new DataSet();
 
 		protected void FindBT_Click(object sender, EventArgs e)
 		{
 			FindClient(FromTB.Text, "From");
 			FindClient(ToTB.Text, "ToT");
-			FromL.Text = DS.Tables["from"].Rows.Count.ToString();
-			ToL.Text = DS.Tables["tot"].Rows.Count.ToString();
-			if (DS.Tables["from"].Rows.Count > 0)
+			FromL.Text = _data.Tables["from"].Rows.Count.ToString();
+			ToL.Text = _data.Tables["tot"].Rows.Count.ToString();
+			if (_data.Tables["from"].Rows.Count > 0)
 			{
-				if (DS.Tables["from"].Rows.Count > 50)
+				if (_data.Tables["from"].Rows.Count > 50)
 				{
 					LabelErr.Text = "Найдено более 50 записей \"От\". Уточните условие поиска.";
 					return;
 				}
 				FromTB.Visible = false;
+				FromDD.DataSource = _data.Tables["From"];
 				FromDD.Visible = true;
 				FromDD.DataBind();
 			}
-			if (DS.Tables["tot"].Rows.Count > 0)
+			if (_data.Tables["tot"].Rows.Count > 0)
 			{
-				if (DS.Tables["tot"].Rows.Count > 50)
+				if (_data.Tables["tot"].Rows.Count > 50)
 				{
 					LabelErr.Text = "Найдено более 50 записей \"Для\". Уточните условие поиска.";
 					return;
 				}
 				ToTB.Visible = false;
+				ToDD.DataSource = _data.Tables["ToT"];
 				ToDD.Visible = true;
 				ToDD.DataBind();
 			}
-			if (DS.Tables["tot"].Rows.Count > 0 & DS.Tables["from"].Rows.Count > 0)
+			if (_data.Tables["tot"].Rows.Count > 0 & _data.Tables["from"].Rows.Count > 0)
 			{
 				SetBT.Enabled = true;
 				FindBT.Enabled = false;
@@ -119,10 +57,11 @@ namespace AddUser
 			}
 		}
 
-		public void FindClient(string NameStr, string Where)
+		public void FindClient(string nameStr, string where)
 		{
-			DA.SelectCommand = new MySqlCommand(
-@"
+			With.Connection(
+				c => {
+					var dataAdapter = new MySqlDataAdapter(@"
 SELECT  FirmCode as ClientCode, 
         convert(concat(FirmCode, '. ', ShortName) using cp1251) name 
 FROM    clientsdata
@@ -130,56 +69,57 @@ WHERE   MaskRegion & ?MaskRegion > 0
         AND firmtype = 1 
         AND firmstatus = 1 
         AND shortname like ?NameStr  
-", _connection);
-			DA.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", NameStr));
-			DA.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
-			try
-			{
-				_connection.Open();
-				DA.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				DA.Fill(DS, Where);
-				DA.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+", c);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", nameStr));
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
+					dataAdapter.Fill(_data, where);
+				});
 		}
 
 		protected void SetBT_Click(object sender, EventArgs e)
 		{
-			var ClientCode = Convert.ToInt32(ToDD.SelectedItem.Value); 
-			var ParentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
-			var MyCommand = new MySqlCommand();
-			MySqlTransaction MyTrans = null;
-			try
-			{
-				MyCommand.CommandText =
-@"
+			var clientCode = Convert.ToInt32(ToDD.SelectedItem.Value); 
+			var parentClientCode = Convert.ToInt32(FromDD.SelectedItem.Value);
+			With.Transaction(
+				(c, t) => {
+					var command = new MySqlCommand(@"
+INSERT INTO Usersettings.AnalitFReplicationInfo(UserId, FirmCode)
+SELECT ouar.RowId, supplier.FirmCode
+FROM usersettings.clientsdata as drugstore
+  JOIN usersettings.OsUserAccessRight ouar on ouar.ClientCode = drugstore.FirmCode
+       JOIN clientsdata supplier ON supplier.firmsegment = drugstore.firmsegment
+       LEFT JOIN Usersettings.AnalitFReplicationInfo ari on ari.UserId = ouar.RowId and ari.FirmCode = supplier.FirmCode
+WHERE ari.UserId IS NULL
+      AND supplier.firmtype = 0
+      AND drugstore.FirmCode = ?ClientCode 
+      AND drugstore.firmtype = 1
+      AND supplier.maskregion & drugstore.maskregion > 0
+group by ouar.RowId, supplier.FirmCode;
+
 set @inHost = ?Host;
 set @inUser = ?UserName;
 
-UPDATE intersection_update_info   
-        SET MaxSynonymCode   = 0,  
-        MaxSynonymFirmCrCode = 0,  
-        LastSent             = default  
-WHERE   ClientCode           = ?ClientCode;    
+UPDATE AnalitFReplicationInfo ari
+	JOIN OsUserAccessRight ouar on ari.UserId = ouar.RowId
+SET MaxSynonymCode = 0,  
+    MaxSynonymFirmCrCode = 0
+WHERE ouar.ClientCode = ?ClientCode;
 
-UPDATE ret_update_info  as a,  
-        ret_update_info as b   
-        SET b.updatetime = a.updatetime  
-WHERE   a.clientcode     = ?ParentClientCode   
-        AND b.clientcode = ?ClientCode;    
+UPDATE (UserUpdateInfo as source, UserUpdateInfo as dest)
+	JOIN OsUserAccessRight sourceUsers on sourceUsers.RowId = source.UserId
+    JOIN OsUserAccessRight destUsers on destUsers.RowId = dest.UserId
+SET dest.UpdateDate = source.UpdateDate
+WHERE sourceUsers.clientcode = ?ParentClientCode   
+      AND destUsers.clientcode = ?ClientCode;    
 
-UPDATE intersection_update_info  as a,  
-        intersection_update_info as b   
-SET a.MaxSynonymFirmCrCode = b.MaxSynonymFirmCrCode,  
-    a.MaxSynonymCode = b.MaxSynonymCode,
-	a.LastSent = b.LastSent,
-	a.UncommittedLastSent = b.UncommittedLastSent
-WHERE   a.clientcode               = ?ClientCode   
-        AND b.clientcode           = ?ParentClientCode   
-        AND a.pricecode            = b.pricecode;   
+UPDATE AnalitFReplicationInfo as dest
+	JOIN AnalitFReplicationInfo as source on source.FirmCode = dest.FirmCode
+		JOIN OsUserAccessRight sourceUsers on source.UserId = sourceUsers.RowId
+	JOIN OsUserAccessRight destUsers on dest.UserId = destUsers.RowId
+SET dest.MaxSynonymFirmCrCode = source.MaxSynonymFirmCrCode,  
+    dest.MaxSynonymCode = source.MaxSynonymCode
+WHERE destUsers.clientcode = ?ClientCode   
+      AND sourceUsers.clientcode = ?ParentClientCode;   
 
 INSERT 
 INTO    logs.clone 
@@ -195,38 +135,19 @@ INTO    logs.clone
                 ?UserName, 
                 ?ParentClientCode, 
                 ?ClientCode
-        );
-";
-				MyCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-				MyCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				MyCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				MyCommand.Parameters.AddWithValue("?ParentClientCode", ParentClientCode);
+        );", c, t);
+					command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
+					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					command.Parameters.AddWithValue("?ClientCode", clientCode);
+					command.Parameters.AddWithValue("?ParentClientCode", parentClientCode);
 
-				_connection.Open();
-				MyTrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				MyCommand.Transaction = MyTrans;
-				MyCommand.Connection = _connection;
-				MyCommand.ExecuteNonQuery();
-				MyTrans.Commit();
-			}
-			catch (Exception)
-			{
-				if (MyTrans != null)
-					MyTrans.Rollback();
-				throw;
-			}
-			finally
-			{
-				_connection.Close();
-			}
-			Func.Mail("register@analit.net",
-			          String.Empty,
-			          "Успешное присвоение кодов(" + ParentClientCode + " > " + ClientCode + ")",
-			          false,
-					  String.Format("От: {0} \nДля: {1} \nОператор: {2}", FromDD.SelectedItem.Text, ToDD.SelectedItem.Text, SecurityContext.Administrator.UserName),
-			          DS.Tables["Regions"].Rows[0]["email"].ToString(),
-			          String.Empty,
-			          "RegisterList@subscribe.analit.net");
+					command.ExecuteNonQuery();
+				});
+
+			NotificationHelper.NotifyAboutRegistration(
+				String.Format("Успешное присвоение кодов({0} > {1})", parentClientCode, clientCode),
+				String.Format("От: {0} \nДля: {1} \nОператор: {2}", FromDD.SelectedItem.Text, ToDD.SelectedItem.Text, SecurityContext.Administrator.UserName));
+
 			LabelErr.ForeColor = Color.Green;
 			LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;
 			FromDD.Visible = false;
@@ -236,34 +157,29 @@ INTO    logs.clone
 			FindBT.Visible = true;
 			FindBT.Enabled = true;
 			SetBT.Visible = false;
-
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore);
 			
-			_connection.ConnectionString = Literals.GetConnectionString();
-			DA.SelectCommand = new MySqlCommand(@"
+			With.Connection(
+				c => {
+					var adapter = new MySqlDataAdapter(@"
 SELECT  r.region, 
         r.regioncode
 FROM farm.regions r
 WHERE r.RegionCode & ?MaskRegion > 0
-ORDER BY region;", _connection);
-            DA.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
-			try
-			{
-				_connection.Open();
-				DA.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				DA.Fill(DS, "Regions");
-				DA.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+ORDER BY region;", c);
+					adapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
+					adapter.Fill(_data, "Regions");
+				});
+
 			if (!IsPostBack)
+			{
+				RegionDD.DataSource = _data;
 				RegionDD.DataBind();
+			}
 		}
 	}
 }
