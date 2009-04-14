@@ -264,18 +264,18 @@
 								<asp:Label ID="WaitPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
 						</tr>
 						<tr>
-							<td colspan="4" style="text-align:center; background-color:#dadada; font-size: 2;">Службы:</td>
+							<td colspan="4" style="text-align:center; background-color:#dadada; font-size: 2; font-weight:bold;">Службы:</td>
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Отправки заказов:</td>
+							<td style="text-align:right">Обработки заказов:</td>
 							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="OrderProcStatus" /></td>
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Получения прайс листов (Master):</td>
+							<td style="text-align:right">Обработки прайс листов (Master):</td>
 							<td style="text-align:left" colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Получения прайс листов (Slave):</td>
+							<td style="text-align:right">Обработки прайс листов (Slave):</td>
 							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
 						</tr>
 						<tr>
