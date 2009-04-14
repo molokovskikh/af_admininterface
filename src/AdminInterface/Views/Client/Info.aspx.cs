@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Views.Client
@@ -25,50 +26,40 @@ namespace AdminInterface.Views.Client
 			set { Session["InfoDataSet"] = value; }
 		}
 
-		private readonly MySqlCommand _command = new MySqlCommand();
-		private readonly MySqlConnection _connection = new MySqlConnection(Literals.GetConnectionString());
 		protected Controller Controller;
 		protected IControllerContext ControllerContext;
 
 		private void GetMessages()
 		{
-			try
-			{
-				var logsDataAddapter = new MySqlDataAdapter(@"
+			With.Connection(
+				c => {
+					var logsDataAddapter = new MySqlDataAdapter(@"
 SELECT  WriteTime as Date, 
 		UserName, 
         Message 
 FROM  logs.clientsinfo 
 WHERE clientcode=?ClientCode
 ORDER BY date DESC;
-", _connection);
-				logsDataAddapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				logsDataAddapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+", c);
+					logsDataAddapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					logsDataAddapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
-				if (Data.Tables["Logs"] != null)
-					Data.Tables["Logs"].Clear();
-				_connection.Open();
-				logsDataAddapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				logsDataAddapter.Fill(Data, "Logs");
-				logsDataAddapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+					if (Data.Tables["Logs"] != null)
+						Data.Tables["Logs"].Clear();
+					logsDataAddapter.Fill(Data, "Logs");
+
+				});
 		}
 
 		protected void Button1_Click(object sender, EventArgs e)
 		{
-			try
-			{
-				if (String.IsNullOrEmpty(ProblemTB.Text))
-					return;
+			if (String.IsNullOrEmpty(ProblemTB.Text))
+				return;
 
-				_connection.Open();
-				_command.Connection = _connection;
-				_command.Transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				_command.CommandText = @"
+			With.Transaction(
+				(c, t) => {
+					var command = new MySqlCommand(
+						@"
 SET @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
@@ -80,21 +71,14 @@ INTO    logs.clientsinfo VALUES
                 now(), 
                 ?ClientCode, 
                 ?Problem
-        );
-";
-				_command.Parameters.AddWithValue("?Problem", ProblemTB.Text);
-				_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				_command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				_command.Parameters.AddWithValue("?ClientCode", ClientCode);
+        );", c, t);
+					command.Parameters.AddWithValue("?Problem", ProblemTB.Text);
+					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+					command.Parameters.AddWithValue("?ClientCode", ClientCode);
 
-				_command.ExecuteNonQuery();
-				_command.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
-
+					command.ExecuteNonQuery();
+				});
 			ProblemTB.Text = String.Empty;
 			IsMessafeSavedLabel.Visible = true;
 			
@@ -143,7 +127,9 @@ INTO    logs.clientsinfo VALUES
 
 			GetMessages();
 
-			var infoDataAdapter = new MySqlDataAdapter(@"
+			With.Connection(
+				c => {
+					var infoDataAdapter = new MySqlDataAdapter(@"
 SELECT  cd.FullName,   
         cd.ShortName,   
         cd.Adress,   
@@ -152,28 +138,15 @@ SELECT  cd.FullName,
         FirmType, 
 		if (ra.ManagerName is null or ra.ManagerName = '', cd.Registrant, ra.ManagerName) as RegistredBy,
 		cd.RegistrationDate,
-        ouar.OsUserName,
-		length(rui.UniqueCopyID) = 0 as Length
+        ouar.OsUserName
 FROM  clientsdata cd
-	LEFT JOIN ret_update_info rui ON rui.ClientCode = cd.FirmCode
 	LEFT JOIN OsUserAccessRight ouar ON ouar.ClientCode = cd.FirmCode  
 	LEFT JOIN accessright.regionaladmins ra on ra.UserName = cd.Registrant
 WHERE firmcode = ?ClientCode;
-", _connection);
-			infoDataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-				        
-			try
-			{
-				_connection.Open();
-				var transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				infoDataAdapter.SelectCommand.Transaction = transaction;
-				infoDataAdapter.Fill(Data, "Info");
-				transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+", c);
+					infoDataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					infoDataAdapter.Fill(Data, "Info");
+				});
 
 			var clientType = (ClientType) Convert.ToUInt32(Data.Tables["Info"].Rows[0]["FirmType"]);
 			var homeRegion = Convert.ToUInt64(Data.Tables["Info"].Rows[0]["RegionCode"]);
@@ -183,14 +156,9 @@ WHERE firmcode = ?ClientCode;
 
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
-			MySqlTransaction transaction = null;
-			try
-			{
-				_connection.Open();
-				transaction = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-
-				_command.Connection = _connection;
-				_command.CommandText = @"
+			With.Transaction(
+				(c, t) => {
+					var command = new MySqlCommand(@"
 SET @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
@@ -200,30 +168,18 @@ SET FullName = ?FullName,
 	Adress = ?Address,
 	Fax = ?Fax
 WHERE firmcode = ?ClientCode  
-";
-				_command.Parameters.AddWithValue("?ClientCode", ClientCode);
-				_command.Parameters.AddWithValue("?FullName", FullNameText.Text);
-				_command.Parameters.AddWithValue("?ShortName", ShortNameText.Text);
-				_command.Parameters.AddWithValue("?Address", AddressText.Text);
-				_command.Parameters.AddWithValue("?Fax", FaxText.Text);
-				_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				_command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-				_command.ExecuteNonQuery();
+", c, t);
+					command.Parameters.AddWithValue("?ClientCode", ClientCode);
+					command.Parameters.AddWithValue("?FullName", FullNameText.Text);
+					command.Parameters.AddWithValue("?ShortName", ShortNameText.Text);
+					command.Parameters.AddWithValue("?Address", AddressText.Text);
+					command.Parameters.AddWithValue("?Fax", FaxText.Text);
+					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+					command.ExecuteNonQuery();
 
-				transaction.Commit();
-				
-				IsMessafeSavedLabel.Visible = false;
-			}
-			catch (Exception ex)
-			{ 
-				if (transaction != null)
-					transaction.Rollback();
-				throw new Exception("Ошибка на странице Info.aspx", ex);
-			}
-			finally
-			{
-				_connection.Close();
-			}
+					IsMessafeSavedLabel.Visible = false;
+				});
 		}
 
 		public void SetController(IController controller, IControllerContext context)
