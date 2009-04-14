@@ -88,7 +88,117 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 
 		public void GetStatistics(ulong regionMask, DateTime fromDate, DateTime toDate)
 		{
-				var urlTemplate = String.Format("BeginDate={0}&EndDate={1}&RegionMask={2}", fromDate, toDate.AddDays(1), regionMask);
+			/*
+SELECT  max(UpdateDate)
+FROM (usersettings.clientsdata cd, accessright.regionaladmins showright)
+	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
+		JOIN usersettings.UserUpdateInfo uui on uui.UserId = ouar.RowId
+WHERE   cd.RegionCode & showright.regionmask > 0
+        and cd.RegionCode & RegionMaskParam      > 0
+        AND uui.UncommitedUpdateDate BETWEEN StartDateParam AND EndDateParam
+        AND username = UserNameParam;
+			 * 
+Declare InProc,  NonProcOrdersCount mediumint unsigned;
+Declare DataSize, DocSize int unsigned;
+Declare MaxUpdateTime, MaxOrderTime, LastForm, LastDown varchar(20);
+Declare FormCount, DownCount varchar(50);
+Declare OrderSum decimal(12, 2);
+Declare  OrdersCount, ReGet, UpdatesAD, UpdatesErr, OrdersErr, OrdersAD, CumulativeUpdates, Updates  varchar(10);
+SELECT  max(UpdateTime)
+INTO    MaxUpdateTime
+FROM    (usersettings.ret_update_info, usersettings.clientsdata, accessright.regionaladmins showright)
+WHERE   clientsdata.firmcode                  = ret_update_info.clientcode 
+        AND RegionCode & showright.regionmask > 0
+        AND RegionCode & RegionMaskParam      > 0
+        AND UncommittedUpdateTime BETWEEN StartDateParam AND EndDateParam
+        AND username = UserNameParam;
+SELECT  concat(count(if(resultid=2, PriceItemId, null)), '(', count(DISTINCT if(resultid=2, PriceItemId, null)), ')'),
+        max(if(resultid=2, logtime, null))
+into FormCount, LastForm
+FROM    logs.formlogs
+WHERE logtime BETWEEN StartDateParam AND EndDateParam;
+SELECT  concat(count(if(resultcode=2, PriceItemId, null)), '(', count(DISTINCT if(resultcode=2, PriceItemId, null)), ')'),
+max(if(resultcode=2, logtime, null))
+into DownCount, LastDown
+FROM    logs.downlogs
+WHERE logtime BETWEEN StartDateParam AND EndDateParam;
+SELECT  concat(count(DISTINCT oh.rowid), '(', count(DISTINCT oh.clientcode), ')'),
+        sum(cost*quantity),
+        count(DISTINCT if(processed = 0
+        AND if(SubmitOrders         = 1, Submited
+        AND not Deleted, 1), orderid, null)),
+        Max(WriteTime)
+INTO    OrdersCount,
+        OrderSum, 
+        NonProcOrdersCount, 
+        MaxOrderTime
+FROM    orders.ordershead oh,
+        orders.orderslist, 
+        usersettings.clientsdata cd, 
+        accessright.regionaladmins showright,
+        usersettings.retclientsset rcs
+WHERE   oh.rowid                              = orderid
+        AND cd.firmcode                       = oh.clientcode
+        AND cd.billingcode                    <> 921
+        AND rcs.clientcode                    = oh.clientcode
+        AND firmsegment                       = 0
+        AND serviceclient                     = 0 
+        AND showright.regionmask & maskregion > 0
+        AND oh.regioncode & RegionMaskParam   > 0
+        AND not Deleted
+        AND showright.username = UserNameParam
+        AND WriteTime BETWEEN StartDateParam AND EndDateParam;
+                                                               
+SELECT  sum(if(UpdateType in (1,2), resultsize, 0)),
+        sum(if(UpdateType in (8), resultsize, 0)),
+        sum(if(updatetype in (1,2), Commit=0, null)),
+                                                               sum(if(UpdateType = 6, 1, 0)),
+        concat(Sum(UpdateType IN (5)) ,'(' ,count(DISTINCT if(UpdateType  IN (5) ,p.ClientCode ,null)) ,')') UpdatesAD ,
+        concat(sum(UpdateType = 2) ,'(' ,count(DISTINCT if(UpdateType = 2 ,p.clientcode ,null)) ,')') CumulativeUpdates              ,
+        concat(sum(UpdateType = 1) ,'(' ,count(DISTINCT if(UpdateType = 1 ,p.clientcode ,null)) ,')') Updates
+INTO    DataSize,
+        DocSize,
+        InProc,
+                                                               UpdatesErr,
+        UpdatesAD,
+        CumulativeUpdates,
+        Updates
+FROM    usersettings.clientsdata ,
+        accessright.regionaladmins showright    ,
+        logs.AnalitFUpdates p
+WHERE   firmcode                                   = clientcode
+        AND showright.regionmask & maskregion      > 0
+        AND maskregion  & RegionMaskParam          > 0
+        AND showright.username                     = UserNameParam
+        AND RequestTime BETWEEN StartDateParam AND EndDateParam;
+                                                                
+select
+ifnull(OrdersCount, '') OrdersCount,
+ifnull(OrderSum, 0) OrderSum,
+ifnull(NonProcOrdersCount, 0) NonProcOrdersCount,
+ifnull(MaxOrderTime, '0:0:0') MaxOrderTime,
+ifnull(InProc, 0) InProc,
+ifnull(MaxUpdateTime, '0:0:0') MaxUpdateTime,
+ifnull(ReGet, '') ReGet,
+ifnull(UpdatesAD, '') UpdatesAD,
+ifnull(UpdatesErr, '') UpdatesErr,
+ifnull(OrdersErr, '') OrdersErr,
+ifnull(OrdersAD, '') OrdersAD,
+ifnull(CumulativeUpdates, '') CumulativeUpdates,
+ifnull(Updates, '') Updates,
+0 NoForm,
+0 NoDown,
+ifnull(LastForm, '2000-01-01') LastForm,
+ifnull(LastDown, '2000-01-01') LastDown,
+0 QueueForm,
+ifnull(DownCount, '') DownCount,
+0 NoPriceCount,
+ifnull(FormCount, '') FormCount,
+ifnull(DataSize, 0) DataSize,
+ifnull(DocSize, 0) DocSize;
+
+			 */
+			var urlTemplate = String.Format("BeginDate={0}&EndDate={1}&RegionMask={2}", fromDate, toDate.AddDays(1), regionMask);
 				CUHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateCumulative, urlTemplate);
 				ErrUpHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateError, urlTemplate);
 				ADHL.NavigateUrl = String.Format("viewcl.aspx?id={0}&{1}", (int)StatisticsType.UpdateBan, urlTemplate);

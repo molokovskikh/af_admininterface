@@ -41,13 +41,13 @@ namespace AdminInterface.Models.Logs
 		public string Addition { get; set; }
 
 		[Property]
-		public uint ClientCode { get; set; }
-
-		[Property]
 		public bool Commit { get; set; }
 
 		[Property]
 		public string UserName { get; set; }
+
+		[BelongsTo("UserId")]
+		public User User { get; set; }
 
 		[Property]
 		public string Log { get; set; }
@@ -64,9 +64,10 @@ namespace AdminInterface.Models.Logs
 		                                                           DateTime beginDate, 
 		                                                           DateTime endDate)
 		{
-			return ArHelper.WithSession<UpdateLogEntity>(
+			var client = Client.Find(clientCode);
+			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
-				           	.Add(Expression.Eq("ClientCode", clientCode))
+							.Add(Expression.InG("User", client.Users))
 				           	.Add(Expression.Between("RequestTime", beginDate, endDate))
 				           	.AddOrder(Order.Desc("RequestTime"))
 				           	.List<UpdateLogEntity>());
