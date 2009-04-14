@@ -7,6 +7,11 @@
 	<title>Интерфейс управления клиентами</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
 	<style type="text/css">
+		td
+		{
+			font-family: Verdana;
+			font-size: 10pt;
+		}
 		.StatisticData
 		{
 			background-color:#d8f1ff; 
@@ -213,7 +218,8 @@
 						<tr>
 							<td bgcolor="#dadada" colspan="4" height="20">
 								<p align="center">
-									<font face="Verdana" size="2"><strong>Прайсы:</strong></font></p>
+									<font face="Verdana" size="2"><strong>Прайсы:</strong></font>
+								</p>
 							</td>
 						</tr>
 						<tr>
@@ -258,8 +264,24 @@
 								<asp:Label ID="WaitPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
 						</tr>
 						<tr>
+							<td colspan="4" style="text-align:center; background-color:#dadada; font-size: 2;">Службы:</td>
+						</tr>
+						<tr style="background-color:#d8f1ff; height:19px;">
+							<td style="text-align:right">Отправки заказов:</td>
+							<td colspan="3"><asp:Label runat="server" ID="OrderProcStatus" /></td>
+						</tr>
+						<tr style="background-color:#d8f1ff; height:19px;">
+							<td style="text-align:right">Получения прайс листов (Master):</td>
+							<td colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
+						</tr>
+						<tr style="background-color:#d8f1ff; height:19px;">
+							<td style="text-align:right">Получения прайс листов (Slave):</td>
+							<td colspan="3"><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
+						</tr>
+						<tr>
 							<td style="height: 19px" align="center" bgcolor="#eef8ff" colspan="4">
-								<font face="Verdana" size="2">В скобках указанно количество уникальных клиентов.</font></td>
+								<font face="Verdana" size="2">В скобках указанно количество уникальных клиентов.</font>
+							</td>
 						</tr>
 					</table>
 				</td>

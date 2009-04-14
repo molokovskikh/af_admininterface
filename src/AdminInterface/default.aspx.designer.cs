@@ -320,6 +320,33 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.Label WaitPLB;
         
         /// <summary>
+        /// OrderProcStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label OrderProcStatus;
+        
+        /// <summary>
+        /// PriceProcessorMasterStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label PriceProcessorMasterStatus;
+        
+        /// <summary>
+        /// PriceProcessorSlaveStatus control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label PriceProcessorSlaveStatus;
+        
+        /// <summary>
         /// PassLB control.
         /// </summary>
         /// <remarks>

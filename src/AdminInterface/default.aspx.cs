@@ -1,6 +1,10 @@
 using System;
 using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.ServiceProcess;
 using System.Web.UI;
+using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -9,6 +13,13 @@ using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
+	public enum ServiceStatus
+	{
+		Running,
+		NotRunning,
+		Unknown
+	}
+
 	partial class _default : Page
 	{
 		protected void Page_Load(object sender, EventArgs e)
@@ -122,6 +133,10 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				                           	ReqHL.Text = s.GetUpdatingClientCount().ToString();
 				                           });
 
+				SetLabel(OrderProcStatus, RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
+				SetLabel(PriceProcessorMasterStatus, RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
+				SetLabel(PriceProcessorSlaveStatus, RemoteServiceHelper.GetServiceStatus("fmsold.adc.analit.net", "PriceProcessorService"));
+
 				DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DataSize"]));
 				DownloadDocumentSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[0].Rows[0]["DocSize"]));
 				//прайсы
@@ -193,6 +208,25 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 					    ConfHL.Enabled = true;
 				}
 				catch (Exception) { }
+		}
+
+		private void SetLabel(Label status, ServiceStatus serviceStatus)
+		{
+			switch (serviceStatus)
+			{
+				case ServiceStatus.NotRunning:
+					status.Text = "Не запущена";
+					//status.BackColor = Color.Red;
+					break;
+				case ServiceStatus.Unknown:
+					status.Text = "Не доступена";
+					//status.BackColor = Color.Red;
+					break;
+				case ServiceStatus.Running:
+					status.Text = "Запущена";
+					//status.BackColor = Color.Green;
+					break;
+			}
 		}
 	}
 }

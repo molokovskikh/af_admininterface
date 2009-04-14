@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceProcess;
+using AddUser;
 using ConsoleApplication11.ServiceReference2;
 using log4net;
 
@@ -30,6 +33,37 @@ namespace AdminInterface.Helpers
 
 					_log.Warn("Ошибка при обращении к сервису подготовки данных", e);
 				}
+			}
+		}
+
+		public static ServiceStatus GetServiceStatus(string host, string serviceName)
+		{
+			return Try(
+				() => {
+					using (WindowsIdentity.GetCurrent().Impersonate())
+					{
+						return ServiceController.GetServices(host)
+								.First(s => s.ServiceName == serviceName)
+								.Status == ServiceControllerStatus.Running
+								? ServiceStatus.Running
+								: ServiceStatus.NotRunning;
+					}
+				},
+				e => {
+					_log.Error(String.Format("Не удалось получить состояние сервиса {0}", serviceName), e);
+					return ServiceStatus.Unknown;
+				});
+		}
+
+		private static T Try<T>(Func<T> action, Func<Exception, T> fail)
+		{
+			try
+			{
+				return action();
+			}
+			catch (Exception e)
+			{
+				return fail(e);
 			}
 		}
 	}
