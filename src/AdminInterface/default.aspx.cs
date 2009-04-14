@@ -109,10 +109,6 @@ WHERE UserName = ?UserName ORDER BY Region) tmp;
 				OprLB.Text = data.Tables[0].Rows[0]["NonProcOrdersCount"].ToString();
 				//Время последнего заказа
 				LOT.Text = Convert.ToDateTime(data.Tables[0].Rows[0]["MaxOrderTime"]).ToLongTimeString();
-				//Ошибок заказов
-				OErrHL.Text = data.Tables[0].Rows[0]["OrdersErr"].ToString();
-				//Запретов заказов
-				OADHL.Text = data.Tables[0].Rows[0]["OrdersAD"].ToString();
 
 				//Обновления
 				//Запретов обновлений

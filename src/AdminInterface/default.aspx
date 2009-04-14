@@ -183,35 +183,32 @@
 								<font face="Verdana" size="2"><strong>Заказы:</strong></font></td>
 						</tr>
 						<tr>
+							<td align="right" bgcolor="#ebebeb" style="width: 229px; height: 19px;">
+								<font face="Verdana" size="2">Очередь:</font>
+							</td>
+							<td style="width: 76px; height: 19px;" bgcolor="#ebebeb">
+								<asp:Label ID="OprLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							</td>
 							<td align="right" bgcolor="#ebebeb" style="width: 229px">
 								<font face="Verdana" size="2">Принято:</font>
 							</td>
 							<td style="width: 76px" bgcolor="#ebebeb" height="20">
-								<asp:Label ID="OPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td align="right" bgcolor="#ebebeb" height="20">
-								<font face="Verdana" size="2">Запретов:</font></td>
-							<td bgcolor="#ebebeb" height="20" style="width: 58px">
-								<asp:HyperLink ID="OADHL" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
-						</tr>
-						<tr>
-							<td align="right" bgcolor="#ebebeb" style="width: 229px; height: 19px;">
-								<font face="Verdana" size="2">Очередь:</font></td>
-							<td style="width: 76px; height: 19px;" bgcolor="#ebebeb">
-								<asp:Label ID="OprLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td align="right" bgcolor="#ebebeb" style="height: 19px">
-								<font face="Verdana" size="2">Ошибок:</font></td>
-							<td bgcolor="#ebebeb" style="height: 19px; width: 58px;">
-								<asp:HyperLink ID="OErrHL" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
+								<asp:Label ID="OPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							</td>
 						</tr>
 						<tr>
 							<td align="right" bgcolor="#ebebeb" style="width: 229px">
-								<font face="Verdana" size="2">Последний заказ:</font></td>
+								<font face="Verdana" size="2">Последний заказ:</font>
+							</td>
 							<td style="width: 76px" bgcolor="#ebebeb" height="20">
-								<asp:Label ID="LOT" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+								<asp:Label ID="LOT" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							</td>
 							<td align="right" bgcolor="#ebebeb" height="20">
-								<font face="Verdana" size="2">Сумма:</font></td>
+								<font face="Verdana" size="2">Сумма:</font>
+							</td>
 							<td bgcolor="#ebebeb" height="20" style="width: 58px">
-								<asp:Label ID="SumLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
+								<asp:Label ID="SumLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							</td>
 						</tr>
 						<tr>
 							<td bgcolor="#dadada" colspan="4" height="20">
