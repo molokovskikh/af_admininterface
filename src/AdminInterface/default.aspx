@@ -268,15 +268,15 @@
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
 							<td style="text-align:right">Отправки заказов:</td>
-							<td colspan="3"><asp:Label runat="server" ID="OrderProcStatus" /></td>
+							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="OrderProcStatus" /></td>
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
 							<td style="text-align:right">Получения прайс листов (Master):</td>
-							<td colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
+							<td style="text-align:left" colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
 						</tr>
 						<tr style="background-color:#d8f1ff; height:19px;">
 							<td style="text-align:right">Получения прайс листов (Slave):</td>
-							<td colspan="3"><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
+							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
 						</tr>
 						<tr>
 							<td style="height: 19px" align="center" bgcolor="#eef8ff" colspan="4">
