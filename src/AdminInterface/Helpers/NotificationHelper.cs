@@ -1,6 +1,7 @@
 ﻿using System;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Security;
 
 namespace AdminInterface.Helpers
 {
@@ -31,7 +32,6 @@ namespace AdminInterface.Helpers
 			Func.Mail("tech@analit.net",
 			          "Аналитическая Компания Инфорум",
 			          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-			          false,
 			          String.Format(_messageTemplateForSupplierAfterDrugstoreRegistration, 
 									fullName, 
 									shortName, 
@@ -80,7 +80,6 @@ ID: {3}
 				Func.Mail("register@analit.net",
 						  String.Empty,
 						  String.Format("Бесплатное изменение пароля - {0}", client.FullName),
-						  false,
 						  String.Format(_messageTemplateAfterFreePasswordChange,
 										administrator.UserName, 
 										host,
@@ -95,7 +94,6 @@ ID: {3}
 				Func.Mail("register@analit.net",
 				          String.Empty,
 						  String.Format("Платное изменение пароля - {0}", client.FullName),
-				          false,
 						  String.Format(_messageTemplateForBillingAfterPassordChange,
 										client.FullName,
 										user.Login,
@@ -111,11 +109,19 @@ ID: {3}
 			Func.Mail("register@analit.net",
 			          String.Empty,
 			          String.Format("Успешное изменение пароля - {0}", client.FullName),
-			          false,
 			          String.Format(_messageTemplateForAdministratorAfterPasswordChange, client.FullName),
 			          administrator.Email,
 			          String.Empty,
 			          null);
+		}
+
+		public static void NotifyAboutRegistration(string subject, string body)
+		{
+			Func.Mail("register@analit.net",
+			          subject,
+			          body,
+			          "RegisterList@subscribe.analit.net",
+			          SecurityContext.Administrator.Email);
 		}
 	}
 }

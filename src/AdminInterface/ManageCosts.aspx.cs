@@ -283,27 +283,15 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 			    adapter.SelectCommand.ExecuteNonQuery();
 
-				adapter.SelectCommand.CommandText =
-@"
-SELECT  regionaladmins.username, 
-        regionaladmins.email 
-FROM accessright.regionaladmins
-WHERE  username = ?UserName;
-";
-
-				adapter.Fill(DS, "admin");
 				adapter.SelectCommand.Transaction.Commit();
-				Func.Mail("register@analit.net", 
-					String.Empty, 
-					"\"" + ShortName + "\" - регистрация ценовой колонки", 
-					false, 
+				NotificationHelper.NotifyAboutRegistration(
+					String.Format("\"{0}\" - регистрация ценовой колонки", ShortName),
 					String.Format(
 @"Оператор: {0} 
 Поставщик: {1}
 Регион: {2}
 Прайс-лист: {3}
-", SecurityContext.Administrator.UserName, ShortName, region, PriceName),
-				          "RegisterList@subscribe.analit.net", String.Empty, DS.Tables["admin"].Rows[0]["email"].ToString());
+", SecurityContext.Administrator.UserName, ShortName, region, PriceName));
 			}
 			catch
 			{

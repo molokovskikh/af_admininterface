@@ -11,9 +11,26 @@ namespace AdminInterface.Helpers
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Func));
 
 		public static void Mail(string from, 
+		                        string subject, 
+		                        string body, 
+		                        string to)
+		{
+			Mail(from, String.Empty, subject, body, to, String.Empty, String.Empty);
+		}
+
+		public static void Mail(string from,
+		                        string subject,
+		                        string body,
+		                        string to,
+		                        string bcc)
+		{
+			Mail(from, String.Empty, subject, body, to, String.Empty, bcc);
+		}
+
+
+		public static void Mail(string from, 
 		                        string fromDisplayName, 
 		                        string subject, 
-		                        bool isBodyHtml,
 		                        string body, 
 		                        string to, 
 		                        string toDisplayName, 
@@ -30,7 +47,7 @@ namespace AdminInterface.Helpers
 					var message = new MailMessage
 					              	{
 					              		From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
-					              		IsBodyHtml = isBodyHtml,
+					              		IsBodyHtml = false,
 					              		Subject = subject,
 					              		SubjectEncoding = Encoding.UTF8,
 					              		Body = body,

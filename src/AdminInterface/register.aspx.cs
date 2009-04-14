@@ -260,17 +260,17 @@ ORDER BY region;";
 
 			_connection.Open();
 			mytrans = _connection.BeginTransaction(IsolationLevel.RepeatableRead);
-			Int64 MaskRegion = 0;
-			Int64 WorkMask = 0;
-			Int64 OrderMask = 0;
+			Int64 maskRegion = 0;
+			Int64 workMask = 0;
+			Int64 orderMask = 0;
 			for (var i = 0; i <= WRList.Items.Count - 1; i++)
 			{
 				if (WRList.Items[i].Selected)
-					MaskRegion += Convert.ToInt64(WRList.Items[i].Value);
+					maskRegion += Convert.ToInt64(WRList.Items[i].Value);
 				if (WRList2.Items[i].Selected)
-					WorkMask += Convert.ToInt64(WRList2.Items[i].Value);
+					workMask += Convert.ToInt64(WRList2.Items[i].Value);
 				if (OrderList.Items[i].Selected)
-					OrderMask += Convert.ToInt64(OrderList.Items[i].Value);
+					orderMask += Convert.ToInt64(OrderList.Items[i].Value);
 			}
 			_command.Connection = _connection;
 			_command.Transaction = mytrans;
@@ -281,10 +281,10 @@ set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			_command.ExecuteNonQuery();
 
-			_command.Parameters.AddWithValue("?MaskRegion", MaskRegion);
-			_command.Parameters.AddWithValue("?OrderMask", OrderMask);
+			_command.Parameters.AddWithValue("?MaskRegion", maskRegion);
+			_command.Parameters.AddWithValue("?OrderMask", orderMask);
 			_command.Parameters.AddWithValue("?ShowRegionMask", 0);
-			_command.Parameters.AddWithValue("?WorkMask", WorkMask);
+			_command.Parameters.AddWithValue("?WorkMask", workMask);
 			_command.Parameters.AddWithValue("?fullname", FullNameTB.Text);
 			_command.Parameters.AddWithValue("?shortname", ShortNameTB.Text);
 			_command.Parameters.AddWithValue("?BeforeNamePrefix", "");
@@ -350,13 +350,15 @@ set @inUser = ?UserName;";
 					new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
 				}
 
-				Func.Mail("register@analit.net", String.Empty, "\"" + FullNameTB.Text + "\" - успешная регистрация",
-				          false, "Оператор: " + SecurityContext.Administrator.UserName + "\nРегион: "
-				                 + RegionDD.SelectedItem.Text + "\nLogin: " + EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower()
-				                 + "\nКод: " + Session["Code"] + "\n\nСегмент: " + SegmentDD.SelectedItem.Text
-				                 + "\nТип: " + TypeDD.SelectedItem.Text, "RegisterList@subscribe.analit.net", String.Empty,
-				          SecurityContext.Administrator.Email);
-
+				NotificationHelper.NotifyAboutRegistration(
+					String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
+					String.Format("Оператор: {0}\nРегион: {1}\nLogin: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					              SecurityContext.Administrator.UserName,
+					              RegionDD.SelectedItem.Text,
+					              EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower(),
+					              Session["Code"],
+					              SegmentDD.SelectedItem.Text,
+					              TypeDD.SelectedItem.Text));
 
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
