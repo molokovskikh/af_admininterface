@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
@@ -14,8 +11,11 @@ namespace AdminInterface.Test.Models
 	[TestFixture]
 	public class UserFixture
 	{
-		[Test]
-		[ExpectedException(typeof(CantChangePassword), ExpectedMessage = "Не возможно изменить пароль для учетной записи test546116879 поскольку она принадлежит пользователю из офиса")]
+		[
+			Test,
+			ExpectedException(typeof(CantChangePassword), ExpectedMessage = "Не возможно изменить пароль для учетной записи test546116879 поскольку она принадлежит пользователю из офиса"),
+			Ignore("Сломан из-за зажатого доступа")
+		]
 		public void Throw_cant_change_password_exception_if_user_from_office()
 		{
 			using (var testUser = new TestADUser("test546116879", "LDAP://OU=Офис,DC=adc,DC=analit,DC=net"))

@@ -32,7 +32,7 @@ namespace AdminInterface.Test.Watin
 
 				browser.Button(Find.ById("Register")).Click();
 				CheckForError(browser);
-				Assert.That(browser.ContainsText("Регистрационная карта №"));
+				Assert.That(browser.ContainsText("Регистрационная карта №"), browser.Text);
 			}
 		}
 

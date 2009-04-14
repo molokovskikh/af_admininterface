@@ -100,19 +100,22 @@ namespace AdminInterface.Test.Models
 		public void ResetUinTest()
 		{
 			var client = ForTest.CreateClient();
-			var retupdate = new RetUpdateInfo { UniqueCopyID = "123" };
-
+			var user = client.Users[0];
+			client.Save();
+			client.Users[0].Save();
+			
+			var updateInfo = new UserUpdateInfo
+			                 	{
+			                 		AFCopyId = "123", 
+									User = client.Users[0]
+			                 	};
 			using (new TransactionScope())
-			{
-				client.SaveAndFlush();
-				retupdate.Id = client.Id;
-				retupdate.Save();
-			}
+				updateInfo.Save();		
 
 			client.ResetUin();
 
-			var retUpdateInfo = RetUpdateInfo.Get(client.Id);
-			Assert.That(retUpdateInfo.UniqueCopyID, Is.Empty);
+			var reloadedInfo = UserUpdateInfo.Find(user.Id);
+			Assert.That(reloadedInfo.AFCopyId, Is.Empty);
 		}
 	}
 }

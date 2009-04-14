@@ -68,27 +68,41 @@ namespace AdminInterface.Test.ForTesting
             var calendarTable = div.Tables.First();
             var text = calendarTable.TableCell(Find.ByClass("title")).Text;
 
-            var month = GetMonth(text.Substring(0, text.IndexOf(",")));
+        	var year = GetYear(text);
+            var month = GetMonth(text);
             string marker;
             if (month > value.Month)
                 marker = "‹";
             else
                 marker = "›";
             var changeMonth = calendarTable.Div(Find.ByText(marker));
-            foreach (var index in Enumerable.Range(0, Math.Abs(month - value.Month)))
+
+			var yearMarker = year > value.Year ? "«" : "»";
+        	var changeYear = calendarTable.Div(Find.ByText(yearMarker));
+
+        	foreach (var i in Enumerable.Range(0, Math.Abs(year - value.Year)))
+        		SimulateClick(changeYear);
+
+        	foreach (var index in Enumerable.Range(0, Math.Abs(month - value.Month)))
                 SimulateClick(changeMonth);
 
             SimulateClick(calendarTable.TableCell(Find.ByText(value.Day.ToString())));
         }
 
-        private static void SimulateClick(Element changeMonth)
+    	private static int GetYear(string title)
+    	{
+			return Convert.ToInt32(title.Substring(title.IndexOf(",") + 1, title.Length - title.IndexOf(",") - 1).Trim());
+    	}
+
+    	private static void SimulateClick(Element changeMonth)
         {
             changeMonth.FireEvent("onmousedown");
             changeMonth.FireEvent("onmouseup");
         }
 
-        private static int GetMonth(string monthName)
+        private static int GetMonth(string title)
         {
+        	var monthName = title.Substring(0, title.IndexOf(","));
             return CultureInfo.GetCultureInfo("ru-Ru")
                 .DateTimeFormat
                 .MonthNames

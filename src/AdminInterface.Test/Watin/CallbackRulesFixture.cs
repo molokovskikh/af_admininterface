@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using AdminInterface.Models.Security;
 using AdminInterface.Test.ForTesting;
 using AdminInterface.Models.Telephony;
 using Microsoft.VisualStudio.WebHost;
@@ -20,8 +21,15 @@ namespace AdminInterface.Test.Watin
 		public void SetupFixture()
 	    {
 	        ForTest.InitialzeAR();
-	        
-	        var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
+
+	    	var adm = Administrator.GetByName("kvasov");
+			if (!adm.HavePermision(PermissionType.ManageCallbacks))
+			{
+				adm.AllowedPermissions.Add(Permission.Find(PermissionType.ManageCallbacks));
+				adm.Save();
+			}
+
+	    	var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
 	        var webDir = ConfigurationManager.AppSettings["webDirectory"];
 
 	        _webServer = new Server(port, "/", Path.GetFullPath(webDir));
@@ -95,11 +103,11 @@ namespace AdminInterface.Test.Watin
             {
                 browser.Link(Find.ByText(CallbackLinkText)).Click();
                 browser.FindRow(callback1).Link(Find.ByText("Редактировать")).Click();
-                browser.Input<Callback>(callback => callback.DueDate, new DateTime(2008, 12, 5));
+                browser.Input<Callback>(callback => callback.DueDate, DateTime.Today.AddMonths(-1));
                 browser.Button(Find.ByValue("Сохранить")).Click();
 
                 callback1.Refresh();
-                Assert.That(callback1.DueDate, Is.EqualTo(new DateTime(2008, 12, 5)));
+                Assert.That(callback1.DueDate, Is.EqualTo(DateTime.Today.AddMonths(-1)));
                 browser.AssertThatTableContains(callback1);
             }
         }

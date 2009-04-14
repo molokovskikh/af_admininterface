@@ -128,7 +128,6 @@
     <Compile Include="ForTesting\FixtureMapping.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="ForTesting\Helper.cs" />
-    <Compile Include="ForTesting\RetUpdateInfo.cs" />
     <Compile Include="ForTesting\StringExtentions.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
     <Compile Include="ForTesting\WatinFixture.cs" />

@@ -49,16 +49,18 @@ namespace AdminInterface.Test.ForTesting
 
 		public static Client CreateClient()
 		{
-			return new Client
+			var client = new Client
 			       	{
 			       		ShortName = "Test short name",
 			       		FullName = "Test full name",
 			       		RegistrationDate = DateTime.Now
 			       	};
+			client.Users = new List<User> {new User {Login = "test" + new Random().Next()}};
+			client.Users[0].Client = client;
+			return client;
 		}
 
 		public static void InitialzeAR()
-		{
-		}
+		{}
 	}
 }

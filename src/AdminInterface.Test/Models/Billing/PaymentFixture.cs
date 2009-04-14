@@ -10,7 +10,7 @@ using NUnit.Framework.SyntaxHelpers;
 
 namespace AdminInterface.Test.Models.Billing
 {
-	[TestFixture]
+	[TestFixture, Ignore("Работа по биллингу заморожена")]
 	public class PaymentFixture
 	{
 		[SetUp]

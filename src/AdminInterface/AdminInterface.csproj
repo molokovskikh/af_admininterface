@@ -163,6 +163,7 @@
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />

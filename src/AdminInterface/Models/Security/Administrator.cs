@@ -70,7 +70,7 @@ namespace AdminInterface.Models.Security
 			ActiveRecordMediator<Administrator>.Update(this);
 		}
 
-		private bool HavePermision(PermissionType permission)
+		public bool HavePermision(PermissionType permission)
 		{
 			foreach (var allowedPermission in AllowedPermissions)
 				if (allowedPermission.Type == permission)

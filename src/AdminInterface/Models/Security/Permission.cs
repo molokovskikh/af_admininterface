@@ -42,6 +42,11 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public string Shortcut { get; set; }
 
+		public static Permission Find(PermissionType permissionType)
+		{
+			return ActiveRecordMediator<Permission>.FindFirst(Expression.Eq("Type", permissionType));
+		}
+
 		public static IList<Permission> FindAll()
 		{
 			return ActiveRecordMediator<Permission>.FindAll(new [] { Order.Asc("Name") });
