@@ -309,17 +309,18 @@ set @inUser = ?UserName;";
 
 			try
 			{
+				uint billingCode;
 				if (IncludeCB.Checked)
-					Session["DogN"] = Convert.ToInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, _connection).ExecuteScalar());
+					billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, _connection).ExecuteScalar());
 				else if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
-					Session["DogN"] = CreateClientOnBilling();
+					billingCode = CreateClientOnBilling();
 				else
-					Session["DogN"] = PayerDDL.SelectedItem.Value;
+					billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
 
-				_command.Parameters["?ClientCode"].Value = CreateClientOnClientsData();
-				Session["Code"] = _command.Parameters["?ClientCode"].Value;
+				var clientCode = CreateClientOnClientsData();
+				_command.Parameters["?ClientCode"].Value = clientCode;
 
-				CreateClientOnOSUserAccessRight();
+				CreateUser();
 				if (IncludeCB.Checked)
 					CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue));
 
@@ -356,10 +357,12 @@ set @inUser = ?UserName;";
 					              SecurityContext.Administrator.UserName,
 					              RegionDD.SelectedItem.Text,
 					              EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower(),
-					              Session["Code"],
+					              clientCode,
 					              SegmentDD.SelectedItem.Text,
 					              TypeDD.SelectedItem.Text));
 
+				Session["DogN"] = billingCode;
+				Session["Code"] = clientCode;
 				Session["Name"] = FullNameTB.Text;
 				Session["ShortName"] = ShortNameTB.Text;
 				Session["Login"] = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
@@ -367,32 +370,36 @@ set @inUser = ?UserName;";
 				Session["Tariff"] = TypeDD.SelectedItem.Text;
 				Session["Register"] = true;
 
-				ClientCardIfNeeded();
+				SendClientCardIfNeeded(clientCode, billingCode);
 
-				if (!IncludeCB.Checked 
-				    || (IncludeCB.Checked && IncludeType.SelectedItem.Text != "Базовый" && IncludeType.SelectedItem.Text != "Базовый+"))
+				var sendBillingNotificationNow = true;
+				if (IsBasicClient())
+				{
+					Response.Redirect(String.Format("Client/info.rails?cc={0}", clientCode));
+				}
+				else
 				{
 					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
+					{
+						sendBillingNotificationNow = false;
 						Response.Redirect(String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-						                                Session["DogN"],
-						                                ShowRegistrationCard.Checked, 
-						                                Session["Code"]));
+						                                billingCode,
+						                                ShowRegistrationCard.Checked,
+						                                clientCode));
+					}
 					else if (ShowRegistrationCard.Checked)
 						Response.Redirect("report.aspx");
 					else
-						Response.Redirect("Register/SuccessRegistration.rails");
+						Response.Redirect(String.Format("Client/info.rails?cc={0}", clientCode));
 				}
-				else
-					Response.Redirect("Register/SuccessRegistration.rails");
 
-				if (Response.RedirectLocation == "Register/SuccessRegistration.rails"
-				    || Response.RedirectLocation == "report.aspx")
+				if (sendBillingNotificationNow)
 					new NotificationService()
-						.SendNotificationToBillingAboutClientRegistration(Convert.ToUInt32(Session["Code"]),
-						                                                  Convert.ToUInt32(Session["DogN"]),
+						.SendNotificationToBillingAboutClientRegistration(clientCode,
+						                                                  billingCode,
 						                                                  ShortNameTB.Text,
 						                                                  SecurityContext.Administrator.UserName,
-						                                                  (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+")),
+						                                                  IsBasicClient(),
 						                                                  null);
 			}
 			catch (Exception)
@@ -410,13 +417,17 @@ set @inUser = ?UserName;";
 			}
 		}
 
-		private void ClientCardIfNeeded()
+		private bool IsBasicClient()
+		{
+			return (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+"));
+		}
+
+		private void SendClientCardIfNeeded(uint clientCode, uint billingCode)
 		{
 			if (!SendRegistrationCard.Checked)
 				return;
 
-			if (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" 
-				|| IncludeType.SelectedItem.Text == "Базовый+"))
+			if (IsBasicClient())
 				return;
 
 			string mailTo;
@@ -427,8 +438,8 @@ set @inUser = ?UserName;";
 				mailTo = TBClientManagerMail.Text.Trim() + ", " + TBOrderManagerMail.Text.Trim();
 
 
-			var smtpid = ReportHelper.SendClientCard(Convert.ToUInt32(Session["Code"]),
-			                                         Convert.ToUInt32(Session["DogN"]),
+			var smtpid = ReportHelper.SendClientCard(clientCode,
+			                                         billingCode,
 			                                         ShortNameTB.Text,
 			                                         FullNameTB.Text,
 			                                         TypeDD.SelectedItem.Text,
@@ -611,17 +622,17 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 			}	
 		}
 
-		private int CreateClientOnBilling()
+		private uint CreateClientOnBilling()
 		{
 			_command.CommandText =
 				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, JuridicalName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
 				DateTime.Now + "', null, ?ShortName, ?fullname, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
 			_command.Parameters.AddWithValue("?BillingContactGroupOwnerId", CreateContactsForBilling(_command.Connection));
-			return Convert.ToInt32(_command.ExecuteScalar());
+			return Convert.ToUInt32(_command.ExecuteScalar());
 		}
 
-		private int CreateClientOnClientsData()
+		private uint CreateClientOnClientsData()
 		{
 			_command.CommandText =
 				@"INSERT INTO usersettings.clientsdata (
@@ -646,13 +657,13 @@ FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId
 from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
 			_command.CommandText += "SELECT LAST_INSERT_ID()";
-			var clientCode = Convert.ToInt32(_command.ExecuteScalar());
+			var clientCode = Convert.ToUInt32(_command.ExecuteScalar());
 			_command.CommandText = "insert into logs.AuthorizationDates(ClientCode) Values(" + clientCode + ")";
 			_command.ExecuteNonQuery();
 			return clientCode;
 		}
 
-		private void CreateClientOnOSUserAccessRight()
+		private void CreateUser()
 		{
 			
 			_command.CommandText = @"
@@ -821,27 +832,26 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
-			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
+			if (!IsBasicClient())
 			{
-				if (IncludeType.SelectedItem.Value == "1")
+				if (IncludeType.SelectedItem.Text == "Сеть")
 				{
 					_command.CommandText += @"
 UPDATE includeregulation i, 
         intersection as src, 
         intersection as dst 
-        SET dst.costcode      = src.costcode, 
-        dst.firmcostcorr      = src.firmcostcorr, 
-        dst.publiccostcorr    = src.publiccostcorr, 
-        dst.minreq            = src.minreq, 
-        dst.controlminreq     = src.controlminreq, 
-        dst.invisibleonclient = src.invisibleonclient 
+SET dst.costcode = src.costcode, 
+    dst.firmcostcorr = src.firmcostcorr, 
+    dst.publiccostcorr = src.publiccostcorr, 
+    dst.minreq = src.minreq, 
+    dst.controlminreq = src.controlminreq, 
+    dst.invisibleonclient = src.invisibleonclient 
 WHERE   dst.clientcode        = ?ClientCode    
         AND src.clientcode    = ?PrimaryClientCode    
 		AND	dst.regioncode    = src.regioncode 
         AND dst.pricecode     = src.pricecode 
         AND src.clientcode    = i.primaryclientcode 
-        AND dst.clientcode    = i.includeclientcode;
-";
+        AND dst.clientcode    = i.includeclientcode;";
 				}
 				else
 				{
@@ -849,22 +859,21 @@ WHERE   dst.clientcode        = ?ClientCode
 UPDATE includeregulation i, 
         intersection as src, 
         intersection as dst 
-        SET dst.costcode      = src.costcode, 
-        dst.firmcostcorr      = src.firmcostcorr, 
-        dst.publiccostcorr    = src.publiccostcorr, 
-        dst.minreq            = src.minreq, 
-        dst.controlminreq     = src.controlminreq, 
-        dst.invisibleonclient = src.invisibleonclient, 
-        dst.FirmClientCode    = src.FirmClientCode, 
-        dst.FirmClientCode2   = src.FirmClientCode2, 
-        dst.FirmClientCode3   = src.FirmClientCode3
+SET dst.costcode = src.costcode, 
+    dst.firmcostcorr = src.firmcostcorr, 
+    dst.publiccostcorr = src.publiccostcorr, 
+    dst.minreq = src.minreq, 
+    dst.controlminreq = src.controlminreq, 
+    dst.invisibleonclient = src.invisibleonclient, 
+    dst.FirmClientCode = src.FirmClientCode, 
+    dst.FirmClientCode2 = src.FirmClientCode2, 
+    dst.FirmClientCode3 = src.FirmClientCode3
 WHERE	dst.clientcode        = ?ClientCode    
         AND src.clientcode    = ?PrimaryClientCode
 		AND dst.regioncode    = src.regioncode 
         AND dst.pricecode     = src.pricecode 
         AND src.clientcode    = i.primaryclientcode 
-        AND dst.clientcode    = i.includeclientcode;  
-";
+        AND dst.clientcode    = i.includeclientcode;";
 				}
 			}
 			if (!invisible)

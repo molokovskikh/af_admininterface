@@ -462,7 +462,6 @@
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Billing\ShowMessageForClientPartial.brail" />
     <None Include="Views\Billing\ShowMessageForClient.brailjs" />
-    <None Include="Views\Register\SuccessRegistration.brail" />
     <None Include="Views\Client\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Layouts\Common.brail" />

@@ -52,10 +52,7 @@ namespace AdminInterface.Controllers
 			if (showRegistrationCard)
 				RedirectToUrl("../report.aspx");
 			else
-				RedirectToAction("SuccessRegistration");
+				RedirectToUrl(String.Format("Client/info.rails?cc={0}", clientCode));
 		}
-
-		public void SuccessRegistration()
-		{}
 	}
 }
