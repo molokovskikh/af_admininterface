@@ -61,6 +61,7 @@
 						<asp:GridView ID="OrdersGrid" runat="server" AutoGenerateColumns="False" AllowSorting="True" OnRowCreated="OrdersGrid_RowCreated" OnSorting="OrdersGrid_Sorting">
 							<Columns>
 								<asp:BoundField HeaderText="№" DataField="RowID" SortExpression="RowID" />
+								<asp:BoundField HeaderText="№ в AnalitF" DataField="ClientOrderId" SortExpression="ClientOrderId" />
 								<asp:BoundField HeaderText="Дата заказа" DataField="WriteTime" SortExpression="WriteTime"/>
 								<asp:BoundField HeaderText="Дата прайса" DataField="PriceDate" SortExpression="PriceDate"/>
 								<asp:BoundField HeaderText="Аптека" DataField="Customer" SortExpression="Customer"/>

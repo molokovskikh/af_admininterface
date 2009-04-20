@@ -50,7 +50,8 @@ SELECT  oh.rowid,
         oh.Processed, 
 		o.ResultCode,
 		o.TransportType,
-		oh.SubmitDate
+		oh.SubmitDate,
+		oh.ClientOrderId
 FROM    (orders.ordershead oh, usersettings.clientsdata as sel)
 		join usersettings.pricesdata on pricesdata.pricecode = oh.pricecode
 			join usersettings.clientsdata as firm on firm.firmcode = pricesdata.firmcode 
