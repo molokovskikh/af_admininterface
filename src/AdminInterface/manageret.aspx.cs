@@ -217,14 +217,14 @@ INTO    UserSettings.IncludeRegulation
 					adapter.UpdateCommand.Parameters.Add("?OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
 					adapter.UpdateCommand.Parameters["?OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
 
-					adapter.DeleteCommand = new MySqlCommand(
-						@"
+					adapter.DeleteCommand = new MySqlCommand(@"
 UPDATE includeregulation i
 	JOIN intersection as src on src.clientcode = i.primaryclientcode
 		JOIN intersection as dst on dst.clientcode = i.includeclientcode 
 									and dst.pricecode = src.pricecode 
 									and dst.regioncode = src.regioncode
 SET dst.CostCode = src.CostCode,
+	dst.FirmCostCorr = src.FirmCostCorr,
     dst.InvisibleOnClient = src.InvisibleOnClient,
 	dst.DisabledByClient = src.DisabledByClient,
 	dst.DisabledByAgency = src.DisabledByAgency,
@@ -234,8 +234,7 @@ SET dst.CostCode = src.CostCode,
 WHERE i.Id = ?Id;
 
 DELETE FROM UserSettings.IncludeRegulation 
-WHERE id = ?id;",
-						connection, transaction);
+WHERE id = ?id;", connection, transaction);
 					adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 					adapter.Update(Data.Tables["Include"]);
 
