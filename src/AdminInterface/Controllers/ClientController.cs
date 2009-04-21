@@ -130,13 +130,7 @@ namespace AdminInterface.Controllers
 				}.SetProblem(isFree, reason)
 				.Save();
 
-				var passwordChangeLog = new PasswordChangeLogEntity
-				{
-					ClientHost = host,
-					LogTime = DateTime.Now,
-					TargetUserName = user.Login,
-					UserName = administrator.UserName,
-				};			
+				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);			
 
 				if (isSendClientCard)
 				{

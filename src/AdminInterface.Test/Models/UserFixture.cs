@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Test.ForTesting;
 using AdminInterface.Test.Helpers;
+using Common.Tools;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 
@@ -45,6 +50,25 @@ namespace AdminInterface.Test.Models
 			Assert.That(user.IsPermissionAssigned(permission), Is.False);
 			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF"});
 			Assert.That(user.IsPermissionAssigned(permission));
+		}
+
+		[Test]
+		public void Is_change_password_by_one_self_return_true_if_last_password_change_done_by_client()
+		{
+			ForTest.InitialzeAR();
+			var user = User.GetByLogin("kvasov");
+			PasswordChangeLogEntity
+				.GetByLogin(user.Login, DateTime.MinValue, DateTime.MaxValue)
+				.Each(l => l.Delete());
+
+			Assert.That(user.IsChangePasswordByOneself(), Is.False);
+			new PasswordChangeLogEntity("127.0.0.1", "kvasov", "kvasov").Save();
+			Assert.That(user.IsChangePasswordByOneself(), Is.True);
+			new PasswordChangeLogEntity("127.0.0.1", "kvasov", "emk")
+				{
+					LogTime = DateTime.Now.AddSeconds(10)
+				}.Save();
+			Assert.That(user.IsChangePasswordByOneself(), Is.False);
 		}
 	}
 }

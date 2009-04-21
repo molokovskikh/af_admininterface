@@ -8,6 +8,17 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord("logs.passwordchange")]
 	public class PasswordChangeLogEntity : ActiveRecordBase<PasswordChangeLogEntity>
 	{
+		public PasswordChangeLogEntity()
+		{}
+
+		public PasswordChangeLogEntity(string host, string target, string user)
+		{
+			UserName = user;
+			TargetUserName = target;
+			LogTime = DateTime.Now;
+			ClientHost = host;
+		}
+
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
 
@@ -44,6 +55,11 @@ namespace AdminInterface.Models.Logs
 				SentTo = additionEmailsToNotify;
 			else if (!String.IsNullOrEmpty(additionEmailsToNotify))
 				SentTo += ", " + additionEmailsToNotify;
+		}
+
+		public bool IsChangedByOneSelf()
+		{
+			return UserName.ToLowerInvariant() == TargetUserName.ToLowerInvariant();
 		}
 	}
 }

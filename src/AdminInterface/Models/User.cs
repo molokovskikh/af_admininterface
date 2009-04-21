@@ -4,6 +4,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
+using Common.MySql;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
@@ -71,9 +72,14 @@ namespace AdminInterface.Models
 
 		public bool IsChangePasswordByOneself()
 		{
-			return PasswordChangeLogEntity.Exists(DetachedCriteria.For<PasswordChangeLogEntity>()
-			                                      	.Add(Expression.EqProperty("TargetUserName", "UserName"))
-													.Add(Expression.Eq("TargetUserName", Login)));
+			var log = PasswordChangeLogEntity.FindFirst(
+				DetachedCriteria
+					.For<PasswordChangeLogEntity>()
+					.Add(Expression.Eq("TargetUserName", Login))
+					.AddOrder(Order.Desc("LogTime")));
+			if (log == null)
+				return false;
+			return log.IsChangedByOneSelf();
 		}
 	}
 }
