@@ -26,5 +26,15 @@ namespace AdminInterface.Models
 			          	client.GetSubordinateType()),
 			          "RegisterList@subscribe.analit.net");
 		}
+
+		public static void SupplierRegistred(string shortname, string homeregion)
+		{
+			Func.Mail("register@analit.net",
+				"Зарегистрирован новый поставщик",
+				String.Format(
+@"Краткое наименование: {0}
+Домашний регион: {1}", shortname, homeregion),
+				"farm@analit.net");
+		}
 	}
 }

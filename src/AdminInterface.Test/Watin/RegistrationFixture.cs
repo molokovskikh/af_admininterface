@@ -31,8 +31,7 @@ namespace AdminInterface.Test.Watin
 				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
 
 				browser.Button(Find.ById("Register")).Click();
-				CheckForError(browser);
-				Assert.That(browser.ContainsText("Регистрационная карта №"), browser.Text);
+				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 			}
 		}
 

@@ -320,7 +320,7 @@ set @inUser = ?UserName;";
 				else
 					billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
 
-				clientCode = CreateClientOnClientsData();
+				clientCode = CreateClientOnClientsData(billingCode);
 				_command.Parameters["?ClientCode"].Value = clientCode;
 
 				CreateUser();
@@ -364,8 +364,11 @@ set @inUser = ?UserName;";
 					&& !ServiceClient.Checked
 					&& IncludeType.SelectedItem.Text != "Скрытый"))
 			{
-				new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(clientCode);
 			}
+
+			if (TypeDD.SelectedItem.Text == "Поставщик")
+				Mailer.SupplierRegistred(ShortNameTB.Text, RegionDD.SelectedItem.Text);
 
 			NotificationHelper.NotifyAboutRegistration(
 				String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
@@ -636,10 +639,10 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 			return Convert.ToUInt32(_command.ExecuteScalar());
 		}
 
-		private uint CreateClientOnClientsData()
+		private uint CreateClientOnClientsData(uint billingCode)
 		{
-			_command.CommandText =
-				@"INSERT INTO usersettings.clientsdata (
+			_command.CommandText = @"
+INSERT INTO usersettings.clientsdata (
 MaskRegion, ShowRegionMask, FullName, ShortName, FirmSegment, RegionCode, Adress, 
 FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId, RegistrationDate) ";
 			_command.Parameters.AddWithValue("?ClientContactGroupOwnerId",
@@ -651,7 +654,7 @@ FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerI
 			{
 				_command.CommandText += @" 
 Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?FirmSegment, ?RegionCode, ?Adress, 
-?FirmType, 1, ?registrant, " + Session["DogN"] + ", 1, ?ClientContactGroupOwnerId, now()); ";
+?FirmType, 1, ?registrant, " + billingCode + ", 1, ?ClientContactGroupOwnerId, now()); ";
 			}
 			else
 			{
@@ -997,14 +1000,17 @@ ORDER BY region;
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			if (!IncludeCB.Checked || (IncludeCB.Checked && TypeDD.SelectedValue != "0"))
+			if (!IsBasicClient())
 			{
 				args.IsValid = args.Value.Length > 0;
 
 				if (args.IsValid)
 				{
-					_connection.Open();
-					var existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", _connection).ExecuteScalar()) == 1;
+					var existsInDataBase = false;
+					With.Connection(c => {
+					                	existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
+					                });
+					
 					_connection.Close();
 					var existsInActiveDirectory = ADHelper.IsLoginExists(args.Value);
 					args.IsValid = !(existsInActiveDirectory || existsInDataBase);
