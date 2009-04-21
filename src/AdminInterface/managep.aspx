@@ -220,7 +220,7 @@
 									<asp:DropDownList ID="Region" runat="server" DataTextField="Region" DataValueField="RegionCode" />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Отправлять дубль заказа в tech@analit.net">
+							<asp:TemplateField HeaderText="Отправлять дубль заказа в zakaz_copy@analit.net">
 								<ItemTemplate>
 									<asp:CheckBox ID="SendDebugMessage" runat="server" Checked='<%#  Convert.ToBoolean(Eval("SendDebugMessage")) %>' />
 								</ItemTemplate>
