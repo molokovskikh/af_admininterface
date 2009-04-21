@@ -89,6 +89,23 @@ where clientcode = ?ClientCode", connection);
 		}
 
 		[Test]
+		public void Redirect_to_client_info_page_if_base_client_registred()
+		{
+			using (var browser = new IE(BuildTestUrl("register.aspx")))
+			{
+				SetupGeneralInformation(browser);
+				browser.CheckBox(Find.ById("IncludeCB")).Click();
+				browser.TextField(Find.ById("IncludeSTB")).TypeText("ТестерК");
+				browser.Button(Find.ById("IncludeSB")).Click();
+				
+				browser.SelectList(Find.ById("IncludeType")).Select("Базовый");
+				browser.Button(Find.ById("Register")).Click();
+
+				Assert.IsTrue(browser.ContainsText("Информация о клиенте"), "не переадресовали");
+			}
+		}
+
+		[Test]
 		public void EditPayerInfo()
 		{
 			using (var browser = new IE(BuildTestUrl("register.aspx")))

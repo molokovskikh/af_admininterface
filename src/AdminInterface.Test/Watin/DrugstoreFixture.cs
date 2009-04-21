@@ -1,5 +1,8 @@
 ﻿using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
+using Castle.ActiveRecord;
+using Common.Tools;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using WatiN.Core;
@@ -35,6 +38,37 @@ namespace AdminInterface.Test.Watin
 				browser.GoTo(browser.Url);
 				browser.Refresh();
 				Assert.That(GetHomeRegionSelect(browser).SelectedOption.Text, Is.EqualTo(changeTo));
+			}
+		}
+
+		[Test]
+		public void Try_to_delete_include_regulation()
+		{
+			ForTest.InitialzeAR();
+			
+			using (new SessionScope())
+			{
+				var client = Client.Find(2575u);
+				client.Parents.Each(p => p.Delete());	
+			}
+			
+			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
+			{
+				var body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
+				body.Button(Find.ByValue("Подчинить клиента.")).Click();
+				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
+				body.TextFields.First().TypeText("ТестерК");
+				body.Button(Find.ByValue("Найти")).Click();
+
+				browser.Button(b => b.Value.Equals("Применить")).Click();
+
+				browser.GoTo(browser.Url);
+				browser.Refresh();
+				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
+				body.Button(Find.ByValue("Удалить")).Click();
+
+				browser.Button(b => b.Value.Equals("Применить")).Click();
+				Assert.That(browser.Text, Text.Contains("Конфигурация клиента "));
 			}
 		}
 

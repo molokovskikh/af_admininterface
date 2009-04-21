@@ -27,13 +27,12 @@ namespace AdminInterface.Test.Services
 			var clientName = "Тестовый клиент";
 			var paymentOptions = new PaymentOptions{ WorkForFree = true };
 			var userName = "test";
-			var isBasicSubmission = false;
 
 			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
 			                                                          payerId,
 			                                                          clientName,
 			                                                          userName,
-			                                                          isBasicSubmission,
+			                                                          null,
 			                                                          paymentOptions);
 
 			Assert.That(_message, Is.Not.Null, "Сообщение не послано");
@@ -68,13 +67,12 @@ namespace AdminInterface.Test.Services
 			var clientName = "Тестовый клиент";
 			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment"};
 			var userName = "test";
-			var isBasicSubmission = true;
 
 			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
 																	  payerId,
 																	  clientName,
 																	  userName,
-																	  isBasicSubmission,
+																	  "Базовый",
 																	  paymentOptions);
 
 			Assert.That(_message.Body, Is.EqualTo(
@@ -88,7 +86,7 @@ namespace AdminInterface.Test.Services
 <br>
 Кем зарегистрирован: test
 <br>
-Клиент с Базовым подчинением
+Подчиненный клиент, тип подчинения Базовый
 <br>
 Дата начала платного периода: 01.01.2007
 <br>
@@ -102,13 +100,12 @@ namespace AdminInterface.Test.Services
 			var payerId = 10u;
 			var clientName = "Тестовый клиент";
 			var userName = "test";
-			var isBasicSubmission = true;
 
 			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
 																	  payerId,
 																	  clientName,
 																	  userName,
-																	  isBasicSubmission,
+																	  "Базовый",
 																	  null);
 
 			Assert.That(_message.Body, Is.EqualTo(
@@ -122,7 +119,7 @@ namespace AdminInterface.Test.Services
 <br>
 Кем зарегистрирован: test
 <br>
-Клиент с Базовым подчинением".Replace(Environment.NewLine, "")));
+Подчиненный клиент, тип подчинения Базовый".Replace(Environment.NewLine, "")));
 		}
 	}
 }
