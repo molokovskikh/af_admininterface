@@ -141,7 +141,11 @@ namespace AdminInterface.Helpers
 				var result = searcher.FindOne();
 				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
 					return null;
-				return DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
+				var lastLogon = DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
+				//ad инициализирует этим значением поле
+				if (lastLogon == DateTime.Parse("01.01.1601 3:00:00"))
+					return null;
+				return lastLogon;
 			}
 		}
 
