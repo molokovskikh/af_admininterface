@@ -58,15 +58,10 @@ Login: {1}
 Сообщение создано автоматической системой изменения паролей {5}";
 
 		private const string _messageTemplateAfterFreePasswordChange =
-@"Operator: {0}
-Host: {1}
-Login: {2}
-ID: {3}
+@"Оператор {0} с хоста {1} изменил пароль пользователя {2}, клиента {3} с кодом {4}
+Дата изменения {5}
 
-Причина: {4}";
-
-		private const string _messageTemplateForAdministratorAfterPasswordChange =
-@"Для клиента {0} был успешно изменен пароль";
+Причина: {6}";
 
 		public static void NotifyAboutPasswordChange(Client client, 
 													 Administrator administrator, 
@@ -78,21 +73,19 @@ ID: {3}
 		{
 			if (isFree)
 				Func.Mail("register@analit.net",
-						  String.Empty,
 						  String.Format("Бесплатное изменение пароля - {0}", client.FullName),
 						  String.Format(_messageTemplateAfterFreePasswordChange,
 										administrator.UserName, 
 										host,
 										user.Login,
+										client.ShortName,
 										client.Id,
+										DateTime.Now,
 										reason),
-						  "RegisterList@subscribe.analit.net",
-						  String.Empty,
-						  null);
+						  "RegisterList@subscribe.analit.net");
 
 			else
 				Func.Mail("register@analit.net",
-				          String.Empty,
 						  String.Format("Платное изменение пароля - {0}", client.FullName),
 						  String.Format(_messageTemplateForBillingAfterPassordChange,
 										client.FullName,
@@ -101,18 +94,7 @@ ID: {3}
 										client.BillingInstance.PayerID,
 										reason,
 										DateTime.Now),
-				          "billing@analit.net",
-				          String.Empty,
-				          "");
-
-
-			Func.Mail("register@analit.net",
-			          String.Empty,
-			          String.Format("Успешное изменение пароля - {0}", client.FullName),
-			          String.Format(_messageTemplateForAdministratorAfterPasswordChange, client.FullName),
-			          administrator.Email,
-			          String.Empty,
-			          null);
+				          "billing@analit.net");
 		}
 
 		public static void NotifyAboutRegistration(string subject, string body)
