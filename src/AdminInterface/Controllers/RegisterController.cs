@@ -46,7 +46,7 @@ namespace AdminInterface.Controllers
 			                                                                      payer.PayerID,
 			                                                                      Session["ShortName"].ToString(),
 			                                                                      SecurityContext.Administrator.UserName, 
-																				  false,
+																				  null,
 			                                                                      paymentOptions);
 
 			if (showRegistrationCard)

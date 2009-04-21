@@ -178,21 +178,16 @@
 								</asp:DropDownList>
 							</div>
 							<div class="DropDownField">
-								<asp:TextBox ID="PassTB" runat="server" Visible="False" Width="10px" />
-								<label for="TypeDD">
-									Тип:</label>
-								<asp:DropDownList ID="TypeDD" runat="server" 
-									onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
+								<label for="TypeDD">Тип:</label>
+								<asp:DropDownList ID="TypeDD" runat="server" onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
 								</div>
 							<div class="DropDownField">
-								<label for="RegionDD">
-									Домашний регион:</label>
+								<label for="RegionDD">Домашний регион:</label>
 								<asp:DropDownList ID="RegionDD" runat="server" OnSelectedIndexChanged="RegionDD_SelectedIndexChanged"
 									AutoPostBack="True" DataSource="<%# admin %>" DataTextField="Region" DataValueField="RegionCode" />
 							</div>
 							<div class="DropDownField">
-								<label for="SegmentDD">
-									Сегмент:</label>
+								<label for="SegmentDD">Сегмент:</label>
 								<asp:DropDownList ID="SegmentDD" runat="server" />
 							</div>
 						</div>

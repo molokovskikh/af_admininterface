@@ -353,7 +353,6 @@
     <Compile Include="statcont.aspx.designer.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Helpers\Utils.cs" />
     <Compile Include="ViewAdministrators.aspx.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

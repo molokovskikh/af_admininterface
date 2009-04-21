@@ -297,8 +297,10 @@ set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
 			_command.Parameters.Add("?ClientCode", MySqlDbType.Int24);
 			_command.Parameters.AddWithValue("?AllowGetData", TypeDD.SelectedItem.Value);
-			_command.Parameters.AddWithValue("?OSUserName", EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower());
-			_command.Parameters.AddWithValue("?OSUserPass", PassTB.Text);
+			var username = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
+			var password = Func.GeneratePassword();
+			_command.Parameters.AddWithValue("?OSUserName", username);
+			_command.Parameters.AddWithValue("?OSUserPass", password);
 			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
 
 			if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" && IncludeType.SelectedItem.Value != "Базовый+")
@@ -306,10 +308,11 @@ set @inUser = ?UserName;";
 
 			_command.Parameters.AddWithValue("?IncludeType", IncludeType.SelectedValue);
 			_command.Parameters.AddWithValue("?invisibleonfirm", CustomerType.SelectedItem.Value);
-
+			uint billingCode;
+			uint clientCode;
 			try
 			{
-				uint billingCode;
+				
 				if (IncludeCB.Checked)
 					billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, _connection).ExecuteScalar());
 				else if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
@@ -317,7 +320,7 @@ set @inUser = ?UserName;";
 				else
 					billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
 
-				var clientCode = CreateClientOnClientsData();
+				clientCode = CreateClientOnClientsData();
 				_command.Parameters["?ClientCode"].Value = clientCode;
 
 				CreateUser();
@@ -329,78 +332,14 @@ set @inUser = ?UserName;";
 				else
 					CreateSupplierSpecific();
 
-				ADHelper.CreateUserInAD(_command.Parameters["?OSUserName"].Value.ToString(),
-				                        _command.Parameters["?OSUserPass"].Value.ToString(),
-				                        _command.Parameters["?ClientCode"].Value.ToString());
+				ADHelper.CreateUserInAD(username,
+				                        password,
+				                        clientCode.ToString());
 
-				CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\",
-				                                 _command.Parameters["?ClientCode"].Value),
-				                   String.Format(@"ANALIT\{0}",
-				                                 _command.Parameters["?OSUserName"].Value));
+				CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", clientCode),
+				                   String.Format(@"ANALIT\{0}", username));
 
 				mytrans.Commit();
-				if (TypeDD.SelectedItem.Text == "Аптека"
-				    && !IncludeCB.Checked
-				    && !ServiceClient.Checked
-				    && CustomerType.SelectedItem.Text == "Стандартный"
-				    || (TypeDD.SelectedItem.Text == "Аптека"
-				        && IncludeCB.Checked
-				        && !ServiceClient.Checked
-				        && IncludeType.SelectedItem.Text != "Скрытый"))
-				{
-					new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
-				}
-
-				NotificationHelper.NotifyAboutRegistration(
-					String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
-					String.Format("Оператор: {0}\nРегион: {1}\nLogin: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-					              SecurityContext.Administrator.UserName,
-					              RegionDD.SelectedItem.Text,
-					              EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower(),
-					              clientCode,
-					              SegmentDD.SelectedItem.Text,
-					              TypeDD.SelectedItem.Text));
-
-				Session["DogN"] = billingCode;
-				Session["Code"] = clientCode;
-				Session["Name"] = FullNameTB.Text;
-				Session["ShortName"] = ShortNameTB.Text;
-				Session["Login"] = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
-				Session["Password"] = PassTB.Text;
-				Session["Tariff"] = TypeDD.SelectedItem.Text;
-				Session["Register"] = true;
-
-				SendClientCardIfNeeded(clientCode, billingCode);
-
-				var sendBillingNotificationNow = true;
-				if (IsBasicClient())
-				{
-					Response.Redirect(String.Format("Client/info.rails?cc={0}", clientCode));
-				}
-				else
-				{
-					if (!IncludeCB.Checked && EnterBillingInfo.Checked)
-					{
-						sendBillingNotificationNow = false;
-						Response.Redirect(String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-						                                billingCode,
-						                                ShowRegistrationCard.Checked,
-						                                clientCode));
-					}
-					else if (ShowRegistrationCard.Checked)
-						Response.Redirect("report.aspx");
-					else
-						Response.Redirect(String.Format("Client/info.rails?cc={0}", clientCode));
-				}
-
-				if (sendBillingNotificationNow)
-					new NotificationService()
-						.SendNotificationToBillingAboutClientRegistration(clientCode,
-						                                                  billingCode,
-						                                                  ShortNameTB.Text,
-						                                                  SecurityContext.Administrator.UserName,
-						                                                  IsBasicClient(),
-						                                                  null);
 			}
 			catch (Exception)
 			{
@@ -415,14 +354,79 @@ set @inUser = ?UserName;";
 				_command.Dispose();
 				_connection.Dispose();
 			}
+
+			if (TypeDD.SelectedItem.Text == "Аптека"
+				&& !IncludeCB.Checked
+				&& !ServiceClient.Checked
+				&& CustomerType.SelectedItem.Text == "Стандартный"
+				|| (TypeDD.SelectedItem.Text == "Аптека"
+					&& IncludeCB.Checked
+					&& !ServiceClient.Checked
+					&& IncludeType.SelectedItem.Text != "Скрытый"))
+			{
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(_command.Parameters["?ClientCode"].Value));
+			}
+
+			NotificationHelper.NotifyAboutRegistration(
+				String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
+				String.Format("Оператор: {0}\nРегион: {1}\nLogin: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+							  SecurityContext.Administrator.UserName,
+							  RegionDD.SelectedItem.Text,
+							  username,
+							  clientCode,
+							  SegmentDD.SelectedItem.Text,
+							  TypeDD.SelectedItem.Text));
+
+			Session["DogN"] = billingCode;
+			Session["Code"] = clientCode;
+			Session["Name"] = FullNameTB.Text;
+			Session["ShortName"] = ShortNameTB.Text;
+			Session["Login"] = username;
+			Session["Password"] = password;
+			Session["Tariff"] = TypeDD.SelectedItem.Text;
+			Session["Register"] = true;
+
+			SendClientCardIfNeeded(clientCode, billingCode, username, password);
+
+			var sendBillingNotificationNow = true;
+			string redirectTo;
+			if (IsBasicClient())
+			{
+				redirectTo = String.Format("Client/info.rails?cc={0}", clientCode);
+			}
+			else
+			{
+				if (!IncludeCB.Checked && EnterBillingInfo.Checked)
+				{
+					sendBillingNotificationNow = false;
+					redirectTo = String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+											   billingCode,
+											   ShowRegistrationCard.Checked,
+											   clientCode);
+				}
+				else if (ShowRegistrationCard.Checked)
+					redirectTo = "report.aspx";
+				else
+					redirectTo = String.Format("Client/info.rails?cc={0}", clientCode);
+			}
+
+			if (sendBillingNotificationNow)
+				new NotificationService()
+					.SendNotificationToBillingAboutClientRegistration(clientCode,
+																	  billingCode,
+																	  ShortNameTB.Text,
+																	  SecurityContext.Administrator.UserName,
+																	  IncludeType.SelectedItem.Text,
+																	  null);
+			Response.Redirect(redirectTo);
 		}
 
 		private bool IsBasicClient()
 		{
-			return (IncludeCB.Checked && (IncludeType.SelectedItem.Text == "Базовый" || IncludeType.SelectedItem.Text == "Базовый+"));
+			return (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый");
 		}
 
-		private void SendClientCardIfNeeded(uint clientCode, uint billingCode)
+		private void SendClientCardIfNeeded(uint clientCode, uint billingCode, string username, string password)
 		{
 			if (!SendRegistrationCard.Checked)
 				return;
@@ -443,8 +447,8 @@ set @inUser = ?UserName;";
 			                                         ShortNameTB.Text,
 			                                         FullNameTB.Text,
 			                                         TypeDD.SelectedItem.Text,
-			                                         LoginTB.Text,
-			                                         PassTB.Text,
+			                                         username,
+			                                         password,
 			                                         mailTo,
 			                                         AdditionEmailToSendRegistrationCard.Text,
 			                                         true);
@@ -458,7 +462,7 @@ insert into logs.passwordchange(ClientHost, LogTime, UserName, TargetUserName, S
 values (?ClientHost, now(), ?UserName, ?TargetUserName, ?SmtpId, ?SentTo);";
 				command.Parameters.AddWithValue("?ClientHost", HttpContext.Current.Request.UserHostAddress);
 				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				command.Parameters.AddWithValue("?TargetUserName", LoginTB.Text);
+				command.Parameters.AddWithValue("?TargetUserName", username);
 				command.Parameters.AddWithValue("?SmtpId", smtpid);
 				var sentTo = "";
 				if (!String.IsNullOrEmpty(mailTo))
@@ -832,62 +836,20 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
-			if (!IsBasicClient())
-			{
-				if (IncludeType.SelectedItem.Text == "Сеть")
-				{
-					_command.CommandText += @"
-UPDATE includeregulation i, 
-        intersection as src, 
-        intersection as dst 
-SET dst.costcode = src.costcode, 
-    dst.firmcostcorr = src.firmcostcorr, 
-    dst.publiccostcorr = src.publiccostcorr, 
-    dst.minreq = src.minreq, 
-    dst.controlminreq = src.controlminreq, 
-    dst.invisibleonclient = src.invisibleonclient 
-WHERE   dst.clientcode        = ?ClientCode    
-        AND src.clientcode    = ?PrimaryClientCode    
-		AND	dst.regioncode    = src.regioncode 
-        AND dst.pricecode     = src.pricecode 
-        AND src.clientcode    = i.primaryclientcode 
-        AND dst.clientcode    = i.includeclientcode;";
-				}
-				else
-				{
-					_command.CommandText += @"
-UPDATE includeregulation i, 
-        intersection as src, 
-        intersection as dst 
-SET dst.costcode = src.costcode, 
-    dst.firmcostcorr = src.firmcostcorr, 
-    dst.publiccostcorr = src.publiccostcorr, 
-    dst.minreq = src.minreq, 
-    dst.controlminreq = src.controlminreq, 
-    dst.invisibleonclient = src.invisibleonclient, 
-    dst.FirmClientCode = src.FirmClientCode, 
-    dst.FirmClientCode2 = src.FirmClientCode2, 
-    dst.FirmClientCode3 = src.FirmClientCode3
-WHERE	dst.clientcode        = ?ClientCode    
-        AND src.clientcode    = ?PrimaryClientCode
-		AND dst.regioncode    = src.regioncode 
-        AND dst.pricecode     = src.pricecode 
-        AND src.clientcode    = i.primaryclientcode 
-        AND dst.clientcode    = i.includeclientcode;";
-				}
-			}
 			if (!invisible)
 				_command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
 			_command.ExecuteNonQuery();
 		}
 
-		private void CreateClientOnShowInclude(int PrimaryClientCode)
+		private void CreateClientOnShowInclude(int primaryClientCode)
 		{
-			_command.CommandText = "INSERT INTO showregulation" + "(PrimaryClientCode, ShowClientCode, Addition)" + " VALUES (" +
-			                       PrimaryClientCode + ", ?ClientCode, ?ShortName);" + "INSERT INTO includeregulation" +
-			                       "(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)" + "VALUES(NULL," +
-			                       PrimaryClientCode +
-			                       ", ?ClientCode, ?ShortName, ?IncludeType)";
+			_command.CommandText = @"
+INSERT INTO showregulation (PrimaryClientCode, ShowClientCode, Addition) 
+VALUES (" + primaryClientCode + @", ?ClientCode, ?ShortName); 
+
+INSERT INTO includeregulation 
+(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)
+VALUES(NULL," + primaryClientCode + ", ?ClientCode, ?ShortName, ?IncludeType)";
 			_command.ExecuteNonQuery();
 		}
 
@@ -1050,9 +1012,7 @@ ORDER BY region;
 					{
 						args.IsValid = false;
 						LoginValidator.ErrorMessage = String.Format("Учетное имя '{0}' существует в системе.", args.Value);
-					}
-					else
-						PassTB.Text = Func.GeneratePassword();
+					}					
 				}
 				else
 				{

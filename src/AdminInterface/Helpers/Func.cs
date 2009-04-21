@@ -65,7 +65,7 @@ namespace AdminInterface.Helpers
 			}
 			catch (Exception ex)
 			{
-				_log.Error(Utils.ExceptionToString(ex));
+				_log.Error("Не удалось отправить письмо", ex);
 			}
 		}
 
@@ -86,7 +86,7 @@ namespace AdminInterface.Helpers
 			}
 			catch (Exception ex)
 			{
-				_log.Error(Utils.ExceptionToString(ex));
+				_log.Error("Не удалось отправить письмо", ex);
 			}
 		}
 
@@ -118,7 +118,7 @@ namespace AdminInterface.Helpers
 			}
 			catch (Exception ex)
 			{
-				_log.Error(Utils.ExceptionToString(ex));
+				_log.Error("Не удалось отправить письмо", ex);
 			}
 			return 0;
 		}

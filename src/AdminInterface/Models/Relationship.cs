@@ -12,7 +12,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("UserSettings.includeregulation")]
-	public class Relationship
+	public class Relationship : ActiveRecordBase
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }

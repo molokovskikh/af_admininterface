@@ -98,7 +98,7 @@ where length(c.contactText) > 0
 		                                                             uint payerId,
 		                                                             string clientName,
 		                                                             string userName,
-		                                                             bool isBasicSubmission,
+		                                                             string includeType,
 		                                                             PaymentOptions options)
 		{
 			var message = new MailMessage();
@@ -109,8 +109,8 @@ where length(c.contactText) > 0
 
 			string clientType;
 
-			if (isBasicSubmission)
-				clientType = "Клиент с Базовым подчинением";
+			if (!String.IsNullOrEmpty(includeType))
+				clientType = String.Format("Подчиненный клиент, тип подчинения {0}", includeType);
 			else
 				clientType = "Независимая копия";
 

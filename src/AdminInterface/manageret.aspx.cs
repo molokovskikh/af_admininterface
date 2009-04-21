@@ -225,6 +225,7 @@ UPDATE includeregulation i
 									and dst.regioncode = src.regioncode
 SET dst.CostCode = src.CostCode,
 	dst.FirmCostCorr = src.FirmCostCorr,
+	dst.PublicCostCorr = src.PublicCostCorr,
     dst.InvisibleOnClient = src.InvisibleOnClient,
 	dst.DisabledByClient = src.DisabledByClient,
 	dst.DisabledByAgency = src.DisabledByAgency,
