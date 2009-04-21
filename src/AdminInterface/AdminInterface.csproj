@@ -152,6 +152,7 @@
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
+    <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />

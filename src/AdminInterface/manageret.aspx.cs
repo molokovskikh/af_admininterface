@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
@@ -28,7 +29,9 @@ namespace AddUser
 
 		protected void NotifySuppliers_Click(object sender, EventArgs e)
 		{
-			new NotificationService().NotifySupplierAboutDrugstoreRegistration(Convert.ToUInt32(ClientCode));
+			var client = Client.Find(Convert.ToUInt32(ClientCode));
+			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client.Id);
+			Mailer.ClientRegistrationResened(client);
 		}
 
 		protected void ParametersSave_Click(object sender, EventArgs e)
