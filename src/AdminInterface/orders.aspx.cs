@@ -48,7 +48,7 @@ SELECT  oh.rowid,
 		oh.PriceCode,
         oh.RowCount, 
         oh.Processed, 
-		o.ResultCode,
+		max(o.ResultCode) as ResultCode,
 		o.TransportType,
 		oh.SubmitDate,
 		oh.ClientOrderId
