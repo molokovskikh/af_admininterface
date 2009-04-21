@@ -66,10 +66,10 @@ SELECT  FirmCode as ClientCode,
         convert(concat(FirmCode, '. ', ShortName) using cp1251) name 
 FROM    clientsdata
 WHERE   MaskRegion & ?MaskRegion > 0
-        AND firmtype = 1 
-        AND firmstatus = 1 
-        AND shortname like ?NameStr  
-", c);
+        and firmtype = 1 
+        and firmstatus = 1 
+        and (shortname like ?NameStr
+			or fullname like ?NameStr)", c);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", nameStr));
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
 					dataAdapter.Fill(_data, where);
@@ -108,7 +108,8 @@ WHERE ouar.ClientCode = ?ClientCode;
 UPDATE (UserUpdateInfo as source, UserUpdateInfo as dest)
 	JOIN OsUserAccessRight sourceUsers on sourceUsers.RowId = source.UserId
     JOIN OsUserAccessRight destUsers on destUsers.RowId = dest.UserId
-SET dest.UpdateDate = source.UpdateDate
+SET dest.UpdateDate = source.UpdateDate,
+	dest.AFAppVersion = source.AFAppVersion
 WHERE sourceUsers.clientcode = ?ParentClientCode   
       AND destUsers.clientcode = ?ClientCode;    
 
