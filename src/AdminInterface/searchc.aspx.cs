@@ -89,6 +89,9 @@ ORDER BY IsAll Desc, Region;", _connection);
 
 		protected void GoFind_Click(object sender, EventArgs e)
 		{
+			if (!IsValid)
+				return;
+
 			var searchType = SearchType.ShortName;
 			switch(FindRB.SelectedValue)
 			{

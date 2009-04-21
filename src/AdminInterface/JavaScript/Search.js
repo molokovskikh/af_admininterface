@@ -52,6 +52,10 @@ function getTitleText(titlesAndIds)
 
 function ValidateSearch(source, args)
 {
+	if (args.Value == "") {
+		args.IsValid = false;
+		return
+	}
 	if (document.getElementById("ctl00_MainContentPlaceHolder_FindRB_3").checked 
 		|| document.getElementById("ctl00_MainContentPlaceHolder_FindRB_2").checked)		
 		args.IsValid = new RegExp("^\\d{1,10}$$").test(args.Value);
