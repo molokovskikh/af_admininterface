@@ -67,7 +67,7 @@ namespace AdminInterface.Test.Controllers
 
 				try
 				{
-					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "", "");
+					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "");
 					Assert.Fail("Должны были выбросить исключение");
 				}
 				catch (Exception ex)
@@ -101,7 +101,7 @@ namespace AdminInterface.Test.Controllers
 
 				try
 				{
-					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "", "");
+					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "");
 					Assert.Fail("Должны были выбросить исключение");
 				}
 				catch (Exception ex)
@@ -127,7 +127,7 @@ namespace AdminInterface.Test.Controllers
 			using (var testAdUser = new TestADUser())
 			using (var testUser = TestUser(testAdUser.Login))
 			{
-				_controller.DoPasswordChange(testUser.Parameter.Id, "r.kvasov@analit.net", true, false, "", "");
+				_controller.DoPasswordChange(testUser.Parameter.Id, "r.kvasov@analit.net", true, false, "");
 				var passwordChanges = PasswordChangeLogEntity.FindAll(Expression.Gt("LogTime", DateTime.Today));
 
 				Assert.That(passwordChanges.Count(), Is.EqualTo(1));

@@ -1,4 +1,6 @@
-﻿namespace AdminInterface.Models
+﻿using System;
+
+namespace AdminInterface.Models
 {
 	public class Message
 	{
@@ -22,6 +24,16 @@
 			if (IsError)
 				return "Error";
 			return "Success";
+		}
+
+		public static Message Error(string message)
+		{
+			return new Message(message, true);
+		}
+
+		public static Message Notify(string message)
+		{
+			return new Message(message, false);
 		}
 	}
 }

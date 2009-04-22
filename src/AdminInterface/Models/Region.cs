@@ -15,7 +15,7 @@ namespace AdminInterface.Models
 
 		public static IList<Region> GetRegionsForClient(string clientName)
 		{
-			return ArHelper.WithSession<Region>(
+			return ArHelper.WithSession(
 				session =>
 				session.CreateSQLQuery(
 					@"

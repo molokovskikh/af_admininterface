@@ -1,0 +1,127 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
+									  ("Информация о клиенте", "")]} %>
+									  
+<style>
+	.InfoRow
+	{
+		height: 20px;
+	}
+	
+	input 
+	{
+		border-style:groove;
+	}
+	
+	textarea
+	{
+		border-style:groove;	
+	}
+	
+	input[type='text']
+	{
+		width: 90%;	
+	}
+</style>
+	
+<h3>${client.ShortName}</h3>
+
+<div class="BorderedBlock" style="padding: 20px 10px 20px 10px; float:left; width: 95%;">
+
+	<% if IsDefined("Message"):
+		clazz = "notice"
+		if message.IsError:
+			clazz = "err"	
+		end
+	%>
+
+	<div class="flash ${clazz}">
+		${Message.MessageText}
+	</div>
+	<% end %>
+
+	<div class="TwoColumn">
+	<% OutputSubView("ClientView") %>
+	<form action="Update.rails" method=post style="padding:0; margin:0;">
+		${FormHelper.HiddenField("client.Id")}
+		<table cellpadding=0 cellspacing=0 border=1 rules=all style="width: 90%; border: solid 1px #dadada; border-collapse:collapse;">
+			<col style="width:50%" />
+			<col style="width:50%" />
+			<tr>
+				<td class="Title" style="height: 30px;" colspan="2">
+					<strong>Общая информация</strong>
+				</td>
+			</tr>
+			<tr class="InfoRow">
+				<td colspan=2>
+					<% if not Registrant: %>
+					Регистратор не указан, дата регистрации ${client.RegistrationDate}
+					<% else: %>
+					Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
+					<% end %>
+				</td>	
+			</tr
+			<tr class="InfoRow">
+				<td align="right">
+					Полное наименование:
+				</td>
+				<td>
+					${FormHelper.TextField("client.FullName")}
+				</td>
+			</tr>
+			<tr class="InfoRow">
+				<td style="text-align: right;">
+					Краткое наименование:
+				</td>
+				<td>
+					${FormHelper.TextField("client.ShortName")}
+				</td>
+			</tr>
+			<tr class="InfoRow">
+				<td align="right">
+					Адрес:
+				</td>
+				<td>
+					${FormHelper.TextField("client.Address")}
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<% OutputSubView("ContactViewer") %>
+				</td>
+			</tr>
+			<tr style="text-align: center;">
+				<td colspan="2">
+					<input type=submit value="Сохранить" />
+				</td>
+			</tr>
+		</table>
+	</form>
+	<% OutputSubView("LegendView") %>
+	</div>
+	<div class="TwoColumn" style="text-align: center;">
+		<form action="SendMessage.rails" method="post">
+			<input type=hidden value=${client.Id} name=clientCode />
+			Новое обращение(сообщение):
+			<br />
+			<textarea style="height: 150px; width:90%;" name=message></textarea>
+			<br />
+			<input type=submit value="Принять" />
+			<p>
+				<table class="DataTable HighLightCurrentRow" style="text-align:left">
+					<tr>
+						<th>Дата</th>
+						<th>Оператор</th>
+						<th>Событие</th>
+					</tr>
+					<% for i, log in enumerate(logs): %>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td>${log.WriteTime}</td>
+						<td>${log.UserName}</td>
+						<td>${ViewHelper.FormatMessage(HttpUtility.HtmlEncode(log.Message))}</td>
+					</tr>
+					<% end %>
+				</table>
+			</p>
+		</form>
+	</div>
+</div>

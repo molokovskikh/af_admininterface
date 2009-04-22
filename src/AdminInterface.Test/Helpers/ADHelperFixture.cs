@@ -71,6 +71,21 @@ namespace AdminInterface.Test.Helpers
 			}
 		}
 
+		[Test]
+		public void c()
+		{
+			var entyty = FindDirectoryEntry("KvasovT");
+			Log(entyty);
+			//Console.WriteLine(entyty.Properties["userAccountControl"][0]);
+		}
+
+		[Test]
+		public void test()
+		{
+			var adm = new Administrator();
+			adm.UserName = "KvasovT";
+			adm.CreateUserInAd("123456789");
+		}
 
 		[Test]
 		public void Get_last_password_change()

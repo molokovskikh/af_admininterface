@@ -80,7 +80,7 @@
 	<tr>
 		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
 			<% if isLoginExists and admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
-				<a href="./ChangePassword.rails?cc=${Client.Id}&ouar=${user.Id}" target="_blank">${user.Login}</a>
+				<a href="./ChangePassword.rails?userId=${user.Id}" target="_blank">${user.Login}</a>
 			<% else: %>
 				${user.Login}
 			<% end %>

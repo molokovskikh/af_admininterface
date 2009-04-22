@@ -130,13 +130,6 @@
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
-    <Compile Include="ForAspxInMonorail.Master.cs">
-      <DependentUpon>ForAspxInMonorail.Master</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="ForAspxInMonorail.Master.designer.cs">
-      <DependentUpon>ForAspxInMonorail.Master</DependentUpon>
-    </Compile>
     <Compile Include="Components\Legend.cs" />
     <Compile Include="Controllers\ClientController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
@@ -369,13 +362,6 @@
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
     <None Include="Views\Client\ClientView.brail" />
-    <Compile Include="Views\Client\Info.aspx.cs">
-      <DependentUpon>Info.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Views\Client\Info.aspx.designer.cs">
-      <DependentUpon>Info.aspx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
@@ -409,7 +395,6 @@
     <Content Include="Css\Billing.css" />
     <Content Include="Css\Contacts.css" />
     <Content Include="JavaScript\Search.js" />
-    <Content Include="Views\Client\Info.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Billing\Edit.brail">
@@ -428,6 +413,7 @@
     <Content Include="Images\BottomLeftCorner.png" />
     <Content Include="Images\BottomRightCorner.png" />
     <Content Include="Images\error.png" />
+    <Content Include="Images\false.png" />
     <Content Include="Images\home.png" />
     <Content Include="Images\TopLeftCorner.png" />
     <Content Include="Images\TopRightCorner.png" />
@@ -437,7 +423,6 @@
     <Content Include="JavaScript\date-ru-RU.js" />
     <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
-    <Content Include="ForAspxInMonorail.Master" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -447,6 +432,8 @@
     <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
+    <None Include="Views\Client\Info.brail" />
+    <None Include="Views\Client\SuccessPasswordChanged.brail" />
     <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Monitoring\UpdatingClients.brail" />
     <None Include="Views\Report\Act.brail" />
@@ -477,7 +464,6 @@
     <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
     <None Include="Views\Contact\NewContactGroup.brail" />
     <Content Include="OfficeUserRegistrationReport.aspx" />
-    <None Include="Views\Client\SuccessPasswordChanged.brail" />
     <Content Include="Rescue\NotAllowed.aspx" />
     <Content Include="Rescue\NotAuthorized.aspx" />
     <Content Include="SenderProperties.aspx" />
@@ -523,6 +509,10 @@
     <ProjectReference Include="..\Common.MySql\Common.MySql\Common.MySql.csproj">
       <Project>{8A680813-C83B-497A-85E6-E8F07B7D7650}</Project>
       <Name>Common.MySql</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Tools\Common.Tools\Common.Tools.csproj">
+      <Project>{72AFCFE8-C9E9-45FA-9698-BEE896A517A3}</Project>
+      <Name>Common.Tools</Name>
     </ProjectReference>
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>

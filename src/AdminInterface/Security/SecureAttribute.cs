@@ -1,8 +1,10 @@
-﻿using AdminInterface.Models.Security;
+﻿using System;
+using AdminInterface.Models.Security;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Security
 {
+	[AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true), Serializable]
 	public class SecureAttribute : FilterAttribute
 	{
 		public SecureAttribute(params PermissionType[] permissionTypes)

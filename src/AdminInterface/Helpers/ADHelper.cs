@@ -11,6 +11,13 @@ namespace AdminInterface.Helpers
 	 * using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
 	 * searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
 	 */
+	[Flags]
+	public enum AccountControl
+	{
+		NormalAccount = 512,
+		DontExpirePassword = 65536,
+	}
+
 	public class ADHelper
 	{
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0); 

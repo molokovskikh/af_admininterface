@@ -83,7 +83,7 @@ namespace AdminInterface.Test.ForTesting
         	foreach (var i in Enumerable.Range(0, Math.Abs(year - value.Year)))
         		SimulateClick(changeYear);
 
-        	foreach (var index in Enumerable.Range(0, Math.Abs(month - value.Month)))
+        	foreach (var i in Enumerable.Range(0, Math.Abs(month - value.Month)))
                 SimulateClick(changeMonth);
 
             SimulateClick(calendarTable.TableCell(Find.ByText(value.Day.ToString())));

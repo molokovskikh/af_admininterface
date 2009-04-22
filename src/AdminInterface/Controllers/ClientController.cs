@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -9,15 +10,18 @@ using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using AdminInterface.Extentions;
+using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(ADHelper)),
 		Helper(typeof(ViewHelper)),
+		Helper(typeof(HttpUtility)),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
-		Secure, 
+		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
+		Layout("General"),
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
@@ -31,29 +35,52 @@ namespace AdminInterface.Controllers
 		 * потому что нужно указывать индекс для каждого элемента коллекции от сюда и хак
 		*/
 		private const string _hackForBinder = "users.0.AssignedPermissions, users.1.AssignedPermissions, users.2.AssignedPermissions, users.3.AssignedPermissions, users.4.AssignedPermissions, users.5.AssignedPermissions, users.6.AssignedPermissions, users.7.AssignedPermissions, users.8.AssignedPermissions, users.9.AssignedPermissions, users.10.AssignedPermissions";
-		public override void PreSendView(object view)
-		{
-			if (view is IControllerAware)
-				((IControllerAware)view).SetController(this, ControllerContext);
-			base.PreSendView(view);
-		}
 
 		public void Info(uint cc)
 		{
-			var client = Client.Find(cc);
+			var client = Client.FindAndCheck(cc);
 			var authorizationLog = AuthorizationLogEntity.TryFind(client.Id);
-
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
 
 			PropertyBag["authorizationLog"] = authorizationLog;
 			PropertyBag["Client"] = client;
+			if (String.IsNullOrEmpty(client.Registrant))
+				PropertyBag["Registrant"] = null;
+			else
+				PropertyBag["Registrant"] = Administrator.GetByName(client.Registrant);
 			PropertyBag["Admin"] = SecurityContext.Administrator;
+			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 		}
 
+		[AccessibleThrough(Verb.Post)]
+		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
+		{
+			SecurityContext.Administrator.CheckClientPermission(client);
+
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
+				                                                     Request.UserHostAddress);
+				client.Update();
+			}
+
+			Flash["Message"] = Message.Notify("Сохранено");
+			RedirectToAction("info", new { cc = client.Id });
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void SendMessage(string message, uint clientCode)
+		{
+			var client = Client.FindAndCheck(clientCode);
+
+			using (new TransactionScope())
+				new ClientInfoLogEntity(message, client.Id).Save();
+
+			Flash["Message"] = Message.Notify("Сохранено");
+			RedirectToAction("info", new {cc = client.Id});
+		}
+
 		//[AccessibleThrough(Verb.Get)]
-		[Layout("Common")]
 		public void SearchOffers(uint clientCode)
 		{
 			var client = Client.FindAndCheck(clientCode);
@@ -61,7 +88,6 @@ namespace AdminInterface.Controllers
 		}
 
 		//[AccessibleThrough(Verb.Post)]
-		[Layout("Common")]
 		public void SearchOffers(uint clientCode, string searchText)
 		{
 			var client = Client.FindAndCheck(clientCode);
@@ -73,11 +99,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["Client"] = client;
 		}
 
-		[Layout("Common")]
 		[RequiredPermission(PermissionType.ChangePassword)]
-		public void ChangePassword(uint ouar)
+		public void ChangePassword(uint userId)
 		{
-			var user = User.GetById(ouar);
+			var user = User.GetById(userId);
 			var client = user.Client;
 
 			SecurityContext.Administrator
@@ -96,8 +121,7 @@ namespace AdminInterface.Controllers
 									 string additionEmailsToNotify, 
 									 bool isSendClientCard, 
 									 bool isFree, 
-									 string payReason, 
-									 string freeReason)
+									 string reason)
 		{
 			var user = User.GetById(userId);
 			var administrator = SecurityContext.Administrator;
@@ -111,7 +135,6 @@ namespace AdminInterface.Controllers
 			var password = Func.GeneratePassword();
 			var userName = administrator.UserName;
 			var host = Context.Request.UserHostAddress;
-			var reason = isFree ? freeReason : payReason;
 		
 			using (new TransactionScope())
 			{
@@ -122,13 +145,7 @@ namespace AdminInterface.Controllers
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
 
-				new ClientInfoLogEntity
-				{
-					UserName = administrator.UserName,
-					ClientCode = user.Client.Id,
-					WriteTime = DateTime.Now
-				}.SetProblem(isFree, reason)
-				.Save();
+				ClientInfoLogEntity.PasswordChange(user.Client.Id, isFree, reason).Save();
 
 				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);			
 
@@ -154,16 +171,15 @@ namespace AdminInterface.Controllers
 			                                             reason);
 
 			if (isSendClientCard)
+			{
 				RedirectToAction("SuccessPasswordChanged");
+			}
 			else
 			{
 				PrepareSessionForReport(user, password);
 				RedirectToUrl("../report.aspx");
 			}
 		}
-
-		public void SuccessPasswordChanged()
-		{}
 
 		private void PrepareSessionForReport(User user, string password)
 		{
@@ -180,37 +196,35 @@ namespace AdminInterface.Controllers
 
 		public void Unlock(uint clientCode)
 		{
-			var client = Client.Find(clientCode);
-			SecurityContext.Administrator.CheckClientPermission(client);
+			var client = Client.FindAndCheck(clientCode);
+
 			foreach(var user in client.GetUsers())
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
 					ADHelper.Unlock(user.Login);
 
-			Flash["UnlockMessage"] = "Разблокировано";
+			Flash["Message"] = Message.Notify("Разблокировано");
 			RedirectToAction("Info", new { cc = client.Id });
 		}
 
 		public void DeletePreparedData(uint clientCode)
 		{
-			var client = Client.Find(clientCode);
-			SecurityContext.Administrator.CheckClientPermission(client);
+			var client = Client.FindAndCheck(clientCode);
 
 			try
 			{
 				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", client.Id));
-				Flash["DeleteMessage"] = "Подготовленные данные удалены";
+				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
 			}
 			catch
 			{
-				Flash["DeleteFailMessage"] = "Ошибка удаления подготовленных данных, попробуйте позднее.";
+				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToAction("Info", new { cc = client.Id });
 		}
 
 		public void ResetUin(uint clientCode, string reason)
 		{
-			var client = Client.Find(clientCode);
-			SecurityContext.Administrator.CheckClientPermission(client);
+			var client = Client.FindAndCheck(clientCode);
 
 			using (new TransactionScope())
 			{
@@ -221,45 +235,33 @@ namespace AdminInterface.Controllers
 							inUser = SecurityContext.Administrator.UserName,
 							ResetIdCause = reason
 						});
-				new ClientInfoLogEntity
-					{
-						UserName = SecurityContext.Administrator.UserName,
-						WriteTime = DateTime.Now,
-						ClientCode = client.Id,
-						Message = String.Format("$$$Изменение УИН: " + reason),
-					}.Save();
-																			
+				ClientInfoLogEntity.ReseteUin(client.Id, reason).Save();																			
 				client.ResetUin();
-
 				RedirectToAction("Info", new { cc = client.Id });
 			}
 		}
 
-		[Layout("Common")]
 		public void ShowUsersPermissions(uint clientCode)
 		{
-			var client = Client.Find(clientCode);
-
-			SecurityContext.Administrator.CheckClientPermission(client);
+			var client = Client.FindAndCheck(clientCode);
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Permissions"] = UserPermission.FindPermissionsAvailableFor(client);
 		}
 
-		public void UpdateUsersPermissions(uint ClientCode,
+		public void UpdateUsersPermissions(uint clientCode,
 										   [ARDataBind("users", Expect = _hackForBinder, AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] User[] users)
 		{
 			
-			var client = Client.Find(ClientCode);
-
-			SecurityContext.Administrator.CheckClientPermission(client);
+			var client = Client.FindAndCheck(clientCode);
 
 			using (new TransactionScope())
-			{
-				foreach (var user in users)
-					user.UpdateAndFlush();
-			}
+				users.Each(u => u.Update());
+
 			RedirectToAction("ShowUsersPermissions", new { clientCode = client.Id });
 		}
+
+		public void SuccessPasswordChanged()
+		{}
 	}
 }

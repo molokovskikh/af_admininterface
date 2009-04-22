@@ -126,6 +126,14 @@ div.flash.notice {
     border-color:#9FCF9F;
     color:#005F00;
 }
+
+div.flash.err, #errorExplanation {
+    background: url(../images/false.png) 8px 5px no-repeat;
+    background-color: #ffe3e3;
+    border-color: #dd0000;
+    color: #550000;
+}
+
 div.flash {
     margin-top:8px;
 }

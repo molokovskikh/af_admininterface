@@ -83,7 +83,7 @@ where clientcode = ?ClientCode", connection);
 
 				browser.Button(Find.ById("Register")).Click();
 
-				Assert.IsTrue(browser.ContainsText("Регистрация завершена успешно."), "не переадресовали");
+				Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно."));
 			}
 		}
 
@@ -100,7 +100,7 @@ where clientcode = ?ClientCode", connection);
 				browser.SelectList(Find.ById("IncludeType")).Select("Базовый");
 				browser.Button(Find.ById("Register")).Click();
 
-				Assert.IsTrue(browser.ContainsText("Информация о клиенте"), "не переадресовали");
+				Assert.That(browser.Text, Text.Contains("Информация о клиенте"));
 			}
 		}
 

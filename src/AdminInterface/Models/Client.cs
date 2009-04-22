@@ -43,6 +43,9 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string FullName { get; set; }
 
+		[Property("Adress")]
+		public virtual string Address { get; set; }
+
 		[Property("FirmStatus")]
 		public virtual ClientStatus Status { get; set; }
 
@@ -57,6 +60,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
+
+		[Property]
+		public virtual string Registrant { get; set; }
 
 		[Property]
 		public virtual UInt64 MaskRegion { get; set; }
