@@ -421,6 +421,7 @@
     <Content Include="Images\true.png" />
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />
+    <Content Include="JavaScript\jquery-1.3.2.min.js" />
     <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
     <None Include="Properties\Settings.settings">

@@ -7,7 +7,19 @@
 		.tdCheckBox {vertical-align: middle; text-align: left;}
 	</style>
 	
-<form id="form1" runat="server">
+	<script>
+		jQuery(document).ready(function() {
+			jQuery("#ctl00_MainContentPlaceHolder_IncludeGrid input[type=text], #ctl00_MainContentPlaceHolder_ShowClientsGrid input[type=text]").keypress(function(e) {
+				if ((e.which && e.which == 13) || (e.keyCode && e.keyCode == 13)) {
+					jQuery(this).parents('td').children('input[type=submit]').click()
+					return false;
+				} else {
+					return true;
+				}
+			});
+		});
+	</script>
+<form id="form1" runat="server" defaultfocus="ParametersSave" defaultbutton="ParametersSave">
 		<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 			<tr>
 				<td valign="top" align="center" style="height: 754px">
@@ -110,7 +122,7 @@
 							<tr>
 								<td style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
 									Таблица подчинений:
-								</td>
+								</td>							
 							</tr>
 							<tr>
 								<td>
