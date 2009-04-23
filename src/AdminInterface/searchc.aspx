@@ -40,7 +40,8 @@
 					</td>
 				</tr>
 				<tr>
-					<td>
+					<td style="text-align:right">
+						Тип клиента:
 					</td>
 					<td colspan="2" style="text-align:left;">
 						<asp:DropDownList ID="ClientType" runat="server">
@@ -48,13 +49,25 @@
 							<asp:ListItem>Аптеки</asp:ListItem>
 							<asp:ListItem>Поставщики</asp:ListItem>
 						</asp:DropDownList>
-						<br />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:right">
+						Состояние:
+					</td>
+					<td colspan="2" style="text-align:left;">
 						<asp:DropDownList ID="ClientState" runat="server">
 							<asp:ListItem>Все</asp:ListItem>
 							<asp:ListItem>Включен</asp:ListItem>
 							<asp:ListItem>Отключен</asp:ListItem>
 						</asp:DropDownList>
-						<br />
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align:right">
+						Регион:
+					</td>
+					<td colspan="2" style="text-align:left;">
 						<asp:DropDownList ID="ClientRegion" runat="server" DataTextField="Region" DataValueField="RegionCode">
 						</asp:DropDownList>
 					</td>
