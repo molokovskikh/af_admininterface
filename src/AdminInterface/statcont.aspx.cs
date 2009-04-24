@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -33,8 +34,10 @@ namespace AddUser
 		
 		private void ShowStatistic()
 		{
-			var _connection = new MySqlConnection(Literals.GetConnectionString());
-			var adapter = new MySqlDataAdapter(String.Format(@"
+			
+			var data = new DataSet();
+			With.Connection(c => {
+			                	var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  ci.WriteTime, 
         ci.UserName, 
         cd.ShortName, 
@@ -51,25 +54,13 @@ WHERE   ci.WriteTime BETWEEN ?FromDate AND ?ToDate
 			or ci.UserName like ?SearchText)
 		and cd.RegionCode & ?AdminMaskRegion > 0
 		{0}
-ORDER BY WriteTime DESC
-", SecurityContext.Administrator.GetClientFilterByType("cd")), _connection);
-			adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
-			adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
-			adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));
-			adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-			
-			var data = new DataSet();
-			try
-			{
-				_connection.Open();
-				adapter.SelectCommand.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.Fill(data);
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+ORDER BY WriteTime DESC", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
+			                	adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
+			                	adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
+			                	adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));
+			                	adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+			                	adapter.Fill(data);
+			                });
 			_view = data.Tables[0].DefaultView;
 			
 			StatisticGrid.DataSource = _view;
