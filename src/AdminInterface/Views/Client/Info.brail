@@ -107,6 +107,7 @@
 			<br />
 			<input type=submit value="Принять" />
 			<p>
+				<% if logs.Count > 0: %>
 				<table class="DataTable HighLightCurrentRow" style="text-align:left">
 					<tr>
 						<th>Дата</th>
@@ -121,6 +122,13 @@
 					</tr>
 					<% end %>
 				</table>
+				<% else: %>
+				<table class="DataTable">
+					<tr class="EmptyData">
+						<td>Сообщений нет.</td>
+					</tr>
+				</table>
+				<% end %>
 			</p>
 		</form>
 	</div>
