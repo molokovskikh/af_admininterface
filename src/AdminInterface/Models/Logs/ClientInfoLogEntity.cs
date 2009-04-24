@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
@@ -40,12 +41,9 @@ namespace AdminInterface.Models.Logs
 			return this;
 		}
 
-		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)
+		public bool IsStatusChange()
 		{
-			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
-			                                             	.For<ClientInfoLogEntity>()
-			                                             	.Add(Expression.Eq("ClientCode", client.Id))
-			                                             	.AddOrder(Order.Desc("WriteTime"))));
+			return Message.Contains("$$$Клиент ");
 		}
 
 		public static ClientInfoLogEntity PasswordChange(uint clientCode, bool isFree, string reason)
@@ -53,9 +51,22 @@ namespace AdminInterface.Models.Logs
 			return new ClientInfoLogEntity("", clientCode).SetProblem(isFree, reason);
 		}
 
+		public static ClientInfoLogEntity StatusChange(ClientStatus status, uint clientCode)
+		{
+			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", BindingHelper.GetDescription(status).ToLower()), clientCode);
+		}
+
 		public static ClientInfoLogEntity ReseteUin(uint clientCode, string reason)
 		{
 			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason), clientCode);
+		}
+
+		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)
+		{
+			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
+															.For<ClientInfoLogEntity>()
+															.Add(Expression.Eq("ClientCode", client.Id))
+															.AddOrder(Order.Desc("WriteTime"))));
 		}
 	}
 }

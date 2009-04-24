@@ -101,6 +101,8 @@ namespace AdminInterface.Controllers
 					var oldClient = Client.Find(client.FirmCode);
 					if (client.Status == ClientStatus.On && oldClient.Status == ClientStatus.Off)
 						Mailer.ClientBackToWork(oldClient);
+					if (oldClient.Status != client.Status)
+						ClientInfoLogEntity.StatusChange(client.Status, client.FirmCode).Save();
 					client.Update();
 				}
 			}
