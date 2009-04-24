@@ -97,7 +97,12 @@ namespace AdminInterface.Controllers
 			    DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
 			                                                                   Request.UserHostAddress);
 				foreach (var client in clients)
+				{
+					var oldClient = Client.Find(client.FirmCode);
+					if (client.Status == ClientStatus.On && oldClient.Status == ClientStatus.Off)
+						Mailer.ClientBackToWork(oldClient);
 					client.Update();
+				}
 			}
 			RedirectToAction("Edit", new {clientCode, tab = "payments"});
 		}

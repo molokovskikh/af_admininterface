@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Castle.ActiveRecord;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
@@ -33,6 +34,22 @@ limit 5")
 			                               		.AddEntity(typeof (ClientLogRecord))
 			                               		.SetParameter("ClientCode", clientCode)
 			                               		.List<ClientLogRecord>(), null);
+		}
+
+		public static ClientLogRecord LastOff(uint clientCode)
+		{
+			return (ClientLogRecord)Execute(
+											(session, instance) =>
+											session.CreateSQLQuery(@"
+select {ClientLogRecord.*}
+from logs.clients_data_logs {ClientLogRecord}
+where firmstatus = 0
+		and clientsdataId = :ClientCode
+order by logtime desc
+limit 1")
+												.AddEntity(typeof(ClientLogRecord))
+												.SetParameter("ClientCode", clientCode)
+												.UniqueResult(), null);
 		}
 	}
 }

@@ -6,7 +6,7 @@ namespace AdminInterface.Models
 	public class ClientWithStatus : ActiveRecordBase<ClientWithStatus>
 	{
 		[PrimaryKey]
-		public uint FirmCode { get; set; }
+		public virtual uint FirmCode { get; set; }
 
 		[Property("FirmStatus")]
 		public virtual ClientStatus Status { get; set; }

@@ -2,8 +2,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.DirectoryServices;
+using System.Web;
 using AdminInterface.Helpers;
-using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
@@ -186,13 +186,16 @@ namespace AdminInterface.Models.Security
 
 		public bool CreateUserInAd(string password)
 		{
-			var isLoginExists = ADHelper.IsLoginExists(UserName);
+			var entry = ADHelper.FindDirectoryEntry(UserName);
 
 			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
-			if (isLoginExists)
-			{
-				var entry = ADHelper.FindDirectoryEntry(UserName);
+			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
 
+			if (entry != null)
+			{
+				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
+				//установить pwdLastSet в текущую дату
+				entry.Properties["pwdLastSet"][0] = -1;
 				var member = entry.Properties["memberOf"]
 					.OfType<string>()
 					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
@@ -202,11 +205,12 @@ namespace AdminInterface.Models.Security
 					var adminGroup = new DirectoryEntry(adminGroupPath);
 					adminGroup.Invoke("Add", entry.Path);
 					adminGroup.CommitChanges();
-					entry.CommitChanges();
 				}
+				entry.MoveTo(root);
+				entry.CommitChanges();
 				return false;
 			}
-			var root = new DirectoryEntry("LDAP://OU=Региональные администраторы,OU=Управляющие,DC=adc,DC=analit,DC=net");
+
 			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
 			var adminGroup1 = new DirectoryEntry(adminGroupPath);
 			var user = root.Children.Add("CN=" + UserName, "user");
@@ -232,6 +236,16 @@ namespace AdminInterface.Models.Security
 		{
 			CheckClientHomeRegion(client.HomeRegion.Id);
 			CheckClientType(client.Type);
+		}
+
+		public override string ToString()
+		{
+			return UserName;
+		}
+
+		public string GetHost()
+		{
+			return HttpContext.Current.Request.UserHostAddress;
 		}
 	}
 }
