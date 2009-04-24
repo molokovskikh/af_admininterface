@@ -185,7 +185,29 @@ SET OrderRegionMask     = ?orderMask,
     ServiceClient           = ?ServiceClient, 
     OrdersVisualizationMode = ?OrdersVisualizationMode,
 	PriceCodeOnly			= ?PriceCodeOnly
-where clientcode=firmcode and firmcode=?clientCode";
+where clientcode=firmcode and firmcode=?clientCode; ";
+
+					var giveAnalitFPermission = false;
+					foreach (DataRow row in Data.Tables["Include"].Rows)
+					{
+						if (row.RowState != DataRowState.Modified)
+							break;
+
+						if (Convert.ToInt32(row["IncludeType", DataRowVersion.Original]) == (int) RelationshipType.Base
+							&& (Convert.ToInt32(row["IncludeType", DataRowVersion.Current]) == (int)RelationshipType.Network
+								|| Convert.ToInt32(row["IncludeType", DataRowVersion.Current]) == (int)RelationshipType.BasePlus))
+							giveAnalitFPermission = true;
+					}
+					if (giveAnalitFPermission)
+					{
+						updateCommand.CommandText += @"
+insert into Usersettings.AssignedPermissions(UserId, PermissionId)
+select ouar.RowId, up.Id
+from (Usersettings.Osuseraccessright ouar, Usersettings.UserPermissions up)
+  left join Usersettings.AssignedPermissions ap on ap.UserId = ouar.RowId
+where ouar.clientcode = 2575 and up.Shortcut = 'AF' and ap.UserId is null;
+";
+					}
 
 					var adapter = new MySqlDataAdapter();
 					adapter.InsertCommand =
