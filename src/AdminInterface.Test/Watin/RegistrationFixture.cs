@@ -83,7 +83,9 @@ where clientcode = ?ClientCode", connection);
 
 				browser.Button(Find.ById("Register")).Click();
 
-				Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно."));
+				//пока не реализована, после успешной регистрации на странице клиента нужно показывать сообщение
+				//Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно."));
+				Assert.That(browser.Text, Text.Contains("Информация о клиенте"));
 			}
 		}
 

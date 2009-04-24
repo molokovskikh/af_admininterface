@@ -26,7 +26,7 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void Try_to_update_general_info()
 		{
-			using (var browser = new IE(BuildTestUrl("Client/info.rails?cc=3616")))
+			using (var browser = new IE(BuildTestUrl("client/3616")))
 			{
 				browser.Input<Client>(client => client.FullName, "ТестерК2");
 				browser.Input<Client>(client => client.ShortName, "ТестерК2");
@@ -39,7 +39,7 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void Try_to_send_message()
 		{
-			using (var browser = new IE(BuildTestUrl("Client/info.rails?cc=3616")))
+			using (var browser = new IE(BuildTestUrl("client/3616")))
 			{
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 				browser.Button(Find.ByValue("Принять")).Click();
@@ -50,7 +50,7 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void Change_password()
 		{
-			using (var browser = new IE(BuildTestUrl("Client/info.rails?cc=3616")))
+			using (var browser = new IE(BuildTestUrl("client/3616")))
 			{
 				browser.Link(Find.ByText("KvasovT")).Click();
 				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля для клиента ТестерК2 [login: KvasovT]")))

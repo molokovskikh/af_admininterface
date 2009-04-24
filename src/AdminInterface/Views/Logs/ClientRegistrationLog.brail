@@ -129,7 +129,7 @@
 				${logEntity.RegistrationDate}
 			</td>
 			<td>
-				<a href="../Client/info.rails?cc=${logEntity.ClientCode}">${logEntity.ClientName}</a>
+				<a href="../Client/${logEntity.ClientCode}">${logEntity.ClientName}</a>
 			</td>
 			<% if logEntity.LastUpdateDate == null: %>
 				<td class="${"HaveOnlyNotCommitedUpdates" if logEntity.HaveOnlyNotCommitedUpdates()}">

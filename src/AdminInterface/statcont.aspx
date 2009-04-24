@@ -64,7 +64,7 @@
 				<Columns>
 					<asp:BoundField HeaderText="Дата" DataField="WriteTime" SortExpression="WriteTime" />
 					<asp:BoundField HeaderText="Оператор" DataField="UserName" SortExpression="UserName" />
-					<asp:HyperLinkField DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}" />
+					<asp:HyperLinkField DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/{0}" />
 					<asp:BoundField HeaderText="Регион" DataField="Region" SortExpression="Region" />
 					<asp:BoundField HeaderText="Сообщение" DataField="Message" SortExpression="Message" />
 				</Columns>

@@ -395,7 +395,7 @@ set @inUser = ?UserName;";
 			string redirectTo;
 			if (IsBasicClient())
 			{
-				redirectTo = String.Format("Client/info.rails?cc={0}", clientCode);
+				redirectTo = String.Format("client/{0}", clientCode);
 			}
 			else
 			{
@@ -410,7 +410,7 @@ set @inUser = ?UserName;";
 				else if (ShowRegistrationCard.Checked)
 					redirectTo = "report.aspx";
 				else
-					redirectTo = String.Format("Client/info.rails?cc={0}", clientCode);
+					redirectTo = String.Format("Client/{0}", clientCode);
 			}
 
 			if (sendBillingNotificationNow)

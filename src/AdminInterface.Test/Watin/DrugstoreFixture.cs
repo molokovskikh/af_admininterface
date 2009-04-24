@@ -75,7 +75,7 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void Try_to_view_orders()
 		{
-			using (var browser = new IE(BuildTestUrl("Client/info.rails?cc=2575")))
+			using (var browser = new IE(BuildTestUrl("Client/2575")))
 			{
 				browser.Link(l => l.Text == "История заказов").Click();
 				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Статистика заказов")))

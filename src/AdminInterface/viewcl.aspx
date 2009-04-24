@@ -24,7 +24,7 @@
 			onsorting="CLList_Sorting" >
                         <Columns>
 							<asp:BoundField DataField="RequestTime" HeaderText="Время" SortExpression="RequestTime" />
-							<asp:HyperLinkField DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/info.rails?cc={0}" DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" />
+							<asp:HyperLinkField DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/{0}" DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" />
 							<asp:BoundField DataField="Region" HeaderText="Регион" SortExpression="Region" />
 							<asp:BoundField DataField="AppVersion" HeaderText="Версия EXE" SortExpression="AppVersion" />
 							<asp:TemplateField HeaderText="Размер приготовленных данных" SortExpression="ResultSize">

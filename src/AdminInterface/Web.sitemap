@@ -3,7 +3,7 @@
   <siteMapNode url="default.aspx" title="Административный интерфейс" >
     <siteMapNode url="CopySynonym.aspx" title="Клонирование"  />
     <siteMapNode url="searchc.aspx" title="Информация о клиентах">
-      <siteMapNode url="client/info.rails" title="Информация о клиенте">
+      <siteMapNode url="client/" title="Информация о клиенте">
         <siteMapNode url="manageret.aspx" title="Настройка аптеки" />
         <siteMapNode url="managep.aspx" title="Настройка поставщика">
           <siteMapNode url="EditRegionalInfo.aspx" title="Информация о прайс листе" />

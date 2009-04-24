@@ -99,7 +99,7 @@
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" runat="server" 
 								Text='<%# Bind("ShortName") %>' 
-								NavigateUrl='<%# String.Format("Client/info.rails?cc={0}", Eval("bfc")) %>'></asp:HyperLink>
+								NavigateUrl='<%# String.Format("Client/{0}", Eval("bfc")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>

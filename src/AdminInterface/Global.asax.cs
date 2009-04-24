@@ -8,6 +8,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.MonoRail.Framework.Routing;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;
@@ -56,6 +57,11 @@ namespace AddUser
 				colection.AddFilter("HomeRegionFilter", "RegionCode & :AdminRegionMask > 0");
 				colection.AddFilter("DrugstoreOnlyFilter", "FirmType = 1");
 				colection.AddFilter("SupplierOnlyFilter", "FirmType = 0");
+
+				RoutingModuleEx.Engine.Add(new PatternRoute("/client/[cc]")
+				                           	.DefaultForController().Is("client")
+				                           	.DefaultForAction().Is("info")
+											.Restrict("cc").ValidInteger);
 			}
 			catch(Exception ex)
 			{
@@ -67,12 +73,12 @@ namespace AddUser
 		{
 			var currentNode = e.Provider.CurrentNode.Clone(true);
 			if (currentNode.Url.EndsWith("/manageret.aspx"))
-				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
+				currentNode.ParentNode.Url += e.Context.Request["cc"];
 			else if (currentNode.Url.EndsWith("/managep.aspx"))
-				currentNode.ParentNode.Url += "?cc=" + e.Context.Request["cc"];
+				currentNode.ParentNode.Url += e.Context.Request["cc"];
 			else if (currentNode.Url.EndsWith("/SenderProperties.aspx"))
 			{
-				uint firmcode;
+				uint firmCode;
 				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 				{
 					connection.Open();
@@ -82,10 +88,10 @@ from ordersendrules.order_send_rules osr
 where osr.id = ?ruleId
 ", connection);
 					command.Parameters.AddWithValue("?RuleId", e.Context.Request["RuleId"]);
-					firmcode = Convert.ToUInt32(command.ExecuteScalar());
+					firmCode = Convert.ToUInt32(command.ExecuteScalar());
 				}
-				currentNode.ParentNode.Url += "?cc=" + firmcode;
-				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmcode;
+				currentNode.ParentNode.Url += "?cc=" + firmCode;
+				currentNode.ParentNode.ParentNode.Url += firmCode;
 			}
 			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
 			{
@@ -100,8 +106,8 @@ WHERE RowID = ?Id", connection);
 					command.Parameters.AddWithValue("?Id", Convert.ToUInt32(e.Context.Request["id"]));
 					firmCode = Convert.ToUInt32(command.ExecuteScalar());
 				}
-				currentNode.ParentNode.Url += "?cc="+firmCode;
-				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmCode;
+				currentNode.ParentNode.Url += "?cc=" + firmCode;
+				currentNode.ParentNode.ParentNode.Url += firmCode;
 			}
 			else if (currentNode.Url.EndsWith("/managecosts.aspx"))
 			{
@@ -117,7 +123,7 @@ WHERE PriceCode = ?Id", connection);
 					firmCode = Convert.ToUInt32(command.ExecuteScalar());
 				}
 				currentNode.ParentNode.Url += "?cc=" + firmCode;
-				currentNode.ParentNode.ParentNode.Url += "?cc=" + firmCode;				
+				currentNode.ParentNode.ParentNode.Url += firmCode;				
 			}
 			return currentNode;
 		}
