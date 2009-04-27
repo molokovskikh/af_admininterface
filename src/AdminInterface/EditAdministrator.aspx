@@ -9,7 +9,8 @@
 			</h3>
 			<div>
 				<label class="LabelForInput" for="Login">
-					Login:</label>
+					Имя пользователя:
+				</label>
 				<asp:TextBox ID="Login" Text='<%# _current.UserName %>' runat="server"></asp:TextBox>
 				<asp:RequiredFieldValidator ID="LoginRequired" runat="server" ControlToValidate="Login"
 					ErrorMessage="*"></asp:RequiredFieldValidator>

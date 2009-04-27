@@ -28,7 +28,7 @@
 					</asp:TemplateField>					
 					<asp:BoundField DataField="Id" HeaderText="AdministratorID" Visible="False" />
 					<asp:BoundField DataField="ManagerName" HeaderText="ФИО" />
-					<asp:TemplateField HeaderText="Login" SortExpression="Login">
+					<asp:TemplateField HeaderText="Имя пользователя" SortExpression="Login">
 						<ItemTemplate>
 							<asp:LinkButton CommandArgument='<%# Bind("Id")%>' ID="LinkButton1" Text='<%# Bind("UserName")%>' runat="server" CommandName="Edit">LinkButton</asp:LinkButton>
 						</ItemTemplate>

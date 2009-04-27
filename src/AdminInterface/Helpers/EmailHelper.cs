@@ -34,7 +34,7 @@ namespace AdminInterface.Helpers
 		{
 			if (text == null)
 				return null;
-			return text.Trim('\r', '\n', '\t', ' ');
+			return text.Trim();
 		}
 	}
 }

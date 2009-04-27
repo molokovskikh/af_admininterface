@@ -55,12 +55,12 @@
 <table style="width:100%;" class="Test">
 	<tr>
 		<td class="Title" colspan="5">
-			Учетные записи пользователя
+			Пользователи
 		</td>
 	</tr>
 	<tr>
 		<td class="Title">
-			Имя учетной записи
+			Имя пользователя
 		</td>
 		<td class="Title">
 			Последний правильный ввод пароля

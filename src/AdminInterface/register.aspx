@@ -84,12 +84,12 @@
 							</div>
 							<div class="SimpleField">
 								<label for="LoginTB">
-									Login:
+									Имя пользователя:
 								</label>
 								<asp:TextBox ID="LoginTB" runat="server" />
 								<asp:CustomValidator ID="LoginValidator" 
 													runat="server" 
-													ErrorMessage="Поле «Login» должно быть заполнено"
+													ErrorMessage="Поле «Имя пользователя» должно быть заполнено"
 													ControlToValidate="LoginTB" 
 													OnServerValidate="LoginValidator_ServerValidate"
 													ValidationGroup="0" 
@@ -99,8 +99,8 @@
 								<asp:RegularExpressionValidator ID="LoginValidator1" 
 																runat="server" 
 																ControlToValidate="LoginTB"
-																ErrorMessage="Не корректный логин, логин может содержать буквы латинского алфавита, цифры и символ подчеркивания" 
-																ValidationExpression="\s*[a-z|0-9|_]+\s*"
+																ErrorMessage="Имя пользователя должно начинаться с латинской буквы, может содержать буквы латинского алфавита, цифры и символ подчеркивания, другие символы не допускаются." 
+																ValidationExpression="^\s*[a-z][a-z|0-9|_]+\s*$"
 																Display="None" 
 																ValidationGroup="0" />
 							</div>

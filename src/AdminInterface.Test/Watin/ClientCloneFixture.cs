@@ -53,7 +53,7 @@ namespace AdminInterface.Test.Watin
 			using (var browser = new IE(BuildTestUrl("client/3616")))
 			{
 				browser.Link(Find.ByText("KvasovT")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля для клиента ТестерК2 [login: KvasovT]")))
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля пользователя KvasovT [Клиент: ТестерК2]")))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.Button(Find.ByValue("Изменить")).Click();

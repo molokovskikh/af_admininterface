@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Security.AccessControl;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -281,12 +282,17 @@ set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			_command.ExecuteNonQuery();
 
+			var shortname = ShortNameTB.Text.Replace("№", "N");
+			var username = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
+			var password = Func.GeneratePassword();
+
 			_command.Parameters.AddWithValue("?MaskRegion", maskRegion);
 			_command.Parameters.AddWithValue("?OrderMask", orderMask);
 			_command.Parameters.AddWithValue("?ShowRegionMask", 0);
 			_command.Parameters.AddWithValue("?WorkMask", workMask);
 			_command.Parameters.AddWithValue("?fullname", FullNameTB.Text);
-			_command.Parameters.AddWithValue("?shortname", ShortNameTB.Text);
+			
+			_command.Parameters.AddWithValue("?shortname", shortname);
 			_command.Parameters.AddWithValue("?BeforeNamePrefix", "");
 			if (TypeDD.SelectedItem.Text == "Аптека")
 				_command.Parameters["?BeforeNamePrefix"].Value = "Аптека";
@@ -297,8 +303,6 @@ set @inUser = ?UserName;";
 			_command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
 			_command.Parameters.Add("?ClientCode", MySqlDbType.Int24);
 			_command.Parameters.AddWithValue("?AllowGetData", TypeDD.SelectedItem.Value);
-			var username = EmailHelper.NormalizeEmailOrPhone(LoginTB.Text).ToLower();
-			var password = Func.GeneratePassword();
 			_command.Parameters.AddWithValue("?OSUserName", username);
 			_command.Parameters.AddWithValue("?OSUserPass", password);
 			_command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
@@ -368,11 +372,11 @@ set @inUser = ?UserName;";
 			}
 
 			if (TypeDD.SelectedItem.Text == "Поставщик")
-				Mailer.SupplierRegistred(ShortNameTB.Text, RegionDD.SelectedItem.Text);
+				Mailer.SupplierRegistred(shortname, RegionDD.SelectedItem.Text);
 
 			NotificationHelper.NotifyAboutRegistration(
 				String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
-				String.Format("Оператор: {0}\nРегион: {1}\nLogin: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+				String.Format("Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
 							  SecurityContext.Administrator.UserName,
 							  RegionDD.SelectedItem.Text,
 							  username,
@@ -383,13 +387,13 @@ set @inUser = ?UserName;";
 			Session["DogN"] = billingCode;
 			Session["Code"] = clientCode;
 			Session["Name"] = FullNameTB.Text;
-			Session["ShortName"] = ShortNameTB.Text;
+			Session["ShortName"] = shortname;
 			Session["Login"] = username;
 			Session["Password"] = password;
 			Session["Tariff"] = TypeDD.SelectedItem.Text;
 			Session["Register"] = true;
 
-			SendClientCardIfNeeded(clientCode, billingCode, username, password);
+			SendClientCardIfNeeded(clientCode, billingCode, shortname, username, password);
 
 			var sendBillingNotificationNow = true;
 			string redirectTo;
@@ -417,7 +421,7 @@ set @inUser = ?UserName;";
 				new NotificationService()
 					.SendNotificationToBillingAboutClientRegistration(clientCode,
 																	  billingCode,
-																	  ShortNameTB.Text,
+																	  shortname,
 																	  SecurityContext.Administrator.UserName,
 																	  IncludeType.SelectedItem.Text,
 																	  null);
@@ -429,7 +433,11 @@ set @inUser = ?UserName;";
 			return (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый");
 		}
 
-		private void SendClientCardIfNeeded(uint clientCode, uint billingCode, string username, string password)
+		private void SendClientCardIfNeeded(uint clientCode,
+		                                    uint billingCode,
+		                                    string shortname,
+		                                    string username,
+		                                    string password)
 		{
 			if (!SendRegistrationCard.Checked)
 				return;
@@ -447,7 +455,7 @@ set @inUser = ?UserName;";
 
 			var smtpid = ReportHelper.SendClientCard(clientCode,
 			                                         billingCode,
-			                                         ShortNameTB.Text,
+			                                         shortname,
 			                                         FullNameTB.Text,
 			                                         TypeDD.SelectedItem.Text,
 			                                         username,
@@ -1000,38 +1008,47 @@ ORDER BY region;
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			if (!IsBasicClient())
-			{
-				args.IsValid = args.Value.Length > 0;
+			var message = ValidateLogin(args.Value);
 
-				if (args.IsValid)
-				{
-					var existsInDataBase = false;
-					With.Connection(c => {
-					                	existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + args.Value + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
-					                });
-					
-					_connection.Close();
-					var existsInActiveDirectory = ADHelper.IsLoginExists(args.Value);
-					args.IsValid = !(existsInActiveDirectory || existsInDataBase);
-					if (existsInActiveDirectory || existsInDataBase)
-					{
-						args.IsValid = false;
-						LoginValidator.ErrorMessage = String.Format("Учетное имя '{0}' существует в системе.", args.Value);
-					}					
-				}
-				else
-				{
-					LoginValidator.ErrorMessage = "Поле «Login» должно быть заполнено";
-				}
+			if (String.IsNullOrEmpty(message))
+			{
+				args.IsValid = true;
+				LoginValidator.Visible = false;
 			}
 			else
-				args.IsValid = true;
-
-			if (args.IsValid)
-				LoginValidator.Visible = false;
-			else
+			{
+				args.IsValid = false;
 				LoginValidator.Visible = true;
+				LoginValidator.ErrorMessage = message;
+			}
+		}
+
+		public string ValidateLogin(string login)
+		{
+			if (IsBasicClient())
+				return null;
+
+			if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(login.Trim()))
+				return "Поле «Имя пользователя» должно быть заполнено";
+
+			var match = new Regex(@"^\s*[a-z|0-9|_]+\s*$").Match(login);
+			if (!match.Success)
+				return "Имя пользователя должно начинаться с буквы";
+
+			match = new Regex(@"^\s*[a-z|0-9|_]+\s*$").Match(login);
+			if (!match.Success)
+				return "Имя пользователя может содержать буквы латинского алфавита, цифры и символ подчеркивания, другие символы не допускаются";
+			
+			var existsInDataBase = false;
+			With.Connection(c => {
+			                	existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + login + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
+			                });
+					
+			var existsInActiveDirectory = ADHelper.IsLoginExists(login);
+			if (existsInActiveDirectory || existsInDataBase)
+				return String.Format("Имя пользователя '{0}' существует в системе.", login);
+
+			return null;
 		}
 
 		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)
@@ -1070,7 +1087,7 @@ ORDER BY region;
 
 		private static object CreateContactsForBilling(MySqlConnection connection)
 		{
-			object contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
+			var contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
 			CreateContactGroup(ContactGroupType.Billing,
 			                   null,
 			                   null,
@@ -1087,8 +1104,8 @@ ORDER BY region;
 		                                       MySqlConnection connection,
 		                                       object contactGroupOwnerId)
 		{
-			MySqlCommand innerCommand = connection.CreateCommand();
-			object contactGroupID = GetNewContactsOwnerId(connection);
+			var innerCommand = connection.CreateCommand();
+			var contactGroupID = GetNewContactsOwnerId(connection);
 			innerCommand.CommandText =
 				@"
 insert into contacts.contact_groups(Id, Name, Type, ContactGroupOwnerId) 
@@ -1136,7 +1153,7 @@ values(?Id, ?Name, ?ContactGroupId);";
 
 		private static object GetNewContactsOwnerId(MySqlConnection connection)
 		{
-			MySqlCommand command = connection.CreateCommand();
+			var command = connection.CreateCommand();
 			command.CommandText = @"
 insert into contacts.contact_owners values();
 select Last_Insert_ID();";
@@ -1145,7 +1162,7 @@ select Last_Insert_ID();";
 
 		private static object GetNewContactsGroupOwnerId(MySqlConnection connection)
 		{
-			MySqlCommand innerCommand = connection.CreateCommand();
+			var innerCommand = connection.CreateCommand();
 			innerCommand.CommandText = @"
 insert into contacts.contact_group_owners values();
 select Last_Insert_ID();";

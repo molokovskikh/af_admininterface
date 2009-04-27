@@ -31,7 +31,7 @@
 							<asp:ListItem Value="ShortName">Имя</asp:ListItem>
 							<asp:ListItem Value="Code">ID</asp:ListItem>
 							<asp:ListItem Value="BillingCode">Billing ID</asp:ListItem>
-							<asp:ListItem Value="Login">Логин</asp:ListItem>
+							<asp:ListItem Value="Login">Имя пользователя</asp:ListItem>
 							<asp:ListItem Value="JuridicalName">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
 					</td>
@@ -141,15 +141,15 @@
 					</tr>
 					<tr>
 						<td class="DisabledLogin"></td>
-						<td> - Учетная запись отключена</td>
+						<td> - Пользователь отключен</td>
 					</tr>
 					<tr>
 						<td class="BlockedLogin"></td>
-						<td> - Учетная запись заблокирована</td>
+						<td> - Пользователь заблокирован</td>
 					</tr>
 					<tr>
 						<td class="LoginNotExists"></td>
-						<td> - Учетной записи не существует</td>
+						<td> - Пользователь удален</td>
 					</tr>
 					<tr>
 						<td class="not-base-client"></td>

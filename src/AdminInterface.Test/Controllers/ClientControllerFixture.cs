@@ -62,7 +62,7 @@ namespace AdminInterface.Test.Controllers
 				{
 					if (!(ex is LoginNotFoundException))
 						throw;
-					Assert.That(ex.Message, Is.EqualTo(String.Format("Учетная запись {0} не найдена", login)));
+					Assert.That(ex.Message, Is.EqualTo(String.Format("Пользователь с именем {0} не найден", login)));
 				}
 
 				try
@@ -74,7 +74,7 @@ namespace AdminInterface.Test.Controllers
 				{
 					if (!(ex is LoginNotFoundException))
 						throw;
-					Assert.That(ex.Message, Is.EqualTo(String.Format("Учетная запись {0} не найдена", login)));
+					Assert.That(ex.Message, Is.EqualTo(String.Format("Пользователь с именем {0} не найден", login)));
 				}
 			}
 		}
