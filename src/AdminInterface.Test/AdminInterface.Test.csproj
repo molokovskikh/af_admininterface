@@ -143,6 +143,7 @@
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />
     <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
+    <Compile Include="Models\OrdersViewFixture.cs" />
     <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />

@@ -9,5 +9,13 @@ namespace AdminInterface.Extentions
 		{
 			return BindingHelper.GetDescription(enumValue);
 		}
+
+		public static object IfDbNull(this object value, object newValue)
+		{
+			if (value == DBNull.Value)
+				return newValue;
+			return value;
+		}
+
 	}
 }

@@ -93,6 +93,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.dll</HintPath>
     </Reference>
+    <Reference Include="RemotePriceProcessor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b87fa865681cc1c6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\RemotePriceProcessor.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core, Version=3.5.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -126,6 +130,7 @@
   <ItemGroup>
     <Compile Include="Components\Bubble.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
+    <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Offer.cs" />
+    <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
@@ -437,6 +443,7 @@
     <None Include="Views\Client\SuccessPasswordChanged.brail" />
     <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Monitoring\UpdatingClients.brail" />
+    <None Include="Views\Orders\Show.brail" />
     <None Include="Views\Report\Act.brail" />
     <None Include="Views\Report\Bill.brail" />
     <None Include="Views\Report\Contract.brail" />

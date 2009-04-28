@@ -6,12 +6,26 @@ using System.ServiceProcess;
 using AddUser;
 using ConsoleApplication11.ServiceReference2;
 using log4net;
+using RemotePricePricessor;
 
 namespace AdminInterface.Helpers
 {
 	public class RemoteServiceHelper
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (RemoteServiceHelper));
+
+		public static void RemotingCall(Action<IRemotePriceProcessor> action)
+		{
+			try
+			{
+				var priceProcessor = (IRemotePriceProcessor)Activator.GetObject(typeof(IRemotePriceProcessor), "http://fms.adc.analit.net:888/RemotePriceProcessor");
+				action(priceProcessor);
+			}
+			catch (Exception e)
+			{
+				_log.Warn("Ошибка при обращении к сервису обработки прайс листов", e);
+			}
+		}
 
 		public static void TryDoCall(Action<StatisticServiceClient> action)
 		{

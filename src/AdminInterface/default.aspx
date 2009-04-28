@@ -25,9 +25,35 @@
 			font-family: Verdana, Arial, Helvetica, sans-serif;
 			font-size: small;
 		}
+		
+		.statistic-top-header
+		{
+			background-color: #eef8ff;
+			padding: 10px 0 10px 0;
+		}
+		
+		.statistic-header
+		{
+			background-color:#dadada;
+			font-weight:bold;
+			text-align:center;
+		}
+		
+		.statistic-label
+		{
+			background-color:#d8f1ff;
+			text-align:right;
+		}
+		
+		.statistic-value
+		{
+			background-color:#d8f1ff;
+			font-weight:bold;
+			text-align: center;
+		}
 	</style>
 </head>
-<body vlink="#ab51cc" alink="#0093e1" link="#0093e1" bgcolor="#ffffff">
+<body>
 	<form id="Form1" method="post" runat="server">
 		<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 			<tr>
@@ -121,166 +147,145 @@
 					<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" width="69%"
 						border="0">
 						<tr>
-							<td bgcolor="#eef8ff" colspan="4" height="30">
-								<p align="center">
-									<strong><font face="Verdana" size="2">Статистика:</font></strong></p>
+							<td class="statistic-top-header" colspan=4>
+								Статистика:
 							</td>
 						</tr>
 						<tr>
-							<td align="center" bgcolor="#dadada" colspan="4" height="20">
-								<font face="Verdana" size="2"><strong>Обновления:</strong></font></td>
+							<td class="statistic-header" colspan=4>
+								Обновления:
+							</td>
 						</tr>
 						<tr>
-							<td style="height: 18px; width: 229px;" align="right" bgcolor="#d8f1ff">
-								<font face="Verdana" size="2">Приготовлено обычных:&nbsp;</font>
+							<td class="statistic-label">
+								Приготовлено обычных:
 							</td>
-							<td style="width: 76px; height: 18px" bgcolor="#d8f1ff" height="18">
-								<asp:HyperLink ID="ConfHL" runat="server" Enabled="False"
-									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
-							<td style="height: 18px" align="right" bgcolor="#d8f1ff" height="18">
-								<font face="Verdana" size="2">В процессе:</font></td>
-							<td style="height: 18px; width: 58px;" bgcolor="#d8f1ff" height="18">
-								<asp:HyperLink ID="ReqHL" runat="server" NavigateUrl="./Monitoring/UpdatingClients.rails" Enabled="False"
-									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>
+							<td class="statistic-value">
+								<asp:HyperLink ID="ConfHL" runat="server" Enabled="False">-</asp:HyperLink>
+							</td>
+							<td class="statistic-label">
+								В процессе:
+							</td>
+							<td class="statistic-value">
+								<asp:HyperLink ID="ReqHL" runat="server" NavigateUrl="./Monitoring/UpdatingClients.rails" Enabled="False">-</asp:HyperLink>
+							</td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
-								<font face="Verdana" size="2">Приготовлено КО:</font></td>
-							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
-								<asp:HyperLink ID="CUHL" runat="server" Enabled="False"
-									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True"></asp:HyperLink></td>
-							<td style="height: 19px" align="right" bgcolor="#d8f1ff">
-								<font face="Verdana" size="2">Запретов:</font></td>
-							<td style="height: 19px; width: 58px;" bgcolor="#d8f1ff" height="19">
-								<asp:HyperLink ID="ADHL" runat="server" Enabled="False"
-									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink></td>							<td>
+							<td class="statistic-label">
+								Приготовлено КО:
+							</td>
+							<td class="statistic-value">
+								<asp:HyperLink ID="CUHL" runat="server" Enabled="False">-</asp:HyperLink>
+							</td>
+							<td class="statistic-label">
+								Запретов:
+							</td>
+							<td class="statistic-value">
+								<asp:HyperLink ID="ADHL" runat="server" Enabled="False">-</asp:HyperLink>
+							</td>
 						</tr>
 						<tr>
-							<td style="height: 19px; width: 229px;" align="right" bgcolor="#d8f1ff">
-								<font face="Verdana" size="2">Ошибок:</font>
+							<td class="statistic-label">
+								Ошибок:
 							</td>
-							<td style="width: 76px; text-align: center;" bgcolor="#d8f1ff" height="19">
-								<asp:HyperLink ID="ErrUpHL" runat="server" Enabled="False"
-									Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:HyperLink>
+							<td class="statistic-value">
+								<asp:HyperLink ID="ErrUpHL" runat="server" Enabled="False">-</asp:HyperLink>
 							</td>
-							<td class="StatisticData">
+							<td class="statistic-label">
 								Загруженно данных:
 							</td>
-							<td class="StatisticData">
+							<td class="statistic-value">
 								<asp:Label runat="server" ID="DownloadDataSize" />
 							</td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
-								<font face="Verdana" size="2">Последнее обновление:</font></td>
-							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
-								<asp:Label ID="MaxUpdateTime" runat="server" Enabled="False" Font-Size="8pt" Font-Names="Verdana"
-									Font-Bold="True">-</asp:Label></td>
-							<td class="StatisticData">
+							<td class="statistic-label">
+								Последнее обновление:
+							</td>
+							<td class="statistic-value">
+								<asp:Label ID="MaxUpdateTime" runat="server" Enabled="False">-</asp:Label>
+							</td>
+							<td class="statistic-label">
 								Загружено документов:
 							</td>
-							<td class="StatisticData">
+							<td class="statistic-value">
 								<asp:Label runat="server" ID="DownloadDocumentSize" />
 							</td>
 						</tr>
 						<tr>
-							<td align="center" bgcolor="#dadada" colspan="4" height="20">
-								<font face="Verdana" size="2"><strong>Заказы:</strong></font></td>
-						</tr>
-						<tr>
-							<td align="right" bgcolor="#ebebeb" style="width: 229px; height: 19px;">
-								<font face="Verdana" size="2">Очередь:</font>
-							</td>
-							<td style="width: 76px; height: 19px;" bgcolor="#ebebeb">
-								<asp:Label ID="OprLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
-							</td>
-							<td align="right" bgcolor="#ebebeb" style="width: 229px">
-								<font face="Verdana" size="2">Принято:</font>
-							</td>
-							<td style="width: 76px" bgcolor="#ebebeb" height="20">
-								<asp:Label ID="OPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							<td class="statistic-header" colspan=4>
+								Заказы:
 							</td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#ebebeb" style="width: 229px">
-								<font face="Verdana" size="2">Последний заказ:</font>
+							<td class="statistic-label">
+								Очередь:
 							</td>
-							<td style="width: 76px" bgcolor="#ebebeb" height="20">
-								<asp:Label ID="LOT" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
+							<td class="statistic-value">
+								<asp:HyperLink ID="OprLB" runat=server Enabled=false NavigateUrl="Orders/" Target=_blank>-</asp:HyperLink>
 							</td>
-							<td align="right" bgcolor="#ebebeb" height="20">
-								<font face="Verdana" size="2">Сумма:</font>
+							<td class="statistic-label">
+								Принято:
 							</td>
-							<td bgcolor="#ebebeb" height="20" style="width: 58px">
-								<asp:Label ID="SumLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label>
-							</td>
-						</tr>
-						<tr>
-							<td bgcolor="#dadada" colspan="4" height="20">
-								<p align="center">
-									<font face="Verdana" size="2"><strong>Прайсы:</strong></font>
-								</p>
+							<td class="statistic-value">
+								<asp:Label ID="OPLB" runat="server">-</asp:Label>
 							</td>
 						</tr>
 						<tr>
-							<td style="height: 20px; width: 229px;" align="right" bgcolor="#d8f1ff">
-								<font face="Verdana" size="2">Получено:</font></td>
-							<td style="width: 76px; height: 20px" bgcolor="#d8f1ff" height="20">
-								<asp:Label ID="PriceDOKLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td style="height: 20px" align="right" bgcolor="#d8f1ff" height="20">
-								<font face="Verdana" size="2">Не опознано:</font></td>
-							<td style="height: 20px; width: 58px;" bgcolor="#d8f1ff" height="20">
+							<td class="statistic-label">
+								Последний заказ:
+							</td>
+							<td class="statistic-value">
+								<asp:Label ID="LOT" runat="server">-</asp:Label>
+							</td>
+							<td class="statistic-label">
+								Сумма:
+							</td>
+							<td class="statistic-value">
+								<asp:Label ID="SumLB" runat="server">-</asp:Label>
 							</td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
-								<font face="Verdana" size="2">Последнее получение:</font></td>
-							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
-								<asp:Label ID="DownPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td align="right" bgcolor="#d8f1ff" height="20">
-								<font face="Verdana" size="2">Не получено:</font></td>
-							<td bgcolor="#d8f1ff" height="20" style="width: 58px">
+							<td class="statistic-header" colspan=4>
+								Прайсы:
 							</td>
 						</tr>
 						<tr>
-							<td align="right" bgcolor="#d8f1ff" style="width: 229px">
-								<font face="Verdana" size="2">Формализовано:</font></td>
-							<td style="width: 76px" bgcolor="#d8f1ff" height="20">
-								<asp:Label ID="PriceFOKLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td align="right" bgcolor="#d8f1ff" height="20">
-								<font face="Verdana" size="2">Не формализовано:</font></td>
-							<td bgcolor="#d8f1ff" height="20" style="width: 58px">
+							<td class="statistic-label" colspan=2>Очередь формализации:</td>
+							<td class="statistic-value" colspan=2>
+								<asp:Label ID="FormalizationQueue" runat=server Enabled=false NavigateUrl="Orders/">-</asp:Label>
 							</td>
 						</tr>
 						<tr>
-							<td style="height: 19px; width: 229px;" align="right" bgcolor="#d8f1ff">
-								<font face="Verdana" size="2">Последняя формализация:</font>
-							</td>
-							<td style="width: 76px; height: 19px" bgcolor="#d8f1ff" height="19">
-								<asp:Label ID="FormPLB" runat="server" Font-Size="8pt" Font-Names="Verdana" Font-Bold="True">-</asp:Label></td>
-							<td style="height: 19px" align="right" bgcolor="#d8f1ff" height="19">
-								<font face="Verdana" size="2"><font face="Verdana" size="2">Очередь формализации:</font></font></td>
-							<td style="height: 19px; width: 58px;" bgcolor="#d8f1ff" height="19">
-							</td>
+							<td class="statistic-label">Загружено:</td>
+							<td class="statistic-value"><asp:Label ID="PriceDOKLB" runat="server">-</asp:Label></td>
+							<td class="statistic-label">Последняя загрузка:</td>
+							<td class="statistic-value"><asp:Label ID="DownPLB" runat="server">-</asp:Label></td>
 						</tr>
 						<tr>
-							<td colspan="4" style="text-align:center; background-color:#dadada; font-size: 2; font-weight:bold;">Службы:</td>
-						</tr>
-						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Обработки заказов:</td>
-							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="OrderProcStatus" /></td>
-						</tr>
-						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Обработки прайс листов (Master):</td>
-							<td style="text-align:left" colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
-						</tr>
-						<tr style="background-color:#d8f1ff; height:19px;">
-							<td style="text-align:right">Обработки прайс листов (Slave):</td>
-							<td style="text-align:left" colspan="3"><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
+							<td class="statistic-label">Формализовано:</td>
+							<td class="statistic-value"><asp:Label ID="PriceFOKLB" runat="server">-</asp:Label></td>
+							<td class="statistic-label">Последняя формализация:</td>
+							<td class="statistic-value"><asp:Label ID="FormPLB" runat="server" >-</asp:Label></td>
 						</tr>
 						<tr>
-							<td style="height: 19px" align="center" bgcolor="#eef8ff" colspan="4">
-								<font face="Verdana" size="2">В скобках указанно количество уникальных клиентов.</font>
+							<td colspan="4" class="statistic-header">Службы:</td>
+						</tr>
+						<tr>
+							<td class="statistic-label">Обработки заказов:</td>
+							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="OrderProcStatus" /></td>
+						</tr>
+						<tr>
+							<td class="statistic-label">Обработки прайс листов (Master):</td>
+							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
+						</tr>
+						<tr>
+							<td class="statistic-label">Обработки прайс листов (Slave):</td>
+							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
+						</tr>
+						<tr>
+							<td class="statistic-top-header" colspan=4>
+								В скобках указанно количество уникальных клиентов.
 							</td>
 						</tr>
 					</table>
@@ -288,7 +293,8 @@
 			</tr>
 		</table>
 		<p>
-			<asp:Label ID="PassLB" runat="server" Font-Size="9pt" Font-Names="Verdana"></asp:Label></p>
+			<asp:Label ID="PassLB" runat="server" Font-Size="9pt" Font-Names="Verdana"></asp:Label>
+		</p>
 	</form>
 </body>
 </html>

@@ -1,0 +1,36 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Очередь заказов к отправке
+<% end %>
+
+<h3>
+	Очередь заказов к отправке
+</h3>
+
+<% if orders.Count == 0: %>
+<table class="DataTable">
+	<tr class="EmptyData"><td>Нет заказов в очереди</td></tr>
+</table>
+<% else: %>
+<table class="DataTable">
+	<tr>
+		<th>№</th>
+		<th>Дата заказа</th>
+		<th>Дата прайса</th>
+		<th>Аптека</th>
+		<th>Поставщик</th>
+		<th>Прайс</th>
+		<th>Позиций</th>
+	</tr>
+	<% for i, order in enumerate(orders): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${order.Id}</td>
+		<td>${order.WriteTime}</td>
+		<td>${order.PriceDate}</td>
+		<td>${order.Customer}</td>
+		<td>${order.Supplier}</td>
+		<td>${order.PriceName}</td>
+		<td>${order.RowCount}</td>
+	</tr>
+	<% end %>
+</table>
+<% end %>

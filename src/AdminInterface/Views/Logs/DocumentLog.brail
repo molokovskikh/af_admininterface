@@ -1,15 +1,4 @@
-﻿<% 
-	[Html]
-	def WriteAddition(log) as string:
-		if log.Addition == null:
-			return ""
-		else:
-			return log.Addition
-		end
-	end
-%>
-
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Статистика получения\отправки документов клиента ${client.ShortName}
 <% end %>
 
@@ -21,9 +10,7 @@
 	Статистика получения\отправки документов клиента ${client.ShortName}
 </div>
 
-<% 
-	OutputSubView("SelectDateIntervalSubView")
-%>
+<% OutputSubView("SelectDateIntervalSubView") %>
 
 <div>
 
@@ -108,7 +95,7 @@
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
 			</td>
 			<td>
-				<pre>${WriteAddition(logEntity)}</pre>
+				<pre>!{WriteAddition(logEntity)}</pre>
 			</td>
 		</tr>
 	<%		

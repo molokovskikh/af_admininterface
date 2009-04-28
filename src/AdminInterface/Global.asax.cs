@@ -62,6 +62,10 @@ namespace AddUser
 				                           	.DefaultForController().Is("client")
 				                           	.DefaultForAction().Is("info")
 											.Restrict("cc").ValidInteger);
+
+				RoutingModuleEx.Engine.Add(new PatternRoute("/orders/")
+				                           	.DefaultForController().Is("orders")
+				                           	.DefaultForAction().Is("show"));
 			}
 			catch(Exception ex)
 			{
