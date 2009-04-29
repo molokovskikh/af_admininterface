@@ -410,13 +410,13 @@ namespace AdminInterface {
         protected global::System.Web.UI.WebControls.CheckBox CheckBox1;
         
         /// <summary>
-        /// WorkRegionLable control.
+        /// OrderRegionsLabel control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableCell WorkRegionLable;
+        protected global::System.Web.UI.HtmlControls.HtmlTableCell OrderRegionsLabel;
         
         /// <summary>
         /// WRList control.
@@ -426,24 +426,6 @@ namespace AdminInterface {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBoxList WRList;
-        
-        /// <summary>
-        /// WorkRegion control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlTableCell WorkRegion;
-        
-        /// <summary>
-        /// WRList2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList WRList2;
         
         /// <summary>
         /// OrderList control.

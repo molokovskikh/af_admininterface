@@ -222,20 +222,13 @@
 							<td style="height: 18px">
 								<strong>Доступные регионы:</strong>
 							</td>
-							<td id="WorkRegionLable" runat="server" visible="false" style="height: 18px">
-								<strong>Регионы работы:</strong>
-							</td>
-							<td style="height: 18px">
+							<td id="OrderRegionsLabel" runat=server style="height: 18px">
 								<strong>Регионы заказа:</strong>
 							</td>
 						</tr>
 						<tr>
 							<td>
 								<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
-									DataTextField="Region" DataValueField="RegionCode" />
-							</td>
-							<td id="WorkRegion" runat="server" visible="false">
-								<asp:CheckBoxList ID="WRList2" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
 									DataTextField="Region" DataValueField="RegionCode" />
 							</td>
 							<td>

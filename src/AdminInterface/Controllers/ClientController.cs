@@ -105,9 +105,7 @@ namespace AdminInterface.Controllers
 			var user = User.GetById(userId);
 			var client = user.Client;
 
-			SecurityContext.Administrator
-				.CheckClientHomeRegion(client.HomeRegion.Id)
-				.CheckClientType(client.Type);
+			SecurityContext.Administrator.CheckClientPermission(client);
 			
 			user.CheckLogin();
 

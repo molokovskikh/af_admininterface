@@ -51,10 +51,10 @@ namespace AdminInterface.Models
 		public void CheckLogin()
 		{
 			if (!ADHelper.IsLoginExists(Login))
-				throw new LoginNotFoundException(String.Format("Учетная запись {0} не найдена", Login));
+				throw new LoginNotFoundException(String.Format("Пользователь {0} не найден", Login));
 
 			if (ADHelper.IsBelongsToOfficeContainer(Login))
-				throw new CantChangePassword(String.Format("Не возможно изменить пароль для учетной записи {0} поскольку она принадлежит пользователю из офиса", Login));
+				throw new CantChangePassword("Запрещено изменять пароль для пользователей из офиса.");
 		}
 
 		public override string ToString()
