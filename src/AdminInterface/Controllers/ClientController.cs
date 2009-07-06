@@ -210,7 +210,12 @@ namespace AdminInterface.Controllers
 
 			try
 			{
-				File.Delete(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", client.Id));
+				foreach (var user in client.GetUsers())
+				{
+					var file = String.Format(@"U:\wwwroot\ios\Results\{0}.zip", user.Id);
+					if (File.Exists(file))
+						File.Delete(file);
+				}
 				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
 			}
 			catch

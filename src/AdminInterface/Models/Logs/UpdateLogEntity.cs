@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -27,9 +28,6 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public string AppVersion { get; set; }
-
-		[Property]
-		public string DbVersion { get; set; }
 
 		[Property]
 		public UpdateType UpdateType { get; set; }
@@ -65,12 +63,14 @@ namespace AdminInterface.Models.Logs
 		                                                           DateTime endDate)
 		{
 			var client = Client.Find(clientCode);
-			return ArHelper.WithSession(
+			var u = ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
-							.Add(Expression.InG("User", client.Users))
+							.Add(Expression.InG("User", client.GetUsers().ToList()))
 				           	.Add(Expression.Between("RequestTime", beginDate, endDate))
 				           	.AddOrder(Order.Desc("RequestTime"))
 				           	.List<UpdateLogEntity>());
+			Console.Write(u.Count);
+			return u;
 		}
 	}
 }

@@ -84,16 +84,16 @@
 	
 		<tr>
 			<th>
+				Пользователь
+			</th>
+			<th>
 				Дата
 			</th>
 			<th>
 				Тип обновления
 			</th>
 			<th>
-				Версия EXE
-			</th>
-			<th>
-				Версия базы
+				Версия
 			</th>
 			<th>
 				Размер приготовленных данных
@@ -117,6 +117,9 @@
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
 			<td style="${requestTimeStyle};width:1%;">
+				${logEntity.User.Login}
+			</td>
+			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.RequestTime}
 			</td>
 			<td>
@@ -130,9 +133,6 @@
 			</td>
 			<td>
 				${logEntity.AppVersion}
-			</td>
-			<td>	
-				${logEntity.DbVersion}
 			</td>
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}

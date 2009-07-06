@@ -280,7 +280,13 @@ group by ouar.clientcode")
 
 		public bool HavePreparedData()
 		{
-			return File.Exists(String.Format(@"U:\wwwroot\ios\Results\{0}.zip", Id));
+			foreach (var user in GetUsers())
+			{
+				var file = String.Format(@"U:\wwwroot\ios\Results\{0}.zip", user.Id);
+				if (File.Exists(file))
+					return true;
+			}
+			return false;
 		}
 	}
 }

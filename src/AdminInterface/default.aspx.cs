@@ -217,7 +217,6 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 #if !DEBUG
 			OrderProcStatus.Text = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
 			PriceProcessorMasterStatus.Text = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
-			PriceProcessorSlaveStatus.Text = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fmsold.adc.analit.net", "PriceProcessorService"));
 #endif
 
 			DownloadDataSize.Text = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DataSize"]));

@@ -50,6 +50,7 @@
 			background-color:#d8f1ff;
 			font-weight:bold;
 			text-align: center;
+			font-size: 8pt;
 		}
 	</style>
 </head>
@@ -222,7 +223,7 @@
 								Очередь:
 							</td>
 							<td class="statistic-value">
-								<asp:HyperLink ID="OprLB" runat=server Enabled=false NavigateUrl="Orders/" Target=_blank>-</asp:HyperLink>
+								<asp:HyperLink ID="OprLB" runat=server Enabled=false NavigateUrl="Orders/show.rails" Target=_blank>-</asp:HyperLink>
 							</td>
 							<td class="statistic-label">
 								Принято:
@@ -276,12 +277,8 @@
 							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="OrderProcStatus" /></td>
 						</tr>
 						<tr>
-							<td class="statistic-label">Обработки прайс листов (Master):</td>
+							<td class="statistic-label">Обработки прайс листов:</td>
 							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="PriceProcessorMasterStatus" /></td>
-						</tr>
-						<tr>
-							<td class="statistic-label">Обработки прайс листов (Slave):</td>
-							<td class="statistic-value" colspan=3><asp:Label runat="server" ID="PriceProcessorSlaveStatus" /></td>
 						</tr>
 						<tr>
 							<td class="statistic-top-header" colspan=4>
