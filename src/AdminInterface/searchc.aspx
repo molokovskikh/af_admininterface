@@ -114,7 +114,7 @@
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="EXE" HeaderText="EXE" SortExpression="EXE"></asp:BoundField>
-					<asp:BoundField DataField="UserName" HeaderText="Login" SortExpression="UserName" />
+					<asp:BoundField DataField="UserName" HeaderText="Имя пользователя" SortExpression="UserName" />
 					<asp:TemplateField HeaderText="Сегмент" SortExpression="FirmSegment">
 						<ItemTemplate>
 							<asp:Label ID="Label3" runat="server" Text='<%# Eval("FirmSegment").ToString() == "0" ? "Опт" : "Справка" %>'></asp:Label>
