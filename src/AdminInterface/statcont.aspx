@@ -1,13 +1,7 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.statcont" CodePage="1251"
-	Theme="Main" CodeBehind="statcont.aspx.cs" %>
+	Theme="Main" CodeBehind="statcont.aspx.cs" MasterPageFile="~/Main.Master" %>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head runat="server">
-	<title>Статистика обращений</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251" />
-</head>
-<body>
+<asp:Content ID="Content1" runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<form id="Form1" method="post" runat="server" defaultbutton="Button1">
 		<div align="center">
 			<table id="Table2" cellspacing="0" cellpadding="0" width="320" align="center" border="0">
@@ -71,5 +65,4 @@
 			</asp:GridView>
 		</p>
 	</form>
-</body>
-</html>
+</asp:Content>
