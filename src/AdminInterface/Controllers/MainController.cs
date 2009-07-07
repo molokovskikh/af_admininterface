@@ -155,7 +155,7 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			PropertyBag["PriceProcessorMasterStatus"] = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
 
 			PropertyBag["DownloadDataSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DataSize"]));
-			PropertyBag["DownloadDataSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DocSize"]));
+			PropertyBag["DownloadDocumentSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DocSize"]));
 			//прайсы
 			//Последняя формализация
 			PropertyBag["FormPLB"] = Convert.ToDateTime(data.Tables[1].Rows[0]["LastForm"]).ToLongTimeString();
