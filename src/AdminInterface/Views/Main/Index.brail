@@ -45,7 +45,7 @@
 	}
 </style>
 <%
-uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate}&RegionMask=${RegionMask}"
+uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}"
 %>
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
