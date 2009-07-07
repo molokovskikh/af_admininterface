@@ -113,7 +113,7 @@
 							<asp:Label ID="Label2" runat="server" Text='<%# Eval("SecondUpdate").ToString() %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
-					<asp:BoundField DataField="EXE" HeaderText="EXE" SortExpression="EXE"></asp:BoundField>
+					<asp:BoundField DataField="EXE" HeaderText="Версия" SortExpression="EXE"></asp:BoundField>
 					<asp:BoundField DataField="UserName" HeaderText="Имя пользователя" SortExpression="UserName" />
 					<asp:TemplateField HeaderText="Сегмент" SortExpression="FirmSegment">
 						<ItemTemplate>

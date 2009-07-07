@@ -7,15 +7,14 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.MySql;
-using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
 	public enum ServiceStatus
 	{
-		[Description("Не запущена")] Running,
-		[Description("Запущена")] NotRunning,
+		[Description("Запущена")] Running,
+		[Description("Не запущена")] NotRunning,
 		[Description("Не доступена")] Unknown
 	}
 
