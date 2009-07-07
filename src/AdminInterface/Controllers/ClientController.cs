@@ -181,7 +181,6 @@ namespace AdminInterface.Controllers
 
 		private void PrepareSessionForReport(User user, string password)
 		{
-			Session["AccessGrant"] = 1;
 			Session["Register"] = false;
 			Session["Code"] = user.Client.Id;
 			Session["DogN"] = user.Client.BillingInstance.PayerID;

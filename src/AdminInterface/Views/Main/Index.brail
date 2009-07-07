@@ -1,0 +1,368 @@
+﻿<% import System %>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Интерфейс управления клиентами
+<% end %>
+
+<style type="text/css">
+	.StatisticData
+	{
+		background-color: #d8f1ff;
+		text-align: right;
+		font-size: 9pt;
+		font-family: Verdana;
+	}
+	a
+	{
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: small;
+	}
+	.statistic-top-header
+	{
+		background-color: #eef8ff;
+		padding: 10px 0 10px 0;
+		font-size: 10pt;
+		text-align: center;
+	}
+	.statistic-header
+	{
+		background-color: #dadada;
+		font-weight: bold;
+		text-align: center;
+		font-size: 10pt;
+	}
+	.statistic-label
+	{
+		background-color: #d8f1ff;
+		text-align: right;
+		font-size: 10pt;
+	}
+	.statistic-value
+	{
+		background-color: #d8f1ff;
+		font-weight: bold;
+		text-align: center;
+		font-size: 8pt;
+	}
+</style>
+<%
+uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate}&RegionMask=${RegionMask}"
+%>
+
+<table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
+	<tr>
+		<td valign=top>
+			<p>
+				<% if admin.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore): %>
+				<a href="${siteroot}/register.aspx">Регистрация клиентов</a>
+				<% else: %>
+				Регистрация клиентов
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/CopySynonym.aspx">Клонирование</a>
+				<% else: %>
+				Клонирование
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/searchc.aspx">Информация о клиентах</a>
+				<% else: %>
+				Информация о клиентах
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/statcont.aspx">Статистика обращений</a>
+				<% else: %>
+				Статистика обращений
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/Billing/Search.rails">Биллинг</a>
+				<% else: %>
+				Биллинг
+				<% end %>
+			</p>
+			<p>
+				<a href="${siteroot}/docs.aspx">Общие документы</a>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.ManageAdministrators): %>
+				<a href="${siteroot}/ViewAdministrators.aspx">Региональные администраторы</a>
+				<% else: %>
+				Региональные администраторы
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.MonitorUpdates) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</a>
+				<% else: %>
+				Мониторинг обновления клиентов
+				<% end %>
+			</p>
+			<p>
+				<a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
+			</p>
+			<p>
+				<% if admin.HavePermisions(PermissionType.ManageCallbacks): %>
+				<a href="${siteroot}/Telephony/Show.rails">Правила обратного звонка</a>
+				<% else: %>
+				Правила обратного звонка
+				<% end %>
+			</p>
+		</td>
+		<td valign=top>
+			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">
+				<tr>
+					<td class="statistic-top-header" colspan=4>
+						Статистика:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Обновления:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено обычных:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("ConfHL"): %>
+						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateNormal)}">${ConfHL}</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						В процессе:
+					</td>
+					<td class="statistic-value">
+						<% if ReqHL == "0": %>
+						-
+						<% else: %>
+						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено КО:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("CUHL"): %>
+						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateCumulative)}">${CUHL}</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Запретов:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("ADHL"): %>
+						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateBan)}">${ADHL}</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Ошибок:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("ErrUpHL"): %>
+						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateError)}">${ErrUpHL}</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Загруженно данных:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("DownloadDataSize"): %>
+						${DownloadDataSize}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Последнее обновление:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("MaxUpdateTime"): %>
+						${MaxUpdateTime}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Загружено документов:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("DownloadDocumentSize"): %>
+						${DownloadDocumentSize}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Заказы:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Очередь:
+					</td>
+					<td class="statistic-value">
+						<% if OprLB == 0: %>
+						-
+						<% else: %>
+						<a href="${siteroot}/Monitoring/Orders" target=_blank>${OprLB}</a>
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Принято:
+					</td>
+					<td class="statistic-value">
+						${OPLB}
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Последний заказ:
+					</td>
+					<td class="statistic-value">
+						<% if IsDefined("LOT"): %>
+						${LOT}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Сумма:
+					</td>
+					<td class="statistic-value">
+						${SumLB}
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Прайсы:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label" colspan=2>Очередь формализации:</td>
+					<td class="statistic-value" colspan=2>
+						<% if FormalizationQueue == "0": %>
+						-
+						<% else: %>
+						${FormalizationQueue}
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Загружено:</td>
+					<td class="statistic-value">
+						${PriceDOKLB}
+					</td>
+					<td class="statistic-label">Последняя загрузка:</td>
+					<td class="statistic-value">
+						${DownPLB}
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Формализовано:</td>
+					<td class="statistic-value">
+						${PriceFOKLB}
+					</td>
+					<td class="statistic-label">Последняя формализация:</td>
+					<td class="statistic-value">
+						${FormPLB}
+					</td>
+				</tr>
+				<tr>
+					<td colspan="4" class="statistic-header">Службы:</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Обработки заказов:</td>
+					<td class="statistic-value" colspan=3>${OrderProcStatus}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Обработки прайс листов:</td>
+					<td class="statistic-value" colspan=3>${PriceProcessorMasterStatus}</td>
+				</tr>
+				<tr>
+					<td class="statistic-top-header" colspan=4>
+						В скобках указанно количество уникальных клиентов.
+					</td>
+				</tr>
+			</table>
+		</td>
+		<td valign=top style="font-size:8pt">
+			<form>
+				${FormHelper.HiddenField("from", fromDate.ToShortDateString())}
+				${FormHelper.HiddenField("to", toDate.ToShortDateString())}
+			<fieldset style="float:right;background-color:#d8f1ff;border:0;padding:3px 3px 3px 3px;">
+				<legend style="font-weight:bold;">Фильтр статистики </legend>
+				<div style="text-align:left;background-color:#eef8ff;padding: 3px;">
+					<label for="RegionList">Регион:</label>
+					<select name="regioncode">
+						<% for region in regions: %>
+						<option value=${region.Id}>${region.Name}</option>
+						<% end %>
+					</select>
+				</div>
+				<div style="text-align:left;background-color:#eef8ff; padding: 3px;">
+					<label for="FromCalendar">Начиная с даты:</label>
+					<div style="border: none;" id="beginDateCalendarHolder"></div>
+				</div>
+				<div style="text-align:left;background-color:#eef8ff;padding: 3px;">
+					<label for="ToCalendar">По дату:</label>
+					<div style="border: none;" id="endDateCalendarHolder"></div>
+				</div>
+				<div style="text-align:right;">
+					<input type=submit value=Показать></input>
+				</div>
+			</fieldset>
+			</form>
+		</td>
+	</tr>
+</table>
+<script type="text/javascript">
+	function beginDateCallBack(cal) 
+	{
+		document.getElementById("from").value = cal.date.print("%d.%m.%Y");
+	};
+
+	function endDateCallBack(cal) 
+	{
+		document.getElementById("to").value = cal.date.print("%d.%m.%Y");
+	};
+
+  
+  Calendar.setup({
+	date: "${fromDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "beginDateCalendarHolder",
+    flatCallback: beginDateCallBack,
+    showOthers: true
+  });
+  
+  Calendar.setup({
+	date: "${toDate.ToString("MM\"/\"dd\"/\"yyyy")}",
+	weekNumbers: false,
+    flat: "endDateCalendarHolder",
+    flatCallback: endDateCallBack,
+    showOthers: true
+  });
+</script>

@@ -133,8 +133,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Bubble.cs" />
+    <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
-    <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TariffController.cs" />
@@ -215,13 +215,6 @@
     </Compile>
     <Compile Include="CopySynonym.aspx.designer.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="default.aspx.cs">
-      <DependentUpon>default.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="default.aspx.designer.cs">
-      <DependentUpon>default.aspx</DependentUpon>
     </Compile>
     <Compile Include="Docs.aspx.cs">
       <DependentUpon>Docs.aspx</DependentUpon>
@@ -375,7 +368,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
-    <Content Include="default.aspx" />
     <Content Include="Docs.aspx" />
     <Content Include="EditAdministrator.aspx" />
     <Content Include="EditRegionalInfo.aspx" />
@@ -446,8 +438,10 @@
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Client\SuccessPasswordChanged.brail" />
     <None Include="Views\Layouts\Report.brail" />
-    <None Include="Views\Monitoring\UpdatingClients.brail" />
-    <None Include="Views\Orders\Show.brail" />
+    <None Include="Views\Main\Index.brail" />
+    <None Include="Views\Monitoring\Prices.brail" />
+    <None Include="Views\Monitoring\Updates.brail" />
+    <None Include="Views\Monitoring\Orders.brail" />
     <None Include="Views\Report\Act.brail" />
     <None Include="Views\Report\Bill.brail" />
     <None Include="Views\Report\Contract.brail" />

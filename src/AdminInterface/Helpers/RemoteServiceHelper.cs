@@ -1,15 +1,22 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
-using AddUser;
 using ConsoleApplication11.ServiceReference2;
 using log4net;
 using RemotePricePricessor;
 
 namespace AdminInterface.Helpers
 {
+	public enum ServiceStatus
+	{
+		[Description("Запущена")] Running,
+		[Description("Не запущена")] NotRunning,
+		[Description("Не доступена")] Unknown
+	}
+
 	public class RemoteServiceHelper
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (RemoteServiceHelper));

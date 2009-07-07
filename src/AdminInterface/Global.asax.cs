@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -8,7 +9,12 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.MonoRail.Framework;
+using Castle.MonoRail.Framework.Configuration;
+using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Views.Aspx;
+using Castle.MonoRail.Views.Brail;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;
@@ -19,7 +25,7 @@ using NHibernate.Type;
 
 namespace AddUser
 {
-	public class Global : HttpApplication
+	public class Global : HttpApplication, IMonoRailConfigurationEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
@@ -63,9 +69,12 @@ namespace AddUser
 				                           	.DefaultForAction().Is("info")
 											.Restrict("cc").ValidInteger);
 
-				RoutingModuleEx.Engine.Add(new PatternRoute("/orders/")
-				                           	.DefaultForController().Is("orders")
-				                           	.DefaultForAction().Is("show"));
+				RoutingModuleEx.Engine.Add(new PatternRoute("/")
+							.DefaultForController().Is("Main")
+							.DefaultForAction().Is("Index"));
+				RoutingModuleEx.Engine.Add(new PatternRoute("default.aspx")
+				                           	.DefaultForController().Is("Main")
+				                           	.DefaultForAction().Is("Index"));
 			}
 			catch(Exception ex)
 			{
@@ -203,5 +212,22 @@ WHERE PriceCode = ?Id", connection);
 
 		void Application_End(object sender, EventArgs e)
 		{}
+
+		public void Configure(IMonoRailConfiguration configuration)
+		{
+			configuration.ControllersConfig.AddAssembly("AdminInterface");
+			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
+			configuration.ViewComponentsConfig.Assemblies = new[]
+			                                                	{
+			                                                		"AdminInterface",
+			                                                		"Common.Web.Ui"
+			                                                	};
+			configuration.ViewEngineConfig.ViewPathRoot = "Views";
+			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
+			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(WebFormsViewEngine), false));
+			configuration.ViewEngineConfig.AssemblySources.Add(new AssemblySourceInfo("Common.Web.Ui", "Common.Web.Ui.Views"));
+			configuration.ViewEngineConfig.VirtualPathRoot = configuration.ViewEngineConfig.ViewPathRoot;
+			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
+		}
 	}
 }
