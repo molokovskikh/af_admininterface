@@ -95,7 +95,7 @@
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
 			</td>
 			<td>
-				<pre>!{WriteAddition(logEntity)}</pre>
+				<pre>!{logEntity}</pre>
 			</td>
 		</tr>
 	<%		
