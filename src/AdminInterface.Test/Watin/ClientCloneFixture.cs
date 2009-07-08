@@ -33,6 +33,7 @@ namespace AdminInterface.Test.Watin
 				browser.Input<Client>(client => client.Address, "-");
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
 			}
 		}
 
@@ -44,6 +45,20 @@ namespace AdminInterface.Test.Watin
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 				browser.Button(Find.ByValue("Принять")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Uri, Text.EndsWith("client/3616"));
+			}
+		}
+
+		[Test]
+		public void Try_to_search_offers()
+		{
+			using (var browser = new IE(BuildTestUrl("client/3616")))
+			{
+				browser.Link(Find.ByText("Поиск предложений")).Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Поиск предложений для клиента ТестерК2")))
+				{
+					Assert.That(openedWindow.Text, Text.Contains("Введите наименование или форму выпуска"));
+				}
 			}
 		}
 
