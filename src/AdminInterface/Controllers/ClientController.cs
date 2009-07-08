@@ -65,7 +65,7 @@ namespace AdminInterface.Controllers
 			}
 
 			Flash["Message"] = Message.Notify("Сохранено");
-			RedirectToAction("info", new { cc = client.Id });
+			RedirectToReferrer();
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -77,7 +77,7 @@ namespace AdminInterface.Controllers
 				new ClientInfoLogEntity(message, client.Id).Save();
 
 			Flash["Message"] = Message.Notify("Сохранено");
-			RedirectToAction("info", new {cc = client.Id});
+			RedirectToReferrer();
 		}
 
 		//[AccessibleThrough(Verb.Get)]
@@ -200,7 +200,7 @@ namespace AdminInterface.Controllers
 					ADHelper.Unlock(user.Login);
 
 			Flash["Message"] = Message.Notify("Разблокировано");
-			RedirectToAction("Info", new { cc = client.Id });
+			RedirectToReferrer();
 		}
 
 		public void DeletePreparedData(uint clientCode)
@@ -221,7 +221,7 @@ namespace AdminInterface.Controllers
 			{
 				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
-			RedirectToAction("Info", new { cc = client.Id });
+			RedirectToReferrer();
 		}
 
 		public void ResetUin(uint clientCode, string reason)
@@ -237,9 +237,9 @@ namespace AdminInterface.Controllers
 							inUser = SecurityContext.Administrator.UserName,
 							ResetIdCause = reason
 						});
-				ClientInfoLogEntity.ReseteUin(client.Id, reason).Save();																			
+				ClientInfoLogEntity.ReseteUin(client.Id, reason).Save();
 				client.ResetUin();
-				RedirectToAction("Info", new { cc = client.Id });
+				RedirectToReferrer();
 			}
 		}
 
