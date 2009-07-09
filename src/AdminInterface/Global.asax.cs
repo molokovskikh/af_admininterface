@@ -9,8 +9,10 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
+using Castle.MonoRail.Framework.Extensions.ExceptionChaining;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Views.Aspx;
@@ -192,13 +194,18 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			builder.AppendLine("----Session---");
-			foreach (string key in Session.Keys)
+			try
 			{
-				if (Session[key] == null)
-					builder.AppendLine(String.Format("{0} - null", key));
-				else
-					builder.AppendLine(String.Format("{0} - {1}", key, Session[key]));
+				foreach (string key in Session.Keys)
+				{
+					if (Session[key] == null)
+						builder.AppendLine(String.Format("{0} - null", key));
+					else
+						builder.AppendLine(String.Format("{0} - {1}", key, Session[key]));
+				}
 			}
+			catch (Exception ex)
+			{}
 			builder.AppendLine("--------------");
 
 			_log.Error(builder.ToString());
@@ -228,6 +235,10 @@ WHERE PriceCode = ?Id", connection);
 			configuration.ViewEngineConfig.AssemblySources.Add(new AssemblySourceInfo("Common.Web.Ui", "Common.Web.Ui.Views"));
 			configuration.ViewEngineConfig.VirtualPathRoot = configuration.ViewEngineConfig.ViewPathRoot;
 			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
+
+/*			configuration.SmtpConfig.Host = "mail.adc.analit.net";
+			configuration.ExtensionEntries.Add(new ExtensionEntry(typeof(ExceptionChainingExtension),
+				new MutableConfiguration("mailTo")));*/
 		}
 	}
 }
