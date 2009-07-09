@@ -137,10 +137,10 @@ ORDER BY IsAll Desc, Region;", _connection);
 				row.BackColor = Color.FromArgb(255, 102, 0);
 
 			if (ADCB.Checked)
-				row.Cells[8].CssClass = data.Row["ADUserStatus"].ToString();
+				row.Cells[7].CssClass = data.Row["ADUserStatus"].ToString();
 
-            if (data.Row["FirstUpdate"] == DBNull.Value)
-                return;
+			if (data.Row["FirstUpdate"] == DBNull.Value)
+				return;
 
 			if (data.Row["InvisibleOnFirm"].ToString() == "1" || data.Row["InvisibleOnFirm"].ToString() == "2")
 				row.Cells[2].CssClass = "not-base-client";
