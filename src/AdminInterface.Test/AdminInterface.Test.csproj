@@ -157,6 +157,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PropertyComparerTest.cs" />
     <Compile Include="Services\NotificationFixture.cs" />
+    <Compile Include="Watin\BillingFixture.cs" />
     <Compile Include="Watin\ClientCloneFixture.cs" />
     <Compile Include="Watin\DocumentLogFixture.cs" />
     <Compile Include="Watin\DrugstoreFixture.cs" />

@@ -10,7 +10,7 @@ namespace AdminInterface.Test.ForTesting
 	[TestFixture]
 	public class WatinFixture
 	{
-		private static Server _webServer;
+		private static readonly Server _webServer;
 
 		static WatinFixture()
 		{
@@ -20,25 +20,6 @@ namespace AdminInterface.Test.ForTesting
 			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
 			_webServer.Start();
 		}
-
-/*		[TestFixtureSetUp]
-		public void SetupFixture()
-		{
-			var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
-			var webDir = ConfigurationManager.AppSettings["webDirectory"];
-
-			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
-			_webServer.Start();
-		}*/
-
-
-/*
-		[TestFixtureTearDown]
-		public void TearDownFixture()
-		{
-			_webServer.Stop();
-		}
-*/
 
 		public static string BuildTestUrl(string urlPart)
 		{
