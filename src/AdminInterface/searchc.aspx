@@ -10,9 +10,9 @@
 		<h3>
 			Статистика работы клиента:
 		</h3>
-		<div style="text-align: center;">
-			<table style="background-color: #e7f6e0;" id="Table2" cellspacing="0" cellpadding="0"
-				width="450" border="0" onload="return SetSearchTitle();">
+		<table style="margin-left:auto; margin-right: auto">
+			<tr><td>
+			<table style="background-color: #e7f6e0; padding: 10px; text-align:center; width: 450px;" id="Table2 onload="return SetSearchTitle();">
 				<tr>
 					<td colspan="3">
 						Выполните поиск клиента:
@@ -79,7 +79,8 @@
 					</td>
 				</tr>
 			</table>
-		</div>
+			</td></tr>
+		</table>
 		<div style="margin-top: 20px;">
 			<asp:GridView ID="ClientsGridView" CssClass="HighLightCurrentRow" runat="server" AutoGenerateColumns="False" DataSource='<%# ClientsDataView %>'
 				OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True" OnRowCreated="ClientsGridView_RowCreated"
@@ -133,7 +134,9 @@
 					Клиент не найден
 				</EmptyDataTemplate>
 			</asp:GridView>
-			<div style="text-align: center; margin-top: 20px;">
+			<table style="text-align: center; margin-top: 20px; margin-left: auto; margin-right: auto;">
+				<tr>
+				<td>
 				<table runat=server id="Table4" visible=false>
 					<tr>
 						<td style="background-color:#FF6600; width:30px"></td>
@@ -163,7 +166,9 @@
 				<div style="margin-top: 20px;">
 					<asp:Label ID="SearchTimeLabel" Visible="false" runat="server" />
 				</div>
-			</div>
+				</td>
+				</tr>
+			</table>
 		</div>
 	</form>
 </asp:Content>
