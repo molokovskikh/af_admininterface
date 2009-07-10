@@ -78,7 +78,12 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				clientMessage.UpdateAndFlush();
+				using (new TransactionScope())
+				{
+					DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
+					                                                            Request.UserHostAddress);
+					clientMessage.UpdateAndFlush();
+				}
 				Flash.Add("Message", new Message("Сообщение сохранено"));
 			}
 			catch (ValidationException exception)
