@@ -46,7 +46,7 @@ namespace AdminInterface.Test.Watin
 				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
 
 				browser.Button(Find.ById("Register")).Click();
-				Assert.That(browser.ContainsText("Регистрационная карта №"));
+				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 				clientCode = new Regex(@"\d+")
 					.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value;
 				Console.WriteLine(clientCode);

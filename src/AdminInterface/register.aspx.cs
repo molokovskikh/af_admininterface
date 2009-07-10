@@ -276,7 +276,6 @@ set @inUser = ?UserName;";
 					command.Parameters.AddWithValue("?firmtype", TypeDD.SelectedItem.Value);
 					command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
 					command.Parameters.Add("?ClientCode", MySqlDbType.Int24);
-					command.Parameters.AddWithValue("?AllowGetData", TypeDD.SelectedItem.Value);
 					command.Parameters.AddWithValue("?OSUserName", username);
 					command.Parameters.AddWithValue("?OSUserPass", password);
 					command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
@@ -295,17 +294,15 @@ set @inUser = ?UserName;";
 					else
 						billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
 
-					clientCode = CreateClientOnClientsData(billingCode, command);
-					command.Parameters["?ClientCode"].Value = clientCode;
+					clientCode = CreateClient(billingCode, command);
 
-					CreateUser(command);
 					if (IncludeCB.Checked)
 						CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue), command);
 
 					if (TypeDD.SelectedItem.Text == "Аптека")
-						CreateDrugstoreSpecific(CustomerType.SelectedItem.Text != "Стандартный", command);
+						CreateDrugstore(CustomerType.SelectedItem.Text != "Стандартный", command);
 					else
-						CreateSupplierSpecific(command);
+						CreateSupplier(command);
 
 					ADHelper.CreateUserInAD(username,
 					                        password,
@@ -588,34 +585,34 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 			return Convert.ToUInt32(_command.ExecuteScalar());
 		}
 
-		private uint CreateClientOnClientsData(uint billingCode, MySqlCommand _command)
+		private uint CreateClient(uint billingCode, MySqlCommand command)
 		{
-			_command.CommandText = @"
+			command.CommandText = @"
 INSERT INTO usersettings.clientsdata (
 MaskRegion, ShowRegionMask, FullName, ShortName, FirmSegment, RegionCode, Adress, 
 FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId, RegistrationDate) ";
-			_command.Parameters.AddWithValue("?ClientContactGroupOwnerId",
-			                                 CreateContactsForClientsData(_command.Connection,
+			command.Parameters.AddWithValue("?ClientContactGroupOwnerId",
+			                                 CreateContactsForClientsData(command.Connection,
 			                                                              TypeDD.SelectedItem.Text == "Аптека"
 			                                                              	? ClientType.Drugstore
 			                                                              	: ClientType.Supplier));
 			if (!IncludeCB.Checked)
 			{
-				_command.CommandText += @" 
+				command.CommandText += @" 
 Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?FirmSegment, ?RegionCode, ?Adress, 
 ?FirmType, 1, ?registrant, " + billingCode + ", 1, ?ClientContactGroupOwnerId, now()); ";
 			}
 			else
 			{
-				_command.CommandText += @"
+				command.CommandText += @"
 select maskregion, ShowRegionMask, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
 FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
 from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
-			_command.CommandText += "SELECT LAST_INSERT_ID()";
-			var clientCode = Convert.ToUInt32(_command.ExecuteScalar());
-			_command.CommandText = "insert into logs.AuthorizationDates(ClientCode) Values(" + clientCode + ")";
-			_command.ExecuteNonQuery();
+			command.CommandText += "SELECT LAST_INSERT_ID()";
+			var clientCode = Convert.ToUInt32(command.ExecuteScalar());
+			command.Parameters["?ClientCode"].Value = clientCode;
+			CreateUser(command);
 			return clientCode;
 		}
 
@@ -623,9 +620,9 @@ from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; "
 		{
 			
 			command.CommandText = @"
-INSERT INTO usersettings.osuseraccessright (ClientCode, AllowGetData, OSUserName) 
-Values(?ClientCode, ?AllowGetData, ?OSUserName);
-";
+INSERT INTO usersettings.osuseraccessright (ClientCode, OSUserName) Values(?ClientCode, ?OSUserName);
+SET @NewUserId = Last_Insert_ID();
+insert into logs.AuthorizationDates(ClientCode, UserId) Values(?ClientCode, @NewUserId);";
 			if (PermissionsDiv.Visible)
 			{
 				foreach (ListItem item in Permissions.Items)
@@ -633,8 +630,6 @@ Values(?ClientCode, ?AllowGetData, ?OSUserName);
 					if (item.Selected)
 					{
 						command.CommandText += String.Format(@"
-SET @NewUserId = Last_Insert_ID();
-
 INSERT INTO usersettings.AssignedPermissions(UserId, PermissionId) 
 Values(@NewUserId, {0});", item.Value);
 					}
@@ -643,7 +638,7 @@ Values(@NewUserId, {0});", item.Value);
 			command.ExecuteNonQuery();
 		}
 
-		public void CreateSupplierSpecific(MySqlCommand command)
+		public void CreateSupplier(MySqlCommand command)
 		{
 			command.CommandText = @"
 INSERT INTO OrderSendRules.order_send_rules(Firmcode, FormaterId, SenderId)
@@ -736,7 +731,7 @@ WHERE   intersection.pricecode IS NULL
 				.ExecuteNonQuery();
 		}
 
-		private void CreateDrugstoreSpecific(bool invisible, MySqlCommand command)
+		private void CreateDrugstore(bool invisible, MySqlCommand command)
 		{
 			command.CommandText = @"
 INSERT INTO usersettings.retclientsset 
