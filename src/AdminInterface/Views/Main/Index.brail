@@ -66,14 +66,14 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				<% end %>
 			</p>
 			<p>
-				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
 				<a href="${siteroot}/searchc.aspx">Информация о клиентах</a>
 				<% else: %>
 				Информация о клиентах
 				<% end %>
 			</p>
 			<p>
-				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
 				<a href="${siteroot}/statcont.aspx">Статистика обращений</a>
 				<% else: %>
 				Статистика обращений
