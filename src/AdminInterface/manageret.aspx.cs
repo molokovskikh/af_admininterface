@@ -433,7 +433,6 @@ SELECT  InvisibleOnFirm,
         SubmitOrders, 
         ServiceClient, 
         OrdersVisualizationMode, 
-        ShowMessageCount,
 		rcs.PriceCodeOnly as NotNoisedPriceCode
 FROM retclientsset rcs
 WHERE rcs.clientcode = ?ClientCode";

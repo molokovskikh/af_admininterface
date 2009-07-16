@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
@@ -39,7 +40,7 @@ namespace AdminInterface.Controllers
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
-			var clientMessage = ClientMessage.TryFind(clientCode);
+			var clientMessage = ClientMessage.FindClientMessage(clientCode);
 
 			if (clientMessage != null)
 				PropertyBag["ClientMessage"] = clientMessage;
@@ -80,9 +81,15 @@ namespace AdminInterface.Controllers
 			{
 				using (new TransactionScope())
 				{
-					DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
-					                                                            Request.UserHostAddress);
-					clientMessage.UpdateAndFlush();
+					foreach (var user in Client.Find(clientMessage.ClientCode).Users)
+					{
+						DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
+						                                                            Request.UserHostAddress);
+						var message = ClientMessage.Find(user.Id);
+						message.Message = clientMessage.Message;
+						message.ShowMessageCount = clientMessage.ShowMessageCount;
+						message.Update();
+					}
 				}
 				Flash.Add("Message", new Message("Сообщение сохранено"));
 			}
@@ -176,7 +183,7 @@ namespace AdminInterface.Controllers
 		{
 			using (new TransactionScope())
 				foreach (var instance in paymentInstances)
-					instance.Save();				
+					instance.Save();
 			SearchBy(searchProperties);
 			RenderView("SearchBy");
 		}
@@ -205,16 +212,23 @@ namespace AdminInterface.Controllers
 
 		public void ShowMessageForClient(uint clientCode)
 		{
-			var message = ClientMessage.Find(clientCode);
+			var message = ClientMessage.FindClientMessage(clientCode);
 			PropertyBag["Message"] = message;
 		}
 
 		public void CancelMessage(uint clientCode)
 		{
-			var message = ClientMessage.Find(clientCode);
-			message.Message = null;
-			message.ShowMessageCount = 0;
-			message.Save();
+			
+			using (new TransactionScope())
+			{
+				var rootUser = User.Find(clientCode);
+				foreach (var user in rootUser.Client.Users /*Client.Find(clientCode).Users*/)
+				{
+					var message = ClientMessage.Find(user.Id);
+					message.ShowMessageCount = 0;
+					message.Update();
+				}				
+			}
 			CancelView();
 		}
 
