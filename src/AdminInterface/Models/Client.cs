@@ -247,7 +247,7 @@ where ouar.clientcode = :clientcode")
 			var result = ArHelper.WithSession(session =>
 			                                  session
 			                                  	.CreateSQLQuery(@"
-select length(concat(uui.AFCopyId)) = 0
+select sum(length(concat(uui.AFCopyId))) = 0
 from usersettings.UserUpdateInfo uui
 	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
 where ouar.clientcode = :clientcode
