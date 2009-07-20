@@ -12,8 +12,8 @@ namespace AdminInterface.Models.PrgData
 
 		public ExtensionDataObject ExtensionData { get; set; }
 
-		[DataMemberAttribute(Name = "_ClientCode")]
-		public uint ClientCode { get; set; }
+		[DataMemberAttribute(Name = "_UserId")]
+		public uint UserId { get; set; }
 
 		[DataMemberAttribute(Name = "_MethodName")]
 		public string MethodName { get; set;}
@@ -23,6 +23,8 @@ namespace AdminInterface.Models.PrgData
 
 		public Client Client { get; set; }
 
+		public uint ClientCode { get; set; }
+
 		public string ShortName
 		{
 			get { return Client.ShortName; }
@@ -30,7 +32,8 @@ namespace AdminInterface.Models.PrgData
 
 		public void FetchClient()
 		{
-			Client = Client.Find(ClientCode);
+			Client = User.Find(UserId).Client;
+			ClientCode = Client.Id;
 		}
 	}
 }
