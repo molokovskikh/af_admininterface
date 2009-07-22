@@ -263,7 +263,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				<tr>
 					<td class="statistic-label" colspan=2>Очередь формализации:</td>
 					<td class="statistic-value" colspan=2>
-						<% if FormalizationQueue == "0": %>
+						<% if not IsDefined("FormalizationQueue") or FormalizationQueue == "0": %>
 						-
 						<% else: %>
 						${FormalizationQueue}
