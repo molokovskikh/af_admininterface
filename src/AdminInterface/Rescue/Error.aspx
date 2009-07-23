@@ -6,7 +6,6 @@
 <head runat="server">
     <title>Ошибка в Административном интерфейсе</title>
     <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-    <script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
 </head>
 <body bgcolor="#ffffff">
     <form id="Form1" method="post" runat="server">
