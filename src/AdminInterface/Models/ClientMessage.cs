@@ -27,7 +27,7 @@ namespace AdminInterface.Models
 			var user = client.Users.FirstOrDefault();
 			if (user == null)
 				return null;
-			return Find(user.Id);
+			return TryFind((user.Id));
 		}
 	}
 }
