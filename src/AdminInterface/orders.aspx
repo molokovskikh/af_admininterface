@@ -80,7 +80,7 @@
 								</asp:TemplateField>
 							</Columns>
 							<EmptyDataTemplate>
-								За указанынй период заказов не найдено.
+								За указанный период заказов не найдено.
 							</EmptyDataTemplate>
 						</asp:GridView>
 					</div>
