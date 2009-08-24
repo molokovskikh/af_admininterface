@@ -2,11 +2,11 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using Functional.ForTesting;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using WatiN.Core;
 using WatiN.Core.Interfaces;
-using TableRow=WatiN.Core.TableRow;
 
 namespace AdminInterface.Test.ForTesting
 {
@@ -41,7 +41,7 @@ namespace AdminInterface.Test.ForTesting
                 if (row.IsEqualTo(activeRecord))
                     return row;
 
-            throw new Exception("Не нашли строки для {0}".Format(activeRecord));
+            throw new Exception(String.Format("Не нашли строки для {0}", activeRecord));
         }
 
         public static void Input<T>(this IElementsContainer container, Expression<Func<T, object>> input, object value)

@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AdminInterface.Models;
+﻿using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Test.ForTesting;
-using Castle.ActiveRecord;
 using NUnit.Framework;
 
 namespace AdminInterface.Test.Models
@@ -17,7 +12,7 @@ namespace AdminInterface.Test.Models
 		[SetUp]
 		public void Setup()
 		{
-			ForTest.InitialzeAR();			
+			ForTest.InitialzeAR();
 			SecurityContext.GetAdministrator = () => new Administrator { RegionMask = ulong.MaxValue };
 		}
 

@@ -31,7 +31,7 @@ namespace AdminInterface.Test.ForTesting
             if (expression.NodeType == ExpressionType.ArrayIndex)
                 return ExtractName(array.Left) + "_" + ExtractName(array.Right);
 
-            throw new Exception("Не знаю как разбирать выражение {0}".Format(expression));
+            throw new Exception(String.Format("Не знаю как разбирать выражение {0}", expression));
         }
 
         public static string GetElementName<T>(Expression<Func<T, object>> input)
@@ -94,7 +94,7 @@ namespace AdminInterface.Test.ForTesting
             var value = FixtureMapping.GetValue(record, alias);
             var compare = value as Func<Element, bool>;
             if (compare != null)
-                Assert.That(compare(cell.Elements.First()), Is.True, "Для ячейки {0} не нашлось значения {1} по алиасу {2}".Format(cell, record, alias));
+                Assert.That(compare(cell.Elements.First()), Is.True, "Для ячейки {0} не нашлось значения {1} по алиасу {2}", cell, record, alias);
             else
                 Assert.That(cell.Text != null ? cell.Text.Trim() : cell.Text, Is.EqualTo(value));
         }

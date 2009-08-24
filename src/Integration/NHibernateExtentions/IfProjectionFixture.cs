@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using AdminInterface.Models;
+﻿using AdminInterface.Models;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Config;
-using log4net.Config;
 using NHibernate.Criterion;
 using NUnit.Framework;
 

@@ -31,7 +31,7 @@ namespace AdminInterface.Test.Models
 		}
 
 		[Test]
-		[ExpectedException(typeof(LoginNotFoundException), ExpectedMessage = "Пользователь test546116879 не найден")]
+		[ExpectedException(typeof(LoginNotFoundException), ExpectedMessage = "Учетная запись test546116879 не найдена")]
 		public void Throw_not_found_exception_if_login_not_exists()
 		{
 			var user = new User { Login = "test546116879" };

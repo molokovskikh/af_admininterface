@@ -107,6 +107,23 @@ where clientcode = ?ClientCode", connection);
 		}
 
 		[Test]
+		public void Try_to_register_network_client()
+		{
+			using (var browser = new IE(BuildTestUrl("register.aspx")))
+			{
+				SetupGeneralInformation(browser);
+				browser.CheckBox(Find.ById("IncludeCB")).Click();
+				browser.TextField(Find.ById("IncludeSTB")).TypeText("ТестерК");
+				browser.Button(Find.ById("IncludeSB")).Click();
+				
+				browser.SelectList(Find.ById("IncludeType")).Select("Сеть");
+				browser.Button(Find.ById("Register")).Click();
+
+				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
+			}
+		}
+
+		[Test]
 		public void EditPayerInfo()
 		{
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
@@ -120,7 +137,7 @@ where clientcode = ?ClientCode", connection);
 				browser.TextField(Find.ByName("PaymentOptions.PaymentPeriodBeginDate")).TypeText(DateTime.Now.AddDays(10).ToShortDateString());
 				browser.Button(Find.ByValue("Сохранить")).Click();
 
-				Assert.That(browser.ContainsText("Регистрационная карта №"));
+				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 			}
 		}
 
