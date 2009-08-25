@@ -39,7 +39,7 @@ namespace AdminInterface.Models.Logs
 		{
 			return (from call in Queryable
 			        where call.Id2 == IdentificationStatus.Unknow && call.Direction == CallDirection.Input
-					orderby call.LogTime
+					orderby call.LogTime descending
 			        group call by call.From into c
 			        select c.Key).Take(5).ToArray();
 		}
