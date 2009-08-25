@@ -18,7 +18,7 @@
                     &nbsp;</td>
             </tr>
         </table>
-                    <asp:GridView ID="CLList" runat="server" 
+                    <asp:GridView ID="CLList" runat="server" OnRowDataBound="RowDataBound"
 			CellPadding="0" AutoGenerateColumns="False" 
 			AllowSorting="True" DataSource='<%# StatisticsDataView %>' onrowcreated="CLList_RowCreated" 
 			onsorting="CLList_Sorting" >

@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Drawing;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
@@ -7,6 +8,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
+using Image=System.Web.UI.WebControls.Image;
 
 namespace AddUser
 {
@@ -67,7 +69,8 @@ SELECT  afu.RequestTime,
         r.Region, 
 		afu.AppVersion,
 		afu.ResultSize,
-        afu.Addition
+        afu.Addition,
+		(cd.FirmStatus = 0 or BillingStatus= 0) FirmStatus
 FROM usersettings.clientsdata cd
 	join farm.regions r on r.regioncode = cd.regioncode 
 	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
@@ -123,6 +126,23 @@ ORDER by afu.RequestTime desc;";
 				};
 				e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
 			}
+		}
+
+		protected void RowDataBound(object sender, GridViewRowEventArgs e)
+		{
+			if (RequestType != StatisticsType.UpdateBan)
+				return;
+
+			if (e.Row.RowType == DataControlRowType.DataRow)
+				FormatRow(e.Row);
+		}
+
+		private void FormatRow(GridViewRow row)
+		{
+			var data = row.DataItem as DataRowView;
+
+			if (data.Row["FirmStatus"].ToString() == "1")
+				row.BackColor = Color.FromArgb(255, 102, 0);
 		}
 	}
 }
