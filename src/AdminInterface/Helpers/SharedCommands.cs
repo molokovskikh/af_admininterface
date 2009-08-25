@@ -15,8 +15,8 @@ SET dst.CostCode = src.CostCode,
 	dst.ControlMinReq = src.ControlMinReq,
 
 	dst.FirmClientCode = if(?IncludeType = 2, src.FirmClientCode, dst.FirmClientCode),
-	dst.FirmClientCode2 = if(?IncludeType = 2, src.FirmClientCode2, dst.FirmClientCode),
-	dst.FirmClientCode3 = if(?IncludeType = 2, src.FirmClientCode3, dst.FirmClientCode)
+	dst.FirmClientCode2 = if(?IncludeType = 2, src.FirmClientCode2, dst.FirmClientCode2),
+	dst.FirmClientCode3 = if(?IncludeType = 2, src.FirmClientCode3, dst.FirmClientCode3)
 WHERE src.ClientCode = ?Parent and dst.ClientCode = ?Child;
 ";
 	}
