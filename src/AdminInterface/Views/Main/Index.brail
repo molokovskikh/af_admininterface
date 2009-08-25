@@ -335,6 +335,11 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 		</td>
 	</tr>
 </table>
+<p>
+	Срок действия Вашего пароля истекает ${expirationDate.ToShortDateString()} в ${expirationDate.ToShortTimeString()}.
+	<br>
+	Пожалуйста не забывайте изменять пароль.
+</p>
 <script type="text/javascript">
 	function beginDateCallBack(cal) 
 	{
