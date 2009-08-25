@@ -44,6 +44,7 @@
 		font-size: 8pt;
 	}
 </style>
+
 <%
 uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}"
 %>
@@ -131,7 +132,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						Приготовлено обычных:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ConfHL"): %>
+						<% if IsDefined("ConfHL") and ConfHL != "0(0)": %>
 						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateNormal)}">${ConfHL}</a>
 						<% else: %>
 						-
@@ -141,11 +142,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						В процессе:
 					</td>
 					<td class="statistic-value">
-						<% if ReqHL == "0": %>
-						-
-						<% else: %>
 						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
-						<% end %>
 					</td>
 				</tr>
 				<tr>
@@ -153,7 +150,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						Приготовлено КО:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("CUHL"): %>
+						<% if IsDefined("CUHL") and CUHL != "0(0)": %>
 						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateCumulative)}">${CUHL}</a>
 						<% else: %>
 						-
@@ -163,7 +160,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						Запретов:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ADHL"): %>
+						<% if IsDefined("ADHL") and ADHL != "0(0)": %>
 						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateBan)}">${ADHL}</a>
 						<% else: %>
 						-
@@ -175,7 +172,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						Ошибок:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ErrUpHL"): %>
+						<% if IsDefined("ErrUpHL") and ErrUpHL != "0": %>
 						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateError)}">${ErrUpHL}</a>
 						<% else: %>
 						-
