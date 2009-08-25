@@ -64,7 +64,6 @@
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
-    <Compile Include="InternetLogEntityFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />

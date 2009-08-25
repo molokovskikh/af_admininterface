@@ -1,6 +1,6 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
 									  ("Информация о клиенте", "")]} %>
-									  
+
 <style>
 	.InfoRow
 	{
@@ -14,12 +14,12 @@
 	
 	textarea
 	{
-		border-style:groove;	
+		border-style:groove;
 	}
 	
 	input[type='text']
 	{
-		width: 90%;	
+		width: 90%;
 	}
 </style>
 	
@@ -30,7 +30,7 @@
 	<% if IsDefined("Message"):
 		clazz = "notice"
 		if message.IsError:
-			clazz = "err"	
+			clazz = "err"
 		end
 	%>
 
@@ -43,7 +43,7 @@
 	<% OutputSubView("ClientView") %>
 	<form action="Update.rails" method=post style="padding:0; margin:0;">
 		${FormHelper.HiddenField("client.Id")}
-		<table cellpadding=0 cellspacing=0 border=1 rules=all style="width: 90%; border: solid 1px #dadada; border-collapse:collapse;">
+		<table cellpadding=0 cellspacing=0 border=1 rules=all style="width: 100%; border: solid 1px #dadada; border-collapse:collapse;">
 			<col style="width:50%" />
 			<col style="width:50%" />
 			<tr>
@@ -98,12 +98,30 @@
 	</form>
 	<% OutputSubView("LegendView") %>
 	</div>
-	<div class="TwoColumn" style="text-align: center;">
+	<div class="TwoColumn" style="margin-left: 10px">
+		<div>
+			<h4 style="margin-bottom:0">Не опознанные звонки:</h4>
+			<table id="UnknownPhones" class="DataTable">
+			<% if CallLogs.Length == 0: %>
+				<tr><td class="EmptyData">Нет звонков</td></tr>
+			<% else: %>
+				<% for i, call in enumerate(CallLogs): %>
+				<tr class="${ViewHelper.GetRowStyle(i)}">
+					<td>
+						<form action="BindPhone?clientcode=${client.Id}&phone=${call}" method=post>
+							<input type=submit value="Связать" />
+						</form>
+					</td>
+					<td>${call}</td>
+				</tr>
+				<% end %>
+			<% end %>
+			</table>
+		</div>
 		<form action="SendMessage.rails" method="post">
 			<input type=hidden value=${client.Id} name=clientCode />
-			Новое обращение(сообщение):
-			<br />
-			<textarea style="height: 150px; width:90%;" name=message></textarea>
+			<h4 style="margin-bottom:0">Новое сообщение:</h4>
+			<textarea style="height: 150px; width:100%;" name=message></textarea>
 			<br />
 			<input type=submit value="Принять" />
 			<p>

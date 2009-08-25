@@ -20,7 +20,7 @@ namespace AdminInterface.Test.ForTesting
 			                                {
 			                                    Assembly.Load("AdminInterface"),
 			                                    Assembly.Load("Common.Web.Ui"),
-												Assembly.Load("AdminInterface.Test"),
+												Assembly.Load("Functional"),
 			                                },
 										   ActiveRecordSectionHandler.Instance);
 		}
@@ -28,23 +28,23 @@ namespace AdminInterface.Test.ForTesting
 		public static Payer CreatePayer()
 		{
 			return new Payer
-			       	{
-			       		ShortName = "Test",
-			       		JuridicalName = "",
-			       		JuridicalAddress = "",
-			       		KPP = "",
-			       		INN = "",
-			       		ActualAddressHouse = "",
-			       		ActualAddressIndex = "",
-			       		ActualAddressOffice = "",
-			       		ActualAddressCountry = "",
-			       		ActualAddressProvince = "",
-			       		ActualAddressRegion = "",
-			       		ActualAddressStreet = "",
-			       		ActualAddressTown = "",
-			       		BeforeNamePrefix = "",
-			       		AfterNamePrefix = "",
-			       	};
+			{
+				ShortName = "Test",
+				JuridicalName = "",
+				JuridicalAddress = "",
+				KPP = "",
+				INN = "",
+				ActualAddressHouse = "",
+				ActualAddressIndex = "",
+				ActualAddressOffice = "",
+				ActualAddressCountry = "",
+				ActualAddressProvince = "",
+				ActualAddressRegion = "",
+				ActualAddressStreet = "",
+				ActualAddressTown = "",
+				BeforeNamePrefix = "",
+				AfterNamePrefix = "",
+			};
 		}
 
 		public static Client CreateClient()

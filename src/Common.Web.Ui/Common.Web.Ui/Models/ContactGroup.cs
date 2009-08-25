@@ -12,12 +12,22 @@ namespace Common.Web.Ui.Models
 		[Description("Менеджер прайс листов(заказов)")] OrderManagers = 2,
 		[Description("Бухгалтер по расчетам с АК \"Инфорум\"")] AccountantManagers = 3,
 		[Description("Контактная информация для биллинга")] Billing = 4,
+		[Description("Известные телефоны")] KnownPhones,
 		Custom = 5
 	}
 
 	[ActiveRecord("contacts.contact_groups")]
 	public class ContactGroup : ContactOwner
 	{
+		public ContactGroup()
+		{}
+
+		public ContactGroup(ContactGroupType type, string name)
+		{
+			Type = type;
+			Name = name;
+		}
+
 		[JoinedKey("Id")]
 		protected uint ContactGroupId { get; set; }
 

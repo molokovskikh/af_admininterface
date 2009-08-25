@@ -16,7 +16,7 @@ function joinSearchHelper(textBox, titlesAndIds)
 	
 	setSearchTitle(textBox, titlesAndIds);
 }
-						
+
 function setSearchTitle(textBox, titlesAndIds)
 {
 	if (isTitleText(textBox.value, titlesAndIds))

@@ -47,6 +47,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.ActiveRecord.Linq, Version=1.9.201.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.Components.Binder, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.Components.Binder.dll</HintPath>
@@ -96,6 +100,10 @@
     <Reference Include="NHibernate.ByteCode.Castle, Version=2.1.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.ByteCode.Castle.dll</HintPath>
+    </Reference>
+    <Reference Include="NHibernate.Linq, Version=1.0.0.0, Culture=neutral, PublicKeyToken=444cf6a87fdab271, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\NHibernate.Linq.dll</HintPath>
     </Reference>
     <Reference Include="RemotePriceProcessor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b87fa865681cc1c6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -152,6 +160,7 @@
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\EndUserException.cs" />
+    <Compile Include="Models\Logs\CallLog.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Offer.cs" />
@@ -271,7 +280,6 @@
     </Compile>
     <Compile Include="Models\ClientMessage.cs" />
     <Compile Include="Models\Logs\DocumentLogEntity.cs" />
-    <Compile Include="Models\Logs\InternetLogEntity.cs" />
     <Compile Include="Models\Security\Permission.cs" />
     <Compile Include="NHibernateExtentions\Projections2.cs" />
     <Compile Include="OfficeUserRegistrationReport.aspx.cs">
@@ -409,6 +417,7 @@
     <Content Include="Css\Highlight.css" />
     <Content Include="Css\Report.css" />
     <Content Include="Css\Table.css" />
+    <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\bc_bg.png" />
     <Content Include="Images\bc_separator.png" />
     <Content Include="Images\BottomLeftCorner.png" />
@@ -436,6 +445,7 @@
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Client\SuccessPasswordChanged.brail" />
+    <None Include="Views\Layouts\GeneralWithJQuery.brail" />
     <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -11,6 +12,8 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using AdminInterface.Extentions;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -21,7 +24,7 @@ namespace AdminInterface.Controllers
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
-		Layout("General"),
+		Layout("GeneralWithJQuery"),
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
@@ -50,6 +53,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
+			PropertyBag["CallLogs"] = CallLog.LastCalls();
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -65,6 +69,28 @@ namespace AdminInterface.Controllers
 			}
 
 			Flash["Message"] = Message.Notify("Сохранено");
+			RedirectToReferrer();
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void BindPhone(uint clientCode, string phone)
+		{
+			var client = Client.FindAndCheck(clientCode);
+			var group = client.ContactGroupOwner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
+			if (group == null)
+				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
+			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
+			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
+			using(new TransactionScope())
+			{
+				ArHelper.WithSession<CallLog>(s => s.CreateSQLQuery(@"
+update logs.CallLogs
+set Id2 = 0
+where `from` = :phone")
+					.SetParameter("phone", phone.Replace("-", ""))
+					.ExecuteUpdate());
+				group.Save();
+			}
 			RedirectToReferrer();
 		}
 
