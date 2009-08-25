@@ -108,7 +108,7 @@ namespace AdminInterface.Models
 
 		public bool IsClientActive()
 		{
-			return Status == ClientStatus.On;
+			return Status == ClientStatus.On && BillingStatus == ClientStatus.On;
 		}
 
 		public float GetPayment(IList<Tariff> tariffs)

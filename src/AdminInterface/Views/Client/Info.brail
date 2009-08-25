@@ -39,6 +39,12 @@
 	</div>
 	<% end %>
 
+	<% if not client.IsClientActive(): %>
+	<div class="Warning">
+		<p>Клиент отключен</p>
+	</div>
+	<% end %>
+
 	<div class="TwoColumn">
 	<% OutputSubView("ClientView") %>
 	<form action="Update.rails" method=post style="padding:0; margin:0;">
