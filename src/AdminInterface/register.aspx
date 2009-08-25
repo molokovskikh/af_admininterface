@@ -114,7 +114,7 @@
 								<asp:TextBox ID="PayerFTB" runat="server" Visible="False" Width="90px" />
 								<asp:Button ID="FindPayerB" runat="server" OnClick="FindPayerB_Click" Text="Найти"
 									Visible="False" ValidationGroup="1" />
-								<asp:DropDownList ID="PayerDDL" runat="server" Visible="False" DataSource="<%# DataTable1 %>"
+								<asp:DropDownList ID="PayerDDL" runat="server" Visible="False"
 									DataTextField="PayerName" DataValueField="PayerID" />
 								<asp:Label ID="PayerCountLB" runat="server" ForeColor="Green" Visible="False" />
 							</div>
@@ -126,7 +126,7 @@
 									Visible="False" ValidationGroup="2" />
 								<asp:Label ID="IncludeCountLB" runat="server" ForeColor="Green" Visible="False" />
 								<asp:DropDownList ID="IncludeSDD" runat="server" OnSelectedIndexChanged="IncludeSDD_SelectedIndexChanged"
-									Visible="False" DataSource="<%# Incudes %>" DataTextField="ShortName" DataValueField="FirmCode"
+									Visible="False" DataTextField="ShortName" DataValueField="FirmCode"
 									AutoPostBack="True" />
 								<asp:DropDownList ID="IncludeType" runat="server" Visible="False">
 									<asp:ListItem Value="0">Базовый</asp:ListItem>
@@ -184,7 +184,7 @@
 							<div class="DropDownField">
 								<label for="RegionDD">Домашний регион:</label>
 								<asp:DropDownList ID="RegionDD" runat="server" OnSelectedIndexChanged="RegionDD_SelectedIndexChanged"
-									AutoPostBack="True" DataSource="<%# admin %>" DataTextField="Region" DataValueField="RegionCode" />
+									AutoPostBack="True" DataTextField="Region" DataValueField="RegionCode" />
 							</div>
 							<div class="DropDownField">
 								<label for="SegmentDD">Сегмент:</label>
@@ -228,11 +228,11 @@
 						</tr>
 						<tr>
 							<td>
-								<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
+								<asp:CheckBoxList ID="WRList" runat="server" BorderStyle="None"
 									DataTextField="Region" DataValueField="RegionCode" />
 							</td>
 							<td>
-								<asp:CheckBoxList ID="OrderList" runat="server" BorderStyle="None" DataSource="<%# WorkReg %>"
+								<asp:CheckBoxList ID="OrderList" runat="server" BorderStyle="None"
 									DataTextField="Region" DataValueField="RegionCode" />
 							</td>
 						</tr>

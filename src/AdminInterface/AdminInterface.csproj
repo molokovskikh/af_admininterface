@@ -154,6 +154,7 @@
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
+    <Compile Include="Helpers\SharedCommands.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />

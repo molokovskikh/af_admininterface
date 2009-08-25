@@ -23,161 +23,12 @@ namespace AdminInterface
 {
 	public partial class RegisterPage : Page
 	{
-		protected DataTable admin;
-		protected DataTable Clientsdata;
-		protected DataColumn DataColumn1;
-		protected DataColumn DataColumn10;
-		protected DataColumn DataColumn11;
-		protected DataColumn DataColumn12;
-		protected DataColumn DataColumn13;
-		protected DataColumn DataColumn14;
-		protected DataColumn DataColumn15;
-		protected DataColumn DataColumn16;
-		protected DataColumn DataColumn17;
-		protected DataColumn DataColumn18;
-		protected DataColumn DataColumn19;
-		protected DataColumn DataColumn2;
-		protected DataColumn DataColumn20;
-		protected DataColumn DataColumn21;
-		protected DataColumn DataColumn22;
-		protected DataColumn DataColumn23;
-		protected DataColumn DataColumn24;
-		protected DataColumn DataColumn25;
-		protected DataColumn DataColumn26;
-		protected DataColumn DataColumn3;
-		protected DataColumn DataColumn4;
-		protected DataColumn DataColumn5;
-		protected DataColumn DataColumn6;
-		protected DataColumn DataColumn7;
-		protected DataColumn DataColumn8;
-		protected DataColumn DataColumn9;
-		protected DataTable DataTable1;
+		protected DataSet data = new DataSet();
 
-
-		protected DataSet DS1;
-		protected DataTable Incudes;
-		protected DataTable Regions;
-		protected DataTable WorkReg;
-
-		[DebuggerStepThrough]
-		private void InitializeComponent()
-		{
-			DS1 = new DataSet();
-			Regions = new DataTable();
-			DataColumn1 = new DataColumn();
-			DataColumn2 = new DataColumn();
-			DataColumn3 = new DataColumn();
-			DataColumn4 = new DataColumn();
-			WorkReg = new DataTable();
-			DataColumn5 = new DataColumn();
-			DataColumn6 = new DataColumn();
-			DataColumn7 = new DataColumn();
-			DataColumn8 = new DataColumn();
-			Clientsdata = new DataTable();
-			DataColumn9 = new DataColumn();
-			DataColumn12 = new DataColumn();
-			DataColumn13 = new DataColumn();
-			DataColumn14 = new DataColumn();
-			DataColumn15 = new DataColumn();
-			DataColumn16 = new DataColumn();
-			DataColumn17 = new DataColumn();
-			DataColumn18 = new DataColumn();
-			DataColumn19 = new DataColumn();
-			DataColumn20 = new DataColumn();
-			DataColumn21 = new DataColumn();
-			admin = new DataTable();
-			DataTable1 = new DataTable();
-			DataColumn22 = new DataColumn();
-			DataColumn23 = new DataColumn();
-			Incudes = new DataTable();
-			DataColumn24 = new DataColumn();
-			DataColumn25 = new DataColumn();
-			DataColumn26 = new DataColumn();
-			DS1.BeginInit();
-			Regions.BeginInit();
-			WorkReg.BeginInit();
-			Clientsdata.BeginInit();
-			admin.BeginInit();
-			DataTable1.BeginInit();
-			Incudes.BeginInit();
-			DS1.DataSetName = "NewDataSet";
-			DS1.Locale = new CultureInfo("ru-RU");
-			DS1.Tables.AddRange(new[] {Regions, WorkReg, Clientsdata, admin, DataTable1, Incudes});
-			Regions.Columns.AddRange(new[] {DataColumn1, DataColumn2});
-			Regions.TableName = "Regions";
-			DataColumn1.ColumnName = "Region";
-			DataColumn2.ColumnName = "RegionCode";
-			DataColumn2.DataType = typeof (Int64);
-			DataColumn3.ColumnName = "FirmCode";
-			DataColumn3.DataType = typeof (Int32);
-			DataColumn4.ColumnName = "ShortName";
-			WorkReg.Columns.AddRange(new[] {DataColumn5, DataColumn6, DataColumn7, DataColumn8});
-			WorkReg.TableName = "WorkReg";
-			DataColumn5.ColumnName = "RegionCode";
-			DataColumn5.DataType = typeof (Int32);
-			DataColumn6.ColumnName = "Region";
-			DataColumn7.ColumnName = "ShowMask";
-			DataColumn7.DataType = typeof (Boolean);
-			DataColumn8.ColumnName = "RegMask";
-			DataColumn8.DataType = typeof (Boolean);
-			Clientsdata.Columns.AddRange(
-				new[]
-					{
-						DataColumn9, DataColumn10, DataColumn11, DataColumn12, DataColumn13, DataColumn14, DataColumn15, DataColumn16,
-						DataColumn17, DataColumn18, DataColumn19, DataColumn20, DataColumn21
-					});
-			Clientsdata.TableName = "Clientsdata";
-			DataColumn9.ColumnName = "adress";
-			DataColumn12.ColumnName = "fax";
-			DataColumn13.ColumnName = "firmsegment";
-			DataColumn13.DataType = typeof (Int16);
-			DataColumn14.ColumnName = "firmtype";
-			DataColumn14.DataType = typeof (Int16);
-			DataColumn15.ColumnName = "oldcode";
-			DataColumn15.DataType = typeof (Int16);
-			DataColumn16.ColumnName = "phone";
-			DataColumn17.ColumnName = "regioncode";
-			DataColumn17.DataType = typeof (Int64);
-			DataColumn18.ColumnName = "shortname";
-			DataColumn19.ColumnName = "url";
-			DataColumn20.ColumnName = "fullname";
-			DataColumn21.ColumnName = "mail";
-			admin.TableName = "admin";
-			DataTable1.Columns.AddRange(new[] {DataColumn22, DataColumn23});
-			DataTable1.TableName = "Payers";
-			DataColumn22.ColumnName = "PayerID";
-			DataColumn22.DataType = typeof (Int32);
-			DataColumn23.ColumnName = "PayerName";
-			Incudes.Columns.AddRange(new[] {DataColumn24, DataColumn25, DataColumn26});
-			Incudes.TableName = "Includes";
-			DataColumn24.ColumnName = "FirmCode";
-			DataColumn24.DataType = typeof (uint);
-			DataColumn25.ColumnName = "ShortName";
-			DataColumn26.ColumnName = "RegionCode";
-			DataColumn26.DataType = typeof (ulong);
-			DS1.EndInit();
-			Regions.EndInit();
-			WorkReg.EndInit();
-			Clientsdata.EndInit();
-			admin.EndInit();
-			DataTable1.EndInit();
-			Incudes.EndInit();
-		}
-
-		protected override void OnInit(EventArgs e)
-		{
-			base.OnInit(e);
-			InitializeComponent();
-		}
-
-		//******** SetWorkRegions *************
-		//при выборе региона клиента обновляет 'Регионы работы' и 'Показываемые регионы'
-		//выделяя те регионы, которые установлены как регионы по умолчанию в таблице regions
-
-		private void SetWorkRegions(string RegCode, bool AllRegions)
+		private void SetWorkRegions(string regCode, bool allRegions)
 		{
 			string commandText;
-			if (AllRegions)
+			if (allRegions)
 			{
 				commandText = @"
 SELECT  a.RegionCode, 
@@ -210,16 +61,18 @@ ORDER BY region;";
 			With.Connection(
 				c => {
 					var adapter = new MySqlDataAdapter(commandText, c);
-					adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", RegCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?RegionCode", regCode);
 					adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-					adapter.Fill(DS1, "WorkReg");
+					adapter.Fill(data, "WorkReg");
 				});
 
+			WRList.DataSource = data.Tables["WorkReg"];
 			WRList.DataBind();
+			OrderList.DataSource = data.Tables["WorkReg"];
 			OrderList.DataBind();
 			for (var i = 0; i <= WRList.Items.Count - 1; i++)
 			{
-				if (WRList.Items[i].Value == RegCode)
+				if (WRList.Items[i].Value == regCode)
 					WRList.Items[i].Selected = true;
 				OrderList.Items[i].Selected = WRList.Items[i].Selected;
 			}
@@ -275,7 +128,7 @@ set @inUser = ?UserName;";
 					command.Parameters.AddWithValue("?adress", AddressTB.Text);
 					command.Parameters.AddWithValue("?firmtype", TypeDD.SelectedItem.Value);
 					command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
-					command.Parameters.Add("?ClientCode", MySqlDbType.Int24);
+					command.Parameters.Add("?ClientCode", MySqlDbType.Int32);
 					command.Parameters.AddWithValue("?OSUserName", username);
 					command.Parameters.AddWithValue("?OSUserPass", password);
 					command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
@@ -290,19 +143,21 @@ set @inUser = ?UserName;";
 					if (IncludeCB.Checked)
 						billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, c).ExecuteScalar());
 					else if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
-						billingCode = CreateClientOnBilling(command);
+						billingCode = CreatePayer(command);
 					else
 						billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
 
 					clientCode = CreateClient(billingCode, command);
 
-					if (IncludeCB.Checked)
-						CreateClientOnShowInclude(Convert.ToInt32(IncludeSDD.SelectedValue), command);
-
 					if (TypeDD.SelectedItem.Text == "Аптека")
 						CreateDrugstore(CustomerType.SelectedItem.Text != "Стандартный", command);
 					else
 						CreateSupplier(command);
+
+					if (IncludeCB.Checked)
+					{
+						CreateRelationship(command);
+					}
 
 					ADHelper.CreateUserInAD(username,
 					                        password,
@@ -388,6 +243,11 @@ set @inUser = ?UserName;";
 			return (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый");
 		}
 
+		public bool IsSlaveClient()
+		{
+			return IncludeCB.Checked;
+		}
+
 		private void SendClientCardIfNeeded(uint clientCode,
 		                                    uint billingCode,
 		                                    string shortname,
@@ -465,7 +325,7 @@ values (?ClientHost, now(), ?UserName, ?TargetUserName, ?SmtpId, ?SentTo);";
 		protected void FindPayerB_Click(object sender, EventArgs e)
 		{
 			With.Connection(c => {
-			                	var adapter = new MySqlDataAdapter(String.Format(@"
+				var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
 FROM clientsdata as cd
@@ -476,12 +336,13 @@ WHERE   cd.regioncode & ?AdminRegionCode > 0
         AND p.ShortName like ?SearchText  
 		{0}
 ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
-			                	adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionCode", SecurityContext.Administrator.RegionMask);
-			                	adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", PayerFTB.Text));
-			                	adapter.Fill(DS1, "Payers");
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionCode", SecurityContext.Administrator.RegionMask);
+				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", PayerFTB.Text));
+				adapter.Fill(data, "Payers");
 
-			                });
+			});
 
+			PayerDDL.DataSource = data.Tables["PayerDDL"];
 			PayerDDL.DataBind();
 			PayerCountLB.Text = "[" + PayerDDL.Items.Count + "]";
 			PayerCountLB.Visible = true;
@@ -538,7 +399,7 @@ ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"
 		protected void IncludeSB_Click(object sender, EventArgs e)
 		{
 			With.Connection(c => {
-			                	var adapter = new MySqlDataAdapter(String.Format(@"
+				var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT cd.FirmCode, 
         convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
         cd.RegionCode  
@@ -554,17 +415,18 @@ WHERE cd.regioncode & ?AdminRegionMask > 0
 	  {0}
 ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
 
-			                	adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-			                	adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
-			                	adapter.Fill(DS1, "Includes");
-			                });
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
+				adapter.Fill(data, "Includes");
+			});
 
+			IncludeSDD.DataSource = data.Tables["Includes"];
 			IncludeSDD.DataBind();
 			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
 			IncludeCountLB.Visible = true;
-			if (DS1.Tables["Includes"].Rows.Count > 0)
+			if (data.Tables["Includes"].Rows.Count > 0)
 			{
-				RegionDD.SelectedValue = DS1.Tables["Includes"].Rows[0]["RegionCode"].ToString();
+				RegionDD.SelectedValue = data.Tables["Includes"].Rows[0]["RegionCode"].ToString();
 				SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 
 				IncludeType.Visible = true;
@@ -575,14 +437,14 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 			}	
 		}
 
-		private uint CreateClientOnBilling(MySqlCommand _command)
+		private uint CreatePayer(MySqlCommand command)
 		{
-			_command.CommandText =
+			command.CommandText =
 				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, JuridicalName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
 				DateTime.Now + "', null, ?ShortName, ?fullname, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
-			_command.CommandText += "SELECT LAST_INSERT_ID()";
-			_command.Parameters.AddWithValue("?BillingContactGroupOwnerId", CreateContactsForBilling(_command.Connection));
-			return Convert.ToUInt32(_command.ExecuteScalar());
+			command.CommandText += "SELECT LAST_INSERT_ID()";
+			command.Parameters.AddWithValue("?BillingContactGroupOwnerId", CreateContactsForBilling(command.Connection));
+			return Convert.ToUInt32(command.ExecuteScalar());
 		}
 
 		private uint CreateClient(uint billingCode, MySqlCommand command)
@@ -782,34 +644,36 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
+
 			if (!invisible)
 				command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
 			command.ExecuteNonQuery();
 		}
 
-		private void CreateClientOnShowInclude(int primaryClientCode, MySqlCommand command)
+		private void CreateRelationship(MySqlCommand command)
 		{
+			command.Parameters.AddWithValue("?Parent", Convert.ToInt32(IncludeSDD.SelectedValue));
+			command.Parameters.AddWithValue("?Child", command.Parameters["?ClientCode"].Value);
 			command.CommandText = @"
-INSERT INTO showregulation (PrimaryClientCode, ShowClientCode, Addition) 
-VALUES (" + primaryClientCode + @", ?ClientCode, ?ShortName); 
+INSERT INTO showregulation(PrimaryClientCode, ShowClientCode, Addition) 
+VALUES (?Parent, ?Child, ?ShortName);
 
-INSERT INTO includeregulation 
-(ID, PrimaryClientCode, IncludeClientCode, Addition, IncludeType)
-VALUES(NULL," + primaryClientCode + ", ?ClientCode, ?ShortName, ?IncludeType)";
+INSERT INTO includeregulation(PrimaryClientCode, IncludeClientCode, Addition, IncludeType)
+VALUES(?Parent, ?Child, ?ShortName, ?IncludeType);" + SharedCommands.UpdateWorkRules;
 			command.ExecuteNonQuery();
 		}
 
 		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			With.Connection(c => {
-			                	var command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;", c);
-			                	command.Parameters.AddWithValue("?firmCode", IncludeSDD.SelectedValue);
-			                	using (var reader = command.ExecuteReader())
-			                	{
-			                		if (reader.Read())
-			                			RegionDD.SelectedValue = reader[0].ToString();
-			                	}
-			                });
+				var command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;", c);
+				command.Parameters.AddWithValue("?firmCode", IncludeSDD.SelectedValue);
+				using (var reader = command.ExecuteReader())
+				{
+					if (reader.Read())
+						RegionDD.SelectedValue = reader[0].ToString();
+				}
+			});
 			UpdateInherit();
 			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
@@ -819,17 +683,16 @@ VALUES(NULL," + primaryClientCode + ", ?ClientCode, ?ShortName, ?IncludeType)";
 			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.RegisterDrugstore,
 			                                                    PermissionType.RegisterSupplier);
 
-			With.Connection(
-				c => {
-					var adapter = new MySqlDataAdapter( @"
+			With.Connection(c => {
+				var adapter = new MySqlDataAdapter(@"
 SELECT  r.regioncode, 
         r.region
 FROM farm.regions as r
 WHERE r.regioncode & ?AdminRegioMask > 0 
 ORDER BY region;", c);
-					adapter.SelectCommand.Parameters.AddWithValue("?AdminRegioMask", SecurityContext.Administrator.RegionMask);
-					adapter.Fill(DS1, "admin");
-				});
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegioMask", SecurityContext.Administrator.RegionMask);
+				adapter.Fill(data, "admin");
+			});
 
 
 			if (IsPostBack) 
@@ -838,18 +701,19 @@ ORDER BY region;", c);
 			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible))
 				CustomerType.Visible = true;
 
+			RegionDD.DataSource = data.Tables["admin"];
 			RegionDD.DataBind();
 
 			for (var i = 0; i <= RegionDD.Items.Count - 1; i++)
 			{
-				if (RegionDD.Items[i].Text == DS1.Tables["admin"].Rows[0]["region"].ToString())
+				if (RegionDD.Items[i].Text == data.Tables["admin"].Rows[0]["region"].ToString())
 				{
 					RegionDD.SelectedIndex = i;
 					break;
 				}
 			}
 
-			var iInt = DS1.Tables["admin"].Rows[0]["regioncode"].ToString();
+			var iInt = data.Tables["admin"].Rows[0]["regioncode"].ToString();
 			SetWorkRegions(iInt, CheckBox1.Checked);
 			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterDrugstore))
 			{

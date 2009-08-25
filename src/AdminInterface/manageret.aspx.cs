@@ -210,58 +210,48 @@ where ouar.clientcode = 2575 and up.Shortcut = 'AF' and ap.UserId is null;
 					}
 
 					var adapter = new MySqlDataAdapter();
-					adapter.InsertCommand =
-						new MySqlCommand(
-							@"
-INSERT 
-INTO    UserSettings.IncludeRegulation  
-        SET IncludeClientCode = ?ClientCode,
-        PrimaryClientCode     = ?PrimaryClientCode,
-        IncludeType           = ?IncludeType;",
-							connection, transaction);
-					adapter.InsertCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-					adapter.InsertCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					adapter.InsertCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
+					adapter.InsertCommand = new MySqlCommand(@"
+INSERT INTO UserSettings.IncludeRegulation
+SET IncludeClientCode = ?Child,
+	PrimaryClientCode = ?Parent,
+	IncludeType = ?IncludeType;" + SharedCommands.UpdateWorkRules, connection, transaction);
+					var command = adapter.InsertCommand;
+					command.Parameters.AddWithValue("?Child", ClientCode);
+					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
+					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 
-					adapter.UpdateCommand =
-						new MySqlCommand(
-							@"
-DELETE FROM UserSettings.IncludeRegulation 
-WHERE	IncludeClientCode = ?ClientCode 
-		AND PrimaryClientCode = ?OldPrimaryClientCode;
 
-INSERT 
-INTO    UserSettings.IncludeRegulation  
-        SET IncludeClientCode = ?ClientCode,
-        PrimaryClientCode     = ?PrimaryClientCode,
-        IncludeType           = ?IncludeType;",
-							connection, transaction);
-					adapter.UpdateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.UpdateCommand = new MySqlCommand(@"
+UPDATE UserSettings.IncludeRegulation
+SET PrimaryClientCode = ?Parent,
+	IncludeType = ?IncludeType
+where id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
+					adapter.UpdateCommand.Parameters.AddWithValue("?Child", ClientCode);
 					adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					adapter.UpdateCommand.Parameters.Add("?PrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-					adapter.UpdateCommand.Parameters.Add("?OldPrimaryClientCode", MySqlDbType.UInt32, 0, "FirmCode");
-					adapter.UpdateCommand.Parameters["?OldPrimaryClientCode"].SourceVersion = DataRowVersion.Original;
+					adapter.UpdateCommand.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
+					adapter.UpdateCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
+
+/*					adapter.UpdateCommand = new MySqlCommand(@"
+UPDATE UserSettings.IncludeRegulation
+SET PrimaryClientCode = ?Parent
+	and IncludeType = ?IncludeType
+where id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
+					command = adapter.UpdateCommand;
+					command.Parameters.AddWithValue("?Child", ClientCode);
+					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
+					command.Parameters["?Parent"].SourceVersion = DataRowVersion.Original;
+					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");*/
 
 					adapter.DeleteCommand = new MySqlCommand(@"
-UPDATE includeregulation i
-	JOIN intersection as src on src.clientcode = i.primaryclientcode
-		JOIN intersection as dst on dst.clientcode = i.includeclientcode 
-									and dst.pricecode = src.pricecode 
-									and dst.regioncode = src.regioncode
-SET dst.CostCode = src.CostCode,
-	dst.FirmCostCorr = src.FirmCostCorr,
-	dst.PublicCostCorr = src.PublicCostCorr,
-    dst.InvisibleOnClient = src.InvisibleOnClient,
-	dst.DisabledByClient = src.DisabledByClient,
-	dst.DisabledByAgency = src.DisabledByAgency,
-    dst.FirmClientCode = src.FirmClientCode,
-    dst.FirmClientCode2 = src.FirmClientCode2,
-    dst.FirmClientCode3 = src.FirmClientCode3
-WHERE i.Id = ?Id;
-
-DELETE FROM UserSettings.IncludeRegulation 
-WHERE id = ?id;", connection, transaction);
-					adapter.DeleteCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
+DELETE FROM UserSettings.IncludeRegulation
+WHERE id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
+					command = adapter.DeleteCommand;
+					command.Parameters.AddWithValue("?Child", ClientCode);
+					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
+					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
+					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 					adapter.Update(Data.Tables["Include"]);
 
 					updateCommand.ExecuteNonQuery();
@@ -472,13 +462,13 @@ WHERE rcs.clientcode = ?ClientCode";
 					var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  id,
 		cd.FirmCode,
-        convert(concat(cd.FirmCode ,'. ' ,cd.ShortName) using cp1251) ShortName,
+		convert(concat(cd.FirmCode ,'. ' ,cd.ShortName) using cp1251) ShortName,
 		ir.IncludeType
-FROM  IncludeRegulation ir 
-	JOIN ClientsData cd ON cd.firmcode = ir.PrimaryClientCode  
+FROM IncludeRegulation ir
+	JOIN ClientsData cd ON cd.firmcode = ir.PrimaryClientCode
 WHERE ir.IncludeClientCode = ?ClientCode
-	  and cd.RegionCode & ?AdminMaskRegion
-	  {0};
+		and cd.RegionCode & ?AdminMaskRegion
+		{0};
 ", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
 
 					Data = new DataSet();
