@@ -13,7 +13,7 @@ namespace AdminInterface.Test.Watin
 		{
 			using (var browser = new IE(BuildTestUrl("default.aspx")))
 			{
-				browser.Link(Find.ByText("Статистика обращений ")).Click();
+				browser.Link(Find.ByText("Статистика обращений")).Click();
 				Assert.That(browser.Text, Text.Contains("Выберите период или введите текст для поиска: "));
 			}
 		}
