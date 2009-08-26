@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text.RegularExpressions;
+using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using MySql.Data.MySqlClient;
@@ -28,7 +29,10 @@ namespace AdminInterface.Test.Watin
 			{
 				SetupGeneralInformation(browser);
 				browser.SelectList(Find.ById("TypeDD")).Select("Поставщик");
-				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
+				Thread.Sleep(1000);
+				browser.CheckBox(Find.ById("EnterBillingInfo")).Click();
+				Assert.That(browser.CheckBox(Find.ById("EnterBillingInfo")).Checked, Is.False);
+
 
 				browser.Button(Find.ById("Register")).Click();
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
@@ -49,7 +53,6 @@ namespace AdminInterface.Test.Watin
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 				clientCode = new Regex(@"\d+")
 					.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value;
-				Console.WriteLine(clientCode);
 			}
 			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
@@ -124,7 +127,19 @@ where clientcode = ?ClientCode", connection);
 		}
 
 		[Test]
-		public void EditPayerInfo()
+		public void Register_client_with_exists_payer()
+		{
+			using(var browser = new IE(BuildTestUrl("register.aspx")))
+			{
+				browser.CheckBox(Find.ById("PayerPresentCB")).Click();
+				browser.TextField(Find.ById("PayerFTB")).TypeText("Офис");
+				browser.Button(Find.ById("FindPayerB")).Click();
+				Assert.That(browser.SelectList(Find.ById("PayerDDL")).SelectedItem, Is.EqualTo("921. Офис123"));
+			}
+		}
+
+		[Test]
+		public void Register_client_with_payer_info()
 		{
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{

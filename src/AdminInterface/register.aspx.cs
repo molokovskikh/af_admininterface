@@ -342,7 +342,7 @@ ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"
 
 			});
 
-			PayerDDL.DataSource = data.Tables["PayerDDL"];
+			PayerDDL.DataSource = data.Tables["Payers"];
 			PayerDDL.DataBind();
 			PayerCountLB.Text = "[" + PayerDDL.Items.Count + "]";
 			PayerCountLB.Visible = true;

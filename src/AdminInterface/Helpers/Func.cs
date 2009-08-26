@@ -41,7 +41,7 @@ namespace AdminInterface.Helpers
 				if (!String.IsNullOrEmpty(to))
 				{
 #if DEBUG
-					to = "r.kvasov@analit.net";
+					to = "KvasovTest@analit.net";
 					bcc = "";
 #endif
 					var message = new MailMessage
@@ -78,7 +78,7 @@ namespace AdminInterface.Helpers
 				message.CC.Clear();
 				message.Bcc.Clear();
 
-				message.To.Add("r.kvasov@analit.net");
+				message.To.Add("KvasovTest@analit.net");
 #endif
 
 				var client = new SmtpClient("mail.adc.analit.net");
@@ -106,7 +106,7 @@ namespace AdminInterface.Helpers
 			{
 #if DEBUG
 				message.To.Clear();
-				message.To.Add("r.kvasov@analit.net");
+				message.To.Add("KvasovTest@analit.net");
 				message.Bcc.Clear();
 				message.CC.Clear();
 #endif
