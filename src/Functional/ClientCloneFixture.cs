@@ -45,7 +45,7 @@ namespace AdminInterface.Test.Watin
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 				browser.Button(Find.ByValue("Принять")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
-				Assert.That(browser.Uri, Text.EndsWith("client/3616"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
 			}
 		}
 

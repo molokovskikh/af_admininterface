@@ -101,8 +101,9 @@ set @inUser = ?UserName;
 
 UPDATE AnalitFReplicationInfo ari
 	JOIN OsUserAccessRight ouar on ari.UserId = ouar.RowId
-SET MaxSynonymCode = 0,  
-    MaxSynonymFirmCrCode = 0
+SET MaxSynonymCode = 0,
+	MaxSynonymFirmCrCode = 0,
+	ForceReplication = 1
 WHERE ouar.ClientCode = ?ClientCode;
 
 UPDATE (UserUpdateInfo as source, UserUpdateInfo as dest)
@@ -110,17 +111,17 @@ UPDATE (UserUpdateInfo as source, UserUpdateInfo as dest)
     JOIN OsUserAccessRight destUsers on destUsers.RowId = dest.UserId
 SET dest.UpdateDate = source.UpdateDate,
 	dest.AFAppVersion = source.AFAppVersion
-WHERE sourceUsers.clientcode = ?ParentClientCode   
-      AND destUsers.clientcode = ?ClientCode;    
+WHERE sourceUsers.clientcode = ?ParentClientCode
+      AND destUsers.clientcode = ?ClientCode;
 
 UPDATE AnalitFReplicationInfo as dest
 	JOIN AnalitFReplicationInfo as source on source.FirmCode = dest.FirmCode
 		JOIN OsUserAccessRight sourceUsers on source.UserId = sourceUsers.RowId
 	JOIN OsUserAccessRight destUsers on dest.UserId = destUsers.RowId
-SET dest.MaxSynonymFirmCrCode = source.MaxSynonymFirmCrCode,  
+SET dest.MaxSynonymFirmCrCode = source.MaxSynonymFirmCrCode,
     dest.MaxSynonymCode = source.MaxSynonymCode
-WHERE destUsers.clientcode = ?ClientCode   
-      AND sourceUsers.clientcode = ?ParentClientCode;   
+WHERE destUsers.clientcode = ?ClientCode
+      AND sourceUsers.clientcode = ?ParentClientCode;
 
 INSERT 
 INTO    logs.clone 
