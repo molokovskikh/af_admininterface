@@ -4,20 +4,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
-    <title>Ошибка в Административном интерфейсе</title>
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+	<title>Ошибка в Административном интерфейсе</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
 </head>
 <body bgcolor="#ffffff">
-    <form id="Form1" method="post" runat="server">
+	<form id="Form1" method="post" runat="server">
 		<div style="width:100%; text-align:center;">
 			<h3 style="color: red">
 			Ошибка в Административном интерфейсе
 			</h3>
 			<p id="Message" runat="server">
-			Сообщение об ошибке было отправленно разработчикам. Повторите ваши действия.
+			Попробуйте вернуться на предыдущую страницу и повторить действие. Мы оповещены о возникшей проблеме и постараемся устранить ее в ближайшее время.
 			</p>
-			<asp:Button ID="BackButton" runat="server" Text="Вернуться на страницу" OnClick="BackButton_Click" />
-        </div>
-    </form>
+			<a href="javascript:history.back(1)">Возврат на предыдущую страницу</a>
+		</div>
+	</form>
 </body>
 </html>
