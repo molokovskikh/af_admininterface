@@ -139,17 +139,17 @@ ORDER BY IsAll Desc, Region;", _connection);
 			if (ADCB.Checked)
 				row.Cells[7].CssClass = data.Row["ADUserStatus"].ToString();
 
-			if (data.Row["FirstUpdate"] == DBNull.Value)
-				return;
-
 			if (data.Row["InvisibleOnFirm"].ToString() == "1" || data.Row["InvisibleOnFirm"].ToString() == "2")
 				row.Cells[2].CssClass = "not-base-client";
+
+			if (data.Row["FirstUpdate"] == DBNull.Value)
+				return;
 
 			if (DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2
 				&& data.Row["FirmStatus"].ToString() == "0")
 				row.Cells[4].BackColor = Color.Gray;
-
 		}
+
 		protected void ClientsGridView_Sorting(object sender, GridViewSortEventArgs e)
 		{
 			if (_sortExpression == e.SortExpression)
