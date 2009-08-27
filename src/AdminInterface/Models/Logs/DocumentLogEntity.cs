@@ -51,7 +51,7 @@ namespace AdminInterface.Model
 																		  DateTime endDate)
 		{
 			var fieldName = client.Type == ClientType.Supplier ? "FromSupplier" : "ForClient";
-			return ArHelper.WithSession<DocumentLogEntity>(
+			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (DocumentLogEntity))
 				           	.Add(Expression.Between("LogTime", beginDate, endDate))
 				           	.Add(Expression.Eq(fieldName, client))

@@ -15,9 +15,7 @@
 <div>
 
 	<table class="DataTable">
-	<%
-		if logEntities.Count != 0:
-	%>
+	<% if logEntities.Count != 0: %>
 		<tr>
 			<th>
 				Номер документа
@@ -28,26 +26,23 @@
 			<th>
 				Тип документа
 			</th>
-		<% 
-			if client.IsDrugstore():
-		%>
+		<% if client.IsDrugstore():%>
 			<th>
 				От поставщика
 			</th>
-		<%
-			else:
-		%>
+		<% else: %>
 			<th>
 				Для аптеки
 			</th>
-		<%
-			end
-		%>
+		<% end %>
 			<th>
 				Название файла
 			</th>
 			<th>
 				Размер
+			</th>
+			<th>
+				Пользователь получивший документ
 			</th>
 			<th>
 				Дата отправки
@@ -74,7 +69,7 @@
 			if client.IsDrugstore():
 		%>
 				<td>
-					${logEntity.FromSupplier.ShortName if logEntity.FromSupplier != null}	
+					${logEntity.FromSupplier.ShortName if logEntity.FromSupplier != null}
 				</td>
 		<%
 			else:
@@ -90,6 +85,9 @@
 			</td>
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize) if logEntity.DocumentSize != null}
+			</td>
+			<td>
+				${logEntity.UpdateLogEntity.User.Login if logEntity.UpdateLogEntity and logEntity.UpdateLogEntity.User}
 			</td>
 			<td>
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
