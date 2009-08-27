@@ -164,14 +164,14 @@ where `from` = :phone")
 			{
 				ADHelper.ChangePassword(user.Login, password);
 
-			    DbLogHelper.SetupParametersForTriggerLogging<ClientInfoLogEntity>(userName, host);
+				DbLogHelper.SetupParametersForTriggerLogging<ClientInfoLogEntity>(userName, host);
 
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
 
 				ClientInfoLogEntity.PasswordChange(user.Client.Id, isFree, reason).Save();
 
-				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);			
+				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);
 
 				if (isSendClientCard)
 				{
@@ -180,7 +180,7 @@ where `from` = :phone")
 					                                                            password,
 					                                                            additionEmailsToNotify);
 					passwordChangeLog.SmtpId = smtpId;
-					passwordChangeLog.SetSentTo(additionEmailsToNotify, user.Client.GetAddressForSendingClientCard());
+					passwordChangeLog.SetSentTo(additionEmailsToNotify);
 				}
 
 				passwordChangeLog.Save();
@@ -189,7 +189,7 @@ where `from` = :phone")
 			NotificationHelper.NotifyAboutPasswordChange(user.Client,
 			                                             administrator,
 			                                             user,
-														 password,
+			                                             password,
 			                                             isFree,
 			                                             Context.Request.UserHostAddress,
 			                                             reason);

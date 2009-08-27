@@ -48,13 +48,9 @@ namespace AdminInterface.Models.Logs
 				         && Expression.Between("LogTime", beginDate, endDate));
 		}
 
-		public void SetSentTo(string additionEmailsToNotify, string clientEmails)
+		public void SetSentTo(string emailsToNotify)
 		{
-			SentTo = clientEmails;
-			if (String.IsNullOrEmpty(SentTo))
-				SentTo = additionEmailsToNotify;
-			else if (!String.IsNullOrEmpty(additionEmailsToNotify))
-				SentTo += ", " + additionEmailsToNotify;
+			SentTo = emailsToNotify;
 		}
 
 		public bool IsChangedByOneSelf()

@@ -61,7 +61,6 @@ namespace AdminInterface.Helpers
 
 		public static int SendClientCardAfterPasswordChange(Client client, User user, string password, string additionTo)
 		{
-			var generalTo = client.GetAddressForSendingClientCard();
 			return SendClientCard(client.Id,
 			                      client.BillingInstance.PayerID,
 			                      client.ShortName,
@@ -69,7 +68,7 @@ namespace AdminInterface.Helpers
 			                      BindingHelper.GetDescription(client.Type),
 			                      user.Login,
 			                      password,
-			                      generalTo,
+			                      null,
 			                      additionTo,
 			                      false);
 		}
