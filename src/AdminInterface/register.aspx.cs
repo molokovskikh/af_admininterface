@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
@@ -203,7 +204,8 @@ set @inUser = ?UserName;";
 			Session["Tariff"] = TypeDD.SelectedItem.Text;
 			Session["Register"] = true;
 
-			SendClientCardIfNeeded(clientCode, billingCode, shortname, username, password);
+			var log = SendClientCardIfNeeded(clientCode, billingCode, shortname, username, password);
+			log.Save();
 
 			var sendBillingNotificationNow = true;
 			string redirectTo;
@@ -248,17 +250,20 @@ set @inUser = ?UserName;";
 			return IncludeCB.Checked;
 		}
 
-		private void SendClientCardIfNeeded(uint clientCode,
+		private PasswordChangeLogEntity SendClientCardIfNeeded(uint clientCode,
 		                                    uint billingCode,
 		                                    string shortname,
 		                                    string username,
 		                                    string password)
 		{
+			var log = new PasswordChangeLogEntity(HttpContext.Current.Request.UserHostAddress,
+			                                      SecurityContext.Administrator.UserName,
+			                                      username);
 			if (!SendRegistrationCard.Checked)
-				return;
+				return log;
 
 			if (IsBasicClient())
-				return;
+				return log;
 
 			string mailTo;
 
@@ -279,29 +284,8 @@ set @inUser = ?UserName;";
 			                                         AdditionEmailToSendRegistrationCard.Text,
 			                                         true);
 
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-				command.CommandText = @"
-insert into logs.passwordchange(ClientHost, LogTime, UserName, TargetUserName, SmtpId, SentTo)
-values (?ClientHost, now(), ?UserName, ?TargetUserName, ?SmtpId, ?SentTo);";
-				command.Parameters.AddWithValue("?ClientHost", HttpContext.Current.Request.UserHostAddress);
-				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-				command.Parameters.AddWithValue("?TargetUserName", username);
-				command.Parameters.AddWithValue("?SmtpId", smtpid);
-				var sentTo = "";
-				if (!String.IsNullOrEmpty(mailTo))
-					sentTo = mailTo;
-				if (!String.IsNullOrEmpty(AdditionEmailToSendRegistrationCard.Text))
-				{
-					if (!String.IsNullOrEmpty(sentTo))
-						sentTo += ", ";
-					sentTo += AdditionEmailToSendRegistrationCard.Text;
-				}
-				command.Parameters.AddWithValue("?SentTo", sentTo);
-				command.ExecuteNonQuery();
-			}
+			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, AdditionEmailToSendRegistrationCard.Text));
+			return log;
 		}
 
 		protected void PayerPresentCB_CheckedChanged(object sender, EventArgs e)

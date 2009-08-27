@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 
 namespace AdminInterface.Test.ForTesting

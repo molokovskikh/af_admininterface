@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 using WatiN.Core.Interfaces;
 

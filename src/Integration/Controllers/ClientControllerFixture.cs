@@ -17,7 +17,7 @@ using MySql.Data.MySqlClient;
 using NHibernate.Criterion;
 using NHibernate.Mapping;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Controllers
 {

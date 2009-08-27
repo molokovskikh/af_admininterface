@@ -6,7 +6,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace Integration.Models
 {

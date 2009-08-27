@@ -3,7 +3,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Models
 {
@@ -55,14 +55,14 @@ namespace AdminInterface.Test.Models
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void Throw_exception_if_nothind_allow()
 		{
 			var adm = new Administrator
 			          	{
 			          		AllowedPermissions = new List<Permission>()
 			          	};
-			adm.GetClientFilterByType("cd");
+			Assert.That(() => adm.GetClientFilterByType("cd"),
+				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
 		[Test]
@@ -80,7 +80,6 @@ namespace AdminInterface.Test.Models
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void CheckFailPermisions()
 		{
 			var adm = new Administrator
@@ -90,7 +89,9 @@ namespace AdminInterface.Test.Models
 							                     		new Permission { Type = PermissionType.Billing },
 							                     	}
 			};
-			adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators);
+			Assert.That(() => adm.CheckPermisions(PermissionType.Billing, PermissionType.ManageAdministrators),
+			            Throws.InstanceOf<NotHavePermissionException>());
+			
 		}
 
 		[Test]
@@ -107,38 +108,40 @@ namespace AdminInterface.Test.Models
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void CheckFailAnyOfPermissions()
 		{
 			var adm = new Administrator
 			{
 				AllowedPermissions = new List<Permission>()
 			};
-			adm.CheckAnyOfPermissions(PermissionType.Billing, PermissionType.ManageAdministrators);
+			Assert.That(() => adm.CheckAnyOfPermissions(PermissionType.Billing, PermissionType.ManageAdministrators),
+			            Throws.InstanceOf<NotHavePermissionException>());
+			
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void FailCheckForDrugstorePermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewSuppliers });
-			_adm.CheckClientType(ClientType.Drugstore);
+			Assert.That(() => _adm.CheckClientType(ClientType.Drugstore),
+			            Throws.InstanceOf<NotHavePermissionException>());
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void FailCheckForSupplierPermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission { Type = PermissionType.ViewDrugstore });
-			_adm.CheckClientType(ClientType.Supplier);
+
+			Assert.That(() => _adm.CheckClientType(ClientType.Supplier),
+			            Throws.InstanceOf<NotHavePermissionException>());
 		}
 
 		[Test]
-		[ExpectedException(ExceptionType = typeof(NotHavePermissionException))]
 		public void FailCheckClientHomeRegion()
 		{
 			_adm.RegionMask = 1;
-			_adm.CheckClientHomeRegion(2);
+			Assert.That(() => _adm.CheckClientHomeRegion(2),
+			            Throws.InstanceOf<NotHavePermissionException>());
 		}
 
 		[Test]

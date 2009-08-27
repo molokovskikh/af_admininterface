@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Mail;
+using Common.Tools;
 
 namespace AdminInterface.Helpers
 {
@@ -35,6 +37,11 @@ namespace AdminInterface.Helpers
 			if (text == null)
 				return null;
 			return text.Trim();
+		}
+
+		public static string JoinMails(params string[] parts)
+		{
+			return parts.Where(p => !String.IsNullOrEmpty(p) && !String.IsNullOrEmpty(p.Trim())).Implode(", ");
 		}
 	}
 }

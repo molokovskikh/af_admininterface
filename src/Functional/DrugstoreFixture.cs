@@ -5,7 +5,7 @@ using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Tools;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 
 namespace AdminInterface.Test.Watin

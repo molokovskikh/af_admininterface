@@ -48,8 +48,9 @@ namespace AdminInterface.Models.Logs
 				         && Expression.Between("LogTime", beginDate, endDate));
 		}
 
-		public void SetSentTo(string emailsToNotify)
+		public void SetSentTo(int smtpId, string emailsToNotify)
 		{
+			SmtpId = smtpId;
 			SentTo = emailsToNotify;
 		}
 

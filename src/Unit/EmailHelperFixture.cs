@@ -4,7 +4,7 @@ using System.Net.Mail;
 using System.Text;
 using AdminInterface.Helpers;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Helpers
 {
@@ -29,6 +29,14 @@ r.kvasov@analit.net
 			Assert.That(EmailHelper.NormalizeEmailOrPhone(""), Is.Empty);
 			Assert.That(EmailHelper.NormalizeEmailOrPhone(" \r \r  \n 456-456546   \t \r\n "), Is.EqualTo("456-456546"));
 			Assert.That(EmailHelper.NormalizeEmailOrPhone("456-456546"), Is.EqualTo("456-456546"));
+		}
+
+		[Test]
+		public void JoinMails()
+		{
+			Assert.That(EmailHelper.JoinMails(null, "tech@analit.net"), Is.EqualTo("tech@analit.net"));
+			Assert.That(EmailHelper.JoinMails("tech@analit.net", ""), Is.EqualTo("tech@analit.net"));
+			Assert.That(EmailHelper.JoinMails("tech@analit.net", "service@analit.net"), Is.EqualTo("tech@analit.net, service@analit.net"));
 		}
 	}
 }

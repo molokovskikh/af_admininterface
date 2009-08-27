@@ -3,7 +3,7 @@ using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.MonoRailExtentions
 {

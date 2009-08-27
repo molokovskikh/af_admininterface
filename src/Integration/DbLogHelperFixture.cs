@@ -4,7 +4,7 @@ using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Helpers
 {

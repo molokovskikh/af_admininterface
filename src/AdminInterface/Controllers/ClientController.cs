@@ -179,8 +179,7 @@ where `from` = :phone")
 					                                                            user,
 					                                                            password,
 					                                                            additionEmailsToNotify);
-					passwordChangeLog.SmtpId = smtpId;
-					passwordChangeLog.SetSentTo(additionEmailsToNotify);
+					passwordChangeLog.SetSentTo(smtpId, additionEmailsToNotify);
 				}
 
 				passwordChangeLog.Save();

@@ -6,7 +6,7 @@ using AdminInterface.Test.ForTesting;
 using AdminInterface.Models.Telephony;
 using Microsoft.VisualStudio.WebHost;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 
 namespace AdminInterface.Test.Watin

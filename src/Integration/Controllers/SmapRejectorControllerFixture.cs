@@ -6,7 +6,7 @@ using AdminInterface.Security;
 using AdminInterface.Test.ForTesting;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Controllers
 {

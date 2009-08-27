@@ -1,6 +1,6 @@
 ﻿using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 
 namespace Functional

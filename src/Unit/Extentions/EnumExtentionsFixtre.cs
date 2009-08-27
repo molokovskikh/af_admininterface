@@ -1,6 +1,6 @@
 ﻿using AdminInterface.Extentions;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 
 namespace AdminInterface.Test.Extentions
 {

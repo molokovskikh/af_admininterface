@@ -5,7 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-using NUnit.Framework.SyntaxHelpers;
+
 using WatiN.Core;
 
 namespace AdminInterface.Test.Watin
