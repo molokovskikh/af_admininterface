@@ -34,7 +34,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<div class="hidden">
 				<% end %>
 					<form action="UpdateClientsStatus.rails" method="post">
-						<input type="hidden" name="clientCode" value="${ClientCode}" />
+						<input type="hidden" name="clientCode" value="${client.Id}" />
 						<div style="overflow-x:scroll;">
 						<table class="DataTable" style="width:100%;">
 							<tr>

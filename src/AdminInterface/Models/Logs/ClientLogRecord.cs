@@ -20,7 +20,7 @@ namespace AdminInterface.Models.Logs
 		[Property("FirmStatus")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
-		public static IList<ClientLogRecord> GetClientLogRecords(uint clientCode)
+		public static IList<ClientLogRecord> GetClientLogRecords(Client client)
 		{
 			return (List<ClientLogRecord>) Execute(
 			                               	(session, instance) =>
@@ -32,7 +32,7 @@ where firmstatus is not null
 order by logtime desc
 limit 5")
 			                               		.AddEntity(typeof (ClientLogRecord))
-			                               		.SetParameter("ClientCode", clientCode)
+			                               		.SetParameter("ClientCode", client.Id)
 			                               		.List<ClientLogRecord>(), null);
 		}
 

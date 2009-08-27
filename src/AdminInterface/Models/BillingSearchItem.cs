@@ -25,9 +25,6 @@ namespace AdminInterface.Models
 		public DateTime LastClientRegistrationDate { get; set; }
 
 		[Property]
-		public uint LastRegistredClientId { get; set; }
-
-		[Property]
 		public uint DisabledClientsCount { get; set; }
 
 		[Property]
@@ -137,13 +134,12 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 				var result = session.CreateSQLQuery(String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
-        p.shortname as {{BillingSearchItem.ShortName}},
-        p.oldpaydate as {{BillingSearchItem.PayDate}},
-        p.oldtariff as {{BillingSearchItem.PaySum}},
-		max(RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},		
-        max(cd.firmcode) as {{BillingSearchItem.LastRegistredClientId}},
-        sum(if(cd.FirmStatus = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
-        sum(if(cd.FirmStatus = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
+		p.shortname as {{BillingSearchItem.ShortName}},
+		p.oldpaydate as {{BillingSearchItem.PayDate}},
+		p.oldtariff as {{BillingSearchItem.PaySum}},
+		max(RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
+		sum(if(cd.FirmStatus = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
+		sum(if(cd.FirmStatus = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
@@ -155,10 +151,10 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 from billing.payers p
 	join usersettings.clientsdata cd on p.payerid = cd.billingcode
 where cd.RegionCode & :AdminRegionMask > 0
-	  {3}
-	  {0}	
+		{3}
+		{0}
 group by p.payerId
-having 	{1}
+having {1}
 		and sum(if({2}, 1, 0)) > 0
 order by {{BillingSearchItem.ShortName}}
 ", debitorFilterBlock, searchBlock, groupFilter, SecurityContext.Administrator.GetClientFilterByType("cd")))

@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BillingFixture.cs" />
+    <Compile Include="ClientMessagesFixture.cs" />
     <Compile Include="BindPhoneToClientFixture.cs" />
     <Compile Include="CallbackRulesFixture.cs" />
     <Compile Include="ClientCloneFixture.cs" />

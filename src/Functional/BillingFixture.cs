@@ -1,93 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
-using Castle.ActiveRecord;
+﻿using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
-	[TestFixture]
 	public class BillingFixture : WatinFixture
 	{
 		[Test]
-		public void User_can_send_message_to_client()
+		public void Payers_should_be_searchable_throw_payer_id()
 		{
-			ForTest.InitialzeAR();
-
-			List<ClientMessage> messages;
-
-			using (new SessionScope())
+			using (var browser = Open("main/index"))
 			{
-				messages = Client.Find(2575u).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
-				foreach (var message in messages)
-				{
-					message.Message = "1";
-					message.ShowMessageCount = 0;
-					message.Update();
-				}
-			}
+				browser.Link(Find.ByText("Биллинг")).Click();
+				Assert.That(browser.Text, Text.Contains("Фильтр плательщиков"));
+				browser.RadioButton(Find.ById("SearchByBillingId")).Click();
+				browser.TextField(Find.ById("SearchText")).TypeText("921");
+				browser.Button(Find.ByValue("Найти")).Click();
 
-			using (var browser = new IE(BuildTestUrl("Billing/edit?clientCode=2575")))
-			{
-				browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText("Тестовое сообщение");
-				browser.Button(Find.ByValue("Отправить сообщение")).Click();
-				Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
-			}
-
-			foreach (var message in messages)
-			{
-				message.Refresh();
-				Assert.That(message.Message, Is.EqualTo("Тестовое сообщение"));
-				Assert.That(message.ShowMessageCount, Is.EqualTo(1));	
+				Assert.That(browser.Text, Text.Contains("Офис123"));
+				browser.Link(Find.ByText("921")).Click();
+				Assert.That(browser.Text, Text.Contains("Платильщик Офис123"));
 			}
 		}
 
-		[Test]
-		public void Cancel_message_for_client()
+		private IE Open(string uri)
 		{
-			ForTest.InitialzeAR();
-
-			List<ClientMessage> messages;
-
-			using (new SessionScope())
-			{
-				messages = Client.Find(2575u).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
-				foreach (var message in messages)
-				{
-					message.Message = "тестовое сообщение";
-					message.ShowMessageCount = 1;
-					message.Update();
-				}
-			}
-
-			using (var browser = new IE(BuildTestUrl("Billing/edit?clientCode=2575")))
-			{
-				Assert.That(browser.Text, Text.Contains("Остались не показанные сообщения"));
-				browser.Link(Find.ByText("Просмотреть сообщение")).Click();
-				Thread.Sleep(400);
-				Assert.That(browser.Text, Text.Contains("тестовое сообщение"));
-				Assert.That(browser.Text, Text.Contains("Осталось показать 1 раз"));
-				browser.Button(Find.ByValue("Отменить показ сообщения")).Click();
-				Thread.Sleep(400);
-				Assert.That(browser.Text, Text.Contains("Сообщение удалено"));
-
-				browser.Refresh();
-				Assert.That(browser.Text, Text.DoesNotContain("Остались не показанные сообщения"));
-			}
-
-
-			foreach (var message in messages)
-			{
-				message.Refresh();
-				Assert.That(message.Message, Is.EqualTo("тестовое сообщение"));
-				Assert.That(message.ShowMessageCount, Is.EqualTo(0));
-			}
+			return new IE(BuildTestUrl(uri));
 		}
 	}
 }

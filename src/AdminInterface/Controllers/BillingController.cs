@@ -29,18 +29,23 @@ namespace AdminInterface.Controllers
 	]
 	public class BillingController : ARSmartDispatcherController
 	{
-		public void Edit(uint clientCode, 
-						bool showClients, 
-						string tab, 
-						DateTime? paymentsFrom, 
-						DateTime? paymentsTo)
+		public void Edit(uint billingCode,
+			uint clientCode,
+			bool showClients,
+			string tab,
+			DateTime? paymentsFrom,
+			DateTime? paymentsTo)
 		{
-			var client = Client.Find(clientCode);
+			Client client;
+			if (billingCode == 0)
+				client = Client.Find(clientCode);
+			else
+				client = Payer.Find(billingCode).Clients.First();
 
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
-			var clientMessage = ClientMessage.FindClientMessage(clientCode);
+			var clientMessage = ClientMessage.FindClientMessage(client.Id);
 
 			if (clientMessage != null)
 				PropertyBag["ClientMessage"] = clientMessage;
@@ -55,7 +60,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["tab"] = tab;
 			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
 			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
-			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(clientCode);
+			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(client);
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
@@ -155,15 +160,15 @@ namespace AdminInterface.Controllers
 							SearchBy searchBy)
 		{
 			var searchProperties = new BillingSearchProperties
-			                       	{
-			                       		PayerState = payerState,
-			                       		SearchText = searchText,
-			                       		RegionId = regionId,
-			                       		Segment = segment,
-			                       		ClientStatus = clientStatus,
-			                       		ClientType = clientType,
-			                       		SearchBy = searchBy
-			                       	};
+			{
+				PayerState = payerState,
+				SearchText = searchText,
+				RegionId = regionId,
+				Segment = segment,
+				ClientStatus = clientStatus,
+				ClientType = clientType,
+				SearchBy = searchBy
+			};
 			var direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
 
 			var searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
@@ -200,7 +205,7 @@ namespace AdminInterface.Controllers
 			{
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-		    RedirectToAction("Edit", new {clientCode, tab = "mail"});
+			RedirectToAction("Edit", new {clientCode, tab = "mail"});
 		}
 
 		public void DeleteMail(uint id)

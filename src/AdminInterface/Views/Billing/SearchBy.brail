@@ -95,7 +95,7 @@ OutputSubView("Search")
 					<% if searchResult.ShowPayDate: %>
 					<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}" />
 					<% end %>
-					<a href="edit.rails?clientCode=${searchResult.LastRegistredClientId}">${searchResult.BillingCode}</a>
+					<a href="edit.rails?BillingCode=${searchResult.BillingCode}">${searchResult.BillingCode}</a>
 				</td>
 				<td>
 					${searchResult.ShortName}
