@@ -32,12 +32,12 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public DateTime WriteTime { get; set; }
 
-		public ClientInfoLogEntity SetProblem(bool isFree, string problem)
+		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
 		{
 			if (isFree)
-				Message = "$$$Бесплатное изменение пароля: " + problem;
+				Message = String.Format("$$$Пользователь {0}. Бесплатное изменение пароля: {1}", username, problem);
 			else
-				Message = "$$$Платное изменение пароля: " + problem;
+				Message = String.Format("$$$Пользователь {0}. Платное изменение пароля: {1}", username,problem);
 			return this;
 		}
 
@@ -46,9 +46,9 @@ namespace AdminInterface.Models.Logs
 			return Message.Contains("$$$Клиент ");
 		}
 
-		public static ClientInfoLogEntity PasswordChange(uint clientCode, bool isFree, string reason)
+		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)
 		{
-			return new ClientInfoLogEntity("", clientCode).SetProblem(isFree, reason);
+			return new ClientInfoLogEntity("", user.Client.Id).SetProblem(isFree, user.Login, reason);
 		}
 
 		public static ClientInfoLogEntity StatusChange(ClientStatus status, uint clientCode)

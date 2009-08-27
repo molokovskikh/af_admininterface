@@ -1,6 +1,8 @@
 ﻿using System.Threading;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
+using Common.Tools;
 using NUnit.Framework;
 using NUnit.Framework.SyntaxHelpers;
 using WatiN.Core;
@@ -74,6 +76,27 @@ namespace AdminInterface.Test.Watin
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
 					Assert.That(openedWindow.Text, Text.Contains("Пароль успешно изменен"));
 				}
+			}
+		}
+
+		[Test]
+		public void After_password_change_message_should_be_added_to_history()
+		{
+			ForTest.InitialzeAR();
+			ClientInfoLogEntity.MessagesForClient(Client.Find(3616u)).Each(e => e.Delete());
+
+			using(var browser = Open("client/3616"))
+			{
+				browser.Link(Find.ByText("KvasovT")).Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля пользователя KvasovT [Клиент: ТестерК2]")))
+				{
+					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+					openedWindow.Button(Find.ByValue("Изменить")).Click();
+					Assert.That(openedWindow.Text, Text.Contains("Пароль успешно изменен"));
+				}
+
+				browser.Refresh();
+				Assert.That(browser.Text, Text.Contains("$$$Пользователь KvasovT. Платное изменение пароля: Тестовое изменение пароля"));
 			}
 		}
 	}

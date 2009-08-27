@@ -35,5 +35,10 @@ namespace AdminInterface.Test.ForTesting
 				Console.WriteLine(browser.Text);
 			}
 		}
+
+		protected IE Open(string uri)
+		{
+			return new IE(BuildTestUrl(uri));
+		}
 	}
 }

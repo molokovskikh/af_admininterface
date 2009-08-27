@@ -23,10 +23,5 @@ namespace Functional
 				Assert.That(browser.Text, Text.Contains("Платильщик Офис123"));
 			}
 		}
-
-		private IE Open(string uri)
-		{
-			return new IE(BuildTestUrl(uri));
-		}
 	}
 }

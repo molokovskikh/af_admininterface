@@ -169,7 +169,7 @@ where `from` = :phone")
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
 
-				ClientInfoLogEntity.PasswordChange(user.Client.Id, isFree, reason).Save();
+				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
 				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);
 
