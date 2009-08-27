@@ -49,6 +49,7 @@ namespace AdminInterface.Models
 				String.Format(
 @"Оператор: {0}
 Хост: {1}
+Код клиента: {6}
 Краткое наименование: {2}
 Полное наименование: {3}
 Домашний регион: {4}
@@ -59,7 +60,8 @@ namespace AdminInterface.Models
 					 client.ShortName,
 					 client.FullName,
 					 client.HomeRegion.Name,
-					 offLetter),
+					 offLetter,
+					 client.Id),
 				"RegisterList@subscribe.analit.net");
 		}
 	}
