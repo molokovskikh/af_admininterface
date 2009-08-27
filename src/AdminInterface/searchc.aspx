@@ -156,7 +156,7 @@
 					</tr>
 					<tr>
 						<td class="not-base-client"></td>
-						<td> - Скрытый или недоступный клиент</td>
+						<td> - Скрытый или недоступный для настроек клиент в интерфейсе поставщика</td>
 					</tr>
 					<tr>
 						<td style="background-color:Gray"></td>
