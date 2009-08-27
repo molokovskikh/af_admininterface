@@ -147,11 +147,11 @@ INTO    logs.clone
 				});
 
 			NotificationHelper.NotifyAboutRegistration(
-				String.Format("Успешное присвоение кодов({0} > {1})", parentClientCode, clientCode),
+				String.Format("Успешное клонирование({0} > {1})", parentClientCode, clientCode),
 				String.Format("От: {0} \nДля: {1} \nОператор: {2}", FromDD.SelectedItem.Text, ToDD.SelectedItem.Text, SecurityContext.Administrator.UserName));
 
 			LabelErr.ForeColor = Color.Green;
-			LabelErr.Text = "Присвоение успешно завершено.Время операции: " + DateTime.Now;
+			LabelErr.Text = "Клонирование успешно завершено.Время операции: " + DateTime.Now;
 			FromDD.Visible = false;
 			ToDD.Visible = false;
 			FromTB.Visible = true;
