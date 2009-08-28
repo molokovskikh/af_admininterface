@@ -221,7 +221,6 @@ SET IncludeClientCode = ?Child,
 					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
 
-
 					adapter.UpdateCommand = new MySqlCommand(@"
 UPDATE UserSettings.IncludeRegulation
 SET PrimaryClientCode = ?Parent,
@@ -231,18 +230,6 @@ where id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
 					adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
 					adapter.UpdateCommand.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
 					adapter.UpdateCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
-
-/*					adapter.UpdateCommand = new MySqlCommand(@"
-UPDATE UserSettings.IncludeRegulation
-SET PrimaryClientCode = ?Parent
-	and IncludeType = ?IncludeType
-where id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
-					command = adapter.UpdateCommand;
-					command.Parameters.AddWithValue("?Child", ClientCode);
-					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
-					command.Parameters["?Parent"].SourceVersion = DataRowVersion.Original;
-					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");*/
 
 					adapter.DeleteCommand = new MySqlCommand(@"
 DELETE FROM UserSettings.IncludeRegulation
