@@ -57,7 +57,6 @@
 				</td>
 			</tr>
 		</table>
-	<asp:Label ID="LabelErr" runat="server" Font-Size="9pt" Font-Names="Verdana" ForeColor="Red"
-		Font-Bold="True"></asp:Label>
+	<asp:Label ID="LabelErr" runat="server" Font-Size="9pt" Font-Names="Verdana" ForeColor="Red" Font-Bold="True"></asp:Label>
 </form>
 </asp:Content>

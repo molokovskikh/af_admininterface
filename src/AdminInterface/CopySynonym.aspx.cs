@@ -71,7 +71,7 @@ WHERE   MaskRegion & ?MaskRegion > 0
         and (shortname like ?NameStr
 			or fullname like ?NameStr)", c);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", nameStr));
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask & Convert.ToUInt64(RegionDD.SelectedValue));
 					dataAdapter.Fill(_data, where);
 				});
 		}
