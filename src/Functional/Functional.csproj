@@ -103,6 +103,10 @@
       <Project>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</Project>
       <Name>AdminInterface</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Common.MySql\Common.MySql\Common.MySql.csproj">
+      <Project>{8A680813-C83B-497A-85E6-E8F07B7D7650}</Project>
+      <Name>Common.MySql</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.Tools\Common.Tools\Common.Tools.csproj">
       <Project>{72AFCFE8-C9E9-45FA-9698-BEE896A517A3}</Project>
       <Name>Common.Tools</Name>

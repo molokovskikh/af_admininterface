@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 
@@ -42,7 +43,7 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
 		{
-			string clientCode;
+			uint clientCode;
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{
 				SetupGeneralInformation(browser);
@@ -51,8 +52,7 @@ namespace AdminInterface.Test.Watin
 
 				browser.Button(Find.ById("Register")).Click();
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
-				clientCode = new Regex(@"\d+")
-					.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value;
+				clientCode = GetClientCodeFromRegistrationCard(browser);
 			}
 			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
@@ -154,6 +154,37 @@ where clientcode = ?ClientCode", connection);
 
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 			}
+		}
+
+		[Test]
+		public void Try_to_register_hiden_client()
+		{
+			uint clientcode;
+			using(var browser = Open("register.aspx"))
+			{
+				SetupGeneralInformation(browser);
+				browser.SelectList(Find.ById("CustomerType")).Select("Скрытый");
+				browser.TextField(Find.ById("SupplierSearchText")).TypeText("Тестирования");
+				browser.Button(Find.ById("SearchSupplier")).Click();
+				browser.SelectList(Find.ById("Suppliers")).Select("234. Поставщик для тестирования");
+				browser.CheckBox(Find.ById("EnterBillingInfo")).Checked = false;
+
+				browser.Button(Find.ByValue("Зарегистрировать")).Click();
+				clientcode = GetClientCodeFromRegistrationCard(browser);
+			}
+
+			With.Connection(c => {
+				var command = new MySqlCommand("select FirmCodeOnly from usersettings.retclientsset where clientcode = ?clientcode", c);
+				command.Parameters.AddWithValue("?clientcode", clientcode);
+				var firmCodeOnly = Convert.ToUInt32(command.ExecuteScalar());
+				Assert.That(firmCodeOnly, Is.EqualTo(234));
+			});
+		}
+
+		private uint GetClientCodeFromRegistrationCard(IE browser)
+		{
+			return Convert.ToUInt32(new Regex(@"\d+")
+				.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 
 		private void SetupGeneralInformation(IE browser)

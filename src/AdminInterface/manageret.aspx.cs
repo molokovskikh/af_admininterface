@@ -58,9 +58,9 @@ namespace AddUser
 			updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
 			if (NoisedCosts.Visible && NoisedCosts.Checked)
-				updateCommand.Parameters.AddWithValue("?PriceCodeOnly", NotNoisedPrice.SelectedValue);
+				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", NotNoisedSupplier.SelectedValue);
 			else
-				updateCommand.Parameters.AddWithValue("?PriceCodeOnly", null);
+				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", null);
 
 			With.Transaction(
 				(connection, transaction) => {
@@ -184,7 +184,7 @@ SET OrderRegionMask     = ?orderMask,
     SubmitOrders            = ?SubmitOrders, 
     ServiceClient           = ?ServiceClient, 
     OrdersVisualizationMode = ?OrdersVisualizationMode,
-	PriceCodeOnly			= ?PriceCodeOnly
+	FirmCodeOnly			= ?FirmCodeOnly
 where clientcode=firmcode and firmcode=?clientCode; ";
 
 					var giveAnalitFPermission = false;
@@ -410,7 +410,7 @@ SELECT  InvisibleOnFirm,
         SubmitOrders, 
         ServiceClient, 
         OrdersVisualizationMode, 
-		rcs.PriceCodeOnly as NotNoisedPriceCode
+		rcs.FirmCodeOnly
 FROM retclientsset rcs
 WHERE rcs.clientcode = ?ClientCode";
 					using (var reader = command.ExecuteReader())
@@ -432,17 +432,17 @@ WHERE rcs.clientcode = ?ClientCode";
 						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(reader["OrdersVisualizationMode"]);
 						if (Convert.ToInt32(reader["InvisibleOnFirm"]) != 0)
 						{
-							var noise = reader["NotNoisedPriceCode"] != DBNull.Value;
+							var noise = reader["FirmCodeOnly"] != DBNull.Value;
 							SetNoiseStatus(noise);
 							if (noise)
-								NotNoisedPrice.SelectedValue = reader["NotNoisedPriceCode"].ToString();
+								NotNoisedSupplier.SelectedValue = reader["FirmCodeOnly"].ToString();
 						}
 						else
 						{
 							NoiseRow.Visible = false;
 							NoisedCosts.Visible = false;
-							NotNoisedPriceLabel.Visible = false;
-							NotNoisedPrice.Visible = false;
+							NotNoisedSupplierLabel.Visible = false;
+							NotNoisedSupplier.Visible = false;
 						}
 					}
 
@@ -623,23 +623,22 @@ ORDER BY cd.shortname;", c);
 		private void SetNoiseStatus(bool noise)
 		{
 			NoisedCosts.Checked = noise;
-			NotNoisedPriceLabel.Visible = noise;
-			NotNoisedPrice.Visible = noise;
+			NotNoisedSupplierLabel.Visible = noise;
+			NotNoisedSupplier.Visible = noise;
 
 			var adapter = new MySqlDataAdapter(@"
-select 0 as PriceCode, 'Зашумлять все прайс листы' as PriceName
+select 0 as FirmCode, 'Зашумлять все прайс листы всех поставщиков' as ShortName
 union
-SELECT pd.PriceCode,
-       concat(suppliers.ShortName, ' ', pd.PriceName) as PriceName
+SELECT suppliers.FirmCode,
+       suppliers.ShortName
 FROM Usersettings.ClientsData cd
   JOIN Usersettings.clientsdata suppliers on cd.BillingCode = suppliers.BillingCode and suppliers.FirmType = 0
-	JOIN Usersettings.pricesdata pd on pd.firmcode = suppliers.firmcode
 WHERE cd.firmcode = ?ClientCode;", Literals.GetConnectionString());
 			adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 			var data = new DataSet();
 			adapter.Fill(data);
-			NotNoisedPrice.DataSource = data;
-			NotNoisedPrice.DataBind();
+			NotNoisedSupplier.DataSource = data;
+			NotNoisedSupplier.DataBind();
 		}
 	}
 }

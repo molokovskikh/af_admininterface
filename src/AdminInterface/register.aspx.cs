@@ -140,6 +140,10 @@ set @inUser = ?UserName;";
 
 					command.Parameters.AddWithValue("?IncludeType", IncludeType.SelectedValue);
 					command.Parameters.AddWithValue("?invisibleonfirm", CustomerType.SelectedItem.Value);
+					if (!String.IsNullOrEmpty(Suppliers.SelectedValue))
+						command.Parameters.AddWithValue("?FirmCodeOnly", Suppliers.SelectedValue);
+					else
+						command.Parameters.AddWithValue("?FirmCodeOnly", null);
 
 					if (IncludeCB.Checked)
 						billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, c).ExecuteScalar());
@@ -581,8 +585,8 @@ WHERE   intersection.pricecode IS NULL
 		{
 			command.CommandText = @"
 INSERT INTO usersettings.retclientsset 
-		(ClientCode, InvisibleOnFirm, OrderRegionMask, BasecostPassword, ServiceClient) 
-Values  (?ClientCode, ?InvisibleOnFirm, ?OrderMask, GeneratePassword(), ?ServiceClient);
+		(ClientCode, InvisibleOnFirm, OrderRegionMask, BasecostPassword, ServiceClient, FirmCodeOnly) 
+Values  (?ClientCode, ?InvisibleOnFirm, ?OrderMask, GeneratePassword(), ?ServiceClient, ?FirmCodeOnly);
 
 insert into usersettings.ret_save_grids(ClientCode, SaveGridId)
 select ?ClientCode, sg.id
@@ -697,8 +701,8 @@ ORDER BY region;", c);
 				}
 			}
 
-			var iInt = data.Tables["admin"].Rows[0]["regioncode"].ToString();
-			SetWorkRegions(iInt, CheckBox1.Checked);
+			var regionCode = data.Tables["admin"].Rows[0]["regioncode"].ToString();
+			SetWorkRegions(regionCode, CheckBox1.Checked);
 			if (SecurityContext.Administrator.HavePermisions(PermissionType.RegisterDrugstore))
 			{
 				TypeDD.Items.Add("Аптека");
@@ -1060,6 +1064,57 @@ where cd.firmcode = ?ClientCode
 			AddressTB.Text = data.Tables[0].Rows[0]["Adress"].ToString();
 			PhoneTB.Text = data.Tables[0].Rows[0]["Phone"].ToString();
 			EmailTB.Text = data.Tables[0].Rows[0]["Email"].ToString();
+		}
+
+		protected void SearchSupplierClick(object sender, EventArgs e)
+		{
+			With.Connection(c => {
+				var adapter = new MySqlDataAdapter(String.Format(@"
+SELECT  DISTINCT cd.FirmCode SupplierId,
+        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) SupplierName
+FROM clientsdata as cd
+WHERE   cd.regioncode & ?AdminRegionCode > 0 
+        AND cd.firmstatus = 1 
+        AND cd.billingstatus = 1 
+		and cd.FirmType = 0
+        AND cd.ShortName like ?SearchText  
+		{0}
+ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
+				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionCode", SecurityContext.Administrator.RegionMask);
+				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", SupplierSearchText.Text));
+				adapter.Fill(data, "Suppliers");
+			});
+
+			Suppliers.DataSource = data.Tables["Suppliers"];
+			Suppliers.DataBind();
+			if (Suppliers.Items.Count > 0)
+			{
+				Suppliers.Visible = true;
+				SupplierSearchText.Visible = false;
+				SearchSupplier.Visible = false;
+			}
+		}
+
+		protected void CustomerTypeChanged(object sender, EventArgs e)
+		{
+			if (CustomerType.SelectedItem.Text == "Стандартный")
+			{
+				SupplierSearchText.Visible = false;
+				Suppliers.Visible = false;
+				SearchSupplier.Visible = false;
+				return;
+			}
+
+			SupplierSearchText.Visible = true;
+			SearchSupplier.Visible = true;
+		}
+
+		protected void ValidateSupplier(object source, ServerValidateEventArgs args)
+		{
+			if (CustomerType.SelectedItem.Text == "Стандартный")
+				return;
+
+			args.IsValid = Suppliers.SelectedItem != null;
 		}
 	}
 }

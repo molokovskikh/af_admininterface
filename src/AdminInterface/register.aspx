@@ -171,16 +171,23 @@
 								<label for="">
 									Тип клиента в интерфейсе поставщика:
 								</label>
-								<asp:DropDownList ID="CustomerType" runat="server" Visible="true">
-									<asp:ListItem Value="0" Text="Стандартный" />
-									<asp:ListItem Value="1" Text="Недоступный для настроек" />
-									<asp:ListItem Value="2" Text="Скрытый" />
-								</asp:DropDownList>
+								<div style="float:left">
+									<asp:DropDownList ID="CustomerType" runat="server" Visible="true" OnSelectedIndexChanged="CustomerTypeChanged" AutoPostBack="True">
+										<asp:ListItem Value="0" Text="Стандартный" />
+										<asp:ListItem Value="1" Text="Недоступный для настроек" />
+										<asp:ListItem Value="2" Text="Скрытый" />
+									</asp:DropDownList>
+									<asp:TextBox ID="SupplierSearchText" runat="server" Visible="False" Width="90px" />
+									<asp:Button ID="SearchSupplier" runat="server" OnClick="SearchSupplierClick" Text="Найти" Visible="False" ValidationGroup="1" />
+									<asp:DropDownList ID="Suppliers" runat="server" Visible="False" DataTextField="SupplierName" DataValueField="SupplierId" />
+									<br />
+									<asp:CustomValidator runat=server ValidateEmptyText=true ErrorMessage="Необходимо указать поставщика для которого регистрируется данная копия" ValidationGroup="0" OnServerValidate="ValidateSupplier"></asp:CustomValidator>
+								</div>
 							</div>
 							<div class="DropDownField">
 								<label for="TypeDD">Тип:</label>
 								<asp:DropDownList ID="TypeDD" runat="server" onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
-								</div>
+							</div>
 							<div class="DropDownField">
 								<label for="RegionDD">Домашний регион:</label>
 								<asp:DropDownList ID="RegionDD" runat="server" OnSelectedIndexChanged="RegionDD_SelectedIndexChanged"

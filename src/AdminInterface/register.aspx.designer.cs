@@ -347,6 +347,33 @@ namespace AdminInterface {
         protected global::System.Web.UI.WebControls.DropDownList CustomerType;
         
         /// <summary>
+        /// SupplierSearchText control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox SupplierSearchText;
+        
+        /// <summary>
+        /// SearchSupplier control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button SearchSupplier;
+        
+        /// <summary>
+        /// Suppliers control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList Suppliers;
+        
+        /// <summary>
         /// TypeDD control.
         /// </summary>
         /// <remarks>

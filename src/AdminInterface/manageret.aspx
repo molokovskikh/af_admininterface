@@ -58,8 +58,8 @@
 								<td valign="middle" align="left" colspan="3" style="height: 22px">
 									<asp:CheckBox runat="server" ID="NoisedCosts" Text="Зашумлять цены"  AutoPostBack="true" oncheckedchanged="NoisedCosts_CheckedChanged" />
 									<br />
-									<label ID="NotNoisedPriceLabel" runat="server">Незашумляемый прайс-лист</label>
-									<asp:DropDownList ID="NotNoisedPrice" runat="server" DataValueField="PriceCode" DataTextField="PriceName" />
+									<label ID="NotNoisedSupplierLabel" runat="server">Не зашумлять прайс-листы поставщика</label>
+									<asp:DropDownList ID="NotNoisedSupplier" runat="server" DataValueField="FirmCode" DataTextField="ShortName" />
 								</td>
 							</tr>
 							<tr>
