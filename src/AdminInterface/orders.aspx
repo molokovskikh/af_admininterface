@@ -73,11 +73,6 @@
 										<asp:Label ID="Label1" runat="server" Text='<%# GetResult((DataRowView) GetDataItem()) %>'></asp:Label>
 									</ItemTemplate>
 								</asp:TemplateField>
-								<asp:TemplateField HeaderText="Дата подтверждения" SortExpression="SubmitDate">
-									<ItemTemplate>
-										<asp:Label ID="Label1" runat="server" Text='<%# GetSubmiteDate((DataRowView) GetDataItem()) %>'></asp:Label>
-									</ItemTemplate>
-								</asp:TemplateField>
 							</Columns>
 							<EmptyDataTemplate>
 								За указанный период заказов не найдено.

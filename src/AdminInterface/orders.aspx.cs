@@ -50,7 +50,6 @@ SELECT  oh.rowid,
         oh.Processed, 
 		max(o.ResultCode) as ResultCode,
 		o.TransportType,
-		oh.SubmitDate,
 		oh.ClientOrderId
 FROM    (orders.ordershead oh, usersettings.clientsdata as sel)
 		join usersettings.pricesdata on pricesdata.pricecode = oh.pricecode
@@ -130,13 +129,6 @@ where clientcode = ?ClientCode", new MySqlParameter("?ClientCode", clientCode)))
 
 			OrdersGrid.DataSource = _data.Tables[0].DefaultView;
 			DataBind();
-		}
-
-		public static string GetSubmiteDate(DataRowView row)
-		{
-			if (row["SubmitDate"] == DBNull.Value)
-				return "Заказ не подтвержден";
-			return row["SubmitDate"].ToString();
 		}
 
 		public static string GetResult(DataRowView row)
