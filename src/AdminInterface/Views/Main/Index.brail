@@ -142,7 +142,9 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 						В процессе:
 					</td>
 					<td class="statistic-value">
+						<% if IsDefined("ReqHL"): %>
 						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% end %>
 					</td>
 				</tr>
 				<tr>
