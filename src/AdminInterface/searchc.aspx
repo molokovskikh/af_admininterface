@@ -134,7 +134,7 @@
 					Клиент не найден
 				</EmptyDataTemplate>
 			</asp:GridView>
-			<table style="text-align: center; margin-top: 20px; margin-left: auto; margin-right: auto;">
+			<table style="margin-top: 20px; margin-left: auto; margin-right: auto;">
 				<tr>
 				<td>
 				<table runat=server id="Table4" visible=false>
@@ -163,7 +163,7 @@
 						<td> - Обновление более 2 суток назад</td>
 					</tr>
 				</table>
-				<div style="margin-top: 20px;">
+				<div style="margin-top: 20px; text-align:center;">
 					<asp:Label ID="SearchTimeLabel" Visible="false" runat="server" />
 				</div>
 				</td>

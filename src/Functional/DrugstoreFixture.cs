@@ -5,21 +5,14 @@ using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Tools;
 using NUnit.Framework;
-
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class DrugstoreFixture : WatinFixture
 	{
 		private uint clientId = 2575;
-
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
 
 		[Test]
 		public void Try_to_send_email_notification()
@@ -97,7 +90,7 @@ namespace AdminInterface.Test.Watin
 			using (new SessionScope())
 			{
 				var client = Client.Find(clientId);
-				client.Parents.Each(p => p.Delete());
+				client.Parents.ToArray().Each(client.RemoveRelationship);
 			}
 
 			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
@@ -133,7 +126,7 @@ namespace AdminInterface.Test.Watin
 			using (new SessionScope())
 			{
 				var client = Client.Find(2575u);
-				client.Parents.Each(p => p.Delete());
+				client.Parents.ToArray().Each(client.RemoveRelationship);
 			}
 			
 			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))

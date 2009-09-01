@@ -38,6 +38,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.DynamicProxy2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Castle\Castle.DynamicProxy2.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
@@ -92,6 +96,7 @@
     <Compile Include="ForTesting\WatinFixture.cs" />
     <Compile Include="RegistrationFixture.cs" />
     <Compile Include="ServiceFixture.cs" />
+    <Compile Include="Setup.cs" />
     <Compile Include="StatContFixture.cs" />
     <Compile Include="SupplierFixture.cs" />
   </ItemGroup>

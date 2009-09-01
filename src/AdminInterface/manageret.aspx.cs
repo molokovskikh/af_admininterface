@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -9,7 +10,10 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Tools;
+using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -62,11 +66,13 @@ namespace AddUser
 			else
 				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", null);
 
-			With.Transaction(
-				(connection, transaction) => {
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				ArHelper.WithSession<Client>(s => {
+					var connection = (MySqlConnection)s.Connection;
+
 					updateCommand.Connection = connection;
-					updateCommand.Transaction = transaction;
-					var tempCommand = new MySqlCommand("", connection, transaction);
+					var tempCommand = new MySqlCommand("", connection);
 					tempCommand.CommandText = @"
 set @inHost = ?Host;
 set @inUser = ?UserName;";
@@ -166,8 +172,7 @@ WHERE   intersection.pricecode IS NULL
 							updateCommand.CommandText += " where intersection.clientcode=retclientsset.clientcode and intersection.pricecode=pricesdata.pricecode and intersection.clientcode=?clientCode; ";
 						}
 					}
-					updateCommand.CommandText +=
-						@"
+					updateCommand.CommandText += @"
 UPDATE UserSettings.retclientsset, 
         UserSettings.clientsdata 
 SET OrderRegionMask     = ?orderMask, 
@@ -205,50 +210,49 @@ insert into Usersettings.AssignedPermissions(UserId, PermissionId)
 select ouar.RowId, up.Id
 from (Usersettings.Osuseraccessright ouar, Usersettings.UserPermissions up)
   left join Usersettings.AssignedPermissions ap on ap.UserId = ouar.RowId
-where ouar.clientcode = 2575 and up.Shortcut = 'AF' and ap.UserId is null;
+where ouar.clientcode = ?ClientCode and up.Shortcut = 'AF' and ap.UserId is null;
 ";
 					}
 
-					var adapter = new MySqlDataAdapter();
-					adapter.InsertCommand = new MySqlCommand(@"
-INSERT INTO UserSettings.IncludeRegulation
-SET IncludeClientCode = ?Child,
-	PrimaryClientCode = ?Parent,
-	IncludeType = ?IncludeType;" + SharedCommands.UpdateWorkRules, connection, transaction);
-					var command = adapter.InsertCommand;
-					command.Parameters.AddWithValue("?Child", ClientCode);
-					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
-					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
-
-					adapter.UpdateCommand = new MySqlCommand(@"
-UPDATE UserSettings.IncludeRegulation
-SET PrimaryClientCode = ?Parent,
-	IncludeType = ?IncludeType
-where id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
-					adapter.UpdateCommand.Parameters.AddWithValue("?Child", ClientCode);
-					adapter.UpdateCommand.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					adapter.UpdateCommand.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
-					adapter.UpdateCommand.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
-
-					adapter.DeleteCommand = new MySqlCommand(@"
-DELETE FROM UserSettings.IncludeRegulation
-WHERE id = ?id;" + SharedCommands.UpdateWorkRules, connection, transaction);
-					command = adapter.DeleteCommand;
-					command.Parameters.AddWithValue("?Child", ClientCode);
-					command.Parameters.Add("?Parent", MySqlDbType.UInt32, 0, "FirmCode");
-					command.Parameters.Add("?IncludeType", MySqlDbType.UInt32, 0, "IncludeType");
-					command.Parameters.Add("?id", MySqlDbType.UInt32, 0, "id");
-					adapter.Update(Data.Tables["Include"]);
+					var client = Client.FindAndCheck((uint) ClientCode);
+					Relationship lastUpdateRelationship = null;
+					foreach (var row in Data.Tables["Include"].Rows.Cast<DataRow>())
+					{
+						if (row.RowState == DataRowState.Added)
+						{
+							var parent = Client.FindAndCheck(Convert.ToUInt32(row["FirmCode"]));
+							var relationshipType = (RelationshipType)Convert.ToUInt32(row["IncludeType"]);
+							lastUpdateRelationship = client.AddRelationship(parent, relationshipType);
+						}
+						else if (row.RowState == DataRowState.Deleted)
+						{
+							lastUpdateRelationship = client.Parents.First(r => r.Id == Convert.ToUInt32(row["Id", DataRowVersion.Original]));
+							client.RemoveRelationship(lastUpdateRelationship);
+						}
+						else if (row.RowState == DataRowState.Modified)
+						{
+							var relationship = client.Parents.First(r => r.Id == Convert.ToUInt32(row["Id"]));
+							relationship.RelationshipType = (RelationshipType)Convert.ToUInt32(row["IncludeType"]);
+							relationship.Parent = Client.FindAndCheck(Convert.ToUInt32(row["FirmCode"]));
+							lastUpdateRelationship = relationship;
+						}
+					}
+					if (lastUpdateRelationship != null)
+					{
+						var command = new MySqlCommand(SharedCommands.UpdateWorkRules, connection);
+						command.Parameters.AddWithValue("?Parent", lastUpdateRelationship.Parent.Id);
+						command.Parameters.AddWithValue("?Child", lastUpdateRelationship.Child.Id);
+						command.Parameters.AddWithValue("?IncludeType", (uint)lastUpdateRelationship.RelationshipType);
+						command.ExecuteNonQuery();
+					}
 
 					updateCommand.ExecuteNonQuery();
 
-					for (int i = 0; i < ExportRulesList.Items.Count; i++)
+					for (var i = 0; i < ExportRulesList.Items.Count; i++)
 					{
-						DataTable table = Data.Tables["ExportRules"];
-						CheckBoxList list = ExportRulesList;
-						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"])
-						    != list.Items[i].Selected)
+						var table = Data.Tables["ExportRules"];
+						var list = ExportRulesList;
+						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
 						{
 							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
 							if (list.Items[i].Selected)
@@ -266,12 +270,11 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 						}
 					}
 
-					for (int i = 0; i < PrintRulesList.Items.Count; i++)
+					for (var i = 0; i < PrintRulesList.Items.Count; i++)
 					{
 						var table = Data.Tables["PrintRules"];
 						var list = PrintRulesList;
-						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"])
-						    != list.Items[i].Selected)
+						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
 						{
 							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
 							if (list.Items[i].Selected)
@@ -289,8 +292,11 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 						}
 					}
 
-					ShowRegulationHelper.Update(connection, transaction, Data, ClientCode);
+					ShowRegulationHelper.Update(connection, null, Data, ClientCode);
 				});
+				scope.VoteCommit();
+			}
+
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
 		}
@@ -509,7 +515,7 @@ ORDER BY sg.DisplayName;";
 						ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
 
 					for (var i = 0; i < PrintRulesList.Items.Count; i++)
-						PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);            	
+						PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
 			    });
 
 			SetWorkRegions(HomeRegionCode, true, false);
@@ -604,9 +610,7 @@ ORDER BY cd.shortname;", c);
 
 		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
 		{
-			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender,
-			                                                e,
-			                                                Data);
+			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender, e, Data);
 		}
 
 		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)

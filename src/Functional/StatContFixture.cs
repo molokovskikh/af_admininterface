@@ -3,7 +3,7 @@ using NUnit.Framework;
 
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class StatContFixture : WatinFixture

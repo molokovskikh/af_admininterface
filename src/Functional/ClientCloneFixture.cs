@@ -7,7 +7,7 @@ using NUnit.Framework;
 
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class ClientCloneFixture : WatinFixture
@@ -82,7 +82,6 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void After_password_change_message_should_be_added_to_history()
 		{
-			ForTest.InitialzeAR();
 			ClientInfoLogEntity.MessagesForClient(Client.Find(3616u)).Each(e => e.Delete());
 
 			using(var browser = Open("client/3616"))

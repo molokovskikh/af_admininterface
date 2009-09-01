@@ -14,6 +14,16 @@ namespace AdminInterface.Models
 	[ActiveRecord("UserSettings.includeregulation")]
 	public class Relationship : ActiveRecordBase
 	{
+		public Relationship()
+		{}
+
+		public Relationship(Client parent, Client child, RelationshipType relationshipType)
+		{
+			Parent = parent;
+			Child = child;
+			RelationshipType = relationshipType;
+		}
+
 		[PrimaryKey]
 		public uint Id { get; set; }
 

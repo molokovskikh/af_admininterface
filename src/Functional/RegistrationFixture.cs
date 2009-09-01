@@ -9,7 +9,7 @@ using NUnit.Framework;
 
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class RegistrationFixture : WatinFixture
@@ -184,7 +184,7 @@ where clientcode = ?ClientCode", connection);
 		private uint GetClientCodeFromRegistrationCard(IE browser)
 		{
 			return Convert.ToUInt32(new Regex(@"\d+")
-				.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
+			                        	.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 
 		private void SetupGeneralInformation(IE browser)

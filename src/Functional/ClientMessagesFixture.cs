@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
@@ -10,7 +8,7 @@ using NUnit.Framework;
 
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class ClientMessagesFixture : WatinFixture
@@ -18,8 +16,6 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void User_can_send_message_to_client()
 		{
-			ForTest.InitialzeAR();
-
 			List<ClientMessage> messages;
 
 			using (new SessionScope())
@@ -51,8 +47,6 @@ namespace AdminInterface.Test.Watin
 		[Test]
 		public void Cancel_message_for_client()
 		{
-			ForTest.InitialzeAR();
-
 			List<ClientMessage> messages;
 
 			using (new SessionScope())

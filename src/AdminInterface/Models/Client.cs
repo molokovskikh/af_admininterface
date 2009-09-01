@@ -15,23 +15,23 @@ namespace AdminInterface.Models
 {
 	public enum ClientStatus
 	{
+		[Description("Отключен")] Off = 0,
 		[Description("Включен")] On = 1,
-		[Description("Отключен")] Off = 0
 	}
 
 	public enum ClientType
 	{
+		[Description("Поставщик")] Supplier = 0,
 		[Description("Аптека")] Drugstore = 1,
-		[Description("Поставщик")] Supplier = 0
 	}
 
 	public enum Segment
 	{
-		[Description("Розница")] Retail = 1,
 		[Description("Опт")] Wholesale = 0,
+		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("usersettings.clientsdata")]
+	[ActiveRecord("usersettings.clientsdata", Lazy = true)]
 	public class Client : ActiveRecordBase<Client>
 	{
 		[PrimaryKey("FirmCode")]
@@ -79,16 +79,16 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientCode", Inverse = true, Lazy = true, OrderBy = "OsUserName")]
 		public virtual IList<User> Users { get; set; }
 
-		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "IncludeClientCode")]
+		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "IncludeClientCode", Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Relationship> Parents { get; set; }
 
 		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "PrimaryClientCode")]
 		public virtual IList<Relationship> Children { get; set; }
 
-		[HasMany(typeof(ShowRelationship), Inverse = true, Lazy = true, ColumnKey = "ShowClientCode")]
+		[HasMany(typeof(ShowRelationship), Inverse = true, Lazy = true, ColumnKey = "ShowClientCode", Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<ShowRelationship> ShowClients { get; set; }
 
-		public IEnumerable<User> GetUsers()
+		public virtual IEnumerable<User> GetUsers()
 		{
 			foreach (var user in Users)
 				yield return user;
@@ -101,17 +101,17 @@ namespace AdminInterface.Models
 					yield return user;	
 		}
 
-		public bool IsDrugstore()
+		public virtual bool IsDrugstore()
 		{
 			return Type == ClientType.Drugstore;
 		}
 
-		public bool IsClientActive()
+		public virtual bool IsClientActive()
 		{
 			return Status == ClientStatus.On && BillingStatus == ClientStatus.On;
 		}
 
-		public float GetPayment(IList<Tariff> tariffs)
+		public virtual float GetPayment(IList<Tariff> tariffs)
 		{
 			RelationshipType? includeType = null;
 			if (Parents.Count > 0)
@@ -150,7 +150,7 @@ namespace AdminInterface.Models
 				           	.UniqueResult<Client>());
 		}
 
-		public string GetAddressForSendingClientCard()
+		public virtual string GetAddressForSendingClientCard()
 		{
 			if (Type == ClientType.Drugstore)
 				return Build(GetContactGroup(ContactGroupType.General),
@@ -161,7 +161,7 @@ namespace AdminInterface.Models
 			             GetContactGroup(ContactGroupType.ClientManagers));
 		}
 
-		public ContactGroup GetContactGroup(ContactGroupType type)
+		public virtual ContactGroup GetContactGroup(ContactGroupType type)
 		{
 			foreach (var contactGroup in ContactGroupOwner.ContactGroups)
 				if (contactGroup.Type == type)
@@ -169,7 +169,7 @@ namespace AdminInterface.Models
 			return null;
 		}
 
-		public void ProcessEmails(List<string> emails, params ContactOwner[] contactGroups)
+		public virtual void ProcessEmails(List<string> emails, params ContactOwner[] contactGroups)
 		{
 			foreach (var contactGroup in contactGroups)
 				foreach (var contact in contactGroup.Contacts)
@@ -205,7 +205,7 @@ namespace AdminInterface.Models
 			return String.Join(", ", emails.ToArray());
 		}
 
-		public string GetSubordinateType()
+		public virtual string GetSubordinateType()
 		{
 			if (Parents.Count == 0)
 				return "-";
@@ -213,7 +213,7 @@ namespace AdminInterface.Models
 			return BindingHelper.GetDescription(Parents[0].RelationshipType);
 		}
 
-		public string GetNameWithParents()
+		public virtual string GetNameWithParents()
 		{
 			if (Parents.Count == 0)
 				return ShortName;
@@ -221,7 +221,7 @@ namespace AdminInterface.Models
 			return ShortName + "[" + Parents[0].Parent.ShortName + "]";
 		}
 
-		public string GetIdWithParentId()
+		public virtual string GetIdWithParentId()
 		{
 			if (Parents.Count == 0)
 				return Id.ToString();
@@ -229,7 +229,7 @@ namespace AdminInterface.Models
 			return Id + "[" + Parents[0].Parent.Id + "]";
 		}
 
-		public void ResetUin()
+		public virtual void ResetUin()
 		{
 			ArHelper.WithSession<Client>(session =>
 			                             session
@@ -242,7 +242,7 @@ where ouar.clientcode = :clientcode")
 			                             	.ExecuteUpdate());
 		}
 
-		public bool HaveUin()
+		public virtual bool HaveUin()
 		{
 			var result = ArHelper.WithSession(session =>
 			                                  session
@@ -258,7 +258,7 @@ group by ouar.clientcode")
 			return result != null && result.Value == 0;
 		}
 
-		public bool CanChangeStatus()
+		public virtual bool CanChangeStatus()
 		{
 			if (Type != ClientType.Drugstore)
 				return true;
@@ -278,7 +278,7 @@ group by ouar.clientcode")
 			return true;
 		}
 
-		public bool HavePreparedData()
+		public virtual bool HavePreparedData()
 		{
 			foreach (var user in GetUsers())
 			{
@@ -287,6 +287,28 @@ group by ouar.clientcode")
 					return true;
 			}
 			return false;
+		}
+
+		public virtual Relationship AddRelationship(Client parent, RelationshipType type)
+		{
+			var relationship = new Relationship(parent, this, type);
+			Parents.Add(relationship);
+			if (type == RelationshipType.Base || type == RelationshipType.BasePlus)
+				ShowClients.Add(new ShowRelationship(parent, this));
+			return relationship;
+		}
+
+		public virtual void RemoveRelationship(Relationship relationship)
+		{
+			Parents.Remove(relationship);
+			var showRelationship = ShowClients.FirstOrDefault(s => s.Parent.Id == relationship.Parent.Id);
+			if (showRelationship != null)
+			{
+				ShowClients.Remove(showRelationship);
+				showRelationship.Delete();
+			}
+
+			relationship.Delete();
 		}
 	}
 }

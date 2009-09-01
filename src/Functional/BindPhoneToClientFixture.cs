@@ -2,10 +2,9 @@
 using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
-
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
 	public class BindPhoneToClientFixture : WatinFixture
@@ -13,7 +12,6 @@ namespace AdminInterface.Test.Watin
 		[SetUp]
 		public void Setup()
 		{
-			ForTest.InitialzeAR();
 			CallLog.DeleteAll();
 
 			new CallLog { Direction = 0, Id2 = IdentificationStatus.Unknow, From = "4732606000" }.Save();
@@ -25,7 +23,7 @@ namespace AdminInterface.Test.Watin
 		{
 			using (var browser = new IE(BuildTestUrl("client/2575")))
 			{
-				Assert.That(browser.Text, Text.Contains("Не опознанные звонки"));
+				Assert.That(browser.Text, Text.Contains("Неопознанные звонки"));
 				Assert.That(GetUnknownPhones(browser), Is.EqualTo(new [] { "4732606000", "4732299222" }));
 			}
 		}

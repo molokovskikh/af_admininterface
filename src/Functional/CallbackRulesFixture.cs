@@ -1,27 +1,21 @@
 ﻿using System;
-using System.Configuration;
-using System.IO;
 using AdminInterface.Models.Security;
 using AdminInterface.Test.ForTesting;
 using AdminInterface.Models.Telephony;
-using Microsoft.VisualStudio.WebHost;
 using NUnit.Framework;
 
 using WatiN.Core;
 
-namespace AdminInterface.Test.Watin
+namespace Functional
 {
 	[TestFixture]
-	public class CallbackRulesFixture
+	public class CallbackRulesFixture : WatinFixture
 	{
-		private Server _webServer;
 		private const string CallbackLinkText = "Правила обратного звонка";
 
 		[TestFixtureSetUp]
 		public void SetupFixture()
 		{
-			ForTest.InitialzeAR();
-
 			var adm = Administrator.GetByName("kvasov");
 			if (!adm.HavePermision(PermissionType.ManageCallbacks))
 			{
@@ -29,11 +23,6 @@ namespace AdminInterface.Test.Watin
 				adm.Save();
 			}
 
-			var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
-			var webDir = ConfigurationManager.AppSettings["webDirectory"];
-
-			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
-			_webServer.Start();
 			FixtureMapping
 				.For<Callback>()
 				.To(c => c.Comment, "Комментарий")
@@ -47,19 +36,6 @@ namespace AdminInterface.Test.Watin
 		public void Setup()
 		{
 			Callback.DeleteAll();
-		}
-
-		[TestFixtureTearDown]
-		public void TearDownFixture()
-		{
-			_webServer.Stop();
-		}
-
-		private static string BuildTestUrl(string urlPart)
-		{
-			return String.Format("http://localhost:{0}/{1}",
-								 ConfigurationManager.AppSettings["webPort"],
-								 urlPart);
 		}
 
 		[Test]

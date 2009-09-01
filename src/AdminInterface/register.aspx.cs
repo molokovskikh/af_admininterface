@@ -13,6 +13,8 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Services;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -94,30 +96,25 @@ ORDER BY region;";
 			var shortname = ShortNameTB.Text.Replace("№", "N");
 			var username = LoginTB.Text.Trim().ToLower();
 			var password = Func.GeneratePassword();
+			Int64 maskRegion = 0;
+			Int64 orderMask = 0;
+			for (var i = 0; i <= WRList.Items.Count - 1; i++)
+			{
+				if (WRList.Items[i].Selected)
+					maskRegion += Convert.ToInt64(WRList.Items[i].Value);
+				if (OrderList.Items[i].Selected)
+					orderMask += Convert.ToInt64(OrderList.Items[i].Value);
+			}
 
-			With.Transaction(
-				(c, t) => {
-					var command = new MySqlCommand("", c, t);
-
-					Int64 maskRegion = 0;
-					Int64 orderMask = 0;
-					for (var i = 0; i <= WRList.Items.Count - 1; i++)
-					{
-						if (WRList.Items[i].Selected)
-							maskRegion += Convert.ToInt64(WRList.Items[i].Value);
-						if (OrderList.Items[i].Selected)
-							orderMask += Convert.ToInt64(OrderList.Items[i].Value);
-					}
-					command.CommandText = @"
-set @inHost = ?Host;
-set @inUser = ?UserName;";
-					command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-					command.ExecuteNonQuery();
+			using(var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				ArHelper.WithSession<Client>(s => {
+					var connection = (MySqlConnection) s.Connection;
+					var command = new MySqlCommand("", connection);
+					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName, HttpContext.Current.Request.UserHostAddress);
 
 					command.Parameters.AddWithValue("?MaskRegion", maskRegion);
 					command.Parameters.AddWithValue("?OrderMask", orderMask);
-					command.Parameters.AddWithValue("?ShowRegionMask", 0);
 					command.Parameters.AddWithValue("?fullname", FullNameTB.Text);
 
 					command.Parameters.AddWithValue("?shortname", shortname);
@@ -131,22 +128,16 @@ set @inUser = ?UserName;";
 					command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
 					command.Parameters.Add("?ClientCode", MySqlDbType.Int32);
 					command.Parameters.AddWithValue("?OSUserName", username);
-					command.Parameters.AddWithValue("?OSUserPass", password);
 					command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
-
-					if (IncludeCB.Checked && IncludeType.SelectedItem.Value != "Базовый" &&
-					    IncludeType.SelectedItem.Value != "Базовый+")
-						command.Parameters.AddWithValue("?PrimaryClientCode", IncludeSDD.SelectedValue);
-
-					command.Parameters.AddWithValue("?IncludeType", IncludeType.SelectedValue);
 					command.Parameters.AddWithValue("?invisibleonfirm", CustomerType.SelectedItem.Value);
+
 					if (!String.IsNullOrEmpty(Suppliers.SelectedValue))
 						command.Parameters.AddWithValue("?FirmCodeOnly", Suppliers.SelectedValue);
 					else
 						command.Parameters.AddWithValue("?FirmCodeOnly", null);
 
 					if (IncludeCB.Checked)
-						billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, c).ExecuteScalar());
+						billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, connection).ExecuteScalar());
 					else if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
 						billingCode = CreatePayer(command);
 					else
@@ -160,19 +151,17 @@ set @inUser = ?UserName;";
 						CreateSupplier(command);
 
 					if (IncludeCB.Checked)
-					{
-						CreateRelationship(command);
-					}
+						CreateRelationship(Client.FindAndCheck(clientCode), connection);
 
 					ADHelper.CreateUserInAD(username,
-					                        password,
-					                        clientCode.ToString());
+											password,
+											clientCode.ToString());
 
 					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", clientCode),
 					                   String.Format(@"ANALIT\{0}", username));
-
 				});
-
+				scope.VoteCommit();
+			}
 
 			if (TypeDD.SelectedItem.Text == "Аптека"
 				&& !IncludeCB.Checked
@@ -439,7 +428,7 @@ ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd
 		{
 			command.CommandText = @"
 INSERT INTO usersettings.clientsdata (
-MaskRegion, ShowRegionMask, FullName, ShortName, FirmSegment, RegionCode, Adress, 
+MaskRegion, FullName, ShortName, FirmSegment, RegionCode, Adress, 
 FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId, RegistrationDate) ";
 			command.Parameters.AddWithValue("?ClientContactGroupOwnerId",
 			                                 CreateContactsForClientsData(command.Connection,
@@ -449,13 +438,13 @@ FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerI
 			if (!IncludeCB.Checked)
 			{
 				command.CommandText += @" 
-Values(?maskregion, ?ShowRegionMask, ?FullName, ?ShortName, ?FirmSegment, ?RegionCode, ?Adress, 
+Values(?maskregion, ?FullName, ?ShortName, ?FirmSegment, ?RegionCode, ?Adress, 
 ?FirmType, 1, ?registrant, " + billingCode + ", 1, ?ClientContactGroupOwnerId, now()); ";
 			}
 			else
 			{
 				command.CommandText += @"
-select maskregion, ShowRegionMask, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
+select maskregion, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
 FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
 from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
 			}
@@ -638,16 +627,16 @@ WHERE   intersection.pricecode IS NULL
 			command.ExecuteNonQuery();
 		}
 
-		private void CreateRelationship(MySqlCommand command)
+		private void CreateRelationship(Client client, MySqlConnection connection)
 		{
-			command.Parameters.AddWithValue("?Parent", Convert.ToInt32(IncludeSDD.SelectedValue));
-			command.Parameters.AddWithValue("?Child", command.Parameters["?ClientCode"].Value);
-			command.CommandText = @"
-INSERT INTO showregulation(PrimaryClientCode, ShowClientCode, Addition) 
-VALUES (?Parent, ?Child, ?ShortName);
+			var type = (RelationshipType) Convert.ToUInt32(IncludeType.SelectedValue);
+			var parent = Client.FindAndCheck(Convert.ToUInt32(IncludeSDD.SelectedValue));
+			client.AddRelationship(parent, type);
 
-INSERT INTO includeregulation(PrimaryClientCode, IncludeClientCode, Addition, IncludeType)
-VALUES(?Parent, ?Child, ?ShortName, ?IncludeType);" + SharedCommands.UpdateWorkRules;
+			var command = new MySqlCommand(SharedCommands.UpdateWorkRules, connection);
+			command.Parameters.AddWithValue("?Parent", parent.Id);
+			command.Parameters.AddWithValue("?Child", client.Id);
+			command.Parameters.AddWithValue("?IncludeType", (uint)type);
 			command.ExecuteNonQuery();
 		}
 
