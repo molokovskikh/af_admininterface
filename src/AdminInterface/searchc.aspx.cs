@@ -216,9 +216,8 @@ SELECT  cd.billingcode,
 		NULL AS IncludeType,
 		NULL AS InvisibleOnFirm
 FROM clientsdata as cd
-    JOIN farm.regions ON regions.regioncode = cd.regioncode 
-    JOIN billing.payers p on cd.BillingCode = p.PayerID
-    LEFT JOIN showregulation ON ShowClientCode= cd.firmcode 
+    JOIN farm.regions ON regions.regioncode = cd.regioncode
+    LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
     LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode 
     LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
 WHERE   (cd.RegionCode & ?RegionMask) > 0
@@ -229,17 +228,17 @@ WHERE   (cd.RegionCode & ?RegionMask) > 0
 			var thirdPart = String.Format(@"
 group by cd.firmcode 
 union 
-SELECT  cd.billingcode, 
-        cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode, 
-        if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')), 
-        region, 
-        max(uui2.UpdateDate) FirstUpdate, 
-        max(uui2.UncommitedUpdateDate) SecondUpdate, 
-        afu.AppVersion as EXE, 
-        if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
-        cd.FirmSegment, 
-        cd.FirmType, 
-        (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus, 
+SELECT  cd.billingcode,
+        cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode,
+        if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')),
+        region,
+        max(uui2.UpdateDate) FirstUpdate,
+        max(uui2.UncommitedUpdateDate) SecondUpdate,
+        afu.AppVersion as EXE,
+        if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName,
+        cd.FirmSegment,
+        cd.FirmType,
+        (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus,
         cd.firmcode as bfc,
 		CASE IncludeRegulation.IncludeType
 			WHEN 0 THEN 'Базовый'
@@ -248,7 +247,7 @@ SELECT  cd.billingcode,
 			WHEN 3 THEN 'Базовый+'
 		END AS IncludeType,
 		rcs.InvisibleOnFirm
-FROM (clientsdata as cd, farm.regions, billing.payers p) 
+FROM (clientsdata as cd, farm.regions)
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
 	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode 
 	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode 
@@ -257,15 +256,14 @@ FROM (clientsdata as cd, farm.regions, billing.payers p)
 		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
 	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
 	LEFT JOIN logs.AnalitFUpdates afu ON afu.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-        and afu.UpdateId = 
-        (
+		and afu.UpdateId =
+		(
 			SELECT max(UpdateId) 
 			FROM logs.AnalitFUpdates
 			WHERE clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
 				  and updatetype in(1,2)
-        ) 
-WHERE   regions.regioncode = cd.regioncode 
-		and cd.BillingCode = p.PayerID
+		)
+WHERE   regions.regioncode = cd.regioncode
 		and (cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
