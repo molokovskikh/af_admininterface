@@ -231,11 +231,11 @@ union
 SELECT  cd.billingcode,
         cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode,
         if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')),
-        region,
+        r.region,
         max(uui2.UpdateDate) FirstUpdate,
         max(uui2.UncommitedUpdateDate) SecondUpdate,
-        afu.AppVersion as EXE,
-        if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName,
+        max(uui2.AFAppVersion) EXE,
+        ouar2.OSUSERNAME as UserName,
         cd.FirmSegment,
         cd.FirmType,
         (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus,
@@ -247,24 +247,16 @@ SELECT  cd.billingcode,
 			WHEN 3 THEN 'Базовый+'
 		END AS IncludeType,
 		rcs.InvisibleOnFirm
-FROM (clientsdata as cd, farm.regions)
+FROM clientsdata as cd
+	JOIN farm.regions r on r.regioncode = cd.regioncode
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
-	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode 
-	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode 
+	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode
+	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode
 	LEFT JOIN clientsdata incd ON incd.firmcode= includeregulation.PrimaryClientCode 
 	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+											or ouar2.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode)
 		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
-	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode) 
-	LEFT JOIN logs.AnalitFUpdates afu ON afu.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-		and afu.UpdateId =
-		(
-			SELECT max(UpdateId) 
-			FROM logs.AnalitFUpdates
-			WHERE clientcode= if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-				  and updatetype in(1,2)
-		)
-WHERE   regions.regioncode = cd.regioncode
-		and (cd.RegionCode & ?RegionMask) > 0
+WHERE	(cd.RegionCode & ?RegionMask) > 0
 		and (cd.RegionCode & ?AdminMaskRegion) > 0
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
