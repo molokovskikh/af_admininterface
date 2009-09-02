@@ -7,6 +7,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 using Image = System.Web.UI.WebControls.Image;
 
@@ -23,9 +24,6 @@ namespace AddUser
 
 	partial class searchc : Page
 	{
-	    private readonly MySqlConnection _connection = new MySqlConnection();
-	    private readonly MySqlCommand _command = new MySqlCommand();
-
 		public DataView ClientsDataView
 		{
 			get { return Session["ClientsDataView"] as DataView; }
@@ -49,8 +47,6 @@ namespace AddUser
 			StateHelper.CheckSession(this, ViewState);
 			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore);
 
-            _connection.ConnectionString = Literals.GetConnectionString();
-
 			if(IsPostBack)
 				return;
 
@@ -72,7 +68,8 @@ namespace AddUser
 		private void BindUserRegions()
 		{
 			var dataSet = new DataSet();
-			var dataAdapter = new MySqlDataAdapter(
+			With.Connection(c => {
+				var dataAdapter = new MySqlDataAdapter(
 @"select (select sum(regioncode) from farm.regions where RegionCode & ?AdminMaskRegion > 0) as RegionCode, 'Все' as Region, 1 as IsAll
 union
 SELECT  r.RegionCode,
@@ -80,11 +77,12 @@ SELECT  r.RegionCode,
         0 as IsAll
 FROM farm.regions as r
 WHERE r.RegionCode & ?AdminMaskRegion > 0
-ORDER BY IsAll Desc, Region;", _connection);
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-			dataAdapter.Fill(dataSet);
-			ClientRegion.DataSource = dataSet.Tables[0];
-			ClientRegion.DataBind();
+ORDER BY IsAll Desc, Region;", c);
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+				dataAdapter.Fill(dataSet);
+				ClientRegion.DataSource = dataSet.Tables[0];
+				ClientRegion.DataBind();
+			});
 		}
 
 		protected void GoFind_Click(object sender, EventArgs e)
@@ -119,8 +117,7 @@ ORDER BY IsAll Desc, Region;", _connection);
 						searchType = SearchType.ShortName;
 					break;
 			}
-			BuildQuery("order by 3, 4", searchType);
-			BindData();
+			BindData(BuildQuery(searchType));
 		}
 
 		protected void ClientsGridView_RowDataBound(object sender, GridViewRowEventArgs e)
@@ -161,26 +158,18 @@ ORDER BY IsAll Desc, Region;", _connection);
 			ClientsGridView.DataBind();
 		}
 
-		private void BindData()
+		private void BindData(MySqlCommand command)
 		{
 			var startDate = DateTime.Now;
 
 			var adapter = new MySqlDataAdapter();
 			var data = new DataSet();
 
-			try
-			{
-				_connection.Open();
-				_command.Connection = _connection;
-				_command.Transaction = _connection.BeginTransaction(IsolationLevel.ReadCommitted);
-				adapter.SelectCommand = _command;
+			With.Connection(c => {
+				command.Connection = c;
+				adapter.SelectCommand = command;
 				adapter.Fill(data);
-				adapter.SelectCommand.Transaction.Commit();
-			}
-			finally
-			{
-				_connection.Close();
-			}
+			});
 
 			if (ADCB.Checked)
 				GetADUserStatus(data.Tables[0]);
@@ -198,30 +187,30 @@ ORDER BY IsAll Desc, Region;", _connection);
 			SearchTimeLabel.Visible = true;
 		}
 
-		private void BuildQuery(string orderStatement, SearchType searchType)
+		private MySqlCommand BuildQuery(SearchType searchType)
 		{
+			var orderStatement = "order by 3, 4";
 			var firstPart = String.Format(@"
-SELECT  cd.billingcode, 
-        cast(cd.firmcode as CHAR) as firmcode, 
-        cd.ShortName, 
-        region, 
-        null FirstUpdate, 
-        null SecondUpdate, 
-        null EXE, 
-        if(ouar2.rowid is null, ouar.OSUSERNAME, ouar2.OSUSERNAME) as UserName, 
-        FirmSegment, 
-        FirmType, 
-        (Firmstatus = 0 or Billingstatus= 0) Firmstatus, 
+SELECT  cd.billingcode,
+        cast(cd.firmcode as CHAR) as firmcode,
+        cd.ShortName,
+        region,
+        null FirstUpdate,
+        null SecondUpdate,
+        null EXE,
+        ouar.OsUserName UserName,
+        FirmSegment,
+        FirmType,
+        (Firmstatus = 0 or Billingstatus= 0) Firmstatus,
         cd.firmcode as bfc,
 		NULL AS IncludeType,
 		NULL AS InvisibleOnFirm
 FROM clientsdata as cd
-    JOIN farm.regions ON regions.regioncode = cd.regioncode
-    LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
-    LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode 
-    LEFT JOIN osuseraccessright as ouar ON ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
-WHERE   (cd.RegionCode & ?RegionMask) > 0
-		and (cd.RegionCode & ?AdminMaskRegion) > 0
+	JOIN billing.payers p on cd.BillingCode = p.PayerID
+	JOIN farm.regions ON regions.regioncode = cd.regioncode
+	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
+	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode= cd.firmcode or ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
+WHERE   (cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and FirmType = 0
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 			var secondPart = String.Empty;
@@ -248,6 +237,7 @@ SELECT  cd.billingcode,
 		END AS IncludeType,
 		rcs.InvisibleOnFirm
 FROM clientsdata as cd
+	JOIN billing.payers p on cd.BillingCode = p.PayerID
 	JOIN farm.regions r on r.regioncode = cd.regioncode
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
 	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode
@@ -256,8 +246,8 @@ FROM clientsdata as cd
 	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
 											or ouar2.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode)
 		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
-WHERE	(cd.RegionCode & ?RegionMask) > 0
-		and (cd.RegionCode & ?AdminMaskRegion) > 0
+WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
+		and cd.FirmType = 1
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
 			var fourthPart = String.Empty;
@@ -294,70 +284,73 @@ WHERE	(cd.RegionCode & ?RegionMask) > 0
 					throw new Exception(String.Format("Не известный тип клиента {0}", ClientType.SelectedValue));
 			}
 
+			var command = new MySqlCommand();
+
 			switch (searchType)
 			{
 				case SearchType.ShortName:
 					{
 						secondPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
 						fourthPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-						_command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
-						_command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
+						command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
+						command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case SearchType.Code:
 					{
 						secondPart += " and cd.firmcode=?ClientCode";
 						fourthPart += " and cd.firmcode=?ClientCode";
-						_command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int32));
-						_command.Parameters["?ClientCode"].Value = FindTB.Text;
+						command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int32));
+						command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
 				case SearchType.Login:
 					{
 						secondPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
 						fourthPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-						_command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
-						_command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
+						command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
+						command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case SearchType.BillingCode:
 					{
 						secondPart += " and cd.billingcode=?BillingCode";
 						fourthPart += " and cd.billingcode=?BillingCode";
-						_command.Parameters.Add(new MySqlParameter("?BillingCode", MySqlDbType.Int32));
-						_command.Parameters["?BillingCode"].Value = FindTB.Text;
+						command.Parameters.Add(new MySqlParameter("?BillingCode", MySqlDbType.Int32));
+						command.Parameters["?BillingCode"].Value = FindTB.Text;
 						break;
 					}
 				case SearchType.JuridicalName:
 					secondPart += " and p.JuridicalName like ?JuridicalName";
 					fourthPart += " and p.JuridicalName like ?JuridicalName";
-					_command.Parameters.Add("?JuridicalName", MySqlDbType.VarChar);
-					_command.Parameters["?JuridicalName"].Value = "%" + FindTB.Text + "%";
+					command.Parameters.Add("?JuridicalName", MySqlDbType.VarChar);
+					command.Parameters["?JuridicalName"].Value = "%" + FindTB.Text + "%";
 					break;
 			}
-			_command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
-			_command.Parameters.AddWithValue("?RegionMask", Convert.ToUInt64(ClientRegion.SelectedItem.Value) & SecurityContext.Administrator.RegionMask);
-			_command.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+			command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
+			command.Parameters.AddWithValue("?RegionMask", Convert.ToUInt64(ClientRegion.SelectedItem.Value));
+			command.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
+
+			return command;
 		}
 
 		protected void ClientsGridView_RowCreated(object sender, GridViewRowEventArgs e)
 		{
-		    if ((e.Row.RowType != DataControlRowType.Header) || (_sortExpression == String.Empty)) 
-                return;
-		    var grid = sender as GridView;
-		    foreach (DataControlField field in grid.Columns)
-		    {
-		        if (field.SortExpression != _sortExpression) 
-                    continue;
-		        var sortIcon = new Image
+			if ((e.Row.RowType != DataControlRowType.Header) || (_sortExpression == String.Empty)) 
+				return;
+			var grid = sender as GridView;
+			foreach (DataControlField field in grid.Columns)
+			{
+				if (field.SortExpression != _sortExpression) 
+					continue;
+				var sortIcon = new Image
 		                             {
-		                                 ImageUrl =
-		                                     (_sortDirection == SortDirection.Ascending
+		                                 ImageUrl = (_sortDirection == SortDirection.Ascending
 		                                          ? "./Images/arrow-down-blue-reversed.gif"
 		                                          : "./Images/arrow-down-blue.gif")
 		                             };
-		        e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
-		    }
+				e.Row.Cells[grid.Columns.IndexOf(field)].Controls.Add(sortIcon);
+			}
 		}
 
 		private static void GetADUserStatus(DataTable data)
@@ -365,20 +358,20 @@ WHERE	(cd.RegionCode & ?RegionMask) > 0
 			data.Columns.Add("ADUserStatus", typeof(String));
 			foreach (DataRow row in data.Rows)
 			{
-			    if (row["UserName"].ToString().Length <= 0) 
-                    continue;
+				if (row["UserName"].ToString().Length <= 0) 
+					continue;
 
-			    try
-			    {
-			        if (ADHelper.IsLocked(row["UserName"].ToString()))
+				try
+				{
+					if (ADHelper.IsLocked(row["UserName"].ToString()))
 						row["ADUserStatus"] = "BlockedLogin";
-			        if (ADHelper.IsDisabled(row["UserName"].ToString()))
+					if (ADHelper.IsDisabled(row["UserName"].ToString()))
 						row["ADUserStatus"] = "DisabledLogin";
-			    }
-			    catch
-			    {
+				}
+				catch
+				{
 					row["aduserstatus"] = "LoginNotExists";
-			    }
+				}
 			}
 		}
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
