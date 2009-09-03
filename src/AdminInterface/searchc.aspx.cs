@@ -198,7 +198,7 @@ SELECT  cd.billingcode,
         null FirstUpdate,
         null SecondUpdate,
         null EXE,
-        ouar.OsUserName UserName,
+        ouar2.OsUserName UserName,
         FirmSegment,
         FirmType,
         (Firmstatus = 0 or Billingstatus= 0) Firmstatus,
@@ -209,7 +209,7 @@ FROM clientsdata as cd
 	JOIN billing.payers p on cd.BillingCode = p.PayerID
 	JOIN farm.regions ON regions.regioncode = cd.regioncode
 	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
-	LEFT JOIN osuseraccessright as ouar ON ouar.clientcode= cd.firmcode or ouar.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
+	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode or ouar2.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
 WHERE   (cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and FirmType = 0
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
@@ -306,8 +306,8 @@ WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 					}
 				case SearchType.Login:
 					{
-						secondPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
-						fourthPart += " and (ouar.osusername like ?Login or ouar2.osusername like ?Login)";
+						secondPart += " and ouar2.osusername like ?Login";
+						fourthPart += " and ouar2.osusername like ?Login";
 						command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
 						command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
