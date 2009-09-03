@@ -174,7 +174,6 @@
 								<div style="float:left">
 									<asp:DropDownList ID="CustomerType" runat="server" Visible="true" OnSelectedIndexChanged="CustomerTypeChanged" AutoPostBack="True">
 										<asp:ListItem Value="0" Text="Стандартный" />
-										<asp:ListItem Value="1" Text="Недоступный для настроек" />
 										<asp:ListItem Value="2" Text="Скрытый" />
 									</asp:DropDownList>
 									<asp:TextBox ID="SupplierSearchText" runat="server" Visible="False" Width="90px" />

@@ -48,7 +48,6 @@
 								<td valign="middle" align="left" colspan="3" style="height: 22px">
 									<asp:DropDownList ID="VisileStateList" runat="server">
 										<asp:ListItem Text="Стандартный" Value="0"></asp:ListItem>
-										<asp:ListItem Text="Недоступный для настроек" Value="1"></asp:ListItem>
 										<asp:ListItem Text="Скрытый" Value="2"></asp:ListItem>
 									</asp:DropDownList>
 									Тип клиента в интерфейсе поставщика

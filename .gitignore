@@ -1,0 +1,5 @@
+bin
+obj
+src/Common.Tools
+src/Common.MySql
+*.log
