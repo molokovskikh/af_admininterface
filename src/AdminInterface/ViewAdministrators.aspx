@@ -128,9 +128,15 @@
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
+					<asp:TemplateField HeaderText="CEP">
+						<ItemTemplate>
+							<asp:CheckBox ID="CheckBox16" Enabled="false" runat="server" 
+										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.ConfigurerEditProducers) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>
 				</Columns>
 			</asp:GridView>
-			<ul class="Legend">			
+			<ul class="Legend">
 				<li><%# GetPermissionShortcut(PermissionType.ViewDrugstore) %> - <%# GetPermissionName(PermissionType.ViewDrugstore)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.RegisterDrugstore) %> - <%# GetPermissionName(PermissionType.RegisterDrugstore)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.ManageDrugstore) %> - <%# GetPermissionName(PermissionType.ManageDrugstore)%></li>
@@ -148,8 +154,10 @@
 				<li><%# GetPermissionShortcut(PermissionType.RegisterInvisible) %> - <%# GetPermissionName(PermissionType.RegisterInvisible)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.SendNotification) %> - <%# GetPermissionName(PermissionType.SendNotification)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.ChangePassword) %> - <%# GetPermissionName(PermissionType.ChangePassword)%></li>
-				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms)%></li>				
+				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.CanRegisterClientWhoWorkForFree)%> - <%# GetPermissionName(PermissionType.CanRegisterClientWhoWorkForFree)%></li>
+				
+				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers)%> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers)%></li>
 			</ul>
 		</div>
 	</form>

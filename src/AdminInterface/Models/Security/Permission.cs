@@ -25,6 +25,8 @@ namespace AdminInterface.Models.Security
 		SendNotification = 15,
 		CanRegisterClientWhoWorkForFree = 16,
 		ManageCallbacks = 17,
+
+		ConfigurerEditProducers = 18
 	}
 
 	[ActiveRecord("accessright.permissions", Lazy = false)]
