@@ -706,7 +706,7 @@ ORDER BY region;", c);
 				TypeDD.Enabled = false;
 
 			if (!SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible))
-				CustomerType.Items.Remove(CustomerType.Items[2]);
+                CustomerType.Items.Remove(CustomerType.Items[1]);
 
 			SegmentDD.Items.Add("Îïò");
 			SegmentDD.Items[0].Value = "0";
