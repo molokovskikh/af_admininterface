@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
+using Castle.ActiveRecord;
 using Common.MySql;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
@@ -54,17 +58,24 @@ namespace Functional
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
 				clientCode = GetClientCodeFromRegistrationCard(browser);
 			}
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
+
+			using(new SessionScope())
 			{
-				connection.Open();
-				var command = new MySqlCommand(@"
-select UserId 
-from usersettings.OsUserAccessRight ouar
-	join usersettings.UserUpdateInfo uui on uui.UserId = ouar.RowId
-where clientcode = ?ClientCode", connection);
-				command.Parameters.AddWithValue("?ClientCode", clientCode);
-				var userId = command.ExecuteScalar();
-				Assert.That(userId, Is.Not.EqualTo(""));
+				var client = Client.Find(clientCode);
+				var user = client.Users.First();
+				var updateInfo = (from info in UserUpdateInfo.Queryable
+				                  where info.User.Id == user.Id
+				                  select info).FirstOrDefault();
+
+				var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
+				var passwordChange = logs.SingleOrDefault();
+				Assert.That(passwordChange, Is.Not.Null);
+				Assert.That(passwordChange.UserName, Is.EqualTo("kvasov"));
+				Assert.That(passwordChange.TargetUserName, Is.EqualTo(user.Login));
+				Assert.That(passwordChange.SmtpId, Is.Not.EqualTo(0));
+				Assert.That(passwordChange.SentTo, Is.EqualTo(String.Format("{0}@mail.ru", user.Login)));
+
+				Assert.That(updateInfo, Is.Not.Null, "Не создали запись в UserUpdateInfo");
 			}
 		}
 

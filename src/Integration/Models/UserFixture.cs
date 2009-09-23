@@ -64,7 +64,7 @@ namespace AdminInterface.Test.Models
 			Assert.That(user.IsChangePasswordByOneself(), Is.False);
 			new PasswordChangeLogEntity("127.0.0.1", "kvasov", "kvasov").Save();
 			Assert.That(user.IsChangePasswordByOneself(), Is.True);
-			new PasswordChangeLogEntity("127.0.0.1", "kvasov", "emk")
+			new PasswordChangeLogEntity("127.0.0.1", "emk", "kvasov")
 				{
 					LogTime = DateTime.Now.AddSeconds(10)
 				}.Save();

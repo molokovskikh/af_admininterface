@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using Castle.ActiveRecord;
+﻿using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models
 {
 	//пока используется только в тестах, заготовка на будущее
 	[ActiveRecord("usersettings.UserUpdateInfo")]
-	public class UserUpdateInfo : ActiveRecordBase<UserUpdateInfo>
+	public class UserUpdateInfo : ActiveRecordLinqBase<UserUpdateInfo>
 	{
 		[PrimaryKey("UserId")]
 		public uint Id { get; set; }

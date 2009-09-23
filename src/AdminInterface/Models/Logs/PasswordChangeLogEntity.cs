@@ -1,17 +1,18 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Castle.ActiveRecord;
-using NHibernate.Criterion;
+using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord("logs.passwordchange")]
-	public class PasswordChangeLogEntity : ActiveRecordBase<PasswordChangeLogEntity>
+	public class PasswordChangeLogEntity : ActiveRecordLinqBase<PasswordChangeLogEntity>
 	{
 		public PasswordChangeLogEntity()
 		{}
 
-		public PasswordChangeLogEntity(string host, string target, string user)
+		public PasswordChangeLogEntity(string host, string user, string target)
 		{
 			UserName = user;
 			TargetUserName = target;
@@ -42,10 +43,10 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<PasswordChangeLogEntity> GetByLogin(string login, DateTime beginDate, DateTime endDate)
 		{
-			return ActiveRecordMediator<PasswordChangeLogEntity>
-				.FindAll(new[] {Order.Asc("LogTime")},
-				         Expression.Eq("TargetUserName", login)
-				         && Expression.Between("LogTime", beginDate, endDate));
+			return (from log in Queryable
+			        where log.TargetUserName == login && log.LogTime >= beginDate && log.LogTime <= endDate
+			        orderby log.LogTime
+			        select log).ToList();
 		}
 
 		public void SetSentTo(int smtpId, string emailsToNotify)

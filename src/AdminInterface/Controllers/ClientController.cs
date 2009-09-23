@@ -171,7 +171,7 @@ where `from` = :phone")
 
 				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
-				var passwordChangeLog = new PasswordChangeLogEntity(host, user.Login, administrator.UserName);
+				var passwordChangeLog = new PasswordChangeLogEntity(host, administrator.UserName, user.Login);
 
 				if (isSendClientCard)
 				{
