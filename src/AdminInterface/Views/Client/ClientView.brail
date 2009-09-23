@@ -74,9 +74,10 @@
 		<td class="Title">
 		</td>
 	</tr>
+<% containsLockedUsers = false %>
 <% for user in Client.GetUsers(): %>
 	<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
-	<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) %>
+	<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) if not containsLockedUsers %>
 	<tr>
 		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
 			<% if isLoginExists and admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
