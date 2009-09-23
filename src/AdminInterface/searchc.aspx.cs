@@ -240,11 +240,9 @@ FROM clientsdata as cd
 	JOIN billing.payers p on cd.BillingCode = p.PayerID
 	JOIN farm.regions r on r.regioncode = cd.regioncode
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
-	LEFT JOIN showregulation ON ShowClientCode = cd.firmcode
 	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode
 	LEFT JOIN clientsdata incd ON incd.firmcode= includeregulation.PrimaryClientCode 
 	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
-											or ouar2.clientcode = ifnull(ShowRegulation.PrimaryClientCode, cd.FirmCode)
 		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
 WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and cd.FirmType = 1
