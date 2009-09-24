@@ -63,14 +63,12 @@ namespace AdminInterface.Models.Logs
 		                                                           DateTime endDate)
 		{
 			var client = Client.Find(clientCode);
-			var u = ArHelper.WithSession(
+			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
-							.Add(Expression.InG("User", client.GetUsers().ToList()))
+				           	.Add(Expression.InG("User", client.GetUsers().ToList()))
 				           	.Add(Expression.Between("RequestTime", beginDate, endDate))
 				           	.AddOrder(Order.Desc("RequestTime"))
 				           	.List<UpdateLogEntity>());
-			Console.Write(u.Count);
-			return u;
 		}
 	}
 }
