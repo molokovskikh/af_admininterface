@@ -210,11 +210,6 @@ where cd.firmcode = :ClientCode")
 			return DateTime.Today;
 		}
 
-		public static void tets()
-		{
-			throw new EndUserException("123");
-		}
-
 		public float DebitOn(DateTime on)
 		{
 			return Payment.DebitOn(this, on);
