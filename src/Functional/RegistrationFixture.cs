@@ -66,6 +66,7 @@ namespace Functional
 				var updateInfo = (from info in UserUpdateInfo.Queryable
 				                  where info.User.Id == user.Id
 				                  select info).FirstOrDefault();
+				Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
 				var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
 				var passwordChange = logs.SingleOrDefault();

@@ -572,6 +572,9 @@ WHERE   intersection.pricecode IS NULL
 
 		private void CreateDrugstore(bool invisible, MySqlCommand command)
 		{
+			var defaultValues = DefaultValues.Get();
+			command.Parameters.AddWithValue("?AnalitFVersion", defaultValues.AnalitFVersion);
+
 			command.CommandText = @"
 INSERT INTO usersettings.retclientsset 
 		(ClientCode, InvisibleOnFirm, OrderRegionMask, BasecostPassword, ServiceClient, FirmCodeOnly) 
@@ -582,12 +585,7 @@ select ?ClientCode, sg.id
 from usersettings.save_grids sg
 where sg.AssignDefaultValue = 1;
 
-INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (@NewUserId, 
-(select max(uui.AFAppVersion)
-from usersettings.UserUpdateInfo uui
-	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
-		join usersettings.clientsdata cd on cd.FirmCode = ouar.ClientCode
-where cd.BillingCode <> 921));
+INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (@NewUserId, ?AnalitFVersion);
 
 INSERT 
 INTO    intersection

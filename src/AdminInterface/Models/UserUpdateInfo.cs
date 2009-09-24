@@ -13,6 +13,9 @@ namespace AdminInterface.Models
 		[Property]
 		public string AFCopyId { get; set; }
 
+		[Property]
+		public uint AFAppVersion { get; set; }
+
 		[BelongsTo("UserId")]
 		public User User { get; set; }
 	}

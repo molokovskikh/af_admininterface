@@ -164,6 +164,7 @@
     <Compile Include="Models\Billing\Reciver.cs" />
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
+    <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\CallLog.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
