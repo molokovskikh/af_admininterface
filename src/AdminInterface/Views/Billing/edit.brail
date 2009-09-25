@@ -1,5 +1,4 @@
-﻿<% import Boo.Lang  %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Детальная информация о платильщике ${Instance.ShortName}
 <% end %>
 
