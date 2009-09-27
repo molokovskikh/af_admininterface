@@ -4,6 +4,7 @@ using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Security;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
@@ -12,7 +13,7 @@ using MySql.Data.MySqlClient;
 namespace AdminInterface.Controllers
 {
 	[Layout("General")]
-	public class MainController : SmartDispatcherController
+	public class MainController : ARSmartDispatcherController
 	{
 		public void Index(ulong? regioncode, DateTime? from, DateTime? to)
 		{
@@ -167,6 +168,21 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			PropertyBag["PriceDOKLB"] = data.Tables[2].Rows[0]["DownCount"].ToString();
 			//Формализовано прайсов
 			PropertyBag["PriceFOKLB"] = data.Tables[1].Rows[0]["FormCount"].ToString();
+		}
+
+		public void Settings()
+		{
+			PropertyBag["Defaults"] = DefaultValues.Get();
+			PropertyBag["Formaters"] = OrderHandler.GetFormaters();
+			PropertyBag["Senders"] = OrderHandler.GetSenders();
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void UpdateSettings([ARDataBind("defaults", AutoLoad = AutoLoadBehavior.Always)] DefaultValues defauls)
+		{
+			defauls.Update();
+			Flash["Message"] = "Сохранено";
+			RedirectToReferrer();
 		}
 	}
 }

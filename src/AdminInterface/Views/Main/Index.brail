@@ -111,6 +111,9 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				Правила обратного звонка
 				<% end %>
 			</p>
+			<p>
+				<a href="${siteroot}/Main/Settings">Настройки</a>
+			</p>
 		</td>
 		<td valign=top>
 			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">

@@ -1,0 +1,34 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	>Настройки по умолчанию
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
+
+<% if IsDefined("Message"): %>
+<div class="flash notice">${Message}</div>
+<% end %>
+<h3>Настройки по умолчанию</h3>
+<form method=post action=UpdateSettings>
+	<input type=hidden value=${defaults.Id} name="defaults.Id" />
+	<fieldset style="width:400px">
+		<legend>Для аптеки</legend>
+		<label>Версия AnalitF</label>
+		<input name="defaults.AnalitFVersion" value="${defaults.AnalitFVersion}" />
+	</fieldset>
+	<fieldset style="width:400px">
+		<legend>Для поставщика</legend>
+		<label>Формат заказа</label>
+		<select name="defaults.Formater.Id">
+			<% for formater in formaters: %>
+			<option value=${formater.Id} ${"selected" if formater.Id == defaults.Formater.Id}>${formater.ClassName}</option>
+			<% end %>
+		</select>
+		<label>Отправщик</label>
+		<select name="defaults.Formater.Id">
+			<% for sender in senders: %>
+			<option value=${sender.Id} ${"selected" if sender.Id == defaults.Sender.Id}>${sender.ClassName}</option>
+			<% end %>
+		</select>
+	</fieldset>
+	<input type=submit value="Сохранить" />
+</form>
