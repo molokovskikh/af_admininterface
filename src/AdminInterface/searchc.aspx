@@ -29,8 +29,8 @@
 						<asp:RadioButtonList ID="FindRB" runat="server" BorderStyle="None" Width="120px">
 							<asp:ListItem Value="Automate" Selected="True">Автоматический</asp:ListItem>
 							<asp:ListItem Value="ShortName">Имя</asp:ListItem>
-							<asp:ListItem Value="Code">ID</asp:ListItem>
-							<asp:ListItem Value="BillingCode">Billing ID</asp:ListItem>
+							<asp:ListItem Value="Code">Код</asp:ListItem>
+							<asp:ListItem Value="BillingCode">Договор</asp:ListItem>
 							<asp:ListItem Value="Login">Имя пользователя</asp:ListItem>
 							<asp:ListItem Value="JuridicalName">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
@@ -86,13 +86,13 @@
 				OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True" OnRowCreated="ClientsGridView_RowCreated"
 				OnSorting="ClientsGridView_Sorting">
 				<Columns>
-					<asp:TemplateField HeaderText="Биллинг код" SortExpression="billingcode">
+					<asp:TemplateField HeaderText="Договор" SortExpression="billingcode">
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" 
 											runat="server" 
 											Enabled='<%# SecurityContext.Administrator.HavePermisions(PermissionType.Billing) %>' 
 											Text='<%# Bind("BillingCode") %>' 
-											NavigateUrl='<%# String.Format("Billing/edit.rails?ClientCode={0}", Eval("bfc")) %>' />
+											NavigateUrl='<%# String.Format("billing/edit.rails?ClientCode={0}", Eval("bfc")) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode"></asp:BoundField>
@@ -100,7 +100,7 @@
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" runat="server" 
 								Text='<%# Bind("ShortName") %>' 
-								NavigateUrl='<%# String.Format("Client/{0}", Eval("bfc")) %>'></asp:HyperLink>
+								NavigateUrl='<%# String.Format("client/{0}", Eval("bfc")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>
