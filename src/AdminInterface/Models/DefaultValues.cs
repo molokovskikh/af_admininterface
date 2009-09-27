@@ -1,10 +1,17 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models
 {
+	public enum HandlerType
+	{
+		Formater = 1,
+		Sender = 2,
+	}
+
 	[ActiveRecord(Table = "UserSettings.Defaults")]
 	public class DefaultValues : ActiveRecordBase<DefaultValues>
 	{
@@ -26,10 +33,30 @@ namespace AdminInterface.Models
 		}
 	}
 
-	public enum HandlerType
+	[ActiveRecord(Table = "OrderSendRules.order_send_rules")]
+	public class OrderSendRules : ActiveRecordBase<OrderHandler>
 	{
-		Formater = 1,
-		Sender = 2,
+		public OrderSendRules()
+		{}
+
+		public OrderSendRules(DefaultValues defaults, uint firmCode)
+		{
+			Formater = defaults.Formater;
+			Sender = defaults.Sender;
+			FirmCode = firmCode;
+		}
+
+		[PrimaryKey]
+		public uint Id { get; set; }
+
+		[Property]
+		public uint FirmCode { get; set; }
+
+		[BelongsTo("FormaterId")]
+		public OrderHandler Formater { get; set; }
+
+		[BelongsTo("SenderId")]
+		public OrderHandler Sender{ get; set; }
 	}
 
 	[ActiveRecord(Table = "OrderSendRules.order_handlers")]

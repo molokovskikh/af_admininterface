@@ -145,10 +145,12 @@ ORDER BY region;";
 
 					clientCode = CreateClient(billingCode, command);
 
+					var defaults = DefaultValues.Get();
+
 					if (TypeDD.SelectedItem.Text == "Аптека")
-						CreateDrugstore(CustomerType.SelectedItem.Text != "Стандартный", command);
+						CreateDrugstore(CustomerType.SelectedItem.Text != "Стандартный", command, defaults);
 					else
-						CreateSupplier(command);
+						CreateSupplier(command, defaults);
 
 					if (IncludeCB.Checked)
 						CreateRelationship(Client.FindAndCheck(clientCode), connection);
@@ -477,15 +479,13 @@ Values(@NewUserId, {0});", item.Value);
 			command.ExecuteNonQuery();
 		}
 
-		public void CreateSupplier(MySqlCommand command)
+		public void CreateSupplier(MySqlCommand command, DefaultValues defaults)
 		{
-			command.CommandText = @"
-INSERT INTO OrderSendRules.order_send_rules(Firmcode, FormaterId, SenderId)
-VALUES(?ClientCode,
-		(SELECT id FROM OrderSendRules.order_handlers o WHERE ClassName = 'DefaultFormater2'),
-		(SELECT id FROM OrderSendRules.order_handlers o WHERE ClassName = 'EmailSender'));
+			var orderSendRules = new OrderSendRules(defaults, Convert.ToUInt32(command.Parameters["?ClientCode"].Value));
+			orderSendRules.Save();
 
-INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);   
+			command.CommandText = @"
+INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);
 SET @NewPriceCode:=Last_Insert_ID(); 
 
 INSERT INTO farm.formrules() VALUES();
@@ -570,10 +570,9 @@ WHERE   intersection.pricecode IS NULL
 				.ExecuteNonQuery();
 		}
 
-		private void CreateDrugstore(bool invisible, MySqlCommand command)
+		private void CreateDrugstore(bool invisible, MySqlCommand command, DefaultValues defaults)
 		{
-			var defaultValues = DefaultValues.Get();
-			command.Parameters.AddWithValue("?AnalitFVersion", defaultValues.AnalitFVersion);
+			command.Parameters.AddWithValue("?AnalitFVersion", defaults.AnalitFVersion);
 
 			command.CommandText = @"
 INSERT INTO usersettings.retclientsset 

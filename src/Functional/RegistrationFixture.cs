@@ -47,6 +47,13 @@ namespace Functional
 		[Test]
 		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
 		{
+			using (new SessionScope())
+			{
+				var defaults = DefaultValues.Get();
+				defaults.AnalitFVersion = 705;
+				defaults.Update();
+			}
+
 			uint clientCode;
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{
