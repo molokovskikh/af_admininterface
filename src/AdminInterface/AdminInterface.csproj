@@ -230,13 +230,6 @@
     <Compile Include="CopySynonym.aspx.designer.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Docs.aspx.cs">
-      <DependentUpon>Docs.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Docs.aspx.designer.cs">
-      <DependentUpon>Docs.aspx</DependentUpon>
-    </Compile>
     <Compile Include="EditAdministrator.aspx.cs">
       <DependentUpon>EditAdministrator.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -381,7 +374,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
-    <Content Include="Docs.aspx" />
     <Content Include="EditAdministrator.aspx" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="Rescue\Error.aspx" />

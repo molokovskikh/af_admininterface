@@ -88,9 +88,6 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				<% end %>
 			</p>
 			<p>
-				<a href="${siteroot}/docs.aspx">Общие документы</a>
-			</p>
-			<p>
 				<% if admin.HavePermisions(PermissionType.ManageAdministrators): %>
 				<a href="${siteroot}/ViewAdministrators.aspx">Региональные администраторы</a>
 				<% else: %>
