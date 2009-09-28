@@ -8,7 +8,6 @@ Global(
 	deployTo : "\\\\acdcserv\\AdmInterface\\",
 	editor : "vim",
 	humanReadableName : "Адмнистративный интерфейс",
-	scm : "git"
 )
 
 Task @default, [@build]
