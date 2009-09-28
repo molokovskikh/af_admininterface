@@ -4,19 +4,19 @@
 	<title>${?Title}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	
-	<script type="text/javascript" src="../JavaScript/prototype.js"></script>
-	<script type="text/javascript" src="../JavaScript/validation.js"></script>
-	<script type="text/javascript" src="../JavaScript/Main.js"></script>
-	<script type="text/javascript" src="../JavaScript/search.js"></script>
+	<script type="text/javascript" src="${siteroot}/JavaScript/prototype.js"></script>
+	<script type="text/javascript" src="${siteroot}/JavaScript/validation.js"></script>
+	<script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
+	<script type="text/javascript" src="${siteroot}/JavaScript/search.js"></script>
 	
-	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/ValidationStyles.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Table.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Block.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Common.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Contacts.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Billing.css" type="text/css" rel="stylesheet"></link>
-	<link href="../Css/Highlight.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/ValidationStyles.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Block.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Common.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Contacts.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Billing.css" type="text/css" rel="stylesheet"></link>
+	<link href="${siteroot}/Css/Highlight.css" type="text/css" rel="stylesheet"></link>
 
 </head>
 <body>

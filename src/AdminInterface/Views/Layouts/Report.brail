@@ -3,8 +3,8 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<title>${?Title}</title>
-	<link href="../Css/Report.css" type="text/css" rel="stylesheet" />	
-	<link href="../App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+	<link href="${siteroot}/Css/Report.css" type="text/css" rel="stylesheet" />	
+	<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 ${ChildOutput}
