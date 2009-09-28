@@ -90,11 +90,7 @@ namespace AdminInterface.Models.Logs
 				if (String.IsNullOrEmpty(sortby))
 					sortby = "ShortName";
 
-				var clientTypeFilter = "";
-				if (filter == 1)
-					clientTypeFilter = "and (rcs.InvisibleOnFirm <> 2 and ifnull(ir.IncludeType, 555) <> 2)";
-				else if (filter == 2)
-					clientTypeFilter = "and (rcs.InvisibleOnFirm = 2 or ifnull(ir.IncludeType, 555) = 2)";
+				var clientTypeFilter = GetClientTypeFilter(filter);
 
 				var items = session.CreateSQLQuery(String.Format(@"
 select	cd.BillingCode,
@@ -154,11 +150,7 @@ order by {0} {1}", sortby, direction, clientTypeFilter))
 				if (String.IsNullOrEmpty(sortby))
 					sortby = "ShortName";
 
-				var clientTypeFilter = "";
-				if (filter == 1)
-					clientTypeFilter = "and rcs.InvisibleOnFirm <> 2";
-				else if (filter == 2)
-					clientTypeFilter = "and rcs.InvisibleOnFirm = 2";
+				var clientTypeFilter = GetClientTypeFilter(filter);
 
 				return session.CreateSQLQuery(String.Format(@"
 select	cd.BillingCode,
@@ -173,7 +165,7 @@ select	cd.BillingCode,
 		cast(ir.IncludeType as CHAR) as IncludeType,
 
 		count(distinct pd.FirmCode) SuppliersCount,
-		sum((select sum(ol.Quantity * ol.Cost) from orders.orderslist ol where ol.orderid = oh.rowid)) OrdersSum,
+		round(sum((select sum(ol.Quantity * ol.Cost) from orders.orderslist ol where ol.orderid = oh.rowid)), 2) OrdersSum,
 		count(oh.RowId) OrdersCount
 from clientsdata cd
 	join farm.Regions r on r.RegionCode = cd.RegionCode
@@ -198,6 +190,15 @@ order by {0} {1}", sortby, direction, clientTypeFilter))
 							.SetResultTransformer(Transformers.AliasToBean<Orders>())
 							.List<ClientRegistrationLogEntity>();
 				});
+		}
+
+		private static string GetClientTypeFilter(uint filter)
+		{
+			if (filter == 1)
+				return "and (rcs.InvisibleOnFirm <> 2 and ifnull(ir.IncludeType, 555) <> 2)";
+			if (filter == 2)
+				return "and (rcs.InvisibleOnFirm = 2 or ifnull(ir.IncludeType, 555) = 2)";
+			return "";
 		}
 	}
 }

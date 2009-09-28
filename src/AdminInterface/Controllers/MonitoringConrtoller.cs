@@ -87,9 +87,9 @@ namespace AdminInterface.Controllers
 			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			if (filter == 4)
-				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotUpdated(days, filter, region, sort, direction);
+				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotUpdated(days, type, region, sort, direction);
 			else if (filter == 5)
-				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotOrdered(days, filter, region, sort, direction);
+				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotOrdered(days, type, region, sort, direction);
 		}
 	}
 }

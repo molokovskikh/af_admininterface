@@ -3,6 +3,7 @@ using System.Data;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -12,7 +13,10 @@ using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("General")]
+	[
+		Layout("General"),
+		Secure
+	]
 	public class MainController : ARSmartDispatcherController
 	{
 		public void Index(ulong? regioncode, DateTime? from, DateTime? to)
@@ -170,6 +174,7 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			PropertyBag["PriceFOKLB"] = data.Tables[1].Rows[0]["FormCount"].ToString();
 		}
 
+		[RequiredPermission(PermissionType.EditSettings)]
 		public void Settings()
 		{
 			PropertyBag["Defaults"] = DefaultValues.Get();
@@ -177,7 +182,7 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			PropertyBag["Senders"] = OrderHandler.GetSenders();
 		}
 
-		[AccessibleThrough(Verb.Post)]
+		[AccessibleThrough(Verb.Post), RequiredPermission(PermissionType.EditSettings)]
 		public void UpdateSettings([ARDataBind("defaults", AutoLoad = AutoLoadBehavior.Always)] DefaultValues defauls)
 		{
 			defauls.Update();

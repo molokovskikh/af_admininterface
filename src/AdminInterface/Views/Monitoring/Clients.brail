@@ -7,7 +7,7 @@
 <% 
 def Header(field as string, name as string) as string:
 	dir = ViewHelper.GetDirection(field, direction, sort)
-	uri = "ClientRegistrationLog.rails?filter=${filter}&days=${days}&type=${type}&region=${region}&sort=${field}&direction=${dir}"
+	uri = "Clients.rails?filter=${filter}&days=${days}&type=${type}&region=${region}&sort=${field}&direction=${dir}"
 	return "<th><a href=\"${uri}\">${name}${ViewHelper.SortArrow(field, direction, sort)}</a></th>"
 end 
 %>

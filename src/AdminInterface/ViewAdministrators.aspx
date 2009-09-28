@@ -128,6 +128,12 @@
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CanRegisterClientWhoWorkForFree) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
+					<asp:TemplateField HeaderText="ES">
+						<ItemTemplate>
+							<asp:CheckBox ID="CheckBox17" Enabled="false" runat="server" 
+										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.EditSettings) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>
 					<asp:TemplateField HeaderText="CEP">
 						<ItemTemplate>
 							<asp:CheckBox ID="CheckBox16" Enabled="false" runat="server" 
@@ -156,6 +162,7 @@
 				<li><%# GetPermissionShortcut(PermissionType.ChangePassword) %> - <%# GetPermissionName(PermissionType.ChangePassword)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.CopySynonyms) %> - <%# GetPermissionName(PermissionType.CopySynonyms)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.CanRegisterClientWhoWorkForFree)%> - <%# GetPermissionName(PermissionType.CanRegisterClientWhoWorkForFree)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.EditSettings)%> - <%# GetPermissionName(PermissionType.EditSettings)%></li>
 				
 				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers)%> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers)%></li>
 			</ul>

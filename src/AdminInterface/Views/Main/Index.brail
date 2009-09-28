@@ -112,7 +112,11 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				<% end %>
 			</p>
 			<p>
+				<% if admin.HavePermisions(PermissionType.EditSettings): %>
 				<a href="${siteroot}/Main/Settings">Настройки</a>
+				<% else: %>
+				Настройки
+				<% end %>
 			</p>
 		</td>
 		<td valign=top>
