@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 using System.Web.UI.WebControls;
@@ -77,7 +76,7 @@ namespace AdminInterface.Controllers
 		{
 			billingInstance.UpdateAndFlush();
 			Flash.Add("Message", new Message("Изменения сохранены"));
-			RedirectToAction("Edit", new {clientCode, tab});
+			Redirect("Billing", "Edit", new {clientCode, tab});
 		}
 
 		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage)
@@ -103,7 +102,7 @@ namespace AdminInterface.Controllers
 				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
 			}
 
-			RedirectToAction("Edit", new {clientMessage.ClientCode, tab = "payments"});
+			Redirect("Billing", "Edit", new {clientMessage.ClientCode, tab = "payments"});
 		}
 
 		public void UpdateClientsStatus(uint clientCode, 
@@ -123,7 +122,7 @@ namespace AdminInterface.Controllers
 					client.Update();
 				}
 			}
-			RedirectToAction("Edit", new {clientCode, tab = "payments"});
+			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
 		}
 
 		public void Search()
@@ -205,7 +204,7 @@ namespace AdminInterface.Controllers
 			{
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			RedirectToAction("Edit", new {clientCode, tab = "mail"});
+			Redirect("Billing", "Edit", new {clientCode, tab = "mail"});
 		}
 
 		public void DeleteMail(uint id)
@@ -243,7 +242,7 @@ namespace AdminInterface.Controllers
 			payment.Name = "Оплата";
 			payment.Save();
 			Flash["Message"] = new Message("Сохранено");
-			RedirectToAction("Edit", new {clientCode, tab = "payments"});
+			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
 		}
 
 		private static IList<Region> GetRegions()

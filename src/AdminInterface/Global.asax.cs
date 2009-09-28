@@ -46,42 +46,61 @@ namespace AddUser
 
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 
-				var configuration = ActiveRecordMediator
-					.GetSessionFactoryHolder()
-					.GetAllConfigurations()[0];
+				SetupSecurityFilters();
 
-				configuration.FilterDefinitions.Add("HomeRegionFilter",
-				                                    new FilterDefinition("HomeRegionFilter",
-				                                                         "",
-				                                                         new Dictionary<string, IType>{{"AdminRegionMask", NHibernateUtil.UInt64}}));
-				configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
-													new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
-				configuration.FilterDefinitions.Add("SupplierOnlyFilter",
-				                                    new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
-
-				var classMapping = configuration.GetClassMapping(typeof (Payer));
-				var colection = (Collection) classMapping.GetProperty("Clients").Value;
-
-				colection.AddFilter("HomeRegionFilter", "RegionCode & :AdminRegionMask > 0");
-				colection.AddFilter("DrugstoreOnlyFilter", "FirmType = 1");
-				colection.AddFilter("SupplierOnlyFilter", "FirmType = 0");
-
-				RoutingModuleEx.Engine.Add(new PatternRoute("/client/[cc]")
-				                           	.DefaultForController().Is("client")
-				                           	.DefaultForAction().Is("info")
-											.Restrict("cc").ValidInteger);
-
-				RoutingModuleEx.Engine.Add(new PatternRoute("/")
-							.DefaultForController().Is("Main")
-							.DefaultForAction().Is("Index"));
-				RoutingModuleEx.Engine.Add(new PatternRoute("default.aspx")
-				                           	.DefaultForController().Is("Main")
-				                           	.DefaultForAction().Is("Index"));
+				SetupRoute();
 			}
 			catch(Exception ex)
 			{
 				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
+		}
+
+		private void SetupRoute()
+		{
+			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[cc]")
+			                           	.DefaultForController().Is("client")
+			                           	.DefaultForAction().Is("info")
+			                           	.Restrict("cc").ValidInteger);
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/billing/[billingCode]")
+			                           	.DefaultForController().Is("Billing")
+			                           	.DefaultForAction().Is("Edit")
+			                           	.Restrict("billingCode").ValidInteger);
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/")
+			                           	.DefaultForController().Is("Main")
+			                           	.DefaultForAction().Is("Index"));
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("default.aspx")
+			                           	.DefaultForController().Is("Main")
+			                           	.DefaultForAction().Is("Index"));
+		}
+
+		private void SetupSecurityFilters()
+		{
+			var configuration = ActiveRecordMediator
+				.GetSessionFactoryHolder()
+				.GetAllConfigurations()[0];
+
+			configuration.FilterDefinitions.Add("RegionFilter",
+			                                    new FilterDefinition("RegionFilter",
+			                                                         "",
+			                                                         new Dictionary<string, IType>{{"AdminRegionMask", NHibernateUtil.UInt64}}));
+			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
+			                                    new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
+			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
+			                                    new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
+
+			var payerMapping = configuration.GetClassMapping(typeof (Payer));
+			var colection = (Collection) payerMapping.GetProperty("Clients").Value;
+
+			colection.AddFilter("RegionFilter", "RegionCode & :AdminRegionMask > 0");
+			colection.AddFilter("DrugstoreOnlyFilter", "FirmType = 1");
+			colection.AddFilter("SupplierOnlyFilter", "FirmType = 0");
+
+			var regionMapping = configuration.GetClassMapping(typeof (Region));
+			regionMapping.AddFilter("RegionFilter", "RegionCode & :AdminRegionMask > 0");
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)

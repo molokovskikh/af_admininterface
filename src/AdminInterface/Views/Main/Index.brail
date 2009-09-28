@@ -96,9 +96,9 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 			</p>
 			<p>
 				<% if admin.HavePermisions(PermissionType.MonitorUpdates) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/Logs/ClientRegistrationLog.rails">Мониторинг обновления клиентов</a>
+				<a href="${siteroot}/Monitoring/Clients">Мониторинг работы клиентов</a>
 				<% else: %>
-				Мониторинг обновления клиентов
+				Мониторинг работы клиентов
 				<% end %>
 			</p>
 			<p>

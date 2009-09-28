@@ -3,7 +3,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Model;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
@@ -20,7 +19,7 @@ namespace AdminInterface.Controllers
 	{
 		public void DocumentLog(uint clientCode)
 		{
-		    DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
+			DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public void DocumentLog(uint clientCode, DateTime beginDate, DateTime endDate)
@@ -101,23 +100,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
-		}
-
-		[RequiredPermission(PermissionType.MonitorUpdates)]
-		public void ClientRegistrationLog()
-		{
-			ClientRegistrationLog(DateTime.Today.AddDays(-1), DateTime.Today, 0);
-		}
-
-		[RequiredPermission(PermissionType.MonitorUpdates)]
-		public void ClientRegistrationLog(DateTime beginDate, DateTime endDate, int dayWithoutUpdate)
-		{
-			PropertyBag["beginDate"] = beginDate;
-			PropertyBag["endDate"] = endDate;
-			PropertyBag["dayWithoutUpdate"] = dayWithoutUpdate;
-			PropertyBag["logEntities"] = ClientRegistrationLogEntity.GetEntitiesForPeriond(beginDate,
-			                                                                               endDate.AddDays(1),
-			                                                                               dayWithoutUpdate);
 		}
 	}
 }

@@ -144,6 +144,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\Bubble.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
@@ -399,8 +400,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />
-    <Content Include="Css\Billing.css" />
-    <Content Include="Css\Contacts.css" />
     <Content Include="JavaScript\Search.js" />
   </ItemGroup>
   <ItemGroup>
@@ -411,10 +410,15 @@
     <Content Include="Views\Layouts\contact.brail" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Css\Billing.css" />
     <Content Include="Css\Block.css" />
+    <Content Include="Css\calendar-blue.css" />
+    <Content Include="Css\Common.css" />
+    <Content Include="Css\Contacts.css" />
     <Content Include="Css\Highlight.css" />
     <Content Include="Css\Report.css" />
     <Content Include="Css\Table.css" />
+    <Content Include="Css\ValidationStyles.css" />
     <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\bc_bg.png" />
     <Content Include="Images\bc_separator.png" />
@@ -425,7 +429,6 @@
     <Content Include="Images\home.png" />
     <Content Include="Images\TopLeftCorner.png" />
     <Content Include="Images\TopRightCorner.png" />
-    <Content Include="Css\ValidationStyles.css" />
     <Content Include="Images\true.png" />
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />
@@ -465,7 +468,7 @@
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Layouts\Common.brail" />
     <None Include="Views\Layouts\logs.brail" />
-    <None Include="Views\Logs\ClientRegistrationLog.brail" />
+    <None Include="Views\Monitoring\Clients.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
@@ -494,8 +497,6 @@
     <None Include="Views\Client\SearchOffers.brail" />
     <None Include="Views\Main\Settings.brail" />
     <Content Include="Web.sitemap" />
-    <Content Include="Css\calendar-blue.css" />
-    <Content Include="Css\Common.css" />
     <Content Include="Images\icon_minus.gif" />
     <Content Include="Images\icon_plus.gif" />
     <Content Include="Images\calendar.gif" />

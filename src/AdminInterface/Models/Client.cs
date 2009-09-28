@@ -98,7 +98,7 @@ namespace AdminInterface.Models
 
 			foreach (var client in ShowClients)
 				foreach (var user in client.Parent.Users)
-					yield return user;	
+					yield return user;
 		}
 
 		public virtual bool IsDrugstore()
@@ -266,14 +266,9 @@ group by ouar.clientcode")
 			if (BillingStatus == ClientStatus.Off || Status == ClientStatus.Off)
 				return true;
 
-			if (Children.Count == 0)
-				return true;
-
 			foreach (var child in Children)
-			{
-				if (child.Child.Status == ClientStatus.On && child.Child.BillingStatus == ClientStatus.On)
+				if (child.Child.IsClientActive())
 					return false;
-			}
 
 			return true;
 		}

@@ -28,6 +28,20 @@ namespace Common.Web.Ui.Helpers
 			}
 		}
 
+		public static void WithSession(Action<ISession> sessionDelegate)
+		{
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
+			try
+			{
+				sessionDelegate(session);
+			}
+			finally
+			{
+				sessionHolder.ReleaseSession(session);
+			}
+		}
+
 		public static IList<T> WithSession<T>(Func<ISession, IList<T>> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
@@ -44,7 +58,7 @@ namespace Common.Web.Ui.Helpers
 			}
 		}
 
-        public static T WithSession<T>(Func<ISession, T> sessionDelegate)
+		public static T WithSession<T>(Func<ISession, T> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(T));

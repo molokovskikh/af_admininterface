@@ -1,43 +1,46 @@
-﻿using System;
-using AdminInterface.Models;
-using AdminInterface.Models.Security;
-using Castle.ActiveRecord;
+﻿using AdminInterface.Models.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Security
 {
 	public class PayerFilterActivationFilter : IFilter
 	{
-		public bool Perform(ExecuteWhen exec, 
-							IEngineContext context, 
-							IController controller,
-		                    IControllerContext controllerContext)
+		public bool Perform(ExecuteWhen exec,
+			IEngineContext context,
+			IController controller,
+			IControllerContext controllerContext)
 		{
-			var holder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = holder.CreateSession(typeof (Payer));
-			try
-			{
+			ArHelper.WithSession(s => {
 				var regionMask = SecurityContext.Administrator.RegionMask;
-				session.EnableFilter("HomeRegionFilter").SetParameter("AdminRegionMask", regionMask);
+				s.EnableFilter("RegionFilter").SetParameter("AdminRegionMask", regionMask);
+
 				if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore)
 					&& SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
-					return true;
+					return;
 
 				if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore))
-					session.EnableFilter("DrugstoreOnlyFilter");
+					s.EnableFilter("DrugstoreOnlyFilter");
 
 				if (SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
-					session.EnableFilter("SupplierOnlyFilter");
-			}
-			catch (Exception)
-			{
-				holder.FailSession(session);
-				throw;
-			}
-			finally
-			{
-				holder.ReleaseSession(session);
-			}
+					s.EnableFilter("SupplierOnlyFilter");
+			});
+			return true;
+		}
+	}
+
+	public class SecurityActivationFilter : IFilter
+	{
+		public bool Perform(ExecuteWhen exec,
+			IEngineContext context,
+			IController controller,
+			IControllerContext controllerContext)
+		{
+			ArHelper.WithSession(s => {
+				var regionMask = SecurityContext.Administrator.RegionMask;
+				s.EnableFilter("RegionFilter").SetParameter("AdminRegionMask", regionMask);
+			});
+
 			return true;
 		}
 	}

@@ -4,9 +4,12 @@ using System.Security.Principal;
 using System.ServiceModel;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.PrgData;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 using ConsoleApplication11.ServiceReference2;
 
 namespace AdminInterface.Controllers
@@ -14,7 +17,9 @@ namespace AdminInterface.Controllers
 	[
 		Secure,
 		Helper(typeof (ViewHelper)),
-		Layout("General")
+		Helper(typeof (BindingHelper)),
+		Layout("General"),
+		Filter(ExecuteWhen.BeforeAction, typeof (SecurityActivationFilter))
 	]
 	public class MonitoringController : SmartDispatcherController
 	{
@@ -56,6 +61,35 @@ namespace AdminInterface.Controllers
 		public void Orders()
 		{
 			PropertyBag["Orders"] = OrderView.FindNotSendedOrders();
+		}
+
+		[RequiredPermission(PermissionType.MonitorUpdates, PermissionType.ViewDrugstore)]
+		public void Clients()
+		{
+			Clients(4, 1, 8, 0, null, null);
+		}
+
+		[RequiredPermission(PermissionType.MonitorUpdates, PermissionType.ViewDrugstore)]
+		public void Clients(uint filter, uint type, uint days, ulong region, string sort, string direction)
+		{
+			if (days < 1)
+				days = 1;
+			if (days > 40)
+				days = 40;
+
+			PropertyBag["filter"] = filter;
+			PropertyBag["days"] = days;
+			PropertyBag["type"] = type;
+			PropertyBag["region"] = region;
+			PropertyBag["sort"] = sort;
+			PropertyBag["direction"] = direction;
+			PropertyBag["regions"] = Region.FindAll();
+			PropertyBag["admin"] = SecurityContext.Administrator;
+
+			if (filter == 4)
+				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotUpdated(days, filter, region, sort, direction);
+			else if (filter == 5)
+				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotOrdered(days, filter, region, sort, direction);
 		}
 	}
 }
