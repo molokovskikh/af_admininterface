@@ -260,17 +260,38 @@ group by ouar.clientcode")
 
 		public virtual bool CanChangeStatus()
 		{
+			if (IsClientActive())
+				return CanTurnOff();
+
+			return CanTurnOn();
+		}
+
+		private bool CanTurnOff()
+		{
+			if (Type != ClientType.Drugstore)
+				return true;
+			
+			if (Children.Count == 0)
+				return true;
+
+			if (Children.All(r => !r.Child.IsClientActive()))
+				return true;
+
+			return false;
+		}
+
+		private bool CanTurnOn()
+		{
 			if (Type != ClientType.Drugstore)
 				return true;
 
-			if (BillingStatus == ClientStatus.Off || Status == ClientStatus.Off)
+			if (Parents.Count == 0)
 				return true;
 
-			foreach (var child in Children)
-				if (child.Child.IsClientActive())
-					return false;
+			if (Parents[0].Parent.IsClientActive())
+				return true;
 
-			return true;
+			return false;
 		}
 
 		public virtual bool HavePreparedData()

@@ -63,11 +63,6 @@ namespace AddUser
 			                           	.DefaultForAction().Is("info")
 			                           	.Restrict("cc").ValidInteger);
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/billing/[billingCode]")
-			                           	.DefaultForController().Is("Billing")
-			                           	.DefaultForAction().Is("Edit")
-			                           	.Restrict("billingCode").ValidInteger);
-
 			RoutingModuleEx.Engine.Add(new PatternRoute("/")
 			                           	.DefaultForController().Is("Main")
 			                           	.DefaultForAction().Is("Index"));

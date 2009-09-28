@@ -32,7 +32,7 @@ OutputSubView("Search")
 
 <% if searchResults.Count == 0: %>
 <div class="EmptyData">
-	Повашему запросу ничего не найдено
+	По вашему запросу ничего не найдено
 </div>
 <% else: %>
 <div>
