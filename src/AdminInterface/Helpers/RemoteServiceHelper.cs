@@ -76,7 +76,7 @@ namespace AdminInterface.Helpers
 				});
 		}
 
-		private static T Try<T>(Func<T> action, Func<Exception, T> fail)
+		public static T Try<T>(Func<T> action, Func<Exception, T> fail)
 		{
 			try
 			{
@@ -85,6 +85,18 @@ namespace AdminInterface.Helpers
 			catch (Exception e)
 			{
 				return fail(e);
+			}
+		}
+
+		public static void Try(Action action)
+		{
+			try
+			{
+				action();
+			}
+			catch (Exception e)
+			{
+				_log.Error(e);
 			}
 		}
 	}

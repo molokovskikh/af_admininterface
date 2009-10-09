@@ -23,7 +23,9 @@ namespace AdminInterface.Controllers
 		{
 			SecurityContext.CheckIsUserAuthorized();
 
-			PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
+			RemoteServiceHelper.Try(() => {
+				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
+			});
 
 			PropertyBag["Regions"] = Region.GetRegionsForClient(SecurityContext.Administrator.UserName);
 			PropertyBag["admin"] = SecurityContext.Administrator;
