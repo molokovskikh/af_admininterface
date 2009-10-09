@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
@@ -65,6 +66,8 @@ namespace AddUser
 				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", NotNoisedSupplier.SelectedValue);
 			else
 				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", null);
+
+			var insertedRelationship = new Dictionary<DataRow, Relationship>();
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -223,6 +226,7 @@ where ouar.clientcode = ?ClientCode and up.Shortcut = 'AF' and ap.UserId is null
 							var parent = Client.FindAndCheck(Convert.ToUInt32(row["FirmCode"]));
 							var relationshipType = (RelationshipType)Convert.ToUInt32(row["IncludeType"]);
 							lastUpdateRelationship = client.AddRelationship(parent, relationshipType);
+							insertedRelationship.Add(row, lastUpdateRelationship);
 						}
 						else if (row.RowState == DataRowState.Deleted)
 						{
@@ -237,6 +241,7 @@ where ouar.clientcode = ?ClientCode and up.Shortcut = 'AF' and ap.UserId is null
 							lastUpdateRelationship = relationship;
 						}
 					}
+					Data.Tables["Include"].AcceptChanges();
 					if (lastUpdateRelationship != null)
 					{
 						var command = new MySqlCommand(SharedCommands.UpdateWorkRules, connection);
@@ -296,6 +301,8 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 				});
 				scope.VoteCommit();
 			}
+
+			insertedRelationship.Each(k => k.Key["Id"] = k.Value.Id);
 
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
