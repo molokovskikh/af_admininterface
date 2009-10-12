@@ -326,5 +326,12 @@ group by ouar.clientcode")
 
 			relationship.Delete();
 		}
+
+		public virtual int? WorkCopyCount()
+		{
+			if (Type == ClientType.Drugstore)
+				return Users.Count;
+			return null;
+		}
 	}
 }

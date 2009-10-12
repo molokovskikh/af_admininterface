@@ -87,7 +87,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 									${client.GetSubordinateType()}
 								</td>
 								<td>
-									${client.Users.Count}
+									<% if client.WorkCopyCount(): %>
+									${client.WorkCopyCount()}
+									<% else: %>
+									-
+									<% end %>
 								</td>
 								<td>
 									${client.RegistrationDate.ToShortDateString()}
