@@ -14,10 +14,10 @@ public partial class EditAdministrator : Page
 	protected Administrator _current { get; set; }
 
 	protected void Page_Load(object sender, EventArgs e)
-    {
+	{
 		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
 
-    	if (IsPostBack)
+		if (IsPostBack)
 			return;
 
 		if (Convert.ToInt32(Request["id"]) > 0)
@@ -25,11 +25,11 @@ public partial class EditAdministrator : Page
 		else
 			_current = new Administrator { AllowedPermissions = new List<Permission>() };
 
-    	var regions = Region.FindAll(Order.Asc("Name"));
-    	var permissions = Permission.FindAll();
+		var regions = Region.FindAll(Order.Asc("Name"));
+		var permissions = Permission.FindAll();
 
-    	RegionSelector.DataSource = regions;
-    	PermissionSelector.DataSource = permissions;
+		RegionSelector.DataSource = regions;
+		PermissionSelector.DataSource = permissions;
 
 		DataBind();
 
@@ -40,7 +40,7 @@ public partial class EditAdministrator : Page
 		foreach (ListItem item in PermissionSelector.Items)
 			if (_current.HavePermisions((PermissionType) Enum.Parse(typeof(PermissionType), item.Value)))
 				item.Selected = true;
-    }
+	}
 
 	protected void Save_Click(object sender, EventArgs e)
 	{
@@ -87,10 +87,11 @@ public partial class EditAdministrator : Page
 		if (admin.Id == 0)
 		{
 			admin.Save();
+			new RedmineUser(admin).Save();
 			var isLoginCreated = CreateUserInAD(admin);
 			if (!isLoginCreated)
 				Response.Redirect("ViewAdministrators.aspx");
-			else			
+			else
 				Response.Redirect("OfficeUserRegistrationReport.aspx");
 		}
 		else
@@ -110,14 +111,16 @@ public partial class EditAdministrator : Page
 	private bool CreateUserInAD(Administrator administrator)
 	{
 		var password = Func.GeneratePassword();
+#if !DEBUG
 		var isLoginCreated = administrator.CreateUserInAd(password);
 
 		if (!isLoginCreated)
 			return false;
-
+#endif
 		Session["Password"] = password;
 		Session["FIO"] = administrator.ManagerName;
 		Session["Login"] = administrator.UserName;
+
 		return true;
 	}
 

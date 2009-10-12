@@ -12,13 +12,12 @@
 					Имя пользователя:
 				</label>
 				<asp:TextBox ID="Login" Text='<%# _current.UserName %>' runat="server"></asp:TextBox>
-				<asp:RequiredFieldValidator ID="LoginRequired" runat="server" ControlToValidate="Login"
-					ErrorMessage="*"></asp:RequiredFieldValidator>
+				<asp:RequiredFieldValidator ID="LoginRequired" runat="server" ControlToValidate="Login" ErrorMessage="*"></asp:RequiredFieldValidator>
 			</div>
 			<div>
-				<label class="LabelForInput" for="FIO">
-					ФИО:</label>
+				<label class="LabelForInput" for="FIO">ФИО:</label>
 				<asp:TextBox ID="FIO" Text='<%# _current.ManagerName %>' runat="server"></asp:TextBox>
+				<asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="FIO" ErrorMessage="*"></asp:RequiredFieldValidator>
 			</div>
 			<div>
 				<label class="LabelForInput" for="Phone">
@@ -34,6 +33,7 @@
 				<asp:TextBox ID="Email" Text='<%# _current.Email %>' runat="server"></asp:TextBox>
 				<asp:RegularExpressionValidator ID="EmailValidator" runat="server" ControlToValidate="Email"
 					ErrorMessage="Поле E-mail заполненно не коректно" ValidationExpression="\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*"></asp:RegularExpressionValidator>
+				<asp:RequiredFieldValidator ID="RequiredFieldValidator2" runat="server" ControlToValidate="Email" ErrorMessage="*"></asp:RequiredFieldValidator>
 			</div>
 			<fieldset>
 				<legend>Регионы:</legend>
