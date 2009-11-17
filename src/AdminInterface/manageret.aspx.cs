@@ -55,6 +55,7 @@ namespace AddUser
 			updateCommand.Parameters.AddWithValue("?AlowWayBill", WayBillCB.Checked);
 			updateCommand.Parameters.AddWithValue("?EnableUpdate", EnableUpdateCB.Checked);
 			updateCommand.Parameters.AddWithValue("?CalculateLeader", CalculateLeaderCB.Checked);
+			updateCommand.Parameters.AddWithValue("?AllowDelayOfPayment", AllowDelayOfPaymentCB.Checked);
 			updateCommand.Parameters.AddWithValue("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
 			updateCommand.Parameters.AddWithValue("?SubmitOrders", SubmitOrdersCB.Checked);
 			updateCommand.Parameters.AddWithValue("?ServiceClient", ServiceClientCB.Checked);
@@ -188,6 +189,7 @@ SET OrderRegionMask     = ?orderMask,
     AlowWayBill             =?AlowWayBill, 
     EnableUpdate            =?EnableUpdate, 
     CalculateLeader         = ?CalculateLeader, 
+	AllowDelayOfPayment    = ?AllowDelayOfPayment,
     AllowSubmitOrders       = ?AllowSubmitOrders, 
     SubmitOrders            = ?SubmitOrders, 
     ServiceClient           = ?ServiceClient, 
@@ -419,6 +421,7 @@ SELECT  InvisibleOnFirm,
         AlowWayBill, 
         EnableUpdate, 
         CalculateLeader, 
+		AllowDelayOfPayment,
         AllowSubmitOrders, 
         SubmitOrders, 
         ServiceClient, 
@@ -439,6 +442,7 @@ WHERE rcs.clientcode = ?ClientCode";
 						WayBillCB.Checked = Convert.ToBoolean(reader["AlowWayBill"]);
 						EnableUpdateCB.Checked = Convert.ToBoolean(reader["EnableUpdate"]);
 						CalculateLeaderCB.Checked = Convert.ToBoolean(reader["CalculateLeader"]);
+						AllowDelayOfPaymentCB.Checked = Convert.ToBoolean(reader["AllowDelayOfPayment"]);
 						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(reader["AllowSubmitOrders"]);
 						SubmitOrdersCB.Checked = Convert.ToBoolean(reader["SubmitOrders"]);
 						ServiceClientCB.Checked = Convert.ToBoolean(reader["ServiceClient"]);

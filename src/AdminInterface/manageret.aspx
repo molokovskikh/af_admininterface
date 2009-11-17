@@ -119,6 +119,11 @@
 								</td>
 							</tr>
 							<tr>
+								<td class="tdCheckBox" colspan="3" style="height: 22px">
+									<asp:CheckBox runat="server" ID="AllowDelayOfPaymentCB" Text="Активировать механизм отсрочки платежей" />
+								</td>
+							</tr>
+							<tr>
 								<td style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
 									Таблица подчинений:
 								</td>							
