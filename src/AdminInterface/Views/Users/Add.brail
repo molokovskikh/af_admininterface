@@ -1,16 +1,26 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
 									  ("Новый пользователь", "")]} %>
+<script>
+	$(function() {
+		$("form").validate({
+			rules : {
+				"user.HumanReadableName" : "required"
+			}
+		});
+	});
+</script>
 
 <div style="width: 600px;">
 	<form method=post action="${siteroot}/users/add">
 		<input type=hidden value="${Client.Id}" name="clientId" />
-		<h3>
+		<h2>
 			Новый пользователь
-		</h3>
+		</h2>
 		<div class=block>
 			Внутреннее имя<br>
-			<input type=text name="user.HumanReadableName" />
+			<input type=text name="user.HumanReadableName"><br>
+			<input type=checkbox name=user.SubmitOrders> Подтверждать отправку заказов
 		</div>
 		<div class=block>
 			<h3>

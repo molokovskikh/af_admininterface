@@ -2,12 +2,22 @@
 									  ("Клиент ${user.Client.ShortName}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
 
+<script>
+	$(function() {
+		$("form").validate({
+			rules : {
+				"user.HumanReadableName" : "required"
+			}
+		});
+	});
+</script>
+
 <div style="width: 600px;">
 	<form method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
-		<h3>
+		<h2>
 			Пользователь ${user.Login}
-		</h3>
+		</h2>
 		<% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
 			<div class=block>
 				<ul class="navigation-menu">
@@ -18,7 +28,8 @@
 		<% end %>
 		<div class=block>
 			Внутреннее имя<br>
-			<input name=user.HumanReadableName value="${user.HumanReadableName}">
+			<input name=user.HumanReadableName value="${user.HumanReadableName}"><br>
+			<input type=checkbox name=user.SubmitOrders> Подтверждать отправку заказов
 		</div>
 		<div class=block>
 			<h3>

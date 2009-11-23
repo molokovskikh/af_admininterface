@@ -1,15 +1,30 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
 									  ("Новый адрес доставки", "")]} %>
+
+<script>
+	$(function() {
+		$("form").validate({
+			rules : {
+				"delivery.value" : "required"
+			}
+		});
+	});
+</script>
+
 <div style="width: 600px;">
 	<form method=post action="${siteroot}/deliveries/add">
 		<input type=hidden name=clientId value=${client.Id}>
-		<h3>
-			Новый адрес доставки
-		</h3>
+		<h2>Новый адрес доставки</h2>
 		<div class=block>
 			Адрес<br>
-			<input name=delivery.value >
+			<input name=delivery.value ><br>
+			Отправлять документы пользователю<br>
+			<select name=delivery.DocumentsResiver.Id>
+				<% for user in client.Users: %>
+					<option value=${user.Id}>${user.HumanReadableName}</option>
+				<% end %>
+			</select>
 		</div>
 		<div class=block>
 			<h3>Доступен пользователям</h3>

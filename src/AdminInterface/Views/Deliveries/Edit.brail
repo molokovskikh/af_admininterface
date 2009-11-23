@@ -2,6 +2,16 @@
 									  ("Клиент ${delivery.Client.ShortName}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
+<script>
+	$(function() {
+		$("form").validate({
+			rules : {
+				"delivery.value" : "required"
+			}
+		});
+	});
+</script>
+
 <div style="width: 600px;">
 	<form method=post action="${siteroot}/deliveries/update">
 		<input type=hidden name=delivery.Id value="${delivery.Id}" >
@@ -9,7 +19,13 @@
 		
 		<div class=block>
 			Адрес<br>
-			<input name=delivery.value value="${delivery.Value}" >
+			<input name=delivery.value value="${delivery.Value}" ><br>
+			Отправлять документы пользователю<br>
+			<select name=delivery.DocumentsResiver.Id>
+				<% for user in delivery.Client.Users: %>
+					<option value=${user.Id} ${"selected" if user.Id == delivery.DocumentsResiver.Id}>${user.HumanReadableName}</option>
+				<% end %>
+			</select>
 		</div>
 		
 		<div class=block>
