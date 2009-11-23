@@ -54,12 +54,7 @@ namespace AddUser
 			updateCommand.Parameters.AddWithValue("?AlowWayBill", WayBillCB.Checked);
 			updateCommand.Parameters.AddWithValue("?EnableUpdate", EnableUpdateCB.Checked);
 			updateCommand.Parameters.AddWithValue("?CalculateLeader", CalculateLeaderCB.Checked);
-<<<<<<< HEAD
 			updateCommand.Parameters.AddWithValue("?AllowDelayOfPayment", AllowDelayOfPaymentCB.Checked);
-			updateCommand.Parameters.AddWithValue("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
-			updateCommand.Parameters.AddWithValue("?SubmitOrders", SubmitOrdersCB.Checked);
-=======
->>>>>>> Удалил обращение к не используемым полям
 			updateCommand.Parameters.AddWithValue("?ServiceClient", ServiceClientCB.Checked);
 			updateCommand.Parameters.AddWithValue("?OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
 			updateCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
@@ -382,12 +377,7 @@ WHERE rcs.clientcode = ?ClientCode";
 						WayBillCB.Checked = Convert.ToBoolean(reader["AlowWayBill"]);
 						EnableUpdateCB.Checked = Convert.ToBoolean(reader["EnableUpdate"]);
 						CalculateLeaderCB.Checked = Convert.ToBoolean(reader["CalculateLeader"]);
-<<<<<<< HEAD
 						AllowDelayOfPaymentCB.Checked = Convert.ToBoolean(reader["AllowDelayOfPayment"]);
-						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(reader["AllowSubmitOrders"]);
-						SubmitOrdersCB.Checked = Convert.ToBoolean(reader["SubmitOrders"]);
-=======
->>>>>>> Удалил обращение к не используемым полям
 						ServiceClientCB.Checked = Convert.ToBoolean(reader["ServiceClient"]);
 						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(reader["OrdersVisualizationMode"]);
 						if (Convert.ToInt32(reader["InvisibleOnFirm"]) != 0)
