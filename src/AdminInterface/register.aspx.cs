@@ -464,7 +464,7 @@ where sg.AssignDefaultValue = 1;
 
 INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (?UserId, ?AnalitFVersion);
 
-INSERT 
+INSERT
 INTO Future.Intersection (
 	ClientId,
 	RegionId,

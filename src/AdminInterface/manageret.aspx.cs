@@ -125,39 +125,32 @@ where firmcode=?clientCode";
 							@"
 UPDATE clientsdata SET MaskRegion = ?workMask WHERE FirmCode = ?ClientCode;
 
-INSERT 
-INTO    intersection
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode, 
-                invisibleonclient, 
-                InvisibleonFirm, 
-                costcode
-        )
-SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode,  
-        if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-        a.invisibleonfirm,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
-FROM clientsdata as clientsdata2
-	JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
-	JOIN clientsdata ON clientsdata.firmsegment = clientsdata2.firmsegment
-		JOIN pricesdata ON pricesdata.firmcode = clientsdata.firmcode
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
+INSERT
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	CostId
+)
+SELECT  DISTINCT drugstore.Id,
+	regions.regioncode,
+	pricesdata.pricecode,
+	(
+		SELECT costcode
+		FROM pricescosts pcc
+		WHERE basecost AND pcc.PriceCode = pricesdata.PriceCode
+	) as CostCode
+FROM Future.Clients as drugstore
+	JOIN retclientsset as a ON a.clientcode = drugstore.Id
+	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
+		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
+	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
-        AND clientsdata.firmtype = 0
-		AND clientsdata2.FirmCode = ?clientCode
-		AND clientsdata2.firmtype = 1;";
+	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
+WHERE i.Id IS NULL
+	AND supplier.firmtype = 0
+	AND drugstore.Id = ?clientCode
+	AND drugstore.FirmType = 1;";
 					}
 					if (VisileStateList.Enabled)
 					{
