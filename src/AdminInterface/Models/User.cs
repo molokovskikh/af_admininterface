@@ -43,7 +43,7 @@ namespace AdminInterface.Models
 			ColumnKey = "UserId",
 			Table = "future.UserAddress",
 			ColumnRef = "AddressId")]
-		public virtual IList<Address> AvaliableAddresses  { get; set; }
+		public virtual IList<Address> AvaliableAddresses { get; set; }
 
 		public static User GetByLogin(string login)
 		{

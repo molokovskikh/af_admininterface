@@ -3,6 +3,7 @@
 									  ("Новый адрес доставки", "")]} %>
 <div style="width: 600px;">
 	<form method=post action="${siteroot}/deliveries/add">
+		<input type=hidden name=clientId value=${client.Id}>
 		<h3>
 			Новый адрес доставки
 		</h3>

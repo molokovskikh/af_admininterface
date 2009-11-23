@@ -30,7 +30,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always)] Address address)
+		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address)
 		{
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");

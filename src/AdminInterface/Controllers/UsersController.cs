@@ -1,6 +1,7 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Controllers
@@ -26,6 +27,7 @@ namespace AdminInterface.Controllers
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}
 
+		[AccessibleThrough(Verb.Get)]
 		public void Edit(string login)
 		{
 			var user = User.GetByLogin(login);
@@ -33,6 +35,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(user.Client);
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.Always, Expect = "user.AssignedPermissions, user.AvaliableAddresses")] User user)
+		{
+			user.Update();
+			Flash["Message"] = new Message("Сохранен");
+			RedirectUsingRoute("client", "info", new { cc = user.Client.Id });
 		}
 	}
 }
