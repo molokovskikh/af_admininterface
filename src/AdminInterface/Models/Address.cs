@@ -16,6 +16,9 @@ namespace AdminInterface.Models
 		[BelongsTo("ClientCode")]
 		public Client Client { get; set; }
 
+		[BelongsTo("DocumentResiverId")]
+		public User DocumentsResiver { get; set; }
+
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
 			ColumnKey = "AddressId",

@@ -30,6 +30,9 @@ namespace AdminInterface.Models
 		[Property(NotNull = true)]
 		public virtual string HumanReadableName { get; set; }
 
+		[Property]
+		public virtual bool SubmitOrders { get; set; }
+
 		[BelongsTo("ClientCode", NotNull = true)]
 		public Client Client { get; set; }
 
