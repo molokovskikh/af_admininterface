@@ -36,7 +36,7 @@
 	}
 </style>
 	
-<h3>${client.ShortName}</h3>
+<h2>Клиент ${client.ShortName}</h2>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
