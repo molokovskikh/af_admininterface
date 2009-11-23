@@ -1,6 +1,19 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
 									  ("Информация о клиенте", "")]} %>
 
+<script>
+	document.observe("dom:loaded", function() {
+
+		Validation.add("uin-reuired",
+			   "Нужно указать причину сброса",
+				function(v) {
+					return !Validation.get('IsEmpty').test(v);
+				});
+
+		var validation = new Validation("ReseteUin");
+	});
+</script>
+
 <style>
 	.InfoRow
 	{
@@ -25,7 +38,7 @@
 	
 <h3>${client.ShortName}</h3>
 
-<div class="BorderedBlock" style="padding: 20px 10px 20px 10px; float:left; width: 95%;">
+<div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
 	<% if IsDefined("Message"):
 		clazz = "notice"
@@ -46,79 +59,193 @@
 	<% end %>
 
 	<div class="TwoColumn">
-		<% OutputSubView("ClientView") %>
-		<form action="Update.rails" method=post style="padding:0; margin:0;">
-			${FormHelper.HiddenField("client.Id")}
-			<table cellpadding=0 cellspacing=0 border=1 rules=all style="width: 100%; border: solid 1px #dadada; border-collapse:collapse;">
-				<col style="width:50%" />
-				<col style="width:50%" />
-				<tr>
-					<td class="Title" style="height: 30px;" colspan="2">
-						<strong>Общая информация</strong>
-					</td>
-				</tr>
-				<tr class="InfoRow">
-					<td colspan=2>
-						<% if not Registrant: %>
-						Регистратор не указан, дата регистрации ${client.RegistrationDate}
-						<% else: %>
-						Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
-						<% end %>
-					</td>	
-				</tr
-				<tr class="InfoRow">
-					<td align="right">
-						Полное наименование:
-					</td>
-					<td>
-						${FormHelper.TextField("client.FullName")}
-					</td>
-				</tr>
-				<tr class="InfoRow">
-					<td style="text-align: right;">
-						Краткое наименование:
-					</td>
-					<td>
-						${FormHelper.TextField("client.ShortName")}
-					</td>
-				</tr>
-				<tr class="InfoRow">
-					<td class="Title" style="height: 30px;" colspan="2">
-						Адреса доставки
-					</td>
-				</tr>
-				<% for address in client.Addresses: %>
-				<tr>
-					<td colspan=2>
-						<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>
-					</td>
-				</tr>
+
+		<div class=block>
+			<ul class="navigation-menu">
+				<li>
+					<% if Client.IsDrugstore(): %>
+						<a ${"href=${siteroot}/manageret.aspx?cc=${Client.Id}" if admin.ManageDrugstore}>Настройка</a>
+					<% else: %>
+						<a ${"href=${siteroot}/managep.aspx?cc=${Client.Id}" if admin.ManageSuppliers}>Настройка</a>
+					<% end %>
+				</li>
+				<li>
+					<a ${"href=../Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
+				</li>
+				<li>
+					<a ${"href=../Logs/UpdateLog.rails?clientCode=${Client.Id}" if Client.IsDrugstore()} target="_blank">История обновлений</a>
+				</li>
+				<li>
+					<a href="../Logs/DocumentLog.rails?clientCode=${Client.Id}" target="_blank">История документов</a>
+				</li>
+				<li>
+					<a href="../orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
+				</li>
+				<% if client.IsDrugstore(): %>
+				<li>
+					<a href="SearchOffers.rails?clientCode=${Client.Id}" target="_blank">Поиск предложений</a>
+				</li>
 				<% end %>
+				<li>
+					<% if client.IsDrugstore(): %>
+						<% if Client.IsDrugstore(): %>
+							<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
+						<% else: %>
+							<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
+						<% end %>
+					<% end %>
+				</li>
+			</ul>
+		</div>
+
+
+		<div class=block>
+			<h3>Операции</h3>
+			
+			<% containsLockedUsers = false %>
+			
+			<form method=post action=unlock.rails style="margin:0; padding:0">
+				<input type=hidden name=clientCode value=${Client.Id} />
+				<input style="border-style:groove;" type=submit ${"disabled" if not containsLockedUsers} value="Разблокировать" />
+				<% if IsDefined("UnlockMessage"): %> 
+					<span style="color:Green;">${UnlockMessage}</span>
+				<% end %>
+			</form>
+
+			<% if Client.IsDrugstore(): %>
+			
+				<form method=post action=DeletePreparedData.rails style="margin:0; padding:0">
+					<input type=hidden name=clientCode value=${Client.Id} />
+					<input style="border-style:groove;" type=submit ${"disabled" if not Client.HavePreparedData()} value="Удалить подготовленные данные" />
+					<% if IsDefined("DeleteMessage"): %> 
+						<span style="color:Green;">${DeleteMessage}</span>
+					<% end %>
+					<% if IsDefined("DeleteErrorMessage"): %> 
+						<span style="color:Red;">${DeleteErrorMessage}</span>
+					<% end %>
+				</form>
+
+				<form id=ReseteUin method=post action=ResetUin.rails style="margin:0; padding:0">
+					<input type=hidden name=clientCode value=${Client.Id} />
+					<% haveUin = Client.HaveUin() %>
+					<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+					<% if haveUin: %>
+						Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
+					<% else: %> 
+						<span style="color:Green;">Идентификатор не присвоен</span>
+					<% end %>
+				</form>
+			
+			<% end %>
+			
+		</div>
+			
+		<div class=block>
+			<div>
+				<a href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
+			</div>
+			<h3>Пользователи</h3>
+			<table style="width:100%;" class="Test">
 				<tr>
-					<td colspan="2">
-					<%
-						component ContactViewer, {"ContactGroups" : ContactGroups}:
-							section ContactGroupHeaderLink:
-							%>
-								<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
-							<%
-							end
-							section Person:
-							%>
-								<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
-							<%
-							end
-						end
-					%>
+					<td class="Title">
+						Имя пользователя
+					</td>
+					<td class="Title">
+						Последний правильный ввод пароля
+					</td>
+					<td class="Title">
+						Последний неправильный ввод пароля
+					</td>
+					<td class="Title">
+						Последнее изменение пароля
 					</td>
 				</tr>
-				<tr style="text-align: center;">
-					<td colspan="2">
-						<input type=submit value="Сохранить" />
-					</td>
-				</tr>
+				<% containsLockedUsers = false %>
+				<% for user in Client.GetUsers(): %>
+					<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
+					<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) if not containsLockedUsers %>
+					<tr>
+						<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
+							<% if isLoginExists or 1 == 1: %>
+								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
+							<% else: %>
+								${user.Login}
+							<% end %>
+						</td>
+						<td>
+							${ADHelper.GetLastLogOnDate(user.Login) if isLoginExists}
+						</td>
+						<td>
+							${ADHelper.GetBadPasswordDate(user.Login) if isLoginExists}
+						</td>
+						<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
+							${ADHelper.GetLastPasswordChange(user.Login) if isLoginExists}
+						</td>
+					</tr>
+				<% end %>
 			</table>
-		</form>
+			<div style="margin-top:10px;">
+				Вход в клиентский интерфейс: ${?authorizationLog.CITime}
+				<br />
+				Обновление AnalitF: ${?authorizationLog.AFTime}
+				<br />
+				Использование AnalitOnline: ${?authorizationLog.AOLTime}
+				<br />
+				Использование Online сервисов: ${?authorizationLog.IOLTime}
+				<br />
+			</div>
+		</div>
+
+		<div class=block>
+			<h3>Общая информация</h3>
+			<div>
+				<% if not Registrant: %>
+				Регистратор не указан, дата регистрации ${client.RegistrationDate}
+				<% else: %>
+				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
+				<% end %>
+			</div>
+			<form action="Update.rails" method=post style="padding:0; margin:0;">
+				<div>
+					${FormHelper.HiddenField("client.Id")}
+					<p>
+						Полное наименование<br>
+						${FormHelper.TextField("client.FullName")}
+					</p>
+					<p>
+						Краткое наименование<br>
+						${FormHelper.TextField("client.ShortName")}
+					</p>
+				</div>
+				<div>
+					<input type=submit value="Сохранить" />
+				</div>
+			</form>
+		</div>
+		
+		<div class=block>
+			<div><a href="${siteroot}/deliveries/add?clientId=${client.Id}">Новый адрес доставки</a></div>
+			<h3>Адреса доставки</h3>
+			<% for address in client.Addresses: %>
+				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>, 
+			<% end %>
+		</div>
+		
+		<%
+			component ContactViewer, {"ContactGroups" : ContactGroups}:
+				section ContactGroupHeaderLink:
+				%>
+					<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+				<%
+				end
+				section Person:
+				%>
+					<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+				<%
+				end
+			end
+		%>
+		
 		<div>
 			<h4 style="margin-bottom:0">Неопознанные звонки:</h4>
 			<table id="UnknownPhones" class="DataTable"	>
@@ -140,6 +267,7 @@
 		</div>
 		<% OutputSubView("LegendView") %>
 	</div>
+	
 	<div class="TwoColumn" style="margin-left: 10px">
 		<form action="SendMessage.rails" method="post">
 			<input type=hidden value=${client.Id} name=clientCode />
