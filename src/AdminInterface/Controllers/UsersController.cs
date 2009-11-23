@@ -44,6 +44,8 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 
+			Mailer.UserRegistred(user);
+
 			if (sendClientCard && !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim()))
 			{
 				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,

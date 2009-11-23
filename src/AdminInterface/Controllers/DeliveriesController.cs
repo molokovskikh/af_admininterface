@@ -19,6 +19,7 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			address.Client = client;
 			address.Save();
+			Mailer.DeliveryAddressRegistred(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}

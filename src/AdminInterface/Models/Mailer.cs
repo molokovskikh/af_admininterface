@@ -62,5 +62,33 @@ namespace AdminInterface.Models
 					 client.Id),
 				"RegisterList@subscribe.analit.net");
 		}
+
+		public static void DeliveryAddressRegistred(Address address)
+		{
+			Func.Mail("register@analit.net", 
+				"Регистрация нового адреса доставки", 
+				String.Format(@"Для клиента {0} код {1}
+Зарегистрирован новый адрес доставки {2}
+Регистратор {3}",
+				address.Client.ShortName,
+				address.Client.Id,
+				address.Value,
+				SecurityContext.Administrator.ManagerName), 
+				"RegisterList@subscribe.analit.net, billing@analit.net");
+		}
+
+		public static void UserRegistred(User user)
+		{
+			Func.Mail("register@analit.net", 
+				"Регистрация нового пользователя", 
+				String.Format(@"Для клиента {0} код {1}
+Зарегистрирован новый пользователь {2}
+Регистратор {3}",
+				user.Client.ShortName,
+				user.Client.Id,
+				user.Login,
+				SecurityContext.Administrator.ManagerName),
+				"RegisterList@subscribe.analit.net, billing@analit.net");
+		}
 	}
 }
