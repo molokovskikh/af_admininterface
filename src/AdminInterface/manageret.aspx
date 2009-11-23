@@ -78,12 +78,6 @@
 							</tr>
 							<tr>
 								<td valign="middle" align="left" colspan="3">
-									<asp:TextBox ID="MultiUserLevelTB" runat="server" BorderStyle="None" Width="33px"
-										BackColor="LightGray" />-одновременных сеансов
-								</td>
-							</tr>
-							<tr>
-								<td valign="middle" align="left" colspan="3">
 									<asp:CheckBox ID="AdvertisingLevelCB" runat="server" Text="–еклама" BorderStyle="None" />
 								</td>
 							</tr>
@@ -96,16 +90,6 @@
 								<td valign="middle" align="left" colspan="3">
 									<asp:CheckBox ID="EnableUpdateCB" runat="server" Text="јвтоматическое обновление версий"
 										BorderStyle="None" />
-								</td>
-							</tr>
-							<tr>
-								<td class="tdCheckBox" colspan="3">
-									<asp:CheckBox runat="server" ID="AllowSubmitOrdersCB" Text="–азрешить пользователю самосто€тельно активировать/дезактивировать механизм подтверждени€ заказов" />
-								</td>
-							</tr>
-							<tr>
-								<td class="tdCheckBox" colspan="3" style="height: 22px">
-									<asp:CheckBox runat="server" ID="SubmitOrdersCB" Text="јктивировать механизм подтверждени€ заказов" />
 								</td>
 							</tr>
 							<tr>

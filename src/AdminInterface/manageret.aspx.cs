@@ -50,14 +50,16 @@ namespace AddUser
 			updateCommand.Parameters.AddWithValue("?InvisibleOnFirm", VisileStateList.SelectedItem.Value);
 			updateCommand.Parameters.AddWithValue("?AlowRegister", RegisterCB.Checked);
 			updateCommand.Parameters.AddWithValue("?AlowRejection", RejectsCB.Checked);
-			updateCommand.Parameters.AddWithValue("?MultiUserLevel", MultiUserLevelTB.Text);
 			updateCommand.Parameters.AddWithValue("?AdvertisingLevel", AdvertisingLevelCB.Checked);
 			updateCommand.Parameters.AddWithValue("?AlowWayBill", WayBillCB.Checked);
 			updateCommand.Parameters.AddWithValue("?EnableUpdate", EnableUpdateCB.Checked);
 			updateCommand.Parameters.AddWithValue("?CalculateLeader", CalculateLeaderCB.Checked);
+<<<<<<< HEAD
 			updateCommand.Parameters.AddWithValue("?AllowDelayOfPayment", AllowDelayOfPaymentCB.Checked);
 			updateCommand.Parameters.AddWithValue("?AllowSubmitOrders", AllowSubmitOrdersCB.Checked);
 			updateCommand.Parameters.AddWithValue("?SubmitOrders", SubmitOrdersCB.Checked);
+=======
+>>>>>>> Удалил обращение к не используемым полям
 			updateCommand.Parameters.AddWithValue("?ServiceClient", ServiceClientCB.Checked);
 			updateCommand.Parameters.AddWithValue("?OrdersVisualizationMode", OrdersVisualizationModeCB.Checked);
 			updateCommand.Parameters.AddWithValue("?HomeRegionCode", RegionDD.SelectedItem.Value);
@@ -182,14 +184,11 @@ SET OrderRegionMask     = ?orderMask,
     WorkRegionMask          =if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), 
     AlowRegister            =?AlowRegister, 
     AlowRejection           =?AlowRejection, 
-    MultiUserLevel          =?MultiUserLevel, 
     AdvertisingLevel        =?AdvertisingLevel, 
     AlowWayBill             =?AlowWayBill, 
     EnableUpdate            =?EnableUpdate, 
     CalculateLeader         = ?CalculateLeader, 
 	AllowDelayOfPayment    = ?AllowDelayOfPayment,
-    AllowSubmitOrders       = ?AllowSubmitOrders, 
-    SubmitOrders            = ?SubmitOrders, 
     ServiceClient           = ?ServiceClient, 
     OrdersVisualizationMode = ?OrdersVisualizationMode,
 	FirmCodeOnly			= ?FirmCodeOnly
@@ -379,14 +378,16 @@ WHERE rcs.clientcode = ?ClientCode";
 
 						RegisterCB.Checked = Convert.ToBoolean(reader["AlowRegister"]);
 						RejectsCB.Checked = Convert.ToBoolean(reader["AlowRejection"]);
-						MultiUserLevelTB.Text = reader["MultiUserLevel"].ToString();
 						AdvertisingLevelCB.Checked = Convert.ToBoolean(reader["AdvertisingLevel"]);
 						WayBillCB.Checked = Convert.ToBoolean(reader["AlowWayBill"]);
 						EnableUpdateCB.Checked = Convert.ToBoolean(reader["EnableUpdate"]);
 						CalculateLeaderCB.Checked = Convert.ToBoolean(reader["CalculateLeader"]);
+<<<<<<< HEAD
 						AllowDelayOfPaymentCB.Checked = Convert.ToBoolean(reader["AllowDelayOfPayment"]);
 						AllowSubmitOrdersCB.Checked = Convert.ToBoolean(reader["AllowSubmitOrders"]);
 						SubmitOrdersCB.Checked = Convert.ToBoolean(reader["SubmitOrders"]);
+=======
+>>>>>>> Удалил обращение к не используемым полям
 						ServiceClientCB.Checked = Convert.ToBoolean(reader["ServiceClient"]);
 						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(reader["OrdersVisualizationMode"]);
 						if (Convert.ToInt32(reader["InvisibleOnFirm"]) != 0)

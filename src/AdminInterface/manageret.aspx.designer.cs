@@ -113,15 +113,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox RejectsCB;
         
         /// <summary>
-        /// MultiUserLevelTB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox MultiUserLevelTB;
-        
-        /// <summary>
         /// AdvertisingLevelCB control.
         /// </summary>
         /// <remarks>
@@ -147,24 +138,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox EnableUpdateCB;
-        
-        /// <summary>
-        /// AllowSubmitOrdersCB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox AllowSubmitOrdersCB;
-        
-        /// <summary>
-        /// SubmitOrdersCB control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBox SubmitOrdersCB;
         
         /// <summary>
         /// OrdersVisualizationModeCB control.
