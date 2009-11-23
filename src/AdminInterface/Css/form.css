@@ -28,6 +28,30 @@ h3
 	font-size:20px;
 }
 
+.contextual
+{
+	float:right;
+	font-size:0.9em;
+	line-height:1.4em;
+	margin-top:5px;
+	padding-left:10px;
+	white-space:nowrap;
+}
+
+.icon
+{
+	background-position:0 40%;
+	background-repeat:no-repeat;
+	padding-bottom:3px;
+	padding-left:20px;
+	padding-top:2px;
+}
+
+.icon-add
+{
+	background-image: url(../images/add.png);
+}
+
 .navigation-menu
 {
 	list-style-type: none;

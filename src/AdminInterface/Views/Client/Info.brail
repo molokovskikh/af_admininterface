@@ -141,8 +141,8 @@
 		</div>
 			
 		<div class=block>
-			<div>
-				<a href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
+			<div class=contextual>
+				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
 			<table style="width:100%;" class="Test">
@@ -224,7 +224,9 @@
 		</div>
 		
 		<div class=block>
-			<div><a href="${siteroot}/deliveries/add?clientId=${client.Id}">Новый адрес доставки</a></div>
+			<div class=contextual>
+				<a href="${siteroot}/deliveries/add?clientId=${client.Id}" class="icon icon-add">Новый адрес доставки</a>
+			</div>
 			<h3>Адреса доставки</h3>
 			<% for address in client.Addresses: %>
 				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>, 

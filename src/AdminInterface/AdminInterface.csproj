@@ -375,7 +375,6 @@
     <Compile Include="viewcl.aspx.designer.cs">
       <DependentUpon>viewcl.aspx</DependentUpon>
     </Compile>
-    <None Include="Views\Client\ClientView.brail" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
@@ -423,6 +422,7 @@
     <Content Include="Css\Report.css" />
     <Content Include="Css\Table.css" />
     <Content Include="Css\ValidationStyles.css" />
+    <Content Include="Images\add.png" />
     <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\bc_bg.png" />
     <Content Include="Images\bc_separator.png" />
