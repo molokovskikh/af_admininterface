@@ -64,17 +64,17 @@ namespace AddUser
 			HeaderLB.Text = BindingHelper.GetDescription(RequestType);
 			adapter.SelectCommand.CommandText = @"
 SELECT  afu.RequestTime, 
-        cd.FirmCode, 
-        cd.ShortName, 
+        cd.Id as FirmCode, 
+        cd.Name as ShortName, 
         r.Region, 
 		afu.AppVersion,
 		afu.ResultSize,
         afu.Addition,
-		cd.FirmStatus = 0 FirmStatus
-FROM usersettings.clientsdata cd
+		cd.Status = 0 FirmStatus
+FROM Future.Clients cd
 	join farm.regions r on r.regioncode = cd.regioncode 
-	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
-	join logs.AnalitFUpdates afu on afu.UserId = ouar.RowId
+	join Future.Users u on u.ClientId = cd.Id
+	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE afu.UpdateType = ?UpdateType
 	  and afu.RequestTime BETWEEN ?BeginDate AND ?EndDate
 	  and r.regioncode & ?RegionMask > 0
