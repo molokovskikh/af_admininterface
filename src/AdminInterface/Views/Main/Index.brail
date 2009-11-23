@@ -118,6 +118,11 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 				Настройки
 				<% end %>
 			</p>
+			<p>
+				<a href="https://stat.analit.net/ReportConf/Reports/base.aspx">
+					Отчеты
+				</a>
+			</p>
 		</td>
 		<td valign=top>
 			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">
