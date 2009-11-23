@@ -3,7 +3,7 @@
 <% end %>
 
 <% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
-									  ("Клиенте ${user.Client.ShortName}", "${siteroot}/client/${user.Client.Id}"),
+									  ("Клиент ${user.Client.ShortName}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
 
 <div style="width: 600px;">
