@@ -1,17 +1,28 @@
-﻿<div>
+﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+									  ("Клиент ${delivery.Client.ShortName}", "${siteroot}/client/${delivery.Client.Id}"),
+									  ("Адрес доставки ${delivery.Value}", "")]} %>
+
+<div style="width: 600px;">
 	<form method=post action="${siteroot}/deliveries/update">
 		<input type=hidden name=delivery.Id value="${delivery.Id}" >
-		Адрес доставки
-		<br>
-		<input name=delivery.value value="${delivery.Value}" >
-		<br>
-		Доступен пользователям
-		<br>
-		<% for i, user in enumerate(delivery.Client.Users): %>
-			<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
-			${user.Login}
-			<br>
-		<% end %>
-		<input type=submit value="Сохранить">
+		<h2>Адрес доставки ${delivery.Value}</h2>
+		
+		<div class=block>
+			Адрес<br>
+			<input name=delivery.value value="${delivery.Value}" >
+		</div>
+		
+		<div class=block>
+			<h3>Доступен пользователям</h3>
+			<% for i, user in enumerate(delivery.Client.Users): %>
+				<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
+				${user.Login}
+				<br>
+			<% end %>
+		</div>
+		
+		<div class=save>
+			<input type=submit value="Сохранить">
+		</div>
 	</form>
 </div>

@@ -1,8 +1,4 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Новый пользователь
-<% end %>
-
-<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
 									  ("Новый пользователь", "")]} %>
 

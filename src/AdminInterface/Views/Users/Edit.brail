@@ -1,13 +1,9 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Пользователь ${user.Login}
-<% end %>
-
-<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${user.Client.ShortName}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
 
 <div style="width: 600px;">
-	<form method=post>
+	<form method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
 		<% if ADHelper.IsLoginExists(user.Login) and admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
 			<div>

@@ -1,17 +1,27 @@
-﻿<div>
-	<form method=post>
-		Адрес доставки
-		<br>
-		<input name=delivery.value >
-		<br>
-		Доступен пользователям
-		<br>
-		<% for i, user in enumerate(client.Users): %>
-			<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
-			${user.Login}
-			<br>
-		<% end %>
-		<br>
-		<input type=submit value="Сохранить">
+﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
+									  ("Новый адрес доставки", "")]} %>
+<div style="width: 600px;">
+	<form method=post action="${siteroot}/deliveries/add">
+		<h3>
+			Новый адрес доставки
+		</h3>
+		<div class=block>
+			Адрес<br>
+			<input name=delivery.value >
+		</div>
+		<div class=block>
+			<h3>Доступен пользователям</h3>
+			<div>
+				<% for i, user in enumerate(client.Users): %>
+					<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
+					${user.Login}
+					<br>
+				<% end %>
+			</div>
+		</div>
+		<div class=save>
+			<input type=submit value="Сохранить">
+		</div>
 	</form>
 </div>
