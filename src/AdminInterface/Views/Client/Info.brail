@@ -102,7 +102,7 @@
 		<div class=block>
 			<h3>Операции</h3>
 			
-			<% containsLockedUsers = false %>
+			<% containsLockedUsers = client.HaveLockedUsers() %>
 			
 			<form method=post action=unlock.rails style="margin:0; padding:0">
 				<input type=hidden name=clientCode value=${Client.Id} />
@@ -145,18 +145,18 @@
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;" class="Test">
+			<table style="width:100%;">
 				<tr>
-					<td class="Title">
+					<td>
 						Имя пользователя
 					</td>
-					<td class="Title">
+					<td>
 						Последний правильный ввод пароля
 					</td>
-					<td class="Title">
+					<td>
 						Последний неправильный ввод пароля
 					</td>
-					<td class="Title">
+					<td>
 						Последнее изменение пароля
 					</td>
 				</tr>
@@ -166,7 +166,7 @@
 					<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) if not containsLockedUsers %>
 					<tr>
 						<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
-							<% if isLoginExists or 1 == 1: %>
+							<% if isLoginExists: %>
 								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
 							<% else: %>
 								${user.Login}
@@ -228,8 +228,8 @@
 				<a href="${siteroot}/deliveries/add?clientId=${client.Id}" class="icon icon-add">Новый адрес доставки</a>
 			</div>
 			<h3>Адреса доставки</h3>
-			<% for address in client.Addresses: %>
-				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>, 
+			<% for i, address in enumerate(client.Addresses): %>
+				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>${"," if i < client.Addresses.Count - 1}
 			<% end %>
 		</div>
 		

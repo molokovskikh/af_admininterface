@@ -9,8 +9,8 @@
 			Новый пользователь
 		</h3>
 		<div class=block>
-			Имя пользователя <br>
-			<input type=text name="user.Login" />
+			Внутреннее имя<br>
+			<input type=text name="user.HumanReadableName" />
 		</div>
 		<div class=block>
 			<h3>Доступные адреса доставки</h3>

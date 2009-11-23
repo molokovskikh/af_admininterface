@@ -9,10 +9,8 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
-using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
-using Castle.MonoRail.Framework.Extensions.ExceptionChaining;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Views.Aspx;
@@ -67,9 +65,17 @@ namespace AddUser
 				.DefaultForAction().Is("edit")
 				.Restrict("id").ValidInteger);
 
+			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/ChangePassword")
+				.DefaultForController().Is("users")
+				.DefaultForAction().Is("ChangePassword"));
+
 			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/edit")
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("edit"));
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
+				.DefaultForController().Is("logs")
+				.DefaultForAction().Is("PasswordChangeLog"));
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")

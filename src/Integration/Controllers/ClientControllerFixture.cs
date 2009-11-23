@@ -41,7 +41,7 @@ namespace AdminInterface.Test.Controllers
 			ForTest.InitialzeAR();
 		}
 
-		[Test]
+/*		[Test]
 		public void Throw_not_found_exception_if_login_not_exists()
 		{
 			using (var testUser = TestUser())
@@ -131,7 +131,7 @@ namespace AdminInterface.Test.Controllers
 				Assert.That(passwordChanges[0].SentTo, Is.EqualTo("r.kvasov@analit.net"));
 			}
 		}
-
+*/
 		[Test, Ignore("нет доступа к ad")]
 		public void Unlock_every_locked_login()
 		{

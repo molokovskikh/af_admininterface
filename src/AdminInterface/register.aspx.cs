@@ -95,7 +95,7 @@ ORDER BY region;";
 			uint clientCode = 0;
 			var shortname = ShortNameTB.Text.Replace("¹", "N");
 			var username = LoginTB.Text.Trim().ToLower();
-			var password = Func.GeneratePassword();
+			var password = Models.User.GeneratePassword();
 			Int64 maskRegion = 0;
 			Int64 orderMask = 0;
 			for (var i = 0; i <= WRList.Items.Count - 1; i++)

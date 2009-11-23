@@ -110,7 +110,7 @@ public partial class EditAdministrator : Page
 
 	private bool CreateUserInAD(Administrator administrator)
 	{
-		var password = Func.GeneratePassword();
+		var password = AdminInterface.Models.User.GeneratePassword();
 #if !DEBUG
 		var isLoginCreated = administrator.CreateUserInAd(password);
 

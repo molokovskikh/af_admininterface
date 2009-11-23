@@ -4,7 +4,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
-using Common.MySql;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
@@ -28,6 +27,9 @@ namespace AdminInterface.Models
 		[Property("Name", NotNull = true)]
 		public virtual string Login { get; set; }
 
+		[Property(NotNull = true)]
+		public virtual string HumanReadableName { get; set; }
+
 		[BelongsTo("ClientCode", NotNull = true)]
 		public Client Client { get; set; }
 
@@ -47,7 +49,7 @@ namespace AdminInterface.Models
 
 		public static User GetByLogin(string login)
 		{
-			return ActiveRecordMediator<User>.FindOne(Expression.Eq("Login", login));
+			return ActiveRecordMediator<User>.FindOne(Restrictions.Eq("Login", login));
 		}
 
 		public static User GetById(uint id)
@@ -79,14 +81,23 @@ namespace AdminInterface.Models
 
 		public bool IsChangePasswordByOneself()
 		{
-			var log = PasswordChangeLogEntity.FindFirst(
-				DetachedCriteria
-					.For<PasswordChangeLogEntity>()
-					.Add(Expression.Eq("TargetUserName", Login))
+			var log = ActiveRecordBase<PasswordChangeLogEntity>.FindFirst(
+				DetachedCriteria.For<PasswordChangeLogEntity>()
+					.Add(Restrictions.Eq("TargetUserName", Login))
 					.AddOrder(Order.Desc("LogTime")));
 			if (log == null)
 				return false;
 			return log.IsChangedByOneSelf();
+		}
+
+		public static string GeneratePassword()
+		{
+			var availableChars = "23456789qwertyupasdfghjkzxcvbnmQWERTYUPASDFGHJKLZXCVBNM";
+			var password = String.Empty;
+			var random = new Random();
+			while (password.Length < 8)
+				password += availableChars[random.Next(0, availableChars.Length - 1)];
+			return password;
 		}
 	}
 }
