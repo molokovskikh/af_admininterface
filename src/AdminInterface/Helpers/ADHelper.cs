@@ -20,9 +20,9 @@ namespace AdminInterface.Helpers
 
 	public class ADHelper
 	{
-		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0); 
+		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
 
-		public static void CreateUserInAD(string login, string password , string clientCode)
+		public static void CreateUserInAD(string login, string password, uint clientCode)
 		{
 #if !DEBUG
 			var root = new DirectoryEntry("LDAP://acdcserv/OU=Пользователи,OU=Клиенты,DC=adc,DC=analit,DC=net");

@@ -43,6 +43,17 @@ namespace Common.Web.Ui.Models
 		[BelongsTo(Column = "ContactGroupOwnerId")]
 		public ContactGroupOwner ContactGroupOwner { get; set; }
 
+		public void AddPerson(string name)
+		{
+			if (Persons == null)
+				Persons = new List<Person>();
+			var person = new Person {
+				Name = name,
+				ContactGroup = this
+			};
+			Persons.Add(person);
+		}
+
 		public bool ShowMailingAddress
 		{
 			get { return Type == ContactGroupType.Billing; }

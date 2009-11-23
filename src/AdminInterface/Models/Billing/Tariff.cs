@@ -8,9 +8,6 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
-		public RelationshipType? IncludeType { get; set; }
-
 		[BelongsTo(Column = "RegionCode")]
 		public Region Region { get; set; }
 

@@ -8,6 +8,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 
@@ -30,6 +31,7 @@ namespace Functional
 		[Test]
 		public void Try_register_supplier()
 		{
+			uint clientId;
 			using (var browser = new IE(BuildTestUrl("register.aspx")))
 			{
 				SetupGeneralInformation(browser);
@@ -41,6 +43,16 @@ namespace Functional
 
 				browser.Button(Find.ById("Register")).Click();
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
+				clientId = GetClientCodeFromRegistrationCard(browser);
+			}
+			using (new SessionScope())
+			{
+				var client = Client.Find(clientId);
+				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(3));
+				var generalContacts = client.ContactGroupOwner.ContactGroups.Where(g => g.Type == ContactGroupType.General).Single();
+				Assert.That(generalContacts.Contacts.Count, Is.EqualTo(2));
+				Assert.That(generalContacts.Contacts.First().Type, Is.EqualTo(ContactType.Phone));
+				Assert.That(generalContacts.Contacts.Skip(1).First().Type, Is.EqualTo(ContactType.Email));
 			}
 		}
 
@@ -81,7 +93,7 @@ namespace Functional
 				Assert.That(passwordChange.UserName, Is.EqualTo("kvasov"));
 				Assert.That(passwordChange.TargetUserName, Is.EqualTo(user.Login));
 				Assert.That(passwordChange.SmtpId, Is.Not.EqualTo(0));
-				Assert.That(passwordChange.SentTo, Is.EqualTo(String.Format("{0}@mail.ru", user.Login)));
+				Assert.That(passwordChange.SentTo, Is.EqualTo(String.Format(_randomClientName + "@mail.ru")));
 
 				Assert.That(updateInfo, Is.Not.Null, "Не создали запись в UserUpdateInfo");
 			}
@@ -202,8 +214,7 @@ namespace Functional
 
 		private uint GetClientCodeFromRegistrationCard(IE browser)
 		{
-			return Convert.ToUInt32(new Regex(@"\d+")
-			                        	.Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
+			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 
 		private void SetupGeneralInformation(IE browser)

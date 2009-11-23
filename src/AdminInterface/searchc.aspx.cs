@@ -218,8 +218,8 @@ WHERE   (cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 group by cd.firmcode 
 union 
 SELECT  cd.billingcode,
-        cast(if(includeregulation.PrimaryClientCode is null, cd.firmcode, concat(cd.firmcode, '[', includeregulation.PrimaryClientCode, ']')) as CHAR) as firmcode,
-        if(includeregulation.PrimaryClientCode is null, cd.ShortName, concat(cd.ShortName, '[', incd.shortname, ']')),
+        cd.firmcode,
+        cd.ShortName,
         r.region,
         max(uui2.UpdateDate) FirstUpdate,
         max(uui2.UncommitedUpdateDate) SecondUpdate,
@@ -229,20 +229,12 @@ SELECT  cd.billingcode,
         cd.FirmType,
         (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus,
         cd.firmcode as bfc,
-		CASE IncludeRegulation.IncludeType
-			WHEN 0 THEN 'Базовый'
-			WHEN 1 THEN 'Сеть'
-			WHEN 2 THEN 'Скрытый'
-			WHEN 3 THEN 'Базовый+'
-		END AS IncludeType,
 		rcs.InvisibleOnFirm
 FROM clientsdata as cd
 	JOIN billing.payers p on cd.BillingCode = p.PayerID
 	JOIN farm.regions r on r.regioncode = cd.regioncode
 	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
-	LEFT JOIN includeregulation ON includeclientcode = cd.firmcode
-	LEFT JOIN clientsdata incd ON incd.firmcode= includeregulation.PrimaryClientCode 
-	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = if(IncludeRegulation.PrimaryClientCode is null, cd.FirmCode, if(IncludeRegulation.IncludeType = 0, IncludeRegulation.PrimaryClientCode, cd.FirmCode))
+	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = cd.FirmCode
 		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
 WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and cd.FirmType = 1

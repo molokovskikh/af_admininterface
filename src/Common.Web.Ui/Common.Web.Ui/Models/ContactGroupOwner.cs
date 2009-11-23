@@ -11,11 +11,14 @@ namespace Common.Web.Ui.Models
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[HasMany(ColumnKey = "ContactGroupOwnerId", Inverse = true, Lazy = true)]
+		[HasMany(ColumnKey = "ContactGroupOwnerId", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
 		public virtual IList<ContactGroup> ContactGroups { get; set; }
 
-		public ContactGroup AddContactGroup(ContactGroupType type)
+		public virtual ContactGroup AddContactGroup(ContactGroupType type)
 		{
+			if (ContactGroups == null)
+				ContactGroups = new List<ContactGroup>();
+
 			var group = new ContactGroup(type, BindingHelper.GetDescription(type));
 			group.ContactGroupOwner = this;
 			ContactGroups.Add(group);

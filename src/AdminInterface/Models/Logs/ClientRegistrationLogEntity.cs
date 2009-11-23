@@ -35,12 +35,6 @@ namespace AdminInterface.Models.Logs
 
 	public class ClientRegistrationLogEntity
 	{
-		public uint ParentId { get; set; }
-
-		public string Parent { get; set; }
-
-		public string IncludeType { get; set; }
-
 		public uint BillingCode { get; set; }
 
 		public uint FirmCode { get; set; } 
@@ -54,20 +48,6 @@ namespace AdminInterface.Models.Logs
 		public string Registrant { get; set; }
 
 		public string ManagerName { get; set; }
-
-		public string GetInclude()
-		{
-			if (String.IsNullOrEmpty(IncludeType))
-				return "";
-			var value = Convert.ToUInt32(IncludeType);
-			var type = (RelationshipType) value;
-			return BindingHelper.GetDescription(type);
-		}
-
-		public bool HaveParent()
-		{
-			return ParentId != 0;
-		}
 
 		public string GetRegistrant()
 		{
@@ -100,17 +80,12 @@ select	cd.BillingCode,
 		cd.RegistrationDate,
 		cd.Registrant,
 		ra.ManagerName,
-		ir.PrimaryClientCode as ParentId,
-		parent.ShortName as Parent,
-		cast(ir.IncludeType as CHAR) as IncludeType,
 
 		max(if(au.Commit = 1, au.RequestTime, null)) LastUpdate,
 		max(if(au.Commit = 0, au.RequestTime, null)) LastUncommitedUpdate
 from clientsdata cd
 	join farm.Regions r on r.RegionCode = cd.RegionCode
 	join usersettings.RetClientsSet rcs on rcs.ClientCode = cd.FirmCode
-	left join includeregulation ir ON ir.includeclientcode = cd.firmcode
-		left join clientsdata parent on parent.FirmCode = ir.PrimaryClientCode
 	join usersettings.OsUserAccessRight ouar on ouar.clientcode = if(ir.PrimaryClientCode is not null and ir.IncludeType = 0, ir.PrimaryClientCode, cd.FirmCode)
 		left join logs.AnalitFUpdates au on au.UserId = ouar.RowId and (au.updatetype = 1 or au.updatetype = 2 or au.updatetype is null)
 	left join accessright.regionaladmins ra on ra.UserName = cd.Registrant
@@ -160,9 +135,6 @@ select	cd.BillingCode,
 		cd.RegistrationDate,
 		cd.Registrant,
 		ra.ManagerName,
-		ir.PrimaryClientCode as ParentId,
-		parent.ShortName as Parent,
-		cast(ir.IncludeType as CHAR) as IncludeType,
 
 		count(distinct pd.FirmCode) SuppliersCount,
 		round(sum((select sum(ol.Quantity * ol.Cost) from orders.orderslist ol where ol.orderid = oh.rowid)), 2) OrdersSum,
@@ -170,8 +142,6 @@ select	cd.BillingCode,
 from clientsdata cd
 	join farm.Regions r on r.RegionCode = cd.RegionCode
 	join usersettings.RetClientsSet rcs on rcs.ClientCode = cd.FirmCode
-	left join includeregulation ir ON ir.includeclientcode = cd.firmcode
-		left join clientsdata parent on parent.FirmCode = ir.PrimaryClientCode
 	left join orders.OrdersHead oh on oh.ClientCode = cd.FirmCode and DATEDIFF(now(), oh.WriteTime) < :days and oh.Deleted = 0 and oh.Submited = 1
 		left join usersettings.pricesdata pd on pd.PriceCode = oh.PriceCode
 	left join accessright.regionaladmins ra on ra.UserName = cd.Registrant

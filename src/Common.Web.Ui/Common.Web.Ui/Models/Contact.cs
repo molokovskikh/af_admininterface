@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Validators;
 
 namespace Common.Web.Ui.Models
@@ -42,6 +43,16 @@ namespace Common.Web.Ui.Models
 
 		public Contact()
 		{}
+
+		public Contact(ContactType type, string contactText)
+		{
+			Type = type;
+
+			if (type == ContactType.Email || type == ContactType.Phone)
+				contactText = (contactText ?? "").Trim();
+
+			ContactText = contactText;
+		}
 
 		public Contact(ContactOwner contactOwner)
 		{

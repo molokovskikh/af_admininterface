@@ -11,15 +11,15 @@ namespace AdminInterface.Helpers
 {
 	public class ReportHelper
 	{
-		public static Stream CreateReport(uint clientCode, 
-										uint billingCode, 
-										string clientShortName, 
-										string clientFullName, 
-										string clientType,
-										string clientLogin,
-										string clientPassword,
-										DateTime operationDate,
-										bool isRegistration)
+		public static Stream CreateReport(uint clientCode,
+			uint billingCode,
+			string clientShortName,
+			string clientFullName,
+			string clientType,
+			string clientLogin,
+			string clientPassword,
+			DateTime operationDate,
+			bool isRegistration)
 		{
 			var report = new LocalReport
 			{
@@ -37,69 +37,60 @@ namespace AdminInterface.Helpers
   </DeviceInfo>";
 			Warning[] warnings;
 
-			report.SetParameters(new List<ReportParameter>
-			                     	{
-			                     		new ReportParameter("ClientCode", clientCode.ToString()),
-										new ReportParameter("BillingCode", billingCode.ToString()),
-										new ReportParameter("ClientFullName", clientFullName),
-										new ReportParameter("ClientShortName", clientShortName),
-										new ReportParameter("ClientType", clientType),
-										new ReportParameter("ClientLogin", clientLogin),
-										new ReportParameter("ClientPassword", clientPassword),
-										new ReportParameter("OperationDate", operationDate.ToString()),
-										new ReportParameter("IsRegistration", isRegistration.ToString())
-			                     	});
+			report.SetParameters(new List<ReportParameter> {
+				new ReportParameter("ClientCode", clientCode.ToString()),
+				new ReportParameter("BillingCode", billingCode.ToString()),
+				new ReportParameter("ClientFullName", clientFullName),
+				new ReportParameter("ClientShortName", clientShortName),
+				new ReportParameter("ClientType", clientType),
+				new ReportParameter("ClientLogin", clientLogin),
+				new ReportParameter("ClientPassword", clientPassword),
+				new ReportParameter("OperationDate", operationDate.ToString()),
+				new ReportParameter("IsRegistration", isRegistration.ToString())
+			});
 
 			var stream = new MemoryStream();
 			report.Render("Image",
-						  deviceInfo,
-						  (name, extention, encoding, mimeType, willSick) => stream,
-						  out warnings);
+				deviceInfo,
+				(name, extention, encoding, mimeType, willSick) => stream,
+				out warnings);
 			stream.Seek(0, SeekOrigin.Begin);
 			return stream;
 		}
 
 		public static int SendClientCardAfterPasswordChange(Client client, User user, string password, string additionTo)
 		{
-			return SendClientCard(client.Id,
-			                      client.BillingInstance.PayerID,
-			                      client.ShortName,
-			                      client.FullName,
-			                      BindingHelper.GetDescription(client.Type),
-			                      user.Login,
-			                      password,
-			                      null,
-			                      additionTo,
-			                      false);
+			return SendClientCard(client,
+				user.Login,
+				password,
+				null,
+				additionTo,
+				false);
 		}
 
-		public static int SendClientCard(uint clietCode,
-		                                  uint billingCode,
-		                                  string clientShortName,
-		                                  string clientFullName,
-		                                  string clientType,
-		                                  string login,
-		                                  string password,
-		                                  string generalTo,
-		                                  string additionTo,
-		                                  bool isRegistration)
+		public static int SendClientCard(Client client,
+			string login,
+			string password,
+			string generalTo,
+			string additionTo,
+			bool isRegistration)
 		{
 			string body;
 
-			if (clientType == "Аптека")
+			if (client.IsDrugstore())
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
 			else
 				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
-				
-			using (var stream = CreateReport(clietCode,
-											 billingCode,
-											 clientShortName,
-											 clientFullName,
-											 clientType,
-											 login,
-											 password,
-											 DateTime.Now,
-											 isRegistration))
+
+			using (var stream = CreateReport(client.Id,
+				client.BillingInstance.PayerID,
+				client.ShortName,
+				client.FullName,
+				client.GetHumanReadableType(),
+				login,
+				password,
+				DateTime.Now,
+				isRegistration))
 			using (var message = new MailMessage
 			{
 				From = new MailAddress("tech@analit.net"),

@@ -26,10 +26,8 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Add([DataBind("user")] User user, uint clientId, bool sendClientCard, string mails)
 		{
-			var administrator = SecurityContext.Administrator;
-			var host = Request.UserHostAddress;
 			var client = Client.FindAndCheck(clientId);
-			var password = User.GeneratePassword();
+			string password;
 			PasswordChangeLogEntity passwordChangeLog;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -38,11 +36,11 @@ namespace AdminInterface.Controllers
 				user.Save();
 				user.Login = user.Id.ToString();
 				user.Update();
-				passwordChangeLog = new PasswordChangeLogEntity(host, administrator.UserName, user.Login);
+				var auth = new AuthorizationLogEntity {Id = user.Id};
+				auth.Save();
+				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
-				ADHelper.CreateUserInAD(user.Login,
-					password,
-					user.Client.Id.ToString());
+				password = user.CreateInAd();
 				scope.VoteCommit();
 			}
 
@@ -129,7 +127,7 @@ namespace AdminInterface.Controllers
 
 				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
-				var passwordChangeLog = new PasswordChangeLogEntity(host, administrator.UserName, user.Login);
+				var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
 				if (isSendClientCard)
 				{

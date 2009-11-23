@@ -5,7 +5,7 @@ using AdminInterface.Services;
 using NUnit.Framework;
 
 
-namespace AdminInterface.Test.Services
+namespace Unit
 {
 	[TestFixture]
 	public class NotificationFixture
@@ -22,18 +22,17 @@ namespace AdminInterface.Test.Services
 		[Test]
 		public void BillingNotificationTest()
 		{
-			var clientCode = 58u;
-			var payerId = 10u;
-			var clientName = "Тестовый клиент";
+			var client = new Client {
+				Id = 58,
+				BillingInstance = new Payer{ PayerID = 10},
+				ShortName = "Тестовый клиент",
+			};
 			var paymentOptions = new PaymentOptions{ WorkForFree = true };
 			var userName = "test";
 
-			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
-			                                                          payerId,
-			                                                          clientName,
-			                                                          userName,
-			                                                          null,
-			                                                          paymentOptions);
+			_service.SendNotificationToBillingAboutClientRegistration(client,
+				userName,
+				paymentOptions);
 
 			Assert.That(_message, Is.Not.Null, "Сообщение не послано");
 			Assert.That(_message.To.Count, Is.EqualTo(1));
@@ -43,7 +42,7 @@ namespace AdminInterface.Test.Services
 
 			Assert.That(_message.Subject, Is.EqualTo("Регистрация нового клиента"));
 			Assert.That(_message.Body, Is.EqualTo(
-@"Зарегистрирован новый клиент
+				@"Зарегистрирован новый клиент
 <br>
 Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
 <br>
@@ -62,21 +61,20 @@ namespace AdminInterface.Test.Services
 		[Test]
 		public void Billing_notification_for_client_with_basic_submission()
 		{
-			var clientCode = 58u;
-			var payerId = 10u;
-			var clientName = "Тестовый клиент";
+			var client = new Client {
+				Id = 58,
+				BillingInstance = new Payer{ PayerID = 10},
+				ShortName = "Тестовый клиент",
+			};
 			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment"};
 			var userName = "test";
 
-			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
-																	  payerId,
-																	  clientName,
-																	  userName,
-																	  "Базовый",
-																	  paymentOptions);
+			_service.SendNotificationToBillingAboutClientRegistration(client,
+				userName,
+				paymentOptions);
 
 			Assert.That(_message.Body, Is.EqualTo(
-@"Зарегистрирован новый клиент
+				@"Зарегистрирован новый клиент
 <br>
 Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
 <br>
@@ -96,20 +94,19 @@ namespace AdminInterface.Test.Services
 		[Test]
 		public void Billing_notification_for_client_without_payment_options()
 		{
-			var clientCode = 58u;
-			var payerId = 10u;
-			var clientName = "Тестовый клиент";
+			var client = new Client {
+				Id = 58,
+				BillingInstance = new Payer{ PayerID = 10},
+				ShortName = "Тестовый клиент",
+			};
 			var userName = "test";
 
-			_service.SendNotificationToBillingAboutClientRegistration(clientCode,
-																	  payerId,
-																	  clientName,
-																	  userName,
-																	  "Базовый",
-																	  null);
+			_service.SendNotificationToBillingAboutClientRegistration(client,
+				userName,
+				null);
 
 			Assert.That(_message.Body, Is.EqualTo(
-@"Зарегистрирован новый клиент
+				@"Зарегистрирован новый клиент
 <br>
 Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
 <br>

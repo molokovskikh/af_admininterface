@@ -78,12 +78,6 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientCode", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
-		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "IncludeClientCode", Cascade = ManyRelationCascadeEnum.All)]
-		public virtual IList<Relationship> Parents { get; set; }
-
-		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "PrimaryClientCode")]
-		public virtual IList<Relationship> Children { get; set; }
-
 		[HasMany(typeof(ShowRelationship), Inverse = true, Lazy = true, ColumnKey = "ShowClientCode", Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<ShowRelationship> ShowClients { get; set; }
 
@@ -112,12 +106,7 @@ namespace AdminInterface.Models
 
 		public virtual float GetPayment(IList<Tariff> tariffs)
 		{
-			RelationshipType? includeType = null;
-			if (Parents.Count > 0)
-			    includeType = Parents[0].RelationshipType;
-
-			var tariff = tariffs.FirstOrDefault(t => t.Region.Id == HomeRegion.Id
-			                                         && t.IncludeType == includeType);
+			var tariff = tariffs.FirstOrDefault(t => t.Region.Id == HomeRegion.Id);
 
 			if (tariff == null)
 				return 0;
@@ -204,93 +193,31 @@ namespace AdminInterface.Models
 			return String.Join(", ", emails.ToArray());
 		}
 
-		public virtual string GetSubordinateType()
-		{
-			if (Parents.Count == 0)
-				return "-";
-
-			return BindingHelper.GetDescription(Parents[0].RelationshipType);
-		}
-
-		public virtual string GetNameWithParents()
-		{
-			if (Parents.Count == 0)
-				return ShortName;
-
-			return ShortName + "[" + Parents[0].Parent.ShortName + "]";
-		}
-
-		public virtual string GetIdWithParentId()
-		{
-			if (Parents.Count == 0)
-				return Id.ToString();
-
-			return Id + "[" + Parents[0].Parent.Id + "]";
-		}
-
 		public virtual void ResetUin()
 		{
 			ArHelper.WithSession<Client>(session =>
-			                             session
-			                             	.CreateSQLQuery(@"
+				session.CreateSQLQuery(@"
 update usersettings.UserUpdateInfo uui
 	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
 set uui.AFCopyId = '' 
 where ouar.clientcode = :clientcode")
-			                             	.SetParameter("clientcode", Id)
-			                             	.ExecuteUpdate());
+					.SetParameter("clientcode", Id)
+					.ExecuteUpdate());
 		}
 
 		public virtual bool HaveUin()
 		{
 			var result = ArHelper.WithSession(session =>
-			                                  session
-			                                  	.CreateSQLQuery(@"
+				session.CreateSQLQuery(@"
 select sum(length(concat(uui.AFCopyId))) = 0
 from usersettings.UserUpdateInfo uui
 	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
 where ouar.clientcode = :clientcode
 group by ouar.clientcode")
-			                                  	.SetParameter("clientcode", Id)
-			                                  	.UniqueResult<long?>());
+					.SetParameter("clientcode", Id)
+					.UniqueResult<long?>());
 
 			return result != null && result.Value == 0;
-		}
-
-		public virtual bool CanChangeStatus()
-		{
-			if (IsClientActive())
-				return CanTurnOff();
-
-			return CanTurnOn();
-		}
-
-		private bool CanTurnOff()
-		{
-			if (Type != ClientType.Drugstore)
-				return true;
-			
-			if (Children.Count == 0)
-				return true;
-
-			if (Children.All(r => !r.Child.IsClientActive()))
-				return true;
-
-			return false;
-		}
-
-		private bool CanTurnOn()
-		{
-			if (Type != ClientType.Drugstore)
-				return true;
-
-			if (Parents.Count == 0)
-				return true;
-
-			if (Parents[0].Parent.IsClientActive())
-				return true;
-
-			return false;
 		}
 
 		public virtual bool HavePreparedData()
@@ -304,28 +231,6 @@ group by ouar.clientcode")
 			return false;
 		}
 
-		public virtual Relationship AddRelationship(Client parent, RelationshipType type)
-		{
-			var relationship = new Relationship(parent, this, type);
-			Parents.Add(relationship);
-			if (type == RelationshipType.Base || type == RelationshipType.BasePlus)
-				ShowClients.Add(new ShowRelationship(parent, this));
-			return relationship;
-		}
-
-		public virtual void RemoveRelationship(Relationship relationship)
-		{
-			Parents.Remove(relationship);
-			var showRelationship = ShowClients.FirstOrDefault(s => s.Parent.Id == relationship.Parent.Id);
-			if (showRelationship != null)
-			{
-				ShowClients.Remove(showRelationship);
-				showRelationship.Delete();
-			}
-
-			relationship.Delete();
-		}
-
 		public virtual int? WorkCopyCount()
 		{
 			if (Type == ClientType.Drugstore)
@@ -336,6 +241,20 @@ group by ouar.clientcode")
 		public virtual bool HaveLockedUsers()
 		{
 			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
+		}
+
+		public virtual void AddDeliveryAddress(string address)
+		{
+			if (Addresses == null)
+				Addresses = new List<Address>();
+			var delivery = new Address {Value = address};
+			delivery.Client = this;
+			Addresses.Add(delivery);
+		}
+
+		public virtual string GetHumanReadableType()
+		{
+			return BindingHelper.GetDescription(Type);
 		}
 	}
 }

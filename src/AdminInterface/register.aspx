@@ -119,25 +119,6 @@
 								<asp:Label ID="PayerCountLB" runat="server" ForeColor="Green" Visible="False" />
 							</div>
 							<div class="ComplexField">
-								<asp:CheckBox ID="IncludeCB" runat="server" OnCheckedChanged="IncludeCB_CheckedChanged"
-									Text="Подчиненный клиент" AutoPostBack="True" />
-								<asp:TextBox ID="IncludeSTB" runat="server" Visible="False" />
-								<asp:Button ID="IncludeSB" runat="server" OnClick="IncludeSB_Click" Text="Найти"
-									Visible="False" ValidationGroup="2" />
-								<asp:Label ID="IncludeCountLB" runat="server" ForeColor="Green" Visible="False" />
-								<asp:DropDownList ID="IncludeSDD" runat="server" OnSelectedIndexChanged="IncludeSDD_SelectedIndexChanged"
-									Visible="False" DataTextField="ShortName" DataValueField="FirmCode"
-									AutoPostBack="True" />
-								<asp:DropDownList ID="IncludeType" runat="server" Visible="False">
-									<asp:ListItem Value="0">Базовый</asp:ListItem>
-									<asp:ListItem Value="3">Базовый+</asp:ListItem>
-									<asp:ListItem Value="1">Сеть</asp:ListItem>
-									<asp:ListItem Value="2">Скрытый</asp:ListItem>
-								</asp:DropDownList>
-								<asp:CheckBox ID="InheritProperties" runat="server" Text="Наследовать информацию" 
-									Visible="False" AutoPostBack="true" OnCheckedChanged="InheritProperties_CheckedChanged" />
-								<asp:DropDownList ID="InheritFrom" runat="server" DataTextField="Name" DataValueField="FirmCode"
-									Visible="False" AutoPostBack="true" OnSelectedIndexChanged="InheritFrom_SelectedIndexChanged" />
 							</div>
 							<div>
 								<asp:CheckBox runat="server" ID="ServiceClient" Text="Сотрудник АК Инфорум" />

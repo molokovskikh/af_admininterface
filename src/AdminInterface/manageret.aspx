@@ -124,55 +124,6 @@
 								</td>
 							</tr>
 							<tr>
-								<td style="text-align: center; background-color: #f0f8ff; font-weight: bold;">
-									Таблица подчинений:
-								</td>							
-							</tr>
-							<tr>
-								<td>
-									<asp:GridView ID="IncludeGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="IncludeGrid_RowCommand"
-										OnRowDeleting="IncludeGrid_RowDeleting" OnRowDataBound="IncludeGrid_RowDataBound">
-										<Columns>
-											<asp:TemplateField>
-												<HeaderTemplate>
-													<asp:Button ID="AddButton" runat="server" Text="Добавить" CommandName="Add" />
-												</HeaderTemplate>
-												<ItemTemplate>
-													<asp:Button ID="DeleteButton" runat="server" Text="Удалить" CommandName="Delete" />
-												</ItemTemplate>
-												<ItemStyle Width="10%" />
-											</asp:TemplateField>
-											<asp:TemplateField HeaderText="Родитель">
-												<ItemTemplate>
-													<asp:TextBox ID="SearchText" runat="server"></asp:TextBox>
-													<asp:Button ID="SearchButton" runat="server" CommandName="Search" Text="Найти" ValidationGroup="0" />
-													<asp:DropDownList ID="ParentList" runat="server" DataTextField="ShortName" DataValueField="FirmCode"
-														Width="200px">
-													</asp:DropDownList>
-													<asp:CustomValidator ID="ParentValidator" runat="server" ControlToValidate="ParentList"
-														ErrorMessage="Необходимо выбрать родителя." OnServerValidate="ParentValidator_ServerValidate" ClientValidationFunction="ValidateParent" ValidateEmptyText="True" ValidationGroup="1">*</asp:CustomValidator>
-												</ItemTemplate>
-											</asp:TemplateField>
-											<asp:TemplateField HeaderText="Тип подчинения">
-												<ItemTemplate>
-													<asp:DropDownList ID="IncludeTypeList" runat="server">
-														<asp:ListItem Value="0">Базовый</asp:ListItem>
-														<asp:ListItem Value="3">Базовый+</asp:ListItem>
-														<asp:ListItem Value="1">Сеть</asp:ListItem>
-														<asp:ListItem Value="2">Скрытый</asp:ListItem>
-													</asp:DropDownList>
-												</ItemTemplate>
-											</asp:TemplateField>
-										</Columns>
-										<EmptyDataTemplate>
-											<div style="text-align:left">
-												<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Подчинить клиента." />
-											</div>
-										</EmptyDataTemplate>
-									</asp:GridView>
-								</td>
-							</tr>
-							<tr>
 								<td class="Title">
 									Показываемые клиенты:
 								</td>

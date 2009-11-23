@@ -3,6 +3,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -91,21 +92,12 @@ ORDER BY region;";
 			if (!IsValid)
 				return;
 
-			uint billingCode = 0;
-			uint clientCode = 0;
-			var shortname = ShortNameTB.Text.Replace("№", "N");
-			var username = LoginTB.Text.Trim().ToLower();
-			var password = Models.User.GeneratePassword();
-			Int64 maskRegion = 0;
-			Int64 orderMask = 0;
-			for (var i = 0; i <= WRList.Items.Count - 1; i++)
-			{
-				if (WRList.Items[i].Selected)
-					maskRegion += Convert.ToInt64(WRList.Items[i].Value);
-				if (OrderList.Items[i].Selected)
-					orderMask += Convert.ToInt64(OrderList.Items[i].Value);
-			}
+			var maskRegion = (ulong) WRList.Items.Cast<ListItem>().Sum(i => Convert.ToInt64(i.Value));
+			var orderMask = (ulong) OrderList.Items.Cast<ListItem>().Sum(i => Convert.ToInt64(i.Value));;
 
+			Client client = null;
+			User user = null;
+			string password = null;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				ArHelper.WithSession<Client>(s => {
@@ -113,171 +105,138 @@ ORDER BY region;";
 					var command = new MySqlCommand("", connection);
 					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName, HttpContext.Current.Request.UserHostAddress);
 
-					command.Parameters.AddWithValue("?MaskRegion", maskRegion);
-					command.Parameters.AddWithValue("?OrderMask", orderMask);
-					command.Parameters.AddWithValue("?fullname", FullNameTB.Text);
+					client = new Client {
+						Type = (ClientType) Convert.ToInt32(TypeDD.SelectedItem.Value),
+						ShortName = ShortNameTB.Text.Replace("№", "N"),
+						FullName = FullNameTB.Text,
+						Segment = (Segment) Convert.ToInt32(SegmentDD.SelectedItem.Value),
+						HomeRegion = Region.Find(Convert.ToUInt64(RegionDD.SelectedItem.Value)),
+						MaskRegion = maskRegion,
+						Registrant = SecurityContext.Administrator.UserName,
+						RegistrationDate = DateTime.Now
+					};
 
-					command.Parameters.AddWithValue("?shortname", shortname);
-					command.Parameters.AddWithValue("?BeforeNamePrefix", "");
-					if (TypeDD.SelectedItem.Text == "Аптека")
-						command.Parameters["?BeforeNamePrefix"].Value = "Аптека";
-					command.Parameters.AddWithValue("?firmsegment", SegmentDD.SelectedItem.Value);
-					command.Parameters.AddWithValue("?RegionCode", RegionDD.SelectedItem.Value);
-					command.Parameters.AddWithValue("?adress", AddressTB.Text);
-					command.Parameters.AddWithValue("?firmtype", TypeDD.SelectedItem.Value);
-					command.Parameters.AddWithValue("?registrant", SecurityContext.Administrator.UserName);
-					command.Parameters.Add("?ClientCode", MySqlDbType.Int32);
-					command.Parameters.AddWithValue("?OSUserName", username);
-					command.Parameters.AddWithValue("?ServiceClient", ServiceClient.Checked);
-					command.Parameters.AddWithValue("?invisibleonfirm", CustomerType.SelectedItem.Value);
+					client.AddDeliveryAddress(AddressTB.Text);
 
-					if (!String.IsNullOrEmpty(Suppliers.SelectedValue))
-						command.Parameters.AddWithValue("?FirmCodeOnly", Suppliers.SelectedValue);
+					Payer payer;
+					if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
+						payer = CreatePayer(client);
 					else
-						command.Parameters.AddWithValue("?FirmCodeOnly", null);
+						payer = Payer.Find(Convert.ToUInt32(PayerDDL.SelectedItem.Value));
 
-					if (IncludeCB.Checked)
-						billingCode = Convert.ToUInt32(new MySqlCommand("select billingcode from clientsdata where firmcode=" + IncludeSDD.SelectedValue, connection).ExecuteScalar());
-					else if (!PayerPresentCB.Checked || (PayerPresentCB.Checked && PayerDDL.SelectedItem == null))
-						billingCode = CreatePayer(command);
-					else
-						billingCode = Convert.ToUInt32(PayerDDL.SelectedItem.Value);
+					client.BillingInstance = payer;
 
-					clientCode = CreateClient(billingCode, command);
+					CreateClient(client);
+					client.Save();
+
+					user = CreateUser(client);
 
 					var defaults = DefaultValues.Get();
 
-					if (TypeDD.SelectedItem.Text == "Аптека")
-						CreateDrugstore(CustomerType.SelectedItem.Text != "Стандартный", command, defaults);
+					if (client.IsDrugstore())
+						CreateDrugstore(command, defaults, client, user, orderMask);
 					else
-						CreateSupplier(command, defaults);
+						CreateSupplier(command, defaults, client);
 
-					if (IncludeCB.Checked)
-						CreateRelationship(Client.FindAndCheck(clientCode), connection);
+					password = user.CreateInAd();
 
-					ADHelper.CreateUserInAD(username,
-											password,
-											clientCode.ToString());
-
-					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", clientCode),
-					                   String.Format(@"ANALIT\{0}", username));
+					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", client.Id),
+						String.Format(@"ANALIT\{0}", user.Login));
 				});
 				scope.VoteCommit();
 			}
 
 			if (TypeDD.SelectedItem.Text == "Аптека"
-				&& !IncludeCB.Checked
 				&& !ServiceClient.Checked
-				&& CustomerType.SelectedItem.Text == "Стандартный"
-				|| (TypeDD.SelectedItem.Text == "Аптека"
-					&& IncludeCB.Checked
-					&& !ServiceClient.Checked
-					&& IncludeType.SelectedItem.Text != "Скрытый"))
-			{
-				new NotificationService().NotifySupplierAboutDrugstoreRegistration(clientCode);
-			}
+				&& CustomerType.SelectedItem.Text == "Стандартный")
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client);
 
-			if (TypeDD.SelectedItem.Text == "Поставщик")
-				Mailer.SupplierRegistred(shortname, RegionDD.SelectedItem.Text);
+			if (!client.IsDrugstore())
+				Mailer.SupplierRegistred(client.ShortName, client.HomeRegion.Name);
 
 			NotificationHelper.NotifyAboutRegistration(
 				String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
 				String.Format("Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-							  SecurityContext.Administrator.UserName,
-							  RegionDD.SelectedItem.Text,
-							  username,
-							  clientCode,
-							  SegmentDD.SelectedItem.Text,
-							  TypeDD.SelectedItem.Text));
+					SecurityContext.Administrator.UserName,
+					client.HomeRegion.Name,
+					user.Login,
+					client.Id,
+					SegmentDD.SelectedItem.Text,
+					TypeDD.SelectedItem.Text));
 
-			Session["DogN"] = billingCode;
-			Session["Code"] = clientCode;
-			Session["Name"] = FullNameTB.Text;
-			Session["ShortName"] = shortname;
-			Session["Login"] = username;
+
+			Session["DogN"] = client.BillingInstance.PayerID;
+			Session["Code"] = client.Id;
+			Session["Name"] = client.FullName;
+			Session["ShortName"] = client.ShortName;
+			Session["Login"] = user.Login;
 			Session["Password"] = password;
 			Session["Tariff"] = TypeDD.SelectedItem.Text;
 			Session["Register"] = true;
 
-			var log = SendClientCardIfNeeded(clientCode, billingCode, shortname, username, password);
+			var log = SendClientCardIfNeeded(client, user.Login, password);
 			log.Save();
 
 			var sendBillingNotificationNow = true;
 			string redirectTo;
-			if (IsBasicClient())
+			if (EnterBillingInfo.Checked)
 			{
-				redirectTo = String.Format("client/{0}", clientCode);
+				sendBillingNotificationNow = false;
+				redirectTo = String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+					client.BillingInstance.PayerID,
+					ShowRegistrationCard.Checked,
+					client.Id);
 			}
+			else if (ShowRegistrationCard.Checked)
+				redirectTo = "report.aspx";
 			else
-			{
-				if (!IncludeCB.Checked && EnterBillingInfo.Checked)
-				{
-					sendBillingNotificationNow = false;
-					redirectTo = String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-											   billingCode,
-											   ShowRegistrationCard.Checked,
-											   clientCode);
-				}
-				else if (ShowRegistrationCard.Checked)
-					redirectTo = "report.aspx";
-				else
-					redirectTo = String.Format("Client/{0}", clientCode);
-			}
+				redirectTo = String.Format("Client/{0}", client.Id);
+
 
 			if (sendBillingNotificationNow)
 				new NotificationService()
-					.SendNotificationToBillingAboutClientRegistration(clientCode,
-																	  billingCode,
-																	  shortname,
-																	  SecurityContext.Administrator.UserName,
-																	  IncludeType.SelectedItem.Text,
-																	  null);
+					.SendNotificationToBillingAboutClientRegistration(client,
+						SecurityContext.Administrator.UserName,
+						null);
 			Response.Redirect(redirectTo);
 		}
 
-		private bool IsBasicClient()
+		private User CreateUser(Client client)
 		{
-			return (IncludeCB.Checked && IncludeType.SelectedItem.Text == "Базовый");
+			var user = new User {
+				Client = client, 
+				HumanReadableName = LoginTB.Text.Trim(),
+				Login = "temporary-login"
+			};
+
+			if (PermissionsDiv.Visible)
+				foreach (var item in Permissions.Items.Cast<ListItem>().Where(i => i.Selected))
+					user.AddPermission(UserPermission.Find(Convert.ToUInt32(item.Value)));
+
+			user.Save();
+			user.Login = user.Id.ToString();
+			user.Update();
+			var auth = new AuthorizationLogEntity {Id = user.Id};
+			auth.Create();
+			return user;
 		}
 
-		public bool IsSlaveClient()
+		private PasswordChangeLogEntity SendClientCardIfNeeded(Client client,
+			string username,
+			string password)
 		{
-			return IncludeCB.Checked;
-		}
-
-		private PasswordChangeLogEntity SendClientCardIfNeeded(uint clientCode,
-		                                    uint billingCode,
-		                                    string shortname,
-		                                    string username,
-		                                    string password)
-		{
-			var log = new PasswordChangeLogEntity(HttpContext.Current.Request.UserHostAddress,
-			                                      SecurityContext.Administrator.UserName,
-			                                      username);
+			var log = new PasswordChangeLogEntity(username);
 			if (!SendRegistrationCard.Checked)
 				return log;
 
-			if (IsBasicClient())
-				return log;
+			var mailTo = client.GetAddressForSendingClientCard();
 
-			string mailTo;
-
-			if (TBOrderManagerMail.Text.Trim().Length == 0 && TBClientManagerMail.Text.Trim().Length == 0)
-				mailTo = EmailTB.Text;
-			else
-				mailTo = TBClientManagerMail.Text.Trim() + ", " + TBOrderManagerMail.Text.Trim();
-
-
-			var smtpid = ReportHelper.SendClientCard(clientCode,
-			                                         billingCode,
-			                                         shortname,
-			                                         FullNameTB.Text,
-			                                         TypeDD.SelectedItem.Text,
-			                                         username,
-			                                         password,
-			                                         mailTo,
-			                                         AdditionEmailToSendRegistrationCard.Text,
-			                                         true);
+			var smtpid = ReportHelper.SendClientCard(client,
+				username,
+				password,
+				mailTo,
+				AdditionEmailToSendRegistrationCard.Text,
+				true);
 
 			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, AdditionEmailToSendRegistrationCard.Text));
 			return log;
@@ -333,155 +292,65 @@ ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"
 			}
 		}
 
-		protected void IncludeCB_CheckedChanged(object sender, EventArgs e)
+		private Payer CreatePayer(Client client)
 		{
-			EnterBillingInfo.Enabled = !IncludeCB.Checked;
-			EnterBillingInfo.Checked = !IncludeCB.Checked;
-			PayerPresentCB.Enabled = !IncludeCB.Checked;
-			PayerPresentCB.Checked = false;
-			CustomerType.SelectedIndex = 0;
-			InheritProperties.Visible = false;
-			InheritProperties.Checked = false;
-			InheritFrom.Visible = false;
-			if (IncludeCB.Checked)
-			{
-				IncludeCB.Text = "Подчинен клиенту:";
-				PayerFTB.Visible = false;
-				FindPayerB.Visible = false;
-				RegionDD.Enabled = false;
-				TypeDD.Enabled = false;
-				TypeDD.SelectedIndex = 0;
-				SegmentDD.Enabled = false;
-				CustomerType.Enabled = false;
-				WRList.Enabled = false;
-				PayerDDL.Visible = false;
-				PayerCountLB.Visible = false;
-				IncludeSTB.Visible = true;
-				IncludeSB.Visible = true;
-			}
-			else
-			{
-				RegionDD.Enabled = true;
-				TypeDD.Enabled = true;
-				SegmentDD.Enabled = true;
-				CustomerType.Enabled = true;
-				WRList.Enabled = true;
-				IncludeCB.Text = "Подчиненный клиент";
-				IncludeSTB.Visible = false;
-				IncludeSB.Visible = false;
-				IncludeSDD.Visible = false;
-				IncludeType.Visible = false;
-				IncludeCountLB.Visible = false;
-			}
+			var prefix = "";
+			if (client.IsDrugstore())
+				prefix = "Аптека";
+
+			var contactGroupOwner = new ContactGroupOwner();
+			var group = contactGroupOwner.AddContactGroup(ContactGroupType.Billing);
+			contactGroupOwner.Save();
+			group.Save();
+
+			var payer = new Payer {
+				OldTariff = 0,
+				OldPayDate = DateTime.Now,
+				Comment = String.Format("Дата регистрации: {0}", DateTime.Now),
+				ShortName = client.ShortName,
+				JuridicalName = client.FullName,
+				BeforeNamePrefix = prefix,
+				ContactGroupOwner = contactGroupOwner,
+			};
+			payer.Save();
+			return payer;
 		}
 
-		protected void IncludeSB_Click(object sender, EventArgs e)
+		private void CreateClient(Client client)
 		{
-			With.Connection(c => {
-				var adapter = new MySqlDataAdapter(String.Format(@"
-SELECT  DISTINCT cd.FirmCode, 
-        convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName, 
-        cd.RegionCode  
-FROM clientsdata as cd
-LEFT JOIN includeregulation ir 
-        ON ir.includeclientcode = cd.firmcode  
-WHERE cd.regioncode & ?AdminRegionMask > 0  
-      AND FirmStatus = 1  
-      AND billingstatus = 1  
-      AND FirmType = 1  
-      AND ir.primaryclientcode is null  
-	  AND cd.ShortName like ?SearchText 
-	  {0}
-ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
+			var owner = new ContactGroupOwner();
+			client.ContactGroupOwner = owner;
 
-				adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-				adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", IncludeSTB.Text));
-				adapter.Fill(data, "Includes");
-			});
+			var generalGroup = owner.AddContactGroup(ContactGroupType.General);
+			if (!String.IsNullOrEmpty(PhoneTB.Text) && !String.IsNullOrEmpty(PhoneTB.Text.Trim()))
+				generalGroup.AddContact(ContactType.Phone, PhoneTB.Text);
+			if (!String.IsNullOrEmpty(EmailTB.Text) && !String.IsNullOrEmpty(EmailTB.Text.Trim()))
+				generalGroup.AddContact(ContactType.Email, EmailTB.Text);
 
-			IncludeSDD.DataSource = data.Tables["Includes"];
-			IncludeSDD.DataBind();
-			IncludeCountLB.Text = "[" + IncludeSDD.Items.Count + "]";
-			IncludeCountLB.Visible = true;
-			if (data.Tables["Includes"].Rows.Count > 0)
+			var orderGroup = owner.AddContactGroup(ContactGroupType.OrderManagers);
+			if (!String.IsNullOrEmpty(TBOrderManagerPhone.Text) && !String.IsNullOrEmpty(TBOrderManagerPhone.Text.Trim()))
+				orderGroup.AddContact(ContactType.Phone, TBOrderManagerPhone.Text);
+			if (!String.IsNullOrEmpty(TBOrderManagerMail.Text) && !String.IsNullOrEmpty(TBOrderManagerMail.Text.Trim()))
+				orderGroup.AddContact(ContactType.Email, TBOrderManagerMail.Text);
+			if (!String.IsNullOrEmpty(TBOrderManagerName.Text) && !String.IsNullOrEmpty(TBOrderManagerName.Text.Trim()))
+				orderGroup.AddPerson(TBOrderManagerName.Text);
+
+			if (!client.IsDrugstore())
 			{
-				RegionDD.SelectedValue = data.Tables["Includes"].Rows[0]["RegionCode"].ToString();
-				SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
-
-				IncludeType.Visible = true;
-				IncludeSDD.Visible = true;
-				IncludeSTB.Visible = false;
-				IncludeSB.Visible = false;
-				InheritProperties.Visible = true;
-			}	
-		}
-
-		private uint CreatePayer(MySqlCommand command)
-		{
-			command.CommandText =
-				"insert into billing.payers(OldTariff, OldPayDate, Comment, PayerID, ShortName, JuridicalName, BeforeNamePrefix, ContactGroupOwnerId) values(0, now(), 'Дата регистрации: " +
-				DateTime.Now + "', null, ?ShortName, ?fullname, ?BeforeNamePrefix, ?BillingContactGroupOwnerId); ";
-			command.CommandText += "SELECT LAST_INSERT_ID()";
-			command.Parameters.AddWithValue("?BillingContactGroupOwnerId", CreateContactsForBilling(command.Connection));
-			return Convert.ToUInt32(command.ExecuteScalar());
-		}
-
-		private uint CreateClient(uint billingCode, MySqlCommand command)
-		{
-			command.CommandText = @"
-INSERT INTO usersettings.clientsdata (
-MaskRegion, FullName, ShortName, FirmSegment, RegionCode, Adress, 
-FirmType, FirmStatus, registrant, BillingCode, BillingStatus, ContactGroupOwnerId, RegistrationDate) ";
-			command.Parameters.AddWithValue("?ClientContactGroupOwnerId",
-			                                 CreateContactsForClientsData(command.Connection,
-			                                                              TypeDD.SelectedItem.Text == "Аптека"
-			                                                              	? ClientType.Drugstore
-			                                                              	: ClientType.Supplier));
-			if (!IncludeCB.Checked)
-			{
-				command.CommandText += @" 
-Values(?maskregion, ?FullName, ?ShortName, ?FirmSegment, ?RegionCode, ?Adress, 
-?FirmType, 1, ?registrant, " + billingCode + ", 1, ?ClientContactGroupOwnerId, now()); ";
+				var clientsGroup = owner.AddContactGroup(ContactGroupType.ClientManagers);
+				if (!String.IsNullOrEmpty(TBClientManagerPhone.Text) && !String.IsNullOrEmpty(TBClientManagerPhone.Text.Trim()))
+					clientsGroup.AddContact(ContactType.Phone, TBClientManagerPhone.Text);
+				if (!String.IsNullOrEmpty(TBClientManagerPhone.Text) && !String.IsNullOrEmpty(TBClientManagerPhone.Text.Trim()))
+					clientsGroup.AddContact(ContactType.Email, TBClientManagerPhone.Text);
+				if (!String.IsNullOrEmpty(TBClientManagerMail.Text) && !String.IsNullOrEmpty(TBClientManagerMail.Text.Trim()))
+					clientsGroup.AddPerson(TBClientManagerMail.Text);
 			}
-			else
-			{
-				command.CommandText += @"
-select maskregion, ?FullName, ?ShortName, FirmSegment, RegionCode, ?Adress, 
-FirmType, 1, ?registrant, BillingCode, BillingStatus, ?ClientContactGroupOwnerId, now()
-from usersettings.clientsdata where firmcode=" + IncludeSDD.SelectedValue + "; ";
-			}
-			command.CommandText += "SELECT LAST_INSERT_ID()";
-			var clientCode = Convert.ToUInt32(command.ExecuteScalar());
-			command.Parameters["?ClientCode"].Value = clientCode;
-			CreateUser(command);
-			return clientCode;
+			owner.Save();
 		}
 
-		private void CreateUser(MySqlCommand command)
+		public void CreateSupplier(MySqlCommand command, DefaultValues defaults, Client client)
 		{
-			
-			command.CommandText = @"
-INSERT INTO usersettings.osuseraccessright (ClientCode, OSUserName) Values(?ClientCode, ?OSUserName);
-SET @NewUserId = Last_Insert_ID();
-insert into logs.AuthorizationDates(ClientCode, UserId) Values(?ClientCode, @NewUserId);";
-			if (PermissionsDiv.Visible)
-			{
-				foreach (ListItem item in Permissions.Items)
-				{
-					if (item.Selected)
-					{
-						command.CommandText += String.Format(@"
-INSERT INTO usersettings.AssignedPermissions(UserId, PermissionId) 
-Values(@NewUserId, {0});", item.Value);
-					}
-				}
-			}
-			command.ExecuteNonQuery();
-		}
-
-		public void CreateSupplier(MySqlCommand command, DefaultValues defaults)
-		{
-			var orderSendRules = new OrderSendRules(defaults, Convert.ToUInt32(command.Parameters["?ClientCode"].Value));
+			var orderSendRules = new OrderSendRules(defaults, client.Id);
 			orderSendRules.Save();
 
 			command.CommandText = @"
@@ -566,25 +435,34 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
-			command
-				.ExecuteNonQuery();
+			command.Parameters.AddWithValue("?ClientCode", client.Id);
+			command.ExecuteNonQuery();
 		}
 
-		private void CreateDrugstore(bool invisible, MySqlCommand command, DefaultValues defaults)
+		private void CreateDrugstore(MySqlCommand command, DefaultValues defaults, Client client, User user, ulong orderMask)
 		{
-			command.Parameters.AddWithValue("?AnalitFVersion", defaults.AnalitFVersion);
+			command.CommandText = "select usersettings.GeneratePassword()";
+			var costCrypKey = command.ExecuteScalar().ToString();
+
+			var settings = new DrugstoreSettings {
+				Id = client.Id,
+				InvisibleOnFirm = (DrugstoreType) Convert.ToUInt32(CustomerType.SelectedItem.Value),
+				OrderRegionMask = orderMask,
+				ServiceClient = ServiceClient.Checked,
+				BasecostPassword = costCrypKey,
+			};
+			if (!String.IsNullOrEmpty(Suppliers.SelectedValue))
+				settings.FirmCodeOnly = Convert.ToUInt32(Suppliers.SelectedValue);
+
+			settings.Create();
 
 			command.CommandText = @"
-INSERT INTO usersettings.retclientsset 
-		(ClientCode, InvisibleOnFirm, OrderRegionMask, BasecostPassword, ServiceClient, FirmCodeOnly) 
-Values  (?ClientCode, ?InvisibleOnFirm, ?OrderMask, GeneratePassword(), ?ServiceClient, ?FirmCodeOnly);
-
 insert into usersettings.ret_save_grids(ClientCode, SaveGridId)
 select ?ClientCode, sg.id
 from usersettings.save_grids sg
 where sg.AssignDefaultValue = 1;
 
-INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (@NewUserId, ?AnalitFVersion);
+INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (?UserId, ?AnalitFVersion);
 
 INSERT 
 INTO    intersection
@@ -618,44 +496,21 @@ WHERE   intersection.pricecode IS NULL
         AND clientsdata.firmtype = 0
 		AND clientsdata2.FirmCode = ?clientCode
 		AND clientsdata2.firmtype = 1;";
+			command.Parameters.AddWithValue("?AnalitFVersion", defaults.AnalitFVersion);
+			command.Parameters.AddWithValue("?ClientCode", client.Id);
+			command.Parameters.AddWithValue("?UserId", user.Id);
 
-			if (!invisible)
+/*
+			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
 				command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
+*/
 			command.ExecuteNonQuery();
-		}
-
-		private void CreateRelationship(Client client, MySqlConnection connection)
-		{
-			var type = (RelationshipType) Convert.ToUInt32(IncludeType.SelectedValue);
-			var parent = Client.FindAndCheck(Convert.ToUInt32(IncludeSDD.SelectedValue));
-			client.AddRelationship(parent, type);
-
-			var command = new MySqlCommand(SharedCommands.UpdateWorkRules, connection);
-			command.Parameters.AddWithValue("?Parent", parent.Id);
-			command.Parameters.AddWithValue("?Child", client.Id);
-			command.Parameters.AddWithValue("?IncludeType", (uint)type);
-			command.ExecuteNonQuery();
-		}
-
-		protected void IncludeSDD_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			With.Connection(c => {
-				var command = new MySqlCommand("SELECT RegionCode FROM clientsdata WHERE firmcode = ?firmCode;", c);
-				command.Parameters.AddWithValue("?firmCode", IncludeSDD.SelectedValue);
-				using (var reader = command.ExecuteReader())
-				{
-					if (reader.Read())
-						RegionDD.SelectedValue = reader[0].ToString();
-				}
-			});
-			UpdateInherit();
-			SetWorkRegions(RegionDD.SelectedItem.Value, CheckBox1.Checked);
 		}
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.RegisterDrugstore,
-			                                                    PermissionType.RegisterSupplier);
+				PermissionType.RegisterSupplier);
 
 			With.Connection(c => {
 				var adapter = new MySqlDataAdapter(@"
@@ -703,7 +558,7 @@ ORDER BY region;", c);
 				TypeDD.Enabled = false;
 
 			if (!SecurityContext.Administrator.HavePermisions(PermissionType.RegisterInvisible))
-                CustomerType.Items.Remove(CustomerType.Items[1]);
+				CustomerType.Items.Remove(CustomerType.Items[1]);
 
 			SegmentDD.Items.Add("Опт");
 			SegmentDD.Items[0].Value = "0";
@@ -792,9 +647,6 @@ ORDER BY region;", c);
 
 		public string ValidateLogin(string login)
 		{
-			if (IsBasicClient())
-				return null;
-
 			if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(login.Trim()))
 				return "Поле «Имя пользователя» должно быть заполнено";
 
@@ -808,9 +660,9 @@ ORDER BY region;", c);
 			
 			var existsInDataBase = false;
 			With.Connection(c => {
-			                	existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + login + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
-			                });
-					
+				existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + login + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
+			});
+
 			var existsInActiveDirectory = ADHelper.IsLoginExists(login);
 			if (existsInActiveDirectory || existsInDataBase)
 				return String.Format("Имя пользователя '{0}' существует в системе.", login);
@@ -820,121 +672,7 @@ ORDER BY region;", c);
 
 		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
-			args.IsValid = args.Value == "Поставщик" && !IncludeCB.Checked;
-		}
-
-		private object CreateContactsForClientsData(MySqlConnection connection, ClientType clientType)
-		{
-			var contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
-
-			CreateContactGroup(ContactGroupType.General,
-			                   EmailHelper.NormalizeEmailOrPhone(PhoneTB.Text),
-			                   EmailHelper.NormalizeEmailOrPhone(EmailTB.Text),
-			                   null,
-			                   connection,
-			                   contactGroupOwnerId);
-			CreateContactGroup(ContactGroupType.OrderManagers,
-			                   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerPhone.Text),
-			                   EmailHelper.NormalizeEmailOrPhone(TBOrderManagerMail.Text),
-			                   TBOrderManagerName.Text,
-			                   connection,
-			                   contactGroupOwnerId);
-
-			if (clientType == ClientType.Supplier)
-				CreateContactGroup(ContactGroupType.ClientManagers,
-				                   EmailHelper.NormalizeEmailOrPhone(TBClientManagerPhone.Text),
-				                   EmailHelper.NormalizeEmailOrPhone(TBClientManagerMail.Text),
-				                   TBClientManagerName.Text,
-				                   connection,
-				                   contactGroupOwnerId);
-
-			return contactGroupOwnerId;
-		}
-
-
-		private static object CreateContactsForBilling(MySqlConnection connection)
-		{
-			var contactGroupOwnerId = GetNewContactsGroupOwnerId(connection);
-			CreateContactGroup(ContactGroupType.Billing,
-			                   null,
-			                   null,
-			                   null,
-			                   connection,
-			                   contactGroupOwnerId);
-			return contactGroupOwnerId;
-		}
-
-		private static void CreateContactGroup(ContactGroupType contactGroupType,
-		                                       string phone,
-		                                       string email,
-		                                       string person,
-		                                       MySqlConnection connection,
-		                                       object contactGroupOwnerId)
-		{
-			var innerCommand = connection.CreateCommand();
-			var contactGroupID = GetNewContactsOwnerId(connection);
-			innerCommand.CommandText =
-				@"
-insert into contacts.contact_groups(Id, Name, Type, ContactGroupOwnerId) 
-values(?ID, ?Name, ?Type, ?ContactGroupOwnerId);";
-
-			innerCommand.Parameters.AddWithValue("?Type", contactGroupType);
-			innerCommand.Parameters.AddWithValue("?Name", BindingHelper.GetDescription(contactGroupType));
-			innerCommand.Parameters.AddWithValue("?ContactGroupOwnerId", contactGroupOwnerId);
-			innerCommand.Parameters.AddWithValue("?ID", contactGroupID);
-			innerCommand.ExecuteNonQuery();
-
-			innerCommand = connection.CreateCommand();
-			innerCommand.CommandText =
-				@"
-insert into contacts.contacts(Type, ContactText, ContactOwnerId) 
-values(?Type, ?Contact, ?ContactOwnerId);";
-
-			innerCommand.Parameters.AddWithValue("?ContactOwnerId", contactGroupID);
-			innerCommand.Parameters.AddWithValue("?Contact", phone);
-			innerCommand.Parameters.AddWithValue("?Type", 1);
-			if (!String.IsNullOrEmpty(phone))
-				innerCommand.ExecuteNonQuery();
-
-			if (!String.IsNullOrEmpty(email))
-			{
-				innerCommand.Parameters["?Contact"].Value = email;
-				innerCommand.Parameters["?Type"].Value = 0;
-				innerCommand.ExecuteNonQuery();
-			}
-
-			if (!String.IsNullOrEmpty(person))
-			{
-				innerCommand = connection.CreateCommand();
-				innerCommand.CommandText =
-					@"
-insert into contacts.persons(Id, Name, ContactGroupId) 
-values(?Id, ?Name, ?ContactGroupId);";
-
-				innerCommand.Parameters.AddWithValue("?ContactGroupId", contactGroupID);
-				innerCommand.Parameters.AddWithValue("?Id", GetNewContactsOwnerId(connection));
-				innerCommand.Parameters.AddWithValue("?Name", person);
-				innerCommand.ExecuteNonQuery();
-			}
-		}
-
-		private static object GetNewContactsOwnerId(MySqlConnection connection)
-		{
-			var command = connection.CreateCommand();
-			command.CommandText = @"
-insert into contacts.contact_owners values();
-select Last_Insert_ID();";
-			return command.ExecuteScalar();
-		}
-
-		private static object GetNewContactsGroupOwnerId(MySqlConnection connection)
-		{
-			var innerCommand = connection.CreateCommand();
-			innerCommand.CommandText = @"
-insert into contacts.contact_group_owners values();
-select Last_Insert_ID();";
-
-			return innerCommand.ExecuteScalar();
+			args.IsValid = args.Value == "Поставщик";
 		}
 
 		protected void ClientTypeChanged(object sender, EventArgs e)
@@ -942,11 +680,9 @@ select Last_Insert_ID();";
 			var isCusomer = TypeDD.SelectedItem.Text == "Аптека";
 			CustomerType.Enabled = isCusomer;
 			ServiceClient.Enabled = isCusomer;
-			IncludeCB.Enabled = isCusomer;
 			UpdatePermissions();
 			if (!isCusomer)
 			{
-				IncludeCB.Checked = false;
 				OrderList.Visible = false;
 				OrderRegionsLabel.Visible = false;
 			}
@@ -957,8 +693,8 @@ select Last_Insert_ID();";
 			}
 
 			OrderManagerGroupLabel.InnerText = isCusomer
-			                                   	? "Ответственный за работу с программой:"
-			                                   	: "Ответственный за отправку прайс-листа:";
+				? "Ответственный за работу с программой:"
+				: "Ответственный за отправку прайс-листа:";
 			ClientManagerGropBlock.Visible = !isCusomer;
 		}
 
@@ -991,65 +727,6 @@ order by name", Literals.GetConnectionString());
 			}
 
 			PermissionsDiv.Visible = permissionsData.Tables[0].Rows.Count > 0;
-		}
-
-		protected void InheritProperties_CheckedChanged(object sender, EventArgs e)
-		{
-			InheritFrom.Visible = InheritProperties.Checked;
-			UpdateInherit();
-		}
-
-		private void UpdateInherit()
-		{
-			if (InheritFrom.Visible)
-			{
-				var dataAdapter = new MySqlDataAdapter(@"
-select cd.FirmCode, cd.ShortName as Name
-from usersettings.clientsdata cd
-where cd.firmcode = ?ClientCode
-      or cd.firmcode in (select includeclientcode from includeregulation where primaryclientcode = ?ClientCode)
-      or cd.firmcode in (select primaryclientcode from includeregulation where includeclientcode = ?ClientCode);", Literals.GetConnectionString());
-				dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", IncludeSDD.SelectedValue);
-				var data = new DataSet();
-				dataAdapter.Fill(data);
-				InheritFrom.DataSource = data;
-				InheritFrom.DataBind();
-				InheritClientProperties();
-			}
-		}
-
-		protected void InheritFrom_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			InheritClientProperties();
-		}
-
-		private void InheritClientProperties()
-		{
-			var dataAdapter = new MySqlDataAdapter(@"
-select cd.ShortName, 
-	   cd.FullName, 
-	   cd.Adress,
-	   (select c.ContactText
-       from contacts.contact_groups cg
-         join contacts.contacts c on cg.id = c.ContactOwnerId
-       where c.`Type` = 1 and cg.ContactGroupOwnerId = cd.ContactGroupOwnerId
-       limit 1) as Phone,
-	   (select c.ContactText
-       from contacts.contact_groups cg
-         join contacts.contacts c on cg.id = c.ContactOwnerId
-       where c.`Type` = 0 and cg.ContactGroupOwnerId = cd.ContactGroupOwnerId
-       limit 1) as Email
-from usersettings.clientsdata cd
-where cd.firmcode = ?ClientCode
-", Literals.GetConnectionString());
-			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", InheritFrom.SelectedValue);
-			var data = new DataSet();
-			dataAdapter.Fill(data);
-			ShortNameTB.Text = data.Tables[0].Rows[0]["ShortName"].ToString();
-			FullNameTB.Text = data.Tables[0].Rows[0]["FullName"].ToString();
-			AddressTB.Text = data.Tables[0].Rows[0]["Adress"].ToString();
-			PhoneTB.Text = data.Tables[0].Rows[0]["Phone"].ToString();
-			EmailTB.Text = data.Tables[0].Rows[0]["Email"].ToString();
 		}
 
 		protected void SearchSupplierClick(object sender, EventArgs e)

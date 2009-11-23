@@ -35,7 +35,7 @@ namespace AddUser
 		protected void NotifySuppliers_Click(object sender, EventArgs e)
 		{
 			var client = Client.Find(Convert.ToUInt32(ClientCode));
-			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client.Id);
+			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client);
 			Mailer.ClientRegistrationResened(client);
 		}
 
@@ -67,8 +67,6 @@ namespace AddUser
 				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", NotNoisedSupplier.SelectedValue);
 			else
 				updateCommand.Parameters.AddWithValue("?FirmCodeOnly", null);
-
-			var insertedRelationship = new Dictionary<DataRow, Relationship>();
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -197,61 +195,7 @@ SET OrderRegionMask     = ?orderMask,
 	FirmCodeOnly			= ?FirmCodeOnly
 where clientcode=firmcode and firmcode=?clientCode; ";
 
-					var giveAnalitFPermission = false;
-					foreach (DataRow row in Data.Tables["Include"].Rows)
-					{
-						if (row.RowState != DataRowState.Modified)
-							break;
-
-						if (Convert.ToInt32(row["IncludeType", DataRowVersion.Original]) == (int) RelationshipType.Base
-							&& (Convert.ToInt32(row["IncludeType", DataRowVersion.Current]) == (int)RelationshipType.Network
-								|| Convert.ToInt32(row["IncludeType", DataRowVersion.Current]) == (int)RelationshipType.BasePlus))
-							giveAnalitFPermission = true;
-					}
-					if (giveAnalitFPermission)
-					{
-						updateCommand.CommandText += @"
-insert into Usersettings.AssignedPermissions(UserId, PermissionId)
-select ouar.RowId, up.Id
-from (Usersettings.Osuseraccessright ouar, Usersettings.UserPermissions up)
-  left join Usersettings.AssignedPermissions ap on ap.UserId = ouar.RowId
-where ouar.clientcode = ?ClientCode and up.Shortcut = 'AF' and ap.UserId is null;
-";
-					}
-
 					var client = Client.FindAndCheck((uint) ClientCode);
-					Relationship lastUpdateRelationship = null;
-					foreach (var row in Data.Tables["Include"].Rows.Cast<DataRow>())
-					{
-						if (row.RowState == DataRowState.Added)
-						{
-							var parent = Client.FindAndCheck(Convert.ToUInt32(row["FirmCode"]));
-							var relationshipType = (RelationshipType)Convert.ToUInt32(row["IncludeType"]);
-							lastUpdateRelationship = client.AddRelationship(parent, relationshipType);
-							insertedRelationship.Add(row, lastUpdateRelationship);
-						}
-						else if (row.RowState == DataRowState.Deleted)
-						{
-							lastUpdateRelationship = client.Parents.First(r => r.Id == Convert.ToUInt32(row["Id", DataRowVersion.Original]));
-							client.RemoveRelationship(lastUpdateRelationship);
-						}
-						else if (row.RowState == DataRowState.Modified)
-						{
-							var relationship = client.Parents.First(r => r.Id == Convert.ToUInt32(row["Id"]));
-							relationship.RelationshipType = (RelationshipType)Convert.ToUInt32(row["IncludeType"]);
-							relationship.Parent = Client.FindAndCheck(Convert.ToUInt32(row["FirmCode"]));
-							lastUpdateRelationship = relationship;
-						}
-					}
-					Data.Tables["Include"].AcceptChanges();
-					if (lastUpdateRelationship != null)
-					{
-						var command = new MySqlCommand(SharedCommands.UpdateWorkRules, connection);
-						command.Parameters.AddWithValue("?Parent", lastUpdateRelationship.Parent.Id);
-						command.Parameters.AddWithValue("?Child", lastUpdateRelationship.Child.Id);
-						command.Parameters.AddWithValue("?IncludeType", (uint)lastUpdateRelationship.RelationshipType);
-						command.ExecuteNonQuery();
-					}
 
 					updateCommand.ExecuteNonQuery();
 
@@ -303,8 +247,6 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 				});
 				scope.VoteCommit();
 			}
-
-			insertedRelationship.Each(k => k.Key["Id"] = k.Value.Id);
 
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
@@ -463,22 +405,10 @@ WHERE rcs.clientcode = ?ClientCode";
 						}
 					}
 
-					var adapter = new MySqlDataAdapter(String.Format(@"
-SELECT  id,
-		cd.FirmCode,
-		convert(concat(cd.FirmCode ,'. ' ,cd.ShortName) using cp1251) ShortName,
-		ir.IncludeType
-FROM IncludeRegulation ir
-	JOIN ClientsData cd ON cd.firmcode = ir.PrimaryClientCode
-WHERE ir.IncludeClientCode = ?ClientCode
-		and cd.RegionCode & ?AdminMaskRegion
-		{0};
-", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
-
+					var adapter = new MySqlDataAdapter("", c);
 					Data = new DataSet();
 					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-					adapter.Fill(Data, "Include");
 
 					adapter.SelectCommand.CommandText = @"
 SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
@@ -500,9 +430,6 @@ ORDER BY sg.DisplayName;";
 
 					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
 					ShowClientsGrid.DataBind();
-
-					IncludeGrid.DataSource = Data.Tables["Include"].DefaultView;
-					IncludeGrid.DataBind();
 
 					ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
 					ExportRulesList.DataBind();
@@ -532,70 +459,8 @@ ORDER BY sg.DisplayName;";
 			SetWorkRegions(HomeRegionCode, true, false);
 		}
 
-		protected void IncludeGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
-		{
-			ProcessChanges();
-			Data.Tables["Include"].DefaultView[e.RowIndex].Delete();
-			IncludeGrid.DataSource = Data;
-			IncludeGrid.DataBind();
-		}
-
-		protected void IncludeGrid_RowCommand(object sender, GridViewCommandEventArgs e)
-		{
-			switch (e.CommandName)
-			{
-				case "Search":
-					var data = new DataSet();
-					var searchText = ((TextBox)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("SearchText"));
-					With.Connection(
-						c => {
-							var adapter = new MySqlDataAdapter(@"
-SELECT DISTINCT cd.FirmCode, 
-       convert(concat(cd.FirmCode, '. ', cd.ShortName) using cp1251) ShortName
-FROM (clientsdata as cd, clientsdata parent)
-	LEFT JOIN includeregulation ir ON ir.includeclientcode = cd.firmcode  
-WHERE cd.ShortName like ?SearchText
-	  and cd.RegionCode = parent.RegionCode
-	  AND cd.RegionCode & ?AdminMaskRegion > 0
-      AND cd.FirmStatus = 1  
-      AND cd.billingstatus= 1  
-      AND cd.FirmType = 1
-	  and parent.firmcode = ?ParentRegionCode
-ORDER BY cd.shortname;", c);
-							adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
-							adapter.SelectCommand.Parameters.AddWithValue("?ParentRegionCode", ClientCode);
-							adapter.SelectCommand.Parameters.AddWithValue("?SearchText", String.Format("%{0}%", searchText.Text));
-							adapter.Fill(data);
-						});
-
-					var parents = ((DropDownList)IncludeGrid.Rows[Convert.ToInt32(e.CommandArgument)].FindControl("ParentList"));
-					parents.DataSource = data;
-					parents.DataBind();
-					parents.Visible = data.Tables[0].Rows.Count > 0;
-					break;
-				case "Add":
-					ProcessChanges();
-					Data.Tables["Include"].Rows.Add(Data.Tables["Include"].NewRow());
-					IncludeGrid.DataSource = Data;
-					IncludeGrid.DataBind();
-					break;
-			}
-		}
-
 		private void ProcessChanges()
 		{
-			foreach (GridViewRow row in IncludeGrid.Rows)
-			{
-				if (Data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"].ToString() != ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue)
-					Data.Tables["Include"].DefaultView[row.RowIndex]["IncludeType"] = ((DropDownList)row.FindControl("IncludeTypeList")).SelectedValue;
-
-				if (Data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"].ToString() != ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text)
-				{
-					Data.Tables["Include"].DefaultView[row.RowIndex]["ShortName"] = ((DropDownList)row.FindControl("ParentList")).SelectedItem.Text;
-					Data.Tables["Include"].DefaultView[row.RowIndex]["FirmCode"] = ((DropDownList)row.FindControl("ParentList")).SelectedValue;
-				}
-			}
-
 			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
 		}
 

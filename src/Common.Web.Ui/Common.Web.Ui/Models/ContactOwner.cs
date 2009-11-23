@@ -29,5 +29,13 @@ namespace Common.Web.Ui.Models
 			contact.ContactOwner = this;
 			Contacts.Add(contact);
 		}
+
+		public void AddContact(ContactType type, string contactText)
+		{
+			var contact = new Contact(type, contactText);
+			contact.ContactOwner = this;
+			Contacts.Add(contact);
+		}
+
 	}
 }

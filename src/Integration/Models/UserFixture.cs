@@ -26,7 +26,7 @@ namespace AdminInterface.Test.Models
 			using (var testUser = new TestADUser("test546116879", "LDAP://OU=Офис,DC=adc,DC=analit,DC=net"))
 			{
 				var user = new User { Login = testUser.Login };
-				user.CheckLogin();				
+				user.CheckLogin();
 			}
 		}
 
@@ -43,10 +43,9 @@ namespace AdminInterface.Test.Models
 		public void IsPermissionAssignedTest()
 		{
 			var permission = new UserPermission {Shortcut = "AF"};
-			var user = new User
-			           	{
-			           		AssignedPermissions = new List<UserPermission>()
-			           	};
+			var user = new User {
+				AssignedPermissions = new List<UserPermission>()
+			};
 			Assert.That(user.IsPermissionAssigned(permission), Is.False);
 			user.AssignedPermissions.Add(new UserPermission { Shortcut = "AF"});
 			Assert.That(user.IsPermissionAssigned(permission));
@@ -62,12 +61,11 @@ namespace AdminInterface.Test.Models
 				.Each(l => l.Delete());
 
 			Assert.That(user.IsChangePasswordByOneself(), Is.False);
-			new PasswordChangeLogEntity("127.0.0.1", "kvasov", "kvasov").Save();
+			new PasswordChangeLogEntity("kvasov").Save();
 			Assert.That(user.IsChangePasswordByOneself(), Is.True);
-			new PasswordChangeLogEntity("127.0.0.1", "emk", "kvasov")
-				{
-					LogTime = DateTime.Now.AddSeconds(10)
-				}.Save();
+			new PasswordChangeLogEntity("kvasov") {
+				LogTime = DateTime.Now.AddSeconds(10)
+			}.Save();
 			Assert.That(user.IsChangePasswordByOneself(), Is.False);
 		}
 	}

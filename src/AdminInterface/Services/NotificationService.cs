@@ -22,30 +22,12 @@ namespace AdminInterface.Services
 			_sendMessage = Func.SendWitnStandartSender;
 		}
 
-		public void NotifySupplierAboutDrugstoreRegistration(uint clientCode)
+		public void NotifySupplierAboutDrugstoreRegistration(Client client)
 		{
 			var data = new DataSet();
-			string fullName;
-			string shortName;
-			string region;
 			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
 				connection.Open();
-				var command = new MySqlCommand(
-@"select cd.RegionCode, cd.FullName, cd.ShortName, r.Region
-from usersettings.clientsdata cd
-	join farm.regions r on r.RegionCode = cd.RegionCode
-where firmcode = ?ClientCode", connection);
-				command.Parameters.AddWithValue("?ClientCode", clientCode);
-				ulong homeRegion;
-				using (var reader = command.ExecuteReader())
-				{
-					reader.Read();
-					fullName = reader.GetString("FullName");
-					shortName = reader.GetString("ShortName");
-					homeRegion = reader.GetUInt64("RegionCode");
-					region = reader.GetString("Region");
-				}
 				var dataAdapter = new MySqlDataAdapter(@"
 select c.contactText
 from usersettings.clientsdata cd
@@ -81,25 +63,19 @@ where length(c.contactText) > 0
                               and MaskRegion & ?Region > 0)
       and cg.Type = ?ContactGroupType
       and c.Type = ?ContactType;", connection);
-				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", homeRegion);
+				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", client.HomeRegion.Id);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
 				dataAdapter.Fill(data);
 			}
 			foreach (DataRow Row in data.Tables[0].Rows)
-				NotificationHelper.NotifySupplierAboutDrugstoreRegistration(clientCode.ToString(),
-																			fullName,
-																			shortName,
-																			region,
-																			Row["ContactText"].ToString());
+				NotificationHelper.NotifySupplierAboutDrugstoreRegistration(client,
+					Row["ContactText"].ToString());
 		}
 
-		public void SendNotificationToBillingAboutClientRegistration(uint clientCode,
-		                                                             uint payerId,
-		                                                             string clientName,
-		                                                             string userName,
-		                                                             string includeType,
-		                                                             PaymentOptions options)
+		public void SendNotificationToBillingAboutClientRegistration(Client client,
+			string userName,
+			PaymentOptions options)
 		{
 			var message = new MailMessage();
 			message.To.Add("billing@analit.net");
@@ -107,12 +83,6 @@ where length(c.contactText) > 0
 			message.IsBodyHtml = true;
 			message.Subject = "Регистрация нового клиента";
 
-			string clientType;
-
-			if (!String.IsNullOrEmpty(includeType))
-				clientType = String.Format("Подчиненный клиент, тип подчинения {0}", includeType);
-			else
-				clientType = "Независимая копия";
 
 			var paymentOptions = "";
 			if (options != null)
@@ -129,8 +99,7 @@ where length(c.contactText) > 0
 <br>
 Кем зарегистрирован: {3}
 <br>
-{4}
-{5}", clientName, clientCode, payerId, userName, clientType, paymentOptions).Replace(Environment.NewLine, "");
+{4}", client.ShortName, client.Id, client.BillingInstance.PayerID, userName, paymentOptions).Replace(Environment.NewLine, "");
 
 			_sendMessage(message);
 		}

@@ -31,9 +31,9 @@ namespace AdminInterface.Controllers
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
-							   [DataBind("PaymentOptions")] PaymentOptions paymentOptions,
-							   uint clientCode,
-		                       bool showRegistrationCard)
+			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
+			uint clientCode,
+			bool showRegistrationCard)
 		{
 			if (String.IsNullOrEmpty(payer.Comment))
 				payer.Comment = paymentOptions.GetCommentForPayer();
@@ -42,12 +42,11 @@ namespace AdminInterface.Controllers
 
 			payer.UpdateAndFlush();
 
-			_notificationService.SendNotificationToBillingAboutClientRegistration(clientCode,
-			                                                                      payer.PayerID,
-			                                                                      Session["ShortName"].ToString(),
-			                                                                      SecurityContext.Administrator.UserName, 
-																				  null,
-			                                                                      paymentOptions);
+			var client = Client.Find(clientCode);
+
+			_notificationService.SendNotificationToBillingAboutClientRegistration(client,
+				SecurityContext.Administrator.UserName,
+				paymentOptions);
 
 			if (showRegistrationCard)
 				RedirectToUrl("../report.aspx");

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 
@@ -12,12 +13,12 @@ namespace AdminInterface.Models.Logs
 		public PasswordChangeLogEntity()
 		{}
 
-		public PasswordChangeLogEntity(string host, string user, string target)
+		public PasswordChangeLogEntity(string target)
 		{
-			UserName = user;
+			UserName = SecurityContext.Administrator.UserName;
+			ClientHost = SecurityContext.Administrator.GetHost();
 			TargetUserName = target;
 			LogTime = DateTime.Now;
-			ClientHost = host;
 		}
 
 		[PrimaryKey("RowId")]

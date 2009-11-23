@@ -23,23 +23,19 @@ namespace AdminInterface.Helpers
 Челябинск +7 351 7298143
 ".Replace('\'', '\"');
 
-		public static void NotifySupplierAboutDrugstoreRegistration(string clientCode,
-		                                                            string fullName,
-		                                                            string shortName,
-		                                                            string region,
-		                                                            string to)
+		public static void NotifySupplierAboutDrugstoreRegistration(Client client, string to)
 		{
 			Func.Mail("tech@analit.net",
-			          "Аналитическая Компания Инфорум",
-			          "Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-			          String.Format(_messageTemplateForSupplierAfterDrugstoreRegistration, 
-									fullName, 
-									shortName, 
-									region, 
-									clientCode),
-			          to,
-					  "",
-			          null);
+				"Аналитическая Компания Инфорум",
+				"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+				String.Format(_messageTemplateForSupplierAfterDrugstoreRegistration,
+					client.FullName,
+					client.ShortName,
+					client.HomeRegion.Name,
+					client.Id),
+				to,
+				"",
+				null);
 		}
 
 		private const string _messageTemplateForBillingAfterPassordChange = 
@@ -73,37 +69,37 @@ namespace AdminInterface.Helpers
 		{
 			if (isFree)
 				Func.Mail("register@analit.net",
-						  String.Format("Бесплатное изменение пароля - {0}", client.FullName),
-						  String.Format(_messageTemplateAfterFreePasswordChange,
-										administrator.UserName, 
-										host,
-										user.Login,
-										client.ShortName,
-										client.Id,
-										DateTime.Now,
-										reason),
-						  "RegisterList@subscribe.analit.net");
+					String.Format("Бесплатное изменение пароля - {0}", client.FullName),
+					String.Format(_messageTemplateAfterFreePasswordChange,
+						administrator.UserName,
+						host,
+						user.Login,
+						client.ShortName,
+						client.Id,
+						DateTime.Now,
+						reason),
+					"RegisterList@subscribe.analit.net");
 
 			else
 				Func.Mail("register@analit.net",
-						  String.Format("Платное изменение пароля - {0}", client.FullName),
-						  String.Format(_messageTemplateForBillingAfterPassordChange,
-										client.FullName,
-										user.Login,
-										client.Id,
-										client.BillingInstance.PayerID,
-										reason,
-										DateTime.Now),
-				          "billing@analit.net");
+					String.Format("Платное изменение пароля - {0}", client.FullName),
+					String.Format(_messageTemplateForBillingAfterPassordChange,
+						client.FullName,
+						user.Login,
+						client.Id,
+						client.BillingInstance.PayerID,
+						reason,
+						DateTime.Now),
+					"billing@analit.net");
 		}
 
 		public static void NotifyAboutRegistration(string subject, string body)
 		{
 			Func.Mail("register@analit.net",
-			          subject,
-			          body,
-			          "RegisterList@subscribe.analit.net",
-			          SecurityContext.Administrator.Email);
+				subject,
+				body,
+				"RegisterList@subscribe.analit.net",
+				SecurityContext.Administrator.Email);
 		}
 	}
 }

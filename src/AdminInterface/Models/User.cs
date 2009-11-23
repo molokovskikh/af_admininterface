@@ -47,6 +47,13 @@ namespace AdminInterface.Models
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
+		public void AddPermission(UserPermission permission)
+		{
+			if (AssignedPermissions == null)
+				AssignedPermissions = new List<UserPermission>();
+			AssignedPermissions.Add(permission);
+		}
+
 		public static User GetByLogin(string login)
 		{
 			return ActiveRecordMediator<User>.FindOne(Restrictions.Eq("Login", login));
@@ -97,6 +104,15 @@ namespace AdminInterface.Models
 			var random = new Random();
 			while (password.Length < 8)
 				password += availableChars[random.Next(0, availableChars.Length - 1)];
+			return password;
+		}
+
+		public string CreateInAd()
+		{
+			var password = GeneratePassword();
+			ADHelper.CreateUserInAD(Login,
+				password,
+				Client.Id);
 			return password;
 		}
 	}

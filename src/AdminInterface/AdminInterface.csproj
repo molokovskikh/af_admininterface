@@ -159,9 +159,9 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
-    <Compile Include="Helpers\SharedCommands.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
@@ -169,6 +169,7 @@
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
+    <Compile Include="Models\DrugstoreSettings.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\CallLog.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
@@ -182,7 +183,6 @@
     <Compile Include="Models\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="Models\Region.cs" />
-    <Compile Include="Models\Relationship.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
@@ -197,7 +197,6 @@
     <Compile Include="Security\SecurityFilter.cs" />
     <Compile Include="Helpers\ADHelper.cs" />
     <Compile Include="Helpers\DbLogHelper.cs" />
-    <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Security\NotHavePermissionException.cs" />
     <Compile Include="Security\NotAuthorizedException.cs" />
     <Compile Include="Helpers\NotificationHelper.cs" />

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Net.Mail;
 using Common.Tools;
 
-namespace AdminInterface.Helpers
+namespace Common.Web.Ui.Helpers
 {
 	public class EmailHelper
 	{
