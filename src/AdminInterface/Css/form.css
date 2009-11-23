@@ -10,7 +10,7 @@
 	text-align:right;
 }
 
-.block h3
+h3
 {
 	border-bottom:1px solid #BBBBBB;
 	margin:0 0 10px;
@@ -20,7 +20,7 @@
 	text-align:inherit;
 }
 
-h2
+.block h2
 {
 	border-bottom:1px solid #BBBBBB;
 	margin:0 0 10px;
