@@ -45,6 +45,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<th>Тип</th>
 								<th>Сегмент</th>
 								<th>Копий</th>
+								<th>Адресов доставки</th>
 								<th>Дата регистрации</th>
 								<th>Платеж</th>
 							</tr>
@@ -83,6 +84,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<td>
 									<% if client.WorkCopyCount(): %>
 									${client.WorkCopyCount()}
+									<% else: %>
+									-
+									<% end %>
+								</td>
+								<td>
+									<% if client.IsDrugstore(): %>
+									${client.Addresses.Count}
 									<% else: %>
 									-
 									<% end %>
