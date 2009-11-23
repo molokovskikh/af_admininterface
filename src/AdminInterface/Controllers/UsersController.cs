@@ -1,4 +1,5 @@
-﻿using AdminInterface.Extentions;
+﻿using System;
+using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -19,20 +20,49 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			PropertyBag["client"] = client;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(client);
+			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("user")] User user, uint clientId)
+		public void Add([DataBind("user")] User user, uint clientId, bool sendClientCard, string mails)
 		{
+			var administrator = SecurityContext.Administrator;
+			var host = Request.UserHostAddress;
 			var client = Client.FindAndCheck(clientId);
-			user.Client = client;
-			user.Save();
-			ADHelper.CreateUserInAD(user.Login,
-				User.GeneratePassword(),
-				user.Client.Id.ToString());
+			var password = User.GeneratePassword();
+			PasswordChangeLogEntity passwordChangeLog;
+			using(var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				user.Client = client;
+				user.Login = "temporary-login";
+				user.Save();
+				user.Login = user.Id.ToString();
+				user.Update();
+				passwordChangeLog = new PasswordChangeLogEntity(host, administrator.UserName, user.Login);
+				passwordChangeLog.Save();
+				ADHelper.CreateUserInAD(user.Login,
+					password,
+					user.Client.Id.ToString());
+				scope.VoteCommit();
+			}
 
-			Flash["Message"] = new Message("Пользователь создан");
-			RedirectUsingRoute("client", "info", new { cc = client.Id });
+			if (sendClientCard && !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim()))
+			{
+				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
+					user,
+					password,
+					mails);
+				passwordChangeLog.SetSentTo(smtpId, mails);
+				passwordChangeLog.Update();
+
+				Flash["Message"] = new Message("Пользователь создан");
+				RedirectUsingRoute("client", "info", new {cc = client.Id});
+			}
+			else
+			{
+				PrepareSessionForReport(user, password);
+				RedirectToUrl("../report.aspx");
+			}
 		}
 
 		[AccessibleThrough(Verb.Get)]

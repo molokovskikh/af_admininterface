@@ -13,6 +13,18 @@
 			<input type=text name="user.HumanReadableName" />
 		</div>
 		<div class=block>
+			<h3>
+				<input id="sendClientCard" name="sendClientCard" type="checkbox" checked="checked" />
+				<label>Отправлять регистрационную карту на E-mail:</label>
+			</h3>
+			<label for="To">
+				Адреса для отправки регистрационной карты (перечисляются через запятую):
+			</label>
+			<div>
+				<textarea class="ValidateEmail EmailRequired" style="width: 100%" name="mails">${emailForSend}</textarea>
+			</div>
+		</div>
+		<div class=block>
 			<h3>Доступные адреса доставки</h3>
 			<div>
 				<% if client.Addresses.Count == 0: %>
