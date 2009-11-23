@@ -6,7 +6,7 @@ import System.IO
 Global(
 	project : "AdminInterface",
 	deployTo : "\\\\acdcserv\\publish\\TestAdm",
-	editor : "vim",
+	editor : "vim-nox",
 	humanReadableName : "Адмнистративный интерфейс"
 )
 
