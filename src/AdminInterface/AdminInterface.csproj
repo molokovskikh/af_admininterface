@@ -146,6 +146,7 @@
   <ItemGroup>
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\Bubble.cs" />
+    <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -156,11 +157,13 @@
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SharedCommands.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
+    <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />
     <Compile Include="Models\Billing\Tariff.cs" />
@@ -406,7 +409,6 @@
   <ItemGroup>
     <Content Include="Views\Billing\Edit.brail">
     </Content>
-    <Content Include="Views\Client\ContactViewer.brail" />
     <Content Include="Views\Layouts\billing.brail" />
     <Content Include="Views\Layouts\contact.brail" />
   </ItemGroup>
@@ -416,6 +418,7 @@
     <Content Include="Css\calendar-blue.css" />
     <Content Include="Css\Common.css" />
     <Content Include="Css\Contacts.css" />
+    <Content Include="Css\form.css" />
     <Content Include="Css\Highlight.css" />
     <Content Include="Css\Report.css" />
     <Content Include="Css\Table.css" />
@@ -434,6 +437,7 @@
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />
     <Content Include="JavaScript\jquery-1.3.2.min.js" />
+    <Content Include="JavaScript\jquery.validate.min.js" />
     <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
     <None Include="Properties\Settings.settings">
@@ -447,7 +451,10 @@
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Client\SuccessPasswordChanged.brail" />
+    <None Include="Views\Deliveries\Add.brail" />
+    <None Include="Views\Deliveries\Edit.brail" />
     <None Include="Views\Layouts\GeneralWithJQuery.brail" />
+    <None Include="Views\Layouts\NewDefault.brail" />
     <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
@@ -458,7 +465,6 @@
     <None Include="Views\Report\Contract.brail" />
     <None Include="Views\Report\RevisionAct.brail" />
     <None Include="Views\SmapRejector\Search.brail" />
-    <None Include="Views\Client\ShowUsersPermissions.brail" />
     <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Billing\Search.brail" />
@@ -497,6 +503,8 @@
     <None Include="Views\Client\LegendView.brail" />
     <None Include="Views\Client\SearchOffers.brail" />
     <None Include="Views\Main\Settings.brail" />
+    <None Include="Views\Users\Add.brail" />
+    <None Include="Views\Users\Edit.brail" />
     <Content Include="Web.sitemap" />
     <Content Include="Images\icon_minus.gif" />
     <Content Include="Images\icon_plus.gif" />

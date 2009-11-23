@@ -37,12 +37,11 @@ namespace AddUser
 			{
 				XmlConfigurator.Configure();
 				GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
-				ActiveRecordStarter.Initialize(new[]
-				                               	{
-				                               		Assembly.Load("AdminInterface"),
-				                               		Assembly.Load("Common.Web.Ui")
-				                               	},
-				                               ActiveRecordSectionHandler.Instance);
+				ActiveRecordStarter.Initialize(new[] {
+					Assembly.Load("AdminInterface"),
+					Assembly.Load("Common.Web.Ui")
+				},
+					ActiveRecordSectionHandler.Instance);
 
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 
@@ -59,17 +58,26 @@ namespace AddUser
 		private void SetupRoute()
 		{
 			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[cc]")
-			                           	.DefaultForController().Is("client")
-			                           	.DefaultForAction().Is("info")
-			                           	.Restrict("cc").ValidInteger);
+				.DefaultForController().Is("client")
+				.DefaultForAction().Is("info")
+				.Restrict("cc").ValidInteger);
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/deliveries/[id]/edit")
+				.DefaultForController().Is("deliveries")
+				.DefaultForAction().Is("edit")
+				.Restrict("id").ValidInteger);
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/edit")
+				.DefaultForController().Is("users")
+				.DefaultForAction().Is("edit"));
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("/")
-			                           	.DefaultForController().Is("Main")
-			                           	.DefaultForAction().Is("Index"));
+				.DefaultForController().Is("Main")
+				.DefaultForAction().Is("Index"));
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("default.aspx")
-			                           	.DefaultForController().Is("Main")
-			                           	.DefaultForAction().Is("Index"));
+				.DefaultForController().Is("Main")
+				.DefaultForAction().Is("Index"));
 		}
 
 		private void SetupSecurityFilters()

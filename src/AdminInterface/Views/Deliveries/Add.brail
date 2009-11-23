@@ -1,0 +1,17 @@
+﻿<div>
+	<form method=post>
+		Адрес доставки
+		<br>
+		<input name=delivery.value >
+		<br>
+		Доступен пользователям
+		<br>
+		<% for i, user in enumerate(client.Users): %>
+			<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
+			${user.Login}
+			<br>
+		<% end %>
+		<br>
+		<input type=submit value="Сохранить">
+	</form>
+</div>

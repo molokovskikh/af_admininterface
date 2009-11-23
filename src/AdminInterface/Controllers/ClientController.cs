@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -28,17 +28,6 @@ namespace AdminInterface.Controllers
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
-		//Скорбная песнь:
-		/*
-		 * ARбиндер в монорельсе, делает следующиее:
-		 * сначала получает объект из базы затем проходит по всему набору полей и заполняет тем что было в запросе
-		 * но тут возникает засада: коллекции которых нет в запросе это может значить что их вообще не нужно бигдить или то 
-		 * что они должны стать пустые, что бы решить эту проблему есть свойство Expect все коллекции которые в нем перечислены будут
-		 * обнулены перед биндингом, но тут есть новая засада если исходный объект это коллекция то мы в беде 
-		 * потому что нужно указывать индекс для каждого элемента коллекции от сюда и хак
-		*/
-		private const string _hackForBinder = "users.0.AssignedPermissions, users.1.AssignedPermissions, users.2.AssignedPermissions, users.3.AssignedPermissions, users.4.AssignedPermissions, users.5.AssignedPermissions, users.6.AssignedPermissions, users.7.AssignedPermissions, users.8.AssignedPermissions, users.9.AssignedPermissions, users.10.AssignedPermissions";
-
 		public void Info(uint cc)
 		{
 			var client = Client.FindAndCheck(cc);
@@ -68,7 +57,7 @@ namespace AdminInterface.Controllers
 				client.Update();
 			}
 
-			Flash["Message"] = Message.Notify("Сохранено");
+			Flash["Message"] = Message.Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
 			RedirectToReferrer();
 		}
 
@@ -102,7 +91,7 @@ where `from` = :phone")
 			using (new TransactionScope())
 				new ClientInfoLogEntity(message, client.Id).Save();
 
-			Flash["Message"] = Message.Notify("Сохранено");
+			Flash["Message"] = Message.Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
 			RedirectToReferrer();
 		}
 
@@ -176,9 +165,9 @@ where `from` = :phone")
 				if (isSendClientCard)
 				{
 					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
-					                                                            user,
-					                                                            password,
-					                                                            additionEmailsToNotify);
+						user,
+						password,
+						additionEmailsToNotify);
 					passwordChangeLog.SetSentTo(smtpId, additionEmailsToNotify);
 				}
 
@@ -186,12 +175,12 @@ where `from` = :phone")
 			}
 
 			NotificationHelper.NotifyAboutPasswordChange(user.Client,
-			                                             administrator,
-			                                             user,
-			                                             password,
-			                                             isFree,
-			                                             Context.Request.UserHostAddress,
-			                                             reason);
+				administrator,
+				user,
+				password,
+				isFree,
+				Context.Request.UserHostAddress,
+				reason);
 
 			if (isSendClientCard)
 			{
@@ -224,7 +213,7 @@ where `from` = :phone")
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
 					ADHelper.Unlock(user.Login);
 
-			Flash["Message"] = Message.Notify("Разблокировано");
+			Flash["Message"] = Message.Notify("Р Р°Р·Р±Р»РѕРєРёСЂРѕРІР°РЅРѕ");
 			RedirectToReferrer();
 		}
 
@@ -240,11 +229,11 @@ where `from` = :phone")
 					if (File.Exists(file))
 						File.Delete(file);
 				}
-				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
+				Flash["Message"] = Message.Notify("РџРѕРґРіРѕС‚РѕРІР»РµРЅРЅС‹Рµ РґР°РЅРЅС‹Рµ СѓРґР°Р»РµРЅС‹");
 			}
 			catch
 			{
-				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
+				Flash["Message"] = Message.Error("РћС€РёР±РєР° СѓРґР°Р»РµРЅРёСЏ РїРѕРґРіРѕС‚РѕРІР»РµРЅРЅС‹С… РґР°РЅРЅС‹С…, РїРѕРїСЂРѕР±СѓР№С‚Рµ РїРѕР·РґРЅРµРµ.");
 			}
 			RedirectToReferrer();
 		}
@@ -266,26 +255,6 @@ where `from` = :phone")
 				client.ResetUin();
 				RedirectToReferrer();
 			}
-		}
-
-		public void ShowUsersPermissions(uint clientCode)
-		{
-			var client = Client.FindAndCheck(clientCode);
-
-			PropertyBag["Client"] = client;
-			PropertyBag["Permissions"] = UserPermission.FindPermissionsAvailableFor(client);
-		}
-
-		public void UpdateUsersPermissions(uint clientCode,
-										   [ARDataBind("users", Expect = _hackForBinder, AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] User[] users)
-		{
-			
-			var client = Client.FindAndCheck(clientCode);
-
-			using (new TransactionScope())
-				users.Each(u => u.Update());
-
-			RedirectToAction("ShowUsersPermissions", new { clientCode = client.Id });
 		}
 
 		public void SuccessPasswordChanged()

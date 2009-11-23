@@ -1,0 +1,17 @@
+﻿<div>
+	<form method=post action="${siteroot}/deliveries/update">
+		<input type=hidden name=delivery.Id value="${delivery.Id}" >
+		Адрес доставки
+		<br>
+		<input name=delivery.value value="${delivery.Value}" >
+		<br>
+		Доступен пользователям
+		<br>
+		<% for i, user in enumerate(delivery.Client.Users): %>
+			<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
+			${user.Login}
+			<br>
+		<% end %>
+		<input type=submit value="Сохранить">
+	</form>
+</div>

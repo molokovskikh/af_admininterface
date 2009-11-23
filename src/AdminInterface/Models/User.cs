@@ -19,13 +19,13 @@ namespace AdminInterface.Models
 		public CantChangePassword(string message) : base(message) { }
 	}
 
-	[ActiveRecord("usersettings.OsUserAccessRight")]
+	[ActiveRecord("future.Users")]
 	public class User : ActiveRecordBase<User>
 	{ 
-		[PrimaryKey("RowId")]
+		[PrimaryKey("Id")]
 		public virtual uint Id { get; set; }
 
-		[Property("OsUserName", NotNull = true)]
+		[Property("Name", NotNull = true)]
 		public virtual string Login { get; set; }
 
 		[BelongsTo("ClientCode", NotNull = true)]
@@ -37,6 +37,13 @@ namespace AdminInterface.Models
 			Table = "usersettings.AssignedPermissions",
 			ColumnRef = "PermissionId")]
 		public virtual IList<UserPermission> AssignedPermissions { get; set; }
+
+		[HasAndBelongsToMany(typeof (Address),
+			Lazy = true,
+			ColumnKey = "UserId",
+			Table = "future.UserAddress",
+			ColumnRef = "AddressId")]
+		public virtual IList<Address> AvaliableAddresses  { get; set; }
 
 		public static User GetByLogin(string login)
 		{

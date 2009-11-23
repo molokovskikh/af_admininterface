@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -15,23 +15,23 @@ namespace AdminInterface.Models
 {
 	public enum ClientStatus
 	{
-		[Description("Îòêëş÷åí")] Off = 0,
-		[Description("Âêëş÷åí")] On = 1,
+		[Description("ĞÑ‚ĞºĞ»ÑÑ‡ĞµĞ½")] Off = 0,
+		[Description("Ğ’ĞºĞ»ÑÑ‡ĞµĞ½")] On = 1,
 	}
 
 	public enum ClientType
 	{
-		[Description("Ïîñòàâùèê")] Supplier = 0,
-		[Description("Àïòåêà")] Drugstore = 1,
+		[Description("ĞŸĞ¾ÑÑ‚Ğ°Ğ²Ñ‰Ğ¸Ğº")] Supplier = 0,
+		[Description("ĞĞ¿Ñ‚ĞµĞºĞ°")] Drugstore = 1,
 	}
 
 	public enum Segment
 	{
-		[Description("Îïò")] Wholesale = 0,
-		[Description("Ğîçíèöà")] Retail = 1,
+		[Description("ĞĞ¿Ñ‚")] Wholesale = 0,
+		[Description("Ğ Ğ¾Ğ·Ğ½Ğ¸Ñ†Ğ°")] Retail = 1,
 	}
 
-	[ActiveRecord("usersettings.clientsdata", Lazy = true)]
+	[ActiveRecord("future.clientsdata", Lazy = true)]
 	public class Client : ActiveRecordBase<Client>
 	{
 		[PrimaryKey("FirmCode")]
@@ -43,14 +43,8 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string FullName { get; set; }
 
-		[Property("Adress")]
-		public virtual string Address { get; set; }
-
 		[Property("FirmStatus")]
 		public virtual ClientStatus Status { get; set; }
-
-		[Property]
-		public virtual ClientStatus BillingStatus { get; set; }
 
 		[Property("FirmType")]
 		public virtual ClientType Type { get; set; }
@@ -76,7 +70,10 @@ namespace AdminInterface.Models
 		[BelongsTo("RegionCode")]
 		public virtual Region HomeRegion { get; set; }
 
-		[HasMany(ColumnKey = "ClientCode", Inverse = true, Lazy = true, OrderBy = "OsUserName")]
+		[HasMany(ColumnKey = "ClientCode", Lazy = true, Inverse = true, OrderBy = "Address")]
+		public virtual IList<Address> Addresses { get; set; }
+
+		[HasMany(ColumnKey = "ClientCode", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
 		[HasMany(typeof(Relationship), Inverse = true, Lazy = true, ColumnKey = "IncludeClientCode", Cascade = ManyRelationCascadeEnum.All)]
@@ -108,7 +105,7 @@ namespace AdminInterface.Models
 
 		public virtual bool IsClientActive()
 		{
-			return Status == ClientStatus.On && BillingStatus == ClientStatus.On;
+			return Status == ClientStatus.On;
 		}
 
 		public virtual float GetPayment(IList<Tariff> tariffs)

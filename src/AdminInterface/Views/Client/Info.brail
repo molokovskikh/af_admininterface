@@ -83,16 +83,33 @@
 					</td>
 				</tr>
 				<tr class="InfoRow">
-					<td align="right">
-						Адрес:
-					</td>
-					<td>
-						${FormHelper.TextField("client.Address")}
+					<td class="Title" style="height: 30px;" colspan="2">
+						Адреса доставки
 					</td>
 				</tr>
+				<% for address in client.Addresses: %>
+				<tr>
+					<td colspan=2>
+						<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>
+					</td>
+				</tr>
+				<% end %>
 				<tr>
 					<td colspan="2">
-						<% OutputSubView("ContactViewer") %>
+					<%
+						component ContactViewer, {"ContactGroups" : ContactGroups}:
+							section ContactGroupHeaderLink:
+							%>
+								<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+							<%
+							end
+							section Person:
+							%>
+								<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+							<%
+							end
+						end
+					%>
 					</td>
 				</tr>
 				<tr style="text-align: center;">

@@ -11,11 +11,6 @@
 </tr>
 <tr>
 	<td>
-		<a href=ShowUsersPermissions.rails?ClientCode=${Client.Id} target=_blank>Права доступа</a>
-	</td>
-</tr>
-<tr>
-	<td>
 		<a ${"href=../Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
 	</td>
 </tr>
@@ -38,6 +33,16 @@
 <tr>
 	<td>
 		<a href="SearchOffers.rails?clientCode=${Client.Id}" target="_blank">Поиск предложений</a>
+	</td>
+</tr>
+<tr>
+	<td>
+		<a href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
+	</td>
+</tr>
+<tr>
+	<td>
+		<a href="${siteroot}/deliveries/add?clientId=${client.Id}">Новый адрес доставки</a>
 	</td>
 </tr>
 <% end %>
@@ -80,8 +85,8 @@
 	<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) if not containsLockedUsers %>
 	<tr>
 		<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
-			<% if isLoginExists and admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
-				<a href="./ChangePassword.rails?userId=${user.Id}" target="_blank">${user.Login}</a>
+			<% if isLoginExists or 1 == 1: %>
+				<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
 			<% else: %>
 				${user.Login}
 			<% end %>
@@ -94,9 +99,6 @@
 		</td>
 		<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
 			${ADHelper.GetLastPasswordChange(user.Login) if isLoginExists}
-		</td>
-		<td>
-			<a href="../Logs/PasswordChangeLog.rails?login=${user.Login}" target="_blank">Статистика изменения пароля</a>
 		</td>
 	</tr>
 <% end %>

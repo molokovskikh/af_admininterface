@@ -1,0 +1,47 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Новый пользователь
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
+									  ("Новый пользователь", "")]} %>
+
+<div style="width: 600px;">
+	<form method=post action="${siteroot}/users/add">
+		<input type=hidden value="${Client.Id}" name="clientId" />
+		<h3>
+			Новый пользователь
+		</h3>
+		<div class=block>
+			Имя пользователя <br>
+			<input type=text name="user.Login" />
+		</div>
+		<div class=block>
+			<h3>Доступные адреса доставки</h3>
+			<div>
+				<% if client.Addresses.Count == 0: %>
+					Нет адресов для доставки
+				<% end %>
+				<% for i, address in enumerate(client.Addresses): %>
+					<input type=checkbox type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id}>
+					${address.Value}
+				<% end %>
+			</div>
+		</div>
+		<div class=block>
+			<h3>
+				Права доступа
+			</h3>
+			<div>
+				<% for i, permission in enumerate(Permissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}>
+					${permission.Name}
+					<br>
+				<% end %>
+			</div>
+		</div>
+		<div class=save>
+			<input type=submit value="Создать">
+		</div>
+	</form>
+</div>

@@ -1,0 +1,26 @@
+﻿.block
+{
+	background-color: #F6F6F6;
+	border:1px solid #E4E4E4;
+	margin-bottom:10px;
+	padding:6px;
+}
+.save
+{
+	text-align:right;
+}
+h3
+{
+	border-bottom:1px solid #BBBBBB;
+	margin:0 0 10px;
+	padding:2px 10px 1px 0;
+	font-size:16px;
+	color:#444444;
+}
+h2
+{
+	border-bottom:1px solid #BBBBBB;
+	margin:0 0 10px;
+	padding:2px 10px 1px 0;
+	font-size:20px;
+}

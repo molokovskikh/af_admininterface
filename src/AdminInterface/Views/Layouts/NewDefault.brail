@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>
+		<% if IsDefined("Title"	): %>
+			${Title}
+		<% else: %>
+			Административный интерфейс
+		<% end %>
+	</title>
+	<link href="${siteroot}/Css/form.css" type="text/css" rel="stylesheet">
+	<link href="${siteroot}/Css/Common.css" type="text/css" rel="stylesheet">
+</head>
+<body>
+	<% if IsDefined("bredcrumbs"): %>
+		<div style="padding-bottom:10px;">
+			<ul id="breadcrumb">
+				<li>
+					<a title="Административный интерфейс" href="${siteroot}/default.aspx">
+						<img class="home" src="${siteroot}/images/home.png" alt="Административный интерфейс" />
+					</a>
+				</li>
+				<% for label, url in bredcrumbs: %>
+				<li>
+					<% if url != "": %>
+					<a href="${url}">${label}</a>
+					<% else: %>
+					${label}
+					<% end %>
+				</li>
+				<% end %>
+			</ul>
+		</div>
+	<% end %>
+	${ChildOutput}
+</body>
+</html>

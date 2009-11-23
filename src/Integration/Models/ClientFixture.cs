@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using NUnit.Framework;
@@ -17,6 +18,15 @@ namespace AdminInterface.Test.Models
 		public void Setup()
 		{
 			ForTest.InitialzeAR();
+		}
+
+		[Test]
+		public void test()
+		{
+			using (new SessionScope())
+			{
+				Administrator.GetByName("kvasov");
+			}
 		}
 
 		[Test]
