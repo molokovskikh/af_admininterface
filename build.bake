@@ -5,7 +5,7 @@ import System.IO
 
 Global(
 	project : "AdminInterface",
-	deployTo : "\\\\acdcserv\\AdmInterface\\",
+	deployTo : "\\\\acdcserv\\publish\\TestAdm",
 	editor : "vim",
 	humanReadableName : "Адмнистративный интерфейс"
 )
@@ -14,4 +14,5 @@ Task @default, [@build]
 
 Task @build, [@buildWebSite]
 
-Task @deploy, [@build, @deployWebSite, @SendDeployNotification]
+Task @deploy, [@build, @deployWebSite]
+#Task @deploy, [@build, @deployWebSite, @SendDeployNotification]

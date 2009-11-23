@@ -48,7 +48,7 @@ namespace AdminInterface.Test.ForTesting
 		{
 			var client = new Client
 			       	{
-			       		ShortName = "Test short name",
+			       		Name = "Test short name",
 			       		FullName = "Test full name",
 			       		RegistrationDate = DateTime.Now
 			       	};

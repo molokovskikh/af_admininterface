@@ -87,6 +87,8 @@ namespace Functional
 				                  select info).FirstOrDefault();
 				Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
+				Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адрес доставки");
+
 				var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
 				var passwordChange = logs.SingleOrDefault();
 				Assert.That(passwordChange, Is.Not.Null);

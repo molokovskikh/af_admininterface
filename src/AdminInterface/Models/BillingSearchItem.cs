@@ -79,10 +79,10 @@ namespace AdminInterface.Models
 						searchBlock = String.Format(
 @"(p.ShortName like '{0}'
 or p.JuridicalName like '{0}'
-or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + properties.SearchText + "%");
+or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + properties.SearchText + "%");
 						break;
 					case SearchBy.Code:
-						searchBlock = String.Format("sum(if(cd.FirmCode = {0}, 1, 0)) > 0", properties.SearchText);
+						searchBlock = String.Format("sum(if(cd.Id = {0}, 1, 0)) > 0", properties.SearchText);
 						break;
 					case SearchBy.BillingCode:
 						searchBlock = String.Format("p.payerId = {0}", properties.SearchText);
@@ -102,10 +102,10 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 				switch(properties.Segment)
 				{
 					case SearchSegment.Retail:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.firmsegment = 1");
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1");
 						break;
 					case SearchSegment.Wholesale:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.firmsegment = 0");
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0");
 						break;
 				}
 
@@ -122,10 +122,10 @@ or sum(if(cd.ShortName like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" +
 				switch(properties.ClientStatus)
 				{
 					case SearchClientStatus.Enabled:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Firmstatus = 1 and cd.Billingstatus = 1");
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 1");
 						break;
 					case SearchClientStatus.Disabled:
-						groupFilter = AddFilterCriteria(groupFilter, "(cd.Firmstatus = 0 or cd.Billingstatus = 0)");
+						groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 0");
 						break;
 				}
 
@@ -138,18 +138,18 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.oldpaydate as {{BillingSearchItem.PayDate}},
 		p.oldtariff as {{BillingSearchItem.PaySum}},
 		max(RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
-		sum(if(cd.FirmStatus = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
-		sum(if(cd.FirmStatus = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
+		sum(if(cd.Status = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
+		sum(if(cd.Status = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r
 		where r.regioncode & bit_or(cd.maskregion) > 0 and r.RegionCode & :AdminRegionMask > 0 ) as {{BillingSearchItem.Regions}},
 
-		sum(if(cd.firmsegment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
-		sum(if(cd.firmsegment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
+		sum(if(cd.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
+		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
 from billing.payers p
-	join usersettings.clientsdata cd on p.payerid = cd.billingcode
+	join future.Clients cd on p.PayerId = cd.PayerId
 where cd.RegionCode & :AdminRegionMask > 0
 		{3}
 		{0}

@@ -18,7 +18,7 @@ namespace AddUser
 		ShortName,
 		Login,
 		Code,
-		BillingCode,
+		PayerId,
 		JuridicalName
 	}
 
@@ -96,8 +96,8 @@ ORDER BY IsAll Desc, Region;", c);
 				case "Code":
 					searchType = SearchType.Code;
 					break;
-				case "BillingCode":
-					searchType = SearchType.BillingCode;
+				case "PayerId":
+					searchType = SearchType.PayerId;
 					break;
 				case "ShortName":
 					searchType = SearchType.ShortName;
@@ -130,7 +130,7 @@ ORDER BY IsAll Desc, Region;", c);
 		{
 			var data = row.DataItem as DataRowView;
 
-			if (data.Row["FirmStatus"].ToString() == "1")
+			if (data.Row["Status"].ToString() == "1")
 				row.BackColor = Color.FromArgb(255, 102, 0);
 
 			if (ADCB.Checked)
@@ -143,7 +143,7 @@ ORDER BY IsAll Desc, Region;", c);
 				return;
 
 			if (DateTime.Now.Subtract(Convert.ToDateTime(data.Row["FirstUpdate"])).TotalDays > 2
-				&& data.Row["FirmStatus"].ToString() == "0")
+				&& data.Row["Status"].ToString() == "0")
 				row.Cells[4].BackColor = Color.Gray;
 		}
 
@@ -190,68 +190,40 @@ ORDER BY IsAll Desc, Region;", c);
 		private MySqlCommand BuildQuery(SearchType searchType)
 		{
 			var orderStatement = "order by 3, 4";
-			var firstPart = String.Format(@"
-SELECT  cd.billingcode,
-        cd.firmcode as firmcode,
-        cd.ShortName,
-        region,
-        null FirstUpdate,
-        null SecondUpdate,
-        null EXE,
-        ouar2.OsUserName UserName,
-        FirmSegment,
-        FirmType,
-        Firmstatus = 0 Firmstatus,
-        cd.firmcode as bfc,
-		NULL AS InvisibleOnFirm
-FROM clientsdata as cd
-	JOIN billing.payers p on cd.BillingCode = p.PayerID
-	JOIN farm.regions ON regions.regioncode = cd.regioncode
-	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
-	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode or ouar2.clientcode = cd.firmcode
-WHERE   (cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
-		and FirmType = 0
-		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
-			var secondPart = String.Empty;
-			var thirdPart = String.Format(@"
-group by cd.firmcode 
-union 
-SELECT  cd.billingcode,
-        cd.firmcode,
-        cd.ShortName,
+			var query = String.Format(@"
+SELECT  cd.PayerId,
+        cd.Id,
+        cd.Name,
         r.region,
-        max(uui2.UpdateDate) FirstUpdate,
-        max(uui2.UncommitedUpdateDate) SecondUpdate,
-        max(uui2.AFAppVersion) EXE,
-        ouar2.OSUSERNAME as UserName,
-        cd.FirmSegment,
+        max(uui.UpdateDate) FirstUpdate,
+        max(uui.UncommitedUpdateDate) SecondUpdate,
+        max(uui.AFAppVersion) EXE,
+        u.Name UserName,
+        cd.Segment,
         cd.FirmType,
-        cd.Firmstatus = 0 Firmstatus,
-        cd.firmcode as bfc,
+        cd.Status,
 		rcs.InvisibleOnFirm
-FROM clientsdata as cd
-	JOIN billing.payers p on cd.BillingCode = p.PayerID
+FROM Future.Clients as cd
+	JOIN billing.payers p on cd.PayerId = p.PayerID
 	JOIN farm.regions r on r.regioncode = cd.regioncode
-	JOIN usersettings.retclientsset rcs on cd.FirmCode = rcs.ClientCode
-	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode = cd.FirmCode
-		LEFT JOIN UserUpdateInfo as uui2 on uui2.UserId = ouar2.RowId
+	JOIN usersettings.retclientsset rcs on cd.Id = rcs.ClientCode
+	LEFT JOIN future.Users u on u.ClientId = cd.Id
+		LEFT JOIN UserUpdateInfo as uui on uui.UserId = u.Id
 WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and cd.FirmType = 1
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
-			var fourthPart = String.Empty;
+			var filter = String.Empty;
 
 			switch(ClientState.SelectedValue)
 			{
 				case "Все":
 					break;
 				case "Включен":
-					secondPart += " and (cd.Firmstatus = 1 and cd.Billingstatus= 1) ";
-					fourthPart += " and (cd.Firmstatus = 1 and cd.Billingstatus= 1) ";
+					filter += " and cd.Status = 1 ";
 					break;
 				case "Отключен":
-					secondPart += " and (cd.Firmstatus = 0 or cd.Billingstatus= 0) ";
-					fourthPart += " and (cd.Firmstatus = 0 or cd.Billingstatus= 0) ";
+					filter += " and cd.Status = 0 ";
 					break;
 				default:
 					throw new Exception(String.Format("Не известное состояние клиента {0}", ClientState.SelectedValue));
@@ -262,12 +234,10 @@ WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 				case "Все":
 					break;
 				case "Аптеки":
-					secondPart += " and cd.firmtype=1";
-					fourthPart += " and cd.firmtype=1";
+					filter += " and cd.FirmType = 1 ";
 					break;
 				case "Поставщики":
-					secondPart += " and cd.firmtype=0";
-					fourthPart += " and cd.firmcode=0";
+					filter += " and cd.FirmType = 0 ";
 					break;
 				default:
 					throw new Exception(String.Format("Не известный тип клиента {0}", ClientType.SelectedValue));
@@ -279,44 +249,39 @@ WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 			{
 				case SearchType.ShortName:
 					{
-						secondPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
-						fourthPart += " and (cd.shortname like ?Name or cd.fullname like ?Name)";
+						filter += " and (cd.Name like ?Name or cd.FullName like ?Name) ";
 						command.Parameters.Add(new MySqlParameter("?Name", MySqlDbType.VarChar));
 						command.Parameters["?Name"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
 				case SearchType.Code:
 					{
-						secondPart += " and cd.firmcode=?ClientCode";
-						fourthPart += " and cd.firmcode=?ClientCode";
+						filter += " and cd.Id = ?ClientCode ";
 						command.Parameters.Add(new MySqlParameter("?ClientCode", MySqlDbType.Int32));
 						command.Parameters["?ClientCode"].Value = FindTB.Text;
 						break;
 					}
 				case SearchType.Login:
 					{
-						secondPart += " and ouar2.osusername like ?Login";
-						fourthPart += " and ouar2.osusername like ?Login";
+						filter += " and u.Login like ?Login ";
 						command.Parameters.Add(new MySqlParameter("?Login", MySqlDbType.VarChar));
 						command.Parameters["?Login"].Value = "%" + FindTB.Text + "%";
 						break;
 					}
-				case SearchType.BillingCode:
+				case SearchType.PayerId:
 					{
-						secondPart += " and cd.billingcode=?BillingCode";
-						fourthPart += " and cd.billingcode=?BillingCode";
-						command.Parameters.Add(new MySqlParameter("?BillingCode", MySqlDbType.Int32));
-						command.Parameters["?BillingCode"].Value = FindTB.Text;
+						filter += " and cd.PayerId = ?BPayerId ";
+						command.Parameters.Add(new MySqlParameter("?PayerId", MySqlDbType.Int32));
+						command.Parameters["?PayerId"].Value = FindTB.Text;
 						break;
 					}
 				case SearchType.JuridicalName:
-					secondPart += " and p.JuridicalName like ?JuridicalName";
-					fourthPart += " and p.JuridicalName like ?JuridicalName";
+					filter += "and p.JuridicalName like ?JuridicalName ";
 					command.Parameters.Add("?JuridicalName", MySqlDbType.VarChar);
 					command.Parameters["?JuridicalName"].Value = "%" + FindTB.Text + "%";
 					break;
 			}
-			command.CommandText = String.Format("{0}{1}{2}{3}{4}{5}", new[] { firstPart, secondPart, thirdPart, fourthPart, " group by cd.firmcode ", orderStatement });
+			command.CommandText = String.Format("{0} {1} {2} {3}", query, filter, " group by cd.Id ", orderStatement);
 			command.Parameters.AddWithValue("?RegionMask", Convert.ToUInt64(ClientRegion.SelectedItem.Value));
 			command.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 
@@ -366,7 +331,7 @@ WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		protected void SearchTextValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			if (FindRB.SelectedValue == "Code" 
-				|| FindRB.SelectedValue == "BillingCode")
+				|| FindRB.SelectedValue == "PayerId")
 				args.IsValid = new Regex("^\\d{1,10}$").IsMatch(args.Value);
 			if (FindRB.SelectedValue == "ShortName"
 				|| FindRB.SelectedValue == "JuridicalName"

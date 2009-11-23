@@ -30,7 +30,7 @@
 							<asp:ListItem Value="Automate" Selected="True">Автоматический</asp:ListItem>
 							<asp:ListItem Value="ShortName">Имя</asp:ListItem>
 							<asp:ListItem Value="Code">Код</asp:ListItem>
-							<asp:ListItem Value="BillingCode">Договор</asp:ListItem>
+							<asp:ListItem Value="PayerId">Договор</asp:ListItem>
 							<asp:ListItem Value="Login">Имя пользователя</asp:ListItem>
 							<asp:ListItem Value="JuridicalName">Юридическое наименование</asp:ListItem>
 						</asp:RadioButtonList>
@@ -86,21 +86,21 @@
 				OnRowDataBound="ClientsGridView_RowDataBound" AllowSorting="True" OnRowCreated="ClientsGridView_RowCreated"
 				OnSorting="ClientsGridView_Sorting">
 				<Columns>
-					<asp:TemplateField HeaderText="Договор" SortExpression="billingcode">
+					<asp:TemplateField HeaderText="Договор" SortExpression="PayerId">
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" 
 											runat="server" 
 											Enabled='<%# SecurityContext.Administrator.HavePermisions(PermissionType.Billing) %>' 
-											Text='<%# Bind("BillingCode") %>' 
-											NavigateUrl='<%# String.Format("billing/edit.rails?ClientCode={0}", Eval("bfc")) %>' />
+											Text='<%# Bind("PayerId") %>' 
+											NavigateUrl='<%# String.Format("billing/edit.rails?ClientCode={0}", Eval("Id")) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
-					<asp:BoundField DataField="firmcode" HeaderText="Код" SortExpression="firmcode"></asp:BoundField>
-					<asp:TemplateField HeaderText="Наименование" SortExpression="ShortName">
+					<asp:BoundField DataField="Id" HeaderText="Код" SortExpression="Id"></asp:BoundField>
+					<asp:TemplateField HeaderText="Наименование" SortExpression="Name">
 						<ItemTemplate>
 							<asp:HyperLink ID="HyperLink1" runat="server" 
-								Text='<%# Bind("ShortName") %>' 
-								NavigateUrl='<%# String.Format("client/{0}", Eval("bfc")) %>'></asp:HyperLink>
+								Text='<%# Bind("Name") %>' 
+								NavigateUrl='<%# String.Format("client/{0}", Eval("Id")) %>'></asp:HyperLink>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:BoundField DataField="region" HeaderText="Регион" SortExpression="region"></asp:BoundField>
@@ -116,9 +116,9 @@
 					</asp:TemplateField>
 					<asp:BoundField DataField="EXE" HeaderText="Версия" SortExpression="EXE"></asp:BoundField>
 					<asp:BoundField DataField="UserName" HeaderText="Имя пользователя" SortExpression="UserName" />
-					<asp:TemplateField HeaderText="Сегмент" SortExpression="FirmSegment">
+					<asp:TemplateField HeaderText="Сегмент" SortExpression="Segment">
 						<ItemTemplate>
-							<asp:Label ID="Label3" runat="server" Text='<%# Eval("FirmSegment").ToString() == "0" ? "Опт" : "Справка" %>'></asp:Label>
+							<asp:Label ID="Label3" runat="server" Text='<%# Eval("Segment").ToString() == "0" ? "Опт" : "Справка" %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:TemplateField HeaderText="Тип" SortExpression="FirmType">

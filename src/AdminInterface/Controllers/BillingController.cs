@@ -114,11 +114,11 @@ namespace AdminInterface.Controllers
 			                                                                   Request.UserHostAddress);
 				foreach (var client in clients)
 				{
-					var oldClient = Client.Find(client.FirmCode);
+					var oldClient = Client.Find(client.Id);
 					if (client.Status == ClientStatus.On && oldClient.Status == ClientStatus.Off)
 						Mailer.ClientBackToWork(oldClient);
 					if (oldClient.Status != client.Status)
-						ClientInfoLogEntity.StatusChange(client.Status, client.FirmCode).Save();
+						ClientInfoLogEntity.StatusChange(client.Status, client.Id).Save();
 					client.Update();
 				}
 			}

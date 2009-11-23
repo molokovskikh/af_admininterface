@@ -19,7 +19,6 @@ FROM clientsdata as cd
 	JOIN ShowRegulation sr ON sr.ShowClientCode = cd.FirmCode
 WHERE   sr.PrimaryClientCode = ?ClientCode
         AND FirmStatus    = 1 
-        AND billingstatus = 1 
 		{0}
 ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"));
 
@@ -111,7 +110,6 @@ LEFT JOIN showregulation sr
         ON sr.ShowClientCode = cd.firmcode  
 WHERE   cd.ShortName like ?SearchText
         AND FirmStatus    = 1  
-        AND billingstatus = 1  
 		{0}
 ORDER BY cd.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), Literals.GetConnectionString());
 					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);

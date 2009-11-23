@@ -18,5 +18,15 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Edit_user()
+		{
+			using (var browser = Open("client/2575"))
+			{
+				browser.Link(Find.ByText("kvasov")).Click();
+				Assert.That(browser.Text, Is.StringContaining("kvasov"));
+			}
+		}
 	}
 }

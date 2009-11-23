@@ -36,7 +36,7 @@
 	}
 </style>
 	
-<h2>Клиент ${client.ShortName}</h2>
+<h2>Клиент ${client.Name}</h2>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
@@ -214,7 +214,7 @@
 					</p>
 					<p>
 						Краткое наименование<br>
-						${FormHelper.TextField("client.ShortName")}
+						${FormHelper.TextField("client.Name")}
 					</p>
 				</div>
 				<div>

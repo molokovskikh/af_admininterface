@@ -7,7 +7,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate;
@@ -33,25 +32,25 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("future.clientsdata", Lazy = true)]
+	[ActiveRecord("Future.Clients", Lazy = true)]
 	public class Client : ActiveRecordBase<Client>
 	{
-		[PrimaryKey("FirmCode")]
+		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
 		[Property]
-		public virtual string ShortName { get; set; }
+		public virtual string Name { get; set; }
 
 		[Property]
 		public virtual string FullName { get; set; }
 
-		[Property("FirmStatus")]
+		[Property]
 		public virtual ClientStatus Status { get; set; }
 
 		[Property("FirmType")]
 		public virtual ClientType Type { get; set; }
 
-		[Property("FirmSegment")]
+		[Property]
 		public virtual Segment Segment { get; set; }
 
 		[Property]
@@ -66,32 +65,22 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupOwnerId")]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
-		[BelongsTo("BillingCode")]
+		[BelongsTo("PayerId")]
 		public virtual Payer BillingInstance { get; set; }
 
 		[BelongsTo("RegionCode")]
 		public virtual Region HomeRegion { get; set; }
 
-		[HasMany(ColumnKey = "ClientCode", Lazy = true, Inverse = true, OrderBy = "Address")]
+		[HasMany(ColumnKey = "ClientId", Lazy = true, Inverse = true, OrderBy = "Address", Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Address> Addresses { get; set; }
 
-		[HasMany(ColumnKey = "ClientCode", Inverse = true, Lazy = true, OrderBy = "Name")]
+		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
-
-		[HasMany(typeof(ShowRelationship), Inverse = true, Lazy = true, ColumnKey = "ShowClientCode", Cascade = ManyRelationCascadeEnum.All)]
-		public virtual IList<ShowRelationship> ShowClients { get; set; }
 
 		public virtual IEnumerable<User> GetUsers()
 		{
 			foreach (var user in Users)
 				yield return user;
-
-			if (Type == ClientType.Drugstore)
-				yield break;
-
-			foreach (var client in ShowClients)
-				foreach (var user in client.Parent.Users)
-					yield return user;
 		}
 
 		public virtual bool IsDrugstore()

@@ -91,7 +91,6 @@ from clientsdata cd
 	left join accessright.regionaladmins ra on ra.UserName = cd.Registrant
 where	cd.firmtype = 1
 		and cd.firmstatus = 1
-		and cd.billingstatus = 1
 		and cd.firmsegment = 0
 		and cd.RegionCode & :adminRegionMask > 0
 
@@ -146,7 +145,6 @@ from clientsdata cd
 	left join accessright.regionaladmins ra on ra.UserName = cd.Registrant
 where	cd.firmtype = 1
 		and cd.firmstatus = 1
-		and cd.billingstatus = 1
 		and cd.firmsegment = 0
 		and cd.RegionCode & :adminRegionMask > 0
 

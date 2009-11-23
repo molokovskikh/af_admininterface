@@ -62,14 +62,13 @@ namespace AddUser
 			With.Connection(
 				c => {
 					var dataAdapter = new MySqlDataAdapter(@"
-SELECT  FirmCode as ClientCode, 
-        convert(concat(FirmCode, '. ', ShortName) using cp1251) name 
-FROM    clientsdata
-WHERE   MaskRegion & ?MaskRegion > 0
-        and firmtype = 1 
-        and firmstatus = 1 
-        and (shortname like ?NameStr
-			or fullname like ?NameStr)", c);
+SELECT  Id as ClientCode,
+        convert(concat(Id, '. ', Name) using cp1251) name
+FROM Future.Clients
+WHERE MaskRegion & ?MaskRegion > 0
+	and FirmType = 1
+	and Status = 1
+	and (name like ?NameStr or FullName like ?NameStr)", c);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?NameStr", String.Format("%{0}%", nameStr));
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?MaskRegion", SecurityContext.Administrator.RegionMask & Convert.ToUInt64(RegionDD.SelectedValue));
 					dataAdapter.Fill(_data, where);

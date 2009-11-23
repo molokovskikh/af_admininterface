@@ -8,6 +8,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
@@ -40,7 +41,11 @@ namespace AdminInterface.Controllers
 				auth.Save();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
+
 				password = user.CreateInAd();
+
+				client.Addresses.Each(a => a.SetAccessControl(user.Login));
+
 				scope.VoteCommit();
 			}
 
@@ -168,7 +173,7 @@ namespace AdminInterface.Controllers
 			Session["Code"] = user.Client.Id;
 			Session["DogN"] = user.Client.BillingInstance.PayerID;
 			Session["Name"] = user.Client.FullName;
-			Session["ShortName"] = user.Client.ShortName;
+			Session["ShortName"] = user.Client.Name;
 			Session["Login"] = user.Login;
 			Session["Password"] = password;
 			Session["Tariff"] = user.Client.Type.Description();

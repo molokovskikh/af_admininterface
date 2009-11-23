@@ -99,6 +99,7 @@
     <Compile Include="ForTesting\Helper.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
     <Compile Include="ForTesting\WatinFixture.cs" />
+    <Compile Include="MainViewFixure.cs" />
     <Compile Include="RegistrationFixture.cs" />
     <Compile Include="SearchClientFixture.cs" />
     <Compile Include="ServiceFixture.cs" />

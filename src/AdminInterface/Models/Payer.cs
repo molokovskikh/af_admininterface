@@ -119,7 +119,7 @@ namespace AdminInterface.Models
 		[BelongsTo("ReciverId")]
 		public virtual Reciver Reciver { get; set; }
 
-		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "ShortName")]
+		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
 
 		public virtual float ApplyDiscount(float sum)
@@ -143,7 +143,7 @@ namespace AdminInterface.Models
 				return session.CreateSQLQuery(@"
 select {Payer.*}
 from billing.payers {Payer}
-	join usersettings.clientsdata cd on {Payer}.PayerID = cd.BillingCode
+	join Future.Clients cd on {Payer}.PayerID = cd.PayerId
 where cd.firmcode = :ClientCode")
 					.AddEntity(typeof (Payer))
 					.SetParameter("ClientCode", clientCode)

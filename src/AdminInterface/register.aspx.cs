@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
@@ -17,6 +18,7 @@ using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Scopes;
 using Common.MySql;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using log4net;
@@ -107,7 +109,7 @@ ORDER BY region;";
 
 					client = new Client {
 						Type = (ClientType) Convert.ToInt32(TypeDD.SelectedItem.Value),
-						ShortName = ShortNameTB.Text.Replace("№", "N"),
+						Name = ShortNameTB.Text.Replace("№", "N"),
 						FullName = FullNameTB.Text,
 						Segment = (Segment) Convert.ToInt32(SegmentDD.SelectedItem.Value),
 						HomeRegion = Region.Find(Convert.ToUInt64(RegionDD.SelectedItem.Value)),
@@ -140,8 +142,7 @@ ORDER BY region;";
 
 					password = user.CreateInAd();
 
-					CreateFtpDirectory(String.Format(@"\\acdcserv\ftp\optbox\{0}\", client.Id),
-						String.Format(@"ANALIT\{0}", user.Login));
+					client.Addresses.Each(a => a.CreateFtpDirectory());
 				});
 				scope.VoteCommit();
 			}
@@ -152,7 +153,7 @@ ORDER BY region;";
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client);
 
 			if (!client.IsDrugstore())
-				Mailer.SupplierRegistred(client.ShortName, client.HomeRegion.Name);
+				Mailer.SupplierRegistred(client.Name, client.HomeRegion.Name);
 
 			NotificationHelper.NotifyAboutRegistration(
 				String.Format("\"{0}\" - успешная регистрация", FullNameTB.Text),
@@ -164,11 +165,10 @@ ORDER BY region;";
 					SegmentDD.SelectedItem.Text,
 					TypeDD.SelectedItem.Text));
 
-
 			Session["DogN"] = client.BillingInstance.PayerID;
 			Session["Code"] = client.Id;
 			Session["Name"] = client.FullName;
-			Session["ShortName"] = client.ShortName;
+			Session["ShortName"] = client.Name;
 			Session["Login"] = user.Login;
 			Session["Password"] = password;
 			Session["Tariff"] = TypeDD.SelectedItem.Text;
@@ -205,7 +205,7 @@ ORDER BY region;";
 		{
 			var user = new User {
 				Client = client, 
-				HumanReadableName = LoginTB.Text.Trim(),
+				Name = LoginTB.Text.Trim(),
 				Login = "temporary-login"
 			};
 
@@ -218,6 +218,7 @@ ORDER BY region;";
 			user.Update();
 			var auth = new AuthorizationLogEntity {Id = user.Id};
 			auth.Create();
+			client.Users = new List<User> {user};
 			return user;
 		}
 
@@ -266,11 +267,10 @@ ORDER BY region;";
 				var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  DISTINCT PayerID, 
         convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
-FROM clientsdata as cd
-	JOIN billing.payers p ON cd.BillingCode = p.PayerId
+FROM Future.Clients as cd
+	JOIN billing.payers p ON cd.PayerId = p.PayerId
 WHERE   cd.regioncode & ?AdminRegionCode > 0 
-        AND firmstatus = 1 
-        AND billingstatus = 1 
+        AND Status = 1 
         AND p.ShortName like ?SearchText  
 		{0}
 ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
@@ -307,7 +307,7 @@ ORDER BY p.shortname;", SecurityContext.Administrator.GetClientFilterByType("cd"
 				OldTariff = 0,
 				OldPayDate = DateTime.Now,
 				Comment = String.Format("Дата регистрации: {0}", DateTime.Now),
-				ShortName = client.ShortName,
+				ShortName = client.Name,
 				JuridicalName = client.FullName,
 				BeforeNamePrefix = prefix,
 				ContactGroupOwner = contactGroupOwner,
@@ -465,45 +465,39 @@ where sg.AssignDefaultValue = 1;
 INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (?UserId, ?AnalitFVersion);
 
 INSERT 
-INTO    intersection
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode, 
-                invisibleonclient, 
-                InvisibleonFirm, 
-                costcode
-        )
-SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode,  
-        if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-        a.invisibleonfirm,
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	CostId
+)
+SELECT  DISTINCT drugstore.Id,
+        regions.regioncode,
+        pricesdata.pricecode,
         (
           SELECT costcode
           FROM    pricescosts pcc
           WHERE   basecost
                   AND pcc.PriceCode = pricesdata.PriceCode
         ) as CostCode
-FROM clientsdata as clientsdata2
-	JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
-	JOIN clientsdata ON clientsdata.firmsegment = clientsdata2.firmsegment
-		JOIN pricesdata ON pricesdata.firmcode = clientsdata.firmcode
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
+FROM Future.Clients as drugstore
+	JOIN retclientsset as a ON a.clientcode = drugstore.Id
+	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
+		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
+	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmtype = 0
-		AND clientsdata2.FirmCode = ?clientCode
-		AND clientsdata2.firmtype = 1;";
+	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
+WHERE i.Id IS NULL
+	AND supplier.firmtype = 0
+	AND drugstore.Id = ?clientCode
+	AND drugstore.FirmType = 1;";
 			command.Parameters.AddWithValue("?AnalitFVersion", defaults.AnalitFVersion);
 			command.Parameters.AddWithValue("?ClientCode", client.Id);
 			command.Parameters.AddWithValue("?UserId", user.Id);
 
-/*
 			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
 				command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
-*/
+
 			command.ExecuteNonQuery();
 		}
 
@@ -577,7 +571,6 @@ ORDER BY region;", c);
 
 		private void CreateFtpDirectory(string directory, string userName)
 		{
-#if !DEBUG
 			try
 			{
 				var supplierDirectory = Directory.CreateDirectory(directory);
@@ -625,7 +618,6 @@ ORDER BY region;", c);
 Дать логину {1} право читать, писать и получать список директорий и удалять под директории в папке Orders", directory, userName),
 																										  e);
 			}
-#endif
 		}
 
 		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
@@ -738,7 +730,6 @@ SELECT  DISTINCT cd.FirmCode SupplierId,
 FROM clientsdata as cd
 WHERE   cd.regioncode & ?AdminRegionCode > 0 
         AND cd.firmstatus = 1 
-        AND cd.billingstatus = 1 
 		and cd.FirmType = 0
         AND cd.ShortName like ?SearchText  
 		{0}

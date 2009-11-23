@@ -31,7 +31,7 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl("client/3616")))
 			{
 				browser.Input<Client>(client => client.FullName, "ТестерК2");
-				browser.Input<Client>(client => client.ShortName, "ТестерК2");
+				browser.Input<Client>(client => client.Name, "ТестерК2");
 				//browser.Input<Client>(client => client.Address, "-");
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));

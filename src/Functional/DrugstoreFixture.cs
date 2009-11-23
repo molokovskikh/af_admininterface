@@ -150,6 +150,15 @@ namespace Functional
 		}
 
 		[Test]
+		public void Try_to_open_client_view()
+		{
+			using (var browser = Open("client/2575"))
+			{
+				Assert.That(browser.Text, Is.StringContaining("ТестерК"));
+			}
+		}
+
+		[Test]
 		public void Try_to_view_orders()
 		{
 			using (var browser = new IE(BuildTestUrl("Client/2575")))

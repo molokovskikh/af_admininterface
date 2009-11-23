@@ -1,12 +1,12 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
-									  ("Клиент ${user.Client.ShortName}", "${siteroot}/client/${user.Client.Id}"),
+									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
 
 <script>
 	$(function() {
 		$("form").validate({
 			rules : {
-				"user.HumanReadableName" : "required"
+				"user.Name" : "required"
 			}
 		});
 	});
@@ -28,15 +28,23 @@
 		<% end %>
 		<div class=block>
 			Внутреннее имя<br>
-			<input name=user.HumanReadableName value="${user.HumanReadableName}"><br>
-			<input type=checkbox name=user.SubmitOrders> Подтверждать отправку заказов
+			<input name=user.Name value="${user.Name}"><br>
+			
+			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
+			<input type=hidden name=user.SubmitOrders value=false>
+			
+			<input type=checkbox name=user.SendWaybills ${"checked" if user.SendWaybills} value=true> Получать накладные<br>
+			<input type=hidden name=user.SendWaybills value=false>
+			
+			<input type=checkbox name=user.SendRejects ${"checked" if user.SendRejects} value=true> Получать отказы<br>
+			<input type=hidden name=user.SendRejects value=false>
 		</div>
 		<div class=block>
 			<h3>
 				Доступ к адресам доставки
 			</h3>
 			<div>
-				<% for i, address in enumerate(client.Addresses): %>
+				<% for i, address in enumerate(client.Addresses): %>	
 					<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)}>
 					${address.Value}
 					<br>

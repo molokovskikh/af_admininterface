@@ -51,9 +51,9 @@ namespace AdminInterface.Controllers
 				{
 					var adapter = new MySqlDataAdapter(@"
 SELECT max(UpdateDate) MaxUpdateTime
-FROM usersettings.clientsdata cd
-	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
-		JOIN usersettings.UserUpdateInfo uui on uui.UserId = ouar.RowId
+FROM future.Clients cd
+	join future.Users u on u.ClientId = cd.Id
+		JOIN usersettings.UserUpdateInfo uui on uui.UserId = u.Id
 WHERE   cd.RegionCode & ?RegionMaskParam > 0
         AND uui.UncommitedUpdateDate BETWEEN ?StartDateParam AND ?EndDateParam;
 		 
@@ -73,13 +73,13 @@ SELECT sum(ol.cost * ol.quantity) as OrderSum,
        Max(WriteTime) as MaxOrderTime
 FROM orders.ordershead oh,
      orders.orderslist ol, 
-     usersettings.clientsdata cd, 
+     future.Clients cd, 
      usersettings.retclientsset rcs
 WHERE oh.rowid = orderid
-      AND cd.firmcode = oh.clientcode
-      AND cd.billingcode <> 921
+      AND cd.Id = oh.clientcode
+      AND cd.PayerId <> 921
       AND rcs.clientcode = oh.clientcode
-      AND cd.firmsegment = 0
+      AND cd.Segment = 0
       AND rcs.serviceclient = 0 
       AND oh.regioncode & ?RegionMaskParam   > 0
       AND oh.Deleted = 0
@@ -95,12 +95,12 @@ where	oh.processed = 0
 SELECT ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DataSize,
        ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DocSize,
        sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
-       cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), cd.FirmCode, null)) ,')') as CHAR) UpdatesAD,
-       cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, cd.FirmCode, null)) ,')') as CHAR) CumulativeUpdates,
-       cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, cd.FirmCode, null)) ,')') as CHAR) Updates
-FROM usersettings.clientsdata cd
-	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode
-	join logs.AnalitFUpdates afu on afu.UserId = ouar.RowId
+       cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), cd.Id, null)) ,')') as CHAR) UpdatesAD,
+       cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, cd.Id, null)) ,')') as CHAR) CumulativeUpdates,
+       cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, cd.Id, null)) ,')') as CHAR) Updates
+FROM Future.Clients cd
+	join Future.Users u on u.ClientId = cd.Id
+	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE cd.maskregion & ?RegionMaskParam > 0
       AND afu.RequestTime BETWEEN ?StartDateParam AND ?EndDateParam;", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);

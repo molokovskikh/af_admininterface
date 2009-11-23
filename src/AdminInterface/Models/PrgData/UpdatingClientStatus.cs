@@ -27,7 +27,7 @@ namespace AdminInterface.Models.PrgData
 
 		public string ShortName
 		{
-			get { return Client.ShortName; }
+			get { return Client.Name; }
 		}
 
 		public void FetchClient()

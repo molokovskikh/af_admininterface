@@ -18,22 +18,28 @@ namespace AdminInterface.Models
 		public CantChangePassword(string message) : base(message) { }
 	}
 
-	[ActiveRecord("future.Users")]
+	[ActiveRecord("Users", Schema = "future")]
 	public class User : ActiveRecordBase<User>
 	{ 
 		[PrimaryKey("Id")]
 		public virtual uint Id { get; set; }
 
-		[Property("Name", NotNull = true)]
+		[Property(NotNull = true)]
 		public virtual string Login { get; set; }
 
 		[Property(NotNull = true)]
-		public virtual string HumanReadableName { get; set; }
+		public virtual string Name { get; set; }
 
 		[Property]
 		public virtual bool SubmitOrders { get; set; }
 
-		[BelongsTo("ClientCode", NotNull = true)]
+		[Property]
+		public virtual bool SendWaybills { get; set; }
+
+		[Property]
+		public virtual bool SendRejects { get; set; }
+
+		[BelongsTo("ClientId", NotNull = true)]
 		public Client Client { get; set; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),
@@ -46,7 +52,7 @@ namespace AdminInterface.Models
 		[HasAndBelongsToMany(typeof (Address),
 			Lazy = true,
 			ColumnKey = "UserId",
-			Table = "future.UserAddress",
+			Table = "future.UserAddresses",
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 

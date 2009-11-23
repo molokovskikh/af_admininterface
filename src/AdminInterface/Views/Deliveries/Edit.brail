@@ -20,12 +20,6 @@
 		<div class=block>
 			Адрес<br>
 			<input name=delivery.value value="${delivery.Value}" ><br>
-			Отправлять документы пользователю<br>
-			<select name=delivery.DocumentsResiver.Id>
-				<% for user in delivery.Client.Users: %>
-					<option value=${user.Id} ${"selected" if user.Id == delivery.DocumentsResiver.Id}>${user.HumanReadableName}</option>
-				<% end %>
-			</select>
 		</div>
 		
 		<div class=block>

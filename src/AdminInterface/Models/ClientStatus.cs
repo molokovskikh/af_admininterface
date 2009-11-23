@@ -2,13 +2,13 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Table = "usersettings.ClientsData")]
+	[ActiveRecord("Client", Schema = "Future")]
 	public class ClientWithStatus : ActiveRecordBase<ClientWithStatus>
 	{
 		[PrimaryKey]
-		public virtual uint FirmCode { get; set; }
+		public virtual uint Id { get; set; }
 
-		[Property("FirmStatus")]
+		[Property]
 		public virtual ClientStatus Status { get; set; }
 	}
 }

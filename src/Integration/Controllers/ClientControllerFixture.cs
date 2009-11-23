@@ -235,7 +235,7 @@ namespace AdminInterface.Test.Controllers
 		{
 			var client = new Client {
 				Type = ClientType.Drugstore,
-				ShortName = "TestClient",
+				Name = "TestClient",
 				FullName = "TestClient",
 				BillingInstance = new Payer {
 					ShortName = "TestPayer",

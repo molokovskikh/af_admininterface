@@ -84,7 +84,7 @@ namespace AdminInterface.Helpers
 
 			using (var stream = CreateReport(client.Id,
 				client.BillingInstance.PayerID,
-				client.ShortName,
+				client.Name,
 				client.FullName,
 				client.GetHumanReadableType(),
 				login,

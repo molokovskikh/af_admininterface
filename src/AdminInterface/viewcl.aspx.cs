@@ -70,7 +70,7 @@ SELECT  afu.RequestTime,
 		afu.AppVersion,
 		afu.ResultSize,
         afu.Addition,
-		(cd.FirmStatus = 0 or BillingStatus= 0) FirmStatus
+		cd.FirmStatus = 0 FirmStatus
 FROM usersettings.clientsdata cd
 	join farm.regions r on r.regioncode = cd.regioncode 
 	join usersettings.OsUserAccessRight ouar on ouar.ClientCode = cd.FirmCode

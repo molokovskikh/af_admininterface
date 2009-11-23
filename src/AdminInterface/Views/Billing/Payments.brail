@@ -65,10 +65,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								</td>
 								<td>
 								<% if client.Id == Client.Id: %>
-									<strong>${client.ShortName}</strong>
+									<strong>${client.Name}</strong>
 								<% else: %>
 									<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
-										${client.ShortName}
+										${client.Name}
 									</a>
 								<% end %>
 								</td>

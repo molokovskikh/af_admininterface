@@ -20,7 +20,7 @@ namespace AdminInterface.Models
 Домашний регион: {4}",
 					SecurityContext.Administrator.UserName,
 					SecurityContext.Administrator.GetHost(),
-					client.ShortName,
+					client.Name,
 					client.FullName,
 					client.HomeRegion.Name),
 				"RegisterList@subscribe.analit.net");
@@ -55,7 +55,7 @@ namespace AdminInterface.Models
 ", 
 					 SecurityContext.Administrator.UserName, 
 					 SecurityContext.Administrator.GetHost(),
-					 client.ShortName,
+					 client.Name,
 					 client.FullName,
 					 client.HomeRegion.Name,
 					 offLetter,
@@ -70,7 +70,7 @@ namespace AdminInterface.Models
 				String.Format(@"Для клиента {0} код {1}
 Зарегистрирован новый адрес доставки {2}
 Регистратор {3}",
-				address.Client.ShortName,
+				address.Client.Name,
 				address.Client.Id,
 				address.Value,
 				SecurityContext.Administrator.ManagerName), 
@@ -84,7 +84,7 @@ namespace AdminInterface.Models
 				String.Format(@"Для клиента {0} код {1}
 Зарегистрирован новый пользователь {2}
 Регистратор {3}",
-				user.Client.ShortName,
+				user.Client.Name,
 				user.Client.Id,
 				user.Login,
 				SecurityContext.Administrator.ManagerName),
