@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate;
@@ -136,15 +138,15 @@ namespace AdminInterface.Models
 		{
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (Client))
-				           	.Add(Expression.Eq("Id", clientCode))
-				           	.SetFetchMode("BillingInstance", FetchMode.Join)
-				           	//.SetFetchMode("Payer.Clients", FetchMode.Eager)
-				           	.SetFetchMode("HomeRegion", FetchMode.Join)
-				           	.SetFetchMode("ContactGroupOwner", FetchMode.Join)
-				           	//.SetFetchMode("ContactGroupOwner.ContactGroups", FetchMode.Eager)
-				           	//.SetFetchMode("ContactGroupOwner.ContactGroups.Contacts", FetchMode.Eager)
-				           	//.SetFetchMode("ContactGroupOwner.ContactGroups.Persons", FetchMode.Eager)
-				           	.UniqueResult<Client>());
+					.Add(Expression.Eq("Id", clientCode))
+					.SetFetchMode("BillingInstance", FetchMode.Join)
+					//.SetFetchMode("Payer.Clients", FetchMode.Eager)
+					.SetFetchMode("HomeRegion", FetchMode.Join)
+					.SetFetchMode("ContactGroupOwner", FetchMode.Join)
+					//.SetFetchMode("ContactGroupOwner.ContactGroups", FetchMode.Eager)
+					//.SetFetchMode("ContactGroupOwner.ContactGroups.Contacts", FetchMode.Eager)
+					//.SetFetchMode("ContactGroupOwner.ContactGroups.Persons", FetchMode.Eager)
+					.UniqueResult<Client>());
 		}
 
 		public virtual string GetAddressForSendingClientCard()
@@ -329,6 +331,11 @@ group by ouar.clientcode")
 			if (Type == ClientType.Drugstore)
 				return Users.Count;
 			return null;
+		}
+
+		public virtual bool HaveLockedUsers()
+		{
+			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
 		}
 	}
 }
