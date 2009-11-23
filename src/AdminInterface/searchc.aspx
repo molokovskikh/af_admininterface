@@ -126,8 +126,6 @@
 							<asp:Label ID="Label4" runat="server" Text='<%# Eval("FirmType").ToString() == "1" ? "Аптека" : "Поставщик" %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
-					<asp:BoundField DataField="IncludeType" HeaderText="Тип подчинения" NullDisplayText="-"
-						SortExpression="IncludeType" />
 				</Columns>
 				<EmptyDataRowStyle Font-Bold="True" HorizontalAlign="Center" />
 				<EmptyDataTemplate>

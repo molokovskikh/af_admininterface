@@ -201,15 +201,14 @@ SELECT  cd.billingcode,
         ouar2.OsUserName UserName,
         FirmSegment,
         FirmType,
-        (Firmstatus = 0 or Billingstatus= 0) Firmstatus,
+        Firmstatus = 0 Firmstatus,
         cd.firmcode as bfc,
-		NULL AS IncludeType,
 		NULL AS InvisibleOnFirm
 FROM clientsdata as cd
 	JOIN billing.payers p on cd.BillingCode = p.PayerID
 	JOIN farm.regions ON regions.regioncode = cd.regioncode
 	LEFT JOIN showregulation ON ShowClientCode= cd.firmcode
-	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode or ouar2.clientcode = if(primaryclientcode is null, cd.firmcode, primaryclientcode) 
+	LEFT JOIN osuseraccessright as ouar2 ON ouar2.clientcode= cd.firmcode or ouar2.clientcode = cd.firmcode
 WHERE   (cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 		and FirmType = 0
 		{0}", SecurityContext.Administrator.GetClientFilterByType("cd"));
@@ -227,7 +226,7 @@ SELECT  cd.billingcode,
         ouar2.OSUSERNAME as UserName,
         cd.FirmSegment,
         cd.FirmType,
-        (cd.Firmstatus = 0 or cd.Billingstatus= 0) Firmstatus,
+        cd.Firmstatus = 0 Firmstatus,
         cd.firmcode as bfc,
 		rcs.InvisibleOnFirm
 FROM clientsdata as cd

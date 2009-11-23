@@ -88,7 +88,6 @@ end
 			${Header("FirmCode", "Код")}
 			${Header("ShortName", "Клиент")}
 			${Header("Region", "Регион")}
-			${Header("IncludeType", "Подчинение")}
 			${Header("Registrant", "Оператор")}
 			${Header("RegistrationDate", "Дата регистрации")}
 			<% if filter == 4: %>
@@ -110,23 +109,14 @@ end
 			</td>
 			<td>
 				${logEntity.FirmCode}
-				<% if logEntity.HaveParent(): %>
-					[${logEntity.ParentId}]
-				<% end %>
 			</td>
 			<td>
 				<a href="${siteroot}/client/${logEntity.FirmCode}">
 					${logEntity.ShortName}
-					<% if logEntity.HaveParent(): %>
-						[${logEntity.Parent}]
-					<% end %>
 				</a>
 			</td>
 			<td>
 				${logEntity.Region}
-			</td>
-			<td>
-				${logEntity.GetInclude()}
 			</td>
 			<td>
 				${logEntity.GetRegistrant()}

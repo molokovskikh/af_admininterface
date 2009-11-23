@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AdminInterface.Test.ForTesting;
+﻿using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -17,7 +13,7 @@ namespace Functional
 			{
 				browser.TextField(Find.ById("ctl00_MainContentPlaceHolder_FindTB")).TypeText("kvasov");
 				browser.Button(Find.ByValue("Найти")).Click();
-				Assert.That(browser.Text, Is.StringContaining("2575"));
+				Assert.That(browser.Text, Is.StringContaining("kvasov"));
 			}
 		}
 	}

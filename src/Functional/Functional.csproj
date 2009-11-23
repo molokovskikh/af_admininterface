@@ -90,6 +90,7 @@
     <Compile Include="BindPhoneToClientFixture.cs" />
     <Compile Include="CallbackRulesFixture.cs" />
     <Compile Include="ClientCloneFixture.cs" />
+    <Compile Include="ClientMonitoringFixture.cs" />
     <Compile Include="DocumentLogFixture.cs" />
     <Compile Include="DrugstoreFixture.cs" />
     <Compile Include="ForTesting\FixtureForFixture.cs" />

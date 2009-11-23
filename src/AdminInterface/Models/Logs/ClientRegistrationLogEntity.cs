@@ -86,7 +86,7 @@ select	cd.BillingCode,
 from clientsdata cd
 	join farm.Regions r on r.RegionCode = cd.RegionCode
 	join usersettings.RetClientsSet rcs on rcs.ClientCode = cd.FirmCode
-	join usersettings.OsUserAccessRight ouar on ouar.clientcode = if(ir.PrimaryClientCode is not null and ir.IncludeType = 0, ir.PrimaryClientCode, cd.FirmCode)
+	join usersettings.OsUserAccessRight ouar on ouar.clientcode = cd.FirmCode
 		left join logs.AnalitFUpdates au on au.UserId = ouar.RowId and (au.updatetype = 1 or au.updatetype = 2 or au.updatetype is null)
 	left join accessright.regionaladmins ra on ra.UserName = cd.Registrant
 where	cd.firmtype = 1
@@ -95,7 +95,6 @@ where	cd.firmtype = 1
 		and cd.firmsegment = 0
 		and cd.RegionCode & :adminRegionMask > 0
 
-		and (ir.PrimaryClientCode is null or ir.IncludeType <> 0)
 		{2}
 group by cd.firmcode
 having LastUpdate < (now() - interval :days day)
@@ -165,9 +164,9 @@ order by {0} {1}", sortby, direction, clientTypeFilter))
 		private static string GetClientTypeFilter(uint filter)
 		{
 			if (filter == 1)
-				return "and (rcs.InvisibleOnFirm <> 2 and ifnull(ir.IncludeType, 555) <> 2)";
+				return "and (rcs.InvisibleOnFirm <> 2)";
 			if (filter == 2)
-				return "and (rcs.InvisibleOnFirm = 2 or ifnull(ir.IncludeType, 555) = 2)";
+				return "and (rcs.InvisibleOnFirm = 2)";
 			return "";
 		}
 	}
