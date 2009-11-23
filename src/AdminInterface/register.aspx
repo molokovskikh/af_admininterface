@@ -166,7 +166,7 @@
 							</div>
 							<div class="DropDownField">
 								<label for="TypeDD">Тип:</label>
-								<asp:DropDownList ID="TypeDD" runat="server" onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
+								<asp:DropDownList Enabled=false ID="TypeDD" runat="server" onselectedindexchanged="ClientTypeChanged" AutoPostBack="True" />
 							</div>
 							<div class="DropDownField">
 								<label for="RegionDD">Домашний регион:</label>
