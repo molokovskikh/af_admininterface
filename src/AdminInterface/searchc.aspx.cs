@@ -192,7 +192,7 @@ ORDER BY IsAll Desc, Region;", c);
 			var orderStatement = "order by 3, 4";
 			var firstPart = String.Format(@"
 SELECT  cd.billingcode,
-        cast(cd.firmcode as CHAR) as firmcode,
+        cd.firmcode as firmcode,
         cd.ShortName,
         region,
         null FirstUpdate,
