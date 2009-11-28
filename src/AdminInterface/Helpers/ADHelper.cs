@@ -43,7 +43,11 @@ namespace AdminInterface.Helpers
 
 		public static bool IsLoginExists(string login)
 		{
+#if !DEBUG
 			return FindDirectoryEntry(login) != null;
+#else
+			return true;
+#endif
 		}
 
 		public static void ChangePassword(string login, string password)
@@ -63,7 +67,11 @@ namespace AdminInterface.Helpers
 
 		public static bool IsLocked(string login)
 		{
+#if !DEBUG
 			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("IsAccountLocked")); 
+#else
+			return false;
+#endif
 		}
 
 		public static void Unlock(string login)
@@ -75,21 +83,24 @@ namespace AdminInterface.Helpers
 
 		public static bool IsDisabled(string login)
 		{
+#if !DEBUG
 			return Convert.ToBoolean(GetDirectoryEntry(login).InvokeGet("AccountDisabled")); 
+#else
+			return false;
+#endif
 		}
 
 		public static byte[] LogonHours()
 		{
-			var hours = new byte[]
-			            	{
-			            		0, 0, 0,
-			            		224, 255, 3,
-			            		224, 255, 3,
-			            		224, 255, 3,
-			            		224, 255, 3,
-			            		224, 255, 3,
-								0, 0, 0,
-			            	};
+			var hours = new byte[] {
+				0, 0, 0,
+				224, 255, 3,
+				224, 255, 3,
+				224, 255, 3,
+				224, 255, 3,
+				224, 255, 3,
+				0, 0, 0,
+			};
 			return hours;
 		}
 
@@ -188,8 +199,12 @@ namespace AdminInterface.Helpers
 
 		public static bool IsBelongsToOfficeContainer(string login)
 		{
+#if !DEBUG
 			var entry = FindDirectoryEntry(login);
 			return entry.Path.Contains("OU=Офис");
+#else
+			return false;
+#endif
 		}
 
 		public static DateTime? GetLastPasswordChange(string login)

@@ -1,5 +1,5 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
-									  ("Клиент ${delivery.Client.ShortName}", "${siteroot}/client/${delivery.Client.Id}"),
+									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
 <script>

@@ -46,13 +46,18 @@ namespace AdminInterface.Test.ForTesting
 
 		public static Client CreateClient()
 		{
-			var client = new Client
-			       	{
-			       		Name = "Test short name",
-			       		FullName = "Test full name",
-			       		RegistrationDate = DateTime.Now
-			       	};
-			client.Users = new List<User> {new User {Login = "test" + new Random().Next()}};
+			var client = new Client {
+				Name = "Test short name",
+				FullName = "Test full name",
+				RegistrationDate = DateTime.Now,
+				BillingInstance = CreatePayer(),
+			};
+			client.Users = new List<User> {
+				new User {
+					Login = "test" + new Random().Next(),
+					Name = "test"
+				}
+			};
 			client.Users[0].Client = client;
 			return client;
 		}

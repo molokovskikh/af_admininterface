@@ -81,12 +81,14 @@ namespace Functional
 			using(new SessionScope())
 			{
 				var client = Client.Find(clientCode);
+				Console.WriteLine(client.Id);
+
 				var user = client.Users.First();
-				var updateInfo = (from info in UserUpdateInfo.Queryable
-				                  where info.User.Id == user.Id
-				                  select info).FirstOrDefault();
+				var updateInfo = UserUpdateInfo.Find(user.Id);
 				Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
+				Assert.That(client.Segment, Is.EqualTo(Segment.Wholesale));
+				Assert.That(client.Status, Is.EqualTo(ClientStatus.On));
 				Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адрес доставки");
 
 				var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
@@ -125,39 +127,6 @@ namespace Functional
 			}
 		}
 
-		[Test]
-		public void Redirect_to_client_info_page_if_base_client_registred()
-		{
-			using (var browser = new IE(BuildTestUrl("register.aspx")))
-			{
-				SetupGeneralInformation(browser);
-				browser.CheckBox(Find.ById("IncludeCB")).Click();
-				browser.TextField(Find.ById("IncludeSTB")).TypeText("ТестерК");
-				browser.Button(Find.ById("IncludeSB")).Click();
-				
-				browser.SelectList(Find.ById("IncludeType")).Select("Базовый");
-				browser.Button(Find.ById("Register")).Click();
-
-				Assert.That(browser.Text, Text.Contains("Информация о клиенте"));
-			}
-		}
-
-		[Test]
-		public void Try_to_register_network_client()
-		{
-			using (var browser = new IE(BuildTestUrl("register.aspx")))
-			{
-				SetupGeneralInformation(browser);
-				browser.CheckBox(Find.ById("IncludeCB")).Click();
-				browser.TextField(Find.ById("IncludeSTB")).TypeText("ТестерК");
-				browser.Button(Find.ById("IncludeSB")).Click();
-				
-				browser.SelectList(Find.ById("IncludeType")).Select("Сеть");
-				browser.Button(Find.ById("Register")).Click();
-
-				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
-			}
-		}
 
 		[Test]
 		public void Register_client_with_exists_payer()

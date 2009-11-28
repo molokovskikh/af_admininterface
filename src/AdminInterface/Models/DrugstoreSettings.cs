@@ -11,6 +11,13 @@ namespace AdminInterface.Models
 	[ActiveRecord("usersettings.RetClientsSet")]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
+		public DrugstoreSettings() {}
+
+		public DrugstoreSettings(uint id)
+		{
+			Id = id;
+		}
+
 		[PrimaryKey("ClientCode", Generator = PrimaryKeyType.Assigned)]
 		public uint Id { get; set; }
 
@@ -26,7 +33,7 @@ namespace AdminInterface.Models
 		[Property]
 		public ulong OrderRegionMask { get; set; }
 
-		[Property]
+		[Property(NotNull = true)]
 		public string BasecostPassword { get; set; }
 	}
 }

@@ -60,16 +60,16 @@
 </script>
 
 <% component CaptureFor, {"id" : "Title"}: %>
-	Статистика обновления клиента ${client.ShortName}
+	История обновлений клиента ${client.Name}
 <% end %>
+
+<div class="PageHeader">
+	История обновлений клиента ${client.Name}
+</div>
 
 <% component CaptureFor, {"id" : "PostToServer"}: %>
 	${FormHelper.HiddenField("clientCode", client.Id)}
 <% end %>
-
-<div class="PageHeader">
-	Статистика обновления клиента ${client.ShortName}
-</div>
 
 <% 
 	OutputSubView("SelectDateIntervalSubView")

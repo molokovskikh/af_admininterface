@@ -1,9 +1,10 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
-using Castle.ActiveRecord;
 using Common.Tools;
+using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -12,8 +13,6 @@ namespace Functional
 	[TestFixture]
 	public class DrugstoreFixture : WatinFixture
 	{
-		private uint clientId = 2575;
-
 		[Test]
 		public void Try_to_send_email_notification()
 		{
@@ -45,111 +44,6 @@ namespace Functional
 
 
 		[Test]
-		public void Try_to_update_relationship()
-		{
-/*			using (new TransactionScope())
-			{
-				var client = Client.Find(clientId);
-				client.Parents.Each(p => p.Delete());
-				client.Parents.Clear();
-				var parent = Client.Find(3616u);
-				client.Parents.Add(new Relationship{ Child = client, Parent = parent, RelationshipType = RelationshipType.Base});
-
-				client.Parents[0].Save();
-			}
-
-			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
-			{
-				var body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.SelectLists.ElementAt(1).Select("Сеть");
-				Thread.Sleep(5*1000);
-
-				browser.Button(b => b.Value.Equals("Применить")).Click();
-				Assert.That(browser.Text, Text.Contains("Конфигурация клиента"));
-
-				browser.GoTo(browser.Url);
-				browser.Refresh();
-				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				Assert.That(body.TableRows.Count(), Is.EqualTo(2));
-				Assert.That(body.TableRows[1].SelectLists.First().SelectedItem, Is.EqualTo("3616. ТестерК2"));
-				Assert.That(body.TableRows[1].SelectLists.ElementAt(1).SelectedItem, Is.EqualTo("Сеть"));
-			}
-
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientId);
-				Assert.That(client.Parents.Count, Is.EqualTo(1));
-				Assert.That(client.Parents[0].Parent.Id, Is.EqualTo(3616u));
-				Assert.That(client.Parents[0].RelationshipType, Is.EqualTo(RelationshipType.Network));
-			}*/
-		}
-
-		[Test]
-		public void Try_to_create_relationship()
-		{
-/*			using (new SessionScope())
-			{
-				var client = Client.Find(clientId);
-				client.Parents.ToArray().Each(client.RemoveRelationship);
-			}
-
-			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
-			{
-				var body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.Button(Find.ByValue("Подчинить клиента.")).Click();
-				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.TextFields.First().TypeText("ТестерК");
-				body.Button(Find.ByValue("Найти")).Click();
-
-				browser.Button(b => b.Value.Equals("Применить")).Click();
-				Assert.That(browser.Text, Text.Contains("Конфигурация клиента"));
-
-				browser.GoTo(browser.Url);
-				browser.Refresh();
-				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				Assert.That(body.TableRows.Count(), Is.EqualTo(2));
-				Assert.That(body.TableRows[1].SelectLists.First().SelectedItem, Is.EqualTo("2575. ТестерК"));
-				Assert.That(body.TableRows[1].SelectLists.ElementAt(1).SelectedItem, Is.EqualTo("Базовый"));
-			}
-
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientId);
-				Assert.That(client.Parents.Count, Is.EqualTo(1));
-				Assert.That(client.Parents[0].RelationshipType, Is.EqualTo(RelationshipType.Base));
-			}*/
-		}
-
-		[Test]
-		public void Try_to_delete_include_regulation()
-		{
-/*			using (new SessionScope())
-			{
-				var client = Client.Find(2575u);
-				client.Parents.ToArray().Each(client.RemoveRelationship);
-			}
-			
-			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
-			{
-				var body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.Button(Find.ByValue("Подчинить клиента.")).Click();
-				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.TextFields.First().TypeText("ТестерК");
-				body.Button(Find.ByValue("Найти")).Click();
-
-				browser.Button(b => b.Value.Equals("Применить")).Click();
-
-				browser.GoTo(browser.Url);
-				browser.Refresh();
-				body = browser.Table(Find.ById("ctl00_MainContentPlaceHolder_IncludeGrid")).TableBodies[0];
-				body.Button(Find.ByValue("Удалить")).Click();
-
-				browser.Button(b => b.Value.Equals("Применить")).Click();
-				Assert.That(browser.Text, Text.Contains("Конфигурация клиента "));
-			}*/
-		}
-
-		[Test]
 		public void Try_to_open_client_view()
 		{
 			using (var browser = Open("client/2575"))
@@ -170,6 +64,92 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void View_update_logs()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users.First();
+			var updateLogEnity = new UpdateLogEntity {
+				RequestTime = DateTime.Now,
+				AppVersion = 833,
+				UpdateType = UpdateType.Accumulative,
+				ResultSize = 1*1024*1024,
+				Commit = true,
+				UserName = user.Login,
+				User = user,
+			};
+			updateLogEnity.Save();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(l => l.Text == "История обновлений").Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name))))
+				{
+					Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));
+					Assert.That(openedWindow.Text, Is.StringContaining(user.Login));
+					Assert.That(openedWindow.Text, Is.StringContaining("833"));
+				}
+			}
+		}
+
+		[Test]
+		public void Try_to_send_message()
+		{
+			using (var browser = new IE(BuildTestUrl("client/3616")))
+			{
+				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
+				browser.Button(Find.ByValue("Принять")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
+			}
+		}
+
+		[Test]
+		public void Try_to_search_offers()
+		{
+			using (var browser = new IE(BuildTestUrl("client/3616")))
+			{
+				browser.Link(Find.ByText("Поиск предложений")).Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Поиск предложений для клиента ТестерК2")))
+				{
+					Assert.That(openedWindow.Text, Text.Contains("Введите наименование или форму выпуска"));
+				}
+			}
+		}
+
+		[Test]
+		public void After_password_change_message_should_be_added_to_history()
+		{
+			ClientInfoLogEntity.MessagesForClient(Client.Find(3616u)).Each(e => e.Delete());
+
+			using(var browser = Open("client/3616"))
+			{
+				browser.Link(Find.ByText("KvasovT")).Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля пользователя KvasovT [Клиент: ТестерК2]")))
+				{
+					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+					openedWindow.Button(Find.ByValue("Изменить")).Click();
+					Assert.That(openedWindow.Text, Text.Contains("Пароль успешно изменен"));
+				}
+
+				browser.Refresh();
+				Assert.That(browser.Text, Text.Contains("$$$Пользователь KvasovT. Платное изменение пароля: Тестовое изменение пароля"));
+			}
+		}
+
+		[Test]
+		public void Try_to_update_general_info()
+		{
+			using (var browser = new IE(BuildTestUrl("client/3616")))
+			{
+				browser.Input<Client>(client => client.FullName, "ТестерК2");
+				browser.Input<Client>(client => client.Name, "ТестерК2");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
+			}
+		}
+
 
 		private SelectList GetHomeRegionSelect(IE browser)
 		{

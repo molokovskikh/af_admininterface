@@ -1,9 +1,11 @@
 ﻿using System;
-using AdminInterface.Model;
+using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using NUnit.Framework;
-
 using WatiN.Core;
 
 namespace Functional
@@ -14,24 +16,38 @@ namespace Functional
 		[Test]
 		public void View_documents()
 		{
-			var documentLog = new DocumentLogEntity
-			{
+			var client = CreateClientWithDeliveryAddress();
+			var documentLog = new DocumentLogEntity {
 				DocumentType = DocumentType.Waybill,
 				FileName = "test.txt",
 				LogTime = DateTime.Now,
-				ForClient = Client.Find(2575u),
-				FromSupplier = Client.Find(5u),
+				ForClient = client,
+				Address = client.Addresses.First(),
+				FromSupplier = Supplier.Find(5u),
 			};
 			documentLog.Save();
 
-			using (var browser = new IE(BuildTestUrl("Client/2575")))
+			using (var browser = Open("Client/{0}", client.Id))
 			{
-				browser.Link(Find.ByText("Статистика документов")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(@"Статистика получения\отправки документов клиента ТестерК")))
+				browser.Link(Find.ByText("История документов")).Click();
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента {0}", client.Name))))
 				{
-					Assert.That(openedWindow.Text, Text.Contains(documentLog.Id.ToString()));
+					Assert.That(openedWindow.Text, Is.StringContaining(documentLog.Id.ToString()));
+					Assert.That(openedWindow.Text, Is.StringContaining("тестовый адрес доставки"));
 				}
 			}
+		}
+
+		public Client CreateClientWithDeliveryAddress()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var address = new Address {
+				Client = client,
+				Value = "тестовый адрес доставки",
+			};
+			address.Save();
+			client.Addresses = new List<Address> {address};
+			return client;
 		}
 	}
 }

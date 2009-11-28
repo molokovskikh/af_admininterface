@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Logs
 		public DateTime RequestTime { get; set; }
 
 		[Property]
-		public string AppVersion { get; set; }
+		public uint AppVersion { get; set; }
 
 		[Property]
 		public UpdateType UpdateType { get; set; }
@@ -58,17 +58,17 @@ namespace AdminInterface.Models.Logs
 			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative;
 		}
 
-		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode, 
-		                                                           DateTime beginDate, 
-		                                                           DateTime endDate)
+		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode,
+			DateTime beginDate,
+			DateTime endDate)
 		{
 			var client = Client.Find(clientCode);
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
-				           	.Add(Expression.InG("User", client.GetUsers().ToList()))
-				           	.Add(Expression.Between("RequestTime", beginDate, endDate))
-				           	.AddOrder(Order.Desc("RequestTime"))
-				           	.List<UpdateLogEntity>());
+					.Add(Expression.InG("User", client.GetUsers().ToList()))
+					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.AddOrder(Order.Desc("RequestTime"))
+					.List<UpdateLogEntity>());
 		}
 	}
 }

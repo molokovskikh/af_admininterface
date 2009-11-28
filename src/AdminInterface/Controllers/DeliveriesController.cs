@@ -1,6 +1,8 @@
 ﻿using AdminInterface.Models;
+using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
@@ -17,8 +19,16 @@ namespace AdminInterface.Controllers
 		public void Add([DataBind("delivery")] Address address, uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
-			address.Client = client;
-			address.Save();
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				address.Client = client;
+				address.Save();
+				address.MaitainIntersection();
+				address.CreateFtpDirectory();
+				client.Users.Each(u => address.SetAccessControl(u.Login));
+				scope.VoteCommit();
+			}
+
 			Mailer.DeliveryAddressRegistred(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });

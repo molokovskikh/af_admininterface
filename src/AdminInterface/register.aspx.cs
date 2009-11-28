@@ -102,12 +102,13 @@ ORDER BY region;";
 			string password = null;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				ArHelper.WithSession<Client>(s => {
+				ArHelper.WithSession(s => {
 					var connection = (MySqlConnection) s.Connection;
 					var command = new MySqlCommand("", connection);
 					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName, HttpContext.Current.Request.UserHostAddress);
 
 					client = new Client {
+						Status = ClientStatus.On,
 						Type = (ClientType) Convert.ToInt32(TypeDD.SelectedItem.Value),
 						Name = ShortNameTB.Text.Replace("№", "N"),
 						FullName = FullNameTB.Text,
@@ -131,15 +132,14 @@ ORDER BY region;";
 					CreateClient(client);
 					client.Save();
 
-					user = CreateUser(client);
-
 					var defaults = DefaultValues.Get();
 
 					if (client.IsDrugstore())
-						CreateDrugstore(command, defaults, client, user, orderMask);
+						CreateDrugstore(command, client, orderMask);
 					else
 						CreateSupplier(command, defaults, client);
 
+					user = CreateUser(client);
 					password = user.CreateInAd();
 
 					client.Addresses.Each(a => a.CreateFtpDirectory());
@@ -206,18 +206,16 @@ ORDER BY region;";
 			var user = new User {
 				Client = client, 
 				Name = LoginTB.Text.Trim(),
-				Login = "temporary-login"
 			};
 
 			if (PermissionsDiv.Visible)
-				foreach (var item in Permissions.Items.Cast<ListItem>().Where(i => i.Selected))
-					user.AddPermission(UserPermission.Find(Convert.ToUInt32(item.Value)));
+			{
+				user.AssignedPermissions = Permissions.Items.Cast<ListItem>()
+					.Where(i => i.Selected)
+					.Select(i => UserPermission.Find(Convert.ToUInt32(i.Value))).ToList();
+			}
 
-			user.Save();
-			user.Login = user.Id.ToString();
-			user.Update();
-			var auth = new AuthorizationLogEntity {Id = user.Id};
-			auth.Create();
+			user.Setup(false);
 			client.Users = new List<User> {user};
 			return user;
 		}
@@ -439,7 +437,7 @@ WHERE   intersection.pricecode IS NULL
 			command.ExecuteNonQuery();
 		}
 
-		private void CreateDrugstore(MySqlCommand command, DefaultValues defaults, Client client, User user, ulong orderMask)
+		private void CreateDrugstore(MySqlCommand command, Client client, ulong orderMask)
 		{
 			command.CommandText = "select usersettings.GeneratePassword()";
 			var costCrypKey = command.ExecuteScalar().ToString();
@@ -454,46 +452,14 @@ WHERE   intersection.pricecode IS NULL
 			if (!String.IsNullOrEmpty(Suppliers.SelectedValue))
 				settings.FirmCodeOnly = Convert.ToUInt32(Suppliers.SelectedValue);
 
-			settings.Create();
-
+			settings.CreateAndFlush();
+			client.MaintainIntersection();
 			command.CommandText = @"
 insert into usersettings.ret_save_grids(ClientCode, SaveGridId)
 select ?ClientCode, sg.id
 from usersettings.save_grids sg
-where sg.AssignDefaultValue = 1;
-
-INSERT INTO usersettings.UserUpdateInfo(UserId, AFAppVersion) Values (?UserId, ?AnalitFVersion);
-
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	CostId
-)
-SELECT  DISTINCT drugstore.Id,
-        regions.regioncode,
-        pricesdata.pricecode,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
-FROM Future.Clients as drugstore
-	JOIN retclientsset as a ON a.clientcode = drugstore.Id
-	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
-		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
-	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
-WHERE i.Id IS NULL
-	AND supplier.firmtype = 0
-	AND drugstore.Id = ?clientCode
-	AND drugstore.FirmType = 1;";
-			command.Parameters.AddWithValue("?AnalitFVersion", defaults.AnalitFVersion);
+where sg.AssignDefaultValue = 1;";
 			command.Parameters.AddWithValue("?ClientCode", client.Id);
-			command.Parameters.AddWithValue("?UserId", user.Id);
 
 			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
 				command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
@@ -567,99 +533,6 @@ ORDER BY region;", c);
 		{
 			var checkBox = sender as CheckBox;
 			SetWorkRegions(RegionDD.SelectedItem.Value, checkBox.Checked);
-		}
-
-		private void CreateFtpDirectory(string directory, string userName)
-		{
-			try
-			{
-				var supplierDirectory = Directory.CreateDirectory(directory);
-				var supplierDirectorySecurity = supplierDirectory.GetAccessControl();
-				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-				                                                                 FileSystemRights.Read,
-				                                                                 InheritanceFlags.ContainerInherit |
-				                                                                 InheritanceFlags.ObjectInherit,
-				                                                                 PropagationFlags.None,
-				                                                                 AccessControlType.Allow));
-				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-				                                                                 FileSystemRights.Write,
-				                                                                 InheritanceFlags.ContainerInherit |
-				                                                                 InheritanceFlags.ObjectInherit,
-				                                                                 PropagationFlags.None,
-				                                                                 AccessControlType.Allow));
-				supplierDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-				                                                                 FileSystemRights.ListDirectory,
-				                                                                 InheritanceFlags.ContainerInherit |
-				                                                                 InheritanceFlags.ObjectInherit,
-				                                                                 PropagationFlags.None,
-				                                                                 AccessControlType.Allow));
-				supplierDirectory.SetAccessControl(supplierDirectorySecurity);
-
-				var ordersDirectory = Directory.CreateDirectory(directory + "Orders\\");
-				var ordersDirectorySecurity = supplierDirectory.GetAccessControl();
-				ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(userName,
-				                                                               FileSystemRights.DeleteSubdirectoriesAndFiles,
-				                                                               InheritanceFlags.ContainerInherit |
-				                                                               InheritanceFlags.ObjectInherit,
-				                                                               PropagationFlags.None,
-				                                                               AccessControlType.Allow));
-				ordersDirectory.SetAccessControl(ordersDirectorySecurity);
-
-				Directory.CreateDirectory(directory + "Docs\\");
-				Directory.CreateDirectory(directory + "Rejects\\");
-				Directory.CreateDirectory(directory + "Waybills\\");
-			}
-			catch(Exception e)
-			{
-				LogManager.GetLogger(GetType()).Error(String.Format(@"
-Ошибка при создании папки на ftp для клиента, иди и создавай руками
-Нужно создать папку {0}
-А так же создать под папки Order, Docs, Rejects, Waybills
-Дать логину {1} право читать, писать и получать список директорий и удалять под директории в папке Orders", directory, userName),
-																										  e);
-			}
-		}
-
-		protected void LoginValidator_ServerValidate(object source, ServerValidateEventArgs args)
-		{
-			var message = ValidateLogin(args.Value);
-
-			if (String.IsNullOrEmpty(message))
-			{
-				args.IsValid = true;
-				LoginValidator.Visible = false;
-			}
-			else
-			{
-				args.IsValid = false;
-				LoginValidator.Visible = true;
-				LoginValidator.ErrorMessage = message;
-			}
-		}
-
-		public string ValidateLogin(string login)
-		{
-			if (String.IsNullOrEmpty(login) || String.IsNullOrEmpty(login.Trim()))
-				return "Поле «Имя пользователя» должно быть заполнено";
-
-			var match = new Regex(@"^\s*[a-z|0-9|_]+\s*$").Match(login);
-			if (!match.Success)
-				return "Имя пользователя должно начинаться с буквы";
-
-			match = new Regex(@"^\s*[a-z|0-9|_]+\s*$").Match(login);
-			if (!match.Success)
-				return "Имя пользователя может содержать буквы латинского алфавита, цифры и символ подчеркивания, другие символы не допускаются";
-			
-			var existsInDataBase = false;
-			With.Connection(c => {
-				existsInDataBase = Convert.ToUInt32(new MySqlCommand("select Max(osusername='" + login + "') as Present from (osuseraccessright)", c).ExecuteScalar()) == 1;
-			});
-
-			var existsInActiveDirectory = ADHelper.IsLoginExists(login);
-			if (existsInActiveDirectory || existsInDataBase)
-				return String.Format("Имя пользователя '{0}' существует в системе.", login);
-
-			return null;
 		}
 
 		protected void TypeValidator_ServerValidate(object source, ServerValidateEventArgs args)

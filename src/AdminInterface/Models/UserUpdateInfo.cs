@@ -7,7 +7,16 @@ namespace AdminInterface.Models
 	[ActiveRecord("usersettings.UserUpdateInfo")]
 	public class UserUpdateInfo : ActiveRecordLinqBase<UserUpdateInfo>
 	{
-		[PrimaryKey("UserId")]
+		public UserUpdateInfo(uint id)
+		{
+			Id = id;
+			AFAppVersion = DefaultValues.Get().AnalitFVersion;
+			AFCopyId = "";
+		}
+
+		public UserUpdateInfo() { }
+
+		[PrimaryKey("UserId", Generator = PrimaryKeyType.Assigned)]
 		public uint Id { get; set; }
 
 		[Property]
@@ -15,8 +24,5 @@ namespace AdminInterface.Models
 
 		[Property]
 		public uint AFAppVersion { get; set; }
-
-		[BelongsTo("UserId")]
-		public User User { get; set; }
 	}
 }

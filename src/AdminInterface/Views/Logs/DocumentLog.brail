@@ -1,5 +1,5 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Статистика получения\отправки документов клиента ${client.ShortName}
+	Статистика получения\отправки документов клиента ${client.Name}
 <% end %>
 
 <% component CaptureFor, {"id" : "PostToServer"}: %>
@@ -7,7 +7,7 @@
 <% end %>
 
 <div class="PageHeader">
-	Статистика получения\отправки документов клиента ${client.ShortName}
+	Статистика получения\отправки документов клиента ${client.Name}
 </div>
 
 <% OutputSubView("SelectDateIntervalSubView") %>
@@ -36,6 +36,9 @@
 			</th>
 		<% end %>
 			<th>
+				На адрес
+			</th>
+			<th>
 				Название файла
 			</th>
 			<th>
@@ -51,10 +54,7 @@
 				Комментарий
 			</th>
 		</tr>
-	<%
-		i = 0
-		for logEntity in logEntities:
-	%>
+	<% for i, logEntity in enumerate(logEntities): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
 			<td>
 				${logEntity.Id}
@@ -65,21 +65,18 @@
 			<td>
 				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
 			</td>
-		<% 
-			if client.IsDrugstore():
-		%>
+			<% if client.IsDrugstore(): %>
 				<td>
-					${logEntity.FromSupplier.ShortName if logEntity.FromSupplier != null}
+					${logEntity.FromSupplier.Name if logEntity.FromSupplier != null}
 				</td>
-		<%
-			else:
-		%>
+			<% else: %>
 				<td>
-					${logEntity.ForClient.ShortName if logEntity.ForClient != null}
+					${logEntity.ForClient.Name if logEntity.ForClient != null}
 				</td>
-		<% 
-			end
-		%>
+			<% end %>
+			<td>
+				${logEntity.Address.Value}
+			</td>
 			<td>
 				${logEntity.FileName}
 			</td>
@@ -96,19 +93,14 @@
 				<pre>!{logEntity.Addition}</pre>
 			</td>
 		</tr>
-	<%		
-			i++
-		end
-		else:
-	%>
+	<% end %>
+	<% else: %>
 		<tr class="EmptyData">
 			<td>
 				За указанный период документов не найдено
 			</td>
 		</tr>
-	<%
-		end
-	%>
+	<% end %>
 	</table>
 
 </div>

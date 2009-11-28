@@ -27,5 +27,10 @@ namespace AdminInterface.Test.ForTesting
 		{
 			return new IE(BuildTestUrl(uri));
 		}
+
+		protected IE Open(string uri, params object[] args)
+		{
+			return new IE(BuildTestUrl(String.Format(uri, args)));
+		}
 	}
 }

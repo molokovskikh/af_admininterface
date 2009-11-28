@@ -1,7 +1,6 @@
 using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using AdminInterface.Helpers;
 
 namespace AddUser
 {
@@ -29,7 +28,7 @@ namespace AddUser
 			LBLogin.Text = Login;
 			LBLcard.Text = Login;
 			LBPassword.Text = Password;
-			LBCode.Text = Code;
+			LBCode.Text = String.Format(Code + " / " + Login);
 			LBCard.Text = Code;
 			DogNLB.Text = DogN;
 			DogNNLB.Text = DogN;

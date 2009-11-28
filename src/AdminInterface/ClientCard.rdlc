@@ -523,7 +523,7 @@ e-mail: tech@analit.net</Value>
         <CanGrow>true</CanGrow>
         <Left>7.25cm</Left>
         <Height>0.75cm</Height>
-        <Value>="Регистрационная карта № " + Parameters!ClientCode.Value.ToString()</Value>
+        <Value>="Регистрационная карта № " + Parameters!ClientCode.Value.ToString() + "/" + Parameters!ClientLogin.Value.ToString()</Value>
       </Textbox>
     </ReportItems>
     <Height>25.75cm</Height>

@@ -83,44 +83,44 @@ WHERE MaskRegion & ?MaskRegion > 0
 				(c, t) => {
 					var command = new MySqlCommand(@"
 INSERT INTO Usersettings.AnalitFReplicationInfo(UserId, FirmCode)
-SELECT ouar.RowId, supplier.FirmCode
-FROM usersettings.clientsdata as drugstore
-  JOIN usersettings.OsUserAccessRight ouar on ouar.ClientCode = drugstore.FirmCode
-       JOIN clientsdata supplier ON supplier.firmsegment = drugstore.firmsegment
-       LEFT JOIN Usersettings.AnalitFReplicationInfo ari on ari.UserId = ouar.RowId and ari.FirmCode = supplier.FirmCode
+SELECT u.Id, supplier.FirmCode
+FROM Future.Clients as drugstore
+  JOIN Future.Users u on u.ClientId = drugstore.Id
+       JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
+       LEFT JOIN Usersettings.AnalitFReplicationInfo ari on ari.UserId = u.Id and ari.FirmCode = supplier.FirmCode
 WHERE ari.UserId IS NULL
-      AND supplier.firmtype = 0
-      AND drugstore.FirmCode = ?ClientCode 
-      AND drugstore.firmtype = 1
+      AND supplier.FirmType = 0
+      AND drugstore.Id = ?ClientCode
+      AND drugstore.FirmType = 1
       AND supplier.maskregion & drugstore.maskregion > 0
-group by ouar.RowId, supplier.FirmCode;
+group by u.Id, supplier.FirmCode;
 
 set @inHost = ?Host;
 set @inUser = ?UserName;
 
 UPDATE AnalitFReplicationInfo ari
-	JOIN OsUserAccessRight ouar on ari.UserId = ouar.RowId
+	JOIN Future.Users u on ari.UserId = u.Id
 SET MaxSynonymCode = 0,
 	MaxSynonymFirmCrCode = 0,
 	ForceReplication = 1
-WHERE ouar.ClientCode = ?ClientCode;
+WHERE u.ClientId = ?ClientCode;
 
 UPDATE (UserUpdateInfo as source, UserUpdateInfo as dest)
-	JOIN OsUserAccessRight sourceUsers on sourceUsers.RowId = source.UserId
-    JOIN OsUserAccessRight destUsers on destUsers.RowId = dest.UserId
+	JOIN Future.Users sourceUsers on sourceUsers.Id = source.UserId
+    JOIN Future.Users destUsers on destUsers.Id = dest.UserId
 SET dest.UpdateDate = source.UpdateDate,
 	dest.AFAppVersion = source.AFAppVersion
-WHERE sourceUsers.clientcode = ?ParentClientCode
-      AND destUsers.clientcode = ?ClientCode;
+WHERE sourceUsers.ClientId = ?ParentClientCode
+      AND destUsers.ClientId = ?ClientCode;
 
 UPDATE AnalitFReplicationInfo as dest
 	JOIN AnalitFReplicationInfo as source on source.FirmCode = dest.FirmCode
-		JOIN OsUserAccessRight sourceUsers on source.UserId = sourceUsers.RowId
-	JOIN OsUserAccessRight destUsers on dest.UserId = destUsers.RowId
+		JOIN Future.Users sourceUsers on source.UserId = sourceUsers.Id
+	JOIN Future.Users destUsers on dest.UserId = destUsers.Id
 SET dest.MaxSynonymFirmCrCode = source.MaxSynonymFirmCrCode,
     dest.MaxSynonymCode = source.MaxSynonymCode
-WHERE destUsers.clientcode = ?ClientCode
-      AND sourceUsers.clientcode = ?ParentClientCode;
+WHERE destUsers.ClientId = ?ClientCode
+      AND sourceUsers.ClientId = ?ParentClientCode;
 
 INSERT 
 INTO    logs.clone 

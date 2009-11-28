@@ -72,7 +72,7 @@ namespace AdminInterface.Controllers
 			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
 			using(new TransactionScope())
 			{
-				ArHelper.WithSession<CallLog>(s => s.CreateSQLQuery(@"
+				ArHelper.WithSession(s => s.CreateSQLQuery(@"
 update logs.CallLogs
 set Id2 = 0
 where `from` = :phone")
@@ -165,8 +165,5 @@ where `from` = :phone")
 				RedirectToReferrer();
 			}
 		}
-
-		public void SuccessPasswordChanged()
-		{}
 	}
 }

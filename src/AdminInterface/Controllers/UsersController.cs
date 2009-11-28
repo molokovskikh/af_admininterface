@@ -33,16 +33,10 @@ namespace AdminInterface.Controllers
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				user.Client = client;
-				user.Login = "temporary-login";
-				user.Save();
-				user.Login = user.Id.ToString();
-				user.Update();
-				var auth = new AuthorizationLogEntity {Id = user.Id};
-				auth.Save();
+				user.Setup(true);
+				password = user.CreateInAd();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
-
-				password = user.CreateInAd();
 
 				client.Addresses.Each(a => a.SetAccessControl(user.Login));
 
@@ -65,7 +59,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				PrepareSessionForReport(user, password);
+				PrepareSessionForReport(user, password, true);
 				RedirectToUrl("../report.aspx");
 			}
 		}
@@ -162,12 +156,15 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				PrepareSessionForReport(user, password);
+				PrepareSessionForReport(user, password, false);
 				RedirectToUrl("../report.aspx");
 			}
 		}
 
-		private void PrepareSessionForReport(User user, string password)
+		public void SuccessPasswordChanged()
+		{}
+
+		private void PrepareSessionForReport(User user, string password, bool isRegistration)
 		{
 			Session["Register"] = false;
 			Session["Code"] = user.Client.Id;
@@ -177,6 +174,7 @@ namespace AdminInterface.Controllers
 			Session["Login"] = user.Login;
 			Session["Password"] = password;
 			Session["Tariff"] = user.Client.Type.Description();
+			Session["IsRegistration"] = isRegistration;
 		}
 	}
 }

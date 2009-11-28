@@ -7,6 +7,8 @@ using System.Linq;
 using System.Security.AccessControl;
 #endif
 using Castle.ActiveRecord;
+using Common.MySql;
+using Common.Web.Ui.Helpers;
 using log4net;
 
 namespace AdminInterface.Models
@@ -33,6 +35,21 @@ namespace AdminInterface.Models
 		public virtual bool AvaliableFor(User user)
 		{
 			return AvaliableForUsers.Any(u => u.Id == user.Id);
+		}
+
+		public virtual void MaitainIntersection()
+		{
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery(@"
+insert into Future.AddressIntersection(AddressId, IntersectionId)
+select a.Id, i.Id
+from Future.Intersection i
+	join Future.Addresses a on a.ClientId = i.ClientId
+	left join Future.AddressIntersection ai on ai.AddressId = a.Id and ai.IntersectionId = i.Id
+where a.Id = :addressId")
+					.SetParameter("addressId", Id)
+					.ExecuteUpdate();
+			});
 		}
 
 		public virtual void CreateFtpDirectory()
@@ -90,14 +107,17 @@ namespace AdminInterface.Models
 			Directory.SetAccessControl(clientRoot, rootDirectorySecurity);
 
 			var orders = Path.Combine(clientRoot, "Orders");
-			var ordersDirectorySecurity = Directory.GetAccessControl(orders);
-			ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
-				FileSystemRights.DeleteSubdirectoriesAndFiles,
-				InheritanceFlags.ContainerInherit |
-					InheritanceFlags.ObjectInherit,
-				PropagationFlags.None,
-				AccessControlType.Allow));
-			Directory.SetAccessControl(orders, ordersDirectorySecurity);
+			if (Directory.Exists(orders))
+			{
+				var ordersDirectorySecurity = Directory.GetAccessControl(orders);
+				ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+					FileSystemRights.DeleteSubdirectoriesAndFiles,
+					InheritanceFlags.ContainerInherit |
+						InheritanceFlags.ObjectInherit,
+					PropagationFlags.None,
+					AccessControlType.Allow));
+				Directory.SetAccessControl(orders, ordersDirectorySecurity);
+			}
 #endif
 		}
 	}

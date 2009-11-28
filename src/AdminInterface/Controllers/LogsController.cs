@@ -1,6 +1,5 @@
 using System;
 using AdminInterface.Helpers;
-using AdminInterface.Model;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
@@ -30,8 +29,8 @@ namespace AdminInterface.Controllers
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
 			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
-			                                                                   beginDate,
-			                                                                   endDate.AddDays(1));
+				beginDate,
+				endDate.AddDays(1));
 			PropertyBag["client"] = client;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
@@ -73,9 +72,9 @@ namespace AdminInterface.Controllers
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
-			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id, 
-																			   beginDate, 
-																			   endDate.AddDays(1));
+			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id,
+				beginDate,
+				endDate.AddDays(1));
 
 			PropertyBag["client"] = client;
 			PropertyBag["beginDate"] = beginDate;
@@ -95,11 +94,21 @@ namespace AdminInterface.Controllers
 			SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
 
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
-			                                                                beginDate,
-			                                                                endDate.AddDays(1));
+				beginDate,
+				endDate.AddDays(1));
 			PropertyBag["login"] = login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
+		}
+
+		public void Order()
+		{
+
+		}
+
+		public void Order(DateTime begin, DateTime end)
+		{
+
 		}
 	}
 }

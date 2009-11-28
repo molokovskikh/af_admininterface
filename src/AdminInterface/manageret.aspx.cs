@@ -67,7 +67,7 @@ namespace AddUser
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				ArHelper.WithSession<Client>(s => {
+				ArHelper.WithSession(s => {
 					var connection = (MySqlConnection)s.Connection;
 
 					updateCommand.Connection = connection;
@@ -83,9 +83,9 @@ set @inUser = ?UserName;";
 					tempCommand.CommandText =
 						@"
 select MaskRegion, OrderRegionMask
-from clientsdata cd
-	join retclientsset rcs on cd.FirmCode = rcs.ClientCode
-where firmcode=?clientCode";
+from Future.Clients cd
+	join retclientsset rcs on cd.Id = rcs.ClientCode
+where cd.Id = ?clientCode";
 					tempCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 
 					ulong workRegionMask;
@@ -123,7 +123,7 @@ where firmcode=?clientCode";
 					{
 						updateCommand.CommandText =
 							@"
-UPDATE clientsdata SET MaskRegion = ?workMask WHERE FirmCode = ?ClientCode;
+UPDATE future.clients SET MaskRegion = ?workMask WHERE id = ?ClientCode;
 
 INSERT
 INTO Future.Intersection (
@@ -166,7 +166,7 @@ WHERE i.Id IS NULL
 					}
 					updateCommand.CommandText += @"
 UPDATE UserSettings.retclientsset, 
-        UserSettings.clientsdata 
+        Future.Clients
 SET OrderRegionMask     = ?orderMask, 
     RegionCode              =?homeRegionCode , 
     WorkRegionMask          =if(WorkRegionMask & ?workMask > 0, WorkRegionMask, ?homeRegionCode), 
@@ -180,7 +180,7 @@ SET OrderRegionMask     = ?orderMask,
     ServiceClient           = ?ServiceClient, 
     OrdersVisualizationMode = ?OrdersVisualizationMode,
 	FirmCodeOnly			= ?FirmCodeOnly
-where clientcode=firmcode and firmcode=?clientCode; ";
+where clientcode=Id and Id=?clientCode; ";
 
 					var client = Client.FindAndCheck((uint) ClientCode);
 
@@ -324,11 +324,8 @@ WHERE
 					command.Parameters.AddWithValue("?ClientCode", ClientCode);
 					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-					command.CommandText = @"
-SELECT  RegionCode
-FROM clientsdata as cd
-WHERE cd.firmcode = ?ClientCode ";
-					HomeRegionCode = Convert.ToUInt64(command.ExecuteScalar());
+					var client = Client.Find((uint)ClientCode);
+					HomeRegionCode = client.HomeRegion.Id;
 					SecurityContext.Administrator.CheckClientHomeRegion(HomeRegionCode);
 
 

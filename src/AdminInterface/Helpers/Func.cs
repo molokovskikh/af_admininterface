@@ -1,4 +1,5 @@
 using System;
+using System.Configuration;
 using System.Net.Mail;
 using System.Text;
 using log4net;
@@ -41,25 +42,24 @@ namespace AdminInterface.Helpers
 				if (!String.IsNullOrEmpty(to))
 				{
 #if DEBUG
-					to = "KvasovTest@analit.net";
+					to = GetDebugMail();
 					bcc = "";
 #endif
-					var message = new MailMessage
-					              	{
-					              		From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
-					              		IsBodyHtml = false,
-					              		Subject = subject,
-					              		SubjectEncoding = Encoding.UTF8,
-					              		Body = body,
-					              		BodyEncoding = Encoding.UTF8,
-					              	};
+					var message = new MailMessage {
+						From = new MailAddress(from, fromDisplayName, Encoding.UTF8),
+						IsBodyHtml = false,
+						Subject = subject,
+						SubjectEncoding = Encoding.UTF8,
+						Body = body,
+						BodyEncoding = Encoding.UTF8,
+					};
 					if (!String.IsNullOrEmpty(bcc))
 						message.Bcc.Add(bcc);
 
 					foreach (var toAddress in to.Split(",".ToCharArray()))
 						message.To.Add(new MailAddress(toAddress, toDisplayName, Encoding.UTF8));
 
-					var client = new SmtpClient("mail.adc.analit.net");
+					var client = new SmtpClient(GetSmtpServer());
 					client.Send(message);
 				}
 			}
@@ -67,6 +67,16 @@ namespace AdminInterface.Helpers
 			{
 				_log.Error("Не удалось отправить письмо", ex);
 			}
+		}
+
+		private static string GetSmtpServer()
+		{
+			return ConfigurationManager.AppSettings["SmtpServer"];
+		}
+
+		private static string GetDebugMail()
+		{
+			return ConfigurationManager.AppSettings["DebugMail"];
 		}
 
 		public static void SendWitnStandartSender(MailMessage message)
@@ -78,10 +88,10 @@ namespace AdminInterface.Helpers
 				message.CC.Clear();
 				message.Bcc.Clear();
 
-				message.To.Add("KvasovTest@analit.net");
+				message.To.Add(GetDebugMail());
 #endif
 
-				var client = new SmtpClient("mail.adc.analit.net");
+				var client = new SmtpClient(GetSmtpServer());
 				client.Send(message);
 			}
 			catch (Exception ex)
@@ -96,11 +106,11 @@ namespace AdminInterface.Helpers
 			{
 #if DEBUG
 				message.To.Clear();
-				message.To.Add("KvasovTest@analit.net");
+				message.To.Add(GetDebugMail());
 				message.Bcc.Clear();
 				message.CC.Clear();
 #endif
-				var smtpid = SmtpClientEx.QuickSendSmartHostSMTPID("mail.adc.analit.net", "", "", message);
+				var smtpid = SmtpClientEx.QuickSendSmartHostSMTPID(GetSmtpServer(), "", "", message);
 				if (smtpid == null)
 					return 0;
 

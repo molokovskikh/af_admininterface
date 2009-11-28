@@ -6,6 +6,13 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Table = "logs.AuthorizationDates")]
 	public class AuthorizationLogEntity : ActiveRecordBase<AuthorizationLogEntity>
 	{
+		public AuthorizationLogEntity(uint id)
+		{
+			Id = id;
+		}
+
+		public AuthorizationLogEntity() {}
+
 		[PrimaryKey("UserId", Generator = PrimaryKeyType.Assigned)]
 		public uint Id { get; set; }
 

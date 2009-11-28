@@ -1,5 +1,5 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
-									  ("Клиент ${client.ShortName}", "${siteroot}/client/${client.Id}"),
+									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый адрес доставки", "")]} %>
 
 <script>
@@ -31,7 +31,7 @@
 			</div>
 		</div>
 		<div class=save>
-			<input type=submit value="Сохранить">
+			<input type=submit value="Создать">
 		</div>
 	</form>
 </div>

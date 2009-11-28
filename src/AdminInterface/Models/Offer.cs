@@ -16,7 +16,7 @@ namespace AdminInterface.Models
 			IList<Offer> offers = null;
 			using (new TransactionScope())
 			{
-				ArHelper.WithSession<Client>(s =>
+				ArHelper.WithSession(s =>
 				{
 					s.CreateSQLQuery(@"call Usersettings.GetActivePrices(:ClientCode)")
 						.SetParameter("ClientCode", client.Id)

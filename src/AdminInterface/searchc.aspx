@@ -118,12 +118,12 @@
 					<asp:BoundField DataField="UserName" HeaderText="Имя пользователя" SortExpression="UserName" />
 					<asp:TemplateField HeaderText="Сегмент" SortExpression="Segment">
 						<ItemTemplate>
-							<asp:Label ID="Label3" runat="server" Text='<%# Eval("Segment").ToString() == "0" ? "Опт" : "Справка" %>'></asp:Label>
+							<asp:Label ID="Label3" runat="server" Text='<%# Convert.ToInt32(Eval("Segment")) == 0 ? "Опт" : "Справка" %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
 					<asp:TemplateField HeaderText="Тип" SortExpression="FirmType">
 						<ItemTemplate>
-							<asp:Label ID="Label4" runat="server" Text='<%# Eval("FirmType").ToString() == "1" ? "Аптека" : "Поставщик" %>'></asp:Label>
+							<asp:Label ID="Label4" runat="server" Text='<%# Convert.ToUInt32(Eval("FirmType")) == 1 ? "Аптека" : "Поставщик" %>'></asp:Label>
 						</ItemTemplate>
 					</asp:TemplateField>
 				</Columns>

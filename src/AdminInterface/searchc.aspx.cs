@@ -130,7 +130,7 @@ ORDER BY IsAll Desc, Region;", c);
 		{
 			var data = row.DataItem as DataRowView;
 
-			if (data.Row["Status"].ToString() == "1")
+			if (!Convert.ToBoolean(data.Row["Status"]))
 				row.BackColor = Color.FromArgb(255, 102, 0);
 
 			if (ADCB.Checked)
@@ -198,7 +198,7 @@ SELECT  cd.PayerId,
         max(uui.UpdateDate) FirstUpdate,
         max(uui.UncommitedUpdateDate) SecondUpdate,
         max(uui.AFAppVersion) EXE,
-        u.Name UserName,
+        u.Login UserName,
         cd.Segment,
         cd.FirmType,
         cd.Status,
@@ -270,7 +270,7 @@ WHERE	(cd.RegionCode & ?RegionMask & ?AdminMaskRegion) > 0
 					}
 				case SearchType.PayerId:
 					{
-						filter += " and cd.PayerId = ?BPayerId ";
+						filter += " and cd.PayerId = ?PayerId ";
 						command.Parameters.Add(new MySqlParameter("?PayerId", MySqlDbType.Int32));
 						command.Parameters["?PayerId"].Value = FindTB.Text;
 						break;

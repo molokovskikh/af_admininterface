@@ -9,12 +9,12 @@ namespace AdminInterface.Helpers
 	{
         public static void SetupParametersForTriggerLogging<T>(string user, string host)
         {
-            ArHelper.WithSession<T>(session => SetupParametersForTriggerLogging(new { InUser = user, InHost = host }, session));
+            ArHelper.WithSession(session => SetupParametersForTriggerLogging(new { InUser = user, InHost = host }, session));
         }
 
         public static void SetupParametersForTriggerLogging<T>(object parameters)
         {
-            ArHelper.WithSession<T>(session => SetupParametersForTriggerLogging(parameters, session));
+            ArHelper.WithSession(session => SetupParametersForTriggerLogging(parameters, session));
         }
 
 	    private static void SetupParametersForTriggerLogging(object parameters, ISession session)

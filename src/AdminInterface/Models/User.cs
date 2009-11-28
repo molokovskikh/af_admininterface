@@ -4,6 +4,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
@@ -21,13 +22,13 @@ namespace AdminInterface.Models
 	[ActiveRecord("Users", Schema = "future")]
 	public class User : ActiveRecordBase<User>
 	{ 
-		[PrimaryKey("Id")]
+		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
 		[Property(NotNull = true)]
 		public virtual string Login { get; set; }
 
-		[Property(NotNull = true)]
+		[Property]
 		public virtual string Name { get; set; }
 
 		[Property]
@@ -55,6 +56,13 @@ namespace AdminInterface.Models
 			Table = "future.UserAddresses",
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
+
+		public string GetLoginOrName()
+		{
+			if (String.IsNullOrEmpty(Name))
+				return Login;
+			return Name;
+		}
 
 		public void AddPermission(UserPermission permission)
 		{
@@ -123,6 +131,27 @@ namespace AdminInterface.Models
 				password,
 				Client.Id);
 			return password;
+		}
+
+		public void Setup(bool maintainPrices)
+		{
+			Login = "temporary-login";
+			Save();
+			Login = Id.ToString();
+			Update();
+			new AuthorizationLogEntity(Id).Create();
+			new UserUpdateInfo(Id).Create();
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery(@"
+insert into Future.UserPrices(PriceId, UserId)
+select i.PriceId, u.Id
+from Future.Users u
+	join Future.Intersection i on i.ClientId = u.ClientId
+where u.Id = :UserId
+group by i.PriceId")
+				.SetParameter("UserId", Id)
+				.ExecuteUpdate();
+			});
 		}
 	}
 }

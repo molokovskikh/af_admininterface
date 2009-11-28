@@ -70,16 +70,16 @@
 					<% end %>
 				</li>
 				<li>
-					<a ${"href=../Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
+					<a ${"href=${siteroot}/Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
 				</li>
 				<li>
-					<a ${"href=../Logs/UpdateLog.rails?clientCode=${Client.Id}" if Client.IsDrugstore()} target="_blank">История обновлений</a>
+					<a ${"href=${siteroot}/Logs/UpdateLog.rails?clientCode=${Client.Id}" if Client.IsDrugstore()} target="_blank">История обновлений</a>
 				</li>
 				<li>
-					<a href="../Logs/DocumentLog.rails?clientCode=${Client.Id}" target="_blank">История документов</a>
+					<a href="${siteroot}/Logs/DocumentLog.rails?clientCode=${Client.Id}" target="_blank">История документов</a>
 				</li>
 				<li>
-					<a href="../orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
+					<a href="${siteroot}/orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
 				</li>
 				<% if client.IsDrugstore(): %>
 				<li>
@@ -169,7 +169,7 @@
 							<% if isLoginExists: %>
 								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
 							<% else: %>
-								${user.Login}
+								${user.GetLoginOrName()}
 							<% end %>
 						</td>
 						<td>

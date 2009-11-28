@@ -7,6 +7,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate;
@@ -32,8 +33,18 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("Future.Clients", Lazy = true)]
-	public class Client : ActiveRecordBase<Client>
+	[ActiveRecord("Usersettings.ClientsData")]
+	public class Supplier : ActiveRecordBase<Supplier>
+	{
+		[PrimaryKey("FirmCode")]
+		public virtual uint Id { get; set;}
+
+		[Property("ShortName", NotNull = true)]
+		public virtual string Name { get; set; }
+	}
+
+	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
+	public class Client : ActiveRecordLinqBase<Client>
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -148,6 +159,7 @@ namespace AdminInterface.Models
 
 		public virtual void ProcessEmails(List<string> emails, params ContactOwner[] contactGroups)
 		{
+			contactGroups = contactGroups.Where(g => g != null).ToArray();
 			foreach (var contactGroup in contactGroups)
 				foreach (var contact in contactGroup.Contacts)
 					if (contact.Type == ContactType.Email && !emails.Contains(contact.ContactText.Trim()))
@@ -156,26 +168,19 @@ namespace AdminInterface.Models
 
 		private string Build(ContactGroup generalGroup, params ContactGroup[] specialGroup)
 		{
+			specialGroup = specialGroup.Where(g => g != null && g.Persons != null).ToArray();
 			var emails = new List<string>();
-			foreach (var contactGroup in specialGroup)
-			{
-				if (contactGroup.Persons != null)
-				{
-					foreach (var person in contactGroup.Persons)
-						ProcessEmails(emails, person);
-				}
-			}
+			foreach (var person in specialGroup.SelectMany(g => g.Persons))
+				ProcessEmails(emails, person);
 
 			ProcessEmails(emails, specialGroup);
 
 			if (emails.Count > 0)
 				return String.Join(", ", emails.ToArray());
 
-			if (generalGroup.Persons != null)
-			{
+			if (generalGroup != null && generalGroup.Persons != null)
 				foreach (var person in generalGroup.Persons)
 					ProcessEmails(emails, person);
-			}
 
 			ProcessEmails(emails, generalGroup);
 			
@@ -184,12 +189,12 @@ namespace AdminInterface.Models
 
 		public virtual void ResetUin()
 		{
-			ArHelper.WithSession<Client>(session =>
+			ArHelper.WithSession(session =>
 				session.CreateSQLQuery(@"
 update usersettings.UserUpdateInfo uui
-	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
+	join Future.Users u on uui.UserId = u.Id
 set uui.AFCopyId = '' 
-where ouar.clientcode = :clientcode")
+where u.ClientId = :clientcode")
 					.SetParameter("clientcode", Id)
 					.ExecuteUpdate());
 		}
@@ -200,9 +205,9 @@ where ouar.clientcode = :clientcode")
 				session.CreateSQLQuery(@"
 select sum(length(concat(uui.AFCopyId))) = 0
 from usersettings.UserUpdateInfo uui
-	join usersettings.OsUserAccessRight ouar on uui.UserId = ouar.RowId
-where ouar.clientcode = :clientcode
-group by ouar.clientcode")
+	join Future.Users u on uui.UserId = u.Id
+where u.ClientId = :clientcode
+group by u.ClientId")
 					.SetParameter("clientcode", Id)
 					.UniqueResult<long?>());
 
@@ -244,6 +249,46 @@ group by ouar.clientcode")
 		public virtual string GetHumanReadableType()
 		{
 			return BindingHelper.GetDescription(Type);
+		}
+
+		public virtual void MaintainIntersection()
+		{
+			ArHelper.WithSession(
+				s => {
+					var reslt = s.CreateSQLQuery(
+							@"
+INSERT
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	CostId
+)
+SELECT  DISTINCT drugstore.Id,
+        regions.regioncode,
+        pricesdata.pricecode,
+        (
+          SELECT costcode
+          FROM    pricescosts pcc
+          WHERE   basecost
+                  AND pcc.PriceCode = pricesdata.PriceCode
+        ) as CostCode
+FROM Future.Clients as drugstore
+	JOIN retclientsset as a ON a.clientcode = drugstore.Id
+	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
+		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
+	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
+		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
+	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
+WHERE i.Id IS NULL
+	AND supplier.firmtype = 0
+	AND drugstore.Id = :clientId
+	AND drugstore.FirmType = 1;
+")
+							.SetParameter("clientId", Id)
+							.ExecuteUpdate();
+					reslt++;
+				});
 		}
 	}
 }
