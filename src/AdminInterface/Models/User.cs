@@ -19,9 +19,9 @@ namespace AdminInterface.Models
 		public CantChangePassword(string message) : base(message) { }
 	}
 
-	[ActiveRecord("Users", Schema = "future")]
+	[ActiveRecord("Users", Schema = "future", Lazy = true)]
 	public class User : ActiveRecordBase<User>
-	{ 
+	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
@@ -40,8 +40,14 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool SendRejects { get; set; }
 
-		[BelongsTo("ClientId", NotNull = true)]
-		public Client Client { get; set; }
+		[Property]
+		public virtual bool Auditor { get; set; }
+
+		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
+		public virtual Client Client { get; set; }
+
+		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
+		public virtual User InheritPricesFrom { get; set; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),
 			Lazy = true,
@@ -57,14 +63,14 @@ namespace AdminInterface.Models
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
-		public string GetLoginOrName()
+		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
 				return Login;
 			return Name;
 		}
 
-		public void AddPermission(UserPermission permission)
+		public virtual void AddPermission(UserPermission permission)
 		{
 			if (AssignedPermissions == null)
 				AssignedPermissions = new List<UserPermission>();
@@ -81,7 +87,7 @@ namespace AdminInterface.Models
 			return ActiveRecordMediator<User>.FindByPrimaryKey(id);
 		}
 
-		public void CheckLogin()
+		public virtual void CheckLogin()
 		{
 			if (!ADHelper.IsLoginExists(Login))
 				throw new LoginNotFoundException(String.Format("Пользователь {0} не найден", Login));
@@ -95,7 +101,7 @@ namespace AdminInterface.Models
 			return Login;
 		}
 
-		public bool IsPermissionAssigned(UserPermission permission)
+		public virtual bool IsPermissionAssigned(UserPermission permission)
 		{
 			foreach (var userPermission in AssignedPermissions)
 				if (permission.Shortcut == userPermission.Shortcut)
@@ -103,7 +109,7 @@ namespace AdminInterface.Models
 			return false;
 		}
 
-		public bool IsChangePasswordByOneself()
+		public virtual bool IsChangePasswordByOneself()
 		{
 			var log = ActiveRecordBase<PasswordChangeLogEntity>.FindFirst(
 				DetachedCriteria.For<PasswordChangeLogEntity>()
@@ -124,7 +130,7 @@ namespace AdminInterface.Models
 			return password;
 		}
 
-		public string CreateInAd()
+		public virtual string CreateInAd()
 		{
 			var password = GeneratePassword();
 			ADHelper.CreateUserInAD(Login,
@@ -133,7 +139,7 @@ namespace AdminInterface.Models
 			return password;
 		}
 
-		public void Setup(bool maintainPrices)
+		public virtual void Setup(bool maintainPrices)
 		{
 			Login = "temporary-login";
 			Save();

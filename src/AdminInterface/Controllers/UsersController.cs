@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.Always, Expect = "user.AssignedPermissions, user.AvaliableAddresses")] User user)
+		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user)
 		{
 			user.Update();
 			Flash["Message"] = new Message("Сохранен");

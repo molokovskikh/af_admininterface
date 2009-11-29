@@ -105,6 +105,7 @@
     <Compile Include="Models\OrdersViewFixture.cs" />
     <Compile Include="Models\PaymentFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
+    <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />

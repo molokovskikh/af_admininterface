@@ -23,6 +23,31 @@ namespace Functional
 		}
 
 		[Test]
+		public void Set_user_parent()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users.First();
+			var mainUser = new User {
+				Client = client,
+				Name = "test"
+			};
+			mainUser.Setup(true);
+			using(var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText(user.Login)).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
+				browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.Login);
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранен"));
+			}
+			using (new SessionScope())
+			{
+				user = User.Find(user.Id);
+				Assert.That(user.InheritPricesFrom.Id, Is.EqualTo(mainUser.Id));
+			}
+		}
+
+		[Test]
 		public void View_password_change_statistics()
 		{
 			var client = DataMother.CreateTestClientWithUser();

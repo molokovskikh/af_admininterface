@@ -83,8 +83,10 @@ namespace Functional.ForTesting
 		public static Client CreateTestClientWithUser()
 		{
 			var client = CreateTestClient();
-			var user = new User();
-			user.Client = client;
+			var user = new User {
+				Client = client,
+				Name = "test"
+			};
 			user.Setup(true);
 			client.Users = new List<User> {user};
 			return client;

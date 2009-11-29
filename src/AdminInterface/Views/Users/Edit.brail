@@ -38,6 +38,16 @@
 			
 			<input type=checkbox name=user.SendRejects ${"checked" if user.SendRejects} value=true> Получать отказы<br>
 			<input type=hidden name=user.SendRejects value=false>
+			
+			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
+			<input type=hidden name=user.Auditor value=false>
+			
+			<select name=user.InheritPricesFrom.Id>
+				<option value=0>Не наследовать</option>
+				<% for parent in user.Client.Users: %>
+					<option value=${parent.Id} ${"selected" if user.InheritPricesFrom and user.InheritPricesFrom.Id == parent.Id}>${parent.Login}</option>
+				<% end %>
+			</select> Наследовать настройки прайс листов <br>
 		</div>
 		<div class=block>
 			<h3>
