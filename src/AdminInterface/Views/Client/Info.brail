@@ -72,14 +72,16 @@
 				<li>
 					<a ${"href=${siteroot}/Billing/edit.rails?ClientCode=${Client.Id}" if admin.CanViewBilling}>Биллинг</a>
 				</li>
+				<% if Client.IsDrugstore(): %>
 				<li>
-					<a ${"href=${siteroot}/Logs/UpdateLog.rails?clientCode=${Client.Id}" if Client.IsDrugstore()} target="_blank">История обновлений</a>
+					<a href="${siteroot}/Logs/UpdateLog.rails?clientCode=${Client.Id}" target="_blank">История обновлений</a>
 				</li>
+				<% end %>
 				<li>
 					<a href="${siteroot}/Logs/DocumentLog.rails?clientCode=${Client.Id}" target="_blank">История документов</a>
 				</li>
 				<li>
-					<a href="${siteroot}/orders.aspx?cc=${Client.Id}" target="_blank">История заказов</a>
+					<a href="${siteroot}/client/${client.Id}/orders/" target="_blank">История заказов</a>
 				</li>
 				<% if client.IsDrugstore(): %>
 				<li>

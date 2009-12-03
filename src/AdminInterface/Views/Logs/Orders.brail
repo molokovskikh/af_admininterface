@@ -1,0 +1,46 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	История заказов клиента ${client.Name}
+<% end %>
+
+<div class="PageHeader">
+	История заказов клиента ${client.Name}
+</div>
+
+<% OutputSubView("SelectDateIntervalSubView") %>
+
+<table class=DataTable>
+	<% if orders.Count > 0: %>
+		<tr>
+			<th>№</th>
+			<th>№ в AnalitF</th>
+			<th>Дата заказа</th>
+			<th>Дата прайса</th>
+			<th>Аптека</th>
+			<th>Адрес</th>
+			<th>Пользователь</th>
+			<th>Поставщик</th>
+			<th>Прайс</th>
+			<th>Позиций</th>
+			<th>SmtpID</th>
+		</tr>
+		<% for i, order in enumerate(orders): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>${order.Id}</td>
+			<td>${order.ClientOrderId}</td>
+			<td>${order.WriteTime}</td>
+			<td>${order.PriceDate}</td>
+			<td>${order.Drugstore}</td>
+			<td>${order.Address}</td>
+			<td>${order.User}</td>
+			<td>${order.Supplier}</td>
+			<td>${order.PriceName}</td>
+			<td>${order.RowCount}</td>
+			<td>${order.SmtpId}</td>
+		</tr>
+		<% end %>
+	<% else: %>
+		<tr class="EmptyData">
+			<td>За указанный период заказов не было</td>
+		</tr>
+	<% end %>
+</table>

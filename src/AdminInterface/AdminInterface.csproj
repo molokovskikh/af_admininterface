@@ -292,13 +292,6 @@
     <Compile Include="OfficeUserRegistrationReport.aspx.designer.cs">
       <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
     </Compile>
-    <Compile Include="orders.aspx.cs">
-      <DependentUpon>orders.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="orders.aspx.designer.cs">
-      <DependentUpon>orders.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -388,7 +381,6 @@
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
     <Content Include="manageret.aspx" />
-    <Content Include="orders.aspx" />
     <Content Include="register.aspx" />
     <Content Include="report.aspx" />
     <Content Include="searchc.aspx" />
@@ -450,6 +442,7 @@
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Client\Info.brail" />
+    <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />

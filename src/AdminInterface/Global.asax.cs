@@ -60,6 +60,11 @@ namespace AddUser
 				.DefaultForAction().Is("info")
 				.Restrict("cc").ValidInteger);
 
+			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[clientId]/orders")
+				.DefaultForController().Is("Logs")
+				.DefaultForAction().Is("Orders")
+				.Restrict("clientId").ValidInteger);
+
 			RoutingModuleEx.Engine.Add(new PatternRoute("/deliveries/[id]/edit")
 				.DefaultForController().Is("deliveries")
 				.DefaultForAction().Is("edit")
@@ -93,13 +98,13 @@ namespace AddUser
 				.GetAllConfigurations()[0];
 
 			configuration.FilterDefinitions.Add("RegionFilter",
-			                                    new FilterDefinition("RegionFilter",
-			                                                         "",
-			                                                         new Dictionary<string, IType>{{"AdminRegionMask", NHibernateUtil.UInt64}}));
+				new FilterDefinition("RegionFilter",
+					"",
+					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}}));
 			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
-			                                    new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
+				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
 			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
-			                                    new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
+				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
 
 			var payerMapping = configuration.GetClassMapping(typeof (Payer));
 			var colection = (Collection) payerMapping.GetProperty("Clients").Value;
@@ -166,7 +171,7 @@ WHERE PriceCode = ?Id", connection);
 					firmCode = Convert.ToUInt32(command.ExecuteScalar());
 				}
 				currentNode.ParentNode.Url += "?cc=" + firmCode;
-				currentNode.ParentNode.ParentNode.Url += firmCode;				
+				currentNode.ParentNode.ParentNode.Url += firmCode;
 			}
 			return currentNode;
 		}

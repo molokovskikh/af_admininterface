@@ -1,16 +1,18 @@
 using System;
+using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("logs"), 
-		Helper(typeof(BindingHelper)), 
+		Layout("logs"),
+		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Secure
 	]
@@ -101,14 +103,99 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 		}
 
-		public void Order()
+		public void Orders(uint clientId)
 		{
-
+			Orders(clientId, DateTime.Today, DateTime.Today);
 		}
 
-		public void Order(DateTime begin, DateTime end)
+		public void Orders(uint clientId, DateTime beginDate, DateTime endDate)
 		{
+			PropertyBag["client"] = Client.FindAndCheck(clientId);
+			PropertyBag["beginDate"] = beginDate;
+			PropertyBag["endDate"] = endDate;
+			PropertyBag["Orders"] = OrderLog.Load(clientId, beginDate, endDate);
+		}
+	}
 
+	public class OrderLog
+	{
+		public uint Id { get; set; }
+		public uint? ClientOrderId { get; set; }
+		public DateTime WriteTime { get; set; }
+		public DateTime PriceDate { get; set; }
+
+		public string Drugstore { get; set; }
+		public string Address { get; set; }
+		public string User { get; set; }
+
+		public string Supplier { get; set; }
+		public string PriceName { get; set; }
+
+		public uint PriceId { get; set; }
+
+		public uint RowCount { get; set; }
+		public double Sum { get; set; }
+		public uint? ResultCode { get; set; }
+		public uint? TransportType { get; set; }
+
+		public uint SmtpId { get; set; }
+
+		public string GetResult()
+		{
+			if (TransportType == null || ResultCode == 0)
+				return "Не отправлен";
+
+			if (PriceId == 2647)
+				return "ok (Обезличенный заказ)";
+
+			switch (TransportType)
+			{
+				case 1:
+					return ResultCode.ToString();
+				case 2:
+					return "ok (Ftp Инфорум)";
+				case 4:
+					return "ok (Ftp Поставщика)";
+				default:
+					return "ok (Собственный отправщик)";
+			}
+		}
+
+		public static IList<OrderLog> Load(uint clientId, DateTime begin, DateTime end)
+		{
+			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
+SELECT  oh.rowid as Id,
+		oh.WriteTime,
+		oh.PriceDate,
+		c.Name as Drugstore,
+		a.Address,
+		u.Login as User,
+		firm.shortname as Supplier,
+		pd.PriceName,
+		pd.PriceCode PriceId,
+		oh.RowCount,
+		max(o.ResultCode) as ResultCode,
+		o.TransportType,
+		oh.ClientOrderId
+FROM orders.ordershead oh
+	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
+	join usersettings.clientsdata as firm on firm.firmcode = pd.firmcode
+	join Future.Clients c on oh.ClientCode = c.Id
+	join Future.Users u on u.Id = oh.UserId
+	join Future.Addresses a on a.Id = oh.AddressId
+		left join logs.orders o on oh.rowid = o.orderid
+WHERE oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)
+	AND oh.ClientCode = :ClientId
+	AND oh.RegionCode & :RegionCode > 0
+	and oh.Deleted = 0
+group by oh.rowid
+ORDER BY writetime desc;")
+				.SetParameter("FromDate", begin)
+				.SetParameter("ToDate", end)
+				.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
+				.SetParameter("ClientId", clientId)
+				.SetResultTransformer(Transformers.AliasToBean<OrderLog>())
+				.List<OrderLog>());
 		}
 	}
 }
