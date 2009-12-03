@@ -42,7 +42,6 @@ namespace Functional
 			}
 		}
 
-
 		[Test]
 		public void Try_to_open_client_view()
 		{
@@ -55,12 +54,13 @@ namespace Functional
 		[Test]
 		public void Try_to_view_orders()
 		{
-			using (var browser = new IE(BuildTestUrl("Client/2575")))
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(l => l.Text == "История заказов").Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Статистика заказов")))
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("История заказов клиента " + client.Name)))
 				{
-					Assert.That(openedWindow.ContainsText("Укажите период"));
+					Assert.That(openedWindow.Text, Is.StringContaining("История заказов"));
 				}
 			}
 		}
