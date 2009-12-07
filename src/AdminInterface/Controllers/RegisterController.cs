@@ -46,7 +46,7 @@ namespace AdminInterface.Controllers
 
 			_notificationService.SendNotificationToBillingAboutClientRegistration(client,
 				SecurityContext.Administrator.UserName,
-				paymentOptions);
+				paymentOptions, NotificationHelper.GetApplicationUrl());
 
 			if (showRegistrationCard)
 				RedirectToUrl("../report.aspx");

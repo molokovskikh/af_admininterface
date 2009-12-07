@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
+using System.Web;
 
 namespace AdminInterface.Services
 {
@@ -75,7 +76,8 @@ where length(c.contactText) > 0
 
 		public void SendNotificationToBillingAboutClientRegistration(Client client,
 			string userName,
-			PaymentOptions options)
+			PaymentOptions options,
+			string appUrl)
 		{
 			var message = new MailMessage();
 			message.To.Add("billing@analit.net");
@@ -87,11 +89,11 @@ where length(c.contactText) > 0
 			var paymentOptions = "";
 			if (options != null)
 				paymentOptions = "<br>" + options.GetCommentForPayer().Replace("\r\n", "<br>");
-
+			
 			message.Body = String.Format(
 @"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode={1}'>{0}</a>
+Название: <a href='{5}Billing/edit.rails?clientCode={1}'>{0}</a>
 <br>
 Код: {1}
 <br>
@@ -99,7 +101,7 @@ where length(c.contactText) > 0
 <br>
 Кем зарегистрирован: {3}
 <br>
-{4}", client.Name, client.Id, client.BillingInstance.PayerID, userName, paymentOptions).Replace(Environment.NewLine, "");
+{4}", client.Name, client.Id, client.BillingInstance.PayerID, userName, paymentOptions, appUrl).Replace(Environment.NewLine, "");
 
 			_sendMessage(message);
 		}

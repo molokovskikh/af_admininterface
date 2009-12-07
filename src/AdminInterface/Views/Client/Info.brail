@@ -1,6 +1,5 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
 									  ("Информация о клиенте", "")]} %>
-
 <script>
 	document.observe("dom:loaded", function() {
 
@@ -91,9 +90,9 @@
 				<li>
 					<% if client.IsDrugstore(): %>
 						<% if Client.IsDrugstore(): %>
-							<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
+							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
 						<% else: %>
-							<a ${"href=https://stat.analit.net/ci/auth/logon.aspx?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
+							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
 						<% end %>
 					<% end %>
 				</li>
@@ -162,26 +161,28 @@
 						Последнее изменение пароля
 					</td>
 				</tr>
+				<% users = Client.GetUsers() %>
+				<% usersInfo = ADHelper.GetUsersInformation(users) %>
 				<% containsLockedUsers = false %>
-				<% for user in Client.GetUsers(): %>
-					<% isLoginExists = ADHelper.IsLoginExists(user.Login) %>
-					<% containsLockedUsers = isLoginExists and ADHelper.IsLocked(user.Login) if not containsLockedUsers %>
+				<% for user in users: %>
+					<% userInfo = usersInfo[user.Login] %>
+					<% containsLockedUsers = userInfo.IsLoginExists and userInfo.IsLocked if not containsLockedUsers %>
 					<tr>
-						<td class="${"BlockedLogin" if isLoginExists and ADHelper.IsLocked(user.Login)} ${"DisabledLogin" if isLoginExists and ADHelper.IsDisabled(user.Login)} ${"LoginNotExists" if not isLoginExists}">
-							<% if isLoginExists: %>
+						<td class="${"BlockedLogin" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledLogin" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"LoginNotExists" if not userInfo.IsLoginExists}">
+							<% if userInfo.IsLoginExists: %>
 								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
 							<% else: %>
 								${user.GetLoginOrName()}
 							<% end %>
 						</td>
 						<td>
-							${ADHelper.GetLastLogOnDate(user.Login) if isLoginExists}
+							${userInfo.LastLogOnDate if userInfo.IsLoginExists}
 						</td>
 						<td>
-							${ADHelper.GetBadPasswordDate(user.Login) if isLoginExists}
+							${userInfo.BadPasswordDate if userInfo.IsLoginExists}
 						</td>
 						<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
-							${ADHelper.GetLastPasswordChange(user.Login) if isLoginExists}
+							${userInfo.LastPasswordChange if userInfo.IsLoginExists}
 						</td>
 					</tr>
 				<% end %>

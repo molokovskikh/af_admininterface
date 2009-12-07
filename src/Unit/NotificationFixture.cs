@@ -32,7 +32,7 @@ namespace Unit
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				paymentOptions);
+				paymentOptions, "https://stat.analit.net/Adm");
 
 			Assert.That(_message, Is.Not.Null, "Сообщение не послано");
 			Assert.That(_message.To.Count, Is.EqualTo(1));
@@ -71,7 +71,7 @@ namespace Unit
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				paymentOptions);
+				paymentOptions, "https://stat.analit.net/Adm");
 
 			Assert.That(_message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
@@ -103,7 +103,7 @@ namespace Unit
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				null);
+				null, "https://stat.analit.net/Adm");
 
 			Assert.That(_message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент

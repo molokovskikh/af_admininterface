@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using AdminInterface.Properties;
 
 namespace AdminInterface.Controllers
 {
@@ -68,6 +69,7 @@ namespace AdminInterface.Controllers
 		public void Edit(string login)
 		{
 			var user = User.GetByLogin(login);
+			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;

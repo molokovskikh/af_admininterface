@@ -197,7 +197,7 @@ ORDER BY region;";
 				new NotificationService()
 					.SendNotificationToBillingAboutClientRegistration(client,
 						SecurityContext.Administrator.UserName,
-						null);
+						null, NotificationHelper.GetApplicationUrl());
 			Response.Redirect(redirectTo);
 		}
 
@@ -263,8 +263,8 @@ ORDER BY region;";
 		{
 			With.Connection(c => {
 				var adapter = new MySqlDataAdapter(String.Format(@"
-SELECT  DISTINCT PayerID, 
-        convert(concat(PayerID, '. ', p.ShortName) using cp1251) PayerName  
+SELECT  DISTINCT p.PayerID, 
+        convert(concat(p.PayerID, '. ', p.ShortName) using cp1251) PayerName  
 FROM Future.Clients as cd
 	JOIN billing.payers p ON cd.PayerId = p.PayerId
 WHERE   cd.regioncode & ?AdminRegionCode > 0 

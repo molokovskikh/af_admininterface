@@ -23,6 +23,7 @@
 				<ul class="navigation-menu">
 					<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
 					<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
+					<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
 				</ul>
 			</div>
 		<% end %>

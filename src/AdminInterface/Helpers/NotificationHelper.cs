@@ -2,6 +2,7 @@
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using System.Web;
 
 namespace AdminInterface.Helpers
 {
@@ -100,6 +101,13 @@ namespace AdminInterface.Helpers
 				body,
 				"RegisterList@subscribe.analit.net",
 				SecurityContext.Administrator.Email);
+		}
+
+		public static string GetApplicationUrl()
+		{
+			var request = HttpContext.Current.Request;
+			string result = request.Url.AbsoluteUri.Replace(request.Url.AbsolutePath, "") + request.ApplicationPath;
+			return result;
 		}
 	}
 }

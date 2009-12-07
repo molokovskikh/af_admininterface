@@ -1,5 +1,8 @@
 ﻿using System;
 using System.DirectoryServices;
+using System.Text;
+using AdminInterface.Models;
+using System.Collections.Generic;
 
 namespace AdminInterface.Helpers
 {
@@ -18,9 +21,98 @@ namespace AdminInterface.Helpers
 		DontExpirePassword = 65536,
 	}
 
+	public class ADUserInformation
+	{
+		public string Login;
+		public bool IsLoginExists = false;
+		public bool IsLocked;
+		public bool IsDisabled;
+		public DateTime? LastLogOnDate;
+		public DateTime? BadPasswordDate;
+		public DateTime? LastPasswordChange;
+	}
+
+	public class ADUserInformationCollection : List<ADUserInformation>
+	{
+		private int GetIndexByLogin(string login)
+		{
+			for(int i = 0; i < this.Count; i++)
+				if(this[i].Login == login)
+					return i;
+			throw new ArgumentException("Не найдены настройки AD для пользователя " + login, "login");
+		}
+
+		public ADUserInformation this[string login]
+		{
+			get
+			{
+				return this[GetIndexByLogin(login)];
+			}
+			set
+			{
+				this[GetIndexByLogin(login)] = value;
+			}
+		}
+	}
+
 	public class ADHelper
 	{
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
+
+		public static ADUserInformationCollection GetUsersInformation(IEnumerable<User> users)
+		{
+			var result = new ADUserInformationCollection();
+			var filter= new StringBuilder();
+			foreach (var user in users)
+			{
+				filter.Append("(sAMAccountName=" + user.Login + ")");
+				result.Add(new ADUserInformation() {Login = user.Login});
+			}
+
+			if(result.Count == 0)
+				return null;
+			if (result.Count > 1)
+				filter.Insert(0, "|");
+			Console.WriteLine("begin - {0:ss.fff}", DateTime.Now);
+			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter)))
+			{				
+				var searchResults = searcher.FindAll();
+				foreach (SearchResult searchResult in searchResults)
+				{
+					var tempResult = new ADUserInformation();
+					if (searchResult == null)
+						continue;
+					Console.WriteLine("{1} - {0:ss.fff}", DateTime.Now, searchResult.Properties["sAMAccountName"][0].ToString());
+					tempResult.IsLoginExists = true;
+					tempResult.Login = searchResult.Properties["sAMAccountName"][0].ToString();
+
+					var directoryEntry = searchResult.GetDirectoryEntry();
+					Console.WriteLine("{0:ss.fff}", DateTime.Now);
+					tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
+					tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
+					Console.WriteLine("{0:ss.fff}", DateTime.Now);
+					if (searchResult.Properties["lastLogon"].Count == 0)
+						tempResult.LastLogOnDate = null;
+					tempResult.LastLogOnDate = DateTime.FromFileTime((long)searchResult.Properties["lastLogon"][0]);
+					//ad инициализирует этим значением поле
+					if (tempResult.LastLogOnDate == DateTime.Parse("01.01.1601 3:00:00"))
+						tempResult.LastLogOnDate = null;
+
+					if (searchResult.Properties["badPasswordTime"].Count == 0)
+						tempResult.BadPasswordDate = null;
+					tempResult.BadPasswordDate = DateTime.FromFileTime((long)searchResult.Properties["badPasswordTime"][0]);
+					if (tempResult.BadPasswordDate == _badPasswordDateIfNotLogin)
+						tempResult.BadPasswordDate = null;
+
+					if (searchResult.Properties["pwdLastSet"].Count == 0)
+						tempResult.LastPasswordChange = null;
+					tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);
+
+					result[tempResult.Login] = tempResult;
+				}
+			}
+			return result;
+		}
 
 		public static void CreateUserInAD(string login, string password, uint clientCode)
 		{

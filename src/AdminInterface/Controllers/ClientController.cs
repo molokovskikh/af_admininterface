@@ -14,6 +14,7 @@ using AdminInterface.Extentions;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using AdminInterface.Properties;
 
 namespace AdminInterface.Controllers
 {
@@ -43,6 +44,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = CallLog.LastCalls();
+			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 		}
 
 		[AccessibleThrough(Verb.Post)]
