@@ -34,7 +34,10 @@
 Просьба подтвердить получение.</Value>
     </Setting>
     <Setting Name="ClientInterfaceUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">http://localhost:50645/ci/</Value>
+      <Value Profile="(Default)">http://localhost:50645/ci/auth/logon.aspx</Value>
+    </Setting>
+    <Setting Name="UserPreparedDataFormatString" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">U:\wwwroot\ios\Results\{0}.zip</Value>
     </Setting>
   </Settings>
 </SettingsFile>

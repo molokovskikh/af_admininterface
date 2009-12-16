@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -177,6 +178,53 @@ namespace AdminInterface.Controllers
 			Session["Password"] = password;
 			Session["Tariff"] = user.Client.Type.Description();
 			Session["IsRegistration"] = isRegistration;
+		}
+
+		public void Unlock(string login)
+		{
+#if !DEBUG
+			if (ADHelper.IsLoginExists(login) && ADHelper.IsLocked(login))
+				ADHelper.Unlock(login);
+#endif
+			Flash["Message"] = Message.Notify("Разблокировано");
+			RedirectToReferrer();
+		}
+
+		public void DeletePreparedData(uint userCode)
+		{			
+			try
+			{
+				var user = User.GetById(userCode);				
+				var file = String.Format(CustomSettings.UserPreparedDataFormatString, user.Id);
+				if (File.Exists(file))
+					File.Delete(file);
+				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
+			}
+			catch
+			{
+				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
+			}
+			RedirectToReferrer();
+		}
+
+		public void ResetUin(uint userCode, string reason)
+		{
+			var user = User.GetById(userCode);
+
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<Client>(
+					new
+					{
+						inHost = Request.UserHostAddress,
+						inUser = SecurityContext.Administrator.UserName,
+						ResetIdCause = reason
+					});
+				ClientInfoLogEntity.ReseteUin(user.Client.Id, reason).Save();
+				user.ResetUin();
+				Flash["Message"] = Message.Notify("УИН сброшен");
+				RedirectToReferrer();
+			}			
 		}
 	}
 }

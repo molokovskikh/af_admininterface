@@ -77,10 +77,19 @@ namespace AdminInterface.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:50645/ci/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("http://localhost:50645/ci/auth/logon.aspx")]
         public string ClientInterfaceUrl {
             get {
                 return ((string)(this["ClientInterfaceUrl"]));
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("U:\\wwwroot\\ios\\Results\\{0}.zip")]
+        public string UserPreparedDataFormatString {
+            get {
+                return ((string)(this["UserPreparedDataFormatString"]));
             }
         }
     }

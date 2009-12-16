@@ -7,6 +7,9 @@ using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
+using AdminInterface.Helpers;
+using System.IO;
+using AdminInterface;
 
 namespace Functional
 {
@@ -145,6 +148,68 @@ namespace Functional
 					.SetParameter("userId", user.Id)
 					.List());
 				Assert.That(result.Count, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
+			}
+		}
+
+		[Test]
+		public void Reset_user_uin()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.GetUsers().First();
+			user.Name = String.Empty;
+			user.Update();
+			var info = UserUpdateInfo.Find(user.Id);
+			info.AFCopyId = "123";
+			info.Update();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				Assert.That(user.HaveUin(), Is.True);
+				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Button(Find.ByValue("Сбросить УИН")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
+				browser.TextField(Find.ByName("reason")).TypeText("test reason");
+				browser.Button(Find.ByValue("Сбросить УИН")).Click();
+				Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
+				var count = Convert.ToInt32(ArHelper.WithSession(s =>
+					s.CreateSQLQuery("SELECT count(*) FROM `logs`.clientsinfo where ClientCode = :id")
+						.SetParameter("id", client.Id)
+						.UniqueResult()));
+				Assert.IsTrue(count == 1);
+			}
+		}
+
+		[Test]
+		public void Delete_user_prepared_data()
+		{
+			var formatString = CustomSettings.UserPreparedDataFormatString;
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.GetUsers().First();
+			user.Name = String.Empty;
+			user.Update();
+			var preparedDataPath = String.Format(formatString, user.Id);
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText(user.Login)).Click();
+				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
+				var directory = Path.GetDirectoryName(preparedDataPath);
+				if (!Directory.Exists(directory))
+					Directory.CreateDirectory(directory);
+				var file = File.Create(preparedDataPath);
+				browser.Back();
+				browser.Link(Find.ByText(user.Login)).Click();
+				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
+				browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Ошибка удаления подготовленных данных, попробуйте позднее."));
+				file.Close();
+				browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Подготовленные данные удалены"));
+				try
+				{
+					File.Delete(file.Name);
+				}
+				catch
+				{
+				}
 			}
 		}
 	}

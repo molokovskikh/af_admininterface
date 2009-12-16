@@ -1,32 +1,87 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
-
 <script>
-	$(function() {
-		$("form").validate({
-			rules : {
-				"user.Name" : "required"
-			}
-		});
-	});
+    $(function() {
+        $("form#UserSettingsForm").validate({
+            rules: {
+                "user.Name": "required"
+            }
+        });
+        $("form#ReseteUin").validate({
+            rules: {
+                "reason": "required"
+            }
+        });
+    });
 </script>
 
 <div style="width: 600px;">
-	<form method=post action="${siteroot}/users/update">
+    <h2>
+        Пользователь ${user.Login}
+    </h2>
+    
+    <% if IsDefined("Message"):
+		clazz = "notice"
+		if message.IsError:
+			clazz = "err"
+		end
+	%>
+
+	<div class="flash ${clazz}">
+		${Message.MessageText}
+	</div>
+	<% end %>
+    
+    <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
+        <div class=block>
+            <ul class="navigation-menu">
+            	<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
+            	<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
+            	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
+			</ul>
+		</div>
+    <% end %>	
+        
+    <div class=block>
+        <h3>Операции</h3>
+        
+        <% isLockedUser = user.IsLocked %>
+        
+        <form method=post action="${siteroot}/users/Unlock.rails" style="margin:0; padding:5px 0px 5px 0px">
+            <input type=hidden name=login value=${user.Login} />				
+            <input style="border-style:groove;" type=submit ${"disabled" if not isLockedUser} value="Разблокировать" />
+            <% if IsDefined("UnlockMessage"): %> 
+            <span style="color:Green;">${UnlockMessage}</span>
+            <% end %>
+        </form>
+        
+        <form method=post action="${siteroot}/users/DeletePreparedData.rails" style="margin:0; padding: 5px 0px 5px 0px">
+            <input type=hidden name=userCode value=${User.Id} />
+            <input style="border-style:groove;" type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
+            <% if IsDefined("DeleteMessage"): %>
+                <span style="color:Green;">${DeleteMessage}</span>
+            <% end %>
+            <% if IsDefined("DeleteErrorMessage"): %> 
+			    <span style="color:Red;">${DeleteErrorMessage}</span>
+			<% end %>
+        </form>
+        
+        <form id=ReseteUin method=post action="${siteroot}/users/ResetUin.rails" style="margin:0; padding:5px 0px 5px 0px">
+            <input type=hidden name=userCode value=${User.Id} />
+            <% haveUin = User.HaveUin() %>
+            <input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+            <% if haveUin: %>
+                Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
+            <% else: %> 
+                <span style="color:Green;">Идентификатор не присвоен</span>
+            <% end %>
+        </form>				
+    </div>	
+
+	<form id="UserSettingsForm" method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
-		<h2>
-			Пользователь ${user.Login}
-		</h2>
-		<% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
-			<div class=block>
-				<ul class="navigation-menu">
-					<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
-					<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
-					<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
-				</ul>
-			</div>
-		<% end %>
+		
 		<div class=block>
 			Внутреннее имя<br>
 			<input name=user.Name value="${user.Name}"><br>

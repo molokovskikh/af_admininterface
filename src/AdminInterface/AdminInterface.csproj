@@ -346,6 +346,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="CustomSettings.cs" />
     <Compile Include="statcont.aspx.cs">
       <DependentUpon>statcont.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

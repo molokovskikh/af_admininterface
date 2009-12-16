@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
@@ -158,6 +159,45 @@ group by i.PriceId")
 				.SetParameter("UserId", Id)
 				.ExecuteUpdate();
 			});
+		}
+
+		public virtual bool IsLocked
+		{
+			get
+			{
+				return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+			}
+		}
+
+		public virtual bool HavePreparedData()
+		{
+			var file = String.Format(CustomSettings.UserPreparedDataFormatString, Id);
+			return (File.Exists(file));
+		}
+
+		public virtual bool HaveUin()
+		{
+			var result = ArHelper.WithSession(session =>
+				session.CreateSQLQuery(@"
+select sum(length(concat(uui.AFCopyId))) = 0
+from usersettings.UserUpdateInfo uui
+where uui.UserId = :userCode
+")
+					.SetParameter("userCode", Id)
+					.UniqueResult<long?>());
+
+			return result != null && result.Value == 0;
+		}
+
+		public virtual void ResetUin()
+		{
+			ArHelper.WithSession(session =>
+				session.CreateSQLQuery(@"
+update usersettings.UserUpdateInfo uui
+set uui.AFCopyId = '' 
+where uui.UserId = :userCode")
+					.SetParameter("userCode", Id)
+					.ExecuteUpdate());
 		}
 	}
 }

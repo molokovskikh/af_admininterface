@@ -31,7 +31,7 @@
 	
 	input[type='text']
 	{
-		width: 90%;
+		width: 70%;
 	}
 </style>
 	
@@ -102,29 +102,7 @@
 
 		<div class=block>
 			<h3>Операции</h3>
-			
-			<% containsLockedUsers = client.HaveLockedUsers() %>
-			
-			<form method=post action=unlock.rails style="margin:0; padding:0">
-				<input type=hidden name=clientCode value=${Client.Id} />
-				<input style="border-style:groove;" type=submit ${"disabled" if not containsLockedUsers} value="Разблокировать" />
-				<% if IsDefined("UnlockMessage"): %> 
-					<span style="color:Green;">${UnlockMessage}</span>
-				<% end %>
-			</form>
-
 			<% if Client.IsDrugstore(): %>
-			
-				<form method=post action=DeletePreparedData.rails style="margin:0; padding:0">
-					<input type=hidden name=clientCode value=${Client.Id} />
-					<input style="border-style:groove;" type=submit ${"disabled" if not Client.HavePreparedData()} value="Удалить подготовленные данные" />
-					<% if IsDefined("DeleteMessage"): %> 
-						<span style="color:Green;">${DeleteMessage}</span>
-					<% end %>
-					<% if IsDefined("DeleteErrorMessage"): %> 
-						<span style="color:Red;">${DeleteErrorMessage}</span>
-					<% end %>
-				</form>
 
 				<form id=ReseteUin method=post action=ResetUin.rails style="margin:0; padding:0">
 					<input type=hidden name=clientCode value=${Client.Id} />

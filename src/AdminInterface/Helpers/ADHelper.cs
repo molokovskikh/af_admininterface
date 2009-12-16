@@ -74,6 +74,7 @@ namespace AdminInterface.Helpers
 			if (result.Count > 1)
 				filter.Insert(0, "|");
 			Console.WriteLine("begin - {0:ss.fff}", DateTime.Now);
+			
 			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter)))
 			{				
 				var searchResults = searcher.FindAll();
@@ -93,20 +94,23 @@ namespace AdminInterface.Helpers
 					Console.WriteLine("{0:ss.fff}", DateTime.Now);
 					if (searchResult.Properties["lastLogon"].Count == 0)
 						tempResult.LastLogOnDate = null;
-					tempResult.LastLogOnDate = DateTime.FromFileTime((long)searchResult.Properties["lastLogon"][0]);
+					else
+						tempResult.LastLogOnDate = DateTime.FromFileTime((long)searchResult.Properties["lastLogon"][0]);
 					//ad инициализирует этим значением поле
 					if (tempResult.LastLogOnDate == DateTime.Parse("01.01.1601 3:00:00"))
 						tempResult.LastLogOnDate = null;
 
 					if (searchResult.Properties["badPasswordTime"].Count == 0)
 						tempResult.BadPasswordDate = null;
-					tempResult.BadPasswordDate = DateTime.FromFileTime((long)searchResult.Properties["badPasswordTime"][0]);
+					else
+						tempResult.BadPasswordDate = DateTime.FromFileTime((long)searchResult.Properties["badPasswordTime"][0]);
 					if (tempResult.BadPasswordDate == _badPasswordDateIfNotLogin)
 						tempResult.BadPasswordDate = null;
 
 					if (searchResult.Properties["pwdLastSet"].Count == 0)
 						tempResult.LastPasswordChange = null;
-					tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);
+					else
+						tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);
 
 					result[tempResult.Login] = tempResult;
 				}
