@@ -139,8 +139,6 @@
 						Последнее изменение пароля
 					</td>
 				</tr>
-				<% users = Client.GetUsers() %>
-				<% usersInfo = ADHelper.GetUsersInformation(users) %>
 				<% containsLockedUsers = false %>
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>

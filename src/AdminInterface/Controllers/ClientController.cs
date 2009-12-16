@@ -15,6 +15,7 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
+using log4net;
 
 namespace AdminInterface.Controllers
 {
@@ -45,6 +46,30 @@ namespace AdminInterface.Controllers
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = CallLog.LastCalls();
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
+
+			var users = client.GetUsers();
+			PropertyBag["users"] = users;
+			try
+			{
+				var usersInfo = ADHelper.GetUsersInformation(users);
+				PropertyBag["usersInfo"] = usersInfo;
+			}
+			catch (Exception ex)
+			{
+				var userInfo = new ADUserInformationCollection();
+				string usersNames = "";
+				foreach (var user in users)
+				{
+					userInfo.Add(new ADUserInformation() {Login = user.Login});
+					usersNames += user.Login + ", ";
+				}
+				PropertyBag["usersInfo"] = userInfo;
+				
+				LogManager.GetLogger(typeof(ClientController)).Error(
+					String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
+						client.Id, SecurityContext.Administrator.UserName, usersNames));
+			}
+
 		}
 
 		[AccessibleThrough(Verb.Post)]

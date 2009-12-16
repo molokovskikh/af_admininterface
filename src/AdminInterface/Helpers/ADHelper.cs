@@ -92,6 +92,7 @@ namespace AdminInterface.Helpers
 					tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
 					tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
 					Console.WriteLine("{0:ss.fff}", DateTime.Now);
+
 					if (searchResult.Properties["lastLogon"].Count == 0)
 						tempResult.LastLogOnDate = null;
 					else
