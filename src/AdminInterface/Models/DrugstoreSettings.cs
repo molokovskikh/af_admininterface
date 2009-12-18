@@ -1,4 +1,5 @@
-﻿using Castle.ActiveRecord;
+﻿using System;
+using Castle.ActiveRecord;
 
 namespace AdminInterface.Models
 {
@@ -35,5 +36,10 @@ namespace AdminInterface.Models
 
 		[Property(NotNull = true)]
 		public string BasecostPassword { get; set; }
+
+		public bool IsNoised
+		{
+			get { return FirmCodeOnly != null; }
+		}
 	}
 }

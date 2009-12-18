@@ -253,30 +253,31 @@ where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
 
 			string sqlCommand =
 @"
-SELECT  a.RegionCode, 
-        a.Region, 
-        ShowRegionMask & a.regioncode >0 as ShowMask,  
-        MaskRegion & a.regioncode     >0 as RegMask, 
-        OrderRegionMask & a.regioncode>0 as OrderMask  
-FROM    farm.regions                     as a, 
-        farm.regions                     as b, 
-        clientsdata, 
-        retclientsset, 
-        accessright.regionaladmins  
+SELECT  a.RegionCode,
+        a.Region,
+        c.MaskRegion & a.regioncode > 0 as RegMask,
+        rcs.OrderRegionMask & a.regioncode>0 as OrderMask
+FROM    farm.regions as a,
+        farm.regions as b,
+        Future.Clients c,
+        retclientsset rcs
 WHERE 
 ";
 			if (!AllRegions)
-				sqlCommand += " b.regioncode=?RegCode and";
-			sqlCommand += " clientsdata.firmcode=?ClientCode and a.regioncode & (b.defaultshowregionmask | MaskRegion)>0 "
-					  + " and clientcode=firmcode" + " and regionaladmins.username=?UserName"
-					  + " and a.regioncode & regionaladmins.RegionMask > 0"
-					  + " group by regioncode" + " order by region";
+				sqlCommand += " b.regioncode=?RegCode and ";
+			sqlCommand += @"
+c.Id = ?ClientId
+and a.regioncode & (b.defaultshowregionmask | MaskRegion) > 0
+and rcs.clientcode = c.Id
+and a.regioncode & ?AdminMask > 0
+group by regioncode
+order by region";
 			With.Connection(
 				c => {
 					var adapter = new MySqlDataAdapter(sqlCommand, c);
-					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+					adapter.SelectCommand.Parameters.AddWithValue("?ClientId", ClientCode);
 					adapter.SelectCommand.Parameters.AddWithValue("?RegCode", RegCode);
-					adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+					adapter.SelectCommand.Parameters.AddWithValue("?AdminMask", SecurityContext.Administrator.RegionMask);
 					adapter.Fill(_data, "WorkReg");
 				});
 
@@ -324,10 +325,9 @@ WHERE
 					command.Parameters.AddWithValue("?ClientCode", ClientCode);
 					command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-					var client = Client.Find((uint)ClientCode);
+					var client = Client.FindAndCheck((uint)ClientCode);
+					var settings = DrugstoreSettings.Find(client.Id);
 					HomeRegionCode = client.HomeRegion.Id;
-					SecurityContext.Administrator.CheckClientHomeRegion(HomeRegionCode);
-
 
 					var regionAdapter = new MySqlDataAdapter(@"
 SELECT  r.regioncode, 
@@ -372,10 +372,9 @@ WHERE rcs.clientcode = ?ClientCode";
 						OrdersVisualizationModeCB.Checked = Convert.ToBoolean(reader["OrdersVisualizationMode"]);
 						if (Convert.ToInt32(reader["InvisibleOnFirm"]) != 0)
 						{
-							var noise = reader["FirmCodeOnly"] != DBNull.Value;
-							SetNoiseStatus(noise);
-							if (noise)
-								NotNoisedSupplier.SelectedValue = reader["FirmCodeOnly"].ToString();
+							SetNoiseStatus(settings.IsNoised, client);
+							if (settings.IsNoised)
+								NotNoisedSupplier.SelectedValue = settings.FirmCodeOnly.ToString();
 						}
 						else
 						{
@@ -435,7 +434,7 @@ ORDER BY sg.DisplayName;";
 
 					for (var i = 0; i < PrintRulesList.Items.Count; i++)
 						PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
-			    });
+				});
 
 			SetWorkRegions(HomeRegionCode, true, false);
 		}
@@ -443,16 +442,6 @@ ORDER BY sg.DisplayName;";
 		private void ProcessChanges()
 		{
 			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
-		}
-
-		protected void IncludeGrid_RowDataBound(object sender, GridViewRowEventArgs e)
-		{
-			if (e.Row.RowType == DataControlRowType.DataRow)
-			{
-				((DropDownList)e.Row.FindControl("ParentList")).Items.Add(new ListItem(((DataRowView)e.Row.DataItem)["ShortName"].ToString(), ((DataRowView)e.Row.DataItem)["FirmCode"].ToString()));
-				((DropDownList)e.Row.FindControl("IncludetypeList")).SelectedValue = ((DataRowView)e.Row.DataItem)["IncludeType"].ToString();
-				((Button)e.Row.FindControl("SearchButton")).CommandArgument = e.Row.RowIndex.ToString();
-			}
 		}
 
 		protected void ParentValidator_ServerValidate(object source, ServerValidateEventArgs args)
@@ -477,15 +466,18 @@ ORDER BY sg.DisplayName;";
 
 		protected void NoisedCosts_CheckedChanged(object sender, EventArgs e)
 		{
+			var client = Client.FindAndCheck((uint)ClientCode);
+			HomeRegionCode = client.HomeRegion.Id;
+
 			var noise = ((CheckBox) sender).Checked;
-			SetNoiseStatus(noise);
+			SetNoiseStatus(noise, client);
 		}
 
-		private void SetNoiseStatus(bool noise)
+		private void SetNoiseStatus(bool isNoised, Client client)
 		{
-			NoisedCosts.Checked = noise;
-			NotNoisedSupplierLabel.Visible = noise;
-			NotNoisedSupplier.Visible = noise;
+			NoisedCosts.Checked = isNoised;
+			NotNoisedSupplierLabel.Visible = isNoised;
+			NotNoisedSupplier.Visible = isNoised;
 
 			var adapter = new MySqlDataAdapter(@"
 select 0 as FirmCode, 'Зашумлять все прайс листы всех поставщиков' as ShortName
@@ -493,9 +485,8 @@ union
 SELECT suppliers.FirmCode,
        suppliers.ShortName
 FROM Usersettings.ClientsData cd
-  JOIN Usersettings.clientsdata suppliers on cd.BillingCode = suppliers.BillingCode and suppliers.FirmType = 0
-WHERE cd.firmcode = ?ClientCode;", Literals.GetConnectionString());
-			adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
+WHERE cd.BillingCode = ?PayerId and suppliers.FirmType = 0;", Literals.GetConnectionString());
+			adapter.SelectCommand.Parameters.AddWithValue("?PayerId", client.BillingInstance.PayerID);
 			var data = new DataSet();
 			adapter.Fill(data);
 			NotNoisedSupplier.DataSource = data;

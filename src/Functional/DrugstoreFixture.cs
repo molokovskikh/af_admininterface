@@ -43,6 +43,55 @@ namespace Functional
 		}
 
 		[Test]
+		public void Change_work_region_and_order_region()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using(var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+
+				var workRegionMoskow = GetWorkRegion(browser, "Курск");
+				Assert.That(workRegionMoskow.Checked, Is.False);
+				workRegionMoskow.Checked = true;
+				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
+
+				var orderRegionMoskow = GetOrderRegion(browser, "Курск");
+				Assert.That(orderRegionMoskow.Checked, Is.False);
+				orderRegionMoskow.Checked = true;
+				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
+
+				browser.Button(b => b.Value == "Применить").Click();
+				Assert.That(browser.ContainsText("Сохранено"), Is.True);
+
+				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Курск").Checked, Is.True);
+
+
+				//перезагружаем, потому что иначе увидим data bind
+				browser.GoTo(browser.Url);
+				browser.Refresh();
+				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Курск").Checked, Is.True);
+
+			}
+		}
+
+		private CheckBox GetWorkRegion(IE browser, string name)
+		{
+			return ((TableCell) browser.Table("ctl00_MainContentPlaceHolder_WRList").Label(l => l.Text.Trim() == name).Parent).CheckBoxes.First();
+		}
+
+		private CheckBox GetOrderRegion(IE browser, string name)
+		{
+			return ((TableCell) browser.Table("ctl00_MainContentPlaceHolder_OrderList").Label(Find.ByText(name)).Parent).CheckBoxes.First();
+		}
+
+		[Test]
 		public void Try_to_open_client_view()
 		{
 			using (var browser = Open("client/2575"))

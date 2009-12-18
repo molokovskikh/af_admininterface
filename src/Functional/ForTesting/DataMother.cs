@@ -71,6 +71,7 @@ namespace Functional.ForTesting
 				client.SaveAndFlush();
 				var drugstoreSettings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",
+					OrderRegionMask = 1UL,
 				};
 				drugstoreSettings.CreateAndFlush();
 				client.MaintainIntersection();
