@@ -89,7 +89,9 @@
 				<% end %>
 				<li>
 					<% if client.IsDrugstore(): %>
-						<% if not Client.IsDrugstore(): %>
+						<% if Client.IsDrugstore(): %>
+							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
+						<% else: %>
 							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
 						<% end %>
 					<% end %>
