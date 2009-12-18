@@ -78,6 +78,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = user.Client;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(user.Client);
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
+			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
 		}
 
 		[AccessibleThrough(Verb.Post)]

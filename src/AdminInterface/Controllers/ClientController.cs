@@ -32,10 +32,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Info(uint cc)
 		{
-			var client = Client.FindAndCheck(cc);
-			var authorizationLog = AuthorizationLogEntity.TryFind(client.Id);
-
-			PropertyBag["authorizationLog"] = authorizationLog;
+			var client = Client.FindAndCheck(cc);			
 			PropertyBag["Client"] = client;
 			if (String.IsNullOrEmpty(client.Registrant))
 				PropertyBag["Registrant"] = null;
@@ -49,6 +46,17 @@ namespace AdminInterface.Controllers
 
 			var users = client.GetUsers();
 			PropertyBag["users"] = users;
+
+			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users.ToList());
+			var authorizationLog = new AuthorizationLogEntity(){
+				AFTime = authorizationLogs.Max(r => r.AFTime),
+				AOLTime = authorizationLogs.Max(r => r.AOLTime),
+				CITime = authorizationLogs.Max(r => r.CITime),
+				IOLTime = authorizationLogs.Max(r => r.IOLTime),
+			};
+
+			PropertyBag["authorizationLog"] = authorizationLog;
+
 			try
 			{
 				var usersInfo = ADHelper.GetUsersInformation(users);

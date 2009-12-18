@@ -130,6 +130,19 @@
 				<% end %>
 			</div>
 		</div>
+		<%if authorizationLog != null and (authorizationLog.CITime!=null or authorizationLog.AFTime!=null or authorizationLog.AOLTime!=null or authorizationLog.IOLTime!=null): %>
+		<div class="block">
+			<h3>
+				Статистика использования
+			</h3>
+			<div style="margin-top:10px;">
+				${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
+				${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
+				${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
+				${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
+			</div>
+		</div>	
+		<%end %>
 		<div class=block>
 			<h3>
 				Права доступа
@@ -141,7 +154,7 @@
 					<br>
 				<% end %>
 			</div>
-		</div>
+		</div>		
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>

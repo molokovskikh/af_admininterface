@@ -158,21 +158,19 @@
 							${userInfo.BadPasswordDate if userInfo.IsLoginExists}
 						</td>
 						<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
-							${userInfo.LastPasswordChange if userInfo.IsLoginExists}
+							<a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>${userInfo.LastPasswordChange if userInfo.IsLoginExists}</a>
 						</td>
 					</tr>
 				<% end %>
 			</table>
+			<%if authorizationLog != null: %>
 			<div style="margin-top:10px;">
-				Вход в клиентский интерфейс: ${?authorizationLog.CITime}
-				<br />
-				Обновление AnalitF: ${?authorizationLog.AFTime}
-				<br />
-				Использование AnalitOnline: ${?authorizationLog.AOLTime}
-				<br />
-				Использование Online сервисов: ${?authorizationLog.IOLTime}
-				<br />
+				${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
+				${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
+				${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
+				${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
 			</div>
+			<%end %>
 		</div>
 
 		<div class=block>

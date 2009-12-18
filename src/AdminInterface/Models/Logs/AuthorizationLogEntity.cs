@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Castle.ActiveRecord;
+using System.Collections.Generic;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
@@ -27,5 +30,10 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public DateTime? IOLTime { get; set; }
+
+		public static List<AuthorizationLogEntity> GetEntitiesByUsers(List<User> users)
+		{
+			return FindAll(Expression.In("Id", users.Select(r => r.Id).ToArray())).ToList();
+		}
 	}
 }
