@@ -115,10 +115,13 @@ where `from` = :phone")
 		{
 			var client = Client.FindAndCheck(clientCode);
 
-			using (new TransactionScope())
-				new ClientInfoLogEntity(message, client.Id).Save();
+			if (!String.IsNullOrEmpty(message))
+			{
+				using (new TransactionScope())
+					new ClientInfoLogEntity(message, client.Id).Save();
 
-			Flash["Message"] = Message.Notify("Сохранено");
+				Flash["Message"] = Message.Notify("Сохранено");
+			}
 			RedirectToReferrer();
 		}
 

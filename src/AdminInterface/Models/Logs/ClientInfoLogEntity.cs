@@ -21,6 +21,15 @@ namespace AdminInterface.Models.Logs
 			ClientCode = clientCode;
 		}
 
+		public ClientInfoLogEntity(string message, uint clientCode, uint userId)
+		{
+			UserName = SecurityContext.Administrator.UserName;
+			WriteTime = DateTime.Now;
+			Message = message;
+			ClientCode = clientCode;
+			User = User.Find(userId);
+		}
+
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
 		[Property]
@@ -31,6 +40,8 @@ namespace AdminInterface.Models.Logs
 		public uint ClientCode { get; set; }
 		[Property]
 		public DateTime WriteTime { get; set; }
+		[BelongsTo(Column = "UserId")]
+		public virtual User User { get; set; }
 
 		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
 		{
@@ -66,6 +77,14 @@ namespace AdminInterface.Models.Logs
 			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
 															.For<ClientInfoLogEntity>()
 															.Add(Expression.Eq("ClientCode", client.Id))
+															.AddOrder(Order.Desc("WriteTime"))));
+		}
+
+		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
+		{
+			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
+															.For<ClientInfoLogEntity>()
+															.Add(Expression.Eq("User", user))
 															.AddOrder(Order.Desc("WriteTime"))));
 		}
 	}

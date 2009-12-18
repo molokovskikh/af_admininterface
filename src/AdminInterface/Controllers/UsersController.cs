@@ -11,10 +11,12 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using AdminInterface.Properties;
+using System.Web;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("NewDefault")]
+	[Helper(typeof(HttpUtility)),
+	 Layout("NewDefault")]
 	public class UsersController : SmartDispatcherController
 	{
 		[AccessibleThrough(Verb.Get)]
@@ -75,6 +77,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(user.Client);
+			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -225,6 +228,22 @@ namespace AdminInterface.Controllers
 				Flash["Message"] = Message.Notify("УИН сброшен");
 				RedirectToReferrer();
 			}			
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void SendMessage(string message, uint clientCode, uint userId)
+		{
+			var client = Client.FindAndCheck(clientCode);
+			var user = User.Find(userId);
+
+			if (!String.IsNullOrEmpty(message))
+			{
+				using (new TransactionScope())
+					new ClientInfoLogEntity(message, client.Id, user.Id).Save();
+
+				Flash["Message"] = Message.Notify("Сохранено");
+			}
+			RedirectToReferrer();
 		}
 	}
 }

@@ -262,12 +262,14 @@
 					<tr>
 						<th>Дата</th>
 						<th>Оператор</th>
+						<th>Пользователь</th>
 						<th>Событие</th>
 					</tr>
 					<% for i, log in enumerate(logs): %>
 					<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 						<td>${log.WriteTime}</td>
 						<td>${log.UserName}</td>
+						<td>${log.User.Login if log.User != null}</td>
 						<td>${ViewHelper.FormatMessage(HttpUtility.HtmlEncode(log.Message))}</td>
 					</tr>
 					<% end %>
