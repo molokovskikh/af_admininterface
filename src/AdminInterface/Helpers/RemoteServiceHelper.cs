@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Security;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
 using ConsoleApplication11.ServiceReference2;
 using log4net;
-using RemotePricePricessor;
+using RemotePriceProcessor;
 
 namespace AdminInterface.Helpers
 {
@@ -14,23 +15,44 @@ namespace AdminInterface.Helpers
 	{
 		[Description("Запущена")] Running,
 		[Description("Не запущена")] NotRunning,
-		[Description("Не доступена")] Unknown
+		[Description("Недоступна")] Unknown
 	}
 
 	public class RemoteServiceHelper
 	{
-		private static readonly ILog _log = LogManager.GetLogger(typeof (RemoteServiceHelper));
+		private static readonly string _wcfServiceUrl = @"net.tcp://prg4:900/RemotePriceProcessorService";
+
+		private static readonly ILog _log = LogManager.GetLogger(typeof(RemoteServiceHelper));
+
+		private static ChannelFactory<IRemotePriceProcessor> _channelFactory;
+
+		private static IRemotePriceProcessor _priceProcessor;
 
 		public static void RemotingCall(Action<IRemotePriceProcessor> action)
 		{
 			try
 			{
-				var priceProcessor = (IRemotePriceProcessor)Activator.GetObject(typeof(IRemotePriceProcessor), "http://fms.adc.analit.net:888/RemotePriceProcessor");
-				action(priceProcessor);
+				var binding = new NetTcpBinding();
+				binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
+				binding.Security.Mode = SecurityMode.None;
+				binding.TransferMode = TransferMode.Streamed;
+				binding.MaxReceivedMessageSize = Int32.MaxValue;
+				binding.MaxBufferSize = 524288;
+
+				_channelFactory = new ChannelFactory<IRemotePriceProcessor>(binding, _wcfServiceUrl);
+				_priceProcessor = _channelFactory.CreateChannel();
+				action(_priceProcessor);
+				((ICommunicationObject)_priceProcessor).Close();
 			}
 			catch (Exception e)
 			{
 				_log.Warn("Ошибка при обращении к сервису обработки прайс листов", e);
+			}
+			finally
+			{
+				if (((ICommunicationObject)_priceProcessor).State != CommunicationState.Closed)
+					((ICommunicationObject)_priceProcessor).Abort();
+				_channelFactory.Close();
 			}
 		}
 
