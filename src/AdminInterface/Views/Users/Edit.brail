@@ -32,17 +32,17 @@
 		${Message.MessageText}
 	</div>
 	<% end %>
-    
-    <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
-        <div class=block>
-            <ul class="navigation-menu">
-            	<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
-            	<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
-            	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
-			</ul>
-		</div>
-    <% end %>	
-        
+
+    <div class=block>
+        <ul class="navigation-menu">
+		  <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
+        	<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
+        	<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
+          <% end %>
+        	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
+		</ul>
+	</div>
+
     <div class=block>
         <h3>Операции</h3>
         
