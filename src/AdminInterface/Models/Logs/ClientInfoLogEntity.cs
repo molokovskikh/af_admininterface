@@ -59,7 +59,7 @@ namespace AdminInterface.Models.Logs
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)
 		{
-			return new ClientInfoLogEntity("", user.Client.Id).SetProblem(isFree, user.Login, reason);
+			return new ClientInfoLogEntity("", user.Client.Id, user.Id).SetProblem(isFree, user.Login, reason);
 		}
 
 		public static ClientInfoLogEntity StatusChange(ClientStatus status, uint clientCode)

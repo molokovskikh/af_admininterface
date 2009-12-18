@@ -40,21 +40,25 @@ namespace AddUser
 			                	var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  ci.WriteTime, 
         ci.UserName, 
-        cd.ShortName, 
+        cl.Name ShortName, 
         r.Region, 
         ci.Message, 
-        cd.FirmCode, 
-        ci.rowid  
+        cl.Id FirmCode, 
+        ci.rowid ,
+		usr.Login,
+		ci.UserId
 FROM    logs.clientsinfo ci
-	JOIN usersettings.clientsdata cd ON ci.clientcode = firmcode 
-        JOIN farm.regions r ON r.regioncode = cd.RegionCode 
+	JOIN future.Clients cl ON cl.Id = ci.clientcode
+        JOIN farm.regions r ON r.regioncode = cl.RegionCode 
+		LEFT JOIN future.Users usr ON usr.Id = ci.UserId
 WHERE   ci.WriteTime BETWEEN ?FromDate AND ?ToDate  
-		and (cd.ShortName like ?SearchText 
+		and (cl.Name like ?SearchText 
 			or ci.Message like ?SearchText 
-			or ci.UserName like ?SearchText)
-		and cd.RegionCode & ?AdminMaskRegion > 0
+			or ci.UserName like ?SearchText
+            or usr.Login like ?SearchText)
+		and cl.RegionCode & ?AdminMaskRegion > 0
 		{0}
-ORDER BY WriteTime DESC", SecurityContext.Administrator.GetClientFilterByType("cd")), c);
+ORDER BY WriteTime DESC", SecurityContext.Administrator.GetClientFilterByType("cl")), c);
 			                	adapter.SelectCommand.Parameters.AddWithValue("?SearchText", '%' + SearchText.Text + '%');
 			                	adapter.SelectCommand.Parameters.AddWithValue("?FromDate", CalendarFrom.SelectedDate);
 			                	adapter.SelectCommand.Parameters.AddWithValue("?ToDate", CalendarTo.SelectedDate.AddDays(1));
