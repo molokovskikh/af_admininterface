@@ -24,7 +24,9 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			PropertyBag["client"] = client;
-			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(client);
+			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
+			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 		}
 
@@ -37,6 +39,7 @@ namespace AdminInterface.Controllers
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				user.Client = client;
+				user.Registrant = SecurityContext.Administrator.UserName;
 				user.Setup(true);
 				password = user.CreateInAd();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
@@ -76,9 +79,16 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
-			PropertyBag["permissions"] = UserPermission.FindPermissionsAvailableFor(user.Client);
+			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
+			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
+
+			if (String.IsNullOrEmpty(user.Registrant))
+				PropertyBag["Registrant"] = null;
+			else
+				PropertyBag["Registrant"] = Administrator.GetByName(user.Registrant);
 		}
 
 		[AccessibleThrough(Verb.Post)]

@@ -186,50 +186,6 @@ where clientcode=Id and Id=?clientCode; ";
 
 					updateCommand.ExecuteNonQuery();
 
-					for (var i = 0; i < ExportRulesList.Items.Count; i++)
-					{
-						var table = Data.Tables["ExportRules"];
-						var list = ExportRulesList;
-						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
-						{
-							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
-							if (list.Items[i].Selected)
-								updateCommand.CommandText = @"
-insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
-values(?ClientCode, ?SaveGridId)";
-							else
-								updateCommand.CommandText = @"
-delete from UserSettings.ret_save_grids
-where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
-							updateCommand.Parameters.Clear();
-							updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-							updateCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
-							updateCommand.ExecuteNonQuery();
-						}
-					}
-
-					for (var i = 0; i < PrintRulesList.Items.Count; i++)
-					{
-						var table = Data.Tables["PrintRules"];
-						var list = PrintRulesList;
-						if (Convert.ToBoolean(table.DefaultView[i]["Enabled"]) != list.Items[i].Selected)
-						{
-							table.DefaultView[i]["Enabled"] = list.Items[i].Selected;
-							if (list.Items[i].Selected)
-								updateCommand.CommandText = @"
-insert into UserSettings.ret_save_grids(ClientCode, SaveGridId)
-values(?ClientCode, ?SaveGridId)";
-							else
-								updateCommand.CommandText = @" 
-delete from UserSettings.ret_save_grids
-where ClientCode = ?ClientCode and SaveGridId = ?SaveGridId";
-							updateCommand.Parameters.Clear();
-							updateCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
-							updateCommand.Parameters.AddWithValue("?SaveGridId", table.DefaultView[i]["Id"]);
-							updateCommand.ExecuteNonQuery();
-						}
-					}
-
 					ShowRegulationHelper.Update(connection, null, Data, ClientCode);
 				});
 				scope.VoteCommit();
@@ -390,32 +346,10 @@ WHERE rcs.clientcode = ?ClientCode";
 					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", ClientCode);
 					adapter.SelectCommand.Parameters.AddWithValue("?AdminMaskRegion", SecurityContext.Administrator.RegionMask);
 
-					adapter.SelectCommand.CommandText = @"
-SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
-FROM UserSettings.Save_Grids sg
-	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
-WHERE sg.Id < 32768
-ORDER BY sg.DisplayName;";
-					adapter.Fill(Data, "ExportRules");
-
-					adapter.SelectCommand.CommandText = @"
-SELECT sg.Id, sg.DisplayName, rsg.ClientCode is not null as Enabled
-FROM UserSettings.Save_Grids sg
-	LEFT JOIN UserSettings.Ret_Save_Grids rsg ON sg.Id = rsg.SaveGridId and rsg.ClientCode = ?ClientCode
-WHERE sg.Id > 16384
-ORDER BY sg.DisplayName;";
-					adapter.Fill(Data, "PrintRules");
-
 					ShowRegulationHelper.Load(adapter, Data);
 
 					ShowClientsGrid.DataSource = Data.Tables["ShowClients"].DefaultView;
 					ShowClientsGrid.DataBind();
-
-					ExportRulesList.DataSource = Data.Tables["ExportRules"].DefaultView;
-					ExportRulesList.DataBind();
-
-					PrintRulesList.DataSource = Data.Tables["PrintRules"].DefaultView;
-					PrintRulesList.DataBind();
 
 					RegionDD.DataSource = _data.Tables["Admin"].DefaultView;
 					RegionDD.DataBind();
@@ -429,11 +363,6 @@ ORDER BY sg.DisplayName;";
 						}
 					}
 
-					for (var i = 0; i < ExportRulesList.Items.Count; i++)
-						ExportRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["ExportRules"].DefaultView[i]["Enabled"]);
-
-					for (var i = 0; i < PrintRulesList.Items.Count; i++)
-						PrintRulesList.Items[i].Selected = Convert.ToBoolean(Data.Tables["PrintRules"].DefaultView[i]["Enabled"]);
 				});
 
 			SetWorkRegions(HomeRegionCode, true, false);

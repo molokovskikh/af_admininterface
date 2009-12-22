@@ -10,6 +10,13 @@ namespace AdminInterface.Models.Security
 		Drugstore = 1,
 	}
 
+	public enum UserPermissionTypes
+	{
+		Base = 0,
+		AnalitFExcel = 1,
+		AnalitFPrint = 2
+	}
+
 	[ActiveRecord("usersettings.UserPermissions")]
 	public class UserPermission : ActiveRecordBase<UserPermission>
 	{
@@ -25,6 +32,12 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public UserPermissionAvailability AvailableFor { get; set; }
 
+		[Property]
+		public UserPermissionTypes Type { get; set; }
+
+		[Property]
+		public bool AssignDefaultValue { get; set; }
+
 		public static UserPermission[] FindPermissionsAvailableFor(Client client)
 		{
 			UserPermissionAvailability clientTypeFilter;
@@ -35,6 +48,11 @@ namespace AdminInterface.Models.Security
 
 			return FindAll(Order.Asc("Name"), Expression.Eq("AvailableFor", UserPermissionAvailability.All)
 											  || Expression.Eq("AvailableFor", clientTypeFilter));
+		}
+
+		public static UserPermission[] FindPermissionsByType(UserPermissionTypes type)
+		{
+			return FindAll(Expression.Eq("Type", type));
 		}
 	}
 }

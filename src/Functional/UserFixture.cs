@@ -121,7 +121,7 @@ namespace Functional
 		[Test]
 		public void Create_user()
 		{
-			var client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClient();
 
 			using (var browser = Open("client/{0}", client.Id))
 			{
@@ -210,6 +210,39 @@ namespace Functional
 				catch
 				{
 				}
+			}
+		}
+
+		[Test]
+		public void EditAnalitFSettings()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using(var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+
+				for (int i = 0; i < 25; i++)
+					browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				browser.Back(); browser.Back();
+
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.TextField(Find.ByName("user.Name")).TypeText("test2");
+
+				for (int i = 0; i < 25; i++ )
+					browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+
+				browser.Button(Find.ByValue("Создать")).Click();
+			}
+
+			using(new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				Assert.AreEqual(2, client.Users.Count);
+				Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
+				Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
 			}
 		}
 	}

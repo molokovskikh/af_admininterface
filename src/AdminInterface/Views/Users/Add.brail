@@ -66,6 +66,33 @@
 				<% end %>
 			</div>
 		</div>
+		
+		<div class=block>
+			<h3>
+				Права в программе АналитФармация
+			</h3>
+			<h4>
+				Выгрузка в Excel
+			</h4>
+			<div style="padding-top: 1px;">
+				<% for i, permission in enumerate(ExcelPermissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
+					${permission.Name}
+					<br>
+				<% end %>
+			</div>
+			<h4>
+				Печать
+			</h4>
+			<div>
+				<% for i, permission in enumerate(PrintPermissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if permission.AssignDefaultValue}>
+					${permission.Name}
+					<br>
+				<% end %>
+			</div>
+		</div>
+		
 		<div class=save>
 			<input type=submit value="Создать">
 		</div>

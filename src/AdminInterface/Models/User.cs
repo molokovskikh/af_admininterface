@@ -44,6 +44,12 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool Auditor { get; set; }
 
+		[Property]
+		public virtual string Registrant { get; set; }
+
+		[Property]
+		public virtual DateTime RegistrationDate { get; set; }
+
 		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
 		public virtual Client Client { get; set; }
 

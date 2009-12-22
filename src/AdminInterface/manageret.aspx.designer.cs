@@ -167,15 +167,6 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox AllowDelayOfPaymentCB;
         
         /// <summary>
-        /// IncludeGrid control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView IncludeGrid;
-        
-        /// <summary>
         /// ShowClientsGrid control.
         /// </summary>
         /// <remarks>
@@ -183,24 +174,6 @@ namespace AddUser {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.GridView ShowClientsGrid;
-        
-        /// <summary>
-        /// ExportRulesList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList ExportRulesList;
-        
-        /// <summary>
-        /// PrintRulesList control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.CheckBoxList PrintRulesList;
         
         /// <summary>
         /// RegionDD control.
