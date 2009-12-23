@@ -10,6 +10,7 @@ using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using log4net;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
@@ -24,6 +25,9 @@ namespace AdminInterface.Models
 
 		[BelongsTo("ClientId")]
 		public Client Client { get; set; }
+
+		[BelongsTo("ContactGroupId")]
+		public ContactGroup ContactGroup { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
