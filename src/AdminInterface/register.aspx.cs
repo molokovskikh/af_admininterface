@@ -570,7 +570,8 @@ ORDER BY region;", c);
 			var dataAdapter = new MySqlDataAdapter(@"
 select id, name, shortcut
 from Usersettings.UserPermissions
-where AvailableFor = ?ClientType or AvailableFor = 2
+where (AvailableFor = ?ClientType or AvailableFor = 2)
+  and Type = 0
 order by name", Literals.GetConnectionString());
 			dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientType", clientType);
 			dataAdapter.Fill(permissionsData);

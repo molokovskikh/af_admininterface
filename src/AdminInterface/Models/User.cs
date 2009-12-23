@@ -7,6 +7,7 @@ using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
+using AdminInterface.Security;
 
 namespace AdminInterface.Models
 {
@@ -23,6 +24,12 @@ namespace AdminInterface.Models
 	[ActiveRecord("Users", Schema = "future", Lazy = true)]
 	public class User : ActiveRecordBase<User>
 	{
+		public User()
+		{
+			Registrant = SecurityContext.Administrator.UserName;
+			RegistrationDate = DateTime.Now;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

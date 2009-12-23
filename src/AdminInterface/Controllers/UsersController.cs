@@ -39,7 +39,6 @@ namespace AdminInterface.Controllers
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				user.Client = client;
-				user.Registrant = SecurityContext.Administrator.UserName;
 				user.Setup(true);
 				password = user.CreateInAd();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
