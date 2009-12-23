@@ -88,11 +88,24 @@
             <% end %>
         </form>				
     </div>	
-
+    <%if authorizationLog != null and (authorizationLog.CITime!=null or authorizationLog.AFTime!=null or authorizationLog.AOLTime!=null or authorizationLog.IOLTime!=null): %>
+	<div class="block">
+		<h3>
+			Статистика использования
+		</h3>
+		<div style="margin-top:10px;">
+			${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
+			${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
+			${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
+			${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
+		</div>
+	</div>	
+	<%end %>	
 	<form id="UserSettingsForm" method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
 		
 		<div class=block>
+			<h3>Настройки</h3>
 			<div style="padding-bottom: 8px;">
 				<% if not Registrant: %>
 				Регистратор не указан${", дата регистрации " + user.RegistrationDate if user.RegistrationDate.ToBinary() > 0}
@@ -123,6 +136,9 @@
 				<% end %>
 			</select> Наследовать настройки прайс листов <br>
 		</div>
+		
+		
+		
 		<div class=block>
 			<h3>
 				Доступ к адресам доставки
@@ -135,19 +151,6 @@
 				<% end %>
 			</div>
 		</div>
-		<%if authorizationLog != null and (authorizationLog.CITime!=null or authorizationLog.AFTime!=null or authorizationLog.AOLTime!=null or authorizationLog.IOLTime!=null): %>
-		<div class="block">
-			<h3>
-				Статистика использования
-			</h3>
-			<div style="margin-top:10px;">
-				${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
-				${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
-				${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
-				${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
-			</div>
-		</div>	
-		<%end %>
 		<div class=block>
 			<h3>
 				Права доступа
