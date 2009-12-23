@@ -245,5 +245,19 @@ namespace Functional
 				Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
 			}
 		}
+
+		[Test]
+		public void SendMessage()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
+				browser.Button(Find.ByValue("Принять")).Click();
+				Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
+				browser.Link(Find.ByText("Клиент " + client.Name)).Click();
+				Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
+			}
+		}
 	}
 }
