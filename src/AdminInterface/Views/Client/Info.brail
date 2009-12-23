@@ -1,5 +1,8 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
 									  ("Информация о клиенте", "")]} %>
+<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
+
 <script>
 	document.observe("dom:loaded", function() {
 
@@ -8,8 +11,13 @@
 				function(v) {
 					return !Validation.get('IsEmpty').test(v);
 				});
-
 		var validation = new Validation("ReseteUin");
+
+		jQuery("form#MessagesForm").validate({
+			rules: {
+				"message": "required"
+			}
+		});
 	});
 </script>
 
@@ -248,12 +256,14 @@
 	</div>
 	
 	<div class="TwoColumn" style="margin-left: 10px">
-		<form action="SendMessage.rails" method="post">
+		<form action="SendMessage.rails" method="post" id="MessagesForm">
+		<div class="block">
+			<h3>Сообщения пользователя</h3>
 			<input type=hidden value=${client.Id} name=clientCode />
-			<h4 style="margin-bottom:0">Новое сообщение:</h4>
-			<textarea style="height: 150px; width:100%;" name=message></textarea>
+			Новое сообщение:
+			<textarea style="height: 150px; width:100%;" class="reuired" name="message"></textarea>
 			<br />
-			<input type=submit value="Принять" />
+			<input type=submit value="Принять" class="RightButton"/>
 			<p>
 				<% if logs.Count > 0: %>
 				<table class="DataTable HighLightCurrentRow" style="text-align:left">
@@ -280,6 +290,7 @@
 				</table>
 				<% end %>
 			</p>
+		</div>
 		</form>
 	</div>
 </div>

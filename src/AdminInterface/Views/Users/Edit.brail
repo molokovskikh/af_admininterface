@@ -6,26 +6,23 @@
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
 <script>
-    $(function() {
-        $("form#UserSettingsForm").validate({
-            rules: {
-                "user.Name": "required"
-            }
-        });
-        $("form#ReseteUin").validate({
-            rules: {
-                "reason": "required"
-            }
-        });
-    });
-
-	$(document).ready(function() {
-		$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function() { jQueryJoin(this) });});
-
-	function jQueryJoin(control) {
-		$(control).mouseout(function() { $(this).removeClass('SelectedRow'); });
-		$(control).mouseover(function() { $(this).addClass('SelectedRow'); });
-	}
+	$(function() {
+		$("form#UserSettingsForm").validate({
+			rules: {
+				"user.Name": "required"
+			}
+		});
+		$("form#ReseteUin").validate({
+			rules: {
+				"reason": "required"
+			}
+		});
+		$("form#MessagesForm").validate({
+			rules: {
+				"message": "required"
+			}
+		});
+	});
 </script>
 
 
@@ -196,17 +193,19 @@
 	</form>
 </div>
 
-<div class="TwoColumn" style="margin-left: 10px">
-	<form action="/users/SendMessage.rails" method="post">
+<div class="TwoColumn Messages" style="margin-left: 10px">
+	<form id="MessagesForm" action="/users/SendMessage.rails" method="post">
+	<div class="block">
+		<h3>Сообщения пользователя</h3>
 		<input type=hidden value=${client.Id} name="clientCode" />
 		<input type=hidden value=${user.Id} name="userId" />
-		<h4 style="margin-bottom:0">Новое сообщение:</h4>
+		Новое сообщение:
 		<textarea style="height: 150px; width:100%;" name=message></textarea>
 		<br />
-		<input type=submit value="Принять" />
+		<input type=submit value="Принять" class="RightButton"/>
 		<p>
 			<% if logs.Count > 0: %>
-			<table class="DataTable HighLightCurrentRow" style="text-align:left">
+			<table class="DataTable HighLightCurrentRow">
 				<tr>
 					<th>Дата</th>
 					<th>Оператор</th>
@@ -228,5 +227,6 @@
 			</table>
 			<% end %>
 		</p>
+	</div>
 	</form>
 </div>

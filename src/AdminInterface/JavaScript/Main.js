@@ -8,6 +8,14 @@ catch(er)
 	havePrototype = false;
 }
 
+var havejQuery = true;
+try {
+	jQuery;
+}
+catch (er) {
+	havejQuery = false;
+}
+
 
 if (havePrototype)
 {
@@ -40,6 +48,17 @@ function join(control)
 						row.addClassName('SelectedRow');
 					});
 	});
+}
+
+if (havejQuery) {
+	$(document).ready(function() {
+		$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function() { jQueryJoin(this) });
+	});
+}
+
+function jQueryJoin(control) {
+	$(control).mouseout(function() { $(this).removeClass('SelectedRow'); });
+	$(control).mouseover(function() { $(this).addClass('SelectedRow'); });
 }
 
 function ValidateLogin(source, args)

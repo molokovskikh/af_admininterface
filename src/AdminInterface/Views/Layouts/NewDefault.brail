@@ -12,6 +12,7 @@
 	<script type="text/javascript" src="${siteroot}/JavaScript/jquery-1.3.2.min.js"></script>
 	<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
 	<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
+	<script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 	<link href="${siteroot}/Css/form.css" type="text/css" rel="stylesheet">
 	<link href="${siteroot}/Css/Common.css" type="text/css" rel="stylesheet">
 </head>
