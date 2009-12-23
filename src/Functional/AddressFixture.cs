@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
@@ -6,6 +7,8 @@ using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
+using System.Collections;
+using Common.Web.Ui.Models;
 
 namespace Functional
 {
@@ -56,43 +59,71 @@ namespace Functional
 			{
 				browser.Link(Find.ByText("Новый адрес доставки")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Контактная информация"));
-				Assert.That(browser.Text, Is.StringContaining("Email"));
-				Assert.That(browser.Text, Is.StringContaining("Телефон"));
-				
-				browser.TextField(Find.ByName("contactEmailText")).TypeText("12@12.12");				
+				browser.Button(Find.ByValue("Добавить")).Click();
+				var rowId = 0;
+				browser.TextField(String.Format("contacts[{0}].ContactText", --rowId)).TypeText("test@test");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Некорректный адрес электронной почты"));
+				browser.TextField(String.Format("contacts[{0}].ContactText", rowId)).TypeText("test@test.ru");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить"));
 				browser.TextField(Find.ByName("delivery.value")).TypeText("Test address");
 				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пожалуйста, введите корректный адрес электронной почты."));
-				browser.TextField(Find.ByName("contactEmailText")).TypeText("ww@ww.ru");
-				browser.TextField(Find.ByName("contactPhoneText")).TypeText("ww@ww.ru");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Неправильный формат телефонного номера"));
-				browser.TextField(Find.ByName("contactPhoneText")).TypeText("123-456789");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
-
 				Assert.That(browser.Text, Is.StringContaining("Test address"));
 				browser.Link(Find.ByText("Test address")).Click();
-				Assert.That(browser.TextField(Find.ByName("contactEmailText")).Text, Is.StringContaining("ww@ww.ru"));
-				Assert.That(browser.TextField(Find.ByName("contactPhoneText")).Text, Is.StringContaining("123-456789"));
-				browser.TextField(Find.ByName("delivery.value")).TypeText("Changed address");
-				browser.TextField(Find.ByName("contactEmailText")).TypeText("test@test.ru");
+				browser.Button(Find.ByValue("Добавить")).Click();
+				var comboBox = browser.SelectList(Find.ByName(String.Format("contactTypes[{0}]", --rowId)));
+				comboBox = browser.SelectLists[1];
+				comboBox.SelectByValue(comboBox.Options[1].Value);
+				browser.TextField(Find.ById(String.Format("contacts[{0}].ContactText", ++rowId))).TypeText("556677");
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Changed address"));
-				browser.Link(Find.ByText("Changed address")).Click();
-				Assert.That(browser.TextField(Find.ByName("contactEmailText")).Text, Is.StringContaining("test@test.ru"));
+				Assert.That(browser.Text, Is.StringContaining("Некорректный телефонный номер"));
+				browser.TextField(Find.ById(String.Format("contacts[{0}].ContactText", rowId))).TypeText("123-556677");
+				browser.Button(Find.ByValue("Добавить")).Click();
+				browser.TextField(String.Format("contacts[{0}].ContactText", --rowId)).TypeText("test2@test.ru");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
 
+			// Проверка, что контактные записи создались в БД
+			IList contactIds;
 			using (new SessionScope())
 			{
 				client = Client.Find(client.Id);
 				Assert.NotNull(client.Addresses[0].ContactGroup);
 				var group = client.Addresses[0].ContactGroup;
-				var contacts = ArHelper.WithSession(s => 
-					s.CreateSQLQuery("select * from contacts.contacts where ContactOwnerId = :ownerId")
-					.SetParameter("ownerId", group.Id)
-					.List());
-				Assert.That(contacts.Count, Is.EqualTo(2));
+				var contactGroupCount = ArHelper.WithSession(s =>
+                    s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
+						.SetParameter("ContactGroupId", group.Id)
+                        .UniqueResult());
+				Assert.That(Convert.ToInt32(contactGroupCount), Is.EqualTo(1));
+				contactIds = ArHelper.WithSession(s =>
+                    s.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
+						.SetParameter("ownerId", group.Id)
+                        .List());
+				Assert.That(contactIds.Count, Is.EqualTo(3));
+
+
+			}
+
+			// Удаление контактной записи
+			using (var browser = Open("client/{0}", client.Id))
+			{				
+				browser.Link(Find.ByText("Test address")).Click();
+				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", contactIds[0]))).Click();
+				browser.Button(Find.ByValue("Сохранить")).Click();
+			}
+
+			// Проверка, что контактная запись удалена
+			using (new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				var group = client.Addresses[0].ContactGroup;
+				contactIds = ArHelper.WithSession(s =>
+                    s.CreateSQLQuery("select * from contacts.contacts where ContactOwnerId = :ownerId")
+						.SetParameter("ownerId", group.Id)
+                        .List());
+				Assert.That(contactIds.Count, Is.EqualTo(2));
 			}
 		}
 	}

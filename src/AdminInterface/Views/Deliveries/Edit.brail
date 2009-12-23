@@ -2,19 +2,6 @@
 									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
-<script>
-    $(function() {
-        $.validator.addMethod("phone", function(value, element) {
-            if (value.toString().length > 0) {
-                res = /^(\d{3,4})-(\d{6,7})(\*\d{3})?$/.test(value)
-                return res;
-            }
-            return true;
-        }, "Неправильный формат телефонного номера");
-        $("#mainForm").validate();
-    });
-</script>
-
 <div style="width: 600px;">
 
 	<% if IsDefined("Message"):
@@ -38,24 +25,8 @@
 			<input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}" /><br>
 		</div>
 
-        <div class="block">
-            <table width="100%" cellspacing="5">
-                <tr><td colspan="2">Контактная информация</td></tr>        
-                <tr>
-                    <td valign="top" align="left" width="10%">Email</td>
-                    <td>
-                        <input type="text" class="email" style="width: 50%; display: block" name="contactEmailText" value="${?ContactGroupEmail}" width="100%" />
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" align="left">Телефон</td>
-                    <td>
-                        <input type="text" class="phone" style="width: 50%; display: block" name="contactPhoneText" value="${?ContactGroupPhone}" width="100%"/>
-                    </td>
-                </tr>
-            </table>
-        </div>		
-        
+        <% OutputSubView("ContactInfo") %>		
+
 		<div class=block>
 			<h3>Доступен пользователям</h3>
 			<% for i, user in enumerate(delivery.Client.Users): %>

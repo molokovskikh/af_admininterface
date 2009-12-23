@@ -443,6 +443,7 @@
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Client\Info.brail" />
+    <None Include="Views\Deliveries\ContactInfo.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />

@@ -17,7 +17,7 @@
 
 <div style="width: 600px;">
 
-	<% if IsDefined("Message"):Z
+	<% if IsDefined("Message"):
 		clazz = "notice"
 		if message.IsError:
 			clazz = "err"
@@ -37,23 +37,7 @@
 			<input name=delivery.value class="required" style="width: 100%;"><br>
 		</div>
 		
-        <div class="block">
-            <table width="100%" cellspacing="5">
-                <tr><td colspan="2">Контактная информация</td></tr>        
-                <tr>
-                    <td valign="top" align="left" width="10%">Email</td>
-                    <td>
-                        <input type="text" class="email" style="width: 50%; display: block" name="contactEmailText" value="${?ContactGroupEmail}" width="100%" />
-                    </td>
-                </tr>
-                <tr>
-                    <td valign="top" align="left">Телефон</td>
-                    <td>
-                        <input type="text" class="phone" style="width: 50%; display: block" name="contactPhoneText" value="${?ContactGroupPhone}" width="100%"/>
-                    </td>
-                </tr>
-            </table>
-        </div>
+		<% OutputSubView("ContactInfo") %>
 		
 		<div class=block>
 			<h3>Доступен пользователям</h3>

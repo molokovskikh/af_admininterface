@@ -19,10 +19,12 @@ namespace AdminInterface.Controllers
 		public void Add(uint clientId)
 		{
 			PropertyBag["client"] = Client.FindAndCheck(clientId);
+			PropertyBag["EmailContactType"] = ContactType.Email;
+			PropertyBag["PhoneContactType"] = ContactType.Phone;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address, uint clientId, string contactEmailText, string contactPhoneText)
+		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] Contact[] contacts, [DataBind("contactTypes")] ContactType[] contactTypes, uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -30,13 +32,7 @@ namespace AdminInterface.Controllers
 				address.Client = client;
 				address.Save();
 
-				var group = CreateContactGroup(address);
-				if (!UpdateContactInformation(group, contactPhoneText, contactEmailText))
-				{
-					Flash["Message"] = Message.Error("Введены неверные данные");
-					RedirectToReferrer();
-					return;
-				}
+				UpdateContacts(address, contacts, contactTypes);
 
 				address.MaitainIntersection();
 				address.CreateFtpDirectory();
@@ -53,50 +49,36 @@ namespace AdminInterface.Controllers
 		{
 			var address = Address.Find(id);
 			PropertyBag["delivery"] = address;
-
-			if ((address.ContactGroup == null) || (address.ContactGroup.Contacts == null))
-				return;
-			foreach (var contact in address.ContactGroup.Contacts)
-			{
-				switch (contact.Type)
-				{
-					case ContactType.Email:
-							PropertyBag["ContactGroupEmail"] = contact.ContactText;
-							break;
-					case ContactType.Phone:
-							PropertyBag["ContactGroupPhone"] = contact.ContactText;
-							break;
-				}
-			}
+			PropertyBag["client"] = address.Client;
+			PropertyBag["EmailContactType"] = ContactType.Email;
+			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			if ((address.ContactGroup != null) && (address.ContactGroup.Contacts != null))
+				PropertyBag["ContactGroup"] = address.ContactGroup;
 		}
 				
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, string contactEmailText, string contactPhoneText)
-		{			
-			if (address.ContactGroup == null)
-				CreateContactGroup(address);
-			if (!UpdateContactInformation(address.ContactGroup, contactPhoneText, contactEmailText))
-			{
-				Flash["Message"] = Message.Error("Введены неверные данные");
-				RedirectToReferrer();
-				return;				
-			}
+		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] Contact[] contacts, [DataBind("contactTypes")] ContactType[] contactTypes)
+		{
+			UpdateContacts(address, contacts, contactTypes);
+
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("client", "info", new {cc = address.Client.Id});
 		}
-
-		private bool UpdateContactInformation(ContactGroup contactGroup, string contactPhone, string contactEmail)
+		
+		private bool UpdateContacts(Address address, Contact[] contacts, ContactType[] contactTypes)
 		{
-			contactGroup.Contacts.Clear();
-
-			if (!AddContact(contactGroup, ContactType.Email, contactEmail))
-				return false;
-			if (!AddContact(contactGroup, ContactType.Phone, contactPhone))
-				return false;
+			if (address.ContactGroup == null)
+				CreateContactGroup(address);
+			address.ContactGroup.Contacts.Clear();
+			for (var i = 0; i < contacts.Length; i++)
+			{
+				if (!AddContact(address.ContactGroup, contactTypes[i], contacts[i].ContactText))
+					return false;
+			}
 			return true;
 		}
-		
+
 		private bool AddContact(ContactGroup contactGroup, ContactType contactType, string contactText)
 		{
 			var result = true;

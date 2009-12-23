@@ -1,0 +1,105 @@
+﻿<style>
+	.ContactInfoCell
+	{
+		width: 55%;
+		padding-right: 8px;
+	}
+</style>
+
+<script>
+    function setContactTypeClass(rowId, className) 
+    {
+        var textBox = document.getElementById("contacts[" + rowId + "].ContactText");
+        textBox.setAttribute("class", className);
+    }
+       
+    function setContactType(rowId)
+    {
+        var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+        var index = comboBox.selectedIndex;
+        if (index == 0)
+        {
+            setContactTypeClass(rowId, "email");
+        }
+        else if (index == 1)
+        {
+            setContactTypeClass(rowId, "phone");
+        }
+    }
+
+    function deleteContactRow(rowId) {
+        $("#row" + rowId).remove();
+    }
+
+    function addContactRow(rowId, clientId, text, contactType) {
+        $("#Holder" + clientId).append("<tr id='row" + rowId + "' name='row" + rowId + "'>" +
+            "<td class='ContactInfoCell'>" +
+                "<select name='contactTypes[" + rowId + "]' id='contactTypes[" + rowId + "]' onchange='setContactType(" + rowId + ")'>" +
+                    "<option value='${EmailContactType}' selected>Email</option>" +
+                    "<option value='${PhoneContactType}'>Телефон</option>" + 
+                "</select>" +
+                "<input type='text' class='email' name='contacts[" + rowId + "].ContactText' id='contacts[" + rowId + "].ContactText' value='" + text + "'/>" +
+                "<input type='hidden' name='contacts[" + rowId + "].Type' id='contacts[" + rowId + "].Type' value='" + contactType + "'/>" +
+            "</td>" +
+            "<td>" +
+                "<input type='button' value='Удалить' name='contacts[" + rowId + "].Delete' onclick='deleteContactRow(" + rowId + ")' />" +
+            "</td>" +
+        "</tr>");
+        
+        if (contactType == '${EmailContactType}')
+        {
+            var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+            comboBox.selectedIndex = 0;
+            setContactType(rowId);
+        }
+        else if (contactType == '${PhoneContactType}')
+        {
+            var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+            comboBox.selectedIndex = 1;
+            setContactType(rowId);
+        }        
+    }    
+    
+    var insertId = 0;
+    $(document).ready(function(){
+        <% if IsDefined('ContactGroup'): %>
+            <% for contact in ContactGroup.Contacts: %>
+                addContactRow(${contact.Id}, ${client.Id}, '${contact.ContactText}', '${contact.Type}');
+            <% end %>
+        <% end %>
+        $("#mainForm").validate();
+    });
+
+    $(function() {
+        $.validator.addMethod("phone", function(value, element) {
+            if (value.toString().length > 0) {
+                res = /^(\d{3,4})-(\d{6,7})(\*\d{3})?$/.test(value)
+                return res;
+            }
+            return true;
+        }, "Некорректный телефонный номер");
+
+        $.validator.addMethod("email", function(value, element) {
+            if (value.toString().length > 0) {
+                res = /^([a-zA-Z0-9_\-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/.test(value)
+                return res;
+            }
+            return true;
+        }, "Некорректный адрес электронной почты");
+        
+        $("#mainForm").validate();
+    });
+</script>
+		
+<div class="block">
+    <table width="100%" cellspacing="5">
+        <tr><td colspan="2">Контактная информация</td></tr>  
+        
+        <tr>
+            <td>
+                <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%"></table>
+            </td>
+        </tr>
+        <tr><td><input type="button" value="Добавить" onclick="addContactRow(--insertId, ${client.Id}, '', '')" /></td></tr>
+    </table>
+</div>
