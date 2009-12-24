@@ -32,7 +32,13 @@ namespace AdminInterface.Controllers
 				address.Client = client;
 				address.Save();
 
-				UpdateContacts(address, contacts, contactTypes);
+				if (address.ContactGroup == null)
+					address.AddContactGroup();
+				for (var i = 0; i < contacts.Length; i++)
+				{
+					contacts[i].Type = contactTypes[i];
+				}
+				Address.SaveContacts(address.Id, contacts);
 
 				address.MaitainIntersection();
 				address.CreateFtpDirectory();
@@ -59,51 +65,17 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] Contact[] contacts, [DataBind("contactTypes")] ContactType[] contactTypes)
 		{
-			UpdateContacts(address, contacts, contactTypes);
+			if (address.ContactGroup == null)
+				address.AddContactGroup();
+			for (var i = 0; i < contacts.Length; i++)
+			{
+				contacts[i].Type = contactTypes[i];
+			}
+			Address.SaveContacts(address.Id, contacts);
 
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("client", "info", new {cc = address.Client.Id});
-		}
-		
-		private bool UpdateContacts(Address address, Contact[] contacts, ContactType[] contactTypes)
-		{
-			if (address.ContactGroup == null)
-				CreateContactGroup(address);
-			address.ContactGroup.Contacts.Clear();
-			for (var i = 0; i < contacts.Length; i++)
-			{
-				if (!AddContact(address.ContactGroup, contactTypes[i], contacts[i].ContactText))
-					return false;
-			}
-			return true;
-		}
-
-		private bool AddContact(ContactGroup contactGroup, ContactType contactType, string contactText)
-		{
-			var result = true;
-			if (!String.IsNullOrEmpty(contactText))
-			{
-				var contact = contactGroup.AddContact(contactType, contactText);
-				if (ValidationHelper.IsInstanceHasValidationError(contact))
-				{
-					contactGroup.Contacts.Remove(contact);
-					result = false;
-				}
-			}
-			contactGroup.Save();
-			return result;
-		}
-		
-		private ContactGroup CreateContactGroup(Address address)
-		{
-			var groupOwner = new ContactGroupOwner();
-			var group = groupOwner.AddContactGroup(ContactGroupType.General);
-			groupOwner.Save();
-			group.Save();
-			address.ContactGroup = group;
-			address.Save();
-			return group;
 		}
 	}
 }

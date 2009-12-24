@@ -2,19 +2,6 @@
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый адрес доставки", "")]} %>
 
-<script>
-    $(function() {
-        $.validator.addMethod("phone", function(value, element) {
-            if (value.toString().length > 0) {
-                res = /^(\d{3,4})-(\d{6,7})(\*\d{3})?$/.test(value)
-                return res;
-            }
-            return true;
-        }, "Неправильный формат телефонного номера");
-        $("#mainForm").validate();
-    });
-</script>
-
 <div style="width: 600px;">
 
 	<% if IsDefined("Message"):

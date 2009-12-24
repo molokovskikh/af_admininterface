@@ -124,5 +124,65 @@ where a.Id = :addressId")
 			}
 #endif
 		}
+
+		public virtual void AddContactGroup()
+		{
+			using (var scope = new TransactionScope())
+			{
+				var groupOwner = new ContactGroupOwner();
+				var group = groupOwner.AddContactGroup(ContactGroupType.General);
+				groupOwner.Save();
+				group.Save();
+				this.ContactGroup = group;
+			}
+		}
+
+		public static void SaveContacts(uint addressId, Contact[] contacts)
+		{
+			var address = Address.Find(addressId);
+			var group = address.ContactGroup;
+			var existsContacts = new List<Contact>();
+
+			foreach (var contact in group.Contacts)
+				existsContacts.Add(contact);
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				foreach (var existsContact in existsContacts)
+				{
+					var exists = contacts.Where(contact => existsContact.Id == contact.Id);
+					// Если его нет, значит удалили
+					if ((exists == null) || (exists.Count() == 0))
+					{
+						var tempGroup = existsContact.ContactOwner;
+						tempGroup.Contacts.Remove(existsContact);
+					}
+				}
+
+				foreach (var contact in contacts)
+				{
+					if (contact.Id <= 0)
+					{
+						if (!String.IsNullOrEmpty(contact.ContactText))
+						{
+							var newContact = address.ContactGroup.AddContact(contact.Type, contact.ContactText);
+							newContact.Save();
+						}
+					}
+					else
+					{
+						var editContact = existsContacts.Where(existsContact => existsContact.Id == contact.Id).First();
+						if (editContact == null)
+							continue;
+						if (!String.Equals(contact.ContactText, editContact.ContactText))
+						{
+							editContact.ContactText = contact.ContactText;
+							editContact.Save();
+						}
+					}
+				}
+				scope.VoteCommit();
+			}
+		}
 	}
 }
