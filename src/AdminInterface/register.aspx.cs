@@ -212,7 +212,7 @@ ORDER BY region;";
 			{
 				user.AssignedPermissions = Permissions.Items.Cast<ListItem>()
 					.Where(i => i.Selected)
-					.Select(i => UserPermission.Find(Convert.ToUInt32(i.Value))).ToList();
+					.Select(i => UserPermission.Find(Convert.ToUInt32(i.Value))).Concat(UserPermission.GetDefaultPermissions()).ToList();
 			}
 
 			user.Setup(false);

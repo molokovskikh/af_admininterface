@@ -8,6 +8,7 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using AdminInterface.Security;
+using System.Web;
 
 namespace AdminInterface.Models
 {
@@ -26,7 +27,8 @@ namespace AdminInterface.Models
 	{
 		public User()
 		{
-			Registrant = SecurityContext.Administrator.UserName;
+			if (HttpContext.Current != null) // для поддержки авт. тестирования
+				Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
 		}
 

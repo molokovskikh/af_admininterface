@@ -259,5 +259,44 @@ namespace Functional
 				Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
 			}
 		}
+
+		[Test]
+		public void HistoriesMenuExistance()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				string baseUrl = browser.Url;
+
+				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
+				Assert.AreEqual("История обновлений пользователя " + client.Users[0].Login, browser.Title);
+				browser.GoTo(baseUrl);
+
+				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
+				Assert.AreEqual("Статистика получения\\отправки документов пользователя " + client.Users[0].Login, browser.Title);
+				browser.GoTo(baseUrl);
+
+				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
+				Assert.AreEqual("История заказов пользователя " + client.Users[0].Login, browser.Title);
+				browser.GoTo(baseUrl);
+			}
+
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				string baseUrl = browser.Url;
+
+				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
+				Assert.AreEqual("История обновлений клиента " + client.Name, browser.Title);
+				browser.GoTo(baseUrl);
+
+				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
+				Assert.AreEqual("Статистика получения\\отправки документов клиента " + client.Name, browser.Title);
+				browser.GoTo(baseUrl);
+
+				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
+				Assert.AreEqual("История заказов клиента " + client.Name, browser.Title);
+				browser.GoTo(baseUrl);
+			}
+		}
 	}
 }
