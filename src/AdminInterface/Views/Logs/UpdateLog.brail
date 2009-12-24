@@ -59,18 +59,31 @@
 	}
 </script>
 
-<% component CaptureFor, {"id" : "Title"}: %>
-	История обновлений клиента ${client.Name}
-<% end %>
+<%if IsDefined("client"): %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		История обновлений клиента ${client.Name}
+	<% end %>
 
-<div class="PageHeader">
-	История обновлений клиента ${client.Name}
-</div>
+	<div class="PageHeader">
+		История обновлений клиента ${client.Name}
+	</div>
 
-<% component CaptureFor, {"id" : "PostToServer"}: %>
-	${FormHelper.HiddenField("clientCode", client.Id)}
-<% end %>
+	<% component CaptureFor, {"id" : "PostToServer"}: %>
+		${FormHelper.HiddenField("clientCode", client.Id)}
+	<% end %>
+<%else: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		История обновлений пользователя ${user.Login}
+	<% end %>
 
+	<div class="PageHeader">
+		История обновлений пользователя ${user.Login}
+	</div>
+
+	<% component CaptureFor, {"id" : "PostToServer"}: %>
+		${FormHelper.HiddenField("userId", user.Id)}
+	<% end %>
+<%end %>
 <% 
 	OutputSubView("SelectDateIntervalSubView")
 %>
@@ -83,9 +96,11 @@
 	%>
 	
 		<tr>
+		  <%if IsDefined("client"): %>
 			<th>
 				Пользователь
 			</th>
+		  <%end %>
 			<th>
 				Дата
 			</th>
@@ -116,9 +131,11 @@
 				end
 	%>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
+		  <%if IsDefined("client"): %>
 			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.User.Login}
 			</td>
+		  <%end %>
 			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.RequestTime}
 			</td>

@@ -18,22 +18,33 @@ namespace AdminInterface.Controllers
 	]
 	public class LogsController : SmartDispatcherController
 	{
-		public void DocumentLog(uint clientCode)
+		public void DocumentLog(uint? clientCode, uint? userId)
 		{
-			DocumentLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
+			DocumentLog(clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
-		public void DocumentLog(uint clientCode, DateTime beginDate, DateTime endDate)
+		public void DocumentLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
 		{
-			var client = Client.Find(clientCode);
+			if (!userId.HasValue)
+			{
+				var client = Client.Find(clientCode.Value);
 
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
+				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+				SecurityContext.Administrator.CheckClientType(client.Type);
 
-			PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
-				beginDate,
-				endDate.AddDays(1));
-			PropertyBag["client"] = client;
+				PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
+					beginDate, endDate.AddDays(1));
+				PropertyBag["client"] = client;
+			}
+			else
+			{
+				var user = User.Find(userId.Value);
+				Client.FindAndCheck(user.Client.Id);
+				PropertyBag["user"] = user;
+				PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForUser(user,
+					beginDate, endDate.AddDays(1));
+			}
+
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}
@@ -62,23 +73,33 @@ namespace AdminInterface.Controllers
 			PropertyBag["log"] = UpdateLogEntity.Find(updateLogEntityId).Log;
 		}
 
-		public void UpdateLog(uint clientCode)
+		public void UpdateLog(uint? clientCode, uint? userId)
 		{
-			UpdateLog(clientCode, DateTime.Today.AddDays(-1), DateTime.Today);
+			UpdateLog(clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
-		public void UpdateLog(uint clientCode, DateTime beginDate, DateTime endDate)
+		public void UpdateLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
 		{
-			var client = Client.Find(clientCode);
 
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
-
-			PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id,
-				beginDate,
-				endDate.AddDays(1));
-
-			PropertyBag["client"] = client;
+			if (!userId.HasValue)
+			{
+				var client = Client.Find(clientCode.Value);
+				PropertyBag["client"] = client;
+				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id,
+					beginDate, endDate.AddDays(1));
+				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
+				SecurityContext.Administrator.CheckClientType(client.Type);
+			}
+			else
+			{
+				var user = User.Find(userId.Value);
+				PropertyBag["user"] = user;
+				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesByUser(userId.Value,
+					beginDate, endDate.AddDays(1));
+				SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
+				SecurityContext.Administrator.CheckClientType(user.Client.Type);
+			}
+			
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}
@@ -103,17 +124,28 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 		}
 
-		public void Orders(uint clientId)
+		public void Orders(uint? clientId, uint? userId)
 		{
-			Orders(clientId, DateTime.Today, DateTime.Today);
+			Orders(clientId, userId, DateTime.Today, DateTime.Today);
 		}
 
-		public void Orders(uint clientId, DateTime beginDate, DateTime endDate)
+		public void Orders(uint? clientId, uint? userId, DateTime beginDate, DateTime endDate)
 		{
-			PropertyBag["client"] = Client.FindAndCheck(clientId);
+			if (!userId.HasValue)
+			{
+				PropertyBag["client"] = Client.FindAndCheck(clientId.Value);
+				PropertyBag["Orders"] = OrderLog.Load(clientId.Value, beginDate, endDate);
+			}
+			else
+			{
+				var user = User.Find(userId.Value);
+				Client.FindAndCheck(user.Client.Id);
+				PropertyBag["user"] = user;
+				PropertyBag["Orders"] = OrderLog.LoadByUser(userId.Value, beginDate, endDate);
+			}
+
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
-			PropertyBag["Orders"] = OrderLog.Load(clientId, beginDate, endDate);
 		}
 	}
 
@@ -194,6 +226,43 @@ ORDER BY writetime desc;")
 				.SetParameter("ToDate", end)
 				.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
 				.SetParameter("ClientId", clientId)
+				.SetResultTransformer(Transformers.AliasToBean<OrderLog>())
+				.List<OrderLog>());
+		}
+
+		public static IList<OrderLog> LoadByUser(uint userId, DateTime begin, DateTime end)
+		{
+			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
+SELECT  oh.rowid as Id,
+		oh.WriteTime,
+		oh.PriceDate,
+		c.Name as Drugstore,
+		a.Address,
+		u.Login as User,
+		firm.shortname as Supplier,
+		pd.PriceName,
+		pd.PriceCode PriceId,
+		oh.RowCount,
+		max(o.ResultCode) as ResultCode,
+		o.TransportType,
+		oh.ClientOrderId
+FROM orders.ordershead oh
+	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
+	join usersettings.clientsdata as firm on firm.firmcode = pd.firmcode
+	join Future.Clients c on oh.ClientCode = c.Id
+	join Future.Users u on u.Id = oh.UserId
+	join Future.Addresses a on a.Id = oh.AddressId
+		left join logs.orders o on oh.rowid = o.orderid
+WHERE oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)
+	AND oh.UserId = :UserId
+	AND oh.RegionCode & :RegionCode > 0
+	and oh.Deleted = 0
+group by oh.rowid
+ORDER BY writetime desc;")
+				.SetParameter("FromDate", begin)
+				.SetParameter("ToDate", end)
+				.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
+				.SetParameter("UserId", userId)
 				.SetResultTransformer(Transformers.AliasToBean<OrderLog>())
 				.List<OrderLog>());
 		}

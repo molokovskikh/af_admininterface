@@ -1,10 +1,24 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	История заказов клиента ${client.Name}
-<% end %>
+﻿<%if IsDefined("client"): %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		История заказов клиента ${client.Name}
+	<% end %>
 
-<div class="PageHeader">
-	История заказов клиента ${client.Name}
-</div>
+	<div class="PageHeader">
+		История заказов клиента ${client.Name}
+	</div>
+<%else: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		История заказов пользователя ${user.Login}
+	<% end %>
+
+	<div class="PageHeader">
+		История заказов пользователя ${user.Login}
+	</div>
+	
+	<% component CaptureFor, {"id" : "PostToServer"}: %>
+		${FormHelper.HiddenField("userId", user.Id)}
+	<% end %>
+<%end %>
 
 <% OutputSubView("SelectDateIntervalSubView") %>
 
@@ -17,7 +31,9 @@
 			<th>Дата прайса</th>
 			<th>Аптека</th>
 			<th>Адрес</th>
+		  <%if IsDefined("client"): %>
 			<th>Пользователь</th>
+		  <%end %>
 			<th>Поставщик</th>
 			<th>Прайс</th>
 			<th>Позиций</th>
@@ -31,7 +47,9 @@
 			<td>${order.PriceDate}</td>
 			<td>${order.Drugstore}</td>
 			<td>${order.Address}</td>
+		  <%if IsDefined("client"): %>
 			<td>${order.User}</td>
+		  <%end %>
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>

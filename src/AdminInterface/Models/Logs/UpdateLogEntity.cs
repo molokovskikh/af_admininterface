@@ -70,5 +70,18 @@ namespace AdminInterface.Models.Logs
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
+
+		public static IList<UpdateLogEntity> GetEntitiesByUser(uint userId,
+			DateTime beginDate,
+			DateTime endDate)
+		{
+			var user = User.Find(userId);
+			return ArHelper.WithSession(
+				session => session.CreateCriteria(typeof(UpdateLogEntity))
+					.Add(Expression.Eq("User", user))
+					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.AddOrder(Order.Desc("RequestTime"))
+					.List<UpdateLogEntity>());
+		}
 	}
 }

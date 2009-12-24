@@ -54,5 +54,10 @@ namespace AdminInterface.Models.Security
 		{
 			return FindAll(Expression.Eq("Type", type));
 		}
+
+		public static UserPermission[] GetDefaultPermissions()
+		{
+			return FindAll(Expression.Eq("AssignDefaultValue", true));
+		}
 	}
 }

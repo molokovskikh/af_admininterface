@@ -1,14 +1,28 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Статистика получения\отправки документов клиента ${client.Name}
-<% end %>
+﻿<%if IsDefined("client"): %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		Статистика получения\отправки документов клиента ${client.Name}
+	<% end %>
 
-<% component CaptureFor, {"id" : "PostToServer"}: %>
-	${FormHelper.HiddenField("clientCode", client.Id)}
-<% end %>
+	<% component CaptureFor, {"id" : "PostToServer"}: %>
+		${FormHelper.HiddenField("clientCode", client.Id)}
+	<% end %>
 
-<div class="PageHeader">
-	Статистика получения\отправки документов клиента ${client.Name}
-</div>
+	<div class="PageHeader">
+		Статистика получения\отправки документов клиента ${client.Name}
+	</div>
+<%else: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		Статистика получения\отправки документов пользователя ${user.Login}
+	<% end %>
+
+	<% component CaptureFor, {"id" : "PostToServer"}: %>
+		${FormHelper.HiddenField("userId", user.Id)}
+	<% end %>
+
+	<div class="PageHeader">
+		Статистика получения\отправки документов пользователя ${user.Login}
+	</div>
+<%end %>
 
 <% OutputSubView("SelectDateIntervalSubView") %>
 
@@ -26,7 +40,7 @@
 			<th>
 				Тип документа
 			</th>
-		<% if client.IsDrugstore():%>
+		<% if not IsDefined("client") or client.IsDrugstore():%>
 			<th>
 				От поставщика
 			</th>
@@ -44,9 +58,11 @@
 			<th>
 				Размер
 			</th>
+		  <%if IsDefined("client"): %>
 			<th>
 				Пользователь получивший документ
 			</th>
+		  <%end %>
 			<th>
 				Дата отправки
 			</th>
@@ -65,7 +81,7 @@
 			<td>
 				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
 			</td>
-			<% if client.IsDrugstore(): %>
+			<% if not IsDefined("client") or client.IsDrugstore(): %>
 				<td>
 					${logEntity.FromSupplier.Name if logEntity.FromSupplier != null}
 				</td>
@@ -83,9 +99,11 @@
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize) if logEntity.DocumentSize != null}
 			</td>
+		  <%if IsDefined("client"): %>
 			<td>
 				${logEntity.UpdateLogEntity.User.Login if logEntity.UpdateLogEntity and logEntity.UpdateLogEntity.User}
 			</td>
+		  <%end %>
 			<td>
 				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
 			</td>

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using Common.Web.Ui.Helpers;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
+using System.Linq;
 
 namespace AdminInterface.Models.Logs
 {
@@ -59,6 +60,20 @@ namespace AdminInterface.Models.Logs
 					.AddOrder(Order.Desc("LogTime"))
 					.List<DocumentLogEntity>());
 			
+		}
+
+		public static IList<DocumentLogEntity> GetEnitiesForUser(User user,
+			DateTime beginDate,
+			DateTime endDate)
+		{
+			var updateEntities = UpdateLogEntity.GetEntitiesByUser(user.Id, beginDate, endDate).ToArray();
+			return ArHelper.WithSession(
+				session => session.CreateCriteria(typeof(DocumentLogEntity))
+					.Add(Expression.Between("LogTime", beginDate, endDate))
+					.Add(Expression.In("UpdateLogEntity", updateEntities))
+					.AddOrder(Order.Desc("LogTime"))
+					.List<DocumentLogEntity>());
+
 		}
 	}
 }
