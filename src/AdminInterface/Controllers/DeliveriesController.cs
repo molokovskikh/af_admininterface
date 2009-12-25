@@ -1,4 +1,5 @@
-﻿using AdminInterface.Models;
+﻿using AdminInterface.Helpers;
+using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -24,7 +25,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] AddressContactInfo[] contacts, uint clientId)
+		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] ContactInfo[] contacts, uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -32,9 +33,7 @@ namespace AdminInterface.Controllers
 				address.Client = client;
 				address.Save();
 
-				if (address.ContactGroup == null)
-					address.AddContactGroup();
-				Address.SaveContacts(address.Id, contacts);
+				address.UpdateContacts(contacts);
 
 				address.MaitainIntersection();
 				address.CreateFtpDirectory();
@@ -59,11 +58,9 @@ namespace AdminInterface.Controllers
 		}
 				
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] AddressContactInfo[] contacts)
+		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] ContactInfo[] contacts)
 		{
-			if (address.ContactGroup == null)
-				address.AddContactGroup();
-			Address.SaveContacts(address.Id, contacts);
+			address.UpdateContacts(contacts);
 
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");

@@ -97,17 +97,13 @@
     });
 </script>
 		
-<div class="block">
-    <table width="100%" cellspacing="5">
-        <tr><td colspan="2">Контактная информация</td></tr>  
-        
-        <tr>
-            <td>
-                <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%">
-                
-                </table>
-            </td>
-        </tr>
-        <tr><td align="right"><input type="button" value="Добавить" onclick="addContactRow(--insertId, ${client.Id}, '', '')" /></td></tr>
-    </table>
-</div>
+
+<table width="100%" cellspacing="5">
+    <tr>
+        <td>
+            <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%">
+            </table>
+        </td>
+    </tr>
+    <tr><td align="right"><input type="button" value="Добавить" onclick="addContactRow(--insertId, ${client.Id}, '', '')" /></td></tr>
+</table>

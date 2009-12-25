@@ -1,7 +1,8 @@
-using System;
+	using System;
 using System.Collections.Generic;
 using System.IO;
-using AdminInterface.Helpers;
+	using System.Linq;
+	using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
@@ -9,6 +10,7 @@ using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using AdminInterface.Security;
 using System.Web;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
@@ -61,6 +63,9 @@ namespace AdminInterface.Models
 
 		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
 		public virtual Client Client { get; set; }
+
+		[BelongsTo("ContactGroupId")]
+		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
 		public virtual User InheritPricesFrom { get; set; }
@@ -213,6 +218,24 @@ set uui.AFCopyId = ''
 where uui.UserId = :userCode")
 					.SetParameter("userCode", Id)
 					.ExecuteUpdate());
+		}
+
+		private void AddContactGroup()
+		{
+			using (var scope = new TransactionScope())
+			{
+				var groupOwner = Client.ContactGroupOwner;
+				var group = groupOwner.AddContactGroup(ContactGroupType.General);
+				group.Save();
+				this.ContactGroup = group;
+			}
+		}
+
+		public virtual void UpdateContacts(ContactInfo[] contacts)
+		{
+			if (ContactGroup == null)
+				AddContactGroup();
+			ContactHelper.UpdateContacts(ContactGroup, contacts);
 		}
 	}
 }

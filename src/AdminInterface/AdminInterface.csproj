@@ -159,6 +159,7 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Helpers\ContactHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
@@ -443,8 +444,8 @@
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Client\Info.brail" />
-    <None Include="Views\Deliveries\ContactInfo.brail" />
     <None Include="Views\Logs\Orders.brail" />
+    <None Include="Views\SubViews\ContactInfo.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />

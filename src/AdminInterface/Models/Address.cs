@@ -6,6 +6,7 @@ using System.Linq;
 #if !DEBUG
 using System.Security.AccessControl;
 #endif
+using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
@@ -14,14 +15,6 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
-	public class AddressContactInfo
-	{
-		public string ContactText { get; set; }
-		public ContactType Type { get; set; }
-		public bool Deleted { get; set; }
-		public int Id { get; set; }
-	}
-
 	[ActiveRecord("Addresses", Schema = "Future")]
 	public class Address : ActiveRecordBase<Address>
 	{
@@ -133,7 +126,7 @@ where a.Id = :addressId")
 #endif
 		}
 
-		public virtual void AddContactGroup()
+		private void AddContactGroup()
 		{
 			using (var scope = new TransactionScope())
 			{
@@ -144,51 +137,11 @@ where a.Id = :addressId")
 			}
 		}
 
-		public static void SaveContacts(uint addressId, AddressContactInfo[] contacts)
+		public virtual void UpdateContacts(ContactInfo[] contacts)
 		{
-			var address = Address.Find(addressId);
-			var group = address.ContactGroup;
-			var existsContacts = new List<Contact>();
-
-			foreach (var contact in group.Contacts)
-				existsContacts.Add(contact);
-
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				foreach (var existsContact in existsContacts)
-				{
-					var deleted = contacts.Where(contact => (existsContact.Id == contact.Id) && (contact.Deleted));
-					if ((deleted != null) && (deleted.Count() > 0))
-					{
-						var tempGroup = existsContact.ContactOwner;
-						tempGroup.Contacts.Remove(existsContact);						
-					}
-				}
-
-				foreach (var contact in contacts)
-				{
-					if (contact.Id < 0)
-					{
-						if (!String.IsNullOrEmpty(contact.ContactText))
-						{
-							var newContact = address.ContactGroup.AddContact(contact.Type, contact.ContactText);
-							newContact.Save();
-						}
-					}
-					else
-					{
-						var editContacts = existsContacts.Where(existsContact => existsContact.Id == contact.Id);
-						if ((editContacts == null) || (editContacts.Count() == 0))
-							continue;
-						if (!String.Equals(contact.ContactText, editContacts.First().ContactText))
-						{
-							editContacts.First().ContactText = contact.ContactText;
-							editContacts.First().Save();
-						}
-					}
-				}
-				scope.VoteCommit();
-			}
+			if (this.ContactGroup == null)
+				AddContactGroup();
+			ContactHelper.UpdateContacts(ContactGroup, contacts);			
 		}
 	}
 }

@@ -1,6 +1,10 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый пользователь", "")]} %>
+									  
+<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
+									  
 <script>
 	$(function() {
 		$("form").validate({
@@ -42,8 +46,14 @@
 				<textarea class="ValidateEmail EmailRequired" style="width: 100%" name="mails">${emailForSend}</textarea>
 			</div>
 		</div>
+		
 		<div class=block>
-			<h3>Доступные адреса доставки</h3>
+		    <h3>Контактная информация</h3>
+		    <% OutputSubView("/SubViews/ContactInfo") %>
+		</div>		
+		
+		<div class=block>
+			<h3>Доступ к адресам доставки</h3>
 			<div>
 				<% if client.Addresses.Count == 0: %>
 					Нет адресов для доставки
@@ -51,6 +61,7 @@
 				<% for i, address in enumerate(client.Addresses): %>
 					<input type=checkbox type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id}>
 					${address.Value}
+					<br />
 				<% end %>
 			</div>
 		</div>

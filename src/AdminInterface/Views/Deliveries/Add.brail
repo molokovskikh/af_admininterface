@@ -2,6 +2,9 @@
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый адрес доставки", "")]} %>
 
+<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />									  
+
 <div style="width: 600px;">
 
 	<% if IsDefined("Message"):
@@ -20,11 +23,14 @@
 		<input type=hidden name=clientId value=${client.Id}>
 		<h2>Новый адрес доставки</h2>
 		<div class=block>
-			Адрес<br>
-			<input name=delivery.value class="required" style="width: 100%;"><br>
+			<h3>Адрес</h3>
+			<p><input name=delivery.value class="required" style="width: 100%;"></p>
 		</div>
 		
-		<% OutputSubView("ContactInfo") %>
+        <div class="block">
+            <h3>Контактная информация</h3>
+            <% OutputSubView("/SubViews/ContactInfo") %>		
+        </div>
 		
 		<div class=block>
 			<h3>Доступен пользователям</h3>

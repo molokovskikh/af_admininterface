@@ -2,6 +2,9 @@
 									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
+<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />									  
+
 <div style="width: 600px;">
 
 	<% if IsDefined("Message"):
@@ -21,12 +24,15 @@
 		<h2>Адрес доставки ${delivery.Value}</h2>
 		
 		<div class=block>
-			Адрес<br>
-			<input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}" /><br>
+			<h3>Адрес</h3>
+			<p><input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}"></p>
 		</div>
 
-        <% OutputSubView("ContactInfo") %>		
-
+        <div class="block">
+            <h3>Контактная информация</h3>
+            <% OutputSubView("/SubViews/ContactInfo") %>		
+        </div>
+        
 		<div class=block>
 			<h3>Доступен пользователям</h3>
 			<% for i, user in enumerate(delivery.Client.Users): %>

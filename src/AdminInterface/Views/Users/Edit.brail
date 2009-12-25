@@ -140,7 +140,10 @@
 			</select> Наследовать настройки прайс листов <br>
 		</div>
 		
-		
+		<div class=block>
+		    <h3>Контактная информация</h3>
+		    <% OutputSubView("/SubViews/ContactInfo") %>
+		</div>
 		
 		<div class=block>
 			<h3>

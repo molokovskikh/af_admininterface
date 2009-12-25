@@ -12,6 +12,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using AdminInterface.Properties;
 using System.Web;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -28,10 +29,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
+			PropertyBag["EmailContactType"] = ContactType.Email;
+			PropertyBag["PhoneContactType"] = ContactType.Phone;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("user")] User user, uint clientId, bool sendClientCard, string mails)
+		public void Add([DataBind("user")] User user, [DataBind("contacts")] ContactInfo[] contacts, uint clientId, bool sendClientCard, string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -43,9 +46,8 @@ namespace AdminInterface.Controllers
 				password = user.CreateInAd();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
-
 				client.Addresses.Each(a => a.SetAccessControl(user.Login));
-
+				user.UpdateContacts(contacts);
 				scope.VoteCommit();
 			}
 
@@ -83,16 +85,23 @@ namespace AdminInterface.Controllers
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
+			PropertyBag["EmailContactType"] = ContactType.Email;
+			PropertyBag["PhoneContactType"] = ContactType.Phone;
 
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
 			else
 				PropertyBag["Registrant"] = Administrator.GetByName(user.Registrant);
+
+			if ((user.ContactGroup != null) && (user.ContactGroup.Contacts != null))
+				PropertyBag["ContactGroup"] = user.ContactGroup;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user)
+		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user,
+			[DataBind("contacts")] ContactInfo[] contacts)
 		{
+			user.UpdateContacts(contacts);
 			user.Update();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { login = user.Login });
