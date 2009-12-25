@@ -92,6 +92,8 @@ namespace Functional
 				client = Client.Find(client.Id);
 				Assert.NotNull(client.Addresses[0].ContactGroup);
 				var group = client.Addresses[0].ContactGroup;
+				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id), 
+					"Не совпадают Id владельца группы у клиента и у новой группы");
 				var contactGroupCount = ArHelper.WithSession(s =>
                     s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
 						.SetParameter("ContactGroupId", group.Id)

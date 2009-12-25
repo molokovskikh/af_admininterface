@@ -3,6 +3,7 @@
 	{
 		width: 25%;
 		padding-left: 10px;
+		vertical-align: top;
 	}
 </style>
 
@@ -15,7 +16,7 @@
        
     function setContactType(rowId)
     {
-        var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+        var comboBox = document.getElementById("contacts[" + rowId + "].Type");
         var index = comboBox.selectedIndex;
         if (index == 0)
         {
@@ -27,37 +28,41 @@
         }
     }
 
-    function deleteContactRow(rowId) {
+    function deleteContactRow(clientId, rowId) {
         $("#row" + rowId).remove();
+        if (rowId > 0)
+        {
+            $("#Holder" + clientId).append("<input type='hidden' name='contacts[" + rowId + "].Deleted' id='contacts[" + rowId + "].Deleted' value='1' />");
+            $("#Holder" + clientId).append("<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "' />");
+        }
     }
 
     function addContactRow(rowId, clientId, text, contactType) {
         $("#Holder" + clientId).append("<tr id='row" + rowId + "' name='row" + rowId + "'>" +
             "<td class='ContactInfoCell'>" +
-                "<select style='width: 100%;' name='contactTypes[" + rowId + "]' id='contactTypes[" + rowId + "]' onchange='setContactType(" + rowId + ")'>" +
+                "<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "'/>" +
+                "<select style='width: 100%;' name='contacts[" + rowId + "].Type' id='contacts[" + rowId + "].Type' onchange='setContactType(" + rowId + ")'>" +
                     "<option value='${EmailContactType}' selected>Email</option>" +
                     "<option value='${PhoneContactType}'>Телефон</option>" + 
                 "</select>" +
             "</td>" +
-            "<td class='ContactInfoCell'>" +
-                "<input type='text' class='email' name='contacts[" + rowId + "].ContactText' id='contacts[" + rowId + "].ContactText' value='" + text + "'/>" +
-                "<input type='hidden' name='contacts[" + rowId + "].Type' id='contacts[" + rowId + "].Type' value='" + contactType + "'/>" +
-                "<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "'/>" +
+            "<td style = 'width: 50%;padding-left: 10px;'>" +
+                "<input type='text' style='width: 100%' class='email' name='contacts[" + rowId + "].ContactText' id='contacts[" + rowId + "].ContactText' value='" + text + "'/>" +
             "</td>" +
-            "<td style='padding-left: 10px'>" +
-                "<input type='button' value='Удалить' name='contacts[" + rowId + "].Delete' onclick='deleteContactRow(" + rowId + ")' />" +
+            "<td style='vertical-align: top;padding-left: 10px'>" +
+                "<input type='button' value='Удалить' name='contacts[" + rowId + "].Delete' onclick='deleteContactRow(" + clientId + "," + rowId + ")' />" +
             "</td>" +
         "</tr>");
         
         if (contactType == '${EmailContactType}')
         {
-            var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+            var comboBox = document.getElementById("contacts[" + rowId + "].Type");
             comboBox.selectedIndex = 0;
             setContactType(rowId);
         }
         else if (contactType == '${PhoneContactType}')
         {
-            var comboBox = document.getElementById("contactTypes[" + rowId + "]");
+            var comboBox = document.getElementById("contacts[" + rowId + "].Type");
             comboBox.selectedIndex = 1;
             setContactType(rowId);
         }        
@@ -88,7 +93,7 @@
                 return res;
             }
             return true;
-        }, "Некорректный адрес электронной почты");        
+        }, "Некорректный адрес электронной почты");  
     });
 </script>
 		
@@ -98,7 +103,9 @@
         
         <tr>
             <td>
-                <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%"></table>
+                <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%">
+                
+                </table>
             </td>
         </tr>
         <tr><td align="right"><input type="button" value="Добавить" onclick="addContactRow(--insertId, ${client.Id}, '', '')" /></td></tr>

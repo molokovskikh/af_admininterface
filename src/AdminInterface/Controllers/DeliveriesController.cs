@@ -24,7 +24,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] Contact[] contacts, [DataBind("contactTypes")] ContactType[] contactTypes, uint clientId)
+		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] AddressContactInfo[] contacts, uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -34,10 +34,6 @@ namespace AdminInterface.Controllers
 
 				if (address.ContactGroup == null)
 					address.AddContactGroup();
-				for (var i = 0; i < contacts.Length; i++)
-				{
-					contacts[i].Type = contactTypes[i];
-				}
 				Address.SaveContacts(address.Id, contacts);
 
 				address.MaitainIntersection();
@@ -63,14 +59,10 @@ namespace AdminInterface.Controllers
 		}
 				
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] Contact[] contacts, [DataBind("contactTypes")] ContactType[] contactTypes)
+		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] AddressContactInfo[] contacts)
 		{
 			if (address.ContactGroup == null)
 				address.AddContactGroup();
-			for (var i = 0; i < contacts.Length; i++)
-			{
-				contacts[i].Type = contactTypes[i];
-			}
 			Address.SaveContacts(address.Id, contacts);
 
 			address.Update();

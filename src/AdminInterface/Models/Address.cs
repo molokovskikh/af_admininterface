@@ -14,6 +14,14 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
+	public class AddressContactInfo
+	{
+		public string ContactText { get; set; }
+		public ContactType Type { get; set; }
+		public bool Deleted { get; set; }
+		public int Id { get; set; }
+	}
+
 	[ActiveRecord("Addresses", Schema = "Future")]
 	public class Address : ActiveRecordBase<Address>
 	{
@@ -129,15 +137,14 @@ where a.Id = :addressId")
 		{
 			using (var scope = new TransactionScope())
 			{
-				var groupOwner = new ContactGroupOwner();
+				var groupOwner = Client.ContactGroupOwner;
 				var group = groupOwner.AddContactGroup(ContactGroupType.General);
-				groupOwner.Save();
 				group.Save();
 				this.ContactGroup = group;
 			}
 		}
 
-		public static void SaveContacts(uint addressId, Contact[] contacts)
+		public static void SaveContacts(uint addressId, AddressContactInfo[] contacts)
 		{
 			var address = Address.Find(addressId);
 			var group = address.ContactGroup;
@@ -150,18 +157,17 @@ where a.Id = :addressId")
 			{
 				foreach (var existsContact in existsContacts)
 				{
-					var exists = contacts.Where(contact => existsContact.Id == contact.Id);
-					// Если его нет, значит удалили
-					if ((exists == null) || (exists.Count() == 0))
+					var deleted = contacts.Where(contact => (existsContact.Id == contact.Id) && (contact.Deleted));
+					if ((deleted != null) && (deleted.Count() > 0))
 					{
 						var tempGroup = existsContact.ContactOwner;
-						tempGroup.Contacts.Remove(existsContact);
+						tempGroup.Contacts.Remove(existsContact);						
 					}
 				}
 
 				foreach (var contact in contacts)
 				{
-					if (contact.Id <= 0)
+					if (contact.Id < 0)
 					{
 						if (!String.IsNullOrEmpty(contact.ContactText))
 						{
@@ -171,13 +177,13 @@ where a.Id = :addressId")
 					}
 					else
 					{
-						var editContact = existsContacts.Where(existsContact => existsContact.Id == contact.Id).First();
-						if (editContact == null)
+						var editContacts = existsContacts.Where(existsContact => existsContact.Id == contact.Id);
+						if ((editContacts == null) || (editContacts.Count() == 0))
 							continue;
-						if (!String.Equals(contact.ContactText, editContact.ContactText))
+						if (!String.Equals(contact.ContactText, editContacts.First().ContactText))
 						{
-							editContact.ContactText = contact.ContactText;
-							editContact.Save();
+							editContacts.First().ContactText = contact.ContactText;
+							editContacts.First().Save();
 						}
 					}
 				}
