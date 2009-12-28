@@ -11,6 +11,7 @@ using NHibernate.Criterion;
 using AdminInterface.Security;
 using System.Web;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.Controllers;
 
 namespace AdminInterface.Models
 {
@@ -231,11 +232,16 @@ where uui.UserId = :userCode")
 			}
 		}
 
-		public virtual void UpdateContacts(ContactInfo[] contacts)
+		public virtual void UpdateContacts(Contact[] contacts)
+		{
+			UpdateContacts(contacts, null);
+		}
+
+		public virtual void UpdateContacts(Contact[] contacts, Contact[] deletedContacts)
 		{
 			if (ContactGroup == null)
 				AddContactGroup();
-			ContactHelper.UpdateContacts(ContactGroup, contacts);
+			ContactGroup.UpdateContacts(contacts, deletedContacts);
 		}
 	}
 }

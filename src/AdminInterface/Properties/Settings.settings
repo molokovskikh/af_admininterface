@@ -39,5 +39,8 @@
     <Setting Name="UserPreparedDataFormatString" Type="System.String" Scope="Application">
       <Value Profile="(Default)">U:\wwwroot\ios\Results\{0}.zip</Value>
     </Setting>
+    <Setting Name="WCFServiceUrl" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">net.tcp://fms.adc.analit.net:900/RemotePriceProcessorService</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

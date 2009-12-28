@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] ContactInfo[] contacts, uint clientId)
+		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] Contact[] contacts, uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -58,9 +58,10 @@ namespace AdminInterface.Controllers
 		}
 				
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, [DataBind("contacts")] ContactInfo[] contacts)
+		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, 
+			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
-			address.UpdateContacts(contacts);
+			address.UpdateContacts(contacts, deletedContacts);
 
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");

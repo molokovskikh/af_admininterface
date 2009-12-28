@@ -117,7 +117,7 @@ namespace Common.Web.Ui.Controllers
 			return cleanContacts.ToArray();
 		}
 
-		protected void UpdateContactForContactOwner(Contact[] contacts, ContactOwner contactOwner)
+		public static void UpdateContactForContactOwner(Contact[] contacts, ContactOwner contactOwner)
 		{
 			var toRemove = new List<Contact>();
 			foreach (var existsContact in contactOwner.Contacts)
@@ -134,29 +134,15 @@ namespace Common.Web.Ui.Controllers
 					existsContact.ContactText = newContact.ContactText;
 					existsContact.Type = newContact.Type;
 					existsContact.Comment = newContact.Comment;
-					new ContactLogEntity(existsContact,
-										 Session["UserName"].ToString(),
-										 Request.UserHostAddress,
-										 OperationType.Update)
-					.Save();
 				}
 			}
 			foreach (var newContact in contacts)
 				if (newContact.Id == 0 && !String.IsNullOrEmpty(newContact.ContactText))
 				{
 					newContact.ContactOwner = contactOwner;
-					new ContactLogEntity(newContact, 
-										 Session["UserName"].ToString(),
-										 Request.UserHostAddress, 
-										 OperationType.Add)
-						.Save();
 				}
 			foreach (var contact in toRemove)
-			{
-				new ContactLogEntity(contact, 
-									 Session["UserName"].ToString(),
-									 Request.UserHostAddress, 
-									 OperationType.Delete).Save();
+			{				
 				contactOwner.Contacts.Remove(contact);
 			}
 		}

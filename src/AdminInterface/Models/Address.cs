@@ -137,11 +137,17 @@ where a.Id = :addressId")
 			}
 		}
 
-		public virtual void UpdateContacts(ContactInfo[] contacts)
+		public virtual void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
 		{
 			if (this.ContactGroup == null)
 				AddContactGroup();
-			ContactHelper.UpdateContacts(ContactGroup, contacts);			
+			ContactGroup.UpdateContacts(displayedContacts, deletedContacts);
 		}
+
+		public virtual void UpdateContacts(Contact[] displayedContacts)
+		{
+			UpdateContacts(displayedContacts, null);
+		}
+
 	}
 }

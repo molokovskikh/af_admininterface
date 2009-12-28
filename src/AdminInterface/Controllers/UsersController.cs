@@ -34,7 +34,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("user")] User user, [DataBind("contacts")] ContactInfo[] contacts, uint clientId, bool sendClientCard, string mails)
+		public void Add([DataBind("user")] User user, [DataBind("contacts")] Contact[] contacts, uint clientId, bool sendClientCard, string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -99,9 +99,9 @@ namespace AdminInterface.Controllers
 
 		[AccessibleThrough(Verb.Post)]
 		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user,
-			[DataBind("contacts")] ContactInfo[] contacts)
+			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
-			user.UpdateContacts(contacts);
+			user.UpdateContacts(contacts, deletedContacts);
 			user.Update();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { login = user.Login });

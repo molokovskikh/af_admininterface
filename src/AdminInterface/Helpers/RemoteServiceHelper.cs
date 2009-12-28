@@ -8,6 +8,7 @@ using System.ServiceProcess;
 using ConsoleApplication11.ServiceReference2;
 using log4net;
 using RemotePriceProcessor;
+using AdminInterface.Properties;
 
 namespace AdminInterface.Helpers
 {
@@ -20,7 +21,7 @@ namespace AdminInterface.Helpers
 
 	public class RemoteServiceHelper
 	{
-		private static readonly string _wcfServiceUrl = @"net.tcp://prg4:900/RemotePriceProcessorService";
+		private static readonly string _wcfServiceUrl = Settings.Default.WCFServiceUrl;
 
 		private static readonly ILog _log = LogManager.GetLogger(typeof(RemoteServiceHelper));
 

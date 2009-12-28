@@ -92,5 +92,14 @@ namespace AdminInterface.Properties {
                 return ((string)(this["UserPreparedDataFormatString"]));
             }
         }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://fms.adc.analit.net:900/RemotePriceProcessorService")]
+        public string WCFServiceUrl {
+            get {
+                return ((string)(this["WCFServiceUrl"]));
+            }
+        }
     }
 }

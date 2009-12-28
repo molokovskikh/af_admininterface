@@ -50,83 +50,70 @@ namespace Functional
 				Assert.That(addressIntersection.Count, Is.EqualTo(intersection.Count), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
 			}
 		}
+        
+		// Создает новый адрес доставки и 3 контакта для него (2 email)
+		private int AddContactsToNewDeliveryAddress(IE browser)
+		{
+			var applyButtonText = "Создать";
+			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			browser.TextField(Find.ByName("delivery.value")).TypeText("Test address");
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+			browser.Link(Find.ByText("Test address")).Click();
+			applyButtonText = "Сохранить";
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Link(Find.ByText("Test address")).Click();
+			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Link(Find.ByText("Test address")).Click();
+			return 3;
+		}
 
 		[Test]
-		public void Setup_address_contact_information()
+		public void AddContactInformation()
 		{
+			var applyButtonText = "Создать";
 			var client = DataMother.CreateTestClient();
+			var countContacts = 0;
 			using (var browser = Open("client/{0}", client.Id))
 			{
-				browser.Link(Find.ByText("Новый адрес доставки")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Контактная информация"));
-				browser.Button(Find.ByValue("Добавить")).Click();
-				var rowId = 0;
-				browser.TextField(String.Format("contacts[{0}].ContactText", --rowId)).TypeText("test@test");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Некорректный адрес электронной почты"));
-				browser.TextField(String.Format("contacts[{0}].ContactText", rowId)).TypeText("test@test.ru");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить"));
-				browser.TextField(Find.ByName("delivery.value")).TypeText("Test address");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Test address"));
-				browser.Link(Find.ByText("Test address")).Click();
-				browser.Button(Find.ByValue("Добавить")).Click();
-				var comboBox = browser.SelectList(Find.ByName(String.Format("contactTypes[{0}]", --rowId)));
-				comboBox = browser.SelectLists[1];
-				comboBox.SelectByValue(comboBox.Options[1].Value);
-				browser.TextField(Find.ById(String.Format("contacts[{0}].ContactText", ++rowId))).TypeText("556677");
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Некорректный телефонный номер"));
-				browser.TextField(Find.ById(String.Format("contacts[{0}].ContactText", rowId))).TypeText("123-556677");
-				browser.Button(Find.ByValue("Добавить")).Click();
-				browser.TextField(String.Format("contacts[{0}].ContactText", --rowId)).TypeText("test2@test.ru");
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				countContacts = AddContactsToNewDeliveryAddress(browser);
 			}
-
 			// Проверка, что контактные записи создались в БД
-			IList contactIds;
 			using (new SessionScope())
 			{
 				client = Client.Find(client.Id);
 				Assert.NotNull(client.Addresses[0].ContactGroup);
 				var group = client.Addresses[0].ContactGroup;
-				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id), 
+				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 					"Не совпадают Id владельца группы у клиента и у новой группы");
-				var contactGroupCount = ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
-						.SetParameter("ContactGroupId", group.Id)
-                        .UniqueResult());
-				Assert.That(Convert.ToInt32(contactGroupCount), Is.EqualTo(1));
-				contactIds = ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
-						.SetParameter("ownerId", group.Id)
-                        .List());
-				Assert.That(contactIds.Count, Is.EqualTo(3));
-
-
+				ContactInformationFixture.CheckContactGroupInDb(group);
+				countContacts = ContactInformationFixture.GetCountContactsInDb(group);
+				Assert.That(countContacts, Is.EqualTo(countContacts));
 			}
+		}
 
+		[Test]
+		public void DeleteContactInformation()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var countContacts = 0;
 			// Удаление контактной записи
 			using (var browser = Open("client/{0}", client.Id))
-			{				
-				browser.Link(Find.ByText("Test address")).Click();
-				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", contactIds[0]))).Click();
-				browser.Button(Find.ByValue("Сохранить")).Click();
-			}
-
-			// Проверка, что контактная запись удалена
-			using (new SessionScope())
 			{
-				client = Client.Find(client.Id);
-				var group = client.Addresses[0].ContactGroup;
-				contactIds = ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select * from contacts.contacts where ContactOwnerId = :ownerId")
-						.SetParameter("ownerId", group.Id)
-                        .List());
-				Assert.That(contactIds.Count, Is.EqualTo(2));
+				countContacts = AddContactsToNewDeliveryAddress(browser);				
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Addresses[0].ContactGroup;
+					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+					browser.Button(Find.ByValue("Сохранить")).Click();
+				}
 			}
+			// Проверка, что контактная запись удалена
+			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
+			Assert.That(count, Is.EqualTo(countContacts - 1));
 		}
 	}
 }

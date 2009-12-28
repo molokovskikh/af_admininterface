@@ -32,8 +32,7 @@
         $("#row" + rowId).remove();
         if (rowId > 0)
         {
-            $("#Holder" + clientId).append("<input type='hidden' name='contacts[" + rowId + "].Deleted' id='contacts[" + rowId + "].Deleted' value='1' />");
-            $("#Holder" + clientId).append("<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "' />");
+            $("#Holder" + clientId).append("<input type='hidden' name='deletedContacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "' />");
         }
     }
 
@@ -97,7 +96,10 @@
     });
 </script>
 		
-
+<div class=contextual>
+    <a class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, ${client.Id}, '', '')">Добавить</a>
+</div>		    
+<h3>Контактная информация</h3>
 <table width="100%" cellspacing="5">
     <tr>
         <td>
@@ -105,5 +107,4 @@
             </table>
         </td>
     </tr>
-    <tr><td align="right"><input type="button" value="Добавить" onclick="addContactRow(--insertId, ${client.Id}, '', '')" /></td></tr>
 </table>

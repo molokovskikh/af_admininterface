@@ -1,7 +1,10 @@
+using System.Collections;
+using System.Linq;
 using Castle.ActiveRecord;
 using System.Collections.Generic;
 using System.ComponentModel;
 using Castle.Components.Validator;
+using Common.Web.Ui.Controllers;
 
 namespace Common.Web.Ui.Models
 {
@@ -62,6 +65,38 @@ namespace Common.Web.Ui.Models
 		public static ContactGroup Find(uint id)
 		{
 			return (ContactGroup)FindByPrimaryKey(typeof (ContactGroup), id);
+		}
+
+		public void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
+		{
+			var hiddenContacts = new List<Contact>();
+			foreach (var contact in Contacts)
+			{
+				if (deletedContacts != null)
+				{
+					var deleted = deletedContacts.Where(c => c.Id == contact.Id);
+					if (deleted.Count() > 0)
+						continue;
+				}
+				var displayed = displayedContacts.Where(c => c.Id == contact.Id);
+				if (displayed.Count() > 0)
+					continue;
+				hiddenContacts.Add(contact);
+			}
+			// Сливаем в один массив отображаемые контакты (существующие + добавленные) и те, 
+			// которые не отображены (могли быть добавлены другими пользователями)
+			var contacts = displayedContacts.Concat(hiddenContacts);
+
+			using (new TransactionScope())
+			{
+				AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
+				this.Save();
+			}
+		}
+
+		public void UpdateContacts(Contact[] displayedContacts)
+		{
+			UpdateContacts(displayedContacts, null);
 		}
 	}
 }

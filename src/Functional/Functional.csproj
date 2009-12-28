@@ -97,6 +97,7 @@
     <Compile Include="ClientCloneFixture.cs" />
     <Compile Include="ClientMonitoringFixture.cs" />
     <Compile Include="ClientRegistrationFixture.cs" />
+    <Compile Include="ForTesting\ContactInformationFixture.cs" />
     <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="DocumentLogFixture.cs" />
     <Compile Include="DrugstoreFixture.cs" />
