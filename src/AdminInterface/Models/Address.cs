@@ -131,7 +131,7 @@ where a.Id = :addressId")
 			using (var scope = new TransactionScope())
 			{
 				var groupOwner = Client.ContactGroupOwner;
-				var group = groupOwner.AddContactGroup(ContactGroupType.General);
+				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
 				this.ContactGroup = group;
 			}

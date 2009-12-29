@@ -24,6 +24,8 @@ namespace Common.Web.Ui.Components
 			}
 			foreach (ContactGroup contactGroup in contactGroups)
 			{
+				if (contactGroup.Specialized)
+					continue;
 				RenderGroupHeader(contactGroup);
 				if (contactGroup.Contacts.Count == 0 && contactGroup.Persons.Count == 0)
 				{

@@ -46,6 +46,9 @@ namespace Common.Web.Ui.Models
 		[BelongsTo(Column = "ContactGroupOwnerId")]
 		public ContactGroupOwner ContactGroupOwner { get; set; }
 
+		[Property]
+		public bool Specialized { get; set; }
+
 		public void AddPerson(string name)
 		{
 			if (Persons == null)

@@ -16,13 +16,19 @@ namespace Common.Web.Ui.Models
 
 		public virtual ContactGroup AddContactGroup(ContactGroupType type)
 		{
+			return AddContactGroup(type, false);
+		}
+
+		public virtual ContactGroup AddContactGroup(ContactGroupType type, bool specialized)
+		{
 			if (ContactGroups == null)
 				ContactGroups = new List<ContactGroup>();
 
 			var group = new ContactGroup(type, BindingHelper.GetDescription(type));
+			group.Specialized = specialized;
 			group.ContactGroupOwner = this;
 			ContactGroups.Add(group);
-			return group;
+			return group;			
 		}
 	}
 }
