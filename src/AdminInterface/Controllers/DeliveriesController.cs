@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -66,6 +67,15 @@ namespace AdminInterface.Controllers
 			address.Update();
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("client", "info", new {cc = address.Client.Id});
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void Notify(uint id)
+		{
+			var address = Address.Find(id);
+			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			Flash["Message"] = new Message("Уведомления отправлены");
+			RedirectToReferrer();
 		}
 	}
 }

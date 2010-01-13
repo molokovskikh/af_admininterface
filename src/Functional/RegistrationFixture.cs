@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;

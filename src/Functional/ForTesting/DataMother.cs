@@ -7,10 +7,26 @@ namespace Functional.ForTesting
 {
 	public class DataMother
 	{
+		public static Client CreateTestClientWithAddress()
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var client = CreateTestClient();
+				var address = new Address {
+					Client = client,
+					Value = "тестовый адрес"
+				};
+				client.Addresses = new List<Address> {
+					address
+				};
+				client.Update();
+				scope.VoteCommit();
+				return client;
+			}
+		}
 
 		public static Client CreateTestClient(Client client)
 		{
-			using(new SessionScope())
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var payer = new Payer {
@@ -48,7 +64,6 @@ namespace Functional.ForTesting
 		public static Client CreateTestClient()
 		{
 			Client client;
-			using(new SessionScope())
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var payer = new Payer {

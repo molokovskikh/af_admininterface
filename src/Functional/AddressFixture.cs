@@ -50,7 +50,19 @@ namespace Functional
 				Assert.That(addressIntersection.Count, Is.EqualTo(intersection.Count), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
 			}
 		}
-        
+
+		[Test]
+		public void Send_notification()
+		{
+			var client = DataMother.CreateTestClientWithAddress();
+			using (var browser = Open("deliveries/{0}/edit", client.Addresses.First().Id))
+			{
+				Assert.That(browser.Text, Is.StringContaining("Адрес доставки"));
+				browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Уведомления отправлены"));
+			}
+		}
+
 		// Создает новый адрес доставки и 3 контакта для него (2 email)
 		private int AddContactsToNewDeliveryAddress(IE browser)
 		{

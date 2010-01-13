@@ -3,7 +3,7 @@
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />									  
+<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
 <div style="width: 600px;">
 
@@ -19,17 +19,27 @@
 	</div>
 	<% end %>
 
+	<h2>Адрес доставки ${delivery.Value}</h2>
+
+	<div class=block>
+		<h3>Операции</h3>
+
+		<form method=post action="${siteroot}/deliveries/notify" style="margin:0; padding:5px 0px 5px 0px">
+			<input type=hidden name=id value=${delivery.Id} />
+			<input style="border-style:groove;" type=submit value="Отправить уведомления о регистрации поставщикам" />
+		</form>
+	</div>
+
 	<form id="mainForm" method=post action="${siteroot}/deliveries/update">
 		<input type=hidden name=delivery.Id value="${delivery.Id}" >
-		<h2>Адрес доставки ${delivery.Value}</h2>
-		
+
 		<div class=block>
 			<h3>Адрес</h3>
 			<p><input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}"></p>
 		</div>
 
         <div class="block">
-            <% OutputSubView("/SubViews/ContactInfo") %>		
+            <% OutputSubView("/SubViews/ContactInfo") %>
         </div>
         
 		<div class=block>

@@ -1,17 +1,52 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
-using System.Web;
 
 namespace AdminInterface.Services
 {
 	public class NotificationService
 	{
 		private readonly Action<MailMessage> _sendMessage;
+
+		private static readonly string _messageTemplateForSupplierAboutDrugstoreRegistration = 
+@"Добрый день.
+
+В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, зарегистрирован новый клиент: {0} ( {1} ) в регионе(городе) {2}.
+Пожалуйста произведите настройки для данного клиента (Раздел 'Для зарегистрированных пользователей' на сайте www.analit.net ).
+
+Адрес доставки накладных: {3}@waybills.analit.net
+Адрес доставки отказов: {3}@rejects.analit.net
+
+С уважением, Аналитическая компания 'Инфорум', г. Воронеж
+
+Москва +7 495 6628727
+С.-Петербург +7 812 3090521
+Воронеж +7 4732 606000
+Челябинск +7 351 7298143
+".Replace('\'', '\"');
+
+		private static readonly string _messageTemplateForSupplierAfterAddressRegistration = 
+@"Добрый день.
+
+В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, для клиента: {0} ( {1} ) в регионе(городе) {2} зарегистрирован новый адрес доставки {3}.
+Пожалуйста при необходимости произведите настройку кодов доставки (Раздел 'Для зарегистрированных пользователей' на сайте www.analit.net ).
+
+Адрес доставки накладных: {4}@waybills.analit.net
+Адрес доставки отказов: {4}@rejects.analit.net
+
+С уважением, Аналитическая компания 'Инфорум', г. Воронеж
+
+Москва +7 495 6628727
+С.-Петербург +7 812 3090521
+Воронеж +7 4732 606000
+Челябинск +7 351 7298143
+".Replace('\'', '\"');
 
 		public NotificationService(Action<MailMessage> sendMessage)
 		{
@@ -23,9 +58,44 @@ namespace AdminInterface.Services
 			_sendMessage = Func.SendWitnStandartSender;
 		}
 
+		public void NotifySupplierAboutAddressRegistration(Address address)
+		{
+			var client = address.Client;
+			var emails = GetEmailsForNotification(client);
+			foreach (var email in emails)
+				Func.Mail("tech@analit.net",
+					"Аналитическая Компания Инфорум",
+					"Новый адрес доставки в системе \"АналитФАРМАЦИЯ\"",
+					String.Format(_messageTemplateForSupplierAfterAddressRegistration,
+						client.FullName,
+						client.Name,
+						client.HomeRegion.Name,
+						address.Value,
+						address.Id),
+					email,
+					"",
+					null);
+		}
+
 		public void NotifySupplierAboutDrugstoreRegistration(Client client)
 		{
-			var data = new DataSet();
+			var emails = GetEmailsForNotification(client);
+			foreach (var email in emails)
+				Func.Mail("tech@analit.net",
+					"Аналитическая Компания Инфорум",
+					"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+					String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
+						client.FullName,
+						client.Name,
+						client.HomeRegion.Name,
+						client.Addresses.First().Id),
+					email,
+					"",
+					null);
+		}
+
+		private List<string> GetEmailsForNotification(Client client)
+		{
 			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
 				connection.Open();
@@ -67,11 +137,10 @@ where length(c.contactText) > 0
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", client.HomeRegion.Id);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);
+				var data  = new DataSet();
 				dataAdapter.Fill(data);
+				return data.Tables[0].Rows.Cast<DataRow>().Select(r => r["ContactText"].ToString()).ToList();
 			}
-			foreach (DataRow Row in data.Tables[0].Rows)
-				NotificationHelper.NotifySupplierAboutDrugstoreRegistration(client,
-					Row["ContactText"].ToString());
 		}
 
 		public void SendNotificationToBillingAboutClientRegistration(Client client,
