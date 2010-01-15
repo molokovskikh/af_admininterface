@@ -73,15 +73,23 @@ namespace AdminInterface.Controllers
 			PropertyBag["log"] = UpdateLogEntity.Find(updateLogEntityId).Log;
 		}
 
-		public void UpdateLog(uint? clientCode, uint? userId)
+		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
 		{
-			UpdateLog(clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
+			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
-		public void UpdateLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
+		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
 		{
-
-			if (!userId.HasValue)
+			if (updateType.HasValue)
+			{
+				PropertyBag["updateType"] = updateType;
+				var statisticType = (StatisticsType)updateType;
+				PropertyBag["updateTypeName"] = BindingHelper.GetDescription(statisticType);
+				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesByUpdateType(updateType, regionMask, beginDate, endDate);
+				PropertyBag["regionMask"] = regionMask;
+				PropertyBag["adminRegionMask"] = SecurityContext.Administrator.RegionMask;
+			}
+			if (clientCode.HasValue)
 			{
 				var client = Client.Find(clientCode.Value);
 				PropertyBag["client"] = client;
@@ -90,7 +98,7 @@ namespace AdminInterface.Controllers
 				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 				SecurityContext.Administrator.CheckClientType(client.Type);
 			}
-			else
+			else if (userId.HasValue)
 			{
 				var user = User.Find(userId.Value);
 				PropertyBag["user"] = user;

@@ -95,7 +95,7 @@ namespace AdminInterface.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://fms.adc.analit.net:900/RemotePriceProcessorService")]
+        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://prg4.adc.analit.net:900/RemotePriceProcessorService")]
         public string WCFServiceUrl {
             get {
                 return ((string)(this["WCFServiceUrl"]));

@@ -46,7 +46,7 @@
 </style>
 
 <%
-uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}"
+uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}"
 %>
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
@@ -142,7 +142,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 					</td>
 					<td class="statistic-value">
 						<% if IsDefined("ConfHL") and ConfHL != "0(0)": %>
-						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateNormal)}">${ConfHL}</a>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateNormal)}">${ConfHL}</a>
 						<% else: %>
 						-
 						<% end %>
@@ -162,7 +162,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 					</td>
 					<td class="statistic-value">
 						<% if IsDefined("CUHL") and CUHL != "0(0)": %>
-						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateCumulative)}">${CUHL}</a>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateCumulative)}">${CUHL}</a>
 						<% else: %>
 						-
 						<% end %>
@@ -172,7 +172,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 					</td>
 					<td class="statistic-value">
 						<% if IsDefined("ADHL") and ADHL != "0(0)": %>
-						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateBan)}">${ADHL}</a>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">${ADHL}</a>
 						<% else: %>
 						-
 						<% end %>
@@ -184,7 +184,7 @@ uriTemplate = "${siteroot}/viewcl.aspx?BeginDate=${FromDate}&EndDate=${ToDate.Ad
 					</td>
 					<td class="statistic-value">
 						<% if IsDefined("ErrUpHL") and ErrUpHL != "0": %>
-						<a href="${uriTemplate}&id=${cast(int, StatisticsType.UpdateError)}">${ErrUpHL}</a>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateError)}">${ErrUpHL}</a>
 						<% else: %>
 						-
 						<% end %>

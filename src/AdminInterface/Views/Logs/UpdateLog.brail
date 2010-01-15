@@ -1,26 +1,24 @@
-﻿<script type="text/javascript">
+﻿<% component Bubble, {"bredcrumbs" : [("Статистика", "")]} %>
+
+<script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
+<script type="text/javascript">
 	function ShowDownloadResult(id, url, callerDescription)
 	{
 		//DisableAction(id);
 		var isCallerVisible = IsVisible(id, callerDescription)
-		HideAll(id,
-				function ()
-				{
-					if (!isCallerVisible)
-						Download(url)
-				});
+		HideAll(id, function() {
+		    if (!isCallerVisible)
+		        Download(url)
+		});
 	}
 
 	function Hide(id, description, afterFinish)
 	{
-		new Effect.SlideUp(description + id, 
-						   { afterFinish: function()
-											{ 
-												$(description + "Row" + id)
-													.remove();
-												afterFinish();
-											},
-							 duration: 0.5 });
+	    new Effect.SlideUp(description + id, {
+	    afterFinish: function() {
+	        $(description + "Row" + id).remove();
+	        afterFinish();
+		}, duration: 0.5 });
 	}
 	
 	function HideAll(id, afterFinish)
@@ -72,100 +70,162 @@
 		${FormHelper.HiddenField("clientCode", client.Id)}
 	<% end %>
 <%else: %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		История обновлений пользователя ${user.Login}
-	<% end %>
+    <% if IsDefined("user"): %>
+	    <% component CaptureFor, {"id" : "Title"}: %>
+		    История обновлений пользователя ${user.Login}
+	    <% end %>
 
-	<div class="PageHeader">
-		История обновлений пользователя ${user.Login}
-	</div>
+	    <div class="PageHeader">
+		    История обновлений пользователя ${user.Login}
+	    </div>
 
-	<% component CaptureFor, {"id" : "PostToServer"}: %>
-		${FormHelper.HiddenField("userId", user.Id)}
+	    <% component CaptureFor, {"id" : "PostToServer"}: %>
+		    ${FormHelper.HiddenField("userId", user.Id)}
+	    <% end %>
 	<% end %>
 <%end %>
-<% 
-	OutputSubView("SelectDateIntervalSubView")
+<%
+    if (not IsDefined("updateType")): 
+	    OutputSubView("SelectDateIntervalSubView")
+	else:
+        accumulative = cast(int, StatisticsType.UpdateNormal) 
+	    cumulative = cast(int, StatisticsType.UpdateCumulative)
+	    isDataTransferUpdateType = (accumulative == updateType or cumulative == updateType)     	
+%>
+    <table width="100%">
+        <tr align="center"><td><font face="Verdana" size="2"><b>${updateTypeName}</b></font></td></tr>
+      <%if IsDefined("regionMask"):
+            countClients = 0
+		    for logEntity in logEntities:
+		        region = logEntity.User.Client.HomeRegion.Id
+		        if (region & regionMask) and (region & adminRegionMask) > 0:
+		            countClients++
+		        end
+		    end
+		else:
+		    countClients = logEntities.Count
+		end%>
+        <tr align="center"><td style="padding-bottom: 15px"><font face="Verdana" size="2">Клиентов, отвечающих условиям выборки: ${countClients}</font></td></tr>
+    </table>        	
+<%	
+	end
 %>
 
 <div>
-	<table class="DataTable">
-	
+	<table class="DataTable HighLightCurrentRow">	
 	<% 
 		if logEntities.Count != 0:
-	%>
-	
+	%>	
 		<tr>
-		  <%if IsDefined("client"): %>
+			<th>
+				Дата
+			</th>
+			
+			<th>
+				Версия
+			</th>
+			
+          <%if (not IsDefined("client")) and (not IsDefined("user")): %>  			
+			<th>
+			    Регион
+			</th>
+		  <%end %>
+			
+		  <%if (IsDefined("client") or IsDefined("updateType")): %>
 			<th>
 				Пользователь
 			</th>
 		  <%end %>
-			<th>
-				Дата
-			</th>
-			<th>
-				Тип обновления
-			</th>
-			<th>
-				Версия
-			</th>
-			<th>
-				Размер приготовленных данных
-			</th>
+		  
+		  <%if IsDefined("updateType"): %>
+		    <th>
+		        Клиент
+		    </th>
+		  <%else: %>  
+	  	    <th>
+	  	        Тип обновления
+		    </th>			  		  
+		  <%end %>
+		  
+		  <%if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):%>
+		    <th>
+			    Размер приготовленных данных
+		    </th>
+		    <th>	
+			    Лог
+		    </th>
+          <%end %>
 			<th>
 				Дополнительно
 			</th>
-			<th>	
-				Лог
-			</th>
-		</tr>
-	
+		</tr>			
 	<%
 			i = 0
 			for logEntity in logEntities:
+			    region = logEntity.User.Client.HomeRegion.Id
+			    if (IsDefined("regionMask") and ((region & regionMask == 0) or (region & adminRegionMask == 0))):
+			        continue
+			    end
 				if logEntity.Commit:
 					requestTimeStyle = ""
 				else:
 					requestTimeStyle = "background-color:#ffa642"
 				end
 	%>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}">
-		  <%if IsDefined("client"): %>
-			<td style="${requestTimeStyle};width:1%;">
-				${logEntity.User.Login}
-			</td>
-		  <%end %>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}" align="center">
 			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.RequestTime}
 			</td>
-			<td>
-			<% if logEntity.IsDataTransferUpdateType():	%>
-				<a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
-					${BindingHelper.GetDescription(logEntity.UpdateType)}
-				</a>
-			<% else: %>
-				${BindingHelper.GetDescription(logEntity.UpdateType)}
-			<% end %>
-			</td>
+
 			<td>
 				${logEntity.AppVersion}
 			</td>
+			
+		  <%if (not IsDefined("client")) and (not IsDefined("user")): %>	
 			<td>
-				${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
+			    ${logEntity.User.Client.HomeRegion.Name}
 			</td>
+		  <%end %>
+
+		  <%if (IsDefined("client") or IsDefined("updateType")): %>
+			<td>
+				<a href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.Login}</a>
+			</td>
+		  <%end %>
+		  
+		  <%if IsDefined("updateType"): %>
+		    <td>
+		        <a href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
+		    </td>
+		  <%else: %>  
+		    <td>
+	        <% if logEntity.IsDataTransferUpdateType():	%>
+	            <a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
+	                ${BindingHelper.GetDescription(logEntity.UpdateType)}</a>
+		    <% else: %>
+			        ${BindingHelper.GetDescription(logEntity.UpdateType)}
+		    <% end %>			  
+		    </td>  		  
+		  <%end %>
+		  
+		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
+			    <td>
+				    ${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
+			    </td>
+    		  
+			    <td>
+				    <% if not string.IsNullOrEmpty(logEntity.Log): %>
+				    <a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
+					    Лог
+				    </a>
+				    <% else: %>
+				    -
+				    <% end %>
+			    </td>	    	  
+    	  <%end %>
 			<td style="text-align:center;">
 				${logEntity.Addition}
 			</td>
-			<td>
-				<% if not string.IsNullOrEmpty(logEntity.Log): %>
-				<a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
-					Лог
-				</a>
-				<% else: %>
-				-
-				<% end %>
-			</td>	
 		</tr>
 	<% 
 				i++
