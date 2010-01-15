@@ -1,5 +1,5 @@
 ﻿<% component CaptureFor, {"id" : "Title"}:%>
-	 Поиск предложений для клиента ${client.ShortName}
+	 Поиск предложений для клиента ${client.Name}
 <% end %>
 
 <form action="SearchOffers.rails" method="post">

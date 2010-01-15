@@ -189,13 +189,13 @@
 
 		  <%if (IsDefined("client") or IsDefined("updateType")): %>
 			<td>
-				<a href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.Login}</a>
+				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.Login}</a>
 			</td>
 		  <%end %>
 		  
 		  <%if IsDefined("updateType"): %>
 		    <td>
-		        <a href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
+		        <a title="ClientSettings" href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
 		    </td>
 		  <%else: %>  
 		    <td>
