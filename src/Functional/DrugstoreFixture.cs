@@ -156,10 +156,13 @@ namespace Functional
 		[Test]
 		public void Try_to_search_offers()
 		{
-			using (var browser = new IE(BuildTestUrl("client/3616")))
+			var client = DataMother.CreateTestClient();
+			client.Name = "Client for test offers";
+			client.Update();
+			using (var browser = new IE(BuildTestUrl("client/" + client.Id)))
 			{
 				browser.Link(Find.ByText("Поиск предложений")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Поиск предложений для клиента ТестерК2")))
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Поиск предложений для клиента " + client.Name)))
 				{
 					Assert.That(openedWindow.Text, Text.Contains("Введите наименование или форму выпуска"));
 				}
