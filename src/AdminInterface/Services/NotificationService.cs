@@ -75,6 +75,7 @@ namespace AdminInterface.Services
 					email,
 					"",
 					null);
+			Mailer.ClientRegistrationResened(client);
 		}
 
 		public void NotifySupplierAboutDrugstoreRegistration(Client client)
@@ -92,6 +93,7 @@ namespace AdminInterface.Services
 					email,
 					"",
 					null);
+			Mailer.ClientRegistrationResened(client);
 		}
 
 		private List<string> GetEmailsForNotification(Client client)

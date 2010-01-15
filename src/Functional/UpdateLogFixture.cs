@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
-using Common.Tools;
-using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;
@@ -69,7 +64,6 @@ namespace Functional
 			}
 		}
 
-		[Test]
 		private IE ViewUpdateLogFromMainPage(UpdateType updateType)
 		{
 			var uriFormat = "Logs/UpdateLog.rails?BeginDate=01.09.2009 0:00:00&EndDate=15.01.2010 0:00:00&RegionMask=137438953471&updateType={0}";
