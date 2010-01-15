@@ -53,7 +53,7 @@
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>
-			<td>${order.SmtpId}</td>
+			<td>${order.GetResult()}</td>
 		</tr>
 		<% end %>
 	<% else: %>
