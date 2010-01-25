@@ -202,7 +202,7 @@
 </div>
 
 <div class="TwoColumn Messages" style="margin-left: 10px">
-	<form id="MessagesForm" action="/users/SendMessage.rails" method="post">
+	<form id="MessagesForm" action="../SendMessage.rails" method="post">
 	<div class="block">
 		<h3>Сообщения пользователя</h3>
 		<input type=hidden value=${client.Id} name="clientCode" />
