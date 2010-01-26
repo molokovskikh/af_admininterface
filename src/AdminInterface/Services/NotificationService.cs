@@ -7,6 +7,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
+using AdminInterface.Properties;
 
 namespace AdminInterface.Services
 {
@@ -14,7 +15,7 @@ namespace AdminInterface.Services
 	{
 		private readonly Action<MailMessage> _sendMessage;
 
-		private static readonly string _messageTemplateForSupplierAboutDrugstoreRegistration = 
+		private readonly string _messageTemplateForSupplierAboutDrugstoreRegistration = 
 @"Добрый день.
 
 В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, зарегистрирован новый клиент: {0} ( {1} ) в регионе(городе) {2}.
@@ -24,14 +25,9 @@ namespace AdminInterface.Services
 Адрес доставки отказов: {3}@rejects.analit.net
 
 С уважением, Аналитическая компания 'Инфорум', г. Воронеж
+".Replace('\'', '\"') + Settings.Default.InforoomContactPhones;
 
-Москва +7 495 6628727
-С.-Петербург +7 812 3090521
-Воронеж +7 4732 606000
-Челябинск +7 351 7298143
-".Replace('\'', '\"');
-
-		private static readonly string _messageTemplateForSupplierAfterAddressRegistration = 
+		private readonly string _messageTemplateForSupplierAfterAddressRegistration = 
 @"Добрый день.
 
 В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, для клиента: {0} ( {1} ) в регионе(городе) {2} зарегистрирован новый адрес доставки {3}.
@@ -41,12 +37,7 @@ namespace AdminInterface.Services
 Адрес доставки отказов: {4}@rejects.analit.net
 
 С уважением, Аналитическая компания 'Инфорум', г. Воронеж
-
-Москва +7 495 6628727
-С.-Петербург +7 812 3090521
-Воронеж +7 4732 606000
-Челябинск +7 351 7298143
-".Replace('\'', '\"');
+".Replace('\'', '\"') + Settings.Default.InforoomContactPhones;
 
 		public NotificationService(Action<MailMessage> sendMessage)
 		{
