@@ -45,21 +45,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 
 			var users = client.GetUsers();
-			PropertyBag["users"] = users;
+			PropertyBag["users"] = users.OrderBy(usr => usr.Login);
 
 			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users.ToList());
-			var authorizationLog = new AuthorizationLogEntity(){
-				AFTime = authorizationLogs.Max(r => r.AFTime),
-				AOLTime = authorizationLogs.Max(r => r.AOLTime),
-				CITime = authorizationLogs.Max(r => r.CITime),
-				IOLTime = authorizationLogs.Max(r => r.IOLTime),
-			};
-
-			PropertyBag["authorizationLog"] = authorizationLog;
+			PropertyBag["authorizationLogs"] = new AuthorizationLogEntityList(authorizationLogs);
 
 			try
 			{
-				var usersInfo = ADHelper.GetUsersInformation(users);
+				var usersInfo = ADHelper.GetPartialUsersInformation(users);
 				PropertyBag["usersInfo"] = usersInfo;
 			}
 			catch (Exception ex)

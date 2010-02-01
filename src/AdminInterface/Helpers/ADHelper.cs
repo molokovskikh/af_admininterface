@@ -59,7 +59,7 @@ namespace AdminInterface.Helpers
 	{
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
 
-		public static ADUserInformationCollection GetUsersInformation(IEnumerable<User> users)
+		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<User> users)
 		{
 			var result = new ADUserInformationCollection();
 			var filter= new StringBuilder();
@@ -93,6 +93,7 @@ namespace AdminInterface.Helpers
 					tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
 					Console.WriteLine("{0:ss.fff}", DateTime.Now);
 
+					/* Более эта информация не нужна и тратить время на ее получение не хочется
 					if (searchResult.Properties["lastLogon"].Count == 0)
 						tempResult.LastLogOnDate = null;
 					else
@@ -111,11 +112,26 @@ namespace AdminInterface.Helpers
 					if (searchResult.Properties["pwdLastSet"].Count == 0)
 						tempResult.LastPasswordChange = null;
 					else
-						tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);
+						tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);*/
 
 					result[tempResult.Login] = tempResult;
 				}
 			}
+			return result;
+		}
+
+		public static ADUserInformation GetADUserInformation(string login)
+		{
+			var result = new ADUserInformation {
+				Login = login,
+           		BadPasswordDate = GetBadPasswordDate(login),
+           		IsDisabled = IsDisabled(login),
+           		IsLocked = IsLocked(login),
+           		IsLoginExists = IsLoginExists(login),
+           		LastLogOnDate = GetLastLogOnDate(login),
+           		LastPasswordChange = GetLastPasswordChange(login),           		
+			};
+
 			return result;
 		}
 

@@ -6,6 +6,26 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
+	public class AuthorizationLogEntityList : List<AuthorizationLogEntity>
+	{
+		public AuthorizationLogEntityList(List<AuthorizationLogEntity> list)
+		{
+			this.AddRange(list);
+		}
+
+		public AuthorizationLogEntity GetEntityByUserId(uint id)
+		{
+			AuthorizationLogEntity result = null;
+			foreach (var entity in this)
+				if(entity.Id == id)
+				{
+					result = entity;
+					break;
+				}
+			return result;
+		}
+	}
+
 	[ActiveRecord(Table = "logs.AuthorizationDates")]
 	public class AuthorizationLogEntity : ActiveRecordBase<AuthorizationLogEntity>
 	{

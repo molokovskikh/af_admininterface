@@ -98,9 +98,9 @@
 				<li>
 					<% if client.IsDrugstore(): %>
 						<% if Client.IsDrugstore(): %>
-							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс пользователя</a>
+							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс клиента</a>
 						<% else: %>
-							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс пользователя</a>
+							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс клиента</a>
 						<% end %>
 					<% end %>
 				</li>
@@ -138,47 +138,34 @@
 						Имя пользователя
 					</td>
 					<td>
-						Последний правильный ввод пароля
+						Комментарий
 					</td>
 					<td>
-						Последний неправильный ввод пароля
-					</td>
-					<td>
-						Последнее изменение пароля
+						Последнее обновление AnalitF
 					</td>
 				</tr>
 				<% containsLockedUsers = false %>
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>
+					<% logEntity = authorizationLogs.GetEntityByUserId(user.Id)%>
 					<% containsLockedUsers = userInfo.IsLoginExists and userInfo.IsLocked if not containsLockedUsers %>
 					<tr>
 						<td class="${"BlockedLogin" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledLogin" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"LoginNotExists" if not userInfo.IsLoginExists}">
-							<% if userInfo.IsLoginExists: %>
+							<% if true: %>
 								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
 							<% else: %>
 								${user.GetLoginOrName()}
 							<% end %>
 						</td>
 						<td>
-							${userInfo.LastLogOnDate if userInfo.IsLoginExists}
+							${user.Name}
 						</td>
 						<td>
-							${userInfo.BadPasswordDate if userInfo.IsLoginExists}
-						</td>
-						<td class="${"change-password-by-one-self" if user.IsChangePasswordByOneself()}">
-							<a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>${userInfo.LastPasswordChange if userInfo.IsLoginExists}</a>
+							${logEntity.AFTime if logEntity != null and logEntity.AFTime != null}
 						</td>
 					</tr>
 				<% end %>
 			</table>
-			<%if authorizationLog != null: %>
-			<div style="margin-top:10px;">
-				${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
-				${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
-				${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
-				${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
-			</div>
-			<%end %>
 		</div>
 
 		<div class=block>
@@ -214,7 +201,7 @@
 			</div>
 			<h3>Адреса доставки</h3>
 			<% for i, address in enumerate(client.Addresses): %>
-				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>${"," if i < client.Addresses.Count - 1}
+				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
 			<% end %>
 		</div>
 		
