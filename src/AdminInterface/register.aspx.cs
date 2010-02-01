@@ -105,19 +105,20 @@ ORDER BY region;";
 				ArHelper.WithSession(s => {
 					var connection = (MySqlConnection) s.Connection;
 					var command = new MySqlCommand("", connection);
-					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName, HttpContext.Current.Request.UserHostAddress);
+					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
+					                                                     HttpContext.Current.Request.UserHostAddress);
 
 					client = new Client {
-						Status = ClientStatus.On,
-						Type = (ClientType) Convert.ToInt32(TypeDD.SelectedItem.Value),
-						Name = ShortNameTB.Text.Replace("¹", "N"),
-						FullName = FullNameTB.Text,
-						Segment = (Segment) Convert.ToInt32(SegmentDD.SelectedItem.Value),
-						HomeRegion = Region.Find(Convert.ToUInt64(RegionDD.SelectedItem.Value)),
-						MaskRegion = maskRegion,
-						Registrant = SecurityContext.Administrator.UserName,
-						RegistrationDate = DateTime.Now
-					};
+					                    	Status = ClientStatus.On,
+					                    	Type = (ClientType) Convert.ToInt32(TypeDD.SelectedItem.Value),
+					                    	Name = ShortNameTB.Text.Replace("¹", "N"),
+					                    	FullName = FullNameTB.Text,
+					                    	Segment = (Segment) Convert.ToInt32(SegmentDD.SelectedItem.Value),
+					                    	HomeRegion = Region.Find(Convert.ToUInt64(RegionDD.SelectedItem.Value)),
+					                    	MaskRegion = maskRegion,
+					                    	Registrant = SecurityContext.Administrator.UserName,
+					                    	RegistrationDate = DateTime.Now
+					                    };
 
 					client.AddDeliveryAddress(AddressTB.Text);
 
@@ -141,6 +142,13 @@ ORDER BY region;";
 
 					user = CreateUser(client);
 					password = user.CreateInAd();
+
+					if (client.IsDrugstore() && client.Addresses.Count > 0)
+					{
+						if(user.AvaliableAddresses == null)
+							user.AvaliableAddresses = new List<Address>();
+						user.AvaliableAddresses.Add(client.Addresses.Last());
+					}
 
 					client.Addresses.Each(a => a.CreateFtpDirectory());
 				});
