@@ -3,6 +3,7 @@
 <head>
 	<title>${?Title}</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> 
 	
 	<script type="text/javascript" src="${siteroot}/JavaScript/prototype.js"></script>
 	<script type="text/javascript" src="${siteroot}/JavaScript/validation.js"></script>
