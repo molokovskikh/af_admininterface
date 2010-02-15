@@ -94,8 +94,14 @@ ORDER BY region;";
 			if (!IsValid)
 				return;
 
-			var maskRegion = (ulong) WRList.Items.Cast<ListItem>().Sum(i => Convert.ToInt64(i.Value));
-			var orderMask = (ulong) OrderList.Items.Cast<ListItem>().Sum(i => Convert.ToInt64(i.Value));;
+			ulong maskRegion = 0;
+			foreach (var mask in WRList.Items.Cast<ListItem>())
+				if (mask.Selected)
+					maskRegion |= Convert.ToUInt64(mask.Value);
+			ulong orderMask = 0;
+			foreach (var mask in OrderList.Items.Cast<ListItem>())
+				if (mask.Selected)
+					orderMask |= Convert.ToUInt64(mask.Value);
 
 			Client client = null;
 			User user = null;
