@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 
 namespace AdminInterface.Helpers
 {
@@ -59,6 +60,61 @@ namespace AdminInterface.Helpers
 			if (direction == "descending")
 				url = "../Images/arrow-down-blue.gif";
 			return String.Format("<img src=\"{0}\" style=\"border: none;\" />", url);
+		}
+
+		/// <summary>
+		/// Заменяем в Url значения параметров на новые, если параметры не находим, то добавляем
+		/// </summary>
+		/// <param name="newParams"> Параметры и значения должны идти парами Имя1, Значение1, Имя2, Значение2</param>
+		public static string GetUrlWithReplacedParams(string url, params string[] newParams)
+		{
+			url = url.TrimEnd('?');
+			string[] urlParts = url.Split('?');
+
+			var newUrl = new StringBuilder(urlParts[0]);
+			newUrl.Append('?');
+			if (urlParts.Length > 1)
+			{
+				string[] oldParams = urlParts[1].Split('&');
+				for (int i = 0; i < oldParams.Length; i++)
+				{
+					string newParam = ProcessOneParam(oldParams[i], newParams);
+					if (!String.IsNullOrEmpty(newParam))
+					{
+						newUrl.Append(newParam);
+						newUrl.Append('&');
+					}
+				}
+			}
+			if (newUrl[newUrl.Length - 1] == '&')
+				newUrl.Remove(newUrl.Length - 1, 1);
+
+			for (int i = 0; (i + 1) < newParams.Length; i += 2)
+				if (!url.Contains('?' + newParams[i] + '=') &&
+				  !url.Contains('&' + newParams[i] + '='))
+				{
+					if (newUrl[newUrl.Length - 1] != '?')
+						newUrl.Append('&');
+					newUrl.Append(newParams[i]);
+					newUrl.Append('=');
+					newUrl.Append(newParams[i + 1]);
+				}
+
+			return newUrl.ToString();
+		}
+
+		private static string ProcessOneParam(string param, string[] newParams)
+		{
+			string[] oldParams = param.Split('=');
+
+			for (int i = 0; (i + 1) < newParams.Length; i += 2)
+				if (oldParams[0] == newParams[i])
+					if (!String.IsNullOrEmpty(newParams[i + 1]))
+						return oldParams[0] + "=" + newParams[i + 1];
+					else
+						return String.Empty;
+
+			return param;
 		}
 	}
 }

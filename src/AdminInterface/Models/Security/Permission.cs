@@ -27,7 +27,8 @@ namespace AdminInterface.Models.Security
 		ManageCallbacks = 17,
 		EditSettings = 19,
 
-		ConfigurerEditProducers = 18
+		ConfigurerEditProducers = 18,
+		CallHistory = 20
 	}
 
 	[ActiveRecord("accessright.permissions", Lazy = false)]

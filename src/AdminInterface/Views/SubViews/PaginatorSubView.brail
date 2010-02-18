@@ -1,0 +1,88 @@
+﻿<%import System %>
+
+<%def CreateLink(i):
+	if i!=currentPage :
+      return "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString()) + "\">" + (i+1) + "</a>"
+   else:
+      return "<span class=\"CurrentPage\">" + (i+1) +"</span>"
+   end
+end%>
+
+<% lastPage = Math.Ceiling(rowsCount/Convert.ToDouble(pageSize))
+   startPage = Math.Max(0, currentPage - 9)
+  
+   if lastPage < 18:
+	groupType = 0
+   elif currentPage < 9:
+	 groupType = 1
+   elif currentPage <(lastPage - 10):
+	 groupType = 2
+   else:
+	 groupType = 3
+   end%>
+<% if lastPage>1: %>    
+    <% if currentPage>0:%>
+		<a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", "0", "rowsCount", rowsCount.ToString())}" title="Первая страница">&laquo; Первая</a>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Предыдущая страница">&lt;</a>
+    <% else: %>
+		<span title="Первая страница">&laquo; Первая</span>
+        <span title="Предыдущая страница">&lt;</span>
+    <% end %>
+<% end %>
+
+<%if lastPage > 1: %>
+	<%if groupType == 0: %>
+		<% for i in range(0, lastPage):%>
+		   ${CreateLink(i)}
+		<% end %>
+	<%end %>
+	
+	<%if groupType == 1: %>
+		<% for i in range(0, Math.Min(11, lastPage)):%>
+		   ${CreateLink(i)}
+		<% end %>
+		<%if lastPage > 11: %>
+			<span class="PaginatorDelimiter" style="border-color: #A1A1A1;color: #0F0F0F;">...</span>
+			<% for i in range(lastPage-5, lastPage):%>
+			   ${CreateLink(i)}
+			<% end %>
+		<%end %>
+	<% end %>
+
+	<%if groupType == 2: %>
+		<% for i in range(0, 5):%>
+		   ${CreateLink(i)}
+		<% end %>
+		
+		<span class="PaginatorDelimiter" style="border-color: #A1A1A1;color: #0F0F0F;">...</span>
+		<% for i in range(currentPage-2, currentPage+3):%>
+		   ${CreateLink(i)}
+		<% end %>
+		
+		<span class="PaginatorDelimiter" style="border-color: #A1A1A1;color: #0F0F0F;">...</span>
+		<% for i in range(lastPage-5, lastPage):%>
+		   ${CreateLink(i)}
+		<% end %>
+	<% end %>
+
+	<%if groupType == 3: %>
+		<% for i in range(0, 4):%>
+		   ${CreateLink(i)}
+		<% end %>
+		
+		<span class="PaginatorDelimiter" style="border-color: #A1A1A1;color: #0F0F0F;">...</span>
+		<% for i in range(lastPage-12, lastPage):%>
+		   ${CreateLink(i)}
+		<% end %>
+	<% end %>
+<%end %>
+
+<% if lastPage>1: %>
+    <% if currentPage<(lastPage-1):%>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage+1).ToString(), "rowsCount", rowsCount.ToString())}" title="Следующая страница">&gt;</a>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (lastPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Последняя страница">Последняя &raquo;</a>
+    <% else: %>
+        <span title="Следующая страница">&gt;</span>
+        <span title="Последняя страница">Последняя &raquo;</span>
+    <% end %>
+<% end %>

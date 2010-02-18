@@ -93,6 +93,7 @@
     <Compile Include="Controllers\AbstractContactController.cs" />
     <Compile Include="Helpers\ArHelper.cs" />
     <Compile Include="Helpers\BindingHelper.cs" />
+    <Compile Include="Helpers\ControllerHelper.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Models\Contact.cs" />
     <Compile Include="Models\ContactGroup.cs" />

@@ -123,6 +123,13 @@ uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${
 					Отчеты
 				</a>
 			</p>
+			<p>
+			    <% if admin.HavePermisions(PermissionType.CallHistory): %>
+			    <a href="${siteroot}/Telephony/ShowCallHistory.brail">История звонков</a>
+			    <% else: %>
+			    История звонков
+			    <% end %>
+			</p>
 		</td>
 		<td valign=top>
 			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">

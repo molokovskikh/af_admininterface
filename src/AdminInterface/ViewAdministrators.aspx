@@ -140,6 +140,12 @@
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.ConfigurerEditProducers) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>
+					<asp:TemplateField HeaderText="VCH">
+						<ItemTemplate>
+							<asp:CheckBox ID="CheckBox17" Enabled="false" runat="server" 
+										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CallHistory) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>					
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">
@@ -165,6 +171,7 @@
 				<li><%# GetPermissionShortcut(PermissionType.EditSettings)%> - <%# GetPermissionName(PermissionType.EditSettings)%></li>
 				
 				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers)%> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.CallHistory)%> - <%# GetPermissionName(PermissionType.CallHistory)%></li>
 			</ul>
 		</div>
 	</form>

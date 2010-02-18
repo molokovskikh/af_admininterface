@@ -1,0 +1,65 @@
+﻿<% component Bubble, {"bredcrumbs" : [("История звонков", "")]} %>
+
+<% OutputSubView("/SubViews/SelectDateInterval") %>
+<script type="text/javascript">
+
+    function ShowCallTracks(recordId) {
+        jQuery.get("ListenCallRecord.rails?recordId=" + recordId, function(html) {
+            var trackList = jQuery("#CallRecordTracks" + recordId);
+            if (trackList.size() == 0)
+                jQuery("#TrackList" + recordId).append(html);
+            else
+                jQuery("#CallRecordTracks" + recordId).remove();
+        });
+    }
+
+</script>
+
+<form id="updateForm" name="updateForm" method="post" action="update.rails">
+    <table class="DataTable" style="width: 100%;">
+        <%
+        if (calls.Count > 0):
+        %>
+        <tr>
+            <% 
+            OutputSubView("/SubViews/SortHeadersSubView", {"headers":["Слушать разговор", "Дата звонка", "Кто звонил", "Куда звонил"], "sortColumnIndex":sortColumnIndex, "rowsCount":rowsCount})
+            %>
+        </tr> 
+        <%
+            for i, call in enumerate(calls):
+        %>       
+        <tr class="${ViewHelper.GetRowStyle(i)}">
+            <td align="center" id="TrackList${call.Id}">
+                <a href="javascript:" onclick="ShowCallTracks(${call.Id})" id="CallTracksLink"><img src="${siteroot}/Images/Sound-icon.png" border="0" /></a>
+            </td>
+            <td align="center">${call.WriteTime}</td>
+            <td align="center">${call.From}</td>
+            <td align="center">${call.To}</td>            
+        </tr>        
+        <%
+            break unless i<pageSize
+            end
+        %>
+        <tr class="NoHighLightRow">
+		    <td colspan="4" align="right">
+		        <br />
+			    <div class="Paginator">
+				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage}) %>
+			    </div>
+		    </td>
+        </tr>
+        <%
+        else:
+        %>
+        <tr class="EmptyData NoHighLightRow"><td>За указанный период звонков не найдено.</td></tr>
+        <%
+        end
+        %>
+    </table>
+    <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}" />
+    <input type="hidden" name="endDate" id="endDate" value="${endDate}" />
+    <input type="hidden" name="rowsCount" id="rowsCount" value="${rowsCount}" />
+    <input type="hidden" name="pageSize" id="pageSize" value="${pageSize}" />
+    <input type="hidden" name="currentPage" id="currentPage" value="${currentPage}" />
+    <input type="hidden" name="sortColumnIndex" id="sortColumnIndex" value="${sortColumnIndex}" />    
+</form>

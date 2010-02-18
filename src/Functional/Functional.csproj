@@ -91,6 +91,7 @@
   <ItemGroup>
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
+    <Compile Include="CallHistoryFixture.cs" />
     <Compile Include="ClientMessagesFixture.cs" />
     <Compile Include="BindPhoneToClientFixture.cs" />
     <Compile Include="CallbackRulesFixture.cs" />

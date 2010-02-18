@@ -1,0 +1,35 @@
+﻿<%
+i = 0
+if IsDefined("tracks") and IsDefined("recordId"):
+%>
+<script type="text/javascript" src="${siteroot}/JavaScript/audio-player.js"></script>  
+<div style="padding: 15px" id="CallRecordTracks${recordId}">
+<table>
+<%
+    while i < tracks.Length:
+        if (tracks.Length > 1):
+%>
+    <tr valign="middle">
+        <td><b>Часть ${i + 1}:</b></td>
+<%
+        end    
+%>    
+    <td>    
+        <object width="200" height="30">
+            <embed type="audio/x-wav" src="${siteroot}/Telephony/GetStream?recordId=${recordId}" autoplay="false" autostart="false">
+            </embed>
+        </object>        
+    </td>
+</tr>
+<%      i++
+    end
+%>
+</table>
+</div>
+<%
+else:
+%>
+<div id="CallRecordTracks${recordId}" align="center" style="width: 100%">Запись не найдена</div>    
+<%    
+end    
+%>

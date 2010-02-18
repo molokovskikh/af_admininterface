@@ -186,6 +186,7 @@
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
+    <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
@@ -445,6 +446,11 @@
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />
+    <None Include="Views\SubViews\PaginatorSubView.brail" />
+    <None Include="Views\SubViews\SelectDateInterval.brail" />
+    <None Include="Views\SubViews\SortHeadersSubView.brail" />
+    <None Include="Views\Telephony\ListenCallRecord.brail" />
+    <None Include="Views\Telephony\ShowCallHistory.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
