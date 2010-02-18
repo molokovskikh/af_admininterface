@@ -1,0 +1,9 @@
+﻿<%
+if IsDefined("payers"):
+    for i, payer in enumerate(payers):
+%>
+    <option id="${payer.PayerID}payer" value="${payer.PayerID}" ${"selected" if (i == 0)}>${payer.PayerID}. ${payer.ShortName}</option>
+<%        
+    end
+end
+%>

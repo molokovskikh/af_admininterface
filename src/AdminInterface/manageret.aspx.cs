@@ -442,14 +442,14 @@ WHERE rcs.clientcode = ?ClientCode";
 			var adapter = new MySqlDataAdapter(@"
 select 0 as FirmCode, 'Зашумлять все прайс листы всех поставщиков' as ShortName
 union
-SELECT suppliers.FirmCode,
-       suppliers.ShortName
+SELECT cd.FirmCode,
+       cd.ShortName
 FROM Usersettings.ClientsData cd
-WHERE cd.BillingCode = ?PayerId and suppliers.FirmType = 0;", Literals.GetConnectionString());
+WHERE cd.BillingCode = ?PayerId and cd.FirmType = 0;", Literals.GetConnectionString());
 			adapter.SelectCommand.Parameters.AddWithValue("?PayerId", client.BillingInstance.PayerID);
 			var data = new DataSet();
 			adapter.Fill(data);
-			NotNoisedSupplier.DataSource = data;
+			NotNoisedSupplier.DataSource = data;			
 			NotNoisedSupplier.DataBind();
 		}
 	}

@@ -19,16 +19,26 @@ namespace AdminInterface.Models
 		[Property("DefaultShowRegionMask")]
 		public virtual UInt64 DefaultShowRegionMask { get; set; }
 
+		public bool IsAll { get; set; }
+
+//		[Property("DefaultShowRegionMask")]
+//		public virtual ulong ShowRegionMask { get; set; }
+
 		public static IList<Region> GetRegionsForClient(string clientName)
 		{
 			return ArHelper.WithSession(
 				session =>
 				session.CreateSQLQuery(
 					@"
-select (select sum(regioncode) from farm.regions) as {Region.Id}, 'Все' as {Region.Name}, 1 as IsAll
+select 
+	(select sum(regioncode) from farm.regions) as {Region.Id},
+	'Все' as {Region.Name}, 
+	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
+	1 as IsAll
 union
 SELECT  r.RegionCode as {Region.Id},
         r.Region as {Region.Name},
+		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
         0 as IsAll
 FROM    farm.regions as r,
         accessright.regionaladmins as ra

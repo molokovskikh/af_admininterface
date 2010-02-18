@@ -33,14 +33,23 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("Usersettings.ClientsData")]
-	public class Supplier : ActiveRecordBase<Supplier>
+	[ActiveRecord("Usersettings.ClientsData", Where = "(FirmType = 0)")]
+	public class Supplier : ActiveRecordLinqBase<Supplier>
 	{
 		[PrimaryKey("FirmCode")]
 		public virtual uint Id { get; set;}
 
 		[Property("ShortName", NotNull = true)]
 		public virtual string Name { get; set; }
+
+		[Property("FirmStatus")]
+		public virtual ClientStatus Status { get; set; }
+
+		[BelongsTo("RegionCode")]
+		public virtual Region HomeRegion { get; set; }
+
+		[BelongsTo("BillingCode")]
+		public virtual Payer BillingInstance { get; set; }
 	}
 
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]

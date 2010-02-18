@@ -103,6 +103,15 @@ ORDER BY region;";
 				if (mask.Selected)
 					orderMask |= Convert.ToUInt64(mask.Value);
 
+            maskRegion = 0;
+            foreach (var mask in WRList.Items.Cast<ListItem>())
+                if (mask.Selected)
+                    maskRegion |= Convert.ToUInt64(mask.Value);
+            orderMask = 0;
+            foreach (var mask in OrderList.Items.Cast<ListItem>())
+                if (mask.Selected)
+                    orderMask |= Convert.ToUInt64(mask.Value);
+
 			Client client = null;
 			User user = null;
 			string password = null;
@@ -196,7 +205,7 @@ ORDER BY region;";
 			if (EnterBillingInfo.Checked)
 			{
 				sendBillingNotificationNow = false;
-				redirectTo = String.Format("Register/Register.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+				redirectTo = String.Format("Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 					client.BillingInstance.PayerID,
 					ShowRegistrationCard.Checked,
 					client.Id);

@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.30729</ProductVersion>
+    <ProductVersion>9.0.21022</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -149,6 +149,7 @@
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
+    <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
@@ -446,12 +447,17 @@
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Logs\Orders.brail" />
+    <None Include="Views\Regions\ShowRegions.brail" />
+    <None Include="Views\Register\Register.brail" />
+    <None Include="Views\Register\SearchPayers.brail" />
+    <None Include="Views\Register\SearchSuppliers.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />
     <None Include="Views\SubViews\PaginatorSubView.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\Telephony\ListenCallRecord.brail" />
     <None Include="Views\Telephony\ShowCallHistory.brail" />
+    <None Include="Views\SubViews\RegionSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
@@ -468,7 +474,7 @@
     <None Include="Views\Report\RevisionAct.brail" />
     <None Include="Views\SmapRejector\Search.brail" />
     <None Include="Views\Rescues\Fail.brail" />
-    <None Include="Views\Register\Register.brail" />
+    <None Include="Views\Register\RegisterPayer.brail" />
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Billing\ShowMessageForClientPartial.brail" />
@@ -569,9 +575,6 @@
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>

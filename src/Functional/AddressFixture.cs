@@ -15,6 +15,28 @@ namespace Functional
 	public class AddressFixture : WatinFixture
 	{
 		[Test]
+		public void DeleteContactInformation()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var countContacts = 0;
+			// Удаление контактной записи
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				countContacts = AddContactsToNewDeliveryAddress(browser);
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Addresses[0].ContactGroup;
+					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+					browser.Button(Find.ByValue("Сохранить")).Click();
+				}
+			}
+			// Проверка, что контактная запись удалена
+			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
+			Assert.That(count, Is.EqualTo(countContacts - 1));
+		}
+
+		[Test]
 		public void Create_address()
 		{
 			var client = DataMother.CreateTestClient();
@@ -104,28 +126,6 @@ namespace Functional
 				countContacts = ContactInformationFixture.GetCountContactsInDb(group);
 				Assert.That(countContacts, Is.EqualTo(countContacts));
 			}
-		}
-
-		[Test]
-		public void DeleteContactInformation()
-		{
-			var client = DataMother.CreateTestClientWithUser();
-			var countContacts = 0;
-			// Удаление контактной записи
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				countContacts = AddContactsToNewDeliveryAddress(browser);				
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Addresses[0].ContactGroup;
-					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
-			}
-			// Проверка, что контактная запись удалена
-			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
-			Assert.That(count, Is.EqualTo(countContacts - 1));
 		}
 	}
 }

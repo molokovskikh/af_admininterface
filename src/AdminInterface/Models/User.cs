@@ -175,8 +175,10 @@ namespace AdminInterface.Models
 			Update();
 			new AuthorizationLogEntity(Id).Create();
 			new UserUpdateInfo(Id).Create();
-			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"
+
+			if (maintainPrices)
+				ArHelper.WithSession(s => {
+                    s.CreateSQLQuery(@"
 insert into Future.UserPrices(PriceId, UserId)
 select i.PriceId, u.Id
 from Future.Users u
@@ -184,7 +186,7 @@ from Future.Users u
 where u.Id = :UserId
 group by i.PriceId")
 				.SetParameter("UserId", Id)
-				.ExecuteUpdate();
+				.ExecuteUpdate();				
 			});
 		}
 

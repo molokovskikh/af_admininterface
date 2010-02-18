@@ -1,0 +1,10 @@
+﻿<%
+if IsDefined("suppliers"):
+    for i, supplier in enumerate(suppliers):
+%>
+    <option id="${supplier.Id}supplier" title="${supplier.BillingInstance.PayerID}. ${supplier.BillingInstance.ShortName}"
+        value="${supplier.Id}" ${"selected" if (i == 0)}>${supplier.Id}. ${supplier.Name}</option>
+<%        
+    end
+end
+%>

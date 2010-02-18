@@ -20,10 +20,12 @@ namespace Functional
 		[Test]
 		public void Edit_user()
 		{
-			using (var browser = Open("client/2575"))
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			using (var browser = Open("client/" + client.Id))
 			{
-				browser.Link(Find.ByText("kvasov")).Click();
-				Assert.That(browser.Text, Is.StringContaining("kvasov"));
+				browser.Link(Find.ByText(user.Login)).Click();
+				Assert.That(browser.Text, Is.StringContaining(user.Login));
 			}
 		}
 

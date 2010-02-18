@@ -2,6 +2,7 @@
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
+using Functional.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -18,7 +19,7 @@ namespace Integration.Models
 		[Test]
 		public void ResetUinTest()
 		{
-			var client = CreateClient();
+			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users.First();
 
 			var info = UserUpdateInfo.Find(user.Id);
@@ -32,20 +33,6 @@ namespace Integration.Models
 			var reloadedInfo = UserUpdateInfo.Find(user.Id);
 			Assert.That(reloadedInfo.AFCopyId, Is.Empty);
 			Assert.That(client.HaveUin(), Is.False);
-		}
-
-		private Client CreateClient()
-		{
-			var client = ForTest.CreateClient();
-			client.BillingInstance.Save();
-			client.Save();
-			client.Users[0].Save();
-
-			var updateInfo = new UserUpdateInfo(client.Users.First().Id);
-
-			using (new TransactionScope())
-				updateInfo.Create();
-			return client;
 		}
 	}
 }

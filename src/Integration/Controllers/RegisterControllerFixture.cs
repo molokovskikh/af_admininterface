@@ -6,6 +6,7 @@ using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
+using Functional.ForTesting;
 
 
 namespace AdminInterface.Test.Controllers
@@ -27,18 +28,11 @@ namespace AdminInterface.Test.Controllers
 		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
-			Payer payer;
-			Client client;
-			using (new TransactionScope())
-			{
-				client = ForTest.CreateClient();
-				client.SaveAndFlush();
-
-				payer = ForTest.CreatePayer();
-				payer.Comment = "ata";
-				payer.SaveAndFlush();
-			}
-
+			
+			Client client = DataMother.CreateTestClient();
+			Payer payer = client.BillingInstance;
+			payer.Comment = "ata";
+			payer.Update();
 			Context.Session["ShortName"] = "Test";
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };

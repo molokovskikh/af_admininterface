@@ -1,263 +1,398 @@
-﻿<%
-def WriteInputGroupHeader(localHeader as string) as string:
-%>
-	<tr>
-		<td class="InputGroupHeader" colspan="2">
-			${localHeader}
-		</td>
-	</tr>
+﻿<% component Bubble, {"bredcrumbs" : [("Регистрация клиента", "")]} %>
+
+<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
+
+<h2>
+    Регистрация клиента
+</h2>
+
 <%
-end
-
-def WriteLabelAndEditControle(labelText as string, editControlText as string) as string:
-	%>
-	<tr>
-		<td style="width: 30%">
-			${labelText}
-		</td>
-		<td style="width: 70%">
-			${editControlText}
-		</td>
-	</tr>
-	<%
-end
+    ClientTypeDrugstore = cast(int, AdminInterface.Models.ClientType.Drugstore)
+    ClientTypeSupplier = cast(int, AdminInterface.Models.ClientType.Supplier)
+    
+    SegmentTypeWholesale = cast(int, AdminInterface.Models.Segment.Wholesale)
+    SegmentTypeRetail = cast(int, AdminInterface.Models.Segment.Retail)
 %>
 
-<% component CaptureFor, {"id" : "Title"}:%>
-	Реистрация клиента, шаг 2: Заполнения информации о плательщике
-<% end %>
+<script type="text/javascript" src="/JavaScript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="/JavaScript/messages_ru.js"></script>
+<script type="text/javascript" src="/JavaScript/jquery_contact_validation.js"></script>
 
-<script>
-	document.observe("dom:loaded", function() {
-		SetupCalendarElements();
-		
-		if ($('PaymentOptions_WorkForFree') != null)
-		{
-			$('PaymentOptions_WorkForFree').observe("change", function() {
-				
-				if (checkBox.checked)
-				{
-					$('CalendarInputField0').disable();
-					$('PaymentOptions_Comment').disable();
-				}
-				else
-				{
-					$('CalendarInputField0').enable();
-					$('PaymentOptions_Comment').enable();
-				}
-			});
-		}
+<script type="text/javascript">
+    jQuery(function() {
+        jQuery("#PayerExists").attr({checked : "", disabled : ""});
+        jQuery("#ShowForOneSupplier").attr({checked : "", disabled : ""});
+        jQuery("#FillBillingInfo").attr({checked : "checked", disabled : ""});
+        jQuery("#SearchPayerDiv").css("display", "none");
+        jQuery("#SelectPayerDiv").css("display", "none");
+        jQuery("#SearchSupplierDiv").css("display", "none");
+        jQuery("#SelectSupplierDiv").css("display", "none");
+        
+        jQuery.validator.addMethod("validateAddress", function(value, element) {
+            return validateAddress(value, element);
+        }, "Некорректное значение адреса");
+
+        validateForm();
+    });
+
+    function validateSupplier() {
+        if (jQuery("#ShowForOneSupplier").attr("checked"))
+            return ((jQuery("#SupplierComboBox").val() != null) &&
+                        (jQuery("#SupplierComboBox").val().length > 0) &&
+                        (jQuery("#SelectSupplierDiv").css("display") == "block"));
+        return true;
+    }
+
+    function validatePayer() {
+        if (jQuery("#PayerExists").attr("checked"))
+            return ((jQuery("#PayerComboBox").val() != null) &&
+	                    (jQuery("#PayerComboBox").val().length > 0) &&
+                        (jQuery("#SelectPayerDiv").css("display") == "block"));
+        return true;
+    }
+
+    function validateAddress(value, element) {
+        if (jQuery("#clientType").val() == ${ClientTypeSupplier})
+            return true;
+        res = /^.{1,100}$/.test(value)
+        return res;
+    }
+
+	function validateForm() {
+	    jQuery("form").validate({
+	        rules: {
+	            "client.FullName": "required",
+	            "client.Name": "required",
+	            "deliveryAddress": "validateAddress",
+	            "clientContacts[0].ContactText" : "required",
+	            "clientContacts[1].ContactText" : "required"
+	        }
+	    });
+	}
+
+	function validate() {
+        if (!validateSupplier()) {
+            jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
+            jQuery("#SearchSupplierTextPattern").focus();
+            return false;
+        }	    
+	    if (!validatePayer()) {
+	        jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
+	        jQuery("#SearchPayerTextPattern").focus();
+	        return false;
+        }
+	    return true;
+	}
 	
-		Validation.add("CommentValidator", "Клиент слишком долго работает бесплатно, нужно указать причину", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-				
-			if (!$("PaymentOptions_Comment").empty())
-				return true;
-			
-			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
-		});		
-		
-		Validation.add("CheckDate", "Не корректная дата", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-		
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate != null;
-		});
-		
-		Validation.add("DateInFuture", "Дата начала платного периода меньше текущей", function(v){
-		
-			var checkBox = $('PaymentOptions_WorkForFree');
-			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
-				return true;
-		
-			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
-			return paymentPeriodBeginDate >= Date.today();
-		});		
-
-		new Validation("PayerInfo");
-	});
+	function ShowSelectSupplierDiv() {
+        var searchText = jQuery("#SearchSupplierTextPattern").val();
+        if (searchText.length == 0)
+            return;
+        var url = "SearchSuppliers?searchPattern=" + searchText;
+        if (jQuery('#PayerComboBox').val() != null) {
+            var payerId = parseInt(jQuery('#PayerComboBox').val());
+            searchText += "&payerId=" + payerId;
+        }
+	    jQuery.get(url, function(htmlOptions) {
+	        jQuery('#SupplierComboBox').find('option').remove().end();
+	        if (htmlOptions.length == 0) {
+	            jQuery("#SearchSupplierTextPattern").attr("disabled", "");
+	            jQuery("#SearchSupplierButton").attr("disabled", "");	            
+	            jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
+	            return;
+	        }
+	        jQuery("#SupplierComboBox").append(htmlOptions);
+            ViewDiv(false, "#SearchSupplierDiv");
+	        ViewDiv(true, "#SelectSupplierDiv");
+	        jQuery("#MessageForSupplier").html("");
+	        OnSupplierChange();	        
+	    });	    
+	    jQuery("#MessageForSupplier").html("<i>Выполняется поиск<i/>");
+	    jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
+	    jQuery("#SearchSupplierButton").attr("disabled", "disabled");	    
+	}
+	
+	function ShowSearchSupplierDiv() {
+	    jQuery('#SupplierComboBox').find('option').remove().end();
+	    jQuery("#MessageForSupplier").html("");
+	    jQuery("#SearchSupplierTextPattern").attr("disabled", "");
+	    jQuery("#SearchSupplierButton").attr("disabled", "");	    
+	    ViewDiv(false, '#SelectSupplierDiv');
+	    ViewDiv(true, "#SearchSupplierDiv");
+	    LockPayer();
+	    jQuery("#SearchSupplierTextPattern").focus();
+	}
+	
+	function ShowSelectPayerDiv() {	    
+        var searchText = jQuery("#SearchPayerTextPattern").val();
+        if (searchText.length == 0)
+            return;
+        var url = "SearchPayers?searchPattern=" + searchText;
+	    jQuery.get(url, function(htmlOptions) {
+	        jQuery('#PayerComboBox').find('option').remove().end();
+	        if (htmlOptions.length == 0) {
+	            jQuery("#SearchPayerTextPattern").attr("disabled", "");
+	            jQuery("#SearchPayerButton").attr("disabled", "");	            
+	            jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
+	            return;
+	        }
+	        jQuery("#PayerComboBox").append(htmlOptions);	        
+	        ViewDiv(false, "#SearchPayerDiv");
+	        ViewDiv(true, "#SelectPayerDiv");
+	        jQuery("#MessageForPayer").html("");
+	    });	    
+	    jQuery("#MessageForPayer").html("<i>Выполняется поиск</i>");
+	    jQuery("#SearchPayerTextPattern").attr("disabled", "disabled");
+	    jQuery("#SearchPayerButton").attr("disabled", "disabled");	    
+	}
+	
+	function ShowSearchPayerDiv() {
+	    jQuery('#PayerComboBox').find('option').remove().end();
+	    jQuery("#MessageForPayer").html("");
+	    jQuery("#SearchPayerTextPattern").attr("disabled", "");
+	    jQuery("#SearchPayerButton").attr("disabled", "");	    
+	    ViewDiv(false, '#SelectPayerDiv');
+	    ViewDiv(true, "#SearchPayerDiv");
+	    jQuery("#SearchPayerTextPattern").focus();
+	}
+	
+	function ViewDiv(show, selector)
+	{
+	    var displayValue = "none";
+	    if (show) {
+	        displayValue = "block";
+	    }
+	    jQuery(selector).css("display", displayValue);
+	}
+	
+	function OnPayerExistsChanged(selectedValue) {	    
+	    ViewDiv(false, "#SearchPayerDiv");
+	    ViewDiv(false, "#SelectPayerDiv");
+	    var disabled = '';
+	    var checked = 'checked';
+	    if (selectedValue) {	        
+	        ShowSearchPayerDiv();
+	        disabled = 'disabled';
+	        checked = '';
+	    }
+	    jQuery("#FillBillingInfo").attr('disabled', disabled);
+	    jQuery("#FillBillingInfo").attr('checked', checked);
+	    jQuery("#PayerExistsValue").val(selectedValue);
+	}
+	
+	function OnClientViewChanged(selectedValue) {
+	    ViewDiv(false, "#SearchSupplierDiv");
+	    ViewDiv(false, "#SelectSupplierDiv");
+	    if (selectedValue) {
+	        ShowSearchSupplierDiv();
+	    }
+	    else {
+	        UnlockPayer();
+	    }
+	}
+	
+	function OnClientTypeChanged(selectedValue) {
+	    if (selectedValue == "${ClientTypeDrugstore}") {
+	        ViewDiv(true, "#DeliveryAddressDiv");
+	    }
+	    
+	    if (selectedValue == "${ClientTypeSupplier}") {
+	        ViewDiv(false, "#DeliveryAddressDiv");
+	    }
+	}
+	
+	function OnSupplierChange(payerName) {
+	    var payer = jQuery("#SupplierComboBox option:selected").attr("title");
+	    SetLockedPayer(payer);
+        var payerId = parseInt(payer);
+	    jQuery("#PayerIdValue").val(payerId);
+	}
+	
+	function LockPayer() {
+	    jQuery("#PayerExists").attr('checked', '');
+	    jQuery("#PayerExists").click();
+	    jQuery("#PayerExists").attr('disabled', 'disabled');
+	    jQuery("#FillBillingInfo").attr('checked', '');
+	    jQuery("#FillBillingInfo").attr('disabled', 'disabled');
+	    ViewDiv(false, '#SelectPayerDiv');
+	    ViewDiv(false, "#SearchPayerDiv");	    
+	}
+	
+	function SetLockedPayer(payerName) {
+	    jQuery("#PayerExists").attr('checked', 'checked');
+	    jQuery("#PayerExists").attr('disabled', 'disabled');
+	    jQuery("#PayerComboBox").attr('disabled', 'disabled');
+	    jQuery("#ResetPayerButton").attr('disabled', 'disabled');
+	    jQuery("#PayerComboBox").html("<option selected>" + payerName + "</option>");
+	    ViewDiv(true, "#SelectPayerDiv");
+	}
+	
+	function UnlockPayer() {
+	    jQuery("#PayerExists").attr('checked', '');
+	    jQuery("#PayerExists").attr('disabled', '');
+	    jQuery("#PayerComboBox").attr('disabled', '');
+	    jQuery("#ResetPayerButton").attr('disabled', '');	
+	    jQuery("#FillBillingInfo").attr('checked', '');
+	    jQuery("#FillBillingInfo").attr('disabled', '');	        
+	    ViewDiv(false, "#SelectPayerDiv");
+	}	
 </script>
 
-<h3>
-	Реистрация клиента, шаг 2: Заполнения информации о плательщике
-</h3>
+<div style="width: 800px;">
+<form id="RegistrationForm" name="RegistrationForm" method="post" action="${siteroot}/Register/RegisterClient" onsubmit="return validate()">
+    <div class="block">
+        <h3>Общая информация</h3>
+        <table border="0" width="100%" cellpadding="5" cellspacing="0">
+            <tr>
+                <td width="20%">Тип клиента:</td>
+                <td width="80%">
+                    <select name="client.Type" id="clientType" style="width: 60%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
+                        <option value="${ClientTypeDrugstore}" selected="selected">Аптека</option>
+                        <!-- 
+                        Возможность регистрации поставщиков в "новой реальности" пока недоступна
+                        <option value="${ClientTypeSupplier}">Поставщик</option>-->
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">Сегмент:</td>
+                <td width="80%">
+                    <select name="client.Segment" id="SegmentComboBox" style="width: 60%">
+                        <option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
+                        <option value="${SegmentTypeRetail}">Розница</option>
+                    </select>                
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">Юридическое наименование:</td>
+                <td width="80%"><input type="text" id="JuridicalName" name="client.FullName" style="width: 60%" /></td>
+            </tr>
+            <tr>
+                <td width="20%">Краткое наименование:</td>
+                <td width="80%"><input type="text" id="ShortName" name="client.Name" style="width: 60%" /></td>
+            </tr>
+            <tr>
+                <td width="20%">Телефон:</td>                
+                <td width="80%">
+                    <input type="text" id="ClientContactPhone" name="clientContacts[0].ContactText" class="phone" style="width: 60%" />
+                    <input type="hidden" name="clientContacts[0].Type" value="1" />
+                </td>
+            </tr>
+            <tr>
+                <td width="20%">Email:</td>
+                <td width="80%">
+                    <input type="text" id="ClientContactEmail" name="clientContacts[1].ContactText" class="email" style="width: 60%" />
+                    <input type="hidden" name="clientContacts[1].Type" value="0" />
+                </td>
+            </tr>
+        </table>
+    </div>
 
-<form id="PayerInfo" action="registered.rails" method="post">
-	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
-	<input type="hidden" name="clientCode" value="${clientCode}" />
-	${FormHelper.HiddenField("Instance.PayerID")}
-
-<table>
-	${WriteInputGroupHeader("Общая информация")}
-
-					
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
-													"Краткое наименование:"), 
-								FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
-												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
-													"Полное наименование:"), 
-								FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
-												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-													"Юридический адрес:"), 
-								FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
-
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
-													"ИНН:"), 
-								FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
-												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
-													"КПП:"), 
-								FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-																		
-	<%
-	contactGroupIndex = 0
-	component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:
-		section ContactGroupHeader:
-		%>
-			<tr>
-				<% if contactGroupIndex == 0: %>
-					<td class="InputGroupHeader">
-						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
-					</td>
-					<td class="InputGroupHeader">
-						${ContactGroupName}
-					</td>
-				<% else: %>
-					<td class="InputGroupHeader" colspan="2">
-						${ContactGroupName}
-					</td>
-				<% end %>
-			</tr>
-		<% 
-							contactGroupIndex++;
-		end
-		section Item:
-		%>
-			<tr>
-				<td>
-					${Label}:
-				</td>
-				<td>
-					${Value}
-				</td>
-			</tr>
-		<% 
-		end
-		section Person:
-		%>
-				<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
-		<%
-		end
-		section ContactGroupHeaderLink:
-		%>
-				<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
-		<%
-		end
-	end
-	%>
-																		
-		${WriteInputGroupHeader("Опции выставки счета")}
-					
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
-														"Выставлять счет:"), 
-									FormHelper.Select("Instance.AutoInvoice", 
-													  {1:"Автоматически", 0:"По запросу"},
-													  {"value":"Key", "text":"Value"}))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", 
-														"Категория счета:"), 
-									FormHelper.Select("Instance.DetailInvoice", 
-													  {0:"Стандартный", 1:"Детализированный"},
-													  {"value":"Key", "text":"Value"}))}
-																  
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", 
-																	"Периодичность выставления счетов:"), 
-									FormHelper.Select("Instance.PayCycle", 
-													  {0:"Помесячно", 1:"Поквартально"}, 
-													  {"value":"Key", "text":"Value"}))}
-
-		${WriteInputGroupHeader("Доставка корреспонденции")}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressCountry", 
-														"Страна:"), 
-									FormHelper.TextField("Instance.ActualAddressCountry", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressIndex", 
-														"Индекс:"), 
-									FormHelper.TextField("Instance.ActualAddressIndex", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressProvince", 
-														"Область:"), 
-									FormHelper.TextField("Instance.ActualAddressProvince", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressTown", 
-														"Город:"), 
-									FormHelper.TextField("Instance.ActualAddressTown", {"class" : "BillingInput"}))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressRegion", 
-														"Район:"), 
-									FormHelper.TextField("Instance.ActualAddressRegion", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressStreet", 
-														"Улица:"), 
-									FormHelper.TextField("Instance.ActualAddressStreet", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressHouse", 
-														"Дом:"), 
-									FormHelper.TextField("Instance.ActualAddressHouse", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressOffice", 
-														"Офис:"), 
-									FormHelper.TextField("Instance.ActualAddressOffice", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeforeNamePrefix", 
-														"Префикс перед \"Кому\":"), 
-									FormHelper.TextField("Instance.BeforeNamePrefix", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
-														"Надпись после \"Кому\":"), 
-									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
-									
-		${WriteInputGroupHeader("Условия оплаты")}
-		
-	<tr>
-		<td colspan="2">
-			<fieldset>
-				<% if admin.CanRegisterClientWhoWorkForFree: %>
-				<legend>			
-					${FormHelper.LabelFor("PaymentOptions.WorkForFree", "Клиент обслуживается бесплатно:")}
-					${FormHelper.CheckboxField("PaymentOptions.WorkForFree")}
-				</legend>
-				<% end %>
-				<div>
-					${FormHelper.LabelFor("PaymentOptions.PaymentPeriodBeginDate", "Дата начала платного периода:")}
-					<br>
-					${FormHelper.TextFieldValue("PaymentOptions.PaymentPeriodBeginDate", PaymentOptions.PaymentPeriodBeginDate.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
-					<input type="button" class="CalendarInput" />
-				</div>
-				<div>
-				${FormHelper.LabelFor("PaymentOptions.Comment", "Комментарий:")}
+    <div class="block">
+        <h3>Права доступа</h3>
+		<div>
+			<% for i, permission in enumerate(Permissions): %>
+				<input type=checkbox name=permissions[${i}].Id value=${permission.Id} ${"checked" if (permission.Name == 'Обновлять AnalitF')}>
+				${permission.Name}
 				<br>
-				${FormHelper.TextArea("PaymentOptions.Comment", {"rows":"20", "class" : "BillingInput CommentValidator" })}
-				</div>
-			</fieldset>
-		</td>
-	</tr>		
-	<tr>
-		<tr style="text-align:right">
-			<td colspan="2">
-			${FormHelper.Submit("Сохранить")}
-		</td>
-	</tr>		
-</table>
-</form>
+			<% end %>
+		</div>        
+    </div>
+    
+    <div class="block">
+        <h3>Настройка</h3>
+        <table cellpadding="1" border="0" width="100%">
+            <tr>
+                <td width="50%">                    
+                    <input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
+                    <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+                </td>
+                <td>
+                    <div id="SearchPayerDiv" style="width: 100%; display: none">
+                        <input type="text" id="SearchPayerTextPattern" name="SearchPayerTextPattern" style="width: 75%" />
+                        <input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />                        
+                    </div>
+                    <div id="SelectPayerDiv" style="width: 100%; display: none">
+                        <select id="PayerComboBox" style="width: 75%"></select>
+                        <input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
+                        <input type="hidden" id="PayerIdValue" name="payer.PayerID" />
+                    </div>
+                    <div id="MessageForPayer"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2"><input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input></td>
+            </tr>            
+            <tr>
+                <td width="50%">
+                    <input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
+                </td>
+                <td>
+                    <div id="SelectSupplierDiv" style="width: 100%; display: none">
+                        <select name="supplier.Id" id="SupplierComboBox" style="width: 75%" onchange="OnSupplierChange(this.options[this.selectedIndex].title)"></select>
+                        <input type="button" name="ResetSupplierButton" id="ResetSupplierButton" value="Сброс" onclick="ShowSearchSupplierDiv()" />
+                    </div>
+                    <div id="SearchSupplierDiv" style="width: 100%; display: none">
+                        <input type="text" id="SearchSupplierTextPattern" name="SearchSupplierTextPattern" style="width: 75%" />
+                        <input type="button" id="SearchSupplierButton" name="SearchSupplierButton" value="Найти" onclick="ShowSelectSupplierDiv()" />                        
+                    </div>                
+                    <div id="MessageForSupplier"></div>
+                </td>
+            </tr>            
+            <tr>
+                <td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>
+            </tr>
+            <tr>            
+                <td colspan="2"><input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input></td>
+            </tr>
+        </table>
+        <fieldset>
+            <legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
+            <br />
+            Дополнительные адреса для отправки регистрационной карты:<br />
+            <textarea rows="2" cols="60" name="additionalEmailsForSendingCard"></textarea>
+        </fieldset>
+    </div>    
+
+    <% OutputSubView("/SubViews/RegionSettings") %>
+
+    <div class="block" id="DeliveryAddressDiv">
+        <h3>Адрес доставки</h3>
+        <table border="0" width="100%" cellpadding="3" cellspacing="0">
+            <tr>
+                <td width="20%">Адрес доставки медикаментов:</td>
+                <td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
+            </tr>                    
+        </table>            
+    </div>
+
+    <div class="block">
+        <h3>Сведения о пользователе</h3>
+        <table border="0" width="100%" cellpadding="3" cellspacing="0">
+            <tr>
+                <td width="20%">Имя пользователя:</td>
+                <td width="80%"><input type="text" id="UserName" name="userName" style="width: 60%" /></td>
+            </tr>        
+            <tr>
+                <td width="20%">Телефон:</td>
+                <td width="80%">
+                    <input type="text" id="UserContactPhone" name="userContacts[0].ContactText" class="phone" style="width: 60%" />
+                    <input type="hidden" name="userContacts[0].Type" value="1" />
+                </td>
+            </tr>          
+            <tr>
+                <td width="20%">Email:</td>
+                <td width="80%">
+                    <input type="text" id="UserContactEmail" name="userContacts[1].ContactText" class="email" style="width: 60%" />
+                    <input type="hidden" name="userContacts[1].Type" value="0" />
+                </td>
+            </tr>            
+        </table>        
+    </div>
+
+    <div class="save">
+        <input type="submit" id="RegisterButton" name="RegisterButton" value="Зарегистрировать" />
+    </div>
+</form>    
+</div>

@@ -1,0 +1,266 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Регистрация аптеки. Шаг 1.", "${siteroot}/Register/Register"),
+									  ("Регистрация аптеки. Шаг 2", "")]} %>
+
+<%
+def WriteInputGroupHeader(localHeader as string) as string:
+%>
+	<tr>
+		<td class="InputGroupHeader" colspan="2">
+			${localHeader}
+		</td>
+	</tr>
+<%
+end
+
+def WriteLabelAndEditControle(labelText as string, editControlText as string) as string:
+	%>
+	<tr>
+		<td style="width: 30%">
+			${labelText}
+		</td>
+		<td style="width: 70%">
+			${editControlText}
+		</td>
+	</tr>
+	<%
+end
+%>
+
+<% component CaptureFor, {"id" : "Title"}:%>
+	Регистрация клиента, шаг 2: Заполнения информации о плательщике
+<% end %>
+
+<script>
+	document.observe("dom:loaded", function() {
+		SetupCalendarElements();
+		
+		if ($('PaymentOptions_WorkForFree') != null)
+		{
+			$('PaymentOptions_WorkForFree').observe("change", function() {
+				
+				if (checkBox.checked)
+				{
+					$('CalendarInputField0').disable();
+					$('PaymentOptions_Comment').disable();
+				}
+				else
+				{
+					$('CalendarInputField0').enable();
+					$('PaymentOptions_Comment').enable();
+				}
+			});
+		}
+	
+		Validation.add("CommentValidator", "Клиент слишком долго работает бесплатно, нужно указать причину", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+				
+			if (!$("PaymentOptions_Comment").empty())
+				return true;
+			
+			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
+		});		
+		
+		Validation.add("CheckDate", "Не корректная дата", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+		
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate != null;
+		});
+		
+		Validation.add("DateInFuture", "Дата начала платного периода меньше текущей", function(v){
+		
+			var checkBox = $('PaymentOptions_WorkForFree');
+			if (checkBox != null && $('PaymentOptions_WorkForFree').checked)
+				return true;
+		
+			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
+			return paymentPeriodBeginDate >= Date.today();
+		});		
+
+		new Validation("PayerInfo");
+	});
+</script>
+
+<h3>
+	Реистрация клиента, шаг 2: Заполнения информации о плательщике
+</h3>
+
+<form id="PayerInfo" action="registered.rails" method="post">
+	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
+	<input type="hidden" name="clientCode" value="${clientCode}" />
+	${FormHelper.HiddenField("Instance.PayerID")}
+
+<table>
+	${WriteInputGroupHeader("Общая информация")}
+
+					
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
+													"Краткое наименование:"), 
+								FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
+												
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
+													"Полное наименование:"), 
+								FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
+												
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+													"Юридический адрес:"), 
+								FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
+													"ИНН:"), 
+								FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
+												
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
+													"КПП:"), 
+								FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+																		
+	<%
+	contactGroupIndex = 0
+	component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:
+		section ContactGroupHeader:
+		%>
+			<tr>
+				<% if contactGroupIndex == 0: %>
+					<td class="InputGroupHeader">
+						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+					</td>
+					<td class="InputGroupHeader">
+						${ContactGroupName}
+					</td>
+				<% else: %>
+					<td class="InputGroupHeader" colspan="2">
+						${ContactGroupName}
+					</td>
+				<% end %>
+			</tr>
+		<% 
+							contactGroupIndex++;
+		end
+		section Item:
+		%>
+			<tr>
+				<td>
+					${Label}:
+				</td>
+				<td>
+					${Value}
+				</td>
+			</tr>
+		<% 
+		end
+		section Person:
+		%>
+				<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+		<%
+		end
+		section ContactGroupHeaderLink:
+		%>
+				<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+		<%
+		end
+	end
+	%>
+																		
+		${WriteInputGroupHeader("Опции выставки счета")}
+					
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
+														"Выставлять счет:"), 
+									FormHelper.Select("Instance.AutoInvoice", 
+													  {1:"Автоматически", 0:"По запросу"},
+													  {"value":"Key", "text":"Value"}))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", 
+														"Категория счета:"), 
+									FormHelper.Select("Instance.DetailInvoice", 
+													  {0:"Стандартный", 1:"Детализированный"},
+													  {"value":"Key", "text":"Value"}))}
+																  
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", 
+																	"Периодичность выставления счетов:"), 
+									FormHelper.Select("Instance.PayCycle", 
+													  {0:"Помесячно", 1:"Поквартально"}, 
+													  {"value":"Key", "text":"Value"}))}
+
+		${WriteInputGroupHeader("Доставка корреспонденции")}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressCountry", 
+														"Страна:"), 
+									FormHelper.TextField("Instance.ActualAddressCountry", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressIndex", 
+														"Индекс:"), 
+									FormHelper.TextField("Instance.ActualAddressIndex", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressProvince", 
+														"Область:"), 
+									FormHelper.TextField("Instance.ActualAddressProvince", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressTown", 
+														"Город:"), 
+									FormHelper.TextField("Instance.ActualAddressTown", {"class" : "BillingInput"}))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressRegion", 
+														"Район:"), 
+									FormHelper.TextField("Instance.ActualAddressRegion", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressStreet", 
+														"Улица:"), 
+									FormHelper.TextField("Instance.ActualAddressStreet", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressHouse", 
+														"Дом:"), 
+									FormHelper.TextField("Instance.ActualAddressHouse", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressOffice", 
+														"Офис:"), 
+									FormHelper.TextField("Instance.ActualAddressOffice", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeforeNamePrefix", 
+														"Префикс перед \"Кому\":"), 
+									FormHelper.TextField("Instance.BeforeNamePrefix", {"class" : "BillingInput"}))}
+												
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
+														"Надпись после \"Кому\":"), 
+									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
+									
+		${WriteInputGroupHeader("Условия оплаты")}
+		
+	<tr>
+		<td colspan="2">
+			<fieldset>
+				<% if admin.CanRegisterClientWhoWorkForFree: %>
+				<legend>			
+					${FormHelper.LabelFor("PaymentOptions.WorkForFree", "Клиент обслуживается бесплатно:")}
+					${FormHelper.CheckboxField("PaymentOptions.WorkForFree")}
+				</legend>
+				<% end %>
+				<div>
+					${FormHelper.LabelFor("PaymentOptions.PaymentPeriodBeginDate", "Дата начала платного периода:")}
+					<br>
+					${FormHelper.TextFieldValue("PaymentOptions.PaymentPeriodBeginDate", PaymentOptions.PaymentPeriodBeginDate.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
+					<input type="button" class="CalendarInput" />
+				</div>
+				<div>
+				${FormHelper.LabelFor("PaymentOptions.Comment", "Комментарий:")}
+				<br>
+				${FormHelper.TextArea("PaymentOptions.Comment", {"rows":"20", "class" : "BillingInput CommentValidator" })}
+				</div>
+			</fieldset>
+		</td>
+	</tr>		
+	<tr>
+		<tr style="text-align:right">
+			<td colspan="2">
+			${FormHelper.Submit("Сохранить")}
+		</td>
+	</tr>		
+</table>
+</form>

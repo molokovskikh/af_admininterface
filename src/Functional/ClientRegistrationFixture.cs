@@ -7,7 +7,7 @@ namespace Functional
 	[TestFixture]
 	public class ClientRegistrationFixture : WatinFixture
 	{
-		[Test]
+		[Test, Ignore("Устарел. Удалить")]
 		public void SetExistsBilingTest()
 		{
 			using(var browser = Open("main/index"))

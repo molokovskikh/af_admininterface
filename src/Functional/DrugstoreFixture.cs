@@ -7,6 +7,7 @@ using Common.Tools;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
+using System.Threading;
 
 namespace Functional
 {
@@ -186,12 +187,13 @@ namespace Functional
 		[Test]
 		public void Try_to_send_message()
 		{
-			using (var browser = new IE(BuildTestUrl("client/3616")))
+			var testClient = DataMother.CreateTestClient();
+			using (var browser = new IE(BuildTestUrl("client/" + testClient.Id)))
 			{
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 				browser.Button(Find.ByValue("Принять")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
-				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/" + testClient.Id));
 			}
 		}
 
@@ -214,33 +216,44 @@ namespace Functional
 		[Test]
 		public void After_password_change_message_should_be_added_to_history()
 		{
-			ClientInfoLogEntity.MessagesForClient(Client.Find(3616u)).Each(e => e.Delete());
+			var testClient = DataMother.CreateTestClientWithUser();
+			testClient.FullName = "Test full name";
+			testClient.Users[0].Name = "Test user for password change";
+			testClient.Users[0].Update();
+			testClient.Update();
+			ClientInfoLogEntity.MessagesForClient(Client.Find(testClient.Id)).Each(e => e.Delete());
 
-			using(var browser = Open("client/3616"))
+			using(var browser = Open("client/" + testClient.Id))
 			{
-				browser.Link(Find.ByText("KvasovT")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Изменение пароля пользователя KvasovT [Клиент: ТестерК2]")))
-				{
+				browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
+				browser.Link(Find.ByText("Изменить пароль")).Click();
+				var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", testClient.Users[0].Login, testClient.FullName);
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(title)))
+				{					
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.Text, Text.Contains("Пароль успешно изменен"));
+					Assert.That(openedWindow.ContainsText("Пароль успешно изменен"));
 				}
-
 				browser.Refresh();
-				Assert.That(browser.Text, Text.Contains("$$$Пользователь KvasovT. Платное изменение пароля: Тестовое изменение пароля"));
+				var checkText = String.Format("$$$Пользователь {0}. Платное изменение пароля: Тестовое изменение пароля", testClient.Users[0].Login);
+				Assert.That(browser.Text, Text.Contains(checkText));
 			}
 		}
 
 		[Test]
 		public void Try_to_update_general_info()
 		{
-			using (var browser = new IE(BuildTestUrl("client/3616")))
+			var testClient = DataMother.CreateTestClient();
+			testClient.FullName = "Full name for test update general info";
+			testClient.Name = "Name for test update general info";
+			testClient.Update();
+			using (var browser = new IE(BuildTestUrl("client/" + testClient.Id)))
 			{
-				browser.Input<Client>(client => client.FullName, "ТестерК2");
-				browser.Input<Client>(client => client.Name, "ТестерК2");
+				browser.Input<Client>(client => client.FullName, testClient.FullName);
+				browser.Input<Client>(client => client.Name, testClient.Name);
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
-				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/3616"));
+				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/" + testClient.Id));
 			}
 		}
 

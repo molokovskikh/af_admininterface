@@ -88,9 +88,16 @@ namespace Functional
 		[Test]
 		public void ViewUpdateLogFromUserPage()
 		{
-			var uri = String.Format("Logs/UpdateLog.rails?userId={0}&beginDate=01.07.2009&endDate=15.01.2010", GetId(typeof(User)));			
+			var uri = String.Format("Logs/UpdateLog.rails?userId={0}", GetId(typeof(User)));			
 			using (var browser = new IE(BuildTestUrl(uri)))
 			{
+				var calendarFrom = browser.Div("beginDateCalendarHolder");
+				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp();
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
+
 				CheckCommonColumnNames(browser);
 				Assert.That(browser.Text, Is.StringContaining("Тип обновления"));
 				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
@@ -101,9 +108,18 @@ namespace Functional
 		[Test]
 		public void ViewUpdateLogFromClientPage()
 		{
-			var uri = String.Format("Logs/UpdateLog.rails?clientCode={0}&beginDate=01.07.2009&endDate=15.01.2010", GetId(typeof(Client)));
+			var uri = String.Format("Logs/UpdateLog.rails?clientCode={0}", GetId(typeof(Client)));
 			using (var browser = new IE(BuildTestUrl(uri)))
 			{
+				var calendarFrom = browser.Div("beginDateCalendarHolder");
+				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp(); 
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
+
+				browser.Button(Find.ByValue("Показать")).Click();
+
 				CheckCommonColumnNames(browser);
 				Assert.That(browser.Text, Is.StringContaining("Пользователь"));
 				Assert.That(browser.Text, Is.StringContaining("Тип обновления"));

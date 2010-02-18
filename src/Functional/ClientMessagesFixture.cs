@@ -7,6 +7,8 @@ using Castle.ActiveRecord;
 using NUnit.Framework;
 
 using WatiN.Core;
+using Functional.ForTesting;
+using System;
 
 namespace Functional
 {
@@ -16,7 +18,7 @@ namespace Functional
 		[Test]
 		public void User_can_send_message_to_client()
 		{
-			List<ClientMessage> messages;
+			List<ClientMessage> messages = null;
 
 			using (new SessionScope())
 			{
@@ -29,7 +31,8 @@ namespace Functional
 				}
 			}
 
-			using (var browser = new IE(BuildTestUrl("Billing/edit?clientCode=2575")))
+			var uri = String.Format("Billing/edit?clientCode={0}", 2575u);
+			using (var browser = new IE(BuildTestUrl(uri)))
 			{
 				browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText("Тестовое сообщение");
 				browser.Button(Find.ByValue("Отправить сообщение")).Click();

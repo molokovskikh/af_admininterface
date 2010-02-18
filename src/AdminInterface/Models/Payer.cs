@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Web.Ui.Models;
@@ -153,6 +155,39 @@ where cd.firmcode = :ClientCode")
 			{
 				sessionHolder.ReleaseSession(session);
 			}
+		}
+
+		public static IEnumerable<Payer> GetLikeAvaliable(string searchPattern)
+		{
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = sessionHolder.CreateSession(typeof(Payer));
+			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
+			var allowViewDrugstore = SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore);
+			try
+			{
+				var filter = String.Empty;
+				if (!allowViewDrugstore)
+					filter += " and FirmType <> 1 ";
+				if (!allowViewSuppliers)
+					filter += " and FirmType <> 0 ";
+				var sql = @"
+SELECT  {Payer.*}
+FROM Future.Clients as cd
+	JOIN billing.payers {Payer} ON cd.PayerId = {Payer}.PayerId
+WHERE   cd.regioncode & :AdminRegionCode > 0 
+        AND Status = 1 
+        AND {Payer}.ShortName like :SearchText " + filter + @"  
+ORDER BY {Payer}.shortname;";
+				var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
+					.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
+                    .SetParameter("SearchText", "%" + searchPattern  + "%")
+					.List<Payer>().Distinct();
+				return resultList;
+			}
+			finally
+			{
+				sessionHolder.ReleaseSession(session);
+			}			
 		}
 
 		public Payment[] FindBills(Period period)

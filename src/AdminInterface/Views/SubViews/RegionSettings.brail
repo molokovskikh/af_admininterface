@@ -1,0 +1,108 @@
+﻿<script>
+    jQuery(document).ready(
+        function() { addDefaultRegions(); }
+    );
+    
+    function ShowRegions()
+    {
+        if (jQuery("#NonDefaultRegions").children().size() == 0)
+        {
+            // Добавляем к регионам по умолчанию остальные регионы
+            addNonDefaultRegions();            
+        }
+        else
+        {
+            // Оставляем только регионы по умолчанию, остальные удаляем
+            removeNonDefaultRegions();            
+        }
+    }
+    
+    function addDefaultRegions()
+    {
+            var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
+            jQuery.get("${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId,
+                function(html) {
+                    jQuery("#DefaultRegions").append(html);
+                }
+            );          
+    }
+
+    function addNonDefaultRegions()
+    {
+        var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
+        jQuery.get("${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId + 
+            "&showDefaultRegions=false&showNonDefaultRegions=true",
+            function(html) {
+                jQuery("#NonDefaultRegions").append(html);
+            }
+        );        
+        jQuery("#ShowRegionsLink")[0].innerHTML = "Показать только регионы по умолчанию";
+    }
+    
+    function removeNonDefaultRegions()
+    {
+        removeAllChildren("NonDefaultRegions");
+        jQuery("#ShowRegionsLink")[0].innerHTML = "Показать все регионы";
+    }
+    
+    function removeAllRegions()
+    {
+        removeNonDefaultRegions();
+        removeAllChildren("DefaultRegions");
+    }
+    
+    function removeAllChildren(selector)
+    {
+        var elem = document.getElementById(selector);
+        var count = elem.childNodes.length;
+        for (var i = 0; i < count; i++)
+        {
+            elem.removeChild(elem.childNodes[0]);
+        }
+    }
+    
+    function OnSelectedHomeRegionChange()
+    {
+        removeAllRegions();
+        var homeRegionId = jQuery('select#comboBoxHomeRegion').val();   
+        addDefaultRegions();
+    }
+</script>
+
+<div class="block">
+    <h3>Региональная настройка</h3>
+    <table cellpadding="5" width="100%">
+        <tr>            
+            <td colspan="3">Домашний регион:<br />
+                <select name="homeRegion" id="comboBoxHomeRegion" onchange="OnSelectedHomeRegionChange()">
+                    <% 
+                    isHomeRegion = false;
+                    for i,region in enumerate(regions): 
+                        isHomeRegion = (i == 0);
+                    %>                        
+                        <option id="${region.Id}region" value="${region.Id}" ${"selected" if (isHomeRegion) }>${region.Name}</option>
+                    <% 
+                    end 
+                    %>
+                </select>
+            </td>
+        </tr>
+		<tr>						
+            <td colspan = "3" id="RegionList">
+				<table id="RegionsTable" width="100%" border="0">
+					<tr valign="top"> 
+						<th width="60%" align="left">Регион</th> 
+						<th width="20%" align="center">Получать обзор</th>
+						<th width="20%" align="center">Доступен для заказа</th>
+					</tr>
+					<tr><td id="DefaultRegions" name="DefaultRegions" colspan="3"></td></tr>
+					<tr><td id="NonDefaultRegions" name="NonDefaultRegions" colspan="3"></td></tr>
+				</table>	                    
+            </td>
+        </tr>
+        <tr><td colspan="3" align="left">
+			<a href="javascript:" id="ShowRegionsLink" onclick="ShowRegions()">Показать все регионы</a>
+		</td></tr>	                
+    </table>
+</div>
+	        

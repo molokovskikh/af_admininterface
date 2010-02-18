@@ -54,7 +54,8 @@ uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${
 		<td valign=top>
 			<p>
 				<% if admin.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore): %>
-				<a href="${siteroot}/register.aspx">Регистрация клиентов</a>
+				<a href="${siteroot}/Register/Register.rails">Регистрация клиентов</a>
+				<!--<a href="${siteroot}/register.aspx">Регистрация клиентов</a>-->
 				<% else: %>
 				Регистрация клиентов
 				<% end %>
