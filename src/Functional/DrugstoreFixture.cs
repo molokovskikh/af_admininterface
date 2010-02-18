@@ -16,29 +16,26 @@ namespace Functional
 		[Test]
 		public void Try_to_send_email_notification()
 		{
-			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
+			using (var browser = new IE(BuildTestUrl(String.Format("client/DrugstoreSettings.rails?clientId=2575"))))
 			{
 				browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
-				Assert.That(browser.ContainsText("Конфигурация клиента"));
+				Assert.That(browser.ContainsText("Уведомления отправлены"));
 			}
 		}
 
 		[Test]
 		public void Try_to_change_home_region_for_drugstore()
 		{
-			using (var browser = new IE(BuildTestUrl("manageret.aspx?cc=2575")))
+			using (var browser = new IE(BuildTestUrl("client/DrugstoreSettings.rails?clientId=2575")))
 			{
 				var homeRegionSelect = GetHomeRegionSelect(browser);
 				var changeTo = homeRegionSelect.Options.Skip(1).First(o => o.Value != homeRegionSelect.SelectedOption.Value).Text;
 				homeRegionSelect.Select(changeTo);
-				browser.Button(b => b.Value.Equals("Применить")).Click();
+				browser.Button(b => b.Value.Equals("Сохранить")).Click();
 				Assert.That(browser.ContainsText("Сохранено"), Is.True);
-				Assert.That(GetHomeRegionSelect(browser).SelectedOption.Text, Is.EqualTo(changeTo));
-
-				//перезагружаем, потому что иначе увидим data bind
-				browser.GoTo(browser.Url);
-				browser.Refresh();
-				Assert.That(GetHomeRegionSelect(browser).SelectedOption.Text, Is.EqualTo(changeTo));
+				browser.Link(Find.ByText("Настройка")).Click();
+				var selectedText = GetHomeRegionSelect(browser).SelectedOption.Text;
+				Assert.That(selectedText, Is.EqualTo(changeTo));
 			}
 		}
 
@@ -51,44 +48,89 @@ namespace Functional
 				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
 
-				var workRegionMoskow = GetWorkRegion(browser, "Курск");
-				Assert.That(workRegionMoskow.Checked, Is.False);
-				workRegionMoskow.Checked = true;
+				var workRegion = GetWorkRegion(browser, "Курск");
+				Assert.That(workRegion.Checked, Is.False);				
+				workRegion.Checked = true;
 				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
 
-				var orderRegionMoskow = GetOrderRegion(browser, "Курск");
-				Assert.That(orderRegionMoskow.Checked, Is.False);
-				orderRegionMoskow.Checked = true;
+				var orderRegion = GetOrderRegion(browser, "Липецк");
+				Assert.That(orderRegion.Checked, Is.False);
+				orderRegion.Checked = true;
 				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
 
-				browser.Button(b => b.Value == "Применить").Click();
+				browser.Button(b => b.Value == "Сохранить").Click();
+				Assert.That(browser.ContainsText("Сохранено"), Is.True);
+				browser.Link(Find.ByText("Настройка")).Click();
+
+				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
+				Assert.That(GetWorkRegion(browser, "Липецк").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
+				Assert.That(GetOrderRegion(browser, "Липецк").Checked, Is.True);
+			}
+		}
+
+		[Test]
+		public void Show_all_regions()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+				var countVisibleRegions = browser.Table("RegionsTable").TableRows.Count();
+				
+				browser.Link(Find.ByText("Показать все регионы")).Click();
+				var countAllRegions = browser.Table("RegionsTable").TableRows.Count();
+				Assert.That(countVisibleRegions, Is.LessThan(countAllRegions));
+
+				browser.Link(Find.ByText("Показать только регионы по умолчанию")).Click();
+				var count = browser.Table("RegionsTable").TableRows.Count();
+				Assert.That(count, Is.EqualTo(countVisibleRegions));
+			}
+		}
+
+		[Test]
+		public void Change_common_settings()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Конфигурация клиента"));
+
+				// "Скрывать клиента в интерфейсе поставщика"
+				var checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
+				Assert.That(checkBoxHide.Checked, Is.False);
+				checkBoxHide.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
 				Assert.That(browser.ContainsText("Сохранено"), Is.True);
 
-				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
-				Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
-				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
-				Assert.That(GetOrderRegion(browser, "Курск").Checked, Is.True);
+				browser.Link(Find.ByText("Настройка")).Click();
+				checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
+				Assert.That(checkBoxHide.Checked, Is.True);
+				// "Сотрудник АК Инфорум"
+				var checkBoxInforoomEmployee = browser.Div(Find.ById("commonSettings")).CheckBoxes[1];
+				checkBoxInforoomEmployee.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				Assert.That(browser.ContainsText("Сохранено"), Is.True);
 
-
-				//перезагружаем, потому что иначе увидим data bind
-				browser.GoTo(browser.Url);
-				browser.Refresh();
-				Assert.That(GetWorkRegion(browser, "Воронеж").Checked, Is.True);
-				Assert.That(GetWorkRegion(browser, "Курск").Checked, Is.True);
-				Assert.That(GetOrderRegion(browser, "Воронеж").Checked, Is.True);
-				Assert.That(GetOrderRegion(browser, "Курск").Checked, Is.True);
-
+				browser.Link(Find.ByText("Настройка")).Click();
+				checkBoxHide = browser.Div(Find.ById("commonSettings")).CheckBoxes[0];
+				Assert.That(checkBoxHide.Checked, Is.True);
+				checkBoxInforoomEmployee = browser.Div(Find.ById("commonSettings")).CheckBoxes[1];
+				Assert.That(checkBoxInforoomEmployee.Checked, Is.True);
 			}
 		}
 
 		private CheckBox GetWorkRegion(IE browser, string name)
 		{
-			return ((TableCell) browser.Table("ctl00_MainContentPlaceHolder_WRList").Label(l => l.Text.Trim() == name).Parent).CheckBoxes.First();
+			return ((TableCell)(browser.Table("RegionsTable").TableCell(Find.ByText(name)).NextSibling)).CheckBoxes.First();
 		}
 
 		private CheckBox GetOrderRegion(IE browser, string name)
 		{
-			return ((TableCell) browser.Table("ctl00_MainContentPlaceHolder_OrderList").Label(Find.ByText(name)).Parent).CheckBoxes.First();
+			return ((TableCell)(browser.Table("RegionsTable").TableCell(Find.ByText(name)).NextSibling.NextSibling)).CheckBoxes.First();
 		}
 
 		[Test]
@@ -205,7 +247,7 @@ namespace Functional
 
 		private SelectList GetHomeRegionSelect(IE browser)
 		{
-			return (SelectList)browser.Label(l => l.Text.Contains("Домашний регион")).NextSibling;
+			return browser.SelectList(Find.ById("comboBoxHomeRegion"));
 		}
 	}
 }

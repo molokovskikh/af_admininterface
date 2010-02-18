@@ -16,6 +16,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
 using log4net;
+using AdminInterface.Services;
 
 namespace AdminInterface.Controllers
 {
@@ -27,6 +28,7 @@ namespace AdminInterface.Controllers
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
 		Layout("GeneralWithJQuery"),
+		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
@@ -87,6 +89,34 @@ namespace AdminInterface.Controllers
 
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectToReferrer();
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void UpdateDrugstore([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
+			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
+			[DataBind("regionsSettings")] RegionSettings[] regionSettings)
+		{
+			foreach (var setting in regionSettings)
+			{
+				if (setting.IsAvaliableForBrowse)
+					client.MaskRegion |= setting.Id;
+				else
+					client.MaskRegion &= ~setting.Id;
+                if (setting.IsAvaliableForOrder)
+					drugstore.OrderRegionMask |= setting.Id;
+				else
+					drugstore.OrderRegionMask &= ~setting.Id;
+			}
+			SecurityContext.Administrator.CheckClientPermission(client);
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
+																	 Request.UserHostAddress);
+				client.Update();
+				drugstore.Update();
+			}
+			Flash["Message"] = Message.Notify("Сохранено");
+			RedirectToUrl(String.Format("../client/{0}", client.Id));
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -165,7 +195,7 @@ where `from` = :phone")
 			{
 				foreach (var user in client.GetUsers())
 				{
-					var file = String.Format(@"U:\wwwroot\ios\Results\{0}.zip", user.Id);
+					var file = String.Format(Settings.Default.UserPreparedDataFormatString, user.Id);
 					if (File.Exists(file))
 						File.Delete(file);
 				}
@@ -195,6 +225,28 @@ where `from` = :phone")
 				client.ResetUin();
 				RedirectToReferrer();
 			}
+		}
+
+		[AccessibleThrough(Verb.Get)]
+		public void DrugstoreSettings(uint clientId)
+		{
+			var client = Client.Find(clientId);
+			var regions = Region.FindAll();
+			var drugstore = Models.DrugstoreSettings.Find(clientId);
+			PropertyBag["client"] = client;
+			PropertyBag["regions"] = regions;
+			PropertyBag["drugstore"] = drugstore;
+		}
+
+		public void NotifySuppliers(uint clientId)
+		{
+			var client = Client.Find(clientId);
+			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client);
+			Mailer.ClientRegistrationResened(client);
+			CancelView();
+			CancelLayout();
+			Flash["Message"] = Message.Notify("Уведомления отправлены");
+			RedirectToReferrer();
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
@@ -14,6 +15,9 @@ namespace AdminInterface.Models
 
 		[Property("Region")]
 		public virtual string Name { get; set; }
+
+		[Property("DefaultShowRegionMask")]
+		public virtual UInt64 DefaultShowRegionMask { get; set; }
 
 		public static IList<Region> GetRegionsForClient(string clientName)
 		{
@@ -40,5 +44,14 @@ ORDER BY IsAll Desc, {Region.Name};")
 		{
 			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
 		}
+	}
+
+	public class RegionSettings
+	{
+		public ulong Id { get; set; }
+
+		public bool IsAvaliableForOrder { get; set; }
+
+		public bool IsAvaliableForBrowse { get; set; }
 	}
 }

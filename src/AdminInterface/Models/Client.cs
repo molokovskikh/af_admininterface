@@ -88,6 +88,50 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
+		public virtual bool IsHiddenForProducer
+		{
+			get
+			{
+				if (!IsDrugstore())
+					return false;
+				var drugstore = DrugstoreSettings.Find(Id);
+				return (drugstore.InvisibleOnFirm == DrugstoreType.Hidden);
+			}
+			set
+			{
+				if (!IsDrugstore())
+					return;
+                var val = value ? 2 : 0;
+				var drugstore = DrugstoreSettings.Find(Id);
+				var tmp = drugstore.InvisibleOnFirm == DrugstoreType.Hidden;				
+				if (tmp != value)
+				{
+					drugstore.InvisibleOnFirm = DrugstoreType.Standart;
+					var updateSql = @"
+update 
+	intersection, pricesdata 
+set 
+	intersection.invisibleonfirm = :InvisibleOnFirm";
+					if (value)
+					{
+						drugstore.InvisibleOnFirm = DrugstoreType.Hidden;
+						updateSql += ", DisabledByFirm = if(PriceType = 2, 1, 0), InvisibleOnClient = if(PriceType = 2, 1, 0)";
+					}
+					updateSql += @"
+where 
+	intersection.pricecode = pricesdata.pricecode and 
+	intersection.clientcode = :ClientCode";
+
+					drugstore.Update();
+
+					ArHelper.WithSession(session => session.CreateSQLQuery(updateSql)
+						.SetParameter("ClientCode", Id)
+						.SetParameter("InvisibleOnFirm", val)
+						.ExecuteUpdate());
+				}
+			}
+		}
+
 		public virtual IEnumerable<User> GetUsers()
 		{
 			foreach (var user in Users)

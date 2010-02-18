@@ -5,8 +5,8 @@ namespace AdminInterface.Models
 {
 	public enum DrugstoreType
 	{
-		Standart,
-		Hidden
+		Standart = 0,
+		Hidden = 2
 	}
 
 	[ActiveRecord("usersettings.RetClientsSet")]
