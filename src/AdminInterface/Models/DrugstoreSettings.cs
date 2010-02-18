@@ -32,6 +32,9 @@ namespace AdminInterface.Models
 		public uint? FirmCodeOnly { get; set; }
 
 		[Property]
+		public ulong WorkRegionMask { get; set; }
+
+		[Property]
 		public ulong OrderRegionMask { get; set; }
 
 		[Property(NotNull = true)]

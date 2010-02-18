@@ -350,5 +350,71 @@ namespace Functional
 			var countContacts = ContactInformationFixture.GetCountContactsInDb(client.Users[0].ContactGroup);
 			Assert.That(countContacts, Is.EqualTo(1));
 		}
+
+		[Test]
+		public void TestUserRegions()
+		{
+				var client = DataMother.CreateTestClientWithUser();
+
+				var user = client.Users[0];
+				var setting = DrugstoreSettings.Find(client.Id);
+
+				client.MaskRegion = 7;
+				client.Save();
+				setting.OrderRegionMask = 7;
+				setting.Save();
+				user.WorkRegionMask = 2;
+				user.OrderRegionMask = 1;
+				user.Save();
+
+				using (var browser = Open("users/{0}/edit", user.Id))
+				{
+					Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
+					Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
+					Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
+					Assert.IsFalse(browser.CheckBox("WorkRegions[3]").Exists);
+
+					Assert.IsFalse(browser.CheckBox("OrderRegions[0]").Checked);
+					Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Checked);
+					Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Checked);
+					Assert.IsFalse(browser.CheckBox("OrderRegions[3]").Exists);
+
+					browser.CheckBox("WorkRegions[1]").Checked = true;
+					browser.CheckBox("OrderRegions[0]").Checked = true;
+					browser.Button(Find.ByValue("Сохранить")).Click();
+
+					using (new SessionScope())
+					{
+						client = Client.Find(client.Id);
+						user = client.Users[0];
+					}
+					Assert.AreEqual(3, user.WorkRegionMask);
+					Assert.AreEqual(3, user.OrderRegionMask);
+
+					browser.CheckBox("WorkRegions[1]").Checked = false;
+					browser.CheckBox("OrderRegions[0]").Checked = false;
+					browser.Button(Find.ByValue("Сохранить")).Click();
+
+					using (new SessionScope())
+					{
+						client = Client.Find(client.Id);
+						user = client.Users[0];
+					}
+					Assert.AreEqual(2, user.WorkRegionMask);
+					Assert.AreEqual(1, user.OrderRegionMask);
+
+					client.MaskRegion = 31;
+					client.Save();
+					setting.OrderRegionMask = 3;
+					setting.Save();
+
+					browser.Refresh();
+					Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
+					Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
+					Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);
+					Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
+					Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
+				}
+		}
 	}
 }

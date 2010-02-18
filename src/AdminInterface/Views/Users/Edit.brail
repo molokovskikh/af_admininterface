@@ -199,6 +199,35 @@
 			</div>
 		</div>
 		
+		<div class="block">
+			<h3>Региональные настройки</h3>
+			<table style="width: 100%;">
+				<tr>
+					<td><h4>Регионы работы</h4></td>
+					<td><h4>Регионы заказа</h4></td>
+				</tr>
+				<tr>
+					<td valign="top">
+					<% for i, region in enumerate(AllowWorkRegions): %>
+						<div>
+							<input type="checkbox" name="WorkRegions[${i}]" id="WorkRegions[${i}]" ${"checked" if (user.WorkRegionMask & region.Id) > 0} value="${region.Id}"/>
+							<label for="WorkRegions[${i}]" >${region.Name}</label>
+						</div>
+					<% end %>
+					</td>
+				
+					<td valign="top">
+					<% for i, region in enumerate(AllowOrderRegions): %>
+						<div>
+							<input type="checkbox" name="OrderRegions[${i}]" id="OrderRegions[${i}]" ${"checked" if (user.OrderRegionMask & region.Id) > 0} value="${region.Id}"/>
+							<label for="OrderRegions[${i}]" >${region.Name}</label>
+						</div>
+					<% end %>
+					</td>
+				</tr>
+			</table>
+		</div>
+		
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>

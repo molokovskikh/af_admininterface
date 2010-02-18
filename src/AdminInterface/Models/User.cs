@@ -62,6 +62,12 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
 
+		[Property]
+		public virtual ulong WorkRegionMask { get; set; }
+
+		[Property]
+		public virtual ulong OrderRegionMask { get; set; }
+
 		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
 		public virtual Client Client { get; set; }
 

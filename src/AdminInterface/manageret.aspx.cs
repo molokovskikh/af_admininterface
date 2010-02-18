@@ -16,6 +16,7 @@ using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
+using Region=AdminInterface.Models.Region;
 
 namespace AddUser
 {
@@ -121,6 +122,9 @@ where cd.Id = ?clientCode";
 
 					if (currentWorkRegionMask != workRegionMask)
 					{
+						// Обновляем регионы у всех пользователей если они изменились у клиента
+						UpdateUsersRegions(workRegionMask, orderRegionMask, currentWorkRegionMask, currentOrderRegionMask);
+
 						updateCommand.CommandText =
 							@"
 UPDATE future.clients SET MaskRegion = ?workMask WHERE id = ?ClientCode;
@@ -193,6 +197,33 @@ where clientcode=Id and Id=?clientCode; ";
 
 			ResultL.ForeColor = Color.Green;
 			ResultL.Text = "Сохранено.";
+		}
+
+		private void UpdateUsersRegions(ulong workRegionMask, ulong orderRegionMask, ulong curWorkRegionMask, ulong curOrderRegionMask)
+		{
+			ulong maxRegion = Region.FindAll().Max(reg => reg.Id);
+
+			ulong workAddingMask = 0;
+			ulong orderAddingMask = 0;
+
+			for (ulong reg = 1; reg <= maxRegion; reg *= 2 )
+			{
+				if ((reg & workRegionMask) == 0 &&
+					(reg & curWorkRegionMask) > 0)
+					workAddingMask |= reg;
+
+				if ((reg & orderRegionMask) == 0 &&
+					(reg & curOrderRegionMask) > 0)
+					orderAddingMask |= reg;
+			}
+
+			var users = Client.Find(Convert.ToUInt32(ClientCode)).Users;
+			foreach (var user in users)
+			{
+				user.WorkRegionMask = (user.WorkRegionMask & curWorkRegionMask | workAddingMask);
+				user.OrderRegionMask = (user.OrderRegionMask & curOrderRegionMask | orderAddingMask);
+				user.Save();
+			}
 		}
 
 		protected void RegionDD_SelectedIndexChanged(object sender, EventArgs e)

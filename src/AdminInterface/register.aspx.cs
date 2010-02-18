@@ -220,6 +220,8 @@ ORDER BY region;";
 			var user = new User {
 				Client = client, 
 				Name = LoginTB.Text.Trim(),
+				WorkRegionMask = client.MaskRegion,
+				OrderRegionMask = DrugstoreSettings.Find(client.Id).OrderRegionMask,
 			};
 
 			if (PermissionsDiv.Visible)

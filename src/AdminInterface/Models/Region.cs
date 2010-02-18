@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
+using System;
 
 namespace AdminInterface.Models
 {
@@ -32,6 +34,11 @@ ORDER BY IsAll Desc, {Region.Name};")
 					.AddEntity(typeof (Region))
 					.SetParameter("UserName", clientName.Replace("ANALIT\\", ""))
 					.List<Region>());
+		}
+
+		public static Region[] GetRegionsByMask(ulong mask)
+		{
+			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
 		}
 	}
 }

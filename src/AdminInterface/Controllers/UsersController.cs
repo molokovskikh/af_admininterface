@@ -13,6 +13,7 @@ using Common.Tools;
 using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
+using System.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -89,6 +90,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 
+			var setting = DrugstoreSettings.Find(user.Client.Id);
+			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
+			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
+
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
 			else
@@ -100,8 +105,18 @@ namespace AdminInterface.Controllers
 
 		[AccessibleThrough(Verb.Post)]
 		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user,
-			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
+			[DataBind("WorkRegions")] ulong[] workRegions, 
+			[DataBind("OrderRegions")] ulong[] orderRegions,
+			[DataBind("contacts")] Contact[] contacts,
+			[DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
+			ulong temp = 0;
+			workRegions.Each(r => { temp += r; });
+			user.WorkRegionMask = temp;
+			temp = 0;
+			orderRegions.Each(r => { temp += r; });
+			user.OrderRegionMask = temp;
+
 			user.UpdateContacts(contacts, deletedContacts);
 			user.Update();
 			Flash["Message"] = new Message("Сохранено");
