@@ -124,12 +124,18 @@
 	        ${FormHelper.HiddenField("drugstore.Id")}
 	        <div class="block" id="commonSettings">
 	            <h3>Общая настройка</h3>
+	            
 	            <input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
 	            <input type="hidden" name="client.IsHiddenForProducer" value="false" />
 	            Скрыть клиента в интефрейсе поставщика<br />
+	            
 	            <input type="checkbox" name="drugstore.ServiceClient" value="true" ${"checked" if drugstore.ServiceClient } />
 	            <input type="hidden" name="drugstore.ServiceClient" value="false" />
 	            Сотрудник АК "Инфорум"<br />
+	            
+	            <input type="checkbox" name="drugstore.ManualComparison" value="true" ${"checked" if drugstore.ManualComparison } />
+	            <input type="hidden" name="drugstore.ManualComparison" value="false" />
+	            Разрешить сопоставление вручную в AnalitOnline<br />
 	        </div>
     	    
     	    <!--

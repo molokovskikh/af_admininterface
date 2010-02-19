@@ -37,6 +37,9 @@ namespace AdminInterface.Models
 		[Property]
 		public ulong OrderRegionMask { get; set; }
 
+		[Property]
+		public bool ManualComparison { get; set; }
+
 		[Property(NotNull = true)]
 		public string BasecostPassword { get; set; }
 

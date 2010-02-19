@@ -262,5 +262,26 @@ namespace Functional
 		{
 			return browser.SelectList(Find.ById("comboBoxHomeRegion"));
 		}
+
+		[Test]
+		public void ManageManualComparison()
+		{
+			var client = DataMother.CreateTestClient();
+			var drugstoreSettings = DrugstoreSettings.Find(client.Id);
+			var uri = BuildTestUrl("client/" + client.Id);
+			using (var browser = new IE(uri))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(drugstoreSettings.ManualComparison));
+				drugstoreSettings.ManualComparison = !drugstoreSettings.ManualComparison;
+				drugstoreSettings.SaveAndFlush();
+				browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked = drugstoreSettings.ManualComparison;				
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				browser.GoTo(browser.Url);
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(drugstoreSettings.ManualComparison));
+			}
+		}
 	}
 }
