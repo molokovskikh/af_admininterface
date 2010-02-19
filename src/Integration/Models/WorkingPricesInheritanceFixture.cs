@@ -30,8 +30,8 @@ namespace Integration.Models
 
 			using(new SessionScope())
 			{
-				parent.Setup(true);
-				child.Setup(true);
+				parent.Setup(client);
+				child.Setup(client);
 
 				ArHelper.WithSession(s => {
 					var prices = s.CreateSQLQuery(@"

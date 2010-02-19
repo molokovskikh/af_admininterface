@@ -29,7 +29,7 @@ namespace Functional
 					message.ShowMessageCount = 0;
 					message.Update();
 				}
-			}
+			}			
 
 			var uri = String.Format("Billing/edit?clientCode={0}", 2575u);
 			using (var browser = new IE(BuildTestUrl(uri)))

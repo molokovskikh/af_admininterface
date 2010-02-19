@@ -167,7 +167,7 @@ namespace AdminInterface.Models
 			return password;
 		}
 
-		public virtual void Setup(bool maintainPrices)
+		public virtual void Setup()
 		{
 			Login = "temporary-login";
 			Save();
@@ -175,19 +175,12 @@ namespace AdminInterface.Models
 			Update();
 			new AuthorizationLogEntity(Id).Create();
 			new UserUpdateInfo(Id).Create();
+		}
 
-			if (maintainPrices)
-				ArHelper.WithSession(s => {
-                    s.CreateSQLQuery(@"
-insert into Future.UserPrices(PriceId, UserId)
-select i.PriceId, u.Id
-from Future.Users u
-	join Future.Intersection i on i.ClientId = u.ClientId
-where u.Id = :UserId
-group by i.PriceId")
-				.SetParameter("UserId", Id)
-				.ExecuteUpdate();				
-			});
+		public virtual void Setup(Client client)
+		{
+			Setup();
+			AddPrices(client);
 		}
 
 		public virtual bool IsLocked
@@ -237,6 +230,7 @@ where uui.UserId = :userCode")
 				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
 				this.ContactGroup = group;
+				scope.VoteCommit();
 			}
 		}
 
@@ -259,9 +253,24 @@ where uui.UserId = :userCode")
 			{
 				var contact = ContactGroup.Contacts[i];
 				if ((contact.Type == ContactType.Email) && (!emails.Contains(contact.ContactText)))
-					emails += (i == 0) ? contact.ContactText : String.Format(", {0}", contact.ContactText);
+					emails += (String.IsNullOrEmpty(emails)) ? contact.ContactText : String.Format(", {0}", contact.ContactText);
 			}
 			return emails;
+		}
+
+		public virtual void AddPrices(Client client)
+		{
+			var sql = @"
+insert into Future.UserPrices(PriceId, UserId, RegionId)
+select i.PriceId, u.Id, i.RegionId
+from Future.Users u
+	join Future.Intersection i on i.ClientId = :ClientId
+where u.Id = :UserId";
+
+			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+				.SetParameter("UserId", Id)
+				.SetParameter("ClientId", client.Id)
+				.ExecuteUpdate());
 		}
 	}
 }

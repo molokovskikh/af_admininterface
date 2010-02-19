@@ -38,7 +38,7 @@ namespace Functional
 				Client = client,
 				Name = "test"
 			};
-			mainUser.Setup(true);
+			mainUser.Setup(client);
 			using(var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText(user.Login)).Click();
@@ -151,7 +151,13 @@ namespace Functional
 					s.CreateSQLQuery("select * from future.UserPrices where UserId = :userId")
 					.SetParameter("userId", user.Id)
 					.List());
+
+				var intersecionCount = Convert.ToUInt32(ArHelper.WithSession(s =>
+                    s.CreateSQLQuery("select count(*) from future.intersection where ClientId = :ClientId")
+                    .SetParameter("ClientId", client.Id)
+                    .UniqueResult()));
 				Assert.That(result.Count, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
+				Assert.That(result.Count, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
 			}
 		}
 

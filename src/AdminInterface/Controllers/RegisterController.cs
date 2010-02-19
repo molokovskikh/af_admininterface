@@ -357,7 +357,7 @@ WHERE   intersection.pricecode IS NULL
 				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
 					.Concat(UserPermission.GetDefaultPermissions()).ToList();
 			}
-			user.Setup(false);
+			user.Setup();
 			if ((contacts != null) && (contacts.Length > 0))
 			{
 				var contactGroup = client.ContactGroupOwner.AddContactGroup(ContactGroupType.General);

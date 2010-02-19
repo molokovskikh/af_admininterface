@@ -103,7 +103,7 @@ namespace Functional.ForTesting
 				Client = client,
 				Name = "test"
 			};
-			user.Setup(true);
+			user.Setup(client);
 			client.Users = new List<User> {user};
 			return client;
 		}

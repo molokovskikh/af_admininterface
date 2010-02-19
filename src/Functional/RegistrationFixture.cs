@@ -205,7 +205,7 @@ namespace Functional
 				Assert.That(passwordChange.UserName, Is.EqualTo(Environment.UserName));
 				Assert.That(passwordChange.TargetUserName, Is.EqualTo(user.Login));
 				Assert.That(passwordChange.SmtpId, Is.Not.EqualTo(0));
-				Assert.That(passwordChange.SentTo, Is.EqualTo(String.Format(_randomClientName + _mailSuffix)));
+				Assert.That(passwordChange.SentTo.Contains(String.Format(_randomClientName + _mailSuffix)), Is.True);
 				Assert.That(updateInfo, Is.Not.Null, "Не создали запись в UserUpdateInfo");
 			}
 		}		
