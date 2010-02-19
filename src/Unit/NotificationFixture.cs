@@ -5,6 +5,7 @@ using AdminInterface.Services;
 using NUnit.Framework;
 
 
+
 namespace Unit
 {
 	[TestFixture]
@@ -27,12 +28,13 @@ namespace Unit
 				BillingInstance = new Payer{ PayerID = 10},
 				Name = "Тестовый клиент",
 			};
-			var paymentOptions = new PaymentOptions{ WorkForFree = true };
+
+			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "Независимая копия" };
 			var userName = "test";
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				paymentOptions, "https://stat.analit.net/Adm");
+				paymentOptions, "https://stat.analit.net/Adm/");
 
 			Assert.That(_message, Is.Not.Null, "Сообщение не послано");
 			Assert.That(_message.To.Count, Is.EqualTo(1));
@@ -52,7 +54,6 @@ namespace Unit
 <br>
 Кем зарегистрирован: test
 <br>
-Независимая копия
 <br>
 Клиент обслуживается бесплатно".Replace(Environment.NewLine, "")));
 			Assert.That(_message.IsBodyHtml, Is.True);
@@ -71,7 +72,7 @@ namespace Unit
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				paymentOptions, "https://stat.analit.net/Adm");
+				paymentOptions, "https://stat.analit.net/Adm/");
 
 			Assert.That(_message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
@@ -84,7 +85,6 @@ namespace Unit
 <br>
 Кем зарегистрирован: test
 <br>
-Подчиненный клиент, тип подчинения Базовый
 <br>
 Дата начала платного периода: 01.01.2007
 <br>
@@ -103,7 +103,7 @@ namespace Unit
 
 			_service.SendNotificationToBillingAboutClientRegistration(client,
 				userName,
-				null, "https://stat.analit.net/Adm");
+				null, "https://stat.analit.net/Adm/");
 
 			Assert.That(_message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
@@ -115,8 +115,7 @@ namespace Unit
 Биллинг код: 10
 <br>
 Кем зарегистрирован: test
-<br>
-Подчиненный клиент, тип подчинения Базовый".Replace(Environment.NewLine, "")));
+<br>".Replace(Environment.NewLine, "")));
 		}
 	}
 }

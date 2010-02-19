@@ -74,9 +74,6 @@ namespace AdminInterface.Helpers
 
 		public static string GetApplicationUrl()
 		{
-//#if DEBUG
-//			return "http://test";
-//#endif
 			var request = HttpContext.Current.Request;
 			string result = request.Url.AbsoluteUri.Replace(request.Url.AbsolutePath, "") + request.ApplicationPath;
 			return result;

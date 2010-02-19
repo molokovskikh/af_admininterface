@@ -13,13 +13,12 @@ namespace AdminInterface.Test.ForTesting
 		static ForTest()
 		{
 			XmlConfigurator.Configure();
-			ActiveRecordStarter.Initialize(new[]
-			                                {
-			                                    Assembly.Load("AdminInterface"),
-			                                    Assembly.Load("Common.Web.Ui"),
-												Assembly.Load("Functional"),
-			                                },
-										   ActiveRecordSectionHandler.Instance);
+			if (!ActiveRecordStarter.IsInitialized)
+				ActiveRecordStarter.Initialize(new[] {
+                    Assembly.Load("AdminInterface"),
+                    Assembly.Load("Common.Web.Ui"),
+                    Assembly.Load("Functional"),
+				}, ActiveRecordSectionHandler.Instance);
 		}
 
 		public static Payer CreatePayer()
@@ -63,6 +62,14 @@ namespace AdminInterface.Test.ForTesting
 		}
 
 		public static void InitialzeAR()
-		{}
+		{
+			XmlConfigurator.Configure();
+			if (!ActiveRecordStarter.IsInitialized)
+				ActiveRecordStarter.Initialize(new[] {
+					Assembly.Load("AdminInterface"),
+					Assembly.Load("Common.Web.Ui"),
+					Assembly.Load("Functional"),
+				}, ActiveRecordSectionHandler.Instance);			
+		}
 	}
 }

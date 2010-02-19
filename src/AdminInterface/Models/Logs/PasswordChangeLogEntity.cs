@@ -4,6 +4,8 @@ using System.Linq;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
+using NHibernate.Criterion;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
@@ -17,6 +19,15 @@ namespace AdminInterface.Models.Logs
 		{
 			UserName = SecurityContext.Administrator.UserName;
 			ClientHost = SecurityContext.Administrator.GetHost();
+			TargetUserName = target;
+			LogTime = DateTime.Now;
+		}
+
+		// Используется только в тесте
+		public PasswordChangeLogEntity(string target, string userName, string hostName)
+		{
+			UserName = userName;
+			ClientHost = hostName;
 			TargetUserName = target;
 			LogTime = DateTime.Now;
 		}
@@ -44,10 +55,16 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<PasswordChangeLogEntity> GetByLogin(string login, DateTime beginDate, DateTime endDate)
 		{
-			return (from log in Queryable
-			        where log.TargetUserName == login && log.LogTime >= beginDate && log.LogTime <= endDate
-			        orderby log.LogTime
-			        select log).ToList();
+			IList<PasswordChangeLogEntity> entity = null;
+			ArHelper.WithSession(session => entity = session.CreateSQLQuery(@"
+select {PasswordChangeLogEntity.*} 
+from logs.passwordchange {PasswordChangeLogEntity}
+where LogTime >= :BeginDate and LogTime <= :EndDate and TargetUserName = :Login")
+					.AddEntity(typeof(PasswordChangeLogEntity))
+					.SetParameter("BeginDate", beginDate)
+					.SetParameter("EndDate", endDate)
+					.SetParameter("Login", login).List<PasswordChangeLogEntity>());
+			return entity;
 		}
 
 		public void SetSentTo(int smtpId, string emailsToNotify)
