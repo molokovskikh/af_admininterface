@@ -91,8 +91,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 
 			var setting = DrugstoreSettings.Find(user.Client.Id);
-			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
-			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
+			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy( reg => reg.Name);
+			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
 
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
