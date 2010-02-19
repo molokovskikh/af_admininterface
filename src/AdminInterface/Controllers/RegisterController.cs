@@ -155,7 +155,7 @@ namespace AdminInterface.Controllers
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)
-				log = SendRegistrationCard(log, newClient, newUser.Login, password, additionalEmailsForSendingCard);
+				log = SendRegistrationCard(log, newClient, newUser, password, additionalEmailsForSendingCard);
 			log.Save();
 
         	var sendBillingNotificationNow = true;
@@ -183,18 +183,18 @@ namespace AdminInterface.Controllers
 			RedirectToUrl(redirectTo);
         }
 
-		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, Client client, string username, string password, string additionalEmails)
+		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, Client client, User user, string password, string additionalEmails)
 		{
 			var mailTo = client.GetAddressForSendingClientCard();
 
 			var smtpid = ReportHelper.SendClientCard(client,
-				username,
+				user.Login,
 				password,
 				mailTo,
 				additionalEmails,
 				true);
 
-			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, additionalEmails));
+			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, user.GetEmails(), additionalEmails));
 			return log;
 		}
 
@@ -365,7 +365,9 @@ WHERE   intersection.pricecode IS NULL
 					if (!String.IsNullOrEmpty(contact.ContactText))
 						contactGroup.AddContact(contact.Type, contact.ContactText);
 				user.ContactGroup = contactGroup;
+				client.ContactGroupOwner.Save();
 			}
+			user.SaveAndFlush();
 			client.Users = new List<User> { user };
 			return user;
 		}		

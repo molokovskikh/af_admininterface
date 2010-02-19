@@ -251,5 +251,17 @@ where uui.UserId = :userCode")
 				AddContactGroup();
 			ContactGroup.UpdateContacts(contacts, deletedContacts);
 		}
+
+		public virtual string GetEmails()
+		{
+			var emails = String.Empty;
+			for (var i = 0; i < ContactGroup.Contacts.Count; i++)
+			{
+				var contact = ContactGroup.Contacts[i];
+				if ((contact.Type == ContactType.Email) && (!emails.Contains(contact.ContactText)))
+					emails += (i == 0) ? contact.ContactText : String.Format(", {0}", contact.ContactText);
+			}
+			return emails;
+		}
 	}
 }

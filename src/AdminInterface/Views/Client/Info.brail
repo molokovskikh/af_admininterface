@@ -71,7 +71,6 @@
 			<ul class="navigation-menu">
 				<li>
 					<% if Client.IsDrugstore(): %>
-						<!--<a ${"href=${siteroot}/manageret.aspx?cc=${Client.Id}" if admin.ManageDrugstore}>Настройка</a>-->
 						<a ${"href=${siteroot}/client/DrugstoreSettings.rails?clientId=${Client.Id}" if admin.ManageDrugstore}>Настройка</a>
 					<% else: %>
 						<a ${"href=${siteroot}/managep.aspx?cc=${Client.Id}" if admin.ManageSuppliers}>Настройка</a>

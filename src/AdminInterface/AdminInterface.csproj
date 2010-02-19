@@ -2,7 +2,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
@@ -276,13 +276,6 @@
     <Compile Include="managep.aspx.designer.cs">
       <DependentUpon>managep.aspx</DependentUpon>
     </Compile>
-    <Compile Include="manageret.aspx.cs">
-      <DependentUpon>manageret.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="manageret.aspx.designer.cs">
-      <DependentUpon>manageret.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Models\ClientMessage.cs" />
     <Compile Include="Models\Logs\DocumentLogEntity.cs" />
     <Compile Include="Models\Security\Permission.cs" />
@@ -299,13 +292,6 @@
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
-    </Compile>
-    <Compile Include="register.aspx.cs">
-      <DependentUpon>register.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="register.aspx.designer.cs">
-      <DependentUpon>register.aspx</DependentUpon>
     </Compile>
     <Compile Include="report.aspx.cs">
       <DependentUpon>report.aspx</DependentUpon>
@@ -383,8 +369,6 @@
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
-    <Content Include="manageret.aspx" />
-    <Content Include="register.aspx" />
     <Content Include="report.aspx" />
     <Content Include="searchc.aspx" />
     <Content Include="statcont.aspx" />
@@ -575,6 +559,9 @@
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
