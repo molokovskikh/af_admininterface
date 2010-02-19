@@ -1,4 +1,7 @@
-﻿using AdminInterface.Controllers;
+﻿using System.IO;
+using System.Web;
+using System.Web.Hosting;
+using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -28,6 +31,9 @@ namespace AdminInterface.Test.Controllers
 		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
+			var workerRequest = new SimpleWorkerRequest("", "", "", "http://test", new StreamWriter(new MemoryStream()));
+			var context = new HttpContext(workerRequest);
+			HttpContext.Current = context;
 			
 			Client client = DataMother.CreateTestClient();
 			Payer payer = client.BillingInstance;
