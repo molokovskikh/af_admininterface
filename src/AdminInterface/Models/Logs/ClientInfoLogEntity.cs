@@ -72,6 +72,11 @@ namespace AdminInterface.Models.Logs
 			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason), clientCode);
 		}
 
+		public static ClientInfoLogEntity ReseteUin(User user, string reason)
+		{
+			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user.Client.Id, user.Id);
+		}
+
 		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)
 		{
 			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria

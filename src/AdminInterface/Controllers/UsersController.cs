@@ -258,7 +258,7 @@ namespace AdminInterface.Controllers
 						inUser = SecurityContext.Administrator.UserName,
 						ResetIdCause = reason
 					});
-				ClientInfoLogEntity.ReseteUin(user.Client.Id, reason).Save();
+				ClientInfoLogEntity.ReseteUin(user, reason).Save();
 				user.ResetUin();
 				Flash["Message"] = Message.Notify("УИН сброшен");
 				RedirectToReferrer();

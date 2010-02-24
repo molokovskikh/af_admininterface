@@ -180,11 +180,12 @@ namespace Functional
 				browser.TextField(Find.ByName("reason")).TypeText("test reason");
 				browser.Button(Find.ByValue("Сбросить УИН")).Click();
 				Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("$$$ Пользователь: {0}", user.Login)));
 				var count = Convert.ToInt32(ArHelper.WithSession(s =>
-					s.CreateSQLQuery("SELECT count(*) FROM `logs`.clientsinfo where ClientCode = :id")
+					s.CreateSQLQuery("SELECT count(*) FROM `logs`.clientsinfo where ClientCode = :id and UserId is not null")
 						.SetParameter("id", client.Id)
 						.UniqueResult()));
-				Assert.IsTrue(count == 1);
+				Assert.IsTrue(count == 1);				
 			}
 		}
 
