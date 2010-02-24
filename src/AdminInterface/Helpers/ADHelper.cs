@@ -129,7 +129,7 @@ namespace AdminInterface.Helpers
            		IsLocked = IsLocked(login),
            		IsLoginExists = IsLoginExists(login),
            		LastLogOnDate = GetLastLogOnDate(login),
-           		LastPasswordChange = GetLastPasswordChange(login),           		
+           		LastPasswordChange = GetLastPasswordChange(login),
 			};
 
 			return result;

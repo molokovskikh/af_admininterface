@@ -103,7 +103,7 @@
 			${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
 			
 			${"Последний правильный ввод пароля:       " + userInfo.LastLogOnDate + "<br />" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}
-			${"Последний правильный ввод пароля:       " + userInfo.BadPasswordDate + "<br />" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}
+			${"Последний неправильный ввод пароля:       " + userInfo.BadPasswordDate + "<br />" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}
 			${"Последнее изменение пароля:             " + userInfo.LastPasswordChange + "<br />" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}
 		</div>
 	</div>	
