@@ -240,16 +240,13 @@ namespace AdminInterface.Controllers
 			settings.CreateAndFlush();
 
 			client.MaintainIntersection();
-			command.CommandText = @"
-insert into usersettings.ret_save_grids(ClientCode, SaveGridId)
-select ?ClientCode, sg.id
-from usersettings.save_grids sg
-where sg.AssignDefaultValue = 1;";
-			command.Parameters.AddWithValue("?ClientCode", client.Id);
 
 			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
-				command.CommandText += " insert into inscribe(ClientCode) values(?ClientCode); ";
-			command.ExecuteNonQuery();			
+			{
+				command.CommandText = "insert into inscribe(ClientCode) values(?ClientCode); ";
+				command.Parameters.AddWithValue("?ClientCode", client.Id);
+				command.ExecuteNonQuery();
+			}			
 		}
 
 		public void CreateSupplier(MySqlCommand command, DefaultValues defaults, Client client)
