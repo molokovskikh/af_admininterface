@@ -2,7 +2,6 @@
 i = 0
 if IsDefined("tracks") and IsDefined("recordId"):
 %>
-<script type="text/javascript" src="${siteroot}/JavaScript/audio-player.js"></script>  
 <div style="padding: 15px" id="CallRecordTracks${recordId}">
 <table>
 <%

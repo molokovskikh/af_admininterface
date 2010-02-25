@@ -117,6 +117,7 @@
     <Compile Include="SupplierFixture.cs" />
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="UserFixture.cs" />
+    <Compile Include="ViewAdministratorsFixture.cs" />
     <Compile Include="ViewclFixture.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -142,7 +142,7 @@
 					</asp:TemplateField>
 					<asp:TemplateField HeaderText="VCH">
 						<ItemTemplate>
-							<asp:CheckBox ID="CheckBox17" Enabled="false" runat="server" 
+							<asp:CheckBox ID="CheckBox18" Enabled="false" runat="server" 
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CallHistory) %>' />
 						</ItemTemplate>
 					</asp:TemplateField>					

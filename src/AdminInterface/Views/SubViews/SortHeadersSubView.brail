@@ -9,9 +9,9 @@
         <%if -(i+1)!=sortColumnIndex: %>
             <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeader">${item}</a></th>
         <% else: %>
-            <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderAsc">${item}</a>&nbsp;<img src="../Images/arrow-down-blue.gif" /></th>
+            <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderAsc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue.gif" /></th>
         <% end %>
     <% else: %>
-       <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (-(i+1)).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderDesc">${item}</a>&nbsp;<img src="../Images/arrow-up-blue.gif" /></th>
+       <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (-(i+1)).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderDesc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue-reversed.gif" /></th>
     <% end %>
 <% end %>

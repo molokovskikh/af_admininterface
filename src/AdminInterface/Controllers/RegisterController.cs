@@ -163,7 +163,7 @@ namespace AdminInterface.Controllers
 			if (additionalSettings.FillBillingInfo)
 			{
 				sendBillingNotificationNow = false;
-				redirectTo = String.Format("RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 					newClient.BillingInstance.PayerID,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
@@ -408,10 +408,12 @@ WHERE   intersection.pricecode IS NULL
 				SecurityContext.Administrator.UserName,
 				paymentOptions, NotificationHelper.GetApplicationUrl());
 
+			var redirectUrl = String.Empty;
 			if (showRegistrationCard)
-				RedirectToUrl("../report.aspx");
+				redirectUrl = "/report.aspx";
 			else
-				RedirectToUrl(String.Format("../client/{0}", clientCode));
+				redirectUrl = String.Format("/client/{0}", clientCode);
+			RedirectToUrl(redirectUrl);
 		}
 
         public void SearchPayers(string searchPattern)

@@ -56,9 +56,9 @@ namespace AdminInterface.Helpers
 			if (String.IsNullOrEmpty(direction))
 				direction = "ascending";
 			direction = direction.ToLower();
-			var url = "../Images/arrow-down-blue-reversed.gif";
+			var url = "${siteroot}/Images/arrow-down-blue-reversed.gif";
 			if (direction == "descending")
-				url = "../Images/arrow-down-blue.gif";
+				url = "${siteroot}/Images/arrow-down-blue.gif";
 			return String.Format("<img src=\"{0}\" style=\"border: none;\" />", url);
 		}
 
