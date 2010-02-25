@@ -2,11 +2,12 @@
 import file from Deploy.bake
 import file from Lib.bake
 import file from Test.bake
+import file from Migration.bake
 import System.IO
 
 Global(
 	project : "AdminInterface",
-	deployTo : "\\\\acdcserv\\publish\\TestAdm",
+	deployTo : "\\\\acdcserv.adc.analit.net\\publish\\TestAdm",
 	humanReadableName : "Адмнистративный интерфейс (Новая реальность)"
 )
 
@@ -14,4 +15,4 @@ Task @default, [@build]
 
 Task @build, [@buildWebSite]
 
-Task @deploy, [@build, @deployWebSite, @SendDeployNotification]
+Task @deploy, [@build, @Migrate, @deployWebSite, @SendDeployNotification]
