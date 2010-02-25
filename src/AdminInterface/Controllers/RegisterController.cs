@@ -352,7 +352,7 @@ WHERE   intersection.pricecode IS NULL
 			if ((permissions != null) && (permissions.Count() > 0))
 			{
 				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
-					.Concat(UserPermission.GetDefaultPermissions()).ToList();
+					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
 			if ((contacts != null) && (contacts.Length > 0))

@@ -22,7 +22,7 @@
 			Новый пользователь
 		</h2>
 		<div class=block>
-			Внутреннее имя<br>
+			Комментарий<br>
 			<input type=text name="user.Name"><br>
 			<input type=hidden name=user.SubmitOrders value=false>
 			<input type=checkbox name=user.SubmitOrders value=true> Подтверждать отправку заказов<br>
@@ -70,7 +70,7 @@
 			</h3>
 			<div>
 				<% for i, permission in enumerate(Permissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}>
+					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id}  ${"checked" if (permission.AssignDefaultValue)}>
 					${permission.Name}
 					<br>
 				<% end %>

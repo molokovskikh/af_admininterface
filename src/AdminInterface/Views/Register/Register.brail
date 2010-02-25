@@ -15,9 +15,9 @@
     SegmentTypeRetail = cast(int, AdminInterface.Models.Segment.Retail)
 %>
 
-<script type="text/javascript" src="/JavaScript/jquery.validate.min.js"></script>
-<script type="text/javascript" src="/JavaScript/messages_ru.js"></script>
-<script type="text/javascript" src="/JavaScript/jquery_contact_validation.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
 
 <script type="text/javascript">
     jQuery(function() {
@@ -293,7 +293,7 @@
         <h3>Права доступа</h3>
 		<div>
 			<% for i, permission in enumerate(Permissions): %>
-				<input type=checkbox name=permissions[${i}].Id value=${permission.Id} ${"checked" if (permission.Name == 'Обновлять AnalitF')}>
+				<input type=checkbox name=permissions[${i}].Id value=${permission.Id} ${"checked" if (permission.AssignDefaultValue)}>
 				${permission.Name}
 				<br>
 			<% end %>
@@ -371,7 +371,7 @@
         <h3>Сведения о пользователе</h3>
         <table border="0" width="100%" cellpadding="3" cellspacing="0">
             <tr>
-                <td width="20%">Имя пользователя:</td>
+                <td width="20%">Комментарий:</td>
                 <td width="80%"><input type="text" id="UserName" name="userName" style="width: 60%" /></td>
             </tr>        
             <tr>
