@@ -231,6 +231,7 @@ namespace AdminInterface.Controllers
 			{
 				Id = client.Id,
 				InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
+				WorkRegionMask = client.MaskRegion,
 				OrderRegionMask = orderMask,
 				ServiceClient = additionalSettings.IsServiceClient,
 				BasecostPassword = costCrypKey,

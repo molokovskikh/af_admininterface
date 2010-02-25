@@ -11,7 +11,7 @@
 			rules : {
 				"user.Name" : "required"
 			}
-		});
+		});			
 	});
 </script>
 
@@ -100,7 +100,7 @@
 					${permission.Name}
 					<br>
 				<% end %>
-			</div>
+			</div>							
 		</div>
 		
 		<div class=save>

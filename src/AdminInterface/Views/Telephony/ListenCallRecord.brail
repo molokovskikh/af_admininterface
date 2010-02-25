@@ -8,8 +8,8 @@ if IsDefined("tracks") and IsDefined("recordId"):
     while i < tracks.Length:
         if (tracks.Length > 1):
 %>
-    <tr valign="middle">
-        <td><b>Часть ${i + 1}:</b></td>
+<tr valign="middle">
+    <td><b>Часть ${i + 1}:</b></td>
 <%
         end    
 %>    
@@ -18,7 +18,10 @@ if IsDefined("tracks") and IsDefined("recordId"):
             <embed type="audio/x-wav" src="${siteroot}/Telephony/GetStream?recordId=${recordId}" autoplay="false" autostart="false">
             </embed>
         </object>        
-    </td>
+    </td>    
+</tr>
+<tr>
+    <td align="center"><a href="${siteroot}/Telephony/GetStream?recordId=${recordId}">Загрузить</a></td>
 </tr>
 <%      i++
     end

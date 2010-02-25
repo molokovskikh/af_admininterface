@@ -17,8 +17,11 @@ using System.Linq;
 
 namespace AdminInterface.Controllers
 {
-	[Helper(typeof(HttpUtility)),
-	 Layout("NewDefault")]
+	[
+	Helper(typeof(HttpUtility)),
+    Layout("NewDefault"),
+	Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
+	]
 	public class UsersController : SmartDispatcherController
 	{
 		[AccessibleThrough(Verb.Get)]
@@ -32,12 +35,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			var regions = Region.FindAll();
+			PropertyBag["regions"] = regions;
+			var drugstore = DrugstoreSettings.Find(client.Id);
+			PropertyBag["drugstore"] = drugstore;
 		}
 
 		[AccessibleThrough(Verb.Post)]
 		public void Add([DataBind("user")] User user, [DataBind("contacts")] Contact[] contacts, uint clientId, bool sendClientCard, string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
+			var drugstore = DrugstoreSettings.Find(client.Id);
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
@@ -45,6 +53,8 @@ namespace AdminInterface.Controllers
 				user.Client = client;
 				user.Setup(client);
 				password = user.CreateInAd();
+				user.WorkRegionMask = drugstore.WorkRegionMask;
+				user.OrderRegionMask = drugstore.OrderRegionMask;
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
 				client.Addresses.Each(a => a.SetAccessControl(user.Login));

@@ -25,8 +25,9 @@
 
     function addNonDefaultRegions() {
         var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
-        jQuery.get("/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId +
-            "&showDefaultRegions=false&showNonDefaultRegions=true",
+        var link = "/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;
+        
+        jQuery.get(link + "&showDefaultRegions=false&showNonDefaultRegions=true",
             function(html) {
                 jQuery("#NonDefaultRegions").append(html);
             }
@@ -67,8 +68,12 @@
                 <select name="homeRegion" id="comboBoxHomeRegion" onchange="OnSelectedHomeRegionChange()">
                     <% 
                     isHomeRegion = false;
-                    for i,region in enumerate(regions): 
-                        isHomeRegion = (i == 0);
+                    for i,region in enumerate(regions):
+                        if IsDefined("client"):
+                            isHomeRegion = (region.Id == client.HomeRegion.Id);
+                        else:
+                            isHomeRegion = (i == 0);
+                        end
                     %>                        
                         <option id="${region.Id}region" value="${region.Id}" ${"selected" if (isHomeRegion) }>${region.Name}</option>
                     <% 

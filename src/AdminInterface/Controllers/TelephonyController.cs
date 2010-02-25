@@ -131,6 +131,8 @@ namespace AdminInterface.Controllers
 			var searchPattern = String.Format("{0}*", recordId);
 			var files = Directory.GetFiles(ConfigurationManager.AppSettings["CallRecordsDirectory"], searchPattern);
 
+			Response.Clear();
+			Response.ContentType = "audio/wav";
 			var buffer = new byte[32768];
 			foreach (var track in files)
 			{
