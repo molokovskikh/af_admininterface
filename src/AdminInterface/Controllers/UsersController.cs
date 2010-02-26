@@ -37,15 +37,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			var regions = Region.FindAll();
 			PropertyBag["regions"] = regions;
-			var drugstore = DrugstoreSettings.Find(client.Id);
-			PropertyBag["drugstore"] = drugstore;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("user")] User user, [DataBind("contacts")] Contact[] contacts, uint clientId, bool sendClientCard, string mails)
+		public void Add([DataBind("user")] User user, 
+			[DataBind("contacts")] Contact[] contacts, 
+			uint clientId, 
+			bool sendClientCard, 
+			string mails,
+			[DataBind("regionSettings")] RegionSettings[] regionSettings)
 		{
 			var client = Client.FindAndCheck(clientId);
-			var drugstore = DrugstoreSettings.Find(client.Id);
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
@@ -53,8 +55,8 @@ namespace AdminInterface.Controllers
 				user.Client = client;
 				user.Setup(client);
 				password = user.CreateInAd();
-				user.WorkRegionMask = drugstore.WorkRegionMask;
-				user.OrderRegionMask = drugstore.OrderRegionMask;
+				user.WorkRegionMask = regionSettings.GetBrowseMask();
+				user.OrderRegionMask = regionSettings.GetOrderMask();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
 				client.Addresses.Each(a => a.SetAccessControl(user.Login));
@@ -208,7 +210,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PrepareSessionForReport(user, password, false);
-				RedirectToUrl("../report.aspx");
+				RedirectToUrl("/report.aspx");
 			}
 		}
 
@@ -220,10 +222,10 @@ namespace AdminInterface.Controllers
 			Session["Register"] = false;
 			Session["Code"] = user.Client.Id;
 			Session["DogN"] = user.Client.BillingInstance.PayerID;
-			Session["Name"] = user.Client.FullName;
-			Session["ShortName"] = user.Client.Name;
-			Session["Login"] = user.Login;
-			Session["Password"] = password;
+			Session["Name"] = String.IsNullOrEmpty(user.Client.FullName) ? String.Empty : user.Client.FullName;
+			Session["ShortName"] = String.IsNullOrEmpty(user.Client.Name) ? String.Empty : user.Client.Name;
+			Session["Login"] = String.IsNullOrEmpty(user.Login) ? String.Empty : user.Login;
+			Session["Password"] = String.IsNullOrEmpty(password) ? String.Empty : password;
 			Session["Tariff"] = user.Client.Type.Description();
 			Session["IsRegistration"] = isRegistration;
 		}

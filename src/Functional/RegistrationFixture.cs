@@ -184,7 +184,7 @@ namespace Functional
 				browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
 				browser.Button(Find.ById("RegisterButton")).Click();
 				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
-				clientCode = GetClientCodeFromRegistrationCard(browser);
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			}
 			using(new SessionScope())
 			{
@@ -233,7 +233,7 @@ namespace Functional
 				SetupGeneralInformation(browser, ClientType.Drugstore);
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button(Find.ById("RegisterButton")).Click();
-				var clientCode = GetClientCodeFromRegistrationCard(browser);
+				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 
 				ArHelper.WithSession(s => {
 					var client = Client.Find(clientCode);
@@ -274,7 +274,7 @@ namespace Functional
 				Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
 
 				browser.Button(Find.ById("RegisterButton")).Click();
-				clientcode = GetClientCodeFromRegistrationCard(browser);
+				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 			}
 			With.Connection(c => {
 				var command = new MySqlCommand("select FirmCodeOnly from usersettings.retclientsset where clientcode = ?clientcode", c);
@@ -292,11 +292,6 @@ namespace Functional
 				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
 				Assert.That(settings.FirmCodeOnly, Is.EqualTo(testSupplierId)); 
 			});
-		}
-
-		private uint GetClientCodeFromRegistrationCard(IE browser)
-		{
-			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 
 		private void SetupGeneralInformation(IE browser, ClientType clientType)

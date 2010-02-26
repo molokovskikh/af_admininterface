@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Text.RegularExpressions;
 using NUnit.Framework;
 
 using WatiN.Core;
@@ -111,5 +112,14 @@ namespace AdminInterface.Test.ForTesting
 			return (cell.Text != null ? cell.Text.Trim() : cell.Text) == value.ToString();
 		}
 
+		public static uint GetClientCodeFromRegistrationCard(IE browser)
+		{
+			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
+		}
+
+		public static uint GetLoginFromRegistrationCard(IE browser)
+		{
+			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Login:\s*\d+", RegexOptions.IgnoreCase))).Value);
+		}
 	}
 }

@@ -64,4 +64,29 @@ ORDER BY IsAll Desc, {Region.Name};")
 
 		public bool IsAvaliableForBrowse { get; set; }
 	}
+
+	public static class RegionSettingsExtension
+	{
+        public static ulong GetOrderMask(this RegionSettings[] regions)
+        {
+        	ulong mask = 0;
+			foreach (var region in regions)
+			{
+				if (region.IsAvaliableForOrder)
+					mask |= region.Id;
+			}
+        	return mask;
+        }
+
+		public static ulong GetBrowseMask(this RegionSettings[] regions)
+		{
+			ulong mask = 0;
+			foreach (var region in regions)
+			{
+				if (region.IsAvaliableForBrowse)
+					mask |= region.Id;
+			}
+			return mask;
+		}
+	}
 }

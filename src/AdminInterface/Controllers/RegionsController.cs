@@ -11,21 +11,39 @@ namespace AdminInterface.Controllers
 	[Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))]
 	public class RegionsController : SmartDispatcherController
 	{
-		public void ShowRegions(ulong homeRegionId)
+		public void ShowRegions(uint? clientId, ulong? homeRegionId)
 		{
-			ShowRegions(homeRegionId, true, false);
+			ShowRegions(clientId, homeRegionId, true, false);	
 		}
 
-		public void ShowRegions(ulong homeRegionId, bool showDefaultRegions, bool showNonDefaultRegions)
+		public void ShowRegions(uint? clientId, ulong? homeRegionId, bool showDefaultRegions, bool showNonDefaultRegions)
 		{
-			var homeRegion = Region.Find(homeRegionId);
 			var allRegions = Region.FindAll();
+			if (homeRegionId.HasValue)
+			{
+				var homeRegion = Region.Find(homeRegionId.Value);
+				if (showDefaultRegions)
+					PropertyBag["defaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0);
+				if (showNonDefaultRegions)
+					PropertyBag["nonDefaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) <= 0);
+				PropertyBag["homeRegion"] = Region.Find(homeRegionId);
+			}
+			else if (clientId.HasValue)
+			{
+                var client = Client.Find(clientId.Value);
+                var drugstore = DrugstoreSettings.Find(clientId.Value);
 
-			if (showDefaultRegions)
-				PropertyBag["defaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0);
-			if (showNonDefaultRegions)
-				PropertyBag["nonDefaultRegions"] = allRegions.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) <= 0);
-			PropertyBag["homeRegion"] = Region.Find(homeRegionId);
+				if (showDefaultRegions)
+					PropertyBag["defaultRegions"] = allRegions.Where(region =>
+						(region.Id & drugstore.WorkRegionMask) > 0 ||
+						(region.Id & drugstore.OrderRegionMask) > 0);
+				if (showNonDefaultRegions)
+					PropertyBag["nonDefaultRegions"] = allRegions.Where(region =>
+						(region.Id & drugstore.WorkRegionMask) <= 0 ||
+						(region.Id & drugstore.OrderRegionMask) <= 0);
+				PropertyBag["homeRegion"] = client.HomeRegion;
+				PropertyBag["drugstore"] = drugstore;
+			}
 		}
 	}
 }

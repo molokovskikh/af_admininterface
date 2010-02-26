@@ -12,6 +12,7 @@ using AdminInterface.Helpers;
 using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
+using System.Threading;
 
 namespace Functional
 {
@@ -424,6 +425,58 @@ namespace Functional
 					Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
 					Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
 				}
+		}
+
+		[Test]
+		public void TestRegionsByCreatingNewUser()
+		{
+			var client = DataMother.CreateTestClient();
+			var drugstore = DrugstoreSettings.Find(client.Id);
+			// Id-шники регионов
+			var browseRegions = new ulong[] { 1, 8, 16, 256 };
+			var orderRegions = new ulong[] { 1, 8, 256 };
+
+			client.MaskRegion = 0;
+			foreach (var region in browseRegions)
+				client.MaskRegion |= region;
+			client.SaveAndFlush();
+			foreach (var region in browseRegions)
+				drugstore.WorkRegionMask |= region;
+			foreach (var region in orderRegions)
+				drugstore.OrderRegionMask |= region;
+			drugstore.SaveAndFlush();
+
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+				// Указанные регионы для обзора и для заказа должны быть выделены
+				foreach (var region in browseRegions)
+					Assert.IsTrue(browser.CheckBox(Find.ById("browseRegion" + region)).Checked);
+				foreach (var region in orderRegions)
+					Assert.IsTrue(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
+				// Если регион помечен только для обзора, то галка "Для заказа" должна быть снята
+				var diff = browseRegions.Where(region => !orderRegions.Contains(region));
+				foreach (var region in diff)
+					Assert.IsFalse(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
+				// Снимаем галку "В обзоре" (должна также сняться галка "Доступен для заказа")
+				// и регистрируем нового пользователя
+				browser.CheckBox(Find.ById("browseRegion" + browseRegions[0])).Checked = false;
+				browser.TextField(Find.ByName("user.Name")).TypeText("User for test regions");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Uri.AbsolutePath.Contains("report.aspx"));
+				var login = Helper.GetLoginFromRegistrationCard(browser);				
+				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+				browser.Refresh();
+				browser.Link(Find.ByText(login.ToString())).Click();
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", login)));
+				// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
+				for (var i = 1; i < browseRegions.Length; i++)
+					Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("WorkRegions[{0}]", i))).Checked);
+				for (var i = 1; i < orderRegions.Length; i++)
+					Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("OrderRegions[{0}]", i))).Checked);
+			}
 		}
 	}
 }

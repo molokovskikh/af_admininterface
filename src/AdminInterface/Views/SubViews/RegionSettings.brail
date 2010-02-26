@@ -16,17 +16,21 @@
 
     function addDefaultRegions() {
         var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
-        jQuery.get("${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId,
-                function(html) {
-                    jQuery("#DefaultRegions").append(html);
-                }
-            );
+        var link = "${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;
+        <% if IsDefined("client"): %>
+            link = "${siteroot}/Regions/ShowRegions.rails?clientId=" + ${client.Id};
+        <% end %>
+        jQuery.get(link, function(html) {
+            jQuery("#DefaultRegions").append(html);
+        });
     }
 
     function addNonDefaultRegions() {
         var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
-        var link = "/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;
-        
+        var link = "${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;
+        <% if IsDefined("client"): %>
+            link = "${siteroot}/Regions/ShowRegions.rails?clientId=" + ${client.Id};
+        <% end %>
         jQuery.get(link + "&showDefaultRegions=false&showNonDefaultRegions=true",
             function(html) {
                 jQuery("#NonDefaultRegions").append(html);
@@ -63,6 +67,7 @@
 <div class="block">
     <h3>Региональная настройка</h3>
     <table cellpadding="5" width="100%">
+        <% if not IsDefined("client"): %>
         <tr>            
             <td colspan="3">Домашний регион:<br />
                 <select name="homeRegion" id="comboBoxHomeRegion" onchange="OnSelectedHomeRegionChange()">
@@ -82,7 +87,8 @@
                 </select>
             </td>
         </tr>
-		<tr>						
+        <% end %>
+		<tr>
             <td colspan = "3" id="RegionList">
 				<table id="RegionsTable" width="100%" border="0">
 					<tr valign="top"> 
@@ -95,9 +101,11 @@
 				</table>	                    
             </td>
         </tr>
+        <% if not IsDefined("client"): %>
         <tr><td colspan="3" align="left">
 			<a href="javascript:" id="ShowRegionsLink" onclick="ShowRegions()">Показать все регионы</a>
-		</td></tr>	                
+		</td></tr>
+		<% end %>
     </table>
 </div>
 	        

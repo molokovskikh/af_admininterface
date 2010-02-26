@@ -22,8 +22,13 @@ end
 <%
 if IsDefined("defaultRegions"):
     for region in defaultRegions:
-        isForBrowse = homeRegion.Id == region.Id;
-        isForOrder = isForBrowse;
+        if IsDefined("drugstore"):
+            isForBrowse = (drugstore.WorkRegionMask & region.Id) > 0;
+            isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
+        else:
+            isForBrowse = homeRegion.Id == region.Id;
+            isForOrder = isForBrowse;
+        end
         
         WriteRegionRow(region.Id, region.Name, isForBrowse, isForOrder);
     end
@@ -31,10 +36,7 @@ end
 
 if IsDefined("nonDefaultRegions"):
     for region in nonDefaultRegions:
-        isForBrowse = homeRegion.Id == region.Id;
-        isForOrder = isForBrowse;
-        
-        WriteRegionRow(region.Id, region.Name, isForBrowse, isForOrder);
+        WriteRegionRow(region.Id, region.Name, false, false);
     end
 end
 %>
