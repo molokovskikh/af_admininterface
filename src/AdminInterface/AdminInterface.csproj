@@ -146,6 +146,7 @@
   <ItemGroup>
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\Bubble.cs" />
+    <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
@@ -428,6 +429,8 @@
     <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
+    <None Include="Views\CallHistory\ListenCallRecord.brail" />
+    <None Include="Views\CallHistory\ShowCallHistory.brail" />
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Logs\Orders.brail" />
@@ -439,8 +442,6 @@
     <None Include="Views\SubViews\PaginatorSubView.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
-    <None Include="Views\Telephony\ListenCallRecord.brail" />
-    <None Include="Views\Telephony\ShowCallHistory.brail" />
     <None Include="Views\SubViews\RegionSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />

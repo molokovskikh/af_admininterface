@@ -14,10 +14,10 @@ if IsDefined("tracks") and IsDefined("recordId"):
 <%
         end    
 %>    
-    <td><a href="${siteroot}/Telephony/GetStream?recordId=${recordId}">Загрузить</a></td>
+    <td><a href="${siteroot}/CallHistory/GetStream?recordId=${recordId}">Загрузить</a></td>
     <td>
         <object width="200" height="30">
-            <embed type="audio/x-wav" src="${siteroot}/Telephony/GetStream?recordId=${recordId}" autoplay="false" autostart="false">
+            <embed type="audio/x-wav" src="${siteroot}/CallHistory/GetStream?recordId=${recordId}" autoplay="false" autostart="false">
             </embed>
         </object>
     </td>    
