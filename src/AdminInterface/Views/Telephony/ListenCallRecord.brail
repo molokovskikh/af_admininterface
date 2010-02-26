@@ -2,6 +2,7 @@
 i = 0
 if IsDefined("tracks") and IsDefined("recordId"):
 %>
+
 <div style="padding: 15px" id="CallRecordTracks${recordId}">
 <table>
 <%
@@ -13,11 +14,11 @@ if IsDefined("tracks") and IsDefined("recordId"):
 <%
         end    
 %>    
-    <td>    
+    <td>
         <object width="200" height="30">
             <embed type="audio/x-wav" src="${siteroot}/Telephony/GetStream?recordId=${recordId}" autoplay="false" autostart="false">
             </embed>
-        </object>        
+        </object>            
     </td>    
 </tr>
 <tr>

@@ -132,6 +132,7 @@ namespace AdminInterface.Controllers
 			var files = Directory.GetFiles(ConfigurationManager.AppSettings["CallRecordsDirectory"], searchPattern);
 
 			Response.Clear();
+			Response.AppendHeader("Content-Disposition", String.Format("attachment; filename=\"{0}.wav\"", recordId));
 			Response.ContentType = "audio/wav";
 			var buffer = new byte[32768];
 			foreach (var track in files)
