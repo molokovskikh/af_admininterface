@@ -12,22 +12,20 @@ namespace Functional
 	public class ViewAdministratorsFixture : WatinFixture
 	{
 		[Test]
-		public void ViewPage()
-		{
-			using (var browser = Open("Index.brail"))
-			{
-//				browser.Link(Find.ByText("Региональные администраторы")).Click();
-//				Assert.That(browser.Text, Is.StringContaining("Пользователи офиса"));
-//				Assert.That(browser.Uri, Is.StringContaining("ViewAdministrators.aspx"));
-			}
-		}
-
-		[Test]
 		public void SetupAdministrator()
 		{
 			using (var browser = Open("ViewAdministrators.aspx"))
 			{
-//				Assert.That(browser.Text, Is.StringContaining("Пользователи офиса"));
+				Assert.That(browser.Text, Is.StringContaining("Пользователи офиса"));
+				browser.Link(Find.ByText("kvasov")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Редактирование регионального администратора"));
+				var checkBox = browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_PermissionSelector_1"));
+				var result = !checkBox.Checked;
+				checkBox.Checked = result;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователи офиса"));
+				Assert.That(browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_Administrators_ctl12_CheckBox15")).Checked,
+					Is.EqualTo(result));
 			}
 		}
 	}
