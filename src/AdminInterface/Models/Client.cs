@@ -310,13 +310,16 @@ group by u.ClientId")
 				s => {
 					var reslt = s.CreateSQLQuery(
 							@"
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	CostId
-)
+DROP TEMPORARY TABLE IF EXISTS TempIntersection;
+CREATE TEMPORARY TABLE TempIntersection
+(
+ClientId int unsigned,
+RegionId int unsigned,
+PriceId int unsigned,
+CostId int unsigned
+) engine=MEMORY;
+INSERT 
+INTO TempIntersection
 SELECT  DISTINCT drugstore.Id,
         regions.regioncode,
         pricesdata.pricecode,
@@ -337,6 +340,34 @@ WHERE i.Id IS NULL
 	AND supplier.firmtype = 0
 	AND drugstore.Id = :clientId
 	AND drugstore.FirmType = 1;
+
+INSERT
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	CostId
+)
+SELECT ClientId,
+	RegionId,
+	PriceId,
+	CostId
+FROM TempIntersection;
+
+INSERT 
+INTO usersettings.Intersection(
+	ClientCode,
+	RegionCode,
+	PriceCode,
+	CostCode
+)
+SELECT ClientId,
+	RegionId,
+	PriceId,
+	CostId
+FROM TempIntersection;
+
+DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 ")
 							.SetParameter("clientId", Id)
 							.ExecuteUpdate();

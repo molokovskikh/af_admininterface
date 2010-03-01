@@ -111,7 +111,7 @@ namespace AdminInterface.Controllers
 					AddContactsToClient(newClient, clientContacts);
 					newClient.SaveAndFlush();
 
-					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userContacts);
+					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask);
 					password = newUser.CreateInAd();
 					var defaults = DefaultValues.Get();
 					if (newClient.IsDrugstore())
@@ -126,12 +126,13 @@ namespace AdminInterface.Controllers
 						newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
 					}
 					newClient.Addresses.Each(a => a.CreateFtpDirectory());
-             	});				
+             	});
 				scope.VoteCommit();
 			}
+			newUser.UpdateContacts(userContacts);
 
 			if (newClient.IsDrugstore() && !additionalSettings.IsServiceClient && !(additionalSettings.ShowForOneSupplier))
-				new NotificationService().NotifySupplierAboutDrugstoreRegistration(newClient);
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(newClient, false);
 			if (!newClient.IsDrugstore())
 				Mailer.SupplierRegistred(newClient.Name, newClient.HomeRegion.Name);
 
@@ -341,7 +342,7 @@ WHERE   intersection.pricecode IS NULL
 			command.ExecuteNonQuery();			
 		}
 
-		private User CreateUser(Client client, string userName, UserPermission[] permissions, ulong workRegionMask, ulong orderRegionMask, Contact[] contacts)
+		private User CreateUser(Client client, string userName, UserPermission[] permissions, ulong workRegionMask, ulong orderRegionMask)
 		{
 			var user = new User
 			{
@@ -356,15 +357,6 @@ WHERE   intersection.pricecode IS NULL
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
-			if ((contacts != null) && (contacts.Length > 0))
-			{
-				var contactGroup = client.ContactGroupOwner.AddContactGroup(ContactGroupType.General);
-				foreach (var contact in contacts)
-					if (!String.IsNullOrEmpty(contact.ContactText))
-						contactGroup.AddContact(contact.Type, contact.ContactText);
-				user.ContactGroup = contactGroup;
-				client.ContactGroupOwner.Save();
-			}
 			user.SaveAndFlush();
 			client.Users = new List<User> { user };
 			return user;

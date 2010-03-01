@@ -71,6 +71,11 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutDrugstoreRegistration(Client client)
 		{
+			NotifySupplierAboutDrugstoreRegistration(client, true);
+		}
+
+		public void NotifySupplierAboutDrugstoreRegistration(Client client, bool isRenotify)
+		{
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",
@@ -84,7 +89,10 @@ namespace AdminInterface.Services
 					email,
 					"",
 					null);
-			Mailer.ClientRegistrationResened(client);
+			// Если это повторная рассылка уведомлений о регистрации, то отсылаем письмо
+			// "Разослано повторное уведомление о регистрации"
+			if (isRenotify)
+				Mailer.ClientRegistrationResened(client);
 		}
 
 		private List<string> GetEmailsForNotification(Client client)

@@ -42,7 +42,7 @@
 </div>
 <% end %>
 
-<div class="TwoColumn" style="width: 600px;">
+<div class="TwoColumn" style="width: 800px;">
     <div class=block>
         <ul class="navigation-menu">
 		  <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
