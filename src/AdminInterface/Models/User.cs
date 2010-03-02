@@ -98,6 +98,13 @@ namespace AdminInterface.Models
 			return Name;
 		}
 
+		public virtual string GetLoginWithName()
+		{
+			if (String.IsNullOrEmpty(Name))
+				return Login;
+			return String.Format("{0} ({1})", Login, Name);
+		}
+
 		public virtual void AddPermission(UserPermission permission)
 		{
 			if (AssignedPermissions == null)

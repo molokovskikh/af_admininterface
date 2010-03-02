@@ -36,7 +36,7 @@
 			<div>
 				<% for i, user in enumerate(client.Users): %>
 					<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
-					${user.Login}
+					${user.GetLoginWithName()}
 					<br>
 				<% end %>
 			</div>
