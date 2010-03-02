@@ -143,6 +143,7 @@ namespace AdminInterface.Helpers
 			var user = root.Children.Add("CN=" + login, "user");
 			user.Properties["samAccountName"].Value = login;
 			user.Properties["userWorkstations"].Add("acdcserv");
+			user.Properties["userWorkstations"].Add("solo");
 			user.Properties["description"].Value = clientCode.ToString();
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
