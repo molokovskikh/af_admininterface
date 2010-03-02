@@ -18,7 +18,7 @@ namespace AdminInterface.Models
 			{
 				ArHelper.WithSession(s =>
 				{
-					s.CreateSQLQuery(@"call Usersettings.GetActivePrices(:ClientCode)")
+					s.CreateSQLQuery(@"call future.GetActivePrices(:ClientCode)")
 						.SetParameter("ClientCode", client.Id)
 						.ExecuteUpdate();
 
