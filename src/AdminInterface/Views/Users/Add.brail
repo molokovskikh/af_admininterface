@@ -5,16 +5,6 @@
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 									  
-<script>
-	$(function() {
-		$("form").validate({
-			rules : {
-				"user.Name" : "required"
-			}
-		});			
-	});
-</script>
-
 <div style="width: 800px;">
 	<form method=post action="${siteroot}/users/add">
 		<input type=hidden value="${Client.Id}" name="clientId" />

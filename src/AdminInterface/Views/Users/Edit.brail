@@ -7,11 +7,6 @@
 
 <script>
 	$(function() {
-		$("form#UserSettingsForm").validate({
-			rules: {
-				"user.Name": "required"
-			}
-		});
 		$("form#ReseteUin").validate({
 			rules: {
 				"reason": "required"
@@ -121,8 +116,8 @@
 				<% end %>
 			</div>
 			
-			Внутреннее имя<br>
-			<input name=user.Name value="${user.Name}"><br>
+			Комментарий<br>
+			<input name=user.Name value="${user.Name}" style="width: 60%"><br>
 			
 			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
 			<input type=hidden name=user.SubmitOrders value=false>
