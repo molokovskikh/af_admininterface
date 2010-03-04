@@ -142,8 +142,7 @@ namespace AdminInterface.Helpers
 			var userGroup = new DirectoryEntry("LDAP://acdcserv/CN=Базовая группа клиентов - получателей данных,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net");
 			var user = root.Children.Add("CN=" + login, "user");
 			user.Properties["samAccountName"].Value = login;
-			user.Properties["userWorkstations"].Add("acdcserv");
-			user.Properties["userWorkstations"].Add("solo");
+			user.Properties["userWorkstations"].Add("acdcserv, solo");
 			user.Properties["description"].Value = clientCode.ToString();
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
