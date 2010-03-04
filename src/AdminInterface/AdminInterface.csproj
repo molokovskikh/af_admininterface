@@ -164,6 +164,7 @@
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
+    <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
@@ -189,6 +190,7 @@
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\Telephony\CallRecord.cs" />
+    <Compile Include="Models\Telephony\CallRecordFile.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />

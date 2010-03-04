@@ -1,11 +1,13 @@
 ﻿<%import System %>
 
 <%def CreateLink(i):
+    link = ""
 	if i!=currentPage :
-      return "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString()) + "\">" + (i+1) + "</a>"
+      link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString(), "searchText", searchText) + "\">" + (i+1) + "</a>"
    else:
-      return "<span class=\"CurrentPage\">" + (i+1) +"</span>"
+      link = "<span class=\"CurrentPage\">" + (i+1) +"</span>"
    end
+   return link
 end%>
 
 <% lastPage = Math.Ceiling(rowsCount/Convert.ToDouble(pageSize))

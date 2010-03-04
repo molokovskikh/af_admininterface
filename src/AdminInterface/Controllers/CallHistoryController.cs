@@ -21,63 +21,45 @@ namespace AdminInterface.Controllers
 	]
 	public class CallHistoryController : ARSmartDispatcherController
 	{
-		public void ShowCallHistory(int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex, DateTime? beginDate, DateTime? endDate)
+		public void ShowCallHistory(int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex,
+			DateTime? beginDate, DateTime? endDate, string searchText)
 		{
-			if (!SecurityContext.Administrator.HavePermision(PermissionType.CallHistory))
-				throw new NotHavePermissionException();
 			ControllerHelper.InitParameter(ref beginDate, "beginDate", DateTime.Today.AddDays(-1), PropertyBag);
 			ControllerHelper.InitParameter(ref endDate, "endDate", DateTime.Today, PropertyBag);
 			ControllerHelper.InitParameter(ref sortColumnIndex, "sortColumnIndex", 1, PropertyBag);
 			ControllerHelper.InitParameter(ref currentPage, "currentPage", 0, PropertyBag);
 			ControllerHelper.InitParameter(ref pageSize, "pageSize", 50, PropertyBag);
+			PropertyBag["searchText"] = searchText;
 
 			var callRecords = CallRecord.GetByPeriod(beginDate.Value, endDate.Value, sortColumnIndex.Value,
-													 rowsCount.HasValue, currentPage.Value, pageSize.Value);
+													 rowsCount.HasValue, currentPage.Value, pageSize.Value, searchText);
 			ControllerHelper.InitParameter(ref rowsCount, "rowsCount", callRecords.Count, PropertyBag);
 			PropertyBag["calls"] = callRecords;
 		}
 
-		public void UpdateCallHistory([DataBind("calls")] CallRecord[] calls,
-			DateTime? beginDate, DateTime? endDate, int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex)
-		{
-			if (!SecurityContext.Administrator.HavePermision(PermissionType.CallHistory))
-				throw new NotHavePermissionException();
-
-			RedirectToAction("ShowCallHistory", new
-			{
-				beginDate,
-				endDate,
-				rowsCount,
-				pageSize,
-				currentPage,
-				sortColumnIndex
-			});
-		}
-
 		public void ListenCallRecord(ulong recordId)
 		{
-			if (!SecurityContext.Administrator.HavePermision(PermissionType.CallHistory))
-				throw new NotHavePermissionException();
 			var searchPattern = String.Format("{0}*", recordId);
 			var files = Directory.GetFiles(ConfigurationManager.AppSettings["CallRecordsDirectory"], searchPattern);
-			if (files.Length > 0)
-				PropertyBag["tracks"] = files;
 			PropertyBag["recordId"] = recordId;
+			if (files.Length > 0)				
+				PropertyBag["call"] = CallRecord.Find(recordId);
 			CancelLayout();
 		}
 
-		public void GetStream(ulong recordId)
+		public void GetStream(ulong recordId, int? partNumber)
 		{
-			if (!SecurityContext.Administrator.HavePermision(PermissionType.CallHistory))
-				throw new NotHavePermissionException();
 			CancelLayout();
 			CancelView();
 
-			var searchPattern = String.Format("{0}*", recordId);
+			var searchPattern = partNumber.HasValue ? String.Format("{0}_{1}*", recordId, partNumber.Value) :
+				String.Format("{0}*", recordId);			
 			var files = Directory.GetFiles(ConfigurationManager.AppSettings["CallRecordsDirectory"], searchPattern);
 
 			Response.Clear();
-			Response.AppendHeader("Content-Disposition", String.Format("attachment; filename=\"{0}.wav\"", recordId));
+			var filename = partNumber.HasValue ? String.Format("{0}_{1}.wav", recordId, partNumber.Value) :
+				String.Format("{0}.wav", recordId);
+			Response.AppendHeader("Content-Disposition", String.Format("attachment; filename=\"{0}\"", filename));
 			Response.ContentType = "audio/wav";
 			var buffer = new byte[32768];
 			foreach (var track in files)

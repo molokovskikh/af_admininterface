@@ -5,12 +5,7 @@
 		<% end %>
 		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
 		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
-		<table class="CenterBlock">
-			<tr>
-				<td colspan="2" style="font-weight:bold;">
-					Выберите период:
-				</td>
-			</tr>
+		<table class="CenterBlock" border="0">
 			<tr style="font-weight:bold;">
 				<td>
 					С:
@@ -28,6 +23,7 @@
 				</td>
 			</tr>
 			<tr>
+			    <td></td>
 				<td style="text-align:right;" colspan="2">
 					${FormHelper.Submit("Показать")}
 				</td>
