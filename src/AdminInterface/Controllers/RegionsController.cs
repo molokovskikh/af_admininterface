@@ -35,11 +35,11 @@ namespace AdminInterface.Controllers
 
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region =>
-						(region.Id & drugstore.WorkRegionMask) > 0 ||
+						(region.Id & client.MaskRegion) > 0 ||
 						(region.Id & drugstore.OrderRegionMask) > 0);
 				if (showNonDefaultRegions)
 					PropertyBag["nonDefaultRegions"] = allRegions.Where(region =>
-						(region.Id & drugstore.WorkRegionMask) <= 0 ||
+						(region.Id & client.MaskRegion) <= 0 ||
 						(region.Id & drugstore.OrderRegionMask) <= 0);
 				PropertyBag["homeRegion"] = client.HomeRegion;
 				PropertyBag["drugstore"] = drugstore;
