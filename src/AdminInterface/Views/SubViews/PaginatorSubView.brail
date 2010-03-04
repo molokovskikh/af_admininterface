@@ -3,7 +3,7 @@
 <%def CreateLink(i):
     link = ""
 	if i!=currentPage :
-      link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString(), "searchText", searchText) + "\">" + (i+1) + "</a>"
+      link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString(), "searchText", searchText, "beginDate", beginDate.ToString(), "endDate", endDate.ToString()) + "\">" + (i+1) + "</a>"
    else:
       link = "<span class=\"CurrentPage\">" + (i+1) +"</span>"
    end

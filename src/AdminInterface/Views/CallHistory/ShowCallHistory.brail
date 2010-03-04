@@ -61,7 +61,7 @@
 		    <td colspan="4" align="right">
 		        <br />
 			    <div class="Paginator">
-				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "searchText":searchText}) %>
+				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "searchText":searchText, "beginDate":beginDate, "endDate":endDate}) %>
 			    </div>
 		    </td>
         </tr>
