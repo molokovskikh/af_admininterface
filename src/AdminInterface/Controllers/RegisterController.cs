@@ -161,18 +161,23 @@ namespace AdminInterface.Controllers
 
         	var sendBillingNotificationNow = true;
 			string redirectTo;
+			var virtualDir = Context.UrlInfo.AppVirtualDir;
+			if (!virtualDir.StartsWith("/"))
+				virtualDir = "/" + virtualDir;
+			if (virtualDir.EndsWith("/"))
+				virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
 			if (additionalSettings.FillBillingInfo)
 			{
 				sendBillingNotificationNow = false;
-				redirectTo = String.Format(Context.UrlInfo.AppVirtualDir + "/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+				redirectTo = String.Format(virtualDir + "/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 					newClient.BillingInstance.PayerID,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}
 			else if (additionalSettings.ShowRegistrationCard)
-				redirectTo = Context.UrlInfo.AppVirtualDir + "/report.aspx";
+				redirectTo = virtualDir  + "/report.aspx";
 			else
-				redirectTo = String.Format(Context.UrlInfo.AppVirtualDir + "/Client/{0}", newClient.Id);
+				redirectTo = String.Format(virtualDir + "/Client/{0}", newClient.Id);
 
 			if (sendBillingNotificationNow)
 				new NotificationService()
