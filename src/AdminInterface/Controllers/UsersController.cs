@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -14,6 +15,7 @@ using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
+using log4net;
 
 namespace AdminInterface.Controllers
 {
@@ -59,7 +61,24 @@ namespace AdminInterface.Controllers
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
-				client.Addresses.Each(a => a.SetAccessControl(user.Login));
+				while (true)
+				{
+					var index = 0;
+					try
+					{
+						client.Addresses.Each(a => a.SetAccessControl(user.Login));
+						break;
+					}
+					catch(Exception e)
+					{
+						LogManager.GetLogger(this.GetType()).Error("Ошибка при назначении прав, пробую еще раз", e);
+						index++;
+						Thread.Sleep(500);
+						if (index > 3)
+							break;
+					}
+				}
+
 				user.UpdateContacts(contacts);
 				scope.VoteCommit();
 			}
