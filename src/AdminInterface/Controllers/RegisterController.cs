@@ -164,15 +164,15 @@ namespace AdminInterface.Controllers
 			if (additionalSettings.FillBillingInfo)
 			{
 				sendBillingNotificationNow = false;
-				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+				redirectTo = String.Format(Context.UrlInfo.AppVirtualDir + "/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 					newClient.BillingInstance.PayerID,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}
 			else if (additionalSettings.ShowRegistrationCard)
-				redirectTo = "/report.aspx";
+				redirectTo = Context.UrlInfo.AppVirtualDir + "/report.aspx";
 			else
-				redirectTo = String.Format("/Client/{0}", newClient.Id);
+				redirectTo = String.Format(Context.UrlInfo.AppVirtualDir + "/Client/{0}", newClient.Id);
 
 			if (sendBillingNotificationNow)
 				new NotificationService()
