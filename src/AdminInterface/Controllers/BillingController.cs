@@ -65,8 +65,9 @@ namespace AdminInterface.Controllers
 			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
-			PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
+			if (payer.ContactGroupOwner != null)
+				PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["Today"] = DateTime.Today;
 		}
 
@@ -114,11 +115,11 @@ namespace AdminInterface.Controllers
 			                                                                   Request.UserHostAddress);
 				foreach (var client in clients)
 				{
-					var oldClient = Client.Find(client.Id);
+					var oldClient = Client.Find(clientCode);
 					if (client.Status == ClientStatus.On && oldClient.Status == ClientStatus.Off)
 						Mailer.ClientBackToWork(oldClient);
 					if (oldClient.Status != client.Status)
-						ClientInfoLogEntity.StatusChange(client.Status, client.Id).Save();
+						ClientInfoLogEntity.StatusChange(client.Status, clientCode).Save();
 					client.Update();
 				}
 			}
