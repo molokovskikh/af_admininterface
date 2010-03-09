@@ -314,9 +314,8 @@
                         <input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />                        
                     </div>
                     <div id="SelectPayerDiv" style="width: 100%; display: none">
-                        <select id="PayerComboBox" style="width: 75%"></select>
+                        <select id="PayerComboBox" name="payer.PayerID" style="width: 75%"></select>
                         <input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
-                        <input type="hidden" id="PayerIdValue" name="payer.PayerID" />
                     </div>
                     <div id="MessageForPayer"></div>
                 </td>

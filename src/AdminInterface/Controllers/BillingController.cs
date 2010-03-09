@@ -15,6 +15,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -66,8 +67,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
-			if (payer.ContactGroupOwner != null)
-				PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
+			//PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["Today"] = DateTime.Today;
 		}
 
