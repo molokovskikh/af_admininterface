@@ -56,6 +56,7 @@ namespace AdminInterface.Controllers
 			[DataBind("flags")] AdditionalSettings additionalSettings, 
 			string deliveryAddress,
 			[DataBind("payer")] Payer payer,
+			uint? existingPayerId,
 			[DataBind("supplier")] Supplier supplier,
 			[DataBind("clientContacts")] Contact[] clientContacts,
 			string userName,
@@ -103,8 +104,14 @@ namespace AdminInterface.Controllers
              		newClient.AddDeliveryAddress(deliveryAddress);
 
 					Payer currentPayer = null;
-					if (additionalSettings.PayerExists && (payer != null) && (payer.PayerID > 0))
-						currentPayer = Payer.Find(payer.PayerID);
+					if (additionalSettings.PayerExists)
+					{
+						if ((payer != null) || (existingPayerId.HasValue))
+						{
+							var id = (payer.PayerID > 0) ? payer.PayerID : existingPayerId.Value;
+							currentPayer = Payer.Find(id);
+						}
+					}
 					else
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;

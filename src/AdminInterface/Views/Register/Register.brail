@@ -318,6 +318,7 @@
                         <input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
                     </div>
                     <div id="MessageForPayer"></div>
+                    <input type="hidden" id="PayerIdValue" name="existingPayerId" />
                 </td>
             </tr>
             <tr>

@@ -308,5 +308,33 @@ namespace Functional
 			if (clientType == ClientType.Drugstore)
 				browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
 		}
+
+		[Test]
+		public void Try_to_register_with_existing_payer()
+		{
+			uint clientcode;
+			var testPayerId = 921;
+			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
+
+				browser.TextField(Find.ById("SearchPayerTextPattern")).TypeText("офис");
+				browser.Button(Find.ById("SearchPayerButton")).Click();
+				Thread.Sleep(2000);
+				browser.SelectList(Find.ById("PayerComboBox")).Select("921. Офис123");
+				Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
+
+				browser.Button(Find.ById("RegisterButton")).Click();
+				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
+
+				var client = Client.Find(clientcode);
+				Assert.That(client.BillingInstance.PayerID, Is.EqualTo(testPayerId));
+
+				var settings = DrugstoreSettings.Find(clientcode);
+				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
+				Assert.That(settings.FirmCodeOnly, Is.Null);
+			}
+		}
 	}
 }
