@@ -354,19 +354,6 @@ SELECT ClientId,
 	CostId
 FROM TempIntersection;
 
-INSERT 
-INTO usersettings.Intersection(
-	ClientCode,
-	RegionCode,
-	PriceCode,
-	CostCode
-)
-SELECT ClientId,
-	RegionId,
-	PriceId,
-	CostId
-FROM TempIntersection;
-
 DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 ")
 							.SetParameter("clientId", Id)

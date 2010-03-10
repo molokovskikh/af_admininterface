@@ -113,41 +113,10 @@ namespace AdminInterface.Controllers
 					else
 						drugstore.OrderRegionMask &= ~setting.Id;
 				}				
+				if (oldMaskRegion != client.MaskRegion)
+					client.MaintainIntersection();
 				client.Update();
 				drugstore.Update();
-
-				if (oldMaskRegion != client.MaskRegion)
-				{
-					ArHelper.WithSession(session => session.CreateSQLQuery(@"
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	CostId
-)
-SELECT  DISTINCT drugstore.Id,
-	regions.regioncode,
-	pricesdata.pricecode,
-	(
-		SELECT costcode
-		FROM pricescosts pcc
-		WHERE basecost AND pcc.PriceCode = pricesdata.PriceCode
-	) as CostCode
-FROM Future.Clients as drugstore
-	JOIN retclientsset as a ON a.clientcode = drugstore.Id
-	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
-		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
-	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
-WHERE i.Id IS NULL
-	AND supplier.firmtype = 0
-	AND drugstore.Id = :ClientId
-	AND drugstore.FirmType = 1;")
-								.SetParameter("ClientId", client.Id)
-								.ExecuteUpdate());
-				}
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
