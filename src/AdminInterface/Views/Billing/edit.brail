@@ -79,7 +79,6 @@
 			}
 		});
 	}
-	
 </script>
 
 <style>
@@ -118,8 +117,8 @@
 <div class="Navigation">
 	<ul id="breadcrumb">
 		<li>
-			<a title="Административный интерфейс" href="../default.aspx">
-				<img class="home" src="../images/home.png" alt="Административный интерфейс" />
+			<a title="Административный интерфейс" href="${siteroot}/default.aspx">
+				<img class="home" src="${siteroot}/Images/home.png" alt="Административный интерфейс" />
 			</a>
 		</li>
 		<li>
@@ -131,7 +130,7 @@
 	</ul>
 </div>
 
-<H3>Платильщик ${Instance.ShortName}</H3>
+<H3>Плательщик ${Instance.ShortName}</H3>
 
 <div id="StatusBar" style="padding-bottom: 10px;">
 	<table Class="CenterBlock ${Message.GetClass() if IsDefined("Message")}">

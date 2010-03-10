@@ -1,0 +1,7 @@
+﻿<%  if IsDefined("addresses"):
+        for i, address in enumerate(addresses): %>
+    <option id="${address.Id}address${address.Client.Id}" value="${address.Id}" ${"selected" if (i == 0)}>
+        ${address.Value}
+    </option>
+<%      end
+    end %>

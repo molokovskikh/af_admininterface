@@ -66,11 +66,14 @@ namespace Functional.ForTesting
 			Client client;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				var contactOwner = new ContactGroupOwner();
+				contactOwner.Save();
 				var payer = new Payer {
 					ShortName = "test",
+					ContactGroupOwner = contactOwner,
 				};
 				payer.Save();
-				var contactOwner = new ContactGroupOwner();
+				contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
 				client = new Client {
 					Status = ClientStatus.On,
@@ -106,6 +109,29 @@ namespace Functional.ForTesting
 			user.Setup(client);
 			client.Users = new List<User> {user};
 			return client;
+		}
+
+		public static Client CreateTestClientWithAddressAndUser()
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var client = CreateTestClient();
+				var user = new User {
+					Client = client,
+					Name = "test"
+				};
+				user.Setup(client);
+				client.Users = new List<User> { user };
+
+				var address = new Address {
+                    Client = client,
+                    Value = "тестовый адрес"
+				};
+				client.Addresses = new List<Address> { address };
+				client.Update();
+				scope.VoteCommit();
+				return client;
+			}
 		}
 	}
 }

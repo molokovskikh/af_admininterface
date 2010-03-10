@@ -23,9 +23,44 @@
 	background-color: #ff6600;
 }
 
-.DisabledLogin
+.DisabledUser td
 {
-	background-color: #bbffff;
+	background-color: #6a6a6a;
+}
+
+.Disabled
+{
+	background-color: #ff6600;
+}
+
+.Disabled td
+{
+	background-color: #ff6600;
+}
+
+.Free
+{
+	background-color: #d0ef72;
+}
+
+.Free td
+{
+	background-color: #d0ef72;
+}
+
+.Inactive td
+{
+	background-color: #AbAbAb;
+}
+
+.Inactive
+{
+	background-color: #Ababab;
+}
+
+.HasNoConnectedUsers
+{
+	background-color: #cece9d;
 }
 
 .BlockedLogin

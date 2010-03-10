@@ -31,16 +31,24 @@ namespace AdminInterface.Controllers
 	{
 		public void Edit(uint billingCode,
 			uint clientCode,
+			uint userId,
+			uint addressId,
 			bool showClients,
+			bool showAddresses,
+			bool showUsers,
 			string tab,
 			DateTime? paymentsFrom,
 			DateTime? paymentsTo)
 		{
 			Client client;
+			User user;
+			Address address;
 			if (billingCode == 0)
 				client = Client.Find(clientCode);
 			else
 				client = Payer.Find(billingCode).Clients.First();
+			user = (userId != 0) ? User.Find(userId) : client.Users.First();
+			address = (addressId != 0) ? Address.Find(addressId) : client.Addresses.First();
 
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
@@ -50,8 +58,9 @@ namespace AdminInterface.Controllers
 			if (clientMessage != null)
 				PropertyBag["ClientMessage"] = clientMessage;
 
-			if (showClients)
-				PropertyBag["ShowClients"] = showClients;
+			PropertyBag["ShowClients"] = showClients;
+			PropertyBag["ShowUsers"] = showUsers;
+			PropertyBag["ShowAddresses"] = showAddresses;
 
 			if (String.IsNullOrEmpty(tab))
 				tab = "payments";
@@ -63,12 +72,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(client);
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
+			PropertyBag["User"] = user;
+			PropertyBag["Address"] = address;
 			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			//PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["Today"] = DateTime.Today;
+			PropertyBag["TotalSum"] = payer.TotalSum;
+
+			PropertyBag["Users"] = payer.GetAllUsers();
+			PropertyBag["Addresses"] = payer.GetAllAddresses();
 		}
 
 		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
@@ -106,24 +121,69 @@ namespace AdminInterface.Controllers
 			Redirect("Billing", "Edit", new {clientMessage.ClientCode, tab = "payments"});
 		}
 
-		public void UpdateClientsStatus(uint clientCode, 
-										[DataBind("Status")] ClientWithStatus[] clients)
+		public void UpdateClientStatus(uint clientId, bool enabled)
 		{
 			using(new TransactionScope())
 			{
 			    DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
 			                                                                   Request.UserHostAddress);
-				foreach (var client in clients)
-				{
-					var oldClient = Client.Find(clientCode);
-					if (client.Status == ClientStatus.On && oldClient.Status == ClientStatus.Off)
-						Mailer.ClientBackToWork(oldClient);
-					if (oldClient.Status != client.Status)
-						ClientInfoLogEntity.StatusChange(client.Status, clientCode).Save();
-					client.Update();
+				var newStatus = enabled ? ClientStatus.On : ClientStatus.Off;
+				var client = Client.Find(clientId);
+				if (newStatus == ClientStatus.On && client.Status == ClientStatus.Off)
+					Mailer.ClientBackToWork(client);
+				if (client.Status != newStatus)
+					ClientInfoLogEntity.StatusChange(newStatus, client.Id).Save();
+				client.Status = newStatus;
+				client.UpdateAndFlush();
+
+				// Если нужно, отключаем пользователей и адреса
+				if (!enabled)
+				{					
+					foreach (var user in client.Users)
+						SetUserStatus(user.Id, false, user.IsFree);
+					foreach (var addr in client.Addresses)
+						SetAddressStatus(addr.Id, false);
 				}
 			}
-			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
+			CancelView();
+			CancelLayout();
+		}
+
+		public void SetUserStatus(uint userId, bool enabled, bool free)
+		{
+			using (new TransactionScope())
+			{
+				var user = User.Find(userId);
+				user.Enabled = enabled;
+				user.IsFree = free;
+				user.UpdateAndFlush();
+				if (!enabled)
+				{
+					// Если это отключение, то проходим по адресам и
+					// отключаем адрес, который доступен только отключенным пользователям
+					foreach (var address in user.AvaliableAddresses)
+					{
+						if (address.AvaliableForEnabledUsers)
+							continue;
+						address.Enabled = false;
+						address.Update();
+					}
+				}
+			}
+			CancelView();
+            CancelLayout();
+		}
+
+		public void SetAddressStatus(uint addressId, bool enabled)
+		{
+			using (new TransactionScope())
+			{
+				var address = Address.Find(addressId);
+				address.Enabled = enabled;
+				address.UpdateAndFlush();
+			}
+			CancelView();
+            CancelLayout();			
 		}
 
 		public void Search()
@@ -184,7 +244,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
-						 [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
+            [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
 			using (new TransactionScope())
 				foreach (var instance in paymentInstances)
@@ -249,6 +309,75 @@ namespace AdminInterface.Controllers
 		private static IList<Region> GetRegions()
 		{
 			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
+		}
+
+		public void AdditionalUserInfo(uint userId, string cssClassName)
+		{
+			CancelLayout();
+			PropertyBag["user"] = User.Find(userId);
+		}
+
+		public void AdditionalAddressInfo(uint addressId, string cssClassName)
+		{
+			CancelLayout();
+			PropertyBag["address"] = Address.Find(addressId);
+		}
+
+		public void SearchUsersForAddress(uint addressId, string searchText)
+		{
+            if (String.IsNullOrEmpty(searchText))
+                searchText = String.Empty;
+            var address = Address.Find(addressId);
+            var users = address.Client.Users.Where(user =>
+                (user.Name.ToLower().Contains(searchText.ToLower()) || user.Login.ToLower().Contains(searchText.ToLower())) &&
+                (!address.AvaliableFor(user)));
+            PropertyBag["Users"] = users;
+            CancelLayout();
+        }
+
+        public void SearchAddressesForUser(uint userId, string searchText)
+		{
+			if (String.IsNullOrEmpty(searchText))
+				searchText = String.Empty;
+            var user = User.Find(userId);
+            var addresses = user.Client.Addresses.Where(address => 
+                address.Value.ToLower().Contains(searchText.ToLower()) &&
+                !address.AvaliableFor(user));
+            PropertyBag["Addresses"] = addresses;
+            CancelLayout();
+		}
+
+		public void ConnectUserToAddress(uint userId, uint addressId)
+		{
+			using (new TransactionScope())
+			{
+				var user = User.Find(userId);
+				var address = Address.Find(addressId);
+				address.AvaliableForUsers.Add(user);
+				address.Update();
+			}
+			CancelView();
+			CancelLayout();
+		}
+
+		public void DisconnectUserFromAddress(uint userId, uint addressId)
+		{
+			using (new TransactionScope())
+			{
+				var user = User.Find(userId);
+				var address = Address.Find(addressId);
+				address.AvaliableForUsers.Remove(user);
+				address.Update();
+			}
+			CancelView();
+			CancelLayout();
+		}
+
+		public void TotalSum(uint payerId)
+		{
+            Response.Output.Write(Payer.Find(payerId).TotalSum.ToString());
+            CancelView();
+			CancelLayout();
 		}
 	}
 }

@@ -87,16 +87,28 @@ function ValidateParent(source, args)
 
 function ShowHidden(sender)
 {
-    $$(".ShowHiden").first().className = "HideVisible";
-	sender.onclick = function() { HideVisible(sender); } 
-	$$(".hidden").first().className = "VisibleFolder";
+	if ($$(".ShowHiden").length > 1 || $$(".hidden").length > 1) {
+        jQuery(".ShowHiden[title=\"" + sender.title + "\"]")[0].className = "HideVisible";        
+        jQuery(".hidden[title=\"" + sender.title + "\"]")[0].className = "VisibleFolder";	
+	}
+	else {
+		$$(".ShowHiden").first().className = "HideVisible";
+		$$(".hidden").first().className = "VisibleFolder";
+	}
+	sender.onclick = function() { HideVisible(sender); }
 }
 
 function HideVisible(sender)
 {
-    $$(".HideVisible").first().className = "ShowHiden";
+	if ($$(".HideVisible").length > 1 || $$(".VisibleFolder").length > 1) {
+        jQuery(".HideVisible[title=\"" + sender.title + "\"]")[0].className = "ShowHiden";
+        jQuery(".VisibleFolder[title=\"" + sender.title + "\"]")[0].className = "hidden";
+	}
+	else {
+		$$(".HideVisible").first().className = "ShowHiden";
+		$$(".VisibleFolder").first().className = "hidden";
+	}
 	sender.onclick = function() { ShowHidden(sender); } 
-	$$(".VisibleFolder").first().className = "hidden";
 }
 
 function SetupCalendarElements()
@@ -114,4 +126,12 @@ function SetupCalendarElements()
 					showOthers: true
 				})
 			});
+}
+
+function ShowElement(show, selector) {
+	var displayValue = "none";
+	if (show) {
+		displayValue = "block";
+	}
+	jQuery(selector).css("display", displayValue);
 }

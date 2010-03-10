@@ -1,0 +1,14 @@
+﻿<%
+i = 0
+    if IsDefined("address"):
+%>
+<tr id="AddressRow${address.Id}" class="${"Free" if address.IsFree} ${"Inactive" if not address.IsActive}" align="center">
+    <td style="width: 50px;">
+        <input type="checkbox" ${"checked" if address.Enabled} onclick="SetAddressStatus(${address.Id}, this.checked)" />
+    </td>
+    <td>${Address.Value}</td>
+    <td>${Address.Client.Name}</td>
+</tr>
+<%
+    end
+%>

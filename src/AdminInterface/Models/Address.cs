@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.AccessControl;
 #endif
 using AdminInterface.Helpers;
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
@@ -30,6 +31,9 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupId")]
 		public ContactGroup ContactGroup { get; set; }
 
+		[Property]
+		public bool Enabled { get; set; }
+
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
 			ColumnKey = "AddressId",
@@ -40,6 +44,39 @@ namespace AdminInterface.Models
 		public virtual bool AvaliableFor(User user)
 		{
 			return AvaliableForUsers.Any(u => u.Id == user.Id);
+		}
+
+		/// <summary>
+		/// true, если доступен хотя бы одному включенному пользователю
+		/// false, если доступен только отключенным пользователям
+		/// </summary>
+		public virtual bool AvaliableForEnabledUsers
+		{
+			get
+			{
+				return (AvaliableForUsers.Where(user => user.Enabled && (user.Client.Status == ClientStatus.On)).Count() > 0);
+			}
+		}
+
+		public virtual bool IsFree
+		{
+			get
+			{
+				// Кол-во пользователей, которым доступен этот адрес и которые работают НЕ бесплатно, должно быть нулевым
+				return (AvaliableForUsers.Where(user => !user.IsFree).Count() == 0);
+			}
+		}
+
+		/// <summary>
+		/// true - адрес активен (активен хотя бы один пользователь, которому доступен этот адрес)
+		/// false - адрес неактивен (неактивны все пользователи, которым доступен этот адрес)
+		/// </summary>
+		public virtual bool IsActive
+		{
+			get
+			{
+				return (AvaliableForUsers.Where(user => user.IsActive).Count() > 0);
+			}
 		}
 
 		public virtual void MaitainIntersection()

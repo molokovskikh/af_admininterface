@@ -431,7 +431,11 @@
     <None Include="Service References\ServiceReference1\StatisticService.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
+    <None Include="Views\Billing\AdditionalUserInfo.brail" />
     <None Include="Views\Billing\Mail.brail" />
+    <None Include="Views\Billing\SearchAddressesForUser.brail" />
+    <None Include="Views\Billing\SearchUsersForAddress.brail" />
+    <None Include="Views\Billing\AdditionalAddressInfo.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />

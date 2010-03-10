@@ -23,6 +23,10 @@ namespace AdminInterface.Models
 	[ActiveRecord("billing.payers")]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
+		public const decimal CostPerUser = 800;
+
+		public const decimal CostPerAdditionalAddress = 200;
+
 		[PrimaryKey]
 		public virtual uint PayerID { get; set; }
 
@@ -210,6 +214,22 @@ ORDER BY {Payer}.shortname;";
 			return bills;
 		}
 
+		public IList<User> GetAllUsers()
+		{
+			var allUsers = new List<User>();
+			foreach (var client in Clients)
+				allUsers.AddRange(client.Users);
+			return allUsers;
+		}
+
+		public IList<Address> GetAllAddresses()
+		{
+			var allAddresses = new List<Address>();
+			foreach (var client in Clients)
+				allAddresses.AddRange(client.Addresses);
+			return allAddresses;
+		}
+
 		public void CheckReciver()
 		{
 			if (Reciver == null)
@@ -253,6 +273,28 @@ ORDER BY {Payer}.shortname;";
 		public float CreditOn(DateTime on)
 		{
 			return Payment.CreditOn(this, on);
+		}
+
+		public decimal TotalSum
+		{
+			get
+			{
+				var countAddresses = Convert.ToDecimal(GetAllAddresses().Where(address => 
+					address.Enabled &&	// Адрес включен
+					!address.IsFree &&	// НЕ бесплатный
+					address.Client.Status == ClientStatus.On &&	// Клиент (владелец адреса) включен
+					address.AvaliableForEnabledUsers	// Есть хотя бы один включенный пользоыватель, которому доступен этот адрес
+					).Count());
+				var countUsers = Convert.ToDecimal(GetAllUsers().Where(user => 
+					user.Enabled &&	// Пользователь включен	
+					!user.IsFree &&	// НЕ бесплатный
+					user.Client.Status == ClientStatus.On // Клиент (владелец пользователя) включен
+					).Count());
+				var sum = countUsers * CostPerUser;
+				if ((countAddresses - countUsers) > 0)
+					sum += (countAddresses - countUsers) * CostPerAdditionalAddress;
+				return sum;
+			}
 		}
 	}
 }

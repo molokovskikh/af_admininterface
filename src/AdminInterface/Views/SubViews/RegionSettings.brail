@@ -14,9 +14,9 @@
         }
     }
 
-    function addDefaultRegions() {
+    function addDefaultRegions() {        
         var homeRegionId = jQuery('select#comboBoxHomeRegion').val();
-        var link = "${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;
+        var link = "${siteroot}/Regions/ShowRegions.rails?homeRegionId=" + homeRegionId;        
         <% if IsDefined("client"): %>
             link = "${siteroot}/Regions/ShowRegions.rails?clientId=" + ${client.Id};
         <% end %>
@@ -66,7 +66,7 @@
 
 <div class="block">
     <h3>Региональная настройка</h3>
-    <table cellpadding="5" width="100%">
+    <table cellpadding="5" width="100%">        
         <% if not IsDefined("client"): %>
         <tr>            
             <td colspan="3">Домашний регион:<br />
@@ -86,7 +86,7 @@
                     %>
                 </select>
             </td>
-        </tr>
+        </tr>        
         <% end %>
 		<tr>
             <td colspan = "3" id="RegionList">

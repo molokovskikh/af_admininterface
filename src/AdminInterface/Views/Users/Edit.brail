@@ -6,7 +6,9 @@
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
 <script>
-	$(function() {
+    $(function() {
+        $("form#UserSettingsForm").validate({
+        });	
 		$("form#ReseteUin").validate({
 			rules: {
 				"reason": "required"

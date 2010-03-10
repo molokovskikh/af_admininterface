@@ -45,6 +45,9 @@ namespace AdminInterface.Models
 		public virtual string Name { get; set; }
 
 		[Property]
+		public virtual bool Enabled { get; set; }
+
+		[Property]
 		public virtual bool SubmitOrders { get; set; }
 
 		[Property]
@@ -67,6 +70,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual ulong OrderRegionMask { get; set; }
+
+		[Property(Column = "Free")]
+		public virtual bool IsFree { get; set; }
 
 		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
 		public virtual Client Client { get; set; }
@@ -195,6 +201,18 @@ namespace AdminInterface.Models
 			get
 			{
 				return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+			}
+		}
+
+		/// <summary>
+		/// Пользователь считается активным, если он получал обновление не более 7 дней назад
+		/// </summary>
+		public virtual bool IsActive
+		{
+			get
+			{
+				var log = AuthorizationLogEntity.TryFind(Id);
+				return ((log != null) && (log.AFTime.HasValue) && (DateTime.Now.Subtract(log.AFTime.Value).Days <= 7));
 			}
 		}
 

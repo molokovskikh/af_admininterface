@@ -17,16 +17,14 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl("default.aspx")))
 			{
 				browser.Link(Find.ByText("История звонков")).Click();
-				var calendarFrom = browser.Div("beginDateCalendarHolder");
-				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
-				headerRow.TableCells[1].MouseDown();
-				headerRow.TableCells[1].MouseUp(); //Выбрали предыдущий месяц
-				browser.Button(Find.ByValue("Показать")).Click();
+				browser.Button(Find.ByValue("Найти")).Click();
 
-				Assert.That(browser.ContainsText("Слушать разговор"));
 				Assert.That(browser.ContainsText("Дата звонка"));
-				Assert.That(browser.ContainsText("Кто звонил"));
 				Assert.That(browser.ContainsText("Куда звонил"));
+				Assert.That(browser.ContainsText("Кому звонил"));
+				Assert.That(browser.ContainsText("Тип звонка"));
+				Assert.That(browser.ContainsText("Номер звонившего"));
+				Assert.That(browser.ContainsText("Имя звонившего"));
 			}
 		}
 	}

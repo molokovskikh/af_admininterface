@@ -1,0 +1,127 @@
+﻿<script type="text/javascript">
+    function ShowConnectingAddressDiv(userId) {
+        ShowElement(true, "#ConnectingAddressDiv" + userId);
+        ShowElement(true, "#SearchAddressDiv" + userId);        
+        ShowElement(false, "#SelectAddressDiv" + userId);
+        ShowElement(false, "#ConnectAddressLink" + userId);
+        jQuery("#SearchAddressMessage" + userId).html("");
+        jQuery("#AddressSearchText" + userId).val("");
+    }
+
+    function ResetSearchAddress(userId) {
+        ShowElement(false, "#SelectAddressDiv" + userId);
+        ShowElement(true, "#SearchAddressDiv" + userId);
+    }
+
+    function ConnectAddressToUser(userId) {
+        var addressId = jQuery("#AddressesComboBox" + userId + " option:selected").val();
+        var address = jQuery("#AddressesComboBox" + userId + " option:selected").html();
+        var link = "${siteroot}/Billing/ConnectUserToAddress.rails?userId=" + userId + "&addressId=" + addressId;
+        jQuery.ajax({
+            url: link,
+            cache: false,
+            success: function(h) {
+                var id = "RowUser" + userId + "Address" + addressId;
+                var html = "<tr id='" + id + "'><td><input type='checkbox' checked='checked' id='CheckBoxUser" + userId + "Address" + addressId + "' " +
+                    "onclick='if (!this.checked) DisconnectAddressFromUser(" + userId +","+ addressId +")'>" +
+                    address + "</input></td></tr>";
+                jQuery("#AddressesTable" + userId).append(html); 
+                CancelSearchAddress(userId);
+                RefreshTotalSum();
+            }
+        });        
+    }
+    
+    function DisconnectAddressFromUser(userId, addressId) {
+        var link = "${siteroot}/Billing/DisconnectUserFromAddress.rails?userId=" + userId + "&addressId=" + addressId;
+        jQuery.ajax({
+            url: link,
+            cache: false,
+            success: function(html) {
+                jQuery("#RowUser" + userId + "Address" + addressId).remove();
+                RefreshTotalSum();
+            }
+        });
+    }
+
+    function SearchAddress(userId) {
+        jQuery('#AddressesComboBox' + userId).find('option').remove().end();
+        jQuery("#SearchAddressMessage" + userId).html("<i>Выполняется поиск</i>");
+        var searchText = jQuery("#AddressSearchText" + userId).val();
+        var link = "${siteroot}/Billing/SearchAddressesForUser.rails?userId=" + userId + "&searchText=" + searchText;
+        jQuery.ajax({
+            url: link,
+            cache: false,
+            success: function(html) {
+                if (html.length > 0) {
+                    jQuery("#SearchAddressMessage" + userId).html("");
+                    jQuery("#AddressesComboBox" + userId).append(html);
+                    ShowElement(false, "#SearchAddressDiv" + userId);
+                    ShowElement(true, "#SelectAddressDiv" + userId);
+                    return;
+                }
+                jQuery("#SearchAddressMessage" + userId).html("<i>Ничего не найдено</i>");
+            }
+        });
+    }    
+    
+    function CancelSearchAddress(userId) {
+        ShowElement(false, "#ConnectingAddressDiv" + userId);
+        ShowElement(true, "#ConnectAddressLink" + userId);
+    }
+</script>
+
+<div id="additionalUserInfo${user.Id}">
+    <div style="padding: 15px; border-left: solid 1px #E4E4E4; border-right: solid 1px #E4E4E4; border-bottom: solid 1px #E4E4E4; background-color: #F6F6F6">
+        <table style="width: 100%; height: 100%">
+            <tr>
+                <td align="left">
+                    <div class= "block">
+                        <div class="contextualNoTopSpace"><a id="ConnectAddressLink${user.Id}" class="icon icon-add" href="javascript:" onclick="ShowConnectingAddressDiv(${user.Id})">Подключить адрес</a></div>
+                        <h4>Доступные адреса</h4>
+                        <table id="AddressesTable${user.Id}" style="width: 100%">
+                            <tr>
+                                <td>
+                                    <div id="ConnectingAddressDiv${user.Id}" style="display: none">
+                                        <div id="SearchAddressDiv${user.Id}" style="display: none">
+                                            <table style="width: 100%">
+                                                <tr>
+                                                    <td style="width: 70%"><input id="AddressSearchText${user.Id}" type="text" style="width: 100%" /></td>
+                                                    <td align="right" style="width: 15%"><input id="SearchAddressButton${user.Id}" type="button" value="Найти" onclick="SearchAddress(${user.Id})" /></td>
+                                                    <td align="right" style="width: 15%"><input id="CancelSearchButton${user.Id}" type="button" value="Отмена" onclick="CancelSearchAddress(${user.Id})"/></td>
+                                                </tr>
+                                            </table>
+                                        </div>
+                                        <div id="SelectAddressDiv${user.Id}" style="display: none">
+                                            <table style="width: 100%">
+                                                <tr>
+                                                    <td style="width: 70%"><select id="AddressesComboBox${user.Id}" style="width: 100%"></select></td>
+                                                    <td align="right" style="width: 15%"><input id="ConnectAddressToUserButton${user.Id}" type="button" value="Подключить" onclick="ConnectAddressToUser(${user.Id})" /></td>
+                                                    <td align="right" style="width: 15%"><input id="ResetSearchButton${user.Id}" type="button" value="Сброс" onclick="ResetSearchAddress(${user.Id})" /></td>
+                                                </tr>
+                                            </table>                                        
+                                        </div>
+                                        <div id="SearchAddressMessage${user.Id}"></div>
+                                        <br />
+                                    </div>
+                                </td>
+                            </tr>                        
+<%                      for address in user.Client.Addresses: 
+                            if (address.AvaliableFor(user)): %>
+                            <tr id="RowUser${user.Id}Address${address.Id}">
+                                <td>
+                                    <input id="CheckBoxUser${user.Id}Address${address.Id}" type="checkbox" ${"checked" if address.AvaliableFor(user)}
+                                        onclick="if (!this.checked) DisconnectAddressFromUser(${user.Id}, ${address.Id})">
+                                        ${address.Value}
+                                    </input>
+                                </td>
+                            </tr>
+<%                          end
+                        end %>
+                        </table>
+                    </div>
+                </td>
+            </tr>
+        </table>    
+    </div>
+</div>

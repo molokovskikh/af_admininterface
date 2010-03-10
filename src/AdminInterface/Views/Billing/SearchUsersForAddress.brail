@@ -1,0 +1,7 @@
+﻿<%  if IsDefined("users"):
+        for i, user in enumerate(users): %>
+        <option id="${user.Id}user${user.Client.Id}" value="${user.Id}" ${"selected" if (i == 0)}>
+            ${user.Login}
+        </option>
+<%      end
+    end %>

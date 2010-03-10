@@ -8,9 +8,9 @@ def WriteHeader(text as string, columnName as string):
 			currentSortDirection = "Descending"
 		end
 		if sortDirection == "Ascending":
-			url = "../Images/arrow-down-blue-reversed.gif"
+			url = "${siteroot}/Images/arrow-down-blue-reversed.gif"
 		else:
-			url = "../Images/arrow-down-blue.gif"
+			url = "${siteroot}/Images/arrow-down-blue.gif"
 		end
 	end
 	%>
