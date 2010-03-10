@@ -13,6 +13,7 @@ using MySql.Data.MySqlClient;
 using NUnit.Framework;
 
 using WatiN.Core;
+using Functional.ForTesting;
 
 namespace Functional
 {
@@ -334,6 +335,29 @@ namespace Functional
 				var settings = DrugstoreSettings.Find(clientcode);
 				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
 				Assert.That(settings.FirmCodeOnly, Is.Null);
+			}
+		}
+
+		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя")]
+		public void Check_flags_by_adding_user()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.Button(Find.ByValue("Создать")).Click();
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					Assert.That(client.Users.Count, Is.GreaterThan(0));
+					browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+					browser.Refresh();
+					var userLink = browser.Link(Find.ByText(client.Users[0].Login));
+					Assert.IsTrue(userLink.Exists);
+					userLink.Click();
+					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
+					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
+				}
 			}
 		}
 	}
