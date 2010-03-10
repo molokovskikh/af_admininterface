@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Security;
@@ -17,24 +18,32 @@ namespace AdminInterface.Controllers
 	[
 		Secure(PermissionType.CallHistory),
 		Helper(typeof(ViewHelper)),
+		Helper(typeof(BindingHelper)), 
 		Layout("GeneralWithJQuery"),
 	]
 	public class CallHistoryController : ARSmartDispatcherController
 	{
-		public void ShowCallHistory(int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex,
-			DateTime? beginDate, DateTime? endDate, string searchText)
+		public void Search()
 		{
-			ControllerHelper.InitParameter(ref beginDate, "beginDate", DateTime.Today.AddDays(-1), PropertyBag);
-			ControllerHelper.InitParameter(ref endDate, "endDate", DateTime.Today, PropertyBag);
-			ControllerHelper.InitParameter(ref sortColumnIndex, "sortColumnIndex", 1, PropertyBag);
+			var searchProperties = new CallSearchProperties {
+					CallType = CallType.All,
+					BeginDate = DateTime.Today.AddDays(-1),
+					EndDate = DateTime.Today
+				};
+			PropertyBag["FindBy"] = searchProperties;
+		}
+
+		public void ShowCallHistory([DataBind("SearchBy")] CallSearchProperties searchProperties,
+			int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex)
+		{
+			ControllerHelper.InitParameter(ref sortColumnIndex, "sortColumnIndex", 2, PropertyBag);
 			ControllerHelper.InitParameter(ref currentPage, "currentPage", 0, PropertyBag);
 			ControllerHelper.InitParameter(ref pageSize, "pageSize", 50, PropertyBag);
-			PropertyBag["searchText"] = searchText;
 
-			var callRecords = CallRecord.GetByPeriod(beginDate.Value, endDate.Value, sortColumnIndex.Value,
-													 rowsCount.HasValue, currentPage.Value, pageSize.Value, searchText);
+			var callRecords = CallRecord.Search(searchProperties, sortColumnIndex.Value, rowsCount.HasValue, currentPage.Value, pageSize.Value);
 			ControllerHelper.InitParameter(ref rowsCount, "rowsCount", callRecords.Count, PropertyBag);
 			PropertyBag["calls"] = callRecords;
+            PropertyBag["FindBy"] = searchProperties;
 		}
 
 		public void ListenCallRecord(ulong recordId)

@@ -1,14 +1,19 @@
 ﻿<%import System %>
 
-<%def CreateLink(i):
+<%
+def CreateLink(i):
     link = ""
-	if i!=currentPage :
-      link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString(), "searchText", searchText, "beginDate", beginDate.ToString(), "endDate", endDate.ToString()) + "\">" + (i+1) + "</a>"
-   else:
-      link = "<span class=\"CurrentPage\">" + (i+1) +"</span>"
-   end
-   return link
-end%>
+	if i != currentPage :
+	    if (IsDefined("formPostBack")):
+            link = "<a href=\"javascript:\" onclick=\"document.getElementById('currentPage').value = ${i}; document.${formPostBack}.submit();\">" + (i+1) + "</a>"	    
+	    else:
+            link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString()) + "\">" + (i+1) + "</a>"
+        end
+    else:
+        link = "<span class=\"CurrentPage\">" + (i+1) +"</span>"
+    end
+    return link
+end %>
 
 <% lastPage = Math.Ceiling(rowsCount/Convert.ToDouble(pageSize))
    startPage = Math.Max(0, currentPage - 9)
@@ -24,8 +29,13 @@ end%>
    end%>
 <% if lastPage>1: %>    
     <% if currentPage>0:%>
+        <% if IsDefined("formPostBack"): %>
+		<a href="javascript:" onclick="document.getElementById('currentPage').value = 0; document.${formPostBack}.submit();" title="Первая страница">&laquo; Первая</a>
+        <a href="javascript:" onclick="document.getElementById('currentPage').value = ${currentPage - 1}; document.${formPostBack}.submit();" title="Предыдущая страница">&lt;</a>
+        <% else: %>
 		<a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", "0", "rowsCount", rowsCount.ToString())}" title="Первая страница">&laquo; Первая</a>
         <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Предыдущая страница">&lt;</a>
+        <% end %>
     <% else: %>
 		<span title="Первая страница">&laquo; Первая</span>
         <span title="Предыдущая страница">&lt;</span>
@@ -81,8 +91,13 @@ end%>
 
 <% if lastPage>1: %>
     <% if currentPage<(lastPage-1):%>
+        <% if IsDefined("formPostBack"): %>
+		<a href="javascript:" onclick="document.getElementById('currentPage').value = ${currentPage+1}; document.${formPostBack}.submit();" title="Следующая страница">&gt;</a>
+        <a href="javascript:" onclick="document.getElementById('currentPage').value = ${lastPage-1}; document.${formPostBack}.submit();" title="Последняя страница">Последняя &raquo;</a>
+        <% else: %>
         <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage+1).ToString(), "rowsCount", rowsCount.ToString())}" title="Следующая страница">&gt;</a>
         <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (lastPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Последняя страница">Последняя &raquo;</a>
+        <% end %>
     <% else: %>
         <span title="Следующая страница">&gt;</span>
         <span title="Последняя страница">Последняя &raquo;</span>

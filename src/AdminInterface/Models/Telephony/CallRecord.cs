@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -16,12 +17,24 @@ using Common.MySql;
 
 namespace AdminInterface.Models.Telephony
 {
+	public enum CallType
+	{
+		[Description("Входящий")]
+		Incoming = 1,
+		[Description("Исходящий")]
+		Outgoing = 2,
+		[Description("Отзвон")]
+		Callback = 3,
+		[Description("Все")]
+		All = 0,
+	}
+
 	[ActiveRecord("logs.RecordCalls")]
 	public class CallRecord : ActiveRecordBase<CallRecord>
 	{
 		private IList<CallRecordFile> _files = null;
 
-		private static string[] _sortableColumns = new[] { "WriteTime", "WriteTime", "From", "NameFrom", "To", "NameTo" };
+		private static string[] _sortableColumns = new[] { "WriteTime", "WriteTime", "From", "NameFrom", "To", "NameTo", "CallType" };
 
 		[PrimaryKey]
 		public virtual ulong Id { get; set; }
@@ -41,6 +54,16 @@ namespace AdminInterface.Models.Telephony
 		[Property(Column = "NameTo")]
 		public virtual string NameDestination { get; set; }
 
+		[Property(Column = "CallType")]
+		public virtual CallType? Type { get; set; }
+
+		public virtual string GetCallType()
+		{
+			if (Type == null)
+				return "Неизвестно";
+			return Type.GetDescription();
+		}
+
 		public virtual IList<CallRecordFile> Files
 		{
 			get
@@ -57,23 +80,23 @@ namespace AdminInterface.Models.Telephony
 			}
 		}
 
-		public static IList<CallRecord> GetByPeriod(DateTime beginDate, DateTime endDate, int sortColumnIndex,
-			bool usePaging, int currentPage, int pageSize, string searchText)
+		public static IList<CallRecord> Search(CallSearchProperties searchProperties,
+			int sortColumnIndex, bool usePaging, int currentPage, int pageSize)
 		{
-			if (!String.IsNullOrEmpty(searchText))
-			{
-				searchText.Trim();
-				searchText = Utils.StringToMySqlString(searchText);
-			}
+			var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty : searchProperties.SearchText.ToLower();            
+			searchText.Trim();
+            searchText = Utils.StringToMySqlString(searchText);
 			var index = Math.Abs(sortColumnIndex) - 1;
 			var sortFilter = String.Format(" order by `{0}` ", _sortableColumns[index]);
 			sortFilter += (sortColumnIndex > 0) ? " asc " : " desc ";
-			var limit = usePaging ? String.Format("limit {0}, {1}", currentPage * pageSize, pageSize) : String.Empty;
+			var limit = usePaging ? String.Format("limit {0}, {1}", currentPage * pageSize, pageSize) : String.Empty;			
 			var searchCondition = String.IsNullOrEmpty(searchText) ? String.Empty :
-				" and (LOWER({CallRecord}.`From`) like \"%" + searchText.ToLower() +
-				"%\" or LOWER({CallRecord}.`To`) like \"%" + searchText.ToLower() +
-                "%\" or LOWER({CallRecord}.NameFrom) like \"%" + searchText.ToLower() +
-				"%\" or LOWER({CallRecord}.NameTo) like \"%" + searchText.ToLower() + "%\") ";
+				" and (LOWER({CallRecord}.`From`) like \"%" + searchText +
+				"%\" or LOWER({CallRecord}.`To`) like \"%" + searchText +
+                "%\" or LOWER({CallRecord}.NameFrom) like \"%" + searchText +
+				"%\" or LOWER({CallRecord}.NameTo) like \"%" + searchText + "%\") ";
+			if (searchProperties.CallType != CallType.All)
+				searchCondition += " and {CallRecord}.CallType = " + Convert.ToInt32(searchProperties.CallType);
 
 			IList<CallRecord> callList = null;
 			var sql = @"
@@ -83,8 +106,8 @@ where {CallRecord}.WriteTime > :BeginDate and {CallRecord}.WriteTime < :EndDate"
 			ArHelper.WithSession(session => {
 				callList = session.CreateSQLQuery(sql)
 					.AddEntity(typeof(CallRecord))
-					.SetParameter("BeginDate", beginDate)
-					.SetParameter("EndDate", endDate)
+					.SetParameter("BeginDate", searchProperties.BeginDate.AddDays(-1))
+					.SetParameter("EndDate", searchProperties.EndDate.AddDays(1))
 					.List<CallRecord>();
             });			
 			return callList;

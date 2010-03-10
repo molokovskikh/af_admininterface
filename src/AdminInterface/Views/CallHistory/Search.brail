@@ -1,0 +1,77 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск в истории звонков", "")]} %>
+
+<div class="CenterBlock FilterBlock" style="padding: 10px;">
+    <br />
+	<h3>
+		Фильтр звонков
+	</h3>
+	
+	<form id="SearchForm" action="ShowCallHistory.rails" method="post">
+	
+	<table style="width:100%">
+		<tr>
+		    <td>Введите текст для поиска:</td>
+        </tr>
+        <tr>
+			<td>
+				<input id="SearchText" class="ValidateSearch" type="text" name="SearchBy.SearchText" value="${FindBy.SearchText}" style="width: 99%;" />
+			</td>
+		</tr>
+	</table>
+	
+    <fieldset style="padding: 0; margin: 0;">
+        <legend>Период</legend>
+		<table style="width: 100%;" >
+		<col style="width:40%" />
+		<col style="width:60%" />
+
+        <tr style="text-align: left;">
+            <td>
+                С:
+            </td>
+            <td>
+                <input type="text" name="SearchBy.BeginDate" value="${FindBy.BeginDate.ToShortDateString()}" />
+                <input type="button" class="CalendarInput" />
+            </td>
+        </tr>
+        
+        <tr style="text-align: left;">
+            <td>
+                По:
+            </td>
+            <td>
+                <input type="text" name="SearchBy.EndDate" value="${FindBy.EndDate.ToShortDateString()}" />
+                <input type="button" class="CalendarInput" />
+            </td>
+        </tr>
+        
+        </table>
+    </fieldset>
+	
+	<fieldset style="padding: 0; margin: 0;">
+		<legend>Фильтры:</legend>
+		<table style="width: 100%;" >
+		    <col style="width:40%" />
+		    <col style="width:60%" />
+
+		    <tr style="text-align:left;">
+			    <td>
+				    Тип звонка:
+			    </td>
+			    <td>
+				    ${FormHelper.Select("SearchBy.CallType",
+									    FindBy.CallType,
+									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Telephony.CallType, AdminInterface"),
+									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+			    </td>
+		    </tr>
+		</table>
+		</fieldset>
+		<div style="text-align:right; margin-top: 10px;">
+			${FormHelper.Submit("Найти")}
+		</div>
+    </form>
+    <script type="text/javascript">
+    	    SetupCalendarElements();
+	</script>
+</div>

@@ -13,21 +13,8 @@
     }
 
 </script>
-    <table align="center">
-        <tr valign="top"><td style="font-weight:bold;">Выберите период:</td><td><% OutputSubView("/SubViews/SelectDateInterval") %></td></tr>
-<form id="searchForm" name="searchForm" method="post" action="ShowCallHistory.rails">        
-        <tr valign="top">
-            <td style="font-weight:bold;">Найти звонок:</td>
-            <td>                  
-                <input type="text" id="searchText" name="searchText" style="width: 100%" />(Введите номер телефона или имя)            
-            </td>
-        </tr>
-        <tr><td></td><td align="center"><input type="submit" value="Поиск" /></td></tr>
-        <input type="hidden" name="beginDate" value="${beginDate}" />
-        <input type="hidden" name="endDate" value="${endDate}" />
-        <input type="hidden" name="sortColumnIndex" value="${sortColumnIndex}" />            
-</form>
-    </table>
+
+<% OutputSubView("Search") %>
 <br />
 
 <form id="updateForm" name="updateForm" method="post" action="ShowCallHistory.rails">
@@ -37,48 +24,50 @@
         %>
         <tr>
             <% 
-            OutputSubView("/SubViews/SortHeadersSubView", {"headers":["Слушать разговор", "Дата звонка", "Номер звонившего", "Имя звонившего", "Куда звонил", "Кому звонил"], "sortColumnIndex":sortColumnIndex, "rowsCount":rowsCount})
+            OutputSubView("/SubViews/SortHeadersSubView", {"headers":["", "Дата звонка", "Номер звонившего", "Имя звонившего", "Куда звонил", "Кому звонил", "Тип звонка"], "sortColumnIndex":sortColumnIndex, "rowsCount":rowsCount, "formPostBack":'updateForm' })
             %>
         </tr> 
         <%
             for i, call in enumerate(calls):
         %>       
-        <tr class="${ViewHelper.GetRowStyle(i)}">
+        <tr class="${ViewHelper.GetRowStyle(i)}" align="center">
             <td align="center" id="TrackList${call.Id}">
                 <a href="javascript:" onclick="ShowCallTracks(${call.Id})" id="CallTracksLink"><img src="${siteroot}/Images/Sound-icon.png" border="0" /></a>
             </td>
-            <td align="center">${call.WriteTime}</td>
-            <td align="center">${call.From}</td>
-            <td align="center">${call.NameSource}</td>
-            <td align="center">${call.To}</td>            
-            <td align="center">${call.NameDestination}</td>
+            <td>${call.WriteTime}</td>
+            <td>${call.From}</td>
+            <td>${call.NameSource}</td>
+            <td>${call.To}</td>            
+            <td>${call.NameDestination}</td>
+            <td>${call.GetCallType()}</td>
         </tr>        
         <%
             break unless i<pageSize
             end
         %>
-        <tr class="NoHighLightRow">
-		    <td colspan="4" align="right">
+        <tr class="NoHighLightRow" align="right">
+		    <td colspan="6">
 		        <br />
 			    <div class="Paginator">
-				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "searchText":searchText, "beginDate":beginDate, "endDate":endDate}) %>
+				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "formPostBack":'updateForm'}) %>
 			    </div>
 		    </td>
         </tr>
         <%
         else:
         %>
-        <tr class="EmptyData NoHighLightRow"><td>За указанный период звонков не найдено.</td></tr>
+        <tr class="EmptyData NoHighLightRow"><td>Ничего не найдено.</td></tr>
         <%
         end
         %>
     </table>
     <br />
-    <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}" />
-    <input type="hidden" name="endDate" id="endDate" value="${endDate}" />
+    <input type="hidden" name="SearchBy.BeginDate" id="beginDate" value="${FindBy.BeginDate}" />
+    <input type="hidden" name="SearchBy.EndDate" id="endDate" value="${FindBy.EndDate}" />
     <input type="hidden" name="rowsCount" id="rowsCount" value="${rowsCount}" />
     <input type="hidden" name="pageSize" id="pageSize" value="${pageSize}" />
     <input type="hidden" name="currentPage" id="currentPage" value="${currentPage}" />
     <input type="hidden" name="sortColumnIndex" id="sortColumnIndex" value="${sortColumnIndex}" />    
-    <input type="hidden" name="searchText" id="searchText" value="${searchText}" />
+    <input type="hidden" name="SearchBy.SearchText" id="searchText" value="${FindBy.SearchText}" />
+    <input type="hidden" name="SearchBy.CallType" value="${FindBy.CallType}" />
 </form>

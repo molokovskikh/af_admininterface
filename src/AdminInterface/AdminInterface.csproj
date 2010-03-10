@@ -191,6 +191,7 @@
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\Telephony\CallRecordFile.cs" />
+    <Compile Include="Models\Telephony\CallSearchProperties.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
@@ -432,6 +433,7 @@
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
+    <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
