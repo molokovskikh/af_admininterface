@@ -26,17 +26,7 @@ namespace AdminInterface.Models.Telephony
 			get
 			{
 				var info = new FileInfo(_filename);
-				var strLength = info.Length.ToString();
-				var result = String.Empty;
-				var part = String.Empty;
-				for (var i = strLength.Length; i > 0; i -= 3)
-				{
-					for (var j = 0; (j < 3) && ((i - j) > 0); j++)
-						part = strLength[i - j - 1] + part;
-					result = (i <= 3) ? part + result : "," + part + result;
-					part = String.Empty;
-				}
-				return result + " байт";
+				return ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(info.Length));
 			}
 		}
 
