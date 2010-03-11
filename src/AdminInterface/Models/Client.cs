@@ -314,7 +314,7 @@ DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 CREATE TEMPORARY TABLE TempIntersection
 (
 ClientId int unsigned,
-RegionId int unsigned,
+RegionId BIGINT(20),
 PriceId int unsigned,
 CostId int unsigned
 ) engine=MEMORY;

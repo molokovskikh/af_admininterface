@@ -360,5 +360,42 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Check_user_regions_after_client_registration()
+		{
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link(Find.ByText("Показать все регионы")).Click();
+				var regions = Region.FindAllByProperty("Name", "Чебоксары");
+				var checkBox = browser.CheckBox(Find.ById("browseRegion" + regions.First().Id));
+				Assert.IsTrue(checkBox.Exists);
+				checkBox.Checked = true;
+				// Снимаем галку, чтобы не заполнять информацию для биллинга
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
+				using (var scope = new SessionScope())
+				{
+					var client = Client.Find(clientCode);
+					browser.Link(Find.ByText(client.Users[0].Login)).Click();
+					var pass = false;
+					for (var i = 0; i < 10; i++)
+					{
+						var regionCheckBox = browser.CheckBox(Find.ByName(String.Format("WorkRegions[{0}]", i)));
+						Assert.IsTrue(regionCheckBox.Exists);
+						if (regionCheckBox.GetValue("value").Equals(regions[0].Id.ToString()))
+						{
+							pass = true;
+							break;
+						}
+
+					}
+					Assert.IsTrue(pass);
+				}				
+			}
+		}
 	}
 }
