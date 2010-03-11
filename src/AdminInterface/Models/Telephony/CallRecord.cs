@@ -106,7 +106,7 @@ where {CallRecord}.WriteTime > :BeginDate and {CallRecord}.WriteTime < :EndDate"
 			ArHelper.WithSession(session => {
 				callList = session.CreateSQLQuery(sql)
 					.AddEntity(typeof(CallRecord))
-					.SetParameter("BeginDate", searchProperties.BeginDate.AddDays(-1))
+					.SetParameter("BeginDate", searchProperties.BeginDate)
 					.SetParameter("EndDate", searchProperties.EndDate.AddDays(1))
 					.List<CallRecord>();
             });			

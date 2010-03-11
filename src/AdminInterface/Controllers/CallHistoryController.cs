@@ -36,6 +36,8 @@ namespace AdminInterface.Controllers
 		public void ShowCallHistory([DataBind("SearchBy")] CallSearchProperties searchProperties,
 			int? rowsCount, int? pageSize, int? currentPage, int? sortColumnIndex)
 		{
+			if (searchProperties.BeginDate.Equals(DateTime.MinValue) || searchProperties.EndDate.Equals(DateTime.MinValue))
+				searchProperties.Init();
 			ControllerHelper.InitParameter(ref sortColumnIndex, "sortColumnIndex", -2, PropertyBag);
 			ControllerHelper.InitParameter(ref currentPage, "currentPage", 0, PropertyBag);
 			ControllerHelper.InitParameter(ref pageSize, "pageSize", 25, PropertyBag);

@@ -21,5 +21,13 @@ namespace AdminInterface.Models.Telephony
 			SearchText = String.Empty;
 			CallType = CallType.All;
 		}
+
+		public void Init()
+		{
+			SearchText = String.Empty;
+			CallType = CallType.All;
+			BeginDate = DateTime.Today.AddDays(-1);
+			EndDate = DateTime.Today;
+		}
 	}
 }

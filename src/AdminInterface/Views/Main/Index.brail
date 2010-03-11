@@ -125,7 +125,7 @@ uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${
 			</p>
 			<p>
 			    <% if admin.HavePermisions(PermissionType.CallHistory): %>
-			    <a href="${siteroot}/CallHistory/Search.brail">История звонков</a>
+			    <a href="${siteroot}/CallHistory/ShowCallHistory.brail">История звонков</a>
 			    <% else: %>
 			    История звонков
 			    <% end %>
