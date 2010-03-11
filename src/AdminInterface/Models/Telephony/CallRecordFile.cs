@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Helpers.Wav;
 
 namespace AdminInterface.Models.Telephony
 {
@@ -34,10 +35,9 @@ namespace AdminInterface.Models.Telephony
 		{
 			get
 			{
-				var duration = SoundHelper.GetSoundLength(_filename);
+				var duration = WavHelper.GetSoundLength(_filename);
 				if (duration <= 0)
-					return String.Empty;
-				duration /= 1000;
+					return String.Empty;				
 				var hours = duration / 3600;
 				var minutes = duration / 60 - hours * 60;
 				var seconds = duration - hours*3600 - minutes*60;

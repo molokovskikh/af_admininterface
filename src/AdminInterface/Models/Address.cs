@@ -38,7 +38,8 @@ namespace AdminInterface.Models
 			Lazy = true,
 			ColumnKey = "AddressId",
 			Table = "future.UserAddresses",
-			ColumnRef = "UserId")]
+			ColumnRef = "UserId",
+			OrderBy = "Name")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
 
 		public virtual bool AvaliableFor(User user)

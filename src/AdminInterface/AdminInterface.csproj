@@ -166,6 +166,9 @@
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
+    <Compile Include="Helpers\Wav\Structs.cs" />
+    <Compile Include="Helpers\Wav\WaveFileReader.cs" />
+    <Compile Include="Helpers\Wav\WavHelper.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />

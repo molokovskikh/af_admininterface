@@ -94,7 +94,8 @@ namespace AdminInterface.Models
 			Lazy = true,
 			ColumnKey = "UserId",
 			Table = "future.UserAddresses",
-			ColumnRef = "AddressId")]
+			ColumnRef = "AddressId",
+			OrderBy = "Address")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
 		public virtual string GetLoginOrName()
