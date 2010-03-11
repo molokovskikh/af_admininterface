@@ -46,7 +46,7 @@
             end
         %>
         <tr class="NoHighLightRow" align="right">
-		    <td colspan="6">
+		    <td colspan="7">
 		        <br />
 			    <div class="Paginator">
 				    <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "formPostBack":'updateForm'}) %>
