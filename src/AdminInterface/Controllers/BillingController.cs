@@ -329,7 +329,7 @@ namespace AdminInterface.Controllers
                 searchText = String.Empty;
             var address = Address.Find(addressId);
             var users = address.Client.Users.Where(user =>
-                (user.Name.ToLower().Contains(searchText.ToLower()) || user.Login.ToLower().Contains(searchText.ToLower())) &&
+                ((!String.IsNullOrEmpty(user.Name) && user.Name.ToLower().Contains(searchText.ToLower())) || (user.Login.ToLower().Contains(searchText.ToLower()))) &&
                 (!address.AvaliableFor(user)));
             PropertyBag["Users"] = users;
             CancelLayout();

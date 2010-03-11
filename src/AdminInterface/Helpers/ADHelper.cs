@@ -1,5 +1,6 @@
 ﻿using System;
 using System.DirectoryServices;
+using System.DirectoryServices.ActiveDirectory;
 using System.Text;
 using AdminInterface.Models;
 using System.Collections.Generic;
@@ -266,18 +267,25 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastLogOnDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(new DirectoryEntry("LDAP://acdcserv")))
+			DateTime? resultDate = null;
+			var controllers = GetDomainControllers();
+			foreach (var serverName in controllers)
 			{
-				searcher.Filter = String.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
-				var result = searcher.FindOne();
-				if ((result == null) || (result.Properties["lastLogon"].Count == 0))
-					return null;
-				var lastLogon = DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
-				//ad инициализирует этим значением поле
-				if (lastLogon == DateTime.Parse("01.01.1601 3:00:00"))
-					return null;
-				return lastLogon;
+				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
+				{
+					searcher.Filter = String.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
+					var result = searcher.FindOne();
+					if ((result == null) || (result.Properties["lastLogon"].Count == 0))
+						continue;
+					var lastLogon = DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
+					//ad инициализирует этим значением поле
+					if (lastLogon == DateTime.Parse("01.01.1601 3:00:00"))
+						continue;
+					if (!resultDate.HasValue || (lastLogon.CompareTo(resultDate.Value) > 0))
+						resultDate = lastLogon;
+				}
 			}
+			return resultDate;
 		}
 
 		public static void Disable(string login)
@@ -296,18 +304,24 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetBadPasswordDate(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
+			DateTime? resultDate = null;
+			var controllers = GetDomainControllers();
+			foreach (var serverName in controllers)
 			{
-				var result = searcher.FindOne();
-				if ((result == null) || (result.Properties["badPasswordTime"].Count == 0))
-					return null;
-
-				var badPassworDate = DateTime.FromFileTime((long)searcher.FindOne().Properties["badPasswordTime"][0]);
-				if (badPassworDate == _badPasswordDateIfNotLogin)
-					return null;
-
-				return badPassworDate;
+				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
+				{
+					searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
+					var result = searcher.FindOne();
+					if ((result == null) || (result.Properties["badPasswordTime"].Count == 0))
+						continue;
+					var date = DateTime.FromFileTime((long) searcher.FindOne().Properties["badPasswordTime"][0]);
+					if (date == _badPasswordDateIfNotLogin)
+						continue;
+					if (!resultDate.HasValue || (date.CompareTo(resultDate.Value) > 0))
+						resultDate = date;
+				}
 			}
+			return resultDate;
 		}
 
 		public static bool IsBelongsToOfficeContainer(string login)
@@ -322,13 +336,31 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastPasswordChange(string login)
 		{
-			using (var searcher = new DirectorySearcher(string.Format("(&(objectClass=user)(sAMAccountName={0}))", login)))
+			DateTime? resultDate = null;
+			var controllers = GetDomainControllers();
+			foreach (var serverName in controllers)
 			{
-				var result = searcher.FindOne();
-				if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
-					return null;
-				return DateTime.FromFileTime((long)searcher.FindOne().Properties["pwdLastSet"][0]);
+				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
+				{
+					searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
+                    var result = searcher.FindOne();
+                    if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
+						continue;
+					var date = DateTime.FromFileTime((long) searcher.FindOne().Properties["pwdLastSet"][0]);
+					if (!resultDate.HasValue || (date.CompareTo(resultDate.Value) > 0))
+						resultDate = date;
+				}
 			}
+			return resultDate;
+		}
+
+		public static IList<string> GetDomainControllers()
+		{
+            var controlers = Forest.GetCurrentForest().Domains[0].DomainControllers;
+			var names = new List<string>();
+			foreach (DomainController srv in controlers)
+				names.Add(srv.Name);
+			return names;
 		}
 	}
 }
