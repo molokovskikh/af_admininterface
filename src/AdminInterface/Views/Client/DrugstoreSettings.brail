@@ -2,94 +2,6 @@
 									  ("Информация о клиенте", "${siteroot}/client/${client.Id}"),
 									  ("Настройка аптеки", "")]} %>
 
-<script>        
-    function ShowRegions() 
-    { 
-		var regionsTable = jQuery("#RegionsTable").find("tr");
-		var count = regionsTable.size() - 1;
-		var showAll = (count != ${regions.Length});
-		var textLink = "";
-		var form = jQuery("#DrugstoreSettingsForm")[0];
-		if (showAll) 
-		{
-			doActionNonDefaultRegions(form.comboBoxHomeRegion.options, addRegionRow);
-			textLink = "Показать только регионы по умолчанию";
-		}
-		else 
-		{
-			doActionNonDefaultRegions(form.comboBoxHomeRegion.options, removeRegionRow);
-			textLink = "Показать все регионы";
-		}
-		jQuery("#ShowRegionsLink")[0].innerHTML = textLink;
-    }
-    
-    function doActionNonDefaultRegions(regions, action) 
-    {
-		for (i = 0; i < regions.length; i++) 
-		{
-			var regionId = parseInt(regions[i].value);
-			var flags = regions[i].title.split(",");
-			var isDefaultRegion = Boolean(parseInt(flags[0]));
-			if (!isDefaultRegion)
-				action(regionId, regions[i].text, flags);
-		}
-    }
-    
-    function addRegionRow(regionId, text, flags)
-    {
-		var id = "RegionRow" + regionId;
-		var isAvaliableForBrowse = Boolean(parseInt(flags[1]));
-		var isAvaliableForOrder = Boolean(parseInt(flags[2]));
-		var checkedOrderRegion = isAvaliableForOrder ? " 'checked' " : "";		
-		var checkedBrowseRegion = isAvaliableForBrowse ? " 'checked' " : "";
-		var html = "<tr id='" + id + "'><td>" + text + "</td>" +
-			"<td align='center'>" +
-				"<input id='checkBoxBrowseRegion" + regionId + "' type='checkbox' " + checkedBrowseRegion + 
-				"name='regionsSettings[" + regionId + "].IsAvaliableForBrowse' " +
-				" onclick='onClickBrowseRegion(" + regionId + ")' value='true' />" + 
-				"<input type='hidden' name='regionsSettings[" + regionId + "].IsAvaliableForBrowse' value='false' />" +
-				"</td>" +
-			"<td align='center'>" +
-				"<input id='checkBoxOrderRegion" + regionId + "' type='checkbox' " + checkedOrderRegion + 
-				"name='regionsSettings[" + regionId + "].IsAvaliableForOrder' " +
-				" onclick='onClickOrderRegion(" + regionId + ")' value='true' />" + 
-				"<input type='hidden' name='regionsSettings[" + regionId + "].IsAvaliableForOrder' value='false' />" +
-				"</td>" +			
-			"</tr>" +
-			"<input type='hidden' name='regionsSettings[" + regionId + "].Id' value='" + regionId + "' />";
-		jQuery("#RegionsTable").append(html);
-		jQuery("#" + id).hover(
-			// mouseover handler
-			function() { this.setAttribute("class", "SelectedRow"); },
-			// mouseout handler
-			function() { this.removeAttribute("class");	}
-		);
-    }
-    
-    function removeRegionRow(regionId)
-    {
-		jQuery("#RegionRow" + regionId).remove();
-    }       
-    
-    function onClickOrderRegion(regionId)
-    {
-		var checked = jQuery("#checkBoxOrderRegion" + regionId).attr('checked');		
-		if (checked)
-		{
-			jQuery("#checkBoxBrowseRegion" + regionId).attr("checked", true);
-		}
-    }
-    
-    function onClickBrowseRegion(regionId)
-    {
-		var checked = jQuery("#checkBoxBrowseRegion" + regionId).attr('checked');
-		if (!checked)
-		{
-			jQuery("#checkBoxOrderRegion" + regionId).attr("checked", false);
-		}
-    }
-</script>
-
 <h2>Конфигурация клиента ${client.Name}</h2>					
 				  
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
@@ -138,7 +50,7 @@
 	            Разрешить сопоставление вручную в AnalitOnline<br />
 	        </div>
     	    
-    	    <!--
+            <!--
 	        <div class="block">
                 <div class=contextual>
                     <a class="icon icon-add" href="javascript:" onclick="">Добавить</a>
@@ -153,71 +65,12 @@
 	            </table>
 	        </div>
 	        -->
-    	    
-	        <div class="block">
-	            <h3>Региональная настройка</h3>
-	            <table width="100%">
-	                <tr>
-	                    <td colspan="3">Домашний регион:<br />
-	                        <select name="client.HomeRegion.Id" id="comboBoxHomeRegion">
-	                            <% for region in regions: %>
-	                                <%  isDefaultRegion = 0
-	                                    if (region.Id & (client.HomeRegion.DefaultShowRegionMask | client.MaskRegion)) > 0:
-	                                        isDefaultRegion = 1;
-	                                    end
-	                                    isAvaliableForBrowse = 0;
-	                                    if (client.MaskRegion & region.Id) > 0:
-	                                        isAvaliableForBrowse = 1
-	                                    end
-	                                    isAvaliableForOrder = 0;
-	                                    if (drugstore.OrderRegionMask & region.Id) > 0:
-	                                        isAvaliableForOrder = 1
-	                                    end
-	                                %>
-									<option id="${region.Id}region" value="${region.Id}" title="${isDefaultRegion,isAvaliableForBrowse,isAvaliableForOrder}"
-									    ${"selected" if (region.Id == client.HomeRegion.Id) }>${region.Name}</option>
-	                            <% end %>
-	                        </select>
-	                        <br />	                        	                    
-	                    </td>
-	                </tr>
-					<tr>						
-	                    <td colspan = "3" id="RegionList">
-							<table id="RegionsTable" width="100%" class="HighLightCurrentRow">
-								<tr valign="top"> 
-									<th width="60%" align="left">Регион</th> 
-									<th width="20%" align="center">Получать обзор</th>
-									<th width="20%" align="center">Доступен для заказа</th>
-								</tr>														
-								<% for region in regions: %>
-									<% if ((region.Id & (client.HomeRegion.DefaultShowRegionMask | client.MaskRegion)) > 0): %>
-										<tr id="RegionRow${region.Id}">
-											<td>${region.Name}</td>
-											<td align="center">
-												<input id="checkBoxBrowseRegion${region.Id}" type="checkbox" name="regionsSettings[${region.Id}].IsAvaliableForBrowse"
-												    ${"checked" if ((client.MaskRegion & region.Id) > 0) } value="true"
-												    onclick="onClickBrowseRegion(${region.Id})" />
-												<input type="hidden" name="regionsSettings[${region.Id}].IsAvaliableForBrowse" value="false" />
-											</td>
-											<td align="center">
-												<input id="checkBoxOrderRegion${region.Id}" type="checkbox" name="regionsSettings[${region.Id}].IsAvaliableForOrder"
-												    ${"checked" if ((drugstore.OrderRegionMask & region.Id) > 0) } value="true"
-												    onclick="onClickOrderRegion(${region.Id})" />
-												<input type="hidden" name="regionsSettings[${region.Id}].IsAvaliableForOrder" value="false" />
-											</td>
-										</tr>
-										<input type="hidden" name="regionsSettings[${region.Id}].Id" value="${region.Id}" />
-									<% end %>
-								<% end %>				
-							</table>	                    
-	                    </td>
-	                </tr>
-	                <tr><td colspan="3" align="left">
-						<a href="javascript:" id="ShowRegionsLink" onclick="ShowRegions()">Показать все регионы</a>
-					</td></tr>	                
-	            </table>
-	        </div>
-    	    
+
+            <div class="block">
+                <h3>Региональная настройка</h3>
+                <% OutputSubView("/SubViews/Regions") %>
+            </div>
+
 		    <div class=save>
 			    <input type=submit value="Сохранить">
 		    </div>

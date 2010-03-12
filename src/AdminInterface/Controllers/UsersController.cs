@@ -31,14 +31,16 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			PropertyBag["client"] = client;
+			PropertyBag["drugstore"] = DrugstoreSettings.Find(client.Id);
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			var regions = Region.FindAll();
+			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["regions"] = regions;
+			PropertyBag["UserRegistration"] = true;
 		}
 
 		[AccessibleThrough(Verb.Post)]

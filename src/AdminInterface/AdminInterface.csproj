@@ -445,12 +445,14 @@
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Logs\Orders.brail" />
+    <None Include="Views\Regions\DefaultRegions.brail" />
     <None Include="Views\Regions\ShowRegions.brail" />
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />
     <None Include="Views\SubViews\PaginatorSubView.brail" />
+    <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\SubViews\RegionSettings.brail" />

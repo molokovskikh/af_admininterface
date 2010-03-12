@@ -92,7 +92,10 @@
 			</div>							
 		</div>
 		
-        <% OutputSubView("/SubViews/RegionSettings") %>		
+        <div class="block">
+            <h3>Региональная настройка</h3>
+            <% OutputSubView("/SubViews/Regions") %>
+        </div>
 		
 		<div class=save>
 			<input type=submit value="Создать">

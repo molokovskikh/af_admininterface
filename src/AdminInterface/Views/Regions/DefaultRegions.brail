@@ -1,0 +1,26 @@
+﻿<%  for i, region in enumerate(regions):
+    isForBrowse = (region.Id == homeRegionId)
+    isForOrder = isForBrowse
+    if (IsDefined("drugstore") and IsDefined("client")):
+        isForBrowse = (client.MaskRegion & region.Id) > 0;
+        isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
+    end %>
+    <tr id="RegionRow${region.Id}" onmouseover="this.setAttribute('class', 'SelectedRow')" onmouseout="this.removeAttribute('class');">
+        <td style="text-align: left">${region.Name}</td>
+        <td style="text-align: center">
+            <input id="browseRegion${region.Id}" type="checkbox" ${"checked" if (isForBrowse) }
+                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="true"
+                onclick="if (!this.checked) document.getElementById('orderRegion${region.Id}').checked = this.checked" />
+            <input id="regionSettings[${region.Id}].IsAvaliableForBrowse" type="hidden"
+                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="false" />
+        </td>
+        <td style="text-align: center">
+            <input id="orderRegion${region.Id}" type="checkbox" ${"checked" if (isForOrder) }
+                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="true"
+                onclick="if (this.checked) document.getElementById('browseRegion${region.Id}').checked = this.checked" />
+            <input id="regionSettings[${region.Id}].IsAvaliableForOrder" type="hidden"
+                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="false" />
+        </td>
+        <input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
+    </tr>        
+<%  end %>

@@ -1,0 +1,176 @@
+﻿<!--
+    Для использования данного SubView, перед отображением нужно передать в PropertyBag упорядоченный массив всех регионов
+    Пример:
+        PropertyBag["regions"] = Region.FindAll().OrderBy(region => region.Name).ToArray();
+-->
+<script type="text/javascript">
+
+    function OnHomeRegionChanged(homeRegionId) {
+        jQuery("#RegionsTableBody").find("tr").remove(); 
+        var link = "${siteroot}/Regions/DefaultRegions.rails?homeRegionId=" + homeRegionId;
+<%      if (IsDefined("client")): %>
+            link += "&clientId=${client.Id}";
+<%      end %>            
+        jQuery.ajax({
+            url: link,
+            cache: false,
+            success: function(html) {
+                jQuery("#RegionsTableBody").append(html);
+            },
+        });
+    }
+    
+    function ShowAllRegions(homeRegionId) {
+        jQuery("#RegionsTableBody").find("tr").remove();
+        var regions = jQuery("#HomeRegionComboBox")[0].options;
+		for (i = 0; i < regions.length; i++) 
+		{
+			var regionId = parseInt(regions[i].value);
+			var isForBrowse = regionId == parseInt(homeRegionId);
+			AddRegionRow(regionId, regions[i].text, isForBrowse, isForBrowse);
+		}        
+    }
+
+    function ShowRegions() {
+        var homeRegionId = jQuery("#HomeRegionComboBox").val();
+        var countDisplayedRegions = jQuery("#RegionsTableBody").children().length;
+        if (countDisplayedRegions == ${regions.Length}) {
+            // Оставить только регионы по умолчанию
+            textLink = "Показать все регионы";
+            OnHomeRegionChanged(homeRegionId);
+        }
+        else {
+            // Показать все регионы
+            ShowAllRegions(homeRegionId);
+            textLink = "Показать только регионы по умолчанию";
+        }
+        jQuery("#ShowRegionsLink")[0].innerHTML = textLink;
+    }
+    
+    function AddRegionRow(regionId, regionName, isForBrowse, isForOrder) {
+        var browseChecked = "";
+        var orderChecked = "";
+        if (isForBrowse)
+            browseChecked = "checked='checked'";
+        if (isForOrder)
+            orderChecked = "checked='checked'";
+        var html = "<tr id='RegionRow" + regionId + "'>" +
+            "<td style='text-align: left'>" + regionName + "</td>" +
+            "<td style='text-align: center'>" +
+                "<input id='browseRegion" + regionId + "' type='checkbox' " + browseChecked + 
+                    "name='regionSettings[" + regionId + "].IsAvaliableForBrowse' value='true'" +
+                    "onclick='onClickBrowseRegion(" + regionId + ")' />" +
+                "<input id='regionSettings[" + regionId + "].IsAvaliableForBrowse' type='hidden' name='regionSettings[" + regionId + "].IsAvaliableForBrowse' value='false' />" +
+            "</td>" +
+            "<td style='text-align: center'>" +
+                "<input id='orderRegion" + regionId + "' type='checkbox' " + orderChecked + 
+                    "name='regionSettings[" + regionId + "].IsAvaliableForOrder' value='true'" +
+                    "onclick='onClickOrderRegion(" + regionId + ")' />" +
+                "<input id='regionSettings[" + regionId + "].IsAvaliableForOrder' type='hidden' name='regionSettings[" + regionId + "].IsAvaliableForOrder' value='false' />" +
+            "</td>" +
+            "<input type='hidden' name='regionSettings[" + regionId + "].Id' value='" + regionId + "' />" +
+            "</tr>";
+        jQuery("#RegionsTableBody").append(html);
+        jQuery("#RegionRow" + regionId).hover(
+			// mouseover handler
+			function() { this.setAttribute("class", "SelectedRow"); },
+			// mouseout handler
+			function() { this.removeAttribute("class");	}
+		);
+    }
+    
+    function onClickOrderRegion(regionId)
+    {
+		var checked = jQuery("#orderRegion" + regionId).attr('checked');		
+		if (checked) {
+			jQuery("#browseRegion" + regionId).attr("checked", true);
+		}
+    }
+    
+    function onClickBrowseRegion(regionId)
+    {
+		var checked = jQuery("#browseRegion" + regionId).attr('checked');
+		if (!checked) {
+			jQuery("#orderRegion" + regionId).attr("checked", false);
+		}
+    }
+
+</script>
+
+<table style="width: 100%; border: 0px;">
+    <tr style="${'display: none' if IsDefined("UserRegistration")}">
+        <td>
+            Домашний регион:
+            <select id="HomeRegionComboBox" name="homeRegion" onchange="OnHomeRegionChanged(this.value)">
+<%              defaultShowRegions = []
+                browseRegions = []
+                orderRegions = []
+                homeRegion = regions[0]
+                if (IsDefined("client")):
+                    homeRegion = client.HomeRegion                            
+                end
+                for i, region in enumerate(regions): 
+                    isForBrowse = homeRegion.Id == region.Id;
+                    isForOrder = isForBrowse;
+                    if not IsDefined("UserRegistration") and (region.Id & homeRegion.DefaultShowRegionMask > 0): 
+                        defaultShowRegions.Add(region.Id)
+                    end
+                    if (IsDefined("drugstore") and IsDefined("client")):
+                        isForBrowse = (client.MaskRegion & region.Id) > 0;
+                        isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
+                    end
+                    if (IsDefined("UserRegistration") and (isForBrowse or isForOrder)):
+                        defaultShowRegions.Add(region.Id)
+                    end
+                    if (isForBrowse):
+                        browseRegions.Add(region.Id)
+                    end
+                    if (isForOrder):
+                        orderRegions.Add(region.Id)
+                    end %>
+                <option id="Region${region.Id}" value="${region.Id}" ${"selected" if (region.Id == homeRegion.Id)}>${region.Name}</option>
+<%              end %>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <table id="RegionsTable" style="width: 100%; border: 0px">
+                <thead>
+                    <tr>
+                        <th style="width: 70%; text-align: left">Регион</th>
+                        <th style="width: 15%; text-align: center">Получать обзор</th>
+                        <th style="width: 15%; text-align: center">Доступен для заказа</th>
+                    </tr>
+                </thead>
+                <tbody id="RegionsTableBody" class="HighLightCurrentRow">
+<%                  for i, region in enumerate(regions):
+                        if (defaultShowRegions.Contains(region.Id) or browseRegions.Contains(region.Id) or (orderRegions.Contains(region.Id))): %>
+                    <tr id="RegionRow${region.Id}">
+                        <td style="text-align: left">${region.Name}</td>
+                        <td style="text-align: center">
+                            <input id="browseRegion${region.Id}" type="checkbox" ${"checked" if (browseRegions.Contains(region.Id)) }
+                                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="true"
+                                onclick="onClickBrowseRegion(${region.Id})" />
+                            <input id="regionSettings[${region.Id}].IsAvaliableForBrowse" type="hidden"
+                                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="false" />                        
+                        </td>
+                        <td style="text-align: center">
+                            <input id="orderRegion${region.Id}" type="checkbox" ${"checked" if (orderRegions.Contains(region.Id)) }
+                                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="true"
+                                onclick="onClickOrderRegion(${region.Id})" />
+                            <input id="regionSettings[${region.Id}].IsAvaliableForOrder" type="hidden"
+                                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="false" />
+                        </td>
+                        <input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
+                    </tr>                    
+<%                      end
+                    end %>
+                </tbody>
+            </table>
+<%          if not IsDefined("UserRegistration"): %>
+            <a href="javascript:" id="ShowRegionsLink" onclick="ShowRegions()">Показать все регионы</a>
+<%          end %>            
+        </td>
+    </tr>
+</table>

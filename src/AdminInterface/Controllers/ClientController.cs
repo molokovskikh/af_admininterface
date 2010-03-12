@@ -93,8 +93,9 @@ namespace AdminInterface.Controllers
 
 		[AccessibleThrough(Verb.Post)]
 		public void UpdateDrugstore([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
+			ulong homeRegion,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
-			[DataBind("regionsSettings")] RegionSettings[] regionSettings)
+			[DataBind("regionSettings")] RegionSettings[] regionSettings)
 		{
 			SecurityContext.Administrator.CheckClientPermission(client);
 			using (var scope = new TransactionScope())
@@ -104,6 +105,8 @@ namespace AdminInterface.Controllers
 				var oldMaskRegion = client.MaskRegion;
 				foreach (var setting in regionSettings)
 				{
+					client.HomeRegion = Region.Find(homeRegion);
+					client.Update();
 					if (setting.IsAvaliableForBrowse)
 						client.MaskRegion |= setting.Id;
 					else
@@ -235,7 +238,7 @@ where `from` = :phone")
 		public void DrugstoreSettings(uint clientId)
 		{
 			var client = Client.Find(clientId);
-			var regions = Region.FindAll();
+			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			var drugstore = Models.DrugstoreSettings.Find(clientId);
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;

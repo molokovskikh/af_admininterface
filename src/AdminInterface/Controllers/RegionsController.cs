@@ -45,5 +45,35 @@ namespace AdminInterface.Controllers
 				PropertyBag["drugstore"] = drugstore;
 			}
 		}
+
+        public void DefaultRegions(ulong homeRegionId)
+        {
+            var homeRegion = Region.Find(homeRegionId);
+            var regions = Region.FindAll()
+                .Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
+                .OrderBy(region => region.Name)
+                .ToArray();
+            PropertyBag["regions"] = regions;
+			PropertyBag["homeRegionId"] = homeRegion.Id;
+			CancelLayout();
+        }
+
+		public void DefaultRegions(ulong homeRegionId, uint clientId)
+		{
+			var homeRegion = Region.Find(homeRegionId);
+			var client = Client.Find(clientId);
+			var drugstore = DrugstoreSettings.Find(clientId);
+			var regions = Region.FindAll()
+				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0 ||
+					((region.Id & client.MaskRegion) > 0) ||
+					((region.Id & drugstore.OrderRegionMask) > 0))
+				.OrderBy(region => region.Name)
+				.ToArray();
+			PropertyBag["regions"] = regions;
+			PropertyBag["client"] = client;
+			PropertyBag["drugstore"] = drugstore;
+			PropertyBag["homeRegionId"] = homeRegion.Id;
+			CancelLayout();
+		}
 	}
 }
