@@ -91,8 +91,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         );
     }
 
-    function SetAddressStatus(addressId, status) {
-        var link = "${siteroot}/Billing/SetAddressStatus.rails?addressId=" + addressId + "&enabled=" + status;
+    function SetAddressStatus(addressId, status, free) {
+        var link = "${siteroot}/Billing/SetAddressStatus.rails?addressId=" + addressId +
+            "&enabled=" + status + "&free=" + free;
         AjaxRequest(link,
             function(html) {
                 jQuery("#AddressRow" + addressId).removeClass();
@@ -159,7 +160,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 <%          headerCssClass = "ShowHiden"
             bodyCssClass = "hidden"
-            if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 10:                
+            if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:                
                 headerCssClass = "HideVisible" 
                 bodyCssClass = "VisibleFolder"
             end %>
@@ -331,6 +332,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					    <table class="DataTable" id="AddressesTable" style="width:100%;">
 						    <tr align="center">
 						        <th>Включен</th>
+						        <th>Работает бесплатно</th>
 							    <th>Адрес</th>
 							    <th>Клиент</th>
 						    </tr>
@@ -349,14 +351,18 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                     <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
                                         onclick="SetAddressStatus(${addr.Id}, this.checked)" />
 <%                          else: %>
-                                    <input type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
-                                        onclick="SetAddressStatus(${addr.Id}, this.checked)" />
+                                    <input id="AddressStatus${addr.Id}" type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
+                                        onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          end %>
+                                </td>
+                                <td style="width: 50px">
+                                    <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
+                                        onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
                                 </td>
                                 <td><a href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">${addr.Value}</a></td>
                                 <td>${addr.Client.Name}</td>
                             </tr>
-                            <tr><td id="additionalAddressInfoCell${addr.Id}" colspan="3"></td></tr>
+                            <tr><td id="additionalAddressInfoCell${addr.Id}" colspan="4"></td></tr>
 <%                      end %>
                         </table>
                     </div>
@@ -537,27 +543,53 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 </div>
 
 <div class="right">
-	<% if IsDefined("ClientMessage"): %>
+<%      if IsDefined("UsersMessages"): %>
 		<div class="UseCaseGroup">
-		<form action="sendMessage.rails" method="post">			
-			<input type="hidden" value="${Client.Id}" name="NewClientMessage.ClientCode" />
+		<form action="sendMessage.rails" method="post">
 			<table style="width:100%">
+			        <tr>
+<%                      if (CountUsersWithMessages > 0): %>			        
+			            <td class="InputGroupHeader" title="Сообщения для пользователей">
+<%                          cssClassHeader = "ShowHiden"
+                            cssClassBody = "hidden"
+                            if (CountUsersWithMessages < 5):
+                                cssClassHeader = "HideVisible"
+                                cssClassBody = "VisibleFolder"
+                            end %>			            
+			                <div class="${cssClassHeader}" title="Сообщения для пользователей">
+			                    <a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>			                
+			                </div>
+			                <div class="${cssClassBody}" title="Сообщения для пользователей">
+			                    <br />
+<%                          for i,user in enumerate(Users): 
+					            if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
+						        <div id="CurrentMessageForUser${user.Id}" style="text-align: left">
+							    Остались не показанные сообщения для пользователя ${user.GetLoginWithName()}.
+							        <a href="javascript:void(0);" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
+    						    </div>
+<%                              end
+					        end %>
+					        </div>
+<%                      end %>			                
+			            </td>
+			        </tr>
+					<tr><td><br /></td></tr>
 					<tr>
 						<td class="InputGroupHeader">
-							Сообщение клиенту:
+							Сообщение для пользователя:
+							<select id="messageReceiverComboBox" name="NewClientMessage.ClientCode">
+                                <option value="0" selected="selected">Для всех пользователей</option>
+<%                              for i, user in enumerate(Users): %>
+                                <option value="${user.Id}">${user.GetLoginWithName()}</option>
+<%                              end %>
+							</select>
+							<input type="hidden" name="clientId" value="${Users[0].Client.Id}" />
 						</td>
 					</tr>
 					<% if IsDefined("SendError"): %>
 					<tr>
 						<td class="ValidationErrorMessage">
 							${SendError}
-						</td>
-					</tr>
-					<% end %>
-					<% if ClientMessage.IsContainsNotShowedMessage(): %>
-					<tr>
-						<td id="CurrentMessage">
-							Остались не показанные сообщения. <a href="javascript:void(0);" onclick="return ShowMessage(${Client.Id});">Просмотреть сообщение</a>
 						</td>
 					</tr>
 					<% end %>
@@ -592,35 +624,70 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				Статистика включений/выключений
 			</div>
+			<!-- Пользователи -->
+			<div class="InputGroupHeader" style="margin-bottom:10px;">
+			Статистика по пользователям<br /><br />
 			<table class="DataTable" style="width: 100%;">
-			<% 
-			if LogRecords.Count > 0:
-				i = 0
+<%          if UsersLogRecords.Length > 0:
+                for i, userLog in enumerate(UsersLogRecords): %>
+                    <tr class="${ViewHelper.GetRowStyle(i)}">
+                        <td>${userLog.LogTime}</td>
+                        <td>${userLog.User.Login}</td>
+                        <td>${userLog.User.Name}</td>
+                        <td>${userLog.OperatorName}</td>
+                        <td>
+<%                      if userLog.Enabled: %>
+                            Включен
+<%                      else: %>
+                            Отключен
+<%                      end %>                        
+                        </td>
+                    </tr>                    
+<%              end
+            else: %>                    
+				<tr><td style="text-align:center;">Ни один пользователь не отключался</td></tr>				    
+<%          end %>
+            </table>
+            </div>			
+            <!-- Адреса -->
+            <div class="InputGroupHeader" style="margin-bottom:10px;">
+            Статистика по адресам<br /><br />
+            <table class="DataTable" style="width: 100%;">
+<%          if AddressesLogRecords.Length > 0:
+                for i, addressLog in enumerate(AddressesLogRecords): %>
+                    <tr class="${ViewHelper.GetRowStyle(i)}">
+                        <td>${addressLog.LogTime}</td>
+                        <td>${addressLog.Address.Value}</td>
+                        <td>${addressLog.OperatorName}</td>
+                        <td>
+<%                      if addressLog.Enabled: %>
+                            Включен
+<%                      else: %>
+                            Отключен
+<%                      end %>                        
+                        </td>
+                    </tr>
+<%              end
+            else: %>                    
+				<tr><td style="text-align:center;">Ни один адрес не отключался</td></tr>				    
+<%          end %>
+            </table>
+            </div>
+            
+            <table class="DataTable" style="width: 100%;">
+<%          if LogRecords.Count > 0:
+                i = 0
 				for logRecord in LogRecords:
-					i++
-			%>
+					i++ %>
 					<tr class="${ViewHelper.GetRowStyle(i)}">
-						<td>
-							${logRecord.LogTime}
-						</td>
-						<td>
-							${logRecord.OperatorName}
-						</td>
-						<td>
-							${BindingHelper.GetDescription(logRecord.ClientStatus)}
-						</td>
+						<td>${logRecord.LogTime}</td>
+						<td>${logRecord.OperatorName}</td>
+						<td>${BindingHelper.GetDescription(logRecord.ClientStatus)}</td>
 					</tr>
-			<% 
-				end
-			else:
-			%>
-				<tr>
-					<td style="text-align:center;">
-						Клиент не отключался
-					</td>
-				</tr>				
-			<% end %>
-			</table>
-			
+<%              end
+			else: %>
+				<tr><td style="text-align:center;">Клиент не отключался</td></tr>				
+<%          end %>
+			</table>			
 		</div>
 </div>

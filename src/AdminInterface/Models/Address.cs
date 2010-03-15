@@ -34,6 +34,9 @@ namespace AdminInterface.Models
 		[Property]
 		public bool Enabled { get; set; }
 
+		[Property("Free")]
+		public bool FreeFlag { get; set; }
+
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
 			ColumnKey = "AddressId",
@@ -53,7 +56,7 @@ namespace AdminInterface.Models
 		public virtual bool AvaliableForEnabledUsers
 		{
 			get
-			{
+			{									
 				return (AvaliableForUsers.Where(user => user.Enabled && (user.Client.Status == ClientStatus.On)).Count() > 0);
 			}
 		}
@@ -62,8 +65,8 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				// Кол-во пользователей, которым доступен этот адрес и которые работают НЕ бесплатно, должно быть нулевым
-				return (AvaliableForUsers.Where(user => !user.IsFree).Count() == 0);
+				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть нулевым
+				return (FreeFlag || (AvaliableForUsers.Where(user => !user.IsFree && user.Enabled).Count() == 0));
 			}
 		}
 

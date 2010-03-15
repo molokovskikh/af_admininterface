@@ -23,23 +23,20 @@
 
 		new Validation("PayerInfo");
 	})
-	
-	function RemoveMessage(clientCode)
-	{
-		SetStatusBarMessage("Удаление...", "Notification");
-		$("CurrentMessage").remove();
-		new Ajax.Request("CancelMessage.rails?clientCode=" + clientCode, { 
-			method: 'post',
-			onFailure: function()
-			{
-				SetStatusBarMessage("Ошибка при удалении сообщения", "Error");
-			},
-			onSuccess: function()
-			{
-				SetStatusBarMessage("Сообщение удалено", "Success");
-			}
-		});
-	}
+
+    function RemoveMessage(userId) {
+        SetStatusBarMessage("Удаление...", "Notification");
+        $("CurrentMessageForUser" + userId).remove();
+        new Ajax.Request("CancelMessage.rails?userId=" + userId, {
+            method: 'post',
+            onFailure: function() {
+                SetStatusBarMessage("Ошибка при удалении сообщения", "Error");
+            },
+            onSuccess: function() {
+                SetStatusBarMessage("Сообщение удалено", "Success");
+            }
+        });    
+    }
 	
 	function RemoveMailEntity(id)
 	{
@@ -67,17 +64,15 @@
 		$$("#StatusBar td").first().update(message);
 		$$("#StatusBar table").first().removeClassName("Notification").removeClassName("Error").removeClassName("Success").addClassName(className);
 	}
-	
-	function ShowMessage(clientCode)
-	{
-		SetStatusBarMessage("Загрузка...", "Notification");
-		new Ajax.Request("ShowMessageForClient.rails?clientCode=" + clientCode, { 
-			method: 'get',
-			onSuccess: function()
-			{
-				SetStatusBarMessage("", "");
-			}
-		});
+
+	function ShowMessage(userId) {
+	    SetStatusBarMessage("Загрузка...", "Notification");
+	    new Ajax.Request("ShowMessageForUser.rails?userId=" + userId, {
+	        method: 'get',
+	        onSuccess: function() {
+	            SetStatusBarMessage("", "");
+	        }
+	    });
 	}
 </script>
 

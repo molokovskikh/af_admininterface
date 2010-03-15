@@ -1,0 +1,19 @@
+﻿<table style="border: solid 1px #d8f1ff; width: 100%; text-align: left; background-color: #ffffff">
+    <tr valign="top">
+        <td style="width: 30%">
+            Пользователь:<br />
+            Осталось показать:<br />
+            Сообщение:
+        </td>
+        <td>
+            ${user.GetLoginWithName()}<br />
+            ${message.ShowMessageCount} раз            
+        </td>
+    </tr>
+    <tr><td colspan="2">${ViewHelper.FormatMessage(message.Message)}</td></tr>
+    <tr>
+        <td colspan="2" align="right">
+            <input type=button onclick="return RemoveMessage(${message.ClientCode})" value="Отменить показ сообщения"></input>
+        </td>
+    </tr>
+</table>

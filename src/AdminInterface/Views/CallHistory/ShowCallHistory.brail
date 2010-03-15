@@ -27,6 +27,7 @@
             OutputSubView("/SubViews/SortHeadersSubView", {"headers":["", "Дата звонка", "Номер звонившего", "Имя звонившего", "Куда звонил", "Кому звонил", "Тип звонка"], "sortColumnIndex":sortColumnIndex, "rowsCount":rowsCount, "formPostBack":'updateForm' })
             %>
         </tr> 
+        <tbody class="HighLightCurrentRow">
         <%
             for i, call in enumerate(calls):
         %>       
@@ -45,6 +46,7 @@
             break unless i<pageSize
             end
         %>
+        </tbody>
         <tr class="NoHighLightRow" align="right">
 		    <td colspan="7">
 		        <br />

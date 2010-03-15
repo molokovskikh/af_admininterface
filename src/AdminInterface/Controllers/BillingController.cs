@@ -53,23 +53,36 @@ namespace AdminInterface.Controllers
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
 
-			var clientMessage = ClientMessage.FindClientMessage(client.Id);
-
-			if (clientMessage != null)
-				PropertyBag["ClientMessage"] = clientMessage;
-
+			var payer = client.BillingInstance;
+			var usersMessages = new List<ClientMessage>();
+			var usersLogs = new List<UserLogRecord>();
+			var addressesLogs = new List<AddressLogRecord>();
+			var countUsersWithMessages = 0;
+			foreach (var item in payer.GetAllUsers())
+			{
+				var message = ClientMessage.FindUserMessage(item.Id);
+				if ((message != null) && message.IsContainsNotShowedMessage())
+					countUsersWithMessages++;
+                usersMessages.Add(message);
+				usersLogs.AddRange(UserLogRecord.GetUserLogRecords(item));
+			}
+			foreach (var item in payer.GetAllAddresses())
+				addressesLogs.AddRange(AddressLogRecord.GetAddressLogRecords(item));
+			PropertyBag["CountUsersWithMessages"] = countUsersWithMessages;
+			PropertyBag["UsersMessages"] = usersMessages;
 			PropertyBag["ShowClients"] = showClients;
 			PropertyBag["ShowUsers"] = showUsers;
 			PropertyBag["ShowAddresses"] = showAddresses;
 
 			if (String.IsNullOrEmpty(tab))
 				tab = "payments";
-
-			var payer = client.BillingInstance;
+			
 			PropertyBag["tab"] = tab;
 			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
 			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
 			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(client);
+			PropertyBag["UsersLogRecords"] =  usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToArray();
+			PropertyBag["AddressesLogRecords"] = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToArray();
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["User"] = user;
@@ -95,20 +108,24 @@ namespace AdminInterface.Controllers
 			Redirect("Billing", "Edit", new {clientCode, tab});
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage)
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId)
 		{
+			uint clientCode = 0;
 			try
 			{
-				using (new TransactionScope())
+				using (var scope = new TransactionScope())
 				{
-					foreach (var user in Client.Find(clientMessage.ClientCode).Users)
+					if (clientMessage.ClientCode == 0)
+						foreach (var user in Client.Find(clientId).Users)
+						{
+							SendMessageToUser(user, clientMessage);
+							clientCode = user.Client.Id;
+						}
+					else
 					{
-						DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
-						                                                            Request.UserHostAddress);
-						var message = ClientMessage.Find(user.Id);
-						message.Message = clientMessage.Message;
-						message.ShowMessageCount = clientMessage.ShowMessageCount;
-						message.Update();
+						var user = User.Find(clientMessage.ClientCode);
+						SendMessageToUser(user, clientMessage);
+						clientCode = user.Client.Id;
 					}
 				}
 				Flash.Add("Message", new Message("Сообщение сохранено"));
@@ -118,7 +135,17 @@ namespace AdminInterface.Controllers
 				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
 			}
 
-			Redirect("Billing", "Edit", new {clientMessage.ClientCode, tab = "payments"});
+			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
+		}
+
+		private void SendMessageToUser(User user, ClientMessage clientMessage)
+		{
+			DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
+																		Request.UserHostAddress);
+			var message = ClientMessage.Find(user.Id);
+			message.Message = clientMessage.Message;
+            message.ShowMessageCount = clientMessage.ShowMessageCount;
+            message.Update();
 		}
 
 		public void UpdateClientStatus(uint clientId, bool enabled)
@@ -142,7 +169,7 @@ namespace AdminInterface.Controllers
 					foreach (var user in client.Users)
 						SetUserStatus(user.Id, false, user.IsFree);
 					foreach (var addr in client.Addresses)
-						SetAddressStatus(addr.Id, false);
+						SetAddressStatus(addr.Id, false, addr.FreeFlag);
 				}
 			}
 			CancelView();
@@ -154,9 +181,12 @@ namespace AdminInterface.Controllers
 			using (new TransactionScope())
 			{
 				var user = User.Find(userId);
+				var oldStatus = user.Enabled;
 				user.Enabled = enabled;
 				user.IsFree = free;
 				user.UpdateAndFlush();
+				if (enabled && !oldStatus)
+					Mailer.UserBackToWork(user);
 				if (!enabled)
 				{
 					// Если это отключение, то проходим по адресам и
@@ -174,12 +204,16 @@ namespace AdminInterface.Controllers
             CancelLayout();
 		}
 
-		public void SetAddressStatus(uint addressId, bool enabled)
+		public void SetAddressStatus(uint addressId, bool enabled, bool free)
 		{
 			using (new TransactionScope())
 			{
 				var address = Address.Find(addressId);
+				var oldStatus = address.Enabled;
+				if (enabled && !oldStatus)
+					Mailer.AddressBackToWork(address);
 				address.Enabled = enabled;
+				address.FreeFlag = free;
 				address.UpdateAndFlush();
 			}
 			CancelView();
@@ -275,24 +309,20 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		public void ShowMessageForClient(uint clientCode)
+		public void ShowMessageForUser(uint userId)
 		{
-			var message = ClientMessage.FindClientMessage(clientCode);
+			var message = ClientMessage.FindUserMessage(userId);
 			PropertyBag["Message"] = message;
+			PropertyBag["user"] = User.Find(message.ClientCode);
 		}
 
-		public void CancelMessage(uint clientCode)
+		public void CancelMessage(uint userId)
 		{
-			
 			using (new TransactionScope())
 			{
-				var rootUser = User.Find(clientCode);
-				foreach (var user in rootUser.Client.Users /*Client.Find(clientCode).Users*/)
-				{
-					var message = ClientMessage.Find(user.Id);
-					message.ShowMessageCount = 0;
-					message.Update();
-				}				
+				var message = ClientMessage.Find(userId);
+				message.ShowMessageCount = 0;
+				message.Update();
 			}
 			CancelView();
 		}

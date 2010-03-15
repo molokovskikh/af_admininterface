@@ -1,0 +1,1 @@
+﻿page.ReplaceHtml("CurrentMessageForUser${Message.ClientCode}", {@partial : 'Billing/ShowMessageForUserPartial.brail' });

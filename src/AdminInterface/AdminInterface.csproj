@@ -177,8 +177,10 @@
     <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\DrugstoreSettings.cs" />
     <Compile Include="Models\EndUserException.cs" />
+    <Compile Include="Models\Logs\AddressLogRecord.cs" />
     <Compile Include="Models\Logs\CallLog.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
+    <Compile Include="Models\Logs\UserLogRecord.cs" />
     <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\OrderView.cs" />
@@ -439,6 +441,8 @@
     <None Include="Views\Billing\SearchAddressesForUser.brail" />
     <None Include="Views\Billing\SearchUsersForAddress.brail" />
     <None Include="Views\Billing\AdditionalAddressInfo.brail" />
+    <None Include="Views\Billing\ShowMessageForUser.brailjs" />
+    <None Include="Views\Billing\ShowMessageForUserPartial.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
@@ -475,8 +479,6 @@
     <None Include="Views\Register\RegisterPayer.brail" />
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Billing\SearchBy.brail" />
-    <None Include="Views\Billing\ShowMessageForClientPartial.brail" />
-    <None Include="Views\Billing\ShowMessageForClient.brailjs" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Layouts\Common.brail" />

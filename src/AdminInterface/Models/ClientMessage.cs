@@ -29,5 +29,10 @@ namespace AdminInterface.Models
 				return null;
 			return TryFind((user.Id));
 		}
+
+		public static ClientMessage FindUserMessage(uint userId)
+		{
+			return TryFind(userId);
+		}
 	}
 }

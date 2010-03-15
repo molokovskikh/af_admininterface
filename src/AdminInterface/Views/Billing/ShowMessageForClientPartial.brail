@@ -1,7 +1,0 @@
-﻿<p>
-${ViewHelper.FormatMessage(message.Message)}
-<p>
-Осталось показать ${message.ShowMessageCount} раз
-<div style="text-align:right;">
-	<input type=button onclick="return RemoveMessage(${message.ClientCode})" value="Отменить показ сообщения"></input>
-</div>

@@ -63,6 +63,58 @@ namespace AdminInterface.Models
 				"RegisterList@subscribe.analit.net");
 		}
 
+		public static void UserBackToWork(User user)
+		{
+			var off = UserLogRecord.LastOff(user.Id);
+			var offLetter = "неизвестно";
+			if (off != null)
+				offLetter = String.Format("{0} пользователем {1}", off.LogTime, off.OperatorName);
+			Func.Mail("register@analit.net", "Возобновлена работа пользователя",
+				String.Format(
+@"Оператор: {0}
+Хост: {1}
+Код клиента: {2}
+Логин: {3}
+Комментарий: {4}
+Домашний регион: {5}
+Последнее отключение: {6}
+",
+				SecurityContext.Administrator.UserName,
+				SecurityContext.Administrator.GetHost(),
+				user.Client.Id,
+				user.Login,
+				user.Name,
+				user.Client.HomeRegion.Name,
+				offLetter),
+				"RegisterList@subscribe.analit.net");
+		}
+
+		public static void AddressBackToWork(Address address)
+		{
+			var off = AddressLogRecord.LastOff(address.Id);
+			var offLetter = "неизвестно";
+			if (off != null)
+				offLetter = String.Format("{0} пользователем {1}", off.LogTime, off.OperatorName);
+			Func.Mail("register@analit.net", "Возобновлена работа адреса доставки",
+				String.Format(
+@"Оператор: {0}
+Хост: {1}
+Код клиента: {2}
+Код адреса: {3}
+Адрес: {4}
+Домашний регион: {5}
+Последнее отключение: {6}
+",
+				SecurityContext.Administrator.UserName,
+				SecurityContext.Administrator.GetHost(),
+				address.Client.Id,
+				address.Id,
+				address.Value,
+				address.Client.HomeRegion.Name,
+				offLetter),
+				"RegisterList@subscribe.analit.net");			
+		}
+
 		public static void DeliveryAddressRegistred(Address address)
 		{
 			Func.Mail("register@analit.net", 
