@@ -152,7 +152,7 @@
 					<tr>
 						<td class="${"BlockedLogin" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledLogin" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"LoginNotExists" if not userInfo.IsLoginExists}">
 							<% if true: %>
-								<a href="${siteroot}/users/${user.Login}/edit">${user.Login}</a>
+								<a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Login}</a>
 							<% else: %>
 								${user.GetLoginOrName()}
 							<% end %>
@@ -201,7 +201,7 @@
 			</div>
 			<h3>Адреса доставки</h3>
 			<% for i, address in enumerate(client.Addresses): %>
-				<a href=${siteroot}/deliveries/${address.Id}/edit>${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
+				<a href=${siteroot}/deliveries/${address.Id}/edit class="${'Disabled' if not address.Enabled }">${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
 			<% end %>
 		</div>
 		

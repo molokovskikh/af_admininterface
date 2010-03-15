@@ -39,6 +39,12 @@
 </div>
 <% end %>
 
+<% if not user.Enabled: %>
+<div class="Warning">
+    <p>Пользователь отключен</p>
+</div>
+<% end %>
+
 <div class="TwoColumn" style="width: 800px;">
     <div class=block>
         <ul class="navigation-menu">

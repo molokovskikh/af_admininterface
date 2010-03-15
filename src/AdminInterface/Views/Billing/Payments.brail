@@ -18,6 +18,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <% end %>
 
 <script type="text/javascript">
+    jQuery(function() {
+        jQuery("form#SendMessageForm").validate({
+            rules: {
+                "NewClientMessage.Message": "required"
+            }
+        });	
+	});
+
     function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
         var count = jQuery(selectorAdditionalInfo + id).length;
         if (count > 0) {
@@ -545,7 +553,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="right">
 <%      if IsDefined("UsersMessages"): %>
 		<div class="UseCaseGroup">
-		<form action="sendMessage.rails" method="post">
+		<form id="SendMessageForm" action="sendMessage.rails" method="post">
 			<table style="width:100%">
 			        <tr>
 <%                      if (CountUsersWithMessages > 0): %>			        
@@ -565,7 +573,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					            if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
 						        <div id="CurrentMessageForUser${user.Id}" style="text-align: left">
 							    Остались не показанные сообщения для пользователя ${user.GetLoginWithName()}.
-							        <a href="javascript:void(0);" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
+							        <a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
     						    </div>
 <%                              end
 					        end %>

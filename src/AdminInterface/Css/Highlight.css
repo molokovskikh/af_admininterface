@@ -28,7 +28,12 @@
 	background-color: #6a6a6a;
 }
 
-.Disabled
+a.Disabled
+{
+	background-color: #ffa66a;
+}
+
+a.Disabled
 {
 	background-color: #ff6600;
 }

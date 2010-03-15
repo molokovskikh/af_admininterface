@@ -572,5 +572,68 @@ namespace Functional
 				Assert.IsTrue(errorMessageDiv.Text.Equals("При выполнении операции возникла ошибка. Попробуйте повторить позднее"));
 			}
 		}
+
+		[Test]
+		public void Send_message_to_user()
+		{
+			using (new SessionScope())
+			{
+				var client = DataMother.CreateTestClientWithAddressAndUser();
+				using (var browser = Open(string.Format("Client/{0}", client.Id)))
+				{
+					var username = client.Users[0].GetLoginWithName();
+					browser.Link(Find.ByText("Биллинг")).Click();
+					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select(username);
+					var message = "test message for user " + username;
+					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(message);
+					browser.Button(Find.ByValue("Отправить сообщение")).Click();
+					Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
+					Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
+					browser.Link(Find.ByText("Просмотреть сообщение")).Click();
+					Thread.Sleep(500);
+					Assert.That(browser.Text, Text.Contains(message));
+				}
+			}			
+		}
+
+		[Test]
+		public void Send_message_to_all_users()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var usr = new User {Client = client, Name = "test user", Enabled = true,};
+				usr.Setup(client);
+				scope.VoteCommit();
+			}
+			using (new SessionScope())
+			{
+				using (var browser = Open(string.Format("Client/{0}", client.Id)))
+				{
+					client = Client.Find(client.Id);
+					browser.Link(Find.ByText("Биллинг")).Click();
+					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select("Для всех пользователей");
+					var message = "test message for all users";
+					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(message);
+					browser.Button(Find.ByValue("Отправить сообщение")).Click();
+					Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
+					foreach (var user in client.Users)
+					{
+						Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}",
+						                                                      user.GetLoginWithName())));
+						var div = browser.Div(Find.ById("CurrentMessageForUser" + user.Id));
+						Assert.IsTrue(div.Exists);
+						browser.Link(Find.ById("ViewMessageForUser" + user.Id)).Click();
+						Thread.Sleep(500);
+						var messageBody = browser.Table(Find.ById("MessageForUser" + user.Id));
+						Assert.IsTrue(messageBody.Exists);
+						browser.Button(Find.ById("CancelViewMessage" + user.Id)).Click();
+						Thread.Sleep(500);
+						Assert.IsFalse(messageBody.Exists);
+						Assert.That(browser.Text, Text.Contains("Сообщение удалено"));
+					}
+				}
+			}
+		}
 	}
 }

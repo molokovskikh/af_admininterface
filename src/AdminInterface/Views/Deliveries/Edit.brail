@@ -18,6 +18,12 @@
 		${Message.MessageText}
 	</div>
 	<% end %>
+	
+    <% if not delivery.Enabled: %>
+    <div class="Warning">
+        <p>Адрес отключен</p>
+    </div>
+    <% end %>	
 
 	<h2>Адрес доставки ${delivery.Value}</h2>
 
