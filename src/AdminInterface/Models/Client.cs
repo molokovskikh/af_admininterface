@@ -294,7 +294,7 @@ group by u.ClientId")
 		{
 			if (Addresses == null)
 				Addresses = new List<Address>();
-			var delivery = new Address {Value = address};
+			var delivery = new Address {Value = address, Enabled = true};
 			delivery.Client = this;
 			Addresses.Add(delivery);
 		}

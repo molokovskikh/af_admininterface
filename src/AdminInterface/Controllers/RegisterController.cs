@@ -358,6 +358,7 @@ WHERE   intersection.pricecode IS NULL
 		{
 			var user = new User
 			{
+				Enabled = true,
 				Client = client,
 				Name = userName,
 				WorkRegionMask = workRegionMask,

@@ -56,6 +56,8 @@ namespace AdminInterface.Controllers
 			PasswordChangeLogEntity passwordChangeLog;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
 				user.Client = client;
 				user.Setup(client);
 				password = user.CreateInAd();
@@ -143,17 +145,23 @@ namespace AdminInterface.Controllers
 			[DataBind("contacts")] Contact[] contacts,
 			[DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
-			ulong temp = 0;
-			workRegions.Each(r => { temp += r; });
-			user.WorkRegionMask = temp;
-			temp = 0;
-			orderRegions.Each(r => { temp += r; });
-			user.OrderRegionMask = temp;
+			using (var scope = new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+				ulong temp = 0;
+				workRegions.Each(r => { temp += r; });
+				user.WorkRegionMask = temp;
+				temp = 0;
+				orderRegions.Each(r => { temp += r; });
+				user.OrderRegionMask = temp;
 
-			user.UpdateContacts(contacts, deletedContacts);
-			user.Update();
-			Flash["Message"] = new Message("Сохранено");
-			RedirectUsingRoute("users", "Edit", new { login = user.Login });
+				user.UpdateContacts(contacts, deletedContacts);
+				user.Update();
+				scope.VoteCommit();
+				Flash["Message"] = new Message("Сохранено");
+				RedirectUsingRoute("users", "Edit", new {login = user.Login});				
+			}
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]

@@ -90,11 +90,8 @@ namespace Common.Web.Ui.Models
 			// которые не отображены (могли быть добавлены другими пользователями)
 			var contacts = displayedContacts.Concat(hiddenContacts);
 
-			using (new TransactionScope())
-			{
-				AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
-				this.Save();
-			}
+            AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
+            Save();
 		}
 
 		public void UpdateContacts(Contact[] displayedContacts)

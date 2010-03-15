@@ -1,5 +1,7 @@
-﻿using AdminInterface.Helpers;
+﻿using System.Web;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -31,6 +33,8 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
 				address.Client = client;
 				address.Save();
 
@@ -62,9 +66,14 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, 
 			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
-			address.UpdateContacts(contacts, deletedContacts);
-
-			address.Update();
+			using (var scope = new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+				address.UpdateContacts(contacts, deletedContacts);
+				address.Update();
+				scope.VoteCommit();
+			}
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("client", "info", new {cc = address.Client.Id});
 		}
