@@ -40,3 +40,43 @@
 {
 	width:80%;
 }
+
+div table[class="DataTable"] tr[id*="Row"].Disabled
+{
+	background-color: #ff6600;
+}
+
+td.Disabled
+{
+	background-color: #ff6600;
+}
+
+div table tr[id*="Row"].Free
+{
+	background-color: #d0ef72;
+}
+
+td.Free
+{
+	background-color: #d0ef72;	
+}
+
+table tr[id*="Row"].HasNoConnectedUsers
+{
+	background-color: #cece9d;
+}
+
+td.HasNoConnectedUsers
+{
+	background-color: #cece9d;
+}
+
+tr[id*="Row"].Inactive
+{
+	background-color: #Ababab;
+}
+
+td.Inactive
+{
+	background-color: #Ababab;
+}

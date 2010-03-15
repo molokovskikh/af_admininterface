@@ -5,7 +5,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("logs.clients_data_logs")]
+	[ActiveRecord("logs.ClientLogs")]
 	public class ClientLogRecord : ActiveRecordBase<ClientLogRecord>
 	{
 		[PrimaryKey("ID")]
@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual string OperatorName { get; set; }
 
-		[Property("FirmStatus")]
+		[Property("Status")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
 		public static IList<ClientLogRecord> GetClientLogRecords(Client client)
@@ -26,9 +26,9 @@ namespace AdminInterface.Models.Logs
 			                               	(session, instance) =>
 			                               	session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
-from logs.clients_data_logs {ClientLogRecord}
-where firmstatus is not null
-		and clientsdataId = :ClientCode
+from logs.ClientLogs {ClientLogRecord}
+where status is not null
+		and clientId = :ClientCode
 order by logtime desc
 limit 5")
 			                               		.AddEntity(typeof (ClientLogRecord))
@@ -42,9 +42,9 @@ limit 5")
 											(session, instance) =>
 											session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
-from logs.clients_data_logs {ClientLogRecord}
-where firmstatus = 0
-		and clientsdataId = :ClientCode
+from logs.ClientLogs {ClientLogRecord}
+where status = 0
+		and clientId = :ClientCode
 order by logtime desc
 limit 1")
 												.AddEntity(typeof(ClientLogRecord))

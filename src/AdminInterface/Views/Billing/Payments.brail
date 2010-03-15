@@ -18,14 +18,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <% end %>
 
 <script type="text/javascript">
-    jQuery(function() {
-        jQuery("form#SendMessageForm").validate({
-            rules: {
-                "NewClientMessage.Message": "required"
-            }
-        });	
-	});
-
     function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
         var count = jQuery(selectorAdditionalInfo + id).length;
         if (count > 0) {
@@ -53,16 +45,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         ShowElement(false, "#ClientStatus" + clientId);
         AjaxRequest(link,
             function(html) {
-                jQuery("#ClientRow" + clientId).removeClass();
                 if (status) {
-                    var cssClass = jQuery("#ClientRow" + clientId).attr("title");
-                    jQuery("#ClientRow" + clientId).addClass(cssClass);
+                    jQuery("#ClientRow" + clientId).removeClass("Disabled");
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "");
                 }
                 else {
-                    jQuery("#ClientRow" + clientId).addClass("DisabledClient");
-                    jQuery("tr[name='Client" + clientId + "']").removeClass();
-                    jQuery("tr[name='Client" + clientId + "']").addClass("Disabled");
+                    jQuery("tr[id*='UserRow']").addClass("Disabled");
+                    jQuery("tr[id*='AddressRow']").addClass("Disabled");
+                    jQuery("#ClientRow" + clientId).addClass("Disabled");
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "disabled");
                     jQuery("input[name='Client" + clientId + "']").attr("checked", "");
                 }
@@ -78,20 +68,24 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         var link = "${siteroot}/Billing/SetUserStatus.rails?userId=" + userId +
             "&enabled=" + status + "&free=" + free;
         AjaxRequest(link,
-            function(html) {
-                jQuery("#UserRow" + userId).removeClass();
+            function(html) {                
                 if (!status) {
                     jQuery("#UserRow" + userId).addClass('Disabled');
                 }
-                else if (free) {
+                else {
+                    jQuery("#UserRow" + userId).removeClass('Disabled');
+                }
+                if (free) {
                     jQuery("#UserRow" + userId).addClass('Free');
                 }
-                else if (!isActive) {
+                else {
+                    jQuery("#UserRow" + userId).removeClass('Free');
+                }
+                if (!isActive) {
                     jQuery("#UserRow" + userId).addClass('Inactive');
                 }
                 else {
-                    var rowCssClass = jQuery("#UserRow" + userId).attr("title");
-                    jQuery("#UserRow" + userId).addClass(rowCssClass);
+                    jQuery("#UserRow" + userId).removeClass('Inactive');
                 }
                 RefreshTotalSum();
             },
@@ -104,13 +98,17 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             "&enabled=" + status + "&free=" + free;
         AjaxRequest(link,
             function(html) {
-                jQuery("#AddressRow" + addressId).removeClass();
                 if (!status) {
                     jQuery("#AddressRow" + addressId).addClass('Disabled');
                 }
                 else {
-                    var rowCssClass = jQuery("#AddressRow" + addressId).attr("title");
-                    jQuery("#AddressRow" + addressId).addClass(rowCssClass);
+                    jQuery("#AddressRow" + addressId).removeClass('Disabled');
+                }
+                if (free) {
+                    jQuery("#AddressRow" + addressId).addClass('Free');
+                }
+                else {
+                    jQuery("#AddressRow" + addressId).removeClass('Free');
                 }
                 RefreshTotalSum();
             },
@@ -172,10 +170,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                 headerCssClass = "HideVisible" 
                 bodyCssClass = "VisibleFolder"
             end %>
-			<div id="ClientListHeader" class="${headerCssClass}" title="Client${client.Id}">
-				<a href="#" title="Client${client.Id}">Клиенты плательщика "${Instance.ShortName}"</a>
+			<div id="ClientListHeader" class="${headerCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
+				<a href="#" title="Клиенты плательщика '${Instance.ShortName}'">Клиенты плательщика "${Instance.ShortName}"</a>
 			</div>
-			<div id="ClientListBody" class="${bodyCssClass}" title="Client${client.Id}">                			
+			<div id="ClientListBody" class="${bodyCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">                			
 			    <input type="hidden" name="clientCode" value="${client.Id}" />
                 <div style="overflow-x:scroll;">
 					<table class="DataTable" style="width:100%;">
@@ -197,7 +195,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					sum = 0
 					for client in Instance.Clients:
 						i++ %>
-						<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if not client.IsClientActive()}" title="${ViewHelper.GetRowStyle(i)}" align="center">
+						<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"Disabled" if not client.IsClientActive()}" align="center">
 							<td style="width: 50px">
 							    <div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
 								<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
@@ -271,10 +269,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             headerCssClass = "HideVisible" 
             bodyCssClass ="VisibleFolder"
         end %>
-        <div id="UserListHeader" class="${headerCssClass}" title="User${client.Id}">
-            <a href="javascript:" title="User${client.Id}">Пользователи плательщика "${Instance.ShortName}"</a>
+        <div id="UserListHeader" class="${headerCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
+            <a href="javascript:" title="Пользователи плательщика '${Instance.ShortName}'">Пользователи плательщика "${Instance.ShortName}"</a>
         </div>
-        <div id="UserListBody" class="${bodyCssClass}" title="User${client.Id}">
+        <div id="UserListBody" class="${bodyCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
             <form action="UpdateUsers.rails" method="post">
                 <input type="hidden" name="userId" value="${user.Id}" />
                 <div align="left">
@@ -288,15 +286,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                             <th>Клиент</th>
                         </tr>
 <%                      for i,user in enumerate(Users):
-                            log = AdminInterface.Models.Logs.AuthorizationLogEntity.TryFind(user.Id)
-                            if (not user.Enabled): %>
-                        <tr id="UserRow${user.Id}" class="Disabled" align="center"
-                            title="${ViewHelper.GetRowStyle(i)} ${'Inactive' if not user.IsActive and not user.IsFree} ${'Free' if user.IsFree}"
-                            name="Client${user.Client.Id}">
-<%                          else: %>
-                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'Inactive' if not user.IsActive and not user.IsFree} ${'Free' if user.IsFree}"
+                            log = AdminInterface.Models.Logs.AuthorizationLogEntity.TryFind(user.Id) %>
+                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'Disabled' if not user.Enabled} ${'Inactive' if not user.IsActive} ${'Free' if user.IsFree}"
                             align="center" title="${ViewHelper.GetRowStyle(i)}" name="Client${user.Client.Id}">
-<%                          end %>
                             <td style="width: 50px">
 <%                          if (user.Client.IsClientActive()): %>
                                 <input type="checkbox" ${"checked" if user.Enabled} id="UserStatusCheckBox${user.Id}" name="Client${user.Client.Id}"
@@ -330,10 +322,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                 headerCssClass = "HideVisible"
                 bodyCssClass = "VisibleFolder"
             end %>                
-			<div id="AddressListHeader" class="${headerCssClass}" title="Address${client.Id}">
-				<a href="javascript:" title="Address${client.Id}">Адреса плательщика "${Instance.ShortName}"</a>
+			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
+				<a href="javascript:" title="Адреса плательщика '${Instance.ShortName}'">Адреса плательщика "${Instance.ShortName}"</a>
 			</div>
-			<div id="AddressListBody" class="${bodyCssClass}" title="Address${client.Id}">
+			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
                 <form action="UpdateAddresses.rails" method="post">
                     <input type="hidden" name="addressId" value="${address.Id}" />
 					<div align="left">
@@ -345,19 +337,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							    <th>Клиент</th>
 						    </tr>
 <%                      for i,addr in enumerate(Addresses):
-                            hasNoUsers = (addr.AvaliableForUsers.Count == 0)
-                            if (not addr.Enabled): %>
-                            <tr id="AddressRow${addr.Id}" class="Disabled" align="center"
-                                title="${ViewHelper.GetRowStyle(i)} ${'Inactive' if not addr.IsActive and not addr.IsFree} ${'Free' if addr.IsFree}"
-                                name="Client${addr.Client.Id}">
-<%                          else: %>
-                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i) if addr.IsActive and not addr.IsFree and not hasNoUsers} ${'Inactive' if not addr.IsActive and not addr.IsFree and not hasNoUsers} ${'Free' if addr.IsFree and not hasNoUsers} ${'HasNoConnectedUsers' if (hasNoUsers)}"
-                                align="center" title="${ViewHelper.GetRowStyle(i)}" name="Client${addr.Client.Id}">
-<%                          end %>
+                            hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
+                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'Disabled' if not addr.Enabled} ${'Inactive' if not addr.IsActive} ${'Free' if addr.IsFree} ${'HasNoConnectedUsers' if (hasNoUsers)}"
+                                align="center" name="Client${addr.Client.Id}">
                                 <td style="width: 50px">
 <%                          if (addr.Client.IsClientActive()): %>                                
                                     <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
-                                        onclick="SetAddressStatus(${addr.Id}, this.checked)" />
+                                        onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          else: %>
                                     <input id="AddressStatus${addr.Id}" type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
                                         onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
@@ -378,8 +364,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             </div>
 		</div>
 		<table>
-		    <tr><td class="Disabled" style="width: 40px"></td><td> - Клиент/Пользователь/Адрес выключен</td></tr>
-		    <tr><td class="Free" style="width: 40px;"></td><td> - Пользователь работает бесплатно</td></tr>
+		    <tr><td class="Disabled" style="width: 40px;"></td><td> - Выключен</td></tr>
+		    <tr><td class="Free" style="width: 40px;"></td><td> - Работает бесплатно</td></tr>
 		    <tr><td class="Inactive" style="width: 40px;"></td><td> - Пользователь не получал обновлений более 7 дней</td></tr>
 		    <tr><td class="HasNoConnectedUsers" style="width: 40px"></td><td> - Адрес не имеет подключенных пользователей</td></tr>
 		</table>
