@@ -36,6 +36,7 @@ namespace AdminInterface.Controllers
 				DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
 					HttpContext.Current.Request.UserHostAddress);
 				address.Client = client;
+				address.Enabled = true;
 				address.Save();
 
 				address.UpdateContacts(contacts);
