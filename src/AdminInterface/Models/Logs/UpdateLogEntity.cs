@@ -94,4 +94,68 @@ namespace AdminInterface.Models.Logs
 					.List<UpdateLogEntity>();					
 		}
 	}
+
+	public static class UpdateLogEntityExtension
+	{
+		public static IList<UpdateLogEntity> SortBy(this IList<UpdateLogEntity> logEntities, string columnName, bool descending)
+		{
+			if (String.IsNullOrEmpty(columnName))
+				return logEntities;
+			if (columnName.Equals("RequestTime", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.RequestTime).ToList();
+				return logEntities.OrderBy(entity => entity.RequestTime).ToList();
+			}
+			if (columnName.Equals("ResultSize", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.ResultSize).ToList();
+				return logEntities.OrderBy(entity => entity.ResultSize).ToList();
+			}
+			if (columnName.Equals("Addition", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.Addition).ToList();
+				return logEntities.OrderBy(entity => entity.Addition).ToList();
+			}
+			if (columnName.Equals("UserName", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.UserName).ToList();
+				return logEntities.OrderBy(entity => entity.UserName).ToList();
+			}
+			if (columnName.Equals("Login", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.User.Login).ToList();
+				return logEntities.OrderBy(entity => entity.User.Login).ToList();
+			}
+			if (columnName.Equals("ClientName", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.User.Client.Name).ToList();
+				return logEntities.OrderBy(entity => entity.User.Client.Name).ToList();
+			}
+			if (columnName.Equals("UpdateType", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.UpdateType).ToList();
+				return logEntities.OrderBy(entity => entity.UpdateType).ToList();
+			}
+			if (columnName.Equals("AppVersion", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.AppVersion).ToList();
+				return logEntities.OrderBy(entity => entity.AppVersion).ToList();
+			}
+			if (columnName.Equals("Region", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return logEntities.OrderByDescending(entity => entity.User.Client.HomeRegion.Name).ToList();
+				return logEntities.OrderBy(entity => entity.User.Client.HomeRegion.Name).ToList();
+			}
+			return logEntities;
+		}		
+	}
 }

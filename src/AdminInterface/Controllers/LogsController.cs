@@ -7,6 +7,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Transform;
+using System.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -75,17 +76,19 @@ namespace AdminInterface.Controllers
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
 		{
-			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
+			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today, new string[] {},  0);
 		}
 
-		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
+		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
+			DateTime beginDate, DateTime endDate, string[] headerNames, int? sortColumnIndex)
 		{
+			IList<UpdateLogEntity> logEntities = null;
 			if (updateType.HasValue)
 			{
 				PropertyBag["updateType"] = updateType;
 				var statisticType = (StatisticsType)updateType;
 				PropertyBag["updateTypeName"] = BindingHelper.GetDescription(statisticType);
-				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesByUpdateType(updateType, regionMask, beginDate, endDate);
+				logEntities = UpdateLogEntity.GetEntitiesByUpdateType(updateType, regionMask, beginDate, endDate);
 				PropertyBag["regionMask"] = regionMask;
 				PropertyBag["adminRegionMask"] = SecurityContext.Administrator.RegionMask;
 			}
@@ -93,7 +96,7 @@ namespace AdminInterface.Controllers
 			{
 				var client = Client.Find(clientCode.Value);
 				PropertyBag["client"] = client;
-				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesFormClient(client.Id,
+				logEntities = UpdateLogEntity.GetEntitiesFormClient(client.Id,
 					beginDate, endDate.AddDays(1));
 				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 				SecurityContext.Administrator.CheckClientType(client.Type);
@@ -102,14 +105,24 @@ namespace AdminInterface.Controllers
 			{
 				var user = User.Find(userId.Value);
 				PropertyBag["user"] = user;
-				PropertyBag["logEntities"] = UpdateLogEntity.GetEntitiesByUser(userId.Value,
+				logEntities = UpdateLogEntity.GetEntitiesByUser(userId.Value,
 					beginDate, endDate.AddDays(1));
 				SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
 				SecurityContext.Administrator.CheckClientType(user.Client.Type);
 			}
-			
+			if ((headerNames.Length > 0) && sortColumnIndex.HasValue)
+				PropertyBag["logEntities"] = logEntities.SortBy(headerNames[Math.Abs(sortColumnIndex.Value) - 1], sortColumnIndex.Value > 0);
+			else
+				PropertyBag["logEntities"] = logEntities;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
+			PropertyBag["sortColumnIndex"] = sortColumnIndex.HasValue ? sortColumnIndex.Value : 0;
+			if (clientCode.HasValue)
+				PropertyBag["clientCode"] = clientCode.Value;
+			if (userId.HasValue)
+				PropertyBag["userId"] = userId.Value;
+			if (updateType.HasValue)
+				PropertyBag["updateType"] = updateType.Value;
 		}
 
 		public void PasswordChangeLog(string login)

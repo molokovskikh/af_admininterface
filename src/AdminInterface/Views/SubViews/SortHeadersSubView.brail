@@ -1,45 +1,51 @@
-﻿<% for i, item in enumerate(headers):%>
-<%  if IsDefined("formPostBack"):
-        elementId = "sortColumnIndex" %>
-<%      if IsDefined("rowsCount"):
-            rowsCountStr = rowsCount.ToString()
-        else: 
-            rowsCountStr = ""
-        end
-        if (i+1)!=sortColumnIndex:
-            if -(i+1)!=sortColumnIndex: %>
+﻿<%  for i, item in enumerate(headers):
+        if IsDefined("formPostBack"):
+            elementId = "sortColumnIndex"
+            if IsDefined("rowsCount"):
+                rowsCountStr = rowsCount.ToString()
+            else: 
+                rowsCountStr = ""
+            end
+            if IsDefined("unsortableHeaders") and (unsortableHeaders.Contains(i) or unsortableHeaders.Contains(item)): %>
+                <th>${item}</th>            
+<%              continue
+            end
+            if (i+1)!=sortColumnIndex:
+                if -(i+1)!=sortColumnIndex: %>
                 <th>
                     <a href="javascript:" onclick="document.getElementById('${elementId}').value = ${i+1}; document.${formPostBack}.submit();"
                         class="SortHeader">${item}</a>
                 </th>
-<%      else: %>
-                <th>
-                    
+<%              else: %>
+                <th>                    
                     <a href="javascript:" onclick="document.getElementById('${elementId}').value = ${i+1}; document.${formPostBack}.submit();"
                         class="SortHeaderAsc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue.gif" />
                 </th>
-<%      end 
-        else: %>
-            <th>
-                
+<%              end 
+            else: %>
+            <th>                
                 <a href="javascript:" onclick="document.getElementById('${elementId}').value = -${i+1}; document.${formPostBack}.submit();"
                     class="SortHeaderDesc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue-reversed.gif" />
             </th>
-<%      end %>    
-<%  else: %>
-<%      if IsDefined("rowsCount"):
-            rowsCountStr = rowsCount.ToString()
-        else: 
-            rowsCountStr = ""
-        end
-        if (i+1)!=sortColumnIndex:
-            if -(i+1)!=sortColumnIndex: %>
-                <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeader">${item}</a></th>
+<%          end %>    
 <%      else: %>
+<%          if IsDefined("unsortableHeaders") and (unsortableHeaders.Contains(i) or unsortableHeaders.Contains(item)): %>
+                <th>${item}</th>
+<%              continue
+            end
+            if IsDefined("rowsCount"):
+                rowsCountStr = rowsCount.ToString()
+            else: 
+                rowsCountStr = ""
+            end
+            if (i+1)!=sortColumnIndex:
+                if -(i+1)!=sortColumnIndex: %>
+                <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeader">${item}</a></th>
+<%              else: %>
                 <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (i+1).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderAsc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue.gif" /></th>
-<%      end 
-        else: %>
+<%              end 
+            else: %>
            <th><a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "sortColumnIndex", (-(i+1)).ToString(), "rowsCount", rowsCountStr)}" class="SortHeaderDesc">${item}</a>&nbsp;<img src="${siteroot}/Images/arrow-down-blue-reversed.gif" /></th>
-<%      end
-    end %>        
-<% end %>
+<%          end
+        end %>        
+<%  end %>

@@ -57,10 +57,10 @@
 	}
 </script>
 
-<%if IsDefined("client"): %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		История обновлений клиента ${client.Name}
-	<% end %>
+<%  if IsDefined("client"):
+        component CaptureFor, {"id" : "Title"}: %>
+		    История обновлений клиента ${client.Name}
+<%      end %>
 
 	<div class="PageHeader">
 		История обновлений клиента ${client.Name}
@@ -69,7 +69,7 @@
 	<% component CaptureFor, {"id" : "PostToServer"}: %>
 		${FormHelper.HiddenField("clientCode", client.Id)}
 	<% end %>
-<%else: %>
+<%  else: %>
     <% if IsDefined("user"): %>
 	    <% component CaptureFor, {"id" : "Title"}: %>
 		    История обновлений пользователя ${user.Login}
@@ -83,25 +83,23 @@
 		    ${FormHelper.HiddenField("userId", user.Id)}
 	    <% end %>
 	<% end %>
-<%end %>
-<%
+<%end 
     if (not IsDefined("updateType")): 
 	    OutputSubView("SelectDateIntervalSubView")
 	else:
         accumulative = cast(int, StatisticsType.UpdateNormal) 
 	    cumulative = cast(int, StatisticsType.UpdateCumulative)
-	    isDataTransferUpdateType = (accumulative == updateType or cumulative == updateType)     	
-%>
+	    isDataTransferUpdateType = (accumulative == updateType or cumulative == updateType) %>
     <table width="100%">
         <tr align="center"><td><font face="Verdana" size="2"><b>${updateTypeName}</b></font></td></tr>
       <%if IsDefined("regionMask"):
             countClients = 0
-		    for logEntity in logEntities:
-		        region = logEntity.User.Client.HomeRegion.Id
-		        if (region & regionMask) and (region & adminRegionMask) > 0:
-		            countClients++
-		        end
-		    end
+	        for logEntity in logEntities:
+	            region = logEntity.User.Client.HomeRegion.Id
+	            if (region & regionMask) and (region & adminRegionMask) > 0:
+	                countClients++
+	            end
+	        end
 		else:
 		    countClients = logEntities.Count
 		end%>
@@ -112,55 +110,47 @@
 %>
 
 <div>
-	<table class="DataTable HighLightCurrentRow">	
-	<% 
-		if logEntities.Count != 0:
-	%>	
+<form id="updateForm" name="updateForm" action="${siteroot}/Logs/UpdateLog.rails">
+	<table class="DataTable">
+	    <thead>
+<%      if logEntities.Count > 0: %>	
 		<tr>
-			<th>
-				Дата
-			</th>
-			
-			<th>
-				Версия
-			</th>
-			
-          <%if (not IsDefined("client")) and (not IsDefined("user")): %>  			
-			<th>
-			    Регион
-			</th>
-		  <%end %>
-			
-		  <%if (IsDefined("client") or IsDefined("updateType")): %>
-			<th>
-				Пользователь
-			</th>
-		  <%end %>
-		  
-		  <%if IsDefined("updateType"): %>
-		    <th>
-		        Клиент
-		    </th>
-		  <%else: %>  
-	  	    <th>
-	  	        Тип обновления
-		    </th>			  		  
-		  <%end %>
-		  
-		  <%if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):%>
-		    <th>
-			    Размер приготовленных данных
-		    </th>
-		    <th>	
-			    Лог
-		    </th>
-          <%end %>
-			<th>
-				Дополнительно
-			</th>
-		</tr>			
-	<%
-			i = 0
+<%          headersList = ["Дата", "Версия"]
+            headersColumns = ["RequestTime", "AppVersion"]
+            unsortableHeaders = []
+            if (not IsDefined("client") and not IsDefined("user")):
+                headersList.Add("Регион")
+                headersColumns.Add("Region")
+            end
+            if (IsDefined("client") or IsDefined("updateType")):
+                headersList.Add("Пользователь")
+                headersColumns.Add("Login")
+            end
+            if IsDefined("updateType"):
+                headersList.Add("Клиент")
+                headersColumns.Add("ClientName")
+            else:
+                headersList.Add("Тип обновления")
+                headersColumns.Add("UpdateType")
+            end
+            if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
+                headersList.Add("Размер приготовленных данных")
+                headersColumns.Add("ResultSize")
+            end
+            headersList.Add("Дополнительно")
+            headersColumns.Add("Addition")
+            if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
+                headersList.Add("Лог")
+                unsortableHeaders.Add("Лог")
+                headersColumns.Add("")
+            end %>
+            
+<%          OutputSubView("/SubViews/SortHeadersSubView",
+                {"headers":headersList, "unsortableHeaders": unsortableHeaders, "sortColumnIndex":sortColumnIndex, "formPostBack":'updateForm' }) %>			
+		</tr>
+		</thead>
+		<tbody class="HighLightCurrentRow">
+<%          i = 0
 			for logEntity in logEntities:
 			    region = logEntity.User.Client.HomeRegion.Id
 			    if (IsDefined("regionMask") and ((region & regionMask == 0) or (region & adminRegionMask == 0))):
@@ -170,8 +160,7 @@
 					requestTimeStyle = ""
 				else:
 					requestTimeStyle = "background-color:#ffa642"
-				end
-	%>
+				end %>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}" align="center">
 			<td style="${requestTimeStyle};width:1%;">
 				${logEntity.RequestTime}
@@ -189,7 +178,7 @@
 
 		  <%if (IsDefined("client") or IsDefined("updateType")): %>
 			<td>
-				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.Login}</a>
+				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginWithName()}</a>
 			</td>
 		  <%end %>
 		  
@@ -211,8 +200,13 @@
 		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
 			    <td>
 				    ${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
-			    </td>
-    		  
+			    </td>    		  
+    	  <%end %>
+			<td style="text-align:center;">
+				${logEntity.Addition}
+			</td>
+			
+		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
 			    <td>
 				    <% if not string.IsNullOrEmpty(logEntity.Log): %>
 				    <a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
@@ -222,10 +216,7 @@
 				    -
 				    <% end %>
 			    </td>	    	  
-    	  <%end %>
-			<td style="text-align:center;">
-				${logEntity.Addition}
-			</td>
+    	  <%end %>			
 		</tr>
 	<% 
 				i++
@@ -237,9 +228,30 @@
 				За указанный период клиент не обновлялся
 			</td>
 		</tr>
-	<% 
-		end
-	%>
-	
-	</table>
+	    </tbody>
+	</table>		
+<%      end %>	
+
+<%      if (logEntities.Count > 0):
+            for i,headerName in enumerate(headersColumns): %>
+        <input type="hidden" name="headerNames[${i}]" value="${headerName}" />
+<%          end
+        end %>		
+        <input type="hidden" name="sortColumnIndex" id="sortColumnIndex" value="${sortColumnIndex}" />
+<%      if IsDefined("regionMask"): %>		        
+        <input type="hidden" name="regionMask" value="${regionMask}" />
+<%      end %>	        
+        <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}"
+        <input type="hidden" name="endDate" id="endDate" value="${endDate}" />
+<%      if IsDefined("clientCode"): %>	
+        <input type="hidden" name="clientCode" id="clientCode" value="${clientCode}" />
+<%      end %>
+<%      if IsDefined("userId"): %>
+        <input type="hidden" name="userId" id="userId" value="${userId}" />
+<%      end %>	
+<%      if IsDefined("updateType"): %>
+        <input type="hidden" name="updateType" id="updateType" value="${updateType}" />
+<%      end %>	
+
+</form>	
 </div>
