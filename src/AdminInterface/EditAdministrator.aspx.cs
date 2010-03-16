@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
@@ -8,6 +9,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using NHibernate.Criterion;
+using Castle.ActiveRecord;
 
 public partial class EditAdministrator : Page
 {
@@ -44,60 +46,67 @@ public partial class EditAdministrator : Page
 
 	protected void Save_Click(object sender, EventArgs e)
 	{
-		if (!IsValid)
-			return;
-
-		var permissions = Permission.FindAll();
-		var id = Convert.ToUInt32(Request["id"]);
-		Administrator admin;
-		if (id == 0)
-			admin = new Administrator { AllowedPermissions = new List<Permission>() };
-		else
-			admin = Administrator.GetById(id);
-
-		admin.UserName = Login.Text;
-		admin.ManagerName = FIO.Text;
-		admin.PhoneSupport = Phone.Text;
-		admin.Email = Email.Text;
-
-		foreach (ListItem item in RegionSelector.Items)
+		using (var scope = new TransactionScope(OnDispose.Rollback))
 		{
-			if (item.Selected)
-				admin.RegionMask |= Convert.ToUInt64(item.Value);
+			DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
+				HttpContext.Current.Request.UserHostAddress);
+			if (!IsValid)
+				return;
+
+			var permissions = Permission.FindAll();
+			var id = Convert.ToUInt32(Request["id"]);
+			Administrator admin;
+			if (id == 0)
+				admin = new Administrator {AllowedPermissions = new List<Permission>()};
 			else
-				admin.RegionMask &= ~Convert.ToUInt64(item.Value);
-		}
+				admin = Administrator.GetById(id);
 
-		foreach (ListItem item in PermissionSelector.Items)
-		{
-			var permissionType = (PermissionType) Enum.Parse(typeof(PermissionType), item.Value);
-			var permission = FindPermission(permissionType, admin.AllowedPermissions);
-			if (item.Selected)
+			admin.UserName = Login.Text;
+			admin.ManagerName = FIO.Text;
+			admin.PhoneSupport = Phone.Text;
+			admin.Email = Email.Text;
+
+			foreach (ListItem item in RegionSelector.Items)
 			{
-				if (permission == null)
-					admin.AllowedPermissions.Add(FindPermission(permissionType, permissions));
+				if (item.Selected)
+					admin.RegionMask |= Convert.ToUInt64(item.Value);
+				else
+					admin.RegionMask &= ~Convert.ToUInt64(item.Value);
+			}
+
+			foreach (ListItem item in PermissionSelector.Items)
+			{
+				var permissionType = (PermissionType) Enum.Parse(typeof (PermissionType), item.Value);
+				var permission = FindPermission(permissionType, admin.AllowedPermissions);
+				if (item.Selected)
+				{
+					if (permission == null)
+						admin.AllowedPermissions.Add(FindPermission(permissionType, permissions));
+				}
+				else
+				{
+					if (permission != null)
+						admin.AllowedPermissions.Remove(permission);
+				}
+			}
+
+			if (admin.Id == 0)
+			{
+				admin.Save();
+				new RedmineUser(admin).Save();
+				var isLoginCreated = CreateUserInAD(admin);
+				scope.VoteCommit();
+				if (!isLoginCreated)
+					Response.Redirect("ViewAdministrators.aspx");
+				else
+					Response.Redirect("OfficeUserRegistrationReport.aspx");
 			}
 			else
 			{
-				if (permission != null)
-					admin.AllowedPermissions.Remove(permission);
-			}
-		}
-
-		if (admin.Id == 0)
-		{
-			admin.Save();
-			new RedmineUser(admin).Save();
-			var isLoginCreated = CreateUserInAD(admin);
-			if (!isLoginCreated)
+				admin.Update();
+				scope.VoteCommit();
 				Response.Redirect("ViewAdministrators.aspx");
-			else
-				Response.Redirect("OfficeUserRegistrationReport.aspx");
-		}
-		else
-		{
-			admin.Update();
-			Response.Redirect("ViewAdministrators.aspx");
+			}			
 		}
 	}
 

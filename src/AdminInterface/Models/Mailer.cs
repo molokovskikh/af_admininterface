@@ -26,6 +26,26 @@ namespace AdminInterface.Models
 				"RegisterList@subscribe.analit.net");
 		}
 
+		public static void AddressRegistrationResened(Client client, string address)
+		{
+			Func.Mail("register@analit.net",
+				"Разослано повторное уведомление о регистрации адреса",
+				String.Format(
+@"Оператор: {0}
+Хост: {1}
+Краткое наименование: {2}
+Полное наименование: {3}
+Домашний регион: {4}
+Адрес доставки: {5}",
+					SecurityContext.Administrator.UserName,
+					SecurityContext.Administrator.GetHost(),
+					client.Name,
+					client.FullName,
+					client.HomeRegion.Name,
+					address),
+				"RegisterList@subscribe.analit.net");
+		}
+
 		public static void SupplierRegistred(string shortname, string homeregion)
 		{
 			Func.Mail("register@analit.net",

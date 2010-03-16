@@ -66,7 +66,7 @@ namespace AdminInterface.Services
 					email,
 					"",
 					null);
-			Mailer.ClientRegistrationResened(client);
+			Mailer.AddressRegistrationResened(client, address.Value);
 		}
 
 		public void NotifySupplierAboutDrugstoreRegistration(Client client)
