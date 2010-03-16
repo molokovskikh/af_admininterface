@@ -183,6 +183,7 @@ namespace AdminInterface.Models
 		public virtual void Setup()
 		{
 			Login = "temporary-login";
+			Enabled = true;
 			Save();
 			Login = Id.ToString();
 			Update();
