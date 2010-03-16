@@ -4,7 +4,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> 
 
-	<title>${?Title}</title>
+	<title>
+		<% if IsDefined("Title"	): %>
+			${Title}
+		<% else: %>
+			Административный интерфейс
+		<% end %>
+	</title>
 	<script type="text/javascript" src="${siteroot}/JavaScript/calendar.js"></script>
 	<script type="text/javascript" src="${siteroot}/JavaScript/calendar-ru_win_.js"></script>
 	<script type="text/javascript" src="${siteroot}/JavaScript/calendar-setup.js"></script>

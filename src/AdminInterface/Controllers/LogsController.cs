@@ -82,6 +82,7 @@ namespace AdminInterface.Controllers
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
 			DateTime beginDate, DateTime endDate, string[] headerNames, int? sortColumnIndex)
 		{
+			PropertyBag["Title"] = "Статистика обновлений";
 			IList<UpdateLogEntity> logEntities = null;
 			if (updateType.HasValue)
 			{
