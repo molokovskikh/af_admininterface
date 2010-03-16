@@ -1,4 +1,7 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Регистрация клиента", "")]} %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+		Регистрация клиента
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Регистрация клиента", "")]} %>
 
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />

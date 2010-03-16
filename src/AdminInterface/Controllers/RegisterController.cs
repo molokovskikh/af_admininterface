@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers
 
         [AccessibleThrough(Verb.Get)]
 		public void Register()
-		{            
+		{
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["regions"] = regions;

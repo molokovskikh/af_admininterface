@@ -1,4 +1,7 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+		Регистрация пользователя
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый пользователь", "")]} %>
 									  

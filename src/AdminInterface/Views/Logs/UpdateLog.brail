@@ -1,4 +1,7 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Статистика", "")]} %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+		Статистика обновлений
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Статистика", "")]} %>
 
 <script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 <script type="text/javascript">

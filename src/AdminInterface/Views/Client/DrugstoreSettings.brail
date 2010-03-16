@@ -45,9 +45,13 @@
 	            <input type="hidden" name="drugstore.ServiceClient" value="false" />
 	            Сотрудник АК "Инфорум"<br />
 	            
+	            <input type="checkbox" name="drugstore.AllowDelayOfPayment" value="true" ${"checked" if drugstore.AllowDelayOfPayment } />
+	            <input type="hidden" name="drugstore.AllowDelayOfPayment" value="false" />
+	            Активировать механизм аптечной корректировки цен<br />	            
+	            
 	            <input type="checkbox" name="drugstore.ManualComparison" value="true" ${"checked" if drugstore.ManualComparison } />
 	            <input type="hidden" name="drugstore.ManualComparison" value="false" />
-	            Разрешить сопоставление вручную в AnalitOnline<br />
+	            Разрешить сопоставление вручную в AnalitOnline<br />	            
 	        </div>
     	    
             <!--

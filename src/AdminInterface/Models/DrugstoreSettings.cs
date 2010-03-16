@@ -40,6 +40,9 @@ namespace AdminInterface.Models
 		[Property]
 		public bool ManualComparison { get; set; }
 
+		[Property]
+		public bool AllowDelayOfPayment { get; set; }
+
 		[Property(NotNull = true)]
 		public string BasecostPassword { get; set; }
 
