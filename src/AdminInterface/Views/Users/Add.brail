@@ -7,9 +7,26 @@
 									  
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
+
+<script>
+    jQuery(function() {
+        jQuery.validator.addMethod("validateEmailList", function(value, element) {
+            if (value.toString().length > 0) {
+                res = /^\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*(\,\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*)*$/.test(value)
+                return res;
+            }
+            else if (jQuery("#sendClientCard")[0].checked) {
+                res = /^.{1,2}$/.test(value)
+                return res;
+            }
+            return true;
+        }, "Поле содержит некорректный адрес электронной почты");
+        jQuery("form").validate({ rules: { "mails": "validateEmailList", } });
+    });
+</script>
 									  
 <div style="width: 800px;">
-	<form method=post action="${siteroot}/users/add">
+	<form method=post name="AddUserForm" action="${siteroot}/users/add">
 		<input type=hidden value="${Client.Id}" name="clientId" />
 		<h2>
 			Новый пользователь
@@ -35,7 +52,7 @@
 				Адреса для отправки регистрационной карты (перечисляются через запятую):
 			</label>
 			<div>
-				<textarea class="ValidateEmail EmailRequired" style="width: 100%" name="mails">${emailForSend}</textarea>
+				<textarea style="width: 100%" name="mails">${emailForSend}</textarea>
 			</div>
 		</div>
 		

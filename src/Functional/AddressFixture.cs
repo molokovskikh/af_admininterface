@@ -127,5 +127,24 @@ namespace Functional
 				Assert.That(countContacts, Is.EqualTo(countContacts));
 			}
 		}
+
+		[Test]
+		public void Address_must_be_enabled_after_registration()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				using (new SessionScope())
+				{
+					browser.Link(Find.ByText("Новый адрес доставки")).Click();
+					browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
+					browser.Button(Find.ByValue("Создать")).Click();
+					Assert.That(browser.Text, Text.Contains("Адрес доставки создан"));
+					client = Client.Find(client.Id);
+					Assert.That(client.Addresses.Count, Is.EqualTo(1));
+					Assert.IsTrue(client.Addresses[0].Enabled);
+				}
+			}
+		}
 	}
 }

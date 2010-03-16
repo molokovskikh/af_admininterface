@@ -478,5 +478,62 @@ namespace Functional
 					Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("OrderRegions[{0}]", i))).Checked);
 			}
 		}
+
+		[Test]
+		public void User_must_be_enabled_after_registration()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				using (new SessionScope())
+				{
+					browser.Link(Find.ByText("Новый пользователь")).Click();
+					browser.TextField(Find.ByName("user.Name")).TypeText("test user");
+					browser.Button(Find.ByValue("Создать")).Click();
+					browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+					client = Client.Find(client.Id);
+					Assert.That(client.Users.Count, Is.EqualTo(1));
+					Assert.IsTrue(client.Users[0].Enabled);
+				}
+			}			
+		}
+
+		[Test, Description("Регистрация пользователя. При добавлении email в контактную информацию, он должен добавляться в список адресов, на которые нужно отсылать регистрационную карту")]
+		public void Add_email_for_registration_card_by_adding_contact_email()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				using (new SessionScope())
+				{
+					browser.Link(Find.ByText("Новый пользователь")).Click();
+				}
+			}
+		}
+
+		[Test, Description("Регистрация пользователя. Проверка валидатора списка email-ов для отправки регистрационной карты")]
+		public void Validate_email_list_for_sending_registration_card()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				using (new SessionScope())
+				{
+					browser.Link(Find.ByText("Новый пользователь")).Click();
+					browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
+					browser.Button(Find.ByValue("Создать")).Click();
+					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
+					browser.TextField(Find.ByName("mails")).Clear();
+					browser.Button(Find.ByValue("Создать")).Click();
+					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
+					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
+					browser.Button(Find.ByValue("Создать")).Click();
+					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
+					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test");
+					browser.Button(Find.ByValue("Создать")).Click();
+					Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+				}
+			}
+		}
 	}
 }
