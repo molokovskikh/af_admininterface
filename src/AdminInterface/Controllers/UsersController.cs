@@ -89,8 +89,18 @@ namespace AdminInterface.Controllers
 
 			Mailer.UserRegistred(user);
 
-			if (sendClientCard && !String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim()))
+			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
+				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);
+			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
+			if (sendClientCard && haveMails)
 			{
+				var contactEmails = String.Empty;
+				foreach (var contact in contacts)
+					if (contact.Type == ContactType.Email)
+						contactEmails = String.Concat(contactEmails, String.Format("{0},", contact.ContactText));
+				mails = String.Concat(contactEmails, mails);
+				if (mails.EndsWith(","))
+					mails = mails.Remove(mails.Length - 1);
 				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
 					user,
 					password,

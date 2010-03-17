@@ -523,9 +523,6 @@ namespace Functional
 					browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
 					browser.Button(Find.ByValue("Создать")).Click();
 					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
-					browser.TextField(Find.ByName("mails")).Clear();
-					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
 					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
 					browser.Button(Find.ByValue("Создать")).Click();
 					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));

@@ -55,7 +55,7 @@ namespace AdminInterface.Models
 
 		public bool IsDisabled
 		{
-			get { return EnabledClientsCount == 0; }
+			get { return (EnabledUsersCount == 0) || (EnabledAddressesCount == 0); }
 		}
 
 		public string GetSegments()

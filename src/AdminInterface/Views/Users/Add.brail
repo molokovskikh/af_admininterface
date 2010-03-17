@@ -15,10 +15,6 @@
                 res = /^\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*(\,\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*)*$/.test(value)
                 return res;
             }
-            else if (jQuery("#sendClientCard")[0].checked) {
-                res = /^.{1,2}$/.test(value)
-                return res;
-            }
             return true;
         }, "Поле содержит некорректный адрес электронной почты");
         jQuery("form").validate({ rules: { "mails": "validateEmailList", } });
