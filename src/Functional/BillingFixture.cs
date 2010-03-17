@@ -635,5 +635,18 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Check_columns_by_billing_search()
+		{
+			using (var browser = Open("Billing/Search.rails"))
+			{
+				browser.Button(Find.ByValue("Найти")).Click();
+				Assert.That(browser.Text, Text.Contains("Отключенных копий"));
+				Assert.That(browser.Text, Text.Contains("Работающих копий"));
+				Assert.That(browser.Text, Text.Contains("Отключенных адресов"));
+				Assert.That(browser.Text, Text.Contains("Работающих адресов"));
+			}
+		}
 	}
 }

@@ -57,16 +57,22 @@ OutputSubView("Search")
 				</th>
 				<th style="width: 190px;">
 					${WriteHeader("Дата платежа", "PayDate")}
-				</th>
+				</th>				
 				<th>
 					${WriteHeader("Дата регистрации", "LastClientRegistrationDate")}
 				</th>
 				<th>
-					${WriteHeader("Отключенных клиентов", "DisabledClientsCount")}
+					${WriteHeader("Отключенных копий", "DisabledUsersCount")}
 				</th>
 				<th>
-					${WriteHeader("Работающих клиентов", "EnabledClientsCount")}
+					${WriteHeader("Работающих копий", "EnabledUsersCount")}
 				</th>
+				<th>
+					${WriteHeader("Отключенных адресов", "DisabledAddressesCount")}
+				</th>
+				<th>
+					${WriteHeader("Работающих адресов", "EnabledAddressesCount")}
+				</th>				
 				<th>
 					Сегменты
 				</th>
@@ -118,11 +124,17 @@ OutputSubView("Search")
 					${searchResult.LastClientRegistrationDate.ToShortDateString()}
 				</td>
 				<td style="width: 1%">
-					${searchResult.DisabledClientsCount}
+					${searchResult.DisabledUsersCount}
 				</td>
 				<td style="width: 1%">
-					${searchResult.EnabledClientsCount}
+					${searchResult.EnabledUsersCount}
 				</td>
+				<td style="width: 1%">
+					${searchResult.DisabledAddressesCount}
+				</td>
+				<td style="width: 1%">
+					${searchResult.EnabledAddressesCount}
+				</td>				
 				<td>
 					${searchResult.GetSegments()}
 				</td>

@@ -23,13 +23,19 @@ namespace AdminInterface.Models
 
 		[Property]
 		public DateTime LastClientRegistrationDate { get; set; }
+	
+        [Property]
+        public uint DisabledUsersCount { get; set; }
 
-		[Property]
-		public uint DisabledClientsCount { get; set; }
+        [Property]
+        public uint EnabledUsersCount { get; set; }
 
-		[Property]
-		public uint EnabledClientsCount { get; set; }
+        [Property]
+        public uint DisabledAddressesCount { get; set; }
 
+        [Property]
+        public uint EnabledAddressesCount { get; set; }
+		
 		[Property]
 		public string Regions { get; set; }
 
@@ -137,9 +143,12 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.shortname as {{BillingSearchItem.ShortName}},
 		p.oldpaydate as {{BillingSearchItem.PayDate}},
 		p.oldtariff as {{BillingSearchItem.PaySum}},
-		max(RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
-		sum(if(cd.Status = 0, 1, 0)) as {{BillingSearchItem.DisabledClientsCount}},
-		sum(if(cd.Status = 1, 1, 0)) as {{BillingSearchItem.EnabledClientsCount}},
+		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
+        count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
+        count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
+        count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
+        count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
+
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
@@ -150,6 +159,8 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
 from billing.payers p
 	join future.Clients cd on p.PayerId = cd.PayerId
+        join future.Users users on users.ClientId = cd.Id
+        join future.Addresses addresses on addresses.ClientId = cd.Id
 where cd.RegionCode & :AdminRegionMask > 0
 		{3}
 		{0}
