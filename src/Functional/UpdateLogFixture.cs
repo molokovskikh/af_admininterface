@@ -161,5 +161,30 @@ where
 			}
 			return id;
 		}
+
+		[Test]
+		public void Try_sort_by_columns()
+		{
+			var uri = String.Format("Logs/UpdateLog.rails?clientCode={0}", GetId(typeof(Client)));
+			using (var browser = new IE(BuildTestUrl(uri)))
+			{
+				var calendarFrom = browser.Div("beginDateCalendarHolder");
+				var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp();
+				headerRow.TableCells[1].MouseDown();
+				headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
+
+				browser.Button(Find.ByValue("Показать")).Click();
+				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				browser.Link(Find.ByText("Дата")).Click();
+				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				browser.Link(Find.ByText("Версия")).Click();
+				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				browser.Link(Find.ByText("Пользователь")).Click();
+				Assert.That(browser.Text, Text.DoesNotContain("За указанный период клиент не обновлялся"));
+				CheckCommonColumnNames(browser);
+			}
+		}
 	}
 }

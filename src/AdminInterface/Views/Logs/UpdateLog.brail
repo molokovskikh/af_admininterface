@@ -244,7 +244,7 @@
 <%      if IsDefined("regionMask"): %>		        
         <input type="hidden" name="regionMask" value="${regionMask}" />
 <%      end %>	        
-        <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}"
+        <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}" />
         <input type="hidden" name="endDate" id="endDate" value="${endDate}" />
 <%      if IsDefined("clientCode"): %>	
         <input type="hidden" name="clientCode" id="clientCode" value="${clientCode}" />
