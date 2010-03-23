@@ -54,7 +54,17 @@
 		
 		<div class=block>
 		    <% OutputSubView("/SubViews/ContactInfo") %>
-		</div>		
+		</div>
+		
+        <div class="block" id="DeliveryAddressDiv">
+            <h3>Адрес доставки</h3>
+            <table border="0" width="100%" cellpadding="3" cellspacing="0">
+                <tr>
+                    <td width="20%">Адрес доставки медикаментов:</td>
+                    <td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
+                </tr>                    
+            </table>            
+        </div>		
 		
 		<div class=block>
 			<h3>Доступ к адресам доставки</h3>

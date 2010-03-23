@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using AdminInterface.Extentions;
@@ -49,7 +50,8 @@ namespace AdminInterface.Controllers
 			uint clientId, 
 			bool sendClientCard, 
 			string mails,
-			[DataBind("regionSettings")] RegionSettings[] regionSettings)
+			[DataBind("regionSettings")] RegionSettings[] regionSettings,
+			string deliveryAddress)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -86,8 +88,22 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(contacts);
 				scope.VoteCommit();
 			}
-
 			Mailer.UserRegistred(user);
+
+			if (!String.IsNullOrEmpty(deliveryAddress))
+				using (var scope = new TransactionScope(OnDispose.Rollback))
+				{
+					DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
+						HttpContext.Current.Request.UserHostAddress);
+					var address = new Address { Client = client, Enabled = true, Value = deliveryAddress };
+					address.AvaliableForUsers = new List<User> { user };
+					address.Save();
+					address.MaitainIntersection();
+					address.CreateFtpDirectory();
+					client.Users.Each(u => address.SetAccessControl(u.Login));
+					scope.VoteCommit();
+					Mailer.DeliveryAddressRegistred(address);
+				}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);

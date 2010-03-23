@@ -532,5 +532,38 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test, Description("Тест для регистрации адреса при регистрации пользователя")]
+		public void Create_user_with_address()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				Assert.That(client.Addresses, Is.Null);
+				Assert.That(client.Users, Is.Null);
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
+				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+			}
+			using (new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				Assert.That(client.Users.Count, Is.EqualTo(1));
+				Assert.That(client.Addresses.Count, Is.EqualTo(1));
+				Assert.That(client.Users[0].AvaliableAddresses.Count, Is.EqualTo(1));
+				var address = client.Addresses[0];
+				Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(1));
+				Assert.IsTrue(address.AvaliableFor(client.Users[0]));
+
+				var addressIntersection = ArHelper.WithSession(s => s.CreateSQLQuery(
+					"select * from future.AddressIntersection where AddressId = :id")
+						.SetParameter("id", address.Id)
+						.List());
+				Assert.That(addressIntersection.Count, Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
+			}
+		}
 	}
 }
