@@ -108,8 +108,7 @@ from usersettings.clientsdata cd
 where length(c.contactText) > 0
       and firmcode in (select pd.FirmCode
                         from pricesdata as pd, pricesregionaldata as prd
-                        where pd.enabled = 1
-                              and prd.enabled = 1
+                        where prd.enabled = 1
                               and firmstatus = 1
                               and firmtype = 0
                               and firmsegment = 0
@@ -127,8 +126,7 @@ from usersettings.clientsdata cd
 where length(c.contactText) > 0
       and firmcode in (select pd.FirmCode
                         from pricesdata as pd, pricesregionaldata as prd
-                        where pd.enabled = 1
-                              and prd.enabled = 1
+                        where prd.enabled = 1
                               and firmstatus = 1
                               and firmtype = 0
                               and firmsegment = 0
