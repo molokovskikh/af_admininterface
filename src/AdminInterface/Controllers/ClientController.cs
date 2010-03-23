@@ -47,11 +47,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 
 			var users = client.GetUsers();
-			PropertyBag["users"] = users.OrderBy(usr => usr.Login);
-
+			PropertyBag["users"] = users.OrderBy(user => user.Id);
 			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users.ToList());
 			PropertyBag["authorizationLogs"] = new AuthorizationLogEntityList(authorizationLogs);
-
+			PropertyBag["sortColumnIndex"] = 0;
 			try
 			{
 				var usersInfo = ADHelper.GetPartialUsersInformation(users);
@@ -72,7 +71,15 @@ namespace AdminInterface.Controllers
 					String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
 						client.Id, SecurityContext.Administrator.UserName, usersNames));
 			}
+		}
 
+		public void Info(uint cc, int sortColumnIndex, string[] headerNames)
+		{
+			Info(cc);
+			var client = Client.FindAndCheck(cc);
+			var users = client.GetUsers();
+			PropertyBag["users"] = users.SortBy(headerNames[Math.Abs(sortColumnIndex) - 1], sortColumnIndex > 0);
+			PropertyBag["sortColumnIndex"] = sortColumnIndex;
 		}
 
 		[AccessibleThrough(Verb.Post)]

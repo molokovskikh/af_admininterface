@@ -299,4 +299,24 @@ where u.Id = :UserId";
 				.ExecuteUpdate());
 		}
 	}
+
+	public static class UserExtension
+	{
+		public static IEnumerable<User> SortBy(this IEnumerable<User> users, string columnName, bool descending)
+		{
+			if (columnName.Equals("Id", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return users.OrderByDescending(user => user.Id).ToList();
+				return users.OrderBy(user => user.Id).ToList();
+			}
+			if (columnName.Equals("Login", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return users.OrderByDescending(user => user.Login).ToList();
+				return users.OrderBy(user => user.Login).ToList();
+			}
+			return users.OrderBy(user => user.Id).ToList();
+		}
+	}
 }

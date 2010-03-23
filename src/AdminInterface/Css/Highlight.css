@@ -23,6 +23,11 @@
 	background-color: #ff6600;
 }
 
+.DisabledLogin
+{
+	background-color: #bbffff;
+}
+
 .DisabledUser td
 {
 	background-color: #6a6a6a;

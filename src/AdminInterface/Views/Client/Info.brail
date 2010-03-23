@@ -132,17 +132,15 @@
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;">
-				<tr>
-					<td>
-						Имя пользователя
-					</td>
-					<td>
-						Комментарий
-					</td>
-					<td>
-						Последнее обновление AnalitF
-					</td>
+			<form id="updateForm" name="updateForm">
+			<table style="width:100%;" name="usersTable">
+				<tr valign="top" align="left">
+				
+<%              headersList = ["Идентификатор", "Имя пользователя", "Комментарий", "Последнее использование сервисов"]
+                headerNames = ["Id", "Login"]
+                unsortableHeaders = ["Комментарий", "Последнее использование сервисов"]
+                OutputSubView("/SubViews/SortHeadersSubView",
+                    {"headers":headersList, "unsortableHeaders": unsortableHeaders, "sortColumnIndex":sortColumnIndex, "formPostBack":'updateForm' }) %>
 				</tr>
 				<% containsLockedUsers = false %>
 				<% for user in users: %>
@@ -150,6 +148,7 @@
 					<% logEntity = authorizationLogs.GetEntityByUserId(user.Id)%>
 					<% containsLockedUsers = userInfo.IsLoginExists and userInfo.IsLocked if not containsLockedUsers %>
 					<tr>
+					    <td><a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
 						<td class="${"BlockedLogin" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledLogin" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"LoginNotExists" if not userInfo.IsLoginExists}">
 							<% if true: %>
 								<a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Login}</a>
@@ -157,15 +156,25 @@
 								${user.GetLoginOrName()}
 							<% end %>
 						</td>
+						<td>${user.Name}</td>						
 						<td>
-							${user.Name}
-						</td>
-						<td>
-							${logEntity.AFTime if logEntity != null and logEntity.AFTime != null}
-						</td>
+<%                          lastUsage = null
+                            if (logEntity != null): 
+                                lastUsage = logEntity.GetLastServicesUsage(user.Id)
+                            end
+                            if (lastUsage != null): %>
+						        ${lastUsage.Date}(${lastUsage.ShortServiceName})
+<%                          end %>
+                        </td>
 					</tr>
 				<% end %>
 			</table>
+            <input type="hidden" id="sortColumnIndex" name="sortColumnIndex" value="${sortColumnIndex}" />
+            <input type="hidden" id="cc" name="cc" value="${Client.Id}" />
+            <% for i,headerName in enumerate(headerNames): %>
+            <input type="hidden" id="headerNames[${i}]" name="headerNames[${i}]" value="${headerName}" />
+            <% end %>
+			</form>
 		</div>
 
 		<div class=block>
