@@ -26,8 +26,10 @@
 		for (i = 0; i < regions.length; i++) 
 		{
 			var regionId = parseInt(regions[i].value);
-			var isForBrowse = regionId == parseInt(homeRegionId);
-			AddRegionRow(regionId, regions[i].text, isForBrowse, isForBrowse);
+			var flags = regions[i].classList[0].split(',');
+			var isForBrowse = parseInt(flags[0]);
+			var isForOrder = parseInt(flags[1]);
+			AddRegionRow(regionId, regions[i].text, isForBrowse, isForOrder);
 		}        
     }
 
@@ -128,7 +130,7 @@
                     if (isForOrder):
                         orderRegions.Add(region.Id)
                     end %>
-                <option id="Region${region.Id}" value="${region.Id}" ${"selected" if (region.Id == homeRegion.Id)}>${region.Name}</option>
+                <option id="Region${region.Id}" class="${System.Convert.ToInt32(isForBrowse)},${System.Convert.ToInt32(isForOrder)}" value="${region.Id}" ${"selected" if (region.Id == homeRegion.Id)}>${region.Name}</option>
 <%              end %>
             </select>
         </td>

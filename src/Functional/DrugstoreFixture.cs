@@ -93,6 +93,29 @@ namespace Functional
 		}
 
 		[Test]
+		public void Regions_must_be_checked_when_show_all()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				var browseCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("browseRegion"));
+				var orderCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("orderRegion"));
+				browser.Link(Find.ByText("Показать все регионы")).Click();
+				var allBrowseCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("browseRegion"));
+				var allOrderCheckboxes = browser.CheckBoxes.Where(element => (element.Id != null) && element.Id.Contains("orderRegion"));
+				foreach (var box in browseCheckboxes)
+					foreach (var checkbox in allBrowseCheckboxes)
+						if (box.Id.Equals(checkbox.Id))
+							Assert.That(box.Checked, Is.EqualTo(checkbox.Checked));
+				foreach (var box in orderCheckboxes)
+					foreach (var checkbox in allOrderCheckboxes)
+						if (box.Id.Equals(checkbox.Id))
+							Assert.That(box.Checked, Is.EqualTo(checkbox.Checked));						
+			}
+		}
+
+		[Test]
 		public void Change_common_settings()
 		{
 			var client = DataMother.CreateTestClient();
