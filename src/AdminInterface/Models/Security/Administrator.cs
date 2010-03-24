@@ -199,7 +199,7 @@ namespace AdminInterface.Models.Security
 			var entry = ADHelper.FindDirectoryEntry(UserName);
 
 			var adminGroupPath = "LDAP://CN=–егиональные администраторы,OU=√руппы,OU= лиенты,DC=adc,DC=analit,DC=net";
-			var root = new DirectoryEntry("LDAP://OU=–егиональные администраторы,OU=”правл€ющие,DC=adc,DC=analit,DC=net");
+			var root = new DirectoryEntry("LDAP://OU=ќфис,DC=adc,DC=analit,DC=net");
 
 			if (entry != null)
 			{
