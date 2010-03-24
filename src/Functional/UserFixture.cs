@@ -565,5 +565,59 @@ namespace Functional
 				Assert.That(addressIntersection.Count, Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
 			}
 		}
+
+		[Test]
+		public void Create_user_with_contact_person_info()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
+					var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
+					Assert.That(persons.Count, Is.EqualTo(1));
+					Assert.That(persons[0].Name, Is.EqualTo("Alice"));
+				}
+			}
+		}
+
+		[Test]
+		public void Update_person_contact_info()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.Button(Find.ByValue("Создать")).Click();
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var user = client.Users[0];
+					browser.Link(Find.ByText(user.Id.ToString())).Click();
+					Assert.That(browser.TextField(Find.ByName("persons[0].Name")).Text, Is.EqualTo("Alice"));
+					browser.TextField(Find.ByName("persons[0].Name")).TypeText("Alice modified");
+					browser.Button(Find.ByValue("Сохранить")).Click();
+					Assert.That(browser.Text, Text.Contains("Сохранено"));
+				}
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
+					Assert.That(persons.Count, Is.EqualTo(1));
+					Assert.That(persons[0].Name, Is.EqualTo("Alice modified"));
+				}
+			}
+		}
 	}
 }

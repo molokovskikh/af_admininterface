@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Linq;
 using Castle.ActiveRecord;
@@ -57,7 +58,9 @@ namespace Common.Web.Ui.Models
 				Name = name,
 				ContactGroup = this
 			};
+			person.Save();
 			Persons.Add(person);
+			Save();
 		}
 
 		public bool ShowMailingAddress
@@ -97,6 +100,23 @@ namespace Common.Web.Ui.Models
 		public void UpdateContacts(Contact[] displayedContacts)
 		{
 			UpdateContacts(displayedContacts, null);
+		}
+
+		public void UpdatePersons(Person[] newPersons)
+		{
+			for (var i = 0; i < Persons.Count; i++)
+			{
+				for (var j = 0; j < newPersons.Length; j++)
+				{
+					if ((Persons[i].Id == newPersons[i].Id) &&
+						(!Persons[i].Name.Equals(newPersons[j].Name)) &&
+						(!String.IsNullOrEmpty(newPersons[j].Name)))
+					{
+						Persons[i].Name = newPersons[j].Name;
+						Persons[i].Update();
+					}
+				}
+			}
 		}
 	}
 }

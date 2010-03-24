@@ -51,7 +51,8 @@ namespace AdminInterface.Controllers
 			bool sendClientCard, 
 			string mails,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			string deliveryAddress)
+			string deliveryAddress,
+			string contactPerson)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -84,8 +85,9 @@ namespace AdminInterface.Controllers
 							break;
 					}
 				}
-
 				user.UpdateContacts(contacts);
+				if (!String.IsNullOrEmpty(contactPerson))
+					user.ContactGroup.AddPerson(contactPerson);
 				scope.VoteCommit();
 			}
 			Mailer.UserRegistred(user);
@@ -169,7 +171,8 @@ namespace AdminInterface.Controllers
 			[DataBind("WorkRegions")] ulong[] workRegions, 
 			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
-			[DataBind("deletedContacts")] Contact[] deletedContacts)
+			[DataBind("deletedContacts")] Contact[] deletedContacts,
+			[DataBind("persons")] Person[] persons)
 		{
 			using (var scope = new TransactionScope())
 			{
@@ -181,8 +184,8 @@ namespace AdminInterface.Controllers
 				temp = 0;
 				orderRegions.Each(r => { temp += r; });
 				user.OrderRegionMask = temp;
-
 				user.UpdateContacts(contacts, deletedContacts);
+				user.UpdatePersons(persons);
 				user.Update();
 				scope.VoteCommit();
 				Flash["Message"] = new Message("Сохранено");

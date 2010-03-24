@@ -248,7 +248,7 @@ where uui.UserId = :userCode")
 					.ExecuteUpdate());
 		}
 
-		private void AddContactGroup()
+		public virtual void AddContactGroup()
 		{
 			using (var scope = new TransactionScope())
 			{
@@ -270,6 +270,13 @@ where uui.UserId = :userCode")
 			if (ContactGroup == null)
 				AddContactGroup();
 			ContactGroup.UpdateContacts(contacts, deletedContacts);
+		}
+
+		public virtual void UpdatePersons(Person[] persons)
+		{
+			if (ContactGroup == null)
+				AddContactGroup();
+			ContactGroup.UpdatePersons(persons);
 		}
 
 		public virtual string GetEmails()
@@ -297,6 +304,17 @@ where u.Id = :UserId";
 				.SetParameter("UserId", Id)
 				.SetParameter("ClientId", client.Id)
 				.ExecuteUpdate());
+		}
+
+		public virtual void AddContactPerson(string name)
+		{
+			if (String.IsNullOrEmpty(name))
+				return;
+			var groupOwner = Client.ContactGroupOwner;
+			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
+			group.Save();
+			group.AddPerson(name);
+			ContactGroup = group;
 		}
 	}
 

@@ -391,10 +391,29 @@ namespace Functional
 							pass = true;
 							break;
 						}
-
 					}
 					Assert.IsTrue(pass);
 				}				
+			}
+		}
+
+		[Test]
+		public void Register_client_with_user_contact_person_info()
+		{
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				using (new SessionScope())
+				{
+					var client = Client.Find(clientCode);
+					var user = client.Users[0];
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					Assert.That(browser.TextField(Find.ByName("persons[0].Name")).Text, Is.EqualTo("Alice"));
+				}
 			}
 		}
 	}

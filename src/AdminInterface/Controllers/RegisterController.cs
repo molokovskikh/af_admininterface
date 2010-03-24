@@ -61,7 +61,8 @@ namespace AdminInterface.Controllers
 			[DataBind("clientContacts")] Contact[] clientContacts,
 			string userName,
 			[DataBind("userContacts")] Contact[] userContacts,
-			string additionalEmailsForSendingCard)
+			string additionalEmailsForSendingCard,
+			string contactPerson)
         {
         	ulong browseRegionMask = 0;
         	ulong orderRegionMask = 0;
@@ -118,7 +119,7 @@ namespace AdminInterface.Controllers
 					AddContactsToClient(newClient, clientContacts);
 					newClient.SaveAndFlush();
 
-					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask);
+					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, contactPerson);
 					password = newUser.CreateInAd();
 					var defaults = DefaultValues.Get();
 					if (newClient.IsDrugstore())
@@ -354,7 +355,8 @@ WHERE   intersection.pricecode IS NULL
 			command.ExecuteNonQuery();			
 		}
 
-		private User CreateUser(Client client, string userName, UserPermission[] permissions, ulong workRegionMask, ulong orderRegionMask)
+		private User CreateUser(Client client, string userName, UserPermission[] permissions,
+			ulong workRegionMask, ulong orderRegionMask, string contactPersonName)
 		{
 			var user = new User
 			{
@@ -370,6 +372,7 @@ WHERE   intersection.pricecode IS NULL
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
+			user.AddContactPerson(contactPersonName);
 			user.SaveAndFlush();
 			client.Users = new List<User> { user };
 			return user;

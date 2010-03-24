@@ -74,7 +74,7 @@ namespace Functional
 				foreach (var address in client.Addresses)
 				{
 					var row = browser.TableRow("AddressRow" + address.Id);
-					Assert.That(row.ClassName, Is.EqualTo("Disabled"));
+					Assert.That(row.ClassName, Text.Contains("Disabled"));
 					var checkBox = browser.CheckBox("AddressStatus" + address.Id);
 					Assert.That(checkBox.Checked, Is.False);
 				}
@@ -103,7 +103,7 @@ namespace Functional
 				foreach (var item in client.Users)
 				{
 					var row = browser.TableRow("UserRow" + item.Id);
-					Assert.That(row.ClassName, Is.EqualTo("Disabled"));
+					Assert.That(row.ClassName, Text.Contains("Disabled"));
 					var checkBox = browser.CheckBox("UserStatusCheckBox" + item.Id);
 					Assert.That(checkBox.Checked, Is.False);
 				}
@@ -296,10 +296,10 @@ namespace Functional
 				var checkBoxStatus = browser.CheckBox(Find.ById("UserStatusCheckBox" + user.Id));
 				var row = browser.TableRow(Find.ById("UserRow" + user.Id));
 				Assert.IsTrue(checkBoxStatus.Checked);
-				Assert.IsFalse(row.ClassName.Equals("Disabled"));
+				Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));
 				checkBoxStatus.Click();
 				Thread.Sleep(500);
-				Assert.IsTrue(row.ClassName.Equals("Disabled"));
+				Assert.That(row.ClassName, Text.Contains("Disabled"));
 			}
 		}
 
@@ -315,11 +315,11 @@ namespace Functional
 				var checkBoxStatus = browser.CheckBox(Find.ById("AddressStatus" + address.Id));
 				var row = browser.TableRow(Find.ById("AddressRow" + address.Id));
 				Assert.IsTrue(checkBoxStatus.Checked);
-				Assert.IsFalse(row.ClassName.Equals("Disabled"));
-				Assert.IsTrue(row.ClassName.Trim().Equals("HasNoConnectedUsers"));
+				Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));				
+				Assert.That(row.ClassName, Text.Contains("HasNoConnectedUsers"));
 				checkBoxStatus.Click();
 				Thread.Sleep(500);
-				Assert.IsTrue(row.ClassName.Equals("Disabled"));
+				Assert.That(row.ClassName, Text.Contains("Disabled"));
 			}
 		}
 
@@ -346,17 +346,17 @@ namespace Functional
 				Assert.IsTrue(userStatus.Checked);
 				Assert.IsTrue(addressStatus.Checked);
 				Assert.IsTrue(clientStatus.Checked);
-				Assert.IsFalse(userRow.ClassName.Trim().Equals("Disabled"));
-				Assert.IsFalse(addressRow.ClassName.Trim().Equals("Disabled"));
-				Assert.IsFalse(clientRow.ClassName.Trim().Equals("Disabled"));
+				Assert.That(userRow.ClassName, Text.DoesNotContain("Disabled"));
+				Assert.That(addressRow.ClassName, Text.DoesNotContain("Disabled"));
+				Assert.That(clientRow.ClassName, Text.DoesNotContain("Disabled"));
 				clientStatus.Click();
 				Thread.Sleep(2000);
 				Assert.IsFalse(userStatus.Checked);
 				Assert.IsFalse(addressStatus.Checked);
 				Assert.IsFalse(clientStatus.Checked);
-				Assert.IsTrue(userRow.ClassName.Trim().Equals("Disabled"));
-				Assert.IsTrue(addressRow.ClassName.Trim().Equals("Disabled"));
-				Assert.IsTrue(clientRow.ClassName.Trim().Equals("DisabledClient"));
+				Assert.That(userRow.ClassName, Text.Contains("Disabled"));
+				Assert.That(addressRow.ClassName, Text.Contains("Disabled"));
+				Assert.That(clientRow.ClassName, Text.Contains("Disabled"));
 			}
 		}
 
@@ -459,15 +459,15 @@ namespace Functional
 			}
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				// Список клиентов должен быть в размернутом виде, т.к. у нас 1 клиент
+				// Список клиентов должен быть в свернутом виде
 				var clientsHeaderDiv = browser.Div(Find.ById("ClientListHeader"));
 				var clientsBodyDiv = browser.Div(Find.ById("ClientListBody"));
-				Assert.IsTrue(clientsHeaderDiv.ClassName.Trim().ToLower().Equals("hidevisible"));
-				Assert.IsTrue(clientsBodyDiv.ClassName.Trim().ToLower().Equals("visiblefolder"));
-				// Щелкаем по заголовку. Список должен свернуться
-				clientsHeaderDiv.Click();
 				Assert.IsTrue(clientsHeaderDiv.ClassName.Trim().ToLower().Equals("showhiden"));
 				Assert.IsTrue(clientsBodyDiv.ClassName.Trim().ToLower().Equals("hidden"));
+				// Щелкаем по заголовку. Список должен свернуться
+				clientsHeaderDiv.Click();
+				Assert.IsTrue(clientsHeaderDiv.ClassName.Trim().ToLower().Equals("hidevisible"));
+				Assert.IsTrue(clientsBodyDiv.ClassName.Trim().ToLower().Equals("visiblefolder"));
 
 				// Списки адресов и пользователей должны быть в свернутом виде
 				var addressesHeaderDiv = browser.Div(Find.ById("AddressListHeader"));

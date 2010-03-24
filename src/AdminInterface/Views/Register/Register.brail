@@ -403,6 +403,10 @@
                     <input type="hidden" name="userContacts[1].Type" value="0" />
                 </td>
             </tr>            
+            <tr>
+                <td width="20%">Контактное лицо:</td>
+                <td width="80%"><input type="text" id="contactPerson" name="contactPerson" style="width: 60%" /></td>
+            </tr>            
         </table>        
     </div>
 
