@@ -4,6 +4,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
+using System.Linq;
 
 namespace AdminInterface.Models.Logs
 {
@@ -91,6 +92,16 @@ namespace AdminInterface.Models.Logs
 															.For<ClientInfoLogEntity>()
 															.Add(Expression.Eq("User", user))
 															.AddOrder(Order.Desc("WriteTime"))));
+		}
+
+		public static IList<ClientInfoLogEntity> MessagesForUserAndClient(User user)
+		{
+			var messages = (List<ClientInfoLogEntity>)MessagesForUser(user);
+			messages.AddRange(FindAll(DetachedCriteria
+										.For<ClientInfoLogEntity>()
+                                        .Add(Expression.Eq("ClientCode", user.Client.Id))
+										.Add(Expression.IsNull("User"))));
+			return messages.OrderByDescending(item => item.WriteTime).ToList();
 		}
 	}
 }

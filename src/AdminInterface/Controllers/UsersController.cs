@@ -147,7 +147,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
-			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
+			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUserAndClient(user);
 			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;

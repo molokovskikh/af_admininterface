@@ -55,5 +55,44 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void View_client_message_from_user()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var scope = new TransactionScope())
+			{				
+				var user = new User {Client = client, Name = "User2",};
+				user.Setup(client);
+				user.SaveAndFlush();
+				client.Users.Add(user);
+				client.UpdateAndFlush();
+				scope.VoteCommit();
+				client = Client.Find(client.Id);
+			}
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.TextField(Find.ByName("message")).TypeText("This message for client");
+				browser.Button(Find.ByValue("Принять")).Click();
+				
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				Assert.That(browser.Text, Text.Contains("This message for client"));
+				browser.TextField(Find.ByName("message")).TypeText("This message for user1");
+				browser.Button(Find.ByValue("Принять")).Click();
+
+				browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Login)));
+				browser.Refresh();
+				Assert.That(browser.Text, Text.Contains("This message for client"));
+				Assert.That(browser.Text, Text.DoesNotContain("This message for user1"));
+				browser.TextField(Find.ByName("message")).TypeText("This message for user2");
+				browser.Button(Find.ByValue("Принять")).Click();
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Refresh();
+				Assert.That(browser.Text, Text.Contains("This message for user1"));
+				Assert.That(browser.Text, Text.Contains("This message for user2"));
+				Assert.That(browser.Text, Text.Contains("This message for client"));
+			}
+		}
 	}
 }
