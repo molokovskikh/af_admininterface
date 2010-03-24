@@ -368,6 +368,7 @@ namespace Functional
 			{
 				SetupGeneralInformation(browser, ClientType.Drugstore);
 				browser.Link(Find.ByText("Показать все регионы")).Click();
+				Thread.Sleep(500);
 				var regions = Region.FindAllByProperty("Name", "Чебоксары");
 				var checkBox = browser.CheckBox(Find.ById("browseRegion" + regions.First().Id));
 				Assert.IsTrue(checkBox.Exists);

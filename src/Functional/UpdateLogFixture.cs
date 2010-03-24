@@ -74,11 +74,11 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
 			Assert.That(browser.Text, Is.StringContaining("Клиент"));
 
-			browser.Links.Where(l => l.Title.Equals("UserSettings")).First().Click();
+			browser.Links.Where(l => (l.Title != null) && l.Title.Equals("UserSettings")).First().Click();
 			Assert.That(browser.Url, Is.StringContaining("/users/"));
 			browser.Back();
 
-			browser.Links.Where(l => l.Title.Equals("ClientSettings")).First().Click();
+			browser.Links.Where(l => (l.Title != null) && l.Title.Equals("ClientSettings")).First().Click();
 			Assert.That(browser.Url, Is.StringContaining("/client/"));
 			browser.Back();
 
@@ -126,7 +126,7 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining("Размер приготовленных данных"));
 				Assert.That(browser.Text, Is.StringContaining("Лог"));
 
-				browser.Links.Where(l => l.Title.Equals("UserSettings")).First().Click();
+				browser.Links.Where(l => (l.Title != null) && l.Title.Equals("UserSettings")).First().Click();
 				Assert.That(browser.Url, Is.StringContaining("/users/"));
 			}
 		}

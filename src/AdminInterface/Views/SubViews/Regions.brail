@@ -26,7 +26,7 @@
 		for (i = 0; i < regions.length; i++) 
 		{
 			var regionId = parseInt(regions[i].value);
-			var flags = regions[i].classList[0].split(',');
+			var flags = jQuery("#" + regions[i].id).attr('class').split(',');
 			var isForBrowse = parseInt(flags[0]);
 			var isForOrder = parseInt(flags[1]);
 			AddRegionRow(regionId, regions[i].text, isForBrowse, isForOrder);

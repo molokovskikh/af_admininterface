@@ -21,10 +21,10 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining("Редактирование регионального администратора"));
 				var checkBox = browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_PermissionSelector_1"));
 				var result = !checkBox.Checked;
-				checkBox.Checked = result;
+				browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_PermissionSelector_1")).Checked = result;
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Пользователи офиса"));
-				Assert.That(browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_Administrators_ctl12_CheckBox15")).Checked,
+				Assert.That(browser.CheckBox(Find.ById("ctl00_MainContentPlaceHolder_Administrators_ctl11_CheckBox15")).Checked,
 					Is.EqualTo(result));
 			}
 		}
