@@ -86,6 +86,7 @@ namespace Functional
 				Assert.That(countVisibleRegions, Is.LessThan(countAllRegions));
 
 				browser.Link(Find.ByText("Показать только регионы по умолчанию")).Click();
+				Thread.Sleep(500);
 				var count = browser.Table("RegionsTable").TableRows.Count();
 				Assert.That(count, Is.EqualTo(countVisibleRegions));
 			}
@@ -175,7 +176,7 @@ namespace Functional
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(l => l.Text == "История обновлений").Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name))))
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
 				{
 					Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));
 					Assert.That(openedWindow.Text, Is.StringContaining(user.Login));
@@ -260,7 +261,7 @@ namespace Functional
 
 		private SelectList GetHomeRegionSelect(IE browser)
 		{
-			return browser.SelectList(Find.ById("comboBoxHomeRegion"));
+			return browser.SelectList(Find.ById("HomeRegionComboBox"));
 		}
 
 		[Test]

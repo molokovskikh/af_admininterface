@@ -281,7 +281,7 @@ namespace Functional
 				string baseUrl = browser.Url;
 
 				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
-				Assert.AreEqual("История обновлений пользователя " + client.Users[0].Login, browser.Title);
+				Assert.AreEqual("Статистика обновлений", browser.Title);
 				browser.GoTo(baseUrl);
 
 				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
@@ -298,7 +298,7 @@ namespace Functional
 				string baseUrl = browser.Url;
 
 				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
-				Assert.AreEqual("История обновлений клиента " + client.Name, browser.Title);
+				Assert.AreEqual("Статистика обновлений", browser.Title);
 				browser.GoTo(baseUrl);
 
 				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);

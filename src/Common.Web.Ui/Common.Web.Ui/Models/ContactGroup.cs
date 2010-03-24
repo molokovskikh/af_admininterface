@@ -104,6 +104,8 @@ namespace Common.Web.Ui.Models
 
 		public void UpdatePersons(Person[] newPersons)
 		{
+			if (Persons == null)
+				return;
 			for (var i = 0; i < Persons.Count; i++)
 			{
 				for (var j = 0; j < newPersons.Length; j++)

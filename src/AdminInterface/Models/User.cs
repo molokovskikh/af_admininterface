@@ -274,6 +274,8 @@ where uui.UserId = :userCode")
 
 		public virtual void UpdatePersons(Person[] persons)
 		{
+			if (persons.Length == 0)
+				return;
 			if (ContactGroup == null)
 				AddContactGroup();
 			ContactGroup.UpdatePersons(persons);
