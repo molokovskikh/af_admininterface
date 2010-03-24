@@ -619,5 +619,37 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Test_enable_update_setting()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				Assert.IsFalse(client.Users[0].EnableUpdate);
+				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+				Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
+				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					Assert.IsTrue(client.Users[0].EnableUpdate);
+				}
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+				Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
+				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					Assert.IsFalse(client.Users[0].EnableUpdate);
+				}
+			}
+		}
 	}
 }

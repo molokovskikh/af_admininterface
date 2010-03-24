@@ -57,6 +57,9 @@ namespace AdminInterface.Models
 		public virtual bool SendRejects { get; set; }
 
 		[Property]
+		public virtual bool EnableUpdate { get; set; }
+
+		[Property]
 		public virtual bool Auditor { get; set; }
 
 		[Property]

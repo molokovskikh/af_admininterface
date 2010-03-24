@@ -126,6 +126,9 @@
 			
 			Комментарий<br>
 			<input name=user.Name value="${user.Name}" style="width: 60%"><br>
+			<p>
+            <input type=checkbox name=user.EnableUpdate ${"checked" if user.EnableUpdate} value=true> Автоматическое обновление версий<br>
+			<input type=hidden name=user.EnableUpdate value=false>
 			
 			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
 			<input type=hidden name=user.SubmitOrders value=false>
@@ -138,7 +141,7 @@
 			
 			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
 			<input type=hidden name=user.Auditor value=false>
-			
+			</p>
 			<select name=user.InheritPricesFrom.Id>
 				<option value=0>Не наследовать</option>
 				<% for parent in user.Client.Users: %>
