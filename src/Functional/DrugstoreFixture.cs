@@ -8,6 +8,7 @@ using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using System.Threading;
+using Common.Web.Ui.Helpers;
 
 namespace Functional
 {
@@ -305,6 +306,60 @@ namespace Functional
 				browser.GoTo(browser.Url);
 				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(drugstoreSettings.ManualComparison));
+			}
+		}
+
+		[Test]
+		public void When_change_home_region_it_must_be_selected()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				var homeRegionSelect = GetHomeRegionSelect(browser);
+				var newHomeRegionName = homeRegionSelect.Options.Skip(1).First(o => o.Value != homeRegionSelect.SelectedOption.Value).Text;
+				homeRegionSelect.Select((newHomeRegionName));
+				Thread.Sleep(500);
+				Assert.IsTrue(GetWorkRegion(browser, newHomeRegionName).Checked);
+				Assert.IsTrue(GetOrderRegion(browser, newHomeRegionName).Checked);
+			}
+		}
+
+		[Test]
+		public void When_add_region_for_browse_it_must_be_in_intersection()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				browser.Link(Find.ByText("Показать все регионы")).Click();
+				Thread.Sleep(500);
+				Assert.IsFalse(GetWorkRegion(browser, "Челябинск").Checked);
+				GetWorkRegion(browser, "Челябинск").Checked = true;
+				Assert.IsFalse(GetWorkRegion(browser, "Чебоксары").Checked);
+				GetWorkRegion(browser, "Чебоксары").Checked = true;
+
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				var sql = @"
+select
+	count(*) 
+from
+	future.Intersection i
+	join farm.Regions r on i.RegionId = r.RegionCode and Region like :RegionName
+where i.ClientId = :ClientId
+";
+				var count = 0;
+				ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
+														.SetParameter("RegionName", "Челябинск")
+														.SetParameter("ClientId", client.Id)
+														.UniqueResult()));
+				Assert.That(count, Is.GreaterThan(0));
+				ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
+														.SetParameter("RegionName", "Чебоксары")
+														.SetParameter("ClientId", client.Id)
+														.UniqueResult()));
+				Assert.That(count, Is.GreaterThan(0));
 			}
 		}
 	}

@@ -104,7 +104,7 @@ namespace AdminInterface.Controllers
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings)
 		{
-			SecurityContext.Administrator.CheckClientPermission(client);
+			SecurityContext.Administrator.CheckClientPermission(client);			
 			using (var scope = new TransactionScope())
 			{
 				DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
@@ -123,10 +123,10 @@ namespace AdminInterface.Controllers
 					else
 						drugstore.OrderRegionMask &= ~setting.Id;
 				}				
+				client.UpdateAndFlush();
+				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
 					client.MaintainIntersection();
-				client.Update();
-				drugstore.Update();
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");

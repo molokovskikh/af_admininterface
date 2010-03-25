@@ -2,8 +2,8 @@
     isForBrowse = (region.Id == homeRegionId)
     isForOrder = isForBrowse
     if (IsDefined("drugstore") and IsDefined("client")):
-        isForBrowse = (client.MaskRegion & region.Id) > 0;
-        isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
+        isForBrowse = ((client.MaskRegion & region.Id) > 0) or (region.Id == homeRegionId);
+        isForOrder = ((drugstore.OrderRegionMask & region.Id) > 0) or (region.Id == homeRegionId);
     end %>
     <tr id="RegionRow${region.Id}" onmouseover="this.setAttribute('class', 'SelectedRow')" onmouseout="this.removeAttribute('class');">
         <td style="text-align: left">${region.Name}</td>
