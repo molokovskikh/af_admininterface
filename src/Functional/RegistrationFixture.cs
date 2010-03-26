@@ -417,5 +417,21 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Register_with_flag_ignore_new_prices()
+		{
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				Assert.IsFalse(browser.CheckBox(Find.ById("ignoreNewPrices")).Checked);
+				browser.CheckBox(Find.ById("ignoreNewPrices")).Checked = true;
+				browser.Button("RegisterButton").Click();
+				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				var settings = DrugstoreSettings.Find(clientCode);
+				Assert.IsTrue(settings.IgnoreNewPrices);
+			}
+		}
 	}
 }

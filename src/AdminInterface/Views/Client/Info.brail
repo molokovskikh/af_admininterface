@@ -95,15 +95,6 @@
 					<a href="SearchOffers.rails?clientCode=${Client.Id}" target="_blank">Поиск предложений</a>
 				</li>
 				<% end %>
-				<li>
-					<% if client.IsDrugstore(): %>
-						<% if Client.IsDrugstore(): %>
-							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewDrugstoreInterface}>Интерфейс клиента</a>
-						<% else: %>
-							<a ${"href=${CiUrl}?sid=${Client.Id}" if admin.CanViewSupplierInterface}>Интерфейс клиента</a>
-						<% end %>
-					<% end %>
-				</li>
 			</ul>
 		</div>
 

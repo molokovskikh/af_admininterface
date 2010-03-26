@@ -27,6 +27,7 @@ namespace AdminInterface.Controllers
 		public bool PayerExists { get; set; }
 		public bool ShowForOneSupplier { get; set; }
 		public bool SendRegistrationCard { get; set; }
+		public bool IgnoreNewPrices { get; set; }
 	}
 
 	[
@@ -249,6 +250,7 @@ namespace AdminInterface.Controllers
 				OrderRegionMask = orderMask,
 				ServiceClient = additionalSettings.IsServiceClient,
 				BasecostPassword = costCrypKey,
+				IgnoreNewPrices = additionalSettings.IgnoreNewPrices,
 			};
 			if (additionalSettings.ShowForOneSupplier)
 				settings.FirmCodeOnly = supplier.Id;

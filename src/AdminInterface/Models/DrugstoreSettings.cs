@@ -46,6 +46,9 @@ namespace AdminInterface.Models
 		[Property(NotNull = true)]
 		public string BasecostPassword { get; set; }
 
+		[Property]
+		public bool IgnoreNewPrices { get; set; }
+
 		public bool IsNoised
 		{
 			get { return FirmCodeOnly != null; }

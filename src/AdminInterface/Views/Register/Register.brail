@@ -316,6 +316,9 @@
         <h3>Настройка</h3>
         <table cellpadding="1" border="0" width="100%">
             <tr>
+                <td colspan="2"><input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">Не подключать новые прайс-листы</input></td>
+            </tr>
+            <tr>
                 <td width="50%">                    
                     <input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
                     <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
@@ -353,7 +356,7 @@
                 </td>
             </tr>            
             <tr>
-                <td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>
+                <td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>                
             </tr>
             <tr>            
                 <td colspan="2"><input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input></td>

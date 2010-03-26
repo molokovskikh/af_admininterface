@@ -9,6 +9,7 @@ using NUnit.Framework;
 using WatiN.Core;
 using System.Threading;
 using Common.Web.Ui.Helpers;
+using Castle.ActiveRecord;
 
 namespace Functional
 {
@@ -360,6 +361,33 @@ where i.ClientId = :ClientId
 														.SetParameter("ClientId", client.Id)
 														.UniqueResult()));
 				Assert.That(count, Is.GreaterThan(0));
+			}
+		}
+
+		[Test]
+		public void Test_option_ignore_new_prices()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.IsFalse(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
+				browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked = true;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+
+                var settings = DrugstoreSettings.Find(client.Id);
+                Assert.IsTrue(settings.IgnoreNewPrices);
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.IsTrue(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
+				browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked = false;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.IsFalse(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
 			}
 		}
 	}

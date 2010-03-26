@@ -37,6 +37,10 @@
 	        <div class="block" id="commonSettings">
 	            <h3>Общая настройка</h3>
 	            
+	            <input type="checkbox" id="IgnoreNewPrices" name="drugstore.IgnoreNewPrices" value="true" ${"checked" if drugstore.IgnoreNewPrices } />
+	            <input type="hidden" name="drugstore.IgnoreNewPrices" value="false" />
+	            Не подключать новые прайс-листы<br />
+
 	            <input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
 	            <input type="hidden" name="client.IsHiddenForProducer" value="false" />
 	            Скрыть клиента в интефрейсе поставщика<br />
