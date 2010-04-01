@@ -65,13 +65,6 @@
 				<% end %>
 			</p>
 			<p>
-				<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/searchc.aspx">Информация о клиентах</a>
-				<% else: %>
-				Информация о клиентах
-				<% end %>
-			</p>
-			<p>
 				<% if admin.HaveAnyOfPermissions(PermissionType.ViewDrugstore): %>
 				<a href="${siteroot}/UserSearch/Search.rails">Поиск пользователей</a>
 				<% else: %>
