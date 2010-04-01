@@ -103,5 +103,23 @@ namespace AdminInterface.Models.Logs
 										.Add(Expression.IsNull("User"))));
 			return messages.OrderByDescending(item => item.WriteTime).ToList();
 		}
+
+		public string GetHumanReadableOperatorName()
+		{
+			var name = String.Empty;
+			var sql = @"
+SELECT 
+	if (length(ManagerName) > 0, ManagerName, UserName) as UserName
+FROM
+	`accessright`.`regionaladmins`
+WHERE 
+	UserName like :UserName
+LIMIT 1";
+			ArHelper.WithSession(session => name = session
+				.CreateSQLQuery(sql)
+				.SetParameter("UserName", UserName)
+				.UniqueResult().ToString());
+			return name;
+		}
 	}
 }

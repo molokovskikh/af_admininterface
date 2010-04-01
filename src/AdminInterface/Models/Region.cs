@@ -21,9 +21,6 @@ namespace AdminInterface.Models
 
 		public bool IsAll { get; set; }
 
-//		[Property("DefaultShowRegionMask")]
-//		public virtual ulong ShowRegionMask { get; set; }
-
 		public static IList<Region> GetRegionsForClient(string clientName)
 		{
 			return ArHelper.WithSession(
@@ -53,6 +50,28 @@ ORDER BY IsAll Desc, {Region.Name};")
 		public static Region[] GetRegionsByMask(ulong mask)
 		{
 			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
+		}
+
+		public static IList<Region> GetAllRegions()
+		{
+			return ArHelper.WithSession(session =>
+				session.CreateSQLQuery(@"
+select
+	(select sum(regioncode) from farm.regions) as {Region.Id},
+	'Все' as {Region.Name}, 
+	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
+	1 as IsAll
+union
+SELECT  r.RegionCode as {Region.Id},
+        r.Region as {Region.Name},
+		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
+        0 as IsAll
+FROM	farm.regions as r,
+		accessright.regionaladmins as ra
+WHERE	ra.RegionMask & r.regioncode > 0
+ORDER BY IsAll Desc, {Region.Name};"))
+						.AddEntity(typeof(Region))
+					   .List<Region>();
 		}
 	}
 

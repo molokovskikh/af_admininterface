@@ -52,7 +52,7 @@
 			<h3>Доступен пользователям</h3>
 			<% for i, user in enumerate(delivery.Client.Users): %>
 				<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
-				${user.GetLoginWithName()}
+				${user.GetLoginOrName()}
 				<br>
 			<% end %>
 		</div>

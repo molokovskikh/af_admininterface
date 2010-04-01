@@ -1,0 +1,99 @@
+﻿<script type="text/javascript">
+    function onHeaderClick(columnName, sortDirection) {
+        document.getElementById("sortColumnName").value = columnName;
+        document.getElementById("sortDirection").value = sortDirection;
+        document.updateForm.submit();
+    }
+</script>
+
+<%
+def WriteHeader(caption as string, columnName as string):
+    currentSortDirection = "Ascending"
+    if SortColumnName == columnName:
+        if SortDirection == "Ascending":
+            currentSortDirection = "Descending"
+        else:
+            currentSortDirection = "Ascending"            
+        end
+		if SortDirection == "Ascending":
+			url = "${siteroot}/Images/arrow-down-blue-reversed.gif"
+		else:
+			url = "${siteroot}/Images/arrow-down-blue.gif"
+		end
+    end %>
+    <a href="javascript:" onclick="onHeaderClick('${columnName}', '${currentSortDirection}')">
+        ${caption}
+        <% output "<img src=\"${url}\" style=\"border: none;\" />" if SortColumnName == columnName %>
+    </a>
+<%
+    return ""
+end
+%>
+
+<% OutputSubView("Search") %>
+
+<br /><br />
+<% if (searchResults.Count == 0): %>
+<div class="EmptyData">По вашему запросу ничего не найдено</div>
+<% else: %>
+<form id="updateForm" name="updateForm" action="OrderBy.rails">
+<table class="DataTable" style="width: 100%;">
+    <thead>
+        <tr valign="top">
+            <th>${WriteHeader("Договор", "PayerId")}</th>
+            <th>${WriteHeader("Код", "UserId")}</th>
+            <th>${WriteHeader("Логин", "Login")}</th>
+            <th>${WriteHeader("Комментарий", "UserName")}</th>
+            <th>${WriteHeader("Регион", "RegionName")}</th>
+            <th>${WriteHeader("Обновление", "UpdateDate")}</th>
+            <th>${WriteHeader("Версия", "AFVersion")}</th>
+            <th>${WriteHeader("Сегмент", "Segment")}</th>
+        </tr>
+    </thead>
+    
+    <tbody id="SearchResults" class="HighLightCurrentRow">
+    <% for i,item in enumerate(searchResults):
+            user = ADHelper.GetADUserInformation(item.Login) %>
+        <tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if(not item.Enabled)} ${'DisabledInAd' if(user.IsLoginExists and user.IsDisabled)} ${'LockedUser' if(user.IsLoginExists and user.IsLocked)} ${'NotExistsUser' if(not user.IsLoginExists)}">
+            <td><a href="${siteroot}/billing/edit.rails?ClientCode=${item.ClientId}">${item.PayerId}</a></td>
+            <td>${item.UserId}</td>
+            <td>
+                <a href="${siteroot}/users/${item.Login}/edit">${item.Login}</a>
+            </td>
+            <td>${item.UserName}</td>
+            <td>${item.RegionName}</td>
+            <%
+                oldUpdate = true
+                if (item.UpdateDate != null):
+                    oldUpdate = (System.DateTime.Now.Subtract(item.UpdateDate).TotalDays >= 2)
+                end    
+            %>
+            <td class="${'OldUserUpdate' if (oldUpdate)} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
+            <td>${item.AFVersion}</td>
+            <td>${BindingHelper.GetDescription(item.Segment)}</td>
+        </tr>
+        <% break unless i < pageSize %>
+    <% end %>        
+    </tbody>
+    <tr>
+        <td colspan="9">
+            <div class="Paginator" style="text-align: right;">
+                <% OutputSubView("/SubViews/PaginatorSubView",{"rowsCount":rowsCount, "pageSize":pageSize, "currentPage":currentPage, "formPostBack":'updateForm'}) %>
+            </div>
+        </td>
+    </tr>
+</table>
+<div style="width: 100%;" align="center"><br /><% OutputSubView("LegendView") %></div>
+<input type="hidden" id="rowsCount" name="rowsCount" value="${rowsCount}" />
+<input type="hidden" id="pageSize" name="pageSize" value="${pageSize}" />
+<input type="hidden" id="currentPage" name="currentPage" value="${currentPage}" />
+<input type="hidden" id="sortColumnName" name="sortColumnName" value="${sortColumnName}" />
+<input type="hidden" id="sortDirection" name="sortDirection" value="${sortDirection}" />
+<input type="hidden" name="SearchBy.SearchBy" value="${FindBy.SearchBy}" />
+<input type="hidden" name="SearchBy.SearchText" value="${FindBy.SearchText}" />
+<input type="hidden" name="SearchBy.PayerId" value="${FindBy.PayerId}" />
+<input type="hidden" name="SearchBy.RegionId" value="${FindBy.RegionId}" />
+<input type="hidden" name="SearchBy.SearchStatus" value="${FindBy.SearchStatus}" />
+<input type="hidden" name="SearchBy.Segment" value="${FindBy.Segment}" />
+</form>
+<% end %>

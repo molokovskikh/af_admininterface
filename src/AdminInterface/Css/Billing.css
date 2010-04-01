@@ -51,15 +51,21 @@ td.Disabled
 	background-color: #ff6600;
 }
 
-div table tr[id*="Row"].Free
+div table.DataTable tr.Free
 {
-	background-color: #d0ef72;
+	background-color: #b0ffb0;
 }
 
 td.Free
 {
-	background-color: #d0ef72;	
+	background-color: #b0ffb0;	
 }
+
+.Free
+{
+	background-color: #b0ffb0;	
+}
+
 
 table tr[id*="Row"].HasNoConnectedUsers
 {
@@ -67,6 +73,11 @@ table tr[id*="Row"].HasNoConnectedUsers
 }
 
 td.HasNoConnectedUsers
+{
+	background-color: #cece9d;
+}
+
+.HasNoConnectedUsers
 {
 	background-color: #cece9d;
 }

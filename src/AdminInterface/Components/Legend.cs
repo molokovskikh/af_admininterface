@@ -29,7 +29,7 @@ namespace AdminInterface.Components
 				<td>
 					<div class='LegendMarker {0}'></div>
 				</td>
-				<td>
+				<td align='left'>
 					- {1}
 				</td>
 </tr>

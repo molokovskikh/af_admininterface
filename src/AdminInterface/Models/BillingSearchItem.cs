@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Common.MySql;
 
 namespace AdminInterface.Models
 {
@@ -73,6 +74,7 @@ namespace AdminInterface.Models
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
+			properties.SearchText = Utils.StringToMySqlString(properties.SearchText);
 			try
 			{
 				var debitorFilterBlock = "";

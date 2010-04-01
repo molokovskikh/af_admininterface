@@ -140,9 +140,9 @@
 					<% containsLockedUsers = userInfo.IsLoginExists and userInfo.IsLocked if not containsLockedUsers %>
 					<tr>
 					    <td><a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
-						<td class="${"BlockedLogin" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledLogin" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"LoginNotExists" if not userInfo.IsLoginExists}">
+						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
 							<% if true: %>
-								<a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Login}</a>
+								<a href="${siteroot}/users/${user.Login}/edit"">${user.Login}</a>
 							<% else: %>
 								${user.GetLoginOrName()}
 							<% end %>
@@ -201,7 +201,7 @@
 			</div>
 			<h3>Адреса доставки</h3>
 			<% for i, address in enumerate(client.Addresses): %>
-				<a href=${siteroot}/deliveries/${address.Id}/edit class="${'Disabled' if not address.Enabled }">${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
+				<a href=${siteroot}/deliveries/${address.Id}/edit class="${'DisabledByBilling' if not address.Enabled}">${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
 			<% end %>
 		</div>
 		
@@ -263,8 +263,8 @@
 					<% for i, log in enumerate(logs): %>
 					<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 						<td>${log.WriteTime}</td>
-						<td>${log.UserName}</td>
-						<td>${log.User.Login if log.User != null}</td>
+						<td>${log.GetHumanReadableOperatorName()}</td>
+						<td>${log.User.GetLoginOrName() if log.User != null}</td>
 						<td>${ViewHelper.FormatMessage(HttpUtility.HtmlEncode(log.Message))}</td>
 					</tr>
 					<% end %>

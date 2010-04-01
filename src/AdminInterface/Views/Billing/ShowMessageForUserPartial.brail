@@ -6,7 +6,7 @@
             Сообщение:
         </td>
         <td>
-            ${user.GetLoginWithName()}<br />
+            ${user.GetLoginOrName()}<br />
             ${message.ShowMessageCount} раз            
         </td>
     </tr>

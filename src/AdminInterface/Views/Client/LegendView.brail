@@ -1,7 +1,8 @@
 ﻿<% 
-	component Legend, { "LegendItems" : {	"Пользователь отключен" : "DisabledLogin", 
-											"Пользователь заблокирован" : "BlockedLogin",
-											"Пользователь удален" : "LoginNotExists",
+	component Legend, { "LegendItems" : {	"Пользователь отключен" : "DisabledInAd", 
+	                                        "Пользователь отключен биллингом" : "DisabledByBilling",
+											"Пользователь заблокирован" : "LockedUser",
+											"Пользователь не существует" : "NotExistsUser",
 											"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self"},
 						"ByCenter" : false}
 %>

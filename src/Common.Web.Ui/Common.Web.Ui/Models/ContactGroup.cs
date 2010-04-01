@@ -52,6 +52,8 @@ namespace Common.Web.Ui.Models
 
 		public void AddPerson(string name)
 		{
+			if (String.IsNullOrEmpty(name))
+				return;
 			if (Persons == null)
 				Persons = new List<Person>();
 			var person = new Person {
@@ -104,8 +106,12 @@ namespace Common.Web.Ui.Models
 
 		public void UpdatePersons(Person[] newPersons)
 		{
-			if (Persons == null)
+			if (((Persons == null) || (Persons.Count == 0)) && (newPersons.Length > 0))
+			{
+				foreach (var person in newPersons)
+					AddPerson(person.Name);
 				return;
+			}
 			for (var i = 0; i < Persons.Count; i++)
 			{
 				for (var j = 0; j < newPersons.Length; j++)

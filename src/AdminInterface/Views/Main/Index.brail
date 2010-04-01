@@ -45,9 +45,7 @@
 	}
 </style>
 
-<%
-uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}"
-%>
+<% uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 	<tr>
@@ -71,6 +69,13 @@ uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${
 				<a href="${siteroot}/searchc.aspx">Информация о клиентах</a>
 				<% else: %>
 				Информация о клиентах
+				<% end %>
+			</p>
+			<p>
+				<% if admin.HaveAnyOfPermissions(PermissionType.ViewDrugstore): %>
+				<a href="${siteroot}/UserSearch/Search.rails">Поиск пользователей</a>
+				<% else: %>
+				Поиск пользователей
 				<% end %>
 			</p>
 			<p>

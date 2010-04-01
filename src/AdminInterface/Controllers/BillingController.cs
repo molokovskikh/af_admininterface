@@ -103,9 +103,14 @@ namespace AdminInterface.Controllers
 						   uint clientCode,
 						   string tab)
 		{
-			billingInstance.UpdateAndFlush();
-			Flash.Add("Message", new Message("Изменения сохранены"));
-			Redirect("Billing", "Edit", new {clientCode, tab});
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+				billingInstance.UpdateAndFlush();
+				Flash.Add("Message", new Message("Изменения сохранены"));
+				Redirect("Billing", "Edit", new {clientCode, tab});
+			}
 		}
 
 		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId)
@@ -115,6 +120,8 @@ namespace AdminInterface.Controllers
 			{
 				using (var scope = new TransactionScope())
 				{
+					DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+						HttpContext.Current.Request.UserHostAddress);
 					if (clientMessage.ClientCode == 0)
 						foreach (var user in Client.Find(clientId).Users)
 						{
@@ -180,6 +187,8 @@ namespace AdminInterface.Controllers
 		{
 			using (new TransactionScope())
 			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
 				var user = User.Find(userId);
 				var oldStatus = user.Enabled;
 				user.Enabled = enabled;
@@ -208,6 +217,8 @@ namespace AdminInterface.Controllers
 		{
 			using (new TransactionScope())
 			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+                    HttpContext.Current.Request.UserHostAddress);
 				var address = Address.Find(addressId);
 				var oldStatus = address.Enabled;
 				if (enabled && !oldStatus)

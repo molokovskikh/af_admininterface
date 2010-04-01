@@ -152,6 +152,7 @@
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
+    <Compile Include="Controllers\UserSearchController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
     <Compile Include="Components\Legend.cs" />
@@ -163,6 +164,7 @@
     <Compile Include="Extentions\EnumExtentions.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
+    <Compile Include="Helpers\LinkHelper.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\TextUtil.cs" />
@@ -198,6 +200,8 @@
     <Compile Include="Models\Telephony\CallRecordFile.cs" />
     <Compile Include="Models\Telephony\CallSearchProperties.cs" />
     <Compile Include="Models\User.cs" />
+    <Compile Include="Models\UserSearchItem.cs" />
+    <Compile Include="Models\UserSearchProperties.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
@@ -454,12 +458,15 @@
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
+    <None Include="Views\UserSearch\LegendView.brail" />
+    <None Include="Views\UserSearch\Search.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />
     <None Include="Views\SubViews\PaginatorSubView.brail" />
     <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\SubViews\RegionSettings.brail" />
+    <None Include="Views\UserSearch\SearchBy.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />

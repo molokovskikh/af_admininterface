@@ -204,7 +204,7 @@ namespace Functional
 				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
 				{
 					Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));
-					Assert.That(openedWindow.Text, Is.StringContaining(user.Login));
+					Assert.That(openedWindow.Text, Is.StringContaining(user.GetLoginOrName()));
 					Assert.That(openedWindow.Text, Is.StringContaining("833"));
 				}
 			}

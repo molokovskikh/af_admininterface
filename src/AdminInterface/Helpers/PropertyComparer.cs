@@ -23,6 +23,12 @@ namespace AdminInterface.Helpers
 			var objX = typeof(T).GetProperty(_propertyName).GetValue(x, null);
 			var objY = typeof(T).GetProperty(_propertyName).GetValue(y, null);
 
+			if ((objX == null) && (objY == null))
+				return 0;
+			if (objX == null)
+                return (_sortDirection == SortDirection.Descending) ? -1 : 1;
+			if (objY == null)
+                return (_sortDirection == SortDirection.Descending) ? 1 : -1; ;
 			int retVal = ((IComparable)objX).CompareTo(objY);
 
 			if (_sortDirection == SortDirection.Descending)

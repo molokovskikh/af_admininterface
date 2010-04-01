@@ -1,0 +1,74 @@
+tr.EvenRow.LockedUser
+{
+	background-color: #ff80c0;
+}
+
+tr.OddRow.LockedUser
+{
+	background-color: #ff80c0;
+}
+
+.LockedUser
+{
+	background-color: #ff80c0;
+}
+
+table.DataTable tr.EvenRow.DisabledInAd
+{
+	background-color: #ff4848;
+}
+
+table.DataTable tr.OddRow.DisabledInAd
+{
+	background-color: #ff4848;
+}
+
+.DisabledInAd
+{
+	background-color: #ff4848;
+}
+
+table.DataTable tr.EvenRow.DisabledByBilling
+{
+	background-color: #ff9d5b;
+}
+
+table.DataTable tr.OddRow.DisabledByBilling
+{
+	background-color: #ff9d5b;
+}
+
+.DisabledByBilling
+{
+	background-color: #ff9d5b;
+}
+
+table.DataTable tr.OldUserUpdate
+{
+	background-color: #aaaaaa;
+}
+
+td.OldUserUpdate
+{
+	background-color: #aaaaaa;
+}
+
+.OldUserUpdate
+{
+	background-color: #aaaaaa;
+}
+
+tr.EvenRow.NotExistsUser
+{
+	background-color: #98cbcb;
+}
+
+tr.OddRow.NotExistsUser
+{
+	background-color: #98cbcb;
+}
+
+.NotExistsUser
+{
+	background-color: #98cbcb;
+}

@@ -1,0 +1,73 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+		Поиск пользователей
+<% end %>
+<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "")]} %>
+
+<style type="text/css">
+    p
+    {
+        width: 100%;
+        text-align: center;
+    }
+</style>
+
+<script type="text/javascript">
+
+    jQuery(document).ready(
+        function() {
+            jQuery("#SearchText").focus();
+        }
+    );
+
+</script>
+<div class="CenterBlock FilterBlock" style="padding: 10px 30px 10px 30px;">
+<h3><b>Поиск пользователей</b></h3>
+<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy.rails">
+    <p style="text-align: left;">Введите текст для поиска:<br /><input type="text" id="SearchText"  name="SearchBy.SearchText" value="${FindBy.SearchText}" style="width: 100%;" /></p>
+    <table style="width: 100%;" cellpadding="0" cellspacing="0">
+        <tr>
+            <td style="text-align: left;">Искать по:</td>
+            <td style="text-align: right;">
+	            ${FormHelper.Select("SearchBy.SearchBy",
+						            FindBy.SearchBy,
+						            BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchUserBy, AdminInterface"),
+						            BindingHelper.GetDictionaryMapping({"class" : "Full"}))}            
+            </td>
+        </tr>
+    </table>
+    
+    <p>
+    <fieldset style="padding: 0; margin: 0; text-align: left;">
+        <legend>Фильтры:</legend>
+        <table style="width:100%" border="0">
+			<col style="width:33%" />
+			<col style="width:33%" />
+			<col style="width:34%" />
+			<thead>
+			    <tr align="left">
+			        <td style="padding: 5px;">Регион<br />
+				    ${FormHelper.Select("SearchBy.RegionId",
+									    FindBy.RegionId,
+									    regions, 
+									    {"value":"Id", "text":"Name", "class" : "Full"})}
+                    </td>
+			        <td style="padding: 5px;">Сегмент<br />
+				    ${FormHelper.Select("SearchBy.Segment",
+									    FindBy.Segment,
+									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchSegment, AdminInterface"),
+									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+			        </td>
+			        <td style="padding: 5px;">Статус<br />
+				    ${FormHelper.Select("SearchBy.SearchStatus",
+									    FindBy.SearchStatus,
+									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientStatus, AdminInterface"),
+									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+			        </td>
+			    </tr>
+			</thead>
+        </table>
+    </fieldset>
+    </p>
+    <p><input type="submit" id="SearchButton" value="Поиск" /></p>
+</form>
+</div>

@@ -12,9 +12,18 @@ using AdminInterface.Security;
 using System.Web;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Controllers;
+using System.ComponentModel;
 
 namespace AdminInterface.Models
 {
+	public enum UserADStatus
+	{
+		[Description("")] Ok,
+		[Description("Заблокирован")] Locked,
+		[Description("Отключен")] Disabled,
+		[Description("Не существует")] NotExists,
+	}
+
 	public class LoginNotFoundException : Exception
 	{
 		public LoginNotFoundException(string message) : base(message) { }
@@ -280,7 +289,12 @@ where uui.UserId = :userCode")
 			if (persons.Length == 0)
 				return;
 			if (ContactGroup == null)
+			{
 				AddContactGroup();
+				foreach (var person in persons)
+					ContactGroup.AddPerson(person.Name);
+				return;
+			}			
 			ContactGroup.UpdatePersons(persons);
 		}
 
@@ -315,11 +329,16 @@ where u.Id = :UserId";
 		{
 			if (String.IsNullOrEmpty(name))
 				return;
-			var groupOwner = Client.ContactGroupOwner;
-			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
-			group.Save();
-			group.AddPerson(name);
-			ContactGroup = group;
+			if (ContactGroup == null)
+			{
+				var groupOwner = Client.ContactGroupOwner;
+				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
+				group.Save();
+				group.AddPerson(name);
+				ContactGroup = group;
+			}
+			else
+				ContactGroup.AddPerson(name);
 		}
 	}
 

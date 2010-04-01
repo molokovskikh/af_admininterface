@@ -154,3 +154,13 @@ div.flash {
 {
 	border-style:groove;
 }
+
+table td.NotCommitedUpdate
+{
+	background-color: #b0b000;
+}
+
+.NotCommitedUpdate
+{
+	background-color: #b0b000;
+}

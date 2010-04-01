@@ -118,16 +118,12 @@
 	    <thead>
 <%      if logEntities.Count > 0: %>	
 		<tr>
-<%          headersList = ["Дата", "Версия"]
+<%          headersList = ["Дата"]
             headersColumns = ["RequestTime", "AppVersion"]
             unsortableHeaders = []
             if (not IsDefined("client") and not IsDefined("user")):
                 headersList.Add("Регион")
                 headersColumns.Add("Region")
-            end
-            if (IsDefined("client") or IsDefined("updateType")):
-                headersList.Add("Пользователь")
-                headersColumns.Add("Login")
             end
             if IsDefined("updateType"):
                 headersList.Add("Клиент")
@@ -136,10 +132,15 @@
                 headersList.Add("Тип обновления")
                 headersColumns.Add("UpdateType")
             end
+            if (IsDefined("client") or IsDefined("updateType")):
+                headersList.Add("Пользователь")
+                headersColumns.Add("Login")
+            end
             if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
                 headersList.Add("Размер приготовленных данных")
                 headersColumns.Add("ResultSize")
             end
+            headersList.Add("Версия")
             headersList.Add("Дополнительно")
             headersColumns.Add("Addition")
             if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
@@ -159,18 +160,10 @@
 			    if (IsDefined("regionMask") and ((region & regionMask == 0) or (region & adminRegionMask == 0))):
 			        continue
 			    end
-				if logEntity.Commit:
-					requestTimeStyle = ""
-				else:
-					requestTimeStyle = "background-color:#ffa642"
-				end %>
+%>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}" align="center">
-			<td style="${requestTimeStyle};width:1%;">
+			<td class="${'NotCommitedUpdate' if not logEntity.Commit}" style="width:1%;">
 				${logEntity.RequestTime}
-			</td>
-
-			<td>
-				${logEntity.AppVersion}
 			</td>
 			
 		  <%if (not IsDefined("client")) and (not IsDefined("user")): %>	
@@ -178,13 +171,7 @@
 			    ${logEntity.User.Client.HomeRegion.Name}
 			</td>
 		  <%end %>
-
-		  <%if (IsDefined("client") or IsDefined("updateType")): %>
-			<td>
-				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginWithName()}</a>
-			</td>
-		  <%end %>
-		  
+	  
 		  <%if IsDefined("updateType"): %>
 		    <td>
 		        <a title="ClientSettings" href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
@@ -200,11 +187,21 @@
 		    </td>  		  
 		  <%end %>
 		  
+		  <%if (IsDefined("client") or IsDefined("updateType")): %>
+			<td>
+				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginOrName()}</a>
+			</td>
+		  <%end %>		  
+		  
 		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
 			    <td>
 				    ${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
 			    </td>    		  
     	  <%end %>
+            <td>
+				${logEntity.AppVersion}
+			</td>
+
 			<td style="text-align:center;">
 				${logEntity.Addition}
 			</td>

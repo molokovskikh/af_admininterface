@@ -174,7 +174,7 @@ namespace Functional
 				var comboBox = browser.SelectList(Find.ById("UsersComboBox" + address.Id));
 				Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
 				Assert.That(comboBox.HasSelectedItems, Is.True);
-				Assert.That(comboBox.SelectedOption.Text.Contains(user.Login));
+				Assert.That(comboBox.SelectedOption.Text.Contains(user.GetLoginOrName()));
 				browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
 				Thread.Sleep(2000);
 				Assert.That(connectUserLink.Style.ToString().ToLower().Contains("display: block"), Is.True);
@@ -581,7 +581,7 @@ namespace Functional
 				var client = DataMother.CreateTestClientWithAddressAndUser();
 				using (var browser = Open(string.Format("Client/{0}", client.Id)))
 				{
-					var username = client.Users[0].GetLoginWithName();
+					var username = client.Users[0].GetLoginOrName();
 					browser.Link(Find.ByText("Биллинг")).Click();
 					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select(username);
 					var message = "test message for user " + username;
@@ -620,7 +620,7 @@ namespace Functional
 					foreach (var user in client.Users)
 					{
 						Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}",
-						                                                      user.GetLoginWithName())));
+						                                                      user.GetLoginOrName())));
 						var div = browser.Div(Find.ById("CurrentMessageForUser" + user.Id));
 						Assert.IsTrue(div.Exists);
 						browser.Link(Find.ById("ViewMessageForUser" + user.Id)).Click();

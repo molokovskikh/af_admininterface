@@ -46,13 +46,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         AjaxRequest(link,
             function(html) {
                 if (status) {
-                    jQuery("#ClientRow" + clientId).removeClass("Disabled");
+                    jQuery("#ClientRow" + clientId).removeClass("DisabledByBilling");
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "");
                 }
                 else {
-                    jQuery("tr[id*='UserRow']").addClass("Disabled");
-                    jQuery("tr[id*='AddressRow']").addClass("Disabled");
-                    jQuery("#ClientRow" + clientId).addClass("Disabled");
+                    jQuery("tr[id*='UserRow']").addClass("DisabledByBilling");
+                    jQuery("tr[id*='AddressRow']").addClass("DisabledByBilling");
+                    jQuery("#ClientRow" + clientId).addClass("DisabledByBilling");
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "disabled");
                     jQuery("input[name='Client" + clientId + "']").attr("checked", "");
                 }
@@ -70,10 +70,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         AjaxRequest(link,
             function(html) {                
                 if (!status) {
-                    jQuery("#UserRow" + userId).addClass('Disabled');
+                    jQuery("#UserRow" + userId).addClass('DisabledByBilling');
                 }
                 else {
-                    jQuery("#UserRow" + userId).removeClass('Disabled');
+                    jQuery("#UserRow" + userId).removeClass('DisabledByBilling');
                 }
                 if (free) {
                     jQuery("#UserRow" + userId).addClass('Free');
@@ -82,10 +82,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                     jQuery("#UserRow" + userId).removeClass('Free');
                 }
                 if (!isActive) {
-                    jQuery("#UserRow" + userId).addClass('Inactive');
+                    jQuery("#UserRow" + userId).addClass('OldUserUpdate');
                 }
                 else {
-                    jQuery("#UserRow" + userId).removeClass('Inactive');
+                    jQuery("#UserRow" + userId).removeClass('OldUserUpdate');
                 }
                 RefreshTotalSum();
             },
@@ -99,10 +99,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         AjaxRequest(link,
             function(html) {
                 if (!status) {
-                    jQuery("#AddressRow" + addressId).addClass('Disabled');
+                    jQuery("#AddressRow" + addressId).addClass('DisabledByBilling');
                 }
                 else {
-                    jQuery("#AddressRow" + addressId).removeClass('Disabled');
+                    jQuery("#AddressRow" + addressId).removeClass('DisabledByBilling');
                 }
                 if (free) {
                     jQuery("#AddressRow" + addressId).addClass('Free');
@@ -287,7 +287,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                         </tr>
 <%                      for i,user in enumerate(Users):
                             log = AdminInterface.Models.Logs.AuthorizationLogEntity.TryFind(user.Id) %>
-                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'Disabled' if not user.Enabled} ${'Inactive' if not user.IsActive} ${'Free' if user.IsFree}"
+                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled}"
                             align="center" title="${ViewHelper.GetRowStyle(i)}" name="Client${user.Client.Id}">
                             <td style="width: 50px">
 <%                          if (user.Client.IsClientActive()): %>
@@ -338,7 +338,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						    </tr>
 <%                      for i,addr in enumerate(Addresses):
                             hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
-                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'Disabled' if not addr.Enabled} ${'Inactive' if not addr.IsActive} ${'Free' if addr.IsFree} ${'HasNoConnectedUsers' if (hasNoUsers)}"
+                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled}"
                                 align="center" name="Client${addr.Client.Id}">
                                 <td style="width: 50px">
 <%                          if (addr.Client.IsClientActive()): %>                                
@@ -363,12 +363,22 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                 </form>
             </div>
 		</div>
+
+<% 
+	component Legend, { "LegendItems" : {	"Выключен" : "DisabledByBilling", 
+	                                        "Работает бесплатно" : "Free", 
+											"Не получал обновлений более 7 дней" : "OldUserUpdate",
+											"Адрес не имеет подключенных пользователей" : "HasNoConnectedUsers"},
+						"ByCenter" : false}
+%>		
+		<!--
 		<table>
 		    <tr><td class="Disabled" style="width: 40px;"></td><td> - Выключен</td></tr>
 		    <tr><td class="Free" style="width: 40px;"></td><td> - Работает бесплатно</td></tr>
 		    <tr><td class="Inactive" style="width: 40px;"></td><td> - Пользователь не получал обновлений более 7 дней</td></tr>
 		    <tr><td class="HasNoConnectedUsers" style="width: 40px"></td><td> - Адрес не имеет подключенных пользователей</td></tr>
 		</table>
+		-->
 		<br />
 <!-- Пока скрыто за ненадобностью -->		
 <div style="display: none">
@@ -558,7 +568,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <%                          for i,user in enumerate(Users): 
 					            if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
 						        <div id="CurrentMessageForUser${user.Id}" style="text-align: left">
-							    Остались не показанные сообщения для пользователя ${user.GetLoginWithName()}.
+							    Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.
 							        <a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
     						    </div>
 <%                              end
@@ -574,7 +584,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<select id="messageReceiverComboBox" name="NewClientMessage.ClientCode">
                                 <option value="0" selected="selected">Для всех пользователей</option>
 <%                              for i, user in enumerate(Users): %>
-                                <option value="${user.Id}">${user.GetLoginWithName()}</option>
+                                <option value="${user.Id}">${user.GetLoginOrName()}</option>
 <%                              end %>
 							</select>
 							<input type="hidden" name="clientId" value="${Users[0].Client.Id}" />

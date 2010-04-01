@@ -29,7 +29,6 @@
 			<th>№ в AnalitF</th>
 			<th>Дата заказа</th>
 			<th>Дата прайса</th>
-			<th>Аптека</th>
 			<th>Адрес</th>
 		  <%if IsDefined("client"): %>
 			<th>Пользователь</th>
@@ -39,16 +38,16 @@
 			<th>Позиций</th>
 			<th>SmtpID</th>
 		</tr>
+		<tbody id="SearchResults">
 		<% for i, order in enumerate(orders): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
 			<td>${order.Id}</td>
 			<td>${order.ClientOrderId}</td>
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>
-			<td>${order.Drugstore}</td>
-			<td>${order.Address}</td>
+			<td>${LinkHelper.Address(siteroot, order.AddressId, order.Address)}</td>
 		  <%if IsDefined("client"): %>
-			<td>${order.User}</td>
+			<td>${LinkHelper.User(siteroot, order.Login, order.User)}</td>
 		  <%end %>
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
@@ -56,6 +55,7 @@
 			<td>${order.GetResult()}</td>
 		</tr>
 		<% end %>
+		</tbody>
 	<% else: %>
 		<tr class="EmptyData">
 			<td>За указанный период заказов не было</td>

@@ -15,6 +15,7 @@ namespace AdminInterface.Controllers
 		Layout("logs"),
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
+		Helper(typeof(LinkHelper)),
 		Secure
 	]
 	public class LogsController : SmartDispatcherController
@@ -178,6 +179,9 @@ namespace AdminInterface.Controllers
 		public DateTime WriteTime { get; set; }
 		public DateTime PriceDate { get; set; }
 
+		public uint AddressId { get; set; }
+		public string Login { get; set; }
+
 		public string Drugstore { get; set; }
 		public string Address { get; set; }
 		public string User { get; set; }
@@ -223,7 +227,9 @@ SELECT  oh.rowid as Id,
 		oh.PriceDate,
 		c.Name as Drugstore,
 		a.Address,
-		u.Login as User,
+		a.Id as AddressId,
+		u.Login as Login,
+		if (u.Name is not null and length(u.Name) > 0, u.Name, u.Login) as User,
 		firm.shortname as Supplier,
 		pd.PriceName,
 		pd.PriceCode PriceId,
@@ -260,7 +266,9 @@ SELECT  oh.rowid as Id,
 		oh.PriceDate,
 		c.Name as Drugstore,
 		a.Address,
-		u.Login as User,
+		a.Id as AddressId,
+		u.Login as Login,
+		if (u.Name is not null and length(u.Name) > 0, u.Name, u.Login) as User,
 		firm.shortname as Supplier,
 		pd.PriceName,
 		pd.PriceCode PriceId,
