@@ -158,5 +158,18 @@ from billing.Payers
 				Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));				
 			}
 		}
+
+		[Test]
+		public void Autosearch_by_client_name()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText("фармаимп");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			}
+		}
 	}
 }

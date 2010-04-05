@@ -29,6 +29,9 @@ namespace AdminInterface.Models
 		public string UserName { get; set; }
 
 		[Property]
+		public string ClientName { get; set; }
+
+		[Property]
 		public string RegionName { get; set; }
 
 		[Property]
@@ -88,6 +91,7 @@ SELECT
 	Users.Login as {{UserSearchItem.Login}},
 	Users.Name as {{UserSearchItem.UserName}},
 	Clients.PayerId as {{UserSearchItem.PayerId}},
+	Clients.Name as {{UserSearchItem.ClientName}},
 	Regions.Region as {{UserSearchItem.RegionName}},
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as {{UserSearchItem.UpdateDate}},
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1) as {{UserSearchItem.UpdateIsUncommited}},
@@ -161,29 +165,30 @@ GROUP BY {{UserSearchItem.UserId}}
 		{
 			var filter = String.Empty;
 		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty : searchProperties.SearchText;
-			var sqlSearchText = String.Format("%{0}%", searchText);
+			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
 
 			switch (searchProperties.SearchBy)
 			{
 				case SearchUserBy.Auto: {
 						filter = AddFilterCriteria(filter,
-							String.Format(" Users.Login like '{0}' or Users.Name like '{0}' ", sqlSearchText));
+							String.Format(" LOWER(Users.Login) like '{0}' or LOWER(Users.Name) like '{0}' or LOWER(Clients.Name) like '{0}' or LOWER(Clients.FullName) like '{0}' ",
+								sqlSearchText));
 						if (searchTextIsNumber)
-							filter += String.Format(" or Users.Id = {0} ", searchText);
+							filter += String.Format(" or Users.Id = {0} or Clients.Id = {0} ", searchText);
 						break;
 					}
 				case SearchUserBy.ByClientName: {
 						filter = AddFilterCriteria(filter,
-							String.Format(" Clients.Name like '{0}' or Clients.FullName like '{0}' ", sqlSearchText));
+							String.Format(" LOWER(Clients.Name) like '{0}' or LOWER(Clients.FullName) like '{0}' ", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByJuridicalName: {
-						filter = AddFilterCriteria(filter, String.Format(" Payers.JuridicalName like '{0}'", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(Payers.JuridicalName) like '{0}'", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByLogin: {
-						filter = AddFilterCriteria(filter, String.Format(" Users.Login like '{0}' ", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(Users.Login) like '{0}' ", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByPayerId: {
@@ -195,7 +200,7 @@ GROUP BY {{UserSearchItem.UserId}}
 						break;
 					}
 				case SearchUserBy.ByUserName: {
-						filter = AddFilterCriteria(filter, String.Format(" Users.Name like '{0}' ", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(Users.Name) like '{0}' ", sqlSearchText));
 						break;
 					}
 			}

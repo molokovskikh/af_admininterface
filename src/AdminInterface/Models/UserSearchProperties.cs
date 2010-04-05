@@ -11,6 +11,8 @@ namespace AdminInterface.Models
 	{
 		[Description("Автоматически")]
 		Auto,
+		[Description("Код клиента")]
+		ByClientId,
 		[Description("Код пользователя")]
 		ByUserId,
 		[Description("Логин пользователя")]
