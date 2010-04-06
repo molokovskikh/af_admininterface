@@ -59,12 +59,6 @@ namespace AdminInterface.Models
 		[Property]
 		public string JuridicalName { get; set; }
 
-		public bool IsLockedInAD { get; set; }
-
-		public bool IsExistsInAD { get; set; }
-
-		public bool IsDisablednAD { get; set; }
-
 		private static string AddFilterCriteria(string filter, string criteria)
 		{
 			if (String.IsNullOrEmpty(filter))
@@ -126,12 +120,6 @@ GROUP BY {{UserSearchItem.UserId}}
 						.SetParameter("RegionId", searchProperties.RegionId)
 						.List<UserSearchItem>();
 				ArHelper.Evict(session, result);
-				foreach (var item in result)
-				{
-					item.IsLockedInAD = ADHelper.IsLocked(item.Login);
-					item.IsExistsInAD = ADHelper.IsLoginExists(item.Login);
-					item.IsDisablednAD = ADHelper.IsDisabled(item.Login);
-				}
 				return result;
 			}
 			finally

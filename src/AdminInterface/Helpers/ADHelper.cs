@@ -123,17 +123,28 @@ namespace AdminInterface.Helpers
 
 		public static ADUserInformation GetADUserInformation(string login)
 		{
-			var result = new ADUserInformation {
-				Login = login,
-           		BadPasswordDate = GetBadPasswordDate(login),
-           		IsDisabled = IsDisabled(login),
-           		IsLocked = IsLocked(login),
-           		IsLoginExists = IsLoginExists(login),
-           		LastLogOnDate = GetLastLogOnDate(login),
-           		LastPasswordChange = GetLastPasswordChange(login),
-			};
-
-			return result;
+			try
+			{
+				var result = new ADUserInformation {
+                    Login = login,
+                    IsLoginExists = IsLoginExists(login),
+				};
+				if (result.IsLoginExists)
+				{
+					result.BadPasswordDate = GetBadPasswordDate(login);
+					result.BadPasswordDate = GetBadPasswordDate(login);
+					result.IsDisabled = IsDisabled(login);
+					result.IsLocked = IsLocked(login);
+					result.LastLogOnDate = GetLastLogOnDate(login);
+					result.LastPasswordChange = GetLastPasswordChange(login);
+					result.IsDisabled = IsDisabled(login);
+				}
+				return result;
+			}
+			catch (Exception)
+			{
+				return null;
+			}
 		}
 
 		public static void CreateUserInAD(string login, string password, uint clientCode)
