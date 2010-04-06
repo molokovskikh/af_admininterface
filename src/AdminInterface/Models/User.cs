@@ -217,6 +217,14 @@ namespace AdminInterface.Models
 			}
 		}
 
+		public virtual bool IsExists
+		{
+			get
+			{
+				return (ADHelper.IsLoginExists(Login));
+			}
+		}
+
 		/// <summary>
 		/// Пользователь считается активным, если он получал обновление не более 7 дней назад
 		/// </summary>
