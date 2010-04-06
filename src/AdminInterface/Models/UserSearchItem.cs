@@ -7,6 +7,7 @@ using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using AdminInterface.Controllers;
 using Common.Web.Ui.Helpers;
+using Common.MySql;
 
 namespace AdminInterface.Models
 {
@@ -82,7 +83,8 @@ namespace AdminInterface.Models
 				filter = AddFilterCriteria(filter, GetFilterBy(searchProperties));
 				filter = AddFilterCriteria(filter, GetSegmentFilter(searchProperties.Segment));
 				filter = AddFilterCriteria(filter, GetStatusFilter(searchProperties.SearchStatus));
-
+				if (!String.IsNullOrEmpty(filter))
+					filter = String.Format(" and ({0}) ", filter);
 				var result = session.CreateSQLQuery(String.Format(@"
 SELECT
 	Users.Id as {{UserSearchItem.UserId}},
@@ -109,8 +111,7 @@ FROM
 	LEFT JOIN usersettings.UserUpdateInfo uui ON uui.UserId = Users.Id
 WHERE
 	Clients.RegionCode & :RegionId > 0
-	and
-	({0})
+	{0}
 GROUP BY {{UserSearchItem.UserId}}
 {1}
 {2}
@@ -164,7 +165,8 @@ GROUP BY {{UserSearchItem.UserId}}
 		private static string GetFilterBy(UserSearchProperties searchProperties)
 		{
 			var filter = String.Empty;
-		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty : searchProperties.SearchText;
+		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty :
+				Utils.StringToMySqlString(searchProperties.SearchText);
 			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
 
@@ -183,6 +185,11 @@ GROUP BY {{UserSearchItem.UserId}}
 							String.Format(" LOWER(Clients.Name) like '{0}' or LOWER(Clients.FullName) like '{0}' ", sqlSearchText));
 						break;
 					}
+				case SearchUserBy.ByClientId: {
+						filter = AddFilterCriteria(filter, String.Format(" Clients.Id = {0} ",
+							searchTextIsNumber ? searchText : "-1"));
+						break;
+					}
 				case SearchUserBy.ByJuridicalName: {
 						filter = AddFilterCriteria(filter, String.Format(" LOWER(Payers.JuridicalName) like '{0}'", sqlSearchText));
 						break;
@@ -192,11 +199,12 @@ GROUP BY {{UserSearchItem.UserId}}
 						break;
 					}
 				case SearchUserBy.ByPayerId: {
-						filter = AddFilterCriteria(filter, String.Format(" Clients.PayerId = {0} ", searchText));
+						filter = AddFilterCriteria(filter, String.Format(" Clients.PayerId = {0} ",
+                            searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserId: {
-						filter = AddFilterCriteria(filter, String.Format(" Users.Id = {0} ", searchText));
+					filter = AddFilterCriteria(filter, String.Format(" Users.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserName: {

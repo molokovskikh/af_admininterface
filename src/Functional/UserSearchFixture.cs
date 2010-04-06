@@ -97,6 +97,15 @@ from billing.Payers
 		}
 
 		[Test]
+		public void SearchByClientId()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				TestSearchResultsByClientInfo(browser, "Id", "Код клиента");
+			}
+		}
+
+		[Test]
 		public void SearchByJuridicalName()
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
@@ -124,7 +133,7 @@ from billing.Payers
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
 				foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
 				{
-					Assert.That(row.TableCells[4].Text, Is.EqualTo("Воронеж"));
+					Assert.That(row.TableCells[6].Text, Is.EqualTo("Воронеж"));
 				}
             }
 		}
@@ -139,7 +148,7 @@ from billing.Payers
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
 				foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
 				{
-					Assert.That(row.TableCells[7].Text, Is.EqualTo("Розница"));
+					Assert.That(row.TableCells[9].Text, Is.EqualTo("Розница"));
 				}
 			}			
 		}
@@ -169,6 +178,47 @@ from billing.Payers
 
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			}
+		}
+
+		[Test]
+		public void Autosearch_by_client_id()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText("7160");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			}
+		}
+
+		[Test]
+		public void Search_by_client_id_with_text()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText("text");
+				browser.SelectList(Find.ById("SearchBy_SearchBy")).Select("Код клиента");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				Assert.IsFalse(browser.TableBody(Find.ById("SearchResults")).Exists);
+				Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
+			}
+		}
+
+		[Test]
+		public void Search_by_client_id()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText("7160");
+				browser.SelectList(Find.ById("SearchBy_SearchBy")).Select("Код клиента");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 			}
 		}
 	}
