@@ -85,6 +85,8 @@
 			<th>Тип документа</th>
 	    <% if (existsParsedDocuments): %>
 	        <th>Номер поставщика</th>
+	        <th>Дата документа</th>
+	        <th>Дата разбора</th>
 		<% end %>
 		
 		<% if not IsDefined("client") or client.IsDrugstore():%>
@@ -124,8 +126,10 @@
 			<% if (logEntity.SendUpdateLogEntity != null):
 			    if (logEntity.Document != null): %>			    
 			<td>${logEntity.Document.ProviderDocumentId}</td>
+			<td>${logEntity.Document.DocumentDate}</td>
+			<td>${logEntity.Document.WriteTime}</td>
 			<%  else: %>
-			<td></td>
+			<td></td><td></td><td></td>
 			<%
 			    end
 			   end %>
