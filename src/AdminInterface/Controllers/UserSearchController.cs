@@ -31,6 +31,16 @@ namespace AdminInterface.Controllers
 		{
 		    var searchResults = UserSearchItem.SearchBy(searchProperties, "UserName", "Ascending");
 
+			if (searchResults.Count.Equals(1))
+			{
+				var virtualDir = Context.UrlInfo.AppVirtualDir;
+				if (!virtualDir.StartsWith("/"))
+					virtualDir = "/" + virtualDir;
+				if (virtualDir.EndsWith("/"))
+					virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
+				RedirectToUrl(String.Format(virtualDir + "/Users/{0}/edit", searchResults.First().Login));
+			}
+
 			PropertyBag["SearchResults"] = searchResults;
 			PropertyBag["FindBy"] = searchProperties;
 			PropertyBag["regions"] = Region.GetAllRegions();
