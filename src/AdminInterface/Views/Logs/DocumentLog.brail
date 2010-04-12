@@ -104,7 +104,11 @@
 			<th>Дата отправки</th>
 			<th>Комментарий</th>
 		</tr>
-	<% for i, logEntity in enumerate(logEntities): %>
+	<% for i, logEntity in enumerate(logEntities):
+	    suffixUpdateType = ""
+	    if (logEntity.SendUpdateLogEntity != null):
+	        suffixUpdateType = "(загрузка документов)"
+	    end %>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Id}">
 			<td>
 				${logEntity.Id}
@@ -114,11 +118,12 @@
 			</td>
 			<td>
 				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
+				${suffixUpdateType}
 			</td>
 			
 			<% if (logEntity.SendUpdateLogEntity != null):
 			    if (logEntity.Document != null): %>			    
-			<td>logEntity.Document.ProviderDocumentId</td>
+			<td>${logEntity.Document.ProviderDocumentId}</td>
 			<%  else: %>
 			<td></td>
 			<%

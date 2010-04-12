@@ -45,8 +45,9 @@ namespace AdminInterface.Controllers
 				var user = User.Find(userId.Value);
 				Client.FindAndCheck(user.Client.Id);
 				PropertyBag["user"] = user;
-				PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForUser(user,
+				documentLogs = DocumentLogEntity.GetEnitiesForUser(user,
 					beginDate, endDate.AddDays(1));
+				PropertyBag["logEntities"] = documentLogs;
 			}
 
 			PropertyBag["beginDate"] = beginDate;
