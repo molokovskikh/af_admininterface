@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Helpers;
 using WatiN.Core;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Functional.ForTesting;
+using AdminInterface.Models.Logs;
+using Document=AdminInterface.Models.Document;
+using System.Threading;
 
 namespace Functional
 {
@@ -79,6 +84,231 @@ namespace Functional
 						Assert.That(openedWindow.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
 				}				
 			}			
+		}
+
+		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentLogEntity documentLogEntity,
+			out Document document, out UpdateLogEntity updateLogEntity)
+		{
+			using (var scope = new TransactionScope())
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
+				supplier = DataMother.CreateTestSupplier();
+				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
+				document = DataMother.CreateTestDocument(supplier, client, documentLogEntity);
+				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
+
+				//documentLogEntity.SendUpdateId = updateLogEntity.Id;
+				documentLogEntity.SendUpdateLogEntity = updateLogEntity;
+				documentLogEntity.SaveAndFlush();
+				scope.VoteCommit();
+			}			
+		}
+
+		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
+			out DocumentLogEntity documentLogEntity, out UpdateLogEntity updateLogEntity)
+		{
+			using (var scope = new TransactionScope())
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
+				supplier = DataMother.CreateTestSupplier();
+				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
+				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
+
+				//documentLogEntity.SendUpdateId = updateLogEntity.Id;
+				documentLogEntity.SendUpdateLogEntity = updateLogEntity;
+				documentLogEntity.SaveAndFlush();
+				scope.VoteCommit();
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_from_client_update_history()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			Document document = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
+
+			using (var mainWindow = Open("Client/{0}", client.Id))
+			{
+				mainWindow.Link(Find.ByText("История обновлений")).Click();
+				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
+				{
+					Thread.Sleep(2000);
+					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+					Thread.Sleep(2000);
+
+					Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
+					Assert.That(browser.Text, Is.StringContaining("Тип документа"));
+					Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
+					Assert.That(browser.Text, Is.StringContaining("Имя файла"));
+					Assert.That(browser.Text, Is.StringContaining("Статус"));
+					Assert.That(browser.Text, Is.StringContaining("Разобран"));
+					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+
+					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+					Check_document_view(browser, document);
+				}
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_from_user_update_history()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			Document document = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
+
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			{
+                mainWindow.Link(Find.ByText("История обновлений")).Click();
+                using (var browser = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
+                {
+					Thread.Sleep(2000);
+					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+					
+					Thread.Sleep(2000);
+					Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
+					Assert.That(browser.Text, Is.StringContaining("Тип документа"));
+					Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
+					Assert.That(browser.Text, Is.StringContaining("Имя файла"));
+					Assert.That(browser.Text, Is.StringContaining("Статус"));
+					Assert.That(browser.Text, Is.StringContaining("Разобран"));
+					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+
+					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+                	Check_document_view(browser, document);
+				}
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_from_client_document_history()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			Document document = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
+
+			using (var mainWindow = Open("Client/{0}", client.Id))
+			{
+				mainWindow.Link(Find.ByText(@"История документов")).Click();
+				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента " + client.Name))))
+				{
+					Thread.Sleep(2000);
+					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+					Thread.Sleep(1000);
+					Assert.That(browser.Text, Is.StringContaining("Код товара"));
+					Assert.That(browser.Text, Is.StringContaining("Наименование"));
+					Assert.That(browser.Text, Is.StringContaining("Производитель"));
+					Assert.That(browser.Text, Is.StringContaining("Страна"));
+					Assert.That(browser.Text, Is.StringContaining("Количество"));
+					Assert.That(browser.Text, Is.StringContaining("Срок годности"));					
+
+					Check_document_view(browser, document);
+				}
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_from_user_document_history()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			Document document = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
+
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			{
+				mainWindow.Link(Find.ByText(@"История документов")).Click();
+				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
+				{
+					Thread.Sleep(2000);
+					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+					Thread.Sleep(1000);
+					Assert.That(browser.Text, Is.StringContaining("Код товара"));
+					Assert.That(browser.Text, Is.StringContaining("Наименование"));
+					Assert.That(browser.Text, Is.StringContaining("Производитель"));
+					Assert.That(browser.Text, Is.StringContaining("Страна"));
+					Assert.That(browser.Text, Is.StringContaining("Количество"));
+					Assert.That(browser.Text, Is.StringContaining("Срок годности"));
+
+					Check_document_view(browser, document);
+				}
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_unparsed_document_documents()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			{
+				mainWindow.Link(Find.ByText(@"История документов")).Click();
+				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
+				{
+					Thread.Sleep(2000);
+					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+					Thread.Sleep(1000);
+					Assert.That(browser.Text, Is.StringContaining("Документ не разобран"));
+				}
+			}
+		}
+
+		[Test]
+		public void View_loaded_documents_details_unparsed_document_updates()
+		{
+			Client client = null;
+			Supplier supplier = null;
+			DocumentLogEntity documentLogEntity = null;
+			UpdateLogEntity updateEntity = null;
+
+			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			{
+				mainWindow.Link(Find.ByText(@"История обновлений")).Click();
+				using (var browser = IE.AttachToIE(Find.ByTitle(@"Статистика обновлений")))
+				{
+					Thread.Sleep(2000);
+					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+					Thread.Sleep(2000);
+					Assert.That(browser.Text, Is.StringContaining("Не разобран"));
+				}
+			}
+		}
+
+		private void Check_document_view(IE browser, Document document)
+		{
+			Thread.Sleep(2000);
+			Assert.That(browser.Text, Is.StringContaining(document.ProviderDocumentId));
+			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Producer));
+			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Country));
+			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2)));
+			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].Nds, 2)));
+			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Certificates));
 		}
 	}
 }

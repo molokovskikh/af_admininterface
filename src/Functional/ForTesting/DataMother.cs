@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
+using AdminInterface.Models.Logs;
+using System.Linq;
 
 namespace Functional.ForTesting
 {
@@ -131,6 +134,102 @@ namespace Functional.ForTesting
 				client.Update();
 				scope.VoteCommit();
 				return client;
+			}
+		}
+
+		public static Supplier CreateTestSupplier()
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var payer = new Payer {ShortName = "test",};
+				payer.Save();
+				var supplier = new Supplier {
+                    BillingInstance = payer,
+                    HomeRegion = Region.FindAll().Last(),
+                    Name = "Test supplier",
+					Status = ClientStatus.On
+				};
+				supplier.Create();
+				scope.VoteCommit();
+				return supplier;
+			}
+		}
+
+		public static DocumentLogEntity CreateTestDocumentLog(Supplier supplier, Client client)
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var documentLogEntity = new DocumentLogEntity
+					{
+						Addition = "Test document log entity",
+						ForClient = client,
+						FromSupplier = supplier,
+						DocumentSize = 1024,
+						DocumentType = DocumentType.Waybill,
+						FileName = "TestFile.txt",
+						LogTime = DateTime.Now,
+					};
+				documentLogEntity.Create();
+				scope.VoteCommit();
+				return documentLogEntity;
+			}
+		}
+
+		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentLogEntity documentLogEntity)
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var document = new Document
+					{
+						ClientCode = client.Id,
+						DocumentDate = DateTime.Now.AddDays(-1),
+						FirmCode = supplier.Id,
+						ProviderDocumentId = "123",
+						Log = documentLogEntity,
+						AddressId = null,
+					};
+				document.Create();
+
+				var documentLine = new DocumentLine
+					{
+						Certificates = "Test certificate",
+						Code = "999",
+						Country = "Test country",
+						Nds = 10,
+						Period = "01.10.2010",
+						Producer = "Test producer",
+						ProducerCost = 10.10M,
+						VitallyImportant = true,
+						Document = document,
+					};
+				documentLine.Create();
+
+				document.Lines = new List<DocumentLine>();
+				document.Lines.Add(documentLine);
+				document.SaveAndFlush();
+
+				scope.VoteCommit();
+				return document;
+			}
+		}
+
+		public static UpdateLogEntity CreateTestUpdateLogEntity(Client client)
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var updateEntity = new UpdateLogEntity()
+					{
+						User = client.Users[0],
+						AppVersion = 1000,
+						Addition = "Test update",
+						Commit = false,
+						RequestTime = DateTime.Now,
+						UpdateType = UpdateType.LoadingDocuments,
+						UserName = client.Users[0].Name,
+					};
+				updateEntity.CreateAndFlush();
+				scope.VoteCommit();
+				return updateEntity;
 			}
 		}
 	}

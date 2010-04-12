@@ -9,7 +9,7 @@ namespace Functional
 	[TestFixture]
 	public class SupplierFixture : WatinFixture
 	{
-		[Test]
+		[Test, Ignore("Тест для поставщика. Из старого интерфейса. Удалить?")]
 		public void Try_to_change_home_region_for_drugstore()
 		{
 			using (var browser = new IE(BuildTestUrl("managep.aspx?cc=1179")))

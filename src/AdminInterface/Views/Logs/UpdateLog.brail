@@ -5,9 +5,7 @@
 
 <script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 <script type="text/javascript">
-	function ShowDownloadResult(id, url, callerDescription)
-	{
-		//DisableAction(id);
+    function ShowDownloadResult(id, url, callerDescription) {
 		var isCallerVisible = IsVisible(id, callerDescription)
 		HideAll(id, function() {
 		    if (!isCallerVisible)
@@ -23,39 +21,34 @@
 	        afterFinish();
 		}, duration: 0.5 });
 	}
-	
-	function HideAll(id, afterFinish)
-	{
-		if (IsVisible(id, "DownloadLog"))
-		{
-			Hide(id, "DownloadLog", afterFinish);
-		}
-		else
-		{
-			if (IsVisible(id, "UpdateDetails"))
-			{
-				Hide(id, "UpdateDetails", afterFinish);
-			}
-			else
-			{
-				afterFinish();
-			}
-		}
+
+	function HideAll(id, afterFinish) {
+	    if (IsVisible(id, "DownloadLog")) {
+	        Hide(id, "DownloadLog", afterFinish);
+	    }
+	    else if (IsVisible(id, "UpdateDetails")) {
+	        Hide(id, "UpdateDetails", afterFinish);
+	    }
+	    else if (IsVisible(id, "DocumentDetails")) {
+	        Hide(id, "DocumentDetails", afterFinish);
+	    }
+	    else {
+	        afterFinish();
+	    }
 	}
 	
-	function IsVisible(id, description)
-	{
+	function IsVisible(id, description) {
 		return $(description + id) != null;
 	}
 	
 	function DisableAction(id)
 	{
 		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
-		$("ShowLogLink" + id).onclick = function () { return false; }
+		$("ShowLogLink" + id).onclick = function() { return false; }
+		$("ShowDocumentDetailsLink" + id).onclick = function() { return false; }
 	}
-	
-	function Download(url)
-	{
+
+	function Download(url) {
 		new Ajax.Request(url, { method: 'get' });
 	}
 </script>

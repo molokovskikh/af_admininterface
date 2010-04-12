@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace AdminInterface.Helpers
@@ -115,6 +116,17 @@ namespace AdminInterface.Helpers
 						return String.Empty;
 
 			return param;
+		}
+
+		public static string CostFormat(object value, int countNumbersAfterDot)
+		{
+			if (value == null)
+				return String.Empty;
+			var result = Convert.ToString(value, CultureInfo.InvariantCulture);
+			var index = result.IndexOf('.');
+			if (index < 0)
+				return result;
+			return result.Substring(0, index + 1 + countNumbersAfterDot);
 		}
 	}
 }

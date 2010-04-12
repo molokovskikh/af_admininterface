@@ -1,38 +1,72 @@
 ﻿<tr id='UpdateDetailsRow${updateLogEntityId}'>
 	<td />
-	<td colspan='4'>
+	<td colspan='6'>
 		<div id='UpdateDetails${updateLogEntityId}'>
 
-	<table class="DataTable" style="width:100%;">
+	<table class="DataTable" style="width:100%; text-align: center;">
 		<tr>
+		<% if (logEntity.UpdateType.Equals(AdminInterface.Models.Logs.UpdateType.LoadingDocuments)): %>
+			<th>Дата загрузки</th>
+			<th>Тип документа</th>
+			<% if IsDefined("existsParsedDocuments") and (existsParsedDocuments): %>
+			    <th>Дата документа</th>
+			    <th>Дата разбора</th>
+			    <th>Номер поставщика</th>
+			    <th>Поставщик</th>			    
+			<% end %>			
+			<th>Имя файла</th>
+			<th>Статус</th>
+		<% else: %>		
 			<th>Дата</th>
 			<th>С хоста</th>
 			<th>Начиная с байта</th>
 			<th>Отправленно байт</th>
+        <% end %>			
 		</tr>
+		
 		<% 
-			i = 0
-			for detailLogEntity in detailLogEntities:
-			
+		if (logEntity.UpdateType.Equals(AdminInterface.Models.Logs.UpdateType.LoadingDocuments)):
+		    for i,documentLog in enumerate(detailDocumentLogs):		
+        %>
+            <tr id="documentFileRow${documentLog.Id}" class="${ViewHelper.GetRowStyle(i)}">
+                <td>${documentLog.LogTime}</td>
+                <td>${BindingHelper.GetDescription(documentLog.DocumentType)}</td>
+                <% if documentLog.Document != null: %>
+                <td>${documentLog.Document.DocumentDate}</td>
+                <td>${documentLog.Document.WriteTime}</td>
+                <td>${documentLog.Document.ProviderDocumentId}</td>
+                <td>${documentLog.Document.Supplier.Name}</td>                
+                <% end %>
+                <td>
+                    <% if (documentLog.Document != null): %>
+                    <a id="ShowDocumentDetailsLink${documentLog.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${documentLog.Id}, 'ShowDocumentDetails.rails?documentLogId=${documentLog.Id}', 'DocumentDetails');">
+                        ${documentLog.FileName}
+                    </a>
+                    <% else: %>
+                        ${documentLog.FileName}
+                    <% end %>
+                </td>
+                <% if documentLog.Document != null: %>
+                <td>Разобран</td>
+                <% else: %>
+                <td class="DocumentNotParsed">Не разобран</td>
+                <% end %>
+            </tr>		
+		
+		<%
+		    end
+        else:		     
+			for i,detailLogEntity in enumerate(detailLogEntities):			
 		%>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td>
-					${detailLogEntity.LogTime}
-				</td>
-				<td>
-					${detailLogEntity.ResolveHost()} ( ${detailLogEntity.ClientHost} )
-				</td>
-				<td>
-					${detailLogEntity.FromByte}
-				</td>
-				<td>
-					${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.SendBytes)}
-				</td>
-				
+				<td>${detailLogEntity.LogTime}</td>
+				<td>${detailLogEntity.ResolveHost()} ( ${detailLogEntity.ClientHost} )</td>
+				<td>${detailLogEntity.FromByte}td>
+				<td>${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.SendBytes)}</td>				
 			</tr>
 		<%
-				i++
 			end
+        end			
 		%>
 		
 		<% if allDownloaded: %>

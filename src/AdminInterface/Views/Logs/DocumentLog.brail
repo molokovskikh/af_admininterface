@@ -26,52 +26,86 @@
 
 <% OutputSubView("SelectDateIntervalSubView") %>
 
+<script type="text/javascript">
+    function ShowDownloadResult(id, url, callerDescription) {
+		var isCallerVisible = IsVisible(id, callerDescription)
+		HideAll(id, function() {
+		    if (!isCallerVisible)
+		        Download(url)
+		});
+	}
+
+	function Hide(id, description, afterFinish)
+	{
+	    new Effect.SlideUp(description + id, {
+	    afterFinish: function() {
+	        $(description + "Row" + id).remove();
+	        afterFinish();
+		}, duration: 0.5 });
+	}
+
+	function HideAll(id, afterFinish) {
+	    if (IsVisible(id, "DownloadLog")) {
+	        Hide(id, "DownloadLog", afterFinish);
+	    }
+	    else if (IsVisible(id, "UpdateDetails")) {
+	        Hide(id, "UpdateDetails", afterFinish);
+	    }
+	    else if (IsVisible(id, "DocumentDetails")) {
+	        Hide(id, "DocumentDetails", afterFinish);
+	    }
+	    else {
+	        afterFinish();
+	    }
+	}
+	
+	function IsVisible(id, description) {
+		return $(description + id) != null;
+	}
+	
+	function DisableAction(id)
+	{
+		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
+		$("ShowLogLink" + id).onclick = function() { return false; }
+		$("ShowDocumentDetailsLink" + id).onclick = function() { return false; }
+	}
+
+	function Download(url) {
+		new Ajax.Request(url, { method: 'get' });
+	}
+</script>
+
 <div>
 
 	<table class="DataTable">
 	<% if logEntities.Count != 0: %>
 		<tr>
-			<th>
-				Номер документа
-			</th>
-			<th>
-				Дата получения
-			</th>
-			<th>
-				Тип документа
-			</th>
-		<% if not IsDefined("client") or client.IsDrugstore():%>
-			<th>
-				От поставщика
-			</th>
-		<% else: %>
-			<th>
-				Для аптеки
-			</th>
+			<th>Номер документа</th>
+			<th>Дата получения</th>
+			<th>Тип документа</th>
+	    <% if (existsParsedDocuments): %>
+	        <th>Номер поставщика</th>
 		<% end %>
-			<th>
-				На адрес
-			</th>
-			<th>
-				Название файла
-			</th>
-			<th>
-				Размер
-			</th>
+		
+		<% if not IsDefined("client") or client.IsDrugstore():%>
+			<th>От поставщика</th>
+		<% else: %>
+			<th>Для аптеки</th>
+		<% end %>
+		
+			<th>На адрес</th>
+			<th>Название файла</th>
+			<th>Размер</th>
+			
 		  <%if IsDefined("client"): %>
-			<th>
-				Пользователь получивший документ
-			</th>
+			<th>Пользователь получивший документ</th>
 		  <%end %>
-			<th>
-				Дата отправки
-			</th>
-			<th>
-				Комментарий
-			</th>
+		  
+			<th>Дата отправки</th>
+			<th>Комментарий</th>
 		</tr>
 	<% for i, logEntity in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}">
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Id}">
 			<td>
 				${logEntity.Id}
 			</td>
@@ -81,6 +115,16 @@
 			<td>
 				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
 			</td>
+			
+			<% if (logEntity.SendUpdateLogEntity != null):
+			    if (logEntity.Document != null): %>			    
+			<td>logEntity.Document.ProviderDocumentId</td>
+			<%  else: %>
+			<td></td>
+			<%
+			    end
+			   end %>
+			
 			<% if not IsDefined("client") or client.IsDrugstore(): %>
 				<td>
 					${logEntity.FromSupplier.Name if logEntity.FromSupplier != null}
@@ -91,10 +135,18 @@
 				</td>
 			<% end %>
 			<td>
+			    <% if logEntity.Address != null: %>
 				${logEntity.Address.Value}
+				<% end %>
 			</td>
-			<td>
-				${logEntity.FileName}
+			<td class="${'DocumentNotParsed' if (logEntity.Document == null)}">
+			    <% if (logEntity.SendUpdateLogEntity != null): %>
+				    <a id="ShowDocumentDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Id}', 'DocumentDetails');">
+				        ${logEntity.FileName}
+                    </a>
+				<% else: %>
+				    ${logEntity.FileName}
+				<% end %>
 			</td>
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize) if logEntity.DocumentSize != null}

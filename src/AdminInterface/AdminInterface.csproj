@@ -177,6 +177,7 @@
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
+    <Compile Include="Models\Document.cs" />
     <Compile Include="Models\DrugstoreSettings.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\AddressLogRecord.cs" />
@@ -453,6 +454,8 @@
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Logs\Orders.brail" />
+    <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
+    <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />
     <None Include="Views\Regions\ShowRegions.brail" />
     <None Include="Views\Register\Register.brail" />
@@ -578,7 +581,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>53302</DevelopmentServerPort>
+          <DevelopmentServerPort>55498</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

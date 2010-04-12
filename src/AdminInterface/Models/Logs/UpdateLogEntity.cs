@@ -14,7 +14,8 @@ namespace AdminInterface.Models.Logs
 		[Description("Кумулятивное")] Cumulative = 2,
 		[Description("Ошибка доступа")] AccessError = 5,
 		[Description("Ошибка сервера")] ServerError = 6,
-		[Description("Документы")] Documents = 8
+		[Description("Документы")] Documents = 8,
+		[Description("Загрузка документов на сервер")] LoadingDocuments = 9,
 	}
 
 	[ActiveRecord(Table = "logs.AnalitFUpdates")]
@@ -55,7 +56,22 @@ namespace AdminInterface.Models.Logs
 
 		public bool IsDataTransferUpdateType()
 		{
-			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative;
+			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative || IsDocumentLoading();
+		}
+
+		public IList<DocumentLogEntity> GetLoadedDocumentLogs()
+		{
+			//return DocumentLogEntity.FindAllByProperty("SendUpdateId", Id);
+            return ArHelper.WithSession(
+				session => session.CreateCriteria(typeof(DocumentLogEntity))
+                    .Add(Expression.Eq("SendUpdateLogEntity", this))
+					.AddOrder(Order.Desc("LogTime"))
+					.List<DocumentLogEntity>());
+		}
+
+		public bool IsDocumentLoading()
+		{
+			return UpdateType == UpdateType.LoadingDocuments;
 		}
 
 		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode,

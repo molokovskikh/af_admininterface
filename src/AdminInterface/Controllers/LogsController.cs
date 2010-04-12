@@ -27,6 +27,7 @@ namespace AdminInterface.Controllers
 
 		public void DocumentLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
 		{
+			IList<DocumentLogEntity> documentLogs = null;
 			if (!userId.HasValue)
 			{
 				var client = Client.Find(clientCode.Value);
@@ -34,8 +35,9 @@ namespace AdminInterface.Controllers
 				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 				SecurityContext.Administrator.CheckClientType(client.Type);
 
-				PropertyBag["logEntities"] = DocumentLogEntity.GetEnitiesForClient(client,
+				documentLogs = DocumentLogEntity.GetEnitiesForClient(client,
 					beginDate, endDate.AddDays(1));
+				PropertyBag["logEntities"] = documentLogs;
 				PropertyBag["client"] = client;
 			}
 			else
@@ -49,12 +51,14 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
+			PropertyBag["existsParsedDocuments"] = ExistsParsedDocuments(documentLogs);
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
 		{
 			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
 			var detailsLogEntities = logEntity.UpdateDownload;
+			var detailDocumentLogs = logEntity.GetLoadedDocumentLogs();
 
 			ulong totalByteDownloaded = 0;
 			ulong totalBytes = 1;
@@ -65,8 +69,30 @@ namespace AdminInterface.Controllers
 			}
 
 			PropertyBag["updateLogEntityId"] = logEntity.Id;
+			PropertyBag["logEntity"] = logEntity;
 			PropertyBag["detailLogEntities"] = detailsLogEntities;
 			PropertyBag["allDownloaded"] = totalByteDownloaded >= totalBytes;
+			PropertyBag["detailDocumentLogs"] = detailDocumentLogs;
+			PropertyBag["existsParsedDocuments"] = ExistsParsedDocuments(logEntity.GetLoadedDocumentLogs());
+		}
+
+		private bool ExistsParsedDocuments(IList<DocumentLogEntity> documentLogs)
+		{
+			if (documentLogs == null)
+				return false;
+			foreach (var log in documentLogs)
+			{
+				if (log.Document != null)
+					return true;
+			}
+			return false;
+		}
+
+		public void ShowDocumentDetails(uint documentLogId)
+		{
+			var documentLog = DocumentLogEntity.Find(documentLogId);
+			PropertyBag["documentLogId"] = documentLogId;
+			PropertyBag["documentLog"] = documentLog;
 		}
 
 		public void ShowDownloadLog(uint updateLogEntityId)

@@ -45,8 +45,20 @@ namespace AdminInterface.Models.Logs
 		[BelongsTo(Column = "UpdateId")]
 		public UpdateLogEntity UpdateLogEntity { get; set; }
 
+		[BelongsTo(Column = "SendUpdateId")]
+		public UpdateLogEntity SendUpdateLogEntity { get; set; }
+
 		[Property]
 		public string Addition { get; set; }
+
+		public Document Document
+		{
+			get
+			{
+				var documents = Document.Queryable.Where(doc => doc.Log.Id == Id);
+				return documents.Count() > 0 ? documents.First() : null;
+			}
+		}
 
 		public static IList<DocumentLogEntity> GetEnitiesForClient(Client client, 
 			DateTime beginDate, 
@@ -70,7 +82,9 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(DocumentLogEntity))
 					.Add(Expression.Between("LogTime", beginDate, endDate))
-					.Add(Expression.In("UpdateLogEntity", updateEntities))
+					.Add(Expression.Or(
+						Expression.In("UpdateLogEntity", updateEntities),
+						Expression.In("SendUpdateLogEntity", updateEntities)))
 					.AddOrder(Order.Desc("LogTime"))
 					.List<DocumentLogEntity>());
 
