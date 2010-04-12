@@ -59,6 +59,12 @@ namespace AdminInterface.Models
 		[Property]
 		public string JuridicalName { get; set; }
 
+		public bool IsLoginExists { get; set; }
+
+		public bool IsLocked { get; set; }
+
+		public bool IsDisabled { get; set; }
+
 		private static string AddFilterCriteria(string filter, string criteria)
 		{
 			if (String.IsNullOrEmpty(filter))
@@ -68,12 +74,10 @@ namespace AdminInterface.Models
 			return String.Format(" ({0}) and ({1}) ", filter, criteria);
 		}
 
-		public static IList<UserSearchItem> SearchBy(UserSearchProperties searchProperties,
-			int pageSize, int currentPage, string sortColumn, string sortDirection)
+		public static IList<UserSearchItem> SearchBy(UserSearchProperties searchProperties, string sortColumn, string sortDirection)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(UserSearchItem));
-		    var pagingFilter = (pageSize > 0) ? String.Format("limit {0},{1}", currentPage * pageSize, pageSize) : String.Empty;
 			var orderDirection = sortDirection.Equals("Ascending", StringComparison.InvariantCultureIgnoreCase) ? "ASC" : "DESC";
 			var orderFilter = String.Format("ORDER BY {{UserSearchItem.{0}}} {1}", sortColumn, orderDirection);
 			try
@@ -96,7 +100,7 @@ SELECT
 	Clients.Name as {{UserSearchItem.ClientName}},
 	Regions.Region as {{UserSearchItem.RegionName}},
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as {{UserSearchItem.UpdateDate}},
-	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1) as {{UserSearchItem.UpdateIsUncommited}},
+	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as {{UserSearchItem.UpdateIsUncommited}},
 	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
 	if(Clients.Segment = 1, 1, 2) as {{UserSearchItem.Segment}},
 	rcs.InvisibleOnFirm as {{UserSearchItem.InvisibleOnFirm}},
@@ -114,12 +118,21 @@ WHERE
 	{0}
 GROUP BY {{UserSearchItem.UserId}}
 {1}
-{2}
-", filter, orderFilter, pagingFilter))
+", filter, orderFilter))
 						.AddEntity(typeof (UserSearchItem))
 						.SetParameter("RegionId", searchProperties.RegionId)
 						.List<UserSearchItem>();
 				ArHelper.Evict(session, result);
+
+				for (var i = 0; i < result.Count; i++)
+				{
+					var info = ADHelper.GetADUserInformation(result[i].Login);
+					if (info == null)
+						continue;
+					result[i].IsDisabled = info.IsDisabled;
+					result[i].IsLocked = info.IsLocked;
+					result[i].IsLoginExists = info.IsLoginExists;
+				}
 				return result;
 			}
 			finally

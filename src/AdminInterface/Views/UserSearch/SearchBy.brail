@@ -54,9 +54,8 @@ end
     </thead>
     
     <tbody id="SearchResults" class="HighLightCurrentRow">
-    <% for i,item in enumerate(searchResults):
-            user = ADHelper.GetADUserInformation(item.Login) %>
-        <tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if(not item.Enabled)} ${'DisabledInAd' if(user.IsLoginExists and user.IsDisabled)} ${'LockedUser' if(user.IsLoginExists and user.IsLocked)} ${'NotExistsUser' if(not user.IsLoginExists)}">
+    <% for i,item in enumerate(searchResults): %>
+        <tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if(not item.Enabled)} ${'DisabledInAd' if(item.IsLoginExists and item.IsDisabled)} ${'LockedUser' if(item.IsLoginExists and item.IsLocked)} ${'NotExistsUser' if(not item.IsLoginExists)}">
             <td><a href="${siteroot}/billing/edit.rails?ClientCode=${item.ClientId}">${item.PayerId}</a></td>
             <td>${item.ClientId}</td>
             <td>${item.UserId}</td>            
@@ -81,8 +80,6 @@ end
 </table>
 <div style="width: 100%;" align="center"><br /><% OutputSubView("LegendView") %></div>
 <input type="hidden" id="rowsCount" name="rowsCount" value="${rowsCount}" />
-<input type="hidden" id="pageSize" name="pageSize" value="${pageSize}" />
-<input type="hidden" id="currentPage" name="currentPage" value="${currentPage}" />
 <input type="hidden" id="sortColumnName" name="sortColumnName" value="${sortColumnName}" />
 <input type="hidden" id="sortDirection" name="sortDirection" value="${sortDirection}" />
 <input type="hidden" name="SearchBy.SearchBy" value="${FindBy.SearchBy}" />

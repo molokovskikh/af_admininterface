@@ -29,7 +29,8 @@ namespace AdminInterface.Controllers
 
 		public void SearchBy([DataBind("SearchBy")] UserSearchProperties searchProperties)
 		{
-		    var searchResults = UserSearchItem.SearchBy(searchProperties, 0, 0, "UserName", "Ascending");
+		    var searchResults = UserSearchItem.SearchBy(searchProperties, "UserName", "Ascending");
+
 			PropertyBag["SearchResults"] = searchResults;
 			PropertyBag["FindBy"] = searchProperties;
 			PropertyBag["regions"] = Region.GetAllRegions();
@@ -51,12 +52,10 @@ namespace AdminInterface.Controllers
         public void OrderBy([DataBind("SearchBy")] UserSearchProperties searchProperties,
 							string sortDirection,
 							string sortColumnName,
-                            int rowsCount,
-                            int pageSize, 
-                            int currentPage)
+                            int rowsCount)
         {
             var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(
-				searchProperties, pageSize, currentPage, sortColumnName, sortDirection));
+				searchProperties, sortColumnName, sortDirection));
 
             PropertyBag["SearchResults"] = searchResults;
             PropertyBag["FindBy"] = searchProperties;
@@ -64,8 +63,6 @@ namespace AdminInterface.Controllers
             PropertyBag["SortColumnName"] = sortColumnName;
         	PropertyBag["SortDirection"] = sortDirection;
             PropertyBag["rowsCount"] = rowsCount;
-            PropertyBag["pageSize"] = pageSize;
-            PropertyBag["currentPage"] = currentPage;
             RenderView("SearchBy");
         }
 	}
