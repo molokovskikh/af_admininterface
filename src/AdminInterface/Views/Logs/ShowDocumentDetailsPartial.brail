@@ -1,5 +1,6 @@
 ﻿<tr id="DocumentDetailsRow${documentLogId}">
-    <td colspan="10">
+    <td />
+    <td colspan="15">
         <div id="DocumentDetails${documentLogId}">
             <table class="DataTable" style="width:100%;">
             
@@ -37,7 +38,11 @@
                         <td>${ViewHelper.CostFormat(docLine.RegistryCost, 2)}</td>
                         <td>${ViewHelper.CostFormat(docLine.SupplierPriceMarkup, 2)}</td>
                         <td>${docLine.Certificates}</td>
-                        <td>${ViewHelper.ToHumanReadable(docLine.VitallyImportant)}</td>
+                        <td>
+                        <% if (docLine.VitallyImportant != null): %>
+                        ${ViewHelper.ToHumanReadable(docLine.VitallyImportant)}
+                        <% end %>
+                        </td>                        
                         <td>${docLine.SerialNumber}</td>
                     </tr>
                 <%  end 

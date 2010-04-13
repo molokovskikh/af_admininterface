@@ -123,7 +123,7 @@
 				${suffixUpdateType}
 			</td>
 			
-			<% if (logEntity.SendUpdateLogEntity != null):
+			<% if (existsParsedDocuments and logEntity.SendUpdateLogEntity != null):
 			    if (logEntity.Document != null): %>			    
 			<td>${logEntity.Document.ProviderDocumentId}</td>
 			<td>${logEntity.Document.DocumentDate}</td>
@@ -132,7 +132,9 @@
 			<td></td><td></td><td></td>
 			<%
 			    end
-			   end %>
+			   else: %>
+			<td></td><td></td><td></td>     
+			<% end %>
 			
 			<% if not IsDefined("client") or client.IsDrugstore(): %>
 				<td>
