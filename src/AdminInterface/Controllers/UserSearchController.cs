@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 		{
 		    var searchResults = UserSearchItem.SearchBy(searchProperties, "UserName", "Ascending");
 
-			if (searchResults.Count.Equals(1))
+			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().Login))
 			{
 				var virtualDir = Context.UrlInfo.AppVirtualDir;
 				if (!virtualDir.StartsWith("/"))

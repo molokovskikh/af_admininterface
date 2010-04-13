@@ -123,7 +123,7 @@
 				${suffixUpdateType}
 			</td>
 			
-			<% if (existsParsedDocuments and logEntity.SendUpdateLogEntity != null):
+			<% if (existsParsedDocuments):
 			    if (logEntity.Document != null): %>			    
 			<td>${logEntity.Document.ProviderDocumentId}</td>
 			<td>${logEntity.Document.DocumentDate}</td>
@@ -151,7 +151,7 @@
 				<% end %>
 			</td>
 			<td class="${'DocumentNotParsed' if (logEntity.Document == null and logEntity.SendUpdateLogEntity != null)}">
-			    <% if (logEntity.SendUpdateLogEntity != null): %>
+			    <% if (existsParsedDocuments): %>
 				    <a id="ShowDocumentDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Id}', 'DocumentDetails');">
 				        ${logEntity.FileName}
                     </a>
