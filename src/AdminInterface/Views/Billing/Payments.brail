@@ -628,70 +628,26 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				Статистика включений/выключений
 			</div>
-			<!-- Пользователи -->
-			<div class="InputGroupHeader" style="margin-bottom:10px;">
-			Статистика по пользователям<br /><br />
 			<table class="DataTable" style="width: 100%;">
-<%          if UsersLogRecords.Length > 0:
-                for i, userLog in enumerate(UsersLogRecords): %>
-                    <tr class="${ViewHelper.GetRowStyle(i)}">
-                        <td>${userLog.LogTime}</td>
-                        <td>${userLog.User.Login}</td>
-                        <td>${userLog.User.Name}</td>
-                        <td>${userLog.OperatorName}</td>
-                        <td>
-<%                      if userLog.Enabled: %>
-                            Включен
-<%                      else: %>
-                            Отключен
-<%                      end %>                        
-                        </td>
-                    </tr>                    
-<%              end
-            else: %>                    
-				<tr><td style="text-align:center;">Ни один пользователь не отключался</td></tr>				    
+<%          if LogRecords.Count > 0: %>			
+                <thead>
+                    <th>Дата</th>
+                    <th>Объект</th>
+                    <th>Имя</th>
+                    <th>Оператор</th>
+                    <th>Статус</th>                    
+                </thead>
 <%          end %>
-            </table>
-            </div>			
-            <!-- Адреса -->
-            <div class="InputGroupHeader" style="margin-bottom:10px;">
-            Статистика по адресам<br /><br />
-            <table class="DataTable" style="width: 100%;">
-<%          if AddressesLogRecords.Length > 0:
-                for i, addressLog in enumerate(AddressesLogRecords): %>
-                    <tr class="${ViewHelper.GetRowStyle(i)}">
-                        <td>${addressLog.LogTime}</td>
-                        <td>${addressLog.Address.Value}</td>
-                        <td>${addressLog.OperatorName}</td>
-                        <td>
-<%                      if addressLog.Enabled: %>
-                            Включен
-<%                      else: %>
-                            Отключен
-<%                      end %>                        
-                        </td>
-                    </tr>
-<%              end
-            else: %>                    
-				<tr><td style="text-align:center;">Ни один адрес не отключался</td></tr>				    
-<%          end %>
-            </table>
-            </div>
-            
-            <table class="DataTable" style="width: 100%;">
-<%          if LogRecords.Count > 0:
-                i = 0
-				for logRecord in LogRecords:
-					i++ %>
-					<tr class="${ViewHelper.GetRowStyle(i)}">
-						<td>${logRecord.LogTime}</td>
-						<td>${logRecord.OperatorName}</td>
-						<td>${BindingHelper.GetDescription(logRecord.ClientStatus)}</td>
-					</tr>
-<%              end
-			else: %>
-				<tr><td style="text-align:center;">Клиент не отключался</td></tr>				
-<%          end %>
-			</table>			
+<%          for i,logRecord in enumerate(LogRecords): %>			    
+			    <tr class="${ViewHelper.GetRowStyle(i)}">
+			        <td>${logRecord.LogTime}</td>
+			        <td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
+			        <td>${logRecord.Value}</td>
+			        <td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
+			        <td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
+			    </tr>
+<%          end %>			    
+			</table>
+					
 		</div>
 </div>

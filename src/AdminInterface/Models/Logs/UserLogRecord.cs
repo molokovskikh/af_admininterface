@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Logs
 		[BelongsTo("UserId")]
 		public virtual User User { get; set; }
 
-		public static IList<UserLogRecord> GetUserLogRecords(User user)
+		public static IList<UserLogRecord> GetUserEnabledLogRecords(User user)
 		{
 			return (List<UserLogRecord>)Execute(
 				(session, instance) =>

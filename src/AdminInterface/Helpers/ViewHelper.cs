@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Helpers
 {
@@ -41,6 +42,13 @@ namespace AdminInterface.Helpers
 				return "Да";
 
 			return "Нет";
+		}
+
+		public static string HumanReadableStatus(bool value)
+		{
+			if (value)
+				return "Включен";
+			return "Отключен";
 		}
 
 		public static string GetDirection(string sortBy, string direction, string property)
@@ -127,6 +135,26 @@ namespace AdminInterface.Helpers
 			if (index < 0)
 				return result;
 			return result.Substring(0, index + 1 + countNumbersAfterDot);
+		}
+
+		public static string GetHumanReadableOperatorName(string operatorName)
+		{
+			//object name = String.Empty;
+			var sql = @"
+SELECT 
+	if (length(ManagerName) > 0, ManagerName, UserName) as UserName
+FROM
+	`accessright`.`regionaladmins`
+WHERE 
+	LOWER(UserName) like :UserName
+LIMIT 1";
+			var name = ArHelper.WithSession(session => session
+                .CreateSQLQuery(sql)
+                .SetParameter("UserName", operatorName.ToLower())
+                .UniqueResult());
+			if (String.IsNullOrEmpty(Convert.ToString(name)))
+				return operatorName;
+			return name.ToString();
 		}
 	}
 }

@@ -64,7 +64,7 @@ namespace AdminInterface.Controllers
 				if ((message != null) && message.IsContainsNotShowedMessage())
 					countUsersWithMessages++;
                 usersMessages.Add(message);
-				usersLogs.AddRange(UserLogRecord.GetUserLogRecords(item));
+				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
 			}
 			foreach (var item in payer.GetAllAddresses())
 				addressesLogs.AddRange(AddressLogRecord.GetAddressLogRecords(item));
@@ -80,9 +80,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["tab"] = tab;
 			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
 			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
-			PropertyBag["LogRecords"] = ClientLogRecord.GetClientLogRecords(client);
-			PropertyBag["UsersLogRecords"] =  usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToArray();
-			PropertyBag["AddressesLogRecords"] = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToArray();
+			var clientLogs = ClientLogRecord.GetClientLogRecords(client);
+			var userLogs = usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
+			var addressLogs = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
+			PropertyBag["LogRecords"] = SwitchLogRecord.GetUnionLogs(clientLogs, userLogs, addressLogs);
+
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["User"] = user;

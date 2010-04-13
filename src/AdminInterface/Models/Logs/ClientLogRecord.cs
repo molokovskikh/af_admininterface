@@ -17,6 +17,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual string OperatorName { get; set; }
 
+		[BelongsTo("ClientId")]
+		public virtual Client Client { get; set; }
+
 		[Property("Status")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
