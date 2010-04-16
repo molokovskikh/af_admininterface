@@ -106,20 +106,22 @@ namespace AdminInterface.Models.Logs
 
 		public string GetHumanReadableOperatorName()
 		{
-			var name = String.Empty;
 			var sql = @"
 SELECT 
 	if (length(ManagerName) > 0, ManagerName, UserName) as UserName
 FROM
 	`accessright`.`regionaladmins`
 WHERE 
-	UserName like :UserName
+	LOWER(UserName) like :UserName
 LIMIT 1";
-			ArHelper.WithSession(session => name = session
+			var name = ArHelper.WithSession(session => session
 				.CreateSQLQuery(sql)
-				.SetParameter("UserName", UserName)
-				.UniqueResult().ToString());
-			return name;
+				.SetParameter("UserName", UserName.ToLower())
+				.UniqueResult());
+			if (String.IsNullOrEmpty(Convert.ToString(name)))
+				return UserName;
+
+			return name.ToString();
 		}
 	}
 }
