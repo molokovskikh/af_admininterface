@@ -172,6 +172,7 @@
     <Compile Include="Helpers\Wav\WaveFileReader.cs" />
     <Compile Include="Helpers\Wav\WavHelper.cs" />
     <Compile Include="Models\Address.cs" />
+    <Compile Include="Models\Billing\AccountingItem.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />
@@ -183,6 +184,7 @@
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\AddressLogRecord.cs" />
     <Compile Include="Models\Logs\CallLog.cs" />
+    <Compile Include="Models\Logs\LogOperation.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Logs\UserLogRecord.cs" />
     <Compile Include="Models\Mailer.cs" />
@@ -442,6 +444,8 @@
     <None Include="Service References\ServiceReference1\StatisticService.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService1.xsd" />
     <None Include="Service References\ServiceReference1\StatisticService2.xsd" />
+    <None Include="Views\Billing\Accounting.brail" />
+    <None Include="Views\Billing\AccountingHistory.brail" />
     <None Include="Views\Billing\AdditionalUserInfo.brail" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Billing\SearchAddressesForUser.brail" />
@@ -449,6 +453,7 @@
     <None Include="Views\Billing\AdditionalAddressInfo.brail" />
     <None Include="Views\Billing\ShowMessageForUser.brailjs" />
     <None Include="Views\Billing\ShowMessageForUserPartial.brail" />
+    <None Include="Views\Billing\Unaccounted.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />

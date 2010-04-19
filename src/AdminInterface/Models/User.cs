@@ -6,13 +6,15 @@ using System.IO;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
+	using Castle.ActiveRecord.Linq;
+	using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using AdminInterface.Security;
 using System.Web;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.Controllers;
 using System.ComponentModel;
+using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
@@ -35,7 +37,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("Users", Schema = "future", Lazy = true)]
-	public class User : ActiveRecordBase<User>
+	public class User : ActiveRecordLinqBase<User>
 	{
 		public User()
 		{
@@ -53,8 +55,8 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string Name { get; set; }
 
-		[Property]
-		public virtual bool Enabled { get; set; }
+        [Property]
+        public virtual bool Enabled { get; set; }
 
 		[Property]
 		public virtual bool SubmitOrders { get; set; }
@@ -108,7 +110,7 @@ namespace AdminInterface.Models
 			Table = "future.UserAddresses",
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
-
+		
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
@@ -348,6 +350,52 @@ where u.Id = :UserId";
 			else
 				ContactGroup.AddPerson(name);
 		}
+		
+		public virtual bool IsRegisteredInBilling
+		{
+			get
+			{
+				return Convert.ToUInt32(ArHelper.WithSession(session =>
+					session.CreateSQLQuery(@"
+SELECT
+	COUNT(*)
+FROM
+	Billing.Accounting
+WHERE
+	AccountId = :AccountId and Type = :Type")
+						.SetParameter("AccountId", Id)
+                        .SetParameter("Type", AccountingItemType.User)
+						.UniqueResult())) > 0;
+			}
+		}
+
+        public virtual void RegisterInBilling()
+        {
+            using (var scope = new TransactionScope())
+            {
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+                var accountingItem = new AccountingItem {
+                    AccountId = Id,
+                    Type = AccountingItemType.User,
+					Operator = SecurityContext.Administrator.UserName,
+                };
+                accountingItem.Create();
+                scope.VoteCommit();
+            }
+        }
+
+        public virtual void UnregisterInBilling()
+        {
+            using (var scope = new TransactionScope())
+            {
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+                var accountingItem = AccountingItem.GetByUser(this);
+                accountingItem.Delete();
+                scope.VoteCommit();
+            }
+        }
 	}
 
 	public static class UserExtension

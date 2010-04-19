@@ -6,18 +6,22 @@ using System.Linq;
 #if !DEBUG
 using System.Security.AccessControl;
 #endif
+using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using log4net;
 using Common.Web.Ui.Models;
+using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
 	[ActiveRecord("Addresses", Schema = "Future")]
-	public class Address : ActiveRecordBase<Address>
+	public class Address : ActiveRecordLinqBase<Address>
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }
@@ -37,13 +41,16 @@ namespace AdminInterface.Models
 		[Property("Free")]
 		public bool FreeFlag { get; set; }
 
+        [Property]
+        public bool BeAccounted { get; set; }
+
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
 			ColumnKey = "AddressId",
 			Table = "future.UserAddresses",
 			ColumnRef = "UserId")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
-
+		
 		public virtual bool AvaliableFor(User user)
 		{
 			return AvaliableForUsers.Any(u => u.Id == user.Id);
@@ -64,9 +71,17 @@ namespace AdminInterface.Models
 		public virtual bool IsFree
 		{
 			get
+			{				
+				return (FreeFlag || !HasPaidUsers);
+			}
+		}
+
+		public virtual bool HasPaidUsers
+		{
+			get
 			{
-				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть нулевым
-				return (FreeFlag || (AvaliableForUsers.Where(user => !user.IsFree && user.Enabled).Count() == 0));
+				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть НЕ нулевым
+				return (AvaliableForUsers != null && AvaliableForUsers.Where(user => !user.IsFree && user.Enabled).Count() > 0);
 			}
 		}
 
@@ -189,5 +204,50 @@ where a.Id = :addressId")
 			UpdateContacts(displayedContacts, null);
 		}
 
+        public virtual bool IsRegisteredInBilling
+        {
+            get
+            {
+                return Convert.ToUInt32(ArHelper.WithSession(session =>
+                    session.CreateSQLQuery(@"
+SELECT
+	COUNT(*)
+FROM
+	Billing.Accounting
+WHERE
+	AccountId = :AccountId and Type = :Type")
+                        .SetParameter("AccountId", Id)
+                        .SetParameter("Type", AccountingItemType.Address)
+                        .UniqueResult())) > 0;
+            }
+        }
+
+        public virtual void RegisterInBilling()
+        {
+            using (var scope = new TransactionScope())
+            {
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+                var accountingItem = new AccountingItem {
+                    AccountId = Id,
+                    Type = AccountingItemType.Address,
+					Operator = SecurityContext.Administrator.UserName,
+                };
+                accountingItem.Create();
+                scope.VoteCommit();
+            }
+        }
+
+        public virtual void UnregisterInBilling()
+        {
+            using (var scope = new TransactionScope())
+            {
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+                var accountingItem = AccountingItem.GetByAddress(this);
+                accountingItem.Delete();
+                scope.VoteCommit();
+            }
+        }
 	}
 }

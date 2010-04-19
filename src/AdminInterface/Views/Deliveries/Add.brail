@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "${siteroot}/searchc.aspx"),
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый адрес доставки", "")]} %>
 
@@ -36,7 +36,7 @@
 			<div>
 				<% for i, user in enumerate(client.Users): %>
 					<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
-					${user.GetLoginOrName()}
+					${user.GetLoginWithName()}
 					<br>
 				<% end %>
 			</div>

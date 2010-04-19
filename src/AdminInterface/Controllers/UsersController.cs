@@ -89,6 +89,8 @@ namespace AdminInterface.Controllers
 				if (!String.IsNullOrEmpty(contactPerson))
 					user.ContactGroup.AddPerson(contactPerson);
 				scope.VoteCommit();
+                user.Client.UpdateBeAccounted();
+                scope.VoteCommit();
 			}
 			Mailer.UserRegistred(user);
 

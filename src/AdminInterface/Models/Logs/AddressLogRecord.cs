@@ -22,6 +22,9 @@ namespace AdminInterface.Models.Logs
 		public virtual Address Address { get; set; }
 
 		[Property]
+		public virtual LogOperation Operation { get; set; }
+
+		[Property]
 		public virtual bool Enabled { get; set; }
 
 		public static IList<AddressLogRecord> GetAddressLogRecords(Address address)

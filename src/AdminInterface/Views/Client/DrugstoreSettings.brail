@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
 									  ("Информация о клиенте", "${siteroot}/client/${client.Id}"),
 									  ("Настройка аптеки", "")]} %>
 

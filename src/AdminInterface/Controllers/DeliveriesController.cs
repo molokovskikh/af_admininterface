@@ -44,6 +44,7 @@ namespace AdminInterface.Controllers
 				address.MaitainIntersection();
 				address.CreateFtpDirectory();
 				client.Users.Each(u => address.SetAccessControl(u.Login));
+                client.UpdateBeAccounted();
 				scope.VoteCommit();
 			}
 			Mailer.DeliveryAddressRegistred(address);

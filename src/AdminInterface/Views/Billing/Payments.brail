@@ -115,6 +115,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             function(xhr, textStatus, error) { }
         );
     }
+    
+    function UserAccounting(userId, status) {
+        var link = "${siteroot}/Billing/UserAccounting.rails?userId=" + userId + "&accounted=" + status;
+        AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+    }
+
+    function AddressAccounting(userId, status) {
+        var link = "${siteroot}/Billing/AddressAccounting.rails?addressId=" + userId + "&accounted=" + status;
+        AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+    }
 
     function RefreshTotalSum() {
         var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
@@ -178,7 +188,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                 <div style="overflow-x:scroll;">
 					<table class="DataTable" style="width:100%;">
 						<tr>
-							<th>Включен</th>
+							<th>Включен</th>							
 							<th>Код</th>
 							<th>Название</th>
 							<th>Регион</th>
@@ -279,7 +289,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                     <table class="DataTable" id="UsersTable" style="width:100%;">
                         <tr align="center">
                             <th>Включен</th>
-                            <th>Работает бесплатно</th>
+                            <th>Учтен</th>
+                            <th>Работает бесплатно</th>                            
                             <th>Логин</th>
                             <th>Комментарий</th>
                             <th>Дата последнего обновления</th>
@@ -298,6 +309,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                     onclick="SetUserStatus(${user.Id}, this.checked, document.getElementById('FreeUserCheckBox${user.Id}').checked, ${cast(int, user.IsActive)})" />
 <%                          end %>                            
                             </td>
+                            <td>
+                                <input type="checkbox" ${"checked" if user.IsRegisteredInBilling} id="UserAccountingStatusCheckBox${user.Id}"
+                                    onclick="UserAccounting(${user.Id}, this.checked)" />
+                            </td>
                             <td>                            
                                 <input type="checkbox" ${"checked" if user.IsFree} id="FreeUserCheckBox${user.Id}"
                                     onclick="SetUserStatus(${user.Id}, document.getElementById('UserStatusCheckBox${user.Id}').checked, this.checked, ${cast(int, user.IsActive)})" />
@@ -307,7 +322,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                             <td>${log.AFTime if (log != null) and (log.AFTime != null)}</td>
                             <td>${user.Client.Name}</td>
                         </tr>
-                        <tr><td id="additionalUserInfoCell${user.Id}" colspan="6"></td></tr>
+                        <tr><td id="additionalUserInfoCell${user.Id}" colspan="10"></td></tr>
 <%                      end %>
                         </table>                        
                     </div>
@@ -332,6 +347,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					    <table class="DataTable" id="AddressesTable" style="width:100%;">
 						    <tr align="center">
 						        <th>Включен</th>
+						        <th>Учтен</th>
 						        <th>Работает бесплатно</th>
 							    <th>Адрес</th>
 							    <th>Клиент</th>
@@ -349,6 +365,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                         onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          end %>
                                 </td>
+                                <td>
+                                    <input type="checkbox" ${"checked" if addr.IsRegisteredInBilling} id="AddressAccountingStatusCheckBox${addr.Id}"
+                                        onclick="AddressAccounting(${addr.Id}, this.checked)" />                                
+                                </td>
                                 <td style="width: 50px">
                                     <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
                                         onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
@@ -356,7 +376,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                 <td><a href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">${addr.Value}</a></td>
                                 <td>${addr.Client.Name}</td>
                             </tr>
-                            <tr><td id="additionalAddressInfoCell${addr.Id}" colspan="4"></td></tr>
+                            <tr><td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td></tr>
 <%                      end %>
                         </table>
                     </div>

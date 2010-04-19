@@ -6,7 +6,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("`logs`.`UserLogs`")]
+	[ActiveRecord("logs.UserLogs")]
 	public class UserLogRecord : ActiveRecordBase<UserLogRecord>
 	{
 		[PrimaryKey]
@@ -29,6 +29,9 @@ namespace AdminInterface.Models.Logs
 
 		[BelongsTo("UserId")]
 		public virtual User User { get; set; }
+
+		[Property]
+		public virtual LogOperation Operation { get; set; }
 
 		public static IList<UserLogRecord> GetUserEnabledLogRecords(User user)
 		{

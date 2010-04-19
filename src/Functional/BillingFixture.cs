@@ -648,5 +648,63 @@ namespace Functional
 				Assert.That(browser.Text, Text.Contains("Работающих адресов"));
 			}
 		}
+
+		[Test]
+		public void Check_user_for_accounting()
+		{
+			Client client = null;
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
+				client.Users[0].Name = String.Format("Test username for Accounting [{0}]", client.Users[0].Id);
+				client.Users[0].UpdateAndFlush();
+				scope.VoteCommit();
+			}
+			using (var browser = Open("Billing/Accounting"))
+			{
+				Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));
+				Assert.That(browser.Text, Is.StringContaining(client.Users[0].Name));
+			}
+		}
+
+		[Test, Description("1 пользователь, 2 адреса. 1-й адрес не должне быть в списке неучтенных, 2-й должен быть")]
+		public void Check_address_for_accounting()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var user = new User { Client = client, Name = "test user", Enabled = true, };
+				user.Setup(client);
+				var address = new Address { Client = client, Value = "address", Enabled = true, };
+				address.Save();
+				client = Client.Find(client.Id);
+
+				client.Users[0].Enabled = true;
+				client.Users[0].Save();
+
+				client.Addresses[0].Enabled = true;
+				client.Addresses[0].BeAccounted = false;
+				client.Addresses[0].Value = String.Format("Test address for accounting [{0}]", client.Addresses[0].Id);
+				client.Addresses[0].Save();
+
+				client.Addresses[1].Enabled = true;
+				client.Addresses[1].BeAccounted = true;
+				client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
+				client.Addresses[1].Save();
+				scope.VoteCommit();
+				
+				foreach (var addr in client.Addresses)
+				{
+					addr.AvaliableForUsers = new List<User> { client.Users[0] };
+					addr.Save();
+				}
+				scope.VoteCommit();
+			}
+			using (var browser = Open("Billing/Accounting"))
+			{
+				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
+				Assert.That(browser.Text, Is.StringContaining(client.Addresses[1].Value));
+			}
+		}
 	}
 }

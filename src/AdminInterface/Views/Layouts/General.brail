@@ -29,6 +29,8 @@
 	<link href="${siteroot}/Css/Highlight.css" type="text/css" rel="stylesheet" />
 	<link href="${siteroot}/Css/Common.css" type="text/css" rel="stylesheet" />
 	<link href="${siteroot}/Css/Contacts.css" type="text/css" rel="stylesheet" />
+	<link href="${siteroot}/App_Themes/WebApp/style.css" type="text/css" rel="stylesheet" />
+	<link href="${siteroot}/App_Themes/WebApp/base.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 	<% if IsDefined("bredcrumbs"): %>

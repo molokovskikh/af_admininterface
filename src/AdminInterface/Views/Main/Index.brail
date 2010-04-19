@@ -49,85 +49,111 @@
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 	<tr>
-		<td valign=top>
-			<p>
-				<% if admin.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore): %>
-				<a href="${siteroot}/Register/Register.rails">Регистрация клиентов</a>
-				<% else: %>
-				Регистрация клиентов
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/CopySynonym.aspx">Клонирование</a>
-				<% else: %>
-				Клонирование
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HaveAnyOfPermissions(PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/UserSearch/Search.rails">Поиск пользователей</a>
-				<% else: %>
-				Поиск пользователей
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/statcont.aspx">Статистика обращений</a>
-				<% else: %>
-				Статистика обращений
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/Billing/Search.rails">Биллинг</a>
-				<% else: %>
-				Биллинг
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.ManageAdministrators): %>
-				<a href="${siteroot}/ViewAdministrators.aspx">Региональные администраторы</a>
-				<% else: %>
-				Региональные администраторы
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.MonitorUpdates) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-				<a href="${siteroot}/Monitoring/Clients">Мониторинг работы клиентов</a>
-				<% else: %>
-				Мониторинг работы клиентов
-				<% end %>
-			</p>
-			<p>
-				<a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.ManageCallbacks): %>
-				<a href="${siteroot}/Telephony/Show.rails">Правила обратного звонка</a>
-				<% else: %>
-				Правила обратного звонка
-				<% end %>
-			</p>
-			<p>
-				<% if admin.HavePermisions(PermissionType.EditSettings): %>
-				<a href="${siteroot}/Main/Settings">Настройки</a>
-				<% else: %>
-				Настройки
-				<% end %>
-			</p>
-			<p>
-				<a href="https://stat.analit.net/ReportConf/Reports/base.aspx">
-					Отчеты
-				</a>
-			</p>
-			<p>
-			    <% if admin.HavePermisions(PermissionType.CallHistory): %>
-			    <a href="${siteroot}/CallHistory/ShowCallHistory.brail">История звонков</a>
-			    <% else: %>
-			    История звонков
-			    <% end %>
-			</p>
+		<td valign=top style="padding: 5px 20px 5px 10px;">
+<div id="sidebar" class="Autosize">
+		        <div class="block">		            
+                    <h3>Административный интерфейс</h3>
+		            <ul class="navigation">
+			            <li>
+				            <% if admin.HaveAnyOfPermissions(PermissionType.RegisterSupplier, PermissionType.RegisterDrugstore): %>
+				            <a href="${siteroot}/Register/Register.rails">Регистрация клиентов</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Регистрация клиентов></a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/CopySynonym.aspx">Клонирование</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Клонирование</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HaveAnyOfPermissions(PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/users/search">Поиск пользователей</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Поиск пользователей</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/statcont.aspx">Статистика обращений</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Статистика обращений</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.ManageAdministrators): %>
+				            <a href="${siteroot}/ViewAdministrators.aspx">Региональные администраторы</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Региональные администраторы</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.MonitorUpdates) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/Monitoring/Clients">Мониторинг работы клиентов</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Мониторинг работы клиентов</a>
+				            <% end %>
+			            </li>		
+			            <li>
+				            <a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
+			            </li>				
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.EditSettings): %>
+				            <a href="${siteroot}/Main/Settings">Настройки</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Настройки</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <a href="https://stat.analit.net/ReportConf/Reports/base.aspx">
+					            Отчеты
+				            </a>
+			            </li>			
+                    </ul>			        
+                </div>
+                
+                <div class="block">
+                    <h3>Биллинг</h3>
+                    <ul class="navigation">
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/Billing/Search">Биллинг</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Биллинг</a>
+				            <% end %>
+			            </li>
+			            <li>
+				            <% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
+				            <a href="${siteroot}/Billing/Accounting">Учет</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Учет</a>
+				            <% end %>
+			            </li>		                
+                    </ul>
+                </div>			    
+                
+		        <div class="block">		            
+		            <h3>Телефония</h3>
+		            <ul class="navigation">
+		                <li>
+				            <% if admin.HavePermisions(PermissionType.ManageCallbacks): %>
+				            <a href="${siteroot}/Telephony/Show.rails">Правила обратного звонка</a>
+				            <% else: %>
+				            <a href="#" class="NotAllowedLink">Правила обратного звонка</a>
+				            <% end %>
+			            </li>
+			            <li>
+			                <% if admin.HavePermisions(PermissionType.CallHistory): %>
+			                <a href="${siteroot}/CallHistory/ShowCallHistory.brail">История звонков</a>
+			                <% else: %>
+			                <a href="#" class="NotAllowedLink">История звонков</a>
+			                <% end %>
+			            </li>
+                    </ul>
+                </div>                
+            </div>		
 		</td>
 		<td valign=top>
 			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">

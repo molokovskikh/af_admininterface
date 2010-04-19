@@ -112,7 +112,7 @@
 <%      if logEntities.Count > 0: %>	
 		<tr>
 <%          headersList = ["Дата"]
-            headersColumns = ["RequestTime", "AppVersion"]
+            headersColumns = ["RequestTime"]
             unsortableHeaders = []
             if (not IsDefined("client") and not IsDefined("user")):
                 headersList.Add("Регион")
@@ -134,6 +134,7 @@
                 headersColumns.Add("ResultSize")
             end
             headersList.Add("Версия")
+            headersColumns.Add("AppVersion")
             headersList.Add("Дополнительно")
             headersColumns.Add("Addition")
             if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
@@ -182,7 +183,7 @@
 		  
 		  <%if (IsDefined("client") or IsDefined("updateType")): %>
 			<td>
-				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginOrName()}</a>
+				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginWithName()}</a>
 			</td>
 		  <%end %>		  
 		  

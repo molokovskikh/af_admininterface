@@ -304,7 +304,21 @@ group by u.ClientId")
 			return BindingHelper.GetDescription(Type);
 		}
 
-		public virtual void MaintainIntersection()
+        public virtual void UpdateBeAccounted()
+        {
+            var users = Users.Where(user => user.Enabled && !user.IsFree);
+            var index = 0;
+            foreach (var address in Addresses)
+            {
+                if (!address.Enabled || address.IsFree)
+                    address.BeAccounted = false;
+                else
+                    address.BeAccounted = index++ >= users.Count();
+                address.UpdateAndFlush();
+            }
+        }
+
+	    public virtual void MaintainIntersection()
 		{
 			ArHelper.WithSession(
 				s => {
@@ -316,7 +330,8 @@ CREATE TEMPORARY TABLE TempIntersection
 ClientId int unsigned,
 RegionId BIGINT(20),
 PriceId int unsigned,
-CostId int unsigned
+CostId int unsigned,
+AvailableForClient int unsigned
 ) engine=MEMORY;
 INSERT 
 INTO TempIntersection
@@ -328,7 +343,8 @@ SELECT  DISTINCT drugstore.Id,
           FROM    pricescosts pcc
           WHERE   basecost
                   AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
+        ) as CostCode,
+		if(pricesdata.PriceType = 0, 1, 0) as AvailableForClient
 FROM Future.Clients as drugstore
 	JOIN retclientsset as a ON a.clientcode = drugstore.Id
 	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
@@ -346,12 +362,14 @@ INTO Future.Intersection (
 	ClientId,
 	RegionId,
 	PriceId,
-	CostId
+	CostId,
+	AvailableForClient
 )
 SELECT ClientId,
 	RegionId,
 	PriceId,
-	CostId
+	CostId,
+	AvailableForClient
 FROM TempIntersection;
 
 DROP TEMPORARY TABLE IF EXISTS TempIntersection;

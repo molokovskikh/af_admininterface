@@ -1,0 +1,45 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+		Учет адресов и пользователей
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Учет адресов и пользователей", "")]} %>
+
+<script type="text/javascript">
+
+	document.observe("dom:loaded", function() {
+		SetupCalendarElements();
+		$$(".tabs ul li a").invoke('observe', 'click', function() {
+			$$(".tab").invoke("hide");
+			$$(".tabs ul li a.selected").first().removeClassName("selected");
+			$(this.id + "-tab").show();
+			this.addClassName("selected");
+		});
+    })
+	
+</script>
+
+
+<div align="center">
+    <h3>Учет адресов и пользователей</h3>
+</div>
+
+<div class="tabs">
+	<ul>
+		<li>
+			<a id="unregistredItems" href="#" ${"class='selected'" if tab == "unregistredItems"}>Неучтенные</a>
+		</li>
+		<li>
+			<a id="AccountingHistory" href="#" ${"class='selected'" if tab == "AccountingHistory"}>История учтенных</a>
+		</li>
+	</ul>
+</div>
+
+<div id="unregistredItems-tab" class="tab" ${"style='display:none'" if tab != "unregistredItems"}>
+	<% OutputSubView("Unaccounted") %>
+</div>
+
+<div id="AccountingHistory-tab" class="tab" ${"style='display:none'" if tab != "AccountingHistory"}>
+	<% OutputSubView("AccountingHistory") %>
+</div>
+
+<br />

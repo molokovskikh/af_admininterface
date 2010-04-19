@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Информация о клиентах", "../searchc.aspx"), 
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
 									  ("Информация о клиенте", "")]} %>
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
@@ -144,7 +144,7 @@
 							<% if true: %>
 								<a href="${siteroot}/users/${user.Login}/edit"">${user.Login}</a>
 							<% else: %>
-								${user.GetLoginOrName()}
+								${user.GetLoginWithName()}
 							<% end %>
 						</td>
 						<td>${user.Name}</td>						

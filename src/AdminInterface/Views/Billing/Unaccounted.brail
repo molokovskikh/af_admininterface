@@ -1,0 +1,23 @@
+﻿<br />
+<% if (records.Count > 0): %>
+<table id="UnregisteredItems" class="DataTable">
+    <thead>
+        <th>Договор</th>
+        <th>Плательщик</th>
+        <th>Объект</th>
+        <th>Имя</th>
+    </thead>
+    <tbody class="HighLightCurrentRow">
+<% for i,item in enumerate(records): %>    
+    <tr class="${ViewHelper.GetRowStyle(i)}">
+            <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${item.PayerId}">${item.PayerId}</a></td>
+            <td>${item.PayerName}</td>            
+            <td>${item.Type}</td>
+            <td>${item.Name}</td>        
+    </tr>    
+<%  end %>    
+    </tbody>
+</table>
+<% else: %>
+<div class="EmptyData">Нет неучтенных адресов и пользователей</div>
+<% end %>

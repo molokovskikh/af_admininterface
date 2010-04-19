@@ -187,7 +187,7 @@ namespace AdminInterface.Controllers
 
 		public void SetUserStatus(uint userId, bool enabled, bool free)
 		{
-			using (new TransactionScope())
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
 					HttpContext.Current.Request.UserHostAddress);
@@ -210,14 +210,38 @@ namespace AdminInterface.Controllers
 						address.Update();
 					}
 				}
+                user.Client.UpdateBeAccounted();
+                scope.VoteCommit();
 			}
 			CancelView();
             CancelLayout();
 		}
 
+        public void UserAccounting(uint userId, bool accounted)
+        {
+            var user = User.Find(userId);
+            if (accounted)
+                user.RegisterInBilling();
+            else
+                user.UnregisterInBilling();
+            CancelView();
+            CancelLayout();
+        }
+
+        public void AddressAccounting(uint addressId, bool accounted)
+        {
+            var address = Address.Find(addressId);
+            if (accounted)
+                address.RegisterInBilling();
+            else
+                address.UnregisterInBilling();
+            CancelView();
+            CancelLayout();
+        }
+
 		public void SetAddressStatus(uint addressId, bool enabled, bool free)
 		{
-			using (new TransactionScope())
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
                     HttpContext.Current.Request.UserHostAddress);
@@ -228,6 +252,8 @@ namespace AdminInterface.Controllers
 				address.Enabled = enabled;
 				address.FreeFlag = free;
 				address.UpdateAndFlush();
+                address.Client.UpdateBeAccounted();
+                scope.VoteCommit();
 			}
 			CancelView();
             CancelLayout();			
@@ -392,12 +418,14 @@ namespace AdminInterface.Controllers
 
 		public void ConnectUserToAddress(uint userId, uint addressId)
 		{
-			using (new TransactionScope())
+			using (var scope = new TransactionScope())
 			{
 				var user = User.Find(userId);
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Add(user);
 				address.Update();
+                address.Client.UpdateBeAccounted();
+                scope.VoteCommit();
 			}
 			CancelView();
 			CancelLayout();
@@ -405,12 +433,14 @@ namespace AdminInterface.Controllers
 
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
-			using (new TransactionScope())
+			using (var scope = new TransactionScope())
 			{
 				var user = User.Find(userId);
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Remove(user);
 				address.Update();
+                address.Client.UpdateBeAccounted();
+                scope.VoteCommit();
 			}
 			CancelView();
 			CancelLayout();
@@ -422,5 +452,23 @@ namespace AdminInterface.Controllers
             CancelView();
 			CancelLayout();
 		}
+
+        public void Accounting(DateTime? beginDate, DateTime? endDate, string tab)
+        {
+            if (!beginDate.HasValue && !endDate.HasValue)
+            {
+                beginDate = DateTime.Today.AddDays(-1);
+                endDate = DateTime.Today;
+            }
+            PropertyBag["accountingHistoryItems"] = AccountingItem
+				.SearchByPeriod(beginDate.Value, endDate.Value.AddDays(1))
+				.OrderByDescending(item => item.WriteTime)
+				.ToList();
+            PropertyBag["records"] = AccountingItem.GetUnaccountedObjects();
+            PropertyBag["beginDate"] = beginDate;
+            PropertyBag["endDate"] = endDate;
+            if (String.IsNullOrEmpty(tab))
+                PropertyBag["tab"] = "unregistredItems";
+        }
 	}
 }
