@@ -147,7 +147,7 @@
 								${user.GetLoginWithName()}
 							<% end %>
 						</td>
-						<td>${user.Name}</td>						
+						<td>${user.Name}</td>
 						<td>
 <%                          lastUsage = null
                             if (logEntity != null): 

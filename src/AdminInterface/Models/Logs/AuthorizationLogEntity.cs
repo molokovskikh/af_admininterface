@@ -21,7 +21,7 @@ namespace AdminInterface.Models.Logs
 					continue;
 				if (last == null)
 					last = usages[i];
-				if (last.Date.CompareTo(usages[i].Date) > 0)
+				if (last.Date.CompareTo(usages[i].Date) < 0)
 					last = usages[i];
 			}
 			return last;
