@@ -1,4 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
+﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
 									  ("Информация о клиенте", "")]} %>
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
@@ -127,7 +127,7 @@
 			<table style="width:100%;" name="usersTable">
 				<tr valign="top" align="left">
 				
-<%              headersList = ["Идентификатор", "Имя пользователя", "Комментарий", "Последнее использование сервисов"]
+<%              headersList = ["Код пользователя", "Имя пользователя", "Комментарий", "Последнее использование сервисов"]
                 headerNames = ["Id", "Login"]
                 unsortableHeaders = ["Комментарий", "Последнее использование сервисов"]
                 OutputSubView("/SubViews/SortHeadersSubView",
