@@ -45,7 +45,7 @@
 </div>
 <% end %>
 
-<div class="TwoColumn" style="width: 800px;">
+<div class="TwoColumn" style="width: 49%;">
     <div class=block>
         <ul class="navigation-menu">
 		  <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
@@ -103,18 +103,42 @@
 		    <table style="width: 100%">
 		    <tr valign="top">
 			<td>
-			${"Последний правильный ввод пароля:       " + userInfo.LastLogOnDate + "<br />" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}
-			${"Последний неправильный ввод пароля:       " + userInfo.BadPasswordDate + "<br />" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}
-			${"Последнее изменение пароля:             " + userInfo.LastPasswordChange + "<br />" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}
+			    <table cellspacing="0" cellpadding="1">
+			    <tr>
+			        <td>${"Последний правильный ввод пароля:" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
+			        <td style="padding-left: 2px;">${userInfo.LastLogOnDate if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
+                </tr>
+			    <tr>
+			        <td>${"Последний неправильный ввод пароля:" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
+			        <td style="padding-left: 2px;">${userInfo.BadPasswordDate if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
+                </tr>
+			    <tr>
+			        <td>${"Последнее изменение пароля:" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
+			        <td style="padding-left: 2px;">${userInfo.LastPasswordChange if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
+                </tr>
+			    </table>
             </td>
 
 		    <td style="padding-left: 5px; width: 50%">
-			${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
-			${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
-			${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
-			${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
+		        <table cellspacing="0" cellpadding="1">
+		        <tr>
+		            <td>${"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
+		            <td style="padding-left: 2px;">${authorizationLog.CITime if authorizationLog.CITime != null}</td>
+		        </tr>
+		        <tr>
+		            <td>${"Обновление AnalitF:" if authorizationLog.AFTime != null}</td>
+		            <td style="padding-left: 2px;">${authorizationLog.AFTime if authorizationLog.AFTime != null}</td>
+		        </tr>
+		        <tr>
+		            <td>${"Использование AnalitOnline:" if authorizationLog.AOLTime != null}</td>
+		            <td style="padding-left: 2px;">${authorizationLog.AOLTime if authorizationLog.AOLTime != null}</td>
+		        </tr>
+		        <tr>
+		            <td>${"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
+		            <td style="padding-left: 2px;">${authorizationLog.IOLTime if authorizationLog.IOLTime != null}</td>
+		        </tr>
+		        </table>
 		    </td>
-		    			
 			</tr>
 			</table>
 		</div>
@@ -275,7 +299,7 @@
 
 <div class="TwoColumn Messages" style="margin-left: 10px">
 	<form id="MessagesForm" action="../SendMessage.rails" method="post">
-	<div class="block">
+	<div class="block" style="width: auto;">
 		<h3>Сообщения пользователя</h3>
 		<input type=hidden value=${client.Id} name="clientCode" />
 		<input type=hidden value=${user.Id} name="userId" />
