@@ -100,14 +100,23 @@
 			Статистика использования
 		</h3>
 		<div style="margin-top:10px;">
+		    <table style="width: 100%">
+		    <tr valign="top">
+			<td>
+			${"Последний правильный ввод пароля:       " + userInfo.LastLogOnDate + "<br />" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}
+			${"Последний неправильный ввод пароля:       " + userInfo.BadPasswordDate + "<br />" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}
+			${"Последнее изменение пароля:             " + userInfo.LastPasswordChange + "<br />" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}
+            </td>
+
+		    <td style="padding-left: 5px; width: 50%">
 			${"Вход в клиентский интерфейс:            " + authorizationLog.CITime + "<br />" if authorizationLog.CITime != null}
 			${"Обновление AnalitF:                     " + authorizationLog.AFTime + "<br />" if authorizationLog.AFTime != null}
 			${"Использование AnalitOnline:             " + authorizationLog.AOLTime + "<br />" if authorizationLog.AOLTime != null}
 			${"Использование Online сервисов:          " + authorizationLog.IOLTime + "<br />" if authorizationLog.IOLTime != null}
-			<br />
-			${"Последний правильный ввод пароля:       " + userInfo.LastLogOnDate + "<br />" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}
-			${"Последний неправильный ввод пароля:       " + userInfo.BadPasswordDate + "<br />" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}
-			${"Последнее изменение пароля:             " + userInfo.LastPasswordChange + "<br />" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}
+		    </td>
+		    			
+			</tr>
+			</table>
 		</div>
 	</div>	
 	<%end %>	
