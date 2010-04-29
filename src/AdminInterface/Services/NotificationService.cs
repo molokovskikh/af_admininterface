@@ -18,11 +18,11 @@ namespace AdminInterface.Services
 		private readonly string _messageTemplateForSupplierAboutDrugstoreRegistration =
 @"Добрый день.
 
-В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, зарегистрирован новый клиент: {0} ( {1} ) в регионе(городе) {2}.
+В информационной системе 'АналитФАРМАЦИЯ', участником которой является Ваша организация, зарегистрирован новый клиент: {0} ( {1} ) по адресу {2} в регионе(городе) {3}.
 Пожалуйста произведите настройки для данного клиента (Раздел 'Для зарегистрированных пользователей' на сайте www.analit.net ).
 
-Адрес доставки накладных: {3}@waybills.analit.net
-Адрес доставки отказов: {3}@refused.analit.net
+Адрес доставки накладных: {4}@waybills.analit.net
+Адрес доставки отказов: {4}@refused.analit.net
 
 С уважением, Аналитическая компания 'Инфорум', г. Воронеж
 ".Replace('\'', '\"') + Settings.Default.InforoomContactPhones;
@@ -83,6 +83,7 @@ namespace AdminInterface.Services
 					String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
 						client.FullName,
 						client.Name,
+						client.Addresses.First().Value,
 						client.HomeRegion.Name,
 						client.Addresses.First().Id),
 					email,

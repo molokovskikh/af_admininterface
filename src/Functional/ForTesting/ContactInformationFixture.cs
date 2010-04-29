@@ -40,7 +40,7 @@ namespace Functional.ForTesting
 			if (contactType == ContactType.Phone)
 			{
 				var comboBox = browser.SelectList(Find.ByName(String.Format("contactTypes[{0}]", --rowId)));
-				comboBox = browser.SelectLists[2];
+				comboBox = browser.SelectLists[1];
 				comboBox.SelectByValue(comboBox.Options[1].Value);
 				rowId++;
 			}

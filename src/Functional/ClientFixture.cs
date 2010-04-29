@@ -26,14 +26,14 @@ namespace Functional
             }
 			using (var browser = Open(String.Format("Client/{0}", client.Id)))
 			{
-				Assert.IsTrue(browser.Link(Find.ByText("Идентификатор")).Exists);
+				Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
 				Assert.IsTrue(browser.Link(Find.ByText("Имя пользователя")).Exists);
 				Assert.That(browser.Table(Find.ByName("usersTable")).Exists);
 				// Берем 1-ю и 2-ю строки потому что 0 - это заголовок
 				var login1 = Convert.ToInt64(browser.Table(Find.ByName("usersTable")).TableRows[1].TableCells[0].Text);
 				var login2 = Convert.ToInt64(browser.Table(Find.ByName("usersTable")).TableRows[2].TableCells[0].Text);
 				Assert.That(login1, Is.LessThan(login2));				
-				browser.Link(Find.ByText("Идентификатор")).Click();
+				browser.Link(Find.ByText("Код пользователя")).Click();
 				login1 = Convert.ToInt64(browser.Table(Find.ByName("usersTable")).TableRows[1].TableCells[0].Text);
 				login2 = Convert.ToInt64(browser.Table(Find.ByName("usersTable")).TableRows[2].TableCells[0].Text);
 				Assert.That(login1, Is.GreaterThan(login2));

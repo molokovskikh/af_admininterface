@@ -78,6 +78,10 @@ namespace AddUser
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("edit"));
 
+			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/settings")
+				.DefaultForController().Is("users")
+				.DefaultForAction().Is("UserSettings"));
+
 			RoutingModuleEx.Engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")
                 .DefaultForAction().Is("Search"));

@@ -146,9 +146,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
-			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
-			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
-			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUserAndClient(user);
 			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
@@ -351,6 +348,30 @@ namespace AdminInterface.Controllers
 				Flash["Message"] = Message.Notify("Сохранено");
 			}
 			RedirectToReferrer();
+		}
+
+		[AccessibleThrough(Verb.Get)]
+		public void UserSettings(string login)
+		{
+			var user = User.GetByLogin(login);
+			PropertyBag["user"] = user;
+			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
+			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom")] User user)
+		{
+			using (var scope = new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
+					HttpContext.Current.Request.UserHostAddress);
+				user.Update();
+				scope.VoteCommit();
+			}
+			Flash["Message"] = Message.Notify("Сохранено");
+			RedirectUsingRoute("users", "Edit", new { login = user.Login });
 		}
 	}
 }

@@ -355,6 +355,7 @@ namespace Functional
 					var userLink = browser.Link(Find.ByText(client.Users[0].Login));
 					Assert.IsTrue(userLink.Exists);
 					userLink.Click();
+					browser.Link(Find.ByText("Настройка")).Click();
 					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
 					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
 				}

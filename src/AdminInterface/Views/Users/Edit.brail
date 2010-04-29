@@ -48,6 +48,7 @@
 <div class="TwoColumn" style="width: 49%;">
     <div class=block>
         <ul class="navigation-menu">
+            <li><a href="${siteroot}/users/${user.Login}/Settings">Настройка</a></li>
 		  <% if admin.AlowChangePassword and not ADHelper.IsBelongsToOfficeContainer(user.Login): %>
         	<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
         	<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
@@ -148,7 +149,7 @@
 		<input name="user.Id" type=hidden value=${user.Id}>
 		
 		<div class=block>
-			<h3>Настройки</h3>
+			<h3>Общая информация</h3>
 			<div style="padding-bottom: 8px;">
 				<% if not Registrant: %>
 				Регистратор не указан${", дата регистрации " + user.RegistrationDate if user.RegistrationDate.ToBinary() > 0}
@@ -160,27 +161,6 @@
 			Комментарий<br>
 			<input name=user.Name value="${user.Name}" style="width: 60%"><br>
 			<p>
-            <input type=checkbox name=user.EnableUpdate ${"checked" if user.EnableUpdate} value=true> Автоматическое обновление версий<br>
-			<input type=hidden name=user.EnableUpdate value=false>
-			
-			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
-			<input type=hidden name=user.SubmitOrders value=false>
-			
-			<input type=checkbox name=user.SendWaybills ${"checked" if user.SendWaybills} value=true> Получать накладные<br>
-			<input type=hidden name=user.SendWaybills value=false>
-			
-			<input type=checkbox name=user.SendRejects ${"checked" if user.SendRejects} value=true> Получать отказы<br>
-			<input type=hidden name=user.SendRejects value=false>
-			
-			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
-			<input type=hidden name=user.Auditor value=false>
-			</p>
-			<select name=user.InheritPricesFrom.Id>
-				<option value=0>Не наследовать</option>
-				<% for parent in user.Client.Users: %>
-					<option value=${parent.Id} ${"selected" if user.InheritPricesFrom and user.InheritPricesFrom.Id == parent.Id}>${parent.Login}</option>
-				<% end %>
-			</select> Наследовать настройки прайс листов <br>
 		</div>
 		
 		<div class=block>
@@ -219,44 +199,6 @@
 				<% for i, address in enumerate(client.Addresses): %>	
 					<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)}>
 					${address.Value}
-					<br>
-				<% end %>
-			</div>
-		</div>
-		<div class=block>
-			<h3>
-				Права доступа
-			</h3>
-			<div>
-				<% for i, permission in enumerate(Permissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
-					${permission.Name}
-					<br>
-				<% end %>
-			</div>
-		</div>
-		
-		<div class=block>
-			<h3>
-				Права в программе АналитФармация
-			</h3>
-			<h4>
-				Выгрузка в Excel
-			</h4>
-			<div>
-				<% for i, permission in enumerate(ExcelPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i + Permissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
-					${permission.Name}
-					<br>
-				<% end %>
-			</div>
-			<h4>
-				Печать
-			</h4>
-			<div>
-				<% for i, permission in enumerate(PrintPermissions): %>
-					<input type=checkbox name=user.AssignedPermissions[${i+ Permissions.Length + ExcelPermissions.Length}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
-					${permission.Name}
 					<br>
 				<% end %>
 			</div>

@@ -270,9 +270,8 @@ namespace Functional
 				{
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
-					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-					Thread.Sleep(1000);
-					Assert.That(browser.Text, Is.StringContaining("Документ не разобран"));
+					Assert.That(browser.Text, Is.StringContaining(documentLogEntity.FileName));
+					Assert.IsFalse(browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Exists);
 				}
 			}
 		}

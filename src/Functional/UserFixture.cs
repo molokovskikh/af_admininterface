@@ -44,6 +44,7 @@ namespace Functional
 			{
 				browser.Link(Find.ByText(user.Login)).Click();
 				Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
+				browser.Link(Find.ByText("Настройка")).Click();
 				browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.Login);
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранен"));
@@ -232,13 +233,15 @@ namespace Functional
 			using(var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				browser.Link(Find.ByText("Настройка")).Click();
 
 				for (int i = 0; i < 25; i++)
 					browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
 				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-				browser.Back(); browser.Back();
+				browser.Back(); browser.Back(); browser.Back();
 
 				browser.Link(Find.ByText("Новый пользователь")).Click();
 				browser.TextField(Find.ByName("user.Name")).TypeText("test2");
@@ -628,6 +631,7 @@ namespace Functional
 			{
 				Assert.IsFalse(client.Users[0].EnableUpdate);
 				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
 				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();
@@ -640,6 +644,7 @@ namespace Functional
 
 				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
 				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
 				browser.Button(Find.ByValue("Сохранить")).Click();
