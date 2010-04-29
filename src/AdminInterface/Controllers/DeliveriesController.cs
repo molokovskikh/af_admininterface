@@ -48,6 +48,7 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			Mailer.DeliveryAddressRegistred(address);
+			new NotificationService().NotifySupplierAboutAddressRegistration(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}
@@ -85,6 +86,7 @@ namespace AdminInterface.Controllers
 		{
 			var address = Address.Find(id);
 			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			Mailer.AddressRegistrationResened(address.Client, address.Value);
 			Flash["Message"] = new Message("Уведомления отправлены");
 			RedirectToReferrer();
 		}
