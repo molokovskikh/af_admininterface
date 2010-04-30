@@ -70,6 +70,7 @@ WHERE logtime BETWEEN ?StartDateParam AND ?EndDateParam;
 SELECT sum(ol.cost * ol.quantity) as OrderSum,
 	   count(DISTINCT oh.rowid) as TotalOrders,
 	   count(DISTINCT oh.clientcode) as UniqClientOrders,
+	   count(DISTINCT oh.userid) as UniqUserOrders,
        Max(WriteTime) as MaxOrderTime
 FROM orders.ordershead oh,
      orders.orderslist ol, 
@@ -95,9 +96,9 @@ where	oh.processed = 0
 SELECT ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DataSize,
        ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DocSize,
        sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
-       cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), cd.Id, null)) ,')') as CHAR) UpdatesAD,
-       cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, cd.Id, null)) ,')') as CHAR) CumulativeUpdates,
-       cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, cd.Id, null)) ,')') as CHAR) Updates
+       cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
+       cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
+       cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, u.Id, null)) ,')') as CHAR) Updates
 FROM Future.Clients cd
 	join Future.Users u on u.ClientId = cd.Id
 	join logs.AnalitFUpdates afu on afu.UserId = u.Id
@@ -112,7 +113,7 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			//Количество принятых заказов
 			PropertyBag["OPLB"] = String.Format("{0} ({1})",
 									  data.Tables[3].Rows[0]["TotalOrders"],
-									  data.Tables[3].Rows[0]["UniqClientOrders"]);
+									  data.Tables[3].Rows[0]["UniqUserOrders"]);
 			//Сумма заказов
 			PropertyBag["SumLB"] = Convert.ToDouble(data.Tables[3].Rows[0]["OrderSum"].IfDbNull(0)).ToString("C");
 
