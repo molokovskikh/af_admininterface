@@ -184,6 +184,7 @@ GROUP BY {{UserSearchItem.UserId}}
 			var filter = String.Empty;
 		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty :
 				Utils.StringToMySqlString(searchProperties.SearchText);
+			searchText = searchText.Replace('№', 'N');
 			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
 
