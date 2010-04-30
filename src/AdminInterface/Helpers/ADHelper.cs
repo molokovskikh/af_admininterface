@@ -69,56 +69,59 @@ namespace AdminInterface.Helpers
 				filter.Append("(sAMAccountName=" + user.Login + ")");
 				result.Add(new ADUserInformation() {Login = user.Login});
 			}
+			return GetInformation(result, filter);
+		}
 
-			if(result.Count == 0)
+		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<string> logins)
+		{
+			var result = new ADUserInformationCollection();
+			var filter = new StringBuilder();
+			foreach (var login in logins)
+			{
+				filter.Append("(sAMAccountName=" + login + ")");
+				result.Add(new ADUserInformation() { Login = login });
+			}
+			return GetInformation(result, filter);
+		}
+
+		private static ADUserInformationCollection GetInformation(ADUserInformationCollection usersInfo, StringBuilder filter)
+		{
+			if (usersInfo.Count == 0)
 				return null;
-			if (result.Count > 1)
+			if (usersInfo.Count > 1)
 				filter.Insert(0, "|");
 			Console.WriteLine("begin - {0:ss.fff}", DateTime.Now);
-			
+
 			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter)))
-			{				
+			{
 				var searchResults = searcher.FindAll();
 				foreach (SearchResult searchResult in searchResults)
 				{
-					var tempResult = new ADUserInformation();
-					if (searchResult == null)
+					var info = GetInformationBySearchResult(searchResult);
+					if (info == null)
 						continue;
-					Console.WriteLine("{1} - {0:ss.fff}", DateTime.Now, searchResult.Properties["sAMAccountName"][0].ToString());
-					tempResult.IsLoginExists = true;
-					tempResult.Login = searchResult.Properties["sAMAccountName"][0].ToString();
-
-					var directoryEntry = searchResult.GetDirectoryEntry();
-					Console.WriteLine("{0:ss.fff}", DateTime.Now);
-					tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
-					tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
-					Console.WriteLine("{0:ss.fff}", DateTime.Now);
-
-					/* Более эта информация не нужна и тратить время на ее получение не хочется
-					if (searchResult.Properties["lastLogon"].Count == 0)
-						tempResult.LastLogOnDate = null;
-					else
-						tempResult.LastLogOnDate = DateTime.FromFileTime((long)searchResult.Properties["lastLogon"][0]);
-					//ad инициализирует этим значением поле
-					if (tempResult.LastLogOnDate == DateTime.Parse("01.01.1601 3:00:00"))
-						tempResult.LastLogOnDate = null;
-
-					if (searchResult.Properties["badPasswordTime"].Count == 0)
-						tempResult.BadPasswordDate = null;
-					else
-						tempResult.BadPasswordDate = DateTime.FromFileTime((long)searchResult.Properties["badPasswordTime"][0]);
-					if (tempResult.BadPasswordDate == _badPasswordDateIfNotLogin)
-						tempResult.BadPasswordDate = null;
-
-					if (searchResult.Properties["pwdLastSet"].Count == 0)
-						tempResult.LastPasswordChange = null;
-					else
-						tempResult.LastPasswordChange = DateTime.FromFileTime((long)searchResult.Properties["pwdLastSet"][0]);*/
-
-					result[tempResult.Login] = tempResult;
+					usersInfo[info.Login] = info;
 				}
 			}
-			return result;
+			return usersInfo;
+		}
+
+		private static ADUserInformation GetInformationBySearchResult(SearchResult searchResult)
+		{
+			var tempResult = new ADUserInformation();
+			if (searchResult == null)
+				return null;
+			Console.WriteLine("{1} - {0:ss.fff}", DateTime.Now, searchResult.Properties["sAMAccountName"][0].ToString());
+			tempResult.IsLoginExists = true;
+			tempResult.Login = searchResult.Properties["sAMAccountName"][0].ToString();
+
+			var directoryEntry = searchResult.GetDirectoryEntry();
+			Console.WriteLine("{0:ss.fff}", DateTime.Now);
+			tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
+			tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
+			Console.WriteLine("{0:ss.fff}", DateTime.Now);
+
+			return tempResult;
 		}
 
 		public static ADUserInformation GetADUserInformation(string login)

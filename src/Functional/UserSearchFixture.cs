@@ -2,10 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;
+using Functional.ForTesting;
+using Castle.ActiveRecord;
 
 namespace Functional
 {
@@ -41,8 +44,23 @@ from billing.Payers
 			browser.SelectList(Find.ById("SearchBy_SearchBy")).Select(searchBy);
 			browser.TextField(Find.ById("SearchText")).TypeText(text);
 			browser.Button(Find.ByValue("Поиск")).Click();
-			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
-			Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+
+			if (browser.TableBody(Find.ById("SearchResults")).Exists)
+			{
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
+			}
+			else
+			{
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		private void CheckThatIsUserPage(IE browser)
+		{
+			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
+			Assert.That(browser.Text, Is.StringContaining("Сообщения пользователя"));
+			Assert.That(browser.Text, Is.StringContaining("Доступ к адресам доставки "));
 		}
 
 		[Test]
@@ -74,7 +92,14 @@ from billing.Payers
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
 				TestSearchResultsByUserInfo(browser, "Login", "Логин пользователя");
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.EqualTo(1));
+				if (browser.TableBody(Find.ById("SearchResults")).Exists)
+				{
+					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.EqualTo(1));
+				}
+				else
+				{
+					CheckThatIsUserPage(browser);
+				}
 			}
 		}
 
@@ -141,16 +166,28 @@ from billing.Payers
 		[Test]
 		public void SearchWithFilterBySegment()
 		{
+			using (var scope = new TransactionScope())
+			{
+				var client = DataMother.CreateTestClientWithUser();
+				client.Segment = Segment.Retail;
+				client.Update();
+				scope.VoteCommit();
+			}
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
 				browser.SelectList(Find.ByName("SearchBy.Segment")).Select("Розница");
 				browser.Button(Find.ByValue("Поиск")).Click();
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
-				foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
+				if (browser.TableBody(Find.ById("SearchResults")).Exists)
 				{
-					Assert.That(row.TableCells[9].Text, Is.EqualTo("Розница"));
+					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+					foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
+						Assert.That(row.TableCells[9].Text, Is.EqualTo("Розница"));
 				}
-			}			
+				else
+				{
+					CheckThatIsUserPage(browser);
+				}
+			}
 		}
 
 		[Test]

@@ -123,15 +123,19 @@ GROUP BY {{UserSearchItem.UserId}}
 						.SetParameter("RegionId", searchProperties.RegionId)
 						.List<UserSearchItem>();
 				ArHelper.Evict(session, result);
+				var logins = new List<string>();
+				for (var i = 0; i < result.Count; i++)
+					logins.Add(result[i].Login);
+
+				var adInfo = ADHelper.GetPartialUsersInformation(logins);
 
 				for (var i = 0; i < result.Count; i++)
 				{
-					var info = ADHelper.GetADUserInformation(result[i].Login);
-					if (info == null)
+					if (adInfo == null)
 						continue;
-					result[i].IsDisabled = info.IsDisabled;
-					result[i].IsLocked = info.IsLocked;
-					result[i].IsLoginExists = info.IsLoginExists;
+					result[i].IsDisabled = adInfo[result[i].Login].IsDisabled;
+					result[i].IsLocked = adInfo[result[i].Login].IsLocked;
+					result[i].IsLoginExists = adInfo[result[i].Login].IsLoginExists;
 				}
 				return result;
 			}
