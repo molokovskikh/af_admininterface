@@ -52,5 +52,45 @@ namespace AdminInterface.Models
 		public SearchSegment Segment { get; set; }
 
 		public ulong RegionId { get; set; }
+
+		public bool IsSearchAuto()
+		{
+			return SearchBy == SearchUserBy.Auto;
+		}
+
+		public bool IsSearchByClientId()
+		{
+			return SearchBy == SearchUserBy.ByClientId;
+		}
+
+		public bool IsSearchByUserId()
+		{
+			return SearchBy == SearchUserBy.ByUserId;
+		}
+
+		public bool IsSearchByClientName()
+		{
+			return SearchBy == SearchUserBy.ByClientName;
+		}
+
+		public bool IsSearchByJuridicalName()
+		{
+			return SearchBy == SearchUserBy.ByJuridicalName;
+		}
+
+		public bool IsSearchByLogin()
+		{
+			return SearchBy == SearchUserBy.ByLogin;
+		}
+
+		public bool IsSearchByPayerId()
+		{
+			return SearchBy == SearchUserBy.ByPayerId;
+		}
+
+		public bool IsSearchByUserName()
+		{
+			return SearchBy == SearchUserBy.ByUserName;
+		}
 	}
 }
