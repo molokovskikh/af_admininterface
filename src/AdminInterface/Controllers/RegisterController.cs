@@ -70,7 +70,7 @@ namespace AdminInterface.Controllers
         	User newUser = null;
 			Client newClient = null;
         	var password = String.Empty;
-        	var trimSymbols = new[] {' ', '\'', '"'};
+        	var trimSymbols = new[] {' '};
 
 			if (!String.IsNullOrEmpty(userName))
 				userName = userName.Replace("№", "N").Trim(trimSymbols);
