@@ -124,4 +124,30 @@ LIMIT 1";
 			return name.ToString();
 		}
 	}
+
+	public static class ClientInfoLogEntityExtension
+	{
+		public static IList<ClientInfoLogEntity> OrderBy(this IList<ClientInfoLogEntity> list, string columnName, bool descending)
+		{
+			if (columnName.Equals("WriteTime", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return list.OrderByDescending(item => item.WriteTime).ToList();
+				return list.OrderBy(item => item.WriteTime).ToList();
+			}
+			if (columnName.Equals("UserName", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return list.OrderByDescending(item => item.User != null ? item.User.GetLoginOrName() : String.Empty).ToList();
+				return list.OrderBy(item => item.User != null ? item.User.GetLoginOrName() : String.Empty).ToList();
+			}
+			if (columnName.Equals("Operator", StringComparison.OrdinalIgnoreCase))
+			{
+				if (descending)
+					return list.OrderByDescending(item => item.GetHumanReadableOperatorName()).ToList();
+				return list.OrderBy(item => item.GetHumanReadableOperatorName()).ToList();
+			}
+			return list.OrderByDescending(item => item.WriteTime).ToList();
+		}
+	}
 }

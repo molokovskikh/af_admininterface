@@ -3,6 +3,31 @@
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
 
+<%
+def WriteHeader(text as string, columnName as string):
+	currentSortDirection = "Ascending";
+	if SortMessagesColumnName == columnName:
+		if sortMessagesDirection == "Descending":
+			currentSortDirection = "Ascending"
+		else:
+			currentSortDirection = "Descending"
+		end
+		if sortMessagesDirection == "Ascending":
+			url = "${siteroot}/Images/arrow-down-blue-reversed.gif"
+		else:
+			url = "${siteroot}/Images/arrow-down-blue.gif"
+		end
+	end
+	%>
+	<a href="OrderMessagesBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&clientId=${client.Id}">
+		${text}
+		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortMessagesColumnName == columnName %>
+	</a>
+	<% 
+	return ""
+end
+%>
+
 <script>
 	document.observe("dom:loaded", function() {
 
@@ -255,9 +280,9 @@
 				<% if logs.Count > 0: %>
 				<table class="DataTable HighLightCurrentRow" style="text-align:left">
 					<tr>
-						<th>Дата</th>
-						<th>Оператор</th>
-						<th>Пользователь</th>
+						<th>${WriteHeader("Дата", "WriteTime")}</th>
+						<th>${WriteHeader("Оператор", "Operator")}</th>
+						<th>${WriteHeader("Пользователь", "UserName")}</th>
 						<th>Событие</th>
 					</tr>
 					<% for i, log in enumerate(logs): %>

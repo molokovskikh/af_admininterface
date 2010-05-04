@@ -42,6 +42,9 @@ namespace AdminInterface.Controllers
 				PropertyBag["Registrant"] = Administrator.GetByName(client.Registrant);
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client);
+			PropertyBag["sortMessagesColumnName"] = "WriteTime";
+			PropertyBag["sortMessagesDirection"] = "Descending";
+
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = CallLog.LastCalls();
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
@@ -80,6 +83,16 @@ namespace AdminInterface.Controllers
 			var users = client.GetUsers();
 			PropertyBag["users"] = users.SortBy(headerNames[Math.Abs(sortColumnIndex) - 1], sortColumnIndex > 0);
 			PropertyBag["sortColumnIndex"] = sortColumnIndex;
+		}
+
+		public void OrderMessagesBy(string columnName, string sortDirection, uint clientId)
+		{
+			Info(clientId);
+			var client = Client.FindAndCheck(clientId);
+			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client).OrderBy(columnName, sortDirection.Equals("Descending"));
+			PropertyBag["sortMessagesColumnName"] = columnName;
+			PropertyBag["sortMessagesDirection"] = sortDirection;
+			RenderView("Info");
 		}
 
 		[AccessibleThrough(Verb.Post)]
