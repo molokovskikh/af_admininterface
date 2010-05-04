@@ -94,5 +94,40 @@ namespace Functional
 				Assert.That(browser.Text, Text.Contains("This message for client"));
 			}
 		}
+
+		[Test]
+		public void Sort_messages()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.TextField(Find.ByName("message")).TypeText("This message for client");
+				browser.Button(Find.ByValue("Принять")).Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				browser.TextField(Find.ByName("message")).TypeText("This message for user1");
+				browser.Button(Find.ByValue("Принять")).Click();
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Refresh();
+
+				Assert.IsTrue(browser.Link(Find.ByText("Дата")).Exists);
+				Assert.IsTrue(browser.Link(Find.ByText("Оператор")).Exists);
+				Assert.IsTrue(browser.Link(Find.ByText("Пользователь")).Exists);
+
+				browser.Link(Find.ByText("Дата")).Click();
+				browser.Link(Find.ByText("Дата")).Click();
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
+				Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+
+				browser.Link(Find.ByText("Оператор")).Click();
+				browser.Link(Find.ByText("Оператор")).Click();
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
+				Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+
+				browser.Link(Find.ByText("Пользователь")).Click();
+				browser.Link(Find.ByText("Пользователь")).Click();
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
+				Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+			}
+		}
 	}
 }

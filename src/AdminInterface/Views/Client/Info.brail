@@ -19,10 +19,8 @@ def WriteHeader(text as string, columnName as string):
 		end
 	end
 	%>
-	<a href="OrderMessagesBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&clientId=${client.Id}">
-		${text}
-		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortMessagesColumnName == columnName %>
-	</a>
+	<a href="OrderMessagesBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&clientId=${client.Id}">${text}</a>
+	<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortMessagesColumnName == columnName %>
 	<% 
 	return ""
 end
@@ -278,7 +276,7 @@ end
 			<input type=submit value="Принять" class="RightButton"/>
 			<p>
 				<% if logs.Count > 0: %>
-				<table class="DataTable HighLightCurrentRow" style="text-align:left">
+				<table class="DataTable HighLightCurrentRow" id="ClientMessagesTable" style="text-align:left">
 					<tr>
 						<th>${WriteHeader("Дата", "WriteTime")}</th>
 						<th>${WriteHeader("Оператор", "Operator")}</th>
