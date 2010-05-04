@@ -165,7 +165,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.AvaliableAddresses, user.InheritPricesFrom")] User user,
+		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AvaliableAddresses")] User user,
 			[DataBind("WorkRegions")] ulong[] workRegions, 
 			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
@@ -188,7 +188,7 @@ namespace AdminInterface.Controllers
 				user.Update();
 				scope.VoteCommit();
 				Flash["Message"] = new Message("Сохранено");
-				RedirectUsingRoute("users", "Edit", new {login = user.Login});				
+				RedirectUsingRoute("users", "Edit", new {login = user.Login});
 			}
 		}
 
