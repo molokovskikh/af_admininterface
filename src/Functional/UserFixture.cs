@@ -760,5 +760,28 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Add_comment_for_contact()
+		{
+			var applyButtonText = "Сохранить";
+			var client = DataMother.CreateTestClientWithUser();
+
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Users[0].ContactGroup;
+					browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
+					browser.Button(Find.ByValue("Сохранить")).Click();
+				}
+			}
+			// Проверка, что комментарий записан
+			var contact = Contact.Find(client.Users[0].ContactGroup.Contacts[0].Id);
+			Assert.That(contact.Comment, Is.EqualTo("some comment"));
+		}
 	}
 }
