@@ -296,6 +296,11 @@ where uui.UserId = :userCode")
 
 		public virtual void UpdatePersons(Person[] persons)
 		{
+			UpdatePersons(persons, null);
+		}
+
+		public virtual void UpdatePersons(Person[] persons, Person[] deletedPersons)
+		{
 			if (persons.Length == 0)
 				return;
 			if (ContactGroup == null)
@@ -304,8 +309,8 @@ where uui.UserId = :userCode")
 				foreach (var person in persons)
 					ContactGroup.AddPerson(person.Name);
 				return;
-			}			
-			ContactGroup.UpdatePersons(persons);
+			}
+			ContactGroup.UpdatePersons(persons, deletedPersons);
 		}
 
 		public virtual string GetEmails()

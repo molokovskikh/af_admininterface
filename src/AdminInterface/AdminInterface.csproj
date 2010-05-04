@@ -467,6 +467,7 @@
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
+    <None Include="Views\SubViews\PersonInfo.brail" />
     <None Include="Views\UserSearch\LegendView.brail" />
     <None Include="Views\UserSearch\Search.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />

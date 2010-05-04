@@ -1,0 +1,54 @@
+﻿<style>
+	.PersonInfoCell
+	{
+		width: 25%;
+		padding-left: 10px;
+		vertical-align: top;
+	}
+</style>
+
+<script type="text/javascript">
+
+	function deletePersonRow(clientId, rowId) {
+		$("#rowPerson" + rowId).remove();
+		if (rowId > 0) {
+			$("#HolderPerson" + clientId).append("<input type='hidden' name='deletedpersons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "' />");
+		}
+	}
+
+	function addPersonRow(rowId, clientId, text) {
+		$("#HolderPerson" + clientId).append("<tr id='rowPerson" + rowId + "' name='rowPerson" + rowId + "'>" +
+			"<td class='PersonInfoCell'>" + "Ф.И.О.:" +
+			"</td>" +
+			"<td style = 'width: 50%;padding-left: 10px;'>" +
+				"<input type='hidden' name='persons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "'/>" +
+				"<input type='text' style='width: 100%' name='persons[" + rowId + "].Name' id='persons[" + rowId + "].Name' value='" + text + "'/>" +
+			"</td>" +
+			"<td style='vertical-align: top;padding-left: 10px'>" +
+				"<input type='button' value='Удалить' name='persons[" + rowId + "].Delete' onclick='deletePersonRow(" + clientId + "," + rowId + ")' />" +
+			"</td>" +
+		"</tr>");
+	}
+
+	var insertId = 0;
+	$(document).ready(function() {
+		<% if IsDefined('ContactGroup'): %>
+			<% for person in ContactGroup.Persons: %>
+				addPersonRow(${person.Id}, ${client.Id}, '${person.Name}');
+			<% end %>
+		<% end %>
+	});
+</script>
+
+<div class="contextual">
+	<a id="addPersonLink${client.Id}" class="icon icon-add" href="javascript:" onclick="addPersonRow(--insertId, ${client.Id}, '', '')">Добавить</a>
+</div>
+<h3>Контактные лица</h3>
+<table width="100%" cellspacing="5">
+	<tr>
+		<td>
+			<table name="HolderPerson${client.Id}" id="HolderPerson${client.Id}" style="width: 100%">
+			</table>
+		</td>
+	</tr>
+</table>

@@ -321,13 +321,13 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithUser();
 			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
 			{
-				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
+				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText);
+				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
 
-			ContactGroup group;			
+			ContactGroup group;
 			using (new SessionScope())
 			{
 				client = Client.Find(client.Id);
@@ -342,6 +342,34 @@ namespace Functional
 		}
 
 		[Test]
+		public void Add_person_information()
+		{
+			var applyButtonText = "Сохранить";
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			}
+			ContactGroup group;
+			using (new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				group = client.Users[0].ContactGroup;
+				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
+							"Не совпадают Id владельца группы у клиента и у новой группы");
+			}
+			// Проверка, что контактные записи создались в БД
+			ContactInformationFixture.CheckContactGroupInDb(group);
+			var persons = ContactInformationFixture.GetPersons(group);
+			Assert.That(persons.Count, Is.EqualTo(2));
+			Assert.That(persons[0], Is.EqualTo("Test person"));
+			Assert.That(persons[1], Is.EqualTo("Test person2"));
+		}
+
+		[Test]
 		public void DeleteContactInformation()
 		{
 			var applyButtonText = "Сохранить";
@@ -349,8 +377,8 @@ namespace Functional
 			// Удаление контактной записи
 			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
 			{
-				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
-				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText);
+				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 				using (new SessionScope())
 				{
 					client = Client.Find(client.Id);
@@ -362,6 +390,79 @@ namespace Functional
 			// Проверка, что контактная запись удалена
 			var countContacts = ContactInformationFixture.GetCountContactsInDb(client.Users[0].ContactGroup);
 			Assert.That(countContacts, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void Delete_person_information()
+		{
+			var applyButtonText = "Сохранить";
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Users[0].ContactGroup;
+					browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
+					browser.Button(Find.ByValue("Сохранить")).Click();
+				}
+			}
+			// Проверка, что контактная запись удалена
+			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			Assert.That(persons.Count, Is.EqualTo(1));
+			Assert.That(persons[0], Is.EqualTo("Test person2"));
+		}
+
+		[Test]
+		public void Delete_person_information_by_fill_empty_string()
+		{
+			var applyButtonText = "Сохранить";
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Users[0].ContactGroup;
+					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
+					browser.Button(Find.ByValue("Сохранить")).Click();
+				}
+			}
+			// Проверка, что контактная запись удалена
+			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			Assert.That(persons.Count, Is.EqualTo(1));
+			Assert.That(persons[0], Is.EqualTo("Test person2"));
+		}
+
+		[Test]
+		public void Change_person_information()
+		{
+			var applyButtonText = "Сохранить";
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			{
+				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var group = client.Users[0].ContactGroup;
+					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
+					browser.Button(Find.ByValue("Сохранить")).Click();
+					Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				}
+			}
+			// Проверка, что контактная запись изменена
+			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			Assert.That(persons.Count, Is.EqualTo(1));
+			Assert.That(persons[0], Is.EqualTo("Test person changed"));
 		}
 
 		[Test]
@@ -576,7 +677,8 @@ namespace Functional
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.Link("addPersonLink" + client.Id).Click();
+				browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
@@ -599,7 +701,8 @@ namespace Functional
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.Link("addPersonLink" + client.Id).Click();
+				browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
@@ -608,8 +711,9 @@ namespace Functional
 					client = Client.Find(client.Id);
 					var user = client.Users[0];
 					browser.Link(Find.ByText(user.Id.ToString())).Click();
-					Assert.That(browser.TextField(Find.ByName("persons[0].Name")).Text, Is.EqualTo("Alice"));
-					browser.TextField(Find.ByName("persons[0].Name")).TypeText("Alice modified");
+					var group = client.Users[0].ContactGroup;
+					Assert.That(browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).Text, Is.EqualTo("Alice"));
+					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Alice modified");
 					browser.Button(Find.ByValue("Сохранить")).Click();
 					Assert.That(browser.Text, Text.Contains("Сохранено"));
 				}

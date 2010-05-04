@@ -97,7 +97,7 @@
 </script>
 		
 <div class=contextual>
-    <a class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, ${client.Id}, '', '')">Добавить</a>
+    <a id="addContactLink${client.Id}" class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, ${client.Id}, '', '')">Добавить</a>
 </div>		    
 <h3>Контактная информация</h3>
 <table width="100%" cellspacing="5">

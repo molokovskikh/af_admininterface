@@ -22,7 +22,7 @@ namespace Functional
 			// Удаление контактной записи
 			using (var browser = Open("client/{0}", client.Id))
 			{
-				countContacts = AddContactsToNewDeliveryAddress(browser);
+				countContacts = AddContactsToNewDeliveryAddress(browser, client.Id);
 				using (new SessionScope())
 				{
 					client = Client.Find(client.Id);
@@ -86,19 +86,19 @@ namespace Functional
 		}
 
 		// Создает новый адрес доставки и 3 контакта для него (2 email)
-		private int AddContactsToNewDeliveryAddress(IE browser)
+		private int AddContactsToNewDeliveryAddress(IE browser, uint clientId)
 		{
 			var applyButtonText = "Создать";
 			browser.Link(Find.ByText("Новый адрес доставки")).Click();
 			browser.TextField(Find.ByName("delivery.value")).TypeText("Test address");
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, clientId);
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 			browser.Link(Find.ByText("Test address")).Click();
 			applyButtonText = "Сохранить";
-			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText);
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, clientId);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			browser.Link(Find.ByText("Test address")).Click();
-			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText);
+			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, clientId);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			browser.Link(Find.ByText("Test address")).Click();
 			return 3;
@@ -112,7 +112,7 @@ namespace Functional
 			var countContacts = 0;
 			using (var browser = Open("client/{0}", client.Id))
 			{
-				countContacts = AddContactsToNewDeliveryAddress(browser);
+				countContacts = AddContactsToNewDeliveryAddress(browser, client.Id);
 			}
 			// Проверка, что контактные записи создались в БД
 			using (new SessionScope())

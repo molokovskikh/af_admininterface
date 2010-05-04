@@ -164,33 +164,13 @@
 		</div>
 		
 		<div class=block>
-		    <% OutputSubView("/SubViews/ContactInfo") %>
+			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>
-		
-        <div class="block">
-            <h3>Контактное лицо</h3>
-            <table border="0" width="100%" cellpadding="3" cellspacing="0">
-<%          if (user.ContactGroup != null) and (user.ContactGroup.Persons != null) and (user.ContactGroup.Persons.Count > 0):
-                for i,person in enumerate(user.ContactGroup.Persons): %>
-                <tr>
-                    <td width="20%">Ф.И.О.:</td>
-                    <td width="80%">
-                        <input type="text" id="persons[${i}].Name" name="persons[${i}].Name" style="width: 60%" value="${person.Name}" />
-                        <input type="hidden" id="persons[${i}].Id" name="persons[${i}].Id" value="${person.Id}" />
-                    </td>
-                </tr>
-<%              end
-            else: %>
-                <tr>
-                    <td width="20%">Ф.И.О.:</td>
-                    <td width="80%">
-                        <input type="text" id="persons[0].Name" name="persons[0].Name" style="width: 60%" value="" />
-                    </td>
-                </tr>
-<%          end %>            
-            </table>            
-        </div>		
-		
+
+		<div class=block>
+			<% OutputSubView("/SubViews/PersonInfo") %>
+		</div>
+
 		<div class=block>
 			<h3>
 				Доступ к адресам доставки

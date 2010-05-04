@@ -52,7 +52,7 @@ namespace AdminInterface.Controllers
 			string mails,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			string deliveryAddress,
-			string contactPerson)
+			[DataBind("persons")] Person[] persons)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -86,8 +86,7 @@ namespace AdminInterface.Controllers
 					}
 				}
 				user.UpdateContacts(contacts);
-				if (!String.IsNullOrEmpty(contactPerson))
-					user.ContactGroup.AddPerson(contactPerson);
+				user.UpdatePersons(persons);
 				scope.VoteCommit();
                 user.Client.UpdateBeAccounted();
                 scope.VoteCommit();
@@ -171,7 +170,8 @@ namespace AdminInterface.Controllers
 			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
 			[DataBind("deletedContacts")] Contact[] deletedContacts,
-			[DataBind("persons")] Person[] persons)
+			[DataBind("persons")] Person[] persons,
+			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
 			using (var scope = new TransactionScope())
 			{
@@ -184,7 +184,7 @@ namespace AdminInterface.Controllers
 				orderRegions.Each(r => { temp += r; });
 				user.OrderRegionMask = temp;
 				user.UpdateContacts(contacts, deletedContacts);
-				user.UpdatePersons(persons);
+				user.UpdatePersons(persons, deletedPersons);
 				user.Update();
 				scope.VoteCommit();
 				Flash["Message"] = new Message("Сохранено");
