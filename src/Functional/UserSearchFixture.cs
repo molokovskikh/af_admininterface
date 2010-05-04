@@ -41,7 +41,7 @@ from billing.Payers
 		{
 			var text = String.Empty;
 			ArHelper.WithSession(session => text = session.CreateSQLQuery(sql).UniqueResult().ToString());
-			browser.SelectList(Find.ById("SearchBy_SearchBy")).Select(searchBy);
+			browser.RadioButton(Find.ById(searchBy)).Checked = true;
 			browser.TextField(Find.ById("SearchText")).TypeText(text);
 			browser.Button(Find.ByValue("Поиск")).Click();
 
@@ -82,7 +82,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByUserInfo(browser, "Id", "Код пользователя");
+				TestSearchResultsByUserInfo(browser, "Id", "SearchByUserId");
 			}
 		}
 
@@ -91,7 +91,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByUserInfo(browser, "Login", "Логин пользователя");
+				TestSearchResultsByUserInfo(browser, "Login", "SearchByLogin");
 				if (browser.TableBody(Find.ById("SearchResults")).Exists)
 				{
 					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.EqualTo(1));
@@ -108,7 +108,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByUserInfo(browser, "Name", "Комментарий пользователя");
+				TestSearchResultsByUserInfo(browser, "Name", "SearchByUserName");
 			}
 		}
 
@@ -117,7 +117,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByClientInfo(browser, "Name", "Имя клиента");
+				TestSearchResultsByClientInfo(browser, "Name", "SearchByClientName");
 			}
 		}
 
@@ -126,7 +126,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByClientInfo(browser, "Id", "Код клиента");
+				TestSearchResultsByClientInfo(browser, "Id", "SearchByClientId");
 			}
 		}
 
@@ -135,7 +135,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByBillingInfo(browser, "JuridicalName", "Юридическое имя");
+				TestSearchResultsByBillingInfo(browser, "JuridicalName", "SearchByJuridicalName");
 			}			
 		}
 
@@ -144,7 +144,7 @@ from billing.Payers
 		{
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
-				TestSearchResultsByBillingInfo(browser, "PayerID", "Код договора");
+				TestSearchResultsByBillingInfo(browser, "PayerId", "SearchByPayerId");
 			}
 		}
 
@@ -237,7 +237,7 @@ from billing.Payers
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
 				browser.TextField(Find.ById("SearchText")).TypeText("text");
-				browser.SelectList(Find.ById("SearchBy_SearchBy")).Select("Код клиента");
+				browser.RadioButton(Find.ById("SearchByClientId")).Checked = true;
 				browser.Button(Find.ByValue("Поиск")).Click();
 
 				Assert.IsFalse(browser.TableBody(Find.ById("SearchResults")).Exists);
@@ -251,7 +251,7 @@ from billing.Payers
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
 				browser.TextField(Find.ById("SearchText")).TypeText("7160");
-				browser.SelectList(Find.ById("SearchBy_SearchBy")).Select("Код клиента");
+				browser.RadioButton(Find.ById("SearchByClientId")).Checked = true;
 				browser.Button(Find.ByValue("Поиск")).Click();
 
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));

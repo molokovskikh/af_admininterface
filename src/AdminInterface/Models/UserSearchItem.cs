@@ -69,9 +69,12 @@ namespace AdminInterface.Models
 		{
 			if (String.IsNullOrEmpty(filter))
 				return criteria;
-            if (String.IsNullOrEmpty(criteria))
-                return filter;
-			return String.Format(" ({0}) and ({1}) ", filter, criteria);
+			if (String.IsNullOrEmpty(criteria))
+				return filter;
+			var newFilter = String.Format(" ({0}) and ({1}) ", filter, criteria);
+			if (newFilter.Contains('№'))
+				newFilter = String.Format(" ({0}) or ({1}) ", newFilter, newFilter.Replace('№', 'N'));
+			return newFilter;
 		}
 
 		public static IList<UserSearchItem> SearchBy(UserSearchProperties searchProperties, string sortColumn, string sortDirection)
@@ -184,7 +187,7 @@ GROUP BY {{UserSearchItem.UserId}}
 			var filter = String.Empty;
 		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty :
 				Utils.StringToMySqlString(searchProperties.SearchText);
-			searchText = searchText.Replace('№', 'N');
+
 			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
 
