@@ -103,7 +103,17 @@ FROM Future.Clients cd
 	join Future.Users u on u.ClientId = cd.Id
 	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE cd.maskregion & ?RegionMaskParam > 0
-      AND afu.RequestTime BETWEEN ?StartDateParam AND ?EndDateParam;", c);
+      AND afu.RequestTime BETWEEN ?StartDateParam AND ?EndDateParam;
+
+SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
+       max(dlogs.LogTime) as LastDownloadedWaybillDate
+FROM logs.document_logs dlogs
+WHERE dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam;
+
+SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
+       max(dheaders.WriteTime) as LastParsedWaybillDate
+FROM documents.documentheaders dheaders
+WHERE dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam;", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & SecurityContext.Administrator.RegionMask);
@@ -175,6 +185,14 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			PropertyBag["PriceDOKLB"] = data.Tables[2].Rows[0]["DownCount"].ToString();
 			//Формализовано прайсов
 			PropertyBag["PriceFOKLB"] = data.Tables[1].Rows[0]["FormCount"].ToString();
+			// Количество загруженных накладных
+			PropertyBag["CountDownloadedWaybills"] = data.Tables[6].Rows[0]["CountDownloadedWaybills"].ToString();
+			// Дата последней загрузки накладной
+			PropertyBag["LastDownloadedWaybillDate"] = data.Tables[6].Rows[0]["LastDownloadedWaybillDate"].ToString();
+			// Количество разобранных накладных
+			PropertyBag["CountParsedWaybills"] = data.Tables[7].Rows[0]["CountParsedWaybills"].ToString();
+			// Дата последнего разбора накладной
+			PropertyBag["LastParsedWaybillDate"] = data.Tables[7].Rows[0]["LastParsedWaybillDate"].ToString();
 		}
 
 		[RequiredPermission(PermissionType.EditSettings)]
