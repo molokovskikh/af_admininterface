@@ -24,7 +24,13 @@
 
 
 <h2>
-    Пользователь ${user.Login}
+<%
+	if (user.Login == user.Id): %>
+		Пользователь ${user.Login}
+<%	else: %>
+		Пользователь ${user.Login}, Код ${user.Id}
+<%	end
+%>
 </h2>
 
 <% if IsDefined("Message"):
