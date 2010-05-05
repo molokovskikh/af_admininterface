@@ -25,7 +25,7 @@
 
 <h2>
 <%
-	if (user.Login == user.Id): %>
+	if (user.Login == user.Id.ToString()): %>
 		Пользователь ${user.Login}
 <%	else: %>
 		Пользователь ${user.Login}, Код ${user.Id}
