@@ -43,10 +43,10 @@
     }
 
     function addContactRow(rowId, clientId, text, comment, contactType) {
-		var imageLink = "<a id='contactActionLink" + rowId + "' href='' name='" + text + "'><img id='contactActionImage" + rowId + "' src='' border=0 /></a>";
+		var imageLink = "<a id='contactActionLink" + rowId + "' href='' name='" + text + "'><img id='contactActionImage" + rowId + "' src='${siteroot}/Images/email.png' border=0 /></a>";
 
         $("#Holder" + clientId).append("<tr id='row" + rowId + "' name='row" + rowId + "' valign='top'>" +
-			"<td>" + imageLink + "</td>" +
+			"<td align='right'>" + imageLink + "</td>" +
             "<td class='ContactInfoCell' align='right'>" +
                 "<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "'/>" +
                 "<select style='width: 100%;' name='contacts[" + rowId + "].Type' id='contacts[" + rowId + "].Type' onchange='setContactType(" + rowId + ")'>" +
@@ -75,8 +75,8 @@
             var comboBox = document.getElementById("contacts[" + rowId + "].Type");
             comboBox.selectedIndex = 1;
             setContactType(rowId);
-        }        
-    }    
+        }
+    }
     
     var insertId = 0;
     $(document).ready(function(){
