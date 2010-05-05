@@ -258,5 +258,17 @@ from billing.Payers
 				Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 			}
 		}
+
+		[Test]
+		public void Search_with_number_symbol()
+		{
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText("аптека №151");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
 	}
 }

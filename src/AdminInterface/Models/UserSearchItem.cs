@@ -65,16 +65,21 @@ namespace AdminInterface.Models
 
 		public bool IsDisabled { get; set; }
 
+		private static string ProcessFilter(string filter)
+		{
+			if (filter.Contains('№'))
+				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('№', 'N'));
+			return filter;
+		}
+
 		private static string AddFilterCriteria(string filter, string criteria)
 		{
 			if (String.IsNullOrEmpty(filter))
-				return criteria;
+				return ProcessFilter(criteria);
 			if (String.IsNullOrEmpty(criteria))
-				return filter;
+				return ProcessFilter(filter);
 			var newFilter = String.Format(" ({0}) and ({1}) ", filter, criteria);
-			if (newFilter.Contains('№'))
-				newFilter = String.Format(" ({0}) or ({1}) ", newFilter, newFilter.Replace('№', 'N'));
-			return newFilter;
+			return ProcessFilter(newFilter);
 		}
 
 		public static IList<UserSearchItem> SearchBy(UserSearchProperties searchProperties, string sortColumn, string sortDirection)
