@@ -267,7 +267,12 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PrepareSessionForReport(user, password, false);
-				RedirectToUrl("/report.aspx");
+				var virtualDir = Context.UrlInfo.AppVirtualDir;
+				if (!virtualDir.StartsWith("/"))
+					virtualDir = "/" + virtualDir;
+				if (virtualDir.EndsWith("/"))
+					virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
+				RedirectToUrl(virtualDir + "/report.aspx");
 			}
 		}
 
