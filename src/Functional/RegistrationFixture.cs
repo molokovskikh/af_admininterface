@@ -395,7 +395,7 @@ namespace Functional
 						}
 					}
 					Assert.IsTrue(pass);
-				}				
+				}
 			}
 		}
 
@@ -405,7 +405,7 @@ namespace Functional
 			using (var browser = Open("Register/Register.rails"))
 			{
 				SetupGeneralInformation(browser, ClientType.Drugstore);
-				browser.TextField(Find.ByName("contactPerson")).TypeText("Alice");
+				browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("Alice");
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button("RegisterButton").Click();
 				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
@@ -414,7 +414,9 @@ namespace Functional
 					var client = Client.Find(clientCode);
 					var user = client.Users[0];
 					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
-					Assert.That(browser.TextField(Find.ByName("persons[0].Name")).Text, Is.EqualTo("Alice"));
+					client = Client.Find(clientCode);
+					var elementName = String.Format("persons[{0}].Name", client.Users[0].ContactGroup.Persons[0].Id);
+					Assert.That(browser.TextField(Find.ByName(elementName)).Text, Is.EqualTo("Alice"));
 				}
 			}
 		}
@@ -432,6 +434,172 @@ namespace Functional
 				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 				var settings = DrugstoreSettings.Find(clientCode);
 				Assert.IsTrue(settings.IgnoreNewPrices);
+			}
+		}
+
+		[Test, Description("Регистрация клиента с несколькими телефонами для клиента")]
+		public void Register_with_multiple_client_phones()
+		{
+			uint clientCode = 0;
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link("clientaddPhoneLink").Click();
+				browser.Link("clientaddPhoneLink").Click();
+				Thread.Sleep(500);
+				browser.TextField(Find.ByName("clientContacts[0].ContactText")).TypeText("111-111111");
+				browser.TextField(Find.ByName("clientContacts[0].Comment")).TypeText("some comment");
+				browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("211-111111");
+				browser.TextField(Find.ByName("clientContacts[3].ContactText")).TypeText("311-111111");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
+				Assert.That(browser.Text, Is.StringContaining("111-111111 - some comment, 211-111111, 311-111111"));
+			}
+			using (new SessionScope())
+			{
+				var client = Client.Find(clientCode);
+				var contacts = client.ContactGroupOwner.ContactGroups[0].Contacts;
+				Assert.That(contacts.Count, Is.EqualTo(4));
+				Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
+				Assert.That(contacts[0].Comment, Is.EqualTo("some comment"));
+				Assert.That(contacts[1].ContactText, Is.EqualTo("211-111111"));
+				Assert.That(contacts[2].ContactText, Is.EqualTo("311-111111"));
+				Assert.That(contacts[3].Type, Is.EqualTo(ContactType.Email));
+			}
+		}
+
+		[Test, Description("Регистрация клиента с несколькими телефонами для пользователя")]
+		public void Register_with_multiple_user_phones()
+		{
+			uint clientCode = 0;
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link("useraddPhoneLink").Click();
+				Thread.Sleep(500);
+				browser.TextField(Find.ByName("userContacts[0].ContactText")).TypeText("111-111111");
+				browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("222-111111");
+				browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("comment for user phone");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				using (new SessionScope())
+				{
+					var client = Client.Find(clientCode);
+					var user = client.Users[0];
+					var contacts = client.Users[0].ContactGroup.Contacts;
+					Assert.That(contacts.Count, Is.EqualTo(3));
+					Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
+					Assert.That(contacts[1].Comment, Is.EqualTo("comment for user phone"));
+					Assert.That(contacts[1].ContactText, Is.EqualTo("222-111111"));
+					Assert.That(contacts[2].Type, Is.EqualTo(ContactType.Email));
+
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[1].Id))).Text;
+					var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[1].Id))).Text;
+					Assert.That(contacts[1].ContactText, Is.EqualTo(text));
+					Assert.That(contacts[1].Comment, Is.EqualTo(comment));
+				}
+			}
+		}
+
+		[Test, Description("Регистрация клиента с несколькими email для клиента")]
+		public void Register_with_multiple_client_email()
+		{
+			uint clientCode = 0;
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link("clientaddEmailLink").Click();
+				Thread.Sleep(500);
+				browser.TextField(Find.ByName("clientContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
+				browser.TextField(Find.ByName("clientContacts[500].ContactText")).TypeText("qwerty2@qq.qq");
+				browser.TextField(Find.ByName("clientContacts[500].Comment")).TypeText("some comment for email");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
+				Assert.That(browser.Text, Is.StringContaining("qwerty1@qq.qq, qwerty2@qq.qq - some comment for email"));
+			}
+			using (new SessionScope())
+			{
+				var client = Client.Find(clientCode);
+				var contacts = client.ContactGroupOwner.ContactGroups[0].Contacts;
+				Assert.That(contacts.Count, Is.EqualTo(3));
+				Assert.That(contacts[0].Type, Is.EqualTo(ContactType.Phone));
+				Assert.That(contacts[1].ContactText, Is.EqualTo("qwerty1@qq.qq"));
+				Assert.That(contacts[1].Comment, Is.Null);
+				Assert.That(contacts[2].ContactText, Is.EqualTo("qwerty2@qq.qq"));
+				Assert.That(contacts[2].Comment, Is.EqualTo("some comment for email"));
+			}
+		}
+
+		[Test, Description("Регистрация клиента с несколькими email для пользователя")]
+		public void Register_with_multiple_user_email()
+		{
+			uint clientCode = 0;
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link("useraddEmailLink").Click();
+				Thread.Sleep(500);
+				browser.TextField(Find.ByName("userContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
+				browser.TextField(Find.ByName("userContacts[500].ContactText")).TypeText("qwerty2@qq.qq");
+				browser.TextField(Find.ByName("userContacts[500].Comment")).TypeText("some comment for email");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				using (new SessionScope())
+				{
+					var client = Client.Find(clientCode);
+					var user = client.Users[0];
+					var contacts = client.Users[0].ContactGroup.Contacts;
+					Assert.That(contacts.Count, Is.EqualTo(3));
+					Assert.That(contacts[0].Type, Is.EqualTo(ContactType.Phone));
+					Assert.That(contacts[1].ContactText, Is.EqualTo("qwerty1@qq.qq"));
+					Assert.That(contacts[2].Comment, Is.EqualTo("some comment for email"));
+					Assert.That(contacts[2].ContactText, Is.EqualTo("qwerty2@qq.qq"));
+
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[2].Id))).Text;
+					var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[2].Id))).Text;
+					Assert.That(contacts[2].ContactText, Is.EqualTo(text));
+					Assert.That(contacts[2].Comment, Is.EqualTo(comment));
+				}
+			}
+		}
+
+		[Test, Description("Регистрация клиента с несколькими контактными лицами для пользователя")]
+		public void Register_with_multiple_user_persons()
+		{
+			uint clientCode = 0;
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.Link("useraddPersonLink").Click();
+				Thread.Sleep(500);
+				browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("person1");
+				browser.TextField(Find.ByName("userPersons[1].Name")).TypeText("person2");
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+				using (new SessionScope())
+				{
+					var client = Client.Find(clientCode);
+					var user = client.Users[0];
+					var persons = client.Users[0].ContactGroup.Persons;
+					Assert.That(persons.Count, Is.EqualTo(2));
+					Assert.That(persons[0].Name, Is.EqualTo("person1"));
+					Assert.That(persons[1].Name, Is.EqualTo("person2"));
+
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					var person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[0].Id))).Text;
+					Assert.That(persons[0].Name, Is.EqualTo(person));
+					person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[1].Id))).Text;
+					Assert.That(persons[1].Name, Is.EqualTo(person));
+				}
 			}
 		}
 	}

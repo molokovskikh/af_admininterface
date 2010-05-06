@@ -62,8 +62,8 @@ namespace AdminInterface.Controllers
 			[DataBind("clientContacts")] Contact[] clientContacts,
 			string userName,
 			[DataBind("userContacts")] Contact[] userContacts,
-			string additionalEmailsForSendingCard,
-			string contactPerson)
+			[DataBind("userPersons")] Person[] userPersons,
+			string additionalEmailsForSendingCard)
         {
         	ulong browseRegionMask = 0;
         	ulong orderRegionMask = 0;
@@ -120,7 +120,7 @@ namespace AdminInterface.Controllers
 					AddContactsToClient(newClient, clientContacts);
 					newClient.SaveAndFlush();
 
-					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, contactPerson);
+					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
 					password = newUser.CreateInAd();
 					var defaults = DefaultValues.Get();
 					if (newClient.IsDrugstore())
@@ -358,7 +358,7 @@ WHERE   intersection.pricecode IS NULL
 		}
 
 		private User CreateUser(Client client, string userName, UserPermission[] permissions,
-			ulong workRegionMask, ulong orderRegionMask, string contactPersonName)
+			ulong workRegionMask, ulong orderRegionMask, Person[] persons)
 		{
 			var user = new User
 			{
@@ -374,7 +374,8 @@ WHERE   intersection.pricecode IS NULL
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
-			user.AddContactPerson(contactPersonName);
+			foreach (var person in persons)
+				user.AddContactPerson(person.Name);
 			user.SaveAndFlush();
 			client.Users = new List<User> { user };
 			return user;
@@ -387,7 +388,7 @@ WHERE   intersection.pricecode IS NULL
 
 			var generalGroup = owner.AddContactGroup(ContactGroupType.General);
 			foreach (var contact in clientContacts)
-				generalGroup.AddContact(contact.Type, contact.ContactText);
+				generalGroup.AddContact(contact);
 			owner.Save();
 		}
 

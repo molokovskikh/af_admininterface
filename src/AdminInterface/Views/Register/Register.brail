@@ -1,21 +1,19 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-		Регистрация клиента
+	Регистрация клиента
 <% end %>
 <% component Bubble, {"bredcrumbs" : [("Регистрация клиента", "")]} %>
 
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
-<h2>
-    Регистрация клиента
-</h2>
+<h2>Регистрация клиента</h2>
 
 <%
-    ClientTypeDrugstore = cast(int, AdminInterface.Models.ClientType.Drugstore)
-    ClientTypeSupplier = cast(int, AdminInterface.Models.ClientType.Supplier)
-    
-    SegmentTypeWholesale = cast(int, AdminInterface.Models.Segment.Wholesale)
-    SegmentTypeRetail = cast(int, AdminInterface.Models.Segment.Retail)
+	ClientTypeDrugstore = cast(int, AdminInterface.Models.ClientType.Drugstore)
+	ClientTypeSupplier = cast(int, AdminInterface.Models.ClientType.Supplier)
+
+	SegmentTypeWholesale = cast(int, AdminInterface.Models.Segment.Wholesale)
+	SegmentTypeRetail = cast(int, AdminInterface.Models.Segment.Retail)
 %>
 
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
@@ -23,29 +21,30 @@
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
 
 <script type="text/javascript">
-    jQuery(function() {
-        jQuery("#PayerExists").attr({checked : "", disabled : ""});
-        jQuery("#ShowForOneSupplier").attr({checked : "", disabled : ""});
-        jQuery("#FillBillingInfo").attr({checked : "checked", disabled : ""});
-        jQuery("#SearchPayerDiv").css("display", "none");
-        jQuery("#SelectPayerDiv").css("display", "none");
-        jQuery("#SearchSupplierDiv").css("display", "none");
-        jQuery("#SelectSupplierDiv").css("display", "none");
-        
-        jQuery.validator.addMethod("validateAddress", function(value, element) {
-            return validateAddress(value, element);
-        }, "Некорректное значение адреса");
-        
-        jQuery.validator.addMethod("validateEmailList", function(value, element) {
-            if (value.toString().length > 0) {
-                res = /^\s*[\w\.\-]{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*(\,\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*)*$/.test(value)
-                return res;
-            }
-            return true;
-        }, "Поле содержит некорректный адрес электронной почты");
 
-        validateForm();
-    });
+	jQuery(function() {
+		jQuery("#PayerExists").attr({checked : "", disabled : ""});
+		jQuery("#ShowForOneSupplier").attr({checked : "", disabled : ""});
+		jQuery("#FillBillingInfo").attr({checked : "checked", disabled : ""});
+		jQuery("#SearchPayerDiv").css("display", "none");
+		jQuery("#SelectPayerDiv").css("display", "none");
+		jQuery("#SearchSupplierDiv").css("display", "none");
+		jQuery("#SelectSupplierDiv").css("display", "none");
+
+		jQuery.validator.addMethod("validateAddress", function(value, element) {
+			return validateAddress(value, element);
+		}, "Некорректное значение адреса");
+
+		jQuery.validator.addMethod("validateEmailList", function(value, element) {
+			if (value.toString().length > 0) {
+				res = /^\s*[\w\.\-]{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*(\,\s*\w{1,}[@][\w\-]{1,}([.]([\w\-]{1,})){1,3}\s*)*$/.test(value)
+				return res;
+			}
+			return true;
+		}, "Поле содержит некорректный адрес электронной почты");
+
+		validateForm();
+	});
 
     function validateSupplier() {
         if (jQuery("#ShowForOneSupplier").attr("checked"))
@@ -248,7 +247,55 @@
 	    jQuery("#FillBillingInfo").attr('checked', '');
 	    jQuery("#FillBillingInfo").attr('disabled', '');	        
 	    ViewDiv(false, "#SelectPayerDiv");
-	}	
+	}
+	
+	function addPhone(prefix) {
+		var linkSelector = "#" + prefix + "addPhoneLink";
+		var id = parseInt(jQuery(linkSelector).attr('name'));
+		jQuery(linkSelector).attr('name', id + 1);
+		
+		var html = "<tr id='phone" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
+			"<td width='30%'>Номер телефона:</td>" +
+			"<td width='53%'>" +
+			"<input type='text' name='" + prefix + "Contacts[" + id + "].ContactText' class='phone' style='width: 100%' />" +
+			"<input type='hidden' name='" + prefix + "Contacts[" + id + "].Type' value='1' /></td>" +
+			"<td align='right'><input type='button' onclick=removeElement('phone" + id + prefix + "') value='Удалить' /></td>" +
+			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + prefix + "Contacts[" + id + "].Comment' style='width: 100%' /></td>" +
+			"</tr></table></td></tr>";
+		jQuery("#" + prefix + "Phones").append(html);
+	}
+
+	function addEmail(prefix) {
+		var linkSelector = "#" + prefix + "addEmailLink";
+		var id = parseInt(jQuery(linkSelector).attr('name'));
+		jQuery(linkSelector).attr('name', id + 1);
+		
+		var html = "<tr id='email" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
+			"<td width='30%'>Email:</td>" +
+			"<td width='53%'>" +
+			"<input type='text' name='" + prefix + "Contacts[" + id + "].ContactText' class='email' style='width: 100%' />" +
+			"<input type='hidden' name='" + prefix + "Contacts[" + id + "].Type' value='0' /></td>" +
+			"<td align='right'><input type='button' onclick=removeElement('email" + id + prefix + "') value='Удалить' /></td>" +
+			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + prefix + "Contacts[" + id + "].Comment' style='width: 100%' /></td>" +
+			"</tr></table></td></tr>";
+		jQuery("#" + prefix + "Emails").append(html);
+	}
+
+	function addPerson(prefix) {
+		var id = parseInt(jQuery("#" + prefix + "addPersonLink").attr('name'));
+		jQuery("#" + prefix + "addPersonLink").attr('name', id + 1);
+		var html = "<tr id='person" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
+			"<td width='30%'>Ф.И.О.:</td>" +
+			"<td width='53%'>" +
+			"<input type='text' name='" + prefix + "Persons[" + id + "].Name' style='width: 100%' /></td>" +
+			"<td align='right'><input type='button' onclick=removeElement('person" + id + prefix + "') value='Удалить' /></td>" +
+			"</tr></table></td></tr>";
+		jQuery("#" + prefix + "Persons").append(html);
+	}
+	
+	function removeElement(id) {
+		jQuery("#" + id).remove();
+	}
 </script>
 
 <div style="width: 800px;">
@@ -258,49 +305,98 @@
         <table border="0" width="100%" cellpadding="5" cellspacing="0">
             <tr>
                 <td width="20%">Тип клиента:</td>
-                <td width="80%">
-                    <select name="client.Type" id="clientType" style="width: 60%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
+                <td width="50%">
+                    <select name="client.Type" id="clientType" style="width: 100%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
                         <option value="${ClientTypeDrugstore}" selected="selected">Аптека</option>
                         <!-- 
                         Возможность регистрации поставщиков в "новой реальности" пока недоступна
                         <option value="${ClientTypeSupplier}">Поставщик</option>-->
                     </select>
                 </td>
+                <td></td>
             </tr>
             <tr>
-                <td width="20%">Сегмент:</td>
-                <td width="80%">
-                    <select name="client.Segment" id="SegmentComboBox" style="width: 60%">
+                <td>Сегмент:</td>
+                <td>
+                    <select name="client.Segment" id="SegmentComboBox" style="width: 100%">
                         <option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
                         <option value="${SegmentTypeRetail}">Розница</option>
-                    </select>                
+                    </select>
                 </td>
+                <td></td>
             </tr>
             <tr>
-                <td width="20%">Юридическое наименование:</td>
-                <td width="80%"><input type="text" id="JuridicalName" name="client.FullName" style="width: 60%" /></td>
+                <td>Юридическое наименование:</td>
+                <td><input type="text" id="JuridicalName" name="client.FullName" style="width: 100%" /></td>
+                <td></td>
             </tr>
             <tr>
-                <td width="20%">Краткое наименование:</td>
-                <td width="80%"><input type="text" id="ShortName" name="client.Name" style="width: 60%" /></td>
+                <td>Краткое наименование:</td>
+                <td><input type="text" id="ShortName" name="client.Name" style="width: 100%" /></td>
+                <td></td>
             </tr>
-            <tr>
-                <td width="20%">Телефон:</td>                
-                <td width="80%">
-                    <input type="text" id="ClientContactPhone" name="clientContacts[0].ContactText" class="phone" style="width: 60%" />
-                    <input type="hidden" name="clientContacts[0].Type" value="1" />
-                </td>
-            </tr>
-            <tr>
-                <td width="20%">Email:</td>
-                <td width="80%">
-                    <input type="text" id="ClientContactEmail" name="clientContacts[1].ContactText" class="email" style="width: 60%" />
-                    <input type="hidden" name="clientContacts[1].Type" value="0" />
-                </td>
+            <tr valign="top">
+				<td colspan="2">
+					<div class="contextualNoTopSpace">
+						<a id="clientaddPhoneLink" class="icon icon-add" name="2" href="javascript:"
+							onclick="addPhone('client')">Добавить</a>
+					</div>
+					<h4>Телефоны</h4>
+					<table id = "clientPhones" cellpadding="0" cellspacing="10" width="100%" border="0">
+						<tr>
+							<td>
+							<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="30%">Номер телефона:</td>
+								<td>
+									<input type="text" id="ClientContactPhone" name="clientContacts[0].ContactText" class="phone" style="width: 100%" />
+									<input type="hidden" name="clientContacts[0].Type" value="1" />
+								</td>
+							</tr>
+							<tr>
+								<td>Примечание:</td>
+								<td><input type="text" name="clientContacts[0].Comment" style="width: 100%" /></td>
+							</tr>
+							</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
+			</tr>
+			
+			<tr valign="top">
+				<td colspan="2">
+					<div class="contextualNoTopSpace">
+						<a id="clientaddEmailLink" class="icon icon-add" name="500" href="javascript:"
+							onclick="addEmail('client')">Добавить</a>
+					</div>
+					<h4>Email</h4>
+					<table id = "clientEmails" cellpadding="0" cellspacing="10" width="100%" border="0">
+						<tr>
+							<td>
+							<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="30%">Email:</td>
+								<td>
+									<input type="text" id="ClientContactEmail" name="clientContacts[1].ContactText" class="email" style="width: 100%" />
+									<input type="hidden" name="clientContacts[1].Type" value="0" />
+								</td>
+							</tr>
+							<tr>
+								<td>Примечание:</td>
+								<td><input type="text" name="clientContacts[1].Comment" style="width: 100%" /></td>
+							</tr>
+							</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
             </tr>
         </table>
     </div>
-
+    
     <div class="block">
         <h3>Права доступа</h3>
 		<div>
@@ -381,8 +477,8 @@
             <tr>
                 <td width="20%">Адрес доставки медикаментов:</td>
                 <td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
-            </tr>                    
-        </table>            
+            </tr>
+        </table>
     </div>
 
     <div class="block">
@@ -390,31 +486,98 @@
         <table border="0" width="100%" cellpadding="3" cellspacing="0">
             <tr>
                 <td width="20%">Комментарий:</td>
-                <td width="80%"><input type="text" id="UserName" name="userName" style="width: 60%" /></td>
-            </tr>        
-            <tr>
-                <td width="20%">Телефон:</td>
-                <td width="80%">
-                    <input type="text" id="UserContactPhone" name="userContacts[0].ContactText" class="phone" style="width: 60%" />
-                    <input type="hidden" name="userContacts[0].Type" value="1" />
-                </td>
-            </tr>          
-            <tr>
-                <td width="20%">Email:</td>
-                <td width="80%">
-                    <input type="text" id="UserContactEmail" name="userContacts[1].ContactText" class="email" style="width: 60%" />
-                    <input type="hidden" name="userContacts[1].Type" value="0" />
-                </td>
-            </tr>            
-            <tr>
-                <td width="20%">Контактное лицо:</td>
-                <td width="80%"><input type="text" id="contactPerson" name="contactPerson" style="width: 60%" /></td>
-            </tr>            
-        </table>        
-    </div>
+                <td width="50%"><input type="text" id="UserName" name="userName" style="width: 100%" /></td>
+                <td></td>
+            </tr>
+            
+            <tr valign="top">
+				<td colspan="2">
+					<div class="contextualNoTopSpace">
+						<a id="useraddPhoneLink" class="icon icon-add" name="2" href="javascript:"
+							onclick="addPhone('user')">Добавить</a>
+					</div>
+					<h4>Телефоны</h4>
+					<table id = "userPhones" cellpadding="0" cellspacing="10" width="100%" border="0">
+						<tr>
+							<td>
+							<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="30%">Номер телефона:</td>
+								<td>
+									<input type="text" id="UserContactPhone" name="userContacts[0].ContactText" class="phone" style="width: 100%" />
+									<input type="hidden" name="userContacts[0].Type" value="1" />
+								</td>
+							</tr>
+							<tr>
+								<td>Примечание:</td>
+								<td><input type="text" name="userContacts[0].Comment" style="width: 100%" /></td>
+							</tr>
+							</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
+			</tr>
 
-    <div class="save">
-        <input type="submit" id="RegisterButton" name="RegisterButton" value="Зарегистрировать" />
-    </div>
-</form>    
+			<tr valign="top">
+				<td colspan="2">
+					<div class="contextualNoTopSpace">
+						<a id="useraddEmailLink" class="icon icon-add" name="500" href="javascript:"
+							onclick="addEmail('user')">Добавить</a>
+					</div>
+					<h4>Email</h4>
+					<table id = "userEmails" cellpadding="0" cellspacing="10" width="100%" border="0">
+						<tr>
+							<td>
+							<table width="100%" cellpadding="0" cellspacing="0" border="0">
+							<tr>
+								<td width="30%">Email:</td>
+								<td>
+									<input type="text" id="UserContactEmail" name="userContacts[1].ContactText" class="email" style="width: 100%" />
+									<input type="hidden" name="userContacts[1].Type" value="0" />
+								</td>
+							</tr>
+							<tr>
+								<td>Примечание:</td>
+								<td><input type="text" name="userContacts[1].Comment" style="width: 100%" /></td>
+							</tr>
+							</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
+			</tr>
+
+			<tr valign="top">
+				<td colspan="2">
+					<div class="contextualNoTopSpace">
+						<a id="useraddPersonLink" class="icon icon-add" name="1" href="javascript:"
+							onclick="addPerson('user')">Добавить</a>
+					</div>
+					<h4>Контактные лица</h4>
+					<table id = "userPersons" cellpadding="0" cellspacing="10" width="100%" border="0">
+						<tr>
+							<td>
+								<table width="100%" cellpadding="0" cellspacing="0" border="0">
+									<tr>
+										<td width="30%">Ф.И.О.:</td>
+										<td><input type="text" name="userPersons[0].Name" style="width: 100%" /></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+					</table>
+				</td>
+				<td></td>
+			</tr>
+		</table>
+	</div>
+
+	<div class="save">
+		<input type="submit" id="RegisterButton" name="RegisterButton" value="Зарегистрировать" />
+	</div>
+
+</form>
 </div>
