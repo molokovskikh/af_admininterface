@@ -128,13 +128,25 @@ namespace AdminInterface.Controllers
 					client.HomeRegion = Region.Find(homeRegion);
 					client.Update();
 					if (setting.IsAvaliableForBrowse)
+					{
 						client.MaskRegion |= setting.Id;
+						client.Users.Each(u => u.WorkRegionMask |= setting.Id);
+					}
 					else
+					{
 						client.MaskRegion &= ~setting.Id;
+						client.Users.Each(u => u.WorkRegionMask &= ~setting.Id);
+					}
 					if (setting.IsAvaliableForOrder)
+					{
 						drugstore.OrderRegionMask |= setting.Id;
+						client.Users.Each(u => u.OrderRegionMask |= setting.Id);
+					}
 					else
+					{
 						drugstore.OrderRegionMask &= ~setting.Id;
+						client.Users.Each(u => u.OrderRegionMask &= ~setting.Id);
+					}
 				}				
 				client.UpdateAndFlush();
 				drugstore.UpdateAndFlush();

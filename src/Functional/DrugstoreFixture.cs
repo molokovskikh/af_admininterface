@@ -73,6 +73,153 @@ namespace Functional
 			}
 		}
 
+		[Test, Description("При добавлении региона работы клиенту, он должен добавиться пользователю")]
+		public void After_add_client_work_region_user_region_settings_must_be_update()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				var workRegion = GetWorkRegion(browser, "Курск");
+				workRegion.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+
+				Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
+
+				Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
+				Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
+
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var user = client.Users[0];
+					Assert.IsTrue((user.WorkRegionMask & 1) > 0);
+					Assert.IsTrue((user.WorkRegionMask & 4) > 0);
+					Assert.IsTrue((user.OrderRegionMask & 1) > 0);
+					Assert.IsFalse((user.OrderRegionMask & 4) > 0);
+				}
+			}
+		}
+
+		[Test, Description("При удалении региона работы у клиента, он должен удалиться у пользователя")]
+		public void After_remove_client_work_region_user_region_settings_must_be_update()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				var workRegion = GetWorkRegion(browser, "Курск");
+				workRegion.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
+
+				browser.Back();
+				browser.Link(Find.ByText("Настройка")).Click();
+				workRegion = GetWorkRegion(browser, "Воронеж");
+				workRegion.Checked = false;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+
+				Assert.IsFalse(UserWorkRegionExists(browser, "Воронеж"));
+				// При удалении региона работы должен автоматически удаляться регион заказа
+				Assert.IsFalse(UserOrderRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var user = client.Users[0];
+					Assert.IsFalse((user.WorkRegionMask & 1) > 0);
+					Assert.IsFalse((user.OrderRegionMask & 1) > 0);
+					Assert.IsTrue((user.WorkRegionMask & 4) > 0);
+				}
+			}
+		}
+
+		[Test, Description("При добавлении региона заказа клиенту, он должен добавиться пользователю")]
+		public void After_add_client_order_region_user_region_settings_must_be_update()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				var workRegion = GetOrderRegion(browser, "Липецк");
+				workRegion.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserOrderRegionExists(browser, "Липецк"));
+				// При добавлении региона заказа, автоматически должен подключаться такой же регион работы
+				Assert.IsTrue(UserWorkRegionExists(browser, "Липецк"));
+
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var user = client.Users[0];
+					Assert.IsTrue((user.WorkRegionMask & 1) > 0);
+					Assert.IsTrue((user.OrderRegionMask & 1) > 0);
+					Assert.IsTrue((user.WorkRegionMask & 8) > 0);
+					Assert.IsTrue((user.OrderRegionMask & 8) > 0);
+				}
+			}
+		}
+
+		[Test, Description("При удалении региона заказа у клиента, он должен удалиться у пользователя")]
+		public void After_remove_client_order_region_user_region_settings_must_be_update()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText("Настройка")).Click();
+				// Когда добавляем регион заказа, автоматически добавляется такой же регион работы
+				var workRegion = GetOrderRegion(browser, "Курск");
+				workRegion.Checked = true;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+				Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
+				Assert.IsTrue(UserOrderRegionExists(browser, "Курск"));
+
+				browser.Back();
+				browser.Link(Find.ByText("Настройка")).Click();
+				workRegion = GetOrderRegion(browser, "Курск");
+				workRegion.Checked = false;
+				browser.Button(b => b.Value == "Сохранить").Click();
+				browser.Link(Find.ByText(client.Users[0].Login)).Click();
+
+				Assert.IsTrue(UserWorkRegionExists(browser, "Воронеж"));
+				Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
+				Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
+				// При удалении региона заказа, регион работы должен оставаться
+				Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					var user = client.Users[0];
+					Assert.IsTrue((user.WorkRegionMask & 1) > 0);
+					Assert.IsTrue((user.OrderRegionMask & 1) > 0);
+					Assert.IsTrue((user.WorkRegionMask & 4) > 0);
+					Assert.IsFalse((user.OrderRegionMask & 4) > 0);
+				}
+			}
+		}
+
+		private static bool UserWorkRegionExists(IE browser, string regionName)
+		{
+			var labels = browser.Labels.Where(label => label != null && label.For.Contains("WorkRegions"));
+			return labels.Any(label => label.Text.Contains(regionName));
+		}
+
+		private static bool UserOrderRegionExists(IE browser, string regionName)
+		{
+			var labels = browser.Labels.Where(label => label != null && label.For.Contains("OrderRegions"));
+			return labels.Any(label => label.Text.Contains(regionName));
+		}
+
 		[Test]
 		public void Show_all_regions()
 		{
