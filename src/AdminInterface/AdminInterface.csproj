@@ -203,6 +203,7 @@
     <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\Telephony\CallRecordFile.cs" />
     <Compile Include="Models\Telephony\CallSearchProperties.cs" />
+    <Compile Include="Models\Telephony\UnresolvedCall.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSearchItem.cs" />
     <Compile Include="Models\UserSearchProperties.cs" />

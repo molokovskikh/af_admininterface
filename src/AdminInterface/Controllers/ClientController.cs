@@ -6,6 +6,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Telephony;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -34,7 +35,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Info(uint cc)
 		{
-			var client = Client.FindAndCheck(cc);			
+			var client = Client.FindAndCheck(cc);
 			PropertyBag["Client"] = client;
 			if (String.IsNullOrEmpty(client.Registrant))
 				PropertyBag["Registrant"] = null;
@@ -46,7 +47,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["sortMessagesDirection"] = "Descending";
 
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
-			PropertyBag["CallLogs"] = CallLog.LastCalls();
+			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 
 			var users = client.GetUsers();
@@ -167,15 +168,15 @@ namespace AdminInterface.Controllers
 				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
 			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
 			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
-			using(new TransactionScope())
+			using(var scope = new TransactionScope())
 			{
-				ArHelper.WithSession(s => s.CreateSQLQuery(@"
-update logs.CallLogs
-set Id2 = 0
-where `from` = :phone")
-					.SetParameter("phone", phone.Replace("-", ""))
-					.ExecuteUpdate());
+					ArHelper.WithSession(s => s.CreateSQLQuery(@"
+delete from telephony.UnresolvedPhone
+where Phone like :phone")
+							.SetParameter("phone", phone.Replace("-", ""))
+							.ExecuteUpdate());
 				group.Save();
+				scope.VoteCommit();
 			}
 			RedirectToReferrer();
 		}

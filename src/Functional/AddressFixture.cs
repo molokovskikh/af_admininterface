@@ -9,6 +9,7 @@ using NUnit.Framework;
 using WatiN.Core;
 using System.Collections;
 using Common.Web.Ui.Models;
+using System.Threading;
 
 namespace Functional
 {
@@ -28,9 +29,11 @@ namespace Functional
 					client = Client.Find(client.Id);
 					var group = client.Addresses[0].ContactGroup;
 					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+					Thread.Sleep(500);
 					browser.Button(Find.ByValue("Сохранить")).Click();
 				}
 			}
+			Thread.Sleep(500);
 			// Проверка, что контактная запись удалена
 			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
 			Assert.That(count, Is.EqualTo(countContacts - 1));
