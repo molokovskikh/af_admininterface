@@ -19,6 +19,10 @@ namespace AdminInterface.Models
 		ByLogin,
 		[Description("Комментарий пользователя")]
 		ByUserName,
+		[Description("Email/телефон")]
+		ByContacts,
+		[Description("Контактное лицо (Ф.И.О.)")]
+		ByPersons,
 		[Description("Имя клиента")]
 		ByClientName,
 		[Description("Юридическое имя")]
@@ -91,6 +95,16 @@ namespace AdminInterface.Models
 		public bool IsSearchByUserName()
 		{
 			return SearchBy == SearchUserBy.ByUserName;
+		}
+
+		public bool IsSearchByContacts()
+		{
+			return SearchBy == SearchUserBy.ByContacts;
+		}
+
+		public bool IsSearchByPersons()
+		{
+			return SearchBy == SearchUserBy.ByPersons;
 		}
 	}
 }

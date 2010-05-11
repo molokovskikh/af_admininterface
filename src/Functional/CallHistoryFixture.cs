@@ -17,6 +17,7 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl("default.aspx")))
 			{
 				browser.Link(Find.ByText("История звонков")).Click();
+				browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
 				browser.Button(Find.ByValue("Найти")).Click();
 
 				Assert.That(browser.ContainsText("Дата звонка"));

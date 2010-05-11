@@ -8,6 +8,8 @@ using Castle.ActiveRecord;
 using AdminInterface.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.MySql;
+using System.IO;
+using System.Text;
 
 namespace AdminInterface.Models
 {
@@ -117,6 +119,9 @@ SELECT
 FROM
 	future.Users
 	JOIN future.Clients ON Clients.Id = Users.ClientId
+		LEFT JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
+		LEFT JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
+		LEFT JOIN contacts.Persons ON Persons.ContactGroupId = cg.Id
 	JOIN farm.Regions ON Regions.RegionCode = Clients.RegionCode
 	JOIN usersettings.RetClientsSet rcs ON rcs.ClientCode = Clients.Id
 	JOIN billing.Payers ON Clients.PayerId = Payers.PayerID
@@ -190,21 +195,31 @@ GROUP BY {{UserSearchItem.UserId}}
 		private static string GetFilterBy(UserSearchProperties searchProperties)
 		{
 			var filter = String.Empty;
-		    var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty :
+			var searchText = String.IsNullOrEmpty(searchProperties.SearchText) ? String.Empty :
 				Utils.StringToMySqlString(searchProperties.SearchText);
 
 			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
+			var searchTextIsPhone = new Regex("^\\d{1,10}$").IsMatch(searchText.Replace("-", ""));
 
 			switch (searchProperties.SearchBy)
 			{
 				case SearchUserBy.Auto: {
 						filter = AddFilterCriteria(filter,
-							String.Format(" LOWER(Users.Login) like '{0}' or LOWER(Users.Name) like '{0}' or LOWER(Clients.Name) like '{0}' or LOWER(Clients.FullName) like '{0}' ",
+							String.Format(@"
+LOWER(Users.Login) like '{0}' or
+LOWER(Users.Name) like '{0}' or
+LOWER(Clients.Name) like '{0}' or
+LOWER(Clients.FullName) like '{0}' or 
+(LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0) or
+LOWER(Persons.Name) like '{0}' ",
 								sqlSearchText));
 						if (searchTextIsNumber)
-							filter += String.Format(" or Users.Id = {0} or Clients.Id = {0} ", searchText);
-						break;
+							filter += String.Format(@" or Users.Id = {0} or Clients.Id = {0} ", searchText);
+						if (searchTextIsPhone && searchText.Length >= 5)
+							filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) ",
+								sqlSearchText.Replace("-", ""));
+					break;
 					}
 				case SearchUserBy.ByClientName: {
 						filter = AddFilterCriteria(filter,
@@ -230,11 +245,24 @@ GROUP BY {{UserSearchItem.UserId}}
 						break;
 					}
 				case SearchUserBy.ByUserId: {
-					filter = AddFilterCriteria(filter, String.Format(" Users.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
+						filter = AddFilterCriteria(filter, String.Format(" Users.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserName: {
 						filter = AddFilterCriteria(filter, String.Format(" LOWER(Users.Name) like '{0}' ", sqlSearchText));
+						break;
+					}
+				case SearchUserBy.ByContacts: {
+						if (searchTextIsPhone || searchTextIsNumber)
+							filter = AddFilterCriteria(filter,
+								String.Format(" REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ", sqlSearchText.Replace("-", "")));
+						else
+							filter = AddFilterCriteria(filter,
+								String.Format(" LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 ", sqlSearchText));
+						break;
+					}
+				case SearchUserBy.ByPersons: {
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(Persons.Name) like '{0}' ", sqlSearchText));
 						break;
 					}
 			}

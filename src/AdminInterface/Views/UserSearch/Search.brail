@@ -36,17 +36,22 @@
                 <input type="radio" id="SearchByUserId" name="SearchBy.SearchBy" value="ByUserId" ${"checked" if FindBy.IsSearchByUserId()} />
                 <label for="SearchByUserId">Код пользователя</label><br />
                 <input type="radio" id="SearchByLogin" name="SearchBy.SearchBy" value="ByLogin" ${"checked" if FindBy.IsSearchByLogin()} />
-                <label for="SearchByLogin">Логин пользователя</label>
-            </td>
-            <td>
+                <label for="SearchByLogin">Логин пользователя</label><br />
                 <input type="radio" id="SearchByUserName" name="SearchBy.SearchBy" value="ByUserName" ${"checked" if FindBy.IsSearchByUserName()} />
                 <label for="SearchByUserName">Комментарий пользователя</label><br />
+            </td>
+            <td>
                 <input type="radio" id="SearchByClientName" name="SearchBy.SearchBy" value="ByClientName" ${"checked" if FindBy.IsSearchByClientName()} />
                 <label for="SearchByClientName">Имя клиента</label><br />
+                <input type="radio" id="SearchByContacts" name="SearchBy.SearchBy" value="ByContacts" ${"checked" if FindBy.IsSearchByContacts()} />
+                <label for="SearchByContacts">Email/телефон</label><br />
+                <input type="radio" id="SearchByPersons" name="SearchBy.SearchBy" value="ByPersons" ${"checked" if FindBy.IsSearchByPersons()} />
+                <label for="SearchByPersons">Контактное лицо (Ф.И.О.)</label><br />
                 <input type="radio" id="SearchByJuridicalName" name="SearchBy.SearchBy" value="ByJuridicalName" ${"checked" if FindBy.IsSearchByJuridicalName()} />
                 <label for="SearchByJuridicalName">Юридическое имя</label><br />
                 <input type="radio" id="SearchByPayerId" name="SearchBy.SearchBy" value="ByPayerId" ${"checked" if FindBy.IsSearchByPayerId()} />
                 <label for="SearchByPayerId">Код договора</label><br />
+                
             </td>
         </tr>
     </table>

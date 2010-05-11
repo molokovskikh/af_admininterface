@@ -15,7 +15,7 @@ namespace Functional
 	[TestFixture]
 	public class ClientMessagesFixture : WatinFixture
 	{
-		[Test]
+		[Test, Ignore("Этот тест эквивалентен тесту Send_message_to_user в BillingFixture")]
 		public void User_can_send_message_to_client()
 		{
 			List<ClientMessage> messages = null;
@@ -47,7 +47,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Этот тест эквивалентен тесту Cancel_message_for_user в BillingFixture")]
 		public void Cancel_message_for_client()
 		{
 			List<ClientMessage> messages;

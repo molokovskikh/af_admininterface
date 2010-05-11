@@ -584,16 +584,45 @@ namespace Functional
 					var username = client.Users[0].GetLoginOrName();
 					browser.Link(Find.ByText("Биллинг")).Click();
 					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select(username);
-					var message = "test message for user " + username;
-					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(message);
+					var messageText = "test message for user " + username;
+					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
 					browser.Button(Find.ByValue("Отправить сообщение")).Click();
 					Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
 					Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
 					browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 					Thread.Sleep(500);
-					Assert.That(browser.Text, Text.Contains(message));
+					Assert.That(browser.Text, Text.Contains(messageText));
+					var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+					messages[0].Refresh();
+					Assert.That(messages[0].Message, Is.EqualTo(messageText));
+					Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
 				}
 			}			
+		}
+
+		[Test]
+		public void Cancel_message_for_user()
+		{
+			using (new SessionScope())
+			{
+				var client = DataMother.CreateTestClientWithAddressAndUser();
+				using (var browser = Open(String.Format("Client/{0}", client.Id)))
+				{
+					var username = client.Users[0].GetLoginOrName();
+					browser.Link(Find.ByText("Биллинг")).Click();
+					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select(username);
+					var messageText = "test message for user " + username;
+					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
+					browser.Button(Find.ByValue("Отправить сообщение")).Click();
+					browser.Link(Find.ByText("Просмотреть сообщение")).Click();
+					Thread.Sleep(500);
+					browser.Button(String.Format("CancelViewMessage{0}", client.Users[0].Id)).Click();
+					var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+					messages[0].Refresh();
+					Assert.That(messages[0].Message, Is.EqualTo(messageText));
+					Assert.That(messages[0].ShowMessageCount, Is.EqualTo(0));
+				}
+			}
 		}
 
 		[Test]

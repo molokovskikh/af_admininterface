@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
+using Common.Web.Ui.Models;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;
@@ -265,6 +266,117 @@ from billing.Payers
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
 				browser.TextField(Find.ById("SearchText")).TypeText("аптека №151");
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Autosearch_by_contact_phone()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{				
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-124578", client.Id.ToString().Substring(0, 4))));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("{0}-124578", client.Id.ToString().Substring(0, 4)));
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Autosearch_by_contact_email()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("test{0}@test.test", client.Id));
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Autosearch_by_person()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("testPerson{0}", client.Id));
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Search_by_contact_email()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("test{0}@test.test", client.Id));
+				browser.RadioButton(Find.ById("SearchByContacts")).Checked = true;
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Search_by_contact_phone()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-123456", client.Id.ToString().Substring(0, 4))));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("{0}-123456", client.Id.ToString().Substring(0, 4)));
+				browser.RadioButton(Find.ById("SearchByContacts")).Checked = true;
+				browser.Button(Find.ByValue("Поиск")).Click();
+
+				CheckThatIsUserPage(browser);
+			}
+		}
+
+		[Test]
+		public void Search_by_person_name()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (new SessionScope())
+			{
+				client.Users[0].AddContactGroup();
+				client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
+			}
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(String.Format("testPerson{0}", client.Id));
+				browser.RadioButton(Find.ById("SearchByPersons")).Checked = true;
 				browser.Button(Find.ByValue("Поиск")).Click();
 
 				CheckThatIsUserPage(browser);
