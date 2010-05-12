@@ -382,5 +382,17 @@ from billing.Payers
 				CheckThatIsUserPage(browser);
 			}
 		}
+
+		[Test]
+		public void Search_from_main_page()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (var browser = Open("Main/Index"))
+			{
+				browser.TextField(Find.ById("SearchText")).TypeText(client.Users[0].Login);
+				browser.Button(Find.ByValue("Найти")).Click();
+				CheckThatIsUserPage(browser);
+			}
+		}
 	}
 }

@@ -10,6 +10,7 @@ using Castle.MonoRail.Framework;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
+using System.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -27,7 +28,9 @@ namespace AdminInterface.Controllers
 				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
 			});
 
-			PropertyBag["Regions"] = Region.GetRegionsForClient(SecurityContext.Administrator.UserName);
+			var regions = Region.GetRegionsForClient(SecurityContext.Administrator.UserName);
+			PropertyBag["Regions"] = regions;
+			PropertyBag["RegionId"] = regions.Where(region => region.Name.ToLower().Equals("все")).First().Id;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			if (regioncode == null || from == null || to == null)
