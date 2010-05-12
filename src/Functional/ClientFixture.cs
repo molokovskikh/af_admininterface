@@ -129,5 +129,15 @@ namespace Functional
 				Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
 			}
 		}
+
+		[Test]
+		public void Client_page_must_contains_client_id()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", client.Name, client.Id)));
+			}
+		}
 	}
 }
