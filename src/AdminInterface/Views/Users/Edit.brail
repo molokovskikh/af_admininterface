@@ -101,7 +101,7 @@
             <% end %>
         </form>				
     </div>	
-    <%if authorizationLog != null and (authorizationLog.CITime!=null or authorizationLog.AFTime!=null or authorizationLog.AOLTime!=null or authorizationLog.IOLTime!=null): %>
+
 	<div class="block">
 		<h3>
 			Статистика использования
@@ -110,6 +110,7 @@
 		    <table style="width: 100%">
 		    <tr valign="top">
 			<td>
+				<% if userInfo != null: %>
 			    <table cellspacing="0" cellpadding="1">
 			    <tr>
 			        <td>${"Последний правильный ввод пароля:" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
@@ -124,9 +125,11 @@
 			        <td style="padding-left: 2px;">${userInfo.LastPasswordChange if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
                 </tr>
 			    </table>
+			    <% end %>
             </td>
 
 		    <td style="padding-left: 5px; width: 50%">
+				<% if (authorizationLog != null): %>
 		        <table cellspacing="0" cellpadding="1">
 		        <tr>
 		            <td>${"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
@@ -145,12 +148,13 @@
 		            <td style="padding-left: 2px;">${authorizationLog.IOLTime if authorizationLog.IOLTime != null}</td>
 		        </tr>
 		        </table>
+		        <% end %>
 		    </td>
 			</tr>
 			</table>
 		</div>
 	</div>	
-	<%end %>	
+
 	<form id="UserSettingsForm" method=post action="${siteroot}/users/update">
 		<input name="user.Id" type=hidden value=${user.Id}>
 		

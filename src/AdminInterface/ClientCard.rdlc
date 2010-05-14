@@ -447,7 +447,7 @@ e-mail: tech@analit.net</Value>
       </Textbox>
       <Textbox Name="textbox4">
         <rd:DefaultName>textbox4</rd:DefaultName>
-        <Top>1.25cm</Top>
+        <Top>1.75cm</Top>
         <Width>8cm</Width>
         <Style>
           <FontFamily>Verdana</FontFamily>
@@ -469,7 +469,7 @@ e-mail: tech@analit.net</Value>
         <Visibility>
           <Hidden>=Parameters!IsRegistration.Value</Hidden>
         </Visibility>
-        <Top>1.75cm</Top>
+        <Top>2.25cm</Top>
         <Width>8cm</Width>
         <Style>
           <FontFamily>Verdana</FontFamily>
@@ -488,7 +488,7 @@ e-mail: tech@analit.net</Value>
       </Textbox>
       <Textbox Name="textbox2">
         <rd:DefaultName>textbox2</rd:DefaultName>
-        <Top>0.75cm</Top>
+        <Top>1.25cm</Top>
         <Width>8cm</Width>
         <Style>
           <FontFamily>Verdana</FontFamily>
@@ -522,7 +522,7 @@ e-mail: tech@analit.net</Value>
         </Style>
         <CanGrow>true</CanGrow>
         <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
+        <Height>1cm</Height>
         <Value>="Регистрационная карта № " + Parameters!ClientCode.Value.ToString() + "/" + Parameters!ClientLogin.Value.ToString()</Value>
       </Textbox>
     </ReportItems>
