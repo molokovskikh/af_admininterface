@@ -76,7 +76,7 @@ namespace AdminInterface.Controllers
 
 		public void ShowDocumentDetails(uint documentLogId)
 		{
-			var documentLog = DocumentRecieveLog.Find(documentLogId);
+			var documentLog = DocumentReceiveLog.Find(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
 		}

@@ -156,11 +156,11 @@ namespace Functional.ForTesting
 			}
 		}
 
-		public static DocumentRecieveLog CreateTestDocumentLog(Supplier supplier, Client client)
+		public static DocumentReceiveLog CreateTestDocumentLog(Supplier supplier, Client client)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var documentLogEntity = new DocumentRecieveLog {
+				var documentLogEntity = new DocumentReceiveLog {
 					Addition = "Test document log entity",
 					ForClient = client,
 					FromSupplier = supplier,
@@ -172,7 +172,7 @@ namespace Functional.ForTesting
 				};
 				documentLogEntity.Create();
 				client.Users.Select(u => new DocumentSendLog {
-					Recieved = documentLogEntity,
+					Received = documentLogEntity,
 					ForUser = u
 				}).Each(d => d.Save());
 				scope.VoteCommit();
@@ -180,7 +180,7 @@ namespace Functional.ForTesting
 			}
 		}
 
-		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentRecieveLog documentLogEntity)
+		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{

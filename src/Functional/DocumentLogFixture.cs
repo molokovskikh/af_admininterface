@@ -17,7 +17,7 @@ namespace Functional
 		public void View_documents()
 		{
 			var client = CreateClientWithDeliveryAddress();
-			var documentLog = new DocumentRecieveLog {
+			var documentLog = new DocumentReceiveLog {
 				DocumentType = DocumentType.Waybill,
 				FileName = "test.txt",
 				LogTime = DateTime.Now,

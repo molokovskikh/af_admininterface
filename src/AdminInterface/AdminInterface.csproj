@@ -181,6 +181,7 @@
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\Document.cs" />
+    <Compile Include="Models\Logs\DocumentReceiveLog.cs" />
     <Compile Include="Models\DrugstoreSettings.cs" />
     <Compile Include="Models\EndUserException.cs" />
     <Compile Include="Models\Logs\AddressLogRecord.cs" />
@@ -296,7 +297,6 @@
       <DependentUpon>managep.aspx</DependentUpon>
     </Compile>
     <Compile Include="Models\ClientMessage.cs" />
-    <Compile Include="Models\Logs\DocumentRecieveLog.cs" />
     <Compile Include="Models\Security\Permission.cs" />
     <Compile Include="NHibernateExtentions\Projections2.cs" />
     <Compile Include="OfficeUserRegistrationReport.aspx.cs">

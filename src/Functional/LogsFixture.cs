@@ -82,11 +82,11 @@ namespace Functional
 						Assert.That(openedWindow.Text, Text.Contains(String.Format("Пользователь {0}", text)));
 					else
 						Assert.That(openedWindow.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
-				}				
-			}			
+				}
+			}
 		}
 
-		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentRecieveLog documentLogEntity,
+		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentReceiveLog documentLogEntity,
 			out Document document, out UpdateLogEntity updateLogEntity)
 		{
 			using (var scope = new TransactionScope())
@@ -105,7 +105,7 @@ namespace Functional
 		}
 
 		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
-			out DocumentRecieveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
+			out DocumentReceiveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
 		{
 			using (var scope = new TransactionScope())
 			{
@@ -126,7 +126,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			Document document = null;
 			UpdateLogEntity updateEntity = null;
 
@@ -161,7 +161,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			Document document = null;
 			UpdateLogEntity updateEntity = null;
 
@@ -195,7 +195,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			Document document = null;
 			UpdateLogEntity updateEntity = null;
 
@@ -227,7 +227,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			Document document = null;
 			UpdateLogEntity updateEntity = null;
 
@@ -259,7 +259,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
@@ -281,7 +281,7 @@ namespace Functional
 		{
 			Client client = null;
 			Supplier supplier = null;
-			DocumentRecieveLog documentLogEntity = null;
+			DocumentReceiveLog documentLogEntity = null;
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);

@@ -97,38 +97,38 @@
 			<th>Комментарий</th>
 		</tr>
 	<% for i, logEntity in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Recieved.Id}">
-			<td>${logEntity.Recieved.Id}</td>
-			<td>${logEntity.Recieved.LogTime}</td>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Received.Id}">
+			<td>${logEntity.Received.Id}</td>
+			<td>${logEntity.Received.LogTime}</td>
 			<td>
-				${BindingHelper.GetDescription(logEntity.Recieved.DocumentType)}
-				<%if logEntity.Recieved.SendUpdateLogEntity: %>
+				${BindingHelper.GetDescription(logEntity.Received.DocumentType)}
+				<%if logEntity.Received.SendUpdateLogEntity: %>
 					(загрузка документов)
 				<% end %>
 			</td>
-			<td>${?logEntity.Recieved.Document.ProviderDocumentId}</td>
-			<td>${?logEntity.Recieved.Document.DocumentDate}</td>
-			<td>${?logEntity.Recieved.Document.WriteTime}</td>
-			<td>${logEntity.Recieved.FromSupplier.Name}</td>
-			<td>${logEntity.Recieved.Address.Value}</td>
-			<td class="${'DocumentNotParsed' if not logEntity.Recieved.Document and logEntity.Recieved.SendUpdateLogEntity}">
-				<% if logEntity.Recieved.Document: %>
-					<a id="ShowDocumentDetailsLink${logEntity.Recieved.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Recieved.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Recieved.Id}', 'DocumentDetails');">
-						!{logEntity.Recieved.FileName}
+			<td>${?logEntity.Received.Document.ProviderDocumentId}</td>
+			<td>${?logEntity.Received.Document.DocumentDate}</td>
+			<td>${?logEntity.Received.Document.WriteTime}</td>
+			<td>${logEntity.Received.FromSupplier.Name}</td>
+			<td>${logEntity.Received.Address.Value}</td>
+			<td class="${'DocumentNotParsed' if not logEntity.Received.Document and logEntity.Received.SendUpdateLogEntity}">
+				<% if logEntity.Received.Document: %>
+					<a id="ShowDocumentDetailsLink${logEntity.Received.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Received.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Received.Id}', 'DocumentDetails');">
+						!{logEntity.Received.FileName}
 					</a>
 				<% else: %>
-					!{logEntity.Recieved.FileName}
+					!{logEntity.Received.FileName}
 				<% end %>
 			</td>
 			<td>
-				${ViewHelper.ConvertToUserFriendlySize(logEntity.Recieved.DocumentSize) if logEntity.Recieved.DocumentSize}
+				${ViewHelper.ConvertToUserFriendlySize(logEntity.Received.DocumentSize) if logEntity.Received.DocumentSize}
 			</td>
 		  <% if IsDefined("client"): %>
 			<td>${logEntity.ForUser.Login}</td>
 		  <% end %>
 			<td>${?logEntity.SendedInUpdate.RequestTime}</td>
 			<td>
-				<pre>!{logEntity.Recieved.Addition}</pre>
+				<pre>!{logEntity.Received.Addition}</pre>
 			</td>
 		</tr>
 	<% end %>
