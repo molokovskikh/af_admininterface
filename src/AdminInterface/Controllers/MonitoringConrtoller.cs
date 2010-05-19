@@ -10,7 +10,6 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using ConsoleApplication11.ServiceReference2;
 
 namespace AdminInterface.Controllers
 {

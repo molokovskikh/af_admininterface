@@ -59,14 +59,14 @@ namespace AdminInterface.Models.Logs
 			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative || IsDocumentLoading();
 		}
 
-		public IList<DocumentLogEntity> GetLoadedDocumentLogs()
+		public IList<DocumentRecieveLog> GetLoadedDocumentLogs()
 		{
 			//return DocumentLogEntity.FindAllByProperty("SendUpdateId", Id);
             return ArHelper.WithSession(
-				session => session.CreateCriteria(typeof(DocumentLogEntity))
+				session => session.CreateCriteria(typeof(DocumentRecieveLog))
                     .Add(Expression.Eq("SendUpdateLogEntity", this))
 					.AddOrder(Order.Desc("LogTime"))
-					.List<DocumentLogEntity>());
+					.List<DocumentRecieveLog>());
 		}
 
 		public bool IsDocumentLoading()

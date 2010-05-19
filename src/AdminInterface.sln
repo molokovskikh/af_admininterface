@@ -1,6 +1,10 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{5B64C6CB-0409-4FB2-90BE-0E4594E00D97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{37F034A2-E126-411C-B47D-C137CA83D5DE}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminInterface", "AdminInterface\AdminInterface.csproj", "{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}"
 	ProjectSection(ProjectDependencies) = postProject
 		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {95E2C313-46FA-4B4B-9EFF-3228662908F4}
@@ -10,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui", "Common.Web
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Web.Ui.Test", "Common.Web.Ui\Common.Web.Ui.Test\Common.Web.Ui.Test.csproj", "{D3BA9766-79FD-4DC9-9A44-B847C6625E0A}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "lib", "lib", "{5B64C6CB-0409-4FB2-90BE-0E4594E00D97}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.MySql", "Common.MySql\Common.MySql\Common.MySql.csproj", "{8A680813-C83B-497A-85E6-E8F07B7D7650}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.MySql.Tests", "Common.MySql\Common.MySql.Tests\Common.MySql.Tests.csproj", "{98EFE255-60D6-4C1B-95A6-49779D21E94E}"
@@ -19,8 +21,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tools", "Common.Tools\Common.Tools\Common.Tools.csproj", "{72AFCFE8-C9E9-45FA-9698-BEE896A517A3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Tools.Tests", "Common.Tools\Common.Tools.Test\Common.Tools.Tests.csproj", "{A2C4864F-8976-4C5B-A2BF-60AE31749BB7}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{37F034A2-E126-411C-B47D-C137CA83D5DE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Functional", "Functional\Functional.csproj", "{641C9D72-F05E-43CE-BD1A-09DE4819AD93}"
 EndProject
@@ -79,8 +79,8 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}
 		{95E2C313-46FA-4B4B-9EFF-3228662908F4} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}
+		{D3BA9766-79FD-4DC9-9A44-B847C6625E0A} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}
 		{8A680813-C83B-497A-85E6-E8F07B7D7650} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}
 		{98EFE255-60D6-4C1B-95A6-49779D21E94E} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}
 		{72AFCFE8-C9E9-45FA-9698-BEE896A517A3} = {5B64C6CB-0409-4FB2-90BE-0E4594E00D97}

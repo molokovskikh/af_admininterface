@@ -83,95 +83,52 @@
 			<th>Номер документа</th>
 			<th>Дата получения</th>
 			<th>Тип документа</th>
-	    <% if (existsParsedDocuments): %>
-	        <th>Номер поставщика</th>
-	        <th>Дата документа</th>
-	        <th>Дата разбора</th>
-		<% end %>
-		
-		<% if not IsDefined("client") or client.IsDrugstore():%>
+			<th>Номер поставщика</th>
+			<th>Дата документа</th>
+			<th>Дата разбора</th>
 			<th>От поставщика</th>
-		<% else: %>
-			<th>Для аптеки</th>
-		<% end %>
-		
 			<th>На адрес</th>
 			<th>Название файла</th>
 			<th>Размер</th>
-			
-		  <%if IsDefined("client"): %>
+		<%if IsDefined("client"): %>
 			<th>Пользователь получивший документ</th>
-		  <%end %>
-		  
+		<% end %>
 			<th>Дата отправки</th>
 			<th>Комментарий</th>
 		</tr>
-	<% for i, logEntity in enumerate(logEntities):
-	    suffixUpdateType = ""
-	    if (logEntity.SendUpdateLogEntity != null):
-	        suffixUpdateType = "(загрузка документов)"
-	    end %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Id}">
+	<% for i, logEntity in enumerate(logEntities): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Recieved.Id}">
+			<td>${logEntity.Recieved.Id}</td>
+			<td>${logEntity.Recieved.LogTime}</td>
 			<td>
-				${logEntity.Id}
-			</td>
-			<td>
-				${logEntity.LogTime}
-			</td>
-			<td>
-				${BindingHelper.GetDescription(logEntity.DocumentType) if logEntity.DocumentType != null}
-				${suffixUpdateType}
-			</td>
-			
-			<% if (existsParsedDocuments):
-			    if (logEntity.Document != null): %>			    
-			<td>${logEntity.Document.ProviderDocumentId}</td>
-			<td>${logEntity.Document.DocumentDate}</td>
-			<td>${logEntity.Document.WriteTime}</td>
-			<%  else: %>
-			<td></td><td></td><td></td>
-			<%
-			    end
-			   else: %>
-			<td></td><td></td><td></td>     
-			<% end %>
-			
-			<% if not IsDefined("client") or client.IsDrugstore(): %>
-				<td>
-					${logEntity.FromSupplier.Name if logEntity.FromSupplier != null}
-				</td>
-			<% else: %>
-				<td>
-					${logEntity.ForClient.Name if logEntity.ForClient != null}
-				</td>
-			<% end %>
-			<td>
-			    <% if logEntity.Address != null: %>
-				${logEntity.Address.Value}
+				${BindingHelper.GetDescription(logEntity.Recieved.DocumentType)}
+				<%if logEntity.Recieved.SendUpdateLogEntity: %>
+					(загрузка документов)
 				<% end %>
 			</td>
-			<td class="${'DocumentNotParsed' if (logEntity.Document == null and logEntity.SendUpdateLogEntity != null)}">
-			    <% if (existsParsedDocuments): %>
-				    <a id="ShowDocumentDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Id}', 'DocumentDetails');">
-				        ${logEntity.FileName}
-                    </a>
+			<td>${?logEntity.Recieved.Document.ProviderDocumentId}</td>
+			<td>${?logEntity.Recieved.Document.DocumentDate}</td>
+			<td>${?logEntity.Recieved.Document.WriteTime}</td>
+			<td>${logEntity.Recieved.FromSupplier.Name}</td>
+			<td>${logEntity.Recieved.Address.Value}</td>
+			<td class="${'DocumentNotParsed' if not logEntity.Recieved.Document and logEntity.Recieved.SendUpdateLogEntity}">
+				<% if logEntity.Recieved.Document: %>
+					<a id="ShowDocumentDetailsLink${logEntity.Recieved.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Recieved.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Recieved.Id}', 'DocumentDetails');">
+						!{logEntity.Recieved.FileName}
+					</a>
 				<% else: %>
-				    ${logEntity.FileName}
+					!{logEntity.Recieved.FileName}
 				<% end %>
 			</td>
 			<td>
-				${ViewHelper.ConvertToUserFriendlySize(logEntity.DocumentSize) if logEntity.DocumentSize != null}
+				${ViewHelper.ConvertToUserFriendlySize(logEntity.Recieved.DocumentSize) if logEntity.Recieved.DocumentSize}
 			</td>
-		  <%if IsDefined("client"): %>
+		  <% if IsDefined("client"): %>
+			<td>${logEntity.ForUser.Login}</td>
+		  <% end %>
+			<td>${?logEntity.SendedInUpdate.RequestTime}</td>
 			<td>
-				${logEntity.UpdateLogEntity.User.Login if logEntity.UpdateLogEntity and logEntity.UpdateLogEntity.User}
-			</td>
-		  <%end %>
-			<td>
-				${logEntity.UpdateLogEntity.RequestTime if logEntity.UpdateLogEntity != null}
-			</td>
-			<td>
-				<pre>!{logEntity.Addition}</pre>
+				<pre>!{logEntity.Recieved.Addition}</pre>
 			</td>
 		</tr>
 	<% end %>

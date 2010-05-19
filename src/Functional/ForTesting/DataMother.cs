@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
@@ -155,27 +156,31 @@ namespace Functional.ForTesting
 			}
 		}
 
-		public static DocumentLogEntity CreateTestDocumentLog(Supplier supplier, Client client)
+		public static DocumentRecieveLog CreateTestDocumentLog(Supplier supplier, Client client)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var documentLogEntity = new DocumentLogEntity
-					{
-						Addition = "Test document log entity",
-						ForClient = client,
-						FromSupplier = supplier,
-						DocumentSize = 1024,
-						DocumentType = DocumentType.Waybill,
-						FileName = "TestFile.txt",
-						LogTime = DateTime.Now,
-					};
+				var documentLogEntity = new DocumentRecieveLog {
+					Addition = "Test document log entity",
+					ForClient = client,
+					FromSupplier = supplier,
+					Address = client.Addresses[0],
+					DocumentSize = 1024,
+					DocumentType = DocumentType.Waybill,
+					FileName = "TestFile.txt",
+					LogTime = DateTime.Now,
+				};
 				documentLogEntity.Create();
+				client.Users.Select(u => new DocumentSendLog {
+					Recieved = documentLogEntity,
+					ForUser = u
+				}).Each(d => d.Save());
 				scope.VoteCommit();
 				return documentLogEntity;
 			}
 		}
 
-		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentLogEntity documentLogEntity)
+		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentRecieveLog documentLogEntity)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{

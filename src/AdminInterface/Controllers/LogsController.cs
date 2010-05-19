@@ -7,7 +7,6 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Transform;
-using System.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -27,7 +26,7 @@ namespace AdminInterface.Controllers
 
 		public void DocumentLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
 		{
-			IList<DocumentLogEntity> documentLogs = null;
+			IList<DocumentSendLog> documentLogs;
 			if (!userId.HasValue)
 			{
 				var client = Client.Find(clientCode.Value);
@@ -35,7 +34,7 @@ namespace AdminInterface.Controllers
 				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 				SecurityContext.Administrator.CheckClientType(client.Type);
 
-				documentLogs = DocumentLogEntity.GetEnitiesForClient(client,
+				documentLogs = DocumentSendLog.GetEnitiesForClient(client,
 					beginDate, endDate.AddDays(1));
 				PropertyBag["logEntities"] = documentLogs;
 				PropertyBag["client"] = client;
@@ -45,14 +44,13 @@ namespace AdminInterface.Controllers
 				var user = User.Find(userId.Value);
 				Client.FindAndCheck(user.Client.Id);
 				PropertyBag["user"] = user;
-				documentLogs = DocumentLogEntity.GetEnitiesForUser(user,
+				documentLogs = DocumentSendLog.GetEnitiesForUser(user,
 					beginDate, endDate.AddDays(1));
 				PropertyBag["logEntities"] = documentLogs;
 			}
 
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
-			PropertyBag["existsParsedDocuments"] = ExistsParsedDocuments(documentLogs);
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
@@ -74,24 +72,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["detailLogEntities"] = detailsLogEntities;
 			PropertyBag["allDownloaded"] = totalByteDownloaded >= totalBytes;
 			PropertyBag["detailDocumentLogs"] = detailDocumentLogs;
-			PropertyBag["existsParsedDocuments"] = ExistsParsedDocuments(logEntity.GetLoadedDocumentLogs());
-		}
-
-		private bool ExistsParsedDocuments(IList<DocumentLogEntity> documentLogs)
-		{
-			if (documentLogs == null)
-				return false;
-			foreach (var log in documentLogs)
-			{
-				if (log.Document != null)
-					return true;
-			}
-			return false;
 		}
 
 		public void ShowDocumentDetails(uint documentLogId)
 		{
-			var documentLog = DocumentLogEntity.Find(documentLogId);
+			var documentLog = DocumentRecieveLog.Find(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
 		}

@@ -15,7 +15,7 @@ namespace AdminInterface.Models
 		public Document()
 		{ }
 
-		public Document(DocumentLogEntity log)
+		public Document(DocumentRecieveLog log)
 		{
 			Log = log;
 			WriteTime = DateTime.Now;
@@ -49,7 +49,7 @@ namespace AdminInterface.Models
 		public DateTime? DocumentDate { get; set; }
 
 		[BelongsTo("DownloadId")]
-		public DocumentLogEntity Log { get; set; }
+		public DocumentRecieveLog Log { get; set; }
 
 		[HasMany(ColumnKey = "DocumentId", Cascade = ManyRelationCascadeEnum.All, Inverse = true)]
 		public IList<DocumentLine> Lines { get; set; }

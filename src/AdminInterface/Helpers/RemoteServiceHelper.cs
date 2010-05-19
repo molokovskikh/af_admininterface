@@ -5,7 +5,7 @@ using System.Net.Security;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
-using ConsoleApplication11.ServiceReference2;
+using AdminInterface.Models.PrgData;
 using log4net;
 using RemotePriceProcessor;
 using AdminInterface.Properties;

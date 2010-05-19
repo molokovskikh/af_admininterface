@@ -8,25 +8,23 @@
 		<% if (logEntity.UpdateType.Equals(AdminInterface.Models.Logs.UpdateType.LoadingDocuments)): %>
 			<th>Дата загрузки</th>
 			<th>Тип документа</th>
-			<% if IsDefined("existsParsedDocuments") and (existsParsedDocuments): %>
-			    <th>Дата документа</th>
-			    <th>Дата разбора</th>
-			    <th>Номер поставщика</th>
-			    <th>Поставщик</th>			    
-			<% end %>			
+			<th>Дата документа</th>
+			<th>Дата разбора</th>
+			<th>Номер поставщика</th>
+			<th>Поставщик</th>
 			<th>Имя файла</th>
 			<th>Статус</th>
-		<% else: %>		
+		<% else: %>
 			<th>Дата</th>
 			<th>С хоста</th>
 			<th>Начиная с байта</th>
 			<th>Отправленно байт</th>
-        <% end %>			
+		<% end %>
 		</tr>
 		
 		<% 
 		if (logEntity.UpdateType.Equals(AdminInterface.Models.Logs.UpdateType.LoadingDocuments)):
-		    for i,documentLog in enumerate(detailDocumentLogs):		
+		    for i,documentLog in enumerate(detailDocumentLogs):
         %>
             <tr id="documentFileRow${documentLog.Id}" class="${ViewHelper.GetRowStyle(i)}">
                 <td>${documentLog.LogTime}</td>
@@ -55,14 +53,14 @@
 		
 		<%
 		    end
-        else:		     
-			for i,detailLogEntity in enumerate(detailLogEntities):			
+        else:
+			for i,detailLogEntity in enumerate(detailLogEntities):
 		%>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
 				<td>${detailLogEntity.LogTime}</td>
 				<td>${detailLogEntity.ResolveHost()} ( ${detailLogEntity.ClientHost} )</td>
-				<td>${detailLogEntity.FromByte}td>
-				<td>${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.SendBytes)}</td>				
+				<td>${detailLogEntity.FromByte}<td>
+				<td>${ViewHelper.ConvertToUserFriendlySize(detailLogEntity.SendBytes)}</td>
 			</tr>
 		<%
 			end
@@ -72,7 +70,7 @@
 		<% if allDownloaded: %>
 		<tr>
 			<td colspan="3" style="text-align:right;">
-				Все данные загружены.	
+				Все данные загружены.
 			</td>
 		</tr>
 		<% end %>
