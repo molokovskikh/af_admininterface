@@ -6,7 +6,7 @@ import System.IO
 
 Global(
 	project : "AdminInterface",
-	deployTo : "\\\\adc.analit.net\\Инфорум\\WebApps\\FutureAdm\\",
+	deployTo : """\\acdcserv.adc.analit.net\WebApps\FutureAdm\""",
 	humanReadableName : "Административный интерфейс (Новая реальность)"
 )
 
