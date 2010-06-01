@@ -8,6 +8,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -106,6 +107,9 @@ namespace AdminInterface.Controllers
 					client.Users.Each(u => address.SetAccessControl(u.Login));
 					scope.VoteCommit();
 					Mailer.DeliveryAddressRegistred(address);
+					var settings = DrugstoreSettings.Find(client.Id);
+					if (!settings.ServiceClient && client.BillingInstance.PayerID != 921)
+						new NotificationService().NotifySupplierAboutAddressRegistration(address);
 				}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||

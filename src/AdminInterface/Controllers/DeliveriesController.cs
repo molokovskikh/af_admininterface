@@ -48,7 +48,11 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			Mailer.DeliveryAddressRegistred(address);
-			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			var settings = DrugstoreSettings.Find(client.Id);
+			// Если клиент - это НЕ Сотрудник АК Инфорум и он не связан с плательщиком с кодом 921
+			// тогда отправляем уведомления поставщикам
+			if (!settings.ServiceClient && client.BillingInstance.PayerID != 921)
+				new NotificationService().NotifySupplierAboutAddressRegistration(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}

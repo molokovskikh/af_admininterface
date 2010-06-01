@@ -140,7 +140,8 @@ namespace AdminInterface.Controllers
 			}
 			newUser.UpdateContacts(userContacts);
 
-			if (newClient.IsDrugstore() && !additionalSettings.IsServiceClient && !(additionalSettings.ShowForOneSupplier))
+			if (newClient.IsDrugstore() && !additionalSettings.IsServiceClient &&
+				!(additionalSettings.ShowForOneSupplier) && newClient.BillingInstance.PayerID != 921)
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(newClient, false);
 			if (!newClient.IsDrugstore())
 				Mailer.SupplierRegistred(newClient.Name, newClient.HomeRegion.Name);
