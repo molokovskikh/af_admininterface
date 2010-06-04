@@ -1,0 +1,174 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Регистрация регионального администратора
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Региональные администраторы", "${siteroot}/ViewAdministrators.aspx"),
+									  ("Регистрация регионального администратора", "")]} %>
+
+<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
+<script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
+
+<script type="text/javascript">
+	jQuery(function() {
+		jQuery("form").validate({
+			rules: {
+				"administrator.PhoneSupport": "required",
+				"administrator.ManagerName": "required",
+				"administrator.UserName": "required",
+			}
+		});
+		jQuery("select").change(function () {
+			var name = "";
+			jQuery("select option:selected").each(function () {
+				name += jQuery(this).text();
+			});
+			setDepartmentPermissions(name);
+		}).change();
+		jQuery("#CheckAllRegions").click();
+	});
+
+	function setDepartmentPermissions(departmentDescription) {
+		<% for i, permission in enumerate(permissions): %>
+			jQuery("#permission${permission.Id}").attr("checked", "");
+		<% end %>
+		jQuery.ajax({
+			url: "${siteroot}/RegionalAdmin/GetDefaultPermissions?departmentDescription=" + departmentDescription,
+			cache: false,
+			success: function(html) {
+				var ids = html.split(',');
+				for (var i = 0; i < ids.size(); i++) {
+					jQuery("#permission" + ids[i]).attr("checked", "checked");
+				}
+			}
+		});
+	}
+
+	function allRegions(checked) {
+		var val = '';
+		if (checked)
+			val = "checked";
+	<% for j,region in enumerate(regions): %>
+		jQuery("#region${j}").attr("checked", val);
+	<% end %>
+	}
+
+	function deselectCheckboxAll() {
+		jQuery("#CheckAllRegions").attr("checked", "");
+	}
+</script>
+
+<style type="text/css">
+	table.PersonalData input { width: 100%; }
+</style>
+
+<form name="form" action="${siteroot}/RegionalAdmin/Add" method="post">
+<div class="TwoColumn" style="width: 800px;">
+	<div class="block">
+	<h3>Личные данные</h3>
+	<table border="0" width="70%" cellpadding="5" cellspacing="0" class="PersonalData">
+		<tr>
+			<td style="width: 20%;">Имя пользователя:</td>
+			<td><input type="text" name="administrator.UserName" value="" /></td>
+		</tr>
+		<tr>
+			<td>Ф.И.О.:</td>
+			<td><input type="text" name="administrator.ManagerName" value="" /></td>
+		</tr>
+		<tr>
+			<td>Телефон:</td>
+			<td><input type="text" name="administrator.PhoneSupport" class="phone" value="" /></td>
+		</tr>
+		<tr>
+			<td>Внутренний телефон:</td>
+			<td><input type="text" name="administrator.InternalPhone" class="InternalPhone" value="" /></td>
+		</tr>
+		<tr>
+			<td>Email:</td>
+			<td><input type="text" name="administrator.Email" class="email" value="" /></td>
+		</tr>
+		<tr>
+			<td>Подразделение:</td>
+			<td>
+				${FormHelper.Select("administrator.Department",
+									"Управление",
+									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Security.Department, AdminInterface"),
+									BindingHelper.GetDictionaryMapping({"style" : "width: 100%"}))}
+			</td>
+		</tr>
+	</table>
+	</div>
+	
+	<div class="block">
+	<h3>Региональная настройка</h3>
+	<input type="checkbox" id="CheckAllRegions" onclick="allRegions(this.checked)" />
+	<label for="CheckAllRegions"><b>Все регионы</b></label>
+	<br />
+
+	<% for j,region in enumerate(regions): %>
+		<input type="hidden" name="accessibleRegions[${j}].Id" value="${region.Id}" />
+		<input type="checkbox" id="region${j}" name="accessibleRegions[${j}].IsAvaliableForBrowse" value="true" onclick="if (!this.checked) deselectCheckboxAll()" />
+		<input type="hidden" name="accessibleRegions[${j}].IsAvaliableForBrowse" value="false" />
+		<label for="region${j}">${region.Name}</label>
+		<br />
+	<% end %>
+	</div>
+	
+	<div class="block">
+	<h3>Права</h3>
+	<% for i, permission in enumerate(permissions): %>
+		<input type="checkbox" id="permission${permission.Id}" name="administrator.AllowedPermissions[${i}].Id"
+			value="${permission.Id}" />
+		<label for="permission${permission.Id}">${permission.Name}</label>
+		<br />
+	<% end %>
+	</div>
+	
+	<div class="block">
+	<h3>Настройка часов доступа</h3>
+	<table>
+		<tr>
+			<td></td>
+		<% for i in range(0, 24):
+			continue if i % 2 != 0 %>
+			<td>${i}ч</td>
+		<% end %>
+		</tr>
+		<tbody class="HighLightCurrentRow">
+	<%	index = 0
+		for dayIndex,day in enumerate(days): %>
+		<tr>
+			<td>${day}:</td>
+		<% for i in range(0, 24):
+			continue if i % 2 != 0 %>
+			<td>
+				<input type="checkbox" name="logonHours[${dayIndex}, ${i}]" ${ "checked" if (logonHours[dayIndex * 24 + i]) } value="true" />
+				<input type="hidden" name="logonHours[${dayIndex}, ${i}]" value="false" />
+			</td>
+		<%  index++
+		   end %>
+		</tr>
+	<% end %>
+		</tbody>
+	</table>
+	</div>
+	
+	<div class="block">
+	<h3>Вход на компьютеры</h3>
+	<% for i,computer in enumerate(computers):
+		handler = ''
+		if avaliableComputers.Contains(computer.ToUpper()):
+			handler = "this.checked=true"
+		end %>
+		<input id="computer" type="checkbox" name="machines[${i}]" value="${computer.ToUpper()}" ${"checked" if avaliableComputers.Contains(computer.ToUpper())}
+			onclick=${handler} />
+		<label for="computer${i}">${computer}</label>
+		<br />
+	<% end %>
+	</div>
+
+	<div class=save>
+		<input type=submit value="Создать">
+	</div>
+</div>
+</form>

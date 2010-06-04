@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using AdminInterface.Models;
 
 public partial class ViewAdministrators : Page
 {
@@ -28,27 +29,36 @@ public partial class ViewAdministrators : Page
 
 	protected void Administrators_RowCommand(object sender, GridViewCommandEventArgs e)
 	{
+		var path = Request.ApplicationPath;
+		if (!path.StartsWith("/"))
+			path = "/" + path;
+		if (!path.EndsWith("/"))
+			path += "/";
 		switch (e.CommandName)
 		{
 			case "Create":
 				{
-					Response.Redirect("EditAdministrator.aspx");
+					Response.Redirect(path + "RegionalAdmin/Add");
 					break;
 				}
 			case "Edit":
 				{
-					Response.Redirect(String.Format("EditAdministrator.aspx?id={0}", e.CommandArgument));
+					Response.Redirect(String.Format(path + "RegionalAdmin/{0}/Edit", e.CommandArgument));
 					break;
 				}
 			case "Disable":
 				{
-					ADHelper.Disable(e.CommandArgument.ToString());
+					var login = e.CommandArgument.ToString();
+					ADHelper.Disable(login);
+					Mailer.RegionalAdminBlocked(Administrator.GetByName(login));
 					Response.Redirect("ViewAdministrators.aspx");
 					break;
 				}
 			case "Enable":
 				{
-					ADHelper.Enable(e.CommandArgument.ToString());
+					var login = e.CommandArgument.ToString();
+					ADHelper.Enable(login);
+					Mailer.RegionalAdminUnblocked(Administrator.GetByName(login));
 					Response.Redirect("ViewAdministrators.aspx");
 					break;
 				}

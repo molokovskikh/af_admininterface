@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Security
@@ -54,6 +56,74 @@ namespace AdminInterface.Models.Security
 		public static IList<Permission> FindAll()
 		{
 			return ActiveRecordMediator<Permission>.FindAll(new [] { Order.Asc("Name") });
+		}
+
+		public bool IsDefaultFor(string departmentDescription)
+		{
+			var allExceptProcessingAndBilling = new List<Department> {
+				Department.Administration, Department.IT, Department.Support, Department.Manager
+			};
+			var allExceptProcessing = new List<Department> { Department.Billing };
+			allExceptProcessing.AddRange(allExceptProcessingAndBilling);
+
+			var department = Department.Administration;
+			foreach (var item in BindingHelper.GetDescriptionsDictionary(typeof (Department)))
+			{
+				if (departmentDescription.Equals(item.Value))
+				{
+					department = (Department) Enum.ToObject(typeof (Department), item.Key);
+					break;
+				}
+			}
+
+			switch (Type)
+			{
+				case PermissionType.ConfigurerEditProducers:
+					return (department == Department.Administration);
+				case PermissionType.CanRegisterClientWhoWorkForFree:
+					return (new List<Department> {
+						Department.Administration, 
+						Department.Manager
+					}).Contains(department);
+				case PermissionType.ViewDrugstore:
+					return true;
+				case PermissionType.ViewSuppliers:
+					return true;
+				case PermissionType.SendNotification:
+					return true;
+				case PermissionType.Billing:
+					return allExceptProcessing.Contains(department);
+				case PermissionType.CallHistory:
+					return department == Department.Administration;
+				case PermissionType.ChangePassword:
+					return allExceptProcessing.Contains(department);
+				case PermissionType.CopySynonyms:
+					return allExceptProcessing.Contains(department);
+				case PermissionType.MonitorUpdates:
+					return true;
+				case PermissionType.ManageDrugstore:
+					return allExceptProcessing.Contains(department);
+				case PermissionType.ManageSuppliers:
+					return allExceptProcessing.Contains(department);
+				case PermissionType.RegisterInvisible:
+					return allExceptProcessingAndBilling.Contains(department);
+				case PermissionType.RegisterDrugstore:
+					return allExceptProcessingAndBilling.Contains(department);
+				case PermissionType.RegisterSupplier:
+					return allExceptProcessingAndBilling.Contains(department);
+				case PermissionType.DrugstoreInterface:
+					return allExceptProcessingAndBilling.Contains(department);
+				case PermissionType.SupplierInterface:
+					return department == Department.Administration;
+				case PermissionType.ManageAdministrators:
+					return department == Department.Administration;
+				case PermissionType.ManageCallbacks:
+					return department == Department.Administration;
+				case PermissionType.EditSettings:
+					return department == Department.Administration;
+				default:
+					return department == Department.Administration;
+			}
 		}
 	}
 }

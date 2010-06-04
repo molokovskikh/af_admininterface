@@ -24,8 +24,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof (BindingHelper)), 
 		Helper(typeof (ViewHelper)),
 		Secure(PermissionType.Billing, ExecutionOrder = 0),
-		Secure(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore, Required = Required.AnyOf, ExecutionOrder = 1),
-		Filter(ExecuteWhen.BeforeAction, typeof (PayerFilterActivationFilter), ExecutionOrder = 2)
+		Secure(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore, Required = Required.AnyOf, ExecutionOrder = 1)
 	]
 	public class BillingController : ARSmartDispatcherController
 	{

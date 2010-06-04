@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
 using System.DirectoryServices;
@@ -7,9 +9,21 @@ using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
+using NHibernate.Type;
+using PropertyAccess = Castle.ActiveRecord.PropertyAccess;
 
 namespace AdminInterface.Models.Security
 {
+	public enum Department
+	{
+		[Description("Управление")] Administration = 0,
+		[Description("Бухгалтерия")] Billing = 1,
+		[Description("IT")] IT = 2,
+		[Description("Обработка")] Processing = 3,
+		[Description("Техподдержка")] Support = 4,
+		[Description("Отдел регионального развития")] Manager = 5,
+	}
+
 	[ActiveRecord("accessright.regionaladmins", Lazy = false)]
 	public class Administrator
 	{
@@ -30,6 +44,12 @@ namespace AdminInterface.Models.Security
 
 		[Property]
 		public string PhoneSupport { get; set; }
+
+		[Property]
+		public string InternalPhone { get; set; }
+
+		[Property]
+		public Department Department { get; set; }
 
 		[HasAndBelongsToMany(typeof(Permission), 
 			RelationType.Bag, 
@@ -204,8 +224,12 @@ namespace AdminInterface.Models.Security
 			if (entry != null)
 			{
 				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
-				//установить pwdLastSet в текущую дату
+				// установить pwdLastSet в текущую дату
 				entry.Properties["pwdLastSet"][0] = -1;
+				// сменить пароль
+				entry.Invoke("SetPassword", password);
+				entry.CommitChanges();
+
 				var member = entry.Properties["memberOf"]
 					.OfType<string>()
 					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
@@ -228,6 +252,8 @@ namespace AdminInterface.Models.Security
 			if (!String.IsNullOrEmpty(ManagerName.Trim()))
 				user.Properties["sn"].Value = ManagerName;
 			user.Properties["logonHours"].Value = ADHelper.LogonHours();
+			user.CommitChanges();
+			user.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
 			user.CommitChanges();
@@ -256,6 +282,23 @@ namespace AdminInterface.Models.Security
 		public string GetHost()
 		{
 			return HttpContext.Current.Request.UserHostAddress;
+		}
+
+		public static void SetLogonHours(string login, bool[] weekLogonHours)
+		{
+			// Делаем полноразмерную матрицу 7x24
+			var logonHours = new bool[7, 24];
+			for (var i = 0; i < 7; i++)
+			{
+				var index = 0;
+				for (var j = 0; j < 24; j += 2)
+				{
+					logonHours[i, j] = weekLogonHours[i * 12 + index];
+					logonHours[i, j + 1] = weekLogonHours[i * 12 + index];
+					index++;
+				}
+			}
+			ADHelper.SetLogonHours(login, logonHours);
 		}
 	}
 }

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.DirectoryServices;
 using System.Security.Principal;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using NUnit.Framework;
 using System.Collections.Generic;
@@ -85,6 +87,59 @@ namespace AdminInterface.Test.Helpers
 			var adm = new Administrator();
 			adm.UserName = "KvasovT";
 			adm.CreateUserInAd("123456789");
+		}
+
+		[Test]
+		public void Set_logon_hours()
+		{
+			var hours = new bool[] {
+				false, false, false, true, true, true, true, true, true, true, false, false,
+				false, false, false, false, true, true, true, true, true, true, true, false,
+				false, false, false, false, true, true, true, true, true, true, true, false,
+				false, false, false, false, true, true, true, true, true, true, true, false,
+				false, false, false, false, true, true, true, true, true, true, false, false,
+				false, false, false, false, false, true, true, true, false, false, false, false,
+				false, false, false, false, false, false, false, false, false, false, false, false,
+			};
+			Administrator.SetLogonHours("KvasovT", hours);
+
+			var weekRealHours = ADHelper.GetLogonHours("KvasovT");
+			var index = 0;
+			for (var i = 0; i < 7; i++)
+				for (var j = 0; j < 24; j++)
+					if (j % 2 == 0)
+						Assert.That(hours[index++], Is.EqualTo(weekRealHours[i, j]));
+		}
+
+		[Test]
+		public void Add_accessible_computer()
+		{
+			var computers = new [] { "FMS", "SOLO" };
+
+			var entry = FindDirectoryEntry("KvasovT");
+			if (entry.Properties["userWorkstations"].Count > 0)
+			{
+				entry.Properties["userWorkstations"].Remove(entry.Properties["userWorkstations"][0]);
+				entry.CommitChanges();
+			}
+
+			var accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
+			Assert.That(accessibleComputers.Count, Is.EqualTo(0));
+
+			var count = 0;
+			foreach (var computer in computers)
+			{
+				ADHelper.AddAccessibleComputer("KvasovT", computer);
+				count++;
+				accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
+				Assert.That(accessibleComputers.Count, Is.EqualTo(count));
+				Assert.IsTrue(accessibleComputers.Contains(computer));
+			}
+
+			// Пробуем добавить FMS, но он не должен добавиться т.к. доступ к нему уже есть
+			ADHelper.AddAccessibleComputer("KvasovT", computers[0]);
+			accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
+			Assert.That(accessibleComputers.Count, Is.EqualTo(count));
 		}
 
 		[Test]

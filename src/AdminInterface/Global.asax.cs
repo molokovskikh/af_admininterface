@@ -84,7 +84,11 @@ namespace AddUser
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")
-                .DefaultForAction().Is("Search"));
+				.DefaultForAction().Is("Search"));
+
+			RoutingModuleEx.Engine.Add(new PatternRoute("/RegionalAdmin/[id]/edit")
+				.DefaultForController().Is("RegionalAdmin")
+				.DefaultForAction().Is("Edit"));
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
 				.DefaultForController().Is("logs")

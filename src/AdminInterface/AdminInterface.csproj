@@ -151,6 +151,7 @@
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
+    <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\UserSearchController.cs" />
@@ -455,6 +456,8 @@
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
     <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
+    <None Include="Views\RegionalAdmin\Add.brail" />
+    <None Include="Views\RegionalAdmin\Edit.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />
     <None Include="Views\Regions\ShowRegions.brail" />
     <None Include="Views\Register\Register.brail" />

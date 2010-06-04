@@ -116,6 +116,7 @@
     <Compile Include="ForTesting\WatinFixture.cs" />
     <Compile Include="LogsFixture.cs" />
     <Compile Include="MainViewFixure.cs" />
+    <Compile Include="RegionalAdminFixture.cs" />
     <Compile Include="RegistrationFixture.cs" />
     <Compile Include="SearchClientFixture.cs" />
     <Compile Include="ServiceFixture.cs" />

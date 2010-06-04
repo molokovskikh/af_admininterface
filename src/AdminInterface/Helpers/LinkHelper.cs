@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Helpers
 {
@@ -20,6 +21,21 @@ namespace AdminInterface.Helpers
 		public static string Client(string siteroot, uint clientId, string text)
 		{
 			return String.Format("<a href=\"{0}/client/{1}\">{2}</a>", siteroot, clientId, text);
+		}
+
+		/// <summary>
+		/// Возвращает виртуальную директорию приложения. БЕЗ '/' в конце
+		/// Пример: '/FutureAdm'
+		/// </summary>
+		/// <param name="context"></param>
+		public static string GetVirtualDir(IEngineContext context)
+		{
+			var virtualDir = context.UrlInfo.AppVirtualDir;
+			if (!virtualDir.StartsWith("/"))
+				virtualDir = "/" + virtualDir;
+			if (virtualDir.EndsWith("/"))
+				virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
+			return virtualDir;
 		}
 	}
 }

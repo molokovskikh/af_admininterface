@@ -9,6 +9,15 @@ jQuery(function() {
             }
             return true;
         }, "Некорректный телефонный номер");
+		
+	// Валидатор для внутреннего номера
+	jQuery.validator.addMethod("InternalPhone", function(value, element) {
+            if (value.toString().length > 0) {
+                res = /^(\d{3})$/.test(value)
+                return res;
+            }
+            return true;
+        }, "Некорректный телефонный номер");		
 
         jQuery.validator.addMethod("email", function(value, element) {
             if (value.toString().length > 0) {

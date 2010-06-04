@@ -11,7 +11,7 @@ namespace Functional
 	[TestFixture]
 	public class ViewAdministratorsFixture : WatinFixture
 	{
-		[Test]
+		[Test, Ignore("Неактуален. Тесты для региональных администраторов находятся в RegionalAdminFixture")]
 		public void SetupAdministrator()
 		{
 			using (var browser = Open("ViewAdministrators.aspx"))

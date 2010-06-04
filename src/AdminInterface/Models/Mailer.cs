@@ -3,11 +3,55 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
+using AdminInterface.Models.Security;
 
 namespace AdminInterface.Models
 {
 	public class Mailer
 	{
+		public static void RegionalAdminCreated(Administrator admin)
+		{
+			Func.Mail("register@analit.net",
+				"Новый сотрудник",
+				String.Format(
+@"В системе зарегистрирован новый сотрудник
+Ф.И.О.: {0}
+Телефон: {1}
+Email: {2}
+Подразделение: {3}
+",					admin.ManagerName,
+					admin.PhoneSupport,
+					admin.Email,
+					admin.Department.GetDescription()),
+				"Help@analit.net");
+		}
+
+		public static void RegionalAdminBlocked(Administrator admin)
+		{
+			Func.Mail("register@analit.net",
+				String.Format("Запрет работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
+				String.Format(
+@"В системе ЗАПРЕЩЕНА работа сотрудника
+Ф.И.О.: {0}
+Подразделение: {1}
+",					admin.ManagerName,
+					admin.Department.GetDescription()),
+				"Help@analit.net");
+		}
+
+		public static void RegionalAdminUnblocked(Administrator admin)
+		{
+			Func.Mail("register@analit.net",
+				String.Format("Возобновление работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
+				String.Format(
+@"В системе ВОЗОБНОВЛЕНА работа сотрудника
+Ф.И.О.: {0}
+Подразделение: {1}
+",					admin.ManagerName,
+					admin.Department.GetDescription()),
+				"Help@analit.net");
+		}
+
 		public static void ClientRegistrationResened(Client client)
 		{
 			Func.Mail("register@analit.net",
