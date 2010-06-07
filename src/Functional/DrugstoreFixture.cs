@@ -517,9 +517,10 @@ where i.ClientId = :ClientId
 			var client = DataMother.CreateTestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
+				var controlName = "drugstore.IgnoreNewPrices";
 				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsFalse(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
-				browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked = true;
+				Assert.IsFalse(browser.CheckBox(Find.ByName(controlName)).Checked);
+				browser.CheckBox(Find.ByName(controlName)).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Text.Contains("Сохранено"));
 
@@ -528,13 +529,41 @@ where i.ClientId = :ClientId
 
 				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsTrue(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
-				browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked = false;
+				Assert.IsTrue(browser.CheckBox(Find.ByName(controlName)).Checked);
+				browser.CheckBox(Find.ByName(controlName)).Checked = false;
 				browser.Button(Find.ByValue("Сохранить")).Click();
 
 				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsFalse(browser.CheckBox(Find.ById("IgnoreNewPrices")).Checked);
+				Assert.IsFalse(browser.CheckBox(Find.ByName(controlName)).Checked);
+			}
+		}
+
+		[Test]
+		public void Max_weekly_orders_sum()
+		{
+			var client = DataMother.CreateTestClient();
+			using (var browser = Open("Client/{0}", client.Id))
+			{
+				var controlName = "drugstore.MaxWeeklyOrdersSum";
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
+				browser.TextField(Find.ByName(controlName)).TypeText("123456");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Text.Contains("Сохранено"));
+
+				var settings = DrugstoreSettings.Find(client.Id);
+				Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("123456"));
+				browser.TextField(Find.ByName(controlName)).Clear();
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
 			}
 		}
 	}

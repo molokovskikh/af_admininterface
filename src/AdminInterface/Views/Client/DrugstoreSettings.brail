@@ -37,25 +37,35 @@
 	        <div class="block" id="commonSettings">
 	            <h3>Общая настройка</h3>
 	            
-	            <input type="checkbox" id="IgnoreNewPrices" name="drugstore.IgnoreNewPrices" value="true" ${"checked" if drugstore.IgnoreNewPrices } />
-	            <input type="hidden" name="drugstore.IgnoreNewPrices" value="false" />
-	            Не подключать новые прайс-листы<br />
+				<input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
+				<input type="hidden" name="client.IsHiddenForProducer" value="false" />
+				Скрыть клиента в интефрейсе поставщика<br />
+<% 
+	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore",
+		"Checkboxes" : { 
+			"IgnoreNewPrices" : drugstore.IgnoreNewPrices,
+			"ServiceClient" : drugstore.ServiceClient,
+			"AllowDelayOfPayment": drugstore.AllowDelayOfPayment }
+	}
 
-	            <input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
-	            <input type="hidden" name="client.IsHiddenForProducer" value="false" />
-	            Скрыть клиента в интефрейсе поставщика<br />
-	            
-	            <input type="checkbox" name="drugstore.ServiceClient" value="true" ${"checked" if drugstore.ServiceClient } />
-	            <input type="hidden" name="drugstore.ServiceClient" value="false" />
-	            Сотрудник АК "Инфорум"<br />
-	            
-	            <input type="checkbox" name="drugstore.AllowDelayOfPayment" value="true" ${"checked" if drugstore.AllowDelayOfPayment } />
-	            <input type="hidden" name="drugstore.AllowDelayOfPayment" value="false" />
-	            Активировать механизм аптечной корректировки цен<br />	            
-	            
-	            <input type="checkbox" name="drugstore.ManualComparison" value="true" ${"checked" if drugstore.ManualComparison } />
-	            <input type="hidden" name="drugstore.ManualComparison" value="false" />
-	            Разрешить сопоставление вручную в AnalitOnline<br />	            
+	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
+		"Checkboxes" : { 
+			"SendWaybillsFromClient" : drugstore.SendWaybillsFromClient,
+			"ShowAdvertising" : drugstore.ShowAdvertising,
+			"SendRetailMarkup": drugstore.SendRetailMarkup,
+			"ParseWaybills": drugstore.ParseWaybills }
+	}
+
+	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitOnline",
+		"Checkboxes" : { "ManualComparison" : drugstore.ManualComparison, "ShowNewDefecture" : drugstore.ShowNewDefecture}
+	}
+
+	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "Недельный заказ",
+		"Checkboxes" : { "CheckWeeklyOrdersSum" : drugstore.CheckWeeklyOrdersSum }
+	}
+%>
+				Максимальный недельный заказ:
+				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
 	        </div>
     	    
             <!--

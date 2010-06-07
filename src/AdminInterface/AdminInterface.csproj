@@ -147,6 +147,7 @@
   <ItemGroup>
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\Bubble.cs" />
+    <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
