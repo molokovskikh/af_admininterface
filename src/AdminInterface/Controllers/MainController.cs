@@ -111,12 +111,12 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
        max(dlogs.LogTime) as LastDownloadedWaybillDate
 FROM logs.document_logs dlogs
-WHERE dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam;
+WHERE (dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dlogs.DocumentType = 1;
 
 SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
        max(dheaders.WriteTime) as LastParsedWaybillDate
 FROM documents.documentheaders dheaders
-WHERE dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam;", c);
+WHERE (dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dheaders.DocumentType = 1;", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & SecurityContext.Administrator.RegionMask);
