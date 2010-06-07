@@ -92,6 +92,9 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 					case SearchBy.Code:
 						searchBlock = String.Format("sum(if(cd.Id = {0}, 1, 0)) > 0", properties.SearchText);
 						break;
+					case SearchBy.UserId:
+						searchBlock = String.Format("sum(if(users.Id = {0}, 1, 0)) > 0", properties.SearchText);
+						break;
 					case SearchBy.BillingCode:
 						searchBlock = String.Format("p.payerId = {0}", properties.SearchText);
 						break;

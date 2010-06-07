@@ -3,8 +3,9 @@
 <% end %>
 
 <script type="text/javascript">
-	var titlesAndIds = $H({	"SearchByName" : "Наименованию", 
-							"SearchById" : "Коду",
+	var titlesAndIds = $H({	"SearchByName" : "Наименованию",
+							"SearchById": "Коду клиента",
+							"SearchByUserId": "Коду пользователя",
 							"SearchByBillingId" : "Биллинг коду"});
 						
 	document.observe("dom:loaded", function() {
@@ -66,7 +67,10 @@
 					<label for="SearchByName">Наименование</label>
 					<br />
 					<input id="SearchById" type="radio" name="SearchBy.SearchBy" value="Code" ${"checked" if FindBy.IsSearchByCode()} />
-					<label for="SearchById">Код</label>
+					<label for="SearchById">Код клиента</label>
+					<br />
+					<input id="SearchByUserId" type="radio" name="SearchBy.SearchBy" value="UserId" ${"checked" if FindBy.IsSearchByUserId()} />
+					<label for="SearchByUserId">Код пользователя</label>
 					<br />
 					<input id="SearchByBillingId" type="radio" name="SearchBy.SearchBy" value="BillingCode" ${"checked" if FindBy.IsSearchByBillingCode()} />
 					<label for="SearchByBillingId">Договор</label>

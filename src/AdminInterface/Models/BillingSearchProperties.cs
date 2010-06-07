@@ -39,6 +39,7 @@ namespace AdminInterface.Models
 		Name,
 		Code,
 		BillingCode,
+		UserId,
 	}
 
 	public class BillingSearchProperties
@@ -65,6 +66,11 @@ namespace AdminInterface.Models
 		public bool IsSearchByCode()
 		{
 			return SearchBy == SearchBy.Code;
+		}
+
+		public bool IsSearchByUserId()
+		{
+			return SearchBy == SearchBy.UserId;
 		}
 
 		public bool IsSearchByBillingCode()
