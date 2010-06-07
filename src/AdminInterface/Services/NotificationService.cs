@@ -153,6 +153,8 @@ where length(c.contactText) > 0
 			message.IsBodyHtml = true;
 			message.Subject = "Регистрация нового клиента";
 
+			if (appUrl.EndsWith("/"))
+				appUrl = appUrl.Remove(appUrl.Length - 1);
 
 			var paymentOptions = "";
 			if (options != null)
@@ -161,7 +163,7 @@ where length(c.contactText) > 0
 			message.Body = String.Format(
 @"Зарегистрирован новый клиент
 <br>
-Название: <a href='{5}Billing/edit.rails?clientCode={1}'>{0}</a>
+Название: <a href='{5}/Billing/edit.rails?clientCode={1}'>{0}</a>
 <br>
 Код: {1}
 <br>
