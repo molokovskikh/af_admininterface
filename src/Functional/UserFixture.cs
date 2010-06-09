@@ -124,6 +124,68 @@ namespace Functional
 			}
 		}
 
+		[Test, Description("При изменении пароля, если логин не совпадает с UserId и установлена соотв. опция, то изменить логин на UserId")]
+		public void Change_login_when_change_password()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users.First();
+			using (new SessionScope())
+			{
+				user.Login = "testLogin" + user.Id;
+				user.SaveAndFlush();
+				user.Refresh();
+			}
+			Assert.IsFalse(user.Login == user.Id.ToString());
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ByText("Изменить пароль")).Click();
+
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				{
+					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).Clear();
+					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.True);
+					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
+					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
+					openedWindow.Button(Find.ByValue("Изменить")).Click();
+					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
+				}
+			}
+			using (new SessionScope())
+			{
+				user.Refresh();
+				Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
+			}
+		}
+
+		[Test, Description("При изменении пароля, если логин совпадает с UserId то изменять логин не нужно")]
+		public void Not_change_login_when_change_password()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users.First();
+			Assert.IsTrue(user.Login == user.Id.ToString());
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ByText("Изменить пароль")).Click();
+
+				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				{
+					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).Clear();
+					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
+					openedWindow.Button(Find.ByValue("Изменить")).Click();
+					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
+				}
+			}
+			using (new SessionScope())
+			{
+				user.Refresh();
+				Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
+			}
+		}
+
 		[Test]
 		public void Create_user()
 		{

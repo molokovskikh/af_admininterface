@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.DirectoryServices;
-using System.Security.Principal;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
@@ -141,6 +140,29 @@ namespace AdminInterface.Test.Helpers
 			accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
 			Assert.That(accessibleComputers.Count, Is.EqualTo(count));
 		}
+
+		[Test]
+		public void Rename_user()
+		{
+			var testLogin = "KvasovT";
+			var newTestLogin = (new Random().Next(30000, 40000)).ToString();
+
+			var user = ADHelper.FindDirectoryEntry(testLogin);
+			Assert.IsNotNull(user, "Не найдена запись в AD, хотя должна быть");
+
+			ADHelper.RenameUser(testLogin, newTestLogin);
+
+			// Переименовываем и проверяем что по старому имени ничего не найдем, а по новому найдем
+			user = ADHelper.FindDirectoryEntry(testLogin);
+			Assert.IsNull(user, "Нашли запись в AD, хотя не должны были");
+			user = ADHelper.FindDirectoryEntry(newTestLogin);
+			Assert.IsNotNull(user, "Не найдена запись в AD, хотя должна быть");
+
+			// Переименовываем обратно
+			ADHelper.RenameUser(newTestLogin, testLogin);
+			user = ADHelper.FindDirectoryEntry(testLogin);
+			Assert.IsNotNull(user, "Не найдена запись в AD, хотя должна быть");
+		}		
 
 		[Test]
 		public void Get_last_password_change()

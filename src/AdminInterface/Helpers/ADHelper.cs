@@ -172,6 +172,17 @@ namespace AdminInterface.Helpers
 #endif
 		}
 
+		public static void RenameUser(string oldLogin, string newLogin)
+		{
+#if !DEBUG
+			var user = FindDirectoryEntry(oldLogin);
+			var parent = new DirectoryEntry(user.Path.Replace(String.Format("CN={0},", oldLogin), String.Empty));
+			user.MoveTo(parent, String.Format("CN={0}", newLogin));
+			user.Properties["samAccountName"].Value = newLogin;
+			user.CommitChanges();
+#endif
+		}		
+
 		public static bool IsLoginExists(string login)
 		{
 #if !DEBUG

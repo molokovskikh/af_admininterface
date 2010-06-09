@@ -216,6 +216,7 @@ namespace AdminInterface.Controllers
 									 string additionEmailsToNotify, 
 									 bool isSendClientCard, 
 									 bool isFree, 
+									 bool changeLogin,
 									 string reason)
 		{
 			var user = User.GetById(userId);
@@ -234,12 +235,18 @@ namespace AdminInterface.Controllers
 			using (new TransactionScope())
 			{
 				ADHelper.ChangePassword(user.Login, password);
+				if (changeLogin)
+					ADHelper.RenameUser(user.Login, user.Id.ToString());
 
 				DbLogHelper.SetupParametersForTriggerLogging<ClientInfoLogEntity>(userName, host);
 
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
-
+				if (changeLogin)
+				{
+					user.Login = user.Id.ToString();
+					user.Save();
+				}
 				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
 				var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
