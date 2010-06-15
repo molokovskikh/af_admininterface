@@ -48,7 +48,7 @@
 
 <% end %>
 
-<form name="form" action="${siteroot}/RegionalAdmin/Update">
+<form name="form" action="${siteroot}/RegionalAdmin/Update" method="post">
 <input type="hidden" name="administrator.Id" value="${admin.Id}" />
 <div class="TwoColumn" style="width: 800px;">
 	<div class="block">
