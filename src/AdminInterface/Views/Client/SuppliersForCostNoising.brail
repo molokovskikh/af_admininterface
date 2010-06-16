@@ -1,0 +1,6 @@
+﻿<select id="drugstore.FirmCodeOnly" name="drugstore.FirmCodeOnly">
+	<option value="0" ${'selected' if (not IsDefined("FirmCodeOnly")) or (FirmCodeOnly == 0)}>Зашумлять все прайс листы всех поставщиков</option>
+	<% for supplier in suppliers: %>
+	<option value="${supplier.Id}" ${'selected' if (IsDefined("FirmCodeOnly") and (FirmCodeOnly == supplier.Id))}>Кроме [${supplier.Id}].${supplier.Name}</option>
+	<% end %>
+</select>

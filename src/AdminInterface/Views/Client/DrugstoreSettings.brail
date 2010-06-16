@@ -2,7 +2,23 @@
 									  ("Информация о клиенте", "${siteroot}/client/${client.Id}"),
 									  ("Настройка аптеки", "")]} %>
 
-<h2>Конфигурация клиента ${client.Name}</h2>					
+<script language="javascript">
+	jQuery(function () {
+	<% if drugstore.IsNoised: %>
+		setNoise(true);
+	<% end %>
+	});
+
+	function setNoise(noiseStatus) {
+		jQuery("#NotNoiseSupplier").find('select').remove().end();
+		if (noiseStatus) {
+			var url = "${siteroot}/Client/SuppliersForCostNoising.rails?clientId=${client.Id}";
+			jQuery.get(url, function(html){ jQuery("#NotNoiseSupplier").append(html); });
+		}
+	}
+</script>
+
+<h2>Конфигурация клиента ${client.Name}</h2>
 				  
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 	
@@ -23,7 +39,7 @@
 		</div>
 	<% end %>
 	
-	<div class="TwoColumn">
+	<div class="TwoColumn" style="width: 800px;">
 	    <div class="block">
 	        <h3>Операции</h3>
 	        <form id="NotifySuppliers" method="post" action="NotifySuppliers.rails?clientId=${client.Id}" style="margin:0; padding:0">
@@ -36,7 +52,19 @@
 	        ${FormHelper.HiddenField("drugstore.Id")}
 	        <div class="block" id="commonSettings">
 	            <h3>Общая настройка</h3>
-	            
+				<table border="0" style="width: 100%; height: 100%;">
+					<tr>
+					<td style="width: 50%;">
+						<input id="FirmCodeOnlyForClient" name="costsIsNoised" onclick="setNoise(this.checked)" type="checkbox" value="true" ${"checked" if drugstore.IsNoised } />
+						<label for="FirmCodeOnlyForClient">Зашумлять цены</label>
+						<input type="hidden" name="costsIsNoised" value="false" />
+					</td>
+					<td>
+						<div id="NotNoiseSupplier">
+						</div>
+					</td>
+					</tr>
+				<tr><td colspan="2">
 				<input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
 				<input type="hidden" name="client.IsHiddenForProducer" value="false" />
 				Скрыть клиента в интефрейсе поставщика<br />
@@ -66,6 +94,8 @@
 %>
 				Максимальный недельный заказ:
 				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
+				</td></tr>
+				</table>
 	        </div>
     	    
             <!--

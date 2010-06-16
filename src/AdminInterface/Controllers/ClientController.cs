@@ -116,6 +116,7 @@ namespace AdminInterface.Controllers
 		public void UpdateDrugstore([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
 			ulong homeRegion,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
+			bool costsIsNoised,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings)
 		{
 			SecurityContext.Administrator.CheckClientPermission(client);			
@@ -148,7 +149,9 @@ namespace AdminInterface.Controllers
 						drugstore.OrderRegionMask &= ~setting.Id;
 						client.Users.Each(u => u.OrderRegionMask &= ~setting.Id);
 					}
-				}				
+				}
+				if (!costsIsNoised)
+					drugstore.FirmCodeOnly = null;
 				client.UpdateAndFlush();
 				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
@@ -157,6 +160,17 @@ namespace AdminInterface.Controllers
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectToUrl(String.Format("../client/{0}", client.Id));
+		}
+
+		public void SuppliersForCostNoising(uint clientId)
+		{
+			CancelLayout();
+			var client = Client.Find(clientId);
+			var drugstoreSetting = Models.DrugstoreSettings.Find(clientId);
+			var suppliers = Supplier.GetByPayerId(client.BillingInstance.PayerID);
+			Flash["suppliers"] = suppliers;
+			if (drugstoreSetting.FirmCodeOnly.HasValue)
+				Flash["FirmCodeOnly"] = drugstoreSetting.FirmCodeOnly;
 		}
 
 		[AccessibleThrough(Verb.Post)]
