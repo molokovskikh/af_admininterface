@@ -235,6 +235,16 @@ where
 
 		private string Build(ContactGroup generalGroup, params ContactGroup[] specialGroup)
 		{
+			return GetEmails(false, generalGroup, specialGroup);
+		}
+
+		public virtual string GetEmails()
+		{
+			return GetEmails(true, GetContactGroup(ContactGroupType.General), GetContactGroup(ContactGroupType.OrderManagers));
+		}
+
+		private string GetEmails(bool unionEmails, ContactGroup generalGroup, params ContactGroup[] specialGroup)
+		{
 			specialGroup = specialGroup.Where(g => g != null && g.Persons != null).ToArray();
 			var emails = new List<string>();
 			foreach (var person in specialGroup.SelectMany(g => g.Persons))
@@ -242,7 +252,7 @@ where
 
 			ProcessEmails(emails, specialGroup);
 
-			if (emails.Count > 0)
+			if ((emails.Count > 0) && !unionEmails)
 				return String.Join(", ", emails.ToArray());
 
 			if (generalGroup != null && generalGroup.Persons != null)
@@ -250,7 +260,7 @@ where
 					ProcessEmails(emails, person);
 
 			ProcessEmails(emails, generalGroup);
-			
+
 			return String.Join(", ", emails.ToArray());
 		}
 

@@ -1,6 +1,6 @@
 ﻿<br />
 <div class="CenterBlock FilterBlock" style="padding: 10px 30px 10px 30px;" align="center">
-<form id="SearchForm" action="${siteroot}/Billing/Accounting">
+<form id="SearchForm" method="post" action="${siteroot}/Billing/Accounting">
         <table style="width: auto; padding: 10px 2px 10px 2px;">   		
             <tr style="text-align: left;">
                 <td style="width: auto;">С:</td>
@@ -21,6 +21,7 @@
 </div>
 <br />
 
+<form id="updateHistoryForm" name="updateHistoryForm" method="post" action="${siteroot}/Billing/Accounting">
 <%  if (IsDefined("accountingHistoryItems") and accountingHistoryItems.Count > 0): %>
 <table id="MainTable" class="DataTable">
     <thead>
@@ -51,14 +52,31 @@
             <td>${item.User.Client.BillingInstance.ShortName}</td>            
             <td>${BindingHelper.GetDescription(item.Type)}</td>
             <td>${item.User.GetLoginWithName()}</td>
-            
+<%		break unless i < pageSize %>
 <%      end %>        
         <td>${ViewHelper.GetHumanReadableOperatorName(item.Operator)}</td>
     </tr>    
 <% end %>
     </tbody>
+	<tr>
+		<td colspan="10" align="right">
+			<div class="Paginator">
+				<% OutputSubView("/SubViews/PaginatorSubView", {
+					"rowsCount":rowsCount,
+					"pageSize":pageSize,
+					"currentPage":currentPage,
+					"formPostBack":'updateHistoryForm'}) %>
+			</div>
+		</td>
+	</tr>
 </table>
 <%  else: %>    
 <div class="EmptyData">За указанный период ничего не найдено</div>
 <%  end %>
-
+<input type="hidden" name="tab" value="${tab}" />
+<input type="hidden" name="rowsCount" id="rowsCount" value="${rowsCount}" />
+<input type="hidden" name="pageSize" id="pageSize" value="${pageSize}" />
+<input type="hidden" name="currentPage" id="currentPage" value="${currentPage}" />
+<input type="hidden" name="beginDate" value="${beginDate}" />
+<input type="hidden" name="endDate" value="${endDate}" />
+</form>

@@ -117,7 +117,8 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var address = client.Addresses[0];
-				browser.Link(Find.ByText(address.Value)).Click();
+				var addressId = "usersForAddress" + address.Id;
+				browser.Link(Find.ById(addressId)).Click();
 				Thread.Sleep(500);
 				Assert.That(browser.Text, Text.Contains("Пользователи"));
 				Assert.That(browser.Text, Text.Contains("Подключить пользователя"));
@@ -126,7 +127,7 @@ namespace Functional
 				Assert.That(additionalInfoDiv.Exists, Is.True);
 				Assert.That(additionalInfoDiv.Enabled, Is.True);
 				// Щелкаем второй раз. Дополнительная информация должна быть скрыта
-				browser.Link(Find.ByText(address.Value)).Click();
+				browser.Link(Find.ById(addressId)).Click();
 				additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
 				Assert.That(additionalInfoDiv.Exists, Is.False);
 			}
@@ -139,7 +140,8 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var user = client.Users[0];
-				browser.Link(Find.ByText(user.Login)).Click();
+				var userId = "addressesForUser" + user.Id;
+				browser.Link(Find.ById(userId)).Click();
 				Thread.Sleep(500);
 				Assert.That(browser.Text, Text.Contains("Адреса"));
 				Assert.That(browser.Text, Text.Contains("Подключить адрес"));
@@ -148,7 +150,7 @@ namespace Functional
 				Assert.That(additionalInfoDiv.Exists, Is.True);
 				Assert.That(additionalInfoDiv.Enabled, Is.True);
 				// Щелкаем второй раз. Дополнительная информация должна быть скрыта
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById(userId)).Click();
 				additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + user.Id));
 				Assert.That(additionalInfoDiv.Exists, Is.False);
 			}			
@@ -164,7 +166,7 @@ namespace Functional
 				var user = client.Users[0];
 				Assert.That(client.Addresses[0].AvaliableForUsers, Is.Null);
 				address.AvaliableForUsers = new List<User>();
-				browser.Link(Find.ByText(address.Value)).Click();
+				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
 				Thread.Sleep(500);
 				var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
 				connectUserLink.Click();
@@ -199,7 +201,7 @@ namespace Functional
 				var user = client.Users[0];
 				Assert.That(client.Addresses[0].AvaliableForUsers, Is.Null);
 				address.AvaliableForUsers = new List<User>();
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 				Thread.Sleep(500);
 				var connectAddressLink = browser.Link(Find.ByText("Подключить адрес"));
 				connectAddressLink.Click();
@@ -233,7 +235,7 @@ namespace Functional
 			{
 				var address = client.Addresses[0];
 				var user = client.Users[0];
-				browser.Link(Find.ByText(address.Value)).Click();
+				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
 				Thread.Sleep(500);
 				var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
 				connectUserLink.Click();
@@ -263,7 +265,7 @@ namespace Functional
 			{
 				var address = client.Addresses[0];
 				var user = client.Users[0];
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 				Thread.Sleep(500);
 				browser.Link(Find.ByText("Подключить адрес")).Click();
 				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
@@ -346,17 +348,17 @@ namespace Functional
 				Assert.IsTrue(userStatus.Checked);
 				Assert.IsTrue(addressStatus.Checked);
 				Assert.IsTrue(clientStatus.Checked);
-				Assert.That(userRow.ClassName, Text.DoesNotContain("Disabled"));
-				Assert.That(addressRow.ClassName, Text.DoesNotContain("Disabled"));
-				Assert.That(clientRow.ClassName, Text.DoesNotContain("Disabled"));
+				Assert.That(userRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
+				Assert.That(addressRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
+				Assert.That(clientRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
 				clientStatus.Click();
 				Thread.Sleep(2000);
 				Assert.IsFalse(userStatus.Checked);
 				Assert.IsFalse(addressStatus.Checked);
 				Assert.IsFalse(clientStatus.Checked);
-				Assert.That(userRow.ClassName, Text.Contains("Disabled"));
-				Assert.That(addressRow.ClassName, Text.Contains("Disabled"));
-				Assert.That(clientRow.ClassName, Text.Contains("Disabled"));
+				Assert.That(userRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
+				Assert.That(addressRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
+				Assert.That(clientRow.ClassName, Text.Contains("DisabledByBilling"));
 			}
 		}
 
@@ -367,7 +369,7 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var address = client.Addresses[0];
-				browser.Link(Find.ByText(address.Value)).Click();
+				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
 				browser.Link(Find.ByText("Подключить пользователя")).Click();
 				var searchDiv = browser.Div(Find.ById("SearchUserDiv" + address.Id));
 				var selectDiv = browser.Div(Find.ById("SelectUserDiv" + address.Id));
@@ -402,8 +404,10 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{				
 				var user = client.Users[0];
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+				Thread.Sleep(500);
 				browser.Link(Find.ByText("Подключить адрес")).Click();
+				Thread.Sleep(500);
 				var searchDiv = browser.Div(Find.ById("SearchAddressDiv" + user.Id));
 				var selectDiv = browser.Div(Find.ById("SelectAddressDiv" + user.Id));
 				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
@@ -441,14 +445,11 @@ namespace Functional
 
 		}
 
-		[Test(Description = "Тест сворачивания/разворачивания заголовков списков клиентов, пользователей и адресов")]
-		public void Test_collapse_and_spread_headers()
+		private void AddUsers(Client client, int countUsers)
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var count = 10;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				for (var i = 0; i < count; i++)
+				for (var i = 0; i < countUsers; i++)
 				{
 					var user = new User { Client = client, Name = "user", };
 					user.Setup(client);
@@ -457,6 +458,19 @@ namespace Functional
 				}
 				scope.VoteCommit();
 			}
+		}
+
+		private void AddClientWithSamePayer(Payer payer)
+		{
+			
+		}
+
+		[Test(Description = "Тест сворачивания/разворачивания заголовков списков клиентов, пользователей и адресов")]
+		public void Test_collapse_and_spread_headers()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			AddUsers(client, 10);
+
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				// Список клиентов должен быть в свернутом виде
@@ -548,13 +562,13 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				// Подключаем пользователю адрес
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 				Thread.Sleep(500);
 				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
 				Thread.Sleep(500);
 				browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 				Thread.Sleep(2000);
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 
 				// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
 				client.Addresses[0].DeleteAndFlush();
@@ -564,7 +578,7 @@ namespace Functional
 				Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
 
 				// Пытаемся посмотреть адреса, доступные пользователю
-				browser.Link(Find.ByText(user.Login)).Click();
+				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 				Thread.Sleep(500);
 
 				Assert.IsTrue(errorMessageDiv.Exists);
@@ -733,6 +747,149 @@ namespace Functional
 			{
 				Assert.That(browser.Text, Is.Not.StringContaining(client.Addresses[0].Value));
 				Assert.That(browser.Text, Is.StringContaining(client.Addresses[1].Value));
+			}
+		}
+
+		[Test, Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
+		public void FilterLogMessagesByUser()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			AddUsers(client, 3);
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				using (new SessionScope())
+				{
+					client.Refresh();
+					// Проверяем, что логины пользователей - это ссылки
+					foreach (var usr in client.Users)
+						Assert.IsTrue(browser.Link(Find.ByText(usr.Login)).Exists);
+				}
+				// Кликаем по логину одного из пользователей
+				var user = client.Users[2];
+				browser.Link(Find.ByText(user.Login)).Click();
+				// В таблице статистики вкл./откл. должны остаться видимыми только строки, относящиеся к выбранному пользователю
+				// остальные строки должны быть невидимы
+				var logRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("logRow"));
+				foreach (TableRow row in logRows)
+				{
+					if (row.Id.Equals("logRowUserLog" + user.Id))
+						Assert.That(row.Style.Display, Is.Null);
+					else
+						Assert.That(row.Style.Display, Is.StringContaining("none"));
+				}
+				// Логин-ссылка должна стать невидимой, видимым должен быть логин-текст (такое обозначение у выделенного пользователя)
+				Assert.That(browser.Link("UserLink" + user.Id).Style.Display, Is.EqualTo("none"));
+				Assert.That(browser.Div("UserValue" + user.Id).Style.Display, Is.Null);
+			}
+		}
+
+		[Test, Description("Проверка, что по клику на логин, этот пользователь выбирается в выпадающем списке 'Сообщение для пользователя:'")]
+		public void SelectUserForSendMessage()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			AddUsers(client, 3);
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				using (new SessionScope())
+				{
+					client.Refresh();
+					// Кликаем по логину одного из пользователей
+					var user = client.Users[2];
+					browser.Link(Find.ByText(user.Login)).Click();
+					// Этот пользователь должен стать выделенным в списке "Сообщение для пользователя"
+					Assert.That(browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).SelectedOption.Text, Is.EqualTo(user.GetLoginOrName()));
+				}
+			}
+		}
+
+		[Test, Description("Проверка фильтрации записей в статистике вкл./откл. по адресу доставки")]
+		public void FilterLogMessagesByAddress()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+		}
+
+		[Test, Description("Проверка, что при выделении клиента, отображаются адреса и пользователи только для выбранного клиента")]
+		public void ShowUsersOnlyForSelectedClient()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var client2 = DataMother.CreateTestClientWithAddressAndUser();
+			uint testUserId = 0;
+
+			using (new SessionScope())
+			{
+				client.Name += client.Id;
+				client.UpdateAndFlush();
+				client2.Name += client2.Id;
+				client2.BillingInstance = client.BillingInstance;
+				client2.UpdateAndFlush();
+				client.Refresh();
+				client2.Refresh();
+				testUserId = client2.Users[0].Id;
+			}
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				var clientRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("ClientRow")).ToList();
+				Assert.That(clientRows.Count, Is.EqualTo(2));
+				browser.Div(Find.ById("ClientListHeader")).Click();
+				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client.Name)).Count(), Is.EqualTo(0));
+				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Count(), Is.EqualTo(1));
+				// Кликаем на другого клиента
+				browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
+
+				// В таблице, которая содержит всех пользователей плательщика должны быть видимыми только те строки,
+				// которые соответствуют пользователям, принадлежащим выделенному клиенту
+				var userRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("UserRow")).ToList();
+				foreach (var row in userRows)
+				{
+					if (row.Id.Contains("UserRowHidden"))
+						continue;
+					if (row.Id.Equals("UserRow" + testUserId))
+						Assert.That(row.Style.Display, Is.Null);
+					else
+						Assert.That(row.Style.Display, Is.EqualTo("none"));
+				}
+
+			}
+		}
+
+		[Test]
+		public void ShowAddressesOnlyForSelectedClient()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var client2 = DataMother.CreateTestClientWithAddressAndUser();
+			uint testAddressId = 0;
+			using (new SessionScope())
+			{
+				client.Name += client.Id;
+				client.UpdateAndFlush();
+				client2.Name += client2.Id;
+				client2.BillingInstance = client.BillingInstance;
+				client2.UpdateAndFlush();
+				client.Refresh();
+				client2.Refresh();
+				testAddressId = client2.Addresses[0].Id;
+			}
+
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				using (new SessionScope())
+				{
+					// Кликаем на другого клиента
+					browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
+
+					// В таблице, которая содержит все адреса доставки плательщика должны быть видимыми только те строки,
+					// которые соответствуют адресам, принадлежащим выделенному клиенту
+					var addressRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("AddressRow")).ToList();
+					foreach (var row in addressRows)
+					{
+						if (row.Id.Contains("AddressRowHidden"))
+							continue;
+						if (row.Id.Equals("AddressRow" + testAddressId))
+							Assert.That(row.Style.Display, Is.Null);
+						else
+							Assert.That(row.Style.Display, Is.EqualTo("none"));
+					}
+				}
 			}
 		}
 	}

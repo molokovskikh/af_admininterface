@@ -1,23 +1,41 @@
-﻿<br />
-<% if (records.Count > 0): %>
+﻿<form id="updateForm" name="updateForm" method="post" action="${siteroot}/Billing/Accounting">
+<br />
+<% if (unaccountedItems.Count > 0): %>
 <table id="UnregisteredItems" class="DataTable">
-    <thead>
-        <th>Договор</th>
-        <th>Плательщик</th>
-        <th>Объект</th>
-        <th>Имя</th>
-    </thead>
-    <tbody class="HighLightCurrentRow">
-<% for i,item in enumerate(records): %>    
-    <tr class="${ViewHelper.GetRowStyle(i)}">
-            <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${item.PayerId}">${item.PayerId}</a></td>
-            <td>${item.PayerName}</td>            
-            <td>${item.Type}</td>
-            <td>${item.Name}</td>        
-    </tr>    
-<%  end %>    
-    </tbody>
+	<thead>
+		<th>Договор</th>
+		<th>Плательщик</th>
+		<th>Объект</th>
+		<th>Имя</th>
+	</thead>
+	<tbody class="HighLightCurrentRow">
+<% for i,item in enumerate(unaccountedItems): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${item.PayerId}">${item.PayerId}</a></td>
+			<td>${item.PayerName}</td>
+			<td>${item.Type}</td>
+			<td>${item.Name}</td>
+	</tr>
+<%	break unless i < pageSize %>
+<%  end %>
+	</tbody>
+	<tr>
+		<td colspan = "10" align="right">
+			<div class="Paginator">
+				<% OutputSubView("/SubViews/PaginatorSubView", {
+					"rowsCount":rowsCount,
+					"pageSize":pageSize,
+					"currentPage":currentPage,
+					"formPostBack" : "updateForm" }) %>
+			</div>
+		</td>
+	</tr>
 </table>
 <% else: %>
 <div class="EmptyData">Нет неучтенных адресов и пользователей</div>
 <% end %>
+<input type="hidden" name="tab" = value="${tab}" />
+<input type="hidden" name="rowsCount" id="rowsCount" value="${rowsCount}" />
+<input type="hidden" name="pageSize" id="pageSize" value="${pageSize}" />
+<input type="hidden" name="currentPage" id="currentPage" value="${currentPage}" />
+</form>

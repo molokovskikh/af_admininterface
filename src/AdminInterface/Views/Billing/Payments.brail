@@ -17,6 +17,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	</tr>
 <% end %>
 
+<style type="text/css">
+	td.ShortWidthColumn { width : 50px; }
+</style>
+
 <script type="text/javascript">
     function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
         var count = jQuery(selectorAdditionalInfo + id).length;
@@ -50,11 +54,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "");
                 }
                 else {
-                    jQuery("tr[id*='UserRow']").addClass("DisabledByBilling");
-                    jQuery("tr[id*='AddressRow']").addClass("DisabledByBilling");
                     jQuery("#ClientRow" + clientId).addClass("DisabledByBilling");
                     jQuery("input[name='Client" + clientId + "']").attr("disabled", "disabled");
-                    jQuery("input[name='Client" + clientId + "']").attr("checked", "");
                 }
                 RefreshTotalSum();
                 ShowElement(false, "#loaderImage" + clientId);
@@ -153,6 +154,77 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
     function HideErrorMessage() {
         ShowElement(false, "#ErrorMessageDiv");
     }
+	
+	function getInvertedDisplay(styleValue) {
+		if (styleValue == "display: none;")
+			return "display: '';";
+		return "display: none;";
+	}
+
+	function ShowUsers(linkCaption) {
+		var linkId = "ShowOrHideUsers";
+		var oldCaption = jQuery("#" + linkId).html();
+		var users = jQuery("tr[id*='UserRow']");
+
+		for (var i = 0; i < users.size(); i++) {
+			if (jQuery("#" + users[i].getAttribute("Id")).hasClass("IsVisible"))
+				continue;
+			users[i].setAttribute("style", getInvertedDisplay(users[i].getAttribute("style")));
+		}
+		jQuery("#" + linkId).html(linkCaption);
+		document.getElementById(linkId).onclick = function () { ShowUsers(oldCaption) };
+	}
+
+	function ShowAddresses(linkCaption) {
+		var linkId = "ShowOrHideAddresses";
+		var oldCaption = jQuery("#" + linkId).html();
+		var addresses = jQuery("tr[id*='AddressRow']");
+
+		for (var i = 0; i < addresses.size(); i++) {
+			if (jQuery("#" + addresses[i].getAttribute("Id")).hasClass("IsVisible"))
+				continue;
+			addresses[i].setAttribute("style", getInvertedDisplay(addresses[i].getAttribute("style")));
+		}
+		jQuery("#" + linkId).html(linkCaption);
+		document.getElementById(linkId).onclick = function () { ShowAddresses(oldCaption) };
+	}
+
+	function FilterBy(objectType, objectId) {
+		var typeName = "";
+		if (objectType == "Address")
+			typeName = "${AdminInterface.Models.Billing.SwitchLogType.AddressLog}";
+		if (objectType == "User") {
+			jQuery("select#messageReceiverComboBox option[selected]").removeAttr("selected");
+			jQuery("select#messageReceiverComboBox option[value='" + objectId + "']").attr("selected", "selected");
+			typeName = "${AdminInterface.Models.Billing.SwitchLogType.UserLog}";
+		}
+		var id = "logRow" + typeName + objectId;
+		var rows = jQuery("tr[id*='logRow']");
+		for (var i = 0; i < rows.size(); i++) {
+			if (rows[i].getAttribute("Id") == id) {
+				rows[i].setAttribute("style", "display: '';");
+				continue;
+			}
+			rows[i].setAttribute("style", "display: none;");
+		}
+		markAsSelected(objectId, objectType + "Link", objectType + "Value");
+	}
+
+	function markAsSelected(id, linkIdPart, textIdPart) {
+		var linkId = linkIdPart + id;
+		var links = jQuery("a[id*='" + linkIdPart + "']");
+		var texts = jQuery("div[id*='" + textIdPart + "']");
+
+		for (var i = 0; i < links.size(); i++) {
+			if (links[i].getAttribute("Id") == linkId) {
+				links[i].setAttribute("style", "display: none;");
+				texts[i].setAttribute("style", "display: '';");
+				continue;
+			}
+			links[i].setAttribute("style", "display: '';");
+			texts[i].setAttribute("style", "display: none;");
+		}
+	}
 </script>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
@@ -176,19 +248,19 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 <%          headerCssClass = "ShowHiden"
             bodyCssClass = "hidden"
-            if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:                
+            if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
                 headerCssClass = "HideVisible" 
                 bodyCssClass = "VisibleFolder"
             end %>
 			<div id="ClientListHeader" class="${headerCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
 				<a href="#" title="Клиенты плательщика '${Instance.ShortName}'">Клиенты плательщика "${Instance.ShortName}"</a>
 			</div>
-			<div id="ClientListBody" class="${bodyCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">                			
-			    <input type="hidden" name="clientCode" value="${client.Id}" />
-                <div style="overflow-x:scroll;">
+			<div id="ClientListBody" class="${bodyCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
+				<input type="hidden" name="clientCode" value="${client.Id}" />
+				<div style="overflow-x:scroll;">
 					<table class="DataTable" style="width:100%;">
 						<tr>
-							<th>Включен</th>							
+							<th>Включен</th>
 							<th>Код</th>
 							<th>Название</th>
 							<th>Регион</th>
@@ -197,17 +269,18 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<th>Копий</th>
 							<th>Адресов доставки</th>
 							<th>Дата регистрации</th>
+							<th></th>
 							<!--
 							<th>Платеж</th>
 							<th>Подробнее</th>-->
 						</tr>
-<%                  i = 0
+<%					i = 0
 					sum = 0
 					for client in Instance.Clients:
 						i++ %>
-						<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"Disabled" if not client.IsClientActive()}" align="center">
+						<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledByBilling" if not client.IsClientActive()}" align="center">
 							<td style="width: 50px">
-							    <div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
+								<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
 								<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
 							</td>
 							<td>${client.Id}</td>
@@ -239,6 +312,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</td>
 							<td>
 								${client.RegistrationDate.ToShortDateString()}
+							</td>
+							<td>
+								<a href="mailto:${client.GetEmails()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
 							</td>
 							<!--
 							<td>
@@ -275,56 +351,68 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
     <div class="InputGroupHeader" style="margin-bottom:10px;">
 <%      headerCssClass = "ShowHiden"
         bodyCssClass = "hidden"
-        if (IsDefined("ShowUsers") and ShowUsers) or Users.Count < 5:
+        if (IsDefined("ShowUsers") and ShowUsers) or Client.Users.Count < 5:
             headerCssClass = "HideVisible" 
             bodyCssClass ="VisibleFolder"
         end %>
         <div id="UserListHeader" class="${headerCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
             <a href="javascript:" title="Пользователи плательщика '${Instance.ShortName}'">Пользователи плательщика "${Instance.ShortName}"</a>
         </div>
+
         <div id="UserListBody" class="${bodyCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
+			<div align="right">
+				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
+			</div>
+			<br />
             <form action="UpdateUsers.rails" method="post">
                 <input type="hidden" name="userId" value="${user.Id}" />
                 <div align="left">
                     <table class="DataTable" id="UsersTable" style="width:100%;">
-                        <tr align="center">
+                        <tr align="center" valign="top">
                             <th>Включен</th>
                             <th>Учтен</th>
-                            <th>Работает бесплатно</th>                            
+                            <th>Работает бесплатно</th>
                             <th>Логин</th>
+							<th>Адреса</th>
                             <th>Комментарий</th>
                             <th>Дата последнего обновления</th>
                             <th>Клиент</th>
                         </tr>
 <%                      for i,user in enumerate(Users):
                             log = AdminInterface.Models.Logs.AuthorizationLogEntity.TryFind(user.Id) %>
-                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled}"
-                            align="center" title="${ViewHelper.GetRowStyle(i)}" name="Client${user.Client.Id}">
-                            <td style="width: 50px">
+                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'IsVisible' if (Client.Id == user.Client.Id)}"
+                            align="center" name="Client${user.Client.Id}" style="${'display:none' if (Client.Id != user.Client.Id)}">
+                            <td class="ShortWidthColumn">
 <%                          if (user.Client.IsClientActive()): %>
                                 <input type="checkbox" ${"checked" if user.Enabled} id="UserStatusCheckBox${user.Id}" name="Client${user.Client.Id}"
                                     onclick="SetUserStatus(${user.Id}, this.checked, document.getElementById('FreeUserCheckBox${user.Id}').checked, ${cast(int, user.IsActive)})" />
 <%                          else: %>
                                 <input type="checkbox" ${"checked" if user.Enabled} id="UserStatusCheckBox${user.Id}" name="Client${user.Client.Id}"
                                     onclick="SetUserStatus(${user.Id}, this.checked, document.getElementById('FreeUserCheckBox${user.Id}').checked, ${cast(int, user.IsActive)})" />
-<%                          end %>                            
+<%                          end %>
                             </td>
-                            <td>
+                            <td class="ShortWidthColumn">
                                 <input type="checkbox" ${"checked" if user.IsRegisteredInBilling} id="UserAccountingStatusCheckBox${user.Id}"
                                     onclick="UserAccounting(${user.Id}, this.checked)" />
                             </td>
-                            <td>                            
+                            <td class="ShortWidthColumn">
                                 <input type="checkbox" ${"checked" if user.IsFree} id="FreeUserCheckBox${user.Id}"
                                     onclick="SetUserStatus(${user.Id}, document.getElementById('UserStatusCheckBox${user.Id}').checked, this.checked, ${cast(int, user.IsActive)})" />
                             </td>
-                            <td><a href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">${user.Login}</a></td>
+							<td>
+								<div id="UserValue${user.Id}" style="display: none;"><b>${user.Login}</b></div>
+								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Login}</a>
+							</td>
+							<td class="ShortWidthColumn"><a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/kfm_home.png" border="0" /></a></td>
                             <td>${user.Name}</td>
                             <td>${log.AFTime if (log != null) and (log.AFTime != null)}</td>
                             <td>${user.Client.Name}</td>
                         </tr>
-                        <tr><td id="additionalUserInfoCell${user.Id}" colspan="10"></td></tr>
+                        <tr id="UserRowHidden${user.Id}" class="${'IsVisible' if (Client.Id == user.Client.Id)}" style="${'display:none' if (Client.Id != user.Client.Id)}">
+							<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
+						</tr>
 <%                      end %>
-                        </table>                        
+                        </table>
                     </div>
                 </form>
             </div>
@@ -333,31 +421,36 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 <%          headerCssClass = "ShowHiden"
             bodyCssClass = "hidden"
-            if (IsDefined("ShowAddresses") and ShowAddresses) or Addresses.Count < 5:
+            if (IsDefined("ShowAddresses") and ShowAddresses) or Client.Addresses.Count < 5:
                 headerCssClass = "HideVisible"
                 bodyCssClass = "VisibleFolder"
-            end %>                
+            end %>
 			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
 				<a href="javascript:" title="Адреса плательщика '${Instance.ShortName}'">Адреса плательщика "${Instance.ShortName}"</a>
 			</div>
 			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
+						<div align="right">
+				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
+			</div>
+			<br />
                 <form action="UpdateAddresses.rails" method="post">
                     <input type="hidden" name="addressId" value="${address.Id}" />
 					<div align="left">
 					    <table class="DataTable" id="AddressesTable" style="width:100%;">
-						    <tr align="center">
+						    <tr align="center" valign="top">
 						        <th>Включен</th>
 						        <th>Учтен</th>
 						        <th>Работает бесплатно</th>
 							    <th>Адрес</th>
+								<th>Пользователи</th>
 							    <th>Клиент</th>
 						    </tr>
 <%                      for i,addr in enumerate(Addresses):
                             hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
-                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled}"
-                                align="center" name="Client${addr.Client.Id}">
-                                <td style="width: 50px">
-<%                          if (addr.Client.IsClientActive()): %>                                
+                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
+                                align="center" name="Client${addr.Client.Id}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
+                                <td class="ShortWidthColumn">
+<%                          if (addr.Client.IsClientActive()): %>
                                     <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
                                         onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          else: %>
@@ -365,18 +458,24 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                         onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          end %>
                                 </td>
-                                <td>
+                                <td class="ShortWidthColumn">
                                     <input type="checkbox" ${"checked" if addr.IsRegisteredInBilling} id="AddressAccountingStatusCheckBox${addr.Id}"
-                                        onclick="AddressAccounting(${addr.Id}, this.checked)" />                                
+                                        onclick="AddressAccounting(${addr.Id}, this.checked)" />
                                 </td>
-                                <td style="width: 50px">
+                                <td class="ShortWidthColumn">
                                     <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
                                         onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
                                 </td>
-                                <td><a href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">${addr.Value}</a></td>
+                                <td>
+									<div id="AddressValue${addr.Id}" style="display: none;"><b>${addr.Value}</b></div>
+									<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>
+								</td>
+								<td class="ShortWidthColumn"><a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/group.png" border="0" /></a></td>
                                 <td>${addr.Client.Name}</td>
                             </tr>
-                            <tr><td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td></tr>
+                            <tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
+								<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
+							</tr>
 <%                      end %>
                         </table>
                     </div>
@@ -572,7 +671,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<form id="SendMessageForm" action="sendMessage.rails" method="post">
 			<table style="width:100%">
 			        <tr>
-<%                      if (CountUsersWithMessages > 0): %>			        
+<%                      if (CountUsersWithMessages > 0): %>
 			            <td class="InputGroupHeader" title="Сообщения для пользователей">
 <%                          cssClassHeader = "ShowHiden"
                             cssClassBody = "hidden"
@@ -581,7 +680,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                 cssClassBody = "VisibleFolder"
                             end %>			            
 			                <div class="${cssClassHeader}" title="Сообщения для пользователей">
-			                    <a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>			                
+			                    <a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>
 			                </div>
 			                <div class="${cssClassBody}" title="Сообщения для пользователей">
 			                    <br />
@@ -594,7 +693,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <%                              end
 					        end %>
 					        </div>
-<%                      end %>			                
+<%                      end %>
 			            </td>
 			        </tr>
 					<tr><td><br /></td></tr>
@@ -624,6 +723,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</tr>
 					<tr>
 						<td>
+							<p>
+								<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" />
+								<label for="sendMessageToClientEmails">Отправлять это сообщение также на Email клиенту</label>
+								<input type="hidden" name="sendMessageToClientEmails" value="false" />
+							</p>
 							Показать
 							<select name="NewClientMessage.ShowMessageCount">
 								<option>1</option>
@@ -655,18 +759,18 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                     <th>Объект</th>
                     <th>Имя</th>
                     <th>Оператор</th>
-                    <th>Статус</th>                    
+                    <th>Статус</th>
                 </thead>
 <%          end %>
-<%          for i,logRecord in enumerate(LogRecords): %>			    
-			    <tr class="${ViewHelper.GetRowStyle(i)}">
+<%          for i,logRecord in enumerate(LogRecords): %>
+			    <tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
 			        <td>${logRecord.LogTime}</td>
 			        <td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
 			        <td>${logRecord.Value}</td>
 			        <td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
 			        <td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
 			    </tr>
-<%          end %>			    
+<%          end %>
 			</table>
 					
 		</div>

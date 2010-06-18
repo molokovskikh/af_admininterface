@@ -9,13 +9,16 @@ namespace AdminInterface.Models.Billing
 {
 	public enum SwitchLogType
 	{
-		[Description("Клиент")] ClientLog,
-		[Description("Пользователь")] UserLog,
-		[Description("Адрес")] AddressLog,
+		[Description("Клиент")] ClientLog = 0,
+		[Description("Пользователь")] UserLog = 1,
+		[Description("Адрес")] AddressLog = 2,
 	}
 
 	public class SwitchLogRecord
 	{
+		// Идентификатор объекта, которому соответствует эта запись (например, идентификатор пользователя или адреса доставки)
+		public uint ObjectId { get; set; }
+
 		public DateTime LogTime { get; set; }
 
 		public SwitchLogType LogType { get; set; }
@@ -57,6 +60,7 @@ namespace AdminInterface.Models.Billing
 		private static SwitchLogRecord GetLogRecord(AddressLogRecord addressLogRecord)
 		{
 			var log = new SwitchLogRecord {
+				ObjectId = addressLogRecord.Address.Id,
 				LogTime = addressLogRecord.LogTime,
 				LogType = SwitchLogType.AddressLog,
 				OperatorName = addressLogRecord.OperatorName,
@@ -69,6 +73,7 @@ namespace AdminInterface.Models.Billing
 		private static SwitchLogRecord GetLogRecord(UserLogRecord userLogRecord)
 		{
 			var log = new SwitchLogRecord {
+				ObjectId = userLogRecord.User.Id,
 				LogTime = userLogRecord.LogTime,
 				LogType = SwitchLogType.UserLog,
                 OperatorName = userLogRecord.OperatorName,

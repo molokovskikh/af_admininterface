@@ -26,20 +26,27 @@
 <div class="tabs">
 	<ul>
 		<li>
-			<a id="unregistredItems" href="#" ${"class='selected'" if tab == "unregistredItems"}>Неучтенные</a>
+			<a id="unregistredItems" href="${siteroot}/Billing/Accounting?tab=unregistredItems" ${"class='selected'" if tab == "unregistredItems"}>Неучтенные</a>
 		</li>
 		<li>
-			<a id="AccountingHistory" href="#" ${"class='selected'" if tab == "AccountingHistory"}>История учтенных</a>
+			<a id="AccountingHistory" href="${siteroot}/Billing/Accounting?tab=AccountingHistory" ${"class='selected'" if tab == "AccountingHistory"}>История поставленных на учет</a>
 		</li>
 	</ul>
 </div>
-
 <div id="unregistredItems-tab" class="tab" ${"style='display:none'" if tab != "unregistredItems"}>
+<% if tab == "unregistredItems": %>
 	<% OutputSubView("Unaccounted") %>
+<% else: %>
+	<div align="center">Пожалуйста подождите...</div>
+<% end %>
 </div>
 
 <div id="AccountingHistory-tab" class="tab" ${"style='display:none'" if tab != "AccountingHistory"}>
+<% if tab == "AccountingHistory": %>
 	<% OutputSubView("AccountingHistory") %>
+<% else: %>
+	<div align="center">Пожалуйста подождите...</div>
+<% end %>
 </div>
 
 <br />

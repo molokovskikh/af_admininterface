@@ -114,11 +114,12 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId)
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId, bool sendMessageToClientEmails)
 		{
 			uint clientCode = 0;
 			try
 			{
+				Client client = null;
 				using (var scope = new TransactionScope())
 				{
 					DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
@@ -128,14 +129,18 @@ namespace AdminInterface.Controllers
 						{
 							SendMessageToUser(user, clientMessage);
 							clientCode = user.Client.Id;
+							client = user.Client;
 						}
 					else
 					{
 						var user = User.Find(clientMessage.ClientCode);
 						SendMessageToUser(user, clientMessage);
 						clientCode = user.Client.Id;
+						client = user.Client;
 					}
 				}
+				if (sendMessageToClientEmails)
+					Mailer.SendMessageFromBillingToClient(client, clientMessage.Message);
 				Flash.Add("Message", new Message("Сообщение сохранено"));
 			}
 			catch (ValidationException exception)
@@ -170,15 +175,6 @@ namespace AdminInterface.Controllers
 					ClientInfoLogEntity.StatusChange(newStatus, client.Id).Save();
 				client.Status = newStatus;
 				client.UpdateAndFlush();
-
-				// Если нужно, отключаем пользователей и адреса
-				if (!enabled)
-				{					
-					foreach (var user in client.Users)
-						SetUserStatus(user.Id, false, user.IsFree);
-					foreach (var addr in client.Addresses)
-						SetAddressStatus(addr.Id, false, addr.FreeFlag);
-				}
 			}
 			CancelView();
 			CancelLayout();
@@ -255,7 +251,7 @@ namespace AdminInterface.Controllers
                 scope.VoteCommit();
 			}
 			CancelView();
-            CancelLayout();			
+            CancelLayout();
 		}
 
 		public void Search()
@@ -452,22 +448,42 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 		}
 
-        public void Accounting(DateTime? beginDate, DateTime? endDate, string tab)
-        {
-            if (!beginDate.HasValue && !endDate.HasValue)
-            {
-                beginDate = DateTime.Today.AddDays(-1);
-                endDate = DateTime.Today;
-            }
-            PropertyBag["accountingHistoryItems"] = AccountingItem
-				.SearchByPeriod(beginDate.Value, endDate.Value.AddDays(1))
-				.OrderByDescending(item => item.WriteTime)
-				.ToList();
-            PropertyBag["records"] = AccountingItem.GetUnaccountedObjects();
-            PropertyBag["beginDate"] = beginDate;
-            PropertyBag["endDate"] = endDate;
-            if (String.IsNullOrEmpty(tab))
-                PropertyBag["tab"] = "unregistredItems";
-        }
+		public void Accounting(DateTime? beginDate, DateTime? endDate, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
+		{
+			if (!beginDate.HasValue && !endDate.HasValue)
+			{
+				beginDate = DateTime.Today.AddDays(-1);
+				endDate = DateTime.Today;
+			}
+			if (!pageSize.HasValue)
+				pageSize = 30;
+			if (!currentPage.HasValue)
+				currentPage = 0;
+
+			if (String.IsNullOrEmpty(tab))
+				tab = "unregistredItems";
+
+			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
+			{
+				var unaccountedItems = AccountingItem.GetUnaccountedObjects(currentPage.Value, pageSize.Value, rowsCount.HasValue);
+				PropertyBag["unaccountedItems"] = unaccountedItems;
+				PropertyBag["rowsCount"] = rowsCount.HasValue ? rowsCount : (uint)unaccountedItems.Count;
+				PropertyBag["currentPage"] = currentPage;
+			}
+			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
+			{
+				var historyItems = AccountingItem
+					.SearchByPeriod(beginDate.Value, endDate.Value.AddDays(1), currentPage.Value, pageSize.Value, rowsCount.HasValue)
+					.OrderByDescending(item => item.WriteTime)
+					.ToList();
+				PropertyBag["accountingHistoryItems"] = historyItems;
+				PropertyBag["beginDate"] = beginDate;
+				PropertyBag["endDate"] = endDate;
+				PropertyBag["currentPage"] = currentPage;
+				PropertyBag["rowsCount"] = rowsCount.HasValue ? rowsCount : (uint)historyItems.Count;
+			}
+			PropertyBag["pageSize"] = pageSize;
+			PropertyBag["tab"] = tab;
+		}
 	}
 }

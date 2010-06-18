@@ -2,6 +2,9 @@
 	Детальная информация о платильщике ${Instance.ShortName}
 <% end %>
 
+<% component Bubble, {"bredcrumbs" : [("Биллинг", "${siteroot}/Billing/Search"),
+									  ("Редактирование информации плательщика", "")]} %>
+
 <script>
 
 	document.observe("dom:loaded", function() {
@@ -108,22 +111,6 @@
 		text-decoration: line-through;
 	}
 </style>
-
-<div class="Navigation">
-	<ul id="breadcrumb">
-		<li>
-			<a title="Административный интерфейс" href="${siteroot}/default.aspx">
-				<img class="home" src="${siteroot}/Images/home.png" alt="Административный интерфейс" />
-			</a>
-		</li>
-		<li>
-			<a href="Search.rails">Биллинг</a>
-		</li>
-		<li>
-			Редактирование информации плательщика
-		</li>
-	</ul>
-</div>
 
 <H3>Плательщик ${Instance.ShortName}</H3>
 

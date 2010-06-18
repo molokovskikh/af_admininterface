@@ -164,6 +164,7 @@ Email: {2}
 @"Оператор: {0}
 Хост: {1}
 Код клиента: {2}
+Клиент: {7}
 Код адреса: {3}
 Адрес: {4}
 Домашний регион: {5}
@@ -175,7 +176,8 @@ Email: {2}
 				address.Id,
 				address.Value,
 				address.Client.HomeRegion.Name,
-				offLetter),
+				offLetter,
+				address.Client.FullName),
 				"RegisterList@subscribe.analit.net");			
 		}
 
@@ -205,6 +207,11 @@ Email: {2}
 				user.Login,
 				SecurityContext.Administrator.ManagerName),
 				"RegisterList@subscribe.analit.net, billing@analit.net");
+		}
+
+		public static void SendMessageFromBillingToClient(Client client, string text)
+		{
+			Func.Mail("billing@analit.net", "Сообщение от службы биллинга АК \"Инфорум\"", text, client.GetEmails());
 		}
 	}
 }

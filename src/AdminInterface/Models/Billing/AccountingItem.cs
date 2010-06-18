@@ -24,11 +24,22 @@ namespace AdminInterface.Models.Billing
         [Description("Адрес")] Address = 1,
     }
 
-	public class AccountingObject
+	[ActiveRecord]
+	public class AccountingObject : ActiveRecordBase
 	{
+		[PrimaryKey]
+		public virtual uint Id { get; set;}
+
+		[Property]
 		public uint PayerId { get; set; }
+
+		[Property]
 		public string PayerName { get; set; }
+
+		[Property]
 		public string Type { get; set; }
+
+		[Property]
 		public string Name { get; set; }
 	}
 
@@ -70,81 +81,103 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public static IList<AccountingItem> GetUnaccounted()
+		private static IList<AccountingObject> GetUnaccountedUsers(uint page, uint pageSize, bool usePaging)
 		{
-			var userIds = ArHelper.WithSession(session => session.CreateSQLQuery(@"
+			var limitExpression = String.Empty;
+			if (usePaging)
+				limitExpression = String.Format(" LIMIT {0},{1} ", page * (pageSize), pageSize);
+			var userIds = ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
 SELECT
-	Users.Id
+	Users.Id AS {{AccountingObject.Id}},
+	Payers.PayerId AS {{AccountingObject.PayerId}},
+	Payers.ShortName AS {{AccountingObject.PayerName}},
+	'Пользователь' AS {{AccountingObject.Type}},
+	concat(Users.Login, ' (', Users.Name, ')') AS {{AccountingObject.Name}}
 FROM
 	future.Users
+JOIN Future.Clients ON Clients.Id = Users.ClientId
+JOIN Billing.Payers ON Payers.PayerID = Clients.PayerId
 WHERE Users.Enabled = 1 and Users.Free = 0 and NOT EXISTS (
-    SELECT * FROM Billing.Accounting
-    WHERE Users.Id = Accounting.AccountId and Type = :Type
-)")
+	SELECT * FROM Billing.Accounting
+	WHERE Users.Id = Accounting.AccountId and Type = :Type
+)
+ORDER BY {{AccountingObject.PayerId}} DESC
+{0} ", limitExpression))
+								.AddEntity(typeof(AccountingObject))
 								.SetParameter("Type", AccountingItemType.User)
-								.List());
-		    var accountingItems = new List<AccountingItem>();
-            foreach (uint id in userIds)
-            {
-                accountingItems.Add(new AccountingItem() {
-                    Type = AccountingItemType.User,
-                    AccountId = id,
-                });
-            }
-		    var addressIds = ArHelper.WithSession(session => session.CreateSQLQuery(@"
-SELECT 
-    Addresses.Id
-FROM
-    future.Addresses
-WHERE Addresses.Enabled = 1 and Addresses.Free = 0 and Addresses.BeAccounted = 1 and NOT EXISTS (
-    SELECT * FROM Billing.Accounting
-    WHERE Addresses.Id = Accounting.AccountId and Type = :Type
-)")
-                                .SetParameter("Type", AccountingItemType.Address)
-                                .List());            
-            foreach (uint id in addressIds)
-            {
-                var address = Address.Find(id);
-                if (address.IsFree)
-                    continue;
-                accountingItems.Add(new AccountingItem() {
-                    Type = AccountingItemType.Address,
-                    AccountId = id,
-                });
-            }
-			return accountingItems;
+								.List<AccountingObject>());
+			return userIds;
 		}
 
-		public static IList<AccountingObject> GetUnaccountedObjects()
+		private static IList<AccountingObject> GetUnaccountedAddresses(uint page, uint pageSize, bool usePaging)
 		{
-			var items = GetUnaccounted();
-			var objects = new List<AccountingObject>();
+			var limitExpression = String.Empty;
+			if (usePaging)
+				limitExpression = String.Format(" LIMIT {0},{1} ", page * (pageSize), pageSize);
+			var addressIds = ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
+SELECT 
+	Addresses.Id AS {{AccountingObject.Id}},
+	Payers.PayerId AS {{AccountingObject.PayerId}},
+	Payers.ShortName AS {{AccountingObject.PayerName}},
+	'Адрес' AS {{AccountingObject.Type}},
+	Addresses.Address AS {{AccountingObject.Name}}
+FROM
+	future.Addresses
+JOIN Future.Clients ON Clients.Id = Addresses.ClientId
+JOIN Billing.Payers ON Payers.PayerID = Clients.PayerId
+WHERE Addresses.Enabled = 1 and Addresses.Free = 0 and Addresses.BeAccounted = 1 and NOT EXISTS (
+	SELECT * FROM Billing.Accounting
+	WHERE Addresses.Id = Accounting.AccountId and Type = :Type
+)
+ORDER BY {{AccountingObject.PayerId}} DESC
+{0} ", limitExpression))
+					.AddEntity(typeof(AccountingObject))
+					.SetParameter("Type", AccountingItemType.Address)
+					.List<AccountingObject>());
+			return addressIds;
+		}
 
-			foreach (var item in items)
-			{
-				if (item.Type.Equals(AccountingItemType.Address))
-					objects.Add(new AccountingObject {
-						Type = "Адрес",
-						Name = item.Address.Value,
-						PayerId = item.Address.Client.BillingInstance.PayerID,
-						PayerName = item.Address.Client.BillingInstance.ShortName,
-					});
-				if (item.Type.Equals(AccountingItemType.User))
-					objects.Add(new AccountingObject {
-						Type = "Пользователь",
-						Name = item.User.GetLoginWithName(),
-						PayerId = item.User.Client.BillingInstance.PayerID,
-						PayerName = item.User.Client.BillingInstance.ShortName,
-					});
-			}
+		public static IList<AccountingObject> GetUnaccountedObjects(uint page, uint pageSize, bool usePaging)
+		{
+			var objects = new List<AccountingObject>();
+			
+			// Делим на 2 потому что отдавать будем список в 2 раза длиннее (адреса + пользователи)
+			var count = pageSize / 2;
+			var addresses = GetUnaccountedAddresses(page, count, usePaging);
+
+			// Если выбрали меньше чем нужно было, остальное будем добирать пользователями
+			if (addresses.Count < count)
+				count = pageSize / 2 + (uint)(pageSize / 2 - addresses.Count);
+
+			var users = GetUnaccountedUsers(page, count, usePaging);
+
+			objects.AddRange(addresses);
+			objects.AddRange(users);
+
 			return objects;
 		}
 
-		public static IList<AccountingItem> SearchByPeriod(DateTime beginDate, DateTime endDate)
+		public static IList<AccountingItem> SearchByPeriod(DateTime beginDate, DateTime endDate, uint page, uint pageSize, bool usePaging)
 		{
-			return FindAll().Where(item => item.WriteTime.HasValue &&
-                item.WriteTime.Value.CompareTo(beginDate) >= 0 &&
-                item.WriteTime.Value.CompareTo(endDate) < 0).ToList();
+			var limitExpression = String.Empty;
+			if (usePaging)
+				limitExpression = String.Format(" LIMIT {0}, {1} ", page * pageSize, pageSize);
+			return ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
+SELECT
+	Accounting.Id AS {{AccountingItem.Id}},
+	Accounting.WriteTime AS {{AccountingItem.WriteTime}},
+	Accounting.Type AS {{AccountingItem.Type}},
+	Accounting.AccountId AS {{AccountingItem.AccountId}},
+	Accounting.Operator AS {{AccountingItem.Operator}}
+FROM Billing.Accounting
+WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
+ORDER BY {{AccountingItem.WriteTime}} DESC
+{0}
+", limitExpression))
+				.AddEntity(typeof(AccountingItem))
+				.SetParameter("BeginDate", beginDate)
+				.SetParameter("EndDate", endDate)
+				.List<AccountingItem>());
 		}
 
 		public static IList<AccountingItem> Union(IList<User> users, IList<Address> addresses)
