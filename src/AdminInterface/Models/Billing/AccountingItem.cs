@@ -170,6 +170,17 @@ SELECT
 	Accounting.AccountId AS {{AccountingItem.AccountId}},
 	Accounting.Operator AS {{AccountingItem.Operator}}
 FROM Billing.Accounting
+JOIN Future.Users ON Users.Id = Accounting.AccountId AND Accounting.Type = 0
+WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
+UNION
+SELECT
+	Accounting.Id AS {{AccountingItem.Id}},
+	Accounting.WriteTime AS {{AccountingItem.WriteTime}},
+	Accounting.Type AS {{AccountingItem.Type}},
+	Accounting.AccountId AS {{AccountingItem.AccountId}},
+	Accounting.Operator AS {{AccountingItem.Operator}}
+FROM Billing.Accounting
+JOIN Future.Addresses ON Addresses.Id = Accounting.AccountId AND Accounting.Type = 1
 WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
 ORDER BY {{AccountingItem.WriteTime}} DESC
 {0}
