@@ -154,18 +154,17 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
     function HideErrorMessage() {
         ShowElement(false, "#ErrorMessageDiv");
     }
-	
+
 	function getInvertedDisplay(styleValue) {
-		if (styleValue == "display: none;")
-			return "display: '';";
-		return "display: none;";
+		if ((styleValue != null) && styleValue.toLowerCase().indexOf("display: none") != -1)
+			return "display: ''";
+		return "display: none";
 	}
 
 	function ShowUsers(linkCaption) {
 		var linkId = "ShowOrHideUsers";
 		var oldCaption = jQuery("#" + linkId).html();
 		var users = jQuery("tr[id*='UserRow']");
-
 		for (var i = 0; i < users.size(); i++) {
 			if (jQuery("#" + users[i].getAttribute("Id")).hasClass("IsVisible"))
 				continue;
