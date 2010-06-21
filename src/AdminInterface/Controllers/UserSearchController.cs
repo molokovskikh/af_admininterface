@@ -29,7 +29,7 @@ namespace AdminInterface.Controllers
 
 		public void SearchBy([DataBind("SearchBy")] UserSearchProperties searchProperties)
 		{
-		    var searchResults = UserSearchItem.SearchBy(searchProperties, "UserName", "Ascending");
+		    var searchResults = UserSearchItem.SearchBy(SecurityContext.Administrator, searchProperties, "UserName", "Ascending");
 
 			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().Login))
 			{
@@ -64,7 +64,7 @@ namespace AdminInterface.Controllers
 							string sortColumnName,
                             int rowsCount)
         {
-            var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(
+            var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(SecurityContext.Administrator,
 				searchProperties, sortColumnName, sortDirection));
 
             PropertyBag["SearchResults"] = searchResults;

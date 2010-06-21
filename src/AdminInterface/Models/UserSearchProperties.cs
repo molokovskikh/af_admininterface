@@ -57,6 +57,8 @@ namespace AdminInterface.Models
 
 		public ulong RegionId { get; set; }
 
+		public ulong AdminRegionMask { get; set; }
+
 		public bool IsSearchAuto()
 		{
 			return SearchBy == SearchUserBy.Auto;

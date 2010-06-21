@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using AdminInterface.Controllers;
 using Common.Web.Ui.Helpers;
@@ -84,7 +85,7 @@ namespace AdminInterface.Models
 			return ProcessFilter(newFilter);
 		}
 
-		public static IList<UserSearchItem> SearchBy(UserSearchProperties searchProperties, string sortColumn, string sortDirection)
+		public static IList<UserSearchItem> SearchBy(Administrator administrator, UserSearchProperties searchProperties, string sortColumn, string sortDirection)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(UserSearchItem));
@@ -127,13 +128,15 @@ FROM
 	JOIN billing.Payers ON Clients.PayerId = Payers.PayerID
 	LEFT JOIN usersettings.UserUpdateInfo uui ON uui.UserId = Users.Id
 WHERE
-	Clients.RegionCode & :RegionId > 0
+	(Regions.RegionCode & :AdminRegionMask > 0) AND
+	(Clients.RegionCode & :RegionId > 0)
 	{0}
 GROUP BY {{UserSearchItem.UserId}}
 {1}
 ", filter, orderFilter))
 						.AddEntity(typeof (UserSearchItem))
 						.SetParameter("RegionId", searchProperties.RegionId)
+						.SetParameter("AdminRegionMask", administrator.RegionMask)
 						.List<UserSearchItem>();
 				ArHelper.Evict(session, result);
 				var logins = new List<string>();
