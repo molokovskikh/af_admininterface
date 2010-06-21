@@ -18,9 +18,7 @@ namespace AdminInterface.Controllers
 	[
 		Layout("GeneralWithJQuery"),
 		Helper(typeof(BindingHelper)),
-		Helper(typeof(ViewHelper)),
-		Filter(ExecuteWhen.BeforeAction,
-		typeof(SecurityActivationFilter))
+		Helper(typeof(ViewHelper))
 	]
 	public class RegionalAdminController : SmartDispatcherController
 	{
