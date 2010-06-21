@@ -13,7 +13,6 @@
 	jQuery(function() {
 		jQuery("form").validate({
 			rules: {
-				"administrator.PhoneSupport": "required",
 				"administrator.ManagerName": "required",
 				"administrator.UserName": "required",
 			}
