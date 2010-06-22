@@ -141,6 +141,8 @@ where a.Id = :addressId")
 		public void SetAccessControl(string username)
 		{
 #if !DEBUG
+			if (!ADHelper.IsLoginExists(username))
+				return;
 			var ftpRoot = ConfigurationManager.AppSettings["FtpRoot"];
 			var clientRoot = Path.Combine(ftpRoot, Id.ToString());
 
