@@ -224,6 +224,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			texts[i].setAttribute("style", "display: none;");
 		}
 	}
+
+	function ShowOrHideTheme(show) {
+		if (show) {
+			jQuery("#EmailSubjectRow").css("display", "");
+			return;
+		}
+		jQuery("#EmailSubjectRow").css("display", "none");
+	}
 </script>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
@@ -313,7 +321,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								${client.RegistrationDate.ToShortDateString()}
 							</td>
 							<td>
-								<a href="mailto:${client.GetEmails()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
+								<a href="mailto:${client.GetEmailsForBilling()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
 							</td>
 							<!--
 							<td>
@@ -354,11 +362,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             headerCssClass = "HideVisible" 
             bodyCssClass ="VisibleFolder"
         end %>
-        <div id="UserListHeader" class="${headerCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
-            <a href="javascript:" title="Пользователи плательщика '${Instance.ShortName}'">Пользователи плательщика "${Instance.ShortName}"</a>
+        <div id="UserListHeader" class="${headerCssClass}" title="Пользователи клиента '${Client.Name}'">
+            <a href="javascript:" title="Пользователи клиента '${Client.Name}'">Пользователи клиента "${Client.Name}"</a>
         </div>
 
-        <div id="UserListBody" class="${bodyCssClass}" title="Пользователи плательщика '${Instance.ShortName}'">
+        <div id="UserListBody" class="${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
 			</div>
@@ -424,10 +432,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                 headerCssClass = "HideVisible"
                 bodyCssClass = "VisibleFolder"
             end %>
-			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
-				<a href="javascript:" title="Адреса плательщика '${Instance.ShortName}'">Адреса плательщика "${Instance.ShortName}"</a>
+			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса клиента '${Client.Name}'">
+				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
 			</div>
-			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса плательщика '${Instance.ShortName}'">
+			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
 						<div align="right">
 				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
 			</div>
@@ -715,6 +723,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</td>
 					</tr>
 					<% end %>
+					<tr id="EmailSubjectRow" style="display: none;">
+						<td>Тема письма:<input type="text" style="width: 100%;" name="subjectForEmailToClient" /></td>
+					</tr>
 					<tr>
 						<td>
 							<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
@@ -723,7 +734,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<tr>
 						<td>
 							<p>
-								<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" />
+								<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" onclick="ShowOrHideTheme(this.checked)" />
 								<label for="sendMessageToClientEmails">Отправлять это сообщение также на Email клиенту</label>
 								<input type="hidden" name="sendMessageToClientEmails" value="false" />
 							</p>

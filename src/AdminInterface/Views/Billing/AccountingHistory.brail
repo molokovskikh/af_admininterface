@@ -1,38 +1,91 @@
-﻿<br />
+﻿<script type="text/javascript">
+	jQuery(document).ready(function () {
+		jQuery("#SearchText").focus();
+	})
+</script>
+
+<br />
 <div class="CenterBlock FilterBlock" style="padding: 10px 30px 10px 30px;" align="center">
 <form id="SearchForm" method="post" action="${siteroot}/Billing/Accounting">
-        <table style="width: auto; padding: 10px 2px 10px 2px;">   		
-            <tr style="text-align: left;">
-                <td style="width: auto;">С:</td>
-                <td>
-                    <input type="text" name="beginDate" value="${beginDate.ToShortDateString()}" /><input id="beginDate" type="button" class="CalendarInput" />                    
-                </td>
-            </tr>
-            <tr>
-                <td style="width: auto;">По:</td>
-                <td>
-                    <input type="text" name="endDate" value="${endDate.ToShortDateString()}" /><input id="endDate" type="button" class="CalendarInput" />                    
-                </td>
-            </tr>
-            <tr><td colspan="2" align="right"><input type="submit" value="Поиск" /></td></tr>
-        </table>
-    <input type="hidden" name="tab" value="AccountingHistory" />
+	<h3>Поиск</h3>
+	<table style="width: 100%;">
+		<tr valign="middle" align="left">
+			<td colspan="10">
+				Введите текст для поиска:<br />
+				<input type="text" id="SearchText" style="width: 99%" name="SearchBy.SearchText" value="${FindBy.SearchText}" />
+			</td>
+		</tr>
+		<tr><td align="left">Искать по:</td><td colspan="10"></td></tr>
+		<tr valign="top" align="left">
+			<td></td>
+			<td style="width: 50%;">
+				<input type="radio" id="Autosearch" name="SearchBy.SearchBy" value="Auto" ${"checked" if FindBy.IsAutoSearch} />
+				<label for="Autosearch">Автоматически</label><br />
+				<input type="radio" id="SearchByClient" name="SearchBy.SearchBy" value="ByClient" ${"checked" if FindBy.IsSearchByClient} />
+				<label for="SearchByClient">По клиенту</label><br />
+				<input type="radio" id="SearchByUser" name="SearchBy.SearchBy" value="ByUser" ${"checked" if FindBy.IsSearchByUser} />
+				<label for="SearchByUser">По пользователю</label><br />
+			</td>
+			<td>
+				<input type="radio" id="SearchByAddress" name="SearchBy.SearchBy" value="ByAddress" ${"checked" if FindBy.IsSearchByAddress} />
+				<label for="SearchByAddress">По адресу</label><br />
+				<input type="radio" id="SearchByPayer" name="SearchBy.SearchBy" value="ByPayer" ${"checked" if FindBy.IsSearchByPayer} />
+				<label for="SearchByPayer">По плательщику</label><br />
+			</td>
+		</tr>
+	</table>
+
+	<fieldset style="padding: 0; margin: 0;">
+
+		<legend>Период</legend>
+
+		<table style="width: 100%">
+			<col style="width: 40%" />
+			<col style="width: 60%" />
+
+			<tr style="text-align: left;">
+				<td>С:</td>
+				<td>
+					<input type="text" name="SearchBy.BeginDate" value="${FindBy.BeginDate.ToShortDateString()}" />
+					<input type="button" class="CalendarInput" />
+				</td>
+			</tr>
+
+			<tr style="text-align: left;">
+				<td>По:</td>
+				<td>
+					<input type="text" name="SearchBy.EndDate" value="${FindBy.EndDate.ToShortDateString()}" />
+					<input type="button" class="CalendarInput" />
+				</td>
+			</tr>
+		</table>
+
+	</fieldset>
+
+	<div style="text-align:right; margin-top: 10px;">
+		${FormHelper.Submit("Найти")}
+	</div>
+
+	<input type="hidden" name="tab" value="AccountingHistory" />
 </form>
 </div>
 <br />
 
 <form id="updateHistoryForm" name="updateHistoryForm" method="post" action="${siteroot}/Billing/Accounting">
+
 <%  if (IsDefined("accountingHistoryItems") and accountingHistoryItems.Count > 0): %>
 <table id="MainTable" class="DataTable">
-    <thead>
-        <th>Дата учета</th>
-        <th>Договор</th>
-        <th>Плательщик</th>
-        <th>Объект</th>
-        <th>Имя</th>
-        <th>Оператор</th>
-    </thead>
-    <tbody class="HighLightCurrentRow">
+	<thead>
+		<th>Дата учета</th>
+		<th>Договор</th>
+		<th>Регион</th>
+		<th>Плательщик</th>
+		<th>Клиент</th>
+		<th>Объект</th>
+		<th>Имя</th>
+		<th>Оператор</th>
+	</thead>
+	<tbody class="HighLightCurrentRow">
 <% for i,item in enumerate(accountingHistoryItems): %>
     <tr class="${ViewHelper.GetRowStyle(i)}">
 
@@ -41,7 +94,9 @@
             payerId = item.Address.Client.BillingInstance.PayerID %>
 
             <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
-            <td>${item.Address.Client.BillingInstance.ShortName}</td>            
+			<td>${item.Client.HomeRegion.Name}</td>
+            <td>${item.Address.Client.BillingInstance.ShortName}</td>
+			<td>${item.Client.Name}</td>
             <td>${BindingHelper.GetDescription(item.Type)}</td>
             <td>${item.Address.Value}</td>
             
@@ -49,15 +104,17 @@
             payerId = item.User.Client.BillingInstance.PayerID %>
             
             <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
-            <td>${item.User.Client.BillingInstance.ShortName}</td>            
+			<td>${item.Client.HomeRegion.Name}</td>
+            <td>${item.User.Client.BillingInstance.ShortName}</td>
+			<td>${item.Client.Name}</td>
             <td>${BindingHelper.GetDescription(item.Type)}</td>
             <td>${item.User.GetLoginWithName()}</td>
 <%		break unless i < pageSize %>
-<%      end %>        
+<%      end %>
         <td>${ViewHelper.GetHumanReadableOperatorName(item.Operator)}</td>
-    </tr>    
+    </tr>
 <% end %>
-    </tbody>
+	</tbody>
 	<tr>
 		<td colspan="10" align="right">
 			<div class="Paginator">
@@ -70,13 +127,15 @@
 		</td>
 	</tr>
 </table>
-<%  else: %>    
+<%  else: %>
 <div class="EmptyData">За указанный период ничего не найдено</div>
 <%  end %>
 <input type="hidden" name="tab" value="${tab}" />
+<input type="hidden" name="SearchBy.SearchBy" value="${FindBy.SearchBy}" />
 <input type="hidden" name="rowsCount" id="rowsCount" value="${rowsCount}" />
 <input type="hidden" name="pageSize" id="pageSize" value="${pageSize}" />
 <input type="hidden" name="currentPage" id="currentPage" value="${currentPage}" />
-<input type="hidden" name="beginDate" value="${beginDate}" />
-<input type="hidden" name="endDate" value="${endDate}" />
+<input type="hidden" name="SearchBy.BeginDate" value="${FindBy.BeginDate}" />
+<input type="hidden" name="SearchBy.EndDate" value="${FindBy.EndDate}" />
+<input type="hidden" name="SearchBy.SearchText" value="${FindBy.SearchText}" />
 </form>

@@ -238,9 +238,9 @@ where
 			return GetEmails(false, generalGroup, specialGroup);
 		}
 
-		public virtual string GetEmails()
+		public virtual string GetEmailsForBilling()
 		{
-			return GetEmails(true, GetContactGroup(ContactGroupType.General), GetContactGroup(ContactGroupType.OrderManagers));
+			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), BillingInstance.ContactGroupOwner.ContactGroups.ToArray());
 		}
 
 		private string GetEmails(bool unionEmails, ContactGroup generalGroup, params ContactGroup[] specialGroup)

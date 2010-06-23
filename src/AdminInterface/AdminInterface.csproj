@@ -176,6 +176,7 @@
     <Compile Include="Helpers\Wav\WavHelper.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\AccountingItem.cs" />
+    <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Reciver.cs" />

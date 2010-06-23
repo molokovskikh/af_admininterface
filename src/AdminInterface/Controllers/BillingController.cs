@@ -49,9 +49,6 @@ namespace AdminInterface.Controllers
 			user = (userId != 0) ? User.Find(userId) : client.Users.First();
 			address = (addressId != 0) ? Address.Find(addressId) : client.Addresses.First();
 
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
-
 			var payer = client.BillingInstance;
 			var usersMessages = new List<ClientMessage>();
 			var usersLogs = new List<UserLogRecord>();
@@ -114,7 +111,8 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId, bool sendMessageToClientEmails)
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId,
+			bool sendMessageToClientEmails, string subjectForEmailToClient)
 		{
 			uint clientCode = 0;
 			try
@@ -140,7 +138,7 @@ namespace AdminInterface.Controllers
 					}
 				}
 				if (sendMessageToClientEmails)
-					Mailer.SendMessageFromBillingToClient(client, clientMessage.Message);
+					Mailer.SendMessageFromBillingToClient(client, clientMessage.Message, subjectForEmailToClient);
 				Flash.Add("Message", new Message("Сообщение сохранено"));
 			}
 			catch (ValidationException exception)
@@ -448,13 +446,14 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 		}
 
-		public void Accounting(DateTime? beginDate, DateTime? endDate, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
+		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties SearchBy, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
 		{
-			if (!beginDate.HasValue && !endDate.HasValue)
-			{
-				beginDate = DateTime.Today.AddDays(-1);
-				endDate = DateTime.Today;
-			}
+			if ((SearchBy.BeginDate == null) && (SearchBy.EndDate == null) && (SearchBy.SearchText == null))
+				SearchBy = new AccountingSearchProperties {
+					BeginDate = DateTime.Today.AddDays(-1),
+					EndDate = DateTime.Today,
+					SearchText = String.Empty,
+				};
 			if (!pageSize.HasValue)
 				pageSize = 30;
 			if (!currentPage.HasValue)
@@ -473,17 +472,16 @@ namespace AdminInterface.Controllers
 			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 			{
 				var historyItems = AccountingItem
-					.SearchByPeriod(beginDate.Value, endDate.Value.AddDays(1), currentPage.Value, pageSize.Value, rowsCount.HasValue)
+					.SearchBy(SearchBy, currentPage.Value, pageSize.Value, rowsCount.HasValue)
 					.OrderByDescending(item => item.WriteTime)
 					.ToList();
 				PropertyBag["accountingHistoryItems"] = historyItems;
-				PropertyBag["beginDate"] = beginDate;
-				PropertyBag["endDate"] = endDate;
 				PropertyBag["currentPage"] = currentPage;
 				PropertyBag["rowsCount"] = rowsCount.HasValue ? rowsCount : (uint)historyItems.Count;
 			}
 			PropertyBag["pageSize"] = pageSize;
 			PropertyBag["tab"] = tab;
+			PropertyBag["FindBy"] = SearchBy;
 		}
 	}
 }

@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountingFixture.cs" />
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
     <Compile Include="CallHistoryFixture.cs" />

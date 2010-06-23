@@ -892,5 +892,49 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test]
+		public void Show_all_users_for_payer()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var client2 = DataMother.CreateTestClientWithAddressAndUser();
+
+			using (new SessionScope())
+			{
+				client.Name += client.Id;
+				client.UpdateAndFlush();
+				client2.Name += client2.Id;
+				client2.BillingInstance = client.BillingInstance;
+				client2.UpdateAndFlush();
+				client.Refresh();
+				client2.Refresh();
+			}
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				var usersTable = browser.Table("UsersTable");
+				var countVisibleRows = 0;
+				foreach (TableRow row in usersTable.TableRows)
+					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
+						countVisibleRows++;
+				browser.Link(Find.ById("ShowOrHideUsers")).Click();
+				Thread.Sleep(1000);
+
+				var countVisibleRows2 = 0;
+				foreach (TableRow row in usersTable.TableRows)
+					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
+						countVisibleRows2++;
+				Assert.That(countVisibleRows, Is.LessThan(countVisibleRows2));
+				browser.Link(Find.ById("ShowOrHideUsers")).Click();
+				Thread.Sleep(1000);
+
+				var countVisibleRows3 = 0;
+				foreach (TableRow row in usersTable.TableRows)
+					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
+						countVisibleRows3++;
+				Assert.That(countVisibleRows, Is.LessThan(countVisibleRows3));
+				browser.Link(Find.ById("ShowOrHideUsers")).Click();
+				Thread.Sleep(1000);
+			}
+		}
 	}
 }

@@ -209,9 +209,9 @@ Email: {2}
 				"RegisterList@subscribe.analit.net, billing@analit.net");
 		}
 
-		public static void SendMessageFromBillingToClient(Client client, string text)
+		public static void SendMessageFromBillingToClient(Client client, string text, string subject)
 		{
-			Func.Mail("billing@analit.net", "Сообщение от службы биллинга АК \"Инфорум\"", text, client.GetEmails());
+			Func.Mail("billing@analit.net", subject, text, client.GetEmailsForBilling());
 		}
 	}
 }

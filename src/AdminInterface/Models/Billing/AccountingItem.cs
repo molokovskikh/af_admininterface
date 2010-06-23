@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
+using Common.MySql;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
@@ -60,6 +61,18 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public virtual string Operator { get; set; }
+
+		public virtual Client Client
+		{
+			get
+			{
+				if (User != null)
+					return User.Client;
+				if (Address != null)
+					return Address.Client;
+				return null;
+			}
+		}
 
 		public virtual User User 
 		{
@@ -157,11 +170,49 @@ ORDER BY {{AccountingObject.PayerId}} DESC
 			return objects;
 		}
 
-		public static IList<AccountingItem> SearchByPeriod(DateTime beginDate, DateTime endDate, uint page, uint pageSize, bool usePaging)
+		public static IList<AccountingItem> SearchBy(AccountingSearchProperties searchProperties, uint page, uint pageSize, bool usePaging)
 		{
 			var limitExpression = String.Empty;
 			if (usePaging)
 				limitExpression = String.Format(" LIMIT {0}, {1} ", page * pageSize, pageSize);
+
+			switch (searchProperties.SearchBy)
+			{
+				case AccountingSearchBy.Auto:
+					return AutoSearch(searchProperties, limitExpression);
+				case AccountingSearchBy.ByAddress:
+					return SearchByAddress(searchProperties, limitExpression);
+				case AccountingSearchBy.ByClient:
+					return SearchByClient(searchProperties, limitExpression);
+				case AccountingSearchBy.ByPayer:
+					return SearchByPayer(searchProperties, limitExpression);
+				case AccountingSearchBy.ByUser:
+					return SearchByUser(searchProperties, limitExpression);
+			}
+
+			return null;
+		}
+
+		public static IList<AccountingItem> AutoSearch(AccountingSearchProperties searchProperties, string limitExpression)
+		{
+			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(searchProperties.SearchText));
+			var searchNumber = 0;
+			Int32.TryParse(searchProperties.SearchText, out searchNumber);
+
+			var result = new List<AccountingItem>();
+
+			result.AddRange(SearchByAddress(searchProperties, limitExpression));
+			result.AddRange(SearchByUser(searchProperties, limitExpression));
+			result.AddRange(SearchByPayer(searchProperties, limitExpression));
+			return result;
+		}
+
+		public static IList<AccountingItem> SearchByAddress(AccountingSearchProperties searchProperties, string limitExpression)
+		{
+			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(searchProperties.SearchText));
+			var searchNumber = 0;
+			Int32.TryParse(searchProperties.SearchText, out searchNumber);
+
 			return ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
 SELECT
 	Accounting.Id AS {{AccountingItem.Id}},
@@ -170,9 +221,27 @@ SELECT
 	Accounting.AccountId AS {{AccountingItem.AccountId}},
 	Accounting.Operator AS {{AccountingItem.Operator}}
 FROM Billing.Accounting
-JOIN Future.Users ON Users.Id = Accounting.AccountId AND Accounting.Type = 0
+	JOIN Future.Addresses ON Addresses.Id = Accounting.AccountId AND Accounting.Type = 1 AND
+		(Addresses.Address LIKE :SearchText OR Addresses.Id = :SearchNumber)
 WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
-UNION
+ORDER BY {{AccountingItem.WriteTime}} DESC
+{0}
+", limitExpression))
+					.AddEntity(typeof(AccountingItem))
+					.SetParameter("BeginDate", searchProperties.BeginDate)
+					.SetParameter("EndDate", searchProperties.EndDate)
+					.SetParameter("SearchText", searchText)
+					.SetParameter("SearchNumber", searchNumber)
+					.List<AccountingItem>());
+		}
+
+		public static IList<AccountingItem> SearchByUser(AccountingSearchProperties searchProperties, string limitExpression)
+		{
+			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(searchProperties.SearchText));
+			var searchNumber = 0;
+			Int32.TryParse(searchProperties.SearchText, out searchNumber);
+
+			return ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
 SELECT
 	Accounting.Id AS {{AccountingItem.Id}},
 	Accounting.WriteTime AS {{AccountingItem.WriteTime}},
@@ -180,14 +249,76 @@ SELECT
 	Accounting.AccountId AS {{AccountingItem.AccountId}},
 	Accounting.Operator AS {{AccountingItem.Operator}}
 FROM Billing.Accounting
-JOIN Future.Addresses ON Addresses.Id = Accounting.AccountId AND Accounting.Type = 1
+	JOIN Future.Users ON Users.Id = Accounting.AccountId AND Accounting.Type = 0 AND
+		(Users.Name LIKE :SearchText OR Users.Id = :SearchNumber)
+WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
+ORDER BY {{AccountingItem.WriteTime}} DESC
+{0}
+", limitExpression))
+					.AddEntity(typeof(AccountingItem))
+					.SetParameter("BeginDate", searchProperties.BeginDate)
+					.SetParameter("EndDate", searchProperties.EndDate)
+					.SetParameter("SearchText", searchText)
+					.SetParameter("SearchNumber", searchNumber)
+					.List<AccountingItem>());
+		}
+
+		public static IList<AccountingItem> SearchByClient(AccountingSearchProperties searchProperties, string limitExpression)
+		{
+			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(searchProperties.SearchText));
+			var searchNumber = 0;
+			Int32.TryParse(searchProperties.SearchText, out searchNumber);
+
+			return ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
+SELECT
+	Accounting.Id AS {{AccountingItem.Id}},
+	Accounting.WriteTime AS {{AccountingItem.WriteTime}},
+	Accounting.Type AS {{AccountingItem.Type}},
+	Accounting.AccountId AS {{AccountingItem.AccountId}},
+	Accounting.Operator AS {{AccountingItem.Operator}}
+FROM Billing.Accounting
+	JOIN Future.Users ON Users.Id = Accounting.AccountId AND Accounting.Type = 0
+	JOIN Future.Clients ON Clients.Id = Users.ClientId AND
+		(Clients.Name LIKE :SearchText OR Clients.FullName LIKE :SearchText OR Clients.Id = :SearchNumber)
 WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
 ORDER BY {{AccountingItem.WriteTime}} DESC
 {0}
 ", limitExpression))
 				.AddEntity(typeof(AccountingItem))
-				.SetParameter("BeginDate", beginDate)
-				.SetParameter("EndDate", endDate)
+				.SetParameter("BeginDate", searchProperties.BeginDate)
+				.SetParameter("EndDate", searchProperties.EndDate)
+				.SetParameter("SearchText", searchText)
+				.SetParameter("SearchNumber", searchNumber)
+				.List<AccountingItem>());
+		}
+
+		public static IList<AccountingItem> SearchByPayer(AccountingSearchProperties searchProperties, string limitExpression)
+		{
+			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(searchProperties.SearchText));
+			var searchNumber = 0;
+			Int32.TryParse(searchProperties.SearchText, out searchNumber);
+
+			return ArHelper.WithSession(session => session.CreateSQLQuery(String.Format(@"
+SELECT
+	Accounting.Id AS {{AccountingItem.Id}},
+	Accounting.WriteTime AS {{AccountingItem.WriteTime}},
+	Accounting.Type AS {{AccountingItem.Type}},
+	Accounting.AccountId AS {{AccountingItem.AccountId}},
+	Accounting.Operator AS {{AccountingItem.Operator}}
+FROM Billing.Accounting
+	JOIN Future.Users ON Users.Id = Accounting.AccountId AND Accounting.Type = 0
+	JOIN Future.Clients ON Clients.Id = Users.ClientId
+	JOIN Billing.Payers ON Clients.PayerId = Payers.PayerId AND
+		(Payers.PayerId = :SearchNumber OR Payers.ShortName LIKE :SearchText OR Payers.JuridicalName LIKE :SearchText)
+WHERE Accounting.WriteTime > :BeginDate AND Accounting.WriteTime < :EndDate
+ORDER BY {{AccountingItem.WriteTime}} DESC
+{0}
+", limitExpression))
+				.AddEntity(typeof(AccountingItem))
+				.SetParameter("BeginDate", searchProperties.BeginDate)
+				.SetParameter("EndDate", searchProperties.EndDate)
+				.SetParameter("SearchText", searchText)
+				.SetParameter("SearchNumber", searchNumber)
 				.List<AccountingItem>());
 		}
 

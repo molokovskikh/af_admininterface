@@ -148,14 +148,14 @@
 		            <ul class="navigation">
 		                <li>
 				            <% if admin.HavePermisions(PermissionType.ManageCallbacks): %>
-				            <a href="${siteroot}/Telephony/Show.rails">Правила обратного звонка</a>
+				            <a href="${siteroot}/Telephony/Show">Правила обратного звонка</a>
 				            <% else: %>
 				            <a href="#" class="NotAllowedLink">Правила обратного звонка</a>
 				            <% end %>
 			            </li>
 			            <li>
 			                <% if admin.HavePermisions(PermissionType.CallHistory): %>
-			                <a href="${siteroot}/CallHistory/ShowCallHistory.brail">История звонков</a>
+			                <a href="${siteroot}/CallHistory/ShowCallHistory">История звонков</a>
 			                <% else: %>
 			                <a href="#" class="NotAllowedLink">История звонков</a>
 			                <% end %>
