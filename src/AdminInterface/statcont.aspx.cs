@@ -39,7 +39,7 @@ namespace AddUser
 			With.Connection(c => {
 			                	var adapter = new MySqlDataAdapter(String.Format(@"
 SELECT  ci.WriteTime, 
-        ci.UserName, 
+        if(length(ra.ManagerName) > 0, ra.ManagerName, ra.UserName) as UserName, 
         cl.Name ShortName, 
         r.Region, 
         ci.Message, 
@@ -51,6 +51,7 @@ FROM    logs.clientsinfo ci
 	JOIN future.Clients cl ON cl.Id = ci.clientcode
         JOIN farm.regions r ON r.regioncode = cl.RegionCode 
 		LEFT JOIN future.Users usr ON usr.Id = ci.UserId
+		LEFT JOIN `accessright`.`regionaladmins` ra ON ra.UserName = ci.UserName
 WHERE   ci.WriteTime BETWEEN ?FromDate AND ?ToDate  
 		and (cl.Name like ?SearchText 
 			or ci.Message like ?SearchText 
