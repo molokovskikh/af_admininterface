@@ -252,6 +252,9 @@ namespace AdminInterface.Controllers
 				ServiceClient = additionalSettings.IsServiceClient,
 				BasecostPassword = costCrypKey,
 				IgnoreNewPrices = additionalSettings.IgnoreNewPrices,
+				ParseWaybills = true,
+				ShowAdvertising = true,
+				ShowNewDefecture = true,
 			};
 			if (additionalSettings.ShowForOneSupplier)
 				settings.FirmCodeOnly = supplier.Id;
