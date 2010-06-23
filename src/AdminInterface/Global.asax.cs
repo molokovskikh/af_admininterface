@@ -218,6 +218,8 @@ WHERE PriceCode = ?Id", connection);
 			}
 
 			var builder = new StringBuilder();
+			builder.AppendLine("----UrlReferer-------");
+			builder.AppendLine(Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : String.Empty);
 			builder.AppendLine("----Url-------");
 			builder.AppendLine(Request.Url.ToString());
 			builder.AppendLine("--------------");
