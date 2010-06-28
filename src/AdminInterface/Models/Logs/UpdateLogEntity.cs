@@ -16,6 +16,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Ошибка сервера")] ServerError = 6,
 		[Description("Документы")] Documents = 8,
 		[Description("Загрузка документов на сервер")] LoadingDocuments = 9,
+		[Description("АвтоЗаказ")] AutoOrder = 10,
 	}
 
 	[ActiveRecord(Table = "logs.AnalitFUpdates")]

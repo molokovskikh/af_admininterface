@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
@@ -844,6 +845,163 @@ namespace Functional
 			// Проверка, что комментарий записан
 			var contact = Contact.Find(client.Users[0].ContactGroup.Contacts[0].Id);
 			Assert.That(contact.Comment, Is.EqualTo("some comment"));
+		}
+
+		[Test, Description("Перемещение только пользователя (без адреса доставки) к другому клиенту")]
+		public void Move_only_user_to_another_client()
+		{
+			Client oldClient;
+			Client newClient;
+			uint userIdForMove = 0;
+			using (new SessionScope())
+			{
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				newClient = DataMother.CreateTestClientWithAddressAndUser();
+
+				oldClient.Name += oldClient.Id.ToString();
+				oldClient.UpdateAndFlush();
+				userIdForMove = oldClient.Users[0].Id;
+				newClient.Name += newClient.Id.ToString();
+				newClient.UpdateAndFlush();
+			}
+
+			using (var browser = Open("users/{0}/edit", oldClient.Users[0].Id))
+			{
+				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+				browser.Button(Find.ById("SearchClientButton")).Click();
+				Thread.Sleep(2000);
+				Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
+				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Length, Is.GreaterThan(0));
+
+				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
+				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
+
+				browser.Button(Find.ByValue("Переместить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+				Assert.That(browser.Text, Is.StringContaining(newClient.Name));
+				Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
+			}
+
+			using (new SessionScope())
+			{
+				oldClient.Refresh();
+				newClient.Refresh();
+				var user = User.Find(userIdForMove);
+				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+				Assert.That(newClient.Users.Count, Is.EqualTo(2));
+				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+			}
+		}
+
+		[
+			Test,
+			Description(@"
+После перемещения пользователя должны быть созданы записи в UserPrices 
+для тех регионов, которых не было у старого клиента, но они есть у нового")
+		]
+		public void After_user_moving_must_be_entries_in_UserPrices()
+		{
+			Client oldClient;
+			Client newClient;
+			Address address;
+			User user;
+
+			using (new SessionScope())
+			{
+				var maskRegion = 1UL | 16UL;
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
+
+				user = oldClient.Users[0];
+				address = oldClient.Addresses[0];
+			}
+			var oldCountUserPrices = GetCountUserPrices(user.Id);
+
+			using (var browser = Open("users/{0}/edit", user.Id.ToString()))
+			{
+				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+				browser.Button(Find.ById("SearchClientButton")).Click();
+				Thread.Sleep(2000);
+				browser.Button(Find.ByValue("Переместить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+			}
+
+			var newCountUserPricesEntries = GetCountUserPrices(user.Id);
+			Assert.That(oldCountUserPrices, Is.LessThan(newCountUserPricesEntries));
+
+			Assert.That(GetCountUserPricesForRegion(user.Id, 16UL), Is.GreaterThan(0));
+		}
+
+		private uint GetCountUserPrices(uint userId)
+		{
+			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT COUNT(*)
+FROM
+	Future.UserPrices
+WHERE UserId = :UserId
+")
+				.SetParameter("UserId", userId)
+				.UniqueResult()));
+		}
+
+		private uint GetCountUserPricesForRegion(uint userId, ulong regionId)
+		{
+			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT COUNT(*)
+FROM
+	Future.UserPrices
+WHERE UserId = :UserId AND RegionId = :RegionId
+")
+				.SetParameter("UserId", userId)
+				.SetParameter("RegionId", regionId)
+				.UniqueResult()));
+		}
+
+		[Test, Description("Перемещение пользователя с адресом доставки к другому клиенту")]
+		public void Move_user_with_address_to_another_client()
+		{
+			Client oldClient;
+			Client newClient;
+			Address address;
+			User user;
+
+			using (new SessionScope())
+			{
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				user = oldClient.Users[0];
+				address = oldClient.Addresses[0];
+				newClient = DataMother.CreateTestClientWithAddressAndUser();
+			}
+			using (var browser = Open("users/{0}/edit", user.Id.ToString()))
+			{
+				// Даем доступ пользователю к адресу доставки
+				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				browser.Refresh();
+
+				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
+				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+				browser.Button(Find.ById("SearchClientButton")).Click();
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Перемещать адрес доставки {0}", address.Value)));
+				Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithAddress")).Checked);
+				browser.Button(Find.ByValue("Переместить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
+			}
+
+			using (new SessionScope())
+			{
+				oldClient.Refresh();
+				newClient.Refresh();
+				user.Refresh();
+				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+
+				Assert.That(newClient.Users.Count, Is.EqualTo(2));
+				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+
+				Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
+				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
+			}
 		}
 	}
 }

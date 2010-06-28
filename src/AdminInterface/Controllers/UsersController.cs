@@ -389,5 +389,26 @@ namespace AdminInterface.Controllers
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { login = user.Login });
 		}
+
+		public void MoveUserToAnotherClient(uint userId, uint clientId, bool moveWithAddress)
+		{
+			CancelLayout();
+			CancelView();
+			var newClient = Client.Find(clientId);
+			var user = User.Find(userId);
+			// Если нужно перенести вместе с адресом,
+			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
+			// тогда переносим адрес
+			if (moveWithAddress && 
+				(user.AvaliableAddresses.Count == 1) && 
+				(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) &&
+				(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == userId))
+			{
+				user.AvaliableAddresses[0].MoveToAnotherClient(newClient);
+			}
+			user.MoveToAnotherClient(newClient);
+			Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
+			RedirectUsingRoute("users", "Edit", new { login = user.Login });
+		}
 	}
 }

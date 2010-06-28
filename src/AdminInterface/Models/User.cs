@@ -340,6 +340,37 @@ where u.Id = :UserId";
 				.ExecuteUpdate());
 		}
 
+		public virtual void AddPrices(Client client, Region region)
+		{
+			var sql = @"
+insert into Future.UserPrices(PriceId, UserId, RegionId)
+select i.PriceId, u.Id, i.RegionId
+from Future.Users u
+	join Future.Intersection i on i.ClientId = :ClientId AND i.RegionId = :RegionId
+where u.Id = :UserId";
+
+			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+				.SetParameter("UserId", Id)
+				.SetParameter("ClientId", client.Id)
+				.SetParameter("RegionId", region.Id)
+				.ExecuteUpdate());
+		}
+
+		public virtual bool HavePricesInRegion(Region region)
+		{
+			var sql = @"
+SELECT COUNT(*)
+FROM
+	Future.UserPrices
+WHERE
+	UserId = :UserId AND RegionId = :RegionId
+";
+			return (Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(sql)
+				.SetParameter("UserId", Id)
+				.SetParameter("RegionId", region.Id)
+				.UniqueResult())) > 0);
+		}
+
 		public virtual void AddContactPerson(string name)
 		{
 			if (String.IsNullOrEmpty(name))
@@ -390,17 +421,46 @@ WHERE
             }
         }
 
-        public virtual void UnregisterInBilling()
-        {
-            using (var scope = new TransactionScope())
-            {
+		public virtual void UnregisterInBilling()
+		{
+			using (var scope = new TransactionScope())
+			{
 				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
 					HttpContext.Current.Request.UserHostAddress);
-                var accountingItem = AccountingItem.GetByUser(this);
-                accountingItem.Delete();
-                scope.VoteCommit();
-            }
-        }
+				var accountingItem = AccountingItem.GetByUser(this);
+				accountingItem.Delete();
+				scope.VoteCommit();
+			}
+		}
+
+		public virtual void MoveToAnotherClient(Client newOwner)
+		{
+			using (var scope = new TransactionScope()) 
+			{
+				var regions = Region.FindAll();
+				// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
+				// которых не было у старого клиента, но они есть у нового клиента
+				if (Client.MaskRegion != newOwner.MaskRegion)
+				{
+					foreach (var region in regions)
+					{
+						// Если этот регион есть у старого клиента, пропускаем его
+						if ((region.Id & Client.MaskRegion) > 0)
+							continue;
+						// Если региона нет у старого клиента, но он есть у нового,
+						// и для этого пользователя нет прайсов в этом регионе добавляем прайсы для этого региона
+						if ((region.Id & newOwner.MaskRegion) > 0)
+						{
+							if (!HavePricesInRegion(region))
+								AddPrices(newOwner, region);
+						}
+					}
+				}
+				Client = newOwner;
+				Update();
+				scope.VoteCommit();
+			}
+		}
 	}
 
 	public static class UserExtension

@@ -67,6 +67,11 @@ namespace Functional.ForTesting
 
 		public static Client CreateTestClient()
 		{
+			return CreateTestClient(1UL);
+		}
+
+		public static Client CreateTestClient(ulong maskRegion)
+		{
 			Client client;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -86,7 +91,7 @@ namespace Functional.ForTesting
 					Name = "test",
 					FullName = "test",
 					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-					MaskRegion = 1UL,
+					MaskRegion = maskRegion,
 					BillingInstance = payer,
 					ContactGroupOwner = contactOwner,
 				};
@@ -117,9 +122,15 @@ namespace Functional.ForTesting
 
 		public static Client CreateTestClientWithAddressAndUser()
 		{
+			return CreateTestClientWithAddressAndUser(1UL);
+		}
+
+		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
+		{
+			Client client;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var client = CreateTestClient();
+				client = CreateTestClient(clientRegionMask);
 				var user = new User {
 					Client = client,
 					Name = "test"
@@ -128,14 +139,22 @@ namespace Functional.ForTesting
 				client.Users = new List<User> { user };
 
 				var address = new Address {
-                    Client = client,
-                    Value = "тестовый адрес"
+					Client = client,
+					Value = "тестовый адрес"
 				};
 				client.Addresses = new List<Address> { address };
 				client.Update();
 				scope.VoteCommit();
-				return client;
+				client.Users[0].Name += client.Users[0].Id;
+				client.Users[0].UpdateAndFlush();
+				client.Addresses[0].Value += client.Addresses[0].Id;
+				client.Addresses[0].UpdateAndFlush();
+				client.Name += client.Id;
+				client.UpdateAndFlush();
+				scope.VoteCommit();
+				client.Refresh();
 			}
+			return client;
 		}
 
 		public static Supplier CreateTestSupplier()

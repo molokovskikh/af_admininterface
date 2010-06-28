@@ -12,12 +12,14 @@ using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using AdminInterface.Extentions;
+using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
 using log4net;
 using AdminInterface.Services;
+using System.Collections.Generic;
 
 namespace AdminInterface.Controllers
 {
@@ -301,6 +303,26 @@ where Phone like :phone")
 			CancelLayout();
 			Flash["Message"] = Message.Notify("Уведомления отправлены");
 			RedirectToReferrer();
+		}
+
+		public void SearchClient(string searchText)
+		{
+			CancelView();
+			CancelLayout();
+			var searchNumber = 0;
+			Int32.TryParse(searchText, out searchNumber);
+			var ids = ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT Id
+FROM Future.Clients
+WHERE Clients.Name LIKE :SearchText OR Clients.Id = :SearchNumber")
+						.SetParameter("SearchText", String.Format("%{0}%", Utils.StringToMySqlString(searchText)))
+						.SetParameter("SearchNumber", searchNumber)
+						.List());
+			var clients = new List<Client>(ids.Count);
+			foreach (var id in ids)
+				clients.Add(Client.Find(id));
+			PropertyBag["clients"] = clients;
+			RenderView("SearchClientSubview");
 		}
 	}
 }

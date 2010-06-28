@@ -6,20 +6,73 @@
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
 <script>
-    $(function() {
-        $("form#UserSettingsForm").validate({
-        });	
+	$(function() {
+		$("form#UserSettingsForm").validate({ });
 		$("form#ReseteUin").validate({
-			rules: {
-				"reason": "required"
-			}
+			rules: { "reason": "required" }
 		});
 		$("form#MessagesForm").validate({
-			rules: {
-				"message": "required"
-			}
+			rules: { "message": "required" }
 		});
 	});
+
+	function SearchClient() {
+		var searchText = $("#TextForSearchClient").val();
+		var link = "${siteroot}/Client/SearchClient?searchText=" + searchText;
+
+		$.ajax({
+			url: link,
+			cache: false,
+			success: function (data) {
+				if (data.length == 0) {
+					$("#ClientSearchMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
+					$("#WarningMessageForUserMoving").css("display", "none");
+					return;
+				}
+				$("#SearchClientButton").css("display", "none");
+				$("#MoveToClientButton").css("display", "");
+				$("#CancelMoveToClientButton").css("display", "");
+				$("#TextForSearchClient").css("display", "none");
+				$("#TextForSearchClient").css("disabled", "");
+				$("#DivForSelectClientToMove").append(data);
+				$("#ClientSearchMessage").html("");
+				$("#WarningMessageForUserMoving").css("display", "");
+			},
+			error: function (xhr, textStatus, error) {
+				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+		$("#TextForSearchClient").css("disabled", "disabled");
+		$("#ClientSearchMessage").html("<i>Идет поиск...</i>");
+	}
+
+	function CancelMove() {
+		$("#DivForSelectClientToMove").children().remove().end();
+		$("#SearchClientButton").css("display", "");
+		$("#MoveToClientButton").css("display", "none");
+		$("#CancelMoveToClientButton").css("display", "none");
+		$("#TextForSearchClient").css("display", "");
+		$("#ClientSearchMessage").html("");
+		$("#WarningMessageForUserMoving").css("display", "none");
+	}
+
+	function MoveUserToAnotherClient(userId) {
+		var clientId = $("#clientsList").val();
+		var link = "${siteroot}/Users/MoveUserToAnotherClient?userId=" + userId + "&clientId=" + clientId;
+		$.ajax({
+			url: link,
+			cache: false,
+			success: function (data) { },
+			error: function (xhr, textStatus, error) {
+				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+	}
+
+	function SetClientId() {
+		var clientId = $("#clientsList").val();
+		$("#ClientIdForMoving").val(clientId);
+	}
 </script>
 
 
@@ -88,27 +141,68 @@
             <% if IsDefined("DeleteErrorMessage"): %> 
 			    <span style="color:Red;">${DeleteErrorMessage}</span>
 			<% end %>
-        </form>
-        
-        <form id=ReseteUin method=post action="${siteroot}/users/ResetUin.rails" style="margin:0; padding:5px 0px 5px 0px">
-            <input type=hidden name=userCode value=${User.Id} />
-            <% haveUin = User.HaveUin() %>
-            <input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
-            <% if haveUin: %>
-                Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
-            <% else: %> 
-                <span style="color:Green;">Идентификатор не присвоен</span>
-            <% end %>
-        </form>				
-    </div>	
+		</form>
+
+		<form id=ReseteUin method=post action="${siteroot}/users/ResetUin.rails" style="margin:0; padding:5px 0px 5px 0px">
+			<input type=hidden name=userCode value=${User.Id} />
+			<% haveUin = User.HaveUin() %>
+			<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+			<% if haveUin: %>
+				Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
+			<% else: %>
+				<span style="color:Green;">Идентификатор не присвоен</span>
+			<% end %>
+		</form>
+	</div>
 
 	<div class="block">
-		<h3>
-			Статистика использования
-		</h3>
+		<form method="post" action="${siteroot}/Users/MoveUserToAnotherClient">
+		<h3>Перемещение пользователя</h3>
+		<div id="WarningMessageForUserMoving" style="display: none;">
+			<font color="red"><b>Внимание!</b></font><br />
+				Текущий пользователь будет перемещен к выбранному клиенту.
+<% if ((user.AvaliableAddresses.Count == 1) and
+		(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) and
+		(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == user.Id)): %>
+				<br />
+				<input id="moveWithAddress" name="moveWithAddress" type="checkbox" checked="checked" value="true" />
+				<label for="moveWithAddress">
+					Перемещать адрес доставки <b>${user.AvaliableAddresses[0].Value}</b>
+					<br />(Коды и условия заказа для этого адреса будут потеряны)
+				</label>
+				<input type="hidden" name="moveWithAddress" value="false" />
+<% end %>
+				<br /><br />
+		</div>
+		<table style="width: 100%;">
+			<tr><td align="left">Выберите клиента, к которому нужно переместить текущего пользователя</td></tr>
+			<tr>
+				<td style="padding: 0px 15px 0px 5px;" >
+					<input id="TextForSearchClient" type="text" value="" style="width :100%; display: '';" />
+					<div id="DivForSelectClientToMove"></div>
+				</td>
+				<td align="right">
+					<strong>
+					<input id="SearchClientButton" type="button" style="display: block;" onclick="SearchClient()" value="Найти" />
+					<input id="CancelMoveToClientButton" type="button" style="display: none;" onclick="CancelMove()" value="Отмена" />
+					</strong>
+				</td>
+				<td align="left">
+					<input id="MoveToClientButton" type="submit" style="display: none;" value="Переместить" onclick="SetClientId()" />
+					<input type="hidden" name="userId" value="${user.Id}" />
+					<input type="hidden" id="ClientIdForMoving" name="clientId" value="0" />
+				</td>
+			</tr>
+			<tr><td id="ClientSearchMessage" colspan="10"></td></tr>
+		</table>
+		</form>
+	</div>
+
+	<div class="block">
+		<h3>Статистика использования</h3>
 		<div style="margin-top:10px;">
-		    <table style="width: 100%">
-		    <tr valign="top">
+			<table style="width: 100%">
+			<tr valign="top">
 			<td>
 				<% if userInfo != null: %>
 			    <table cellspacing="0" cellpadding="1">

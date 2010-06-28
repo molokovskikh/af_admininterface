@@ -455,6 +455,7 @@
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
     <None Include="Views\Client\DrugstoreSettings.brail" />
     <None Include="Views\Client\Info.brail" />
+    <None Include="Views\Client\SearchClientSubview.brail" />
     <None Include="Views\Client\SuppliersForCostNoising.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brailjs" />

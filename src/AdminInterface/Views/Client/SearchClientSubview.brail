@@ -1,0 +1,7 @@
+﻿<% if (clients.Count > 0): %>
+<select id="clientsList" name="clientsList" style="width: 100%">
+	<% for i,client in enumerate(clients): %>
+	<option value="${client.Id}" ${'selected' if (i == 0)}>[${client.Id}].${client.Name}</option>
+	<% end %>
+</select>
+<% end %>

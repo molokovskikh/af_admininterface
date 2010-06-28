@@ -251,5 +251,54 @@ WHERE
                 scope.VoteCommit();
             }
         }
+
+		public virtual void MoveToAnotherClient(Client newOwner)
+		{
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				MoveAddressIntersection(newOwner.Id);
+				Client = newOwner;
+				Update();
+				scope.VoteCommit();
+			}
+		}
+
+		private void MoveAddressIntersection(uint newClientId)
+		{
+			ArHelper.WithSession(session => session.CreateSQLQuery(@"
+DROP TEMPORARY TABLE IF EXISTS Future.TempAddressIntersection;
+CREATE TEMPORARY TABLE Future.TempAddressIntersection 
+SELECT
+	i.Id AS OldIntersectionId,
+	newi.Id as NewIntersectionId,
+	ai.SupplierDeliveryId,
+	ai.ControlMinReq,
+	ai.MinReq
+FROM
+	Future.Intersection i
+	JOIN Future.addressintersection ai on i.Id = ai.IntersectionId
+	JOIN Future.Intersection newi on newi.ClientId = :NewClientId and newi.RegionId = i.regionId and newi.PriceId = i.priceid
+WHERE i.ClientId = :OldClientId
+;
+
+INSERT INTO Future.AddressIntersection(AddressId,IntersectionId,SupplierDeliveryId,ControlMinReq,MinReq)
+(SELECT
+	:AddressId, tmp.NewIntersectionId, tmp.SupplierDeliveryId, tmp.ControlMinReq, tmp.MinReq 
+FROM
+	Future.TempAddressIntersection AS tmp);
+
+DELETE
+FROM Future.AddressIntersection 
+WHERE 
+	AddressId = :AddressId AND 
+	IntersectionId IN (SELECT OldIntersectionId FROM Future.TempAddressIntersection);
+
+DROP TEMPORARY TABLE IF EXISTS Future.TempAddressIntersection;
+")
+				.SetParameter("AddressId", Id)
+				.SetParameter("NewClientId", newClientId)
+				.SetParameter("OldClientId", Client.Id)
+				.ExecuteUpdate());
+		}
 	}
 }
