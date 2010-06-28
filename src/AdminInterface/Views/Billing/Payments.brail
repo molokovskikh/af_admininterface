@@ -367,9 +367,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         </div>
 
         <div id="UserListBody" class="${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
+			<% if Instance.Clients.Count > 1: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
 			</div>
+			<% end %>
 			<br />
             <form action="UpdateUsers.rails" method="post">
                 <input type="hidden" name="userId" value="${user.Id}" />
@@ -436,9 +438,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
 			</div>
 			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
-						<div align="right">
+			<% if Instance.Clients.Count > 1: %>
+			<div align="right">
 				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
 			</div>
+			<% end %>
 			<br />
                 <form action="UpdateAddresses.rails" method="post">
                     <input type="hidden" name="addressId" value="${address.Id}" />
