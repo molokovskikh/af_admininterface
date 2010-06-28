@@ -239,5 +239,62 @@ namespace Functional
 				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
 			}
 		}
+
+		[Test, Description("После перемещения адреса доставки, для этого адреса должны быть скопированы записи в таблице AddressesIntersection")]
+		public void After_moving_address_must_be_copied_address_intersection_entries()
+		{
+			Client newClient;
+			Client oldClient;
+			User user;
+			Address address;
+
+			using (new SessionScope())
+			{
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				newClient = DataMother.CreateTestClientWithAddressAndUser();
+				user = oldClient.Users[0];
+				address = oldClient.Addresses[0];
+			}
+			var oldCountAddressIntersectionEntries = GetCountAddressIntersectionEntries(address.Id);
+
+			using (var browser = Open("deliveries/{0}/edit", oldClient.Addresses[0].Id))
+			{
+				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+				browser.Button(Find.ById("SearchClientButton")).Click();
+				Thread.Sleep(2000);
+				browser.Button(Find.ByValue("Переместить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
+			}
+
+			var newCountAddressInterSectionEntries = GetCountAddressIntersectionEntries(address.Id);
+
+			Assert.That(oldCountAddressIntersectionEntries, Is.EqualTo(newCountAddressInterSectionEntries));
+			Assert.That(GetCountAddressIntersectionEntriesForClient(address.Id, oldClient.Id), Is.EqualTo(0));
+			Assert.That(GetCountAddressIntersectionEntriesForClient(address.Id, newClient.Id), Is.EqualTo(oldCountAddressIntersectionEntries));
+		}
+
+		private uint GetCountAddressIntersectionEntries(uint addressId)
+		{
+			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT COUNT(*)
+FROM Future.AddressIntersection
+WHERE AddressId = :AddressId
+")
+					.SetParameter("AddressId", addressId)
+					.UniqueResult()));
+		}
+
+		private uint GetCountAddressIntersectionEntriesForClient(uint addressId, uint clientId)
+		{
+			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT COUNT(*)
+FROM Future.AddressIntersection AS ai
+	JOIN Future.Intersection AS i ON i.ClientId = :ClientId AND ai.IntersectionId = i.Id
+WHERE AddressId = :AddressId
+")
+					.SetParameter("AddressId", addressId)
+					.SetParameter("ClientId", clientId)
+					.UniqueResult()));
+		}
 	}
 }
