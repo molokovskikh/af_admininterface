@@ -24,6 +24,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${FormHelper.HiddenField("tab", "mail")}
 		
 	<table>
+	<!--
 	    ${WriteInputGroupHeader("Общая информация")}
 
 					
@@ -50,6 +51,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
 														"КПП:"), 
 									FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+									-->
 																		
 		<%
 		contactGroupIndex = 0

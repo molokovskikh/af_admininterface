@@ -1,0 +1,110 @@
+﻿<%
+def WriteLabelAndEditControl(labelText as string, editControlText as string) as string: %>
+	<tr align="left">
+		<td style="width: 30%">
+			${labelText}
+		</td>
+		<td style="width: 70%">
+			${editControlText}
+		</td>
+	</tr>
+<% end %>
+
+<%
+def WriteHeader(juridicalOrganization) as string:
+	headerCssClass = "ShowHiden"
+	bodyCssClass = "hidden"
+	if IsDefined("currentJuridicalOrganizationId") and (juridicalOrganization.Id == currentJuridicalOrganizationId):
+		headerCssClass = "HideVisible" 
+		bodyCssClass ="VisibleFolder"
+	end %>
+	<div class="InputGroupHeader" style="margin-bottom:10px; width: 100%;">
+		<div id="JuridicalOrganization${juridicalOrganization.Id}Header" class="${headerCssClass}" title="Юридические лица${juridicalOrganization.Id}" align="left">
+			<a id="JuridicalOrganization${juridicalOrganization.Id}Link" href="#" title="Юридические лица${juridicalOrganization.Id}">
+				<b>Юридическое лицо "${juridicalOrganization.Name}"</b>
+			</a>
+		</div>
+		<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="${bodyCssClass}" title="Юридические лица${juridicalOrganization.Id}" style="background-color: White;">
+			<br />
+			<form action="${siteroot}/Billing/UpdateJuridicalOrganizationInfo.rails" method="post">
+				<input type="hidden" name="juridicalOrganization.Id" value="${juridicalOrganization.Id}" />
+				<table title="" style="width: 100%; height: 100%;" border="0">
+					${WriteJuridicalOrganizationInfo(juridicalOrganization)}
+					<tr><td colspan="10" align="right"><input id="SubmitChanges${juridicalOrganization.Id}" type="submit" value="Сохранить" /></td></tr>
+				</table>
+			</form>
+		</div>
+	</div>
+<% end %>
+
+<%
+def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.Name",
+		"Краткое наименование:"), FormHelper.TextFieldValue("JuridicalOrganization.Name", juridicalOrganization.Name, { "class" : "BillingInput" }))}
+
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.FullName",
+		"Полное наименование:"), FormHelper.TextFieldValue("JuridicalOrganization.FullName", juridicalOrganization.FullName, { "class" : "BillingInput" }))}
+
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.Address",
+		"Юридический адрес:"), FormHelper.TextFieldValue("JuridicalOrganization.Address", juridicalOrganization.Address, { "class" : "BillingInput" }))}
+
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.ReceiverAddress",
+		"Адрес получателя:"), FormHelper.TextFieldValue("JuridicalOrganization.ReceiverAddress", juridicalOrganization.ReceiverAddress, { "class" : "BillingInput" }))}
+
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.INN",
+		"ИНН:"), FormHelper.TextFieldValue("JuridicalOrganization.INN", juridicalOrganization.Inn, { "class" : "BillingInput" }))}
+
+	${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.KPP",
+		"КПП:"), FormHelper.TextFieldValue("JuridicalOrganization.KPP", juridicalOrganization.Kpp, { "class" : "BillingInput" }))}
+<% end %>
+
+<script type="text/javascript">
+
+	function ShowFormForAdding() {
+		jQuery("#FormForAdding").attr("style", "display:block");
+		jQuery("#AddJuridicalOrganizationButton").attr("style", "display:none");
+	}
+
+	function HideFormForAdding() {
+		jQuery("#FormForAdding").attr("style", "display:none");
+		jQuery("#AddJuridicalOrganizationButton").attr("style", "display:block");
+	}
+
+</script>
+
+<div width="100%"><input id="AddJuridicalOrganizationButton" type="button" value="Создать" onclick="ShowFormForAdding()" /></div>
+<div id="FormForAdding" width="100%" style="display: none;">
+	<form id="AddJuridicalOrganizationForm" method="post" action="${siteroot}/Billing/AddJuridicalOrganization.rails">
+	<table width="100%">
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.Name",
+			"Краткое наименование:"), FormHelper.TextField("JuridicalOrganization.Name", { "class" : "BillingInput" }))}
+
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.FullName",
+			"Полное наименование:"), FormHelper.TextField("JuridicalOrganization.FullName", { "class" : "BillingInput" }))}
+
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.Address",
+			"Юридический адрес:"), FormHelper.TextField("JuridicalOrganization.Address", { "class" : "BillingInput" }))}
+
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.ReceiverAddress",
+			"Адрес получателя:"), FormHelper.TextField("JuridicalOrganization.ReceiverAddress", { "class" : "BillingInput" }))}
+
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.INN",
+			"ИНН:"), FormHelper.TextField("JuridicalOrganization.INN", { "class" : "BillingInput" }))}
+
+		${WriteLabelAndEditControl(FormHelper.LabelFor("JuridicalOrganization.KPP",
+			"КПП:"), FormHelper.TextField("JuridicalOrganization.KPP", { "class" : "BillingInput" }))}
+
+		<tr><td colspan="10" align="right"><input id="SubmitFormButton" type="submit" value="Создать" onclick="HideFormForAdding()" ></td></tr>
+	</table>
+
+	<input type="hidden" name="payerId" value="${Instance.PayerID}" />
+
+	</form>
+</div>
+
+<% for item in Instance.JuridicalOrganizations:
+	if (item != null):%>
+		${WriteHeader(item)}
+<%	end %>
+
+<% end %>

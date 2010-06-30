@@ -146,19 +146,30 @@
 			<p><input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}"></p>
 		</div>
 
-        <div class="block">
-            <% OutputSubView("/SubViews/ContactInfo") %>
-        </div>
-        
+		<div class="block">
+			<h3>Юридическое лицо</h3>
+			<% if (delivery.JuridicalOrganization != null): %>
+				<select name="delivery.JuridicalOrganization.Id" style="width: 80%;">
+				<% for item in delivery.JuridicalOrganization.Payer.JuridicalOrganizations: %>
+					<option value="${item.Id}" ${"selected" if (item.Id == delivery.JuridicalOrganization.Id)}>${item.Name}</option>
+				<% end %>
+				</select>
+			<% end %>
+		</div>
+
+		<div class="block">
+			<% OutputSubView("/SubViews/ContactInfo") %>
+		</div>
+
 		<div class=block>
 			<h3>Доступен пользователям</h3>
 			<% for i, user in enumerate(delivery.Client.Users): %>
 				<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
 				${user.GetLoginWithName()}
-				<br>
+				<br />
 			<% end %>
 		</div>
-		
+
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>

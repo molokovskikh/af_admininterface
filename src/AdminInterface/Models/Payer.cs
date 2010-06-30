@@ -128,6 +128,9 @@ namespace AdminInterface.Models
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
 
+		[HasMany(typeof(JuridicalOrganization), Lazy = true, Inverse = true, OrderBy = "Name")]
+		public virtual IList<JuridicalOrganization> JuridicalOrganizations { get; set; }
+
 		public virtual float ApplyDiscount(float sum)
 		{
 			if (DiscountType == DiscountType.Currency)

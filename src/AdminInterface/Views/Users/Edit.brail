@@ -121,9 +121,9 @@
 
     <div class=block>
         <h3>Операции</h3>
-        
+
         <% isLockedUser = user.IsLocked %>
-        
+
         <form method=post action="${siteroot}/users/Unlock.rails" style="margin:0; padding:5px 0px 5px 0px">
             <input type=hidden name=login value=${user.Login} />				
             <input style="border-style:groove;" type=submit ${"disabled" if not isLockedUser} value="Разблокировать" />
@@ -178,7 +178,7 @@
 			<tr><td align="left">Выберите клиента, к которому нужно переместить текущего пользователя</td></tr>
 			<tr>
 				<td style="padding: 0px 15px 0px 5px;" >
-					<input id="TextForSearchClient" type="text" value="" style="width :100%; display: '';" />
+					<input id="TextForSearchClient" type="text" value="" style="width :100%; display:;" />
 					<div id="DivForSelectClientToMove"></div>
 				</td>
 				<td align="right">

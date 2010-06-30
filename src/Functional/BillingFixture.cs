@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdminInterface.Models.Billing;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 
@@ -19,6 +20,14 @@ namespace Functional
 		[Test]
 		public void Payers_should_be_searchable_throw_payer_id()
 		{
+			using (var scope = new TransactionScope())
+			{
+				var payer = Payer.Find(921u);
+				payer.ShortName = "Офис123";
+				payer.UpdateAndFlush();
+				scope.VoteCommit();
+			}
+
 			using (var browser = Open("main/index"))
 			{
 				browser.Link(Find.ByText("Биллинг")).Click();
@@ -56,21 +65,25 @@ namespace Functional
 		public void View_all_addresses()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
-			client.BillingInstance.UpdateAndFlush();
-			var addr = new Address { Client = client, Value = "test address for billing",};
-			addr.SaveAndFlush();
-			client.Addresses.Add(addr);
-			client.UpdateAndFlush();
-			foreach (var address in client.Addresses)
+			using (new SessionScope())
 			{
-				address.Enabled = false;
-				address.UpdateAndFlush();
+				client.Refresh();
+				client.BillingInstance.ShortName += client.BillingInstance.PayerID;
+				client.BillingInstance.UpdateAndFlush();
+				var addr = new Address {Client = client, Value = "test address for billing",};
+				addr.SaveAndFlush();
+				client.Addresses.Add(addr);
+				client.UpdateAndFlush();
+				foreach (var address in client.Addresses)
+				{
+					address.Enabled = false;
+					address.UpdateAndFlush();
+				}
 			}
 
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				Assert.That(browser.Text, Text.Contains(String.Format("Адреса плательщика \"{0}\"", client.BillingInstance.ShortName)));
+				Assert.That(browser.Text, Text.Contains(String.Format("Адреса клиента \"{0}\"", client.Name)));
 				foreach (var address in client.Addresses)
 				{
 					var row = browser.TableRow("AddressRow" + address.Id);
@@ -85,21 +98,25 @@ namespace Functional
 		public void View_all_users()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
-			client.BillingInstance.UpdateAndFlush();
-			var user = new User {Client = client, Name = "test user for billing",};
-			user.Setup(client);
-			user.SaveAndFlush();
-			client.Users.Add(user);
-			client.UpdateAndFlush();
-			foreach (var item in client.Users)
+			using (new SessionScope())
 			{
-				item.Enabled = false;
-				item.UpdateAndFlush();
+				client.Refresh();
+				client.BillingInstance.ShortName += client.BillingInstance.PayerID;
+				client.BillingInstance.UpdateAndFlush();
+				var user = new User {Client = client, Name = "test user for billing",};
+				user.Setup(client);
+				user.SaveAndFlush();
+				client.Users.Add(user);
+				client.UpdateAndFlush();
+				foreach (var item in client.Users)
+				{
+					item.Enabled = false;
+					item.UpdateAndFlush();
+				}
 			}
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				Assert.That(browser.Text, Text.Contains(String.Format("Пользователи плательщика \"{0}\"", client.BillingInstance.ShortName)));
+				Assert.That(browser.Text, Text.Contains(String.Format("Пользователи клиента \"{0}\"", client.Name)));
 				foreach (var item in client.Users)
 				{
 					var row = browser.TableRow("UserRow" + item.Id);
@@ -116,20 +133,24 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var address = client.Addresses[0];
-				var addressId = "usersForAddress" + address.Id;
-				browser.Link(Find.ById(addressId)).Click();
-				Thread.Sleep(500);
-				Assert.That(browser.Text, Text.Contains("Пользователи"));
-				Assert.That(browser.Text, Text.Contains("Подключить пользователя"));
-				// Щелкаем по адресу. Должна быть показана дополнительная информация
-				var additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
-				Assert.That(additionalInfoDiv.Exists, Is.True);
-				Assert.That(additionalInfoDiv.Enabled, Is.True);
-				// Щелкаем второй раз. Дополнительная информация должна быть скрыта
-				browser.Link(Find.ById(addressId)).Click();
-				additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
-				Assert.That(additionalInfoDiv.Exists, Is.False);
+				using (new SessionScope())
+				{
+					client.Refresh();
+					var address = client.Addresses[0];
+					var addressId = "usersForAddress" + address.Id;
+					browser.Link(Find.ById(addressId)).Click();
+					Thread.Sleep(500);
+					Assert.That(browser.Text, Text.Contains("Пользователи"));
+					Assert.That(browser.Text, Text.Contains("Подключить пользователя"));
+					// Щелкаем по адресу. Должна быть показана дополнительная информация
+					var additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
+					Assert.That(additionalInfoDiv.Exists, Is.True);
+					Assert.That(additionalInfoDiv.Enabled, Is.True);
+					// Щелкаем второй раз. Дополнительная информация должна быть скрыта
+					browser.Link(Find.ById(addressId)).Click();
+					additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
+					Assert.That(additionalInfoDiv.Exists, Is.False);
+				}
 			}
 		}
 
@@ -139,20 +160,24 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var user = client.Users[0];
-				var userId = "addressesForUser" + user.Id;
-				browser.Link(Find.ById(userId)).Click();
-				Thread.Sleep(500);
-				Assert.That(browser.Text, Text.Contains("Адреса"));
-				Assert.That(browser.Text, Text.Contains("Подключить адрес"));
-				// Щелкаем по адресу. Должна быть показана дополнительная информация
-				var additionalInfoDiv = browser.Div(Find.ById("additionalUserInfo" + user.Id));
-				Assert.That(additionalInfoDiv.Exists, Is.True);
-				Assert.That(additionalInfoDiv.Enabled, Is.True);
-				// Щелкаем второй раз. Дополнительная информация должна быть скрыта
-				browser.Link(Find.ById(userId)).Click();
-				additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + user.Id));
-				Assert.That(additionalInfoDiv.Exists, Is.False);
+				using (new SessionScope())
+				{
+					client.Refresh();
+					var user = client.Users[0];
+					var userId = "addressesForUser" + user.Id;
+					browser.Link(Find.ById(userId)).Click();
+					Thread.Sleep(500);
+					Assert.That(browser.Text, Text.Contains("Адреса"));
+					Assert.That(browser.Text, Text.Contains("Подключить адрес"));
+					// Щелкаем по адресу. Должна быть показана дополнительная информация
+					var additionalInfoDiv = browser.Div(Find.ById("additionalUserInfo" + user.Id));
+					Assert.That(additionalInfoDiv.Exists, Is.True);
+					Assert.That(additionalInfoDiv.Enabled, Is.True);
+					// Щелкаем второй раз. Дополнительная информация должна быть скрыта
+					browser.Link(Find.ById(userId)).Click();
+					additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + user.Id));
+					Assert.That(additionalInfoDiv.Exists, Is.False);
+				}
 			}			
 		}
 
@@ -162,32 +187,36 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var address = client.Addresses[0];
-				var user = client.Users[0];
-				Assert.That(client.Addresses[0].AvaliableForUsers, Is.Null);
-				address.AvaliableForUsers = new List<User>();
-				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
-				Thread.Sleep(500);
-				var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
-				connectUserLink.Click();
-				Assert.That(connectUserLink.Style.ToString().ToLower().Contains("display: none"), Is.True);
-				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
-				Thread.Sleep(500);
-				var comboBox = browser.SelectList(Find.ById("UsersComboBox" + address.Id));
-				Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
-				Assert.That(comboBox.HasSelectedItems, Is.True);
-				Assert.That(comboBox.SelectedOption.Text.Contains(user.GetLoginOrName()));
-				browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
-				Thread.Sleep(2000);
-				Assert.That(connectUserLink.Style.ToString().ToLower().Contains("display: block"), Is.True);
-				var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
-				Assert.That(connectingDiv.Style.ToString().ToLower().Contains("display: none"), Is.True);
-				
-				using (var scope = new SessionScope())
+				using (new SessionScope())
 				{
-					var newClient = Client.Find(client.Id);
-					Assert.That(newClient.Addresses[0].AvaliableFor(newClient.Users[0]), Is.True);
+					client.Refresh();
+					var address = client.Addresses[0];
+					var user = client.Users[0];
+					Assert.That(client.Addresses[0].AvaliableForUsers.Count, Is.EqualTo(0));
+					address.AvaliableForUsers = new List<User>();
+					browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
+					Thread.Sleep(500);
+					var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
+					connectUserLink.Click();
+					Assert.That(connectUserLink.Style.Display, Is.EqualTo("none"));
+					browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
+					Thread.Sleep(500);
+					var comboBox = browser.SelectList(Find.ById("UsersComboBox" + address.Id));
+					Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
+					Assert.That(comboBox.HasSelectedItems, Is.True);
+					Assert.That(comboBox.SelectedOption.Text.Contains(user.GetLoginOrName()));
+					browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
+					Thread.Sleep(2000);
+					Assert.That(connectUserLink.Style.Display, Is.EqualTo("block"));
+					var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
+					Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 				}
+			}
+
+			using (var scope = new SessionScope())
+			{
+				client.Refresh();
+				Assert.That(client.Addresses[0].AvaliableFor(client.Users[0]), Is.True);
 			}
 		}
 
@@ -197,33 +226,37 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var address = client.Addresses[0];
-				var user = client.Users[0];
-				Assert.That(client.Addresses[0].AvaliableForUsers, Is.Null);
-				address.AvaliableForUsers = new List<User>();
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-				Thread.Sleep(500);
-				var connectAddressLink = browser.Link(Find.ByText("Подключить адрес"));
-				connectAddressLink.Click();
-				Assert.That(connectAddressLink.Style.ToString().ToLower().Contains("display: none"), Is.True);
-				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-				Thread.Sleep(500);
-				var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
-				Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
-				Assert.That(comboBox.HasSelectedItems, Is.True);
-				Assert.That(comboBox.SelectedOption.Text.Contains(address.Value));
-
-				browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
-				Thread.Sleep(2000);
-				Assert.That(connectAddressLink.Style.ToString().ToLower().Contains("display: block"), Is.True);
-				var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
-				Assert.That(connectingDiv.Style.ToString().ToLower().Contains("display: none"), Is.True);
-
-				using (var scope = new SessionScope())
+				using (new SessionScope())
 				{
-					var newClient = Client.Find(client.Id);
-					Assert.That(newClient.Addresses[0].AvaliableFor(newClient.Users[0]), Is.True);
+					client.Refresh();
+					var address = client.Addresses[0];
+					var user = client.Users[0];
+					Assert.That(client.Addresses[0].AvaliableForUsers.Count, Is.EqualTo(0));
+					address.AvaliableForUsers = new List<User>();
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+					Thread.Sleep(500);
+					var connectAddressLink = browser.Link(Find.ByText("Подключить адрес"));
+					connectAddressLink.Click();
+					Assert.That(connectAddressLink.Style.Display, Is.EqualTo("none"));
+					browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+					Thread.Sleep(500);
+					var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
+					Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
+					Assert.That(comboBox.HasSelectedItems, Is.True);
+					Assert.That(comboBox.SelectedOption.Text.Contains(address.Value));
+
+					browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
+					Thread.Sleep(2000);
+					Assert.That(connectAddressLink.Style.Display, Is.EqualTo("block"));
+					var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
+					Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 				}
+			}
+
+			using (new SessionScope())
+			{
+				client.Refresh();
+				Assert.That(client.Addresses[0].AvaliableFor(client.Users[0]), Is.True);
 			}
 		}
 
@@ -233,27 +266,32 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var address = client.Addresses[0];
-				var user = client.Users[0];
-				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
-				Thread.Sleep(500);
-				var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
-				connectUserLink.Click();
-				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
-				Thread.Sleep(500);
-				browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
-				Thread.Sleep(2000);
-				var row = browser.TableRow(Find.ById("RowAddress" + address.Id + "User" + user.Id));
-				Assert.That(row.Exists, Is.True);
-				browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id))).Click();
-				Thread.Sleep(500);
-				var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
-				Assert.That(checkBox.Exists, Is.False);
-				using (var scope = new SessionScope())
+				using (new SessionScope())
 				{
-					var newClient = Client.Find(client.Id);
-					Assert.That(newClient.Addresses[0].AvaliableFor(newClient.Users[0]), Is.False);
+					client.Refresh();
+					var address = client.Addresses[0];
+					var user = client.Users[0];
+					browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
+					Thread.Sleep(500);
+					var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
+					connectUserLink.Click();
+					browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
+					Thread.Sleep(500);
+					browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
+					Thread.Sleep(2000);
+					var row = browser.TableRow(Find.ById("RowAddress" + address.Id + "User" + user.Id));
+					Assert.That(row.Exists, Is.True);
+					browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id))).Click();
+					Thread.Sleep(500);
+					var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
+					Assert.That(checkBox.Exists, Is.False);
 				}
+			}
+
+			using (new SessionScope())
+			{
+				client.Refresh();
+				Assert.That(client.Addresses[0].AvaliableFor(client.Users[0]), Is.False);
 			}
 		}
 
@@ -263,36 +301,46 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))			
 			{
-				var address = client.Addresses[0];
-				var user = client.Users[0];
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-				Thread.Sleep(500);
-				browser.Link(Find.ByText("Подключить адрес")).Click();
-				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-				Thread.Sleep(500);
-				browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
-				Thread.Sleep(2000);
-				var row = browser.TableRow(Find.ById("RowUser" + user.Id + "Address" + address.Id));
-				Assert.That(row.Exists, Is.True);
-				browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id))).Click();
-				Thread.Sleep(500);
-				var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
-				Assert.That(checkBox.Exists, Is.False);
-				using (var scope = new SessionScope())
+				using (new SessionScope())
 				{
-					var newClient = Client.Find(client.Id);
-					Assert.That(newClient.Addresses[0].AvaliableFor(newClient.Users[0]), Is.False);
+					client.Refresh();
+					var address = client.Addresses[0];
+					var user = client.Users[0];
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+					Thread.Sleep(500);
+					browser.Link(Find.ByText("Подключить адрес")).Click();
+					browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+					Thread.Sleep(500);
+					browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
+					Thread.Sleep(2000);
+					var row = browser.TableRow(Find.ById("RowUser" + user.Id + "Address" + address.Id));
+					Assert.That(row.Exists, Is.True);
+					browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id))).Click();
+					Thread.Sleep(500);
+					var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
+					Assert.That(checkBox.Exists, Is.False);
 				}
-			}			
+			}
+
+			using (new SessionScope())
+			{
+				client.Refresh();
+				Assert.That(client.Addresses[0].AvaliableFor(client.Users[0]), Is.False);
+			}
 		}
 
 		[Test]
 		public void Change_user_status()
 		{
+			User user;
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var user = client.Users[0];
-			user.Enabled = true;
-			user.UpdateAndFlush();
+			using (new SessionScope())
+			{
+				client.Refresh();
+				user = client.Users[0];
+				user.Enabled = true;
+				user.UpdateAndFlush();
+			}
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var checkBoxStatus = browser.CheckBox(Find.ById("UserStatusCheckBox" + user.Id));
@@ -308,35 +356,50 @@ namespace Functional
 		[Test]
 		public void Change_address_status()
 		{
+			Address address;
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var address = client.Addresses[0];
-			address.Enabled = true;
-			address.UpdateAndFlush();
+			using (new SessionScope())
+			{
+				client.Refresh();
+				address = client.Addresses[0];
+				address.Enabled = true;
+				address.UpdateAndFlush();
+			}
+
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
-			{				
-				var checkBoxStatus = browser.CheckBox(Find.ById("AddressStatus" + address.Id));
-				var row = browser.TableRow(Find.ById("AddressRow" + address.Id));
-				Assert.IsTrue(checkBoxStatus.Checked);
-				Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));				
-				Assert.That(row.ClassName, Text.Contains("HasNoConnectedUsers"));
-				checkBoxStatus.Click();
-				Thread.Sleep(500);
-				Assert.That(row.ClassName, Text.Contains("Disabled"));
+			{
+				using (new SessionScope())
+				{
+					var checkBoxStatus = browser.CheckBox(Find.ById("AddressStatus" + address.Id));
+					var row = browser.TableRow(Find.ById("AddressRow" + address.Id));
+					Assert.IsTrue(checkBoxStatus.Checked);
+					Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));
+					Assert.That(row.ClassName, Text.Contains("HasNoConnectedUsers"));
+					checkBoxStatus.Click();
+					Thread.Sleep(500);
+					Assert.That(row.ClassName, Text.Contains("Disabled"));
+				}
 			}
 		}
 
 		[Test]
 		public void Change_client_status()
 		{
+			User user;
+			Address address;
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Status = ClientStatus.On;
-			client.UpdateAndFlush();
-			var address = client.Addresses[0];
-			var user = client.Users[0];
-			address.Enabled = true;
-			address.UpdateAndFlush();
-			user.Enabled = true;
-			user.UpdateAndFlush();
+			using (new SessionScope())
+			{
+				client.Refresh();
+				client.Status = ClientStatus.On;
+				client.UpdateAndFlush();
+				address = client.Addresses[0];
+				user = client.Users[0];
+				address.Enabled = true;
+				address.UpdateAndFlush();
+				user.Enabled = true;
+				user.UpdateAndFlush();
+			}
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var userStatus = browser.CheckBox(Find.ById("UserStatusCheckBox" + user.Id));
@@ -353,8 +416,10 @@ namespace Functional
 				Assert.That(clientRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
 				clientStatus.Click();
 				Thread.Sleep(2000);
-				Assert.IsFalse(userStatus.Checked);
-				Assert.IsFalse(addressStatus.Checked);
+				Assert.IsTrue(userStatus.Checked);
+				Assert.IsFalse(userStatus.Enabled);
+				Assert.IsTrue(addressStatus.Checked);
+				Assert.IsFalse(addressStatus.Enabled);
 				Assert.IsFalse(clientStatus.Checked);
 				Assert.That(userRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
 				Assert.That(addressRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
@@ -368,32 +433,36 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var address = client.Addresses[0];
-				browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
-				browser.Link(Find.ByText("Подключить пользователя")).Click();
-				var searchDiv = browser.Div(Find.ById("SearchUserDiv" + address.Id));
-				var selectDiv = browser.Div(Find.ById("SelectUserDiv" + address.Id));
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
-				// Жмем "Найти"
-				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
-				Thread.Sleep(500);
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("none"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("block"));
-				// Жмем "Сброс" и возвращаемся к полю ввода текста для поиска
-				browser.Button(Find.ById("ResetUserSearchButton" + address.Id)).Click();
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
-				// Жмем "Отмена". Должна появиться ссылка "Подключить пользователя", а поле ввода и кнопки - исчезнуть
-				browser.Button(Find.ById("CancelUserSearchButton" + address.Id)).Click();
-				Assert.IsTrue(browser.Link(Find.ByText("Подключить пользователя")).Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(browser.Div(Find.ById("ConnectingUserDiv" + address.Id)).Style.Display.ToLower().Equals("none"));
-				// Жмем "Подключить пользователя" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
-				browser.Link(Find.ByText("Подключить пользователя")).Click();
-				browser.TextField(Find.ById("UserSearchText" + address.Id)).TypeText("1234567890");
-				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
-				Thread.Sleep(500);
-				Assert.That(browser.Div(Find.ById("SearchUserMessage" + address.Id)).Text, Text.Contains("Ничего не найдено"));
+				using (new SessionScope())
+				{
+					client.Refresh();
+					var address = client.Addresses[0];
+					browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
+					browser.Link(Find.ByText("Подключить пользователя")).Click();
+					var searchDiv = browser.Div(Find.ById("SearchUserDiv" + address.Id));
+					var selectDiv = browser.Div(Find.ById("SelectUserDiv" + address.Id));
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
+					// Жмем "Найти"
+					browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
+					Thread.Sleep(500);
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("none"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("block"));
+					// Жмем "Сброс" и возвращаемся к полю ввода текста для поиска
+					browser.Button(Find.ById("ResetUserSearchButton" + address.Id)).Click();
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
+					// Жмем "Отмена". Должна появиться ссылка "Подключить пользователя", а поле ввода и кнопки - исчезнуть
+					browser.Button(Find.ById("CancelUserSearchButton" + address.Id)).Click();
+					Assert.IsTrue(browser.Link(Find.ByText("Подключить пользователя")).Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(browser.Div(Find.ById("ConnectingUserDiv" + address.Id)).Style.Display.ToLower().Equals("none"));
+					// Жмем "Подключить пользователя" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
+					browser.Link(Find.ByText("Подключить пользователя")).Click();
+					browser.TextField(Find.ById("UserSearchText" + address.Id)).TypeText("1234567890");
+					browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
+					Thread.Sleep(500);
+					Assert.That(browser.Div(Find.ById("SearchUserMessage" + address.Id)).Text, Text.Contains("Ничего не найдено"));
+				}
 			}
 		}
 
@@ -402,47 +471,40 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
-			{				
-				var user = client.Users[0];
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-				Thread.Sleep(500);
-				browser.Link(Find.ByText("Подключить адрес")).Click();
-				Thread.Sleep(500);
-				var searchDiv = browser.Div(Find.ById("SearchAddressDiv" + user.Id));
-				var selectDiv = browser.Div(Find.ById("SelectAddressDiv" + user.Id));
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
-				// Жмем "Найти"
-				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-				Thread.Sleep(500);
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("none"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("block"));
-				// Жмем "Сброс" и возвращаемся к полю ввода текста для поиска
-				browser.Button(Find.ById("ResetSearchButton" + user.Id)).Click();
-				Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
-				// Жмем "Отмена". Должна появиться ссылка "Подключить адрес", а поле ввода и кнопки - исчезнуть
-				browser.Button(Find.ById("CancelSearchButton" + user.Id)).Click();
-				Assert.IsTrue(browser.Link(Find.ByText("Подключить адрес")).Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(browser.Div(Find.ById("ConnectingAddressDiv" + user.Id)).Style.Display.ToLower().Equals("none"));
-				// Жмем "Подключить адрес" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
-				browser.Link(Find.ByText("Подключить адрес")).Click();
-				browser.TextField(Find.ById("AddressSearchText" + user.Id)).TypeText("1234567890");
-				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-				Thread.Sleep(500);
-				Assert.That(browser.Div(Find.ById("SearchAddressMessage" + user.Id)).Text, Text.Contains("Ничего не найдено"));
-			}			
-		}
-
-		[Test]
-		public void If_clients_count_more_than_5_they_must_be_collapsed()
-		{
-		}
-
-		[Test]
-		public void If_addresses_count_more_than_5_they_must_be_collapsed()
-		{
-
+			{
+				using (new SessionScope())
+				{
+					client.Refresh();
+					var user = client.Users[0];
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+					Thread.Sleep(500);
+					browser.Link(Find.ByText("Подключить адрес")).Click();
+					Thread.Sleep(500);
+					var searchDiv = browser.Div(Find.ById("SearchAddressDiv" + user.Id));
+					var selectDiv = browser.Div(Find.ById("SelectAddressDiv" + user.Id));
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
+					// Жмем "Найти"
+					browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+					Thread.Sleep(500);
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("none"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("block"));
+					// Жмем "Сброс" и возвращаемся к полю ввода текста для поиска
+					browser.Button(Find.ById("ResetSearchButton" + user.Id)).Click();
+					Assert.IsTrue(searchDiv.Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(selectDiv.Style.Display.ToLower().Equals("none"));
+					// Жмем "Отмена". Должна появиться ссылка "Подключить адрес", а поле ввода и кнопки - исчезнуть
+					browser.Button(Find.ById("CancelSearchButton" + user.Id)).Click();
+					Assert.IsTrue(browser.Link(Find.ByText("Подключить адрес")).Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(browser.Div(Find.ById("ConnectingAddressDiv" + user.Id)).Style.Display.ToLower().Equals("none"));
+					// Жмем "Подключить адрес" и вводим то, что не сможем найти. Должно быть сообщение что ничего не нашли
+					browser.Link(Find.ByText("Подключить адрес")).Click();
+					browser.TextField(Find.ById("AddressSearchText" + user.Id)).TypeText("1234567890");
+					browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+					Thread.Sleep(500);
+					Assert.That(browser.Div(Find.ById("SearchAddressMessage" + user.Id)).Text, Text.Contains("Ничего не найдено"));
+				}
+			}
 		}
 
 		private void AddUsers(Client client, int countUsers)
@@ -511,6 +573,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				client.Refresh();
 				var user = new User { Client = client, Name = "test user", Enabled = true, };
 				user.Setup(client);
 				var address = new Address { Client = client, Value = "address", Enabled = true, };
@@ -557,33 +620,43 @@ namespace Functional
 		[Test]
 		public void Show_message_if_server_error_occured()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var user = client.Users[0];
+			var client = DataMother.CreateTestClientWithAddressAndUser();			
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				// Подключаем пользователю адрес
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-				Thread.Sleep(500);
-				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-				Thread.Sleep(500);
-				browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
-				Thread.Sleep(2000);
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+				using (new SessionScope())
+				{
+					client.Refresh();
+					var user = client.Users[0];
+					// Подключаем пользователю адрес
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+					Thread.Sleep(500);
+					browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+					Thread.Sleep(500);
+					browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
+					Thread.Sleep(2000);
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 
-				// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
-				client.Addresses[0].DeleteAndFlush();
-				client.Users[0].DeleteAndFlush();
+					// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
+					ArHelper.WithSession(session => session.CreateSQLQuery(@"
+DELETE FROM future.Addresses WHERE Id = :AddressId
+;
+DELETE FROM future.Users WHERE Id = :UserId
+;")
+					.SetParameter("AddressId", client.Addresses[0].Id)
+					.SetParameter("UserId", client.Users[0].Id)
+					.ExecuteUpdate());
 
-				var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
-				Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
+					var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
+					Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
 
-				// Пытаемся посмотреть адреса, доступные пользователю
-				browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
-				Thread.Sleep(500);
+					// Пытаемся посмотреть адреса, доступные пользователю
+					browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
+					Thread.Sleep(500);
 
-				Assert.IsTrue(errorMessageDiv.Exists);
-				Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("block"));
-				Assert.IsTrue(errorMessageDiv.Text.Equals("При выполнении операции возникла ошибка. Попробуйте повторить позднее"));
+					Assert.IsTrue(errorMessageDiv.Exists);
+					Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("block"));
+					Assert.IsTrue(errorMessageDiv.Text.Equals("При выполнении операции возникла ошибка. Попробуйте повторить позднее"));
+				}
 			}
 		}
 
@@ -617,25 +690,34 @@ namespace Functional
 		[Test]
 		public void Cancel_message_for_user()
 		{
-			using (new SessionScope())
+			ClientMessage message;
+			var messageText = String.Empty;
+
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			using (var browser = Open(String.Format("Client/{0}", client.Id)))
 			{
-				var client = DataMother.CreateTestClientWithAddressAndUser();
-				using (var browser = Open(String.Format("Client/{0}", client.Id)))
+				using (new SessionScope())
 				{
+					client.Refresh();
 					var username = client.Users[0].GetLoginOrName();
 					browser.Link(Find.ByText("Биллинг")).Click();
 					browser.SelectList(Find.ByName("NewClientMessage.ClientCode")).Select(username);
-					var messageText = "test message for user " + username;
+					messageText = "test message for user " + username;
 					browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
 					browser.Button(Find.ByValue("Отправить сообщение")).Click();
 					browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 					Thread.Sleep(500);
 					browser.Button(String.Format("CancelViewMessage{0}", client.Users[0].Id)).Click();
 					var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
-					messages[0].Refresh();
-					Assert.That(messages[0].Message, Is.EqualTo(messageText));
-					Assert.That(messages[0].ShowMessageCount, Is.EqualTo(0));
+					message = messages[0];
 				}
+			}
+
+			using (new SessionScope())
+			{
+				message.Refresh();
+				Assert.That(message.Message, Is.EqualTo(messageText));
+				Assert.That(message.ShowMessageCount, Is.EqualTo(0));
 			}
 		}
 
@@ -699,6 +781,7 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				client = DataMother.CreateTestClientWithAddressAndUser();
+				client.Refresh();
 				client.Users[0].Name = String.Format("Test username for Accounting [{0}]", client.Users[0].Id);
 				client.Users[0].UpdateAndFlush();
 				scope.VoteCommit();
@@ -831,8 +914,8 @@ namespace Functional
 				var clientRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("ClientRow")).ToList();
 				Assert.That(clientRows.Count, Is.EqualTo(2));
 				browser.Div(Find.ById("ClientListHeader")).Click();
-				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client.Name)).Count(), Is.EqualTo(0));
-				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Count(), Is.EqualTo(1));
+				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Equals(client.Name)).Count(), Is.EqualTo(0));
+				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Equals(client2.Name)).Count(), Is.EqualTo(1));
 				// Кликаем на другого клиента
 				browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
 
@@ -931,9 +1014,93 @@ namespace Functional
 				foreach (TableRow row in usersTable.TableRows)
 					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
 						countVisibleRows3++;
-				Assert.That(countVisibleRows, Is.LessThan(countVisibleRows3));
+				Assert.That(countVisibleRows, Is.EqualTo(countVisibleRows3));
 				browser.Link(Find.ById("ShowOrHideUsers")).Click();
 				Thread.Sleep(1000);
+			}
+		}
+
+		[Test, Description("Тест перехода на закладку с юридическими лицами из таблицы с адресами (должно раскрываться только юр. лицо, с которым связан выбранный адрес)")]
+		public void Go_to_juridical_organization_from_address()
+		{
+			Client client;
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
+				var juridicalOrganization = new JuridicalOrganization() {
+					Name = "Test" + client.Id,
+					Payer = client.BillingInstance,
+				};
+				juridicalOrganization.CreateAndFlush();
+				scope.VoteCommit();
+			}
+
+			using (var browser = Open("Client/{0}/Info", client.Id))
+			{
+				
+			}
+		}
+
+		[Test, Description("Создание нового юридического лица")]
+		public void Create_new_juridical_organization()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+
+			using (var browser = Open("Client/{0}/Info", client.Id))
+			{
+				browser.Link(Find.ByText("Биллинг")).Click();
+				browser.Link(Find.ByText("Юридические лица")).Click();
+				Assert.IsTrue(browser.Div(Find.ById("FormForAdding")).Exists);
+				Assert.That(browser.Div(Find.ById("FormForAdding")).Style.Display, Is.EqualTo("none"));
+				Assert.That(browser.Button(Find.ById("AddJuridicalOrganizationButton")).Style.Display, Is.Null);
+				browser.Button(Find.ById("AddJuridicalOrganizationButton")).Click();
+				Thread.Sleep(500);
+				Assert.That(browser.Div(Find.ById("FormForAdding")).Style.Display, Is.EqualTo("block"));
+				Assert.That(browser.Button(Find.ById("AddJuridicalOrganizationButton")).Style.Display, Is.EqualTo("none"));
+				browser.TextField(Find.ByName("JuridicalOrganization.Name")).TypeText(String.Format("TestJuridicalNameForClient{0}", client.Id));
+				browser.Button(Find.ById("SubmitFormButton")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Юридическое лицо создано"));
+
+				ArHelper.WithSession(session => session.CreateSQLQuery(@"
+SELECT COUNT(*)
+FROM Billing.JuridicalOrganizations
+WHERE Name = :Name")
+				 .SetParameter("Name", String.Format("TestJuridicalNameForClient{0}", client.Id))
+				 .ExecuteUpdate());
+			}
+		}
+
+		[Test]
+		public void Update_juridical_organization_info()
+		{
+			Client client;
+			JuridicalOrganization juridicalOrganization;
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
+				juridicalOrganization = new JuridicalOrganization() {
+					Name = "Test" + client.Id,
+					Payer = client.BillingInstance,
+				};
+				juridicalOrganization.CreateAndFlush();
+				scope.VoteCommit();
+			}
+
+			using (var browser = Open("Client/{0}/Info", client.Id))
+			{
+				browser.Link(Find.ByText("Биллинг")).Click();
+				browser.Link(Find.ByText("Юридические лица")).Click();
+				browser.Link(Find.ById(String.Format("JuridicalOrganization{0}Link", juridicalOrganization.Id))).Click();
+
+				var newName = juridicalOrganization.Name + "_" + client.Id;
+				browser.TextField(Find.ByValue(juridicalOrganization.Name)).TypeText(newName);
+				browser.Button(Find.ById(String.Format("SubmitChanges{0}", juridicalOrganization.Id))).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
+				juridicalOrganization.Refresh();
+				Assert.That(juridicalOrganization.Name, Is.EqualTo(newName));
 			}
 		}
 	}

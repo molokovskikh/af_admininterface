@@ -99,28 +99,28 @@ end
 	${FormHelper.HiddenField("Instance.PayerID")}
 
 <table>
-	${WriteInputGroupHeader("Общая информация")}
+	${WriteInputGroupHeader("Юридическое лицо")}
 
 					
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Name", 
 													"Краткое наименование:"), 
-								FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
+								FormHelper.TextField("JuridicalOrganization.Name", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.FullName", 
 													"Полное наименование:"), 
-								FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
+								FormHelper.TextField("JuridicalOrganization.FullName", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Address", 
 													"Юридический адрес:"), 
-								FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+								FormHelper.TextField("JuridicalOrganization.Address", {"class" : "BillingInput"}))}
 
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Inn", 
 													"ИНН:"), 
-								FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
+								FormHelper.TextField("JuridicalOrganization.Inn", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Kpp", 
 													"КПП:"), 
-								FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+								FormHelper.TextField("JuridicalOrganization.Kpp", {"class" : "BillingInput"}))}
 																		
 	<%
 	contactGroupIndex = 0
