@@ -936,5 +936,27 @@ namespace Functional
 				Thread.Sleep(1000);
 			}
 		}
+
+		[Test]
+		public void Show_payer_with_no_addresses()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.BillingInstance.ShortName)));
+			}
+		}
+
+		[Test]
+		public void Show_payer_with_no_users()
+		{
+			var client = DataMother.CreateTestClientWithAddress();
+
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			{
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.BillingInstance.ShortName)));
+			}
+		}
 	}
 }

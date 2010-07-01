@@ -30,24 +30,16 @@ namespace AdminInterface.Controllers
 	{
 		public void Edit(uint billingCode,
 			uint clientCode,
-			uint userId,
-			uint addressId,
 			bool showClients,
-			bool showAddresses,
-			bool showUsers,
 			string tab,
 			DateTime? paymentsFrom,
 			DateTime? paymentsTo)
 		{
 			Client client;
-			User user;
-			Address address;
 			if (billingCode == 0)
 				client = Client.Find(clientCode);
 			else
 				client = Payer.Find(billingCode).Clients.First();
-			user = (userId != 0) ? User.Find(userId) : client.Users.First();
-			address = (addressId != 0) ? Address.Find(addressId) : client.Addresses.First();
 
 			var payer = client.BillingInstance;
 			var usersMessages = new List<ClientMessage>();
@@ -67,8 +59,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["CountUsersWithMessages"] = countUsersWithMessages;
 			PropertyBag["UsersMessages"] = usersMessages;
 			PropertyBag["ShowClients"] = showClients;
-			PropertyBag["ShowUsers"] = showUsers;
-			PropertyBag["ShowAddresses"] = showAddresses;
 
 			if (String.IsNullOrEmpty(tab))
 				tab = "payments";
@@ -83,8 +73,6 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
-			PropertyBag["User"] = user;
-			PropertyBag["Address"] = address;
 			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);

@@ -371,8 +371,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
 			</div>
 			<br />
-            <form action="UpdateUsers.rails" method="post">
-                <input type="hidden" name="userId" value="${user.Id}" />
                 <div align="left">
                     <table class="DataTable" id="UsersTable" style="width:100%;">
                         <tr align="center" valign="top">
@@ -421,7 +419,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <%                      end %>
                         </table>
                     </div>
-                </form>
             </div>
 		</div>
 			
@@ -440,8 +437,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
 			</div>
 			<br />
-                <form action="UpdateAddresses.rails" method="post">
-                    <input type="hidden" name="addressId" value="${address.Id}" />
 					<div align="left">
 					    <table class="DataTable" id="AddressesTable" style="width:100%;">
 						    <tr align="center" valign="top">
@@ -486,7 +481,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <%                      end %>
                         </table>
                     </div>
-                </form>
             </div>
 		</div>
 
@@ -713,7 +707,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                 <option value="${user.Id}">${user.GetLoginOrName()}</option>
 <%                              end %>
 							</select>
+							<% if (Users.Count > 0): %>
 							<input type="hidden" name="clientId" value="${Users[0].Client.Id}" />
+							<% else: %>
+							<input type="hidden" name="clientId" value="${client.Id}" />
+							<% end %>
 						</td>
 					</tr>
 					<% if IsDefined("SendError"): %>
@@ -750,7 +748,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</tr>
 					<tr style="text-align:right">
 						<td>
-							<input type="submit" value="Отправить сообщение" />
+							<input type="submit" value="Отправить сообщение" ${"disabled" if (Users.Count == 0)} />
 						</td>
 					</tr>
 			</table>
