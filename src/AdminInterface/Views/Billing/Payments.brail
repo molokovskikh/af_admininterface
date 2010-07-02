@@ -377,7 +377,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                             <th>Включен</th>
                             <th>Учтен</th>
                             <th>Работает бесплатно</th>
-                            <th>Логин</th>
+                            <th>Код пользователя</th>
 							<th>Адреса</th>
                             <th>Комментарий</th>
                             <th>Дата последнего обновления</th>
@@ -405,8 +405,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
                                     onclick="SetUserStatus(${user.Id}, document.getElementById('UserStatusCheckBox${user.Id}').checked, this.checked, ${cast(int, user.IsActive)})" />
                             </td>
 							<td>
-								<div id="UserValue${user.Id}" style="display: none;"><b>${user.Login}</b></div>
-								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Login}</a>
+								<div id="UserValue${user.Id}" style="display: none;"><b>${user.Id}</b></div>
+								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
 							</td>
 							<td class="ShortWidthColumn"><a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/kfm_home.png" border="0" /></a></td>
                             <td>${user.Name}</td>
