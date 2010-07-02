@@ -914,8 +914,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 				var clientRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("ClientRow")).ToList();
 				Assert.That(clientRows.Count, Is.EqualTo(2));
 				browser.Div(Find.ById("ClientListHeader")).Click();
-				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Equals(client.Name)).Count(), Is.EqualTo(0));
-				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Equals(client2.Name)).Count(), Is.EqualTo(1));
+				Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Count(), Is.EqualTo(1));
 				// Кликаем на другого клиента
 				browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
 

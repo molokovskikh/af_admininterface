@@ -263,6 +263,16 @@ namespace AdminInterface.Controllers
 
 			client.MaintainIntersection();
 
+			var juridicalOrganization = new JuridicalOrganization();
+			juridicalOrganization.Payer = client.BillingInstance;
+			juridicalOrganization.CreateAndFlush();
+
+			if (client.Addresses.Count > 0)
+			{
+				client.Addresses[0].JuridicalOrganization = juridicalOrganization;
+				client.Addresses[0].UpdateAndFlush();
+			}
+
 			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
 			{
 				command.CommandText = "insert into inscribe(ClientCode) values(?ClientCode); ";
