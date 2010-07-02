@@ -4,6 +4,7 @@
 									  
 <link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
+<link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
 
 <script>
 	$(function() {
@@ -205,45 +206,45 @@
 			<tr valign="top">
 			<td>
 				<% if userInfo != null: %>
-			    <table cellspacing="0" cellpadding="1">
-			    <tr>
-			        <td>${"Последний правильный ввод пароля:" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
-			        <td style="padding-left: 2px;">${userInfo.LastLogOnDate if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
-                </tr>
-			    <tr>
-			        <td>${"Последний неправильный ввод пароля:" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
-			        <td style="padding-left: 2px;">${userInfo.BadPasswordDate if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
-                </tr>
-			    <tr>
-			        <td>${"Последнее изменение пароля:" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
-			        <td style="padding-left: 2px;">${userInfo.LastPasswordChange if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
-                </tr>
-			    </table>
-			    <% end %>
-            </td>
+				<table cellspacing="0" cellpadding="1">
+				<tr>
+					<td>${"Последний правильный ввод пароля:" if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
+					<td style="padding-left: 2px;">${userInfo.LastLogOnDate if userInfo.IsLoginExists and userInfo.LastLogOnDate != null}</td>
+				</tr>
+				<tr>
+					<td>${"Последний неправильный ввод пароля:" if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
+					<td style="padding-left: 2px;">${userInfo.BadPasswordDate if userInfo.IsLoginExists and userInfo.BadPasswordDate != null}</td>
+				</tr>
+				<tr>
+					<td>${"Последнее изменение пароля:" if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
+					<td style="padding-left: 2px;">${userInfo.LastPasswordChange if userInfo.IsLoginExists and userInfo.LastPasswordChange != null}</td>
+				</tr>
+				</table>
+				<% end %>
+			</td>
 
-		    <td style="padding-left: 5px; width: 50%">
+			<td style="padding-left: 5px; width: 50%">
 				<% if (authorizationLog != null): %>
-		        <table cellspacing="0" cellpadding="1">
-		        <tr>
-		            <td>${"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
-		            <td style="padding-left: 2px;">${authorizationLog.CITime if authorizationLog.CITime != null}</td>
-		        </tr>
-		        <tr>
-		            <td>${"Обновление AnalitF:" if authorizationLog.AFTime != null}</td>
-		            <td style="padding-left: 2px;">${authorizationLog.AFTime if authorizationLog.AFTime != null}</td>
-		        </tr>
-		        <tr>
-		            <td>${"Использование AnalitOnline:" if authorizationLog.AOLTime != null}</td>
-		            <td style="padding-left: 2px;">${authorizationLog.AOLTime if authorizationLog.AOLTime != null}</td>
-		        </tr>
-		        <tr>
-		            <td>${"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
-		            <td style="padding-left: 2px;">${authorizationLog.IOLTime if authorizationLog.IOLTime != null}</td>
-		        </tr>
-		        </table>
-		        <% end %>
-		    </td>
+				<table cellspacing="0" cellpadding="1">
+				<tr>
+					<td>${"Вход в клиентский интерфейс:" if authorizationLog.CITime != null}</td>
+					<td style="padding-left: 2px;">${authorizationLog.CITime if authorizationLog.CITime != null}</td>
+				</tr>
+				<tr>
+					<td>${"Обновление AnalitF:" if authorizationLog.AFTime != null}</td>
+					<td style="padding-left: 2px;">${authorizationLog.AFTime if authorizationLog.AFTime != null}</td>
+				</tr>
+				<tr>
+					<td>${"Использование AnalitOnline:" if authorizationLog.AOLTime != null}</td>
+					<td style="padding-left: 2px;">${authorizationLog.AOLTime if authorizationLog.AOLTime != null}</td>
+				</tr>
+				<tr>
+					<td>${"Использование Online сервисов:" if authorizationLog.IOLTime != null}</td>
+					<td style="padding-left: 2px;">${authorizationLog.IOLTime if authorizationLog.IOLTime != null}</td>
+				</tr>
+				</table>
+				<% end %>
+			</td>
 			</tr>
 			</table>
 		</div>
@@ -276,14 +277,14 @@
 		</div>
 
 		<div class=block>
-			<h3>
-				Доступ к адресам доставки
-			</h3>
+			<h3>Доступ к адресам доставки</h3>
 			<div>
-				<% for i, address in enumerate(client.Addresses): %>	
-					<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)}>
+				<% for i, address in enumerate(client.Addresses): %>
+					<div style="width: 100%" class="${'DisabledByBilling' if not address.Enabled}">
+					<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id}
+						${"checked" if address.AvaliableFor(user)} ${"disabled" if not address.Enabled} />
 					${address.Value}
-					<br>
+					</div>
 				<% end %>
 			</div>
 		</div>
