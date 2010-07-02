@@ -12,11 +12,14 @@ namespace AdminInterface.Models.Logs
 	{
 		[Description("Накопительное")] Accumulative = 1,
 		[Description("Кумулятивное")] Cumulative = 2,
+		[Description("Отправка заказа")] OldOrderSending = 4,
 		[Description("Ошибка доступа")] AccessError = 5,
 		[Description("Ошибка сервера")] ServerError = 6,
 		[Description("Документы")] Documents = 8,
 		[Description("Загрузка документов на сервер")] LoadingDocuments = 9,
 		[Description("АвтоЗаказ")] AutoOrder = 10,
+		[Description("Отправка заказов")] NewOrderSending = 11,
+		[Description("Отправка измененных настроек прайс-листов")] PriceSettingSending = 12,
 	}
 
 	[ActiveRecord(Table = "logs.AnalitFUpdates")]
