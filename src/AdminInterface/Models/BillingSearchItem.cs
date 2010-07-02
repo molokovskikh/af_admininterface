@@ -164,8 +164,8 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
 from billing.payers p
 	join future.Clients cd on p.PayerId = cd.PayerId
-        join future.Users users on users.ClientId = cd.Id
-        join future.Addresses addresses on addresses.ClientId = cd.Id
+        left join future.Users users on users.ClientId = cd.Id
+        left join future.Addresses addresses on addresses.ClientId = cd.Id
 where cd.RegionCode & :AdminRegionMask > 0
 		{3}
 		{0}
