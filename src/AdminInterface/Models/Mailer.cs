@@ -138,14 +138,16 @@ Email: {2}
 @"Оператор: {0}
 Хост: {1}
 Код клиента: {2}
-Логин: {3}
-Комментарий: {4}
-Домашний регион: {5}
-Последнее отключение: {6}
+Наименование клиента: {3}
+Логин: {4}
+Комментарий: {5}
+Домашний регион: {6}
+Последнее отключение: {7}
 ",
 				SecurityContext.Administrator.UserName,
 				SecurityContext.Administrator.GetHost(),
 				user.Client.Id,
+				user.Client.Name,
 				user.Login,
 				user.Name,
 				user.Client.HomeRegion.Name,
