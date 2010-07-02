@@ -187,11 +187,12 @@ Email: {2}
 		{
 			Func.Mail("register@analit.net", 
 				"Регистрация нового адреса доставки", 
-				String.Format(@"Для клиента {0} код {1}
-Зарегистрирован новый адрес доставки {2}
-Регистратор {3}",
+				String.Format(@"Для клиента {0} код {1} регион {2}
+Зарегистрирован новый адрес доставки {3}
+Регистратор {4}",
 				address.Client.Name,
 				address.Client.Id,
+				address.Client.HomeRegion.Name,
 				address.Value,
 				SecurityContext.Administrator.ManagerName), 
 				"RegisterList@subscribe.analit.net, billing@analit.net");
