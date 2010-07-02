@@ -602,5 +602,27 @@ namespace Functional
 				}
 			}
 		}
+
+		[Test, Description("После регистрации клиента, должны бюыть выставлены флаги 'Получать накладные' и 'Получать отказы'")]
+		public void After_client_registration_SendWaybills_and_SendRejects_must_be_selected()
+		{
+			uint clientId = 0;
+
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				clientId = Helper.GetClientCodeFromRegistrationCard(browser);
+			}
+
+			using (new SessionScope())
+			{
+				var client = Client.Find(clientId);
+				Assert.That(client.Users.Count, Is.EqualTo(1));
+				Assert.That(client.Users[0].SendWaybills, Is.True);
+				Assert.That(client.Users[0].SendRejects, Is.True);
+			}
+		}
 	}
 }

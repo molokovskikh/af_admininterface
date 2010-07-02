@@ -370,7 +370,9 @@ WHERE   intersection.pricecode IS NULL
 				Client = client,
 				Name = userName,
 				WorkRegionMask = workRegionMask,
-				OrderRegionMask = orderRegionMask
+				OrderRegionMask = orderRegionMask,
+				SendRejects = true,
+				SendWaybills = true,
 			};
 			if ((permissions != null) && (permissions.Count() > 0))
 			{
