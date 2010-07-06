@@ -223,6 +223,7 @@
 	function LockPayer() {
 	    jQuery("#PayerExists").attr('checked', '');
 	    jQuery("#PayerExists").click();
+		jQuery("#PayerExistsValue").val(true);
 	    jQuery("#PayerExists").attr('disabled', 'disabled');
 	    jQuery("#FillBillingInfo").attr('checked', '');
 	    jQuery("#FillBillingInfo").attr('disabled', 'disabled');
@@ -232,6 +233,7 @@
 	
 	function SetLockedPayer(payerName) {
 	    jQuery("#PayerExists").attr('checked', 'checked');
+		jQuery("#PayerExistsValue").val(true);
 	    jQuery("#PayerExists").attr('disabled', 'disabled');
 	    jQuery("#PayerComboBox").attr('disabled', 'disabled');
 	    jQuery("#ResetPayerButton").attr('disabled', 'disabled');
@@ -241,6 +243,7 @@
 	
 	function UnlockPayer() {
 	    jQuery("#PayerExists").attr('checked', '');
+		jQuery("#PayerExistsValue").val(false);
 	    jQuery("#PayerExists").attr('disabled', '');
 	    jQuery("#PayerComboBox").attr('disabled', '');
 	    jQuery("#ResetPayerButton").attr('disabled', '');	
@@ -417,7 +420,7 @@
             <tr>
                 <td width="50%">                    
                     <input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
-                    <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					 <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
                 </td>
                 <td>
                     <div id="SearchPayerDiv" style="width: 100%; display: none">
@@ -437,7 +440,7 @@
             </tr>            
             <tr>
                 <td width="50%">
-                    <input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
+					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
                 </td>
                 <td>
                     <div id="SelectSupplierDiv" style="width: 100%; display: none">

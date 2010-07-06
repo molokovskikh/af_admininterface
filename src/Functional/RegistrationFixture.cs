@@ -262,16 +262,22 @@ namespace Functional
 		public void Try_to_register_hiden_client()
 		{
 			uint clientcode;
-			var testSupplierId = 234;
+			uint testSupplierId = 0;
+
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
+				var supplier = DataMother.CreateTestSupplier();
+				supplier.Name += supplier.Id;
+				supplier.UpdateAndFlush();
+				testSupplierId = supplier.Id;
+
 				SetupGeneralInformation(browser, ClientType.Drugstore);
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 
-				browser.TextField(Find.ById("SearchSupplierTextPattern")).TypeText("тестирования");
+				browser.TextField(Find.ById("SearchSupplierTextPattern")).TypeText(supplier.Name.ToLower());
 				browser.Button(Find.ById("SearchSupplierButton")).Click();
 				Thread.Sleep(2000);
-				browser.SelectList(Find.ById("SupplierComboBox")).Select("234. Поставщик для тестирования");
+				browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
 				Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
 
 				browser.Button(Find.ById("RegisterButton")).Click();
@@ -622,6 +628,45 @@ namespace Functional
 				Assert.That(client.Users.Count, Is.EqualTo(1));
 				Assert.That(client.Users[0].SendWaybills, Is.True);
 				Assert.That(client.Users[0].SendRejects, Is.True);
+			}
+		}
+
+		[Test, Description("При регистрации клиента была попытка зарегистрировать скрытую копию, но поставщика не нашли")]
+		public void Register_client_with_failed_supplier_searching()
+		{
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
+				browser.TextField(Find.ByName("SearchSupplierTextPattern")).TypeText("12839046eqwuiywiuryer");
+				browser.Button(Find.ByName("SearchSupplierButton")).Click();
+				Thread.Sleep(1000);
+				Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
+				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = false;
+				browser.CheckBox("ShowRegistrationCard").Checked = false;
+				browser.Button("RegisterButton").Click();
+				Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
+			}
+		}
+
+		[Test, Description("При регистрации клиента была попытка зарегистрировать с существующим плательщиком, но плательщика не нашли")]
+		public void Register_client_with_failed_payer_searching()
+		{
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
+				browser.TextField(Find.ByName("SearchPayerTextPattern")).TypeText("12839046eqwuiywiuryer");
+				browser.Button(Find.ByName("SearchPayerButton")).Click();
+				Thread.Sleep(1000);
+				Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
+				browser.CheckBox("ShowRegistrationCard").Checked = false;
+				browser.Button("RegisterButton").Click();
+				Assert.That(browser.Text, Is.StringContaining("Выберите плательщика"));
+				browser.CheckBox(Find.ById("PayerExists")).Checked = false;
+				browser.CheckBox("FillBillingInfo").Checked = false;
+				browser.Button("RegisterButton").Click();
+				Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 			}
 		}
 	}

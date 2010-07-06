@@ -110,11 +110,11 @@ namespace AdminInterface.Controllers
 					{
 						if ((payer != null) || (existingPayerId.HasValue))
 						{
-							var id = (payer.PayerID > 0) ? payer.PayerID : existingPayerId.Value;
+							var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
 							currentPayer = Payer.Find(id);
 						}
 					}
-					else
+					if (currentPayer == null)
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;
 					AddContactsToClient(newClient, clientContacts);
@@ -446,7 +446,9 @@ WHERE   intersection.pricecode IS NULL
         {
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			var suppliers = Supplier.FindAll().Where(item => (item.Status == ClientStatus.On) && item.Name.Contains(searchPattern));
+			var suppliers = Supplier.FindAll()
+					.Where(item => (item.Status == ClientStatus.On) && item.Name.ToLower().Contains(searchPattern.ToLower()))
+					.Take(50);
 			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
