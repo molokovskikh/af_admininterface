@@ -117,8 +117,8 @@ namespace Functional
 						Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
 
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).Clear();
-					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).TypeText("KvasovTest@analit.net");
+					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
+					openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
 					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 				}
@@ -145,7 +145,7 @@ namespace Functional
 				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).Clear();
+					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
 					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.True);
 					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
 					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
@@ -174,7 +174,7 @@ namespace Functional
 				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("additionEmailsToNotify")).Clear();
+					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
 					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
 					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));

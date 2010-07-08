@@ -213,7 +213,7 @@ namespace AdminInterface.Controllers
 
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void DoPasswordChange(uint userId, 
-									 string additionEmailsToNotify, 
+									 string emailsForSend, 
 									 bool isSendClientCard, 
 									 bool isFree, 
 									 bool changeLogin,
@@ -256,8 +256,8 @@ namespace AdminInterface.Controllers
 					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
 						user,
 						password,
-						additionEmailsToNotify);
-					passwordChangeLog.SetSentTo(smtpId, additionEmailsToNotify);
+						emailsForSend);
+					passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 				}
 
 				passwordChangeLog.Save();
