@@ -119,6 +119,13 @@ namespace AdminInterface.Controllers
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;
 					AddContactsToClient(newClient, clientContacts);
+
+					var juridicalOrganization = new JuridicalOrganization();
+					juridicalOrganization.Payer = currentPayer;
+					juridicalOrganization.CreateAndFlush();
+
+					if (newClient.Addresses.Count > 0)
+						newClient.Addresses[0].JuridicalOrganization = juridicalOrganization;
 					newClient.SaveAndFlush();
 
 					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
@@ -263,16 +270,6 @@ namespace AdminInterface.Controllers
 
 			client.MaintainIntersection();
 
-			var juridicalOrganization = new JuridicalOrganization();
-			juridicalOrganization.Payer = client.BillingInstance;
-			juridicalOrganization.CreateAndFlush();
-
-			if (client.Addresses.Count > 0)
-			{
-				client.Addresses[0].JuridicalOrganization = juridicalOrganization;
-				client.Addresses[0].UpdateAndFlush();
-			}
-
 			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
 			{
 				command.CommandText = "insert into inscribe(ClientCode) values(?ClientCode); ";
@@ -415,6 +412,9 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["clientCode"] = clientCode;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 			PropertyBag["admin"] = SecurityContext.Administrator;
+
+			var client = Client.Find(clientCode);
+			PropertyBag["JuridicalOrganization"] = client.Addresses[0].JuridicalOrganization;
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
@@ -431,11 +431,10 @@ WHERE   intersection.pricecode IS NULL
 					payer.Comment = paymentOptions.GetCommentForPayer();
 				else
 					payer.Comment += "\r\n" + paymentOptions.GetCommentForPayer();
-
 				payer.UpdateAndFlush();
 
 				juridicalOrganization.Payer = payer;
-				juridicalOrganization.CreateAndFlush();
+				juridicalOrganization.UpdateAndFlush();
 
 				if (client.Addresses.Count > 0)
 				{

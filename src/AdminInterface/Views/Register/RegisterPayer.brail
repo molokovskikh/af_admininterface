@@ -99,6 +99,7 @@ end
 	${FormHelper.HiddenField("Instance.PayerID")}
 
 <table>
+	<input type="hidden" name="JuridicalOrganization.Id" value="${JuridicalOrganization.Id}" />
 	${WriteInputGroupHeader("Юридическое лицо")}
 
 					

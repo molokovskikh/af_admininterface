@@ -44,7 +44,7 @@ namespace AdminInterface.Models
 		[Property]
 		public bool BeAccounted { get; set; }
 
-		[BelongsTo("JuridicalOrganizationId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
 		public JuridicalOrganization JuridicalOrganization { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
