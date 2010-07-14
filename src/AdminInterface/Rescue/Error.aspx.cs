@@ -1,23 +1,7 @@
-using System;
 using System.Web.UI;
-using AdminInterface.Security;
 
-namespace AddUser
+namespace AdminInterface.Rescue
 {
 	partial class Error : Page
-	{
-		protected void Page_Load(object sender, EventArgs e)
-		{
-			try
-			{
-				var exception = Server.GetLastError();
-				if (exception is NotAuthorizedException)
-					Response.Redirect("NotAuthorized.aspx");
-				else if (exception is NotHavePermissionException)
-					Response.Redirect("NotAllowed.aspx");
-			}
-			catch
-			{}
-		}
-	}
+	{}
 }

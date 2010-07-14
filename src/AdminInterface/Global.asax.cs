@@ -271,11 +271,10 @@ WHERE PriceCode = ?Id", connection);
 		{
 			configuration.ControllersConfig.AddAssembly("AdminInterface");
 			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
-			configuration.ViewComponentsConfig.Assemblies = new[]
-			                                                	{
-			                                                		"AdminInterface",
-			                                                		"Common.Web.Ui"
-			                                                	};
+			configuration.ViewComponentsConfig.Assemblies = new[] {
+				"AdminInterface",
+				"Common.Web.Ui"
+			};
 			configuration.ViewEngineConfig.ViewPathRoot = "Views";
 			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
 			configuration.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(WebFormsViewEngine), false));
