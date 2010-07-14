@@ -34,11 +34,12 @@ namespace AdminInterface.Models.PrgData
 
 		public void FetchClient()
 		{
-			Client = User.Find(UserId).Client;
+			Client = User.TryFind(UserId).Client;
 			ClientCode = Client.Id;
 		}
 	}
 
+	[ServiceContract]
 	public interface IStatisticService
 	{
 		[OperationContract(Action = "http://tempuri.org/IStatisticService/GetUpdateInfo",

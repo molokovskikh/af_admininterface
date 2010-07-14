@@ -48,6 +48,8 @@ namespace AdminInterface.Controllers
 			foreach (var status in info)
 				status.FetchClient();
 
+			info = info.Where(i => i.Client != null).ToArray();
+
 			PropertyBag["statuses"] = info.Sort(ref sortBy, ref direction, "StartTime").ToArray();
 			PropertyBag["sortBy"] = sortBy;
 			PropertyBag["direction"] = direction;

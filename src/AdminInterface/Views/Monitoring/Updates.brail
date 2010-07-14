@@ -39,7 +39,7 @@
 <% for i, status in enumerate(statuses): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>${status.ClientCode}</td>
-		<td><a href="../Client/${status.ClientCode}">${status.Client.ShortName}</a></td>
+		<td><a href="${siteroot}/Client/${status.ClientCode}">${status.Client.Name}</a></td>
 		<td>${status.MethodName}</td>
 		<td>${status.StartTime}</td>
 	</tr>

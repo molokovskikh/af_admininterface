@@ -21,29 +21,24 @@ namespace AdminInterface.Helpers
 
 	public class RemoteServiceHelper
 	{
-		private static readonly string _wcfServiceUrl = Settings.Default.WCFServiceUrl;
-
 		private static readonly ILog _log = LogManager.GetLogger(typeof(RemoteServiceHelper));
-
-		private static ChannelFactory<IRemotePriceProcessor> _channelFactory;
-
-		private static IRemotePriceProcessor _priceProcessor;
 
 		public static void RemotingCall(Action<IRemotePriceProcessor> action)
 		{
+			var binding = new NetTcpBinding();
+			binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
+			binding.Security.Mode = SecurityMode.None;
+			binding.TransferMode = TransferMode.Streamed;
+			binding.MaxReceivedMessageSize = Int32.MaxValue;
+			binding.MaxBufferSize = 524288;
+
+			var channelFactory = new ChannelFactory<IRemotePriceProcessor>(binding, Settings.Default.WCFServiceUrl);
+			IRemotePriceProcessor channel = null;
 			try
 			{
-				var binding = new NetTcpBinding();
-				binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
-				binding.Security.Mode = SecurityMode.None;
-				binding.TransferMode = TransferMode.Streamed;
-				binding.MaxReceivedMessageSize = Int32.MaxValue;
-				binding.MaxBufferSize = 524288;
-
-				_channelFactory = new ChannelFactory<IRemotePriceProcessor>(binding, _wcfServiceUrl);
-				_priceProcessor = _channelFactory.CreateChannel();
-				action(_priceProcessor);
-				((ICommunicationObject)_priceProcessor).Close();
+				channel = channelFactory.CreateChannel();
+				action(channel);
+				((ICommunicationObject)channel).Close();
 			}
 			catch (Exception e)
 			{
@@ -51,9 +46,11 @@ namespace AdminInterface.Helpers
 			}
 			finally
 			{
-				if (((ICommunicationObject)_priceProcessor).State != CommunicationState.Closed)
-					((ICommunicationObject)_priceProcessor).Abort();
-				_channelFactory.Close();
+				var communicationObject = (ICommunicationObject) channel;
+				if (communicationObject != null 
+					&& communicationObject.State != CommunicationState.Closed)
+					communicationObject.Abort();
+				channelFactory.Close();
 			}
 		}
 
