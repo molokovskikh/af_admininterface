@@ -1,13 +1,25 @@
 ﻿<script>
 	$(function() {
-		$("a.new").click(function() {
-			var index = $(".DataTable tbody").children().length - 1
-			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>")
+		$("a.new").live('click', function() {
+			var index = $(".DataTable tbody").children().length - 1;
+			if (index == 0)
+			{
+				$(".DataTable tbody").children().remove();
+				$(".DataTable tbody").append("<tr><td><a class='new' href='javascript:'>Новый</a></td><th>Наименование</th>");
+			}
+				
+			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>");
 		})
 
 		$("a.delete").live('click', function() {
-			$(this).parents("tr").remove()
-		})	
+			$(this).parents("tr").remove();
+			var index = $(".DataTable tbody").children().length - 1;
+			if (index == 0)
+			{
+				$(".DataTable tbody").children().remove();
+				$(".DataTable tbody").append("<tr><td class='EmptyData'>Нет ни одного получателя платежей. <a class='new' href='javascript:'>Создать нового?</a></td></tr>");
+			}
+		})
 	})
 </script>
 <style>
@@ -30,7 +42,7 @@
 <table class="DataTable">
 	<tr>
 		<td class="EmptyData">
-			Нет ни одного получателя платежей. <a href="javascript:">Создать нового?</a>
+			Нет ни одного получателя платежей. <a class=new href="javascript:">Создать нового?</a>
 		</td>
 	</tr>
 </table>
@@ -44,7 +56,7 @@
 			<th>Наименование</th>
 		</tr>
 		<% for i, recipient in enumerate(recipients): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}">
+		<tr>
 			<td>
 				<a class="delete" href="javascript:">Удалить</a>
 			</td>
