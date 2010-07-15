@@ -135,7 +135,7 @@
 									clientTypesValues,
 									attr)}
 			</td>
-		</tr>	
+		</tr>
 		<tr style="text-align:left;">
 			<td>
 				Отключен\Не отключен:
@@ -147,12 +147,28 @@
 									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
 			</td>
 		</tr>
+		<tr style="text-align:left;">
+			<td>
+				Получатель платежей:
+			</td>
+			<td>
+				<select class="Full" name='SearchBy.RecipientId'>
+					<option>Все</option>
+					<% for recipient in FindBy.Recipients(): %>
+					<option ${"selected" if FindBy.RecipientId == recipient.Id} value=${recipient.Id}>
+						${recipient.Name}
+					</option>
+					<% end %>
+				</select>
+			</td>
+		</tr>
+
 		</table>
 		</fieldset>
 		<div style="text-align:right; margin-top: 10px;">
 			${FormHelper.Submit("Найти")}
 		</div>
-	</form>		
+	</form>
 	<div class="CornerHolder">
 		<div class="BottomLeftCorner">
 		</div>

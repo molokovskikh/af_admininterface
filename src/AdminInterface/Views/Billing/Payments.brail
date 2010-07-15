@@ -596,22 +596,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 													  
 		<% if not Instance.IsManualPayments(): %>
 		
-				<tr>
-					<td style="width: 30%">
-						${FormHelper.LabelFor("Instance.Reciver", "Получатель платежей:")}
-					</td>
-					<td style="width: 70%">
-						<select name="Instance.Reciver.Id">
-							<option></option>
-							<% for reciver in recivers: %>
-								<option ${"selected" if Instance.Reciver != null and Instance.Reciver.Id == reciver.Id } value="${reciver.Id}">
-									${reciver.Name}
-								</option>
-							<% end %>
-						</select>
-					</td>
-				</tr>
-
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", "Категория счета:"), 
 									FormHelper.Select("Instance.DetailInvoice", 
 													  {0:"Стандартный", 1:"Объединить все услуги"},
@@ -629,7 +613,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 									FormHelper.CheckboxField("Instance.ShowDiscount"))}
 		<% end %>
 		
-		<% if Instance.IsManualPayments(): %>							  
+		<% if Instance.IsManualPayments(): %>
 		${WriteInputGroupHeader("Оплата")}
 										
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 

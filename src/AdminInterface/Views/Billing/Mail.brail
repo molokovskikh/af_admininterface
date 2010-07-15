@@ -1,17 +1,34 @@
-﻿<% def WriteInputGroupHeader(localHeader as string) as string: %>
+﻿<%
+def Select() as string:
+	result = "<select name='Instance.Recipient.Id'>" + "<option></option>"
+	for recipient in Recipients:
+		selected = ""
+		if Instance.Recipient and Instance.Recipient.Id == recipient.Id:
+			selected = "selected"
+		end
+		result += "<option ${selected} value=${recipient.Id}>"
+		result += recipient.Name
+		result += "</option>"
+	end
+	result += "</select>"
+	return result
+end
+%>
+
+<% def WriteInputGroupHeader(localHeader as string) as string: %>
 	<tr>
 		<td class="InputGroupHeader" colspan="2">
 			${localHeader}
 		</td>
 	</tr>
-<% end
+<% end %>
 
-def WriteLabelAndEditControle(labelText as string, editControlText as string) as string: %>
+<% def WriteLabelAndEditControle(labelText as string, editControlText as string) as string: %>
 	<tr>
 		<td style="width: 30%">
 			${labelText}
 		</td>
-		<td style="width: 70%">
+		<td class="BillingInput">
 			${editControlText}
 		</td>
 	</tr>
@@ -24,33 +41,36 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${FormHelper.HiddenField("tab", "mail")}
 		
 	<table>
-	    ${WriteInputGroupHeader("Общая информация")}
+		${WriteInputGroupHeader("Общая информация")}
 
-					
-	    ${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ShortName", 
-													    "Краткое наименование:"), 
-								    FormHelper.TextField("Instance.ShortName", {"class" : "BillingInput"}))}
-												
-	    ${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
-														"Полное наименование:"), 
-									FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-														"Юридический адрес:"), 
-									FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.ShortName", "Краткое наименование:"), 
+			FormHelper.TextField("Instance.ShortName"))}
 
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-														"Адрес получателя:"), 
-									FormHelper.TextField("Instance.ReceiverAddress", {"class" : "BillingInput"}))}
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.JuridicalName", "Полное наименование:"), 
+			FormHelper.TextField("Instance.JuridicalName"))}
 
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
-														"ИНН:"), 
-									FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
-												
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
-														"КПП:"), 
-									FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
-																		
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.JuridicalAddress", "Юридический адрес:"), 
+			FormHelper.TextField("Instance.JuridicalAddress"))}
+
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.JuridicalAddress", "Адрес получателя:"), 
+			FormHelper.TextField("Instance.ReceiverAddress"))}
+
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.INN", "ИНН:"),
+			FormHelper.TextField("Instance.INN"))}
+
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.KPP", "КПП:"),
+			FormHelper.TextField("Instance.KPP"))}
+
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.Recipient", "Получатель платежей"),
+			Select())}
+
 		<%
 		contactGroupIndex = 0
 		component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:
@@ -152,7 +172,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
 														"Надпись после \"Кому\":"), 
-									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}									
+									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
 									
 		<tr style="text-align:right">
 			<td colspan="2">${FormHelper.Submit("Сохранить")}</td>

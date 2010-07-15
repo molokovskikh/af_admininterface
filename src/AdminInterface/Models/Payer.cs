@@ -30,6 +30,11 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public virtual uint PayerID { get; set; }
 
+		public virtual uint Id
+		{
+			get { return PayerID; }
+		}
+
 		[Property]
 		public virtual string ShortName { get; set; }
 
@@ -122,8 +127,8 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool ShowDiscount { get; set; }
 
-		[BelongsTo("ReciverId")]
-		public virtual Reciver Reciver { get; set; }
+		[BelongsTo("RecipientId")]
+		public virtual Recipient Recipient { get; set;  }
 
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
@@ -232,7 +237,7 @@ ORDER BY {Payer}.shortname;";
 
 		public void CheckReciver()
 		{
-			if (Reciver == null)
+			if (Recipient == null)
 				throw new EndUserException(
 					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
 					              ShortName));

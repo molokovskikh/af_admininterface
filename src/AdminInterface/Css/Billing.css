@@ -1,3 +1,18 @@
+td.BillingInput
+{
+	width: 70%;
+}
+
+td.BillingInput input
+{
+	width: 99%;
+}
+
+td.BillingInput select
+{
+	width: 99%;
+}
+
 .BillingInput
 {
 	width: 99%;

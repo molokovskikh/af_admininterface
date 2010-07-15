@@ -152,6 +152,7 @@
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
+    <Compile Include="Controllers\RecipientController.cs" />
     <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -177,9 +178,9 @@
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\AccountingItem.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
+    <Compile Include="Models\Billing\Recipient.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
-    <Compile Include="Models\Billing\Reciver.cs" />
     <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
@@ -457,9 +458,11 @@
     <None Include="Views\Client\Info.brail" />
     <None Include="Views\Client\SearchClientSubview.brail" />
     <None Include="Views\Client\SuppliersForCostNoising.brail" />
+    <None Include="Views\Layouts\GeneralWithJQueryOnly.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
     <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
+    <None Include="Views\Recipient\Show.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />
     <None Include="Views\RegionalAdmin\Edit.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />

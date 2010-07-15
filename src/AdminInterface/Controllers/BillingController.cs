@@ -14,8 +14,6 @@ using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
-using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -51,7 +49,7 @@ namespace AdminInterface.Controllers
 				var message = ClientMessage.FindUserMessage(item.Id);
 				if ((message != null) && message.IsContainsNotShowedMessage())
 					countUsersWithMessages++;
-                usersMessages.Add(message);
+				usersMessages.Add(message);
 				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
 			}
 			foreach (var item in payer.GetAllAddresses())
@@ -73,13 +71,13 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
-			PropertyBag["recivers"] = Reciver.FindAll(Order.Asc("Name"));
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
-			//PropertyBag["ContactGroups"] = payer.ContactGroupOwner.ContactGroups;
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["TotalSum"] = payer.TotalSum;
+			var recipients = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+			PropertyBag["Recipients"] = recipients;
 
 			PropertyBag["Users"] = payer.GetAllUsers();
 			PropertyBag["Addresses"] = payer.GetAllAddresses();
@@ -143,16 +141,16 @@ namespace AdminInterface.Controllers
 																		Request.UserHostAddress);
 			var message = ClientMessage.Find(user.Id);
 			message.Message = clientMessage.Message;
-            message.ShowMessageCount = clientMessage.ShowMessageCount;
-            message.Update();
+			message.ShowMessageCount = clientMessage.ShowMessageCount;
+			message.Update();
 		}
 
 		public void UpdateClientStatus(uint clientId, bool enabled)
 		{
 			using(new TransactionScope())
 			{
-			    DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
-			                                                                   Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
+																			   Request.UserHostAddress);
 				var newStatus = enabled ? ClientStatus.On : ClientStatus.Off;
 				var client = Client.Find(clientId);
 				if (newStatus == ClientStatus.On && client.Status == ClientStatus.Off)
@@ -191,41 +189,41 @@ namespace AdminInterface.Controllers
 						address.Update();
 					}
 				}
-                user.Client.UpdateBeAccounted();
-                scope.VoteCommit();
+				user.Client.UpdateBeAccounted();
+				scope.VoteCommit();
 			}
 			CancelView();
-            CancelLayout();
+			CancelLayout();
 		}
 
-        public void UserAccounting(uint userId, bool accounted)
-        {
-            var user = User.Find(userId);
-            if (accounted)
-                user.RegisterInBilling();
-            else
-                user.UnregisterInBilling();
-            CancelView();
-            CancelLayout();
-        }
+		public void UserAccounting(uint userId, bool accounted)
+		{
+			var user = User.Find(userId);
+			if (accounted)
+				user.RegisterInBilling();
+			else
+				user.UnregisterInBilling();
+			CancelView();
+			CancelLayout();
+		}
 
-        public void AddressAccounting(uint addressId, bool accounted)
-        {
-            var address = Address.Find(addressId);
-            if (accounted)
-                address.RegisterInBilling();
-            else
-                address.UnregisterInBilling();
-            CancelView();
-            CancelLayout();
-        }
+		public void AddressAccounting(uint addressId, bool accounted)
+		{
+			var address = Address.Find(addressId);
+			if (accounted)
+				address.RegisterInBilling();
+			else
+				address.UnregisterInBilling();
+			CancelView();
+			CancelLayout();
+		}
 
 		public void SetAddressStatus(uint addressId, bool enabled, bool free)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-                    HttpContext.Current.Request.UserHostAddress);
+					HttpContext.Current.Request.UserHostAddress);
 				var address = Address.Find(addressId);
 				var oldStatus = address.Enabled;
 				if (enabled && !oldStatus)
@@ -233,19 +231,18 @@ namespace AdminInterface.Controllers
 				address.Enabled = enabled;
 				address.FreeFlag = free;
 				address.UpdateAndFlush();
-                address.Client.UpdateBeAccounted();
-                scope.VoteCommit();
+				address.Client.UpdateBeAccounted();
+				scope.VoteCommit();
 			}
 			CancelView();
-            CancelLayout();
+			CancelLayout();
 		}
 
 		public void Search()
 		{
-			var billingSearchProperties = new BillingSearchProperties
-			                              	{
-			                              		ClientStatus = SearchClientStatus.Enabled
-			                              	};
+			var billingSearchProperties = new BillingSearchProperties {
+				ClientStatus = SearchClientStatus.Enabled
+			};
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["FindBy"] = billingSearchProperties;
@@ -267,6 +264,7 @@ namespace AdminInterface.Controllers
 							string sortDirection,
 							string searchText,
 							ulong regionId,
+							uint recipientId,
 							PayerStateFilter payerState,
 							SearchSegment segment,
 							SearchClientType clientType,
@@ -278,6 +276,7 @@ namespace AdminInterface.Controllers
 				PayerState = payerState,
 				SearchText = searchText,
 				RegionId = regionId,
+				RecipientId = recipientId,
 				Segment = segment,
 				ClientStatus = clientStatus,
 				ClientType = clientType,
@@ -298,7 +297,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
-            [DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
+			[DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
 			using (new TransactionScope())
 				foreach (var instance in paymentInstances)
@@ -375,26 +374,26 @@ namespace AdminInterface.Controllers
 
 		public void SearchUsersForAddress(uint addressId, string searchText)
 		{
-            if (String.IsNullOrEmpty(searchText))
-                searchText = String.Empty;
-            var address = Address.Find(addressId);
-            var users = address.Client.Users.Where(user =>
-                ((!String.IsNullOrEmpty(user.Name) && user.Name.ToLower().Contains(searchText.ToLower())) || (user.Login.ToLower().Contains(searchText.ToLower()))) &&
-                (!address.AvaliableFor(user)));
-            PropertyBag["Users"] = users;
-            CancelLayout();
-        }
+			if (String.IsNullOrEmpty(searchText))
+				searchText = String.Empty;
+			var address = Address.Find(addressId);
+			var users = address.Client.Users.Where(user =>
+				((!String.IsNullOrEmpty(user.Name) && user.Name.ToLower().Contains(searchText.ToLower())) || (user.Login.ToLower().Contains(searchText.ToLower()))) &&
+				(!address.AvaliableFor(user)));
+			PropertyBag["Users"] = users;
+			CancelLayout();
+		}
 
-        public void SearchAddressesForUser(uint userId, string searchText)
+		public void SearchAddressesForUser(uint userId, string searchText)
 		{
 			if (String.IsNullOrEmpty(searchText))
 				searchText = String.Empty;
-            var user = User.Find(userId);
-            var addresses = user.Client.Addresses.Where(address => 
-                address.Value.ToLower().Contains(searchText.ToLower()) &&
-                !address.AvaliableFor(user));
-            PropertyBag["Addresses"] = addresses;
-            CancelLayout();
+			var user = User.Find(userId);
+			var addresses = user.Client.Addresses.Where(address => 
+				address.Value.ToLower().Contains(searchText.ToLower()) &&
+				!address.AvaliableFor(user));
+			PropertyBag["Addresses"] = addresses;
+			CancelLayout();
 		}
 
 		public void ConnectUserToAddress(uint userId, uint addressId)
@@ -405,8 +404,8 @@ namespace AdminInterface.Controllers
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Add(user);
 				address.Update();
-                address.Client.UpdateBeAccounted();
-                scope.VoteCommit();
+				address.Client.UpdateBeAccounted();
+				scope.VoteCommit();
 			}
 			CancelView();
 			CancelLayout();
@@ -420,8 +419,8 @@ namespace AdminInterface.Controllers
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Remove(user);
 				address.Update();
-                address.Client.UpdateBeAccounted();
-                scope.VoteCommit();
+				address.Client.UpdateBeAccounted();
+				scope.VoteCommit();
 			}
 			CancelView();
 			CancelLayout();
@@ -429,8 +428,8 @@ namespace AdminInterface.Controllers
 
 		public void TotalSum(uint payerId)
 		{
-            Response.Output.Write(Payer.Find(payerId).TotalSum.ToString());
-            CancelView();
+			Response.Output.Write(Payer.Find(payerId).TotalSum.ToString());
+			CancelView();
 			CancelLayout();
 		}
 

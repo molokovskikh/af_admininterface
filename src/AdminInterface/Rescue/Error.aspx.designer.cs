@@ -7,7 +7,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace AddUser {
+namespace AdminInterface.Rescue {
     
     
     public partial class Error {

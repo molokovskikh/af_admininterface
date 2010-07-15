@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
@@ -39,12 +41,14 @@ namespace AdminInterface.Models
 		Name,
 		Code,
 		BillingCode,
-		UserId,
+		UserId
 	}
 
 	public class BillingSearchProperties
 	{
 		public ulong RegionId { get; set; }
+
+		public uint RecipientId { get; set; }
 
 		public string SearchText { get; set; }
 
@@ -76,6 +80,11 @@ namespace AdminInterface.Models
 		public bool IsSearchByBillingCode()
 		{
 			return SearchBy == SearchBy.BillingCode;
+		}
+
+		public IList<Recipient> Recipients()
+		{
+			return Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
 		public Dictionary<object, string> GetClientTypeDescriptions()

@@ -14,7 +14,7 @@ def WriteHeader(text as string, columnName as string):
 		end
 	end
 	%>
-	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&regionId=${FindBy.RegionId}&searchText=${FindBy.SearchText}&payerState=${FindBy.PayerState}&segment=${FindBy.Segment}&clientType=${FindBy.ClientType}&clientStatus=${FindBy.ClientStatus}&searchBy=${FindBy.SearchBy}">
+	<a href="OrderBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&regionId=${FindBy.RegionId}&searchText=${FindBy.SearchText}&payerState=${FindBy.PayerState}&segment=${FindBy.Segment}&clientType=${FindBy.ClientType}&clientStatus=${FindBy.ClientStatus}&searchBy=${FindBy.SearchBy}&recipientId=${FindBy.RecipientId}">
 		${text}
 		<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortColumnName == columnName %>
 	</a>

@@ -140,6 +140,11 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 						break;
 				}
 
+				if (properties.RecipientId != 0)
+				{
+					debitorFilterBlock += " and p.RecipientId = " + properties.RecipientId;
+				}
+
 				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
 
 				var result = session.CreateSQLQuery(String.Format(@"
