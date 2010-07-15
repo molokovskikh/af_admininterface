@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using AdminInterface.Models.Billing;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 
@@ -956,6 +957,28 @@ namespace Functional
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.BillingInstance.ShortName)));
+			}
+		}
+
+		[Test]
+		public void Change_recipient_for_payer()
+		{
+			var recipients = Recipient.Queryable.ToList();
+			if (recipients.Count == 0)
+			{
+				new Recipient {
+					Name = "ООО «АналитФармация»"
+				}.Save();
+			}
+			var client = DataMother.CreateTestClientWithAddress();
+			using(var browser = Open("Billing/Edit.rails?billingCode="+ client.BillingInstance.Id))
+			{
+				browser.Link(Find.ByText("Отправка кореспонденции")).Click();
+				Assert.That(browser.SelectList("Recipient").SelectedItem, Is.Empty);
+				browser.SelectList("Recipient").Select("ООО «АналитФармация»");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				Assert.That(browser.SelectList("Recipient").SelectedItem, Is.EqualTo("ООО «АналитФармация»"));
 			}
 		}
 	}

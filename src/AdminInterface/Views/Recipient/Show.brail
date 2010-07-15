@@ -1,0 +1,62 @@
+﻿<script>
+	$(function() {
+		$("a.new").click(function() {
+			var index = $(".DataTable tbody").children().length - 1
+			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>")
+		})
+
+		$("a.delete").live('click', function() {
+			$(this).parents("tr").remove()
+		})	
+	})
+</script>
+<style>
+	input[type=text]
+	{
+		width: 400px;
+	}
+</style>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Получатели платежей
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Получатели платежей", "")]} %>
+
+<% if IsDefined("isUpdated"): %>
+<div class="flash notice">Сохранено.</div>
+<% end %>
+
+<% if recipients.Count ==  0: %>
+<table class="DataTable">
+	<tr>
+		<td class="EmptyData">
+			Нет ни одного получателя платежей. <a href="javascript:">Создать нового?</a>
+		</td>
+	</tr>
+</table>
+<% else: %>
+<form action="${siteroot}/recipient/update.rails" method="post">
+	<table class="DataTable" style="width:600px">
+		<tr>
+			<td>
+				<a class="new" href="javascript:">Новый</a>
+			</td>
+			<th>Наименование</th>
+		</tr>
+		<% for i, recipient in enumerate(recipients): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				<a class="delete" href="javascript:">Удалить</a>
+			</td>
+			<td>
+				${FormHelper.TextField("recipients[${i}].Name")}
+				${FormHelper.HiddenField("recipients[${i}].Id")}
+			</td>
+		</tr>
+		<% end %>
+	</table>
+	<p style="display:block; margin: 1em 0">
+		<input type="submit" value="Сохранить" />
+	</p>
+</form>
+<% end %>
