@@ -144,13 +144,13 @@ namespace Functional.ForTesting
 				};
 				client.Addresses = new List<Address> { address };
 				client.Update();
-				scope.VoteCommit();
 				client.Users[0].Name += client.Users[0].Id;
 				client.Users[0].UpdateAndFlush();
 				client.Addresses[0].Value += client.Addresses[0].Id;
 				client.Addresses[0].UpdateAndFlush();
 				client.Name += client.Id;
 				client.UpdateAndFlush();
+				client.Addresses.Single().MaitainIntersection();
 				scope.VoteCommit();
 				client.Refresh();
 			}

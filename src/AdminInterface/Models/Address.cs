@@ -266,34 +266,20 @@ WHERE
 		private void MoveAddressIntersection(uint newClientId)
 		{
 			ArHelper.WithSession(session => session.CreateSQLQuery(@"
-DROP TEMPORARY TABLE IF EXISTS Future.TempAddressIntersection;
-CREATE TEMPORARY TABLE Future.TempAddressIntersection 
-SELECT
-	i.Id AS OldIntersectionId,
-	newi.Id as NewIntersectionId,
-	ai.SupplierDeliveryId,
-	ai.ControlMinReq,
-	ai.MinReq
-FROM
-	Future.Intersection i
-	JOIN Future.addressintersection ai on i.Id = ai.IntersectionId
-	JOIN Future.Intersection newi on newi.ClientId = :NewClientId and newi.RegionId = i.regionId and newi.PriceId = i.priceid
-WHERE i.ClientId = :OldClientId
+insert into Future.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
+select :AddressId, ni.Id, ai.SupplierDeliveryId, ai.ControlMinReq, ai.MinReq
+from Future.Intersection ni
+left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId
+left join Future.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.AddressId = :AddressId
+where ni.ClientId = :NewClientId
 ;
 
-INSERT INTO Future.AddressIntersection(AddressId,IntersectionId,SupplierDeliveryId,ControlMinReq,MinReq)
-(SELECT
-	:AddressId, tmp.NewIntersectionId, tmp.SupplierDeliveryId, tmp.ControlMinReq, tmp.MinReq 
-FROM
-	Future.TempAddressIntersection AS tmp);
-
-DELETE
-FROM Future.AddressIntersection 
-WHERE 
-	AddressId = :AddressId AND 
-	IntersectionId IN (SELECT OldIntersectionId FROM Future.TempAddressIntersection);
-
-DROP TEMPORARY TABLE IF EXISTS Future.TempAddressIntersection;
+delete future.ai
+from Future.AddressIntersection ai
+join Future.Intersection i on i.Id = ai.IntersectionId
+where ai.AddressId = :AddressId
+and i.ClientId = :OldClientId
+;
 ")
 				.SetParameter("AddressId", Id)
 				.SetParameter("NewClientId", newClientId)
