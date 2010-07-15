@@ -34,8 +34,12 @@ namespace AdminInterface.Models.PrgData
 
 		public void FetchClient()
 		{
-			Client = User.TryFind(UserId).Client;
-			ClientCode = Client.Id;
+			var user = User.TryFind(UserId);
+			if (user != null)
+			{
+				Client = user.Client;
+				ClientCode = Client.Id;
+			}
 		}
 	}
 
