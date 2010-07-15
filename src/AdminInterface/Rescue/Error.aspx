@@ -1,4 +1,4 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.Error" CodeBehind="Error.aspx.cs" Theme="Main" %>
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AdminInterface.Rescue.Error" CodeBehind="Error.aspx.cs" %>
 
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 
