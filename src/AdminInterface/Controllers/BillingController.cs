@@ -26,18 +26,33 @@ namespace AdminInterface.Controllers
 	]
 	public class BillingController : ARSmartDispatcherController
 	{
+		[AccessibleThrough(Verb.Get)]
+		public void Edit(uint billingCode, string tab, uint currentJuridicalOrganizationId)
+		{
+			Edit(billingCode, 0, 0, 0, false, false, false, tab, null, null, currentJuridicalOrganizationId);
+		}
+
 		public void Edit(uint billingCode,
 			uint clientCode,
+			uint userId,
+			uint addressId,
 			bool showClients,
+			bool showAddresses,
+			bool showUsers,
 			string tab,
 			DateTime? paymentsFrom,
-			DateTime? paymentsTo)
+			DateTime? paymentsTo,
+			uint currentJuridicalOrganizationId)
 		{
 			Client client;
+
 			if (billingCode == 0)
 				client = Client.Find(clientCode);
 			else
 				client = Payer.Find(billingCode).Clients.First();
+
+			var user = (userId != 0) ? User.Find(userId) : client.Users.FirstOrDefault();
+			var address = (addressId != 0) ? Address.Find(addressId) : client.Addresses.FirstOrDefault();
 
 			var payer = client.BillingInstance;
 			var usersMessages = new List<ClientMessage>();
@@ -71,21 +86,26 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
+			PropertyBag["User"] = user;
+			PropertyBag["Address"] = address;
 			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["TotalSum"] = payer.TotalSum;
-			var recipients = Recipient.Queryable.OrderBy(r => r.Name).ToList();
-			PropertyBag["Recipients"] = recipients;
+			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
 			PropertyBag["Users"] = payer.GetAllUsers();
 			PropertyBag["Addresses"] = payer.GetAllAddresses();
+
+			if (currentJuridicalOrganizationId > 0)
+				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
 		}
 
-		public void Update([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance, 
-						   uint clientCode,
-						   string tab)
+		public void Update(
+			[ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance,
+			uint clientCode,
+			string tab)
 		{
 			using (new TransactionScope())
 			{
@@ -469,6 +489,57 @@ namespace AdminInterface.Controllers
 			PropertyBag["pageSize"] = pageSize;
 			PropertyBag["tab"] = tab;
 			PropertyBag["FindBy"] = SearchBy;
+		}
+
+		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)
+		{
+			var payer = Payer.Find(payerId);
+			PropertyBag["Payer"] = payer;
+			PropertyBag["tab"] = "juridicalOrganization";
+			PropertyBag["Addresses"] = payer.GetAllAddresses();
+			if (currentJuridicalOrganizationId > 0)
+				PropertyBag["currentJuridicalOrganization"] = JuridicalOrganization.Find(currentJuridicalOrganizationId);
+		}
+
+		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] JuridicalOrganization juridicalOrganization)
+		{
+			CancelLayout();
+			CancelView();
+			using (var scope = new TransactionScope())
+			{
+				var organization = JuridicalOrganization.Find(juridicalOrganization.Id);
+				organization.Name = juridicalOrganization.Name;
+				organization.FullName = juridicalOrganization.FullName;
+				organization.Inn = juridicalOrganization.Inn;
+				organization.Kpp = juridicalOrganization.Kpp;
+				organization.ReceiverAddress = juridicalOrganization.ReceiverAddress;
+				organization.Address = juridicalOrganization.Address;
+
+				organization.Update();
+				scope.VoteCommit();
+				Flash["Message"] = new Message("Сохранено");
+				var billingCode = organization.Payer.PayerID;
+				Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
+			}
+		}
+
+		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] JuridicalOrganization juridicalOrganization, uint payerId)
+		{
+			CancelLayout();
+			CancelView();
+
+			using (var scope = new TransactionScope())
+			{
+				var payer = Payer.Find(payerId);
+
+				juridicalOrganization.Payer = payer;
+				juridicalOrganization.CreateAndFlush();
+
+				scope.VoteCommit();
+
+				Flash["Message"] = new Message("Юридическое лицо создано");
+			}
+			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = juridicalOrganization.Id });
 		}
 	}
 }

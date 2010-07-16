@@ -403,5 +403,14 @@ DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 					reslt++;
 				});
 		}
+
+		public virtual void AddAddress(Address address)
+		{
+			if (Addresses == null)
+				Addresses = new List<Address>();
+			if (address.JuridicalOrganization == null)
+				address.JuridicalOrganization = BillingInstance.JuridicalOrganizations.Single();
+			Addresses.Add(address);
+		}
 	}
 }

@@ -1,13 +1,31 @@
 ﻿using System;
 using System.Configuration;
+using Castle.ActiveRecord;
 using NUnit.Framework;
 using WatiN.Core;
 
-namespace AdminInterface.Test.ForTesting
+namespace Functional.ForTesting
 {
 	[TestFixture]
 	public class WatinFixture
 	{
+		protected SessionScope scope;
+
+		[SetUp]
+		public void Setup()
+		{
+			scope = new SessionScope(FlushAction.Never);
+		}
+
+		[TearDown]
+		public void Teardown()
+		{
+			if (scope == null)
+				return;
+			scope.Dispose();
+			scope = null;
+		}
+
 		public static string BuildTestUrl(string urlPart)
 		{
 			return String.Format("http://localhost:{0}/{1}",

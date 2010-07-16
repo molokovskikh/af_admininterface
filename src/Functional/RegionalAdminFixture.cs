@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using AdminInterface.Models.Security;

@@ -1,6 +1,7 @@
-using System;
+Ôªøusing System;
 using System.Collections.Generic;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -18,11 +19,9 @@ namespace Functional.ForTesting
 				var client = CreateTestClient();
 				var address = new Address {
 					Client = client,
-					Value = "ÚÂÒÚÓ‚˚È ‡‰ÂÒ"
+					Value = "—Ç–µ—Å—Ç–æ–≤—ã–π –∞–¥—Ä–µ—Å"
 				};
-				client.Addresses = new List<Address> {
-					address
-				};
+				client.AddAddress(address);
 				client.Update();
 				scope.VoteCommit();
 				return client;
@@ -77,11 +76,17 @@ namespace Functional.ForTesting
 			{
 				var contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
+				var juridical = new JuridicalOrganization();
 				var payer = new Payer {
 					ShortName = "test",
 					ContactGroupOwner = contactOwner,
+					JuridicalOrganizations = new List<JuridicalOrganization> {
+						juridical
+					}
 				};
+				juridical.Payer = payer;
 				payer.Save();
+				juridical.Save();
 				contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
 				client = new Client {
@@ -128,8 +133,8 @@ namespace Functional.ForTesting
 		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
 		{
 			Client client;
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
+/*			using (var scope = new TransactionScope(/*OnDispose.Rollback‚ô•1‚ô•))
+			{*/
 				client = CreateTestClient(clientRegionMask);
 				var user = new User {
 					Client = client,
@@ -140,9 +145,10 @@ namespace Functional.ForTesting
 
 				var address = new Address {
 					Client = client,
-					Value = "ÚÂÒÚÓ‚˚È ‡‰ÂÒ"
+					Value = "—Ç–µ—Å—Ç–æ–≤—ã–π –∞–¥—Ä–µ—Å"
 				};
-				client.Addresses = new List<Address> { address };
+				client.AddAddress(address);
+				//client.Addresses = new List<Address> { address };
 				client.Update();
 				client.Users[0].Name += client.Users[0].Id;
 				client.Users[0].UpdateAndFlush();
@@ -151,9 +157,9 @@ namespace Functional.ForTesting
 				client.Name += client.Id;
 				client.UpdateAndFlush();
 				client.Addresses.Single().MaitainIntersection();
-				scope.VoteCommit();
-				client.Refresh();
-			}
+				/*scope.VoteCommit();*/
+//			}
+			client.Refresh();
 			return client;
 		}
 

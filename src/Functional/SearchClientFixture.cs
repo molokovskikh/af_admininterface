@@ -1,4 +1,5 @@
 ﻿using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 

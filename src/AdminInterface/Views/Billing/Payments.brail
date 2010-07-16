@@ -116,16 +116,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
             function(xhr, textStatus, error) { }
         );
     }
-    
-    function UserAccounting(userId, status) {
-        var link = "${siteroot}/Billing/UserAccounting.rails?userId=" + userId + "&accounted=" + status;
-        AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
-    }
 
-    function AddressAccounting(userId, status) {
-        var link = "${siteroot}/Billing/AddressAccounting.rails?addressId=" + userId + "&accounted=" + status;
-        AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
-    }
+	function UserAccounting(userId, status) {
+		var link = "${siteroot}/Billing/UserAccounting.rails?userId=" + userId + "&accounted=" + status;
+		AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+	}
+
+	function AddressAccounting(userId, status) {
+		var link = "${siteroot}/Billing/AddressAccounting.rails?addressId=" + userId + "&accounted=" + status;
+		AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+	}
 
     function RefreshTotalSum() {
         var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
@@ -146,14 +146,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         });
     }
 
-    function ShowErrorMessage(text) {
-        ShowElement(true, "#ErrorMessageDiv");
-        jQuery("#ErrorMessageDiv").html(text);
-    }
+	function ShowErrorMessage(text) {
+		ShowElement(true, "#ErrorMessageDiv");
+		jQuery("#ErrorMessageDiv").html(text);
+	}
 
-    function HideErrorMessage() {
-        ShowElement(false, "#ErrorMessageDiv");
-    }
+	function HideErrorMessage() {
+		ShowElement(false, "#ErrorMessageDiv");
+	}
 
 	function getInvertedDisplay(styleValue) {
 		if ((styleValue != null) && styleValue.toLowerCase().indexOf("display: none") != -1)
@@ -232,33 +232,49 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		}
 		jQuery("#EmailSubjectRow").css("display", "none");
 	}
+
+	function ShowJuridicalOrganization(id) {
+		$$(".tab").invoke("hide");
+		$$(".tabs ul li a.selected").first().removeClassName("selected");
+		$("juridicalOrganization-tab").show();
+		$("juridicalOrganization").addClassName("selected");
+
+		var elements = jQuery("div[id*='JuridicalOrganization']");
+		for (var i = 0; i < elements.size(); i++) {
+			if (jQuery("#" + elements[i].id).attr("class").indexOf("HideVisible") >= 0) {
+				jQuery("#" + elements[i].id).click();
+			}
+		}
+		if (jQuery("#JuridicalOrganization" + id + "Header").attr("class").indexOf("ShowHiden") >= 0)
+			jQuery("#JuridicalOrganization" + id + "Header").click();
+	}
 </script>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
 </div>
 
 <div class="left">
-    <font style="font-size:large;">
-    <table>
-        <tr>
-            <td><b>Всего к оплате: </b></td>
-            <td style="padding-left: 5px; padding-right: 5px;">
-                <b><div id="TotalSum"> ${TotalSum}</div></b>
-            </td>
-            <td>рублей</td>
-        </tr>
-    </table>
-    </font>
-    <br />
-    
+	<font style="font-size:large;">
+	<table>
+		<tr>
+			<td><b>Всего к оплате: </b></td>
+			<td style="padding-left: 5px; padding-right: 5px;">
+				<b><div id="TotalSum"> ${TotalSum}</div></b>
+			</td>
+			<td>рублей</td>
+		</tr>
+	</table>
+	</font>
+	<br />
+
 	<div style="width: 100%">
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
-<%          headerCssClass = "ShowHiden"
-            bodyCssClass = "hidden"
-            if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
-                headerCssClass = "HideVisible" 
-                bodyCssClass = "VisibleFolder"
-            end %>
+<%			headerCssClass = "ShowHiden"
+			bodyCssClass = "hidden"
+			if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
+				headerCssClass = "HideVisible" 
+				bodyCssClass = "VisibleFolder"
+			end %>
 			<div id="ClientListHeader" class="${headerCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
 				<a href="#" title="Клиенты плательщика '${Instance.ShortName}'">Клиенты плательщика "${Instance.ShortName}"</a>
 			</div>
@@ -367,9 +383,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
         </div>
 
         <div id="UserListBody" class="${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
+			<% if Instance.Clients.Count > 1: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
 			</div>
+			<% end %>
 			<br />
                 <div align="left">
                     <table class="DataTable" id="UsersTable" style="width:100%;">
@@ -433,54 +451,62 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
 			</div>
 			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
-						<div align="right">
+			<% if Instance.Clients.Count > 1: %>
+			<div align="right">
 				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
 			</div>
+			<% end %>
 			<br />
-					<div align="left">
-					    <table class="DataTable" id="AddressesTable" style="width:100%;">
-						    <tr align="center" valign="top">
-						        <th>Включен</th>
-						        <th>Учтен</th>
-						        <th>Работает бесплатно</th>
-							    <th>Адрес</th>
-								<th>Пользователи</th>
-							    <th>Клиент</th>
-						    </tr>
+				<div align="left">
+					<table class="DataTable" id="AddressesTable" style="width:100%;">
+						<tr align="center" valign="top">
+							<th>Включен</th>
+							<th>Учтен</th>
+							<th>Работает бесплатно</th>
+							<th>Адрес</th>
+							<th>Пользователи</th>
+							<th>Клиент</th>
+							<th>Юр. лицо</th>
+						</tr>
 <%                      for i,addr in enumerate(Addresses):
-                            hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
-                            <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
-                                align="center" name="Client${addr.Client.Id}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
-                                <td class="ShortWidthColumn">
+                        hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
+                        <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
+                            align="center" name="Client${addr.Client.Id}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
+                            <td class="ShortWidthColumn">
 <%                          if (addr.Client.IsClientActive()): %>
-                                    <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
-                                        onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
+                                <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
+                                    onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          else: %>
-                                    <input id="AddressStatus${addr.Id}" type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
-                                        onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
+                                <input id="AddressStatus${addr.Id}" type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
+                                    onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
 <%                          end %>
-                                </td>
-                                <td class="ShortWidthColumn">
-                                    <input type="checkbox" ${"checked" if addr.IsRegisteredInBilling} id="AddressAccountingStatusCheckBox${addr.Id}"
-                                        onclick="AddressAccounting(${addr.Id}, this.checked)" />
-                                </td>
-                                <td class="ShortWidthColumn">
-                                    <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
-                                        onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
-                                </td>
-                                <td>
-									<div id="AddressValue${addr.Id}" style="display: none;"><b>${addr.Value}</b></div>
-									<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>
+                            </td>
+                            <td class="ShortWidthColumn">
+                                <input type="checkbox" ${"checked" if addr.IsRegisteredInBilling} id="AddressAccountingStatusCheckBox${addr.Id}"
+                                    onclick="AddressAccounting(${addr.Id}, this.checked)" />
+                            </td>
+                            <td class="ShortWidthColumn">
+                                <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
+                                    onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
+                            </td>
+                            <td>
+								<div id="AddressValue${addr.Id}" style="display: none;"><b>${addr.Value}</b></div>
+								<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>
+							</td>
+							<td class="ShortWidthColumn"><a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/group.png" border="0" /></a></td>
+							<td>${addr.Client.Name}</td>
+								<td>
+								<% if (addr.JuridicalOrganization != null): %>
+									<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.JuridicalOrganization.Id})">${addr.JuridicalOrganization.Name}</a>
+								<% end %>
 								</td>
-								<td class="ShortWidthColumn"><a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/group.png" border="0" /></a></td>
-                                <td>${addr.Client.Name}</td>
-                            </tr>
-                            <tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
-								<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
-							</tr>
+                        </tr>
+                        <tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
+							<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
+						</tr>
 <%                      end %>
-                        </table>
-                    </div>
+                    </table>
+                </div>
             </div>
 		</div>
 

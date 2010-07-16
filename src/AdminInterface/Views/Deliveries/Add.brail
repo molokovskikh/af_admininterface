@@ -26,11 +26,20 @@
 			<h3>Адрес</h3>
 			<p><input name=delivery.value class="required" style="width: 100%;"></p>
 		</div>
-		
-        <div class="block">
-            <% OutputSubView("/SubViews/ContactInfo") %>		
-        </div>
-		
+
+		<div class="block">
+			<h3>Юридическое лицо</h3>
+			<select name="delivery.JuridicalOrganization.Id" style="width: 80%;">
+			<% for i,item in enumerate(client.BillingInstance.JuridicalOrganizations): %>
+				<option value="${item.Id}" ${"selected" if (i == 0)}>${item.Name}</option>
+			<% end %>
+			</select>
+		</div>
+
+		<div class="block">
+			<% OutputSubView("/SubViews/ContactInfo") %>
+		</div>
+
 		<div class=block>
 			<h3>Доступен пользователям</h3>
 			<div>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -118,6 +119,13 @@ namespace AdminInterface.Controllers
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;
 					AddContactsToClient(newClient, clientContacts);
+
+					var juridicalOrganization = new JuridicalOrganization();
+					juridicalOrganization.Payer = currentPayer;
+					juridicalOrganization.CreateAndFlush();
+
+					if (newClient.Addresses.Count > 0)
+						newClient.Addresses[0].JuridicalOrganization = juridicalOrganization;
 					newClient.SaveAndFlush();
 
 					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
@@ -406,21 +414,38 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["clientCode"] = clientCode;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 			PropertyBag["admin"] = SecurityContext.Administrator;
+
+			var client = Client.Find(clientCode);
+			PropertyBag["JuridicalOrganization"] = client.Addresses[0].JuridicalOrganization;
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
+			[DataBind("JuridicalOrganization")] JuridicalOrganization juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			uint clientCode,
 			bool showRegistrationCard)
 		{
-			if (String.IsNullOrEmpty(payer.Comment))
-				payer.Comment = paymentOptions.GetCommentForPayer();
-			else
-				payer.Comment += "\r\n" + paymentOptions.GetCommentForPayer();
-
-			payer.UpdateAndFlush();
-
 			var client = Client.Find(clientCode);
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				if (String.IsNullOrEmpty(payer.Comment))
+					payer.Comment = paymentOptions.GetCommentForPayer();
+				else
+					payer.Comment += "\r\n" + paymentOptions.GetCommentForPayer();
+				payer.UpdateAndFlush();
+
+				juridicalOrganization.Payer = payer;
+				juridicalOrganization.UpdateAndFlush();
+
+				if (client.Addresses.Count > 0)
+				{
+					client.Addresses[0].JuridicalOrganization = juridicalOrganization;
+					client.Addresses[0].UpdateAndFlush();
+				}
+
+				scope.VoteCommit();
+			}
 
 			_notificationService.SendNotificationToBillingAboutClientRegistration(client,
 				SecurityContext.Administrator.UserName,

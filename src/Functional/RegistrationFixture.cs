@@ -158,13 +158,13 @@ namespace Functional
 
 		private void ClickRegisterAndCheck(IE browser)
 		{
-			// Снимаем галку, чтобы не показывалась карта регистрации			
+			// Снимаем галку, чтобы не показывалась карта регистрации
 			browser.CheckBox("ShowRegistrationCard").Checked = false;
 			// Снимаем галку, чтобы не заполнять информацию для биллинга
 			if (browser.CheckBox("FillBillingInfo").Enabled)
 				browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно"));			
+			Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно"));
 		}
 
 		[Test]
@@ -667,6 +667,34 @@ namespace Functional
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button("RegisterButton").Click();
 				Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
+			}
+		}
+
+		[Test]
+		public void Register_client_with_payer_and_juridical_organization()
+		{
+			uint clientCode;
+
+			using (var browser = Open("Register/Register.rails"))
+			{
+				SetupGeneralInformation(browser, ClientType.Drugstore);
+				browser.CheckBox("ShowRegistrationCard").Checked = true;
+				browser.CheckBox("FillBillingInfo").Checked = true;
+
+				browser.Button(Find.ByValue("Зарегистрировать")).Click();
+
+				browser.TextField(Find.ByName("JuridicalOrganization.Name")).TypeText("TestJuridicalOrganizationName");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+			}
+
+			using (new SessionScope())
+			{
+				var client = Client.Find(clientCode);
+				Assert.That(client.BillingInstance.JuridicalOrganizations.Count, Is.EqualTo(1));
+				Assert.That(client.BillingInstance.JuridicalOrganizations[0].Name, Is.EqualTo("TestJuridicalOrganizationName"));
+				Assert.That(client.Addresses[0].JuridicalOrganization, Is.Not.Null);
 			}
 		}
 	}

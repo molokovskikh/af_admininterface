@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;

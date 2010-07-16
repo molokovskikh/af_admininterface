@@ -41,8 +41,11 @@ namespace AdminInterface.Models
 		[Property("Free")]
 		public bool FreeFlag { get; set; }
 
-        [Property]
-        public bool BeAccounted { get; set; }
+		[Property]
+		public bool BeAccounted { get; set; }
+
+		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
+		public JuridicalOrganization JuridicalOrganization { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
@@ -63,7 +66,7 @@ namespace AdminInterface.Models
 		public virtual bool AvaliableForEnabledUsers
 		{
 			get
-			{									
+			{
 				return (AvaliableForUsers.Where(user => user.Enabled && (user.Client.Status == ClientStatus.On)).Count() > 0);
 			}
 		}

@@ -127,11 +127,11 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool ShowDiscount { get; set; }
 
-		[BelongsTo("RecipientId")]
-		public virtual Recipient Recipient { get; set;  }
-
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
+
+		[HasMany(typeof(JuridicalOrganization), Lazy = true, Inverse = true, OrderBy = "Name")]
+		public virtual IList<JuridicalOrganization> JuridicalOrganizations { get; set; }
 
 		public virtual float ApplyDiscount(float sum)
 		{
@@ -237,10 +237,12 @@ ORDER BY {Payer}.shortname;";
 
 		public void CheckReciver()
 		{
+/*
 			if (Recipient == null)
 				throw new EndUserException(
 					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
 					              ShortName));
+*/
 		}
 
 		public Payment[] FindPayments(DateTime from, DateTime to)
