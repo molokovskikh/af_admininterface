@@ -346,8 +346,9 @@ group by u.ClientId")
 		{
 			ArHelper.WithSession(
 				s => {
-					var reslt = s.CreateSQLQuery(
-							@"
+					s.CreateSQLQuery(@"
+set @skip = 0;
+
 DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 CREATE TEMPORARY TABLE TempIntersection
 (
@@ -400,7 +401,6 @@ DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 ")
 							.SetParameter("clientId", Id)
 							.ExecuteUpdate();
-					reslt++;
 				});
 		}
 

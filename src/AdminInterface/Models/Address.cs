@@ -104,13 +104,25 @@ namespace AdminInterface.Models
 		{
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(@"
+set @skip = 1;
+
+insert into Future.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
+select i.ClientId, i.RegionId, i.PriceId, :legalEntityId, i.CostId, i.AvailableForClient, i.AgencyEnabled, i.PriceMarkup
+from Future.Intersection i
+left join Future.Intersection li on li.ClientId = i.ClientId and i.RegionId = li.RegionId and i.PriceId = li.PriceId and li.LegalEntityId = :legalEntityId
+where i.clientId = :clientId and li.Id is null;
+
 insert into Future.AddressIntersection(AddressId, IntersectionId)
 select a.Id, i.Id
 from Future.Intersection i
-	join Future.Addresses a on a.ClientId = i.ClientId
-	left join Future.AddressIntersection ai on ai.AddressId = a.Id and ai.IntersectionId = i.Id
-where a.Id = :addressId")
+	join Future.Addresses a on a.ClientId = i.ClientId and i.LegalEntityID = a.LegalEntityId
+where a.Id = :addressId
+;
+set @skip = 0;
+")
 					.SetParameter("addressId", Id)
+					.SetParameter("legalEntityId", JuridicalOrganization.Id)
+					.SetParameter("clientId", Client.Id)
 					.ExecuteUpdate();
 			});
 		}
