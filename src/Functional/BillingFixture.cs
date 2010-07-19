@@ -14,6 +14,12 @@ namespace Functional
 {
 	public class BillingFixture : WatinFixture
 	{
+		[SetUp]
+		public void Setup()
+		{
+			UseTestScope = true;
+		}
+
 		[Test]
 		public void Payers_should_be_searchable_throw_payer_id()
 		{

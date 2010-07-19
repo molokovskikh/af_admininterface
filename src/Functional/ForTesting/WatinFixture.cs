@@ -10,11 +10,13 @@ namespace Functional.ForTesting
 	public class WatinFixture
 	{
 		protected SessionScope scope;
+		protected bool UseTestScope;
 
 		[SetUp]
 		public void Setup()
 		{
-			scope = new SessionScope(FlushAction.Never);
+			if (UseTestScope)
+				scope = new SessionScope(FlushAction.Never);
 		}
 
 		[TearDown]

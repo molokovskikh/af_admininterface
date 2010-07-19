@@ -91,21 +91,21 @@
 
         <td>${item.WriteTime}</td>
 <%      if (item.Type.Equals(AdminInterface.Models.Billing.AccountingItemType.Address)):
-            payerId = item.Address.Client.BillingInstance.PayerID %>
+            payerId = item.Address.Client.Payer.Id %>
 
             <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
 			<td>${item.Client.HomeRegion.Name}</td>
-            <td>${item.Address.Client.BillingInstance.ShortName}</td>
+            <td>${item.Address.Client.Payer.ShortName}</td>
 			<td>${item.Client.Name}</td>
             <td>${BindingHelper.GetDescription(item.Type)}</td>
             <td>${item.Address.Value}</td>
             
 <%      elif (item.Type.Equals(AdminInterface.Models.Billing.AccountingItemType.User)):
-            payerId = item.User.Client.BillingInstance.PayerID %>
+            payerId = item.User.Client.Payer.Id %>
             
             <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
 			<td>${item.Client.HomeRegion.Name}</td>
-            <td>${item.User.Client.BillingInstance.ShortName}</td>
+            <td>${item.User.Client.Payer.ShortName}</td>
 			<td>${item.Client.Name}</td>
             <td>${BindingHelper.GetDescription(item.Type)}</td>
             <td>${item.User.GetLoginWithName()}</td>

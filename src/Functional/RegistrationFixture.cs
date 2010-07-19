@@ -245,7 +245,7 @@ namespace Functional
 					Assert.That(count, Is.GreaterThan(0));
 
 					command.CommandText = "select count(*) from future.Users where ClientId = ?ClientCode";
-                    var usersCount = Convert.ToUInt32(command.ExecuteScalar());
+					var usersCount = Convert.ToUInt32(command.ExecuteScalar());
 					Assert.That(usersCount, Is.EqualTo(1), "у клиента нет пользователей");
 
 					command.CommandText = "select Id from future.Users where ClientId = ?ClientCode";
@@ -254,7 +254,7 @@ namespace Functional
 					command.Parameters.AddWithValue("?UserId", userId);
 					count = Convert.ToUInt32(command.ExecuteScalar());
 					Assert.That(count, Is.GreaterThan(0));
-                });
+				});
 			}
 		}
 
@@ -289,9 +289,9 @@ namespace Functional
 				var firmCodeOnly = Convert.ToUInt32(command.ExecuteScalar());
 				Assert.That(firmCodeOnly, Is.EqualTo(testSupplierId));
 
-                command.CommandText = "select BillingCode from usersettings.ClientsData where FirmCode = ?FirmCode";
+				command.CommandText = "select BillingCode from usersettings.ClientsData where FirmCode = ?FirmCode";
 				command.Parameters.AddWithValue("?FirmCode", testSupplierId);
-                var billingCode = Convert.ToUInt32(command.ExecuteScalar());
+				var billingCode = Convert.ToUInt32(command.ExecuteScalar());
 				var client = Client.Find(clientcode);
 				Assert.That(client.BillingInstance.PayerID, Is.EqualTo(billingCode));
 

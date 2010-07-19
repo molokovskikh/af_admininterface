@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers
 	{
 		private readonly NotificationService _notificationService = new NotificationService();
 
-        [AccessibleThrough(Verb.Get)]
+		[AccessibleThrough(Verb.Get)]
 		public void Register()
 		{
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
@@ -50,8 +50,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = regions;
 		}
 
-        [AccessibleThrough(Verb.Post)]
-        public void RegisterClient([DataBind("client")]Client client, 
+		[AccessibleThrough(Verb.Post)]
+		public void RegisterClient([DataBind("client")]Client client, 
 			ulong homeRegion, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[DataBind("permissions")] UserPermission[] permissions, 
@@ -65,13 +65,13 @@ namespace AdminInterface.Controllers
 			[DataBind("userContacts")] Contact[] userContacts,
 			[DataBind("userPersons")] Person[] userPersons,
 			string additionalEmailsForSendingCard)
-        {
-        	ulong browseRegionMask = 0;
-        	ulong orderRegionMask = 0;
-        	User newUser = null;
+		{
+			ulong browseRegionMask = 0;
+			ulong orderRegionMask = 0;
+			User newUser = null;
 			Client newClient = null;
-        	var password = String.Empty;
-        	var trimSymbols = new[] {' '};
+			var password = String.Empty;
+			var trimSymbols = new[] {' '};
 
 			if (!String.IsNullOrEmpty(userName))
 				userName = userName.Replace("№", "N").Trim(trimSymbols);
@@ -89,44 +89,39 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				ArHelper.WithSession(s => {
-             		var connection = (MySqlConnection) s.Connection;
-             		var command = new MySqlCommand("", connection);
+					var connection = (MySqlConnection) s.Connection;
+					var command = new MySqlCommand("", connection);
 					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
 						HttpContext.Current.Request.UserHostAddress);
-             		newClient = new Client {
-         				Status = ClientStatus.On,
-         				Type = client.Type,
-         				FullName = client.FullName.Replace("№", "N").Trim(trimSymbols),
-         				Name = client.Name.Replace("№", "N").Trim(trimSymbols),
-         				HomeRegion = Region.Find(homeRegion),
-         				Segment = client.Segment,
-						MaskRegion = browseRegionMask,
-         				Registrant = SecurityContext.Administrator.UserName,
-         				RegistrationDate = DateTime.Now,						
-         			};
-             		newClient.AddDeliveryAddress(deliveryAddress);
 
 					Payer currentPayer = null;
 					if (additionalSettings.PayerExists)
 					{
-						if ((payer != null) || (existingPayerId.HasValue))
+						if (payer != null || existingPayerId.HasValue)
 						{
 							var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
 							currentPayer = Payer.Find(id);
 						}
 					}
+
+					newClient = new Client {
+						Status = ClientStatus.On,
+						Type = client.Type,
+						FullName = client.FullName.Replace("№", "N").Trim(trimSymbols),
+						Name = client.Name.Replace("№", "N").Trim(trimSymbols),
+						HomeRegion = Region.Find(homeRegion),
+						Segment = client.Segment,
+						MaskRegion = browseRegionMask,
+						Registrant = SecurityContext.Administrator.UserName,
+						RegistrationDate = DateTime.Now,
+					};
 					if (currentPayer == null)
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;
-					AddContactsToClient(newClient, clientContacts);
-
-					var juridicalOrganization = new JuridicalOrganization();
-					juridicalOrganization.Payer = currentPayer;
-					juridicalOrganization.CreateAndFlush();
-
-					if (newClient.Addresses.Count > 0)
-						newClient.Addresses[0].JuridicalOrganization = juridicalOrganization;
+					newClient.AddDeliveryAddress(deliveryAddress);
 					newClient.SaveAndFlush();
+
+					AddContactsToClient(newClient, clientContacts);
 
 					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
 					password = newUser.CreateInAd();
@@ -143,7 +138,7 @@ namespace AdminInterface.Controllers
 						newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
 					}
 					newClient.Addresses.Each(a => a.CreateFtpDirectory());
-             	});
+				});
 				scope.VoteCommit();
 			}
 			newUser.UpdateContacts(userContacts);
@@ -154,15 +149,15 @@ namespace AdminInterface.Controllers
 			if (!newClient.IsDrugstore())
 				Mailer.SupplierRegistred(newClient.Name, newClient.HomeRegion.Name);
 
-        	NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", newClient.FullName),
-        	                                           String.Format(
-        	                                           	"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-        	                                           	SecurityContext.Administrator.UserName,
-        	                                           	newClient.HomeRegion.Name,
-        	                                           	newUser.Login,
-        	                                           	newClient.Id,
-        	                                           	newClient.Segment.GetDescription(),
-        	                                           	newClient.Type.GetDescription()));
+			NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", newClient.FullName),
+													   String.Format(
+														"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+														SecurityContext.Administrator.UserName,
+														newClient.HomeRegion.Name,
+														newUser.Login,
+														newClient.Id,
+														newClient.Segment.GetDescription(),
+														newClient.Type.GetDescription()));
 			Session["DogN"] = newClient.BillingInstance.PayerID;
 			Session["Code"] = newClient.Id;
 			Session["Name"] = newClient.FullName;
@@ -177,7 +172,7 @@ namespace AdminInterface.Controllers
 				log = SendRegistrationCard(log, newClient, newUser, password, additionalEmailsForSendingCard);
 			log.Save();
 
-        	var sendBillingNotificationNow = true;
+			var sendBillingNotificationNow = true;
 			string redirectTo;
 			var virtualDir = Context.UrlInfo.AppVirtualDir;
 			if (!virtualDir.StartsWith("/"))
@@ -203,9 +198,9 @@ namespace AdminInterface.Controllers
 						SecurityContext.Administrator.UserName,
 						null, NotificationHelper.GetApplicationUrl());
 
-			Flash["Message"] = AdminInterface.Models.Message.Notify("Регистрация завершена успешно");
+			Flash["Message"] = Message.Notify("Регистрация завершена успешно");
 			RedirectToUrl(redirectTo);
-        }
+		}
 
 		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, Client client, User user, string password, string additionalEmails)
 		{
@@ -243,6 +238,14 @@ namespace AdminInterface.Controllers
 				ContactGroupOwner = contactGroupOwner,
 			};
 			payer.Save();
+
+			var organization = new JuridicalOrganization();
+			organization.Payer = payer;
+			organization.Name = client.Name;
+			organization.FullName = client.FullName;
+			payer.JuridicalOrganizations = new List<JuridicalOrganization> {organization};
+			organization.Save();
+
 			return payer;
 		}
 
@@ -302,58 +305,58 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 INSERT 
 INTO    regionaldata
-        (
-                regioncode, 
-                firmcode
-        )  
+		(
+				regioncode, 
+				firmcode
+		)  
 SELECT  DISTINCT regions.regioncode, 
-        clientsdata.firmcode  
+		clientsdata.firmcode  
 FROM (clientsdata, farm.regions, pricesdata)  
 	LEFT JOIN regionaldata ON regionaldata.firmcode = clientsdata.firmcode AND regionaldata.regioncode = regions.regioncode  
 WHERE   pricesdata.firmcode = clientsdata.firmcode  
-        AND clientsdata.firmcode = ?ClientCode  
-        AND (clientsdata.maskregion & regions.regioncode)>0  
-        AND regionaldata.firmcode is null; 
+		AND clientsdata.firmcode = ?ClientCode  
+		AND (clientsdata.maskregion & regions.regioncode)>0  
+		AND regionaldata.firmcode is null; 
 
 INSERT 
 INTO    pricesregionaldata
-        (
-                regioncode, 
-                pricecode
-        )  
+		(
+				regioncode, 
+				pricecode
+		)  
 SELECT  DISTINCT regions.regioncode, 
-        pricesdata.pricecode  
+		pricesdata.pricecode  
 FROM    (clientsdata, farm.regions, pricesdata, clientsdata as a)  
 LEFT JOIN pricesregionaldata 
-        ON pricesregionaldata.pricecode = pricesdata.pricecode 
-        AND pricesregionaldata.regioncode = regions.regioncode  
+		ON pricesregionaldata.pricecode = pricesdata.pricecode 
+		AND pricesregionaldata.regioncode = regions.regioncode  
 WHERE   pricesdata.firmcode = clientsdata.firmcode  
-        AND clientsdata.firmcode = ?ClientCode  
-        AND (clientsdata.maskregion & regions.regioncode)>0  
-        AND pricesregionaldata.pricecode is null; 
+		AND clientsdata.firmcode = ?ClientCode  
+		AND (clientsdata.maskregion & regions.regioncode)>0  
+		AND pricesregionaldata.pricecode is null; 
 
 
 INSERT 
 INTO    intersection
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode, 
-                invisibleonclient, 
-                InvisibleonFirm, 
-                costcode
-        )
+		(
+				ClientCode, 
+				regioncode, 
+				pricecode, 
+				invisibleonclient, 
+				InvisibleonFirm, 
+				costcode
+		)
 SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode,  
+		regions.regioncode, 
+		pricesdata.pricecode,  
 		if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-        a.invisibleonfirm,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
+		a.invisibleonfirm,
+		(
+		  SELECT costcode
+		  FROM    pricescosts pcc
+		  WHERE   basecost
+				  AND pcc.PriceCode = pricesdata.PriceCode
+		) as CostCode
 FROM pricesdata 
 	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
 		JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
@@ -362,7 +365,7 @@ FROM pricesdata
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmtype = 0
+		AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
 			command.Parameters.AddWithValue("?ClientCode", client.Id);
@@ -459,16 +462,16 @@ WHERE   intersection.pricecode IS NULL
 			RedirectToUrl(redirectUrl);
 		}
 
-        public void SearchPayers(string searchPattern)
-        {
+		public void SearchPayers(string searchPattern)
+		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-        	PropertyBag["payers"] = Payer.GetLikeAvaliable(searchPattern);
-            CancelLayout();
-        }
+			PropertyBag["payers"] = Payer.GetLikeAvaliable(searchPattern);
+			CancelLayout();
+		}
 
-        public void SearchSuppliers(string searchPattern, uint? payerId)
-        {
+		public void SearchSuppliers(string searchPattern, uint? payerId)
+		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
 			var suppliers = Supplier.FindAll()
@@ -479,8 +482,8 @@ WHERE   intersection.pricecode IS NULL
 				return;
 			if (payerId.HasValue && (payerId.Value > 0))
 				suppliers = suppliers.Where(item => item.BillingInstance.PayerID == payerId.Value);
-        	PropertyBag["suppliers"] = suppliers;
-            CancelLayout();
-        }
+			PropertyBag["suppliers"] = suppliers;
+			CancelLayout();
+		}
 	}
 }

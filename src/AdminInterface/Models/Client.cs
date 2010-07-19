@@ -111,6 +111,11 @@ WHERE FIrmType = 0 AND BillingCode = :PayerId")
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
+		public virtual Payer Payer
+		{
+			get { return BillingInstance; }
+		}
+
 		public virtual bool IsHiddenForProducer
 		{
 			get
@@ -320,7 +325,7 @@ group by u.ClientId")
 				Addresses = new List<Address>();
 			var delivery = new Address {Value = address, Enabled = true};
 			delivery.Client = this;
-			Addresses.Add(delivery);
+			AddAddress(delivery);
 		}
 
 		public virtual string GetHumanReadableType()
@@ -349,20 +354,19 @@ group by u.ClientId")
 					s.CreateSQLQuery(@"
 set @skip = 0;
 
-DROP TEMPORARY TABLE IF EXISTS TempIntersection;
-CREATE TEMPORARY TABLE TempIntersection
-(
-ClientId int unsigned,
-RegionId BIGINT(20),
-PriceId int unsigned,
-CostId int unsigned,
-AvailableForClient int unsigned
-) engine=MEMORY;
-INSERT 
-INTO TempIntersection
+INSERT
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	LegalEntityId,
+	CostId,
+	AvailableForClient
+)
 SELECT  DISTINCT drugstore.Id,
         regions.regioncode,
         pricesdata.pricecode,
+		:legalEntityId,
         (
           SELECT costcode
           FROM    pricescosts pcc
@@ -381,25 +385,9 @@ WHERE i.Id IS NULL
 	AND supplier.firmtype = 0
 	AND drugstore.Id = :clientId
 	AND drugstore.FirmType = 1;
-
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	CostId,
-	AvailableForClient
-)
-SELECT ClientId,
-	RegionId,
-	PriceId,
-	CostId,
-	AvailableForClient
-FROM TempIntersection;
-
-DROP TEMPORARY TABLE IF EXISTS TempIntersection;
 ")
 							.SetParameter("clientId", Id)
+							.SetParameter("legalEntityId", Payer.JuridicalOrganizations.Single().Id)
 							.ExecuteUpdate();
 				});
 		}
