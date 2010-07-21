@@ -2,7 +2,6 @@
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Security;
-using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -28,26 +27,21 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-				address.Client = client;
-				address.Enabled = true;
-				address.Save();
+				DbLogHelper.SetupParametersForTriggerLogging();
 
+				client.RegisterDeliveryAddress(address);
 				address.UpdateContacts(contacts);
-
+				address.Save();
 				address.MaitainIntersection();
-				address.CreateFtpDirectory();
-				client.Users.Each(u => address.SetAccessControl(u.Login));
-				client.UpdateBeAccounted();
+
 				scope.VoteCommit();
 			}
+
+			address.CreateFtpDirectory();
+			client.Users.Each(u => address.SetAccessControl(u.Login));
+
 			Mailer.DeliveryAddressRegistred(address);
-			var settings = DrugstoreSettings.Find(client.Id);
-			// Если клиент - это НЕ Сотрудник АК Инфорум и он не связан с плательщиком с кодом 921
-			// тогда отправляем уведомления поставщикам
-			if (!settings.ServiceClient && client.BillingInstance.PayerID != 921)
-				new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			Mailer.NotifySupplierAboutAddressRegistration(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}
@@ -84,8 +78,8 @@ namespace AdminInterface.Controllers
 		public void Notify(uint id)
 		{
 			var address = Address.Find(id);
-			new NotificationService().NotifySupplierAboutAddressRegistration(address);
-			Mailer.AddressRegistrationResened(address.Client, address.Value);
+			Mailer.NotifySupplierAboutAddressRegistration(address);
+			Mailer.AddressRegistrationResened(address);
 			Flash["Message"] = new Message("Уведомления отправлены");
 			RedirectToReferrer();
 		}

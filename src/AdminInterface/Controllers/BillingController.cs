@@ -210,6 +210,7 @@ namespace AdminInterface.Controllers
 					}
 				}
 				user.Client.UpdateBeAccounted();
+				user.Client.Save();
 				scope.VoteCommit();
 			}
 			CancelView();
@@ -242,16 +243,16 @@ namespace AdminInterface.Controllers
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				var address = Address.Find(addressId);
 				var oldStatus = address.Enabled;
 				if (enabled && !oldStatus)
 					Mailer.AddressBackToWork(address);
 				address.Enabled = enabled;
 				address.FreeFlag = free;
-				address.UpdateAndFlush();
 				address.Client.UpdateBeAccounted();
+				address.Client.Save();
+
 				scope.VoteCommit();
 			}
 			CancelView();
@@ -423,8 +424,9 @@ namespace AdminInterface.Controllers
 				var user = User.Find(userId);
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Add(user);
-				address.Update();
 				address.Client.UpdateBeAccounted();
+				address.Client.Save();
+
 				scope.VoteCommit();
 			}
 			CancelView();
@@ -433,13 +435,16 @@ namespace AdminInterface.Controllers
 
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(OnDispose.Commit))
 			{
 				var user = User.Find(userId);
 				var address = Address.Find(addressId);
+				var client = user.Client;
+
 				address.AvaliableForUsers.Remove(user);
-				address.Update();
-				address.Client.UpdateBeAccounted();
+				client.UpdateBeAccounted();
+				client.Save();
+
 				scope.VoteCommit();
 			}
 			CancelView();

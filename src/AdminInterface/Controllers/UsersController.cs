@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -17,13 +16,12 @@ using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
-using log4net;
 
 namespace AdminInterface.Controllers
 {
 	[
 	Helper(typeof(HttpUtility)),
-    Layout("NewDefault"),
+	Layout("NewDefault"),
 	Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class UsersController : SmartDispatcherController
@@ -42,6 +40,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["regions"] = regions;
+			PropertyBag["Organizations"] = client.Payer.JuridicalOrganizations;
 			PropertyBag["UserRegistration"] = true;
 		}
 
@@ -52,16 +51,18 @@ namespace AdminInterface.Controllers
 			bool sendClientCard, 
 			string mails,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			string deliveryAddress,
+			[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
 			[DataBind("persons")] Person[] persons)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
+			if (String.IsNullOrEmpty(address.Value))
+				address = null;
 			using(var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
+
 				user.Client = client;
 				user.Setup(client);
 				password = user.CreateInAd();
@@ -69,48 +70,32 @@ namespace AdminInterface.Controllers
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 				passwordChangeLog.Save();
-				while (true)
-				{
-					var index = 0;
-					try
-					{
-						client.Addresses.Each(a => a.SetAccessControl(user.Login));
-						break;
-					}
-					catch(Exception e)
-					{
-						LogManager.GetLogger(this.GetType()).Error("Ошибка при назначении прав, пробую еще раз", e);
-						index++;
-						Thread.Sleep(500);
-						if (index > 3)
-							break;
-					}
-				}
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
-				scope.VoteCommit();
-                user.Client.UpdateBeAccounted();
-                scope.VoteCommit();
-			}
-			Mailer.UserRegistred(user);
 
-			if (!String.IsNullOrEmpty(deliveryAddress))
-				using (var scope = new TransactionScope(OnDispose.Rollback))
+				if (address != null)
 				{
-					DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
-						HttpContext.Current.Request.UserHostAddress);
-					var address = new Address { Client = client, Enabled = true, Value = deliveryAddress };
-					address.AvaliableForUsers = new List<User> { user };
+					address = client.RegisterDeliveryAddress(address);
+					address.AvaliableForUsers = new List<User> {user};
 					address.Save();
 					address.MaitainIntersection();
-					address.CreateFtpDirectory();
-					client.Users.Each(u => address.SetAccessControl(u.Login));
-					scope.VoteCommit();
-					Mailer.DeliveryAddressRegistred(address);
-					var settings = DrugstoreSettings.Find(client.Id);
-					if (!settings.ServiceClient && client.BillingInstance.PayerID != 921)
-						new NotificationService().NotifySupplierAboutAddressRegistration(address);
 				}
+				client.Save();
+
+				scope.VoteCommit();
+			}
+
+			if (address != null)
+				address.CreateFtpDirectory();
+
+			client.Addresses.Each(a => a.SetAccessControl(user.Login));
+
+			Mailer.UserRegistred(user);
+			if (address != null)
+			{
+				Mailer.DeliveryAddressRegistred(address);
+				Mailer.NotifySupplierAboutAddressRegistration(address);
+			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);
@@ -169,7 +154,8 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AvaliableAddresses")] User user,
+		public void Update(
+			[ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AvaliableAddresses")] User user,
 			[DataBind("WorkRegions")] ulong[] workRegions, 
 			[DataBind("OrderRegions")] ulong[] orderRegions,
 			[DataBind("contacts")] Contact[] contacts,
@@ -177,23 +163,20 @@ namespace AdminInterface.Controllers
 			[DataBind("persons")] Person[] persons,
 			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-				ulong temp = 0;
-				workRegions.Each(r => { temp += r; });
-				user.WorkRegionMask = temp;
-				temp = 0;
-				orderRegions.Each(r => { temp += r; });
-				user.OrderRegionMask = temp;
+				DbLogHelper.SetupParametersForTriggerLogging();
+
+				user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
+				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 				user.UpdateContacts(contacts, deletedContacts);
 				user.UpdatePersons(persons, deletedPersons);
 				user.Update();
 				scope.VoteCommit();
-				Flash["Message"] = new Message("Сохранено");
-				RedirectUsingRoute("users", "Edit", new {login = user.Login});
 			}
+
+			Flash["Message"] = new Message("Сохранено");
+			RedirectUsingRoute("users", "Edit", new {login = user.Login});
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]

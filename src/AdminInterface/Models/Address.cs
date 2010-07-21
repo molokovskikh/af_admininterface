@@ -6,6 +6,7 @@ using System.Linq;
 #if !DEBUG
 using System.Security.AccessControl;
 #endif
+using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
@@ -155,47 +156,64 @@ set @skip = 0;
 
 		public void SetAccessControl(string username)
 		{
-#if !DEBUG
 			if (!ADHelper.IsLoginExists(username))
 				return;
-			var ftpRoot = ConfigurationManager.AppSettings["FtpRoot"];
-			var clientRoot = Path.Combine(ftpRoot, Id.ToString());
 
-			username = String.Format(@"ANALIT\{0}", username);
-			var rootDirectorySecurity = Directory.GetAccessControl(clientRoot);
-			rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
-				FileSystemRights.Read,
-				InheritanceFlags.ContainerInherit |
-					InheritanceFlags.ObjectInherit,
-				PropagationFlags.None,
-				AccessControlType.Allow));
-			rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
-				FileSystemRights.Write,
-				InheritanceFlags.ContainerInherit |
-					InheritanceFlags.ObjectInherit,
-				PropagationFlags.None,
-				AccessControlType.Allow));
-			rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
-				FileSystemRights.ListDirectory,
-				InheritanceFlags.ContainerInherit |
-					InheritanceFlags.ObjectInherit,
-				PropagationFlags.None,
-				AccessControlType.Allow));
-			Directory.SetAccessControl(clientRoot, rootDirectorySecurity);
-
-			var orders = Path.Combine(clientRoot, "Orders");
-			if (Directory.Exists(orders))
+			while (true)
 			{
-				var ordersDirectorySecurity = Directory.GetAccessControl(orders);
-				ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
-					FileSystemRights.DeleteSubdirectoriesAndFiles,
-					InheritanceFlags.ContainerInherit |
-						InheritanceFlags.ObjectInherit,
-					PropagationFlags.None,
-					AccessControlType.Allow));
-				Directory.SetAccessControl(orders, ordersDirectorySecurity);
-			}
+				var index = 0;
+				try
+				{
+#if !DEBUG
+					var ftpRoot = ConfigurationManager.AppSettings["FtpRoot"];
+					var clientRoot = Path.Combine(ftpRoot, Id.ToString());
+
+					username = String.Format(@"ANALIT\{0}", username);
+					var rootDirectorySecurity = Directory.GetAccessControl(clientRoot);
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.Read,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.Write,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.ListDirectory,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+					Directory.SetAccessControl(clientRoot, rootDirectorySecurity);
+
+					var orders = Path.Combine(clientRoot, "Orders");
+					if (Directory.Exists(orders))
+					{
+						var ordersDirectorySecurity = Directory.GetAccessControl(orders);
+						ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+							FileSystemRights.DeleteSubdirectoriesAndFiles,
+							InheritanceFlags.ContainerInherit |
+								InheritanceFlags.ObjectInherit,
+							PropagationFlags.None,
+							AccessControlType.Allow));
+						Directory.SetAccessControl(orders, ordersDirectorySecurity);
+					}
 #endif
+					break;
+				}
+				catch(Exception e)
+				{
+					LogManager.GetLogger(typeof(Address)).Error("Ошибка при назначении прав, пробую еще раз", e);
+					index++;
+					Thread.Sleep(500);
+					if (index > 3)
+						break;
+				}
+			}
 		}
 
 		private void AddContactGroup()
@@ -205,13 +223,13 @@ set @skip = 0;
 				var groupOwner = Client.ContactGroupOwner;
 				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
-				this.ContactGroup = group;
+				ContactGroup = group;
 			}
 		}
 
 		public virtual void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
 		{
-			if (this.ContactGroup == null)
+			if (ContactGroup == null)
 				AddContactGroup();
 			ContactGroup.UpdateContacts(displayedContacts, deletedContacts);
 		}

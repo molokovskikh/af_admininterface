@@ -209,6 +209,7 @@ namespace AdminInterface.Models
 		{
 			Setup();
 			AddPrices(client);
+			client.UpdateBeAccounted();
 		}
 
 		public virtual bool IsLocked

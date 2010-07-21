@@ -218,9 +218,9 @@ namespace Functional
 					.List());
 
 				var intersecionCount = Convert.ToUInt32(ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select count(*) from future.intersection where ClientId = :ClientId")
-                    .SetParameter("ClientId", client.Id)
-                    .UniqueResult()));
+					s.CreateSQLQuery("select count(*) from future.intersection where ClientId = :ClientId")
+					.SetParameter("ClientId", client.Id)
+					.UniqueResult()));
 				Assert.That(result.Count, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
 				Assert.That(result.Count, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
 			}
@@ -250,7 +250,7 @@ namespace Functional
 					s.CreateSQLQuery("SELECT count(*) FROM `logs`.clientsinfo where ClientCode = :id and UserId is not null")
 						.SetParameter("id", client.Id)
 						.UniqueResult()));
-				Assert.IsTrue(count == 1);				
+				Assert.IsTrue(count == 1);
 			}
 		}
 
@@ -396,7 +396,7 @@ namespace Functional
 				client = Client.Find(client.Id);
 				group = client.Users[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-				            "Не совпадают Id владельца группы у клиента и у новой группы");
+							"Не совпадают Id владельца группы у клиента и у новой группы");
 			}
 			// Проверка, что контактные записи создались в БД
 			ContactInformationFixture.CheckContactGroupInDb(group);
@@ -711,7 +711,7 @@ namespace Functional
 				browser.Link(Find.ByText("Новый пользователь")).Click();
 				browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
 				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
 			}
@@ -743,7 +743,7 @@ namespace Functional
 				browser.Link("addPersonLink" + client.Id).Click();
 				browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
 				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
 				using (new SessionScope())
@@ -767,7 +767,7 @@ namespace Functional
 				browser.Link("addPersonLink" + client.Id).Click();
 				browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("deliveryAddress")).TypeText("TestAddress");
+				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
 				using (new SessionScope())
 				{

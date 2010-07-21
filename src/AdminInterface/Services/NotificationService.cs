@@ -51,6 +51,9 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
+			if (address.Client.Settings.ServiceClient || address.Client.Payer.Id == 921)
+				return;
+
 			var client = address.Client;
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)

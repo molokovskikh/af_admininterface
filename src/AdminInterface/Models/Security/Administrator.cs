@@ -59,11 +59,6 @@ namespace AdminInterface.Models.Security
 			Lazy = false)]
 		public IList<Permission> AllowedPermissions { get; set; }
 
-		public string GetUserHost()
-		{
-			return HttpContext.Current.Request.UserHostAddress;
-		}
-
 		public static Administrator GetByName(string name)
 		{
 			return ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));

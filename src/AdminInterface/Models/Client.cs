@@ -96,6 +96,9 @@ WHERE FIrmType = 0 AND BillingCode = :PayerId")
 		[Property]
 		public virtual UInt64 MaskRegion { get; set; }
 
+		[OneToOne]
+		public virtual DrugstoreSettings Settings { get; set; }
+
 		[BelongsTo("ContactGroupOwnerId")]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
@@ -129,7 +132,7 @@ WHERE FIrmType = 0 AND BillingCode = :PayerId")
 			{
 				if (!IsDrugstore())
 					return;
-                var val = value ? 2 : 0;
+				var val = value ? 2 : 0;
 				var drugstore = DrugstoreSettings.Find(Id);
 				var tmp = drugstore.InvisibleOnFirm == DrugstoreType.Hidden;				
 				if (tmp != value)
@@ -214,11 +217,11 @@ where
 		{
 			if (Type == ClientType.Drugstore)
 				return Build(GetContactGroup(ContactGroupType.General),
-				             GetContactGroup(ContactGroupType.OrderManagers));
+							 GetContactGroup(ContactGroupType.OrderManagers));
 
 			return Build(GetContactGroup(ContactGroupType.General),
-			             GetContactGroup(ContactGroupType.OrderManagers),
-			             GetContactGroup(ContactGroupType.ClientManagers));
+						 GetContactGroup(ContactGroupType.OrderManagers),
+						 GetContactGroup(ContactGroupType.ClientManagers));
 		}
 
 		public virtual ContactGroup GetContactGroup(ContactGroupType type)
@@ -333,21 +336,25 @@ group by u.ClientId")
 			return BindingHelper.GetDescription(Type);
 		}
 
-        public virtual void UpdateBeAccounted()
-        {
-            var users = Users.Where(user => user.Enabled && !user.IsFree);
-            var index = 0;
-            foreach (var address in Addresses)
-            {
-                if (!address.Enabled || address.IsFree)
-                    address.BeAccounted = false;
-                else
-                    address.BeAccounted = index++ >= users.Count();
-                address.UpdateAndFlush();
-            }
-        }
+		public virtual void UpdateBeAccounted()
+		{
+			if (Addresses == null)
+				Addresses = new List<Address>();
+			if (Users == null)
+				Users = new List<User>();
 
-	    public virtual void MaintainIntersection()
+			var users = Users.Where(user => user.Enabled && !user.IsFree);
+			var index = 0;
+			foreach (var address in Addresses)
+			{
+				if (!address.Enabled || address.IsFree)
+					address.BeAccounted = false;
+				else
+					address.BeAccounted = index++ >= users.Count();
+			}
+		}
+
+		public virtual void MaintainIntersection()
 		{
 			ArHelper.WithSession(
 				s => {
@@ -364,15 +371,15 @@ INTO Future.Intersection (
 	AvailableForClient
 )
 SELECT  DISTINCT drugstore.Id,
-        regions.regioncode,
-        pricesdata.pricecode,
+		regions.regioncode,
+		pricesdata.pricecode,
 		:legalEntityId,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode,
+		(
+		  SELECT costcode
+		  FROM    pricescosts pcc
+		  WHERE   basecost
+				  AND pcc.PriceCode = pricesdata.PriceCode
+		) as CostCode,
 		if(pricesdata.PriceType = 0, 1, 0) as AvailableForClient
 FROM Future.Clients as drugstore
 	JOIN retclientsset as a ON a.clientcode = drugstore.Id
@@ -399,6 +406,21 @@ WHERE i.Id IS NULL
 			if (address.JuridicalOrganization == null)
 				address.JuridicalOrganization = BillingInstance.JuridicalOrganizations.Single();
 			Addresses.Add(address);
+		}
+
+		public virtual Address RegisterDeliveryAddress(string address)
+		{
+			return RegisterDeliveryAddress(new Address {Value = address});
+		}
+
+		public virtual  Address RegisterDeliveryAddress(Address address)
+		{
+			address.Client = this;
+			address.Enabled = true;
+			Addresses.Add(address);
+
+			UpdateBeAccounted();
+			return address;
 		}
 	}
 }

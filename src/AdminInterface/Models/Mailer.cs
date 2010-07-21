@@ -4,6 +4,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using AdminInterface.Models.Security;
+using AdminInterface.Services;
 
 namespace AdminInterface.Models
 {
@@ -70,8 +71,9 @@ Email: {2}
 				"RegisterList@subscribe.analit.net");
 		}
 
-		public static void AddressRegistrationResened(Client client, string address)
+		public static void AddressRegistrationResened(Address address)
 		{
+			var client = address.Client;
 			Func.Mail("register@analit.net",
 				"Разослано повторное уведомление о регистрации адреса",
 				String.Format(
@@ -86,7 +88,7 @@ Email: {2}
 					client.Name,
 					client.FullName,
 					client.HomeRegion.Name,
-					address),
+					address.Value),
 				"RegisterList@subscribe.analit.net");
 		}
 
@@ -215,6 +217,11 @@ Email: {2}
 		public static void SendMessageFromBillingToClient(Client client, string text, string subject)
 		{
 			Func.Mail("billing@analit.net", subject, text, client.GetEmailsForBilling());
+		}
+
+		public static void NotifySupplierAboutAddressRegistration(Address address)
+		{
+			new NotificationService().NotifySupplierAboutAddressRegistration(address);
 		}
 	}
 }

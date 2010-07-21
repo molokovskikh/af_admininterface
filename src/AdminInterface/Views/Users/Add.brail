@@ -63,10 +63,14 @@
             <table border="0" width="100%" cellpadding="3" cellspacing="0">
                 <tr>
                     <td width="20%">Адрес доставки медикаментов:</td>
-                    <td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
-                </tr>                    
-            </table>            
-        </div>		
+                    <td width="80%"><input type="text" id="deliveryAddress" name="address.Value" style="width: 60%" /></td>
+                </tr>
+				<tr>
+					<td wisth="20%">Юридическое лицо</td>
+					<td>${FormHelper.Select("address.JuridicalOrganization.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
+				<tr/>
+            </table>
+        </div>
 		
 		<div class=block>
 			<h3>Доступ к адресам доставки</h3>
