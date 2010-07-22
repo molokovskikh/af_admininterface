@@ -167,12 +167,11 @@ namespace AdminInterface.Controllers
 		public void SuppliersForCostNoising(uint clientId)
 		{
 			CancelLayout();
-			var client = Client.Find(clientId);
-			var drugstoreSetting = Models.DrugstoreSettings.Find(clientId);
+			var client = Client.FindAndCheck(clientId);
 			var suppliers = Supplier.GetByPayerId(client.BillingInstance.PayerID);
-			Flash["suppliers"] = suppliers;
-			if (drugstoreSetting.FirmCodeOnly.HasValue)
-				Flash["FirmCodeOnly"] = drugstoreSetting.FirmCodeOnly;
+			PropertyBag["suppliers"] = suppliers;
+			if (client.Settings.FirmCodeOnly.HasValue)
+				PropertyBag["FirmCodeOnly"] = client.Settings.FirmCodeOnly;
 		}
 
 		[AccessibleThrough(Verb.Post)]
