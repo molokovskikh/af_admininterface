@@ -15,7 +15,6 @@
     <siteMapNode url="statcont.aspx" title="Статистика обращений" />
 		<siteMapNode url="viewcl.aspx" title="Статистика" />
 		<siteMapNode url="ViewAdministrators.aspx" title="Региональные администраторы">
-      <siteMapNode url="EditAdministrator.aspx" title="Редактирование регионального администратора" />
     </siteMapNode>
   </siteMapNode>
 </siteMap>
