@@ -277,6 +277,7 @@ namespace Functional
 				browser.TextField(Find.ById("SearchSupplierTextPattern")).TypeText(supplier.Name.ToLower());
 				browser.Button(Find.ById("SearchSupplierButton")).Click();
 				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining(supplier.Name), "не нашли поставщика");
 				browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
 				Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
 

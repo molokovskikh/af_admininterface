@@ -114,6 +114,7 @@ namespace AdminInterface.Test.ForTesting
 
 		public static uint GetClientCodeFromRegistrationCard(IE browser)
 		{
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 

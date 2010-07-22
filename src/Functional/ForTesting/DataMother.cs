@@ -133,8 +133,8 @@ namespace Functional.ForTesting
 		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
 		{
 			Client client;
-/*			using (var scope = new TransactionScope(/*OnDispose.Rollback♥1♥))
-			{*/
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
 				client = CreateTestClient(clientRegionMask);
 				var user = new User {
 					Client = client,
@@ -157,8 +157,8 @@ namespace Functional.ForTesting
 				client.Name += client.Id;
 				client.UpdateAndFlush();
 				client.Addresses.Single().MaitainIntersection();
-				/*scope.VoteCommit();*/
-//			}
+				scope.VoteCommit();
+			}
 			client.Refresh();
 			return client;
 		}
@@ -167,12 +167,20 @@ namespace Functional.ForTesting
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var payer = new Payer {ShortName = "test",};
+				var juridicalOrganization = new JuridicalOrganization();
+				var payer = new Payer {
+					ShortName = "test",
+					JuridicalOrganizations = new List<JuridicalOrganization> {
+						juridicalOrganization
+					}
+				};
+				juridicalOrganization.Payer = payer;
 				payer.Save();
+				juridicalOrganization.Save();
 				var supplier = new Supplier {
-                    BillingInstance = payer,
-                    HomeRegion = Region.FindAll().Last(),
-                    Name = "Test supplier",
+					BillingInstance = payer,
+					HomeRegion = Region.FindAll().Last(),
+					Name = "Test supplier",
 					Status = ClientStatus.On
 				};
 				supplier.Create();

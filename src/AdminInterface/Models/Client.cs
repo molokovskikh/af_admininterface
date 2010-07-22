@@ -51,18 +51,14 @@ namespace AdminInterface.Models
 		[BelongsTo("BillingCode")]
 		public virtual Payer BillingInstance { get; set; }
 
+		public virtual Payer Payer
+		{
+			get { return BillingInstance; }
+		}
+
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
-			var ids = ArHelper.WithSession(session => session.CreateSQLQuery(@"
-SELECT FirmCode
-FROM usersettings.ClientsData
-WHERE FIrmType = 0 AND BillingCode = :PayerId")
-						   .SetParameter("PayerId", payerId)
-						   .List());
-			var suppliers = new List<Supplier>(ids.Count);
-			foreach (var id in ids)
-				suppliers.Add(Supplier.Find(id));
-			return suppliers;
+			return Queryable.Where(p => p.BillingInstance.Id == payerId).ToList();
 		}
 	}
 
