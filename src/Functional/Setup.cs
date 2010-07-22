@@ -3,6 +3,7 @@ using System.IO;
 using AdminInterface.Test.ForTesting;
 using Microsoft.VisualStudio.WebHost;
 using NUnit.Framework;
+using WatiN.Core;
 
 namespace Functional
 {
@@ -21,6 +22,8 @@ namespace Functional
 
 			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
 			_webServer.Start();
+			Settings.Instance.AutoMoveMousePointerToTopLeft = false;
+			Settings.Instance.MakeNewIeInstanceVisible = false;
 		}
 
 		[TearDown]
