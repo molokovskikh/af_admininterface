@@ -85,7 +85,6 @@ ORDER BY WriteTime DESC", SecurityContext.Administrator.GetClientFilterByType("c
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			StateHelper.CheckSession(this, ViewState);
 			SecurityContext.Administrator.CheckAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore);
 
 			if (IsPostBack) 

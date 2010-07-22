@@ -230,7 +230,6 @@
     <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ReportHelper.cs" />
     <Compile Include="Helpers\ShowRegulationHelper.cs" />
-    <Compile Include="Helpers\StateHelper.cs" />
     <Compile Include="Helpers\ViewHelper.cs" />
     <Compile Include="Main.Master.cs">
       <DependentUpon>Main.Master</DependentUpon>
@@ -260,13 +259,6 @@
     </Compile>
     <Compile Include="CopySynonym.aspx.designer.cs">
       <DependentUpon>CopySynonym.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="EditAdministrator.aspx.cs">
-      <DependentUpon>EditAdministrator.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="EditAdministrator.aspx.designer.cs">
-      <DependentUpon>EditAdministrator.aspx</DependentUpon>
     </Compile>
     <Compile Include="EditRegionalInfo.aspx.cs">
       <DependentUpon>EditRegionalInfo.aspx</DependentUpon>
@@ -338,13 +330,6 @@
     <Compile Include="Rescue\NotAuthorized.aspx.designer.cs">
       <DependentUpon>NotAuthorized.aspx</DependentUpon>
     </Compile>
-    <Compile Include="searchc.aspx.cs">
-      <DependentUpon>searchc.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="searchc.aspx.designer.cs">
-      <DependentUpon>searchc.aspx</DependentUpon>
-    </Compile>
     <Compile Include="SenderProperties.aspx.cs">
       <DependentUpon>SenderProperties.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -368,17 +353,9 @@
     <Compile Include="ViewAdministrators.aspx.designer.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
     </Compile>
-    <Compile Include="viewcl.aspx.cs">
-      <DependentUpon>viewcl.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="viewcl.aspx.designer.cs">
-      <DependentUpon>viewcl.aspx</DependentUpon>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
-    <Content Include="EditAdministrator.aspx" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
@@ -389,10 +366,8 @@
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
     <Content Include="report.aspx" />
-    <Content Include="searchc.aspx" />
     <Content Include="statcont.aspx" />
     <Content Include="ViewAdministrators.aspx" />
-    <Content Include="viewcl.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />

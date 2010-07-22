@@ -211,11 +211,6 @@ WHERE PriceCode = ?Id", connection);
 				Response.Redirect("~/Rescue/NotAllowed.aspx");
 				return;
 			}
-			if (exception.InnerException is SessionOutDateException)
-			{
-				Response.Redirect("~/default.aspx");
-				return;
-			}
 
 			var builder = new StringBuilder();
 			builder.AppendLine("----UrlReferer-------");

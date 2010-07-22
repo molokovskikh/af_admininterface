@@ -25,7 +25,6 @@ namespace AdminInterface
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
-			StateHelper.CheckSession(this, ViewState);
 			SecurityContext
 				.Administrator
 				.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);

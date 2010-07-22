@@ -128,7 +128,6 @@
     <Compile Include="UserFixture.cs" />
     <Compile Include="UserSearchFixture.cs" />
     <Compile Include="ViewAdministratorsFixture.cs" />
-    <Compile Include="ViewclFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

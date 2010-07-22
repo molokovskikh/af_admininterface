@@ -21,20 +21,19 @@ public partial class EditRegionalInfo : Page
 		set { Session["ClientCode"] = value; }
 	}
 	
-    protected void Page_Load(object sender, EventArgs e)
-    {
-		StateHelper.CheckSession(this, ViewState);
+	protected void Page_Load(object sender, EventArgs e)
+	{
 		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageSuppliers, PermissionType.ViewSuppliers);
 		
 		if (IsPostBack)
 			return;
 		int regionalSettingsCode;
-    	if (!int.TryParse(Request["id"], out regionalSettingsCode))
-    		throw new ArgumentException(string.Format("Не верный аргумент id = {0}", Request["id"]), "id");
+		if (!int.TryParse(Request["id"], out regionalSettingsCode))
+			throw new ArgumentException(string.Format("Не верный аргумент id = {0}", Request["id"]), "id");
 
-    	_regionalSettingsCode = regionalSettingsCode;
-    	BindData();
-    }
+		_regionalSettingsCode = regionalSettingsCode;
+		BindData();
+	}
 
 	private void BindData()
 	{	
