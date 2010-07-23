@@ -320,11 +320,11 @@ group by u.ClientId")
 
 		public virtual void AddDeliveryAddress(string address)
 		{
-			if (Addresses == null)
-				Addresses = new List<Address>();
-			var delivery = new Address {Value = address, Enabled = true};
-			delivery.Client = this;
-			AddAddress(delivery);
+			AddAddress(new Address {
+				Value = address,
+				Enabled = true,
+				Client = this
+			});
 		}
 
 		public virtual string GetHumanReadableType()

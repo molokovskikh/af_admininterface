@@ -369,7 +369,7 @@ WHERE   intersection.pricecode IS NULL
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
 			command.Parameters.AddWithValue("?ClientCode", client.Id);
-			command.ExecuteNonQuery();			
+			command.ExecuteNonQuery();
 		}
 
 		private User CreateUser(Client client, string userName, UserPermission[] permissions,
@@ -385,16 +385,16 @@ WHERE   intersection.pricecode IS NULL
 				SendRejects = true,
 				SendWaybills = true,
 			};
-			if ((permissions != null) && (permissions.Count() > 0))
+			if (permissions != null && permissions.Count() > 0)
 			{
 				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
+			client.Users = new List<User> {user};
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
 			user.SaveAndFlush();
-			client.Users = new List<User> { user };
 			return user;
 		}		
 
