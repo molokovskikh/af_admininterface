@@ -30,8 +30,8 @@ namespace AdminInterface.Controllers
 			}
 			else if (clientId.HasValue)
 			{
-                var client = Client.Find(clientId.Value);
-                var drugstore = DrugstoreSettings.Find(clientId.Value);
+				var client = Client.Find(clientId.Value);
+				var drugstore = DrugstoreSettings.Find(clientId.Value);
 
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region =>
@@ -46,17 +46,17 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-        public void DefaultRegions(ulong homeRegionId)
-        {
-            var homeRegion = Region.Find(homeRegionId);
-            var regions = Region.FindAll()
-                .Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
-                .OrderBy(region => region.Name)
-                .ToArray();
-            PropertyBag["regions"] = regions;
+		public void DefaultRegions(ulong homeRegionId)
+		{
+			var homeRegion = Region.Find(homeRegionId);
+			var regions = Region.FindAll()
+				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
+				.OrderBy(region => region.Name)
+				.ToArray();
+			PropertyBag["regions"] = regions;
 			PropertyBag["homeRegionId"] = homeRegion.Id;
 			CancelLayout();
-        }
+		}
 
 		public void DefaultRegions(ulong homeRegionId, uint clientId)
 		{
