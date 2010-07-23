@@ -127,7 +127,6 @@
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="UserFixture.cs" />
     <Compile Include="UserSearchFixture.cs" />
-    <Compile Include="ViewAdministratorsFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

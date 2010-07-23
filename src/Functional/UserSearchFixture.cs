@@ -152,16 +152,16 @@ from billing.Payers
 		[Test]
 		public void SearchWithFilterByRegion()
 		{
-            using (var browser = Open("UserSearch/Search.rails"))
-            {
-            	browser.SelectList(Find.ByName("SearchBy.RegionId")).Select("Воронеж");
+			using (var browser = Open("UserSearch/Search.rails"))
+			{
+				browser.SelectList(Find.ByName("SearchBy.RegionId")).Select("Воронеж");
 				browser.Button(Find.ByValue("Поиск")).Click();
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
 				foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
 				{
 					Assert.That(row.TableCells[6].Text, Is.EqualTo("Воронеж"));
 				}
-            }
+			}
 		}
 
 		[Test]
@@ -275,9 +275,10 @@ from billing.Payers
 		[Test]
 		public void Autosearch_by_contact_phone()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Client client;
 			using (new SessionScope())
-			{				
+			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-124578", client.Id.ToString().Substring(0, 4))));
 			}
@@ -293,9 +294,10 @@ from billing.Payers
 		[Test]
 		public void Autosearch_by_contact_email()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Client client;
 			using (new SessionScope())
 			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
 			}
@@ -311,11 +313,13 @@ from billing.Payers
 		[Test]
 		public void Autosearch_by_person()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (new SessionScope())
+			Client client;
+			using (var transaction = new TransactionScope(OnDispose.Rollback))
 			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
+				transaction.VoteCommit();
 			}
 			using (var browser = Open("UserSearch/Search.rails"))
 			{
@@ -329,9 +333,10 @@ from billing.Payers
 		[Test]
 		public void Search_by_contact_email()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Client client;
 			using (new SessionScope())
 			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
 			}
@@ -348,9 +353,10 @@ from billing.Payers
 		[Test]
 		public void Search_by_contact_phone()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Client client;
 			using (new SessionScope())
 			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-123456", client.Id.ToString().Substring(0, 4))));
 			}
@@ -367,9 +373,10 @@ from billing.Payers
 		[Test]
 		public void Search_by_person_name()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Client client;
 			using (new SessionScope())
 			{
+				client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Users[0].AddContactGroup();
 				client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
 			}

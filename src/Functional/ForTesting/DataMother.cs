@@ -115,14 +115,17 @@ namespace Functional.ForTesting
 
 		public static Client CreateTestClientWithUser()
 		{
-			var client = CreateTestClient();
-			var user = new User {
-				Client = client,
-				Name = "test"
-			};
-			user.Setup(client);
-			client.Users = new List<User> {user};
-			return client;
+			using (var transaction = new TransactionScope(OnDispose.Rollback))
+			{
+				var client = CreateTestClient();
+				var user = new User {
+					Client = client,
+					Name = "test"
+				};
+				user.Setup(client);
+				transaction.VoteCommit();
+				return client;
+			}
 		}
 
 		public static Client CreateTestClientWithAddressAndUser()
@@ -141,14 +144,11 @@ namespace Functional.ForTesting
 					Name = "test"
 				};
 				user.Setup(client);
-				client.Users = new List<User> { user };
-
 				var address = new Address {
 					Client = client,
 					Value = "тестовый адрес"
 				};
 				client.AddAddress(address);
-				//client.Addresses = new List<Address> { address };
 				client.Update();
 				client.Users[0].Name += client.Users[0].Id;
 				client.Users[0].UpdateAndFlush();

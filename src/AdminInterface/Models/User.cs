@@ -208,6 +208,10 @@ namespace AdminInterface.Models
 		public virtual void Setup(Client client)
 		{
 			Setup();
+			if (client.Users == null)
+				client.Users = new List<User>();
+
+			client.Users.Add(this);
 			AddPrices(client);
 			client.UpdateBeAccounted();
 		}

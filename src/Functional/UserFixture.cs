@@ -34,13 +34,20 @@ namespace Functional
 		[Test]
 		public void Set_user_parent()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			var mainUser = new User {
-				Client = client,
-				Name = "test"
-			};
-			mainUser.Setup(client);
+			User user;
+			User mainUser;
+			Client client;
+			using (var transaction = new TransactionScope(OnDispose.Rollback))
+			{
+				client = DataMother.CreateTestClientWithUser();
+				user = client.Users.First();
+				mainUser = new User {
+					Client = client,
+					Name = "test"
+				};
+				mainUser.Setup(client);
+				transaction.VoteCommit();
+			}
 			using(var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText(user.Login)).Click();
