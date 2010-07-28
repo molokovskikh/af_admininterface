@@ -2,7 +2,7 @@
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord("Billing.Tariffs")]
+	[ActiveRecord("Tariffs", Schema = "Billing")]
 	public class Tariff : ActiveRecordBase<Tariff>
 	{
 		[PrimaryKey]

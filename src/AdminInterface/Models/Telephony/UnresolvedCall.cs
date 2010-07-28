@@ -7,7 +7,7 @@ using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Telephony
 {
-	[ActiveRecord("telephony.UnresolvedPhone")]
+	[ActiveRecord("UnresolvedPhone", Schema = "telephony")]
 	public class UnresolvedCall : ActiveRecordLinqBase<UnresolvedCall>
 	{
 		[PrimaryKey("id")]

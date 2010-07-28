@@ -48,7 +48,7 @@ namespace AdminInterface.Models.Logs
 		}
 	}
 
-	[ActiveRecord(Table = "logs.AuthorizationDates")]
+	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs")]
 	public class AuthorizationLogEntity : ActiveRecordLinqBase<AuthorizationLogEntity>
 	{
 		public AuthorizationLogEntity(uint id)

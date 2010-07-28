@@ -10,7 +10,7 @@ namespace AdminInterface.Models
 		Hidden = 2
 	}
 
-	[ActiveRecord("usersettings.RetClientsSet")]
+	[ActiveRecord("RetClientsSet", Schema = "usersettings")]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
 		public DrugstoreSettings() {}

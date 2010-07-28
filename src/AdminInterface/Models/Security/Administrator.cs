@@ -24,7 +24,7 @@ namespace AdminInterface.Models.Security
 		[Description("Отдел регионального развития")] Manager = 5,
 	}
 
-	[ActiveRecord("accessright.regionaladmins", Lazy = false)]
+	[ActiveRecord("Regionaladmins", Schema = "accessright", Lazy = false)]
 	public class Administrator
 	{
 		[PrimaryKey("RowId")]
@@ -53,7 +53,8 @@ namespace AdminInterface.Models.Security
 
 		[HasAndBelongsToMany(typeof(Permission), 
 			RelationType.Bag, 
-			Table = "accessright.AdminsPermissions", 
+			Table = "AdminsPermissions", 
+			Schema = "accessright",
 			ColumnKey = "AdminId", 
 			ColumnRef = "PermissionId", 
 			Lazy = false)]

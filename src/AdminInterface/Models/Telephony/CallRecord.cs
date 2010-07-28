@@ -29,7 +29,7 @@ namespace AdminInterface.Models.Telephony
 		All = 0,
 	}
 
-	[ActiveRecord("logs.RecordCalls")]
+	[ActiveRecord("RecordCalls", Schema = "logs")]
 	public class CallRecord : ActiveRecordBase<CallRecord>
 	{
 		private IList<CallRecordFile> _files = null;

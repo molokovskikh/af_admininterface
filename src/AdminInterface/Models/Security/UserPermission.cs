@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Security
 		AnalitFPrint = 2
 	}
 
-	[ActiveRecord("usersettings.UserPermissions")]
+	[ActiveRecord("UserPermissions", Schema = "usersettings")]
 	public class UserPermission : ActiveRecordBase<UserPermission>
 	{
 		[PrimaryKey("Id")]

@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord(Table = "logs.clientsinfo")]
+	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
 	public class ClientInfoLogEntity : ActiveRecordBase<ClientInfoLogEntity>
 	{
 		public ClientInfoLogEntity()

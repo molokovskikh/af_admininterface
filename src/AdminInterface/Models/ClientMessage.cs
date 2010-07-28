@@ -4,7 +4,7 @@ using Castle.Components.Validator;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Table = "usersettings.UserUpdateInfo")]
+	[ActiveRecord(Table = "UserUpdateInfo", Schema = "usersettings")]
 	public class ClientMessage : ActiveRecordValidationBase<ClientMessage>
 	{
 		[PrimaryKey("UserId")]

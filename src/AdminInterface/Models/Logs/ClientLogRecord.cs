@@ -5,7 +5,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("logs.ClientLogs")]
+	[ActiveRecord("ClientLogs", Schema = "logs")]
 	public class ClientLogRecord : ActiveRecordBase<ClientLogRecord>
 	{
 		[PrimaryKey("ID")]

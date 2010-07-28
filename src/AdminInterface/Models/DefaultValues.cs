@@ -12,7 +12,7 @@ namespace AdminInterface.Models
 		Sender = 2,
 	}
 
-	[ActiveRecord(Table = "UserSettings.Defaults")]
+	[ActiveRecord(Table = "Defaults", Schema = "UserSettings")]
 	public class DefaultValues : ActiveRecordBase<DefaultValues>
 	{
 		[PrimaryKey]
@@ -33,7 +33,7 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord(Table = "OrderSendRules.order_send_rules")]
+	[ActiveRecord(Table = "order_send_rules", Schema = "OrderSendRules")]
 	public class OrderSendRules : ActiveRecordBase<OrderHandler>
 	{
 		public OrderSendRules()
@@ -59,7 +59,7 @@ namespace AdminInterface.Models
 		public OrderHandler Sender{ get; set; }
 	}
 
-	[ActiveRecord(Table = "OrderSendRules.order_handlers")]
+	[ActiveRecord(Table = "order_handlers", Schema = "OrderSendRules")]
 	public class OrderHandler : ActiveRecordLinqBase<OrderHandler>
 	{
 		[PrimaryKey]

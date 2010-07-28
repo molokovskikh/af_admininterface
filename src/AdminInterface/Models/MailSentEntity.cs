@@ -5,7 +5,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Table = "billing.MailSentHistory")]
+	[ActiveRecord(Table = "MailSentHistory", Schema = "billing")]
 	public class MailSentEntity : ActiveRecordValidationBase<MailSentEntity>
 	{
 		[PrimaryKey]

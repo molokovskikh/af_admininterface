@@ -4,7 +4,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("logs.EmailRejectLogs")]
+	[ActiveRecord("EmailRejectLogs", Schema = "logs")]
 	public class RejectedEmail : ActiveRecordBase<RejectedEmail>
 	{
 		[PrimaryKey]

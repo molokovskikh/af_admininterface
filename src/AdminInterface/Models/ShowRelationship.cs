@@ -2,7 +2,7 @@
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("UserSettings.showregulation")]
+	[ActiveRecord("showregulation", Schema = "UserSettings")]
 	public class ShowRelationship : ActiveRecordBase<ShowRelationship>
 	{
 		public ShowRelationship()

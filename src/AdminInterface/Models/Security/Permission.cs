@@ -33,7 +33,7 @@ namespace AdminInterface.Models.Security
 		CallHistory = 20
 	}
 
-	[ActiveRecord("accessright.permissions", Lazy = false)]
+	[ActiveRecord("permissions", Schema = "accessright", Lazy = false)]
 	public class Permission
 	{
 		[PrimaryKey("Id")]

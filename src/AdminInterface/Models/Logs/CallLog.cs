@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Logs
 		Unknow = 1
 	}
 
-	[ActiveRecord(Table = "logs.CallLogs")]
+	[ActiveRecord(Table = "CallLogs", Schema = "logs")]
 	public class CallLog : ActiveRecordLinqBase<CallLog>
 	{
 		[PrimaryKey]

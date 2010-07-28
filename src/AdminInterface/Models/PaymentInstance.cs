@@ -3,7 +3,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Table = "billing.payers")]
+	[ActiveRecord(Table = "payers", Schema = "billing")]
 	public class PaymentInstance : ActiveRecordBase<PaymentInstance>
 	{
 		[PrimaryKey(Column = "payerId")]

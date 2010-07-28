@@ -9,7 +9,7 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("logs.passwordchange")]
+	[ActiveRecord("passwordchange", Schema = "logs")]
 	public class PasswordChangeLogEntity : ActiveRecordLinqBase<PasswordChangeLogEntity>
 	{
 		public PasswordChangeLogEntity()

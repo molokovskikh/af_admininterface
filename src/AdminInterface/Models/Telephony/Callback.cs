@@ -3,7 +3,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Telephony
 {
-	[ActiveRecord("telephony.CallbackPhones")]
+	[ActiveRecord("CallbackPhones", Schema = "telephony")]
 	public class Callback : ActiveRecordBase<Callback>
 	{
 		[PrimaryKey]

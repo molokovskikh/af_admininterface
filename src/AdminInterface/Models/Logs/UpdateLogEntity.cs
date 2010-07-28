@@ -22,7 +22,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Отправка измененных настроек прайс-листов")] PriceSettingSending = 12,
 	}
 
-	[ActiveRecord(Table = "logs.AnalitFUpdates")]
+	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
 	public class UpdateLogEntity : ActiveRecordBase<UpdateLogEntity>
 	{
 		[PrimaryKey("UpdateId")]

@@ -20,7 +20,7 @@ namespace AdminInterface.Models
 		Percent,
 	}
 
-	[ActiveRecord("billing.payers")]
+	[ActiveRecord("payers", Schema = "billing")]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
 		public const decimal CostPerUser = 800;
@@ -184,12 +184,12 @@ SELECT  {Payer.*}
 FROM Future.Clients as cd
 	JOIN billing.payers {Payer} ON cd.PayerId = {Payer}.PayerId
 WHERE   cd.regioncode & :AdminRegionCode > 0 
-        AND Status = 1 
-        AND {Payer}.ShortName like :SearchText " + filter + @"  
+		AND Status = 1 
+		AND {Payer}.ShortName like :SearchText " + filter + @"  
 ORDER BY {Payer}.shortname;";
 				var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
 					.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
-                    .SetParameter("SearchText", "%" + searchPattern  + "%")
+					.SetParameter("SearchText", "%" + searchPattern  + "%")
 					.List<Payer>().Distinct();
 				return resultList;
 			}
@@ -241,7 +241,7 @@ ORDER BY {Payer}.shortname;";
 			if (Recipient == null)
 				throw new EndUserException(
 					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
-					              ShortName));
+								  ShortName));
 */
 		}
 

@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
-using AdminInterface.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.MySql;
-using System.IO;
-using System.Text;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord]
-	public class UserSearchItem : ActiveRecordBase
+	[ActiveRecord(SchemaAction = "none")]
+	public class UserSearchItem : ActiveRecordBase<UserSearchItem>
 	{
 		[PrimaryKey]
 		public uint UserId { get; set; }

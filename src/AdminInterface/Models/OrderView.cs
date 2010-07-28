@@ -7,7 +7,7 @@ using NHibernate.Transform;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("orders.OrdersHead")]
+	[ActiveRecord(SchemaAction = "none")]
 	public class OrderView : ActiveRecordBase<OrderView>
 	{
 		[PrimaryKey]

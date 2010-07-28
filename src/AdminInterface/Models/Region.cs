@@ -7,7 +7,7 @@ using System;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("farm.regions")]
+	[ActiveRecord("Regions", Schema = "farm")]
 	public class Region : ActiveRecordBase<Region>
 	{
 		[PrimaryKey("RegionCode")]

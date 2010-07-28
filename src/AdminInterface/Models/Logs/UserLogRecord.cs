@@ -6,7 +6,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Logs
 {
-	[ActiveRecord("logs.UserLogs")]
+	[ActiveRecord("UserLogs", Schema = "logs")]
 	public class UserLogRecord : ActiveRecordBase<UserLogRecord>
 	{
 		[PrimaryKey]
