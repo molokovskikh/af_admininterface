@@ -1,7 +1,6 @@
 ﻿using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -12,7 +11,6 @@ namespace Integration.Models
 		[SetUp]
 		public void Setup()
 		{
-			ForTest.InitialzeAR();
 			SecurityContext.GetAdministrator = () => new Administrator{ RegionMask = ulong.MaxValue };
 		}
 

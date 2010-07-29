@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
@@ -11,12 +10,6 @@ namespace Integration.Models
 	[TestFixture]
 	public class WorkingPricesInheritanceFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void Inherit_working_prices()
 		{

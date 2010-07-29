@@ -1,24 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Models.Billing
+namespace Integration.Models
 {
 	[TestFixture, Ignore("Работа по биллингу заморожена")]
 	public class PaymentFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void Debit_is_a_sum_of_charge()
 		{

@@ -14,8 +14,7 @@ namespace Functional
 {
 	public class BillingFixture : WatinFixture
 	{
-		[SetUp]
-		public void Setup()
+		public BillingFixture()
 		{
 			UseTestScope = true;
 		}
@@ -743,12 +742,12 @@ DELETE FROM future.Users WHERE Id = :UserId
 				client.Users[0].Save();
 
 				client.Addresses[0].Enabled = true;
-				client.Addresses[0].BeAccounted = false;
+				client.Addresses[0].Accounting.BeAccounted = false;
 				client.Addresses[0].Value = String.Format("Test address for accounting [{0}]", client.Addresses[0].Id);
 				client.Addresses[0].Save();
 
 				client.Addresses[1].Enabled = true;
-				client.Addresses[1].BeAccounted = true;
+				client.Addresses[1].Accounting.BeAccounted = true;
 				client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
 				client.Addresses[1].Save();
 				foreach (var addr in client.Addresses)
@@ -910,7 +909,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var usersTable = browser.Table("UsersTable");
+				var usersTable = browser.Table("users");
 				var countVisibleRows = 0;
 				foreach (TableRow row in usersTable.TableRows)
 					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))

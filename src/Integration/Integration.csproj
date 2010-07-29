@@ -11,10 +11,10 @@
     <AssemblyName>Integration</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags></FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -100,7 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ADHelperFixture.cs" />
-    <Compile Include="Models\AuditRecordsFixture.cs" />
+    <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
     <Compile Include="Controllers\BillingControllerFixture.cs" />
@@ -116,6 +116,7 @@
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
+    <Compile Include="SetupFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface\AdminInterface.csproj">
@@ -136,7 +137,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

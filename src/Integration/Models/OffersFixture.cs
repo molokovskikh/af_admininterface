@@ -1,23 +1,15 @@
 ﻿using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Models
+namespace Integration.Models
 {
-	[TestFixture]
-	public class OffersFixture
+	public class OffersFixture : IntergationFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void Search_should_return_offers()
 		{
-			var client = Client.Find(2575u);
+			var client = DataMother.CreateTestClient();
 			var offers = Offer.Search(client, "папа");
 			Assert.That(offers.Count, Is.GreaterThan(0));
 		}
@@ -25,7 +17,7 @@ namespace AdminInterface.Test.Models
 		[Test]
 		public void Request_for_not_exist_name_should_return_zero_elements()
 		{
-			var client = Client.Find(2575u);
+			var client = DataMother.CreateTestClient();
 			var offers = Offer.Search(client, "sdfaefawefsdf");
 			Assert.That(offers.Count, Is.EqualTo(0));
 		}

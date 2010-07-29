@@ -1,27 +1,19 @@
 ﻿using AdminInterface.Helpers;
-using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NUnit.Framework;
 
-namespace AdminInterface.Test.Helpers
+namespace Integration
 {
 	[TestFixture]
 	public class DbLogHelperFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void Set_up_transaction_parameters()
 		{
 			using (new SessionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(
+				DbLogHelper.SetupParametersForTriggerLogging(
 					"test",
 					"localhost");
 
@@ -40,7 +32,7 @@ namespace AdminInterface.Test.Helpers
 		{
 			using (new SessionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(new {
+				DbLogHelper.SetupParametersForTriggerLogging(new {
 					InUser = "test",
 					InHost = "localhost"
 				});

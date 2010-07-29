@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
-using Castle.ActiveRecord;
 using Functional.ForTesting;
 using NUnit.Framework;
 
@@ -10,12 +8,6 @@ namespace Integration.Models
 	[TestFixture]
 	public class ClientFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void ResetUinTest()
 		{

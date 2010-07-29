@@ -11,10 +11,10 @@
     <AssemblyName>Functional</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags>
-    </FileUpgradeFlags>
+    <FileUpgradeFlags></FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -97,6 +97,7 @@
     <Compile Include="AccountingFixture.cs" />
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
+    <Compile Include="Billing\PaymentFixture.cs" />
     <Compile Include="CallHistoryFixture.cs" />
     <Compile Include="ClientFixture.cs" />
     <Compile Include="ClientMessagesFixture.cs" />

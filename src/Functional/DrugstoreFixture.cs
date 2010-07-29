@@ -406,7 +406,7 @@ namespace Functional
 				{					
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.ContainsText("Пароль успешно изменен"));
+					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 				}
 				browser.Refresh();
 				var checkText = String.Format("$$$Пользователь {0}. Платное изменение пароля: Тестовое изменение пароля", testClient.Users[0].Login);

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.DirectoryServices;
 using AdminInterface.Helpers;
-using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using NUnit.Framework;
 using System.Collections.Generic;
 
-
-namespace AdminInterface.Test.Helpers
+namespace Integration
 {
 	[TestFixture]
 	[Ignore("не работают т.к. нет административных прав")]

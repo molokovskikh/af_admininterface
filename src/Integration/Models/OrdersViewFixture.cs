@@ -1,10 +1,9 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 
-namespace AdminInterface.Test.Models
+namespace Integration.Models
 {
 	[TestFixture]
 	public class OrdersViewFixture
@@ -12,7 +11,6 @@ namespace AdminInterface.Test.Models
 		[SetUp]
 		public void Setup()
 		{
-			ForTest.InitialzeAR();
 			SecurityContext.GetAdministrator = () => new Administrator { RegionMask = ulong.MaxValue };
 		}
 

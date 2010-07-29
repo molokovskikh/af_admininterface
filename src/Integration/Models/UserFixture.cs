@@ -1,26 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
-using System.Security.Principal;
-using System.Threading;
-using System.Web;
-using System.Web.Hosting;
-using System.Web.SessionState;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Test.ForTesting;
-using AdminInterface.Test.Helpers;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Config;
 using Common.Tools;
-using log4net.Config;
+using Integration;
 using NUnit.Framework;
 using Functional.ForTesting;
-using AdminInterface.Security;
-using System.Security;
 
 
 namespace AdminInterface.Test.Models
