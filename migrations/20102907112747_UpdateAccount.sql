@@ -7,4 +7,4 @@ join Billing.Accounting a on a.AccountId = u.Id and a.Type = 0
 set u.AccountingId = a.Id;
 
 update Billing.Accounting
-set BeAccounted = 1 and ReadForAccounting = 1;;
+set BeAccounted = 1 and ReadyForAcounting = 1;;
