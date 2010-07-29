@@ -139,7 +139,8 @@ namespace AdminInterface.Helpers
 
 		public static string GetHumanReadableOperatorName(string operatorName)
 		{
-			//object name = String.Empty;
+			if (String.IsNullOrEmpty(operatorName))
+				return "";
 			var sql = @"
 SELECT 
 	if (length(ManagerName) > 0, ManagerName, UserName) as UserName
@@ -149,9 +150,9 @@ WHERE
 	LOWER(UserName) like :UserName
 LIMIT 1";
 			var name = ArHelper.WithSession(session => session
-                .CreateSQLQuery(sql)
-                .SetParameter("UserName", operatorName.ToLower())
-                .UniqueResult());
+				.CreateSQLQuery(sql)
+				.SetParameter("UserName", operatorName.ToLower())
+				.UniqueResult());
 			if (String.IsNullOrEmpty(Convert.ToString(name)))
 				return operatorName;
 			return name.ToString();

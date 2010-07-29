@@ -7,7 +7,7 @@ using Common.MySql;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord]
+	[ActiveRecord(SchemaAction = "none")]
 	public class BillingSearchItem : ActiveRecordBase
 	{
 		[PrimaryKey]
