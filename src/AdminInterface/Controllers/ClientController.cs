@@ -11,14 +11,12 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using AdminInterface.Extentions;
 using Common.MySql;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
 using log4net;
-using AdminInterface.Services;
 using System.Collections.Generic;
 
 namespace AdminInterface.Controllers
@@ -105,8 +103,7 @@ namespace AdminInterface.Controllers
 
 			using (new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
-				                                                     Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				client.Update();
 			}
 
@@ -121,11 +118,10 @@ namespace AdminInterface.Controllers
 			bool costsIsNoised,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings)
 		{
-			SecurityContext.Administrator.CheckClientPermission(client);			
+			SecurityContext.Administrator.CheckClientPermission(client);
 			using (var scope = new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
-																	 Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				var oldMaskRegion = client.MaskRegion;
 				foreach (var setting in regionSettings)
 				{
@@ -269,13 +265,12 @@ where Phone like :phone")
 
 			using (new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Client>(
-					new
-						{
-							inHost = Request.UserHostAddress,
-							inUser = SecurityContext.Administrator.UserName,
-							ResetIdCause = reason
-						});
+				DbLogHelper.SetupParametersForTriggerLogging(
+					new {
+						inHost = Request.UserHostAddress,
+						inUser = SecurityContext.Administrator.UserName,
+						ResetIdCause = reason
+					});
 				ClientInfoLogEntity.ReseteUin(client.Id, reason).Save();
 				client.ResetUin();
 				RedirectToReferrer();
@@ -287,7 +282,7 @@ where Phone like :phone")
 		{
 			var client = Client.Find(clientId);
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
-			var drugstore = Models.DrugstoreSettings.Find(clientId);
+			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
@@ -296,10 +291,7 @@ where Phone like :phone")
 		public void NotifySuppliers(uint clientId)
 		{
 			var client = Client.Find(clientId);
-			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client);
-			Mailer.ClientRegistrationResened(client);
-			CancelView();
-			CancelLayout();
+			Mailer.ClientRegistred(client, true);
 			Flash["Message"] = Message.Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}
@@ -308,19 +300,9 @@ where Phone like :phone")
 		{
 			CancelView();
 			CancelLayout();
-			var searchNumber = 0;
+			int searchNumber;
 			Int32.TryParse(searchText, out searchNumber);
-			var ids = ArHelper.WithSession(session => session.CreateSQLQuery(@"
-SELECT Id
-FROM Future.Clients
-WHERE Clients.Name LIKE :SearchText OR Clients.Id = :SearchNumber")
-						.SetParameter("SearchText", String.Format("%{0}%", Utils.StringToMySqlString(searchText)))
-						.SetParameter("SearchNumber", searchNumber)
-						.List());
-			var clients = new List<Client>(ids.Count);
-			foreach (var id in ids)
-				clients.Add(Client.Find(id));
-			PropertyBag["clients"] = clients;
+			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name);
 			RenderView("SearchClientSubview");
 		}
 	}

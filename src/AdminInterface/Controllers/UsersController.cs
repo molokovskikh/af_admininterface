@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			PropertyBag["client"] = client;
-			PropertyBag["drugstore"] = DrugstoreSettings.Find(client.Id);
+			PropertyBag["drugstore"] = client.Settings;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
@@ -93,7 +93,7 @@ namespace AdminInterface.Controllers
 			Mailer.UserRegistred(user);
 			if (address != null)
 			{
-				Mailer.DeliveryAddressRegistred(address);
+				Mailer.AddressRegistred(address);
 				Mailer.NotifySupplierAboutAddressRegistration(address);
 			}
 
@@ -140,7 +140,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 
-			var setting = DrugstoreSettings.Find(user.Client.Id);
+			var setting = user.Client.Settings;
 			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy( reg => reg.Name);
 			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
 
@@ -212,8 +212,6 @@ namespace AdminInterface.Controllers
 			user.CheckLogin();
 
 			var password = User.GeneratePassword();
-			var userName = administrator.UserName;
-			var host = Context.Request.UserHostAddress;
 		
 			using (new TransactionScope())
 			{
@@ -221,7 +219,7 @@ namespace AdminInterface.Controllers
 				if (changeLogin)
 					ADHelper.RenameUser(user.Login, user.Id.ToString());
 
-				DbLogHelper.SetupParametersForTriggerLogging<ClientInfoLogEntity>(userName, host);
+				DbLogHelper.SetupParametersForTriggerLogging();
 
 				if (user.Client.Type == ClientType.Drugstore)
 					user.Client.ResetUin();
@@ -319,7 +317,7 @@ namespace AdminInterface.Controllers
 
 			using (new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Client>(
+				DbLogHelper.SetupParametersForTriggerLogging(
 					new
 					{
 						inHost = Request.UserHostAddress,
@@ -364,8 +362,7 @@ namespace AdminInterface.Controllers
 		{
 			using (var scope = new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				user.Update();
 				scope.VoteCommit();
 			}

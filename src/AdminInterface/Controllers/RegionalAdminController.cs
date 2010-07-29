@@ -56,8 +56,7 @@ namespace AdminInterface.Controllers
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				var admin = new Administrator {
 					UserName = administrator.UserName,
 					Department = administrator.Department,
@@ -122,8 +121,7 @@ namespace AdminInterface.Controllers
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 
 				var countAccessibleRegions = 0;
 				foreach (var region in accessibleRegions)

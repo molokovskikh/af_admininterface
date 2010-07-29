@@ -1,18 +1,12 @@
-﻿using System;
-using System.Configuration;
-using System.Net;
-using AdminInterface.Helpers;
+﻿using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using ViewHelper=AdminInterface.Helpers.ViewHelper;
-using System.IO;
-using AdminInterface.Properties;
 
 namespace AdminInterface.Controllers
 {
@@ -28,30 +22,28 @@ namespace AdminInterface.Controllers
 			PropertyBag["callbacks"] = Callback.FindAll(Order.Asc("Comment"));
 		}
 
-        public void UpdateCallbacks([ARDataBind("callbacks", AutoLoad = AutoLoadBehavior.Always)] Callback[] callbacks)
-        {
-            using (new TransactionScope())
-            {
-                DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
-                                                                       Request.UserHostAddress);
-                foreach (var callback in callbacks)
-                    callback.Save();
-            }
-
-            Flash["isUpdated"] = true;
-            RedirectToAction("Show");
-        }
-
-	    public void Update([DataBind("callback")] Callback callback)
+		public void UpdateCallbacks([ARDataBind("callbacks", AutoLoad = AutoLoadBehavior.Always)] Callback[] callbacks)
 		{
-	        using (new TransactionScope())
-	        {
-	            DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
-	                                                                   Request.UserHostAddress);
-                callback.Save();
-	        }
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+				foreach (var callback in callbacks)
+					callback.Save();
+			}
+
+			Flash["isUpdated"] = true;
+			RedirectToAction("Show");
+		}
+
+		public void Update([DataBind("callback")] Callback callback)
+		{
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+				callback.Save();
+			}
 			
-	        Flash["isUpdated"] = true;
+			Flash["isUpdated"] = true;
 			RedirectToAction("Show");
 		}
 
@@ -68,12 +60,11 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-		    using (new TransactionScope())
-		    {
-                DbLogHelper.SetupParametersForTriggerLogging<Callback>(SecurityContext.Administrator.UserName,
-                                                                       Request.UserHostAddress);
-                Callback.Find(id).Delete();		        
-		    }
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+				Callback.Find(id).Delete();
+			}
 			RedirectToAction("Show");
 		}
 	}

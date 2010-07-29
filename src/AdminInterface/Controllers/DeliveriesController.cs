@@ -1,7 +1,5 @@
-﻿using System.Web;
-using AdminInterface.Helpers;
+﻿using AdminInterface.Helpers;
 using AdminInterface.Models;
-using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -40,7 +38,7 @@ namespace AdminInterface.Controllers
 			address.CreateFtpDirectory();
 			client.Users.Each(u => address.SetAccessControl(u.Login));
 
-			Mailer.DeliveryAddressRegistred(address);
+			Mailer.AddressRegistred(address);
 			Mailer.NotifySupplierAboutAddressRegistration(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
@@ -64,8 +62,7 @@ namespace AdminInterface.Controllers
 		{
 			using (var scope = new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<Address>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				address.UpdateContacts(contacts, deletedContacts);
 				address.Update();
 				scope.VoteCommit();

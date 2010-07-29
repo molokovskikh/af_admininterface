@@ -91,8 +91,7 @@ namespace AdminInterface.Controllers
 				ArHelper.WithSession(s => {
 					var connection = (MySqlConnection) s.Connection;
 					var command = new MySqlCommand("", connection);
-					DbLogHelper.SetupParametersForTriggerLogging<Client>(SecurityContext.Administrator.UserName,
-						HttpContext.Current.Request.UserHostAddress);
+					DbLogHelper.SetupParametersForTriggerLogging();
 
 					Payer currentPayer = null;
 					if (additionalSettings.PayerExists)
@@ -143,21 +142,7 @@ namespace AdminInterface.Controllers
 			}
 			newUser.UpdateContacts(userContacts);
 
-			if (newClient.IsDrugstore() && !additionalSettings.IsServiceClient &&
-				!(additionalSettings.ShowForOneSupplier) && newClient.BillingInstance.PayerID != 921)
-				new NotificationService().NotifySupplierAboutDrugstoreRegistration(newClient, false);
-			if (!newClient.IsDrugstore())
-				Mailer.SupplierRegistred(newClient.Name, newClient.HomeRegion.Name);
-
-			NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", newClient.FullName),
-													   String.Format(
-														"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-														SecurityContext.Administrator.UserName,
-														newClient.HomeRegion.Name,
-														newUser.Login,
-														newClient.Id,
-														newClient.Segment.GetDescription(),
-														newClient.Type.GetDescription()));
+			Mailer.ClientRegistred(newClient, false);
 			Session["DogN"] = newClient.BillingInstance.PayerID;
 			Session["Code"] = newClient.Id;
 			Session["Name"] = newClient.FullName;
@@ -254,10 +239,10 @@ namespace AdminInterface.Controllers
 			command.CommandText = "select usersettings.GeneratePassword()";
 			var costCrypKey = command.ExecuteScalar().ToString();
 
-			var settings = new DrugstoreSettings
-			{
+			client.Settings = new DrugstoreSettings {
 				Id = client.Id,
-				InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
+				InvisibleOnFirm =
+					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
 				WorkRegionMask = client.MaskRegion,
 				OrderRegionMask = orderMask,
 				ServiceClient = additionalSettings.IsServiceClient,
@@ -268,17 +253,17 @@ namespace AdminInterface.Controllers
 				ShowNewDefecture = true,
 			};
 			if (additionalSettings.ShowForOneSupplier)
-				settings.FirmCodeOnly = supplier.Id;
-			settings.CreateAndFlush();
+				client.Settings.FirmCodeOnly = supplier.Id;
+			client.Settings.CreateAndFlush();
 
 			client.MaintainIntersection();
 
-			if (settings.InvisibleOnFirm == DrugstoreType.Standart)
+			if (client.Settings.InvisibleOnFirm == DrugstoreType.Standart)
 			{
 				command.CommandText = "insert into inscribe(ClientCode) values(?ClientCode); ";
 				command.Parameters.AddWithValue("?ClientCode", client.Id);
 				command.ExecuteNonQuery();
-			}			
+			}
 		}
 
 		public void CreateSupplier(MySqlCommand command, DefaultValues defaults, Client client)

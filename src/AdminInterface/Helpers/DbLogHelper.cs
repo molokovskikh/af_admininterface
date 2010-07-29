@@ -13,12 +13,12 @@ namespace AdminInterface.Helpers
 			ArHelper.WithSession(session => SetupParametersForTriggerLogging(new { InUser = SecurityContext.Administrator.UserName, InHost = SecurityContext.Administrator.GetHost() }, session));
 		}
 
-		public static void SetupParametersForTriggerLogging<T>(string user, string host)
+		public static void SetupParametersForTriggerLogging(string user, string host)
 		{
 			ArHelper.WithSession(session => SetupParametersForTriggerLogging(new { InUser = user, InHost = host }, session));
 		}
 
-		public static void SetupParametersForTriggerLogging<T>(object parameters)
+		public static void SetupParametersForTriggerLogging(object parameters)
 		{
 			ArHelper.WithSession(session => SetupParametersForTriggerLogging(parameters, session));
 		}

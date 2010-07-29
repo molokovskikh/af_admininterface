@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 			else if (clientId.HasValue)
 			{
 				var client = Client.Find(clientId.Value);
-				var drugstore = DrugstoreSettings.Find(clientId.Value);
+				var drugstore = client.Settings;
 
 				if (showDefaultRegions)
 					PropertyBag["defaultRegions"] = allRegions.Where(region =>
@@ -62,7 +62,7 @@ namespace AdminInterface.Controllers
 		{
 			var homeRegion = Region.Find(homeRegionId);
 			var client = Client.Find(clientId);
-			var drugstore = DrugstoreSettings.Find(clientId);
+			var drugstore = client.Settings;
 			var regions = Region.FindAll()
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0 ||
 					((region.Id & client.MaskRegion) > 0) ||
