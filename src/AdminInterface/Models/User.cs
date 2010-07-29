@@ -1,18 +1,17 @@
-	using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
-	using System.Linq;
-	using AdminInterface.Helpers;
+using System.Linq;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
-	using Castle.ActiveRecord.Linq;
-	using Common.Web.Ui.Helpers;
+using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using AdminInterface.Security;
 using System.Web;
 using Common.Web.Ui.Models;
-using Common.Web.Ui.Controllers;
 using System.ComponentModel;
 using AdminInterface.Models.Billing;
 
@@ -46,7 +45,7 @@ namespace AdminInterface.Models
 			RegistrationDate = DateTime.Now;
 		}
 
-		[PrimaryKey]
+		[PrimaryKey(PrimaryKeyType.Native)]
 		public virtual uint Id { get; set; }
 
 		[Property(NotNull = true)]
@@ -55,8 +54,8 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string Name { get; set; }
 
-        [Property]
-        public virtual bool Enabled { get; set; }
+		[Property]
+		public virtual bool Enabled { get; set; }
 
 		[Property]
 		public virtual bool SubmitOrders { get; set; }
@@ -91,26 +90,34 @@ namespace AdminInterface.Models
 		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
 		public virtual Client Client { get; set; }
 
-		[BelongsTo("ContactGroupId")]
+		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
 		public virtual User InheritPricesFrom { get; set; }
 
+		[OneToOne]
+		public virtual AuthorizationLogEntity Logs { get; set; }
+
 		[HasAndBelongsToMany(typeof (UserPermission),
 			Lazy = true,
 			ColumnKey = "UserId",
-			Table = "usersettings.AssignedPermissions",
+			Table = "AssignedPermissions",
+			Schema = "usersettings",
 			ColumnRef = "PermissionId")]
 		public virtual IList<UserPermission> AssignedPermissions { get; set; }
 
 		[HasAndBelongsToMany(typeof (Address),
 			Lazy = true,
 			ColumnKey = "UserId",
-			Table = "future.UserAddresses",
+			Table = "UserAddresses",
+			Schema = "future",
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
-		
+
+		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
+		public virtual Accounting Accounting { get; set; }
+
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
@@ -210,7 +217,7 @@ namespace AdminInterface.Models
 			Setup();
 			if (client.Users == null)
 				client.Users = new List<User>();
-
+			Accounting = new UserAccounting(this);
 			client.Users.Add(this);
 			AddPrices(client);
 			client.UpdateBeAccounted();
@@ -392,52 +399,6 @@ WHERE
 				ContactGroup.AddPerson(name);
 		}
 		
-		public virtual bool IsRegisteredInBilling
-		{
-			get
-			{
-				return Convert.ToUInt32(ArHelper.WithSession(session =>
-					session.CreateSQLQuery(@"
-SELECT
-	COUNT(*)
-FROM
-	Billing.Accounting
-WHERE
-	AccountId = :AccountId and Type = :Type")
-						.SetParameter("AccountId", Id)
-                        .SetParameter("Type", AccountingItemType.User)
-						.UniqueResult())) > 0;
-			}
-		}
-
-        public virtual void RegisterInBilling()
-        {
-            using (var scope = new TransactionScope())
-            {
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-                var accountingItem = new AccountingItem {
-                    AccountId = Id,
-                    Type = AccountingItemType.User,
-					Operator = SecurityContext.Administrator.UserName,
-                };
-                accountingItem.Create();
-                scope.VoteCommit();
-            }
-        }
-
-		public virtual void UnregisterInBilling()
-		{
-			using (var scope = new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-				var accountingItem = AccountingItem.GetByUser(this);
-				accountingItem.Delete();
-				scope.VoteCommit();
-			}
-		}
-
 		public virtual void MoveToAnotherClient(Client newOwner)
 		{
 			using (var scope = new TransactionScope()) 

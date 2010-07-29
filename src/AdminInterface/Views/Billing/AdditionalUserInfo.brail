@@ -4,8 +4,8 @@
         ShowElement(true, "#SearchAddressDiv" + userId);        
         ShowElement(false, "#SelectAddressDiv" + userId);
         ShowElement(false, "#ConnectAddressLink" + userId);
-        jQuery("#SearchAddressMessage" + userId).html("");
-        jQuery("#AddressSearchText" + userId).val("");
+        $("#SearchAddressMessage" + userId).html("");
+        $("#AddressSearchText" + userId).val("");
     }
 
     function ResetSearchAddress(userId) {
@@ -14,10 +14,10 @@
     }
 
     function ConnectAddressToUser(userId) {
-        var addressId = jQuery("#AddressesComboBox" + userId + " option:selected").val();
-        var address = jQuery("#AddressesComboBox" + userId + " option:selected").html();
+        var addressId = $("#AddressesComboBox" + userId + " option:selected").val();
+        var address = $("#AddressesComboBox" + userId + " option:selected").html();
         var link = "${siteroot}/Billing/ConnectUserToAddress.rails?userId=" + userId + "&addressId=" + addressId;
-        jQuery.ajax({
+        $.ajax({
             url: link,
             cache: false,
             success: function(h) {
@@ -25,7 +25,7 @@
                 var html = "<tr id='" + id + "'><td><input type='checkbox' checked='checked' id='CheckBoxUser" + userId + "Address" + addressId + "' " +
                     "onclick='if (!this.checked) DisconnectAddressFromUser(" + userId +","+ addressId +")'>" +
                     address + "</input></td></tr>";
-                jQuery("#AddressesTable" + userId).append(html); 
+                $("#AddressesTable" + userId).append(html); 
                 CancelSearchAddress(userId);
                 RefreshTotalSum();
             }
@@ -34,33 +34,33 @@
     
     function DisconnectAddressFromUser(userId, addressId) {
         var link = "${siteroot}/Billing/DisconnectUserFromAddress.rails?userId=" + userId + "&addressId=" + addressId;
-        jQuery.ajax({
+        $.ajax({
             url: link,
             cache: false,
             success: function(html) {
-                jQuery("#RowUser" + userId + "Address" + addressId).remove();
+                $("#RowUser" + userId + "Address" + addressId).remove();
                 RefreshTotalSum();
             }
         });
     }
 
     function SearchAddress(userId) {
-        jQuery('#AddressesComboBox' + userId).find('option').remove().end();
-        jQuery("#SearchAddressMessage" + userId).html("<i>Выполняется поиск</i>");
-        var searchText = jQuery("#AddressSearchText" + userId).val();
+        $('#AddressesComboBox' + userId).find('option').remove().end();
+        $("#SearchAddressMessage" + userId).html("<i>Выполняется поиск</i>");
+        var searchText = $("#AddressSearchText" + userId).val();
         var link = "${siteroot}/Billing/SearchAddressesForUser.rails?userId=" + userId + "&searchText=" + searchText;
-        jQuery.ajax({
+        $.ajax({
             url: link,
             cache: false,
             success: function(html) {
                 if (html.length > 0) {
-                    jQuery("#SearchAddressMessage" + userId).html("");
-                    jQuery("#AddressesComboBox" + userId).append(html);
+                    $("#SearchAddressMessage" + userId).html("");
+                    $("#AddressesComboBox" + userId).append(html);
                     ShowElement(false, "#SearchAddressDiv" + userId);
                     ShowElement(true, "#SelectAddressDiv" + userId);
                     return;
                 }
-                jQuery("#SearchAddressMessage" + userId).html("<i>Ничего не найдено</i>");
+                $("#SearchAddressMessage" + userId).html("<i>Ничего не найдено</i>");
             }
         });
     }    

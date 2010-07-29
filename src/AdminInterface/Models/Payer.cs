@@ -23,10 +23,6 @@ namespace AdminInterface.Models
 	[ActiveRecord("payers", Schema = "billing")]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
-		public const decimal CostPerUser = 800;
-
-		public const decimal CostPerAdditionalAddress = 200;
-
 		[PrimaryKey]
 		public virtual uint PayerID { get; set; }
 
@@ -143,27 +139,6 @@ namespace AdminInterface.Models
 		public virtual bool IsManualPayments()
 		{
 			return AutoInvoice == 0;
-		}
-
-		public static Payer GetByClientCode(uint clientCode)
-		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = sessionHolder.CreateSession(typeof(Payer));
-			try
-			{
-				return session.CreateSQLQuery(@"
-select {Payer.*}
-from billing.payers {Payer}
-	join Future.Clients cd on {Payer}.PayerID = cd.PayerId
-where cd.firmcode = :ClientCode")
-					.AddEntity(typeof (Payer))
-					.SetParameter("ClientCode", clientCode)
-					.UniqueResult<Payer>();
-			}
-			finally
-			{
-				sessionHolder.ReleaseSession(session);
-			}
 		}
 
 		public static IEnumerable<Payer> GetLikeAvaliable(string searchPattern)
@@ -286,21 +261,12 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				var countAddresses = Convert.ToDecimal(GetAllAddresses().Where(address => 
-					address.Enabled &&	// Адрес включен
-					!address.IsFree &&	// НЕ бесплатный
-					address.Client.Status == ClientStatus.On &&	// Клиент (владелец адреса) включен
-					address.AvaliableForEnabledUsers	// Есть хотя бы один включенный пользоыватель, которому доступен этот адрес
-					).Count());
-				var countUsers = Convert.ToDecimal(GetAllUsers().Where(user => 
-					user.Enabled &&	// Пользователь включен	
-					!user.IsFree &&	// НЕ бесплатный
-					user.Client.Status == ClientStatus.On // Клиент (владелец пользователя) включен
-					).Count());
-				var sum = countUsers * CostPerUser;
-				if ((countAddresses - countUsers) > 0)
-					sum += (countAddresses - countUsers) * CostPerAdditionalAddress;
-				return sum;
+				var users = Clients.SelectMany(c => c.Users.Select(u => u.Accounting));
+				var addresses = Clients.SelectMany(c => c.Addresses.Select(a => a.Accounting));
+
+				var accounts = users.Concat(addresses).Where(a => a.ShouldPay());
+
+				return accounts.Sum(a => a.Payment);
 			}
 		}
 	}

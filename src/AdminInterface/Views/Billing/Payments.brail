@@ -17,142 +17,52 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	</tr>
 <% end %>
 
-<style type="text/css">
-	td.ShortWidthColumn { width : 50px; }
-</style>
-
 <script type="text/javascript">
-    function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
-        var count = jQuery(selectorAdditionalInfo + id).length;
-        if (count > 0) {
-            jQuery(selectorAdditionalInfo + id).remove();
-            return;
-        }
-        AjaxRequest(ajaxLink,
-            function(html) { jQuery(selectorInfoCell + id).append(html); },
-            function(xhr, textStatus, error) { });
-    }
-
-    function ShowAdditionalInfoForUser(userId, cssClass) {
-        ShowAdditionalInfo(userId, "#additionalUserInfo", "#additionalUserInfoCell",
-            "${siteroot}/Billing/AdditionalUserInfo.rails?userId=" + userId + "&cssClassName=" + cssClass);
-    }
-
-    function ShowAdditionalInfoForAddress(addressId, cssClass) {
-        ShowAdditionalInfo(addressId, "#additionalAddressInfo", "#additionalAddressInfoCell",
-            "${siteroot}/Billing/AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
-    }
-
-    function SetClientStatus(clientId, status) {
-        var link = "${siteroot}/Billing/UpdateClientStatus?clientId=" + clientId + "&enabled=" + status;
-        ShowElement(true, "#loaderImage" + clientId);
-        ShowElement(false, "#ClientStatus" + clientId);
-        AjaxRequest(link,
-            function(html) {
-                if (status) {
-                    jQuery("#ClientRow" + clientId).removeClass("DisabledByBilling");
-                    jQuery("input[name='Client" + clientId + "']").attr("disabled", "");
-                }
-                else {
-                    jQuery("#ClientRow" + clientId).addClass("DisabledByBilling");
-                    jQuery("input[name='Client" + clientId + "']").attr("disabled", "disabled");
-                }
-                RefreshTotalSum();
-                ShowElement(false, "#loaderImage" + clientId);
-                ShowElement(true, "#ClientStatus" + clientId);
-            },
-            function(xhr, textStatus, error) { }
-        );
-    }
-    
-    function SetUserStatus(userId, status, free, isActive) {
-        var link = "${siteroot}/Billing/SetUserStatus.rails?userId=" + userId +
-            "&enabled=" + status + "&free=" + free;
-        AjaxRequest(link,
-            function(html) {                
-                if (!status) {
-                    jQuery("#UserRow" + userId).addClass('DisabledByBilling');
-                }
-                else {
-                    jQuery("#UserRow" + userId).removeClass('DisabledByBilling');
-                }
-                if (free) {
-                    jQuery("#UserRow" + userId).addClass('Free');
-                }
-                else {
-                    jQuery("#UserRow" + userId).removeClass('Free');
-                }
-                if (!isActive) {
-                    jQuery("#UserRow" + userId).addClass('OldUserUpdate');
-                }
-                else {
-                    jQuery("#UserRow" + userId).removeClass('OldUserUpdate');
-                }
-                RefreshTotalSum();
-            },
-            function(xhr, textStatus, error) { }
-        );
-    }
-
-    function SetAddressStatus(addressId, status, free) {
-        var link = "${siteroot}/Billing/SetAddressStatus.rails?addressId=" + addressId +
-            "&enabled=" + status + "&free=" + free;
-        AjaxRequest(link,
-            function(html) {
-                if (!status) {
-                    jQuery("#AddressRow" + addressId).addClass('DisabledByBilling');
-                }
-                else {
-                    jQuery("#AddressRow" + addressId).removeClass('DisabledByBilling');
-                }
-                if (free) {
-                    jQuery("#AddressRow" + addressId).addClass('Free');
-                }
-                else {
-                    jQuery("#AddressRow" + addressId).removeClass('Free');
-                }
-                RefreshTotalSum();
-            },
-            function(xhr, textStatus, error) { }
-        );
-    }
-
-	function UserAccounting(userId, status) {
-		var link = "${siteroot}/Billing/UserAccounting.rails?userId=" + userId + "&accounted=" + status;
-		AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+	function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
+		var count = $(selectorAdditionalInfo + id).length;
+		if (count > 0) {
+			$(selectorAdditionalInfo + id).remove();
+			return;
+		}
+		AjaxRequest(ajaxLink,
+			function(html) { $(selectorInfoCell + id).append(html); });
 	}
 
-	function AddressAccounting(userId, status) {
-		var link = "${siteroot}/Billing/AddressAccounting.rails?addressId=" + userId + "&accounted=" + status;
-		AjaxRequest(link, function(html) {}, function(xhr, textStatus, error) {});
+	function ShowAdditionalInfoForUser(userId, cssClass) {
+		ShowAdditionalInfo(userId, "#additionalUserInfo", "#additionalUserInfoCell",
+			"${siteroot}/Billing/AdditionalUserInfo.rails?userId=" + userId + "&cssClassName=" + cssClass);
 	}
 
-    function RefreshTotalSum() {
-        var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
-        AjaxRequest(link, function(html) { jQuery("#TotalSum").html(html); },
-            function(xhr, textStatus, error) { jQuery("#TotalSum").html(""); });
-    }
-
-    function AjaxRequest(link, action, errorAction) {
-        HideErrorMessage();
-        jQuery.ajax({
-            url: link,
-            cache: false,
-            success: function(html) { action(html); },
-            error: function(xhr, textStatus, error) {
-                ShowErrorMessage("При выполнении операции возникла ошибка. Попробуйте повторить позднее");
-                errorAction(xhr, textStatus, error);
-            }
-        });
-    }
-
-	function ShowErrorMessage(text) {
-		ShowElement(true, "#ErrorMessageDiv");
-		jQuery("#ErrorMessageDiv").html(text);
+	function ShowAdditionalInfoForAddress(addressId, cssClass) {
+		ShowAdditionalInfo(addressId, "#additionalAddressInfo", "#additionalAddressInfoCell",
+			"${siteroot}/Billing/AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
 	}
 
-	function HideErrorMessage() {
-		ShowElement(false, "#ErrorMessageDiv");
+	function SetClientStatus(clientId, status) {
+		var link = "${siteroot}/Billing/UpdateClientStatus?clientId=" + clientId + "&enabled=" + status;
+		ShowElement(true, "#loaderImage" + clientId);
+		ShowElement(false, "#ClientStatus" + clientId);
+		AjaxRequest(link,
+			function(html) {
+				if (status) {
+					$("#ClientRow" + clientId).removeClass("DisabledByBilling");
+					$("tr[name=Client" + clientId + "] input[name=status]").attr("disabled", "");
+				}
+				else {
+					$("#ClientRow" + clientId).addClass("DisabledByBilling");
+					$("tr[name=Client" + clientId + "] input[name=status]").attr("disabled", "disabled");
+				}
+				RefreshTotalSum();
+				ShowElement(false, "#loaderImage" + clientId);
+				ShowElement(true, "#ClientStatus" + clientId);
+			}
+		);
+	}
+
+	function RefreshTotalSum() {
+		var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
+		AjaxRequest(link, function(html) { $("#TotalSum").html(html); },
+			function(xhr, textStatus, error) { $("#TotalSum").html(""); });
 	}
 
 	function getInvertedDisplay(styleValue) {
@@ -163,28 +73,28 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 	function ShowUsers(linkCaption) {
 		var linkId = "ShowOrHideUsers";
-		var oldCaption = jQuery("#" + linkId).html();
-		var users = jQuery("tr[id*='UserRow']");
+		var oldCaption = $("#" + linkId).html();
+		var users = $("tr[id*='UserRow']");
 		for (var i = 0; i < users.size(); i++) {
-			if (jQuery("#" + users[i].getAttribute("Id")).hasClass("IsVisible"))
+			if ($("#" + users[i].getAttribute("Id")).hasClass("IsVisible"))
 				continue;
 			users[i].setAttribute("style", getInvertedDisplay(users[i].getAttribute("style")));
 		}
-		jQuery("#" + linkId).html(linkCaption);
+		$("#" + linkId).html(linkCaption);
 		document.getElementById(linkId).onclick = function () { ShowUsers(oldCaption) };
 	}
 
 	function ShowAddresses(linkCaption) {
 		var linkId = "ShowOrHideAddresses";
-		var oldCaption = jQuery("#" + linkId).html();
-		var addresses = jQuery("tr[id*='AddressRow']");
+		var oldCaption = $("#" + linkId).html();
+		var addresses = $("tr[id*='AddressRow']");
 
 		for (var i = 0; i < addresses.size(); i++) {
-			if (jQuery("#" + addresses[i].getAttribute("Id")).hasClass("IsVisible"))
+			if ($("#" + addresses[i].getAttribute("Id")).hasClass("IsVisible"))
 				continue;
 			addresses[i].setAttribute("style", getInvertedDisplay(addresses[i].getAttribute("style")));
 		}
-		jQuery("#" + linkId).html(linkCaption);
+		$("#" + linkId).html(linkCaption);
 		document.getElementById(linkId).onclick = function () { ShowAddresses(oldCaption) };
 	}
 
@@ -193,340 +103,328 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		if (objectType == "Address")
 			typeName = "${AdminInterface.Models.Billing.SwitchLogType.AddressLog}";
 		if (objectType == "User") {
-			jQuery("select#messageReceiverComboBox option[selected]").removeAttr("selected");
-			jQuery("select#messageReceiverComboBox option[value='" + objectId + "']").attr("selected", "selected");
+			$("select#messageReceiverComboBox option[selected]").removeAttr("selected");
+			$("select#messageReceiverComboBox option[value='" + objectId + "']").attr("selected", "selected");
 			typeName = "${AdminInterface.Models.Billing.SwitchLogType.UserLog}";
 		}
 		var id = "logRow" + typeName + objectId;
-		var rows = jQuery("tr[id*='logRow']");
-		for (var i = 0; i < rows.size(); i++) {
-			if (rows[i].getAttribute("Id") == id) {
-				rows[i].setAttribute("style", "display: '';");
-				continue;
+
+		var rows = $("tr[id*='logRow']").each(function (row) { 
+			if (row.id == id) {
+				$(row).attr("style", "display: '';");
+				return;
 			}
-			rows[i].setAttribute("style", "display: none;");
-		}
+			$(row).attr("style", "display: none;");
+		});
+
 		markAsSelected(objectId, objectType + "Link", objectType + "Value");
 	}
 
 	function markAsSelected(id, linkIdPart, textIdPart) {
 		var linkId = linkIdPart + id;
-		var links = jQuery("a[id*='" + linkIdPart + "']");
-		var texts = jQuery("div[id*='" + textIdPart + "']");
+		var links = $("a[id*='" + linkIdPart + "']");
+		var texts = $("div[id*='" + textIdPart + "']");
 
 		for (var i = 0; i < links.size(); i++) {
-			if (links[i].getAttribute("Id") == linkId) {
-				links[i].setAttribute("style", "display: none;");
-				texts[i].setAttribute("style", "display: '';");
+			if (links.get(i).Id == linkId) {
+				$(links.get(i)).attr("style", "display: none;");
+				$(texts.get(i)).attr("style", "display: '';");
 				continue;
 			}
-			links[i].setAttribute("style", "display: '';");
-			texts[i].setAttribute("style", "display: none;");
+			$(links.get(i)).attr("style", "display: '';");
+			$(texts.get(i)).attr("style", "display: none;");
 		}
 	}
 
 	function ShowOrHideTheme(show) {
 		if (show) {
-			jQuery("#EmailSubjectRow").css("display", "");
+			$("#EmailSubjectRow").css("display", "");
 			return;
 		}
-		jQuery("#EmailSubjectRow").css("display", "none");
+		$("#EmailSubjectRow").css("display", "none");
 	}
 
 	function ShowJuridicalOrganization(id) {
-		$$(".tab").invoke("hide");
-		$$(".tabs ul li a.selected").first().removeClassName("selected");
-		$("juridicalOrganization-tab").show();
-		$("juridicalOrganization").addClassName("selected");
+		$(".tab").hide();
+		$(".tabs ul li a.selected").removeClass("selected");
+		$("#juridicalOrganization-tab").show();
+		$("#juridicalOrganization").addClass("selected");
 
-		var elements = jQuery("div[id*='JuridicalOrganization']");
+		var elements = $("div[id*='JuridicalOrganization']");
 		for (var i = 0; i < elements.size(); i++) {
-			if (jQuery("#" + elements[i].id).attr("class").indexOf("HideVisible") >= 0) {
-				jQuery("#" + elements[i].id).click();
+			if ($("#" + elements[i].id).attr("class").indexOf("HideVisible") >= 0) {
+				$("#" + elements[i].id).click();
 			}
 		}
-		if (jQuery("#JuridicalOrganization" + id + "Header").attr("class").indexOf("ShowHiden") >= 0)
-			jQuery("#JuridicalOrganization" + id + "Header").click();
+		if ($("#JuridicalOrganization" + id + "Header").attr("class").indexOf("ShowHiden") >= 0)
+			$("#JuridicalOrganization" + id + "Header").click();
 	}
+
+	$(function () {
+
+		$("input[name=free]").change(function () {
+			if (this.checked)
+				$(this).parents("tr").addClass("Free");
+			else
+				$(this).parents("tr").removeClass("Free");
+		});
+
+		$("input[name=status]").change(function () {
+			if (this.checked)
+				$(this).parents("tr").removeClass("DisabledByBilling");
+			else
+				$(this).parents("tr").addClass("DisabledByBilling");
+		});
+
+		$("#addresses input, #users input").change(function () {
+			var id = $(this).parents("tr").find("input[name=id]").get(0).value;
+			var value = this.value;
+			if (this.type == "checkbox")
+				value = this.checked;
+
+			var link = "${siteroot}/Account/Update?id=" + id + "&" + this.name + "=" + value;
+			AjaxRequest(link,
+				function (html) {
+					RefreshTotalSum();
+				},
+				function (xhr, textStatus, error) { }
+			);
+		});
+	});
 </script>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
 </div>
 
 <div class="left">
-	<font style="font-size:large;">
-	<table>
-		<tr>
-			<td><b>Всего к оплате: </b></td>
-			<td style="padding-left: 5px; padding-right: 5px;">
-				<b><div id="TotalSum"> ${TotalSum}</div></b>
-			</td>
-			<td>рублей</td>
-		</tr>
-	</table>
-	</font>
-	<br />
 
-	<div style="width: 100%">
-		<div class="InputGroupHeader" style="margin-bottom:10px;">
-<%			headerCssClass = "ShowHiden"
-			bodyCssClass = "hidden"
-			if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
-				headerCssClass = "HideVisible" 
-				bodyCssClass = "VisibleFolder"
-			end %>
-			<div id="ClientListHeader" class="${headerCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
-				<a href="#" title="Клиенты плательщика '${Instance.ShortName}'">Клиенты плательщика "${Instance.ShortName}"</a>
-			</div>
-			<div id="ClientListBody" class="${bodyCssClass}" title="Клиенты плательщика '${Instance.ShortName}'">
-				<input type="hidden" name="clientCode" value="${client.Id}" />
-				<div style="overflow-x:scroll;">
-					<table class="DataTable" style="width:100%;">
-						<tr>
-							<th>Включен</th>
-							<th>Код</th>
-							<th>Название</th>
-							<th>Регион</th>
-							<th>Тип</th>
-							<th>Сегмент</th>
-							<th>Копий</th>
-							<th>Адресов доставки</th>
-							<th>Дата регистрации</th>
-							<th></th>
-							<!--
-							<th>Платеж</th>
-							<th>Подробнее</th>-->
-						</tr>
-<%					i = 0
-					sum = 0
-					for client in Instance.Clients:
-						i++ %>
-						<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledByBilling" if not client.IsClientActive()}" align="center">
-							<td style="width: 50px">
-								<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
-								<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
-							</td>
-							<td>${client.Id}</td>
-							<td>
-<%                      if client.Id == Client.Id: %>
-								<strong>${client.Name}</strong>
-<%                      else: %>
-								<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
-									${client.Name}
-								</a>
-<%                      end %>
-							</td>
-							<td>${client.HomeRegion.Name}</td>
-							<td>${BindingHelper.GetDescription(client.Type)}</td>
-							<td>${BindingHelper.GetDescription(client.Segment)}</td>
-							<td>
-<%                          if client.WorkCopyCount(): %>
-								${client.WorkCopyCount()}
-<%                          else: %>
-								-
-<%                          end %>
-							</td>
-							<td>
-<%                          if client.IsDrugstore(): %>
-								${client.Addresses.Count}
-<%                          else: %>
-								-
-<%                          end %>
-							</td>
-							<td>
-								${client.RegistrationDate.ToShortDateString()}
-							</td>
-							<td>
-								<a href="mailto:${client.GetEmailsForBilling()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
-							</td>
-							<!--
-							<td>
-								<% sum += client.GetPayment(tariffs) %>
-								${client.GetPayment(tariffs)}
-							</td>
-							<td><a href="javascript:" onclick="ShowAdditionalInfo(${client.Id}, '${ViewHelper.GetRowStyle(i)}')">...</a></td>
-							-->
-						</tr>
-						<!--
-						<tr>
-						    <td colspan="2"></td>
-						    <td id="additionalInfoCell${client.Id}" colspan="9"></td>
-                        </tr>
-                        -->
-<%                  end %>
-                        <!--
-						<tr>
-							<td colspan="9" style="text-align:right;">
-								Итого ${sum}
-							</td>
-						</tr>
-						-->
-					</table>
-					</div><!--
-                    <div style="text-align:right;">
-                        <input type="submit" value="Сохранить" />
-                    </div>-->
-				<!--</form>-->
-			</div>				
+	<div style="font-size:large; margin-bottom: 10px">
+		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum}</span> рублей</b>
+	</div>
+
+	<div class="InputGroupHeader" style="margin-bottom:10px;width: 100%;">
+		<%
+		headerCssClass = "ShowHiden"
+		bodyCssClass = "hidden"
+		if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
+			headerCssClass = "HideVisible"
+			bodyCssClass = ""
+		end
+		%>
+		<div class="${headerCssClass}" title="Клиенты">
+			<a href="javascript:">Клиенты</a>
+		</div>
+
+		<div class="VisibleFolder ${bodyCssClass}" title="Клиенты">
+			<table id=clients class="DataTable" style="width:100%;">
+				<tr>
+					<th>Включен</th>
+					<th>Код</th>
+					<th>Название</th>
+					<th>Регион</th>
+					<th>Тип</th>
+					<th>Сегмент</th>
+					<th>Копий</th>
+					<th>Адресов доставки</th>
+					<th>Дата регистрации</th>
+					<th></th>
+				</tr>
+				<% for i, client in enumerate(payer.Clients): %>
+				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledByBilling" if not client.IsClientActive()}" align="center">
+					<td style="width: 50px">
+						<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
+						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
+					</td>
+					<td>${client.Id}</td>
+					<td>
+					<% if client.Id == Client.Id: %>
+						<strong>${client.Name}</strong>
+					<% else: %>
+						<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
+							${client.Name}
+						</a>
+					<% end %>
+					</td>
+					<td>${client.HomeRegion.Name}</td>
+					<td>${BindingHelper.GetDescription(client.Type)}</td>
+					<td>${BindingHelper.GetDescription(client.Segment)}</td>
+					<td>
+						<% if client.WorkCopyCount(): %>
+						${client.WorkCopyCount()}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td>
+						<% if client.IsDrugstore(): %>
+						${client.Addresses.Count}
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td>
+						${client.RegistrationDate.ToShortDateString()}
+					</td>
+					<td>
+						<a href="mailto:${client.GetEmailsForBilling()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
+					</td>
+				</tr>
+				<% end %>
+			</table>
 		</div>
 	</div>
 
-    <div class="InputGroupHeader" style="margin-bottom:10px;">
-<%      headerCssClass = "ShowHiden"
-        bodyCssClass = "hidden"
-        if (IsDefined("ShowUsers") and ShowUsers) or Client.Users.Count < 5:
-            headerCssClass = "HideVisible" 
-            bodyCssClass ="VisibleFolder"
-        end %>
-        <div id="UserListHeader" class="${headerCssClass}" title="Пользователи клиента '${Client.Name}'">
-            <a href="javascript:" title="Пользователи клиента '${Client.Name}'">Пользователи клиента "${Client.Name}"</a>
-        </div>
+	<div class="InputGroupHeader" style="margin-bottom:10px;">
+		<%
+		headerCssClass = "ShowHiden"
+		bodyCssClass = "hidden"
+		if (IsDefined("ShowUsers") and ShowUsers) or Client.Users.Count < 5:
+			headerCssClass = "HideVisible" 
+			bodyCssClass =""
+		end
+		%>
+		<div id="UserListHeader" class="${headerCssClass}" title="Пользователи клиента '${Client.Name}'">
+			<a href="javascript:" title="Пользователи клиента '${Client.Name}'">Пользователи клиента "${Client.Name}"</a>
+		</div>
 
-        <div id="UserListBody" class="${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
+		<div id="UserListBody" class="VisibleFolder ${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
 			<% if Instance.Clients.Count > 1: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
 			</div>
 			<% end %>
 			<br />
-                <div align="left">
-                    <table class="DataTable" id="UsersTable" style="width:100%;">
-                        <tr align="center" valign="top">
-                            <th>Включен</th>
-                            <th>Учтен</th>
-                            <th>Работает бесплатно</th>
-                            <th>Код пользователя</th>
-							<th>Адреса</th>
-                            <th>Комментарий</th>
-                            <th>Дата последнего обновления</th>
-                            <th>Клиент</th>
-                        </tr>
-<%                      for i,user in enumerate(Users):
-                            log = AdminInterface.Models.Logs.AuthorizationLogEntity.TryFind(user.Id) %>
-                        <tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'IsVisible' if (Client.Id == user.Client.Id)}"
-                            align="center" name="Client${user.Client.Id}" style="${'display:none' if (Client.Id != user.Client.Id)}">
-                            <td class="ShortWidthColumn">
-<%                          if (user.Client.IsClientActive()): %>
-                                <input type="checkbox" ${"checked" if user.Enabled} id="UserStatusCheckBox${user.Id}" name="Client${user.Client.Id}"
-                                    onclick="SetUserStatus(${user.Id}, this.checked, document.getElementById('FreeUserCheckBox${user.Id}').checked, ${cast(int, user.IsActive)})" />
-<%                          else: %>
-                                <input type="checkbox" ${"checked" if user.Enabled} id="UserStatusCheckBox${user.Id}" name="Client${user.Client.Id}"
-                                    onclick="SetUserStatus(${user.Id}, this.checked, document.getElementById('FreeUserCheckBox${user.Id}').checked, ${cast(int, user.IsActive)})" />
-<%                          end %>
-                            </td>
-                            <td class="ShortWidthColumn">
-                                <input type="checkbox" ${"checked" if user.IsRegisteredInBilling} id="UserAccountingStatusCheckBox${user.Id}"
-                                    onclick="UserAccounting(${user.Id}, this.checked)" />
-                            </td>
-                            <td class="ShortWidthColumn">
-                                <input type="checkbox" ${"checked" if user.IsFree} id="FreeUserCheckBox${user.Id}"
-                                    onclick="SetUserStatus(${user.Id}, document.getElementById('UserStatusCheckBox${user.Id}').checked, this.checked, ${cast(int, user.IsActive)})" />
-                            </td>
-							<td>
-								<div id="UserValue${user.Id}" style="display: none;"><b>${user.Id}</b></div>
-								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
-							</td>
-							<td class="ShortWidthColumn"><a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/kfm_home.png" border="0" /></a></td>
-                            <td>${user.Name}</td>
-                            <td>${log.AFTime if (log != null) and (log.AFTime != null)}</td>
-                            <td>${user.Client.Name}</td>
-                        </tr>
-                        <tr id="UserRowHidden${user.Id}" class="${'IsVisible' if (Client.Id == user.Client.Id)}" style="${'display:none' if (Client.Id != user.Client.Id)}">
-							<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
-						</tr>
-<%                      end %>
-                        </table>
-                    </div>
-            </div>
-		</div>
-			
-		<div class="InputGroupHeader" style="margin-bottom:10px;">
-<%          headerCssClass = "ShowHiden"
-            bodyCssClass = "hidden"
-            if (IsDefined("ShowAddresses") and ShowAddresses) or Client.Addresses.Count < 5:
-                headerCssClass = "HideVisible"
-                bodyCssClass = "VisibleFolder"
-            end %>
-			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса клиента '${Client.Name}'">
-				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
-			</div>
-			<div id="AddressListBody" class="${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
-			<% if Instance.Clients.Count > 1: %>
-			<div align="right">
-				<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
-			</div>
-			<% end %>
-			<br />
 				<div align="left">
-					<table class="DataTable" id="AddressesTable" style="width:100%;">
+					<table class="DataTable" id="users" style="width:100%;">
 						<tr align="center" valign="top">
 							<th>Включен</th>
 							<th>Учтен</th>
-							<th>Работает бесплатно</th>
+							<th>Бесплатно</th>
+							<th>Платеж</th>
+							<th>Код пользователя</th>
+							<th>Адреса</th>
+							<th>Комментарий</th>
+							<th>Дата последнего обновления</th>
+							<th>Клиент</th>
+						</tr>
+						<% for i,user in enumerate(Users): %>
+						<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'IsVisible' if (Client.Id == user.Client.Id)}"
+							align="center" name="Client${user.Client.Id}" style="${'display:none' if (Client.Id != user.Client.Id)}">
+							<td class=short>
+								<input name=id type=hidden value=${user.Accounting.Id}>
+								<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if not user.Client.IsClientActive()} />
+							</td>
+							<td class=short>
+								<input name=accouted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
+							</td>
+							<td class=short>
+								<input name=free type="checkbox" ${"checked" if user.IsFree} />
+							</td>
+							<td class=short>
+								<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment}"> 
+							</td>
+							<td>
+								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
+							</td>
+							<td class=short>
+								<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
+									<img src="${siteroot}/Images/kfm_home.png" border="0" />
+								</a>
+							</td>
+							<td>${user.Name}</td>
+							<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
+							<td>${user.Client.Name}</td>
+						</tr>
+						<tr id="UserRowHidden${user.Id}" class="${'IsVisible' if (Client.Id == user.Client.Id)}" style="${'display:none' if Client.Id != user.Client.Id}">
+							<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
+						</tr>
+						<% end %>
+					</table>
+				</div>
+			</div>
+		</div>
+			
+		<div class="InputGroupHeader" style="margin-bottom:10px;">
+			<%
+			headerCssClass = "ShowHiden"
+			bodyCssClass = "hidden"
+			if (IsDefined("ShowAddresses") and ShowAddresses) or Client.Addresses.Count < 5:
+				headerCssClass = "HideVisible"
+				bodyCssClass = ""
+			end
+			%>
+			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса клиента '${Client.Name}'">
+				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
+			</div>
+			<div id="AddressListBody" class="VisibleFolder ${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
+				<% if Instance.Clients.Count > 1: %>
+				<div align="right">
+					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
+				</div>
+				<% end %>
+				<br />
+				<div align="left">
+					<table class="DataTable" id="addresses" style="width:100%;">
+						<tr align="center" valign="top">
+							<th>Включен</th>
+							<th>Учтен</th>
+							<th>Бесплатно</th>
+							<th>Платеж</th>
 							<th>Адрес</th>
 							<th>Пользователи</th>
 							<th>Клиент</th>
 							<th>Юр. лицо</th>
 						</tr>
-<%                      for i,addr in enumerate(Addresses):
-                        hasNoUsers = (addr.AvaliableForUsers.Count == 0) %>
-                        <tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
-                            align="center" name="Client${addr.Client.Id}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
-                            <td class="ShortWidthColumn">
-<%                          if (addr.Client.IsClientActive()): %>
-                                <input id="AddressStatus${addr.Id}" type="checkbox" ${"checked" if addr.Enabled} name="Client${addr.Client.Id}"
-                                    onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
-<%                          else: %>
-                                <input id="AddressStatus${addr.Id}" type="checkbox" disabled="disabled" name="Client${addr.Client.Id}"
-                                    onclick="SetAddressStatus(${addr.Id}, this.checked, document.getElementById('AddressFree${addr.Id}').checked)" />
-<%                          end %>
-                            </td>
-                            <td class="ShortWidthColumn">
-                                <input type="checkbox" ${"checked" if addr.IsRegisteredInBilling} id="AddressAccountingStatusCheckBox${addr.Id}"
-                                    onclick="AddressAccounting(${addr.Id}, this.checked)" />
-                            </td>
-                            <td class="ShortWidthColumn">
-                                <input id=AddressFree${addr.Id} type="checkbox" ${"checked" if addr.FreeFlag} 
-                                    onclick="SetAddressStatus(${addr.Id}, document.getElementById('AddressStatus${addr.Id}').checked, this.checked)" />
-                            </td>
-                            <td>
-								<div id="AddressValue${addr.Id}" style="display: none;"><b>${addr.Value}</b></div>
+						<% for i, addr in enumerate(Addresses): %>
+						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
+						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
+							align="center" name="Client${addr.Client.Id}" style="${'display:none' if Client.Id != addr.Client.Id}">
+							<td class=short>
+								<input name=id type=hidden value=${addr.Accounting.Id}>
+								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if not addr.Client.IsClientActive()} />
+							</td>
+							<td class=short>
+								<input name=accounted type=checkbox ${"checked" if addr.Accounting.BeAccounted} />
+							</td>
+							<td class=short>
+								<input name=free type=checkbox ${"checked" if addr.FreeFlag} />
+							</td>
+							<td class=short>
+								<input name=payment class=payment type=text value="${addr.Accounting.Payment}"> 
+							</td>
+							<td>
 								<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>
 							</td>
-							<td class="ShortWidthColumn"><a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')"><img src="${siteroot}/Images/group.png" border="0" /></a></td>
+							<td class=short>
+								<a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">
+									<img src="${siteroot}/Images/group.png" border="0" />
+								</a>
+							</td>
 							<td>${addr.Client.Name}</td>
-								<td>
-								<% if (addr.JuridicalOrganization != null): %>
+							<td>
+								<% if addr.JuridicalOrganization: %>
 									<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.JuridicalOrganization.Id})">${addr.JuridicalOrganization.Name}</a>
 								<% end %>
-								</td>
-                        </tr>
-                        <tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if (Client.Id != addr.Client.Id)}">
+							</td>
+						</tr>
+						<tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if Client.Id != addr.Client.Id}">
 							<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
 						</tr>
-<%                      end %>
-                    </table>
-                </div>
-            </div>
+						<% end %>
+					</table>
+				</div>
+			</div>
 		</div>
 
 <% 
 	component Legend, { "LegendItems" : {	"Выключен" : "DisabledByBilling", 
-	                                        "Работает бесплатно" : "Free", 
+											"Работает бесплатно" : "Free", 
 											"Не получал обновлений более 7 дней" : "OldUserUpdate",
 											"Адрес не имеет подключенных пользователей" : "HasNoConnectedUsers"},
 						"ByCenter" : false}
 %>		
-		<!--
-		<table>
-		    <tr><td class="Disabled" style="width: 40px;"></td><td> - Выключен</td></tr>
-		    <tr><td class="Free" style="width: 40px;"></td><td> - Работает бесплатно</td></tr>
-		    <tr><td class="Inactive" style="width: 40px;"></td><td> - Пользователь не получал обновлений более 7 дней</td></tr>
-		    <tr><td class="HasNoConnectedUsers" style="width: 40px"></td><td> - Адрес не имеет подключенных пользователей</td></tr>
-		</table>
-		-->
-		<br />
-<!-- Пока скрыто за ненадобностью -->		
+	<br />
+<!-- Пока скрыто за ненадобностью -->
 <div style="display: none">
 		<div class="InputGroupHeader">
 			<form action="" method="get">
@@ -562,7 +460,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<form action="AddPayment.rails" method="post">
 			<input type="hidden" name="clientCode" value="${Client.Id}" />
 			<input type="hidden" name="Payment.Payer.PayerID" value="${Instance.PayerID}" />
-			Сумма платежа:<br />			
+			Сумма платежа:<br />
 			<input name="Payment.Sum" type="text" /><br />
 			Дата платежа:<br />
 			<input name="Payment.PayedOn" type="text" /><input type="button" class="CalendarInput" />
@@ -661,12 +559,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 														 BindingHelper.GetDescriptionsDictionary(Instance.DiscountType.GetType()),
 														 BindingHelper.GetDictionaryMapping()))}
 		<% end %>
-		        ${WriteInputGroupHeader("Комментарий")}
-		        <tr>
-			        <td colspan=2>
-				        ${FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" })}
-			        </td>
-		        </tr>									 
+				${WriteInputGroupHeader("Комментарий")}
+				<tr>
+					<td colspan=2>
+						${FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" })}
+					</td>
+				</tr>									 
 				<tr style="text-align:right">
 					<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
 				</tr>
@@ -681,40 +579,40 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="UseCaseGroup">
 		<form id="SendMessageForm" action="sendMessage.rails" method="post">
 			<table style="width:100%">
-			        <tr>
+					<tr>
 <%                      if (CountUsersWithMessages > 0): %>
-			            <td class="InputGroupHeader" title="Сообщения для пользователей">
+						<td class="InputGroupHeader" title="Сообщения для пользователей">
 <%                          cssClassHeader = "ShowHiden"
-                            cssClassBody = "hidden"
-                            if (CountUsersWithMessages < 5):
-                                cssClassHeader = "HideVisible"
-                                cssClassBody = "VisibleFolder"
-                            end %>			            
-			                <div class="${cssClassHeader}" title="Сообщения для пользователей">
-			                    <a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>
-			                </div>
-			                <div class="${cssClassBody}" title="Сообщения для пользователей">
-			                    <br />
+							cssClassBody = "hidden"
+							if (CountUsersWithMessages < 5):
+								cssClassHeader = "HideVisible"
+								cssClassBody = ""
+							end %>			            
+							<div class="${cssClassHeader}" title="Сообщения для пользователей">
+								<a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>
+							</div>
+							<div class="VisibleFolder ${cssClassBody}" title="Сообщения для пользователей">
+								<br />
 <%                          for i,user in enumerate(Users): 
-					            if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
-						        <div id="CurrentMessageForUser${user.Id}" style="text-align: left">
-							    Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.
-							        <a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
-    						    </div>
+								if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
+								<div id="CurrentMessageForUser${user.Id}" style="text-align: left">
+								Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.
+									<a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
+								</div>
 <%                              end
-					        end %>
-					        </div>
+							end %>
+							</div>
 <%                      end %>
-			            </td>
-			        </tr>
+						</td>
+					</tr>
 					<tr><td><br /></td></tr>
 					<tr>
 						<td class="InputGroupHeader">
 							Сообщение для пользователя:
 							<select id="messageReceiverComboBox" name="NewClientMessage.ClientCode">
-                                <option value="0" selected="selected">Для всех пользователей</option>
+								<option value="0" selected="selected">Для всех пользователей</option>
 <%                              for i, user in enumerate(Users): %>
-                                <option value="${user.Id}">${user.GetLoginOrName()}</option>
+								<option value="${user.Id}">${user.GetLoginOrName()}</option>
 <%                              end %>
 							</select>
 							<% if (Users.Count > 0): %>
@@ -772,22 +670,22 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			</div>
 			<table class="DataTable" style="width: 100%;">
 <%          if LogRecords.Count > 0: %>			
-                <thead>
-                    <th>Дата</th>
-                    <th>Объект</th>
-                    <th>Имя</th>
-                    <th>Оператор</th>
-                    <th>Статус</th>
-                </thead>
+				<thead>
+					<th>Дата</th>
+					<th>Объект</th>
+					<th>Имя</th>
+					<th>Оператор</th>
+					<th>Статус</th>
+				</thead>
 <%          end %>
 <%          for i,logRecord in enumerate(LogRecords): %>
-			    <tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
-			        <td>${logRecord.LogTime}</td>
-			        <td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
-			        <td>${logRecord.Value}</td>
-			        <td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
-			        <td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
-			    </tr>
+				<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
+					<td>${logRecord.LogTime}</td>
+					<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
+					<td>${logRecord.Value}</td>
+					<td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
+					<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
+				</tr>
 <%          end %>
 			</table>
 					

@@ -7,75 +7,80 @@
 
 <script>
 
-	document.observe("dom:loaded", function () {
-		SetupCalendarElements();
+	function AjaxRequest(link, action) {
+		AjaxRequest(link, action, null);
+	}
 
-		Validation.add("ValidateDate", "Не корректная дата", function (v) {
-			return Validation.get('IsEmpty').test(v) || Date.parse(v) != null;
+	function AjaxRequest(link, action, errorAction) {
+		HideErrorMessage();
+		$.ajax({
+			url: link,
+			cache: false,
+			success: function (html) { action(html); },
+			error: function (xhr, textStatus, error) {
+				ShowErrorMessage("При выполнении операции возникла ошибка. Попробуйте повторить позднее");
+				if (errorAction)
+					errorAction(xhr, textStatus, error);
+			}
 		});
-		Validation.add("ValidatePaySum", "Не корректная сумма платежа", function (v) {
-			return Validation.get('IsEmpty').test(v) || /^\d+(\,\d*)?$/.test(v);
-		});
+	}
 
-		$$(".tabs ul li a").invoke('observe', 'click', function () {
-			$$(".tab").invoke("hide");
-			$$(".tabs ul li a.selected").first().removeClassName("selected");
-			$(this.id + "-tab").show();
-			this.addClassName("selected");
-		});
+	function ShowErrorMessage(text) {
+		ShowElement(true, "#ErrorMessageDiv");
+		$("#ErrorMessageDiv").html(text);
+	}
 
-		new Validation("PayerInfo");
-	})
+	function HideErrorMessage() {
+		$(false, "#ErrorMessageDiv");
+	}
+
+	$(function () {
+//		Validation.add("ValidateDate", "Не корректная дата", function (v) {
+//			return Validation.get('IsEmpty').test(v) || Date.parse(v) != null;
+//		});
+//		Validation.add("ValidatePaySum", "Не корректная сумма платежа", function (v) {
+//			return Validation.get('IsEmpty').test(v) || /^\d+(\,\d*)?$/.test(v);
+//		});
+
+//		new Validation("PayerInfo");
+	});
 
 	function RemoveMessage(userId) {
 		SetStatusBarMessage("Удаление...", "Notification");
-		$("CurrentMessageForUser" + userId).remove();
-		new Ajax.Request("CancelMessage.rails?userId=" + userId, {
-			method: 'post',
-			onFailure: function() {
-				SetStatusBarMessage("Ошибка при удалении сообщения", "Error");
-			},
-			onSuccess: function() {
+		AjaxRequest("CancelMessage.rails?userId=" + userId,
+			function () {
+				$("#CurrentMessageForUser" + userId).remove();
 				SetStatusBarMessage("Сообщение удалено", "Success");
-			}
-		});
+			});
 	}
 	
 	function RemoveMailEntity(id)
 	{
 		SetStatusBarMessage("Удаление...", "Notification");
-		new Ajax.Request("DeleteMail.rails?id=" + id, { 
-			method: 'post',
-			onFailure: function()
-			{
-				SetStatusBarMessage("Ошибка при удалении", "Error");
-			},
-			onSuccess: function()
-			{
-				$('mail' + id)
-					.addClassName('DeletedMessage')
-					.select('input')
-					.first()
+		AjaxRequest("DeleteMail.rails?id=" + id, 
+			function() {
+				$('#mail' + id)
+					.addClass('DeletedMessage')
+					.find('input')
 					.remove();
 				SetStatusBarMessage("Сообщение удалено", "Success");
-			}
-		});
+			});
 	}
 	
 	function SetStatusBarMessage(message, className)
 	{
-		$$("#StatusBar td").first().update(message);
-		$$("#StatusBar table").first().removeClassName("Notification").removeClassName("Error").removeClassName("Success").addClassName(className);
+		$("#StatusBar td").html(message);
+		$("#StatusBar table").removeClass("Notification").removeClass("Error").removeClass("Success").addClass(className);
 	}
 
 	function ShowMessage(userId) {
 		SetStatusBarMessage("Загрузка...", "Notification");
-		new Ajax.Request("ShowMessageForUser.rails?userId=" + userId, {
-			method: 'get',
-			onSuccess: function() {
+		AjaxRequest("ShowMessageForUser.rails?userId=" + userId,
+			function(html) {
 				SetStatusBarMessage("", "");
+				$("#CurrentMessageForUser" + userId).children().replaceWith(html);
 			}
-		});
+		);
 	}
 </script>
 

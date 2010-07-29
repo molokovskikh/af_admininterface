@@ -13,6 +13,16 @@ td.BillingInput select
 	width: 99%;
 }
 
+input[type=text].payment
+{
+	width: 4em;
+}
+
+td.short
+{
+	width : 1%;
+}
+
 .BillingInput
 {
 	width: 99%;

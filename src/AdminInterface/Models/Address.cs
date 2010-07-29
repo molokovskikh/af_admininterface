@@ -9,11 +9,9 @@ using System.Security.AccessControl;
 using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
-using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
-using Common.MySql;
 using Common.Web.Ui.Helpers;
 using log4net;
 using Common.Web.Ui.Models;
@@ -21,40 +19,41 @@ using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("Addresses", Schema = "Future")]
+	[ActiveRecord("Addresses", Schema = "Future", Lazy = true)]
 	public class Address : ActiveRecordLinqBase<Address>
 	{
 		[PrimaryKey]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		[Property("Address")]
-		public string Value { get; set; }
+		public virtual string Value { get; set; }
 
 		[BelongsTo("ClientId")]
-		public Client Client { get; set; }
+		public virtual Client Client { get; set; }
 
-		[BelongsTo("ContactGroupId")]
-		public ContactGroup ContactGroup { get; set; }
+		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
+		public virtual ContactGroup ContactGroup { get; set; }
 
 		[Property]
-		public bool Enabled { get; set; }
+		public virtual  bool Enabled { get; set; }
 
 		[Property("Free")]
-		public bool FreeFlag { get; set; }
-
-		[Property]
-		public bool BeAccounted { get; set; }
+		public virtual  bool FreeFlag { get; set; }
 
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
-		public JuridicalOrganization JuridicalOrganization { get; set; }
+		public virtual  JuridicalOrganization JuridicalOrganization { get; set; }
+
+		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
+		public virtual Accounting Accounting { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,
 			ColumnKey = "AddressId",
-			Table = "future.UserAddresses",
+			Table = "UserAddresses",
+			Schema = "future",
 			ColumnRef = "UserId")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
-		
+
 		public virtual bool AvaliableFor(User user)
 		{
 			return AvaliableForUsers.Any(u => u.Id == user.Id);
@@ -154,7 +153,7 @@ set @skip = 0;
 			}
 		}
 
-		public void SetAccessControl(string username)
+		public virtual void SetAccessControl(string username)
 		{
 			if (!ADHelper.IsLoginExists(username))
 				return;
@@ -238,52 +237,6 @@ set @skip = 0;
 		{
 			UpdateContacts(displayedContacts, null);
 		}
-
-        public virtual bool IsRegisteredInBilling
-        {
-            get
-            {
-                return Convert.ToUInt32(ArHelper.WithSession(session =>
-                    session.CreateSQLQuery(@"
-SELECT
-	COUNT(*)
-FROM
-	Billing.Accounting
-WHERE
-	AccountId = :AccountId and Type = :Type")
-                        .SetParameter("AccountId", Id)
-                        .SetParameter("Type", AccountingItemType.Address)
-                        .UniqueResult())) > 0;
-            }
-        }
-
-        public virtual void RegisterInBilling()
-        {
-            using (var scope = new TransactionScope())
-            {
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-                var accountingItem = new AccountingItem {
-                    AccountId = Id,
-                    Type = AccountingItemType.Address,
-					Operator = SecurityContext.Administrator.UserName,
-                };
-                accountingItem.Create();
-                scope.VoteCommit();
-            }
-        }
-
-        public virtual void UnregisterInBilling()
-        {
-            using (var scope = new TransactionScope())
-            {
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-                var accountingItem = AccountingItem.GetByAddress(this);
-                accountingItem.Delete();
-                scope.VoteCommit();
-            }
-        }
 
 		public virtual void MoveToAnotherClient(Client newOwner)
 		{

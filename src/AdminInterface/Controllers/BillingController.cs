@@ -44,6 +44,8 @@ namespace AdminInterface.Controllers
 			DateTime? paymentsTo,
 			uint currentJuridicalOrganizationId)
 		{
+			LayoutName = "GeneralWithJQueryOnly";
+
 			Client client;
 
 			if (billingCode == 0)
@@ -86,6 +88,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Instance"] = payer;
+			PropertyBag["payer"] = payer;
 			PropertyBag["User"] = user;
 			PropertyBag["Address"] = address;
 			PropertyBag["Tariffs"] = Tariff.FindAll();
@@ -109,8 +112,7 @@ namespace AdminInterface.Controllers
 		{
 			using (new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				billingInstance.UpdateAndFlush();
 				Flash.Add("Message", new Message("Изменения сохранены"));
 				Redirect("Billing", "Edit", new {clientCode, tab});
@@ -126,8 +128,7 @@ namespace AdminInterface.Controllers
 				Client client = null;
 				using (var scope = new TransactionScope())
 				{
-					DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-						HttpContext.Current.Request.UserHostAddress);
+					DbLogHelper.SetupParametersForTriggerLogging();
 					if (clientMessage.ClientCode == 0)
 						foreach (var user in Client.Find(clientId).Users)
 						{
@@ -157,8 +158,7 @@ namespace AdminInterface.Controllers
 
 		private void SendMessageToUser(User user, ClientMessage clientMessage)
 		{
-			DbLogHelper.SetupParametersForTriggerLogging<ClientMessage>(SecurityContext.Administrator.UserName,
-																		Request.UserHostAddress);
+			DbLogHelper.SetupParametersForTriggerLogging();
 			var message = ClientMessage.Find(user.Id);
 			message.Message = clientMessage.Message;
 			message.ShowMessageCount = clientMessage.ShowMessageCount;
@@ -169,8 +169,7 @@ namespace AdminInterface.Controllers
 		{
 			using(new TransactionScope())
 			{
-				DbLogHelper.SetupParametersForTriggerLogging<ClientWithStatus>(SecurityContext.Administrator.UserName,
-																			   Request.UserHostAddress);
+				DbLogHelper.SetupParametersForTriggerLogging();
 				var newStatus = enabled ? ClientStatus.On : ClientStatus.Off;
 				var client = Client.Find(clientId);
 				if (newStatus == ClientStatus.On && client.Status == ClientStatus.Off)
@@ -179,81 +178,6 @@ namespace AdminInterface.Controllers
 					ClientInfoLogEntity.StatusChange(newStatus, client.Id).Save();
 				client.Status = newStatus;
 				client.UpdateAndFlush();
-			}
-			CancelView();
-			CancelLayout();
-		}
-
-		public void SetUserStatus(uint userId, bool enabled, bool free)
-		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging<User>(SecurityContext.Administrator.UserName,
-					HttpContext.Current.Request.UserHostAddress);
-				var user = User.Find(userId);
-				var oldStatus = user.Enabled;
-				user.Enabled = enabled;
-				user.IsFree = free;
-				user.UpdateAndFlush();
-				if (enabled && !oldStatus)
-					Mailer.UserBackToWork(user);
-				if (!enabled)
-				{
-					// Если это отключение, то проходим по адресам и
-					// отключаем адрес, который доступен только отключенным пользователям
-					foreach (var address in user.AvaliableAddresses)
-					{
-						if (address.AvaliableForEnabledUsers)
-							continue;
-						address.Enabled = false;
-						address.Update();
-					}
-				}
-				user.Client.UpdateBeAccounted();
-				user.Client.Save();
-				scope.VoteCommit();
-			}
-			CancelView();
-			CancelLayout();
-		}
-
-		public void UserAccounting(uint userId, bool accounted)
-		{
-			var user = User.Find(userId);
-			if (accounted)
-				user.RegisterInBilling();
-			else
-				user.UnregisterInBilling();
-			CancelView();
-			CancelLayout();
-		}
-
-		public void AddressAccounting(uint addressId, bool accounted)
-		{
-			var address = Address.Find(addressId);
-			if (accounted)
-				address.RegisterInBilling();
-			else
-				address.UnregisterInBilling();
-			CancelView();
-			CancelLayout();
-		}
-
-		public void SetAddressStatus(uint addressId, bool enabled, bool free)
-		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var address = Address.Find(addressId);
-				var oldStatus = address.Enabled;
-				if (enabled && !oldStatus)
-					Mailer.AddressBackToWork(address);
-				address.Enabled = enabled;
-				address.FreeFlag = free;
-				address.Client.UpdateBeAccounted();
-				address.Client.Save();
-
-				scope.VoteCommit();
 			}
 			CancelView();
 			CancelLayout();
@@ -351,6 +275,7 @@ namespace AdminInterface.Controllers
 
 		public void ShowMessageForUser(uint userId)
 		{
+			CancelLayout();
 			var message = ClientMessage.FindUserMessage(userId);
 			PropertyBag["Message"] = message;
 			PropertyBag["user"] = User.Find(message.ClientCode);
@@ -458,42 +383,34 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 		}
 
-		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties SearchBy, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
+		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties searchBy, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
 		{
-			if ((SearchBy.BeginDate == null) && (SearchBy.EndDate == null) && (SearchBy.SearchText == null))
-				SearchBy = new AccountingSearchProperties {
-					BeginDate = DateTime.Today.AddDays(-1),
-					EndDate = DateTime.Today,
-					SearchText = String.Empty,
-				};
-			if (!pageSize.HasValue)
-				pageSize = 30;
-			if (!currentPage.HasValue)
-				currentPage = 0;
+			if (searchBy.BeginDate == null && searchBy.EndDate == null && searchBy.SearchText == null)
+				searchBy = new AccountingSearchProperties();
 
 			if (String.IsNullOrEmpty(tab))
 				tab = "unregistredItems";
 
+			var pager = new Pager(currentPage, pageSize, rowsCount.HasValue);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 			{
-				var unaccountedItems = AccountingItem.GetUnaccountedObjects(currentPage.Value, pageSize.Value, rowsCount.HasValue);
+				var unaccountedItems = Models.Billing.Accounting.GetReadyForAccounting(pager);
 				PropertyBag["unaccountedItems"] = unaccountedItems;
-				PropertyBag["rowsCount"] = rowsCount.HasValue ? rowsCount : (uint)unaccountedItems.Count;
-				PropertyBag["currentPage"] = currentPage;
 			}
 			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 			{
-				var historyItems = AccountingItem
-					.SearchBy(SearchBy, currentPage.Value, pageSize.Value, rowsCount.HasValue)
+				var historyItems = Models.Billing.AccountingItem
+					.SearchBy(searchBy, pager)
 					.OrderByDescending(item => item.WriteTime)
 					.ToList();
 				PropertyBag["accountingHistoryItems"] = historyItems;
-				PropertyBag["currentPage"] = currentPage;
-				PropertyBag["rowsCount"] = rowsCount.HasValue ? rowsCount : (uint)historyItems.Count;
 			}
-			PropertyBag["pageSize"] = pageSize;
+			PropertyBag["pageSize"] = pager.PageSize;
+			PropertyBag["currentPage"] = pager.Page;
+			PropertyBag["rowsCount"] = pager.Total;
+
 			PropertyBag["tab"] = tab;
-			PropertyBag["FindBy"] = SearchBy;
+			PropertyBag["FindBy"] = searchBy;
 		}
 
 		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)

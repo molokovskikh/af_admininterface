@@ -32,7 +32,7 @@ def WriteHeader(juridicalOrganization) as string:
 	bodyCssClass = "hidden"
 	if IsDefined("currentJuridicalOrganizationId") and (juridicalOrganization.Id == currentJuridicalOrganizationId):
 		headerCssClass = "HideVisible" 
-		bodyCssClass ="VisibleFolder"
+		bodyCssClass =""
 	end %>
 	<div class="InputGroupHeader" style="margin-bottom:10px; width: 100%;">
 		<div id="JuridicalOrganization${juridicalOrganization.Id}Header" class="${headerCssClass}" title="Юридические лица${juridicalOrganization.Id}" align="left">
@@ -40,7 +40,7 @@ def WriteHeader(juridicalOrganization) as string:
 				<b>Юридическое лицо "${juridicalOrganization.Name}"</b>
 			</a>
 		</div>
-		<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="${bodyCssClass}" title="Юридические лица${juridicalOrganization.Id}" style="background-color: White;">
+		<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="VisibleFolder ${bodyCssClass}" title="Юридические лица${juridicalOrganization.Id}" style="background-color: White;">
 			<br />
 			<form action="${siteroot}/Billing/UpdateJuridicalOrganizationInfo.rails" method="post">
 				<input type="hidden" name="juridicalOrganization.Id" value="${juridicalOrganization.Id}" />
@@ -87,13 +87,13 @@ def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
 <script type="text/javascript">
 
 	function ShowFormForAdding() {
-		jQuery("#FormForAdding").attr("style", "display:block");
-		jQuery("#AddJuridicalOrganizationButton").attr("style", "display:none");
+		$("#FormForAdding").attr("style", "display:block");
+		$("#AddJuridicalOrganizationButton").attr("style", "display:none");
 	}
 
 	function HideFormForAdding() {
-		jQuery("#FormForAdding").attr("style", "display:none");
-		jQuery("#AddJuridicalOrganizationButton").attr("style", "display:block");
+		$("#FormForAdding").attr("style", "display:none");
+		$("#AddJuridicalOrganizationButton").attr("style", "display:block");
 	}
 
 </script>

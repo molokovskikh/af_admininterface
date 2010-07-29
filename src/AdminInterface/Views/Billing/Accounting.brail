@@ -4,23 +4,8 @@
 
 <% component Bubble, {"bredcrumbs" : [("Учет адресов и пользователей", "")]} %>
 
-<script type="text/javascript">
-
-	document.observe("dom:loaded", function() {
-		SetupCalendarElements();
-		$$(".tabs ul li a").invoke('observe', 'click', function() {
-			$$(".tab").invoke("hide");
-			$$(".tabs ul li a.selected").first().removeClassName("selected");
-			$(this.id + "-tab").show();
-			this.addClassName("selected");
-		});
-    })
-	
-</script>
-
-
 <div align="center">
-    <h3>Учет адресов и пользователей</h3>
+	<h3>Учет адресов и пользователей</h3>
 </div>
 
 <div class="tabs">

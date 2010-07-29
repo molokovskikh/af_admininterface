@@ -33,7 +33,7 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("Usersettings.ClientsData", Where = "(FirmType = 0)")]
+	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)")]
 	public class Supplier : ActiveRecordLinqBase<Supplier>
 	{
 		[PrimaryKey("FirmCode")]
@@ -110,6 +110,11 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
 
+		public virtual bool Enabled
+		{
+			get { return Status == ClientStatus.On; }
+		}
+
 		public virtual Payer Payer
 		{
 			get { return BillingInstance; }
@@ -121,19 +126,17 @@ namespace AdminInterface.Models
 			{
 				if (!IsDrugstore())
 					return false;
-				var drugstore = DrugstoreSettings.Find(Id);
-				return (drugstore.InvisibleOnFirm == DrugstoreType.Hidden);
+				return (Settings.InvisibleOnFirm == DrugstoreType.Hidden);
 			}
 			set
 			{
 				if (!IsDrugstore())
 					return;
 				var val = value ? 2 : 0;
-				var drugstore = DrugstoreSettings.Find(Id);
-				var tmp = drugstore.InvisibleOnFirm == DrugstoreType.Hidden;				
+				var tmp = Settings.InvisibleOnFirm == DrugstoreType.Hidden;
 				if (tmp != value)
 				{
-					drugstore.InvisibleOnFirm = DrugstoreType.Standart;
+					Settings.InvisibleOnFirm = DrugstoreType.Standart;
 					var updateSql = @"
 update 
 	intersection, pricesdata 
@@ -141,7 +144,7 @@ set
 	intersection.invisibleonfirm = :InvisibleOnFirm";
 					if (value)
 					{
-						drugstore.InvisibleOnFirm = DrugstoreType.Hidden;
+						Settings.InvisibleOnFirm = DrugstoreType.Hidden;
 						updateSql += ", DisabledByFirm = if(PriceType = 2, 1, 0), InvisibleOnClient = if(PriceType = 2, 1, 0)";
 					}
 					updateSql += @"
@@ -149,7 +152,7 @@ where
 	intersection.pricecode = pricesdata.pricecode and 
 	intersection.clientcode = :ClientCode";
 
-					drugstore.Update();
+					Settings.Update();
 
 					ArHelper.WithSession(session => session.CreateSQLQuery(updateSql)
 						.SetParameter("ClientCode", Id)
@@ -173,16 +176,6 @@ where
 		public virtual bool IsClientActive()
 		{
 			return Status == ClientStatus.On;
-		}
-
-		public virtual float GetPayment(IList<Tariff> tariffs)
-		{
-			var tariff = tariffs.FirstOrDefault(t => t.Region.Id == HomeRegion.Id);
-
-			if (tariff == null)
-				return 0;
-
-			return tariff.Pay;
 		}
 
 		public static Client FindAndCheck(uint clientCode)
@@ -339,14 +332,14 @@ group by u.ClientId")
 			if (Users == null)
 				Users = new List<User>();
 
-			var users = Users.Where(user => user.Enabled && !user.IsFree);
+			var userCount = Users.Count(user => user.Enabled && !user.IsFree);
 			var index = 0;
 			foreach (var address in Addresses)
 			{
 				if (!address.Enabled || address.IsFree)
-					address.BeAccounted = false;
+					address.Accounting.ReadyForAcounting = false;
 				else
-					address.BeAccounted = index++ >= users.Count();
+					address.Accounting.ReadyForAcounting = index++ >= userCount;
 			}
 		}
 
@@ -401,6 +394,8 @@ WHERE i.Id IS NULL
 				Addresses = new List<Address>();
 			if (address.JuridicalOrganization == null)
 				address.JuridicalOrganization = BillingInstance.JuridicalOrganizations.Single();
+			if (address.Accounting == null)
+				address.Accounting = new AddressAccounting(address);
 			Addresses.Add(address);
 		}
 
@@ -409,7 +404,7 @@ WHERE i.Id IS NULL
 			return RegisterDeliveryAddress(new Address {Value = address});
 		}
 
-		public virtual  Address RegisterDeliveryAddress(Address address)
+		public virtual Address RegisterDeliveryAddress(Address address)
 		{
 			address.Client = this;
 			address.Enabled = true;
@@ -417,6 +412,11 @@ WHERE i.Id IS NULL
 
 			UpdateBeAccounted();
 			return address;
+		}
+
+		public virtual bool ShouldSendNotification()
+		{
+			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payer.Id != 921;
 		}
 	}
 }
