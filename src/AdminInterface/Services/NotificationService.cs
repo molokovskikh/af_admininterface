@@ -51,7 +51,7 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
-			if (address.Client.Settings.ServiceClient || address.Client.Payer.Id == 921)
+			if (address.Client.ShouldSendNotification())
 				return;
 
 			var client = address.Client;
@@ -78,6 +78,9 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutDrugstoreRegistration(Client client, bool isRenotify)
 		{
+			if (!client.ShouldSendNotification())
+				return;
+
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",

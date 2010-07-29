@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
@@ -185,7 +186,7 @@ Email: {2}
 				"RegisterList@subscribe.analit.net");			
 		}
 
-		public static void DeliveryAddressRegistred(Address address)
+		public static void AddressRegistred(Address address)
 		{
 			Func.Mail("register@analit.net", 
 				"Регистрация нового адреса доставки", 
@@ -222,6 +223,31 @@ Email: {2}
 		public static void NotifySupplierAboutAddressRegistration(Address address)
 		{
 			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+		}
+
+		public static void ClientRegistred(Client client, bool renotification)
+		{
+			if (client.IsDrugstore())
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
+			else
+				SupplierRegistred(client.Name, client.HomeRegion.Name);
+
+			if (renotification)
+			{
+				ClientRegistrationResened(client);
+			}
+			else
+			{
+				NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", client.FullName),
+					String.Format(
+						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+						SecurityContext.Administrator.UserName,
+						client.HomeRegion.Name,
+						client.Users.First().Login,
+						client.Id,
+						client.Segment.GetDescription(),
+						client.Type.GetDescription()));
+			}
 		}
 	}
 }
