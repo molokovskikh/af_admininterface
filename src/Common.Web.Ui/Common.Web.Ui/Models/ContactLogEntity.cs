@@ -11,7 +11,7 @@ namespace Common.Web.Ui.Models
 		Update = 3
 	}
 
-	[ActiveRecord("logs.ContactLogs")]
+	[ActiveRecord("ContactLogs", Schema = "logs")]
 	public class ContactLogEntity : ActiveRecordBase<ContactLogEntity>
 	{
 		[PrimaryKey]

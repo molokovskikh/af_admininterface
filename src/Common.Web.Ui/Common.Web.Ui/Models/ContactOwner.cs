@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Common.Web.Ui.Models
 {
-	[ActiveRecord("contacts.contact_owners"), JoinedBase]
+	[ActiveRecord("contact_owners", Schema = "contacts"), JoinedBase]
 	public class ContactOwner : ActiveRecordValidationBase
 	{
 		private IList<Contact> _contacts;

@@ -20,7 +20,7 @@ namespace Common.Web.Ui.Models
 		Custom = 5
 	}
 
-	[ActiveRecord("contacts.contact_groups")]
+	[ActiveRecord("contact_groups", Schema = "contacts")]
 	public class ContactGroup : ContactOwner
 	{
 		public ContactGroup()

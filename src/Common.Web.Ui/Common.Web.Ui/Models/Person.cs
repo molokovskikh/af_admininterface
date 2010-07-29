@@ -3,7 +3,7 @@ using Castle.ActiveRecord;
 
 namespace Common.Web.Ui.Models
 {
-	[ActiveRecord("contacts.Persons")]
+	[ActiveRecord("Persons", Schema = "contacts")]
 	public class Person : ContactOwner
 	{
 		public Person()

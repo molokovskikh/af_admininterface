@@ -13,7 +13,7 @@ namespace Common.Web.Ui.Models
 		[Description("ิเ๊๑")] Fax = 3,
 	}
 
-	[ActiveRecord("contacts.contacts")]
+	[ActiveRecord("contacts", Schema = "contacts")]
 	public class Contact : ActiveRecordValidationBase<Contact>
 	{
 		private ContactOwner _contactOwner;

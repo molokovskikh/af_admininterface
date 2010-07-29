@@ -5,7 +5,7 @@ using Common.Web.Ui.Helpers;
 
 namespace Common.Web.Ui.Models
 {
-	[ActiveRecord("contacts.contact_group_owners")]
+	[ActiveRecord("contact_group_owners", Schema = "contacts")]
 	public class ContactGroupOwner : ActiveRecordBase<ContactGroupOwner>
 	{
 		[PrimaryKey]
