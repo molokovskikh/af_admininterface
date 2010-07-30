@@ -41,11 +41,11 @@ function SetupCalendarElements() {
 		$(value).prev().id = "CalendarInputField" + index;
 		Calendar.setup({
 			ifFormat: "%d.%m.%Y",
-			inputField: $(value).prev(),
+			inputField: $(value).prev().get(0),
 			button: value.id,
 			weekNumbers: false,
 			showOthers: true
-		})
+		});
 	});
 }
 

@@ -261,12 +261,13 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				var users = Clients.SelectMany(c => c.Users.Select(u => u.Accounting));
-				var addresses = Clients.SelectMany(c => c.Addresses.Select(a => a.Accounting));
+				var users = Clients.SelectMany(c => c.Users.Select(u => u.Accounting)).Where(a => a.ShouldPay());
+				var addresses = Clients.SelectMany(c => c.Addresses.Select(a => a.Accounting)).Where(a => a.ShouldPay());
 
-				var accounts = users.Concat(addresses).Where(a => a.ShouldPay());
+				var sum = users.Sum(u => u.Payment);
+				sum += addresses.Skip(users.Count()).Sum(a => a.Payment);
 
-				return accounts.Sum(a => a.Payment);
+				return sum;
 			}
 		}
 	}

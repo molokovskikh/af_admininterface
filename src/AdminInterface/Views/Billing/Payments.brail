@@ -199,7 +199,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="left">
 
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum}</span> рублей</b>
+		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("#.#")}</span> рублей</b>
 	</div>
 
 	<div class="InputGroupHeader" style="margin-bottom:10px;width: 100%;">
@@ -321,7 +321,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=free type="checkbox" ${"checked" if user.IsFree} />
 							</td>
 							<td class=short>
-								<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment}"> 
+								<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}"> 
 							</td>
 							<td>
 								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
@@ -390,7 +390,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=free type=checkbox ${"checked" if addr.FreeFlag} />
 							</td>
 							<td class=short>
-								<input name=payment class=payment type=text value="${addr.Accounting.Payment}"> 
+								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}"> 
 							</td>
 							<td>
 								<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>

@@ -18,7 +18,7 @@ using Common.Web.Ui.Helpers;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("billing"), 
+		Layout("GeneralWithJQueryOnly"), 
 		Helper(typeof (BindingHelper)), 
 		Helper(typeof (ViewHelper)),
 		Secure(PermissionType.Billing, ExecutionOrder = 0),
@@ -44,8 +44,6 @@ namespace AdminInterface.Controllers
 			DateTime? paymentsTo,
 			uint currentJuridicalOrganizationId)
 		{
-			LayoutName = "GeneralWithJQueryOnly";
-
 			Client client;
 
 			if (billingCode == 0)
@@ -378,7 +376,7 @@ namespace AdminInterface.Controllers
 
 		public void TotalSum(uint payerId)
 		{
-			Response.Output.Write(Payer.Find(payerId).TotalSum.ToString());
+			Response.Output.Write(Payer.Find(payerId).TotalSum.ToString("#.#"));
 			CancelView();
 			CancelLayout();
 		}

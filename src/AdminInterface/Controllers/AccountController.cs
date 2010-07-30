@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 				else
 				{
 					var address = ((AddressAccounting)account).Address;
-					SetUserStatus(address.Id, status ?? address.Enabled, free ?? address.IsFree);
+					SetAddressStatus(address.Id, status ?? address.Enabled, free ?? address.IsFree);
 				}
 			}
 			CancelView();
