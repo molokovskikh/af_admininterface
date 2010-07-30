@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 
 				if (address != null)
 				{
-					address = client.RegisterDeliveryAddress(address);
+					address = client.AddAddress(address);
 					address.AvaliableForUsers = new List<User> {user};
 					address.Save();
 					address.MaitainIntersection();
@@ -92,10 +92,7 @@ namespace AdminInterface.Controllers
 
 			Mailer.UserRegistred(user);
 			if (address != null)
-			{
 				Mailer.AddressRegistred(address);
-				Mailer.NotifySupplierAboutAddressRegistration(address);
-			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);

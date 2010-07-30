@@ -117,7 +117,7 @@ namespace AdminInterface.Controllers
 					if (currentPayer == null)
 						currentPayer = CreatePayer(newClient);
 					newClient.BillingInstance = currentPayer;
-					newClient.AddDeliveryAddress(deliveryAddress);
+					newClient.AddAddress(deliveryAddress);
 					newClient.SaveAndFlush();
 
 					AddContactsToClient(newClient, clientContacts);

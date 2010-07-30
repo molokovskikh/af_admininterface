@@ -199,6 +199,8 @@ Email: {2}
 				address.Value,
 				SecurityContext.Administrator.ManagerName), 
 				"RegisterList@subscribe.analit.net, billing@analit.net");
+
+			NotifySupplierAboutAddressRegistration(address);
 		}
 
 		public static void UserRegistred(User user)

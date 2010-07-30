@@ -311,15 +311,6 @@ group by u.ClientId")
 			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
 		}
 
-		public virtual void AddDeliveryAddress(string address)
-		{
-			AddAddress(new Address {
-				Value = address,
-				Enabled = true,
-				Client = this
-			});
-		}
-
 		public virtual string GetHumanReadableType()
 		{
 			return BindingHelper.GetDescription(Type);
@@ -388,7 +379,12 @@ WHERE i.Id IS NULL
 				});
 		}
 
-		public virtual void AddAddress(Address address)
+		public virtual Address AddAddress(string address)
+		{
+			return AddAddress(new Address {Value = address});
+		}
+
+		public virtual Address AddAddress(Address address)
 		{
 			if (Addresses == null)
 				Addresses = new List<Address>();
@@ -396,16 +392,7 @@ WHERE i.Id IS NULL
 				address.JuridicalOrganization = BillingInstance.JuridicalOrganizations.Single();
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
-			Addresses.Add(address);
-		}
 
-		public virtual Address RegisterDeliveryAddress(string address)
-		{
-			return RegisterDeliveryAddress(new Address {Value = address});
-		}
-
-		public virtual Address RegisterDeliveryAddress(Address address)
-		{
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);

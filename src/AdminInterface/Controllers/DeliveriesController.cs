@@ -27,7 +27,7 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 
-				client.RegisterDeliveryAddress(address);
+				client.AddAddress(address);
 				address.UpdateContacts(contacts);
 				address.Save();
 				address.MaitainIntersection();
@@ -39,7 +39,6 @@ namespace AdminInterface.Controllers
 			client.Users.Each(u => address.SetAccessControl(u.Login));
 
 			Mailer.AddressRegistred(address);
-			Mailer.NotifySupplierAboutAddressRegistration(address);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}
