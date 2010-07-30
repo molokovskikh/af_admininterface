@@ -51,7 +51,7 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
-			if (address.Client.ShouldSendNotification())
+			if (!address.Client.ShouldSendNotification())
 				return;
 
 			var client = address.Client;
