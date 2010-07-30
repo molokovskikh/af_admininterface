@@ -315,7 +315,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if not user.Client.IsClientActive()} />
 							</td>
 							<td class=short>
-								<input name=accouted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
+								<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
 							</td>
 							<td class=short>
 								<input name=free type="checkbox" ${"checked" if user.IsFree} />
