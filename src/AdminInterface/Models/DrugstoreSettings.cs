@@ -10,6 +10,18 @@ namespace AdminInterface.Models
 		Hidden = 2
 	}
 
+	public enum BuyingMatrixType
+	{
+		BlackList = 1,
+		WhiteList = 0,
+	}
+
+	public enum BuyingMatrixAction
+	{
+		Block = 0,
+		Warning = 1,
+	}
+
 	[ActiveRecord("RetClientsSet", Schema = "usersettings")]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
@@ -70,6 +82,15 @@ namespace AdminInterface.Models
 
 		[Property, Description("Не подключать новые прайс-листы")]
 		public bool IgnoreNewPrices { get; set; }
+
+		[Property]
+		public uint? BuyingMatrixPriceId { get; set; }
+
+		[Property]
+		public BuyingMatrixType BuyingMatrixType { get; set; }
+
+		[Property]
+		public BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
 		public bool IsNoised
 		{

@@ -116,7 +116,8 @@ namespace AdminInterface.Controllers
 			ulong homeRegion,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
 			bool costsIsNoised,
-			[DataBind("regionSettings")] RegionSettings[] regionSettings)
+			[DataBind("regionSettings")] RegionSettings[] regionSettings,
+			bool ActivateBuyMatrix)
 		{
 			SecurityContext.Administrator.CheckClientPermission(client);
 			using (var scope = new TransactionScope())
@@ -154,6 +155,9 @@ namespace AdminInterface.Controllers
 				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
 					client.MaintainIntersection();
+
+				if (!ActivateBuyMatrix)
+					drugstore.BuyingMatrixPriceId = null;
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
@@ -286,6 +290,8 @@ where Phone like :phone")
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
+			if (drugstore.BuyingMatrixPriceId != null)
+				PropertyBag["BuyMatrixPrice"] = Price.Find(drugstore.BuyingMatrixPriceId.Value);
 		}
 
 		public void NotifySuppliers(uint clientId)
@@ -302,8 +308,20 @@ where Phone like :phone")
 			CancelLayout();
 			int searchNumber;
 			Int32.TryParse(searchText, out searchNumber);
-			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name);
+			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name).ToList();
 			RenderView("SearchClientSubview");
+		}
+
+		public void SearchAssortmentPrices(string text)
+		{
+			CancelLayout();
+			uint id;
+			UInt32.TryParse(text, out id);
+			PropertyBag["prices"] = Price.Queryable
+				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == 1)
+				.OrderBy(p => p.Supplier.Name)
+				.Take(50)
+				.ToList();
 		}
 	}
 }

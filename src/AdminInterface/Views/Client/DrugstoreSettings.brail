@@ -7,7 +7,33 @@
 	<% if drugstore.IsNoised: %>
 		setNoise(true);
 	<% end %>
+
+		jQuery("#ActivateBuyMatrix").click(function() {
+			if (this.checked)
+				jQuery("#SearchBuyMatrixBlock").css("display", "")
+			else
+				Cancel();
+		});
+
+		jQuery("#CancelBuyMatrix").click(function(){
+			Cancel();
+		});
+
+		jQuery("#SearchBuyMatrix").click(function(){
+			Search();
+		});
 	});
+
+	function Cancel() {
+		jQuery("#WarningOnBuyingMatrix").css("display", "none");
+		jQuery("#BuyingMatrixType").css("display", "none");
+
+		jQuery("#SearchBuyMatrixBlock").css("display", "none")
+		jQuery("#SearchBuymatrixText").css("disabled", "");
+
+		jQuery("#DivForAssortmentPrice").children().remove().end();
+		jQuery("#ActivateBuyMatrix").get(0).checked = false;
+	}
 
 	function setNoise(noiseStatus) {
 		jQuery("#NotNoiseSupplier").find('select').remove().end();
@@ -16,6 +42,35 @@
 			jQuery.get(url, function(html){ jQuery("#NotNoiseSupplier").append(html); });
 		}
 	}
+
+	function Search() {
+		var searchText = jQuery("#SearchBuymatrixText").val();
+		var link = "${siteroot}/Client/SearchAssortmentPrices?text=" + searchText;
+
+		jQuery.ajax({
+			url: link,
+			cache: false,
+			success: function (data) {
+				if (data.length == 0) {
+					jQuery("#SearchBuymatrixMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
+					return;
+				}
+				jQuery("#SearchBuyMatrixBlock").css("display", "none")
+				jQuery("#SearchBuymatrixText").css("disabled", "");
+				jQuery("#SearchBuymatrixMessage").html("");
+
+				jQuery("#DivForAssortmentPrice").append(data);
+				jQuery("#BuyingMatrixType").css("display", "");
+				jQuery("#WarningOnBuyingMatrix").css("display", "");
+			},
+			error: function (xhr, textStatus, error) {
+				jQuery("#SearchBuymatrixMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+		jQuery("#SearchBuymatrixText").css("disabled", "disabled");
+		jQuery("#SearchBuymatrixMessage").html("<i>Идет поиск...</i>");
+	}
+
 </script>
 
 <h2>Конфигурация клиента ${client.Name}</h2>
@@ -95,6 +150,42 @@
 				Максимальный недельный заказ:
 				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
 				</td></tr>
+				<tr>
+					<td>
+						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPriceId } />
+						<label>Подключить матрицу закупок</label>
+					</td>
+					<td>
+						<table id="SearchBuyMatrixBlock" style="width: 100%;display:none">
+							<tr><td align="left">Выберете ассортиментный прайс лист</td></tr>
+							<tr>
+								<td style="padding: 0px 15px 0px 5px;" >
+									<input id="SearchBuymatrixText" type="text" style="width :100%;" />
+								</td>
+								<td align="right">
+									<strong>
+										<input id="SearchBuyMatrix" type="button" value="Найти" />
+										<input id="CancelBuyMatrix" type="button" value="Отмена" />
+									</strong>
+								</td>
+							</tr>
+							<tr><td id="SearchBuymatrixMessage" colspan="10"></td></tr>
+						</table>
+						<div id="DivForAssortmentPrice">
+							<% if IsDefined("BuyMatrixPrice"): %>
+								${BuyMatrixPrice.Supplier.Name} - ${BuyMatrixPrice.Name}
+							<% end %>
+						</div>
+						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if drugstore.BuyingMatrixPriceId == null } >
+							<option value=0 ${"selected" if drugstore.BuyingMatrixType == 0}>Белый список</option>
+							<option value=1 ${"selected" if drugstore.BuyingMatrixType == 1}>Черный список</option>
+						</select>
+						<select id="WarningOnBuyingMatrix" name="drugstore.WarningOnBuyingMatrix" ${ "style='display:none'" if drugstore.BuyingMatrixPriceId == null }>
+							<option value=0 ${"selected" if drugstore.WarningOnBuyingMatrix == 0}>Запретить заказ</option>
+							<option value=1 ${"selected" if drugstore.WarningOnBuyingMatrix == 1}>Выводить предупреждения</option>
+						</select>
+					</td>
+				</tr>
 				</table>
 	        </div>
     	    

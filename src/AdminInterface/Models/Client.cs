@@ -33,6 +33,22 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
+	[ActiveRecord("PricesData", Schema = "Usersettings")]
+	public class Price : ActiveRecordLinqBase<Price>
+	{
+		[PrimaryKey("PriceCode")]
+		public virtual uint Id { get; set; }
+
+		[Property("PriceName")]
+		public virtual string Name { get; set; }
+
+		[Property]
+		public virtual int PriceType { get; set; }
+
+		[BelongsTo("FirmCode")]
+		public virtual Supplier Supplier { get; set; }
+	}
+
 	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)")]
 	public class Supplier : ActiveRecordLinqBase<Supplier>
 	{
@@ -51,6 +67,9 @@ namespace AdminInterface.Models
 		[BelongsTo("BillingCode")]
 		public virtual Payer BillingInstance { get; set; }
 
+		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
+		public virtual IList<Price> Prices { get; set; }
+
 		public virtual Payer Payer
 		{
 			get { return BillingInstance; }
@@ -58,7 +77,7 @@ namespace AdminInterface.Models
 
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
-			return Queryable.Where(p => p.BillingInstance.Id == payerId).ToList();
+			return Queryable.Where(p => p.BillingInstance.PayerID == payerId).ToList();
 		}
 	}
 
