@@ -208,6 +208,12 @@ namespace AdminInterface.Models
 			Save();
 			Login = Id.ToString();
 			Update();
+
+			if (Client.Users == null)
+				Client.Users = new List<User>();
+			Accounting = new UserAccounting(this);
+			Client.Users.Add(this);
+			Client.UpdateBeAccounted();
 			new AuthorizationLogEntity(Id).Create();
 			new UserUpdateInfo(Id).Create();
 		}
@@ -215,12 +221,7 @@ namespace AdminInterface.Models
 		public virtual void Setup(Client client)
 		{
 			Setup();
-			if (client.Users == null)
-				client.Users = new List<User>();
-			Accounting = new UserAccounting(this);
-			client.Users.Add(this);
 			AddPrices(client);
-			client.UpdateBeAccounted();
 		}
 
 		public virtual bool IsLocked
