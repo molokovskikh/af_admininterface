@@ -90,7 +90,7 @@ namespace Functional
 				browser.SelectList("clientType").Select("Аптека");
 				browser.TextField("deliveryAddress").TypeText("Test address");
 				browser.TextField("JuridicalName").TypeText(_randomClientName);
-				browser.TextField("ShortName").TypeText(_randomClientName);				
+				browser.TextField("ShortName").TypeText(_randomClientName);
 				browser.TextField("ClientContactPhone").TypeText("123456789");
 				browser.Button("RegisterButton").Click();
 				Assert.That(browser.Text, Text.Contains("Некорректный телефонный номер"));
@@ -109,7 +109,7 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
 				SetupGeneralInformation(browser, ClientType.Drugstore);
-				browser.CheckBox(Find.ById("PayerExists")).Checked = true;	
+				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
 				Test_search_and_select(browser, "Payer");
 			}
 		}
@@ -123,7 +123,7 @@ namespace Functional
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 				Assert.That(browser.CheckBox(Find.ById("PayerExists")).Enabled, Is.False);
 				Test_search_and_select(browser, "Supplier");
-			}			
+			}
 		}
 
 		private void Test_search_and_select(IE browser, string namePart)
