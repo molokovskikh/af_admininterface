@@ -649,5 +649,41 @@ UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :Sup
 				Assert.That(settings.FirmCodeOnly, Is.Null);
 			}
 		}
+
+		[Test]
+		public void Set_buying_matrix_configuration()
+		{
+			Client client;
+			using (new SessionScope())
+			{
+				client = DataMother.CreateTestClient();
+			}
+
+			using (var browser = Open("client/{0}", client.Id))
+			{
+				browser.CheckBox("buymatrix").Click();
+
+				browser.TextField("SearchBuymatrixText").TypeText("Фармаимпекс");
+				browser.Button("SearchBuyMatrix").Click();
+				Assert.That(browser.SelectList("drugstore.BuyingMatrixPriceId").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+				Assert.That(browser.SelectList("drugstore.BuyingMatrixType").SelectedItem, Is.EqualTo("Черный список"));
+				Assert.That(browser.SelectList("drugstore.WarningOnBuyingMatrix").SelectedItem, Is.EqualTo("Запрешать"));
+
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
+				Assert.That(browser.SelectList("drugstore.BuyingMatrixPriceId").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+				Assert.That(browser.SelectList("drugstore.BuyingMatrixType").SelectedItem, Is.EqualTo("Черный список"));
+				Assert.That(browser.SelectList("drugstore.WarningOnBuyingMatrix").SelectedItem, Is.EqualTo("Запрешать"));
+			}
+
+			using (new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				Assert.That(client.Settings.BuyingMatrixPriceId, Is.EqualTo(4957));
+				Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.BlackList));
+				Assert.That(client.Settings.WarningOnBuyingMatrix, Is.EqualTo(BuyingMatrixAction.Block));
+			}
+		}
 	}
 }
