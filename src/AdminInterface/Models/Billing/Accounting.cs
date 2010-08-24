@@ -217,6 +217,11 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		[OneToOne(PropertyRef = "Accounting")]
 		public virtual User User { get; set; }
 
+		public string Type
+		{
+			get { return "Пользователь"; }
+		}
+
 		public UserAccounting(User user)
 		{
 			Payment = 800;
@@ -241,6 +246,11 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		{
 			Address = address;
 			Payment = 200;
+		}
+
+		public string Type
+		{
+			get { return "Адрес"; }
 		}
 
 		public AddressAccounting() { }
