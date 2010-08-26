@@ -13,6 +13,6 @@ Global(
 
 task @default, [@Build]
 
-task @Build, [@buildWebSite]
+task @Build, [@BuildWebSite]
 
 task @deploy, [@Build, @Production, @Migrate, @SendDeployNotification, @DeployWebSite]
