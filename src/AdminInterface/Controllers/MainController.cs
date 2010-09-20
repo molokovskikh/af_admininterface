@@ -162,7 +162,7 @@ WHERE (dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dheader
 			//Время последнего обновления
 			if (data.Tables[0].Rows[0]["MaxUpdateTime"] != DBNull.Value)
 				PropertyBag["MaxUpdateTime"] = Convert.ToDateTime(data.Tables[0].Rows[0]["MaxUpdateTime"]).ToLongTimeString();
-
+#if !DEBUG
 			RemoteServiceHelper.RemotingCall(s =>
 			{
 				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
@@ -174,8 +174,13 @@ WHERE (dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dheader
 				PropertyBag["ReqHL"] = s.GetUpdatingClientCount().ToString();
 			});
 
+
 			PropertyBag["OrderProcStatus"] = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("offdc.adc.analit.net", "OrderProcService"));
 			PropertyBag["PriceProcessorMasterStatus"] = BindingHelper.GetDescription(RemoteServiceHelper.GetServiceStatus("fms.adc.analit.net", "PriceProcessorService"));
+#else
+			PropertyBag["OrderProcStatus"] = "";
+			PropertyBag["PriceProcessorMasterStatus"] = "";
+#endif
 
 			PropertyBag["DownloadDataSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DataSize"]));
 			PropertyBag["DownloadDocumentSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DocSize"]));
