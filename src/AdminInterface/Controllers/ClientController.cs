@@ -124,31 +124,9 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var oldMaskRegion = client.MaskRegion;
-				foreach (var setting in regionSettings)
-				{
-					client.HomeRegion = Region.Find(homeRegion);
-					client.Update();
-					if (setting.IsAvaliableForBrowse)
-					{
-						client.MaskRegion |= setting.Id;
-						client.Users.Each(u => u.WorkRegionMask |= setting.Id);
-					}
-					else
-					{
-						client.MaskRegion &= ~setting.Id;
-						client.Users.Each(u => u.WorkRegionMask &= ~setting.Id);
-					}
-					if (setting.IsAvaliableForOrder)
-					{
-						drugstore.OrderRegionMask |= setting.Id;
-						client.Users.Each(u => u.OrderRegionMask |= setting.Id);
-					}
-					else
-					{
-						drugstore.OrderRegionMask &= ~setting.Id;
-						client.Users.Each(u => u.OrderRegionMask &= ~setting.Id);
-					}
-				}
+				client.HomeRegion = Region.Find(homeRegion);
+				client.Update();
+				client.UpdateRegionSettings(regionSettings);
 				if (!costsIsNoised)
 					drugstore.FirmCodeOnly = null;
 				client.UpdateAndFlush();

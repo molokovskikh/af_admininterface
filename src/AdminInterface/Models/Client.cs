@@ -8,6 +8,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate;
@@ -424,6 +425,39 @@ WHERE i.Id IS NULL
 		public virtual bool ShouldSendNotification()
 		{
 			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payer.Id != 921;
+		}
+
+		public void UpdateRegionSettings(RegionSettings[] regionSettings)
+		{
+			foreach (var setting in regionSettings)
+			{
+				if (setting.IsAvaliableForBrowse)
+				{
+					if ((MaskRegion & setting.Id) == 0)
+					{
+						MaskRegion |= setting.Id;
+						Users.Each(u => u.WorkRegionMask |= setting.Id);
+					}
+				}
+				else
+				{
+					MaskRegion &= ~setting.Id;
+					Users.Each(u => u.WorkRegionMask &= ~setting.Id);
+				}
+				if (setting.IsAvaliableForOrder)
+				{
+					if ((Settings.OrderRegionMask & setting.Id) == 0)
+					{
+						Settings.OrderRegionMask |= setting.Id;
+						Users.Each(u => u.OrderRegionMask |= setting.Id);
+					}
+				}
+				else
+				{
+					Settings.OrderRegionMask &= ~setting.Id;
+					Users.Each(u => u.OrderRegionMask &= ~setting.Id);
+				}
+			}
 		}
 	}
 }
