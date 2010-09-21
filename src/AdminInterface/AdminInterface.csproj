@@ -57,6 +57,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.Components.Binder.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Common.EmailSender, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.Components.Validator, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.Components.Validator.dll</HintPath>
@@ -210,6 +211,7 @@
     <Compile Include="Models\UserSearchProperties.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
+    <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
@@ -365,6 +367,10 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Mail\AddressRegistred.brail" />
+    <None Include="Views\Mail\DrugstoreRegistred.brail" />
+    <None Include="Views\Mail\EnableChanged.brail" />
+    <None Include="Views\Mail\FreePasswordChange.brail" />
     <Content Include="Web.Config" />
   </ItemGroup>
   <ItemGroup>
@@ -433,6 +439,7 @@
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
     <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
+    <None Include="Views\Mail\PasswordChange.brail" />
     <None Include="Views\Recipient\Show.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />
     <None Include="Views\RegionalAdmin\Edit.brail" />
@@ -539,6 +546,7 @@
       <Name>Common.Web.Ui</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="C:\Program Files (x86)\MSBuild\Microsoft\VisualStudio\v9.0\WebApplications\Microsoft.WebApplication.targets" Condition="" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -20,7 +20,7 @@ using AdminInterface.Models.Billing;
 namespace AdminInterface.Models
 {
 	[ActiveRecord("Addresses", Schema = "Future", Lazy = true)]
-	public class Address : ActiveRecordLinqBase<Address>
+	public class Address : ActiveRecordLinqBase<Address>, IEnablable
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -42,6 +42,16 @@ namespace AdminInterface.Models
 
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
 		public virtual  JuridicalOrganization JuridicalOrganization { get; set; }
+
+		public virtual string Name
+		{
+			get { return Value; }
+		}
+
+/*
+		[BelongsTo("PayerId")]
+		public virtual Payer Payer { get; set; }
+*/
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }

@@ -1,6 +1,7 @@
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using NHibernate;
@@ -42,8 +43,8 @@ namespace AdminInterface.Controllers
 				user.Enabled = enabled;
 				user.IsFree = free;
 				user.UpdateAndFlush();
-				if (enabled && !oldStatus)
-					Mailer.UserBackToWork(user);
+				if (enabled != oldStatus)
+					this.Mail().EnableChanged(user, oldStatus).Send();
 				if (!enabled)
 				{
 					// Если это отключение, то проходим по адресам и
@@ -86,11 +87,12 @@ namespace AdminInterface.Controllers
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var address = Address.Find(addressId);
 				var oldStatus = address.Enabled;
-				if (enabled && !oldStatus)
-					Mailer.AddressBackToWork(address);
 				address.Enabled = enabled;
 				address.FreeFlag = free;
 				address.Client.UpdateBeAccounted();
+
+				if (enabled != oldStatus)
+					this.Mail().EnableChanged(address, oldStatus).Send();
 				address.Client.Save();
 
 				scope.VoteCommit();

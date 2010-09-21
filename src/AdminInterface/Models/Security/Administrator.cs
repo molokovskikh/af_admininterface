@@ -42,6 +42,11 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public string ManagerName { get; set; }
 
+		public string Name
+		{
+			get { return ManagerName; }
+		}
+
 		[Property]
 		public string PhoneSupport { get; set; }
 
@@ -273,6 +278,11 @@ namespace AdminInterface.Models.Security
 		public override string ToString()
 		{
 			return UserName;
+		}
+
+		public string Host
+		{
+			get { return HttpContext.Current.Request.UserHostAddress; }
 		}
 
 		public string GetHost()

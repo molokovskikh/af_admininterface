@@ -1,0 +1,11 @@
+﻿<% import AdminInterface.Models %> Оператор: ${admin.Name}
+Хост: ${admin.Host}
+Код клиента: ${client.Id}
+Наименование клиента: ${client.Name}
+Полное наименование: ${client.FullName}
+Домашний регион: ${client.HomeRegion.Name}
+<% if item isa User: %>Логин: ${item.Login}
+Комментарий: ${item.Name} <% end %>
+<% if item isa Address: %> Код адреса: ${item.Id}
+Адрес: ${item.Name} <% end %>
+Последнее отключение: ${lastDisable}

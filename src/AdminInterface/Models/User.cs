@@ -35,8 +35,13 @@ namespace AdminInterface.Models
 		public CantChangePassword(string message) : base(message) { }
 	}
 
+	public interface IEnablable
+	{
+		bool Enabled { get; }
+	}
+
 	[ActiveRecord("Users", Schema = "future", Lazy = true)]
-	public class User : ActiveRecordLinqBase<User>
+	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
 		public User()
 		{
@@ -95,6 +100,10 @@ namespace AdminInterface.Models
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
 		public virtual User InheritPricesFrom { get; set; }
+
+/*		[BelongsTo("PayerId")]
+		public virtual Payer Payer { get; set; }
+*/
 
 		[OneToOne]
 		public virtual AuthorizationLogEntity Logs { get; set; }

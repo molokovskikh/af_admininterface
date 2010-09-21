@@ -82,7 +82,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
-	public class Client : ActiveRecordLinqBase<Client>
+	public class Client : ActiveRecordLinqBase<Client>, IEnablable
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -132,6 +132,7 @@ namespace AdminInterface.Models
 		public virtual bool Enabled
 		{
 			get { return Status == ClientStatus.On; }
+			set { Status = value ? ClientStatus.On : ClientStatus.Off; }
 		}
 
 		public virtual Payer Payer

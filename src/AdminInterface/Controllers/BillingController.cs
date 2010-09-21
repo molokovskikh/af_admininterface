@@ -9,6 +9,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -168,13 +169,14 @@ namespace AdminInterface.Controllers
 			using(new TransactionScope())
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				var newStatus = enabled ? ClientStatus.On : ClientStatus.Off;
 				var client = Client.Find(clientId);
-				if (newStatus == ClientStatus.On && client.Status == ClientStatus.Off)
-					Mailer.ClientBackToWork(client);
-				if (client.Status != newStatus)
-					ClientInfoLogEntity.StatusChange(newStatus, client.Id).Save();
-				client.Status = newStatus;
+				var oldEnabled = client.Enabled;
+				client.Enabled = enabled;
+				if (oldEnabled != client.Enabled)
+				{
+					this.Mail().EnableChanged(client, enabled).Send();
+					ClientInfoLogEntity.StatusChange(client.Status, client.Id).Save();
+				}
 				client.UpdateAndFlush();
 			}
 			CancelView();
@@ -397,7 +399,7 @@ namespace AdminInterface.Controllers
 			}
 			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 			{
-				var historyItems = Models.Billing.AccountingItem
+				var historyItems = AccountingItem
 					.SearchBy(searchBy, pager)
 					.OrderByDescending(item => item.WriteTime)
 					.ToList();
