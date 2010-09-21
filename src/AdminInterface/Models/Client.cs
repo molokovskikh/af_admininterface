@@ -427,7 +427,7 @@ WHERE i.Id IS NULL
 			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payer.Id != 921;
 		}
 
-		public void UpdateRegionSettings(RegionSettings[] regionSettings)
+		public virtual void UpdateRegionSettings(RegionSettings[] regionSettings)
 		{
 			foreach (var setting in regionSettings)
 			{
