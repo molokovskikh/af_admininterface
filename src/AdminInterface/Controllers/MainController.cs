@@ -111,7 +111,8 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
        max(dlogs.LogTime) as LastDownloadedWaybillDate
 FROM logs.document_logs dlogs
-WHERE (dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dlogs.DocumentType = 1;
+join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
+WHERE (dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
 
 SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
        max(dheaders.WriteTime) as LastParsedWaybillDate
