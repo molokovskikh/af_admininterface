@@ -52,7 +52,7 @@ namespace AdminInterface.Test.ForTesting
 				BillingInstance = CreatePayer(),
 			};
 			client.Users = new List<User> {
-				new User {
+				new User(client) {
 					Login = "test" + new Random().Next(),
 					Name = "test"
 				}

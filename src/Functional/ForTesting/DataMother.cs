@@ -118,8 +118,7 @@ namespace Functional.ForTesting
 			using (var transaction = new TransactionScope(OnDispose.Rollback))
 			{
 				var client = CreateTestClient();
-				var user = new User {
-					Client = client,
+				var user = new User(client) {
 					Name = "test"
 				};
 				user.Setup(client);
@@ -139,8 +138,7 @@ namespace Functional.ForTesting
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				client = CreateTestClient(clientRegionMask);
-				var user = new User {
-					Client = client,
+				var user = new User(client) {
 					Name = "test"
 				};
 				user.Setup(client);

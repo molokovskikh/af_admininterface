@@ -1,32 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
-using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
-using Common.Web.Ui.Models;
-using Integration;
-using MySql.Data.MySqlClient;
-using NHibernate.Criterion;
+using Functional.ForTesting;
 using NUnit.Framework;
 
-namespace AdminInterface.Test.Controllers
+namespace Integration.Controllers
 {
 	[TestFixture]
 	public class ClientControllerFixture : BaseControllerTest
 	{
-		private ClientController _controller;
+		private ClientController controller;
+		private Client client;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_controller = new ClientController();
+			controller = new ClientController();
+
 			var admin = new Administrator {
 				UserName = "TestAdmin",
 				RegionMask = 1,
@@ -36,9 +31,10 @@ namespace AdminInterface.Test.Controllers
 					new Permission {Type = PermissionType.ViewDrugstore},
 				},
 			};
-			PrepareController(_controller);
+			PrepareController(controller);
 			SecurityContext.GetAdministrator = () => admin;
-			ForTest.InitialzeAR();
+
+			client = DataMother.CreateTestClientWithUser();
 		}
 
 /*		[Test]
@@ -137,19 +133,17 @@ namespace AdminInterface.Test.Controllers
 		{
 			using (var adUser1 = new TestADUser())
 			using (var adUser2 = new TestADUser())
-			using (var user = TestUser(adUser1.Login))
 			{
-				ADHelper.Block(adUser1.Login);
-				ADHelper.Block(adUser2.Login);
-
-				ActiveRecordMediator.SaveAndFlush(new User { Login = adUser2.Login, Client = user.Parameter.Client});
+				client.Users.Add(new User(client) {Login = adUser1.Login});
+				client.Users[0].Login = adUser1.Login;
+				client.Save();
 
 				using (new SessionScope())
-					_controller.Unlock(user.Parameter.Client.Id);
+					controller.Unlock(client.Id);
 
 				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 				Assert.That(ADHelper.IsLocked(adUser2.Login), Is.False);
-				Assert.That(Response.RedirectedTo, Is.EqualTo("/Controller/Info.castle?cc=" + user.Parameter.Client.Id));
+				Assert.That(Response.RedirectedTo, Is.EqualTo("/Controller/Info.castle?cc=" + client.Id));
 				Assert.That(Context.Flash["UnlockMessage"], Is.EqualTo("Разблокировано"));
 			}
 		}
@@ -158,14 +152,14 @@ namespace AdminInterface.Test.Controllers
 		public void If_login_not_exists_it_must_be_skiped()
 		{
 			using (var adUser1 = new TestADUser())
-			using (var user = TestUser(adUser1.Login))
 			{
+
 				ADHelper.Block(adUser1.Login);
 
-				ActiveRecordMediator.SaveAndFlush(new User { Login = "test8779546", Client = user.Parameter.Client });
+				ActiveRecordMediator.SaveAndFlush(new User(client) { Login = "test8779546" });
 
 				using (new SessionScope())
-					_controller.Unlock(user.Parameter.Client.Id);
+					controller.Unlock(client.Id);
 
 				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 			}
@@ -177,12 +171,14 @@ namespace AdminInterface.Test.Controllers
 		{
 			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };
 			using (var adUser1 = new TestADUser())
-			using (var user = TestUser(adUser1.Login))
 			{
+				client.Users[0].Login = adUser1.Login;
+				client.Save();
+
 				ADHelper.Block(adUser1.Login);
 
 				using (new SessionScope())
-					_controller.Unlock(user.Parameter.Client.Id);
+					controller.Unlock(client.Id);
 
 				Assert.That(ADHelper.IsLocked(adUser1.Login), Is.False);
 			}
@@ -225,67 +221,5 @@ namespace AdminInterface.Test.Controllers
 				}
 			}
 		}*/
-
-		public DisposibleAction<User> TestUser()
-		{
-			return TestUser("test" + new Random().Next());
-		}
-
-		public DisposibleAction<User> TestUser(string userName)
-		{
-			var client = new Client {
-				Type = ClientType.Drugstore,
-				Name = "TestClient",
-				FullName = "TestClient",
-				BillingInstance = new Payer {
-					ShortName = "TestPayer",
-				},
-				HomeRegion = Region.Find(1UL),
-				ContactGroupOwner = new ContactGroupOwner {
-					ContactGroups = new List<ContactGroup> {
-						new ContactGroup {Name = "123", Type = ContactGroupType.General},
-						new ContactGroup {Name = "123", Type = ContactGroupType.OrderManagers},
-						new ContactGroup {Name = "123", Type = ContactGroupType.ClientManagers},
-					}
-				}
-			};
-
-			var user = new User { Login = userName, Client = client };
-			using (new TransactionScope())
-			{
-				ActiveRecordMediator.Save(client.ContactGroupOwner);
-				client.ContactGroupOwner.ContactGroups[0].ContactGroupOwner = client.ContactGroupOwner;
-				client.ContactGroupOwner.ContactGroups[1].ContactGroupOwner = client.ContactGroupOwner;
-				client.ContactGroupOwner.ContactGroups[2].ContactGroupOwner = client.ContactGroupOwner;
-				ActiveRecordMediator.Save(client.ContactGroupOwner.ContactGroups[0]);
-				ActiveRecordMediator.Save(client.ContactGroupOwner.ContactGroups[1]);
-				ActiveRecordMediator.Save(client.ContactGroupOwner.ContactGroups[2]);
-				ActiveRecordMediator.Save(client.BillingInstance);
-				ActiveRecordMediator.Save(client);
-				ActiveRecordMediator.SaveAndFlush(user);
-			}
-			return new DisposibleAction<User>(user, () => {
-				ActiveRecordMediator<User>.Delete(user);
-				ActiveRecordMediator<Client>.Delete(client);
-			});
-		}
-	}
-
-	public class DisposibleAction<T> : IDisposable
-	{
-		private readonly Action _dispose;
-
-		public DisposibleAction(T t, Action dispose)
-		{
-			Parameter = t;
-			_dispose = dispose;
-		}
-
-		public T Parameter { get; private set; }
-
-		public void Dispose()
-		{
-			_dispose();
-		}
 	}
 }

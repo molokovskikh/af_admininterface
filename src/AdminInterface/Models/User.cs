@@ -45,9 +45,19 @@ namespace AdminInterface.Models
 	{
 		public User()
 		{
+		}
+
+		public User(Client client)
+		{
 			if (HttpContext.Current != null) // для поддержки авт. тестирования
 				Registrant = SecurityContext.Administrator.UserName;
+
 			RegistrationDate = DateTime.Now;
+			Enabled = true;
+			Client = client;
+			Payer = client.Payer;
+			SendRejects = true;
+			SendWaybills = true;
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -101,9 +111,8 @@ namespace AdminInterface.Models
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
 		public virtual User InheritPricesFrom { get; set; }
 
-/*		[BelongsTo("PayerId")]
+		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
-*/
 
 		[OneToOne]
 		public virtual AuthorizationLogEntity Logs { get; set; }
@@ -229,6 +238,8 @@ namespace AdminInterface.Models
 
 		public virtual void Setup(Client client)
 		{
+			Client = client;
+			Payer = client.Payer;
 			Setup();
 			AddPrices(client);
 		}

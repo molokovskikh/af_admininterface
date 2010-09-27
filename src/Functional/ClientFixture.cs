@@ -18,12 +18,12 @@ namespace Functional
 		public void Try_sort_users()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-            using (var scope = new TransactionScope(OnDispose.Rollback))
-            {
-            	var user = new User {Client = client, Name = "test user", Enabled = true,};
-            	user.Setup(client);
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var user = new User(client) {Name = "test user", Enabled = true,};
+				user.Setup(client);
 				scope.VoteCommit();
-            }
+			}
 			using (var browser = Open(String.Format("Client/{0}", client.Id)))
 			{
 				Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
@@ -62,7 +62,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithUser();
 			using (var scope = new TransactionScope())
 			{				
-				var user = new User {Client = client, Name = "User2",};
+				var user = new User(client) {Name = "User2",};
 				user.Setup(client);
 				user.SaveAndFlush();
 				client.Users.Add(user);

@@ -414,6 +414,7 @@ WHERE i.Id IS NULL
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
 
+			address.Payer = Payer;
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);

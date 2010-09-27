@@ -14,12 +14,8 @@ namespace Integration.Models
 		public void Inherit_working_prices()
 		{
 			var client = DataMother.CreateTestClient();
-			var parent = new User {
-				Client = client,
-			};
-			var child = new User {
-				Client = client,
-			};
+			var parent = new User(client);
+			var child = new User(client);
 
 			using(new SessionScope())
 			{

@@ -41,8 +41,7 @@ namespace Functional
 			{
 				client = DataMother.CreateTestClientWithUser();
 				user = client.Users.First();
-				mainUser = new User {
-					Client = client,
+				mainUser = new User(client) {
 					Name = "test"
 				};
 				mainUser.Setup(client);

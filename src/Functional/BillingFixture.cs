@@ -99,7 +99,7 @@ namespace Functional
 			client.Refresh();
 			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
 			client.BillingInstance.UpdateAndFlush();
-			var user = new User {Client = client, Name = "test user for billing",};
+			var user = new User(client) {Name = "test user for billing",};
 			user.Setup(client);
 			user.SaveAndFlush();
 			client.Users.Add(user);
@@ -460,7 +460,7 @@ namespace Functional
 			{
 				for (var i = 0; i < countUsers; i++)
 				{
-					var user = new User { Client = client, Name = "user", };
+					var user = new User(client) { Name = "user", };
 					user.Setup(client);
 					var address = new Address { Client = client, Value = "address", };
 					client.AddAddress(address);
@@ -522,18 +522,13 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				client.Refresh();
-				var user = new User { Client = client, Name = "test user", Enabled = true, };
+				var user = new User(client) { Name = "test user", Enabled = true, };
 				user.Setup(client);
-				var address = new Address { Client = client, Value = "address", Enabled = true, };
-				client.AddAddress(address);
-				address.Save();
-				address = new Address { Client = client,  Value = "address", Enabled = true, };
-				client.AddAddress(address);
-				address.Save();
+				client.AddAddress("address");
+				client.AddAddress("address");
 				client.Users[0].Enabled = true;
-				client.Users[0].Save();
 				client.Addresses[0].Enabled = false;
-				client.Addresses[0].Save();
+				client.Save();
 				client = Client.Find(client.Id);
 				foreach (var addr in client.Addresses)
 				{
@@ -665,7 +660,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var usr = new User {Client = client, Name = "test user", Enabled = true,};
+				var usr = new User(client) {Name = "test user",};
 				usr.Setup(client);
 				scope.VoteCommit();
 			}
@@ -731,9 +726,9 @@ DELETE FROM future.Users WHERE Id = :UserId
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var user = new User { Client = client, Name = "test user", Enabled = true, };
+				var user = new User(client) {Name = "test user",};
 				user.Setup(client);
-				var address = new Address { Client = client, Value = "address", Enabled = true, };
+				var address = new Address {Value = "address",};
 				client.AddAddress(address);
 				address.Save();
 				client = Client.Find(client.Id);

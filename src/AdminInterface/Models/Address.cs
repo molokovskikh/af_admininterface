@@ -48,10 +48,8 @@ namespace AdminInterface.Models
 			get { return Value; }
 		}
 
-/*
 		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
-*/
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }

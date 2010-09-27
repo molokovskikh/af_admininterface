@@ -21,7 +21,7 @@ namespace Unit
 			client.MaskRegion = 1 | 2;
 
 			client.Users = new List<User> {
-				new User{ WorkRegionMask = 1, OrderRegionMask = 1},
+				new User(client) { WorkRegionMask = 1, OrderRegionMask = 1},
 			};
 
 			client.UpdateRegionSettings(new [] {

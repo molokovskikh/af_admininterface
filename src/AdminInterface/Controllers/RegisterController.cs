@@ -360,16 +360,12 @@ WHERE   intersection.pricecode IS NULL
 		private User CreateUser(Client client, string userName, UserPermission[] permissions,
 			ulong workRegionMask, ulong orderRegionMask, Person[] persons)
 		{
-			var user = new User
-			{
-				Enabled = true,
-				Client = client,
+			var user = new User(client) {
 				Name = userName,
 				WorkRegionMask = workRegionMask,
 				OrderRegionMask = orderRegionMask,
-				SendRejects = true,
-				SendWaybills = true,
 			};
+
 			if (permissions != null && permissions.Count() > 0)
 			{
 				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
