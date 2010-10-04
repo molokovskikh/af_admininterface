@@ -365,7 +365,8 @@ insert into Future.UserPrices(PriceId, UserId, RegionId)
 select i.PriceId, u.Id, i.RegionId
 from Future.Users u
 	join Future.Intersection i on i.ClientId = :ClientId
-where u.Id = :UserId";
+where u.Id = :UserId
+group by i.PriceId, i.RegionId";
 
 			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
 				.SetParameter("UserId", Id)
@@ -380,7 +381,8 @@ insert into Future.UserPrices(PriceId, UserId, RegionId)
 select i.PriceId, u.Id, i.RegionId
 from Future.Users u
 	join Future.Intersection i on i.ClientId = :ClientId AND i.RegionId = :RegionId
-where u.Id = :UserId";
+where u.Id = :UserId
+group by i.PriceId, i.RegionId";
 
 			ArHelper.WithSession(session => session.CreateSQLQuery(sql)
 				.SetParameter("UserId", Id)
