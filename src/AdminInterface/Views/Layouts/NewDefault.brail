@@ -17,6 +17,8 @@
 	<script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 	<link href="${siteroot}/Css/form.css" type="text/css" rel="stylesheet">
 	<link href="${siteroot}/Css/Common.css" type="text/css" rel="stylesheet">
+	<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
+	<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
 	<% if IsDefined("bredcrumbs"): %>

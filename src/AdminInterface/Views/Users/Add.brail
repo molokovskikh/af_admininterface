@@ -4,9 +4,6 @@
 <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
 									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
 									  ("Новый пользователь", "")]} %>
-									  
-<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 
 <script>
     jQuery(function() {

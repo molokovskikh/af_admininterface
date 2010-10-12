@@ -3,9 +3,6 @@
 									  ("Пользователь ${user.Login}", "${siteroot}/users/${user.Login}/edit"),
 									  ("Настройка пользователя", "")]} %>
 									  
-<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
-
 <h2>
     Настройки пользователя ${user.Login}
 </h2>

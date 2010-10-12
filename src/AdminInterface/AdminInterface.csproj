@@ -351,6 +351,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="CopySynonym.aspx" />
+    <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\Common.js" />
     <Content Include="Rescue\Error.aspx" />

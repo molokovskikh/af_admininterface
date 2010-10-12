@@ -2,9 +2,6 @@
 									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 
-<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
-
 <script type="text/javascript">
 	function SearchClient() {
 		var searchText = $("#TextForSearchClient").val();

@@ -2,8 +2,6 @@
 									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
 									  ("Пользователь ${user.Login}", "")]} %>
 									  
-<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
 <link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
 
 <script>
