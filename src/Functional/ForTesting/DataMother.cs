@@ -76,11 +76,11 @@ namespace Functional.ForTesting
 			{
 				var contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
-				var juridical = new JuridicalOrganization();
+				var juridical = new LegalEntity();
 				var payer = new Payer {
 					ShortName = "test",
 					ContactGroupOwner = contactOwner,
-					JuridicalOrganizations = new List<JuridicalOrganization> {
+					JuridicalOrganizations = new List<LegalEntity> {
 						juridical
 					}
 				};
@@ -165,10 +165,10 @@ namespace Functional.ForTesting
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var juridicalOrganization = new JuridicalOrganization();
+				var juridicalOrganization = new LegalEntity();
 				var payer = new Payer {
 					ShortName = "test",
-					JuridicalOrganizations = new List<JuridicalOrganization> {
+					JuridicalOrganizations = new List<LegalEntity> {
 						juridicalOrganization
 					}
 				};

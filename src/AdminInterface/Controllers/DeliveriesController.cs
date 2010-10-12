@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}
-		
+
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint id)
 		{
@@ -86,17 +86,19 @@ namespace AdminInterface.Controllers
 			CancelView();
 			var newClient = Client.Find(clientId);
 			var address = Address.Find(addressId);
+
 			// Если нужно перенести вместе с пользователем,
 			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
 			// тогда переносим пользователя
-			if (moveWithUser &&
-				(address.AvaliableForUsers.Count == 1) &&
-				(address.AvaliableForUsers[0].AvaliableAddresses.Count == 1) &&
-				(address.AvaliableForUsers[0].AvaliableAddresses[0].Id == addressId))
+			using (var scope = new TransactionScope())
 			{
-				address.AvaliableForUsers[0].MoveToAnotherClient(newClient);
+				if (moveWithUser && address.CanBeMoved())
+					address.AvaliableForUsers[0].MoveToAnotherClient(newClient);
+				address.MoveToAnotherClient(newClient);
+
+				scope.VoteCommit();
 			}
-			address.MoveToAnotherClient(newClient);
+
 			Flash["Message"] = Message.Notify("Адрес доставки успешно перемещен");
 			RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 		}

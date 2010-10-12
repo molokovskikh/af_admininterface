@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,9 +20,9 @@ namespace AdminInterface.Models
 	public enum UserADStatus
 	{
 		[Description("")] Ok,
-		[Description("Заблокирован")] Locked,
-		[Description("Отключен")] Disabled,
-		[Description("Не существует")] NotExists,
+		[Description("Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ")] Locked,
+		[Description("РћС‚РєР»СЋС‡РµРЅ")] Disabled,
+		[Description("РќРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚")] NotExists,
 	}
 
 	public class LoginNotFoundException : Exception
@@ -49,7 +49,7 @@ namespace AdminInterface.Models
 
 		public User(Client client)
 		{
-			if (HttpContext.Current != null) // для поддержки авт. тестирования
+			if (HttpContext.Current != null) // РґР»СЏ РїРѕРґРґРµСЂР¶РєРё Р°РІС‚. С‚РµСЃС‚РёСЂРѕРІР°РЅРёСЏ
 				Registrant = SecurityContext.Administrator.UserName;
 
 			RegistrationDate = DateTime.Now;
@@ -170,10 +170,10 @@ namespace AdminInterface.Models
 		public virtual void CheckLogin()
 		{
 			if (!ADHelper.IsLoginExists(Login))
-				throw new LoginNotFoundException(String.Format("Пользователь {0} не найден", Login));
+				throw new LoginNotFoundException(String.Format("РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ {0} РЅРµ РЅР°Р№РґРµРЅ", Login));
 
 			if (ADHelper.IsBelongsToOfficeContainer(Login))
-				throw new CantChangePassword("Запрещено изменять пароль для пользователей из офиса.");
+				throw new CantChangePassword("Р—Р°РїСЂРµС‰РµРЅРѕ РёР·РјРµРЅСЏС‚СЊ РїР°СЂРѕР»СЊ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ РёР· РѕС„РёСЃР°.");
 		}
 
 		public override string ToString()
@@ -261,7 +261,7 @@ namespace AdminInterface.Models
 		}
 
 		/// <summary>
-		/// Пользователь считается активным, если он получал обновление не более 7 дней назад
+		/// РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СЃС‡РёС‚Р°РµС‚СЃСЏ Р°РєС‚РёРІРЅС‹Рј, РµСЃР»Рё РѕРЅ РїРѕР»СѓС‡Р°Р» РѕР±РЅРѕРІР»РµРЅРёРµ РЅРµ Р±РѕР»РµРµ 7 РґРЅРµР№ РЅР°Р·Р°Рґ
 		/// </summary>
 		public virtual bool IsActive
 		{
@@ -424,31 +424,28 @@ WHERE
 		
 		public virtual void MoveToAnotherClient(Client newOwner)
 		{
-			using (var scope = new TransactionScope()) 
+			var regions = Region.FindAll();
+			// Р•СЃР»Рё РјР°СЃРєРё СЂРµРіРёРѕРЅРѕРІ РЅРµ СЃРѕРІРїР°РґР°СЋС‚, РґРѕР±Р°РІР»СЏРµРј Р·Р°РїРёСЃРё РІ UserPrices РґР»СЏ С‚РµС… СЂРµРіРёРѕРЅРѕРІ,
+			// РєРѕС‚РѕСЂС‹С… РЅРµ Р±С‹Р»Рѕ Сѓ СЃС‚Р°СЂРѕРіРѕ РєР»РёРµРЅС‚Р°, РЅРѕ РѕРЅРё РµСЃС‚СЊ Сѓ РЅРѕРІРѕРіРѕ РєР»РёРµРЅС‚Р°
+			if (Client.MaskRegion != newOwner.MaskRegion)
 			{
-				var regions = Region.FindAll();
-				// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
-				// которых не было у старого клиента, но они есть у нового клиента
-				if (Client.MaskRegion != newOwner.MaskRegion)
+				foreach (var region in regions)
 				{
-					foreach (var region in regions)
+					// Р•СЃР»Рё СЌС‚РѕС‚ СЂРµРіРёРѕРЅ РµСЃС‚СЊ Сѓ СЃС‚Р°СЂРѕРіРѕ РєР»РёРµРЅС‚Р°, РїСЂРѕРїСѓСЃРєР°РµРј РµРіРѕ
+					if ((region.Id & Client.MaskRegion) > 0)
+						continue;
+					// Р•СЃР»Рё СЂРµРіРёРѕРЅР° РЅРµС‚ Сѓ СЃС‚Р°СЂРѕРіРѕ РєР»РёРµРЅС‚Р°, РЅРѕ РѕРЅ РµСЃС‚СЊ Сѓ РЅРѕРІРѕРіРѕ,
+					// Рё РґР»СЏ СЌС‚РѕРіРѕ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РЅРµС‚ РїСЂР°Р№СЃРѕРІ РІ СЌС‚РѕРј СЂРµРіРёРѕРЅРµ РґРѕР±Р°РІР»СЏРµРј РїСЂР°Р№СЃС‹ РґР»СЏ СЌС‚РѕРіРѕ СЂРµРіРёРѕРЅР°
+					if ((region.Id & newOwner.MaskRegion) > 0)
 					{
-						// Если этот регион есть у старого клиента, пропускаем его
-						if ((region.Id & Client.MaskRegion) > 0)
-							continue;
-						// Если региона нет у старого клиента, но он есть у нового,
-						// и для этого пользователя нет прайсов в этом регионе добавляем прайсы для этого региона
-						if ((region.Id & newOwner.MaskRegion) > 0)
-						{
-							if (!HavePricesInRegion(region))
-								AddPrices(newOwner, region);
-						}
+						if (!HavePricesInRegion(region))
+							AddPrices(newOwner, region);
 					}
 				}
-				Client = newOwner;
-				Update();
-				scope.VoteCommit();
 			}
+			Client = newOwner;
+			Payer = newOwner.Payer;
+			Update();
 		}
 	}
 

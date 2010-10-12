@@ -373,17 +373,18 @@ namespace AdminInterface.Controllers
 			CancelView();
 			var newClient = Client.Find(clientId);
 			var user = User.Find(userId);
-			// Если нужно перенести вместе с адресом,
-			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
-			// тогда переносим адрес
-			if (moveWithAddress && 
-				(user.AvaliableAddresses.Count == 1) && 
-				(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) &&
-				(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == userId))
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				user.AvaliableAddresses[0].MoveToAnotherClient(newClient);
+				if (moveWithAddress &&
+					(user.AvaliableAddresses.Count == 1) &&
+					(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) &&
+					(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == userId))
+				{
+					user.AvaliableAddresses[0].MoveToAnotherClient(newClient);
+				}
+				user.MoveToAnotherClient(newClient);
+				scope.VoteCommit();
 			}
-			user.MoveToAnotherClient(newClient);
 			Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
 			RedirectUsingRoute("users", "Edit", new { login = user.Login });
 		}

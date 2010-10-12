@@ -41,7 +41,7 @@ namespace AdminInterface.Models
 		public virtual  bool FreeFlag { get; set; }
 
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
-		public virtual  JuridicalOrganization JuridicalOrganization { get; set; }
+		public virtual LegalEntity JuridicalOrganization { get; set; }
 
 		public virtual string Name
 		{
@@ -250,22 +250,27 @@ set @skip = 0;
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				MoveAddressIntersection(newOwner.Id);
+				var legalEntity = newOwner.Payer.JuridicalOrganizations.Single();
+				MoveAddressIntersection(newOwner, legalEntity);
+
 				Client = newOwner;
+				Payer = JuridicalOrganization.Payer;
+				JuridicalOrganization = JuridicalOrganization;
+
 				Update();
 				scope.VoteCommit();
 			}
 		}
 
-		private void MoveAddressIntersection(uint newClientId)
+		private void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity)
 		{
 			ArHelper.WithSession(session => session.CreateSQLQuery(@"
 insert into Future.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
 select :AddressId, ni.Id, ai.SupplierDeliveryId, ai.ControlMinReq, ai.MinReq
 from Future.Intersection ni
-left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId
+left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId and oi.LegalEntityId = :oldLegalEntityId
 left join Future.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.AddressId = :AddressId
-where ni.ClientId = :NewClientId
+where ni.ClientId = :NewClientId and ni.LegalEntityId = :legalEntityId
 ;
 
 delete future.ai
@@ -276,9 +281,17 @@ and i.ClientId = :OldClientId
 ;
 ")
 				.SetParameter("AddressId", Id)
-				.SetParameter("NewClientId", newClientId)
+				.SetParameter("NewClientId", newClient.Id)
 				.SetParameter("OldClientId", Client.Id)
+				.SetParameter("legalEntityId", JuridicalOrganization.Id)
+				.SetParameter("oldLegalEntityId", newLegalEntity.Id)
 				.ExecuteUpdate());
+		}
+
+		public bool CanBeMoved()
+		{
+			return (AvaliableForUsers.Count == 1) &&
+				(AvaliableForUsers[0].AvaliableAddresses.Count == 1);
 		}
 	}
 }

@@ -4,7 +4,7 @@ using Castle.ActiveRecord.Linq;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord("LegalEntities", Schema = "Billing", Lazy = true)]
-	public class JuridicalOrganization : ActiveRecordLinqBase<JuridicalOrganization>
+	public class LegalEntity : ActiveRecordLinqBase<LegalEntity>
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

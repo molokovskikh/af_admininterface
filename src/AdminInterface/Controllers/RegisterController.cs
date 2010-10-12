@@ -224,11 +224,11 @@ namespace AdminInterface.Controllers
 			};
 			payer.Save();
 
-			var organization = new JuridicalOrganization();
+			var organization = new LegalEntity();
 			organization.Payer = payer;
 			organization.Name = client.Name;
 			organization.FullName = client.FullName;
-			payer.JuridicalOrganizations = new List<JuridicalOrganization> {organization};
+			payer.JuridicalOrganizations = new List<LegalEntity> {organization};
 			organization.Save();
 
 			return payer;
@@ -404,7 +404,7 @@ WHERE   intersection.pricecode IS NULL
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
-			[DataBind("JuridicalOrganization")] JuridicalOrganization juridicalOrganization,
+			[DataBind("JuridicalOrganization")] LegalEntity juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			uint clientCode,
 			bool showRegistrationCard)

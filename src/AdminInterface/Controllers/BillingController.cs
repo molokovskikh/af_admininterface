@@ -420,16 +420,16 @@ namespace AdminInterface.Controllers
 			PropertyBag["tab"] = "juridicalOrganization";
 			PropertyBag["Addresses"] = payer.GetAllAddresses();
 			if (currentJuridicalOrganizationId > 0)
-				PropertyBag["currentJuridicalOrganization"] = JuridicalOrganization.Find(currentJuridicalOrganizationId);
+				PropertyBag["currentJuridicalOrganization"] = LegalEntity.Find(currentJuridicalOrganizationId);
 		}
 
-		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] JuridicalOrganization juridicalOrganization)
+		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
 		{
 			CancelLayout();
 			CancelView();
 			using (var scope = new TransactionScope())
 			{
-				var organization = JuridicalOrganization.Find(juridicalOrganization.Id);
+				var organization = LegalEntity.Find(juridicalOrganization.Id);
 				organization.Name = juridicalOrganization.Name;
 				organization.FullName = juridicalOrganization.FullName;
 				organization.Inn = juridicalOrganization.Inn;
@@ -445,7 +445,7 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] JuridicalOrganization juridicalOrganization, uint payerId)
+		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity juridicalOrganization, uint payerId)
 		{
 			CancelLayout();
 			CancelView();

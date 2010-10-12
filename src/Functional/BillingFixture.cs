@@ -978,7 +978,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				client = DataMother.CreateTestClientWithAddressAndUser();
-				var juridicalOrganization = new JuridicalOrganization() {
+				var juridicalOrganization = new LegalEntity() {
 					Name = "Test" + client.Id,
 					Payer = client.BillingInstance,
 				};
@@ -1012,7 +1012,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 				browser.Button(Find.ById("SubmitFormButton")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Юридическое лицо создано"));
 
-				var count = JuridicalOrganization.Queryable.Count(u => u.Name == String.Format("TestJuridicalNameForClient{0}", client.Id));
+				var count = LegalEntity.Queryable.Count(u => u.Name == String.Format("TestJuridicalNameForClient{0}", client.Id));
 				Assert.That(count, Is.EqualTo(1));
 			}
 		}
@@ -1021,12 +1021,12 @@ DELETE FROM future.Users WHERE Id = :UserId
 		public void Update_juridical_organization_info()
 		{
 			Client client;
-			JuridicalOrganization juridicalOrganization;
+			LegalEntity juridicalOrganization;
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				client = DataMother.CreateTestClientWithAddressAndUser();
-				juridicalOrganization = new JuridicalOrganization() {
+				juridicalOrganization = new LegalEntity() {
 					Name = "Test" + client.Id,
 					Payer = client.BillingInstance,
 				};

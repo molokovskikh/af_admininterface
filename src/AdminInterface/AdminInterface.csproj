@@ -180,7 +180,7 @@
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\Document.cs" />
-    <Compile Include="Models\Billing\JuridicalOrganization.cs" />
+    <Compile Include="Models\Billing\LegalEntity.cs" />
     <Compile Include="Models\Logs\DocumentReceiveLog.cs" />
     <Compile Include="Models\DrugstoreSettings.cs" />
     <Compile Include="Models\EndUserException.cs" />
