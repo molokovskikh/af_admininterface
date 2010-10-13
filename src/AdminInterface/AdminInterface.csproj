@@ -354,6 +354,7 @@
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\Common.js" />
+    <Content Include="JavaScript\jquery_contact_validation.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\arrow-down-blue-reversed.gif" />
@@ -449,6 +450,9 @@
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
+    <None Include="Views\SubViews\MoveTo.brail">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Views\SubViews\PersonInfo.brail" />
     <None Include="Views\UserSearch\LegendView.brail" />
     <None Include="Views\UserSearch\Search.brail" />

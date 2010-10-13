@@ -14,75 +14,15 @@
 			rules: { "message": "required" }
 		});
 	});
-
-	function SearchClient() {
-		var searchText = $("#TextForSearchClient").val();
-		var link = "${siteroot}/Client/SearchClient?searchText=" + searchText;
-
-		$.ajax({
-			url: link,
-			cache: false,
-			success: function (data) {
-				if (data.length == 0) {
-					$("#ClientSearchMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
-					$("#WarningMessageForUserMoving").css("display", "none");
-					return;
-				}
-				$("#SearchClientButton").css("display", "none");
-				$("#MoveToClientButton").css("display", "");
-				$("#CancelMoveToClientButton").css("display", "");
-				$("#TextForSearchClient").css("display", "none");
-				$("#TextForSearchClient").css("disabled", "");
-				$("#DivForSelectClientToMove").append(data);
-				$("#ClientSearchMessage").html("");
-				$("#WarningMessageForUserMoving").css("display", "");
-			},
-			error: function (xhr, textStatus, error) {
-				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-		$("#TextForSearchClient").css("disabled", "disabled");
-		$("#ClientSearchMessage").html("<i>Идет поиск...</i>");
-	}
-
-	function CancelMove() {
-		$("#DivForSelectClientToMove").children().remove().end();
-		$("#SearchClientButton").css("display", "");
-		$("#MoveToClientButton").css("display", "none");
-		$("#CancelMoveToClientButton").css("display", "none");
-		$("#TextForSearchClient").css("display", "");
-		$("#ClientSearchMessage").html("");
-		$("#WarningMessageForUserMoving").css("display", "none");
-	}
-
-	function MoveUserToAnotherClient(userId) {
-		var clientId = $("#clientsList").val();
-		var link = "${siteroot}/Users/MoveUserToAnotherClient?userId=" + userId + "&clientId=" + clientId;
-		$.ajax({
-			url: link,
-			cache: false,
-			success: function (data) { },
-			error: function (xhr, textStatus, error) {
-				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-	}
-
-	function SetClientId() {
-		var clientId = $("#clientsList").val();
-		$("#ClientIdForMoving").val(clientId);
-	}
 </script>
 
 
 <h2>
-<%
-	if (user.Login == user.Id.ToString()): %>
+	<% if (user.Login == user.Id.ToString()): %>
 		Пользователь ${user.Login}
-<%	else: %>
+	<% else: %>
 		Пользователь ${user.Login}, Код ${user.Id}
-<%	end
-%>
+	<% end %>
 </h2>
 
 <% if IsDefined("Message"):
@@ -155,46 +95,7 @@
 	</div>
 
 	<div class="block">
-		<form method="post" action="${siteroot}/Users/MoveUserToAnotherClient">
-		<h3>Перемещение пользователя</h3>
-		<div id="WarningMessageForUserMoving" style="display: none;">
-			<font color="red"><b>Внимание!</b></font><br />
-				Текущий пользователь будет перемещен к выбранному клиенту.
-<% if ((user.AvaliableAddresses.Count == 1) and
-		(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) and
-		(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == user.Id)): %>
-				<br />
-				<input id="moveWithAddress" name="moveWithAddress" type="checkbox" checked="checked" value="true" />
-				<label for="moveWithAddress">
-					Перемещать адрес доставки <b>${user.AvaliableAddresses[0].Value}</b>
-					<br />(Коды и условия заказа для этого адреса будут потеряны)
-				</label>
-				<input type="hidden" name="moveWithAddress" value="false" />
-<% end %>
-				<br /><br />
-		</div>
-		<table style="width: 100%;">
-			<tr><td align="left">Выберите клиента, к которому нужно переместить текущего пользователя</td></tr>
-			<tr>
-				<td style="padding: 0px 15px 0px 5px;" >
-					<input id="TextForSearchClient" type="text" value="" style="width :100%; display:;" />
-					<div id="DivForSelectClientToMove"></div>
-				</td>
-				<td align="right">
-					<strong>
-					<input id="SearchClientButton" type="button" style="display: block;" onclick="SearchClient()" value="Найти" />
-					<input id="CancelMoveToClientButton" type="button" style="display: none;" onclick="CancelMove()" value="Отмена" />
-					</strong>
-				</td>
-				<td align="left">
-					<input id="MoveToClientButton" type="submit" style="display: none;" value="Переместить" onclick="SetClientId()" />
-					<input type="hidden" name="userId" value="${user.Id}" />
-					<input type="hidden" id="ClientIdForMoving" name="clientId" value="0" />
-				</td>
-			</tr>
-			<tr><td id="ClientSearchMessage" colspan="10"></td></tr>
-		</table>
-		</form>
+		<% OutputSubView("/SubViews/MoveTo") %>
 	</div>
 
 	<div class="block">

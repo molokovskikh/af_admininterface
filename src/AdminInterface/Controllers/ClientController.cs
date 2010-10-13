@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
@@ -290,6 +291,14 @@ where Phone like :phone")
 			RenderView("SearchClientSubview");
 		}
 
+		[AccessibleThrough(Verb.Get)]
+		[return: JSONReturnBinder]
+		public object[] LegalEntities(uint id)
+		{
+			var client = Client.FindAndCheck(id);
+			return client.Payer.JuridicalOrganizations.Select(j => new {j.Id, j.Name}).ToArray();
+		}
+
 		public void SearchAssortmentPrices(string text)
 		{
 			CancelLayout();
@@ -300,6 +309,65 @@ where Phone like :phone")
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
 				.ToList();
+		}
+
+		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
+		{
+			var newClient = Client.Find(clientId);
+			var address = Address.TryFind(addressId);
+			var user = User.TryFind(userId);
+			var legalEntity = LegalEntity.TryFind(legalEntityId);
+			if (legalEntity == null)
+				legalEntity = newClient.Payer.JuridicalOrganizations.Single();
+
+			// Если нужно перенести вместе с пользователем,
+			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
+			// тогда переносим пользователя))
+
+			if ((user != null && user.AvaliableAddresses.Count > 1)
+				|| (address != null && address.AvaliableForUsers.Count > 1))
+			{
+				if (moveAddress)
+				{
+					Flash["Message"] = Message.Error("Адрес доставки не может быть перемещен, т.к. имеет доступ к нему подключены пользователи");
+					RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
+					return;
+				}
+				else
+				{
+					Flash["Message"] = Message.Error("Пользователь не может быть перемещен т.к. имеет доступ к адресам доставки");
+					RedirectUsingRoute("users", "Edit", new { login = user.Login });
+					return;
+				}
+			}
+
+			if (address != null)
+				user = address.AvaliableForUsers.SingleOrDefault();
+			if (user != null)
+				address = user.AvaliableAddresses.SingleOrDefault();
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+
+				if (user != null)
+					user.MoveToAnotherClient(newClient, legalEntity);
+				if (address != null)
+					address.MoveToAnotherClient(newClient, legalEntity);
+
+				scope.VoteCommit();
+			}
+
+			if (moveAddress)
+			{
+				Flash["Message"] = Message.Notify("Адрес доставки успешно перемещен");
+				RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
+			}
+			else
+			{
+				Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
+				RedirectUsingRoute("users", "Edit", new { login = user.Login });
+			}
 		}
 	}
 }

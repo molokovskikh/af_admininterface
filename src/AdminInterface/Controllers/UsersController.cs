@@ -20,9 +20,9 @@ using System.Linq;
 namespace AdminInterface.Controllers
 {
 	[
-	Helper(typeof(HttpUtility)),
-	Layout("NewDefault"),
-	Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
+		Helper(typeof(HttpUtility)),
+		Layout("NewDefault"),
+		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class UsersController : SmartDispatcherController
 	{
@@ -295,7 +295,7 @@ namespace AdminInterface.Controllers
 		{			
 			try
 			{
-				var user = User.GetById(userCode);				
+				var user = User.GetById(userCode);
 				var file = String.Format(CustomSettings.UserPreparedDataFormatString, user.Id);
 				if (File.Exists(file))
 					File.Delete(file);
@@ -364,28 +364,6 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
-			RedirectUsingRoute("users", "Edit", new { login = user.Login });
-		}
-
-		public void MoveUserToAnotherClient(uint userId, uint clientId, bool moveWithAddress)
-		{
-			CancelLayout();
-			CancelView();
-			var newClient = Client.Find(clientId);
-			var user = User.Find(userId);
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				if (moveWithAddress &&
-					(user.AvaliableAddresses.Count == 1) &&
-					(user.AvaliableAddresses[0].AvaliableForUsers.Count == 1) &&
-					(user.AvaliableAddresses[0].AvaliableForUsers[0].Id == userId))
-				{
-					user.AvaliableAddresses[0].MoveToAnotherClient(newClient);
-				}
-				user.MoveToAnotherClient(newClient);
-				scope.VoteCommit();
-			}
-			Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
 			RedirectUsingRoute("users", "Edit", new { login = user.Login });
 		}
 	}

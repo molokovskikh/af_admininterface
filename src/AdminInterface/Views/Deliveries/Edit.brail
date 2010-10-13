@@ -1,67 +1,6 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
 									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
-
-<script type="text/javascript">
-	function SearchClient() {
-		var searchText = $("#TextForSearchClient").val();
-		var link = "${siteroot}/Client/SearchClient?searchText=" + searchText;
-
-		$.ajax({
-			url: link,
-			cache: false,
-			success: function (data) {
-				if (data.length == 0) {
-					$("#ClientSearchMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
-					$("#WarningMessageForAddressMoving").css("display", "none");
-					return;
-				}
-				$("#SearchClientButton").css("display", "none");
-				$("#MoveToClientButton").css("display", "");
-				$("#CancelMoveToClientButton").css("display", "");
-				$("#TextForSearchClient").css("display", "none");
-				$("#TextForSearchClient").css("disabled", "");
-				$("#DivForSelectClientToMove").append(data);
-				$("#ClientSearchMessage").html("");
-				$("#WarningMessageForAddressMoving").css("display", "");
-			},
-			error: function (xhr, textStatus, error) {
-				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-		$("#TextForSearchClient").css("disabled", "disabled");
-		$("#ClientSearchMessage").html("<i>Идет поиск...</i>");
-	}
-
-	function CancelMove() {
-		$("#DivForSelectClientToMove").children().remove().end();
-		$("#SearchClientButton").css("display", "");
-		$("#MoveToClientButton").css("display", "none");
-		$("#CancelMoveToClientButton").css("display", "none");
-		$("#TextForSearchClient").css("display", "");
-		$("#ClientSearchMessage").html("");
-		$("#WarningMessageForAddressMoving").css("display", "none");
-	}
-
-	function MoveAddressToAnotherClient(addressId) {
-		var clientId = $("#clientsList").val();
-		var link = "${siteroot}/Deliveries/MoveAddressToAnotherClient?addressId=" + addressId + "&clientId=" + clientId;
-		$.ajax({
-			url: link,
-			cache: false,
-			success: function (data) { },
-			error: function (xhr, textStatus, error) {
-				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-	}
-
-	function SetClientId() {
-		var clientId = $("#clientsList").val();
-		$("#ClientIdForMoving").val(clientId);
-	}
-</script>
-
 <div style="width: 600px;">
 
 	<% if IsDefined("Message"):
@@ -94,45 +33,7 @@
 	</div>
 
 	<div class="block">
-	<form method="post" action="${siteroot}/Deliveries/MoveAddressToAnotherClient">
-		<h3>Перемещение адреса доставки</h3>
-		<div id="WarningMessageForAddressMoving" style="display: none;">
-			<font color="red"><b>Внимание!</b></font><br />
-				Текущий адрес будет перемещен к выбранному клиенту.
-<% if ((delivery.AvaliableForUsers.Count == 1) and
-		(delivery.AvaliableForUsers[0].AvaliableAddresses.Count == 1) and
-		(delivery.AvaliableForUsers[0].AvaliableAddresses[0].Id == delivery.Id)): %>
-				<br />
-				<input id="moveWithUser" name="moveWithUser" type="checkbox" checked="checked" value="true" />
-				<label for="moveWithUser">
-					Перемещать пользователя <b>${delivery.AvaliableForUsers[0].Login}</b>
-				</label>
-				<input type="hidden" name="moveWithUser" value="false" />
-<% end %>
-				<br /><br />
-		</div>
-		<table style="width: 100%;">
-			<tr><td align="left">Выберите клиента, к которому нужно переместить текущий адрес доставки</td></tr>
-			<tr>
-				<td style="padding: 0px 15px 0px 5px;" >
-					<input id="TextForSearchClient" type="text" value="" style="width :100%; display: '';" />
-					<div id="DivForSelectClientToMove"></div>
-				</td>
-				<td align="right">
-					<strong>
-					<input id="SearchClientButton" type="button" style="display: block;" onclick="SearchClient()" value="Найти" />
-					<input id="CancelMoveToClientButton" type="button" style="display: none;" onclick="CancelMove()" value="Отмена" />
-					</strong>
-				</td>
-				<td align="left">
-					<input id="MoveToClientButton" type="submit" style="display: none;" value="Переместить" onclick="SetClientId()" />
-					<input type="hidden" name="addressId" value="${delivery.Id}" />
-					<input type="hidden" id="ClientIdForMoving" name="clientId" value="0" />
-				</td>
-			</tr>
-			<tr><td id="ClientSearchMessage" colspan="10"></td></tr>
-		</table>
-		</form>
+		<% OutputSubView("/SubViews/MoveTo") %>
 	</div>
 
 	<form id="mainForm" method=post action="${siteroot}/deliveries/update">

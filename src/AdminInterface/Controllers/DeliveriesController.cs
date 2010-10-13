@@ -79,28 +79,5 @@ namespace AdminInterface.Controllers
 			Flash["Message"] = new Message("Уведомления отправлены");
 			RedirectToReferrer();
 		}
-
-		public void MoveAddressToAnotherClient(uint addressId, uint clientId, bool moveWithUser)
-		{
-			CancelLayout();
-			CancelView();
-			var newClient = Client.Find(clientId);
-			var address = Address.Find(addressId);
-
-			// Если нужно перенести вместе с пользователем,
-			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
-			// тогда переносим пользователя
-			using (var scope = new TransactionScope())
-			{
-				if (moveWithUser && address.CanBeMoved())
-					address.AvaliableForUsers[0].MoveToAnotherClient(newClient);
-				address.MoveToAnotherClient(newClient);
-
-				scope.VoteCommit();
-			}
-
-			Flash["Message"] = Message.Notify("Адрес доставки успешно перемещен");
-			RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
-		}
 	}
 }

@@ -422,7 +422,7 @@ WHERE
 				ContactGroup.AddPerson(name);
 		}
 		
-		public virtual void MoveToAnotherClient(Client newOwner)
+		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
 			var regions = Region.FindAll();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
@@ -444,7 +444,7 @@ WHERE
 				}
 			}
 			Client = newOwner;
-			Payer = newOwner.Payer;
+			Payer = legalEntity.Payer;
 			Update();
 		}
 	}

@@ -1,0 +1,146 @@
+﻿<script type="text/javascript">
+
+	$(function() {
+		$("#MoveForm").submit(function() {
+			var clientId = $("#clientsList").val();
+			if (!clientId)
+				return false;
+			$("#ClientIdForMoving").val(clientId);
+		});
+	});
+
+	function SearchClient() {
+		var searchText = $("#TextForSearchClient").val();
+		var link = "${siteroot}/Client/SearchClient?searchText=" + searchText;
+
+		$.ajax({
+			url: link,
+			cache: false,
+			success: function (data) {
+				if (data.length == 0) {
+					$("#ClientSearchMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
+					$("#WarningMessageForAddressMoving").css("display", "none");
+					return;
+				}
+				$("#SearchClientButton").css("display", "none");
+				$("#MoveToClientButton").css("display", "");
+				
+				$("#CancelMoveToClientButton").css("display", "");
+				$("#TextForSearchClient").css("display", "none");
+				$("#TextForSearchClient").css("disabled", "");
+				$("#DivForSelectClientToMove").append(data);
+				$("#ClientSearchMessage").html("");
+				$("#WarningMessageForAddressMoving").css("display", "");
+				$('#clientsList').change(function() {
+					CheckLegalEntity();
+				});
+				CheckLegalEntity();
+			},
+			error: function (xhr, textStatus, error) {
+				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+		$("#TextForSearchClient").css("disabled", "disabled");
+		$("#ClientSearchMessage").html("<i>Идет поиск...</i>");
+	}
+
+	function CheckLegalEntity()
+	{
+		$("#MoveToClientButton").attr("disabled", "disabled");
+		$.ajax({
+			cache : false,
+			dataType : "json",
+			url : "${siteroot}/Client/LegalEntities?id=" + $("#clientsList").val(),
+			success : function(data) {
+				if (data.length < 2)
+				{
+					$("#MoveToClientButton").removeAttr("disabled");
+					return;
+				}
+				var select = $('<select/>')
+					.attr('id', 'LegalEntityId')
+					.attr('name', 'LegalEntityId');
+				$(data).each(function () {
+					select.append($('<option/>').attr('value', this.Id).append(this.Name));
+				});
+				$("#DivForSelectClientToMove")
+					.append("<span>Выберете юр. лицо:</span>")
+					.append(select);
+
+				$("#MoveToClientButton").removeAttr("disabled");
+			},
+			error: function (xhr, textStatus, error) {
+				$("#ClientSearchMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+	}
+
+	function CancelMove() {
+		$("#DivForSelectClientToMove").children().remove().end();
+		$("#SearchClientButton").css("display", "");
+		$("#MoveToClientButton").css("display", "none");
+		$("#CancelMoveToClientButton").css("display", "none");
+		$("#TextForSearchClient").css("display", "");
+		$("#ClientSearchMessage").html("");
+		$("#WarningMessageForAddressMoving").css("display", "none");
+	}
+</script>
+
+
+<form id='MoveForm' method="post" action="${siteroot}/Client/MoveUserOrAddress">
+	
+	<% moveAddress = IsDefined("delivery") %>
+
+	<input name="moveAddress" type="hidden" value="${moveAddress}"></input>
+		
+	<% if moveAddress : %>
+		<h3>Перемещение адреса доставки</h3>
+	<% else: %>
+		<h3>Перемещение пользователя</h3>
+	<% end %>
+
+	<div id="WarningMessageForAddressMoving" style="display: none;">
+		<font color="red">
+			<b>Внимание!</b>
+		</font>
+		<br />
+		<% if moveAddress: %>
+			Текущий адрес будет перемещен к выбранному клиенту.
+			<input name="addressId" type="hidden" value="${delivery.Id}" />
+		<% else: %>
+			Текущий пользователь будет перемещен к выбранному клиенту.
+			<input name="userId" type="hidden" value="${user.Id}" />
+		<% end %>
+
+		<br />
+		<br />
+	</div>
+	<table style="width: 100%;">
+		<tr>
+			<% if moveAddress: %>
+			<td align="left">Выберите клиента, к которому нужно переместить текущий адрес доставки</td>
+			<% else: %>
+			<td align="left">Выберите клиента, к которому нужно переместить текущего пользователя</td>
+			<% end %>
+		</tr>
+		<tr>
+			<td style="padding: 0px 15px 0px 5px;" >
+				<input id="TextForSearchClient" type="text" value="" style="width :100%; display: '';" />
+				<div id="DivForSelectClientToMove"></div>
+			</td>
+			<td align="right">
+				<strong>
+					<input id="SearchClientButton" type="button" style="display: block;" onclick="SearchClient()" value="Найти" />
+					<input id="CancelMoveToClientButton" type="button" style="display: none;" onclick="CancelMove()" value="Отмена" />
+				</strong>
+			</td>
+			<td align="left">
+				<input id="MoveToClientButton" type="submit" style="display: none;" value="Переместить" />
+				<input type="hidden" id="ClientIdForMoving" name="clientId" value="0" />
+			</td>
+		</tr>
+		<tr>
+			<td id="ClientSearchMessage" colspan="10"></td>
+		</tr>
+	</table>
+</form>

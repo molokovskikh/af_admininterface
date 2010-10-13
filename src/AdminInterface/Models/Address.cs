@@ -246,20 +246,15 @@ set @skip = 0;
 			UpdateContacts(displayedContacts, null);
 		}
 
-		public virtual void MoveToAnotherClient(Client newOwner)
+		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var legalEntity = newOwner.Payer.JuridicalOrganizations.Single();
-				MoveAddressIntersection(newOwner, legalEntity);
+			MoveAddressIntersection(newOwner, legalEntity);
 
-				Client = newOwner;
-				Payer = JuridicalOrganization.Payer;
-				JuridicalOrganization = JuridicalOrganization;
+			Client = newOwner;
+			Payer = JuridicalOrganization.Payer;
+			JuridicalOrganization = JuridicalOrganization;
 
-				Update();
-				scope.VoteCommit();
-			}
+			Update();
 		}
 
 		private void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity)
@@ -288,7 +283,7 @@ and i.ClientId = :OldClientId
 				.ExecuteUpdate());
 		}
 
-		public bool CanBeMoved()
+		public virtual bool CanBeMoved()
 		{
 			return (AvaliableForUsers.Count == 1) &&
 				(AvaliableForUsers[0].AvaliableAddresses.Count == 1);
