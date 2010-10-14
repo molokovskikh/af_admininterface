@@ -15,7 +15,7 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl("default.aspx")))
 			{
 				browser.Link(Find.ByText("Статистика обращений")).Click();
-				Assert.That(browser.Text, Text.Contains("Выберите период или введите текст для поиска: "));
+				Assert.That(browser.Text, Is.StringContaining("Выберите период или введите текст для поиска: "));
 			}
 		}
 
@@ -26,7 +26,7 @@ namespace Functional
 			{
 				browser.TextField(Find.ById("ctl00_MainContentPlaceHolder_SearchText")).TypeText("тест");
 				browser.Button(Find.ByValue("Показать")).Click();
-				Assert.That(browser.Text, Text.Contains("Выберите период или введите текст для поиска: "));
+				Assert.That(browser.Text, Is.StringContaining("Выберите период или введите текст для поиска: "));
 			}
 		}
 	}

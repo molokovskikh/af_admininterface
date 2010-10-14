@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AdminInterface.Helpers;
-using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Helpers;
 using WatiN.Core;
@@ -42,17 +39,17 @@ namespace Functional
 				{
 					browser.Link(Find.ByText("История заказов")).Click();
 					using (
-						var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format(@"История заказов пользователя {0}", user.Login))))
+						var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"История заказов пользователя {0}", user.Login))))
 					{
 						Set_calendar_dates(openedWindow);
 						openedWindow.Button(Find.ByValue("Показать")).Click();
 						Assert.IsTrue(openedWindow.TableBody(Find.ById("SearchResults")).Exists);
-						Assert.That(openedWindow.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+						Assert.That(openedWindow.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 						var addressLinks = openedWindow.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[4].Links;
-						Assert.That(addressLinks.Length, Is.EqualTo(1));
+						Assert.That(addressLinks.Count, Is.EqualTo(1));
 						var text = addressLinks[0].Text;
 						addressLinks[0].Click();
-						Assert.That(openedWindow.Text, Text.Contains(String.Format("Адрес доставки {0}", text)));
+						Assert.That(openedWindow.Text, Is.StringContaining(String.Format("Адрес доставки {0}", text)));
 					}
 				}
 			}
@@ -68,18 +65,18 @@ namespace Functional
 			using (var browser = Open("client/{0}", clientId))
 			{
 				browser.Link(Find.ByText("История заказов")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("История заказов клиента {0}", client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История заказов клиента {0}", client.Name))))
 				{
 					Set_calendar_dates(openedWindow);
 					openedWindow.Button(Find.ByValue("Показать")).Click();
 					Assert.IsTrue(openedWindow.TableBody(Find.ById("SearchResults")).Exists);
-					Assert.That(openedWindow.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+					Assert.That(openedWindow.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 					var userLinks = openedWindow.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[5].Links;
-					Assert.That(userLinks.Length, Is.EqualTo(1));
+					Assert.That(userLinks.Count, Is.EqualTo(1));
 					var text = userLinks[0].Text;
 					userLinks[0].Click();
 					if (String.IsNullOrEmpty(text))
-						Assert.That(openedWindow.Text, Text.Contains(String.Format("Пользователь {0}", text)));
+						Assert.That(openedWindow.Text, Is.StringContaining(String.Format("Пользователь {0}", text)));
 					else
 						Assert.That(openedWindow.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
 				}
@@ -135,7 +132,7 @@ namespace Functional
 			using (var mainWindow = Open("Client/{0}", client.Id))
 			{
 				mainWindow.Link(Find.ByText("История обновлений")).Click();
-				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
 				{
 					Thread.Sleep(2000);
 					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
@@ -169,9 +166,9 @@ namespace Functional
 
 			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
 			{
-                mainWindow.Link(Find.ByText("История обновлений")).Click();
-                using (var browser = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
-                {
+				mainWindow.Link(Find.ByText("История обновлений")).Click();
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
+				{
 					Thread.Sleep(2000);
 					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 					
@@ -185,7 +182,7 @@ namespace Functional
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
 
 					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-                	Check_document_view(browser, document);
+					Check_document_view(browser, document);
 				}
 			}
 		}
@@ -204,7 +201,7 @@ namespace Functional
 			using (var mainWindow = Open("Client/{0}", client.Id))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента " + client.Name))))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента " + client.Name))))
 				{
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
@@ -215,7 +212,7 @@ namespace Functional
 					Assert.That(browser.Text, Is.StringContaining("Производитель"));
 					Assert.That(browser.Text, Is.StringContaining("Страна"));
 					Assert.That(browser.Text, Is.StringContaining("Количество"));
-					Assert.That(browser.Text, Is.StringContaining("Срок годности"));					
+					Assert.That(browser.Text, Is.StringContaining("Срок годности"));
 
 					Check_document_view(browser, document);
 				}
@@ -236,7 +233,7 @@ namespace Functional
 			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
 				{
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
@@ -266,7 +263,7 @@ namespace Functional
 			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
 				{
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
@@ -288,7 +285,7 @@ namespace Functional
 			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
 			{
 				mainWindow.Link(Find.ByText(@"История обновлений")).Click();
-				using (var browser = IE.AttachToIE(Find.ByTitle(@"Статистика обновлений")))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle(@"Статистика обновлений")))
 				{
 					Thread.Sleep(2000);
 					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);

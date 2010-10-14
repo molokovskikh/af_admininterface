@@ -11,9 +11,9 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
-
 using WatiN.Core;
 using Functional.ForTesting;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
 {
@@ -47,7 +47,7 @@ namespace Functional
 				Assert.That(browser.CheckBox(Find.ById("EnterBillingInfo")).Checked, Is.False);
 
 				browser.Button(Find.ById("Register")).Click();
-				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
+				Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
 				clientId = GetClientCodeFromRegistrationCard(browser);
 			}
 			using (new SessionScope())
@@ -71,11 +71,11 @@ namespace Functional
 				// Заполняем адрес доставки
 				browser.TextField("deliveryAddress").TypeText(_randomClientName);
 				browser.Button("RegisterButton").Click();
-				Assert.That(browser.Text, Text.Contains("Это поле необходимо заполнить."));
+				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
 				browser.TextField("JuridicalName").TypeText(_randomClientName);
 				browser.TextField("ShortName").TypeText(_randomClientName);
 				browser.Button("RegisterButton").Click();
-				Assert.That(browser.Text, Text.Contains("Это поле необходимо заполнить."));
+				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
 				browser.TextField("ClientContactPhone").TypeText("123-456789");
 				browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 				ClickRegisterAndCheck(browser);
@@ -93,10 +93,10 @@ namespace Functional
 				browser.TextField("ShortName").TypeText(_randomClientName);
 				browser.TextField("ClientContactPhone").TypeText("123456789");
 				browser.Button("RegisterButton").Click();
-				Assert.That(browser.Text, Text.Contains("Некорректный телефонный номер"));
+				Assert.That(browser.Text, Is.StringContaining("Некорректный телефонный номер"));
 				browser.TextField("ClientContactEmail").TypeText(_randomClientName + "test.test");
 				browser.Button("RegisterButton").Click();
-				Assert.That(browser.Text, Text.Contains("Некорректный адрес электронной почты"));
+				Assert.That(browser.Text, Is.StringContaining("Некорректный адрес электронной почты"));
 				browser.TextField("ClientContactPhone").TypeText("123-456789");
 				browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 				ClickRegisterAndCheck(browser);
@@ -136,11 +136,11 @@ namespace Functional
 			Assert.That(browser.Div(Find.ById("Search" + namePart + "Div")).Style.Display, Is.EqualTo("block"));
 			Assert.That(browser.Div(Find.ById("Select" + namePart + "Div")).Style.Display, Is.EqualTo("none"));
 			browser.Button("RegisterButton").Click();
-			Assert.That(browser.Text, Text.Contains(errorMessage));
+			Assert.That(browser.Text, Is.StringContaining(errorMessage));
 
 			browser.TextField(Find.ById("Search" + namePart + "TextPattern")).TypeText("12");
 			browser.Button(Find.ById("Search" + namePart + "Button")).Click();
-			Assert.That(browser.Text, Text.Contains("Выполняется поиск"));
+			Assert.That(browser.Text, Is.StringContaining("Выполняется поиск"));
 
 			Thread.Sleep(5000);
 			Assert.That(browser.Div(Find.ById("Select" + namePart + "Div")).Style.Display, Is.EqualTo("block"));
@@ -153,7 +153,7 @@ namespace Functional
 			browser.TextField(Find.ById("Search" + namePart + "TextPattern")).TypeText("124567890sdffffasd");
 			browser.Button(Find.ById("Search" + namePart + "Button")).Click();
 			Thread.Sleep(5000);
-			Assert.That(browser.Text, Text.Contains("Ничего не найдено"));
+			Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
 		}
 
 		private void ClickRegisterAndCheck(IE browser)
@@ -164,7 +164,7 @@ namespace Functional
 			if (browser.CheckBox("FillBillingInfo").Enabled)
 				browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			Assert.That(browser.Text, Text.Contains("Регистрация завершена успешно"));
+			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
 
 		[Test]
@@ -184,7 +184,7 @@ namespace Functional
 				browser.SelectList(Find.ById("clientType")).Select("Аптека");
 				browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
 				browser.Button(Find.ById("RegisterButton")).Click();
-				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
+				Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
 				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			}
 			using(new SessionScope())
@@ -222,7 +222,7 @@ namespace Functional
 				browser.TextField(Find.ByName("PaymentOptions.Comment")).TypeText("Комментарий");
 				browser.TextField(Find.ByName("PaymentOptions.PaymentPeriodBeginDate")).TypeText(DateTime.Now.AddDays(10).ToShortDateString());
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Регистрационная карта №"));
+				Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
 			}
 		}
 

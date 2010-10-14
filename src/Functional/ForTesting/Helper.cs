@@ -56,9 +56,9 @@ namespace AdminInterface.Test.ForTesting
 
 		public static TableCell GetCellByHeader(TableRow row, string headerText)
 		{
-			var headerRow = row.ParentTable.TableRows.First();
+			var headerRow = row.ContainingTable.TableRows.First();
 			var index = 0;
-			foreach (Element header in headerRow.Elements)
+			foreach (var header in headerRow.Elements)
 			{
 				try
 				{
@@ -80,8 +80,8 @@ namespace AdminInterface.Test.ForTesting
 		public static string GetHeader(TableCell cell)
 		{
 			return cell
-				.ParentTableRow
-				.ParentTable
+				.ContainingTableRow
+				.ContainingTable
 				.TableRows[0]
 				.Elements
 				.Where(e => e.TagName == "TH")

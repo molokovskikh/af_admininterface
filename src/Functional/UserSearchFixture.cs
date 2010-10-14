@@ -48,7 +48,7 @@ from billing.Payers
 
 			if (browser.TableBody(Find.ById("SearchResults")).Exists)
 			{
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
 			else
@@ -70,10 +70,10 @@ from billing.Payers
 			using (var browser = Open("default.aspx"))
 			{
 				browser.Link(Find.ByText("Поиск пользователей")).Click();
-				Assert.That(browser.Text, Text.Contains("Поиск пользователей"));
-				Assert.That(browser.Text, Text.Contains("Введите текст для поиска"));
+				Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
+				Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
 				browser.Button(Find.ByValue("Поиск")).Click();
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
 		}
@@ -95,7 +95,7 @@ from billing.Payers
 				TestSearchResultsByUserInfo(browser, "Login", "SearchByLogin");
 				if (browser.TableBody(Find.ById("SearchResults")).Exists)
 				{
-					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.EqualTo(1));
+					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.EqualTo(1));
 				}
 				else
 				{
@@ -156,7 +156,7 @@ from billing.Payers
 			{
 				browser.SelectList(Find.ByName("SearchBy.RegionId")).Select("Воронеж");
 				browser.Button(Find.ByValue("Поиск")).Click();
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
 				{
 					Assert.That(row.TableCells[6].Text, Is.EqualTo("Воронеж"));
@@ -180,8 +180,8 @@ from billing.Payers
 				browser.Button(Find.ByValue("Поиск")).Click();
 				if (browser.TableBody(Find.ById("SearchResults")).Exists)
 				{
-					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
-					foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
+					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
+					foreach (var row in browser.TableBody(Find.ById("SearchResults")).TableRows)
 						Assert.That(row.TableCells[9].Text, Is.EqualTo("Розница"));
 				}
 				else
@@ -202,7 +202,7 @@ from billing.Payers
 
 				browser.TextField(Find.ById("SearchText")).TypeText("'%test%'");
 				browser.Button(Find.ByValue("Поиск")).Click();
-				Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));				
+				Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
 			}
 		}
 
@@ -214,7 +214,7 @@ from billing.Payers
 				browser.TextField(Find.ById("SearchText")).TypeText("фармаимп");
 				browser.Button(Find.ByValue("Поиск")).Click();
 
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
 		}
@@ -227,7 +227,7 @@ from billing.Payers
 				browser.TextField(Find.ById("SearchText")).TypeText("7160");
 				browser.Button(Find.ByValue("Поиск")).Click();
 
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Text.DoesNotContain("По вашему запросу ничего не найдено"));
 			}
 		}
@@ -255,7 +255,7 @@ from billing.Payers
 				browser.RadioButton(Find.ById("SearchByClientId")).Checked = true;
 				browser.Button(Find.ByValue("Поиск")).Click();
 
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Length, Is.GreaterThan(0));
+				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 				Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
 			}
 		}

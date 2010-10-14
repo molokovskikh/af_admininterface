@@ -30,7 +30,7 @@ namespace Functional
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("История документов")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента {0}", client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента {0}", client.Name))))
 				{
 					Assert.That(openedWindow.Text, Is.StringContaining(documentLog.Id.ToString()));
 					Assert.That(openedWindow.Text, Is.StringContaining("тестовый адрес доставки"));

@@ -41,7 +41,7 @@ delete from telephony.UnresolvedPhone where Phone like :phone")
 			var client = DataMother.CreateTestClientWithUser();
 			using (var browser = new IE(BuildTestUrl(String.Format("client/{0}", client.Id))))
 			{
-				Assert.That(browser.Text, Text.Contains("Неопознанные звонки"));
+				Assert.That(browser.Text, Is.StringContaining("Неопознанные звонки"));
 				Assert.That(GetUnknownPhones(browser), Is.EqualTo(new[] { "4732606000", "4732299224", "4732299223", "4732605000", "4732299222" }));
 			}
 		}
@@ -56,8 +56,8 @@ delete from telephony.UnresolvedPhone where Phone like :phone")
 
 				Assert.That(GetUnknownPhones(browser), Is.EqualTo(new [] { "4732299222" }));
 
-				Assert.That(browser.Text, Text.Contains("Известные телефоны"));
-				Assert.That(browser.Text, Text.Contains("4732-606000"));
+				Assert.That(browser.Text, Is.StringContaining("Известные телефоны"));
+				Assert.That(browser.Text, Is.StringContaining("4732-606000"));
 			}
 		}
 
@@ -75,8 +75,8 @@ delete from telephony.UnresolvedPhone where Phone like :phone")
 				Assert.That(GetUnknownPhones(browser).Contains("4732299223"));
 				Assert.That(GetUnknownPhones(browser).Contains("4732299224"));
 
-				Assert.That(browser.Text, Text.Contains("Известные телефоны"));
-				Assert.That(browser.Text, Text.Contains("4732-606000"));
+				Assert.That(browser.Text, Is.StringContaining("Известные телефоны"));
+				Assert.That(browser.Text, Is.StringContaining("4732-606000"));
 			}
 		}
 

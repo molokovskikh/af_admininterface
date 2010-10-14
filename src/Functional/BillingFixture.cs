@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models.Billing;
+using Common.Tools.Calendar;
 using NUnit.Framework;
 using WatiN.Core;
 using Functional.ForTesting;
@@ -9,6 +10,8 @@ using System.Threading;
 using Common.Web.Ui.Helpers;
 using Castle.ActiveRecord;
 using System.Linq;
+using WatiNCssSelectorExtensions;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
 {
@@ -33,14 +36,14 @@ namespace Functional
 			using (var browser = Open("main/index"))
 			{
 				browser.Link(Find.ByText("Биллинг")).Click();
-				Assert.That(browser.Text, Text.Contains("Фильтр плательщиков"));
+				Assert.That(browser.Text, Is.StringContaining("Фильтр плательщиков"));
 				browser.RadioButton(Find.ById("SearchByBillingId")).Click();
 				browser.TextField(Find.ById("SearchText")).TypeText("921");
 				browser.Button(Find.ByValue("Найти")).Click();
 
-				Assert.That(browser.Text, Text.Contains("Офис123"));
+				Assert.That(browser.Text, Is.StringContaining("Офис123"));
 				browser.Link(Find.ByText("921")).Click();
-				Assert.That(browser.Text, Text.Contains("Плательщик Офис123"));
+				Assert.That(browser.Text, Is.StringContaining("Плательщик Офис123"));
 			}
 		}
 
@@ -57,9 +60,9 @@ namespace Functional
 				browser.TextField(Find.ById("SearchText")).TypeText(client.BillingInstance.PayerID.ToString());
 				browser.Button(Find.ByValue("Найти")).Click();
 
-				Assert.That(browser.Text, Text.Contains(client.BillingInstance.ShortName));
+				Assert.That(browser.Text, Is.StringContaining(client.BillingInstance.ShortName));
 				browser.Link(Find.ByText(client.BillingInstance.PayerID.ToString())).Click();
-				Assert.That(browser.Text, Text.Contains("Плательщик " + client.BillingInstance.ShortName));				
+				Assert.That(browser.Text, Is.StringContaining("Плательщик " + client.BillingInstance.ShortName));				
 			}
 		}
 
@@ -80,11 +83,11 @@ namespace Functional
 
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				Assert.That(browser.Text, Text.Contains(String.Format("Адреса клиента \"{0}\"", client.Name)));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Адреса клиента \"{0}\"", client.Name)));
 				foreach (var address in client.Addresses)
 				{
 					var row = browser.TableRow("AddressRow" + address.Id);
-					Assert.That(row.ClassName, Text.Contains("Disabled"));
+					Assert.That(row.ClassName, Is.StringContaining("Disabled"));
 					var checkBox = browser.CheckBox("AddressStatus" + address.Id);
 					Assert.That(checkBox.Checked, Is.False);
 				}
@@ -111,11 +114,11 @@ namespace Functional
 			}
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				Assert.That(browser.Text, Text.Contains(String.Format("Пользователи клиента \"{0}\"", client.Name)));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователи клиента \"{0}\"", client.Name)));
 				foreach (var item in client.Users)
 				{
 					var row = browser.TableRow("UserRow" + item.Id);
-					Assert.That(row.ClassName, Text.Contains("Disabled"));
+					Assert.That(row.ClassName, Is.StringContaining("Disabled"));
 					var checkBox = browser.CheckBox("UserStatusCheckBox" + item.Id);
 					Assert.That(checkBox.Checked, Is.False);
 				}
@@ -133,8 +136,8 @@ namespace Functional
 				var addressId = "usersForAddress" + address.Id;
 				browser.Link(Find.ById(addressId)).Click();
 				Thread.Sleep(500);
-				Assert.That(browser.Text, Text.Contains("Пользователи"));
-				Assert.That(browser.Text, Text.Contains("Подключить пользователя"));
+				Assert.That(browser.Text, Is.StringContaining("Пользователи"));
+				Assert.That(browser.Text, Is.StringContaining("Подключить пользователя"));
 				// Щелкаем по адресу. Должна быть показана дополнительная информация
 				var additionalInfoDiv = browser.Div(Find.ById("additionalAddressInfo" + address.Id));
 				Assert.That(additionalInfoDiv.Exists, Is.True);
@@ -157,8 +160,8 @@ namespace Functional
 				var userId = "addressesForUser" + user.Id;
 				browser.Link(Find.ById(userId)).Click();
 				Thread.Sleep(500);
-				Assert.That(browser.Text, Text.Contains("Адреса"));
-				Assert.That(browser.Text, Text.Contains("Подключить адрес"));
+				Assert.That(browser.Text, Is.StringContaining("Адреса"));
+				Assert.That(browser.Text, Is.StringContaining("Подключить адрес"));
 				// Щелкаем по адресу. Должна быть показана дополнительная информация
 				var additionalInfoDiv = browser.Div(Find.ById("additionalUserInfo" + user.Id));
 				Assert.That(additionalInfoDiv.Exists, Is.True);
@@ -189,7 +192,7 @@ namespace Functional
 				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
 				Thread.Sleep(500);
 				var comboBox = browser.SelectList(Find.ById("UsersComboBox" + address.Id));
-				Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
+				Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
 				Assert.That(comboBox.HasSelectedItems, Is.True);
 				Assert.That(comboBox.SelectedOption.Text.Contains(user.GetLoginOrName()));
 				browser.Button(Find.ById("ConnectAddressToUserButton" + address.Id)).Click();
@@ -225,7 +228,7 @@ namespace Functional
 				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
 				Thread.Sleep(500);
 				var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
-				Assert.That(comboBox.Options.Length, Is.GreaterThan(0));
+				Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
 				Assert.That(comboBox.HasSelectedItems, Is.True);
 				Assert.That(comboBox.SelectedOption.Text.Contains(address.Value));
 
@@ -301,19 +304,18 @@ namespace Functional
 		public void Change_user_status()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Refresh();
 			var user = client.Users[0];
-			user.Enabled = true;
-			user.UpdateAndFlush();
+
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var checkBoxStatus = browser.CheckBox(Find.ById("UserStatusCheckBox" + user.Id));
-				var row = browser.TableRow(Find.ById("UserRow" + user.Id));
-				Assert.IsTrue(checkBoxStatus.Checked);
-				Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));
-				checkBoxStatus.Click();
-				Thread.Sleep(500);
-				Assert.That(row.ClassName, Text.Contains("Disabled"));
+				var selector = String.Format("tr#UserRow{0}", user.Id);
+				var row = (TableRow)browser.CssSelect(selector);
+				var checkbox = (CheckBox)browser.CssSelect("input[name=status]");
+
+				Assert.IsTrue(checkbox.Checked);
+				Assert.That(row.ClassName, Is.Not.StringContaining("Disabled"));
+				SimulateClick(browser, selector, checkbox);
+				Assert.That(row.ClassName, Is.StringContaining("Disabled"));
 			}
 		}
 
@@ -321,22 +323,29 @@ namespace Functional
 		public void Change_address_status()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Refresh();
 			var address = client.Addresses[0];
-			address.Enabled = true;
-			address.UpdateAndFlush();
 
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
-				var checkBoxStatus = browser.CheckBox(Find.ById("AddressStatus" + address.Id));
-				var row = browser.TableRow(Find.ById("AddressRow" + address.Id));
-				Assert.IsTrue(checkBoxStatus.Checked);
-				Assert.That(row.ClassName, Text.DoesNotContain("Disabled"));
-				Assert.That(row.ClassName, Text.Contains("HasNoConnectedUsers"));
-				checkBoxStatus.Click();
-				Thread.Sleep(500);
-				Assert.That(row.ClassName, Text.Contains("Disabled"));
+				var selector = String.Format("tr#AddressRow{0}", address.Id);
+				var row = (TableRow)browser.CssSelect(selector);
+				var checkbox = (CheckBox)browser.CssSelect(String.Format("tr#AddressRow{0} input[name=status]", address.Id));
+				
+				Assert.IsTrue(checkbox.Checked);
+				Assert.That(row.ClassName, Is.Not.StringContaining("Disabled"));
+				Assert.That(row.ClassName, Is.StringContaining("HasNoConnectedUsers"));
+
+				SimulateClick(browser, selector, checkbox);
+
+				Assert.That(row.ClassName, Is.StringContaining("Disabled"));
 			}
+		}
+
+		//я обрабатываю change но почему то click не вызывает change, по этому симулирую его
+		private void SimulateClick(IE browser, string selector, CheckBox checkbox)
+		{
+			checkbox.Click();
+			browser.Eval(String.Format("$('{0}').change()", String.Format("{0} input[name=status]", selector)));
 		}
 
 		[Test]
@@ -364,9 +373,9 @@ namespace Functional
 				Assert.IsTrue(userStatus.Checked);
 				Assert.IsTrue(addressStatus.Checked);
 				Assert.IsTrue(clientStatus.Checked);
-				Assert.That(userRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
-				Assert.That(addressRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
-				Assert.That(clientRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
+				Assert.That(userRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
+				Assert.That(addressRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
+				Assert.That(clientRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
 				clientStatus.Click();
 				Thread.Sleep(2000);
 				Assert.IsTrue(userStatus.Checked);
@@ -374,9 +383,9 @@ namespace Functional
 				Assert.IsTrue(addressStatus.Checked);
 				Assert.IsFalse(addressStatus.Enabled);
 				Assert.IsFalse(clientStatus.Checked);
-				Assert.That(userRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
-				Assert.That(addressRow.ClassName, Text.DoesNotContain("DisabledByBilling"));
-				Assert.That(clientRow.ClassName, Text.Contains("DisabledByBilling"));
+				Assert.That(userRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
+				Assert.That(addressRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
+				Assert.That(clientRow.ClassName, Is.StringContaining("DisabledByBilling"));
 			}
 		}
 
@@ -412,7 +421,7 @@ namespace Functional
 				browser.TextField(Find.ById("UserSearchText" + address.Id)).TypeText("1234567890");
 				browser.Button(Find.ById("SearchUserButton" + address.Id)).Click();
 				Thread.Sleep(500);
-				Assert.That(browser.Div(Find.ById("SearchUserMessage" + address.Id)).Text, Text.Contains("Ничего не найдено"));
+				Assert.That(browser.Div(Find.ById("SearchUserMessage" + address.Id)).Text, Is.StringContaining("Ничего не найдено"));
 			}
 		}
 
@@ -450,7 +459,7 @@ namespace Functional
 				browser.TextField(Find.ById("AddressSearchText" + user.Id)).TypeText("1234567890");
 				browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
 				Thread.Sleep(500);
-				Assert.That(browser.Div(Find.ById("SearchAddressMessage" + user.Id)).Text, Text.Contains("Ничего не найдено"));
+				Assert.That(browser.Div(Find.ById("SearchAddressMessage" + user.Id)).Text, Is.StringContaining("Ничего не найдено"));
 			}
 		}
 
@@ -614,11 +623,11 @@ DELETE FROM future.Users WHERE Id = :UserId
 				var messageText = "test message for user " + username;
 				browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
 				browser.Button(Find.ByValue("Отправить сообщение")).Click();
-				Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
-				Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
+				Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
 				browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 				Thread.Sleep(500);
-				Assert.That(browser.Text, Text.Contains(messageText));
+				Assert.That(browser.Text, Is.StringContaining(messageText));
 				var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
 				messages[0].Refresh();
 				Assert.That(messages[0].Message, Is.EqualTo(messageText));
@@ -673,10 +682,10 @@ DELETE FROM future.Users WHERE Id = :UserId
 				var message = "test message for all users";
 				browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(message);
 				browser.Button(Find.ByValue("Отправить сообщение")).Click();
-				Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
 				foreach (var user in client.Users)
 				{
-					Assert.That(browser.Text, Text.Contains(String.Format("Остались не показанные сообщения для пользователя {0}",
+					Assert.That(browser.Text, Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}",
 						                                                    user.GetLoginOrName())));
 					var div = browser.Div(Find.ById("CurrentMessageForUser" + user.Id));
 					Assert.IsTrue(div.Exists);
@@ -687,7 +696,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 					browser.Button(Find.ById("CancelViewMessage" + user.Id)).Click();
 					Thread.Sleep(500);
 					Assert.IsFalse(messageBody.Exists);
-					Assert.That(browser.Text, Text.Contains("Сообщение удалено"));
+					Assert.That(browser.Text, Is.StringContaining("Сообщение удалено"));
 				}
 			}
 		}
@@ -698,10 +707,10 @@ DELETE FROM future.Users WHERE Id = :UserId
 			using (var browser = Open("Billing/Search.rails"))
 			{
 				browser.Button(Find.ByValue("Найти")).Click();
-				Assert.That(browser.Text, Text.Contains("Отключенных копий"));
-				Assert.That(browser.Text, Text.Contains("Работающих копий"));
-				Assert.That(browser.Text, Text.Contains("Отключенных адресов"));
-				Assert.That(browser.Text, Text.Contains("Работающих адресов"));
+				Assert.That(browser.Text, Is.StringContaining("Отключенных копий"));
+				Assert.That(browser.Text, Is.StringContaining("Работающих копий"));
+				Assert.That(browser.Text, Is.StringContaining("Отключенных адресов"));
+				Assert.That(browser.Text, Is.StringContaining("Работающих адресов"));
 			}
 		}
 
@@ -905,25 +914,24 @@ DELETE FROM future.Users WHERE Id = :UserId
 			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
 			{
 				var usersTable = browser.Table("users");
-				var countVisibleRows = 0;
-				foreach (TableRow row in usersTable.TableRows)
-					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
-						countVisibleRows++;
+				var countVisibleRows = usersTable.TableRows.Count(row => (row != null) && (row.Id != null) 
+					&& !row.Id.Contains("UserRowHidden") 
+					&& (row.Style.Display != "none"));
+
 				browser.Link(Find.ById("ShowOrHideUsers")).Click();
 				Thread.Sleep(1000);
 
-				var countVisibleRows2 = 0;
-				foreach (TableRow row in usersTable.TableRows)
-					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
-						countVisibleRows2++;
+				var countVisibleRows2 = usersTable.TableRows.Count(row => (row != null) 
+					&& (row.Id != null) 
+					&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
+
 				Assert.That(countVisibleRows, Is.LessThan(countVisibleRows2));
 				browser.Link(Find.ById("ShowOrHideUsers")).Click();
 				Thread.Sleep(1000);
 
-				var countVisibleRows3 = 0;
-				foreach (TableRow row in usersTable.TableRows)
-					if ((row != null) && (row.Id != null) && !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"))
-						countVisibleRows3++;
+				var countVisibleRows3 = usersTable.TableRows.Count(row => (row != null) 
+					&& (row.Id != null) 
+					&& !row.Id.Contains("UserRowHidden") && (row.Style.Display != "none"));
 				Assert.That(countVisibleRows, Is.EqualTo(countVisibleRows3));
 				browser.Link(Find.ById("ShowOrHideUsers")).Click();
 				Thread.Sleep(1000);

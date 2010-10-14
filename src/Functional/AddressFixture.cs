@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
-using System.Collections;
 using Common.Web.Ui.Models;
 using System.Threading;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
 {
@@ -142,7 +141,7 @@ namespace Functional
 					browser.Link(Find.ByText("Новый адрес доставки")).Click();
 					browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
 					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Text.Contains("Адрес доставки создан"));
+					Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 					client = Client.Find(client.Id);
 					Assert.That(client.Addresses.Count, Is.EqualTo(1));
 					Assert.IsTrue(client.Addresses[0].Enabled);
@@ -199,7 +198,7 @@ namespace Functional
 			}
 		}
 
-				[Test, Description("Перемещение только адреса доставки (без пользователя) к другому клиенту")]
+		[Test, Description("Перемещение только адреса доставки (без пользователя) к другому клиенту")]
 		public void Move_only_address_to_another_client()
 		{
 			Client oldClient;
@@ -218,7 +217,7 @@ namespace Functional
 				browser.Button(Find.ById("SearchClientButton")).Click();
 				Thread.Sleep(2000);
 				Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
-				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Length, Is.GreaterThan(0));
+				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
 
 				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
 				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);

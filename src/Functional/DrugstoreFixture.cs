@@ -11,6 +11,7 @@ using WatiN.Core;
 using System.Threading;
 using Common.Web.Ui.Helpers;
 using Castle.ActiveRecord;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
 {
@@ -324,7 +325,7 @@ namespace Functional
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(l => l.Text == "История заказов").Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("История заказов клиента " + client.Name)))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История заказов клиента " + client.Name)))
 				{
 					Assert.That(openedWindow.Text, Is.StringContaining("История заказов"));
 				}
@@ -349,7 +350,7 @@ namespace Functional
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(l => l.Text == "История обновлений").Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Статистика обновлений"))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
 				{
 					Assert.That(openedWindow.Text, Is.StringContaining("История обновлений"));
 					Assert.That(openedWindow.Text, Is.StringContaining(user.GetLoginOrName()));
@@ -366,8 +367,8 @@ namespace Functional
 			{
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 				browser.Button(Find.ByValue("Принять")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
-				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/" + testClient.Id));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				Assert.That(browser.Uri.ToString(), Is.StringEnding("client/" + testClient.Id));
 			}
 		}
 
@@ -380,9 +381,9 @@ namespace Functional
 			using (var browser = new IE(BuildTestUrl("client/" + client.Id)))
 			{
 				browser.Link(Find.ByText("Поиск предложений")).Click();
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle("Поиск предложений для клиента " + client.Name)))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("Поиск предложений для клиента " + client.Name)))
 				{
-					Assert.That(openedWindow.Text, Text.Contains("Введите наименование или форму выпуска"));
+					Assert.That(openedWindow.Text, Is.StringContaining("Введите наименование или форму выпуска"));
 				}
 			}
 		}
@@ -402,7 +403,7 @@ namespace Functional
 				browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
 				browser.Link(Find.ByText("Изменить пароль")).Click();
 				var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", testClient.Users[0].Login, testClient.FullName);
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(title)))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
 				{					
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
@@ -410,7 +411,7 @@ namespace Functional
 				}
 				browser.Refresh();
 				var checkText = String.Format("$$$Пользователь {0}. Платное изменение пароля: Тестовое изменение пароля", testClient.Users[0].Login);
-				Assert.That(browser.Text, Text.Contains(checkText));
+				Assert.That(browser.Text, Is.StringContaining(checkText));
 			}
 		}
 
@@ -426,8 +427,8 @@ namespace Functional
 				browser.Input<Client>(client => client.FullName, testClient.FullName);
 				browser.Input<Client>(client => client.Name, testClient.Name);
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
-				Assert.That(browser.Uri.ToString(), Text.EndsWith("client/" + testClient.Id));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+				Assert.That(browser.Uri.ToString(), Is.StringEnding("client/" + testClient.Id));
 			}
 		}
 
@@ -451,7 +452,7 @@ namespace Functional
 				drugstoreSettings.SaveAndFlush();
 				browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked = drugstoreSettings.ManualComparison;				
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 				browser.GoTo(browser.Url);
 				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(drugstoreSettings.ManualComparison));
@@ -489,7 +490,7 @@ namespace Functional
 				GetWorkRegion(browser, "Чебоксары").Checked = true;
 
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 				var sql = @"
 select
 	count(*) 
@@ -523,7 +524,7 @@ where i.ClientId = :ClientId
 				Assert.IsFalse(browser.CheckBox(Find.ByName(controlName)).Checked);
 				browser.CheckBox(Find.ByName(controlName)).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
                 var settings = DrugstoreSettings.Find(client.Id);
                 Assert.IsTrue(settings.IgnoreNewPrices);
@@ -551,7 +552,7 @@ where i.ClientId = :ClientId
 				Assert.That(browser.TextField(Find.ByName(controlName)).Text, Is.EqualTo("0"));
 				browser.TextField(Find.ByName(controlName)).TypeText("123456");
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
 				var settings = DrugstoreSettings.Find(client.Id);
 				Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));

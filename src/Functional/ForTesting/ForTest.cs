@@ -15,9 +15,9 @@ namespace AdminInterface.Test.ForTesting
 			XmlConfigurator.Configure();
 			if (!ActiveRecordStarter.IsInitialized)
 				ActiveRecordStarter.Initialize(new[] {
-                    Assembly.Load("AdminInterface"),
-                    Assembly.Load("Common.Web.Ui"),
-                    Assembly.Load("Functional"),
+					Assembly.Load("AdminInterface"),
+					Assembly.Load("Common.Web.Ui"),
+					Assembly.Load("Functional"),
 				}, ActiveRecordSectionHandler.Instance);
 		}
 
@@ -69,7 +69,7 @@ namespace AdminInterface.Test.ForTesting
 					Assembly.Load("AdminInterface"),
 					Assembly.Load("Common.Web.Ui"),
 					Assembly.Load("Functional"),
-				}, ActiveRecordSectionHandler.Instance);			
+				}, ActiveRecordSectionHandler.Instance);
 		}
 	}
 }

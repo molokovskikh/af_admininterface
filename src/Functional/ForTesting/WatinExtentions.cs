@@ -2,12 +2,11 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
-
 using WatiN.Core;
-using WatiN.Core.Interfaces;
 
-namespace AdminInterface.Test.ForTesting
+namespace Functional.ForTesting
 {
 	public static class WatinExtentions
 	{
@@ -15,11 +14,11 @@ namespace AdminInterface.Test.ForTesting
 		{
 			var table = Helper.GetDataTable(ie);
 			var dataRows = GetDataRow(table);
-			Assert.That(dataRows.Length,
+			Assert.That(dataRows.Count,
 						Is.EqualTo(activeRecords.Length));
 
 			var index = 0;
-			foreach (TableRow row in dataRows)
+			foreach (var row in dataRows)
 			{
 				row.AssertEquality(activeRecords[index]);
 				index++;
@@ -36,14 +35,14 @@ namespace AdminInterface.Test.ForTesting
 		public static TableRow FindRow<T>(this IE ie, T activeRecord)
 		{
 			var table = Helper.GetDataTable(ie);
-			foreach (TableRow row in GetDataRow(table))
+			foreach (var row in GetDataRow(table))
 				if (row.IsEqualTo(activeRecord))
 					return row;
 
 			throw new Exception(String.Format("Не нашли строки для {0}", activeRecord));
 		}
 
-		public static void Input<T>(this IElementsContainer container, Expression<Func<T, object>> input, object value)
+		public static void Input<T>(this IElementContainer container, Expression<Func<T, object>> input, object value)
 		{
 			var id = Helper.GetElementName(input);
 			if (value is DateTime)
@@ -67,7 +66,7 @@ namespace AdminInterface.Test.ForTesting
 			var calendarTable = div.Tables.First();
 			var text = calendarTable.TableCell(Find.ByClass("title")).Text;
 
-    		var year = GetYear(text);
+			var year = GetYear(text);
 			var month = GetMonth(text);
 			string marker;
 			if (month > value.Month)
@@ -77,12 +76,12 @@ namespace AdminInterface.Test.ForTesting
 			var changeMonth = calendarTable.Div(Find.ByText(marker));
 
 			var yearMarker = year > value.Year ? "«" : "»";
-    		var changeYear = calendarTable.Div(Find.ByText(yearMarker));
+			var changeYear = calendarTable.Div(Find.ByText(yearMarker));
 
-    		foreach (var i in Enumerable.Range(0, Math.Abs(year - value.Year)))
-    			SimulateClick(changeYear);
+			foreach (var i in Enumerable.Range(0, Math.Abs(year - value.Year)))
+				SimulateClick(changeYear);
 
-    		foreach (var i in Enumerable.Range(0, Math.Abs(month - value.Month)))
+			foreach (var i in Enumerable.Range(0, Math.Abs(month - value.Month)))
 				SimulateClick(changeMonth);
 
 			SimulateClick(calendarTable.TableCell(Find.ByText(value.Day.ToString())));
@@ -101,7 +100,7 @@ namespace AdminInterface.Test.ForTesting
 
 		private static int GetMonth(string title)
 		{
-    		var monthName = title.Substring(0, title.IndexOf(","));
+			var monthName = title.Substring(0, title.IndexOf(","));
 			return CultureInfo.GetCultureInfo("ru-Ru")
 				.DateTimeFormat
 				.MonthNames
@@ -110,10 +109,10 @@ namespace AdminInterface.Test.ForTesting
 				.IndexOf(monthName) + 1;
 		}
 
-		private static Button TryFindCalendareButton(IElementsContainer container, string id)
+		private static Button TryFindCalendareButton(IElementContainer container, string id)
 		{
 			var element = container.Element(Find.ById(id));
-			return ((IElementsContainer) element.Parent).Button(Find.ByClass("CalendarInput"));
+			return ((IElementContainer) element.Parent).Button(Find.ByClass("CalendarInput"));
 		}
 
 		public static bool IsEqualTo<T>(this TableRow row, T recordBase)

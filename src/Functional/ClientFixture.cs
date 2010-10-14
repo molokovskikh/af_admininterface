@@ -51,7 +51,7 @@ namespace Functional
 				var user = User.Find(logEntity.Id);
 				using (var browser = Open(String.Format("Client/{0}", user.Client.Id)))
 				{
-					Assert.That(browser.Text, Text.Contains(logEntity.AFTime.ToString()));
+					Assert.That(browser.Text, Is.StringContaining(logEntity.AFTime.ToString()));
 				}
 			}
 		}
@@ -76,22 +76,22 @@ namespace Functional
 				browser.Button(Find.ByValue("Принять")).Click();
 				
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
-				Assert.That(browser.Text, Text.Contains("This message for client"));
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
 				browser.TextField(Find.ByName("message")).TypeText("This message for user1");
 				browser.Button(Find.ByValue("Принять")).Click();
 
 				browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", client.Users[1].Login)));
 				browser.Refresh();
-				Assert.That(browser.Text, Text.Contains("This message for client"));
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
 				Assert.That(browser.Text, Text.DoesNotContain("This message for user1"));
 				browser.TextField(Find.ByName("message")).TypeText("This message for user2");
 				browser.Button(Find.ByValue("Принять")).Click();
 
 				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 				browser.Refresh();
-				Assert.That(browser.Text, Text.Contains("This message for user1"));
-				Assert.That(browser.Text, Text.Contains("This message for user2"));
-				Assert.That(browser.Text, Text.Contains("This message for client"));
+				Assert.That(browser.Text, Is.StringContaining("This message for user1"));
+				Assert.That(browser.Text, Is.StringContaining("This message for user2"));
+				Assert.That(browser.Text, Is.StringContaining("This message for client"));
 			}
 		}
 

@@ -14,6 +14,7 @@ using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
 using System.Threading;
+using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
 {
@@ -74,7 +75,7 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 
 				browser.Link(Find.ByText("Статистика изменения пароля")).Click();
-				using (var stat = IE.AttachToIE(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login))))
+				using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login))))
 				{
 					Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
 				}
@@ -92,7 +93,7 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 				browser.Link(Find.ByText("Изменить пароль")).Click();
 
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					Assert.That(openedWindow.Text,
 						Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
@@ -117,7 +118,7 @@ namespace Functional
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 				browser.Link(Find.ByText("Изменить пароль")).Click();
 
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					Assert.That(openedWindow.Text,
 						Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
@@ -148,7 +149,7 @@ namespace Functional
 				browser.Link(Find.ByText(user.Login)).Click();
 				browser.Link(Find.ByText("Изменить пароль")).Click();
 
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
@@ -177,7 +178,7 @@ namespace Functional
 				browser.Link(Find.ByText(user.Login)).Click();
 				browser.Link(Find.ByText("Изменить пароль")).Click();
 
-				using (var openedWindow = IE.AttachToIE(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
@@ -695,13 +696,13 @@ namespace Functional
 					browser.Link(Find.ByText("Новый пользователь")).Click();
 					browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
 					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
+					Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
 					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
 					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Text.Contains("Поле содержит некорректный адрес электронной почты"));
+					Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
 					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test");
 					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+					Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 				}
 			}
 		}
@@ -719,7 +720,7 @@ namespace Functional
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 			}
 			using (new SessionScope())
 			{
@@ -751,7 +752,7 @@ namespace Functional
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
 				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Text.Contains("Пользователь создан"));
+				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 				using (new SessionScope())
 				{
 					client = Client.Find(client.Id);
@@ -784,7 +785,7 @@ namespace Functional
 					Assert.That(browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).Text, Is.EqualTo("Alice"));
 					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Alice modified");
 					browser.Button(Find.ByValue("Сохранить")).Click();
-					Assert.That(browser.Text, Text.Contains("Сохранено"));
+					Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 				}
 				using (new SessionScope())
 				{
@@ -808,7 +809,7 @@ namespace Functional
 				Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
 				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 				using (new SessionScope())
 				{
 					client = Client.Find(client.Id);
@@ -821,7 +822,7 @@ namespace Functional
 				Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
 				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
 				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Text.Contains("Сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 				using (new SessionScope())
 				{
 					client = Client.Find(client.Id);
@@ -877,7 +878,7 @@ namespace Functional
 				browser.Button(Find.ById("SearchClientButton")).Click();
 				Thread.Sleep(2000);
 				Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
-				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Length, Is.GreaterThan(0));
+				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
 
 				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
 				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);

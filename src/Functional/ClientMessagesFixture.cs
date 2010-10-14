@@ -36,7 +36,7 @@ namespace Functional
 			{
 				browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText("Тестовое сообщение");
 				browser.Button(Find.ByValue("Отправить сообщение")).Click();
-				Assert.That(browser.Text, Text.Contains("Сообщение сохранено"));
+				Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
 			}
 
 			foreach (var message in messages)
@@ -65,14 +65,14 @@ namespace Functional
 
 			using (var browser = new IE(BuildTestUrl("Billing/edit?clientCode=2575")))
 			{
-				Assert.That(browser.Text, Text.Contains("Остались не показанные сообщения"));
+				Assert.That(browser.Text, Is.StringContaining("Остались не показанные сообщения"));
 				browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 				Thread.Sleep(400);
-				Assert.That(browser.Text, Text.Contains("тестовое сообщение"));
-				Assert.That(browser.Text, Text.Contains("Осталось показать 1 раз"));
+				Assert.That(browser.Text, Is.StringContaining("тестовое сообщение"));
+				Assert.That(browser.Text, Is.StringContaining("Осталось показать 1 раз"));
 				browser.Button(Find.ByValue("Отменить показ сообщения")).Click();
 				Thread.Sleep(400);
-				Assert.That(browser.Text, Text.Contains("Сообщение удалено"));
+				Assert.That(browser.Text, Is.StringContaining("Сообщение удалено"));
 
 				browser.Refresh();
 				Assert.That(browser.Text, Text.DoesNotContain("Остались не показанные сообщения"));
