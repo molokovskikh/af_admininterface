@@ -60,7 +60,7 @@ namespace AdminInterface.Controllers
 			var usersLogs = new List<UserLogRecord>();
 			var addressesLogs = new List<AddressLogRecord>();
 			var countUsersWithMessages = 0;
-			foreach (var item in payer.GetAllUsers())
+			foreach (var item in payer.Users)
 			{
 				var message = ClientMessage.FindUserMessage(item.Id);
 				if ((message != null) && message.IsContainsNotShowedMessage())
@@ -68,7 +68,7 @@ namespace AdminInterface.Controllers
 				usersMessages.Add(message);
 				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
 			}
-			foreach (var item in payer.GetAllAddresses())
+			foreach (var item in payer.Addresses)
 				addressesLogs.AddRange(AddressLogRecord.GetAddressLogRecords(item));
 			PropertyBag["CountUsersWithMessages"] = countUsersWithMessages;
 			PropertyBag["UsersMessages"] = usersMessages;
@@ -97,8 +97,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["TotalSum"] = payer.TotalSum;
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
-			PropertyBag["Users"] = payer.GetAllUsers();
-			PropertyBag["Addresses"] = payer.GetAllAddresses();
+			PropertyBag["Users"] = payer.Users;
+			PropertyBag["Addresses"] = payer.Addresses;
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
@@ -418,7 +418,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(payerId);
 			PropertyBag["Payer"] = payer;
 			PropertyBag["tab"] = "juridicalOrganization";
-			PropertyBag["Addresses"] = payer.GetAllAddresses();
+			PropertyBag["Addresses"] = payer.Addresses;
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganization"] = LegalEntity.Find(currentJuridicalOrganizationId);
 		}

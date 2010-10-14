@@ -126,6 +126,12 @@ namespace AdminInterface.Models
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
 
+		[HasMany(typeof (User), Lazy = true, Inverse = true, OrderBy = "Name")]
+		public virtual IList<User> Users { get; set; }
+
+		[HasMany(typeof (Address), Lazy = true, Inverse = true, OrderBy = "Address")]
+		public virtual IList<Address> Addresses { get; set; }
+
 		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<LegalEntity> JuridicalOrganizations { get; set; }
 
@@ -171,7 +177,7 @@ ORDER BY {Payer}.shortname;";
 			finally
 			{
 				sessionHolder.ReleaseSession(session);
-			}			
+			}
 		}
 
 		public Payment[] FindBills(Period period)
@@ -192,22 +198,6 @@ ORDER BY {Payer}.shortname;";
 				return new[] {totalChargeOff};
 			}
 			return bills;
-		}
-
-		public IList<User> GetAllUsers()
-		{
-			var allUsers = new List<User>();
-			foreach (var client in Clients)
-				allUsers.AddRange(client.Users);
-			return allUsers;
-		}
-
-		public IList<Address> GetAllAddresses()
-		{
-			var allAddresses = new List<Address>();
-			foreach (var client in Clients)
-				allAddresses.AddRange(client.Addresses);
-			return allAddresses;
 		}
 
 		public void CheckReciver()
@@ -261,8 +251,8 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				var users = Clients.SelectMany(c => c.Users.Select(u => u.Accounting)).Where(a => a.ShouldPay());
-				var addresses = Clients.SelectMany(c => c.Addresses.Select(a => a.Accounting)).Where(a => a.ShouldPay());
+				var users = Users.Select(u => u.Accounting).Where(a => a.ShouldPay());
+				var addresses = Addresses.Select(a => a.Accounting).Where(a => a.ShouldPay());
 
 				var sum = users.Sum(u => u.Payment);
 				sum += addresses.Skip(users.Count()).Sum(a => a.Payment);

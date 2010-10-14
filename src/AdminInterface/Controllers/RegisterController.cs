@@ -13,7 +13,6 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using System.Linq;
-using System.Web.Script.Serialization;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
