@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using System.ComponentModel;
 using AdminInterface.Models;
 
 namespace AdminInterface.Controllers
@@ -17,7 +14,7 @@ namespace AdminInterface.Controllers
 	[
 		Layout("GeneralWithJQuery"),
 		Helper(typeof(BindingHelper)), 
-        Helper(typeof(ViewHelper)),
+		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
 		Helper(typeof(LinkHelper)),
 		Secure(PermissionType.ViewDrugstore, Required = Required.AnyOf),
@@ -29,7 +26,7 @@ namespace AdminInterface.Controllers
 
 		public void SearchBy([DataBind("SearchBy")] UserSearchProperties searchProperties)
 		{
-		    var searchResults = UserSearchItem.SearchBy(SecurityContext.Administrator, searchProperties, "UserName", "Ascending");
+			var searchResults = UserSearchItem.SearchBy(SecurityContext.Administrator, searchProperties, "UserName", "Ascending");
 
 			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().Login))
 			{
@@ -44,12 +41,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["SearchResults"] = searchResults;
 			PropertyBag["FindBy"] = searchProperties;
 			PropertyBag["regions"] = Region.GetAllRegions();
-		    PropertyBag["SortDirection"] = "Ascending";
+			PropertyBag["SortDirection"] = "Ascending";
 			PropertyBag["SortColumnName"] = "UserName";
 
-		    PropertyBag["rowsCount"] = searchResults.Count;
-		    PropertyBag["pageSize"] = PageSize;
-		    PropertyBag["currentPage"] = 0;
+			PropertyBag["rowsCount"] = searchResults.Count;
+			PropertyBag["pageSize"] = PageSize;
+			PropertyBag["currentPage"] = 0;
 		}
 
 		public void Search()
@@ -57,23 +54,23 @@ namespace AdminInterface.Controllers
 			var searchProperties = new UserSearchProperties { SearchBy = SearchUserBy.Auto };
 			PropertyBag["FindBy"] = searchProperties;
 			PropertyBag["regions"] = Region.GetAllRegions();
-        }
+		}
 
-        public void OrderBy([DataBind("SearchBy")] UserSearchProperties searchProperties,
+		public void OrderBy([DataBind("SearchBy")] UserSearchProperties searchProperties,
 							string sortDirection,
 							string sortColumnName,
-                            int rowsCount)
-        {
-            var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(SecurityContext.Administrator,
+							int rowsCount)
+		{
+			var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(SecurityContext.Administrator,
 				searchProperties, sortColumnName, sortDirection));
 
-            PropertyBag["SearchResults"] = searchResults;
-            PropertyBag["FindBy"] = searchProperties;
-            PropertyBag["regions"] = Region.GetAllRegions();
-            PropertyBag["SortColumnName"] = sortColumnName;
-        	PropertyBag["SortDirection"] = sortDirection;
-            PropertyBag["rowsCount"] = rowsCount;
-            RenderView("SearchBy");
-        }
+			PropertyBag["SearchResults"] = searchResults;
+			PropertyBag["FindBy"] = searchProperties;
+			PropertyBag["regions"] = Region.GetAllRegions();
+			PropertyBag["SortColumnName"] = sortColumnName;
+			PropertyBag["SortDirection"] = sortDirection;
+			PropertyBag["rowsCount"] = rowsCount;
+			RenderView("SearchBy");
+		}
 	}
 }

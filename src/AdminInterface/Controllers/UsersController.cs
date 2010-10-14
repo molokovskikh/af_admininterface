@@ -22,6 +22,7 @@ namespace AdminInterface.Controllers
 	[
 		Helper(typeof(HttpUtility)),
 		Layout("NewDefault"),
+		Secure,
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class UsersController : SmartDispatcherController

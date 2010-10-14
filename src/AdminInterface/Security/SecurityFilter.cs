@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Reflection;
-using AdminInterface.Models;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Security
@@ -9,14 +8,14 @@ namespace AdminInterface.Security
 	{
 		private SecureAttribute _attribute;
 
-		public bool Perform(ExecuteWhen exec, 
-							IEngineContext context, 
-							IController controller,
-		                    IControllerContext controllerContext)
+		public bool Perform(ExecuteWhen exec,
+			IEngineContext context,
+			IController controller,
+			IControllerContext controllerContext)
 		{
 			if (SecurityContext.Administrator == null)
 			{
-				context.Response.RedirectToUrl("../Rescue/NotAuthorized.aspx");
+				context.Response.RedirectToUrl("~/Rescue/NotAuthorized.aspx");
 				return false;
 			}
 
@@ -29,7 +28,7 @@ namespace AdminInterface.Security
 
 			if (!isPermissionGranted)
 			{
-				context.Response.RedirectToUrl("../Rescue/NotAllowed.aspx");
+				context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
 				return false;
 			}
 
@@ -51,12 +50,12 @@ namespace AdminInterface.Security
 
 				if (!isPermissionGranted)
 				{
-					context.Response.RedirectToUrl("../Rescue/NotAllowed.aspx");
+					context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
 					return false;
-				}				
+				}
 			}
 
-			return true;			
+			return true;
 		}
 
 		public FilterAttribute Filter

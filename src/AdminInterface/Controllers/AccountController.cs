@@ -1,13 +1,16 @@
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using NHibernate;
 
 namespace AdminInterface.Controllers
 {
+	[Secure(PermissionType.Billing)]
 	public class AccountController : SmartDispatcherController
 	{
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)

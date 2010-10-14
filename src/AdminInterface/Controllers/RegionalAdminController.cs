@@ -18,7 +18,8 @@ namespace AdminInterface.Controllers
 	[
 		Layout("GeneralWithJQuery"),
 		Helper(typeof(BindingHelper)),
-		Helper(typeof(ViewHelper))
+		Helper(typeof(ViewHelper)),
+		Secure(PermissionType.ManageAdministrators)
 	]
 	public class RegionalAdminController : SmartDispatcherController
 	{

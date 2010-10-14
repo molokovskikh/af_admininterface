@@ -12,13 +12,10 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.MySql;
-using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
 using log4net;
-using System.Collections.Generic;
 
 namespace AdminInterface.Controllers
 {

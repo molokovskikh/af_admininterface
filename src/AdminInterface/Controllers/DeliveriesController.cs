@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -8,7 +9,10 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("NewDefault")]
+	[
+		Layout("NewDefault"),
+		Secure,
+	]
 	public class DeliveriesController : SmartDispatcherController
 	{
 		[AccessibleThrough(Verb.Get)]
