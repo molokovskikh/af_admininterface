@@ -1,3 +1,8 @@
+.InputGroupHeader table.DataTable
+{
+	width:100%;
+}
+
 td.BillingInput
 {
 	width: 70%;

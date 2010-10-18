@@ -169,6 +169,7 @@
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
+    <Compile Include="Models\Billing\Report.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Billing\Tariff.cs" />
@@ -191,7 +192,7 @@
     <Compile Include="Models\RedmineUser.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
-    <Compile Include="Models\Payer.cs" />
+    <Compile Include="Models\Billing\Payer.cs" />
     <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />

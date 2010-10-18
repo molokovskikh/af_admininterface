@@ -160,6 +160,21 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			$("#JuridicalOrganization" + id + "Header").click();
 	}
 
+	function Update(url, item) {
+		var id = $(item).parents("tr").find("input[name=id]").val();
+		var value = item.value;
+		if (item.type == "checkbox")
+			value = item.checked;
+
+		var link = url + "?id=" + id + "&" + item.name + "=" + value;
+		AjaxRequest(link,
+			function (html) {
+				RefreshTotalSum();
+			},
+			function (xhr, textStatus, error) { }
+		);
+	}
+
 	$(function () {
 
 		$("input[name=free]").change(function () {
@@ -176,19 +191,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				$(this).parents("tr").addClass("DisabledByBilling");
 		});
 
-		$("#addresses input, #users input").change(function () {
-			var id = $(this).parents("tr").find("input[name=id]").get(0).value;
-			var value = this.value;
-			if (this.type == "checkbox")
-				value = this.checked;
+		$("#reports input").change(function () {
+			Update("${siteroot}/Billing/UpdateReport", this);
+		});
 
-			var link = "${siteroot}/Account/Update?id=" + id + "&" + this.name + "=" + value;
-			AjaxRequest(link,
-				function (html) {
-					RefreshTotalSum();
-				},
-				function (xhr, textStatus, error) { }
-			);
+		$("#addresses input, #users input").change(function () {
+			Update("${siteroot}/Account/Update", this);
 		});
 	});
 </script>
@@ -211,12 +219,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			bodyCssClass = ""
 		end
 		%>
-		<div class="${headerCssClass}" title="Клиенты">
+		<div class="${headerCssClass}">
 			<a href="javascript:">Клиенты</a>
 		</div>
 
-		<div class="VisibleFolder ${bodyCssClass}" title="Клиенты">
-			<table id=clients class="DataTable" style="width:100%;">
+		<div class="VisibleFolder ${bodyCssClass}">
+			<table id=clients class="DataTable"">
 				<tr>
 					<th>Включен</th>
 					<th>Код</th>
@@ -283,11 +291,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			bodyCssClass =""
 		end
 		%>
-		<div id="UserListHeader" class="${headerCssClass}" title="Пользователи клиента '${Client.Name}'">
-			<a href="javascript:" title="Пользователи клиента '${Client.Name}'">Пользователи клиента "${Client.Name}"</a>
+		<div id="UserListHeader" class="${headerCssClass}">
+			<a href="javascript:">Пользователи клиента "${Client.Name}"</a>
 		</div>
 
-		<div id="UserListBody" class="VisibleFolder ${bodyCssClass}" title="Пользователи клиента '${Client.Name}'">
+		<div id="UserListBody" class="VisibleFolder ${bodyCssClass}">
 			<% if Instance.Clients.Count > 1: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
@@ -295,7 +303,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<% end %>
 			<br />
 				<div align="left">
-					<table class="DataTable" id="users" style="width:100%;">
+					<table class="DataTable" id="users">
 						<tr align="center" valign="top">
 							<th>Включен</th>
 							<th>Учтен</th>
@@ -353,10 +361,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				bodyCssClass = ""
 			end
 			%>
-			<div id="AddressListHeader" class="${headerCssClass}" title="Адреса клиента '${Client.Name}'">
+			<div id="AddressListHeader" class="${headerCssClass}">
 				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
 			</div>
-			<div id="AddressListBody" class="VisibleFolder ${bodyCssClass}" title="Адреса клиента '${Client.Name}'">
+			<div id="AddressListBody" class="VisibleFolder ${bodyCssClass}">
 				<% if Instance.Clients.Count > 1: %>
 				<div align="right">
 					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
@@ -364,7 +372,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% end %>
 				<br />
 				<div align="left">
-					<table class="DataTable" id="addresses" style="width:100%;">
+					<table class="DataTable" id="addresses">
 						<tr align="center" valign="top">
 							<th>Включен</th>
 							<th>Учтен</th>
@@ -415,6 +423,31 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</div>
 			</div>
 		</div>
+
+		<% if reports.Count: %>
+		<div class="InputGroupHeader" id=reports style="margin-bottom:10px;">
+			<div class="HideVisible">
+				<a href="javascript:">Отчеты</a>
+			</div>
+			<div>
+				<table class="DataTable">
+					<tr align="center" valign="top">
+						<th>Включен</th>
+						<th>Примечание</th>
+					</tr>
+					<% for i, report in enumerate(reports): %>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td class=short>
+							<input name=id type=hidden value=${report.Id}>
+							<input name=allow type="checkbox" ${"checked" if report.Allow} />
+						</td>
+						<td>!{report.Comment}</td>
+					</tr>
+					<% end %>
+				</table>
+			</div>
+		</div>
+		<% end %>
 
 <% 
 	component Legend, { "LegendItems" : {	"Выключен" : "DisabledByBilling", 
@@ -668,8 +701,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<div class="InputGroupHeader" style="margin-bottom:10px;">
 				Статистика включений/выключений
 			</div>
-			<table class="DataTable" style="width: 100%;">
-<%          if LogRecords.Count > 0: %>			
+			<table class="DataTable">
+			<% if LogRecords.Count > 0: %>
 				<thead>
 					<th>Дата</th>
 					<th>Объект</th>
@@ -677,8 +710,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th>Оператор</th>
 					<th>Статус</th>
 				</thead>
-<%          end %>
-<%          for i,logRecord in enumerate(LogRecords): %>
+			<% end %>
+			<% for i,logRecord in enumerate(LogRecords): %>
 				<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
 					<td>${logRecord.LogTime}</td>
 					<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
@@ -686,7 +719,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
 					<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
 				</tr>
-<%          end %>
+			<% end %>
 			</table>
 					
 		</div>

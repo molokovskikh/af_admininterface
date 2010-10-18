@@ -25,13 +25,13 @@ $(function() {
 function ShowHidden(folder) {
 	$(folder).removeClass("ShowHiden");
 	$(folder).addClass("HideVisible");
-	$(".VisibleFolder[title=\"" + folder.title + "\"]").removeClass("hidden");
+	$(folder).siblings("div").removeClass("hidden")
 }
 
 function HideVisible(folder) {
 	$(folder).removeClass("HideVisible");
 	$(folder).addClass("ShowHiden");
-	$(".VisibleFolder[title=\"" + folder.title + "\"]").addClass("hidden");
+	$(folder).siblings("div").addClass("hidden")
 }
 
 function SetupCalendarElements() {

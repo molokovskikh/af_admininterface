@@ -102,6 +102,7 @@
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
     <Compile Include="Billing\PaymentFixture.cs" />
+    <Compile Include="Billing\ReportFixture.cs" />
     <Compile Include="CallHistoryFixture.cs" />
     <Compile Include="ClientFixture.cs" />
     <Compile Include="ClientMessagesFixture.cs" />

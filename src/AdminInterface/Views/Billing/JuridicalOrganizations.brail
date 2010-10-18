@@ -35,12 +35,12 @@ def WriteHeader(juridicalOrganization) as string:
 		bodyCssClass =""
 	end %>
 	<div class="InputGroupHeader" style="margin-bottom:10px; width: 100%;">
-		<div id="JuridicalOrganization${juridicalOrganization.Id}Header" class="${headerCssClass}" title="Юридические лица${juridicalOrganization.Id}" align="left">
-			<a id="JuridicalOrganization${juridicalOrganization.Id}Link" href="#" title="Юридические лица${juridicalOrganization.Id}">
+		<div id="JuridicalOrganization${juridicalOrganization.Id}Header" class="${headerCssClass}" align="left">
+			<a id="JuridicalOrganization${juridicalOrganization.Id}Link" href="#">
 				<b>Юридическое лицо "${juridicalOrganization.Name}"</b>
 			</a>
 		</div>
-		<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="VisibleFolder ${bodyCssClass}" title="Юридические лица${juridicalOrganization.Id}" style="background-color: White;">
+		<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="VisibleFolder ${bodyCssClass}" style="background-color: White;">
 			<br />
 			<form action="${siteroot}/Billing/UpdateJuridicalOrganizationInfo.rails" method="post">
 				<input type="hidden" name="juridicalOrganization.Id" value="${juridicalOrganization.Id}" />

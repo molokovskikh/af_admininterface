@@ -99,6 +99,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Users"] = payer.Users;
 			PropertyBag["Addresses"] = payer.Addresses;
+			PropertyBag["Reports"] = payer.Reports;
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
@@ -462,6 +463,14 @@ namespace AdminInterface.Controllers
 				Flash["Message"] = new Message("ёридическое лицо создано");
 			}
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = juridicalOrganization.Id });
+		}
+
+		public void UpdateReport(uint id, bool allow)
+		{
+			var report = Report.Find(id);
+			report.Allow = allow;
+			report.Update();
+			CancelView();
 		}
 	}
 }

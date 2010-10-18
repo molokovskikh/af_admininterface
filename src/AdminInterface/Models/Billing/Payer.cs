@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -14,9 +14,9 @@ namespace AdminInterface.Models
 {
 	public enum DiscountType
 	{
-		[Description("В рублях")]
+		[Description("Р’ СЂСѓР±Р»СЏС…")]
 		Currency,
-		[Description("В процентах")]
+		[Description("Р’ РїСЂРѕС†РµРЅС‚Р°С…")]
 		Percent,
 	}
 
@@ -44,11 +44,11 @@ namespace AdminInterface.Models
 		public string ReceiverAddress { get; set; }
 
 		[Property]
-		[ValidateRegExp("", "КПП должен содержать 9 цифр")]
+		[ValidateRegExp("", "РљРџРџ РґРѕР»Р¶РµРЅ СЃРѕРґРµСЂР¶Р°С‚СЊ 9 С†РёС„СЂ")]
 		public virtual string KPP { get; set; }
 
 		[Property]
-		[ValidateRegExp("", "ИНН может содержать 10 или 12 цифр")]
+		[ValidateRegExp("", "РРќРќ РјРѕР¶РµС‚ СЃРѕРґРµСЂР¶Р°С‚СЊ 10 РёР»Рё 12 С†РёС„СЂ")]
 		public virtual string INN { get; set; }
 
 		[BelongsTo(Column = "ContactGroupOwnerId")]
@@ -135,6 +135,9 @@ namespace AdminInterface.Models
 		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<LegalEntity> JuridicalOrganizations { get; set; }
 
+		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]
+		public virtual IList<Report> Reports { get; set; }
+
 		public virtual float ApplyDiscount(float sum)
 		{
 			if (DiscountType == DiscountType.Currency)
@@ -187,7 +190,7 @@ ORDER BY {Payer}.shortname;";
 			var bills = Payment.FindChargeOffs(this, period);
 
 			if (bills.Length == 0)
-				throw new EndUserException(String.Format("Не могу сформировать документ т.к. у платильщика {0} не было отчислений", ShortName));
+				throw new EndUserException(String.Format("РќРµ РјРѕРіСѓ СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РґРѕРєСѓРјРµРЅС‚ С‚.Рє. Сѓ РїР»Р°С‚РёР»СЊС‰РёРєР° {0} РЅРµ Р±С‹Р»Рѕ РѕС‚С‡РёСЃР»РµРЅРёР№", ShortName));
 
 			if (DetailInvoice == 1)
 			{
@@ -205,7 +208,7 @@ ORDER BY {Payer}.shortname;";
 /*
 			if (Recipient == null)
 				throw new EndUserException(
-					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
+					String.Format("РќРµ РјРѕРіСѓ СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РґРѕРєСѓРјРµРЅС‚ С‚.Рє. Сѓ РїР»Р°С‚РёР»СЊС‰РёРєР° {0} РЅРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ РїРѕР»СѓС‡Р°С‚РµР»СЊ РїР»Р°С‚РµР¶РµР№",
 								  ShortName));
 */
 		}
@@ -218,7 +221,7 @@ ORDER BY {Payer}.shortname;";
 
 			if (payments.Length == 0)
 				throw new EndUserException(
-					String.Format("Не могу сформировать документ т.к. с платильщиком {0} не было взаиморасчетов",
+					String.Format("РќРµ РјРѕРіСѓ СЃС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РґРѕРєСѓРјРµРЅС‚ С‚.Рє. СЃ РїР»Р°С‚РёР»СЊС‰РёРєРѕРј {0} РЅРµ Р±С‹Р»Рѕ РІР·Р°РёРјРѕСЂР°СЃС‡РµС‚РѕРІ",
 								  ShortName));
 
 			return payments;
