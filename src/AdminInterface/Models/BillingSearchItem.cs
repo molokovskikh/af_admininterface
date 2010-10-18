@@ -17,6 +17,9 @@ namespace AdminInterface.Models
 		public string ShortName { get; set; }
 
 		[Property]
+		public string Recipients { get; set; }
+
+		[Property]
 		public double PaySum { get; set; }
 
 		[Property]
@@ -142,7 +145,7 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 
 				if (properties.RecipientId != 0)
 				{
-					debitorFilterBlock += " and p.RecipientId = " + properties.RecipientId;
+					groupFilter += AddFilterCriteria(groupFilter, "	le.RecipientId = " + properties.RecipientId);
 				}
 
 				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
@@ -166,11 +169,14 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		where r.regioncode & bit_or(cd.maskregion) > 0 and r.RegionCode & :AdminRegionMask > 0 ) as {{BillingSearchItem.Regions}},
 
 		sum(if(cd.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
-		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}}
+		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
+		ifnull(group_concat(distinct ifnull(r.Name, '')), '') as {{BillingSearchItem.Recipients}}
 from billing.payers p
-	join future.Clients cd on p.PayerId = cd.PayerId
-        left join future.Users users on users.ClientId = cd.Id
-        left join future.Addresses addresses on addresses.ClientId = cd.Id
+	left join future.Clients cd on p.PayerId = cd.PayerId
+		left join future.Users users on users.PayerId = p.PayerId
+		left join future.Addresses addresses on addresses.PayerId = cd.PayerId
+	left join Billing.LegalEntities le on le.PayerId = p.PayerId
+		left join Billing.Recipients r on r.Id = le.RecipientId
 where cd.RegionCode & :AdminRegionMask > 0
 		{3}
 		{0}

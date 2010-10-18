@@ -53,6 +53,9 @@ OutputSubView("Search")
 					${WriteHeader("Краткое наименование", "ShortName")}
 				</th>
 				<th>
+					${WriteHeader("Получатель платежей", "Recipients")}
+				</th>
+				<th>
 					${WriteHeader("Сумма платежа", "PaySum")}
 				</th>
 				<th style="width: 190px;">
@@ -105,6 +108,9 @@ OutputSubView("Search")
 				</td>
 				<td>
 					${searchResult.ShortName}
+				</td>
+				<td>
+					${searchResult.Recipients}
 				</td>
 				<% if searchResult.ShowPayDate: %>
 				<td style="width: 1%">
