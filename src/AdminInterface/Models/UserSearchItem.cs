@@ -103,7 +103,7 @@ SELECT
 	Clients.Id as {{UserSearchItem.ClientId}},
 	Users.Login as {{UserSearchItem.Login}},
 	Users.Name as {{UserSearchItem.UserName}},
-	Clients.PayerId as {{UserSearchItem.PayerId}},
+	Users.PayerId as {{UserSearchItem.PayerId}},
 	Clients.Name as {{UserSearchItem.ClientName}},
 	Regions.Region as {{UserSearchItem.RegionName}},
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as {{UserSearchItem.UpdateDate}},
@@ -111,7 +111,7 @@ SELECT
 	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
 	if(Clients.Segment = 1, 1, 2) as {{UserSearchItem.Segment}},
 	rcs.InvisibleOnFirm as {{UserSearchItem.InvisibleOnFirm}},
-	Payers.JuridicalName as {{UserSearchItem.JuridicalName}},
+	p.JuridicalName as {{UserSearchItem.JuridicalName}},
 	1 as {{UserSearchItem.ClientType}}
 FROM
 	future.Users
@@ -121,7 +121,7 @@ FROM
 		LEFT JOIN contacts.Persons ON Persons.ContactGroupId = cg.Id
 	JOIN farm.Regions ON Regions.RegionCode = Clients.RegionCode
 	JOIN usersettings.RetClientsSet rcs ON rcs.ClientCode = Clients.Id
-	JOIN billing.Payers ON Clients.PayerId = Payers.PayerID
+	JOIN billing.Payers p ON users.PayerId = p.PayerID
 	LEFT JOIN usersettings.UserUpdateInfo uui ON uui.UserId = Users.Id
 WHERE
 	(Regions.RegionCode & :AdminRegionMask > 0) AND
@@ -231,7 +231,7 @@ LOWER(Persons.Name) like '{0}' ",
 						break;
 					}
 				case SearchUserBy.ByJuridicalName: {
-						filter = AddFilterCriteria(filter, String.Format(" LOWER(Payers.JuridicalName) like '{0}'", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(p.JuridicalName) like '{0}'", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByLogin: {
