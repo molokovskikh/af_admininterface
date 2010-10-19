@@ -5,7 +5,7 @@ using System.ServiceModel.Channels;
 
 namespace AdminInterface.Models.PrgData
 {
-	[DataContractAttribute(Name = "ClientStatus", Namespace = "http://schemas.datacontract.org/2004/07/Counter")]
+	[DataContractAttribute(Name = "ClientStatus", Namespace = "http://schemas.datacontract.org/2004/07/PrgData.Common.Counters")]
 	[SerializableAttribute]
 	public class UpdatingClientStatus : IExtensibleDataObject
 	{
