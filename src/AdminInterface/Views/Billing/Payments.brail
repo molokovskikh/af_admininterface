@@ -18,6 +18,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <% end %>
 
 <script type="text/javascript">
+
+	function Filter(linkCaption, link, id) {
+		var oldCaption = $(link).html();
+		var addresses = $("#" + id + " tr.hidable").toggleClass("hidden");
+		$(link).html(linkCaption);
+		link.onclick = function () { Filter(oldCaption, link, id) };
+	}
+
 	function ShowAdditionalInfo(id, selectorAdditionalInfo, selectorInfoCell, ajaxLink, cssClass) {
 		var count = $(selectorAdditionalInfo + id).length;
 		if (count > 0) {
@@ -63,39 +71,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
 		AjaxRequest(link, function(html) { $("#TotalSum").html(html); },
 			function(xhr, textStatus, error) { $("#TotalSum").html(""); });
-	}
-
-	function getInvertedDisplay(styleValue) {
-		if ((styleValue != null) && styleValue.toLowerCase().indexOf("display: none") != -1)
-			return "display: ''";
-		return "display: none";
-	}
-
-	function ShowUsers(linkCaption) {
-		var linkId = "ShowOrHideUsers";
-		var oldCaption = $("#" + linkId).html();
-		var users = $("tr[id*='UserRow']");
-		for (var i = 0; i < users.size(); i++) {
-			if ($("#" + users[i].getAttribute("Id")).hasClass("IsVisible"))
-				continue;
-			users[i].setAttribute("style", getInvertedDisplay(users[i].getAttribute("style")));
-		}
-		$("#" + linkId).html(linkCaption);
-		document.getElementById(linkId).onclick = function () { ShowUsers(oldCaption) };
-	}
-
-	function ShowAddresses(linkCaption) {
-		var linkId = "ShowOrHideAddresses";
-		var oldCaption = $("#" + linkId).html();
-		var addresses = $("tr[id*='AddressRow']");
-
-		for (var i = 0; i < addresses.size(); i++) {
-			if ($("#" + addresses[i].getAttribute("Id")).hasClass("IsVisible"))
-				continue;
-			addresses[i].setAttribute("style", getInvertedDisplay(addresses[i].getAttribute("style")));
-		}
-		$("#" + linkId).html(linkCaption);
-		document.getElementById(linkId).onclick = function () { ShowAddresses(oldCaption) };
 	}
 
 	function FilterBy(objectType, objectId) {
@@ -237,7 +212,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th>Дата регистрации</th>
 					<th></th>
 				</tr>
-				<% for i, client in enumerate(payer.Clients): %>
+				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledByBilling" if not client.IsClientActive()}" align="center">
 					<td style="width: 50px">
 						<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
@@ -245,7 +220,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${client.Id}</td>
 					<td>
-					<% if client.Id == Client.Id: %>
+					<% if IsDefined("Client") and client.Id == Client.Id: %>
 						<strong>${client.Name}</strong>
 					<% else: %>
 						<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
@@ -286,19 +261,19 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<%
 		headerCssClass = "ShowHiden"
 		bodyCssClass = "hidden"
-		if (IsDefined("ShowUsers") and ShowUsers) or Client.Users.Count < 5:
+		if (IsDefined("ShowUsers") and ShowUsers) or users.Count < 5:
 			headerCssClass = "HideVisible" 
 			bodyCssClass =""
 		end
 		%>
 		<div id="UserListHeader" class="${headerCssClass}">
-			<a href="javascript:">Пользователи клиента "${Client.Name}"</a>
+			<a href="javascript:">Пользователи</a>
 		</div>
 
 		<div id="UserListBody" class="VisibleFolder ${bodyCssClass}">
-			<% if Instance.Clients.Count > 1: %>
+			<% if IsDefined("Client") and clients.Count: %>
 			<div align="right">
-				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="ShowUsers('Показать только для текущего клиента')">Показать всех</a>
+				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'users')">Показать всех</a>
 			</div>
 			<% end %>
 			<br />
@@ -315,9 +290,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<th>Дата последнего обновления</th>
 							<th>Клиент</th>
 						</tr>
-						<% for i,user in enumerate(Users): %>
-						<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'IsVisible' if (Client.Id == user.Client.Id)}"
-							align="center" name="Client${user.Client.Id}" style="${'display:none' if (Client.Id != user.Client.Id)}">
+						<% for i, user in enumerate(Users): %>
+						<% hidden = IsDefined("Client") and Client.Id != user.Client.Id %>
+						<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
+							align="center" name="Client${user.Client.Id}">
 							<td class=short>
 								<input name=id type=hidden value=${user.Accounting.Id}>
 								<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if not user.Client.IsClientActive()} />
@@ -343,7 +319,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
 							<td>${user.Client.Name}</td>
 						</tr>
-						<tr id="UserRowHidden${user.Id}" class="${'IsVisible' if (Client.Id == user.Client.Id)}" style="${'display:none' if Client.Id != user.Client.Id}">
+						<tr id="UserRowHidden${user.Id}" class='${'hidable hidden' if hidden}'">
 							<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
 						</tr>
 						<% end %>
@@ -356,18 +332,18 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<%
 			headerCssClass = "ShowHiden"
 			bodyCssClass = "hidden"
-			if (IsDefined("ShowAddresses") and ShowAddresses) or Client.Addresses.Count < 5:
+			if (IsDefined("ShowAddresses") and ShowAddresses) or addresses.Count < 5:
 				headerCssClass = "HideVisible"
 				bodyCssClass = ""
 			end
 			%>
 			<div id="AddressListHeader" class="${headerCssClass}">
-				<a href="javascript:" title="Адреса клиента '${Client.Name}'">Адреса клиента "${Client.Name}"</a>
+				<a href="javascript:">Адреса доставки</a>
 			</div>
 			<div id="AddressListBody" class="VisibleFolder ${bodyCssClass}">
-				<% if Instance.Clients.Count > 1: %>
+				<% if IsDefined("Client") and clients.Count > 1: %>
 				<div align="right">
-					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="ShowAddresses('Показать только для текущего клиента')">Показать всех</a>
+					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'addresses')">Показать всех</a>
 				</div>
 				<% end %>
 				<br />
@@ -385,8 +361,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</tr>
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
-						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'IsVisible' if (Client.Id == addr.Client.Id)}"
-							align="center" name="Client${addr.Client.Id}" style="${'display:none' if Client.Id != addr.Client.Id}">
+						<% hidden = IsDefined("Client") and Client.Id != addr.Client.Id %>
+						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'hidable hidden' if hidden}"
+							align="center" name="Client${addr.Client.Id}">
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
 								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if not addr.Client.IsClientActive()} />
@@ -410,12 +387,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</td>
 							<td>${addr.Client.Name}</td>
 							<td>
-								<% if addr.JuridicalOrganization: %>
+								<% if addr.JuridicalOrganization != null: %>
 									<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.JuridicalOrganization.Id})">${addr.JuridicalOrganization.Name}</a>
 								<% end %>
 							</td>
 						</tr>
-						<tr id="AddressRowHidden${addr.Id}" class="${'IsVisible' if (Client.Id == addr.Client.Id)}" style="${'display:none' if Client.Id != addr.Client.Id}">
+						<tr id="AddressRowHidden${addr.Id}" class='${'hidable hidden' if hidden}'>
 							<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
 						</tr>
 						<% end %>
@@ -457,89 +434,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						"ByCenter" : false}
 %>		
 	<br />
-<!-- Пока скрыто за ненадобностью -->
-<div style="display: none">
-		<div class="InputGroupHeader">
-			<form action="" method="get">
-				${FormHelper.HiddenField("ClientCode", Client.Id)}
-				${FormHelper.HiddenField("tab", "payments")}
-				Платежи за период с
-				<input value="${paymentsFrom.ToShortDateString()}" name="paymentsFrom" class="date-input" type="text" /><input type="button" class="CalendarInput" />
-				по
-				<input value="${paymentsTo.ToShortDateString()}" name="paymentsTo" class="date-input" type="text" /><input type="button" class="CalendarInput" />
-				<input type=submit value="Показать" />
-			</form>
-		</div>
-		<% if payments.Length > 0: %>
-		<table class="DataTable">
-			<tr>
-				<th>Дата платежа</th>
-				<th>Сумма платежа</th>
-			</tr>
-			<% i = 0 %>
-			<% for payment in payments: %>
-			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td>${payment.PayedOn.ToShortDateString()}</td>
-				<td>${payment.Sum}</td>
-			</tr>
-			<% i++ %>
-			<% end %>
-		</table>
-		<% else: %>
-		<div class="EmptyData">Платежей за указанный период не было</div>
-		<% end %>
-		<fieldset style="width: 20em">
-		<legend>Новый платеж</legend>
-		<form action="AddPayment.rails" method="post">
-			<input type="hidden" name="clientCode" value="${Client.Id}" />
-			<input type="hidden" name="Payment.Payer.PayerID" value="${Instance.PayerID}" />
-			Сумма платежа:<br />
-			<input name="Payment.Sum" type="text" /><br />
-			Дата платежа:<br />
-			<input name="Payment.PayedOn" type="text" /><input type="button" class="CalendarInput" />
-			<br />
-			<input type="submit" value="Добавить" />
-		</form>
-		</fieldset>
-	
-	<div style="margin-bottom:10px">
-		<div class="InputGroupHeader">Документы:</div>
-		<form action="../Report/Bill.rails" method="get" target="_blank">
-			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
-			Акт за ${FormHelper.Select("Period",
-									   BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
-									   BindingHelper.GetDictionaryMapping())}
-			<input type="submit" value="Сформировать" />
-		</form>
-		
-		<form action="../Report/Bill.rails" method="get" target="_blank">
-			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
-			Счет за: ${FormHelper.Select("Period",
-										 BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
-										 BindingHelper.GetDictionaryMapping())}
-			<input type="submit" value="Сформировать" />
-		</form>
-		
-		<form action="../Report/RevisionAct.rails" method="get" target="_blank">
-			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
-			Акт сверки за период 
-			с <input class="date-input" name="from" type="text" /><input type="button" class="CalendarInput" />
-			по <input class="date-input" name="to" type="text" /><input type="button" class="CalendarInput" />
-			<input type="submit" value="Сформировать" />
-		</form>
-		
-		<form action="../Report/contract.rails" method="get" target="_blank">
-			<input name="payerId" type="hidden" value="${Instance.PayerID}" />
-			Договор 
-			<input type="submit" value="Сформировать" />
-		</form>
-	</div>
-</div>	
-<!-- -->
+
 	<div>
 		<form id="PayerInfo" action="update.rails" method="post">
+			<% if IsDefined("Client"): %>
 			${FormHelper.HiddenField("ClientCode", Client.Id)}
-			${FormHelper.HiddenField("Instance.PayerID")}
+			<% end %>
+			${FormHelper.HiddenField("Instance.Id")}
 			${FormHelper.HiddenField("tab", "payments")}
 			<table style="width: 100%">
 			
@@ -608,25 +509,25 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 </div>
 
 <div class="right">
-<%      if IsDefined("UsersMessages"): %>
+<% if IsDefined("UsersMessages"): %>
 		<div class="UseCaseGroup">
 		<form id="SendMessageForm" action="sendMessage.rails" method="post">
 			<table style="width:100%">
 					<tr>
-<%                      if (CountUsersWithMessages > 0): %>
+						<% if (CountUsersWithMessages > 0): %>
 						<td class="InputGroupHeader" title="Сообщения для пользователей">
-<%                          cssClassHeader = "ShowHiden"
+						<% cssClassHeader = "ShowHiden"
 							cssClassBody = "hidden"
 							if (CountUsersWithMessages < 5):
 								cssClassHeader = "HideVisible"
 								cssClassBody = ""
-							end %>			            
+							end %>
 							<div class="${cssClassHeader}" title="Сообщения для пользователей">
 								<a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>
 							</div>
 							<div class="VisibleFolder ${cssClassBody}" title="Сообщения для пользователей">
 								<br />
-<%                          for i,user in enumerate(Users): 
+							<% for i,user in enumerate(Users): 
 								if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
 								<div id="CurrentMessageForUser${user.Id}" style="text-align: left">
 								Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.

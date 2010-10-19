@@ -45,17 +45,22 @@ namespace AdminInterface.Controllers
 			DateTime? paymentsTo,
 			uint currentJuridicalOrganizationId)
 		{
-			Client client;
+			Client client = null;
+			Payer payer;
 
-			if (billingCode == 0)
+			if (clientCode != 0)
+			{
 				client = Client.Find(clientCode);
+				payer = client.Payer;
+			}
 			else
-				client = Payer.Find(billingCode).Clients.First();
+			{
+				payer = Payer.Find(billingCode);
+			}
 
-			var user = (userId != 0) ? User.Find(userId) : client.Users.FirstOrDefault();
-			var address = (addressId != 0) ? Address.Find(addressId) : client.Addresses.FirstOrDefault();
+			var user = (userId != 0) ? User.Find(userId) : payer.Users.FirstOrDefault();
+			var address = (addressId != 0) ? Address.Find(addressId) : payer.Addresses.FirstOrDefault();
 
-			var payer = client.BillingInstance;
 			var usersMessages = new List<ClientMessage>();
 			var usersLogs = new List<UserLogRecord>();
 			var addressesLogs = new List<AddressLogRecord>();
@@ -63,7 +68,7 @@ namespace AdminInterface.Controllers
 			foreach (var item in payer.Users)
 			{
 				var message = ClientMessage.FindUserMessage(item.Id);
-				if ((message != null) && message.IsContainsNotShowedMessage())
+				if (message != null && message.IsContainsNotShowedMessage())
 					countUsersWithMessages++;
 				usersMessages.Add(message);
 				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
@@ -80,12 +85,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["tab"] = tab;
 			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
 			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
+
 			var clientLogs = ClientLogRecord.GetClientLogRecords(client);
 			var userLogs = usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
 			var addressLogs = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
 			PropertyBag["LogRecords"] = SwitchLogRecord.GetUnionLogs(clientLogs, userLogs, addressLogs);
 
-			PropertyBag["Client"] = client;
+			if (client != null)
+				PropertyBag["Client"] = client;
+
+			var clients = payer.Users.Select(u => u.Client).Distinct().ToList();
+			PropertyBag["Clients"] = clients;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["User"] = user;
@@ -304,7 +314,9 @@ namespace AdminInterface.Controllers
 
 		private static IList<Region> GetRegions()
 		{
-			return Region.GetRegionsForClient(HttpContext.Current.User.Identity.Name);
+			var regions = Region.GetAllRegions();
+			regions.First(r => r.Name == "Все").Id = ulong.MaxValue;
+			return regions;
 		}
 
 		public void AdditionalUserInfo(uint userId, string cssClassName)

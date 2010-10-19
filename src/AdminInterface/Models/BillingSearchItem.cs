@@ -28,17 +28,17 @@ namespace AdminInterface.Models
 		[Property]
 		public DateTime LastClientRegistrationDate { get; set; }
 	
-        [Property]
-        public uint DisabledUsersCount { get; set; }
+		[Property]
+		public uint DisabledUsersCount { get; set; }
 
-        [Property]
-        public uint EnabledUsersCount { get; set; }
+		[Property]
+		public uint EnabledUsersCount { get; set; }
 
-        [Property]
-        public uint DisabledAddressesCount { get; set; }
+		[Property]
+		public uint DisabledAddressesCount { get; set; }
 
-        [Property]
-        public uint EnabledAddressesCount { get; set; }
+		[Property]
+		public uint EnabledAddressesCount { get; set; }
 		
 		[Property]
 		public string Regions { get; set; }
@@ -145,50 +145,55 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 
 				if (properties.RecipientId != 0)
 				{
-					groupFilter += AddFilterCriteria(groupFilter, "	le.RecipientId = " + properties.RecipientId);
+					groupFilter += AddFilterCriteria(groupFilter, " le.RecipientId = " + properties.RecipientId);
 				}
 
-				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
+				//.SetParameter("RegionId", properties.RegionId)
+				if (properties.RegionId != UInt64.MaxValue)
+					groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
 
-				var result = session.CreateSQLQuery(String.Format(@"
+				if (!String.IsNullOrEmpty(groupFilter))
+					searchBlock = AddFilterCriteria(searchBlock, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
+
+				var query = session.CreateSQLQuery(String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
 		p.shortname as {{BillingSearchItem.ShortName}},
 		p.oldpaydate as {{BillingSearchItem.PayDate}},
 		p.oldtariff as {{BillingSearchItem.PaySum}},
 		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
-        count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
-        count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
-        count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
-        count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
+		count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
+		count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
+		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
+		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
 
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r
-		where r.regioncode & bit_or(cd.maskregion) > 0 and r.RegionCode & :AdminRegionMask > 0 ) as {{BillingSearchItem.Regions}},
+		where r.regioncode & bit_or(cd.maskregion) > 0) as {{BillingSearchItem.Regions}},
 
 		sum(if(cd.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
 		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
 		ifnull(group_concat(distinct ifnull(r.Name, '')), '') as {{BillingSearchItem.Recipients}}
 from billing.payers p
-	left join future.Clients cd on p.PayerId = cd.PayerId
-		left join future.Users users on users.PayerId = p.PayerId
-		left join future.Addresses addresses on addresses.PayerId = cd.PayerId
+	left join future.Users users on users.PayerId = p.PayerId
+		left join future.Clients cd on cd.Id = users.ClientId
+	left join future.Addresses addresses on addresses.PayerId = cd.PayerId
 	left join Billing.LegalEntities le on le.PayerId = p.PayerId
 		left join Billing.Recipients r on r.Id = le.RecipientId
-where cd.RegionCode & :AdminRegionMask > 0
-		{3}
-		{0}
+where 1 = 1 {0}
 group by p.payerId
 having {1}
-		and sum(if({2}, 1, 0)) > 0
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, searchBlock, groupFilter, SecurityContext.Administrator.GetClientFilterByType("cd")))
-					.AddEntity(typeof(BillingSearchItem))
-					.SetParameter("RegionId", properties.RegionId)
-					.SetParameter("AdminRegionMask", SecurityContext.Administrator.RegionMask)
-					.List<BillingSearchItem>();
+", debitorFilterBlock, searchBlock))
+					.AddEntity(typeof(BillingSearchItem));
+
+				if (properties.RegionId != UInt64.MaxValue)
+					query.SetParameter("RegionId", properties.RegionId);
+
+				var result = query.List<BillingSearchItem>();
+
 				ArHelper.Evict(session, result);
 				return result;
 			}
@@ -238,13 +243,13 @@ order by {{BillingSearchItem.ShortName}}
 				{
 					case SearchClientStatus.Enabled:
 						groupFilter = groupFilter
-						              & Expression.Eq("cd.Status", ClientStatus.On)
-						              & Expression.Eq("cd.BillingStatus", ClientStatus.On);
+									  & Expression.Eq("cd.Status", ClientStatus.On)
+									  & Expression.Eq("cd.BillingStatus", ClientStatus.On);
 						break;
 					case SearchClientStatus.Disabled:
 						groupFilter = groupFilter
-						              & (Expression.Eq("cd.Status", ClientStatus.Off)
-						                 | Expression.Eq("cd.BillingStatus", ClientStatus.Off));
+									  & (Expression.Eq("cd.Status", ClientStatus.Off)
+										 | Expression.Eq("cd.BillingStatus", ClientStatus.Off));
 						break;
 				}
 
@@ -261,21 +266,21 @@ order by {{BillingSearchItem.ShortName}}
 						.Add(Projections.Max("cd.Id"))
 //						.Add(Projections.)
 						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Status",
-						                                                            ClientStatus.Off),
-						                                              Projections.Constant(1),
-						                                              Projections.Constant(0))))
+																					ClientStatus.Off),
+																	  Projections.Constant(1),
+																	  Projections.Constant(0))))
 						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Status",
-						                                                            ClientStatus.On),
-						                                              Projections.Constant(1),
-						                                              Projections.Constant(0))))
+																					ClientStatus.On),
+																	  Projections.Constant(1),
+																	  Projections.Constant(0))))
 						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Segment",
-						                                                            Segment.Wholesale),
-						                                              Projections.Constant(1),
-						                                              Projections.Constant(0))))
+																					Segment.Wholesale),
+																	  Projections.Constant(1),
+																	  Projections.Constant(0))))
 						.Add(Projections2.Sum(Projections.Conditional(Expression.Eq("cd.Segment",
-						                                                            Segment.Retail),
-						                                              Projections.Constant(1),
-						                                              Projections.Constant(0))))
+																					Segment.Retail),
+																	  Projections.Constant(1),
+																	  Projections.Constant(0))))
 						.Add(Projections.GroupProperty("p.PayerID"))
 					)
 					.AddOrder(Order.Asc("p.ShortName"));
@@ -285,22 +290,22 @@ order by {{BillingSearchItem.ShortName}}
 				{
 					case SearchBy.Name:
 						criteria.Add(Restrictions.Like(Projections.GroupProperty("p.ShortName"),
-						                               properties.SearchText)
-						             | Restrictions.Like(Projections.GroupProperty("p.JuridicalName"),
-						                                  properties.SearchText)
-						             | Restrictions.Ge(Projections2.Sum(Projections.Conditional(
+													   properties.SearchText)
+									 | Restrictions.Like(Projections.GroupProperty("p.JuridicalName"),
+														  properties.SearchText)
+									 | Restrictions.Ge(Projections2.Sum(Projections.Conditional(
 																			Expression.Like("cd.FullName", properties.SearchText)
-						                                                 	| Expression.Like("cd.ShortName", properties.SearchText),
-						                                                 	Projections.Constant(1),
-						                                                 	Projections.Constant(0))),
-						                                0));
+																			| Expression.Like("cd.ShortName", properties.SearchText),
+																			Projections.Constant(1),
+																			Projections.Constant(0))),
+														0));
 						break;
 					case SearchBy.Code:
 						criteria.Add(
 							Restrictions.Ge(Projections2.Sum(Projections.Conditional(
-							                                 	Expression.Eq("cd.id", properties.SearchText),
-							                                 	Projections.Constant(1),
-							                                 	Projections.Constant(0))), 0));
+																Expression.Eq("cd.id", properties.SearchText),
+																Projections.Constant(1),
+																Projections.Constant(0))), 0));
 						break;
 					case SearchBy.BillingCode:
 						criteria.Add(Restrictions.Eq(Projections.GroupProperty("p.PayerID"), Convert.ToUInt32(properties.SearchText)));
@@ -319,9 +324,9 @@ order by {{BillingSearchItem.ShortName}}
 				}
 
 				criteria.Add(Expression.Ge(Projections2.Sum(Projections.Conditional(groupFilter,
-				                                                                    Projections.Constant(1),
-				                                                                    Projections.Constant(0))),
-				                           0));
+																					Projections.Constant(1),
+																					Projections.Constant(0))),
+										   0));
 
 				var s = criteria.List();
 

@@ -1,6 +1,9 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
+using System.Linq;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using System;
@@ -21,32 +24,6 @@ namespace AdminInterface.Models
 
 		public bool IsAll { get; set; }
 
-		public static IList<Region> GetRegionsForClient(string clientName)
-		{
-			return ArHelper.WithSession(
-				session =>
-				session.CreateSQLQuery(
-					@"
-select 
-	(select sum(regioncode) from farm.regions) as {Region.Id},
-	'Âñå' as {Region.Name}, 
-	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
-	1 as IsAll
-union
-SELECT  r.RegionCode as {Region.Id},
-        r.Region as {Region.Name},
-		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
-        0 as IsAll
-FROM    farm.regions as r,
-        accessright.regionaladmins as ra
-WHERE   ra.username = :UserName
-        and ra.RegionMask & r.regioncode > 0
-ORDER BY IsAll Desc, {Region.Name};")
-					.AddEntity(typeof (Region))
-					.SetParameter("UserName", clientName.Replace("ANALIT\\", ""))
-					.List<Region>());
-		}
-
 		public static Region[] GetRegionsByMask(ulong mask)
 		{
 			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
@@ -54,24 +31,28 @@ ORDER BY IsAll Desc, {Region.Name};")
 
 		public static IList<Region> GetAllRegions()
 		{
-			return ArHelper.WithSession(session =>
-				session.CreateSQLQuery(@"
+			return ArHelper.WithSession(session => {
+			
+				var regions = session.CreateSQLQuery(@"
 select
 	(select sum(regioncode) from farm.regions) as {Region.Id},
-	'Âñå' as {Region.Name}, 
+	'Ð’ÑÐµ' as {Region.Name}, 
 	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
 	1 as IsAll
 union
 SELECT  r.RegionCode as {Region.Id},
-        r.Region as {Region.Name},
+		r.Region as {Region.Name},
 		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
-        0 as IsAll
-FROM	farm.regions as r,
-		accessright.regionaladmins as ra
-WHERE	ra.RegionMask & r.regioncode > 0
-ORDER BY IsAll Desc, {Region.Name};"))
-						.AddEntity(typeof(Region))
-					   .List<Region>();
+		0 as IsAll
+FROM	farm.regions as r
+WHERE	:Mask & r.regioncode > 0
+ORDER BY IsAll Desc, {Region.Name};")
+					.AddEntity(typeof(Region))
+					.SetParameter("Mask", SecurityContext.Administrator.RegionMask)
+					.List<Region>();
+				regions.Each(session.Evict);
+				return regions;
+			});
 		}
 	}
 
@@ -86,26 +67,16 @@ ORDER BY IsAll Desc, {Region.Name};"))
 
 	public static class RegionSettingsExtension
 	{
-        public static ulong GetOrderMask(this RegionSettings[] regions)
-        {
-        	ulong mask = 0;
-			foreach (var region in regions)
-			{
-				if (region.IsAvaliableForOrder)
-					mask |= region.Id;
-			}
-        	return mask;
-        }
+		public static ulong GetOrderMask(this RegionSettings[] regions)
+		{
+			return regions.Where(region => region.IsAvaliableForOrder)
+				.Aggregate<RegionSettings, ulong>(0, (current, region) => current | region.Id);
+		}
 
 		public static ulong GetBrowseMask(this RegionSettings[] regions)
 		{
-			ulong mask = 0;
-			foreach (var region in regions)
-			{
-				if (region.IsAvaliableForBrowse)
-					mask |= region.Id;
-			}
-			return mask;
+			return regions.Where(region => region.IsAvaliableForBrowse)
+				.Aggregate<RegionSettings, ulong>(0, (current, region) => current | region.Id);
 		}
 	}
 }

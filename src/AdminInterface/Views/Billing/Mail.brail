@@ -19,7 +19,9 @@
 
 <div class="left">
 	<form action="update.rails" method="post">
+		<% if IsDefined("Client"): %>
 		${FormHelper.HiddenField("ClientCode", Client.Id)}
+		<% end %>
 		${FormHelper.HiddenField("Instance.PayerID")}
 		${FormHelper.HiddenField("tab", "mail")}
 		
@@ -169,8 +171,10 @@
 				Отправка корреспонденции
 			</div>
 			<form method="post" action="SentMail.rails">
+				<% if IsDefined("Client"): %>
 				${FormHelper.HiddenField("ClientCode", Client.Id)}
-				${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.PayerID)}
+				<% end %>
+				${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.Id)}
 				${FormHelper.LabelFor("MailSentEntity.SentDate", "Дата отправки:")}
 				<br>
 				${FormHelper.TextFieldValue("MailSentEntity.SentDate", Today.ToShortDateString(), { "class" : "CheckDate DateInFuture" })}
@@ -192,9 +196,7 @@
 			<table class="DataTable" style="width: 100%;">
 			<% 
 			if MailSentHistory.Length > 0:
-				i = 0
-				for mailSentEntity in MailSentHistory:
-					i++
+				for i, mailSentEntity in enumerate(MailSentHistory):
 			%>
 					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)} ${ "DeletedMessage" if mailSentEntity.IsDeleted}">
 						<td>

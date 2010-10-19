@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
 			});
 
-			var regions = Region.GetRegionsForClient(SecurityContext.Administrator.UserName);
+			var regions = Region.GetAllRegions();
 			PropertyBag["Regions"] = regions;
 			PropertyBag["RegionId"] = regions.Where(region => region.Name.ToLower().Equals("все")).First().Id;
 			PropertyBag["admin"] = SecurityContext.Administrator;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
 
@@ -25,34 +26,35 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<ClientLogRecord> GetClientLogRecords(Client client)
 		{
+			if (client == null)
+				return Enumerable.Empty<ClientLogRecord>().ToList();
+
 			return (List<ClientLogRecord>) Execute(
-			                               	(session, instance) =>
-			                               	session.CreateSQLQuery(@"
+				(session, instance) => session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
 where status is not null
 		and clientId = :ClientCode
 order by logtime desc
 limit 5")
-			                               		.AddEntity(typeof (ClientLogRecord))
-			                               		.SetParameter("ClientCode", client.Id)
-			                               		.List<ClientLogRecord>(), null);
+						.AddEntity(typeof (ClientLogRecord))
+						.SetParameter("ClientCode", client.Id)
+						.List<ClientLogRecord>(), null);
 		}
 
 		public static ClientLogRecord LastOff(uint clientCode)
 		{
-			return (ClientLogRecord)Execute(
-											(session, instance) =>
-											session.CreateSQLQuery(@"
+			return (ClientLogRecord) Execute(
+				(session, instance) => session.CreateSQLQuery(@"
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
 where status = 0
 		and clientId = :ClientCode
 order by logtime desc
 limit 1")
-												.AddEntity(typeof(ClientLogRecord))
-												.SetParameter("ClientCode", clientCode)
-												.UniqueResult(), null);
+						.AddEntity(typeof (ClientLogRecord))
+						.SetParameter("ClientCode", clientCode)
+						.UniqueResult(), null);
 		}
 	}
 }
