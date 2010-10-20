@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -116,23 +116,24 @@ namespace AdminInterface.Controllers
 		}
 
 		public void Update(
-			[ARDataBind("Instance", AutoLoadBehavior.Always)] Payer billingInstance,
+			[ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
 			uint clientCode,
 			string tab)
 		{
 			using (new TransactionScope())
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				billingInstance.UpdateAndFlush();
-				Flash.Add("Message", new Message("Изменения сохранены"));
-				Redirect("Billing", "Edit", new {clientCode, tab});
+				payer.UpdateAndFlush();
+				Flash.Add("Message", new Message("РР·РјРµРЅРµРЅРёСЏ СЃРѕС…СЂР°РЅРµРЅС‹"));
 			}
+			RedirectToReferrer();
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage, uint clientId,
-			bool sendMessageToClientEmails, string subjectForEmailToClient)
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage,
+			uint clientId,
+			bool sendMessageToClientEmails,
+			string subjectForEmailToClient)
 		{
-			uint clientCode = 0;
 			try
 			{
 				Client client = null;
@@ -143,27 +144,25 @@ namespace AdminInterface.Controllers
 						foreach (var user in Client.Find(clientId).Users)
 						{
 							SendMessageToUser(user, clientMessage);
-							clientCode = user.Client.Id;
 							client = user.Client;
 						}
 					else
 					{
 						var user = User.Find(clientMessage.ClientCode);
 						SendMessageToUser(user, clientMessage);
-						clientCode = user.Client.Id;
 						client = user.Client;
 					}
 				}
 				if (sendMessageToClientEmails)
 					Mailer.SendMessageFromBillingToClient(client, clientMessage.Message, subjectForEmailToClient);
-				Flash.Add("Message", new Message("Сообщение сохранено"));
+				Flash["Message"] = new Message("РЎРѕРѕР±С‰РµРЅРёРµ СЃРѕС…СЂР°РЅРµРЅРѕ");
 			}
 			catch (ValidationException exception)
 			{
-				Flash.Add("SendError", exception.ValidationErrorMessages[0]);
+				Flash["SendError"] = exception.ValidationErrorMessages[0];
 			}
 
-			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
+			RedirectToReferrer();
 		}
 
 		private void SendMessageToUser(User user, ClientMessage clientMessage)
@@ -268,13 +267,13 @@ namespace AdminInterface.Controllers
 			{
 				sentEntity.UserName = SecurityContext.Administrator.UserName;
 				sentEntity.SaveAndFlush();
-				Flash["Message"] = new Message("Cохранено");
+				Flash["Message"] = new Message("CРѕС…СЂР°РЅРµРЅРѕ");
 			}
 			catch (ValidationException ex)
 			{
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			Redirect("Billing", "Edit", new {clientCode, tab = "mail"});
+			RedirectToReferrer();
 		}
 
 		public void DeleteMail(uint id)
@@ -303,19 +302,10 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		public void AddPayment(uint clientCode, [DataBind("Payment")] Payment payment)
-		{
-			payment.PaymentType = PaymentType.Charge;
-			payment.Name = "Оплата";
-			payment.Save();
-			Flash["Message"] = new Message("Сохранено");
-			Redirect("Billing", "Edit", new {clientCode, tab = "payments"});
-		}
-
 		private static IList<Region> GetRegions()
 		{
 			var regions = Region.GetAllRegions();
-			regions.First(r => r.Name == "Все").Id = ulong.MaxValue;
+			regions.First(r => r.Name == "Р’СЃРµ").Id = ulong.MaxValue;
 			return regions;
 		}
 
@@ -452,7 +442,7 @@ namespace AdminInterface.Controllers
 
 				organization.Update();
 				scope.VoteCommit();
-				Flash["Message"] = new Message("Сохранено");
+				Flash["Message"] = new Message("РЎРѕС…СЂР°РЅРµРЅРѕ");
 				var billingCode = organization.Payer.PayerID;
 				Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
 			}
@@ -472,7 +462,7 @@ namespace AdminInterface.Controllers
 
 				scope.VoteCommit();
 
-				Flash["Message"] = new Message("Юридическое лицо создано");
+				Flash["Message"] = new Message("Р®СЂРёРґРёС‡РµСЃРєРѕРµ Р»РёС†Рѕ СЃРѕР·РґР°РЅРѕ");
 			}
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = juridicalOrganization.Id });
 		}
