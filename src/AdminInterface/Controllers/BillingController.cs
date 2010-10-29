@@ -273,7 +273,7 @@ namespace AdminInterface.Controllers
 			{
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			RedirectToReferrer();
+			Redirect("Billing", "Edit", new {clientCode, billingCode = sentEntity.PayerId, tab = "mail"});
 		}
 
 		public void DeleteMail(uint id)
