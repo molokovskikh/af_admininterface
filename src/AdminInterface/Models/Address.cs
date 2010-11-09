@@ -43,11 +43,6 @@ namespace AdminInterface.Models
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
 		public virtual LegalEntity LegalEntity { get; set; }
 
-		public virtual string Name
-		{
-			get { return Value; }
-		}
-
 		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
 
@@ -61,6 +56,16 @@ namespace AdminInterface.Models
 			Schema = "future",
 			ColumnRef = "UserId")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
+
+		public virtual string Name
+		{
+			get { return Value; }
+		}
+
+		public virtual string LegalName
+		{
+			get { return LegalEntity.Name; }
+		}
 
 		public virtual bool AvaliableFor(User user)
 		{

@@ -237,7 +237,7 @@ namespace Functional
 		public void Reset_user_uin()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			var user = client.GetUsers().First();
+			var user = client.Users.First();
 			user.Name = String.Empty;
 			user.Update();
 			var info = UserUpdateInfo.Find(user.Id);
@@ -266,7 +266,7 @@ namespace Functional
 		{
 			var formatString = CustomSettings.UserPreparedDataFormatString;
 			var client = DataMother.CreateTestClientWithUser();
-			var user = client.GetUsers().First();
+			var user = client.Users.First();
 			user.Name = String.Empty;
 			user.Update();
 			var preparedDataPath = String.Format(formatString, user.Id);

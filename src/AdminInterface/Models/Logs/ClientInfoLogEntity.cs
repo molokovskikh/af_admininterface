@@ -34,16 +34,31 @@ namespace AdminInterface.Models.Logs
 
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
+
 		[Property]
 		public string UserName { get; set; }
+
 		[Property]
 		public string Message { get; set; }
+
 		[Property]
 		public uint ClientCode { get; set; }
+
 		[Property]
 		public DateTime WriteTime { get; set; }
+
 		[BelongsTo(Column = "UserId")]
 		public virtual User User { get; set; }
+
+		public string Login
+		{
+			get { return User.Login; }
+		}
+
+		public string Operator
+		{
+			get { return GetHumanReadableOperatorName(); }
+		}
 
 		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
 		{
@@ -57,6 +72,11 @@ namespace AdminInterface.Models.Logs
 		public bool IsStatusChange()
 		{
 			return Message.Contains("$$$Клиент ");
+		}
+
+		public string GetHumanReadableOperatorName()
+		{
+			return ViewHelper.GetHumanReadableOperatorName(UserName);
 		}
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)

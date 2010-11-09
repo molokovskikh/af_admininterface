@@ -83,6 +83,7 @@
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
     <Compile Include="NotificationFixture.cs" />
+    <Compile Include="SortFixture.cs" />
     <Compile Include="ViewHelperFixture.cs" />
   </ItemGroup>
   <ItemGroup>

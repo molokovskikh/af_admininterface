@@ -3,29 +3,6 @@
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
 
-<%
-def WriteHeader(text as string, columnName as string):
-	currentSortDirection = "Ascending";
-	if SortMessagesColumnName == columnName:
-		if sortMessagesDirection == "Descending":
-			currentSortDirection = "Ascending"
-		else:
-			currentSortDirection = "Descending"
-		end
-		if sortMessagesDirection == "Ascending":
-			url = "${siteroot}/Images/arrow-down-blue-reversed.gif"
-		else:
-			url = "${siteroot}/Images/arrow-down-blue.gif"
-		end
-	end
-	%>
-	<a href="OrderMessagesBy.rails?columnName=${columnName}&sortDirection=${currentSortDirection}&clientId=${client.Id}">${text}</a>
-	<% output "<img src=\"${url}\" style=\"border: none;\" />" if SortMessagesColumnName == columnName %>
-	<% 
-	return ""
-end
-%>
-
 <script>
 	document.observe("dom:loaded", function() {
 
@@ -146,49 +123,34 @@ end
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<form id="updateForm" name="updateForm">
 			<table style="width:100%;" name="usersTable">
 				<tr valign="top" align="left">
-				
-<%              headersList = ["Код пользователя", "Имя пользователя", "Комментарий", "Последнее использование сервисов"]
-                headerNames = ["Id", "Login"]
-                unsortableHeaders = ["Комментарий", "Последнее использование сервисов"]
-                OutputSubView("/SubViews/SortHeadersSubView",
-                    {"headers":headersList, "unsortableHeaders": unsortableHeaders, "sortColumnIndex":sortColumnIndex, "formPostBack":'updateForm' }) %>
+					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
+					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>
+					<th>Комментарий</th>
+					<th>Последнее использование сервисов</th>
 				</tr>
-				<% containsLockedUsers = false %>
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>
 					<% logEntity = authorizationLogs.GetEntityByUserId(user.Id)%>
-					<% containsLockedUsers = userInfo.IsLoginExists and userInfo.IsLocked if not containsLockedUsers %>
 					<tr>
-					    <td><a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
+						<td><a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
 						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
-							<% if true: %>
-								<a href="${siteroot}/users/${user.Login}/edit"">${user.Login}</a>
-							<% else: %>
-								${user.GetLoginWithName()}
-							<% end %>
+							<a href="${siteroot}/users/${user.Login}/edit"">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
 						<td>
-<%                          lastUsage = null
-                            if (logEntity != null): 
-                                lastUsage = logEntity.GetLastServicesUsage(user.Id)
-                            end
-                            if (lastUsage != null): %>
-						        ${lastUsage.Date}(${lastUsage.ShortServiceName})
-<%                          end %>
-                        </td>
+						<% lastUsage = null
+							if (logEntity != null): 
+								lastUsage = logEntity.GetLastServicesUsage(user.Id)
+							end
+							if (lastUsage != null): %>
+								${lastUsage.Date}(${lastUsage.ShortServiceName})
+						<% end %>
+						</td>
 					</tr>
 				<% end %>
 			</table>
-            <input type="hidden" id="sortColumnIndex" name="sortColumnIndex" value="${sortColumnIndex}" />
-            <input type="hidden" id="cc" name="cc" value="${Client.Id}" />
-            <% for i,headerName in enumerate(headerNames): %>
-            <input type="hidden" id="headerNames[${i}]" name="headerNames[${i}]" value="${headerName}" />
-            <% end %>
-			</form>
 		</div>
 
 		<div class=block>
@@ -223,8 +185,23 @@ end
 				<a href="${siteroot}/deliveries/add?clientId=${client.Id}" class="icon icon-add">Новый адрес доставки</a>
 			</div>
 			<h3>Адреса доставки</h3>
-			<% for i, address in enumerate(client.Addresses): %>
-				<a href=${siteroot}/deliveries/${address.Id}/edit class="${'DisabledByBilling' if not address.Enabled}">${address.Value}</a>${",<br/>" if i < client.Addresses.Count - 1}
+			<% if client.Addresses.Count: %>
+				<table>
+					<tr>
+						<th>${app.Sortable("Адрес", "Addresses.Value")}</th>
+						<th>${app.Sortable("Юр.лицо", "Addresses.LegalEntity.Name")}</th>
+					</tr>
+					<% for i, address in enumerate(client.Addresses): %>
+						<tr>
+							<td>
+								${app.LinkTo(address)}
+							</td>
+							<td>
+								${address.LegalEntity.Name}
+							</td>
+						</tr>
+					<% end %>
+				</table>
 			<% end %>
 		</div>
 		
@@ -275,15 +252,15 @@ end
 			<br />
 			<input type=submit value="Принять" class="RightButton"/>
 			<p>
-				<% if logs.Count > 0: %>
+				<% if messages.Count: %>
 				<table class="DataTable HighLightCurrentRow" id="ClientMessagesTable" style="text-align:left">
 					<tr>
-						<th>${WriteHeader("Дата", "WriteTime")}</th>
-						<th>${WriteHeader("Оператор", "Operator")}</th>
-						<th>${WriteHeader("Пользователь", "UserName")}</th>
+						<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
+						<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+						<th>${app.Sortable("Пользователь", "Messages.Login")}</th>
 						<th>Событие</th>
 					</tr>
-					<% for i, log in enumerate(logs): %>
+					<% for i, log in enumerate(messages): %>
 					<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 						<td>${log.WriteTime}</td>
 						<td>${log.GetHumanReadableOperatorName()}</td>

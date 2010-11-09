@@ -38,3 +38,18 @@ tr.SelectedRow.OddRow
 	background-color: #F6F6F6;
 	border: solid 1px #DADADA;
 }
+
+th a.sort
+{
+	background-position: 100% 50%;
+	background-repeat: no-repeat;
+	padding-right: 10px;
+}
+th a.sort.asc
+{
+	background-image: url("../Images/arrow-down-blue.gif");
+}
+th a.sort.desc
+{
+	background-image: url("../Images/arrow-down-blue-reversed.gif");
+}

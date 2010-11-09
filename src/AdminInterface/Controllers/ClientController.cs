@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -12,17 +14,75 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
-using log4net;
 
 namespace AdminInterface.Controllers
 {
+	public class Sort
+	{
+		public string Property;
+		public string Direction;
+
+		public Sort(string property, string direction)
+		{
+			var columns = new [] {
+				"Messages.WriteTime",
+				"Messages.Operator",
+				"Messages.Login",
+
+				"Addresses.Value",
+				"Addresses.LegalName",
+
+				"Users.Id",
+				"Users.Login",
+			};
+
+			if (columns.All(s => !s.Equals(property, StringComparison.OrdinalIgnoreCase)))
+				property = null;
+
+			var directions = new [] {"asc", "desc"};
+			if (directions.All(s => !s.Equals(direction, StringComparison.OrdinalIgnoreCase)))
+				direction = null;
+
+			Property = property;
+			Direction = direction;
+
+			if (Property == null)
+				Property = "Messages.WriteTime";
+
+			if (Direction == null)
+				Direction = "Desc";
+		}
+
+		public void Apply(IDictionary bag)
+		{
+			var indexOf = Property.IndexOf(".");
+			var prefix = Property.Substring(0, indexOf);
+			if (!bag.Contains(prefix))
+				return;
+
+			indexOf++;
+			var property = Property.Substring(indexOf, Property.Length - indexOf);
+
+			var sortedList = new ArrayList(((IList)bag[prefix]));
+			sortedList.Sort(
+				new PropertyComparer(Direction.Equals("asc", StringComparison.OrdinalIgnoreCase) ? SortDirection.Asc : SortDirection.Desc, property)
+			);
+
+			bag[prefix] = sortedList;
+			bag["SortBy"] = Property;
+			bag["Direction"] = Direction;
+		}
+	}
+
 	[
 		Helper(typeof(ADHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(HttpUtility)),
+		Helper(typeof(AppHelper), "app"),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
@@ -33,26 +93,27 @@ namespace AdminInterface.Controllers
 	{
 		public void Info(uint cc)
 		{
+			var sort = GetSort();
 			var client = Client.FindAndCheck(cc);
+			var users = client.Users;
+			var addresses = client.Addresses;
+			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users);
+
 			PropertyBag["Client"] = client;
-			if (String.IsNullOrEmpty(client.Registrant))
-				PropertyBag["Registrant"] = null;
-			else
-				PropertyBag["Registrant"] = Administrator.GetByName(client.Registrant);
+			PropertyBag["Registrant"] = client.GetRegistrant();
 			PropertyBag["Admin"] = SecurityContext.Administrator;
-			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client);
-			PropertyBag["sortMessagesColumnName"] = "WriteTime";
-			PropertyBag["sortMessagesDirection"] = "Descending";
 
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 
-			var users = client.GetUsers();
-			PropertyBag["users"] = users.OrderBy(user => user.Id);
-			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users.ToList());
+			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
+			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
+			PropertyBag["addresses"] = addresses;
 			PropertyBag["authorizationLogs"] = new AuthorizationLogEntityList(authorizationLogs);
-			PropertyBag["sortColumnIndex"] = 0;
+
+			sort.Apply(PropertyBag);
+
 			try
 			{
 				var usersInfo = ADHelper.GetPartialUsersInformation(users);
@@ -61,38 +122,23 @@ namespace AdminInterface.Controllers
 			catch (Exception ex)
 			{
 				var userInfo = new ADUserInformationCollection();
-				string usersNames = "";
+				var usersNames = "";
 				foreach (var user in users)
 				{
-					userInfo.Add(new ADUserInformation() {Login = user.Login});
+					userInfo.Add(new ADUserInformation {Login = user.Login});
 					usersNames += user.Login + ", ";
 				}
 				PropertyBag["usersInfo"] = userInfo;
-				
-				LogManager.GetLogger(typeof(ClientController)).Error(
+
+				Logger.Error(
 					String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
-						client.Id, SecurityContext.Administrator.UserName, usersNames));
+						client.Id, SecurityContext.Administrator.UserName, usersNames), ex);
 			}
 		}
 
-		public void Info(uint cc, int sortColumnIndex)
+		private Sort GetSort()
 		{
-			var headerNames = new [] {"Id", "Login"};
-			Info(cc);
-			var client = Client.FindAndCheck(cc);
-			var users = client.GetUsers();
-			PropertyBag["users"] = users.SortBy(headerNames[Math.Abs(sortColumnIndex) - 1], sortColumnIndex > 0);
-			PropertyBag["sortColumnIndex"] = sortColumnIndex;
-		}
-
-		public void OrderMessagesBy(string columnName, string sortDirection, uint clientId)
-		{
-			Info(clientId);
-			var client = Client.FindAndCheck(clientId);
-			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForClient(client).OrderBy(columnName, sortDirection.Equals("Descending"));
-			PropertyBag["sortMessagesColumnName"] = columnName;
-			PropertyBag["sortMessagesDirection"] = sortDirection;
-			RenderView("Info");
+			return new Sort(Query["SortBy"], Query["Direction"]);
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -211,7 +257,7 @@ where Phone like :phone")
 		{
 			var client = Client.FindAndCheck(clientCode);
 
-			foreach(var user in client.GetUsers())
+			foreach(var user in client.Users)
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
 					ADHelper.Unlock(user.Login);
 
@@ -225,7 +271,7 @@ where Phone like :phone")
 
 			try
 			{
-				foreach (var user in client.GetUsers())
+				foreach (var user in client.Users)
 				{
 					var file = String.Format(Settings.Default.UserPreparedDataFormatString, user.Id);
 					if (File.Exists(file))

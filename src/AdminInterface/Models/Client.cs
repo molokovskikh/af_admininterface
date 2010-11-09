@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
@@ -183,12 +184,6 @@ where
 			}
 		}
 
-		public virtual IEnumerable<User> GetUsers()
-		{
-			foreach (var user in Users)
-				yield return user;
-		}
-
 		public virtual bool IsDrugstore()
 		{
 			return Type == ClientType.Drugstore;
@@ -311,7 +306,7 @@ group by u.ClientId")
 
 		public virtual bool HavePreparedData()
 		{
-			foreach (var user in GetUsers())
+			foreach (var user in Users)
 			{
 				var file = String.Format(@"U:\wwwroot\ios\Results\{0}.zip", user.Id);
 				if (File.Exists(file))
@@ -464,6 +459,14 @@ WHERE i.Id IS NULL
 					Users.Each(u => u.OrderRegionMask &= ~setting.Id);
 				}
 			}
+		}
+
+		public virtual object GetRegistrant()
+		{
+			if (String.IsNullOrEmpty(Registrant))
+				return null;
+			else
+				return Administrator.GetByName(Registrant);
 		}
 	}
 }

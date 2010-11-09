@@ -73,7 +73,7 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public DateTime? IOLTime { get; set; }
 
-		public static List<AuthorizationLogEntity> GetEntitiesByUsers(List<User> users)
+		public static List<AuthorizationLogEntity> GetEntitiesByUsers(IEnumerable<User> users)
 		{
 			return FindAll(Expression.In("Id", users.Select(r => r.Id).ToArray())).ToList();
 		}
@@ -84,9 +84,9 @@ namespace AdminInterface.Models.Logs
 			if (logEntity == null)
 				return null;
 			var usages = new [] {
-                logEntity.AFTime.HasValue ? new LastServicesUsage { Date = logEntity.AFTime.Value, ShortServiceName = "AF" } : null,
-                logEntity.AOLTime.HasValue ? new LastServicesUsage { Date = logEntity.AOLTime.Value, ShortServiceName = "AOL" } : null,
-                logEntity.CITime.HasValue ? new LastServicesUsage { Date = logEntity.CITime.Value, ShortServiceName = "CI" } : null,
+				logEntity.AFTime.HasValue ? new LastServicesUsage { Date = logEntity.AFTime.Value, ShortServiceName = "AF" } : null,
+				logEntity.AOLTime.HasValue ? new LastServicesUsage { Date = logEntity.AOLTime.Value, ShortServiceName = "AOL" } : null,
+				logEntity.CITime.HasValue ? new LastServicesUsage { Date = logEntity.CITime.Value, ShortServiceName = "CI" } : null,
 				logEntity.IOLTime.HasValue ? new LastServicesUsage { Date = logEntity.IOLTime.Value, ShortServiceName = "IOL" } : null,
 			};
 			return LastServicesUsage.GetLastUsage(usages);

@@ -156,6 +156,7 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Controllers\UsersController.cs" />
     <Compile Include="Extentions\EnumExtentions.cs" />
+    <Compile Include="Helpers\AppHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\LinkHelper.cs" />
