@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
@@ -98,30 +99,10 @@ namespace AdminInterface.Models.Logs
 		{
 			var messages = (List<ClientInfoLogEntity>)MessagesForUser(user);
 			messages.AddRange(FindAll(DetachedCriteria
-										.For<ClientInfoLogEntity>()
-                                        .Add(Expression.Eq("ClientCode", user.Client.Id))
-										.Add(Expression.IsNull("User"))));
+				.For<ClientInfoLogEntity>()
+				.Add(Expression.Eq("ClientCode", user.Client.Id))
+				.Add(Expression.IsNull("User"))));
 			return messages.OrderByDescending(item => item.WriteTime).ToList();
-		}
-
-		public string GetHumanReadableOperatorName()
-		{
-			var sql = @"
-SELECT 
-	if (length(ManagerName) > 0, ManagerName, UserName) as UserName
-FROM
-	`accessright`.`regionaladmins`
-WHERE 
-	LOWER(UserName) like :UserName
-LIMIT 1";
-			var name = ArHelper.WithSession(session => session
-				.CreateSQLQuery(sql)
-				.SetParameter("UserName", UserName.ToLower())
-				.UniqueResult());
-			if (String.IsNullOrEmpty(Convert.ToString(name)))
-				return UserName;
-
-			return name.ToString();
 		}
 	}
 
@@ -144,8 +125,8 @@ LIMIT 1";
 			if (columnName.Equals("Operator", StringComparison.OrdinalIgnoreCase))
 			{
 				if (descending)
-					return list.OrderByDescending(item => item.GetHumanReadableOperatorName()).ToList();
-				return list.OrderBy(item => item.GetHumanReadableOperatorName()).ToList();
+					return list.OrderByDescending(item => ViewHelper.GetHumanReadableOperatorName(item.UserName)).ToList();
+				return list.OrderBy(item => ViewHelper.GetHumanReadableOperatorName(item.UserName)).ToList();
 			}
 			return list.OrderByDescending(item => item.WriteTime).ToList();
 		}
