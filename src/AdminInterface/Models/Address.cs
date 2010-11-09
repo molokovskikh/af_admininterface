@@ -41,7 +41,7 @@ namespace AdminInterface.Models
 		public virtual  bool FreeFlag { get; set; }
 
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
-		public virtual LegalEntity JuridicalOrganization { get; set; }
+		public virtual LegalEntity LegalEntity { get; set; }
 
 		public virtual string Name
 		{
@@ -129,7 +129,7 @@ where a.Id = :addressId
 set @skip = 0;
 ")
 					.SetParameter("addressId", Id)
-					.SetParameter("legalEntityId", JuridicalOrganization.Id)
+					.SetParameter("legalEntityId", LegalEntity.Id)
 					.SetParameter("clientId", Client.Id)
 					.ExecuteUpdate();
 			});
@@ -251,8 +251,8 @@ set @skip = 0;
 			MoveAddressIntersection(newOwner, legalEntity);
 
 			Client = newOwner;
-			Payer = JuridicalOrganization.Payer;
-			JuridicalOrganization = JuridicalOrganization;
+			Payer = LegalEntity.Payer;
+			LegalEntity = LegalEntity;
 
 			Update();
 		}
@@ -278,7 +278,7 @@ and i.ClientId = :OldClientId
 				.SetParameter("AddressId", Id)
 				.SetParameter("NewClientId", newClient.Id)
 				.SetParameter("OldClientId", Client.Id)
-				.SetParameter("legalEntityId", JuridicalOrganization.Id)
+				.SetParameter("legalEntityId", LegalEntity.Id)
 				.SetParameter("oldLegalEntityId", newLegalEntity.Id)
 				.ExecuteUpdate());
 		}

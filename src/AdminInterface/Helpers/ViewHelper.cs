@@ -1,6 +1,8 @@
 using System;
 using System.Globalization;
 using System.Text;
+using Castle.MonoRail.Framework.Helpers;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Helpers

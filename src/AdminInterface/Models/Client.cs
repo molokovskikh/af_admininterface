@@ -409,8 +409,8 @@ WHERE i.Id IS NULL
 		{
 			if (Addresses == null)
 				Addresses = new List<Address>();
-			if (address.JuridicalOrganization == null)
-				address.JuridicalOrganization = BillingInstance.JuridicalOrganizations.Single();
+			if (address.LegalEntity == null)
+				address.LegalEntity = BillingInstance.JuridicalOrganizations.Single();
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
 

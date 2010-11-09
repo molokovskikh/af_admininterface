@@ -695,7 +695,7 @@ namespace Functional
 				var client = Client.Find(clientCode);
 				Assert.That(client.BillingInstance.JuridicalOrganizations.Count, Is.EqualTo(1));
 				Assert.That(client.BillingInstance.JuridicalOrganizations[0].Name, Is.EqualTo("TestJuridicalOrganizationName"));
-				Assert.That(client.Addresses[0].JuridicalOrganization, Is.Not.Null);
+				Assert.That(client.Addresses[0].LegalEntity, Is.Not.Null);
 			}
 		}
 	}

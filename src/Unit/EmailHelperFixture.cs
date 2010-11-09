@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Mail;
 using System.Text;
+using AdminInterface.Helpers;
 using Common.Web.Ui.Helpers;
 using NUnit.Framework;
 

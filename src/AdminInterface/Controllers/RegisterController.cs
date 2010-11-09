@@ -399,7 +399,7 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			var client = Client.Find(clientCode);
-			PropertyBag["JuridicalOrganization"] = client.Addresses[0].JuridicalOrganization;
+			PropertyBag["JuridicalOrganization"] = client.Addresses[0].LegalEntity;
 		}
 
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
@@ -423,7 +423,7 @@ WHERE   intersection.pricecode IS NULL
 
 				if (client.Addresses.Count > 0)
 				{
-					client.Addresses[0].JuridicalOrganization = juridicalOrganization;
+					client.Addresses[0].LegalEntity = juridicalOrganization;
 					client.Addresses[0].UpdateAndFlush();
 				}
 
