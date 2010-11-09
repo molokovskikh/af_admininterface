@@ -107,11 +107,10 @@ namespace AdminInterface.Models.Logs
 		public static IList<UpdateLogEntity> GetEntitiesByUpdateType(UpdateType? updateType, ulong regionMask, DateTime beginDate, DateTime endDate)
 		{
 			return ArHelper.WithSession(session => session.CreateCriteria(typeof(UpdateLogEntity))
-					.Add(Expression.InG("User", User.FindAll())))
 					.Add(Expression.Between("RequestTime", beginDate, endDate))
 					.Add(Expression.Eq("UpdateType", updateType))
 					.AddOrder(Order.Desc("RequestTime"))
-					.List<UpdateLogEntity>();					
+					.List<UpdateLogEntity>());
 		}
 	}
 
