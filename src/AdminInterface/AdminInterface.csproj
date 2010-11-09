@@ -161,7 +161,6 @@
     <Compile Include="Helpers\LinkHelper.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
-    <Compile Include="Helpers\TextUtil.cs" />
     <Compile Include="Helpers\Wav\Structs.cs" />
     <Compile Include="Helpers\Wav\WaveFileReader.cs" />
     <Compile Include="Helpers\Wav\WavHelper.cs" />
@@ -219,7 +218,6 @@
     <Compile Include="Security\NotHavePermissionException.cs" />
     <Compile Include="Security\NotAuthorizedException.cs" />
     <Compile Include="Helpers\NotificationHelper.cs" />
-    <Compile Include="Helpers\PropertyComparer.cs" />
     <Compile Include="Helpers\ReportHelper.cs" />
     <Compile Include="Helpers\ShowRegulationHelper.cs" />
     <Compile Include="Helpers\ViewHelper.cs" />

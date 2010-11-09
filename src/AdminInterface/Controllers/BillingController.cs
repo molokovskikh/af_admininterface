@@ -14,7 +14,9 @@ using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
+using SortDirection = Common.Tools.SortDirection;
 
 namespace AdminInterface.Controllers
 {
@@ -237,7 +239,7 @@ namespace AdminInterface.Controllers
 				ClientType = clientType,
 				SearchBy = searchBy
 			};
-			var direction = sortDirection == "Ascending" ? SortDirection.Ascending : SortDirection.Descending;
+			var direction = sortDirection == "Ascending" ? SortDirection.Asc : SortDirection.Desc;
 
 			var searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
 
