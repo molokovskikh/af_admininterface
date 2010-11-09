@@ -75,8 +75,9 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void Info(uint cc, int sortColumnIndex, string[] headerNames)
+		public void Info(uint cc, int sortColumnIndex)
 		{
+			var headerNames = new [] {"Id", "Login"};
 			Info(cc);
 			var client = Client.FindAndCheck(cc);
 			var users = client.GetUsers();
