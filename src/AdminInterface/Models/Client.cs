@@ -439,10 +439,15 @@ WHERE i.Id IS NULL
 						MaskRegion |= setting.Id;
 						Users.Each(u => u.WorkRegionMask |= setting.Id);
 					}
+					if ((Settings.WorkRegionMask & setting.Id) == 0)
+					{
+						Settings.WorkRegionMask |= setting.Id;
+					}
 				}
 				else
 				{
 					MaskRegion &= ~setting.Id;
+					Settings.WorkRegionMask &= ~setting.Id;
 					Users.Each(u => u.WorkRegionMask &= ~setting.Id);
 				}
 				if (setting.IsAvaliableForOrder)
