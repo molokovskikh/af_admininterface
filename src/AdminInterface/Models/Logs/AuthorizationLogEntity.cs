@@ -69,7 +69,7 @@ namespace AdminInterface.Models.Logs
 			var usage = LastServicesUsage.GetLastUsage(usages);
 			if (usage == null)
 				return "";
-			return String.Format("{0} ({1}}", usage.Date, usage.ShortServiceName);
+			return String.Format("{0} ({1})", usage.Date, usage.ShortServiceName);
 		}
 	}
 }
