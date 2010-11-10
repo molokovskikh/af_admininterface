@@ -5,6 +5,7 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
+using NHibernate.SqlCommand;
 
 namespace AdminInterface.Models.Logs
 {
@@ -106,7 +107,9 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<UpdateLogEntity> GetEntitiesByUpdateType(UpdateType? updateType, ulong regionMask, DateTime beginDate, DateTime endDate)
 		{
-			return ArHelper.WithSession(session => session.CreateCriteria(typeof(UpdateLogEntity))
+			return ArHelper.WithSession(session => 
+				session.CreateCriteria(typeof(UpdateLogEntity))
+					.CreateAlias("User", "u", JoinType.InnerJoin)
 					.Add(Expression.Between("RequestTime", beginDate, endDate))
 					.Add(Expression.Eq("UpdateType", updateType))
 					.AddOrder(Order.Desc("RequestTime"))

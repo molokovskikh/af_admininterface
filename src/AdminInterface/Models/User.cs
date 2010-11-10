@@ -111,10 +111,10 @@ namespace AdminInterface.Models
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
 		public virtual User InheritPricesFrom { get; set; }
 
-		[BelongsTo("PayerId")]
+		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke)]
 		public virtual Payer Payer { get; set; }
 
-		[OneToOne]
+		[OneToOne(Constrained = true)]
 		public virtual AuthorizationLogEntity Logs { get; set; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),

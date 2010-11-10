@@ -48,7 +48,7 @@ namespace AdminInterface.Models.Logs
 		}
 	}
 
-	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs")]
+	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs", Lazy = true)]
 	public class AuthorizationLogEntity : ActiveRecordLinqBase<AuthorizationLogEntity>
 	{
 		public AuthorizationLogEntity(uint id)
@@ -59,19 +59,19 @@ namespace AdminInterface.Models.Logs
 		public AuthorizationLogEntity() {}
 
 		[PrimaryKey("UserId", Generator = PrimaryKeyType.Assigned)]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		[Property]
-		public DateTime? CITime { get; set; }
+		public virtual  DateTime? CITime { get; set; }
 
 		[Property]
-		public DateTime? AFTime { get; set; }
+		public virtual  DateTime? AFTime { get; set; }
 
 		[Property]
-		public DateTime? AOLTime { get; set; }
+		public virtual  DateTime? AOLTime { get; set; }
 
 		[Property]
-		public DateTime? IOLTime { get; set; }
+		public virtual DateTime? IOLTime { get; set; }
 
 		public static List<AuthorizationLogEntity> GetEntitiesByUsers(IEnumerable<User> users)
 		{

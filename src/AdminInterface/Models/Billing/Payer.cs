@@ -20,7 +20,7 @@ namespace AdminInterface.Models
 		Percent,
 	}
 
-	[ActiveRecord("payers", Schema = "billing")]
+	[ActiveRecord("payers", Schema = "billing", Lazy = true)]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
 		[PrimaryKey]
@@ -41,7 +41,7 @@ namespace AdminInterface.Models
 		public virtual string JuridicalAddress { get; set; }
 
 		[Property]
-		public string ReceiverAddress { get; set; }
+		public virtual string ReceiverAddress { get; set; }
 
 		[Property]
 		[ValidateRegExp("", "КПП должен содержать 9 цифр")]
@@ -183,7 +183,7 @@ ORDER BY {Payer}.shortname;";
 			}
 		}
 
-		public Payment[] FindBills(Period period)
+		public virtual Payment[] FindBills(Period period)
 		{
 			CheckReciver();
 
@@ -203,7 +203,7 @@ ORDER BY {Payer}.shortname;";
 			return bills;
 		}
 
-		public void CheckReciver()
+		public virtual void CheckReciver()
 		{
 /*
 			if (Recipient == null)
@@ -213,7 +213,7 @@ ORDER BY {Payer}.shortname;";
 */
 		}
 
-		public Payment[] FindPayments(DateTime from, DateTime to)
+		public virtual Payment[] FindPayments(DateTime from, DateTime to)
 		{
 			CheckReciver();
 
@@ -227,7 +227,7 @@ ORDER BY {Payer}.shortname;";
 			return payments;
 		}
 
-		public DateTime DefaultBeginPeriod()
+		public virtual DateTime DefaultBeginPeriod()
 		{
 			if (PayCycle == 0)
 				return DateTime.Today.AddMonths(-2);
@@ -235,22 +235,22 @@ ORDER BY {Payer}.shortname;";
 			return DateTime.Today.AddMonths(-2 * 3);
 		}
 
-		public DateTime DefaultEndPeriod()
+		public virtual DateTime DefaultEndPeriod()
 		{
 			return DateTime.Today;
 		}
 
-		public float DebitOn(DateTime on)
+		public virtual float DebitOn(DateTime on)
 		{
 			return Payment.DebitOn(this, on);
 		}
 
-		public float CreditOn(DateTime on)
+		public virtual float CreditOn(DateTime on)
 		{
 			return Payment.CreditOn(this, on);
 		}
 
-		public decimal TotalSum
+		public virtual decimal TotalSum
 		{
 			get
 			{

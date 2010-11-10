@@ -20,7 +20,7 @@ namespace Common.Web.Ui.Models
 		Custom = 5
 	}
 
-	[ActiveRecord("contact_groups", Schema = "contacts")]
+	[ActiveRecord("contact_groups", Schema = "contacts", Lazy = true)]
 	public class ContactGroup : ContactOwner
 	{
 		public ContactGroup()
@@ -33,24 +33,24 @@ namespace Common.Web.Ui.Models
 		}
 
 		[JoinedKey("Id")]
-		protected uint ContactGroupId { get; set; }
+		protected virtual uint ContactGroupId { get; set; }
 
 		[Property, ValidateNonEmpty("Название не может быть пустым")]
-		public string Name { get; set; }
+		public virtual string Name { get; set; }
 
 		[Property]
-		public ContactGroupType Type { get; set; }
+		public virtual ContactGroupType Type { get; set; }
 
 		[HasMany(ColumnKey = "ContactGroupId", Lazy = true, Inverse = true, OrderBy = "Name")]
-		public IList<Person> Persons { get; set; }
+		public virtual IList<Person> Persons { get; set; }
 
 		[BelongsTo(Column = "ContactGroupOwnerId")]
-		public ContactGroupOwner ContactGroupOwner { get; set; }
+		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[Property]
-		public bool Specialized { get; set; }
+		public virtual bool Specialized { get; set; }
 
-		public void AddPerson(string name)
+		public virtual void AddPerson(string name)
 		{
 			if (String.IsNullOrEmpty(name))
 				return;
@@ -71,7 +71,7 @@ namespace Common.Web.Ui.Models
 			person.DeleteAndFlush();
 		}
 
-		public bool ShowMailingAddress
+		public virtual bool ShowMailingAddress
 		{
 			get { return Type == ContactGroupType.Billing; }
 		}
@@ -81,7 +81,7 @@ namespace Common.Web.Ui.Models
 			return (ContactGroup)FindByPrimaryKey(typeof (ContactGroup), id);
 		}
 
-		public void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
+		public virtual void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
 		{
 			var hiddenContacts = new List<Contact>();
 			foreach (var contact in Contacts)
@@ -101,21 +101,21 @@ namespace Common.Web.Ui.Models
 			// которые не отображены (могли быть добавлены другими пользователями)
 			var contacts = displayedContacts.Concat(hiddenContacts);
 
-            AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
-            Save();
+			AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
+			Save();
 		}
 
-		public void UpdateContacts(Contact[] displayedContacts)
+		public virtual void UpdateContacts(Contact[] displayedContacts)
 		{
 			UpdateContacts(displayedContacts, null);
 		}
 
-		public void UpdatePersons(Person[] persons)
+		public virtual void UpdatePersons(Person[] persons)
 		{
 			UpdatePersons(persons, null);
 		}
 
-		public void UpdatePersons(Person[] displayedPersons, Person[] deletedPersons)
+		public virtual void UpdatePersons(Person[] displayedPersons, Person[] deletedPersons)
 		{
 			if (((Persons == null) || (Persons.Count == 0)) && (displayedPersons.Length > 0))
 			{

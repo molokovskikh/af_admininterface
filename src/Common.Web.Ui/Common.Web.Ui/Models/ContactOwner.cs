@@ -9,10 +9,10 @@ namespace Common.Web.Ui.Models
 		private IList<Contact> _contacts;
 
 		[PrimaryKey]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		[HasMany(typeof(Contact), Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.AllDeleteOrphan)]
-		public IList<Contact> Contacts
+		public virtual IList<Contact> Contacts
 		{
 			get
 			{
@@ -24,13 +24,13 @@ namespace Common.Web.Ui.Models
 			set { _contacts = value; }
 		}
 
-		public void AddContact(Contact contact)
+		public virtual void AddContact(Contact contact)
 		{
 			contact.ContactOwner = this;
 			Contacts.Add(contact);
 		}
 
-		public Contact AddContact(ContactType type, string contactText)
+		public virtual Contact AddContact(ContactType type, string contactText)
 		{
 			var contact = new Contact(type, contactText);
 			contact.ContactOwner = this;
