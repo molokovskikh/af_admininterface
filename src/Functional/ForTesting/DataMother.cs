@@ -23,6 +23,7 @@ namespace Functional.ForTesting
 				};
 				client.AddAddress(address);
 				client.Update();
+				address.MaitainIntersection();
 				scope.VoteCommit();
 				return client;
 			}

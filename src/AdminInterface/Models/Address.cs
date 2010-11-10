@@ -116,7 +116,7 @@ namespace AdminInterface.Models
 		public virtual void MaitainIntersection()
 		{
 			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"
+				var count = s.CreateSQLQuery(@"
 set @skip = 1;
 
 insert into Future.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
@@ -137,6 +137,7 @@ set @skip = 0;
 					.SetParameter("legalEntityId", LegalEntity.Id)
 					.SetParameter("clientId", Client.Id)
 					.ExecuteUpdate();
+				Console.WriteLine("count=" + count);
 			});
 		}
 
@@ -256,8 +257,8 @@ set @skip = 0;
 			MoveAddressIntersection(newOwner, legalEntity);
 
 			Client = newOwner;
-			Payer = LegalEntity.Payer;
-			LegalEntity = LegalEntity;
+			Payer = legalEntity.Payer;
+			LegalEntity = legalEntity;
 
 			Update();
 		}
@@ -283,8 +284,8 @@ and i.ClientId = :OldClientId
 				.SetParameter("AddressId", Id)
 				.SetParameter("NewClientId", newClient.Id)
 				.SetParameter("OldClientId", Client.Id)
-				.SetParameter("legalEntityId", LegalEntity.Id)
-				.SetParameter("oldLegalEntityId", newLegalEntity.Id)
+				.SetParameter("legalEntityId", newLegalEntity.Id)
+				.SetParameter("oldLegalEntityId", LegalEntity.Id)
 				.ExecuteUpdate());
 		}
 
