@@ -187,7 +187,7 @@ namespace AdminInterface.Controllers
 				if (oldEnabled != client.Enabled)
 				{
 					this.Mail().EnableChanged(client, enabled).Send();
-					ClientInfoLogEntity.StatusChange(client.Status, client.Id).Save();
+					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
 				}
 				client.UpdateAndFlush();
 			}

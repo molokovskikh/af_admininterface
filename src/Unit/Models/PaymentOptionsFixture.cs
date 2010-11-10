@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using AdminInterface.Models;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Models
+namespace Unit.Models
 {
 	[TestFixture]
 	public class PaymentOptionsFixture

@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Globalization;
 using System.Text;
 using Castle.MonoRail.Framework.Helpers;
@@ -14,13 +14,13 @@ namespace AdminInterface.Helpers
 			if (size == 0)
 				return "-";
 			if (size < 1024)
-				return size + " Б";
+				return size + " Р‘";
 			if (size < 1048576)
-				return (size / 1024f).ToString("#.##") + " КБ";
+				return (size / 1024f).ToString("#.##") + " РљР‘";
 			if (size < 1073741824)
-				return (size / 1048576f).ToString("#.##") + " МБ";
+				return (size / 1048576f).ToString("#.##") + " РњР‘";
 
-			return (size / 1073741824f).ToString("#.##") + " ГБ";
+			return (size / 1073741824f).ToString("#.##") + " Р“Р‘";
 		}
 
 		public static string GetRowStyle(int rowIndex)
@@ -41,16 +41,16 @@ namespace AdminInterface.Helpers
 		public static string ToHumanReadable(bool value)
 		{
 			if (value)
-				return "Да";
+				return "Р”Р°";
 
-			return "Нет";
+			return "РќРµС‚";
 		}
 
 		public static string HumanReadableStatus(bool value)
 		{
 			if (value)
-				return "Включен";
-			return "Отключен";
+				return "Р’РєР»СЋС‡РµРЅ";
+			return "РћС‚РєР»СЋС‡РµРЅ";
 		}
 
 		public static string GetDirection(string sortBy, string direction, string property)
@@ -74,9 +74,9 @@ namespace AdminInterface.Helpers
 		}
 
 		/// <summary>
-		/// Заменяем в Url значения параметров на новые, если параметры не находим, то добавляем
+		/// Р—Р°РјРµРЅСЏРµРј РІ Url Р·РЅР°С‡РµРЅРёСЏ РїР°СЂР°РјРµС‚СЂРѕРІ РЅР° РЅРѕРІС‹Рµ, РµСЃР»Рё РїР°СЂР°РјРµС‚СЂС‹ РЅРµ РЅР°С…РѕРґРёРј, С‚Рѕ РґРѕР±Р°РІР»СЏРµРј
 		/// </summary>
-		/// <param name="newParams"> Параметры и значения должны идти парами Имя1, Значение1, Имя2, Значение2</param>
+		/// <param name="newParams"> РџР°СЂР°РјРµС‚СЂС‹ Рё Р·РЅР°С‡РµРЅРёСЏ РґРѕР»Р¶РЅС‹ РёРґС‚Рё РїР°СЂР°РјРё РРјСЏ1, Р—РЅР°С‡РµРЅРёРµ1, РРјСЏ2, Р—РЅР°С‡РµРЅРёРµ2</param>
 		public static string GetUrlWithReplacedParams(string url, params string[] newParams)
 		{
 			url = url.TrimEnd('?');

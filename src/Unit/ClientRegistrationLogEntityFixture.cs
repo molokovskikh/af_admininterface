@@ -1,9 +1,6 @@
-﻿using System;
-using AdminInterface.Models.Logs;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
-
-namespace AdminInterface.Test
+namespace Unit
 {
 	[TestFixture]
 	public class ClientRegistrationLogEntityFixture

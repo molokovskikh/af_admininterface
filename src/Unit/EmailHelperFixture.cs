@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Mail;
-using System.Text;
+﻿using System.Net.Mail;
 using AdminInterface.Helpers;
-using Common.Web.Ui.Helpers;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Helpers
+namespace Unit
 {
 	[TestFixture]
 	public class EmailHelperFixture

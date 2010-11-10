@@ -4,8 +4,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Models
+namespace Unit.Models
 {
 	[TestFixture]
 	public class ClientInfoLogEntityFixture
@@ -14,9 +13,9 @@ namespace AdminInterface.Test.Models
 		public void Message_on_status_change()
 		{
 			SecurityContext.GetAdministrator = () => new Administrator();
-			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.Off, 2575u).Message, 
+			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.Off, new Client()).Message, 
 				Is.EqualTo("$$$Клиент отключен"));
-			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.On, 2575u).Message, 
+			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.On, new Client()).Message, 
 				Is.EqualTo("$$$Клиент включен"));
 		}
 	}

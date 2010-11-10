@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 
-
-namespace Common.Web.Ui.Test
+namespace Unit.Models
 {
 	[TestFixture]
 	public class GetPasswordChangeNotificationAddressFixture

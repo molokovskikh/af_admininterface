@@ -4,8 +4,7 @@ using Castle.MonoRail.Framework;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.MonoRailExtentions
+namespace Unit.MonoRailExtentions
 {
 
 	[TestFixture]

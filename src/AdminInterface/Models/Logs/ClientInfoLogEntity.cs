@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using System.Linq;
@@ -10,26 +11,26 @@ using System.Linq;
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
-	public class ClientInfoLogEntity : ActiveRecordBase<ClientInfoLogEntity>
+	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>
 	{
 		public ClientInfoLogEntity()
 		{}
 
-		public ClientInfoLogEntity(string message, uint clientCode)
+		public ClientInfoLogEntity(string message, Client client)
 		{
 			UserName = SecurityContext.Administrator.UserName;
 			WriteTime = DateTime.Now;
 			Message = message;
-			ClientCode = clientCode;
+			ClientCode = client.Id;
 		}
 
-		public ClientInfoLogEntity(string message, uint clientCode, uint userId)
+		public ClientInfoLogEntity(string message, User user)
 		{
 			UserName = SecurityContext.Administrator.UserName;
 			WriteTime = DateTime.Now;
 			Message = message;
-			ClientCode = clientCode;
-			User = User.Find(userId);
+			ClientCode = user.Client.Id;
+			User = user;
 		}
 
 		[PrimaryKey("RowId")]
@@ -81,22 +82,22 @@ namespace AdminInterface.Models.Logs
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)
 		{
-			return new ClientInfoLogEntity("", user.Client.Id, user.Id).SetProblem(isFree, user.Login, reason);
+			return new ClientInfoLogEntity("", user).SetProblem(isFree, user.Login, reason);
 		}
 
-		public static ClientInfoLogEntity StatusChange(ClientStatus status, uint clientCode)
+		public static ClientInfoLogEntity StatusChange(ClientStatus status, Client client)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", BindingHelper.GetDescription(status).ToLower()), clientCode);
+			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", BindingHelper.GetDescription(status).ToLower()), client);
 		}
 
-		public static ClientInfoLogEntity ReseteUin(uint clientCode, string reason)
+		public static ClientInfoLogEntity ReseteUin(Client client, string reason)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason), clientCode);
+			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason), client);
 		}
 
 		public static ClientInfoLogEntity ReseteUin(User user, string reason)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user.Client.Id, user.Id);
+			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user);
 		}
 
 		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)

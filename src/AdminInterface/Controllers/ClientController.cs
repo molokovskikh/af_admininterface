@@ -227,7 +227,7 @@ where Phone like :phone")
 			if (!String.IsNullOrEmpty(message))
 			{
 				using (new TransactionScope())
-					new ClientInfoLogEntity(message, client.Id).Save();
+					new ClientInfoLogEntity(message, client).Save();
 
 				Flash["Message"] = Message.Notify("Сохранено");
 			}
@@ -298,7 +298,7 @@ where Phone like :phone")
 						inUser = SecurityContext.Administrator.UserName,
 						ResetIdCause = reason
 					});
-				ClientInfoLogEntity.ReseteUin(client.Id, reason).Save();
+				ClientInfoLogEntity.ReseteUin(client, reason).Save();
 				client.ResetUin();
 				RedirectToReferrer();
 			}

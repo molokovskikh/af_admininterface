@@ -338,7 +338,7 @@ namespace AdminInterface.Controllers
 			if (!String.IsNullOrEmpty(message))
 			{
 				using (new TransactionScope())
-					new ClientInfoLogEntity(message, client.Id, user.Id).Save();
+					new ClientInfoLogEntity(message, user).Save();
 
 				Flash["Message"] = Message.Notify("Сохранено");
 			}

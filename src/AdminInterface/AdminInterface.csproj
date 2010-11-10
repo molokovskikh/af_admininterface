@@ -520,7 +520,9 @@
     <Content Include="JavaScript\prototype.js" />
     <Content Include="JavaScript\scriptaculous.js" />
     <Content Include="JavaScript\slider.js" />
-    <Content Include="Web.Release.Config" />
+    <Content Include="Web.Release.Config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />

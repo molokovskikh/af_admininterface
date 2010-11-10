@@ -1,8 +1,7 @@
 ﻿using AdminInterface.Models.Logs;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Models
+namespace Unit.Models
 {
 	[TestFixture]
 	public class PasswordChangeLogEntityFixture

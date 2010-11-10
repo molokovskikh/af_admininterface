@@ -1,8 +1,7 @@
 ﻿using AdminInterface.Extentions;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Extentions
+namespace Unit.Extentions
 {
 	[TestFixture]
 	public class EnumExtentionsFixtre
