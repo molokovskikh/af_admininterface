@@ -97,7 +97,6 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(cc);
 			var users = client.Users;
 			var addresses = client.Addresses;
-			var authorizationLogs = AuthorizationLogEntity.GetEntitiesByUsers(users);
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Registrant"] = client.GetRegistrant();
@@ -110,7 +109,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
 			PropertyBag["addresses"] = addresses;
-			PropertyBag["authorizationLogs"] = new AuthorizationLogEntityList(authorizationLogs);
 
 			sort.Apply(PropertyBag);
 

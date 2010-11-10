@@ -28,26 +28,6 @@ namespace AdminInterface.Models.Logs
 		}
 	}
 
-	public class AuthorizationLogEntityList : List<AuthorizationLogEntity>
-	{
-		public AuthorizationLogEntityList(List<AuthorizationLogEntity> list)
-		{
-			this.AddRange(list);
-		}
-
-		public AuthorizationLogEntity GetEntityByUserId(uint id)
-		{
-			AuthorizationLogEntity result = null;
-			foreach (var entity in this)
-				if(entity.Id == id)
-				{
-					result = entity;
-					break;
-				}
-			return result;
-		}
-	}
-
 	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs", Lazy = true)]
 	public class AuthorizationLogEntity : ActiveRecordLinqBase<AuthorizationLogEntity>
 	{
@@ -78,18 +58,18 @@ namespace AdminInterface.Models.Logs
 			return FindAll(Expression.In("Id", users.Select(r => r.Id).ToArray())).ToList();
 		}
 
-		public static LastServicesUsage GetLastServicesUsage(uint userId)
+		public virtual string GetLastServicesUsage()
 		{
-			var logEntity = TryFind(userId);
-			if (logEntity == null)
-				return null;
 			var usages = new [] {
-				logEntity.AFTime.HasValue ? new LastServicesUsage { Date = logEntity.AFTime.Value, ShortServiceName = "AF" } : null,
-				logEntity.AOLTime.HasValue ? new LastServicesUsage { Date = logEntity.AOLTime.Value, ShortServiceName = "AOL" } : null,
-				logEntity.CITime.HasValue ? new LastServicesUsage { Date = logEntity.CITime.Value, ShortServiceName = "CI" } : null,
-				logEntity.IOLTime.HasValue ? new LastServicesUsage { Date = logEntity.IOLTime.Value, ShortServiceName = "IOL" } : null,
+				AFTime.HasValue ? new LastServicesUsage { Date = AFTime.Value, ShortServiceName = "AF" } : null,
+				AOLTime.HasValue ? new LastServicesUsage { Date = AOLTime.Value, ShortServiceName = "AOL" } : null,
+				CITime.HasValue ? new LastServicesUsage { Date = CITime.Value, ShortServiceName = "CI" } : null,
+				IOLTime.HasValue ? new LastServicesUsage { Date = IOLTime.Value, ShortServiceName = "IOL" } : null,
 			};
-			return LastServicesUsage.GetLastUsage(usages);
+			var usage = LastServicesUsage.GetLastUsage(usages);
+			if (usage == null)
+				return "";
+			return usage.ShortServiceName;
 		}
 	}
 }

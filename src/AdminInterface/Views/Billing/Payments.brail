@@ -387,9 +387,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</td>
 							<td>${addr.Client.Name}</td>
 							<td>
-								<% if addr.JuridicalOrganization != null: %>
-									<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.JuridicalOrganization.Id})">${addr.JuridicalOrganization.Name}</a>
-								<% end %>
+								<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.LegalEntity.Id})">${addr.LegalEntity.Name}</a>
 							</td>
 						</tr>
 						<tr id="AddressRowHidden${addr.Id}" class='${'hidable hidden' if hidden}'>

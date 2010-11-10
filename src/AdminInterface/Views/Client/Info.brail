@@ -132,22 +132,13 @@
 				</tr>
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>
-					<% logEntity = authorizationLogs.GetEntityByUserId(user.Id)%>
 					<tr>
 						<td><a href="${siteroot}/users/${user.Login}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
 						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
 							<a href="${siteroot}/users/${user.Login}/edit"">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
-						<td>
-						<% lastUsage = null
-							if (logEntity != null): 
-								lastUsage = logEntity.GetLastServicesUsage(user.Id)
-							end
-							if (lastUsage != null): %>
-								${lastUsage.Date}(${lastUsage.ShortServiceName})
-						<% end %>
-						</td>
+						<td>${user.Logs.GetLastServicesUsage()}</td>
 					</tr>
 				<% end %>
 			</table>
