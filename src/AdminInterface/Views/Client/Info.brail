@@ -176,13 +176,13 @@
 				<a href="${siteroot}/deliveries/add?clientId=${client.Id}" class="icon icon-add">Новый адрес доставки</a>
 			</div>
 			<h3>Адреса доставки</h3>
-			<% if client.Addresses.Count: %>
+			<% if addresses.Count: %>
 				<table>
 					<tr>
 						<th>${app.Sortable("Адрес", "Addresses.Value")}</th>
-						<th>${app.Sortable("Юр.лицо", "Addresses.LegalEntity.Name")}</th>
+						<th>${app.Sortable("Юр.лицо", "Addresses.LegalName")}</th>
 					</tr>
-					<% for i, address in enumerate(client.Addresses): %>
+					<% for i, address in enumerate(addresses): %>
 						<tr>
 							<td>
 								${app.LinkTo(address)}
