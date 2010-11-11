@@ -155,30 +155,30 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void UpdateDrugstore([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
-			ulong homeRegion,
+		public void UpdateDrugstore(
+			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
-			bool costsIsNoised,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			bool ActivateBuyMatrix)
+			ulong homeRegion,
+			bool costsIsNoised,
+			bool activateBuyMatrix)
 		{
 			SecurityContext.Administrator.CheckClientPermission(client);
-			using (var scope = new TransactionScope())
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var oldMaskRegion = client.MaskRegion;
 				client.HomeRegion = Region.Find(homeRegion);
-				client.Update();
 				client.UpdateRegionSettings(regionSettings);
 				if (!costsIsNoised)
 					drugstore.FirmCodeOnly = null;
-				client.UpdateAndFlush();
-				drugstore.UpdateAndFlush();
+				if (!activateBuyMatrix)
+					drugstore.BuyingMatrixPrice = null;
+				client.Update();
+				drugstore.Update();
 				if (oldMaskRegion != client.MaskRegion)
 					client.MaintainIntersection();
 
-				if (!ActivateBuyMatrix)
-					drugstore.BuyingMatrixPriceId = null;
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
@@ -191,8 +191,8 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			var suppliers = Supplier.GetByPayerId(client.BillingInstance.PayerID);
 			PropertyBag["suppliers"] = suppliers;
-			if (client.Settings.FirmCodeOnly.HasValue)
-				PropertyBag["FirmCodeOnly"] = client.Settings.FirmCodeOnly;
+			if (client.Settings.FirmCodeOnly != null)
+				PropertyBag["FirmCodeOnly"] = client.Settings.FirmCodeOnly.Id;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -311,8 +311,8 @@ where Phone like :phone")
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
-			if (drugstore.BuyingMatrixPriceId != null)
-				PropertyBag["BuyMatrixPrice"] = Price.Find(drugstore.BuyingMatrixPriceId.Value);
+			if (drugstore.BuyingMatrixPrice != null)
+				PropertyBag["BuyMatrixPrice"] = drugstore.BuyingMatrixPrice;
 		}
 
 		public void NotifySuppliers(uint clientId)

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using System.ComponentModel;
+using System.Reflection;
 
 namespace Common.Web.Ui.Helpers
 {
@@ -52,6 +53,18 @@ namespace Common.Web.Ui.Helpers
 			dictionary.Add("value", "Key");
 			dictionary.Add("text", "Value");
 			return dictionary;
+		}
+
+		public static string GetDescription(string typeName, string propertyName)
+		{
+			var property = Type.GetType(typeName).GetProperty(propertyName);
+			return GetDescription(property);
+		}
+
+		public static string GetDescription(PropertyInfo property)
+		{
+			var attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), false);
+			return ((DescriptionAttribute)attributes[0]).Description;
 		}
 	}
 }

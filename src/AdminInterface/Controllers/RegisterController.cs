@@ -252,7 +252,7 @@ namespace AdminInterface.Controllers
 				ShowNewDefecture = true,
 			};
 			if (additionalSettings.ShowForOneSupplier)
-				client.Settings.FirmCodeOnly = supplier.Id;
+				client.Settings.FirmCodeOnly = supplier;
 			client.Settings.CreateAndFlush();
 
 			client.MaintainIntersection();

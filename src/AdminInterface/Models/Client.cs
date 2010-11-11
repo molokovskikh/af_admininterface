@@ -35,7 +35,7 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("PricesData", Schema = "Usersettings")]
+	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
 	public class Price : ActiveRecordLinqBase<Price>
 	{
 		[PrimaryKey("PriceCode")]
@@ -45,13 +45,13 @@ namespace AdminInterface.Models
 		public virtual string Name { get; set; }
 
 		[Property]
-		public virtual int PriceType { get; set; }
+		public virtual int? PriceType { get; set; }
 
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 	}
 
-	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)")]
+	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)", Lazy = true)]
 	public class Supplier : ActiveRecordLinqBase<Supplier>
 	{
 		[PrimaryKey("FirmCode")]
@@ -81,6 +81,11 @@ namespace AdminInterface.Models
 		{
 			return Queryable.Where(p => p.BillingInstance.PayerID == payerId).ToList();
 		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
@@ -89,13 +94,13 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		[Property]
+		[Property, Description("Краткое наименование"), Auditable]
 		public virtual string Name { get; set; }
 
-		[Property]
+		[Property, Description("Полное наименование"), Auditable]
 		public virtual string FullName { get; set; }
 
-		[Property]
+		[Property, Description("Включен"), Auditable]
 		public virtual ClientStatus Status { get; set; }
 
 		[Property("FirmType")]
@@ -110,7 +115,7 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual string Registrant { get; set; }
 
-		[Property]
+		[Property, Description("Регионы работы")]
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[OneToOne]
@@ -122,7 +127,7 @@ namespace AdminInterface.Models
 		[BelongsTo("PayerId")]
 		public virtual Payer BillingInstance { get; set; }
 
-		[BelongsTo("RegionCode")]
+		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]
 		public virtual Region HomeRegion { get; set; }
 
 		[HasMany(ColumnKey = "ClientId", Lazy = true, Inverse = true, OrderBy = "Address", Cascade = ManyRelationCascadeEnum.All)]
@@ -467,6 +472,11 @@ WHERE i.Id IS NULL
 				return null;
 			else
 				return Administrator.GetByName(Registrant);
+		}
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }

@@ -1,12 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Web;
-using AdminInterface.Models;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Components
 {
@@ -44,18 +40,10 @@ namespace AdminInterface.Components
 				writer.WriteLine(@"
 <input type='checkbox' id='{0}.{1}' name='{0}.{1}' value='true' {2} />
 <input type='hidden' name='{0}.{1}' value='false' />
-<label for='{0}.{1}'>{3}</label><br />", instanceName, key, isChecked, GetDescription(typeName, Convert.ToString(key)));
+<label for='{0}.{1}'>{3}</label><br />", instanceName, key, isChecked, BindingHelper.GetDescription(typeName + ", AdminInterface", Convert.ToString(key)));
 			}
 			writer.WriteLine("<br />");
 			RenderText(writer.ToString());
-		}
-
-		private static string GetDescription(string typeName, string propertyName)
-		{
-			var property = Type.GetType(typeName).GetProperty(propertyName);
-			var attributes = property.GetCustomAttributes
-					(typeof(DescriptionAttribute), false);
-			return ((DescriptionAttribute)attributes[0]).Description;
 		}
 	}
 }

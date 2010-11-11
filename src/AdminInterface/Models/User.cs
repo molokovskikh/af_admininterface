@@ -63,28 +63,28 @@ namespace AdminInterface.Models
 		[PrimaryKey(PrimaryKeyType.Native)]
 		public virtual uint Id { get; set; }
 
-		[Property(NotNull = true)]
+		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
-		[Property]
+		[Property, Description("Комментарий"), Auditable]
 		public virtual string Name { get; set; }
 
-		[Property]
+		[Property, Description("Включен"), Auditable]
 		public virtual bool Enabled { get; set; }
 
-		[Property]
+		[Property, Description("Подтверждать отправку заказов"), Auditable]
 		public virtual bool SubmitOrders { get; set; }
 
-		[Property]
+		[Property, Description("Получать накладные"), Auditable]
 		public virtual bool SendWaybills { get; set; }
 
-		[Property]
+		[Property, Description("Получать отказы"), Auditable]
 		public virtual bool SendRejects { get; set; }
 
-		[Property]
+		[Property, Description("Включить автообновление"), Auditable]
 		public virtual bool EnableUpdate { get; set; }
 
-		[Property]
+		[Property, Description("Аудитор"), Auditable]
 		public virtual bool Auditor { get; set; }
 
 		[Property]
@@ -93,25 +93,26 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
 
-		[Property]
+		[Property, Description("Регионы работы"), Auditable]
 		public virtual ulong WorkRegionMask { get; set; }
 
-		[Property]
+		[Property, Description("Регионы заказа"), Auditable]
 		public virtual ulong OrderRegionMask { get; set; }
 
 		[Property(Column = "Free")]
 		public virtual bool IsFree { get; set; }
 
-		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
 		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
-		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
+			Description("Наследовать настройки прайс листов"), Auditable]
 		public virtual User InheritPricesFrom { get; set; }
 
-		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]
 		public virtual Payer Payer { get; set; }
 
 		[OneToOne(Constrained = true)]
@@ -446,26 +447,6 @@ WHERE
 			Client = newOwner;
 			Payer = legalEntity.Payer;
 			Update();
-		}
-	}
-
-	public static class UserExtension
-	{
-		public static IEnumerable<User> SortBy(this IEnumerable<User> users, string columnName, bool descending)
-		{
-			if (columnName.Equals("Id", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return users.OrderByDescending(user => user.Id).ToList();
-				return users.OrderBy(user => user.Id).ToList();
-			}
-			if (columnName.Equals("Login", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return users.OrderByDescending(user => user.Login).ToList();
-				return users.OrderBy(user => user.Login).ToList();
-			}
-			return users.OrderBy(user => user.Id).ToList();
 		}
 	}
 }

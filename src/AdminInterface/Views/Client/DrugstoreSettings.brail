@@ -152,7 +152,7 @@
 				</td></tr>
 				<tr>
 					<td>
-						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPriceId } />
+						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPrice } />
 						<label>Подключить матрицу закупок</label>
 					</td>
 					<td>
@@ -176,11 +176,11 @@
 								${BuyMatrixPrice.Supplier.Name} - ${BuyMatrixPrice.Name}
 							<% end %>
 						</div>
-						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if drugstore.BuyingMatrixPriceId == null } >
+						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if not drugstore.BuyingMatrixPrice} >
 							<option value=0 ${"selected" if drugstore.BuyingMatrixType == 0}>Белый список</option>
 							<option value=1 ${"selected" if drugstore.BuyingMatrixType == 1}>Черный список</option>
 						</select>
-						<select id="WarningOnBuyingMatrix" name="drugstore.WarningOnBuyingMatrix" ${ "style='display:none'" if drugstore.BuyingMatrixPriceId == null }>
+						<select id="WarningOnBuyingMatrix" name="drugstore.WarningOnBuyingMatrix" ${ "style='display:none'" if not drugstore.BuyingMatrixPrice}>
 							<option value=0 ${"selected" if drugstore.WarningOnBuyingMatrix == 0}>Запретить заказ</option>
 							<option value=1 ${"selected" if drugstore.WarningOnBuyingMatrix == 1}>Выводить предупреждения</option>
 						</select>

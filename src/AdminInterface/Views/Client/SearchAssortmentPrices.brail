@@ -1,4 +1,4 @@
-﻿<% if (prices.Count > 0): %>
+﻿<% if prices.Count: %>
 <select name="drugstore.BuyingMatrixPriceId" style="width: 100%">
 	<% for i, price in enumerate(prices): %>
 		<option value="${price.Id}">${price.Supplier.Name} - ${price.Name}</option>

@@ -4,7 +4,6 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
-using NHibernate.Event;
 using NUnit.Framework;
 
 namespace Integration
@@ -29,7 +28,7 @@ namespace Integration
 			{
 				var logs = ClientInfoLogEntity.Queryable.Where(l => l.ClientCode == client.Id).ToList();
 				Assert.That(logs[0].Message,
-					Is.EqualTo(String.Format("Изменено название клиента старое значение '{0}' новое значение '{1}'", oldName, client.Name)));
+					Is.EqualTo(String.Format("Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
 			}
 		}
 	}

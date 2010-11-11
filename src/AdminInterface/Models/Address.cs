@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -25,25 +26,25 @@ namespace AdminInterface.Models
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		[Property("Address")]
+		[Property("Address"), Description("Адрес"), Auditable]
 		public virtual string Value { get; set; }
 
-		[BelongsTo("ClientId")]
+		[BelongsTo("ClientId"), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
 		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
-		[Property]
-		public virtual  bool Enabled { get; set; }
+		[Property, Description("Включен"), Auditable]
+		public virtual bool Enabled { get; set; }
 
 		[Property("Free")]
-		public virtual  bool FreeFlag { get; set; }
+		public virtual bool FreeFlag { get; set; }
 
-		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke), Description("Юр.лицо"), Auditable]
 		public virtual LegalEntity LegalEntity { get; set; }
 
-		[BelongsTo("PayerId")]
+		[BelongsTo("PayerId"), Description("Плательщик"), Auditable]
 		public virtual Payer Payer { get; set; }
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]

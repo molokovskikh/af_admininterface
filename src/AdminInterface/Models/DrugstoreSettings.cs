@@ -6,23 +6,23 @@ namespace AdminInterface.Models
 {
 	public enum DrugstoreType
 	{
-		Standart = 0,
-		Hidden = 2
+		[Description("Стандартный")] Standart = 0,
+		[Description("Скрытый")] Hidden = 2
 	}
 
 	public enum BuyingMatrixType
 	{
-		BlackList = 1,
-		WhiteList = 0,
+		[Description("Черный список")] BlackList = 1,
+		[Description("Белый список")] WhiteList = 0,
 	}
 
 	public enum BuyingMatrixAction
 	{
-		Block = 0,
-		Warning = 1,
+		[Description("Запретить заказ")] Block = 0,
+		[Description("Выводить предупреждения")] Warning = 1,
 	}
 
-	[ActiveRecord("RetClientsSet", Schema = "usersettings")]
+	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true)]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
 		public DrugstoreSettings() {}
@@ -33,66 +33,66 @@ namespace AdminInterface.Models
 		}
 
 		[PrimaryKey("ClientCode", Generator = PrimaryKeyType.Assigned)]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
-		[Property, Description("Сотрудник АК \"Инфорум\"")]
-		public bool ServiceClient { get; set; }
+		[Property, Description("Сотрудник АК \"Инфорум\""), Auditable]
+		public virtual bool ServiceClient { get; set; }
 
-		[Property, Description("Скрыть клиента в интефрейсе поставщика")]
-		public DrugstoreType InvisibleOnFirm { get; set; }
+		[Property, Description("Тип клиента в интефрейсе поставщика"), Auditable]
+		public virtual DrugstoreType InvisibleOnFirm { get; set; }
 
-		[Property]
-		public uint? FirmCodeOnly { get; set; }
-
-		[Property]
-		public ulong WorkRegionMask { get; set; }
+		[BelongsTo("FirmCodeOnly"), Description("Зашумлять все прайс листы всех поставщиков кроме"), Auditable]
+		public virtual Supplier FirmCodeOnly { get; set; }
 
 		[Property]
-		public ulong OrderRegionMask { get; set; }
+		public virtual ulong WorkRegionMask { get; set; }
 
-		[Property, Description("Активировать механизм аптечной корректировки цен")]
-		public bool AllowDelayOfPayment { get; set; }
+		[Property, Description("Регионы заказа"), Auditable]
+		public virtual ulong OrderRegionMask { get; set; }
+
+		[Property, Description("Активировать механизм аптечной корректировки цен"), Auditable]
+		public virtual bool AllowDelayOfPayment { get; set; }
 
 		[Property(NotNull = true)]
-		public string BasecostPassword { get; set; }
+		public virtual string BasecostPassword { get; set; }
 
-		[Property, Description("Принимать накладные от клиента")]
-		public bool SendWaybillsFromClient { get; set; }
+		[Property, Description("Принимать накладные от клиента"), Auditable]
+		public virtual bool SendWaybillsFromClient { get; set; }
 
-		[Property, Description("Показывать рекламу в AnalitF")]
-		public bool ShowAdvertising { get; set; }
+		[Property, Description("Показывать рекламу в AnalitF"), Auditable]
+		public virtual bool ShowAdvertising { get; set; }
 
-		[Property, Description("Передавать розничную цену")]
-		public bool SendRetailMarkup { get; set; }
+		[Property, Description("Передавать розничную цену"), Auditable]
+		public virtual bool SendRetailMarkup { get; set; }
 
-		[Property, Description("Разбирать накладные")]
-		public bool ParseWaybills { get; set; }
+		[Property, Description("Разбирать накладные"), Auditable]
+		public virtual bool ParseWaybills { get; set; }
 
-		[Property, Description("Показывать новую форму обработки дефектуры")]
-		public bool ShowNewDefecture { get; set; }
+		[Property, Description("Показывать новую форму обработки дефектуры"), Auditable]
+		public virtual bool ShowNewDefecture { get; set; }
 
-		[Property, Description("Разрешить сопоставление вручную в AnalitOnline")]
-		public bool ManualComparison { get; set; }
+		[Property, Description("Разрешить сопоставление вручную в AnalitOnline"), Auditable]
+		public virtual bool ManualComparison { get; set; }
 
-		[Property, Description("Проверять максимальный недельный заказ")]
-		public bool CheckWeeklyOrdersSum { get; set; }
+		[Property, Description("Проверять максимальный недельный заказ"), Auditable]
+		public virtual bool CheckWeeklyOrdersSum { get; set; }
 
-		[Property, Description("Максимальный недельный заказ")]
-		public uint MaxWeeklyOrdersSum { get; set; }
+		[Property, Description("Максимальный недельный заказ"), Auditable]
+		public virtual uint MaxWeeklyOrdersSum { get; set; }
 
-		[Property, Description("Не подключать новые прайс-листы")]
-		public bool IgnoreNewPrices { get; set; }
+		[Property, Description("Не подключать новые прайс-листы"), Auditable]
+		public virtual bool IgnoreNewPrices { get; set; }
 
-		[Property]
-		public uint? BuyingMatrixPriceId { get; set; }
+		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
+		public virtual Price BuyingMatrixPrice { get; set; }
 
-		[Property]
-		public BuyingMatrixType BuyingMatrixType { get; set; }
+		[Property, Description("Тип матрицы"), Auditable]
+		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
-		[Property]
-		public BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
+		[Property, Description("Действие матрицы"), Auditable]
+		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
-		public bool IsNoised
+		public virtual bool IsNoised
 		{
 			get { return FirmCodeOnly != null; }
 		}

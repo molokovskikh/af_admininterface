@@ -628,16 +628,16 @@ UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :Sup
 			var client = DataMother.CreateTestClient();
 			using (new SessionScope())
 			{
-				var settings = DrugstoreSettings.Find(client.Id);
-				settings.FirmCodeOnly = 0;
-				settings.UpdateAndFlush();
+				client.Settings.FirmCodeOnly = Supplier.Queryable.First();
+				client.UpdateAndFlush();
 			}
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
 				Thread.Sleep(1000);
 				Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).Exists);
-				Assert.That(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectedOption.Value, Is.EqualTo("0"));
+				Assert.That(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectedOption.Value,
+					Is.EqualTo(client.Settings.FirmCodeOnly.Id.ToString()));
 				Assert.IsTrue(browser.CheckBox(Find.ByName("costsIsNoised")).Checked);
 				browser.CheckBox(Find.ByName("costsIsNoised")).Checked = false;
 				Thread.Sleep(1000);
@@ -681,7 +681,7 @@ UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :Sup
 			using (new SessionScope())
 			{
 				client = Client.Find(client.Id);
-				Assert.That(client.Settings.BuyingMatrixPriceId, Is.EqualTo(4957));
+				Assert.That(client.Settings.BuyingMatrixPrice.Id, Is.EqualTo(4957));
 				Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.BlackList));
 				Assert.That(client.Settings.WarningOnBuyingMatrix, Is.EqualTo(BuyingMatrixAction.Block));
 			}

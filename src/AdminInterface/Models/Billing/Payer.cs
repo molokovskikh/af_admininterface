@@ -263,5 +263,10 @@ ORDER BY {Payer}.shortname;";
 				return sum;
 			}
 		}
+
+		public override string ToString()
+		{
+			return ShortName;
+		}
 	}
 }

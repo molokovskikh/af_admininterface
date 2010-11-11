@@ -5,7 +5,6 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
 using System.Linq;
 
 namespace AdminInterface.Models.Logs
@@ -16,21 +15,47 @@ namespace AdminInterface.Models.Logs
 		public ClientInfoLogEntity()
 		{}
 
-		public ClientInfoLogEntity(string message, Client client)
+		public ClientInfoLogEntity(string message)
 		{
+			Message = message;
 			UserName = SecurityContext.Administrator.UserName;
 			WriteTime = DateTime.Now;
-			Message = message;
+		}
+
+		public ClientInfoLogEntity(string message, Client client) : this(message)
+		{
 			ClientCode = client.Id;
 		}
 
-		public ClientInfoLogEntity(string message, User user)
+		public ClientInfoLogEntity(string message, User user) : this(message)
 		{
-			UserName = SecurityContext.Administrator.UserName;
-			WriteTime = DateTime.Now;
-			Message = message;
 			ClientCode = user.Client.Id;
 			User = user;
+		}
+
+		public ClientInfoLogEntity(string message, object entity) : this(message)
+		{
+			if (entity is Client)
+			{
+				ClientCode = ((Client)entity).Id;
+			}
+			else if (entity is User)
+			{
+				User = (User)entity;
+				ClientCode = User.Id;
+			}
+			else if (entity is Address)
+			{
+				ClientCode = ((Address)entity).Client.Id;
+			}
+			else if (entity is DrugstoreSettings)
+			{
+				ClientCode = ((DrugstoreSettings)entity).Id;
+			}
+			else
+			{
+				throw new Exception(String.Format("Не знаю как делать сообщения для {0}", entity));
+			}
 		}
 
 		[PrimaryKey("RowId")]
@@ -102,54 +127,18 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)
 		{
-			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
-															.For<ClientInfoLogEntity>()
-															.Add(Expression.Eq("ClientCode", client.Id))
-															.AddOrder(Order.Desc("WriteTime"))));
+			return Queryable
+				.Where(l => l.ClientCode == client.Id)
+				.OrderByDescending(l => l.WriteTime)
+				.ToList();
 		}
 
 		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
 		{
-			return new List<ClientInfoLogEntity>(FindAll(DetachedCriteria
-															.For<ClientInfoLogEntity>()
-															.Add(Expression.Eq("User", user))
-															.AddOrder(Order.Desc("WriteTime"))));
-		}
-
-		public static IList<ClientInfoLogEntity> MessagesForUserAndClient(User user)
-		{
-			var messages = (List<ClientInfoLogEntity>)MessagesForUser(user);
-			messages.AddRange(FindAll(DetachedCriteria
-				.For<ClientInfoLogEntity>()
-				.Add(Expression.Eq("ClientCode", user.Client.Id))
-				.Add(Expression.IsNull("User"))));
-			return messages.OrderByDescending(item => item.WriteTime).ToList();
-		}
-	}
-
-	public static class ClientInfoLogEntityExtension
-	{
-		public static IList<ClientInfoLogEntity> OrderBy(this IList<ClientInfoLogEntity> list, string columnName, bool descending)
-		{
-			if (columnName.Equals("WriteTime", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return list.OrderByDescending(item => item.WriteTime).ToList();
-				return list.OrderBy(item => item.WriteTime).ToList();
-			}
-			if (columnName.Equals("UserName", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return list.OrderByDescending(item => item.User != null ? item.User.GetLoginOrName() : String.Empty).ToList();
-				return list.OrderBy(item => item.User != null ? item.User.GetLoginOrName() : String.Empty).ToList();
-			}
-			if (columnName.Equals("Operator", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return list.OrderByDescending(item => ViewHelper.GetHumanReadableOperatorName(item.UserName)).ToList();
-				return list.OrderBy(item => ViewHelper.GetHumanReadableOperatorName(item.UserName)).ToList();
-			}
-			return list.OrderByDescending(item => item.WriteTime).ToList();
+			return Queryable
+				.Where(l => l.User == user || (l.ClientCode == user.Client.Id && l.User == null))
+				.OrderByDescending(l => l.WriteTime)
+				.ToList();
 		}
 	}
 }
