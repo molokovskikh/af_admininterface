@@ -294,7 +294,7 @@ namespace Functional
 				command.Parameters.AddWithValue("?FirmCode", testSupplierId);
 				var billingCode = Convert.ToUInt32(command.ExecuteScalar());
 				var client = Client.Find(clientcode);
-				Assert.That(client.BillingInstance.PayerID, Is.EqualTo(billingCode));
+				Assert.That(client.Payer.PayerID, Is.EqualTo(billingCode));
 
 				var settings = DrugstoreSettings.Find(clientcode);
 				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
@@ -337,7 +337,7 @@ namespace Functional
 				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
 				var client = Client.Find(clientcode);
-				Assert.That(client.BillingInstance.PayerID, Is.EqualTo(testPayerId));
+				Assert.That(client.Payer.PayerID, Is.EqualTo(testPayerId));
 
 				var settings = DrugstoreSettings.Find(clientcode);
 				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
@@ -693,8 +693,8 @@ namespace Functional
 			using (new SessionScope())
 			{
 				var client = Client.Find(clientCode);
-				Assert.That(client.BillingInstance.JuridicalOrganizations.Count, Is.EqualTo(1));
-				Assert.That(client.BillingInstance.JuridicalOrganizations[0].Name, Is.EqualTo("TestJuridicalOrganizationName"));
+				Assert.That(client.Payer.JuridicalOrganizations.Count, Is.EqualTo(1));
+				Assert.That(client.Payer.JuridicalOrganizations[0].Name, Is.EqualTo("TestJuridicalOrganizationName"));
 				Assert.That(client.Addresses[0].LegalEntity, Is.Not.Null);
 			}
 		}

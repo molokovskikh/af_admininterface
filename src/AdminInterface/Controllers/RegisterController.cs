@@ -115,7 +115,7 @@ namespace AdminInterface.Controllers
 					};
 					if (currentPayer == null)
 						currentPayer = CreatePayer(newClient);
-					newClient.BillingInstance = currentPayer;
+					newClient.Payer = currentPayer;
 					newClient.AddAddress(deliveryAddress);
 					newClient.SaveAndFlush();
 
@@ -142,7 +142,7 @@ namespace AdminInterface.Controllers
 			newUser.UpdateContacts(userContacts);
 
 			Mailer.ClientRegistred(newClient, false);
-			Session["DogN"] = newClient.BillingInstance.PayerID;
+			Session["DogN"] = newClient.Payer.PayerID;
 			Session["Code"] = newClient.Id;
 			Session["Name"] = newClient.FullName;
 			Session["ShortName"] = newClient.Name;
@@ -167,7 +167,7 @@ namespace AdminInterface.Controllers
 			{
 				sendBillingNotificationNow = false;
 				redirectTo = String.Format(virtualDir + "/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-					newClient.BillingInstance.PayerID,
+					newClient.Payer.PayerID,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}
@@ -461,7 +461,7 @@ WHERE   intersection.pricecode IS NULL
 			if (!allowViewSuppliers)
 				return;
 			if (payerId.HasValue && (payerId.Value > 0))
-				suppliers = suppliers.Where(item => item.BillingInstance.PayerID == payerId.Value);
+				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);
 			PropertyBag["suppliers"] = suppliers;
 			CancelLayout();
 		}

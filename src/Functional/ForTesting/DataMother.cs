@@ -51,7 +51,7 @@ namespace Functional.ForTesting
 					client.HomeRegion = ActiveRecordBase<Region>.Find(1UL);
 				if (client.MaskRegion == 0)
 					client.MaskRegion = 1UL;
-				client.BillingInstance = payer;
+				client.Payer = payer;
 				client.ContactGroupOwner = contactOwner;
 				client.SaveAndFlush();
 				var drugstoreSettings = new DrugstoreSettings(client.Id) {
@@ -98,7 +98,7 @@ namespace Functional.ForTesting
 					FullName = "test",
 					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
 					MaskRegion = maskRegion,
-					BillingInstance = payer,
+					Payer = payer,
 					ContactGroupOwner = contactOwner,
 				};
 				client.SaveAndFlush();
@@ -177,7 +177,7 @@ namespace Functional.ForTesting
 				payer.Save();
 				juridicalOrganization.Save();
 				var supplier = new Supplier {
-					BillingInstance = payer,
+					Payer = payer,
 					HomeRegion = Region.FindAll().Last(),
 					Name = "Test supplier",
 					Status = ClientStatus.On

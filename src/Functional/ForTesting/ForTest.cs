@@ -49,7 +49,7 @@ namespace AdminInterface.Test.ForTesting
 				Name = "Test short name",
 				FullName = "Test full name",
 				RegistrationDate = DateTime.Now,
-				BillingInstance = CreatePayer(),
+				Payer = CreatePayer(),
 			};
 			client.Users = new List<User> {
 				new User(client) {

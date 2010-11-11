@@ -25,7 +25,7 @@ namespace Unit
 		{
 			var client = new Client {
 				Id = 58,
-				BillingInstance = new Payer{ PayerID = 10},
+				Payer = new Payer{ PayerID = 10},
 				Name = "Тестовый клиент",
 			};
 
@@ -64,7 +64,7 @@ namespace Unit
 		{
 			var client = new Client {
 				Id = 58,
-				BillingInstance = new Payer{ PayerID = 10},
+				Payer = new Payer{ PayerID = 10},
 				Name = "Тестовый клиент",
 			};
 			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment"};
@@ -96,7 +96,7 @@ namespace Unit
 		{
 			var client = new Client {
 				Id = 58,
-				BillingInstance = new Payer{ PayerID = 10},
+				Payer = new Payer{ PayerID = 10},
 				Name = "Тестовый клиент",
 			};
 			var userName = "test";

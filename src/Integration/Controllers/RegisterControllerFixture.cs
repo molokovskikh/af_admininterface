@@ -36,7 +36,7 @@ namespace AdminInterface.Test.Controllers
 			HttpContext.Current = context;
 			
 			Client client = DataMother.CreateTestClient();
-			Payer payer = client.BillingInstance;
+			Payer payer = client.Payer;
 			payer.Comment = "ata";
 			payer.Update();
 			Context.Session["ShortName"] = "Test";

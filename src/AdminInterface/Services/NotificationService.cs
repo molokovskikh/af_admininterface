@@ -177,7 +177,7 @@ where length(c.contactText) > 0
 <br>
 Кем зарегистрирован: {3}
 <br>
-{4}", client.Name, client.Id, client.BillingInstance.PayerID, userName, paymentOptions, appUrl).Replace(Environment.NewLine, "");
+{4}", client.Name, client.Id, client.Payer.PayerID, userName, paymentOptions, appUrl).Replace(Environment.NewLine, "");
 
 			_sendMessage(message);
 		}

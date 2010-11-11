@@ -579,7 +579,7 @@ where i.ClientId = :ClientId
 				supplier = Supplier.FindFirst(Restrictions.Like("Name", "%%"));
 				ArHelper.WithSession(session => session.CreateSQLQuery(@"
 UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :SupplierId")
-														.SetParameter("PayerId", client.BillingInstance.PayerID)
+														.SetParameter("PayerId", client.Payer.PayerID)
 														.SetParameter("SupplierId", supplier.Id)
 														.ExecuteUpdate());
 				scope.VoteCommit();

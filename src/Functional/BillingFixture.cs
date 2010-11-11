@@ -51,18 +51,18 @@ namespace Functional
 		public void View_billing_page_for_client()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
-			client.BillingInstance.UpdateAndFlush();
+			client.Payer.ShortName += client.Payer.PayerID;
+			client.Payer.UpdateAndFlush();
 			using (var browser = Open("main/index"))
 			{
 				browser.Link(Find.ByText("Биллинг")).Click();
 				browser.RadioButton(Find.ById("SearchByBillingId")).Click();
-				browser.TextField(Find.ById("SearchText")).TypeText(client.BillingInstance.PayerID.ToString());
+				browser.TextField(Find.ById("SearchText")).TypeText(client.Payer.PayerID.ToString());
 				browser.Button(Find.ByValue("Найти")).Click();
 
-				Assert.That(browser.Text, Is.StringContaining(client.BillingInstance.ShortName));
-				browser.Link(Find.ByText(client.BillingInstance.PayerID.ToString())).Click();
-				Assert.That(browser.Text, Is.StringContaining("Плательщик " + client.BillingInstance.ShortName));				
+				Assert.That(browser.Text, Is.StringContaining(client.Payer.ShortName));
+				browser.Link(Find.ByText(client.Payer.PayerID.ToString())).Click();
+				Assert.That(browser.Text, Is.StringContaining("Плательщик " + client.Payer.ShortName));				
 			}
 		}
 
@@ -71,8 +71,8 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			client.Refresh();
-			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
-			client.BillingInstance.UpdateAndFlush();
+			client.Payer.ShortName += client.Payer.PayerID;
+			client.Payer.UpdateAndFlush();
 			client.AddAddress(new Address {Client = client, Value = "test address for billing",});
 			client.UpdateAndFlush();
 			foreach (var address in client.Addresses)
@@ -81,7 +81,7 @@ namespace Functional
 				address.UpdateAndFlush();
 			}
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Адреса клиента \"{0}\"", client.Name)));
 				foreach (var address in client.Addresses)
@@ -100,8 +100,8 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 
 			client.Refresh();
-			client.BillingInstance.ShortName += client.BillingInstance.PayerID;
-			client.BillingInstance.UpdateAndFlush();
+			client.Payer.ShortName += client.Payer.PayerID;
+			client.Payer.UpdateAndFlush();
 			var user = new User(client) {Name = "test user for billing",};
 			user.Setup(client);
 			user.SaveAndFlush();
@@ -112,7 +112,7 @@ namespace Functional
 				item.Enabled = false;
 				item.UpdateAndFlush();
 			}
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователи клиента \"{0}\"", client.Name)));
 				foreach (var item in client.Users)
@@ -129,7 +129,7 @@ namespace Functional
 		public void View_additional_address_info()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -153,7 +153,7 @@ namespace Functional
 		public void View_additional_user_info()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var user = client.Users[0];
@@ -177,7 +177,7 @@ namespace Functional
 		public void Adding_users_to_address()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -213,7 +213,7 @@ namespace Functional
 		public void Adding_addresses_to_users()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -247,7 +247,7 @@ namespace Functional
 		public void DisconnectUserFromAddress()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -276,7 +276,7 @@ namespace Functional
 		public void DisconnectAddressFromUser()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))			
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))			
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -306,7 +306,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var user = client.Users[0];
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var selector = String.Format("tr#UserRow{0}", user.Id);
 				var row = (TableRow)browser.CssSelect(selector);
@@ -325,7 +325,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var address = client.Addresses[0];
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var selector = String.Format("tr#AddressRow{0}", address.Id);
 				var row = (TableRow)browser.CssSelect(selector);
@@ -362,7 +362,7 @@ namespace Functional
 			user.Enabled = true;
 			user.UpdateAndFlush();
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var userStatus = browser.CheckBox(Find.ById("UserStatusCheckBox" + user.Id));
 				var addressStatus = browser.CheckBox(Find.ById("AddressStatus" + address.Id));
@@ -393,7 +393,7 @@ namespace Functional
 		public void Test_view_connecting_user_to_address()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var address = client.Addresses[0];
@@ -429,7 +429,7 @@ namespace Functional
 		public void Test_view_connecting_address_to_user()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var user = client.Users[0];
@@ -490,7 +490,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			AddUsers(client, 10);
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				// Список клиентов должен быть в свернутом виде
 				var clientsHeaderDiv = browser.Div(Find.ById("ClientListHeader"));
@@ -546,7 +546,7 @@ namespace Functional
 				}
 				scope.VoteCommit();
 			}
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var user = client.Users[0];
 				var address = client.Addresses.Where(addr => !addr.Enabled).First();
@@ -575,7 +575,7 @@ namespace Functional
 		public void Show_message_if_server_error_occured()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();			
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				var user = client.Users[0];
@@ -773,7 +773,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			AddUsers(client, 3);
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 					// Проверяем, что логины пользователей - это ссылки
@@ -804,7 +804,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			AddUsers(client, 3);
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				client.Refresh();
 				// Кликаем по логину одного из пользователей
@@ -831,13 +831,13 @@ DELETE FROM future.Users WHERE Id = :UserId
 			client.Name += client.Id;
 			client.UpdateAndFlush();
 			client2.Name += client2.Id;
-			client2.BillingInstance = client.BillingInstance;
+			client2.Payer = client.Payer;
 			client2.UpdateAndFlush();
 			client.Refresh();
 			client2.Refresh();
 			testUserId = client2.Users[0].Id;
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var clientRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("ClientRow")).ToList();
 				Assert.That(clientRows.Count, Is.EqualTo(2));
@@ -871,13 +871,13 @@ DELETE FROM future.Users WHERE Id = :UserId
 			client.Name += client.Id;
 			client.UpdateAndFlush();
 			client2.Name += client2.Id;
-			client2.BillingInstance = client.BillingInstance;
+			client2.Payer = client.Payer;
 			client2.UpdateAndFlush();
 			client.Refresh();
 			client2.Refresh();
 			testAddressId = client2.Addresses[0].Id;
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				// Кликаем на другого клиента
 				browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
@@ -906,12 +906,12 @@ DELETE FROM future.Users WHERE Id = :UserId
 			client.Name += client.Id;
 			client.UpdateAndFlush();
 			client2.Name += client2.Id;
-			client2.BillingInstance = client.BillingInstance;
+			client2.Payer = client.Payer;
 			client2.UpdateAndFlush();
 			client.Refresh();
 			client2.Refresh();
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
 				var usersTable = browser.Table("users");
 				var countVisibleRows = usersTable.TableRows.Count(row => (row != null) && (row.Id != null) 
@@ -943,9 +943,9 @@ DELETE FROM future.Users WHERE Id = :UserId
 		{
 			var client = DataMother.CreateTestClientWithUser();
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.BillingInstance.ShortName)));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.Payer.ShortName)));
 			}
 		}
 
@@ -954,9 +954,9 @@ DELETE FROM future.Users WHERE Id = :UserId
 		{
 			var client = DataMother.CreateTestClientWithAddress();
 
-			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.BillingInstance.PayerID))
+			using (var browser = Open("Billing/Edit.rails?BillingCode=" + client.Payer.PayerID))
 			{
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.BillingInstance.ShortName)));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", client.Payer.ShortName)));
 			}
 		}
 
@@ -964,10 +964,10 @@ DELETE FROM future.Users WHERE Id = :UserId
 		public void Change_recipient_for_payer()
 		{
 			var client = DataMother.CreateTestClientWithAddress();
-			using(var browser = Open("Billing/Edit.rails?billingCode="+ client.BillingInstance.Id))
+			using(var browser = Open("Billing/Edit.rails?billingCode="+ client.Payer.Id))
 			{
 				browser.Link(Find.ByText("Юридические лица")).Click();
-				var juridicalOrganization = client.BillingInstance.JuridicalOrganizations.Single();
+				var juridicalOrganization = client.Payer.JuridicalOrganizations.Single();
 				browser.Link(Find.ById(String.Format("JuridicalOrganization{0}Link", juridicalOrganization.Id))).Click();
 				var select = browser.Div(String.Format("JuridicalOrganization{0}Body", juridicalOrganization.Id)).SelectList(Find.ByName("JuridicalOrganization.Recipient.Id"));
 				Assert.That(select.SelectedItem, Is.Null);
@@ -988,7 +988,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 				client = DataMother.CreateTestClientWithAddressAndUser();
 				var juridicalOrganization = new LegalEntity() {
 					Name = "Test" + client.Id,
-					Payer = client.BillingInstance,
+					Payer = client.Payer,
 				};
 				juridicalOrganization.CreateAndFlush();
 				scope.VoteCommit();
@@ -1036,7 +1036,7 @@ DELETE FROM future.Users WHERE Id = :UserId
 				client = DataMother.CreateTestClientWithAddressAndUser();
 				juridicalOrganization = new LegalEntity() {
 					Name = "Test" + client.Id,
-					Payer = client.BillingInstance,
+					Payer = client.Payer,
 				};
 				juridicalOrganization.CreateAndFlush();
 				scope.VoteCommit();

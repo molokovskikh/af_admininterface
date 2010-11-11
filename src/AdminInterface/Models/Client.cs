@@ -67,19 +67,14 @@ namespace AdminInterface.Models
 		public virtual Region HomeRegion { get; set; }
 
 		[BelongsTo("BillingCode")]
-		public virtual Payer BillingInstance { get; set; }
+		public virtual Payer Payer { get; set; }
 
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
 		public virtual IList<Price> Prices { get; set; }
 
-		public virtual Payer Payer
-		{
-			get { return BillingInstance; }
-		}
-
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
-			return Queryable.Where(p => p.BillingInstance.PayerID == payerId).ToList();
+			return Queryable.Where(p => p.Payer.PayerID == payerId).ToList();
 		}
 
 		public override string ToString()
@@ -125,7 +120,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[BelongsTo("PayerId")]
-		public virtual Payer BillingInstance { get; set; }
+		public virtual Payer Payer { get; set; }
 
 		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]
 		public virtual Region HomeRegion { get; set; }
@@ -140,11 +135,6 @@ namespace AdminInterface.Models
 		{
 			get { return Status == ClientStatus.On; }
 			set { Status = value ? ClientStatus.On : ClientStatus.Off; }
-		}
-
-		public virtual Payer Payer
-		{
-			get { return BillingInstance; }
 		}
 
 		public virtual bool IsHiddenForProducer
@@ -258,7 +248,7 @@ where
 
 		public virtual string GetEmailsForBilling()
 		{
-			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), BillingInstance.ContactGroupOwner.ContactGroups.ToArray());
+			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), Payer.ContactGroupOwner.ContactGroups.ToArray());
 		}
 
 		private string GetEmails(bool unionEmails, ContactGroup generalGroup, params ContactGroup[] specialGroup)
@@ -410,7 +400,7 @@ WHERE i.Id IS NULL
 			if (Addresses == null)
 				Addresses = new List<Address>();
 			if (address.LegalEntity == null)
-				address.LegalEntity = BillingInstance.JuridicalOrganizations.Single();
+				address.LegalEntity = Payer.JuridicalOrganizations.Single();
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
 

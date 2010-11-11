@@ -189,7 +189,7 @@ namespace AdminInterface.Controllers
 		{
 			CancelLayout();
 			var client = Client.FindAndCheck(clientId);
-			var suppliers = Supplier.GetByPayerId(client.BillingInstance.PayerID);
+			var suppliers = Supplier.GetByPayerId(client.Payer.PayerID);
 			PropertyBag["suppliers"] = suppliers;
 			if (client.Settings.FirmCodeOnly != null)
 				PropertyBag["FirmCodeOnly"] = client.Settings.FirmCodeOnly.Id;
