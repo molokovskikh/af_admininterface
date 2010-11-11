@@ -132,8 +132,8 @@ namespace AdminInterface.Helpers
 			try
 			{
 				var result = new ADUserInformation {
-                    Login = login,
-                    IsLoginExists = IsLoginExists(login),
+					Login = login,
+					IsLoginExists = IsLoginExists(login),
 				};
 				if (result.IsLoginExists)
 				{
@@ -518,8 +518,8 @@ namespace AdminInterface.Helpers
 				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
 				{
 					searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
-                    var result = searcher.FindOne();
-                    if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
+					var result = searcher.FindOne();
+					if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
 						continue;
 					var date = DateTime.FromFileTime((long) searcher.FindOne().Properties["pwdLastSet"][0]);
 					if (!resultDate.HasValue || (date.CompareTo(resultDate.Value) > 0))
@@ -531,7 +531,7 @@ namespace AdminInterface.Helpers
 
 		public static IList<string> GetDomainControllers()
 		{
-            var controlers = Forest.GetCurrentForest().Domains[0].DomainControllers;
+			var controlers = Forest.GetCurrentForest().Domains[0].DomainControllers;
 			var names = new List<string>();
 			foreach (DomainController srv in controlers)
 				names.Add(srv.Name);
