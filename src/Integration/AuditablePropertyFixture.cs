@@ -1,4 +1,4 @@
-using AdminInterface.Models;
+п»їusing AdminInterface.Models;
 using NUnit.Framework;
 
 namespace Integration
@@ -14,8 +14,8 @@ namespace Integration
 		[Test]
 		public void Build_region()
 		{
-			var property = new AuditableProperty(typeof(Test).GetProperty("MaskRegion"), "Регион", 4ul, 5ul);
-			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Воронеж'"));
+			var property = new AuditableProperty(typeof(Test).GetProperty("MaskRegion"), "Р РµРіРёРѕРЅ", 4ul, 5ul);
+			Assert.That(property.ToString(), Is.EqualTo("$$$РР·РјРµРЅРµРЅРѕ 'Р РµРіРёРѕРЅ' РЈРґР°Р»РµРЅРѕ 'Р’РѕСЂРѕРЅРµР¶'"));
 		}
 	}
 }

@@ -6,9 +6,11 @@ using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using log4net;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Event;
+using NHibernate.Event.Default;
 using NHibernate.Persister.Entity;
 
 namespace AdminInterface.Models
@@ -102,6 +104,15 @@ namespace AdminInterface.Models
 			{
 				return (bool)value ? "вкл" : "выкл";
 			}
+			if (!NHibernateUtil.IsInitialized(value))
+			{
+				return "";
+/*
+				var asString = value.ToString();
+				new DefaultEvictEventListener().OnEvict(new EvictEvent(value, session));
+				return asString;
+*/
+			}
 
 			return value.ToString();
 		}
@@ -139,7 +150,7 @@ namespace AdminInterface.Models
 				.Implode("\r\n");
 		}
 
-		private List<AuditableProperty> GetDirtyAuditableProperties(IEntityPersister persister, object[] state, object[] oldState, object entity, ISessionImplementor session)
+		private List<AuditableProperty> GetDirtyAuditableProperties(IEntityPersister persister, object[] state, object[] oldState, object entity, IEventSource session)
 		{
 			var dirty = persister.FindDirty(state, oldState, entity, session);
 			var result = new List<AuditableProperty>();
