@@ -33,7 +33,7 @@ namespace AdminInterface.Controllers
 
 				client.AddAddress(address);
 				address.UpdateContacts(contacts);
-				address.Save();
+				address.SaveAndFlush();
 				address.MaitainIntersection();
 
 				scope.VoteCommit();

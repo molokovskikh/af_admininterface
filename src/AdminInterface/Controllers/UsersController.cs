@@ -78,7 +78,7 @@ namespace AdminInterface.Controllers
 				{
 					address = client.AddAddress(address);
 					address.AvaliableForUsers = new List<User> {user};
-					address.Save();
+					address.SaveAndFlush();
 					address.MaitainIntersection();
 				}
 				client.Save();

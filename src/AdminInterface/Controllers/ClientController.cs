@@ -18,6 +18,8 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
+using log4net;
+using NHibernate;
 
 namespace AdminInterface.Controllers
 {
@@ -175,7 +177,7 @@ namespace AdminInterface.Controllers
 				if (!activateBuyMatrix)
 					drugstore.BuyingMatrixPrice = null;
 				client.Update();
-				drugstore.Update();
+				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
 					client.MaintainIntersection();
 
@@ -364,7 +366,7 @@ where Phone like :phone")
 
 			// Если нужно перенести вместе с пользователем,
 			// адрес привязан только к этому пользователю и у пользователя нет других адресов,
-			// тогда переносим пользователя))
+			// тогда переносим пользователя
 
 			if ((user != null && user.AvaliableAddresses.Count > 1)
 				|| (address != null && address.AvaliableForUsers.Count > 1))
@@ -396,7 +398,6 @@ where Phone like :phone")
 					user.MoveToAnotherClient(newClient, legalEntity);
 				if (address != null)
 					address.MoveToAnotherClient(newClient, legalEntity);
-
 				scope.VoteCommit();
 			}
 
