@@ -117,7 +117,7 @@ namespace AdminInterface.Models
 		public virtual void MaitainIntersection()
 		{
 			ArHelper.WithSession(s => {
-				var count = s.CreateSQLQuery(@"
+				s.CreateSQLQuery(@"
 set @skip = 1;
 
 insert into Future.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
@@ -138,7 +138,6 @@ set @skip = 0;
 					.SetParameter("legalEntityId", LegalEntity.Id)
 					.SetParameter("clientId", Client.Id)
 					.ExecuteUpdate();
-				Console.WriteLine("count=" + count);
 			});
 		}
 
