@@ -54,6 +54,11 @@ ORDER BY IsAll Desc, {Region.Name};")
 				return regions;
 			});
 		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 
 	public class RegionSettings

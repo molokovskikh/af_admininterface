@@ -101,6 +101,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ADHelperFixture.cs" />
+    <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\AddressFixture.cs" />

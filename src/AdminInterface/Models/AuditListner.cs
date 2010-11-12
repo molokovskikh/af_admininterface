@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -32,6 +32,7 @@ namespace AdminInterface.Models
 		public string Name { get; set; }
 		public string OldValue { get; set; }
 		public string NewValue { get; set; }
+		public string Message { get ;set; }
 
 		public AuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 		{
@@ -41,6 +42,12 @@ namespace AdminInterface.Models
 			if (String.IsNullOrEmpty(name))
 			{
 				Name = BindingHelper.GetDescription(property);
+			}
+
+			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
+			{
+				SpecialCase((ulong)newValue, (ulong)oldValue);
+				return;
 			}
 
 			if (oldValue == null)
@@ -60,6 +67,29 @@ namespace AdminInterface.Models
 			{
 				NewValue = AsString(property, newValue);
 			}
+			Message = String.Format("$$$Изменено '{0}' было '{1}' стало '{2}'", Name, OldValue, NewValue);
+		}
+
+		private void SpecialCase(ulong newValue, ulong oldValue)
+		{
+			var diff = Math.Max(newValue, oldValue) - Math.Min(newValue, oldValue);
+			string action;
+			if (newValue > oldValue)
+			{
+				action = "Добавлено";
+			}
+			else
+			{
+				action = "Удалено";
+			}
+
+			var diffAsString = Enumerable
+				.Range(0, 64)
+				.Select(i => (ulong)Math.Pow(2, i))
+				.Where(i => (diff & i) > 0)
+				.Select(i => "'" + Region.Find(i).Name + "'")
+				.Implode();
+			Message = String.Format("$$$Изменено '{0}' {1} {2}", Name, action, diffAsString);
 		}
 
 		private string AsString(PropertyInfo property, object value)
@@ -70,7 +100,7 @@ namespace AdminInterface.Models
 			}
 			if (property.PropertyType == typeof(bool))
 			{
-				return (bool)value ? "���" : "����";
+				return (bool)value ? "вкл" : "выкл";
 			}
 
 			return value.ToString();
@@ -78,7 +108,7 @@ namespace AdminInterface.Models
 
 		public override string ToString()
 		{
-			return String.Format("$$$�������� '{0}' ���� '{1}' ����� '{2}'", Name, OldValue, NewValue);
+			return Message;
 		}
 	}
 
