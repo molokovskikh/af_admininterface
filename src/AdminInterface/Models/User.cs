@@ -8,6 +8,7 @@ using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
+using NHibernate;
 using NHibernate.Criterion;
 using AdminInterface.Security;
 using System.Web;
@@ -115,7 +116,9 @@ namespace AdminInterface.Models
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]
 		public virtual Payer Payer { get; set; }
 
-		[OneToOne(Constrained = true)]
+		//не работает какая то фигня в хибере
+		//[OneToOne(Cascade = CascadeEnum.All, Constrained = true)]
+		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual AuthorizationLogEntity Logs { get; set; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),
@@ -224,6 +227,8 @@ namespace AdminInterface.Models
 		{
 			Login = "temporary-login";
 			Enabled = true;
+			Logs = new AuthorizationLogEntity();
+			Logs.User = this;
 			Save();
 			Login = Id.ToString();
 			Update();
@@ -233,7 +238,6 @@ namespace AdminInterface.Models
 			Accounting = new UserAccounting(this);
 			Client.Users.Add(this);
 			Client.UpdateBeAccounted();
-			new AuthorizationLogEntity(Id).Create();
 			new UserUpdateInfo(Id).Create();
 		}
 
@@ -268,8 +272,7 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				var log = AuthorizationLogEntity.TryFind(Id);
-				return ((log != null) && (log.AFTime.HasValue) && (DateTime.Now.Subtract(log.AFTime.Value).Days <= 7));
+				return Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7;
 			}
 		}
 

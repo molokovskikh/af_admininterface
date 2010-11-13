@@ -38,8 +38,11 @@ namespace AdminInterface.Models.Logs
 
 		public AuthorizationLogEntity() {}
 
-		[PrimaryKey("UserId", Generator = PrimaryKeyType.Assigned)]
+		[PrimaryKey("UserId", Generator = PrimaryKeyType.Foreign)]
 		public virtual uint Id { get; set; }
+
+		[OneToOne]
+		public virtual User User { get; set; }
 
 		[Property]
 		public virtual  DateTime? CITime { get; set; }

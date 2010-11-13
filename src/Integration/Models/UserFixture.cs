@@ -4,12 +4,11 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Common.Tools;
-using Integration;
+using log4net.Config;
 using NUnit.Framework;
 using Functional.ForTesting;
 
-
-namespace AdminInterface.Test.Models
+namespace Integration.Models
 {
 	[TestFixture]
 	public class UserFixture
@@ -19,6 +18,7 @@ namespace AdminInterface.Test.Models
 		[SetUp]
 		public void Setup()
 		{
+			BasicConfigurator.Configure();
 			var client = DataMother.CreateTestClientWithUser();
 			user = client.Users[0];
 		}
@@ -66,6 +66,13 @@ namespace AdminInterface.Test.Models
 			new PasswordChangeLogEntity(user.Login, user.Login, Environment.MachineName) {
 				LogTime = DateTime.Now.AddSeconds(10)
 			}.Save();
+		}
+
+		[Test]
+		public void Create_user_logs()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			Assert.That(client.Users[0].Logs, Is.Not.Null);
 		}
 	}
 }

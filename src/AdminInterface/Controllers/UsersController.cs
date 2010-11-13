@@ -133,7 +133,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
-			PropertyBag["authorizationLog"] = AuthorizationLogEntity.TryFind(user.Id);
+			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
