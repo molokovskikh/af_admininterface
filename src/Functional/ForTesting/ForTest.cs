@@ -6,7 +6,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using log4net.Config;
 
-namespace AdminInterface.Test.ForTesting
+namespace Functional.ForTesting
 {
 	public class ForTest
 	{
@@ -63,7 +63,6 @@ namespace AdminInterface.Test.ForTesting
 
 		public static void InitialzeAR()
 		{
-			XmlConfigurator.Configure();
 			if (!ActiveRecordStarter.IsInitialized)
 				ActiveRecordStarter.Initialize(new[] {
 					Assembly.Load("AdminInterface"),

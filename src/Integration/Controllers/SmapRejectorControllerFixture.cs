@@ -3,12 +3,11 @@ using AdminInterface.Controllers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Test.ForTesting;
 using Castle.MonoRail.TestSupport;
+using Functional.ForTesting;
 using NUnit.Framework;
 
-
-namespace AdminInterface.Test.Controllers
+namespace Integration.Controllers
 {
 	[TestFixture]
 	public class SmapRejectorControllerFixture : BaseControllerTest

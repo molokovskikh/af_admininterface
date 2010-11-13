@@ -51,7 +51,7 @@ namespace AdminInterface.Models
 		[ValidateRegExp("", "ИНН может содержать 10 или 12 цифр")]
 		public virtual string INN { get; set; }
 
-		[BelongsTo(Column = "ContactGroupOwnerId")]
+		[BelongsTo(Column = "ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[Property]

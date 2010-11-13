@@ -1,6 +1,7 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
+using Functional.ForTesting;
 using NHibernate.Criterion;
 using NUnit.Framework;
 

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.IO;
 using AdminInterface.Models.Security;
 using AdminInterface.Test.ForTesting;
+using Functional.ForTesting;
 using log4net;
 using log4net.Appender;
 using log4net.Config;
