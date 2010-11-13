@@ -92,6 +92,12 @@ namespace AdminInterface.Models
 		[Property, Description("Действие матрицы"), Auditable]
 		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
+		[Property, Description("Обезличенный заказ"), Auditable]
+		public virtual bool EnableImpersonalPrice { get; set; }
+
+		[Property, Description("Автозаказ"), Auditable]
+		public virtual bool EnableSmartOrder { get; set; }
+
 		public virtual bool IsNoised
 		{
 			get { return FirmCodeOnly != null; }

@@ -136,7 +136,9 @@
 			"SendWaybillsFromClient" : drugstore.SendWaybillsFromClient,
 			"ShowAdvertising" : drugstore.ShowAdvertising,
 			"SendRetailMarkup": drugstore.SendRetailMarkup,
-			"ParseWaybills": drugstore.ParseWaybills }
+			"ParseWaybills": drugstore.ParseWaybills,
+			"EnableImpersonalPrice" : drugstore.EnableImpersonalPrice,
+			"EnableSmartOrder" : drugstore.EnableSmartOrder }
 	}
 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitOnline",
