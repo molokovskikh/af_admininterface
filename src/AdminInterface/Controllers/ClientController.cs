@@ -162,7 +162,6 @@ namespace AdminInterface.Controllers
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion,
-			bool costsIsNoised,
 			bool activateBuyMatrix)
 		{
 			SecurityContext.Administrator.CheckClientPermission(client);
@@ -172,8 +171,6 @@ namespace AdminInterface.Controllers
 				var oldMaskRegion = client.MaskRegion;
 				client.HomeRegion = Region.Find(homeRegion);
 				client.UpdateRegionSettings(regionSettings);
-				if (!costsIsNoised)
-					drugstore.FirmCodeOnly = null;
 				if (!activateBuyMatrix)
 					drugstore.BuyingMatrixPrice = null;
 				client.Update();
@@ -193,8 +190,8 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			var suppliers = Supplier.GetByPayerId(client.Payer.PayerID);
 			PropertyBag["suppliers"] = suppliers;
-			if (client.Settings.FirmCodeOnly != null)
-				PropertyBag["FirmCodeOnly"] = client.Settings.FirmCodeOnly.Id;
+			if (client.Settings.NoiseCostExceptSupplier != null)
+				PropertyBag["FirmCodeOnly"] = client.Settings.NoiseCostExceptSupplier.Id;
 		}
 
 		[AccessibleThrough(Verb.Post)]

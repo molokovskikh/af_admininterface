@@ -2,10 +2,8 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using AdminInterface.Test.ForTesting;
 using Common.Tools;
 using Functional.ForTesting;
-using NHibernate.Criterion;
 using NUnit.Framework;
 using WatiN.Core;
 using System.Threading;
@@ -526,8 +524,8 @@ where i.ClientId = :ClientId
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-                var settings = DrugstoreSettings.Find(client.Id);
-                Assert.IsTrue(settings.IgnoreNewPrices);
+				var settings = DrugstoreSettings.Find(client.Id);
+				Assert.IsTrue(settings.IgnoreNewPrices);
 
 				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -573,23 +571,13 @@ where i.ClientId = :ClientId
 		public void Set_costs_noising_except_one_supplier()
 		{
 			var client = DataMother.CreateTestClient();
-			Supplier supplier = null;
-			using (var scope = new TransactionScope())
-			{
-				supplier = Supplier.FindFirst(Restrictions.Like("Name", "%%"));
-				ArHelper.WithSession(session => session.CreateSQLQuery(@"
-UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :SupplierId")
-														.SetParameter("PayerId", client.Payer.PayerID)
-														.SetParameter("SupplierId", supplier.Id)
-														.ExecuteUpdate());
-				scope.VoteCommit();
-			}
+			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payer; });
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
-				browser.CheckBox(Find.ByName("costsIsNoised")).Checked = true;
+				browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 				Thread.Sleep(1000);
-				browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectByValue(supplier.Id.ToString());
+				browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectByValue(supplier.Id.ToString());
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
@@ -607,11 +595,11 @@ UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :Sup
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
-				browser.CheckBox(Find.ByName("costsIsNoised")).Checked = true;
+				browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 				Thread.Sleep(1000);
-				Assert.That(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectedOption.Text,
+				Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Text,
 					Is.EqualTo("Зашумлять все прайс листы всех поставщиков"));
-				Assert.That(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectedOption.Value, Is.EqualTo("0"));
+				Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value, Is.EqualTo("0"));
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
@@ -626,20 +614,22 @@ UPDATE usersettings.ClientsData SET BillingCode = :PayerId WHERE FirmCode = :Sup
 		public void Unset_costs_noising()
 		{
 			var client = DataMother.CreateTestClient();
+			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payer; });
 			using (new SessionScope())
 			{
-				client.Settings.FirmCodeOnly = Supplier.Queryable.First();
-				client.UpdateAndFlush();
+				client.Settings.NoiseCosts = true;
+				client.Settings.NoiseCostExceptSupplier = supplier;
+				client.Settings.UpdateAndFlush();
 			}
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
 				Thread.Sleep(1000);
-				Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).Exists);
-				Assert.That(browser.SelectList(Find.ByName("drugstore.FirmCodeOnly")).SelectedOption.Value,
-					Is.EqualTo(client.Settings.FirmCodeOnly.Id.ToString()));
-				Assert.IsTrue(browser.CheckBox(Find.ByName("costsIsNoised")).Checked);
-				browser.CheckBox(Find.ByName("costsIsNoised")).Checked = false;
+				Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).Exists);
+				Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value,
+					Is.EqualTo(client.Settings.NoiseCostExceptSupplier.Id.ToString()));
+				Assert.IsTrue(browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked);
+				browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = false;
 				Thread.Sleep(1000);
 				browser.Button(Find.ByValue("Сохранить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));

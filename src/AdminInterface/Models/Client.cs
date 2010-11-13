@@ -74,7 +74,7 @@ namespace AdminInterface.Models
 
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
-			return Queryable.Where(p => p.Payer.PayerID == payerId).ToList();
+			return Queryable.Where(p => p.Payer.PayerID == payerId).OrderBy(s => s.Name).ToList();
 		}
 
 		public override string ToString()

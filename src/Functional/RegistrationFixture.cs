@@ -285,20 +285,9 @@ namespace Functional
 				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 			}
 			With.Connection(c => {
-				var command = new MySqlCommand("select FirmCodeOnly from usersettings.retclientsset where clientcode = ?clientcode", c);
-				command.Parameters.AddWithValue("?clientcode", clientcode);
-				var firmCodeOnly = Convert.ToUInt32(command.ExecuteScalar());
-				Assert.That(firmCodeOnly, Is.EqualTo(testSupplierId));
-
-				command.CommandText = "select BillingCode from usersettings.ClientsData where FirmCode = ?FirmCode";
-				command.Parameters.AddWithValue("?FirmCode", testSupplierId);
-				var billingCode = Convert.ToUInt32(command.ExecuteScalar());
 				var client = Client.Find(clientcode);
-				Assert.That(client.Payer.PayerID, Is.EqualTo(billingCode));
-
-				var settings = DrugstoreSettings.Find(clientcode);
-				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
-				Assert.That(settings.FirmCodeOnly, Is.EqualTo(testSupplierId)); 
+				Assert.That(client.Settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
+				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(testSupplierId)); 
 			});
 		}
 

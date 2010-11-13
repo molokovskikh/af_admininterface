@@ -102,11 +102,11 @@ namespace Functional.ForTesting
 					ContactGroupOwner = contactOwner,
 				};
 				client.SaveAndFlush();
-				var drugstoreSettings = new DrugstoreSettings(client.Id) {
+				client.Settings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",
 					OrderRegionMask = 1UL,
 				};
-				drugstoreSettings.CreateAndFlush();
+				client.Settings.CreateAndFlush();
 				client.MaintainIntersection();
 
 				scope.VoteCommit();
@@ -162,7 +162,7 @@ namespace Functional.ForTesting
 			return client;
 		}
 
-		public static Supplier CreateTestSupplier()
+		public static Supplier CreateTestSupplier(Action<Supplier> action)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -182,10 +182,16 @@ namespace Functional.ForTesting
 					Name = "Test supplier",
 					Status = ClientStatus.On
 				};
+				action(supplier);
 				supplier.Create();
 				scope.VoteCommit();
 				return supplier;
 			}
+		}
+
+		public static Supplier CreateTestSupplier()
+		{
+			return CreateTestSupplier(s => {});
 		}
 
 		public static DocumentReceiveLog CreateTestDocumentLog(Supplier supplier, Client client)

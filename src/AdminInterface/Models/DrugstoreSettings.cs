@@ -25,6 +25,9 @@ namespace AdminInterface.Models
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true)]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
+		private bool _noiseCosts;
+		private Supplier _noiseCostExceptSupplier;
+
 		public DrugstoreSettings() {}
 
 		public DrugstoreSettings(uint id)
@@ -41,8 +44,46 @@ namespace AdminInterface.Models
 		[Property, Description("Тип клиента в интефрейсе поставщика"), Auditable]
 		public virtual DrugstoreType InvisibleOnFirm { get; set; }
 
-		[BelongsTo("FirmCodeOnly"), Description("Зашумлять все прайс листы всех поставщиков кроме"), Auditable]
-		public virtual Supplier FirmCodeOnly { get; set; }
+		[Property(NotNull = true), Description("Зашумлять цены"), Auditable]
+		public virtual bool NoiseCosts
+		{
+			get { return _noiseCosts; }
+			set
+			{
+				if (_noiseCosts != value)
+				{
+					var supplierId = GetSupplierId();
+					FirmCodeOnly = value
+						? (uint?)supplierId
+						: null;
+				}
+				_noiseCosts = value;
+			}
+		}
+
+		private uint GetSupplierId()
+		{
+			uint supplierId = 0;
+			if (NoiseCostExceptSupplier != null)
+				supplierId = NoiseCostExceptSupplier.Id;
+			return supplierId;
+		}
+
+		[BelongsTo("NoiseCostExceptSupplierId"), Description("Зашумлять все прайс листы всех поставщиков кроме"), Auditable]
+		public virtual Supplier NoiseCostExceptSupplier {
+			get { return _noiseCostExceptSupplier; }
+			set
+			{
+				_noiseCostExceptSupplier = value;
+				if (NoiseCosts)
+				{
+					FirmCodeOnly = GetSupplierId();
+				}
+			}
+		}
+
+		[Property]
+		public virtual uint? FirmCodeOnly { get; set; }
 
 		[Property]
 		public virtual ulong WorkRegionMask { get; set; }
@@ -97,10 +138,5 @@ namespace AdminInterface.Models
 
 		[Property, Description("Автозаказ"), Auditable]
 		public virtual bool EnableSmartOrder { get; set; }
-
-		public virtual bool IsNoised
-		{
-			get { return FirmCodeOnly != null; }
-		}
 	}
 }

@@ -3,7 +3,7 @@ using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord("reports.General_Reports")]
+	[ActiveRecord("General_Reports", Schema = "reports")]
 	public class Report : ActiveRecordLinqBase<Report>
 	{
 		[PrimaryKey("GeneralReportCode")]

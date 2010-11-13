@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
+using Castle.ActiveRecord;
 using Functional.ForTesting;
 using NUnit.Framework;
 
@@ -25,6 +26,27 @@ namespace Integration.Models
 			var reloadedInfo = UserUpdateInfo.Find(user.Id);
 			Assert.That(reloadedInfo.AFCopyId, Is.Empty);
 			Assert.That(client.HaveUin(), Is.False);
+		}
+
+		[Test]
+		public void Update_firm_code_only()
+		{
+			using (new SessionScope())
+			{
+				var client = DataMother.CreateTestClientWithUser();
+				client.Settings.NoiseCosts = true;
+				client.Settings.Save();
+				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
+
+				var supplier = Supplier.Queryable.First();
+				client.Settings.NoiseCostExceptSupplier = supplier;
+				client.Settings.Save();
+				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
+
+				client.Settings.NoiseCosts = false;
+				client.Settings.Save();
+				Assert.That(client.Settings.FirmCodeOnly, Is.Null);
+			}
 		}
 	}
 }
