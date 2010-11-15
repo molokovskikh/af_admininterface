@@ -274,7 +274,7 @@ left join Future.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.Addr
 where ni.ClientId = :NewClientId and ni.LegalEntityId = :legalEntityId
 ;
 
-delete future.ai
+delete ai
 from Future.AddressIntersection ai
 join Future.Intersection i on i.Id = ai.IntersectionId
 where ai.AddressId = :AddressId
