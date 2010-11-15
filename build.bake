@@ -15,4 +15,4 @@ task @default, [@Build]
 
 task @Build, [@BuildWebSite]
 
-task @deploy, [@Build, @Production, @Migrate, @SendDeployNotification, @DeployWebSite]
+task @deploy, [@Production, @Build, @Migrate, @SendDeployNotification, @Backup, @DeployWebSite]
