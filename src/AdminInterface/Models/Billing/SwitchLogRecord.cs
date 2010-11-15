@@ -48,11 +48,11 @@ namespace AdminInterface.Models.Billing
 		private static SwitchLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
 		{
 			var log = new SwitchLogRecord {
-                LogTime = clientLogRecord.LogTime,
-                LogType = SwitchLogType.ClientLog,
-                OperatorName = clientLogRecord.OperatorName,
-                Status = clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On),
-                Value = clientLogRecord.Client.Name,
+				LogTime = clientLogRecord.LogTime,
+				LogType = SwitchLogType.ClientLog,
+				OperatorName = clientLogRecord.OperatorName,
+				Status = clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On),
+				Value = clientLogRecord.Client.Name,
 			};
 			return log;
 		}
@@ -76,7 +76,7 @@ namespace AdminInterface.Models.Billing
 				ObjectId = userLogRecord.User.Id,
 				LogTime = userLogRecord.LogTime,
 				LogType = SwitchLogType.UserLog,
-                OperatorName = userLogRecord.OperatorName,
+				OperatorName = userLogRecord.OperatorName,
 				Status = userLogRecord.Enabled.HasValue && userLogRecord.Enabled.Value,
 				Value = userLogRecord.User.GetLoginOrName(),
 			};

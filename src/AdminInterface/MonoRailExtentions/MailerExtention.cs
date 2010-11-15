@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -55,40 +55,40 @@ namespace AdminInterface.MonoRailExtentions
 			To = "RegisterList@subscribe.analit.net";
 #endif
 			From = "register@analit.net";
-			var lastDisable = "неизвестно";
+			var lastDisable = "РЅРµРёР·РІРµСЃС‚РЅРѕ";
 
 			var type = "";
 			if (item is User)
 			{
-				type = "пользователя";
+				type = "РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 				var user = ((User) item);
 				PropertyBag["client"] = user.Client;
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
 			if (item is Address)
 			{
-				type = "адреса";
+				type = "Р°РґСЂРµСЃР°";
 				var address = ((Address) item);
 				PropertyBag["client"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
 			if (item is Client)
 			{
-				type = "клиента";
+				type = "РєР»РёРµРЅС‚Р°";
 				var client = (Client) item;
 				PropertyBag["client"] = client;
-				var disable = ClientLogRecord.LastOff(client.Id);
+				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
 			if (item.Enabled)
-				Subject = String.Format("Возобновлена работа {0}", type);
+				Subject = String.Format("Р’РѕР·РѕР±РЅРѕРІР»РµРЅР° СЂР°Р±РѕС‚Р° {0}", type);
 			else
-				Subject = String.Format("Приостановлена работа {0}", type);
+				Subject = String.Format("РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅР° СЂР°Р±РѕС‚Р° {0}", type);
 			PropertyBag["lastDisable"] = lastDisable;
 			PropertyBag["item"] = item;
 			PropertyBag["admin"] = SecurityContext.Administrator;
@@ -99,14 +99,14 @@ namespace AdminInterface.MonoRailExtentions
 		{
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
-			Subject = String.Format("Бесплатное изменение пароля - {0}", user.Client.FullName);
+			Subject = String.Format("Р‘РµСЃРїР»Р°С‚РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ РїР°СЂРѕР»СЏ - {0}", user.Client.FullName);
 		}
 
 		public void PasswordChange(User user)
 		{
 			To = "billing@analit.net";
 			From = "register@analit.net";
-			Subject = String.Format("Платное изменение пароля - {0}", user.Client.FullName);
+			Subject = String.Format("РџР»Р°С‚РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ РїР°СЂРѕР»СЏ - {0}", user.Client.FullName);
 		}
 
 		public void NotifySupplierAboutAddressRegistration(Address address)

@@ -66,6 +66,7 @@ namespace AdminInterface.Controllers
 			var usersMessages = new List<ClientMessage>();
 			var usersLogs = new List<UserLogRecord>();
 			var addressesLogs = new List<AddressLogRecord>();
+			var clients = payer.Users.Select(u => u.Client).Distinct().ToList();
 			var countUsersWithMessages = 0;
 			foreach (var item in payer.Users)
 			{
@@ -88,7 +89,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
 			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
 
-			var clientLogs = ClientLogRecord.GetClientLogRecords(client);
+			var clientLogs = ClientLogRecord.GetClientLogRecords(clients);
 			var userLogs = usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
 			var addressLogs = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
 			PropertyBag["LogRecords"] = SwitchLogRecord.GetUnionLogs(clientLogs, userLogs, addressLogs);
@@ -96,7 +97,6 @@ namespace AdminInterface.Controllers
 			if (client != null)
 				PropertyBag["Client"] = client;
 
-			var clients = payer.Users.Select(u => u.Client).Distinct().ToList();
 			PropertyBag["Clients"] = clients;
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;

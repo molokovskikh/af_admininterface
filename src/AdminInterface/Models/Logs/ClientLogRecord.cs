@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Castle.ActiveRecord;
+using Common.Tools;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
@@ -24,7 +25,7 @@ namespace AdminInterface.Models.Logs
 		[Property("Status")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
-		public static IList<ClientLogRecord> GetClientLogRecords(Client client)
+		public static IList<ClientLogRecord> GetClientLogRecords(IEnumerable<Client> client)
 		{
 			if (client == null)
 				return Enumerable.Empty<ClientLogRecord>().ToList();
@@ -34,15 +35,15 @@ namespace AdminInterface.Models.Logs
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
 where status is not null
-		and clientId = :ClientCode
+		and clientId in (:ClientCode)
 order by logtime desc
 limit 5")
 						.AddEntity(typeof (ClientLogRecord))
-						.SetParameter("ClientCode", client.Id)
+						.SetParameter("ClientCode", client.Select(c => c.Id).ToArray().Implode())
 						.List<ClientLogRecord>(), null);
 		}
 
-		public static ClientLogRecord LastOff(uint clientCode)
+		public static ClientLogRecord LastOff(Client client)
 		{
 			return (ClientLogRecord) Execute(
 				(session, instance) => session.CreateSQLQuery(@"
@@ -53,7 +54,7 @@ where status = 0
 order by logtime desc
 limit 1")
 						.AddEntity(typeof (ClientLogRecord))
-						.SetParameter("ClientCode", clientCode)
+						.SetParameter("ClientCode", client.Id)
 						.UniqueResult(), null);
 		}
 	}
