@@ -101,6 +101,7 @@ namespace Functional.ForTesting
 					Payer = payer,
 					ContactGroupOwner = contactOwner,
 				};
+				payer.Clients = new List<Client>{ client };
 				client.SaveAndFlush();
 				client.Settings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",

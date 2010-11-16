@@ -187,6 +187,7 @@
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Logs\UserLogRecord.cs" />
     <Compile Include="Models\Mailer.cs" />
+    <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />

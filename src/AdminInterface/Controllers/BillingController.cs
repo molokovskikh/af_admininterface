@@ -430,8 +430,6 @@ namespace AdminInterface.Controllers
 
 		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
 		{
-			CancelLayout();
-			CancelView();
 			using (var scope = new TransactionScope())
 			{
 				var organization = LegalEntity.Find(juridicalOrganization.Id);
@@ -450,23 +448,22 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity juridicalOrganization, uint payerId)
+		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
 		{
-			CancelLayout();
-			CancelView();
-
 			using (var scope = new TransactionScope())
 			{
 				var payer = Payer.Find(payerId);
 
-				juridicalOrganization.Payer = payer;
-				juridicalOrganization.CreateAndFlush();
+				legalEntity.Payer = payer;
+				legalEntity.CreateAndFlush();
+
+				Maintainer.LegalEntityCreated(legalEntity);
 
 				scope.VoteCommit();
 
 				Flash["Message"] = new Message("Юридическое лицо создано");
 			}
-			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = juridicalOrganization.Id });
+			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
 		}
 
 		public void UpdateReport(uint id, bool allow)
