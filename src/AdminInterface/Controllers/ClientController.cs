@@ -110,7 +110,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
-			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name);
+			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 
 			sort.Apply(PropertyBag);
 
