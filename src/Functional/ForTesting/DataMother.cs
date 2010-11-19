@@ -23,7 +23,7 @@ namespace Functional.ForTesting
 				};
 				client.AddAddress(address);
 				client.Update();
-				address.MaitainIntersection();
+				address.MaintainIntersection();
 				scope.VoteCommit();
 				return client;
 			}
@@ -156,7 +156,7 @@ namespace Functional.ForTesting
 				client.Addresses[0].UpdateAndFlush();
 				client.Name += client.Id;
 				client.UpdateAndFlush();
-				client.Addresses.Single().MaitainIntersection();
+				client.Addresses.Single().MaintainIntersection();
 				scope.VoteCommit();
 			}
 			client.Refresh();

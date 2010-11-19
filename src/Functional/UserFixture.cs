@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
@@ -9,7 +7,6 @@ using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
-using AdminInterface.Helpers;
 using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
@@ -141,9 +138,7 @@ namespace Functional
 			{
 				user.Login = "testLogin" + user.Id;
 				user.SaveAndFlush();
-				user.Refresh();
 			}
-			Assert.IsFalse(user.Login == user.Id.ToString());
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText(user.Login)).Click();
@@ -152,9 +147,7 @@ namespace Functional
 				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 				{
 					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
-					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.True);
-					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
+					openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
 					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
 					openedWindow.Button(Find.ByValue("Изменить")).Click();
 					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
@@ -162,7 +155,7 @@ namespace Functional
 			}
 			using (new SessionScope())
 			{
-				user.Refresh();
+				user = User.Find(user.Id);
 				Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 			}
 		}
@@ -238,8 +231,6 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users.First();
-			user.Name = String.Empty;
-			user.Update();
 			var info = UserUpdateInfo.Find(user.Id);
 			info.AFCopyId = "123";
 			info.Update();
@@ -253,12 +244,9 @@ namespace Functional
 				browser.Button(Find.ByValue("Сбросить УИН")).Click();
 				Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
 				Assert.That(browser.Text, Is.StringContaining(String.Format("$$$ Пользователь: {0}", user.Login)));
-				var count = Convert.ToInt32(ArHelper.WithSession(s =>
-					s.CreateSQLQuery("SELECT count(*) FROM `logs`.clientsinfo where ClientCode = :id and UserId is not null")
-						.SetParameter("id", client.Id)
-						.UniqueResult()));
-				Assert.IsTrue(count == 1);
 			}
+			info.Refresh();
+			Assert.That(info.AFCopyId, Is.Empty);
 		}
 
 		[Test]
@@ -362,7 +350,7 @@ namespace Functional
 				browser.GoTo(baseUrl);
 
 				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
-				Assert.AreEqual("История заказов пользователя " + client.Users[0].Login, browser.Title);
+				Assert.AreEqual("История заказов", browser.Title);
 				browser.GoTo(baseUrl);
 			}
 
@@ -379,7 +367,7 @@ namespace Functional
 				browser.GoTo(baseUrl);
 
 				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
-				Assert.AreEqual("История заказов клиента " + client.Name, browser.Title);
+				Assert.AreEqual("История заказов", browser.Title);
 				browser.GoTo(baseUrl);
 			}
 		}

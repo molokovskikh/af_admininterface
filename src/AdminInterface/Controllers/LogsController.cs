@@ -5,8 +5,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
-using Castle.Components.Binder;
-using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Transform;

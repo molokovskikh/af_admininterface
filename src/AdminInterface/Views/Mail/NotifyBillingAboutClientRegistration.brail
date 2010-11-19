@@ -1,0 +1,11 @@
+﻿Зарегистрирован новый клиент
+<br>
+Название: <a href='${me}/Billing/edit.rails?clientCode=${client.Id}'>${client.Name}</a>
+<br>
+Код: ${client.Id}
+<br>
+Биллинг код: ${client.Payer.Id}
+<br>
+Кем зарегистрирован: ${admin.Name}
+<br>
+${client.Payer.Comment}

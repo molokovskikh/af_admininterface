@@ -15,17 +15,6 @@
 	height: 20px;
 }
 
-.calendar
-{
-	width:100%;
-	border: none;
-}
-
-.calendar table
-{
-	width:100%;
-}
-
 .filter-label
 {
 	font-weight:bolder;

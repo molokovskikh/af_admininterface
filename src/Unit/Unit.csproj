@@ -50,6 +50,7 @@
     <Reference Include="Castle.MonoRail.TestSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.MonoRail.TestSupport.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="nunit.framework, Version=2.4.7.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -74,7 +75,6 @@
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
-    <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />
@@ -82,7 +82,6 @@
     <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
-    <Compile Include="NotificationFixture.cs" />
     <Compile Include="SortFixture.cs" />
     <Compile Include="ViewHelperFixture.cs" />
   </ItemGroup>

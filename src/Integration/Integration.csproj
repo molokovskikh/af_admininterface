@@ -44,6 +44,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Common.EmailSender, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
+    <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
+    </Reference>
     <Reference Include="Castle.DynamicProxy2, Version=2.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.DynamicProxy2.dll</HintPath>
@@ -59,6 +63,9 @@
     <Reference Include="Castle.MonoRail.TestSupport, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.MonoRail.TestSupport.dll</HintPath>
+    </Reference>
+    <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -84,6 +91,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
+    <Reference Include="Rhino.Mocks">
+      <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -103,6 +113,7 @@
     <Compile Include="ADHelperFixture.cs" />
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
+    <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\AddressFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />

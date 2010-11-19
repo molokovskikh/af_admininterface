@@ -6,7 +6,7 @@
 									  ("Новый пользователь", "")]} %>
 
 <script>
-    jQuery(function() {
+	jQuery(function() {
 			jQuery.validator.addMethod("validateEmailList", function(value, element) {
 			if (value.toString().length > 0) {
 				res = /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
@@ -14,10 +14,10 @@
 			}
 			return true;
 		}, "Поле содержит некорректный адрес электронной почты");
-        jQuery("form").validate({ rules: { "mails": "validateEmailList", } });
-    });
+		jQuery("form").validate({ rules: { "mails": "validateEmailList", } });
+	});
 </script>
-									  
+
 <div style="width: 800px;">
 	<form method=post name="AddUserForm" action="${siteroot}/users/add">
 		<input type=hidden value="${Client.Id}" name="clientId" />
@@ -35,6 +35,10 @@
 			
 			<input type="checkbox" name="user.SendRejects" value="true" checked="checked" /> Получать отказы<br>
 			<input type="hidden" name="user.SendRejects" value="false" />
+		</div>
+		<div class=block>
+			<h3>Примечание</h3>
+			<textarea cols=60 rows=4 name=comment></textarea>
 		</div>
 		<div class=block>
 			<h3>
@@ -57,19 +61,19 @@
 			<% OutputSubView("/SubViews/PersonInfo") %>
 		</div>
 
-        <div class="block" id="DeliveryAddressDiv">
-            <h3>Адрес доставки</h3>
-            <table border="0" width="100%" cellpadding="3" cellspacing="0">
-                <tr>
-                    <td width="20%">Адрес доставки медикаментов:</td>
-                    <td width="80%"><input type="text" id="deliveryAddress" name="address.Value" style="width: 60%" /></td>
-                </tr>
+		<div class="block" id="DeliveryAddressDiv">
+			<h3>Адрес доставки</h3>
+			<table border="0" width="100%" cellpadding="3" cellspacing="0">
+				<tr>
+					<td width="20%">Адрес доставки медикаментов:</td>
+					<td width="80%"><input type="text" id="deliveryAddress" name="address.Value" style="width: 60%" /></td>
+				</tr>
 				<tr>
 					<td wisth="20%">Юридическое лицо</td>
 					<td>${FormHelper.Select("address.JuridicalOrganization.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
 				<tr/>
-            </table>
-        </div>
+			</table>
+		</div>
 		
 		<div class=block>
 			<h3>Доступ к адресам доставки</h3>
@@ -123,10 +127,10 @@
 			</div>							
 		</div>
 		
-        <div class="block">
-            <h3>Региональная настройка</h3>
-            <% OutputSubView("/SubViews/Regions") %>
-        </div>
+		<div class="block">
+			<h3>Региональная настройка</h3>
+			<% OutputSubView("/SubViews/Regions") %>
+		</div>
 		
 		<div class=save>
 			<input type=submit value="Создать">

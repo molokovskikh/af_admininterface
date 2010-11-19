@@ -65,7 +65,7 @@ Email: {2}
 Полное наименование: {3}
 Домашний регион: {4}",
 					SecurityContext.Administrator.UserName,
-					SecurityContext.Administrator.GetHost(),
+					SecurityContext.Administrator.Host,
 					client.Name,
 					client.FullName,
 					client.HomeRegion.Name),
@@ -85,7 +85,7 @@ Email: {2}
 Домашний регион: {4}
 Адрес доставки: {5}",
 					SecurityContext.Administrator.UserName,
-					SecurityContext.Administrator.GetHost(),
+					SecurityContext.Administrator.Host,
 					client.Name,
 					client.FullName,
 					client.HomeRegion.Name,
@@ -103,35 +103,46 @@ Email: {2}
 				"farm@analit.net");
 		}
 
-		public static void AddressRegistred(Address address)
+		public static void Registred(object item, string comment)
 		{
+			Client client;
+			string body;
+			if (item is User)
+			{
+				var user = ((User)item);
+				body = "Зарегистрирован новый пользователь " + user.Login;
+				client = user.Client;
+			}
+			else
+			{
+				var address = ((Address)item);
+				body = "Зарегистрирован новый адрес доставки " + address.Value;
+				client = address.Client;
+			}
+
+			if (!String.IsNullOrEmpty(comment))
+			{
+				body += "\r\nПримечание " + comment;
+				new ClientInfoLogEntity(comment, item).Save();
+			}
+
 			Func.Mail("register@analit.net", 
 				"Регистрация нового адреса доставки", 
 				String.Format(@"Для клиента {0} код {1} регион {2}
-Зарегистрирован новый адрес доставки {3}
+{3}
 Регистратор {4}",
-				address.Client.Name,
-				address.Client.Id,
-				address.Client.HomeRegion.Name,
-				address.Value,
-				SecurityContext.Administrator.ManagerName), 
-				"RegisterList@subscribe.analit.net, billing@analit.net");
-
-			NotifySupplierAboutAddressRegistration(address);
-		}
-
-		public static void UserRegistred(User user)
-		{
-			Func.Mail("register@analit.net", 
-				"Регистрация нового пользователя", 
-				String.Format(@"Для клиента {0} код {1}
-Зарегистрирован новый пользователь {2}
-Регистратор {3}",
-				user.Client.Name,
-				user.Client.Id,
-				user.Login,
+				client.Name,
+				client.Id,
+				client.HomeRegion.Name,
+				body,
 				SecurityContext.Administrator.ManagerName),
 				"RegisterList@subscribe.analit.net, billing@analit.net");
+
+
+			if (item is Address)
+			{
+				NotifySupplierAboutAddressRegistration((Address)item);
+			}
 		}
 
 		public static void SendMessageFromBillingToClient(Client client, string text, string subject)

@@ -1,5 +1,7 @@
-﻿using AdminInterface.Helpers;
+﻿using System;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -25,7 +27,10 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address, [DataBind("contacts")] Contact[] contacts, uint clientId)
+		public void Add([DataBind("delivery")] Address address,
+			[DataBind("contacts")] Contact[] contacts,
+			uint clientId,
+			string comment)
 		{
 			var client = Client.FindAndCheck(clientId);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -35,15 +40,14 @@ namespace AdminInterface.Controllers
 				client.AddAddress(address);
 				address.UpdateContacts(contacts);
 				address.SaveAndFlush();
-				address.MaitainIntersection();
+				address.Maintain();
 
 				scope.VoteCommit();
 			}
 
 			address.CreateFtpDirectory();
 			client.Users.Each(u => address.SetAccessControl(u.Login));
-
-			Mailer.AddressRegistred(address);
+			Mailer.Registred(address, comment);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "info", new { cc = client.Id });
 		}

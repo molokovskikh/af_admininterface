@@ -55,28 +55,28 @@
 		validateForm();
 	});
 
-    function validateSupplier() {
-        if (jQuery("#ShowForOneSupplier").attr("checked"))
-            return ((jQuery("#SupplierComboBox").val() != null) &&
-                        (jQuery("#SupplierComboBox").val().length > 0) &&
-                        (jQuery("#SelectSupplierDiv").css("display") == "block"));
-        return true;
-    }
+	function validateSupplier() {
+		if (jQuery("#ShowForOneSupplier").attr("checked"))
+			return ((jQuery("#SupplierComboBox").val() != null) &&
+						(jQuery("#SupplierComboBox").val().length > 0) &&
+						(jQuery("#SelectSupplierDiv").css("display") == "block"));
+		return true;
+	}
 
-    function validatePayer() {
-        if (jQuery("#PayerExists").attr("checked"))
-            return ((jQuery("#PayerComboBox").val() != null) &&
-	                    (jQuery("#PayerComboBox").val().length > 0) &&
-                        (jQuery("#SelectPayerDiv").css("display") == "block"));
-        return true;
-    }
+	function validatePayer() {
+		if (jQuery("#PayerExists").attr("checked"))
+			return ((jQuery("#PayerComboBox").val() != null) &&
+						(jQuery("#PayerComboBox").val().length > 0) &&
+						(jQuery("#SelectPayerDiv").css("display") == "block"));
+		return true;
+	}
 
-    function validateAddress(value, element) {
-        if (jQuery("#clientType").val() == ${ClientTypeSupplier})
-            return true;
-        res = /^.{1,100}$/.test(value)
-        return res;
-    }
+	function validateAddress(value, element) {
+		if (jQuery("#clientType").val() == ${ClientTypeSupplier})
+			return true;
+		res = /^.{1,100}$/.test(value)
+		return res;
+	}
 
 	function validateForm() {
 		jQuery("form").validate({
@@ -106,159 +106,159 @@
 	}
 	
 	function ShowSelectSupplierDiv() {
-        var searchText = jQuery("#SearchSupplierTextPattern").val();
-        if (searchText.length == 0)
-            return;
-        var url = "SearchSuppliers?searchPattern=" + searchText;
-        if (jQuery('#PayerComboBox').val() != null) {
-            var payerId = parseInt(jQuery('#PayerComboBox').val());
-            searchText += "&payerId=" + payerId;
-        }
-	    jQuery.get(url, function(htmlOptions) {
-	        jQuery('#SupplierComboBox').find('option').remove().end();
-	        if (htmlOptions.length == 0) {
-	            jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-	            jQuery("#SearchSupplierButton").attr("disabled", "");	            
-	            jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
-	            return;
-	        }
-	        jQuery("#SupplierComboBox").append(htmlOptions);
-            ViewDiv(false, "#SearchSupplierDiv");
-	        ViewDiv(true, "#SelectSupplierDiv");
-	        jQuery("#MessageForSupplier").html("");
-	        OnSupplierChange();	        
-	    });	    
-	    jQuery("#MessageForSupplier").html("<i>Выполняется поиск<i/>");
-	    jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
-	    jQuery("#SearchSupplierButton").attr("disabled", "disabled");	    
+		var searchText = jQuery("#SearchSupplierTextPattern").val();
+		if (searchText.length == 0)
+			return;
+		var url = "SearchSuppliers?searchPattern=" + searchText;
+		if (jQuery('#PayerComboBox').val() != null) {
+			var payerId = parseInt(jQuery('#PayerComboBox').val());
+			searchText += "&payerId=" + payerId;
+		}
+		jQuery.get(url, function(htmlOptions) {
+			jQuery('#SupplierComboBox').find('option').remove().end();
+			if (htmlOptions.length == 0) {
+				jQuery("#SearchSupplierTextPattern").attr("disabled", "");
+				jQuery("#SearchSupplierButton").attr("disabled", "");	            
+				jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
+				return;
+			}
+			jQuery("#SupplierComboBox").append(htmlOptions);
+			ViewDiv(false, "#SearchSupplierDiv");
+			ViewDiv(true, "#SelectSupplierDiv");
+			jQuery("#MessageForSupplier").html("");
+			OnSupplierChange();	        
+		});	    
+		jQuery("#MessageForSupplier").html("<i>Выполняется поиск<i/>");
+		jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
+		jQuery("#SearchSupplierButton").attr("disabled", "disabled");	    
 	}
 	
 	function ShowSearchSupplierDiv() {
-	    jQuery('#SupplierComboBox').find('option').remove().end();
-	    jQuery("#MessageForSupplier").html("");
-	    jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-	    jQuery("#SearchSupplierButton").attr("disabled", "");	    
-	    ViewDiv(false, '#SelectSupplierDiv');
-	    ViewDiv(true, "#SearchSupplierDiv");
-	    LockPayer();
-	    jQuery("#SearchSupplierTextPattern").focus();
+		jQuery('#SupplierComboBox').find('option').remove().end();
+		jQuery("#MessageForSupplier").html("");
+		jQuery("#SearchSupplierTextPattern").attr("disabled", "");
+		jQuery("#SearchSupplierButton").attr("disabled", "");	    
+		ViewDiv(false, '#SelectSupplierDiv');
+		ViewDiv(true, "#SearchSupplierDiv");
+		LockPayer();
+		jQuery("#SearchSupplierTextPattern").focus();
 	}
 	
 	function ShowSelectPayerDiv() {	    
-        var searchText = jQuery("#SearchPayerTextPattern").val();
-        if (searchText.length == 0)
-            return;
-        var url = "SearchPayers?searchPattern=" + searchText;
-	    jQuery.get(url, function(htmlOptions) {
-	        jQuery('#PayerComboBox').find('option').remove().end();
-	        if (htmlOptions.length == 0) {
-	            jQuery("#SearchPayerTextPattern").attr("disabled", "");
-	            jQuery("#SearchPayerButton").attr("disabled", "");	            
-	            jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
-	            return;
-	        }
-	        jQuery("#PayerComboBox").append(htmlOptions);	        
-	        ViewDiv(false, "#SearchPayerDiv");
-	        ViewDiv(true, "#SelectPayerDiv");
-	        jQuery("#MessageForPayer").html("");
-	    });	    
-	    jQuery("#MessageForPayer").html("<i>Выполняется поиск</i>");
-	    jQuery("#SearchPayerTextPattern").attr("disabled", "disabled");
-	    jQuery("#SearchPayerButton").attr("disabled", "disabled");	    
+		var searchText = jQuery("#SearchPayerTextPattern").val();
+		if (searchText.length == 0)
+			return;
+		var url = "SearchPayers?searchPattern=" + searchText;
+		jQuery.get(url, function(htmlOptions) {
+			jQuery('#PayerComboBox').find('option').remove().end();
+			if (htmlOptions.length == 0) {
+				jQuery("#SearchPayerTextPattern").attr("disabled", "");
+				jQuery("#SearchPayerButton").attr("disabled", "");	            
+				jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
+				return;
+			}
+			jQuery("#PayerComboBox").append(htmlOptions);	        
+			ViewDiv(false, "#SearchPayerDiv");
+			ViewDiv(true, "#SelectPayerDiv");
+			jQuery("#MessageForPayer").html("");
+		});	    
+		jQuery("#MessageForPayer").html("<i>Выполняется поиск</i>");
+		jQuery("#SearchPayerTextPattern").attr("disabled", "disabled");
+		jQuery("#SearchPayerButton").attr("disabled", "disabled");	    
 	}
 	
 	function ShowSearchPayerDiv() {
-	    jQuery('#PayerComboBox').find('option').remove().end();
-	    jQuery("#MessageForPayer").html("");
-	    jQuery("#SearchPayerTextPattern").attr("disabled", "");
-	    jQuery("#SearchPayerButton").attr("disabled", "");	    
-	    ViewDiv(false, '#SelectPayerDiv');
-	    ViewDiv(true, "#SearchPayerDiv");
-	    jQuery("#SearchPayerTextPattern").focus();
+		jQuery('#PayerComboBox').find('option').remove().end();
+		jQuery("#MessageForPayer").html("");
+		jQuery("#SearchPayerTextPattern").attr("disabled", "");
+		jQuery("#SearchPayerButton").attr("disabled", "");	    
+		ViewDiv(false, '#SelectPayerDiv');
+		ViewDiv(true, "#SearchPayerDiv");
+		jQuery("#SearchPayerTextPattern").focus();
 	}
 	
 	function ViewDiv(show, selector)
 	{
-	    var displayValue = "none";
-	    if (show) {
-	        displayValue = "block";
-	    }
-	    jQuery(selector).css("display", displayValue);
+		var displayValue = "none";
+		if (show) {
+			displayValue = "block";
+		}
+		jQuery(selector).css("display", displayValue);
 	}
 	
 	function OnPayerExistsChanged(selectedValue) {	    
-	    ViewDiv(false, "#SearchPayerDiv");
-	    ViewDiv(false, "#SelectPayerDiv");
-	    var disabled = '';
-	    var checked = 'checked';
-	    if (selectedValue) {	        
-	        ShowSearchPayerDiv();
-	        disabled = 'disabled';
-	        checked = '';
-	    }
-	    jQuery("#FillBillingInfo").attr('disabled', disabled);
-	    jQuery("#FillBillingInfo").attr('checked', checked);
-	    jQuery("#PayerExistsValue").val(selectedValue);
+		ViewDiv(false, "#SearchPayerDiv");
+		ViewDiv(false, "#SelectPayerDiv");
+		var disabled = '';
+		var checked = 'checked';
+		if (selectedValue) {	        
+			ShowSearchPayerDiv();
+			disabled = 'disabled';
+			checked = '';
+		}
+		jQuery("#FillBillingInfo").attr('disabled', disabled);
+		jQuery("#FillBillingInfo").attr('checked', checked);
+		jQuery("#PayerExistsValue").val(selectedValue);
 	}
 	
 	function OnClientViewChanged(selectedValue) {
-	    ViewDiv(false, "#SearchSupplierDiv");
-	    ViewDiv(false, "#SelectSupplierDiv");
-	    if (selectedValue) {
-	        ShowSearchSupplierDiv();
-	    }
-	    else {
-	        UnlockPayer();
-	    }
+		ViewDiv(false, "#SearchSupplierDiv");
+		ViewDiv(false, "#SelectSupplierDiv");
+		if (selectedValue) {
+			ShowSearchSupplierDiv();
+		}
+		else {
+			UnlockPayer();
+		}
 	}
 	
 	function OnClientTypeChanged(selectedValue) {
-	    if (selectedValue == "${ClientTypeDrugstore}") {
-	        ViewDiv(true, "#DeliveryAddressDiv");
-	    }
-	    
-	    if (selectedValue == "${ClientTypeSupplier}") {
-	        ViewDiv(false, "#DeliveryAddressDiv");
-	    }
+		if (selectedValue == "${ClientTypeDrugstore}") {
+			ViewDiv(true, "#DeliveryAddressDiv");
+		}
+		
+		if (selectedValue == "${ClientTypeSupplier}") {
+			ViewDiv(false, "#DeliveryAddressDiv");
+		}
 	}
 	
 	function OnSupplierChange(payerName) {
-	    var payer = jQuery("#SupplierComboBox option:selected").attr("title");
-	    SetLockedPayer(payer);
-        var payerId = parseInt(payer);
-	    jQuery("#PayerIdValue").val(payerId);
+		var payer = jQuery("#SupplierComboBox option:selected").attr("title");
+		SetLockedPayer(payer);
+		var payerId = parseInt(payer);
+		jQuery("#PayerIdValue").val(payerId);
 	}
 	
 	function LockPayer() {
-	    jQuery("#PayerExists").attr('checked', '');
-	    jQuery("#PayerExists").click();
+		jQuery("#PayerExists").attr('checked', '');
+		jQuery("#PayerExists").click();
 		jQuery("#PayerExistsValue").val(true);
-	    jQuery("#PayerExists").attr('disabled', 'disabled');
-	    jQuery("#FillBillingInfo").attr('checked', '');
-	    jQuery("#FillBillingInfo").attr('disabled', 'disabled');
-	    ViewDiv(false, '#SelectPayerDiv');
-	    ViewDiv(false, "#SearchPayerDiv");	    
+		jQuery("#PayerExists").attr('disabled', 'disabled');
+		jQuery("#FillBillingInfo").attr('checked', '');
+		jQuery("#FillBillingInfo").attr('disabled', 'disabled');
+		ViewDiv(false, '#SelectPayerDiv');
+		ViewDiv(false, "#SearchPayerDiv");	    
 	}
 	
 	function SetLockedPayer(payerName) {
-	    jQuery("#PayerExists").attr('checked', 'checked');
+		jQuery("#PayerExists").attr('checked', 'checked');
 		jQuery("#PayerExistsValue").val(true);
-	    jQuery("#PayerExists").attr('disabled', 'disabled');
-	    jQuery("#PayerComboBox").attr('disabled', 'disabled');
-	    jQuery("#ResetPayerButton").attr('disabled', 'disabled');
-	    jQuery("#PayerComboBox").html("<option selected>" + payerName + "</option>");
-	    ViewDiv(true, "#SelectPayerDiv");
+		jQuery("#PayerExists").attr('disabled', 'disabled');
+		jQuery("#PayerComboBox").attr('disabled', 'disabled');
+		jQuery("#ResetPayerButton").attr('disabled', 'disabled');
+		jQuery("#PayerComboBox").html("<option selected>" + payerName + "</option>");
+		ViewDiv(true, "#SelectPayerDiv");
 	}
 	
 	function UnlockPayer() {
-	    jQuery("#PayerExists").attr('checked', '');
+		jQuery("#PayerExists").attr('checked', '');
 		jQuery("#PayerExistsValue").val(false);
-	    jQuery("#PayerExists").attr('disabled', '');
-	    jQuery("#PayerComboBox").attr('disabled', '');
-	    jQuery("#ResetPayerButton").attr('disabled', '');	
-	    jQuery("#FillBillingInfo").attr('checked', '');
-	    jQuery("#FillBillingInfo").attr('disabled', '');	        
-	    ViewDiv(false, "#SelectPayerDiv");
+		jQuery("#PayerExists").attr('disabled', '');
+		jQuery("#PayerComboBox").attr('disabled', '');
+		jQuery("#ResetPayerButton").attr('disabled', '');	
+		jQuery("#FillBillingInfo").attr('checked', '');
+		jQuery("#FillBillingInfo").attr('disabled', '');	        
+		ViewDiv(false, "#SelectPayerDiv");
 	}
 	
 	function addPhone(prefix) {
@@ -312,42 +312,42 @@
 
 <div style="width: 800px;">
 <form id="RegistrationForm" name="RegistrationForm" method="post" action="${siteroot}/Register/RegisterClient" onsubmit="return validate()">
-    <div class="block">
-        <h3>Общая информация</h3>
-        <table border="0" width="100%" cellpadding="5" cellspacing="0">
-            <tr>
-                <td width="20%">Тип клиента:</td>
-                <td width="50%">
-                    <select name="client.Type" id="clientType" style="width: 100%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
-                        <option value="${ClientTypeDrugstore}" selected="selected">Аптека</option>
-                        <!-- 
-                        Возможность регистрации поставщиков в "новой реальности" пока недоступна
-                        <option value="${ClientTypeSupplier}">Поставщик</option>-->
-                    </select>
-                </td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Сегмент:</td>
-                <td>
-                    <select name="client.Segment" id="SegmentComboBox" style="width: 100%">
-                        <option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
-                        <option value="${SegmentTypeRetail}">Розница</option>
-                    </select>
-                </td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Юридическое наименование:</td>
-                <td><input type="text" id="JuridicalName" name="client.FullName" style="width: 100%" /></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td>Краткое наименование:</td>
-                <td><input type="text" id="ShortName" name="client.Name" style="width: 100%" /></td>
-                <td></td>
-            </tr>
-            <tr valign="top">
+	<div class="block">
+		<h3>Общая информация</h3>
+		<table border="0" width="100%" cellpadding="5" cellspacing="0">
+			<tr>
+				<td width="20%">Тип клиента:</td>
+				<td width="50%">
+					<select name="client.Type" id="clientType" style="width: 100%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
+						<option value="${ClientTypeDrugstore}" selected="selected">Аптека</option>
+						<!-- 
+						Возможность регистрации поставщиков в "новой реальности" пока недоступна
+						<option value="${ClientTypeSupplier}">Поставщик</option>-->
+					</select>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Сегмент:</td>
+				<td>
+					<select name="client.Segment" id="SegmentComboBox" style="width: 100%">
+						<option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
+						<option value="${SegmentTypeRetail}">Розница</option>
+					</select>
+				</td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Юридическое наименование:</td>
+				<td><input type="text" id="JuridicalName" name="client.FullName" style="width: 100%" /></td>
+				<td></td>
+			</tr>
+			<tr>
+				<td>Краткое наименование:</td>
+				<td><input type="text" id="ShortName" name="client.Name" style="width: 100%" /></td>
+				<td></td>
+			</tr>
+			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
 						<a id="clientaddPhoneLink" class="icon icon-add" name="2" href="javascript:"
@@ -405,51 +405,57 @@
 					</table>
 				</td>
 				<td></td>
-            </tr>
-        </table>
-    </div>
-    
-    <div class="block">
-        <h3>Права доступа</h3>
+			</tr>
+		</table>
+	</div>
+
+	<div class=block>
+		<h3>Примечание</h3>
+		<textarea cols=60 rows=4 name=comment></textarea>
+	</div>
+
+	<div class="block">
+		<h3>Права доступа</h3>
 		<div>
 			<% for i, permission in enumerate(Permissions): %>
 				<input type=checkbox name=permissions[${i}].Id value=${permission.Id} ${"checked" if (permission.AssignDefaultValue)}>
 				${permission.Name}
 				<br>
 			<% end %>
-		</div>        
-    </div>
-    
-    <div class="block">
-        <h3>Настройка</h3>
-        <table cellpadding="1" border="0" width="100%">
-            <tr>
-                <td colspan="2"><input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">Не подключать новые прайс-листы</input></td>
-            </tr>
-            <tr>
-                <td width="50%">                    
-                    <input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
+		</div>
+	</div>
+	
+	<div class="block">
+		<h3>Настройка</h3>
+		<table cellpadding="1" border="0" width="100%">
+			<tr>
+				<td colspan="2"><input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">Не подключать новые прайс-листы</input></td>
+			</tr>
+			<tr>
+				<td width="50%">                    
+					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
 					 <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
-                </td>
-                <td>
-                    <div id="SearchPayerDiv" style="width: 100%; display: none">
-                        <input type="text" id="SearchPayerTextPattern" name="SearchPayerTextPattern" style="width: 75%" />
-                        <input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />                        
-                    </div>
-                    <div id="SelectPayerDiv" style="width: 100%; display: none">
-                        <select id="PayerComboBox" name="payer.PayerID" style="width: 75%"></select>
-                        <input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
-                    </div>
-                    <div id="MessageForPayer"></div>
-                    <input type="hidden" id="PayerIdValue" name="existingPayerId" />
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2"><input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input></td>
-            </tr>            
-            <tr>
-                <td width="50%">
+				</td>
+				<td>
+					<div id="SearchPayerDiv" style="width: 100%; display: none">
+						<input type="text" id="SearchPayerTextPattern" name="SearchPayerTextPattern" style="width: 75%" />
+						<input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />                        
+					</div>
+					<div id="SelectPayerDiv" style="width: 100%; display: none">
+						<select id="PayerComboBox" name="payer.PayerID" style="width: 75%"></select>
+						<input type="button" id="ResetPayerButton" name="ResetPayerButton" value="Сброс" onclick="ShowSearchPayerDiv()" />
+					</div>
+					<div id="MessageForPayer"></div>
+					<input type="hidden" id="PayerIdValue" name="existingPayerId" />
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input></td>
+			</tr>            
+			<tr>
+				<td width="50%">
 					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
+<<<<<<< HEAD
                 </td>
                 <td>
                     <div id="SelectSupplierDiv" style="width: 100%; display: none">
@@ -478,32 +484,32 @@
 				id="additionalEmails"></textarea>
         </fieldset>
     </div>    
+	
+	<div class="block">
+		<h3>Региональная настройка</h3>
+		<% OutputSubView("/SubViews/Regions") %>
+	</div>
 
-    <div class="block">
-        <h3>Региональная настройка</h3>
-        <% OutputSubView("/SubViews/Regions") %>
-    </div>
+	<div class="block" id="DeliveryAddressDiv">
+		<h3>Адрес доставки</h3>
+		<table border="0" width="100%" cellpadding="3" cellspacing="0">
+			<tr>
+				<td width="20%">Адрес доставки медикаментов:</td>
+				<td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
+			</tr>
+		</table>
+	</div>
 
-    <div class="block" id="DeliveryAddressDiv">
-        <h3>Адрес доставки</h3>
-        <table border="0" width="100%" cellpadding="3" cellspacing="0">
-            <tr>
-                <td width="20%">Адрес доставки медикаментов:</td>
-                <td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="block">
-        <h3>Сведения о пользователе</h3>
-        <table border="0" width="100%" cellpadding="3" cellspacing="0">
-            <tr>
-                <td width="20%">Комментарий:</td>
-                <td width="50%"><input type="text" id="UserName" name="userName" style="width: 100%" /></td>
-                <td></td>
-            </tr>
-            
-            <tr valign="top">
+	<div class="block">
+		<h3>Сведения о пользователе</h3>
+		<table border="0" width="100%" cellpadding="3" cellspacing="0">
+			<tr>
+				<td width="20%">Комментарий:</td>
+				<td width="50%"><input type="text" id="UserName" name="userName" style="width: 100%" /></td>
+				<td></td>
+			</tr>
+			
+			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
 						<a id="useraddPhoneLink" class="icon icon-add" name="2" href="javascript:"

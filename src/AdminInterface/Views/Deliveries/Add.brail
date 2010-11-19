@@ -20,7 +20,12 @@
 		<h2>Новый адрес доставки</h2>
 		<div class=block>
 			<h3>Адрес</h3>
-			<p><input name=delivery.value class="required" style="width: 100%;"></p>
+			<input name=delivery.value class="required" style="width: 100%;">
+		</div>
+
+		<div class=block>
+			<h3>Примечание</h3>
+			<textarea cols=60 rows=4 name=comment></textarea>
 		</div>
 
 		<div class="block">

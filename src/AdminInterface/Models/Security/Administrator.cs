@@ -27,6 +27,8 @@ namespace AdminInterface.Models.Security
 	[ActiveRecord("Regionaladmins", Schema = "accessright", Lazy = false)]
 	public class Administrator
 	{
+		public static Func<string> GetHost = () => HttpContext.Current.Request.UserHostAddress;
+
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
 
@@ -282,12 +284,7 @@ namespace AdminInterface.Models.Security
 
 		public string Host
 		{
-			get { return HttpContext.Current.Request.UserHostAddress; }
-		}
-
-		public string GetHost()
-		{
-			return HttpContext.Current.Request.UserHostAddress;
+			get { return GetHost(); }
 		}
 
 		public static void SetLogonHours(string login, bool[] weekLogonHours)
