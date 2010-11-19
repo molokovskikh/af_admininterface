@@ -43,6 +43,15 @@
 			return true;
 		}, "Поле содержит некорректный адрес электронной почты");
 
+		jQuery.validator.addMethod( "noEmailAddress", function(value, element) {  
+			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 
+				&& jQuery("#SendRegistrationCard").attr("checked"))  
+			{  
+				return false;  
+			}  
+			else return true;  
+		}, "Это поле необходимо заполнить."); 
+		
 		validateForm();
 	});
 
@@ -70,15 +79,15 @@
     }
 
 	function validateForm() {
-	    jQuery("form").validate({
+		jQuery("form").validate({
 	        rules: {
 	            "client.FullName": "required",
 	            "client.Name": "required",
 	            "deliveryAddress": "validateAddress",
 	            "clientContacts[0].ContactText" : "required",
-	            "clientContacts[1].ContactText" : "required",
-	            "additionalEmailsForSendingCard": "validateEmailList"
-	        }
+	            "additionalEmailsForSendingCard": "validateEmailList",
+	            "clientContacts[1].ContactText" : "noEmailAddress"
+			}
 	    });
 	}
 
@@ -93,7 +102,7 @@
 	        jQuery("#SearchPayerTextPattern").focus();
 	        return false;
         }
-	    return true;
+		return true;
 	}
 	
 	function ShowSelectSupplierDiv() {
@@ -465,7 +474,8 @@
             <legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
             <br />
             Дополнительные адреса для отправки регистрационной карты:<br />
-            <textarea rows="2" cols="60" name="additionalEmailsForSendingCard"></textarea>
+            <textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
+				id="additionalEmails"></textarea>
         </fieldset>
     </div>    
 

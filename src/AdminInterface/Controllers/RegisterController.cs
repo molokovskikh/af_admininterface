@@ -385,7 +385,7 @@ WHERE   intersection.pricecode IS NULL
 
 			var generalGroup = owner.AddContactGroup(ContactGroupType.General);
 			foreach (var contact in clientContacts)
-				generalGroup.AddContact(contact);
+				if (contact.ContactText!=null) generalGroup.AddContact(contact);
 			owner.Save();
 		}
 
