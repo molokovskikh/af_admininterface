@@ -347,47 +347,10 @@ group by u.ClientId")
 
 		public virtual void MaintainIntersection()
 		{
-			ArHelper.WithSession(
-				s => {
-					s.CreateSQLQuery(@"
-set @skip = 0;
-
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	LegalEntityId,
-	CostId,
-	AvailableForClient
-)
-SELECT  DISTINCT drugstore.Id,
-		regions.regioncode,
-		pricesdata.pricecode,
-		:legalEntityId,
-		(
-		  SELECT costcode
-		  FROM    pricescosts pcc
-		  WHERE   basecost
-				  AND pcc.PriceCode = pricesdata.PriceCode
-		) as CostCode,
-		if(pricesdata.PriceType = 0, 1, 0) as AvailableForClient
-FROM Future.Clients as drugstore
-	JOIN retclientsset as a ON a.clientcode = drugstore.Id
-	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
-		JOIN pricesdata ON pricesdata.firmcode = supplier.firmcode
-	JOIN farm.regions ON (supplier.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id
-WHERE i.Id IS NULL
-	AND supplier.firmtype = 0
-	AND drugstore.Id = :clientId
-	AND drugstore.FirmType = 1;
-")
-							.SetParameter("clientId", Id)
-							.SetParameter("legalEntityId", Payer.JuridicalOrganizations.Single().Id)
-							.ExecuteUpdate();
-				});
+			foreach (var legalEntity in Payer.JuridicalOrganizations)
+			{
+				Maintainer.MaintainIntersection(this, legalEntity);
+			}
 		}
 
 		public virtual Address AddAddress(string address)
@@ -460,8 +423,8 @@ WHERE i.Id IS NULL
 		{
 			if (String.IsNullOrEmpty(Registrant))
 				return null;
-			else
-				return Administrator.GetByName(Registrant);
+
+			return Administrator.GetByName(Registrant);
 		}
 
 		public override string ToString()

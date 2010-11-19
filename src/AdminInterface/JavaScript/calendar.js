@@ -1390,8 +1390,8 @@ Calendar.prototype.showAtElement = function (el, opts) {
 		var br = Calendar.getAbsolutePos(cp);
 		document.body.removeChild(cp);
 		if (Calendar.is_ie) {
-			br.y += document.documentElement.scrollTop;
-			br.x += document.documentElement.scrollLeft;
+			br.y += document.body.scrollTop;
+			br.x += document.body.scrollLeft;
 		} else {
 			br.y += window.scrollY;
 			br.x += window.scrollX;
@@ -1804,3 +1804,5 @@ Date.prototype.setFullYear = function(y) {
 
 // global object that remembers the calendar
 window._dynarch_popupCalendar = null;
+
+

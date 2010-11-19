@@ -187,6 +187,7 @@
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Logs\UserLogRecord.cs" />
     <Compile Include="Models\Mailer.cs" />
+    <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
@@ -210,6 +211,7 @@
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
+    <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />

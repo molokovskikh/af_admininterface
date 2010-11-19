@@ -1,12 +1,11 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.NHibernateExtentions;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
 using NHibernate.Criterion;
 using NUnit.Framework;
 
-namespace AdminInterface.Test.NHibernateExtentions
+namespace Integration.NHibernateExtentions
 {
 	[TestFixture]
 	public class IfProjectionFixture

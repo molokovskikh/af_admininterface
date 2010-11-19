@@ -146,7 +146,7 @@ Calendar.setup = function (params) {
 		}
 		cal.create(params.flat);
 		cal.show();
-		return false;
+		return cal;
 	}
 
 	var triggerEl = params.button || params.displayArea || params.inputField;
@@ -193,8 +193,10 @@ Calendar.setup = function (params) {
 			cal.showAtElement(params.button || params.displayArea || params.inputField, params.align);
 		else
 			cal.showAt(params.position[0], params.position[1]);
-		return false;
+		return cal;
 	};
 
 	return cal;
 };
+
+

@@ -20,6 +20,55 @@ $(function() {
 		$("#" + this.id + "-tab").show();
 		$(this).addClass("selected");
 	});
+
+	function beginDateAllowed(date) {
+		if (endCalendar)
+			return !(date <= endCalendar.date);
+		else
+			return false;
+	}
+
+	function endDateAllowed(date) {
+		if (beginCalendar)
+			return !(date >= beginCalendar.date);
+		else
+			return false;
+	}
+
+	$(".calendar").each(function () {
+		var id = this.id.substring(0, this.id.indexOf("CalendarHolder"));
+		var value = $("#" + id).get(0).value;
+
+		beginCalendar = null;
+		endCalendar = null;
+
+		var calendar = Calendar.setup({
+			daFormat: "%d.%m.%Y",
+			ifFormat: "%d.%m.%Y",
+			weekNumbers: false,
+			flat: this.id,
+			flatCallback: function () {
+				$("#" + id).get(0).value = calendar.date.print("%d.%m.%Y")
+				calendar.refresh();
+				if (beginCalendar && endCalendar) {
+					beginCalendar.refresh();
+					endCalendar.refresh();
+				}
+			},
+			showOthers: true
+		});
+		calendar.parseDate(value)
+		if (id.indexOf("begin") >= 0) {
+			beginCalendar = calendar;
+			calendar.setDateStatusHandler(beginDateAllowed);
+		}
+		if (id.indexOf("end") >= 0) {
+			endCalendar = calendar;
+			calendar.setDateStatusHandler(endDateAllowed);
+		}
+
+		calendar.refresh();
+	});
 });
 
 function ShowHidden(folder) {

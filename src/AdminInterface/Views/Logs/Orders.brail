@@ -1,26 +1,15 @@
-﻿<%if IsDefined("client"): %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		История заказов клиента ${client.Name}
-	<% end %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	История заказов
+<% end %>
+<div class="PageHeader">
+	История заказов
+</div>
 
-	<div class="PageHeader">
-		История заказов клиента ${client.Name}
-	</div>
-<%else: %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		История заказов пользователя ${user.Login}
-	<% end %>
-
-	<div class="PageHeader">
-		История заказов пользователя ${user.Login}
-	</div>
-	
-	<% component CaptureFor, {"id" : "PostToServer"}: %>
-		${FormHelper.HiddenField("userId", user.Id)}
-	<% end %>
-<%end %>
-
-<% OutputSubView("SelectDateIntervalSubView") %>
+${app.BeginFormFor("filter")}
+${app.FilterFor("filter.Period")}
+${app.FilterFor("filter.Users")}
+${app.FilterFor("filter.Addresses")}
+${app.EndFormFor("filter")}
 
 <table class=DataTable>
 	<% if orders.Count > 0: %>
@@ -30,9 +19,7 @@
 			<th>Дата заказа</th>
 			<th>Дата прайса</th>
 			<th>Адрес</th>
-		  <%if IsDefined("client"): %>
 			<th>Пользователь</th>
-		  <%end %>
 			<th>Поставщик</th>
 			<th>Прайс</th>
 			<th>Позиций</th>
@@ -46,9 +33,7 @@
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>
 			<td>${LinkHelper.Address(siteroot, order.AddressId, order.Address)}</td>
-		  <%if IsDefined("client"): %>
 			<td>${LinkHelper.User(siteroot, order.Login, order.User)}</td>
-		  <%end %>
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>

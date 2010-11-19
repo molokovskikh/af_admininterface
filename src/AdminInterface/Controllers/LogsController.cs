@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
+using Castle.Components.Binder;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Transform;
@@ -15,6 +18,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(LinkHelper)),
+		Helper(typeof(AppHelper), "app"),
 		Secure
 	]
 	public class LogsController : SmartDispatcherController
@@ -159,28 +163,56 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 		}
 
-		public void Orders(uint? clientId, uint? userId)
+		public void Orders(uint? clientId,
+			[DataBind("filter")] OrderFilter filter)
 		{
-			Orders(clientId, userId, DateTime.Today, DateTime.Today);
+			LayoutName = "GeneralWithJQueryOnly";
+			if (clientId != null)
+			{
+				filter.Client = Client.Find(clientId.Value);
+				if (filter.Address != null && filter.Address.Id == 0)
+				{
+					filter.Address = null;
+				}
+				if (filter.User != null && filter.User.Id == 0)
+				{
+					filter.User = null;
+				}
+			}
+			PropertyBag["orders"] = OrderLog.Load(filter);
+			PropertyBag["filter"] = filter;
+		}
+	}
+
+	public class DatePeriod
+	{
+		public DateTime Begin { get; set; }
+		public DateTime End { get; set; }
+	}
+
+	public class OrderFilter
+	{
+		public Client Client { get; set; }
+		public User User { get; set; }
+		public Address Address { get; set; }
+		public DatePeriod Period { get; set; }
+
+		public IList<User> Users
+		{
+			get { return Client.Users.OrderBy(u => u.Name).ToList(); }
 		}
 
-		public void Orders(uint? clientId, uint? userId, DateTime beginDate, DateTime endDate)
+		public IList<Address> Addresses
 		{
-			if (!userId.HasValue)
-			{
-				PropertyBag["client"] = Client.FindAndCheck(clientId.Value);
-				PropertyBag["Orders"] = OrderLog.Load(clientId.Value, beginDate, endDate);
-			}
-			else
-			{
-				var user = User.Find(userId.Value);
-				Client.FindAndCheck(user.Client.Id);
-				PropertyBag["user"] = user;
-				PropertyBag["Orders"] = OrderLog.LoadByUser(userId.Value, beginDate, endDate);
-			}
+			get { return Client.Addresses.OrderBy(u => u.Name).ToList(); }
+		}
 
-			PropertyBag["beginDate"] = beginDate;
-			PropertyBag["endDate"] = endDate;
+		public OrderFilter()
+		{
+			Period = new DatePeriod{
+				Begin = DateTime.Today,
+				End = DateTime.Today
+			};
 		}
 	}
 
@@ -231,48 +263,22 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public static IList<OrderLog> Load(uint clientId, DateTime begin, DateTime end)
+		public static IList<OrderLog> Load(OrderFilter filter)
 		{
-			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
-SELECT  oh.rowid as Id,
-		oh.WriteTime,
-		oh.PriceDate,
-		c.Name as Drugstore,
-		a.Address,
-		a.Id as AddressId,
-		u.Login as Login,
-		if (u.Name is not null and length(u.Name) > 0, u.Name, u.Login) as User,
-		firm.shortname as Supplier,
-		pd.PriceName,
-		pd.PriceCode PriceId,
-		oh.RowCount,
-		max(o.ResultCode) as ResultCode,
-		o.TransportType,
-		oh.ClientOrderId
-FROM orders.ordershead oh
-	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
-	join usersettings.clientsdata as firm on firm.firmcode = pd.firmcode
-	join Future.Clients c on oh.ClientCode = c.Id
-	join Future.Users u on u.Id = oh.UserId
-	join Future.Addresses a on a.Id = oh.AddressId
-		left join logs.orders o on oh.rowid = o.orderid
-WHERE oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)
-	AND oh.ClientCode = :ClientId
-	AND oh.RegionCode & :RegionCode > 0
-	and oh.Deleted = 0
-group by oh.rowid
-ORDER BY writetime desc;")
-				.SetParameter("FromDate", begin)
-				.SetParameter("ToDate", end)
-				.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
-				.SetParameter("ClientId", clientId)
-				.SetResultTransformer(Transformers.AliasToBean<OrderLog>())
-				.List<OrderLog>());
-		}
+			return ArHelper.WithSession(s => {
 
-		public static IList<OrderLog> LoadByUser(uint userId, DateTime begin, DateTime end)
-		{
-			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
+				var sqlFilter = "oh.ClientCode = :clientId and oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)";
+				if (filter.User != null)
+				{
+					sqlFilter += "and oh.UserId = :UserId ";
+
+				}
+				if (filter.Address != null)
+				{
+					sqlFilter += "and oh.AddressId = :AddressId ";
+				}
+
+				var query = s.CreateSQLQuery(String.Format(@"
 SELECT  oh.rowid as Id,
 		oh.WriteTime,
 		oh.PriceDate,
@@ -295,18 +301,27 @@ FROM orders.ordershead oh
 	join Future.Users u on u.Id = oh.UserId
 	join Future.Addresses a on a.Id = oh.AddressId
 		left join logs.orders o on oh.rowid = o.orderid
-WHERE oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)
-	AND oh.UserId = :UserId
-	AND oh.RegionCode & :RegionCode > 0
+WHERE {0} and oh.RegionCode & :RegionCode > 0
 	and oh.Deleted = 0
 group by oh.rowid
-ORDER BY writetime desc;")
-				.SetParameter("FromDate", begin)
-				.SetParameter("ToDate", end)
-				.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
-				.SetParameter("UserId", userId)
-				.SetResultTransformer(Transformers.AliasToBean<OrderLog>())
-				.List<OrderLog>());
+ORDER BY writetime desc;", sqlFilter))
+					.SetParameter("FromDate", filter.Period.Begin)
+					.SetParameter("ToDate", filter.Period.End)
+					.SetParameter("clientId", filter.Client.Id)
+					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
+					.SetResultTransformer(Transformers.AliasToBean<OrderLog>());
+
+				if (filter.User != null)
+				{
+					query.SetParameter("UserId", filter.User.Id);
+				}
+				if (filter.Address != null)
+				{
+					query.SetParameter("AddressId", filter.Address.Id);
+				}
+
+				return query.List<OrderLog>();
+			});
 		}
 	}
 }

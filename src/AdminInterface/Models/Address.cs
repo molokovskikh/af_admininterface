@@ -252,26 +252,28 @@ set @skip = 0;
 			UpdateContacts(displayedContacts, null);
 		}
 
-		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
+		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity newLegalEntity)
 		{
-			MoveAddressIntersection(newOwner, legalEntity);
+			MoveAddressIntersection(newOwner, newLegalEntity,
+				Client, LegalEntity);
 
 			Client = newOwner;
-			Payer = legalEntity.Payer;
-			LegalEntity = legalEntity;
+			Payer = newLegalEntity.Payer;
+			LegalEntity = newLegalEntity;
 
 			Update();
 		}
 
-		private void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity)
+		public virtual void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity, 
+			Client oldClient, LegalEntity oldLegalEntity)
 		{
 			ArHelper.WithSession(session => session.CreateSQLQuery(@"
 insert into Future.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
 select :AddressId, ni.Id, ai.SupplierDeliveryId, ai.ControlMinReq, ai.MinReq
 from Future.Intersection ni
-left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId and oi.LegalEntityId = :oldLegalEntityId
+left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId and oi.LegalEntityId = :OldLegalEntityId
 left join Future.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.AddressId = :AddressId
-where ni.ClientId = :NewClientId and ni.LegalEntityId = :legalEntityId
+where ni.ClientId = :NewClientId and ni.LegalEntityId = :NewLegalEntityId
 ;
 
 delete ai
@@ -279,13 +281,14 @@ from Future.AddressIntersection ai
 join Future.Intersection i on i.Id = ai.IntersectionId
 where ai.AddressId = :AddressId
 and i.ClientId = :OldClientId
+and i.LegalEntityId = :OldLegalEntityId
 ;
 ")
 				.SetParameter("AddressId", Id)
 				.SetParameter("NewClientId", newClient.Id)
-				.SetParameter("OldClientId", Client.Id)
-				.SetParameter("legalEntityId", newLegalEntity.Id)
-				.SetParameter("oldLegalEntityId", LegalEntity.Id)
+				.SetParameter("OldClientId", oldClient.Id)
+				.SetParameter("NewLegalEntityId", newLegalEntity.Id)
+				.SetParameter("OldLegalEntityId", oldLegalEntity.Id)
 				.ExecuteUpdate());
 		}
 
