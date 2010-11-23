@@ -80,28 +80,28 @@
 
 	function validateForm() {
 		jQuery("form").validate({
-	        rules: {
-	            "client.FullName": "required",
-	            "client.Name": "required",
-	            "deliveryAddress": "validateAddress",
-	            "clientContacts[0].ContactText" : "required",
-	            "additionalEmailsForSendingCard": "validateEmailList",
-	            "clientContacts[1].ContactText" : "noEmailAddress"
+			rules: {
+				"client.FullName": "required",
+				"client.Name": "required",
+				"deliveryAddress": "validateAddress",
+				"clientContacts[0].ContactText" : "required",
+				"additionalEmailsForSendingCard": "validateEmailList",
+				"clientContacts[1].ContactText" : "noEmailAddress"
 			}
-	    });
+		});
 	}
 
 	function validate() {
-        if (!validateSupplier()) {
-            jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
-            jQuery("#SearchSupplierTextPattern").focus();
-            return false;
-        }	    
-	    if (!validatePayer()) {
-	        jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
-	        jQuery("#SearchPayerTextPattern").focus();
-	        return false;
-        }
+		if (!validateSupplier()) {
+			jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
+			jQuery("#SearchSupplierTextPattern").focus();
+			return false;
+		}	    
+		if (!validatePayer()) {
+			jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
+			jQuery("#SearchPayerTextPattern").focus();
+			return false;
+		}
 		return true;
 	}
 	
@@ -432,7 +432,7 @@
 				<td colspan="2"><input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">Не подключать новые прайс-листы</input></td>
 			</tr>
 			<tr>
-				<td width="50%">                    
+				<td width="50%">
 					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
 					 <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
 				</td>
@@ -451,39 +451,38 @@
 			</tr>
 			<tr>
 				<td colspan="2"><input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input></td>
-			</tr>            
+			</tr>
 			<tr>
 				<td width="50%">
 					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
-<<<<<<< HEAD
-                </td>
-                <td>
-                    <div id="SelectSupplierDiv" style="width: 100%; display: none">
-                        <select name="supplier.Id" id="SupplierComboBox" style="width: 75%" onchange="OnSupplierChange(this.options[this.selectedIndex].title)"></select>
-                        <input type="button" name="ResetSupplierButton" id="ResetSupplierButton" value="Сброс" onclick="ShowSearchSupplierDiv()" />
-                    </div>
-                    <div id="SearchSupplierDiv" style="width: 100%; display: none">
-                        <input type="text" id="SearchSupplierTextPattern" name="SearchSupplierTextPattern" style="width: 75%" />
-                        <input type="button" id="SearchSupplierButton" name="SearchSupplierButton" value="Найти" onclick="ShowSelectSupplierDiv()" />                        
-                    </div>                
-                    <div id="MessageForSupplier"></div>
-                </td>
-            </tr>            
-            <tr>
-                <td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>                
-            </tr>
-            <tr>            
-                <td colspan="2"><input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input></td>
-            </tr>
-        </table>
-        <fieldset>
-            <legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
-            <br />
-            Дополнительные адреса для отправки регистрационной карты:<br />
-            <textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
+				</td>
+				<td>
+					<div id="SelectSupplierDiv" style="width: 100%; display: none">
+						<select name="supplier.Id" id="SupplierComboBox" style="width: 75%" onchange="OnSupplierChange(this.options[this.selectedIndex].title)"></select>
+						<input type="button" name="ResetSupplierButton" id="ResetSupplierButton" value="Сброс" onclick="ShowSearchSupplierDiv()" />
+					</div>
+					<div id="SearchSupplierDiv" style="width: 100%; display: none">
+						<input type="text" id="SearchSupplierTextPattern" name="SearchSupplierTextPattern" style="width: 75%" />
+						<input type="button" id="SearchSupplierButton" name="SearchSupplierButton" value="Найти" onclick="ShowSelectSupplierDiv()" />                        
+					</div>                
+					<div id="MessageForSupplier"></div>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>                
+			</tr>
+			<tr>
+				<td colspan="2"><input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input></td>
+			</tr>
+		</table>
+		<fieldset>
+			<legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
+			<br />
+			Дополнительные адреса для отправки регистрационной карты:<br />
+			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
 				id="additionalEmails"></textarea>
-        </fieldset>
-    </div>    
+		</fieldset>
+	</div>
 	
 	<div class="block">
 		<h3>Региональная настройка</h3>
