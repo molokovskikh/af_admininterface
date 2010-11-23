@@ -131,32 +131,37 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage clientMessage,
+		public void SendMessage([DataBind("NewClientMessage")] ClientMessage message,
 			uint clientId,
+			uint payerId,
 			bool sendMessageToClientEmails,
 			string subjectForEmailToClient)
 		{
 			try
 			{
 				Client client = null;
-				using (var scope = new TransactionScope())
+				using (var scope = new TransactionScope(OnDispose.Rollback))
 				{
 					DbLogHelper.SetupParametersForTriggerLogging();
-					if (clientMessage.ClientCode == 0)
-						foreach (var user in Client.Find(clientId).Users)
-						{
-							SendMessageToUser(user, clientMessage);
-							client = user.Client;
-						}
+					if (message.ClientCode != 0)
+					{
+						var user = User.Find(message.ClientCode);
+						client = user.Client;
+						SendMessageToUser(user, message);
+					}
 					else
 					{
-						var user = User.Find(clientMessage.ClientCode);
-						SendMessageToUser(user, clientMessage);
-						client = user.Client;
+						var payer = Payer.Find(payerId);
+						foreach(var user in payer.Users)
+						{
+							client = user.Client;
+							SendMessageToUser(user, message);
+						}
 					}
+					scope.VoteCommit();
 				}
 				if (sendMessageToClientEmails)
-					Mailer.SendMessageFromBillingToClient(client, clientMessage.Message, subjectForEmailToClient);
+					Mailer.SendMessageFromBillingToClient(client, message.Message, subjectForEmailToClient);
 				Flash["Message"] = new Message("Сообщение сохранено");
 			}
 			catch (ValidationException exception)

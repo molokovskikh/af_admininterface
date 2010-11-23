@@ -189,7 +189,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<%
 		headerCssClass = "ShowHiden"
 		bodyCssClass = "hidden"
-		if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 0:
+		if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 5:
 			headerCssClass = "HideVisible"
 			bodyCssClass = ""
 		end
@@ -507,9 +507,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 </div>
 
 <div class="right">
-<% if IsDefined("UsersMessages"): %>
+<% if IsDefined("UsersMessages") and Users.Count: %>
 		<div class="UseCaseGroup">
 		<form id="SendMessageForm" action="sendMessage.rails" method="post">
+			<% if IsDefined("Client"): %>
+			${FormHelper.HiddenField("clientId", Client.Id)}
+			<% end %>
+			${FormHelper.HiddenField("payerId", Instance.Id)}
+			${FormHelper.HiddenField("tab", "payments")}
 			<table style="width:100%">
 					<tr>
 						<% if (CountUsersWithMessages > 0): %>
@@ -525,16 +530,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</div>
 							<div class="VisibleFolder ${cssClassBody}" title="Сообщения для пользователей">
 								<br />
-							<% for i,user in enumerate(Users): 
+							<% for i, user in enumerate(Users): 
 								if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
 								<div id="CurrentMessageForUser${user.Id}" style="text-align: left">
 								Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.
 									<a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
 								</div>
-<%                              end
+							<% end
 							end %>
 							</div>
-<%                      end %>
+							<% end %>
 						</td>
 					</tr>
 					<tr><td><br /></td></tr>
@@ -543,15 +548,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							Сообщение для пользователя:
 							<select id="messageReceiverComboBox" name="NewClientMessage.ClientCode">
 								<option value="0" selected="selected">Для всех пользователей</option>
-<%                              for i, user in enumerate(Users): %>
+								<% for i, user in enumerate(Users): %>
 								<option value="${user.Id}">${user.GetLoginOrName()}</option>
-<%                              end %>
+								<% end %>
 							</select>
-							<% if (Users.Count > 0): %>
-							<input type="hidden" name="clientId" value="${Users[0].Client.Id}" />
-							<% else: %>
-							<input type="hidden" name="clientId" value="${client.Id}" />
-							<% end %>
 						</td>
 					</tr>
 					<% if IsDefined("SendError"): %>
@@ -596,30 +596,31 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 	<% end %>
 	
-		<div class="UseCaseGroup">
-			<div class="InputGroupHeader" style="margin-bottom:10px;">
-				Статистика включений/выключений
-			</div>
-			<table class="DataTable">
-			<% if LogRecords.Count > 0: %>
-				<thead>
+	<div class="UseCaseGroup">
+		<div class="InputGroupHeader" style="margin-bottom:10px;">
+			Статистика включений/выключений
+		</div>
+		<table class="DataTable">
+		<% if LogRecords.Count: %>
+			<thead>
+				<tr>
 					<th>Дата</th>
 					<th>Объект</th>
 					<th>Имя</th>
 					<th>Оператор</th>
 					<th>Статус</th>
-				</thead>
-			<% end %>
-			<% for i,logRecord in enumerate(LogRecords): %>
-				<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
-					<td>${logRecord.LogTime}</td>
-					<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
-					<td>${logRecord.Value}</td>
-					<td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
-					<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
 				</tr>
-			<% end %>
-			</table>
-					
-		</div>
+			</thead>
+		<% end %>
+		<% for i,logRecord in enumerate(LogRecords): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
+				<td>${logRecord.LogTime}</td>
+				<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
+				<td>${logRecord.Value}</td>
+				<td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
+				<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
+			</tr>
+		<% end %>
+		</table>
+	</div>
 </div>
