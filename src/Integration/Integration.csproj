@@ -118,7 +118,6 @@
     <Compile Include="Models\AddressFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
-    <Compile Include="Controllers\BillingControllerFixture.cs" />
     <Compile Include="Controllers\ClientControllerFixture.cs" />
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Controllers\SmapRejectorControllerFixture.cs" />

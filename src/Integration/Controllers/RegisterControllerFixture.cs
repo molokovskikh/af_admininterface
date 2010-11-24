@@ -5,14 +5,11 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using AdminInterface.Test.ForTesting;
-using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
 using Functional.ForTesting;
 
-
-namespace AdminInterface.Test.Controllers
+namespace Integration.Controllers
 {
 	[TestFixture]
 	public class RegisterControllerFixture : BaseControllerTest

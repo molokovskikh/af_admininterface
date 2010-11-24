@@ -28,7 +28,7 @@ namespace Integration
 			{
 				var logs = ClientInfoLogEntity.Queryable.Where(l => l.ClientCode == client.Id).ToList();
 				Assert.That(logs[0].Message,
-					Is.EqualTo(String.Format("Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
+					Is.EqualTo(String.Format("$$$Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
 			}
 		}
 	}

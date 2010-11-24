@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Security;
-using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
-using Functional.ForTesting;
+using Common.Tools;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -12,16 +12,19 @@ namespace Integration.Controllers
 	[TestFixture]
 	public class SmapRejectorControllerFixture : BaseControllerTest
 	{
-		private SmapRejectorController _controller;
+		private SmapRejectorController controller;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_controller = new SmapRejectorController();
-			SecurityContext.GetAdministrator = () => new Administrator { UserName = "TestAdmin" };
-			PrepareController(_controller);
-			ForTest.InitialzeAR();
-			RejectedEmail.DeleteAll();
+			controller = new SmapRejectorController();
+			PrepareController(controller);
+			using (new TransactionScope())
+			{
+				RejectedEmail.Queryable
+					.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
+					.Each(r => r.Delete());
+			}
 		}
 
 		[Test]
@@ -34,7 +37,7 @@ namespace Integration.Controllers
 			var mail3 = new RejectedEmail { SmtpId = 64619, Comment = "снова нафиг", LogTime = DateTime.Now.AddDays(-1), From = "tech@analit.net", Subject = "test"};
 			mail3.SaveAndFlush();
 
-			_controller.Show();
+			controller.Show();
 
 			var mails = (RejectedEmail[]) ControllerContext.PropertyBag["rejects"];
 			Assert.That(mails.Length, Is.EqualTo(2));
@@ -58,7 +61,7 @@ namespace Integration.Controllers
 			var mail5 = new RejectedEmail { SmtpId = 4497, Comment = "нафиг", LogTime = new DateTime(2008, 10, 4, 8, 10, 0), From = "test@analit.net", Subject = "Увеличение объемов продаж" };
 			mail5.SaveAndFlush();
 
-			_controller.Search("test", new DateTime(2008, 10, 1), new DateTime(2008, 10, 3));
+			controller.Search("test", new DateTime(2008, 10, 1), new DateTime(2008, 10, 3));
 
 			var mails = (RejectedEmail[])ControllerContext.PropertyBag["rejects"];
 			Assert.That(mails.Length, Is.EqualTo(2));
