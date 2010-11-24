@@ -10,7 +10,11 @@ namespace AdminInterface.Helpers
 	{
 		public static void SetupParametersForTriggerLogging()
 		{
-			ArHelper.WithSession(session => SetupParametersForTriggerLogging(new { InUser = SecurityContext.Administrator.UserName, InHost = SecurityContext.Administrator.GetHost() }, session));
+			ArHelper.WithSession(session => SetupParametersForTriggerLogging(new {
+					InUser = SecurityContext.Administrator.UserName,
+					InHost = SecurityContext.Administrator.Host
+				},
+				session));
 		}
 
 		public static void SetupParametersForTriggerLogging(string user, string host)

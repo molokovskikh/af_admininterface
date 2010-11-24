@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.Components.Common.EmailSender;
 using Castle.Components.Common.EmailSender.Smtp;
 using Castle.MonoRail.Framework;
+using Message = Castle.Components.Common.EmailSender.Message;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -21,39 +23,74 @@ namespace AdminInterface.MonoRailExtentions
 		}
 	}
 
-
 	public class BaseMailer
 	{
+		public bool UnderTest;
 		public SmartDispatcherController Controller;
 		protected string To;
 		protected string From;
 		protected string Subject;
-		protected string Template;
+		protected bool IsBodyHtml;
 
+		protected string Template;
 		protected IDictionary PropertyBag = new Dictionary<string, object>();
 
-		public void Send()
+		private IEmailSender _sender;
+
+		public BaseMailer(IEmailSender sender)
+		{
+			_sender = sender;
+		}
+
+		public BaseMailer()
+		{
+			_sender = new SmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+		}
+
+		public virtual void Send()
+		{
+			var message = GetMessage();
+#if DEBUG
+			if (!UnderTest)
+				message.To = ConfigurationManager.AppSettings["DebugMail"];
+#endif 
+			_sender.Send(message);
+		}
+
+		protected virtual Message GetMessage()
 		{
 			var message = Controller.RenderMailMessage(Template, null, PropertyBag);
 			message.Subject = Subject;
 			message.From = From;
 			message.To = To;
 			message.Encoding = Encoding.UTF8;
-			var sender = new SmtpSender("box.analit.net");
-			sender.Send(message);
+			if (IsBodyHtml)
+				message.Format = Format.Html;
+			else
+				message.Format = Format.Text;
+			return message;
 		}
 	}
 
 	public class MonorailMailer : BaseMailer
 	{
+		public MonorailMailer(IEmailSender sender) : base(sender)
+		{}
+
+		public MonorailMailer()
+		{}
+
+		public string Me()
+		{
+			var request = Controller.Request;
+			var result = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
+			return result;
+		}
+
 		public MonorailMailer EnableChanged(IEnablable item, bool oldEnable)
 		{
 			Template = "EnableChanged";
-#if DEBUG
-			To = "KvasovTest@analit.net";
-#else
 			To = "RegisterList@subscribe.analit.net";
-#endif
 			From = "register@analit.net";
 			var lastDisable = "неизвестно";
 
@@ -107,6 +144,19 @@ namespace AdminInterface.MonoRailExtentions
 			To = "billing@analit.net";
 			From = "register@analit.net";
 			Subject = String.Format("Платное изменение пароля - {0}", user.Client.FullName);
+		}
+
+		public void NotifyBillingAboutClientRegistration(Client client)
+		{
+			Template = "NotifyBillingAboutClientRegistration";
+			IsBodyHtml = true;
+			To = "billing@analit.net";
+			From = "register@analit.net";
+			Subject = "Регистрация нового клиента";
+
+			PropertyBag["client"] = client;
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["Me"] = Me();
 		}
 
 		public void NotifySupplierAboutAddressRegistration(Address address)

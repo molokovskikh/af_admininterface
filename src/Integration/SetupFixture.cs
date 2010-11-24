@@ -13,7 +13,10 @@ namespace Integration
 		public void Setup()
 		{
 			ForTest.InitialzeAR();
-			SecurityContext.GetAdministrator = () => new Administrator{UserName = "test"};
+			SecurityContext.GetAdministrator = () => new Administrator{
+				UserName = "test",
+			};
+			Administrator.GetHost = () => "localhost";
 		}
 	}
 }

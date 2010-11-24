@@ -1,16 +1,8 @@
-﻿using System;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
 using AdminInterface.Models.Security;
-using AdminInterface.Test.ForTesting;
+using CassiniDev;
 using Functional.ForTesting;
-using log4net;
-using log4net.Appender;
-using log4net.Config;
-using log4net.Core;
-using log4net.Layout;
-using log4net.Repository.Hierarchy;
-using Microsoft.VisualStudio.WebHost;
 using NUnit.Framework;
 using WatiN.Core;
 using SecurityContext = AdminInterface.Security.SecurityContext;
@@ -60,7 +52,7 @@ namespace Functional
 		[TearDown]
 		public void TeardownFixture()
 		{
-			_webServer.Stop();
+			_webServer.ShutDown();
 		}
 	}
 }

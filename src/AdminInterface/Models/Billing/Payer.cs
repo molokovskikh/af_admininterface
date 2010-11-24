@@ -268,5 +268,15 @@ ORDER BY {Payer}.shortname;";
 		{
 			return ShortName;
 		}
+
+		public virtual void AddComment(string comment)
+		{
+			if (String.IsNullOrEmpty(comment))
+				return;
+
+			if (!String.IsNullOrEmpty(Comment))
+				Comment += "\r\n";
+			Comment += comment;
+		}
 	}
 }

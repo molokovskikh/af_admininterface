@@ -74,24 +74,43 @@ namespace AdminInterface.Models
 
 		private void SpecialCase(ulong newValue, ulong oldValue)
 		{
-			var diff = Math.Max(newValue, oldValue) - Math.Min(newValue, oldValue);
-			string action;
-			if (newValue > oldValue)
-			{
-				action = "Добавлено";
-			}
-			else
-			{
-				action = "Удалено";
-			}
+			var current = ToRegionList(newValue);
+			var old = ToRegionList(oldValue);
 
-			var diffAsString = Enumerable
-				.Range(0, 64)
-				.Select(i => (ulong)Math.Pow(2, i))
-				.Where(i => (diff & i) > 0)
+			var added = Complement(current, old).ToArray();
+			var removed = Complement(old, current).ToArray();
+
+			Message = String.Format("$$$Изменено '{0}'", Name);
+
+			if (removed.Length > 0)
+				Message += " Удалено " + ToString(removed);
+
+			if (added.Length > 0)
+				Message += " Добавлено " + ToString(added);
+		}
+
+		public string ToString(IEnumerable<ulong> items)
+		{
+			return items
 				.Select(i => "'" + Region.Find(i).Name + "'")
 				.Implode();
-			Message = String.Format("$$$Изменено '{0}' {1} {2}", Name, action, diffAsString);
+		}
+
+		public IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
+		{
+			foreach (var item in first)
+			{
+				if (second.All(i => !Equals(i, item)))
+					yield return item;
+			}
+		}
+
+		private IEnumerable<ulong> ToRegionList(ulong diff)
+		{
+			return Enumerable
+				.Range(0, 64)
+				.Select(i => (ulong)Math.Pow(2, i))
+				.Where(i => (diff & i) > 0);
 		}
 
 		private string AsString(PropertyInfo property, object value)

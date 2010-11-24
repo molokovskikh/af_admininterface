@@ -58,9 +58,9 @@ namespace AdminInterface.Helpers
 			return stream;
 		}
 
-		public static int SendClientCardAfterPasswordChange(Client client, User user, string password, string additionTo)
+		public static int SendClientCardAfterPasswordChange(User user, string password, string additionTo)
 		{
-			return SendClientCard(client,
+			return SendClientCard(user.Client,
 				user.Login,
 				password,
 				null,

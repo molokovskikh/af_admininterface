@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -431,6 +432,15 @@ group by u.ClientId")
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual void AddComment(string comment)
+		{
+			if (String.IsNullOrEmpty(comment))
+				return;
+
+			Payer.AddComment(comment);
+			new ClientInfoLogEntity(comment, this).Save();
 		}
 	}
 }

@@ -441,6 +441,7 @@
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
     <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
+    <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
     <None Include="Views\Mail\PasswordChange.brail" />
     <None Include="Views\Recipient\Show.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />

@@ -18,7 +18,7 @@ namespace AdminInterface.Models.Logs
 		public PasswordChangeLogEntity(string target)
 		{
 			UserName = SecurityContext.Administrator.UserName;
-			ClientHost = SecurityContext.Administrator.GetHost();
+			ClientHost = SecurityContext.Administrator.Host;
 			TargetUserName = target;
 			LogTime = DateTime.Now;
 		}

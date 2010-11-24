@@ -121,7 +121,13 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public virtual void MaitainIntersection()
+		public virtual void Maintain()
+		{
+			MaintainInscribe();
+			MaintainIntersection();
+		}
+
+		public virtual void MaintainIntersection()
 		{
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(@"
@@ -311,6 +317,18 @@ and i.LegalEntityId = :OldLegalEntityId
 				return null;
 
 			return Administrator.GetByName(Registrant);
+		}
+
+		public virtual void MaintainInscribe()
+		{
+			if (Client.Settings.InvisibleOnFirm != DrugstoreType.Standart)
+				return;
+
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery("insert into inscribe(ClientCode) values(:AddressId);")
+					.SetParameter("AddressId", Id)
+					.ExecuteUpdate();
+			});
 		}
 	}
 }

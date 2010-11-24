@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -39,8 +40,6 @@ namespace AdminInterface.Controllers
 	]
 	public class RegisterController : SmartDispatcherController
 	{
-		private readonly NotificationService _notificationService = new NotificationService();
-
 		[AccessibleThrough(Verb.Get)]
 		public void Register()
 		{
@@ -63,13 +62,14 @@ namespace AdminInterface.Controllers
 			string userName,
 			[DataBind("userContacts")] Contact[] userContacts,
 			[DataBind("userPersons")] Person[] userPersons,
-			string additionalEmailsForSendingCard)
+			string additionalEmailsForSendingCard,
+			string comment)
 		{
 			ulong browseRegionMask = 0;
 			ulong orderRegionMask = 0;
-			User newUser = null;
-			Client newClient = null;
-			var password = String.Empty;
+			User newUser;
+			Client newClient;
+			string password;
 			var trimSymbols = new[] {' '};
 
 			if (!String.IsNullOrEmpty(userName))
@@ -87,56 +87,55 @@ namespace AdminInterface.Controllers
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				ArHelper.WithSession(s => {
-					var connection = (MySqlConnection) s.Connection;
-					var command = new MySqlCommand("", connection);
-					DbLogHelper.SetupParametersForTriggerLogging();
+				DbLogHelper.SetupParametersForTriggerLogging();
 
-					Payer currentPayer = null;
-					if (additionalSettings.PayerExists)
+				Payer currentPayer = null;
+				if (additionalSettings.PayerExists)
+				{
+					if (payer != null || existingPayerId.HasValue)
 					{
-						if (payer != null || existingPayerId.HasValue)
-						{
-							var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
-							currentPayer = Payer.Find(id);
-						}
+						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
+						currentPayer = Payer.Find(id);
 					}
+				}
 
-					newClient = new Client {
-						Status = ClientStatus.On,
-						Type = client.Type,
-						FullName = client.FullName.Replace("№", "N").Trim(trimSymbols),
-						Name = client.Name.Replace("№", "N").Trim(trimSymbols),
-						HomeRegion = Region.Find(homeRegion),
-						Segment = client.Segment,
-						MaskRegion = browseRegionMask,
-						Registrant = SecurityContext.Administrator.UserName,
-						RegistrationDate = DateTime.Now,
-					};
-					if (currentPayer == null)
-						currentPayer = CreatePayer(newClient);
-					newClient.Payer = currentPayer;
-					newClient.AddAddress(deliveryAddress);
-					newClient.SaveAndFlush();
+				newClient = new Client {
+					Status = ClientStatus.On,
+					Type = client.Type,
+					FullName = client.FullName.Replace("№", "N").Trim(trimSymbols),
+					Name = client.Name.Replace("№", "N").Trim(trimSymbols),
+					HomeRegion = Region.Find(homeRegion),
+					Segment = client.Segment,
+					MaskRegion = browseRegionMask,
+					Registrant = SecurityContext.Administrator.UserName,
+					RegistrationDate = DateTime.Now,
+				};
+				if (currentPayer == null)
+					currentPayer = CreatePayer(newClient);
+				newClient.Payer = currentPayer;
+				newClient.AddAddress(deliveryAddress);
+				newClient.SaveAndFlush();
 
-					AddContactsToClient(newClient, clientContacts);
+				AddContactsToClient(newClient, clientContacts);
 
-					newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
-					password = newUser.CreateInAd();
-					var defaults = DefaultValues.Get();
-					if (newClient.IsDrugstore())
-						CreateDrugstore(command, newClient, additionalSettings, orderRegionMask, supplier);
-					else
-						CreateSupplier(command, defaults, newClient);
+				newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
+				password = newUser.CreateInAd();
+				var defaults = DefaultValues.Get();
+				if (newClient.IsDrugstore())
+					CreateDrugstore(newClient, additionalSettings, orderRegionMask, supplier);
+				else
+					CreateSupplier(defaults, newClient);
 
-					if (newClient.IsDrugstore() && newClient.Addresses.Count > 0)
-					{
-						if (newUser.AvaliableAddresses == null)
-							newUser.AvaliableAddresses = new List<Address>();
-						newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
-					}
-					newClient.Addresses.Each(a => a.CreateFtpDirectory());
-				});
+				if (newClient.IsDrugstore() && newClient.Addresses.Count > 0)
+				{
+					if (newUser.AvaliableAddresses == null)
+						newUser.AvaliableAddresses = new List<Address>();
+					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
+				}
+				newClient.Addresses.Each(a => a.CreateFtpDirectory());
+
+				newClient.AddComment(comment);
+
 				scope.VoteCommit();
 			}
 			newUser.UpdateContacts(userContacts);
@@ -158,29 +157,22 @@ namespace AdminInterface.Controllers
 
 			var sendBillingNotificationNow = true;
 			string redirectTo;
-			var virtualDir = Context.UrlInfo.AppVirtualDir;
-			if (!virtualDir.StartsWith("/"))
-				virtualDir = "/" + virtualDir;
-			if (virtualDir.EndsWith("/"))
-				virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
 			if (additionalSettings.FillBillingInfo)
 			{
 				sendBillingNotificationNow = false;
-				redirectTo = String.Format(virtualDir + "/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
+				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
 					newClient.Payer.PayerID,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}
 			else if (additionalSettings.ShowRegistrationCard)
-				redirectTo = virtualDir  + "/report.aspx";
+				redirectTo = "/report.aspx";
 			else
-				redirectTo = String.Format(virtualDir + "/Client/{0}", newClient.Id);
+				redirectTo = String.Format("/Client/{0}", newClient.Id);
+			redirectTo = LinkHelper.GetVirtualDir(Context) + redirectTo;
 
 			if (sendBillingNotificationNow)
-				new NotificationService()
-					.SendNotificationToBillingAboutClientRegistration(newClient,
-						SecurityContext.Administrator.UserName,
-						null, NotificationHelper.GetApplicationUrl());
+				this.Mail().NotifyBillingAboutClientRegistration(newClient);
 
 			Flash["Message"] = Message.Notify("Регистрация завершена успешно");
 			RedirectToUrl(redirectTo);
@@ -233,10 +225,11 @@ namespace AdminInterface.Controllers
 			return payer;
 		}
 
-		private void CreateDrugstore(MySqlCommand command, Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
+		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
 		{
-			command.CommandText = "select usersettings.GeneratePassword()";
-			var costCrypKey = command.ExecuteScalar().ToString();
+			var costCrypKey = ArHelper.WithSession(s =>
+				s.CreateSQLQuery("select usersettings.GeneratePassword()")
+				.UniqueResult<string>());
 
 			client.Settings = new DrugstoreSettings {
 				Id = client.Id,
@@ -256,21 +249,15 @@ namespace AdminInterface.Controllers
 			client.Settings.CreateAndFlush();
 
 			client.MaintainIntersection();
-
-			if (client.Settings.InvisibleOnFirm == DrugstoreType.Standart)
-			{
-				command.CommandText = "insert into inscribe(ClientCode) values(?ClientCode); ";
-				command.Parameters.AddWithValue("?ClientCode", client.Id);
-				command.ExecuteNonQuery();
-			}
+			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 
-		public void CreateSupplier(MySqlCommand command, DefaultValues defaults, Client client)
+		public void CreateSupplier(DefaultValues defaults, Client client)
 		{
 			var orderSendRules = new OrderSendRules(defaults, client.Id);
 			orderSendRules.Save();
 
-			command.CommandText = @"
+/*			command.CommandText = @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);
 SET @NewPriceCode:=Last_Insert_ID(); 
 
@@ -353,7 +340,7 @@ WHERE   intersection.pricecode IS NULL
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
 			command.Parameters.AddWithValue("?ClientCode", client.Id);
-			command.ExecuteNonQuery();
+			command.ExecuteNonQuery();*/
 		}
 
 		private User CreateUser(Client client, string userName, UserPermission[] permissions,
@@ -376,7 +363,7 @@ WHERE   intersection.pricecode IS NULL
 				user.AddContactPerson(person.Name);
 			user.SaveAndFlush();
 			return user;
-		}		
+		}
 
 		private void AddContactsToClient(Client client, Contact[] clientContacts)
 		{
@@ -392,13 +379,13 @@ WHERE   intersection.pricecode IS NULL
 		public void RegisterPayer(uint id, uint clientCode, bool showRegistrationCard)
 		{
 			var instance = Payer.Find(id);
+			var client = Client.Find(clientCode);
+
 			PropertyBag["Instance"] = instance;
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 			PropertyBag["clientCode"] = clientCode;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 			PropertyBag["admin"] = SecurityContext.Administrator;
-
-			var client = Client.Find(clientCode);
 			PropertyBag["JuridicalOrganization"] = client.Addresses[0].LegalEntity;
 		}
 
@@ -408,14 +395,11 @@ WHERE   intersection.pricecode IS NULL
 			uint clientCode,
 			bool showRegistrationCard)
 		{
-			var client = Client.Find(clientCode);
-
+			Client client;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				if (String.IsNullOrEmpty(payer.Comment))
-					payer.Comment = paymentOptions.GetCommentForPayer();
-				else
-					payer.Comment += "\r\n" + paymentOptions.GetCommentForPayer();
+				client = Client.Find(clientCode);
+				payer.AddComment(paymentOptions.GetCommentForPayer());
 				payer.UpdateAndFlush();
 
 				juridicalOrganization.Payer = payer;
@@ -429,16 +413,13 @@ WHERE   intersection.pricecode IS NULL
 
 				scope.VoteCommit();
 			}
+			this.Mail().NotifyBillingAboutClientRegistration(client);
 
-			_notificationService.SendNotificationToBillingAboutClientRegistration(client,
-				SecurityContext.Administrator.UserName,
-				paymentOptions, NotificationHelper.GetApplicationUrl());
-
-			var redirectUrl = String.Empty;
+			string redirectUrl;
 			if (showRegistrationCard)
-				redirectUrl = "/report.aspx";
+				redirectUrl = "~/report.aspx";
 			else
-				redirectUrl = String.Format("/client/{0}", clientCode);
+				redirectUrl = String.Format("~/client/{0}", clientCode);
 			RedirectToUrl(redirectUrl);
 		}
 
@@ -454,12 +435,12 @@ WHERE   intersection.pricecode IS NULL
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			var suppliers = Supplier.FindAll()
-					.Where(item => (item.Status == ClientStatus.On) && item.Name.ToLower().Contains(searchPattern.ToLower()))
-					.Take(50);
 			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
+			var suppliers = Supplier.Queryable
+					.Where(s => (s.Status == ClientStatus.On) && s.Name.Contains(searchPattern))
+					.Take(50);
 			if (payerId.HasValue && (payerId.Value > 0))
 				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);
 			PropertyBag["suppliers"] = suppliers;

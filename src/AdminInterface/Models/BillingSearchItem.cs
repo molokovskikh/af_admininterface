@@ -179,7 +179,7 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 from billing.payers p
 	left join future.Users users on users.PayerId = p.PayerId
 		left join future.Clients cd on cd.Id = users.ClientId
-	left join future.Addresses addresses on addresses.PayerId = cd.PayerId
+	left join future.Addresses addresses on addresses.PayerId = p.PayerId
 	left join Billing.LegalEntities le on le.PayerId = p.PayerId
 		left join Billing.Recipients r on r.Id = le.RecipientId
 where 1 = 1 {0}

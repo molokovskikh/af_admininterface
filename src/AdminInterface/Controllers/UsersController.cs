@@ -48,12 +48,13 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Add([DataBind("user")] User user, 
 			[DataBind("contacts")] Contact[] contacts, 
-			uint clientId, 
-			bool sendClientCard, 
-			string mails,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
-			[DataBind("persons")] Person[] persons)
+			[DataBind("persons")] Person[] persons,
+			string comment,
+			bool sendClientCard,
+			uint clientId,
+			string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
 			string password;
@@ -81,7 +82,7 @@ namespace AdminInterface.Controllers
 					address = client.AddAddress(address);
 					address.AvaliableForUsers = new List<User> {user};
 					address.SaveAndFlush();
-					address.MaitainIntersection();
+					address.Maintain();
 				}
 				client.Save();
 
@@ -93,24 +94,22 @@ namespace AdminInterface.Controllers
 
 			client.Addresses.Each(a => a.SetAccessControl(user.Login));
 
-			Mailer.UserRegistred(user);
+			Mailer.Registred(user, comment);
 			if (address != null)
-				Mailer.AddressRegistred(address);
+				Mailer.Registred(address, null);
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && haveMails)
 			{
-				var contactEmails = String.Empty;
-				foreach (var contact in contacts)
-					if (contact.Type == ContactType.Email)
-						contactEmails = String.Concat(contactEmails, String.Format("{0},", contact.ContactText));
+				var contactEmails = contacts
+					.Where(c => c.Type == ContactType.Email)
+					.Implode(c => c.ContactText);
 				mails = String.Concat(contactEmails, mails);
 				if (mails.EndsWith(","))
 					mails = mails.Remove(mails.Length - 1);
-				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
-					user,
+				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user,
 					password,
 					mails);
 				passwordChangeLog.SetSentTo(smtpId, mails);
@@ -232,7 +231,7 @@ namespace AdminInterface.Controllers
 
 				if (isSendClientCard)
 				{
-					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user.Client,
+					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(
 						user,
 						password,
 						emailsForSend);
