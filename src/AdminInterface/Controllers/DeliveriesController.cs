@@ -1,5 +1,7 @@
-﻿using AdminInterface.Helpers;
+﻿using System;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -56,6 +58,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = address.Client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			if (String.IsNullOrEmpty(address.Registrant))
+				PropertyBag["Registrant"] = null;
+			else 
+				PropertyBag["Registrant"] = Administrator.GetByName(address.Registrant);
 			if ((address.ContactGroup != null) && (address.ContactGroup.Contacts != null))
 				PropertyBag["ContactGroup"] = address.ContactGroup;
 		}

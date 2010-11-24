@@ -89,10 +89,10 @@ namespace AdminInterface.Models
 		public virtual bool Auditor { get; set; }
 
 		[Property]
-		public virtual string Registrant { get; set; }
+		public virtual DateTime RegistrationDate { get; set; }
 
 		[Property]
-		public virtual DateTime RegistrationDate { get; set; }
+		public virtual string Registrant { get; set; }
 
 		[Property, Description("Регионы работы"), Auditable]
 		public virtual ulong WorkRegionMask { get; set; }
@@ -450,6 +450,14 @@ WHERE
 			Client = newOwner;
 			Payer = legalEntity.Payer;
 			Update();
+		}
+
+		public virtual object GetRegistrant()
+		{
+			if (String.IsNullOrEmpty(Registrant))
+				return null;
+
+			return Administrator.GetByName(Registrant);
 		}
 	}
 }

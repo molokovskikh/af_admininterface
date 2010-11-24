@@ -1,0 +1,2 @@
+﻿update usersettings.UserPermissions set Name='Предложения поставщиков по выбранному препарату' where Id=9;
+update usersettings.UserPermissions set Name='Предложения поставщиков по выбранному препарату' where Id=19;

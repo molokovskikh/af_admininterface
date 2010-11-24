@@ -1,0 +1,1 @@
+alter table future.Addresses add column RegistrationDate timestamp not null default current_timestamp;
