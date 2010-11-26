@@ -12,7 +12,7 @@ using NHibernate.Transform;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("logs"),
+		Layout("General"),
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(LinkHelper)),

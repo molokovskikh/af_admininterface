@@ -15,7 +15,7 @@ using System.Linq;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("General"),
+		Layout("GeneralWithJQueryOnly"),
 		Secure
 	]
 	public class MainController : ARSmartDispatcherController

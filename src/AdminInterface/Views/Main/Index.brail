@@ -1,5 +1,4 @@
-﻿<% import System %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Интерфейс управления клиентами
 <% end %>
 
@@ -416,11 +415,11 @@
 				</div>
 				<div style="text-align:left;background-color:#eef8ff; padding: 3px;">
 					<label for="FromCalendar">Начиная с даты:</label>
-					<div style="border: none;" id="beginDateCalendarHolder"></div>
+					<div class=calendar style="border: none;" id="fromCalendarHolder"></div>
 				</div>
 				<div style="text-align:left;background-color:#eef8ff;padding: 3px;">
 					<label for="ToCalendar">По дату:</label>
-					<div style="border: none;" id="endDateCalendarHolder"></div>
+					<div class=calendar style="border: none;" id="toCalendarHolder"></div>
 				</div>
 				<div style="text-align:right;">
 					<input type=submit value=Показать></input>
@@ -437,31 +436,3 @@
 	Пожалуйста не забывайте изменять пароль.
 </p>
 <% end %>
-<script type="text/javascript">
-	function beginDateCallBack(cal) 
-	{
-		document.getElementById("from").value = cal.date.print("%d.%m.%Y");
-	};
-
-	function endDateCallBack(cal) 
-	{
-		document.getElementById("to").value = cal.date.print("%d.%m.%Y");
-	};
-
-  
-  Calendar.setup({
-	date: "${fromDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-	flat: "beginDateCalendarHolder",
-	flatCallback: beginDateCallBack,
-	showOthers: true
-  });
-  
-  Calendar.setup({
-	date: "${toDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-	flat: "endDateCalendarHolder",
-	flatCallback: endDateCallBack,
-	showOthers: true
-  });
-</script>

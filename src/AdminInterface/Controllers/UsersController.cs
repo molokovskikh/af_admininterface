@@ -21,7 +21,7 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(HttpUtility)),
-		Layout("NewDefault"),
+		Layout("GeneralWithJQueryOnly"),
 		Secure,
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]

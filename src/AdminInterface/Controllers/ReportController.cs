@@ -30,13 +30,13 @@ namespace AdminInterface.Controllers
 	}
 
 	[
+		Layout("Report"),
 		Helper(typeof(ViewHelper)),
 		Rescue("Fail", typeof(EndUserException)),
 		Secure(PermissionType.Billing)
 	]
 	public class ReportController : SmartDispatcherController
 	{
-		[Layout("Report")]
 		public void Bill(uint payerId, Period period)
 		{
 			var payer = Payer.Find(payerId);
@@ -48,7 +48,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["Number"] = 1;
 		}
 
-		[Layout("Report")]
 		public void Act(uint payerId, Period period)
 		{
 			var payer = Payer.Find(payerId);
@@ -60,7 +59,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["Number"] = 1;
 		}
 
-		[Layout("Report")]
 		public void RevisionAct(uint payerId, DateTime from, DateTime to)
 		{
 			var payer = Payer.Find(payerId);
@@ -74,6 +72,7 @@ namespace AdminInterface.Controllers
 		
 		public void Contract(uint payerId)
 		{
+			CancelLayout();
 			var payer = Payer.Find(payerId);
 			PropertyBag["payer"] = payer;
 		}

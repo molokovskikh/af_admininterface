@@ -13,7 +13,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("NewDefault"),
+		Layout("GeneralWithJQueryOnly"),
 		Secure,
 	]
 	public class DeliveriesController : SmartDispatcherController

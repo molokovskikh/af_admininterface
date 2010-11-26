@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.IO;
 using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -21,6 +22,49 @@ namespace AdminInterface.Helpers
 				clazz = "DisabledByBilling";
 			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/deliveries/{0}/edit", id);
 			return String.Format("<a class='{1}' href='{2}'>{0}</a>", name, clazz, uri);
+		}
+
+		public string JS(params string[] items)
+		{
+			return Resource(items,
+				"JavaScript",
+				"<script type='text/javascript' src='{0}'></script>");
+		}
+
+		public string CSS(params string[] items)
+		{
+			return Resource(items,
+				"CSS",
+				"<link type='text/css' rel='stylesheet' href='{0}'></link>");
+		}
+
+		private string Resource(string[] items, string path, string template)
+		{
+			var result = new StringBuilder();
+			foreach (var item in items)
+			{
+				string timeStamp;
+				string itemPath;
+				if (item.StartsWith("/"))
+				{
+					itemPath = LinkHelper.GetVirtualDir(Context) + item;
+					timeStamp = GetTimeStamp(Path.Combine(Context.ApplicationPhysicalPath, item));
+				}
+				else
+				{
+					timeStamp = GetTimeStamp(Path.Combine(Path.Combine(Context.ApplicationPhysicalPath, path), item));
+					itemPath = LinkHelper.GetVirtualDir(Context) + "/" + path + "/" + item ;
+				}
+
+				result.AppendFormat(template, itemPath + "?" + timeStamp);
+			}
+			return result.ToString();
+		}
+
+		private string GetTimeStamp(string path)
+		{
+			return new FileInfo(path)
+				.LastWriteTime.ToString("yyyyMMddHHmmss");
 		}
 
 		public string Sortable(string name, string key)

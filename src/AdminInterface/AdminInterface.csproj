@@ -348,6 +348,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Themes\WebApp\base.css" />
+    <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="CopySynonym.aspx" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
@@ -382,8 +384,6 @@
   <ItemGroup>
     <Content Include="Views\Billing\Edit.brail">
     </Content>
-    <Content Include="Views\Layouts\billing.brail" />
-    <Content Include="Views\Layouts\contact.brail" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Css\Billing.css" />
@@ -469,8 +469,6 @@
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
     <None Include="Views\Layouts\GeneralWithJQuery.brail" />
-    <None Include="Views\Layouts\NewDefault.brail" />
-    <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
     <None Include="Views\Monitoring\Updates.brail" />
@@ -486,8 +484,6 @@
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
-    <None Include="Views\Layouts\Common.brail" />
-    <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Monitoring\Clients.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />

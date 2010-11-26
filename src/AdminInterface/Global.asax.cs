@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -9,10 +10,14 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
+using Castle.MonoRail.Framework.Container;
+using Castle.MonoRail.Framework.Descriptors;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using log4net;
@@ -25,7 +30,7 @@ using NHibernate.Type;
 
 namespace AddUser
 {
-	public class Global : HttpApplication, IMonoRailConfigurationEvents
+	public class Global : HttpApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
@@ -285,5 +290,18 @@ WHERE PriceCode = ?Id", connection);
 			configuration.ExtensionEntries.Add(new ExtensionEntry(typeof(ExceptionChainingExtension),
 				new MutableConfiguration("mailTo")));*/
 		}
+
+		public void Created(IMonoRailContainer container)
+		{}
+
+		public void Initialized(IMonoRailContainer container)
+		{
+			container.ControllerDescriptorProvider.AfterProcess += desc => {
+				if (desc.Helpers.Any(d => d.HelperType == typeof(AppHelper)))
+					return;
+				desc.Helpers = desc.Helpers.Concat(new [] {new HelperDescriptor(typeof(AppHelper), "app"), }).ToArray();
+			};
+		}
 	}
+
 }
