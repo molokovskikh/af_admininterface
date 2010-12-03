@@ -265,7 +265,8 @@ namespace AdminInterface.Controllers
 		{
 			return ArHelper.WithSession(s => {
 
-				var sqlFilter = "oh.ClientCode = :clientId and oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)";
+				var sqlFilter = "oh.ClientCode = :clientId and oh.writetime >= :FromDate AND oh.writetime <= ADDDATE(:ToDate, INTERVAL 1 DAY)";
+					//"oh.ClientCode = :clientId and oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)";
 				if (filter.User != null)
 				{
 					sqlFilter += "and oh.UserId = :UserId ";
