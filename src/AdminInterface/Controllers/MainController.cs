@@ -22,8 +22,6 @@ namespace AdminInterface.Controllers
 	{
 		public void Index(ulong? regioncode, DateTime? from, DateTime? to)
 		{
-			SecurityContext.CheckIsUserAuthorized();
-
 			RemoteServiceHelper.Try(() => {
 				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
 			});

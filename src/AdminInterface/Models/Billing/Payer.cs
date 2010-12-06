@@ -8,16 +8,36 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
+using Common.Tools;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
 	public enum DiscountType
 	{
-		[Description("В рублях")]
-		Currency,
-		[Description("В процентах")]
-		Percent,
+		[Description("В рублях")] Currency,
+		[Description("В процентах")] Percent,
+	}
+
+	public enum InvoiceType
+	{
+		[Description("Вручную")] Manual = 0,
+		[Description("Автоматически")] Auto = 1
+	}
+
+	public enum InvoicePeriod
+	{
+		Month,
+		Quarter
+	}
+
+	public class InvoiceSettings
+	{
+		[Property]
+		public virtual bool EmailInvoice { get; set; }
+
+		[Property]
+		public virtual bool PrintInvoice { get; set; }
 	}
 
 	[ActiveRecord("payers", Schema = "billing", Lazy = true)]
@@ -94,10 +114,10 @@ namespace AdminInterface.Models
 		public virtual string ChangeServiceNameTo { get; set; }
 
 		[Property]
-		public virtual int AutoInvoice { get; set; }
+		public virtual InvoiceType AutoInvoice { get; set; }
 
 		[Property]
-		public virtual int PayCycle { get; set; }
+		public virtual InvoicePeriod PayCycle { get; set; }
 
 		[Property]
 		public virtual DateTime OldPayDate { get; set;}
@@ -123,6 +143,9 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool ShowDiscount { get; set; }
 
+		[Nested]
+		public virtual InvoiceSettings InvoiceSettings { get; set; }
+
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
 
@@ -138,6 +161,11 @@ namespace AdminInterface.Models
 		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]
 		public virtual IList<Report> Reports { get; set; }
 
+		public virtual string Name
+		{
+			get { return ShortName; }
+		}
+
 		public virtual float ApplyDiscount(float sum)
 		{
 			if (DiscountType == DiscountType.Currency)
@@ -147,7 +175,7 @@ namespace AdminInterface.Models
 
 		public virtual bool IsManualPayments()
 		{
-			return AutoInvoice == 0;
+			return AutoInvoice == InvoiceType.Manual;
 		}
 
 		public static IEnumerable<Payer> GetLikeAvaliable(string searchPattern)
@@ -183,50 +211,6 @@ ORDER BY {Payer}.shortname;";
 			}
 		}
 
-		public virtual Payment[] FindBills(Period period)
-		{
-			CheckReciver();
-
-			var bills = Payment.FindChargeOffs(this, period);
-
-			if (bills.Length == 0)
-				throw new EndUserException(String.Format("Не могу сформировать документ т.к. у платильщика {0} не было отчислений", ShortName));
-
-			if (DetailInvoice == 1)
-			{
-				var totalChargeOff = Payment.ChargeOff();
-				totalChargeOff.Sum = bills.Sum(b => b.Sum);
-				totalChargeOff.PayedOn = bills.Max(b => b.PayedOn);
-				totalChargeOff.Name = ChangeServiceNameTo;
-				return new[] {totalChargeOff};
-			}
-			return bills;
-		}
-
-		public virtual void CheckReciver()
-		{
-/*
-			if (Recipient == null)
-				throw new EndUserException(
-					String.Format("Не могу сформировать документ т.к. у платильщика {0} не установлен получатель платежей",
-								  ShortName));
-*/
-		}
-
-		public virtual Payment[] FindPayments(DateTime from, DateTime to)
-		{
-			CheckReciver();
-
-			var payments = Payment.FindBetwen(this, from, to);
-
-			if (payments.Length == 0)
-				throw new EndUserException(
-					String.Format("Не могу сформировать документ т.к. с платильщиком {0} не было взаиморасчетов",
-								  ShortName));
-
-			return payments;
-		}
-
 		public virtual DateTime DefaultBeginPeriod()
 		{
 			if (PayCycle == 0)
@@ -238,16 +222,6 @@ ORDER BY {Payer}.shortname;";
 		public virtual DateTime DefaultEndPeriod()
 		{
 			return DateTime.Today;
-		}
-
-		public virtual float DebitOn(DateTime on)
-		{
-			return Payment.DebitOn(this, on);
-		}
-
-		public virtual float CreditOn(DateTime on)
-		{
-			return Payment.CreditOn(this, on);
 		}
 
 		public virtual decimal TotalSum
@@ -277,6 +251,17 @@ ORDER BY {Payer}.shortname;";
 			if (!String.IsNullOrEmpty(Comment))
 				Comment += "\r\n";
 			Comment += comment;
+		}
+
+		public virtual string GetInvocesAddress()
+		{
+			return ContactGroupOwner.ContactGroups
+				.Where(g => g.Type == ContactGroupType.Invoice)
+				.First()
+				.Contacts
+				.Where(c => c.Type == ContactType.Email)
+				.Select(c => c.ContactText)
+				.Implode();
 		}
 	}
 }

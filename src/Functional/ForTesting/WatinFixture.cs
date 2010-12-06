@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Configuration;
+using System.Threading;
 using Castle.ActiveRecord;
 using NUnit.Framework;
+using SHDocVw;
 using WatiN.Core;
 
 namespace Functional.ForTesting
@@ -45,12 +47,20 @@ namespace Functional.ForTesting
 
 		protected IE Open(string uri)
 		{
-			return new IE(BuildTestUrl(uri));
+			var browser = new IE(BuildTestUrl(uri));
+/*
+			((InternetExplorerClass)browser.InternetExplorer).DocumentComplete += (object disp, ref object url) => {
+				Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
+				//Console.WriteLine(browser.Text);
+				//Assert.That(browser.Text, Is.Not.ContainsSubstring("exception"));
+			};
+*/
+			return browser;
 		}
 
 		protected IE Open(string uri, params object[] args)
 		{
-			return new IE(BuildTestUrl(String.Format(uri, args)));
+			return Open(String.Format(uri, args));
 		}
 	}
 }

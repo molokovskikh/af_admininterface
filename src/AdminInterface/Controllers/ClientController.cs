@@ -100,6 +100,7 @@ namespace AdminInterface.Controllers
 			var users = client.Users;
 			var addresses = client.Addresses;
 
+			PropertyBag["self"] = "client/" + client.Id;
 			PropertyBag["Client"] = client;
 			PropertyBag["Registrant"] = client.GetRegistrant();
 			PropertyBag["Admin"] = SecurityContext.Administrator;

@@ -1,5 +1,5 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-	>Настройки по умолчанию
+	Настройки по умолчанию
 <% end %>
 
 <% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>

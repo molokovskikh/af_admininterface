@@ -1,0 +1,10 @@
+alter table Billing.Recipients add column FullName VARCHAR(255);
+alter table Billing.Recipients add column Address VARCHAR(255);
+alter table Billing.Recipients add column INN VARCHAR(255);
+alter table Billing.Recipients add column KPP VARCHAR(255);
+alter table Billing.Recipients add column BIC VARCHAR(255);
+alter table Billing.Recipients add column BankAccountNumber VARCHAR(255);
+alter table Billing.Recipients add column BankLoroAccount VARCHAR(255);
+alter table Billing.Recipients add column Bank VARCHAR(255);
+alter table Billing.Recipients add column Boss VARCHAR(255);
+alter table Billing.Recipients add column Accountant VARCHAR(255);

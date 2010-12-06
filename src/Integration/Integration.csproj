@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>Integration</RootNamespace>
     <AssemblyName>Integration</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -67,10 +67,14 @@
     <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
+    <Reference Include="ExposedObject">
+      <HintPath>..\..\lib\ExposedObject.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MySql.Data, Version=5.1.6.1, Culture=neutral, PublicKeyToken=56e353737e921561, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
@@ -111,8 +115,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ADHelperFixture.cs" />
+    <Compile Include="AppHelperFixture.cs" />
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
+    <Compile Include="InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\AddressFixture.cs" />
@@ -133,6 +139,7 @@
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\IsChangedFixture.cs" />
+    <Compile Include="PrinterFixture.cs" />
     <Compile Include="SetupFixture.cs" />
   </ItemGroup>
   <ItemGroup>

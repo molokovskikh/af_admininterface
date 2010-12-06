@@ -1,0 +1,71 @@
+﻿<div style="padding: 10px">
+	<% component Bubble, {"bredcrumbs" : [("Реестр счетов", "")]} %>
+
+	<div class=block style="float:left; width: 100%;padding:0;">
+		<div style="float:left; width: 50%">
+			<div style="margin:10px">
+				<h3>Реестр счетов</h3>
+				${app.BeginFormFor("filter")}
+				${app.FilterFor("filter.Period")}
+				${app.FilterFor("filter.Regions")}
+				${app.FilterFor("filter.Recipients")}
+				${app.FilterFor("filter.SearchText")}
+				${app.EndFormFor("filter")}
+			</div>
+		</div>
+
+		<div style="float:left; width: 50%">
+			<div style="margin:10px">
+				<h3>Сформировать счета</h3>
+				<form action='${siteroot}/Invoices/Build' method=post>
+					<p>
+						<label>За период</label>
+						${FormHelper.Select(
+							"period",
+							BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
+							BindingHelper.GetDictionaryMapping())}
+						<br>
+						<label>Принтер</label>
+						<select name=printer>
+						<% for printer in printers: %>
+							<option value='${printer}'>${printer}</option>
+						<% end %>
+						</select>
+					</p>
+					<p>
+						<input type=submit value="Сформировать">
+					</p>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class=block>
+		<table class=DataTable>
+			<% if invoices.Count: %>
+			<tr>
+				<th>${app.Sortable("Договор", "payerId")}</th>
+				<th>${app.Sortable("Получатель платежей", "recipient")}</th>
+				<th>${app.Sortable("Плательщик", "payer")}</th>
+				<th>${app.Sortable("Сумма счета", "sum")}</th>
+				<th>${app.Sortable("За период", "period")}</th>
+				<th>${app.Sortable("Дата", "date")}</th>
+			</tr>
+			<% for i, invoice in enumerate(invoices): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td>${invoice.Payer.Id}</td>
+				<td>${invoice.Recipient.Name}</td>
+				<td>${invoice.Payer.Name}</td>
+				<td>${invoice.Sum.ToString("0.##")}</td>
+				<td>${BindingHelper.GetDescription(invoice.Period)}</td>
+				<td>${invoice.Date}</td>
+			</tr>
+			<% end %>
+			<% else: %>
+			<tr class=EmptyData>
+				<td>По вашему запросу ничего не найдено</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

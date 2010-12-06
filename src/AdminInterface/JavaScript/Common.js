@@ -1,10 +1,10 @@
-$(function() {
+$(function () {
 	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});
 
-	$(".ShowHiden").live('click', function() {
+	$(".ShowHiden").live('click', function () {
 		ShowHidden(this);
 	});
 
@@ -19,7 +19,23 @@ $(function() {
 		$(".tabs ul li a.selected").removeClass("selected");
 		$("#" + this.id + "-tab").show();
 		$(this).addClass("selected");
+		return false;
 	});
+
+	$(".tabs ul li a.inline-tab").click(function () {
+		var id = this.id;
+		$.ajax({
+			url: $(this).attr("href"),
+			success: function (content) {
+				$("#" + id + "-tab").html(content)
+			},
+			error: function () {
+				alert(error);
+			}
+		});
+		return false;
+	});
+
 
 	function beginDateAllowed(date) {
 		if (endCalendar)

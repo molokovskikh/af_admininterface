@@ -65,6 +65,22 @@ namespace AddUser
 				.DefaultForAction().Is("info")
 				.Restrict("cc").ValidInteger);
 
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[action]")
+					.DefaultForAction().Is("index")
+			);
+
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[id]")
+					.DefaultForAction().Is("show")
+					.Restrict("id").ValidInteger
+			);
+
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[id]/<action>")
+					.Restrict("id").ValidInteger
+			);
+
 			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[clientId]/orders")
 				.DefaultForController().Is("Logs")
 				.DefaultForAction().Is("Orders")
@@ -286,9 +302,11 @@ WHERE PriceCode = ?Id", connection);
 			MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
 #endif
 
-/*			configuration.SmtpConfig.Host = "mail.adc.analit.net";
+/*
+			configuration.SmtpConfig.Host = "mail.adc.analit.net";
 			configuration.ExtensionEntries.Add(new ExtensionEntry(typeof(ExceptionChainingExtension),
-				new MutableConfiguration("mailTo")));*/
+				new MutableConfiguration("mailTo")));
+*/
 		}
 
 		public void Created(IMonoRailContainer container)

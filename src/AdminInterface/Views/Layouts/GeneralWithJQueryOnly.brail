@@ -17,13 +17,15 @@
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
-			"jquery-1.3.2.min.js",
+			"jquery-1.4.2.min.js",
 			"jquery.validate.min.js",
+			"jquery-ui-1.8.6.custom.min.js",
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css",
 			"/App_Themes/WebApp/base.css",
 			"/App_Themes/WebApp/style.css",
+			"jquery-ui-1.8.6.custom.css",
 			"calendar-blue.css",
 			"Billing.css",
 			"Table.css",
