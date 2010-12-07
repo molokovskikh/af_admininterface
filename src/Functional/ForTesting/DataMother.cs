@@ -276,5 +276,49 @@ namespace Functional.ForTesting
 				return updateEntity;
 			}
 		}
+
+		public static Client CreateTestClientWithPayer()
+		{
+			Client client;
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				var contactOwner = new ContactGroupOwner();
+				contactOwner.Save();
+				var payer = new Payer
+				{
+					ShortName = "test",
+					ContactGroupOwner = contactOwner,
+					JuridicalName = "testName",
+					JuridicalAddress = "testAddress",
+					ReceiverAddress = "testRecAddress",
+				};
+				payer.Save();
+				contactOwner = new ContactGroupOwner();
+				contactOwner.Save();
+				client = new Client
+				{
+					Status = ClientStatus.On,
+					Segment = Segment.Wholesale,
+					Type = ClientType.Drugstore,
+					Name = "test",
+					FullName = "test",
+					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
+					MaskRegion = 1UL,
+					Payer = payer,
+					ContactGroupOwner = contactOwner,
+				};
+				payer.Clients = new List<Client> { client };
+				client.SaveAndFlush();
+				client.Settings = new DrugstoreSettings(client.Id)
+				{
+					BasecostPassword = "",
+					OrderRegionMask = 1UL,
+				};
+				client.Settings.CreateAndFlush();
+
+				scope.VoteCommit();
+				return client;
+			}
+		}
 	}
 }

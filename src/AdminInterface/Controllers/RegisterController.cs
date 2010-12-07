@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -88,14 +89,25 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-
 				Payer currentPayer = null;
+
 				if (additionalSettings.PayerExists)
 				{
 					if (payer != null || existingPayerId.HasValue)
 					{
 						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
 						currentPayer = Payer.Find(id);
+						if (currentPayer.JuridicalOrganizations.Count == 0)
+						{
+							var organization = new LegalEntity();
+							organization.Payer = currentPayer;
+							organization.Name = currentPayer.ShortName;
+							organization.FullName = currentPayer.JuridicalName;
+							organization.Address = currentPayer.JuridicalAddress;
+							organization.ReceiverAddress = currentPayer.ReceiverAddress;
+							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
+							organization.Save();
+						}
 					}
 				}
 
