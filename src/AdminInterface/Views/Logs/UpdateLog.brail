@@ -5,36 +5,36 @@
 
 <script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 <script type="text/javascript">
-    function ShowDownloadResult(id, url, callerDescription) {
-		var isCallerVisible = IsVisible(id, callerDescription)
-		HideAll(id, function() {
-		    if (!isCallerVisible)
-		        Download(url)
+	function ShowDownloadResult(id, url, callerDescription) {
+		var isCallerVisible = IsVisible(id, callerDescription);
+		HideAll(id, function () {
+			if (!isCallerVisible)
+				Download(url);
 		});
 	}
 
 	function Hide(id, description, afterFinish)
 	{
-	    new Effect.SlideUp(description + id, {
-	    afterFinish: function() {
-	        $(description + "Row" + id).remove();
-	        afterFinish();
+		new Effect.SlideUp(description + id, {
+		afterFinish: function() {
+			$(description + "Row" + id).remove();
+			afterFinish();
 		}, duration: 0.5 });
 	}
 
 	function HideAll(id, afterFinish) {
-	    if (IsVisible(id, "DownloadLog")) {
-	        Hide(id, "DownloadLog", afterFinish);
-	    }
-	    else if (IsVisible(id, "UpdateDetails")) {
-	        Hide(id, "UpdateDetails", afterFinish);
-	    }
-	    else if (IsVisible(id, "DocumentDetails")) {
-	        Hide(id, "DocumentDetails", afterFinish);
-	    }
-	    else {
-	        afterFinish();
-	    }
+		if (IsVisible(id, "DownloadLog")) {
+			Hide(id, "DownloadLog", afterFinish);
+		}
+		else if (IsVisible(id, "UpdateDetails")) {
+			Hide(id, "UpdateDetails", afterFinish);
+		}
+		else if (IsVisible(id, "DocumentDetails")) {
+			Hide(id, "DocumentDetails", afterFinish);
+		}
+		else {
+			afterFinish();
+		}
 	}
 	
 	function IsVisible(id, description) {
@@ -53,167 +53,151 @@
 	}
 </script>
 
-<%  if IsDefined("client"):
-        component CaptureFor, {"id" : "Title"}: %>
-		    История обновлений клиента ${client.Name}
-<%      end %>
+	<% if filter.Client:
+		component CaptureFor, {"id" : "Title"}: %>
+			История обновлений клиента ${filter.Client.Name}
+	<% end %>
 
 	<div class="PageHeader">
-		История обновлений клиента ${client.Name}
+		История обновлений клиента ${filter.Client.Name}
 	</div>
 
 	<% component CaptureFor, {"id" : "PostToServer"}: %>
-		${FormHelper.HiddenField("clientCode", client.Id)}
+		${FormHelper.HiddenField("clientCode", filter.Client.Id)}
 	<% end %>
+
 <%  else: %>
-    <% if IsDefined("user"): %>
-	    <% component CaptureFor, {"id" : "Title"}: %>
-		    История обновлений пользователя ${user.Login}
-	    <% end %>
 
-	    <div class="PageHeader">
-		    История обновлений пользователя ${user.Login}
-	    </div>
+	<% if filter.User: %>
 
-	    <% component CaptureFor, {"id" : "PostToServer"}: %>
-		    ${FormHelper.HiddenField("userId", user.Id)}
-	    <% end %>
+		<% component CaptureFor, {"id" : "Title"}: %>
+			История обновлений пользователя ${filter.User.Login}
+		<% end %>
+
+		<div class="PageHeader">
+			История обновлений пользователя ${filter.User.Login}
+		</div>
+
+		<% component CaptureFor, {"id" : "PostToServer"}: %>
+			${FormHelper.HiddenField("userId", filter.User.Id)}
+		<% end %>
+
 	<% end %>
-<%end 
-    if (not IsDefined("updateType")): 
-	    OutputSubView("SelectDateIntervalSubView")
+<%
+	end
+
+	if not filter.UpdateType:
+		OutputSubView("SelectDateIntervalSubView")
 	else:
-        accumulative = cast(int, StatisticsType.UpdateNormal) 
-	    cumulative = cast(int, StatisticsType.UpdateCumulative)
-	    isDataTransferUpdateType = (accumulative == updateType or cumulative == updateType) %>
-    <table width="100%">
-        <tr align="center"><td><font face="Verdana" size="2"><b>${updateTypeName}</b></font></td></tr>
-      <%if IsDefined("regionMask"):
-            countClients = 0
-	        for logEntity in logEntities:
-	            region = logEntity.User.Client.HomeRegion.Id
-	            if (region & regionMask) and (region & adminRegionMask) > 0:
-	                countClients++
-	            end
-	        end
-		else:
-		    countClients = logEntities.Count
-		end%>
-        <tr align="center"><td style="padding-bottom: 15px"><font face="Verdana" size="2">Клиентов, отвечающих условиям выборки: ${countClients}</font></td></tr>
-    </table>        	
+%>
+	<table width="100%">
+		<tr align="center"><td><font face="Verdana" size="2"><b>${BindingHelper.GetDescription(filter.UpdateType)}</b></font></td></tr>
+		<tr align="center"><td style="padding-bottom: 15px"><font face="Verdana" size="2">Клиентов, отвечающих условиям выборки: ${logEntities.Count}</font></td></tr>
+	</table>
 <%	
 	end
 %>
 
 <div>
-<form id="updateForm" name="updateForm" action="${siteroot}/Logs/UpdateLog.rails">
 	<table class="DataTable">
-	    <thead>
-<%      if logEntities.Count > 0: %>	
+		<thead>
+		<% if logEntities.Count: %>
 		<tr>
-<%          headersList = ["Дата"]
-            headersColumns = ["RequestTime"]
-            unsortableHeaders = []
-            if (not IsDefined("client") and not IsDefined("user")):
-                headersList.Add("Регион")
-                headersColumns.Add("Region")
-            end
-            if IsDefined("updateType"):
-                headersList.Add("Клиент")
-                headersColumns.Add("ClientName")
-            else:
-                headersList.Add("Тип обновления")
-                headersColumns.Add("UpdateType")
-            end
-            if (IsDefined("client") or IsDefined("updateType")):
-                headersList.Add("Пользователь")
-                headersColumns.Add("Login")
-            end
-            if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
-                headersList.Add("Размер приготовленных данных")
-                headersColumns.Add("ResultSize")
-            end
-            headersList.Add("Версия")
-            headersColumns.Add("AppVersion")
-            headersList.Add("Дополнительно")
-            headersColumns.Add("Addition")
-            if (IsDefined("updateType") and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"):
-                headersList.Add("Лог")
-                unsortableHeaders.Add("Лог")
-                headersColumns.Add("")
-            end %>
-            
-<%          OutputSubView("/SubViews/SortHeadersSubView",
-                {"headers":headersList, "unsortableHeaders": unsortableHeaders, "sortColumnIndex":sortColumnIndex, "formPostBack":'updateForm' }) %>			
+			<th>
+				${app.Sortable("Дата", "RequestTime")}
+			</th>
+			<% if filter.ShowRegion(): %>
+			<th>
+				${app.Sortable("Регион", "Region")}
+			</th>
+			<% end %>
+			<% if filter.ShowClient(): %>
+			<th>
+				${app.Sortable("Клиент", "ClientName")}
+			</th>
+			<% end %>
+			<% if filter.ShowUpdateType(): %>
+			<th>
+				${app.Sortable("Тип обновления", "UpdateType")}
+			</th>
+			<% end %>
+			<% if filter.ShowUser(): %>
+			<th>
+				${app.Sortable("Пользователь", "Login")}
+			</th>
+			<% end %>
+			<% if filter.ShowUpdateSize(): %>
+			<th>
+				${app.Sortable("Размер приготовленных данных", "ResultSize")}
+			</th>
+			<% end %>
+			<th>
+				${app.Sortable("Версия", "AppVersion")}
+			</th>
+			<th>
+				${app.Sortable("Дополнительно", "Addition")}
+			</th>
+			<% if filter.ShowLog(): %>
+			<th>Лог</th>
+			<% end %>
 		</tr>
 		</thead>
 		<tbody class="HighLightCurrentRow">
-<%          i = 0
-			for logEntity in logEntities:
-			    region = logEntity.User.Client.HomeRegion.Id
-			    if (IsDefined("regionMask") and ((region & regionMask == 0) or (region & adminRegionMask == 0))):
-			        continue
-			    end
-%>
+		<% for i, logEntity in enumerate(logEntities): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}" align="center">
 			<td class="${'NotCommitedUpdate' if not logEntity.Commit}" style="width:1%;">
 				${logEntity.RequestTime}
 			</td>
-			
-		  <%if (not IsDefined("client")) and (not IsDefined("user")): %>	
+			<% if filter.ShowRegion(): %>
 			<td>
-			    ${logEntity.User.Client.HomeRegion.Name}
+				${logEntity.User.Client.HomeRegion.Name}
 			</td>
-		  <%end %>
-	  
-		  <%if IsDefined("updateType"): %>
-		    <td>
-		        <a title="ClientSettings" href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
-		    </td>
-		  <%else: %>  
-		    <td>
-	        <% if logEntity.IsDataTransferUpdateType():	%>
-	            <a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
-	                ${BindingHelper.GetDescription(logEntity.UpdateType)}</a>
-		    <% else: %>
-			        ${BindingHelper.GetDescription(logEntity.UpdateType)}
-		    <% end %>			  
-		    </td>  		  
-		  <%end %>
-		  
-		  <%if (IsDefined("client") or IsDefined("updateType")): %>
+			<% end %>
+			<% if filter.ShowClient(): %>
+			<td>
+				<a title="ClientSettings" href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
+			</td>
+			<% end %>
+			<% if filter.ShowUpdateType(): %>
+			<td>
+			<% if logEntity.IsDataTransferUpdateType(): %>
+				<a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
+					${BindingHelper.GetDescription(logEntity.UpdateType)}
+				</a>
+			<% else: %>
+					${BindingHelper.GetDescription(logEntity.UpdateType)}
+			<% end %>
+			</td>
+			<% end %>
+			<% if filter.ShowUser(): %>
 			<td>
 				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginWithName()}</a>
 			</td>
-		  <%end %>		  
-		  
-		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
-			    <td>
-				    ${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
-			    </td>    		  
-    	  <%end %>
-            <td>
+			<% end %>
+			<% if filter.ShowUpdateSize(): %>
+				<td>
+					${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
+				</td>
+			<% end %>
+			<td>
 				${logEntity.AppVersion}
 			</td>
-
 			<td style="text-align:center;">
 				${logEntity.Addition}
 			</td>
-			
-		  <%if (IsDefined("updateType")and isDataTransferUpdateType) or IsDefined("client") or IsDefined("user"): %>		  
-			    <td>
-				    <% if not string.IsNullOrEmpty(logEntity.Log): %>
-				    <a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
-					    Лог
-				    </a>
-				    <% else: %>
-				    -
-				    <% end %>
-			    </td>	    	  
-    	  <%end %>			
+			<% if filter.ShowLog(): %>
+			<td>
+				<% if not string.IsNullOrEmpty(logEntity.Log): %>
+				<a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
+					Лог
+				</a>
+				<% else: %>
+				-
+				<% end %>
+			</td>
+			<% end %>
 		</tr>
 	<% 
-				i++
 			end
 		else:
 	%>
@@ -222,30 +206,7 @@
 				За указанный период клиент не обновлялся
 			</td>
 		</tr>
-	    </tbody>
-	</table>		
-<%      end %>	
-
-<%      if (logEntities.Count > 0):
-            for i,headerName in enumerate(headersColumns): %>
-        <input type="hidden" name="headerNames[${i}]" value="${headerName}" />
-<%          end
-        end %>		
-        <input type="hidden" name="sortColumnIndex" id="sortColumnIndex" value="${sortColumnIndex}" />
-<%      if IsDefined("regionMask"): %>		        
-        <input type="hidden" name="regionMask" value="${regionMask}" />
-<%      end %>	        
-        <input type="hidden" name="beginDate" id="beginDate" value="${beginDate}" />
-        <input type="hidden" name="endDate" id="endDate" value="${endDate}" />
-<%      if IsDefined("clientCode"): %>	
-        <input type="hidden" name="clientCode" id="clientCode" value="${clientCode}" />
-<%      end %>
-<%      if IsDefined("userId"): %>
-        <input type="hidden" name="userId" id="userId" value="${userId}" />
-<%      end %>	
-<%      if IsDefined("updateType"): %>
-        <input type="hidden" name="updateType" id="updateType" value="${updateType}" />
-<%      end %>	
-
-</form>	
+		</tbody>
+	</table>
+	<% end %>
 </div>

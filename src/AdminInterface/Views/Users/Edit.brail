@@ -51,8 +51,8 @@
         	<li><a href="${siteroot}/users/${user.Login}/ChangePassword" target=_blank>Изменить пароль</a></li>
         	<li><a href="${siteroot}/logs/${user.Login}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
           <% end %>
-			<li><a href="${siteroot}/Logs/UpdateLog.rails?userId=${user.Id}" target="_blank">История обновлений</a></li>
-			<li><a href="${siteroot}/Logs/DocumentLog.rails?userId=${user.Id}" target="_blank">История документов</a></li>
+			<li><a href="${siteroot}/Logs/UpdateLog?userId=${user.Id}" target="_blank">История обновлений</a></li>
+			<li><a href="${siteroot}/Logs/DocumentLog?userId=${user.Id}" target="_blank">История документов</a></li>
 			<li><a href="${siteroot}/client/${user.Client.Id}/Orders?filter.User.Id=${user.Id}" target="_blank">История заказов</a></li>
         	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
 		</ul>

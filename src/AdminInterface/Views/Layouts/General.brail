@@ -11,15 +11,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> 
 
-	${app.JS("calendar.js",
-		"calendar-ru_win_.js",
-		"calendar-setup.js",
-		"prototype.js",
-		"date-ru-RU.js",
-		"Main.js",
-		"Search.js",
-		"validation.js"")}
-
 	${app.CSS("calendar-blue.css",
 		"/App_Themes/Main/Main.css",
 		"Billing.css",
@@ -30,6 +21,17 @@
 		"Contacts.css",
 		"Highlight.css",
 		"Contacts.css")}
+
+	${app.JS("calendar.js",
+		"calendar-ru_win_.js",
+		"calendar-setup.js",
+		"prototype.js",
+		"scriptaculous.js",
+		"date-ru-RU.js",
+		"Main.js",
+		"Search.js",
+		"validation.js")}
+
 </head>
 <body>
 	<% if IsDefined("bredcrumbs"): %>

@@ -53,7 +53,7 @@
 	}
 </style>
 
-<% uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
+<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 	<tr>

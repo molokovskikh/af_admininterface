@@ -95,7 +95,7 @@ namespace AdminInterface.Helpers
 		public string Sortable(string name, string key)
 		{
 			var sorted = false;
-			if (ControllerContext.PropertyBag.Contains("SortBy"))
+			if (ControllerContext.PropertyBag["SortBy"] != null)
 				sorted = ControllerContext.PropertyBag["SortBy"].ToString()
 					.Equals(key, StringComparison.OrdinalIgnoreCase);
 
@@ -105,10 +105,22 @@ namespace AdminInterface.Helpers
 				ControllerContext.PropertyBag["Direction"].ToString().Equals("asc", StringComparison.OrdinalIgnoreCase))
 				direction = "desc";
 
-			var uri = String.Format("{0}/{1}?SortBy={2}&Direction={3}", 
+			var uriParams = "";
+			if (ControllerContext.PropertyBag["filter"] != null)
+			{
+				var contributor = ControllerContext.PropertyBag["filter"] as SortableContributor;
+				if (contributor != null)
+				{
+					uriParams = contributor.GetUri();
+				}
+			}
+
+			var uri = String.Format("{0}/{1}?SortBy={2}&Direction={3}&{4}", 
 				LinkHelper.GetVirtualDir(Context),
 				GetSelfUri(),
-				key, direction);
+				key,
+				direction,
+				uriParams);
 
 			var clazz = "";
 			if (sorted)
