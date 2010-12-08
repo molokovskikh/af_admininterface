@@ -112,6 +112,9 @@ namespace AdminInterface.Controllers
 				if (!payer.JuridicalOrganizations.Any(j => j.Recipient != null))
 					continue;
 
+				if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
+					continue;
+
 				var invoice = new Invoice(payer, period);
 				invoice.Send(this);
 				invoice.Save();

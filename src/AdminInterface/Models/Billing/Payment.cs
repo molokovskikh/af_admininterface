@@ -125,12 +125,18 @@ namespace AdminInterface.Models.Billing
 		public DateTime RegistredOn { get; set; }
 
 		[Property]
-		public float Sum { get; set; }
+		public decimal Sum { get; set; }
 
-		[BelongsTo(Column = "PayerId")]
+		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 
 		[BelongsTo(Column = "RecipientId")]
 		public Recipient Recipient { get; set; }
+
+		public void RegisterPayment()
+		{
+			Payer.Balance += Sum;
+			RegistredOn = DateTime.Now;
+		}
 	}
 }

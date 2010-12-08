@@ -182,8 +182,13 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="left">
 
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("#.#")}</span> рублей</b>
+		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("0.#")}</span> рублей</b>
 	</div>
+	<% if not payer.IsManualPayments(): %>
+	<div style="font-size:large; margin-bottom: 10px">
+		<b>Баланс: <span> ${payer.Balance.ToString("0.#")}</span> рублей</b>
+	</div>
+	<% end %>
 
 	<div class="InputGroupHeader" style="margin-bottom:10px;width: 100%;">
 		<%

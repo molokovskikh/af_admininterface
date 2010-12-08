@@ -62,7 +62,7 @@ namespace AdminInterface.Controllers
 			{
 				var payment = new Payment();
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.OnlyNested);
-				payment.RegistredOn = DateTime.Now;
+				payment.RegisterPayment();
 				payment.Save();
 				RedirectToReferrer();
 			}

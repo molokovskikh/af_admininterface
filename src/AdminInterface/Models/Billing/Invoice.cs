@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Billing
 		public uint Id { get; set; }
 		[BelongsTo]
 		public Recipient Recipient { get; set; }
-		[BelongsTo]
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 		[Property]
 		public decimal Sum { get; set; }
@@ -65,6 +65,7 @@ namespace AdminInterface.Models.Billing
 				mailer.Invoice(this);
 				mailer.Send();
 			}
+			Payer.Balance -= Sum;
 		}
 	}
 

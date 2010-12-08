@@ -143,6 +143,9 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual bool ShowDiscount { get; set; }
 
+		[Property]
+		public virtual decimal Balance { get; set; }
+
 		[Nested]
 		public virtual InvoiceSettings InvoiceSettings { get; set; }
 
