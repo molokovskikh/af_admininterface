@@ -41,6 +41,13 @@
 
 		<div class=block>
 			<h3>Адрес</h3>
+			<div style="padding-bottom: 8px;">
+				<% if not Registrant: %>
+				Регистратор не указан${", дата регистрации " + delivery.RegistrationDate if delivery.RegistrationDate.ToBinary() > 0}
+				<% else: %>
+				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${delivery.RegistrationDate}
+				<% end %>
+			</div>
 			<p><input name=delivery.value class="required" style="width: 100%;" value="${delivery.Value}"></p>
 		</div>
 

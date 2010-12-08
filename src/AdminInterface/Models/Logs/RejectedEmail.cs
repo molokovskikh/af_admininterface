@@ -1,11 +1,12 @@
 ﻿using System;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord("EmailRejectLogs", Schema = "logs")]
-	public class RejectedEmail : ActiveRecordBase<RejectedEmail>
+	public class RejectedEmail : ActiveRecordLinqBase<RejectedEmail>
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

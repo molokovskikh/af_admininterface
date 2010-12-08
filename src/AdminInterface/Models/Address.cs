@@ -10,6 +10,7 @@ using System.Security.AccessControl;
 using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
@@ -40,6 +41,12 @@ namespace AdminInterface.Models
 
 		[Property("Free")]
 		public virtual bool FreeFlag { get; set; }
+
+		[Property]
+		public virtual string Registrant { get; set; }
+
+		[Property]
+		public virtual DateTime RegistrationDate { get; set; }
 
 		[BelongsTo("LegalEntityId", Lazy = FetchWhen.OnInvoke), Description("Юр.лицо"), Auditable]
 		public virtual LegalEntity LegalEntity { get; set; }
@@ -302,6 +309,14 @@ and i.LegalEntityId = :OldLegalEntityId
 		{
 			return (AvaliableForUsers.Count == 1) &&
 				(AvaliableForUsers[0].AvaliableAddresses.Count == 1);
+		}
+
+		public virtual object GetRegistrant()
+		{
+			if (String.IsNullOrEmpty(Registrant))
+				return null;
+
+			return Administrator.GetByName(Registrant);
 		}
 
 		public virtual void MaintainInscribe()

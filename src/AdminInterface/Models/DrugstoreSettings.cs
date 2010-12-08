@@ -91,7 +91,7 @@ namespace AdminInterface.Models
 		[Property, Description("Регионы заказа"), Auditable]
 		public virtual ulong OrderRegionMask { get; set; }
 
-		[Property, Description("Активировать механизм аптечной корректировки цен"), Auditable]
+		[Property, Description("Активировать механизм аптечной корректировки цен (CreditNote, пересчет отсрочек в цены)"), Auditable]
 		public virtual bool AllowDelayOfPayment { get; set; }
 
 		[Property(NotNull = true)]
@@ -103,7 +103,7 @@ namespace AdminInterface.Models
 		[Property, Description("Показывать рекламу в AnalitF"), Auditable]
 		public virtual bool ShowAdvertising { get; set; }
 
-		[Property, Description("Передавать розничную цену"), Auditable]
+		[Property, Description("Передавать розничную цену (работа по договору комиссии)"), Auditable]
 		public virtual bool SendRetailMarkup { get; set; }
 
 		[Property, Description("Разбирать накладные"), Auditable]

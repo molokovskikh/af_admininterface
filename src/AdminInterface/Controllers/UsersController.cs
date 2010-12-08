@@ -74,6 +74,8 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.Save();
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
+				user.Registrant = SecurityContext.Administrator.UserName;
+				user.RegistrationDate = DateTime.Now;
 
 				if (address != null)
 				{
@@ -136,16 +138,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-
 			var setting = user.Client.Settings;
 			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy( reg => reg.Name);
 			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
-
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
-			else
+			else 
 				PropertyBag["Registrant"] = Administrator.GetByName(user.Registrant);
-
+			PropertyBag["RegistrationDate"] = user.RegistrationDate;
 			if ((user.ContactGroup != null) && (user.ContactGroup.Contacts != null))
 				PropertyBag["ContactGroup"] = user.ContactGroup;
 		}

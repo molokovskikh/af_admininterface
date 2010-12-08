@@ -99,6 +99,7 @@
       <HintPath>..\..\lib\Rhino.Mocks.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -124,7 +125,6 @@
     <Compile Include="Models\AddressFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
-    <Compile Include="Controllers\BillingControllerFixture.cs" />
     <Compile Include="Controllers\ClientControllerFixture.cs" />
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Controllers\SmapRejectorControllerFixture.cs" />

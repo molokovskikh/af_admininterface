@@ -367,7 +367,8 @@ group by u.ClientId")
 				address.LegalEntity = Payer.JuridicalOrganizations.Single();
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
-
+			address.Registrant = SecurityContext.Administrator.UserName;
+			address.RegistrationDate = DateTime.Now;
 			address.Payer = Payer;
 			address.Client = this;
 			address.Enabled = true;
@@ -424,8 +425,8 @@ group by u.ClientId")
 		{
 			if (String.IsNullOrEmpty(Registrant))
 				return null;
-
-			return Administrator.GetByName(Registrant);
+			
+				return Administrator.GetByName(Registrant);
 		}
 
 		public override string ToString()

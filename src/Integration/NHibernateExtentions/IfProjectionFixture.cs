@@ -18,7 +18,6 @@ namespace Integration.NHibernateExtentions
 		[Test]
 		public void IfProjectionInHaving()
 		{
-			//Projections.Conditional()
 			ActiveRecordMediator<Payer>.Execute(
 				(session, target) =>
 					{

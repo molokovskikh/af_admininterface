@@ -26,6 +26,7 @@ namespace Functional
 			}
 			using (var browser = Open(String.Format("Client/{0}", client.Id)))
 			{
+				Assert.That(browser.Text, Is.StringContaining("клиент"));
 				Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
 				Assert.IsTrue(browser.Link(Find.ByText("Имя пользователя")).Exists);
 				Assert.That(browser.Table(Find.ByName("users")).Exists);

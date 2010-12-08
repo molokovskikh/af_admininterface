@@ -56,17 +56,17 @@ FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id
 		JOIN usersettings.UserUpdateInfo uui on uui.UserId = u.Id
 WHERE   cd.RegionCode & ?RegionMaskParam > 0
-        AND uui.UncommitedUpdateDate BETWEEN ?StartDateParam AND ?EndDateParam;
+        AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate >= ?EndDateParam;
 		 
 SELECT cast(concat(count(if(resultid=2, PriceItemId, null)), '(', count(DISTINCT if(resultid=2, PriceItemId, null)), ')') as CHAR) as FormCount,
        cast(ifnull(max(if(resultid=2, logtime, null)), '2000-01-01') as CHAR) as LastForm
 FROM logs.formlogs
-WHERE logtime BETWEEN ?StartDateParam AND ?EndDateParam;
+WHERE logtime >= ?StartDateParam AND logtime <= ?EndDateParam;
 			 
 SELECT cast(concat(count(if(resultcode=2, PriceItemId, null)), '(', count(DISTINCT if(resultcode=2, PriceItemId, null)), ')') as CHAR) as DownCount,
 	   cast(ifnull(max(if(resultcode=2, logtime, null)), '2000-01-01') as CHAR) as LastDown
 FROM logs.downlogs
-WHERE logtime BETWEEN ?StartDateParam AND ?EndDateParam;
+WHERE logtime >= ?StartDateParam AND logtime <= ?EndDateParam;
 			 
 SELECT sum(ol.cost * ol.quantity) as OrderSum,
 	   count(DISTINCT oh.rowid) as TotalOrders,
@@ -86,7 +86,7 @@ WHERE oh.rowid = orderid
       AND oh.regioncode & ?RegionMaskParam   > 0
       AND oh.Deleted = 0
 	  AND oh.Submited = 1
-      AND WriteTime BETWEEN ?StartDateParam AND ?EndDateParam;
+      AND WriteTime >= ?StartDateParam AND WriteTime <= ?EndDateParam;
 
 select count(oh.RowId) as NonProcOrdersCount
 from orders.ordershead oh
@@ -104,18 +104,18 @@ FROM Future.Clients cd
 	join Future.Users u on u.ClientId = cd.Id
 	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE cd.maskregion & ?RegionMaskParam > 0
-      AND afu.RequestTime BETWEEN ?StartDateParam AND ?EndDateParam;
+      AND afu.RequestTime >= ?StartDateParam AND afu.RequestTime <= ?EndDateParam;
 
 SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
        max(dlogs.LogTime) as LastDownloadedWaybillDate
 FROM logs.document_logs dlogs
 join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
-WHERE (dlogs.LogTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
+WHERE (dlogs.LogTime >= ?StartDateParam AND dlogs.LogTime <= ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
 
 SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
        max(dheaders.WriteTime) as LastParsedWaybillDate
 FROM documents.documentheaders dheaders
-WHERE (dheaders.WriteTime BETWEEN ?StartDateParam AND ?EndDateParam) AND dheaders.DocumentType = 1;", c);
+WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateParam) AND dheaders.DocumentType = 1;", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & SecurityContext.Administrator.RegionMask);
