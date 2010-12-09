@@ -58,7 +58,7 @@ FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id
 		JOIN usersettings.UserUpdateInfo uui on uui.UserId = u.Id
 WHERE   cd.RegionCode & ?RegionMaskParam > 0
-        AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate >= ?EndDateParam;
+        AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate <= ?EndDateParam;
 		 
 SELECT cast(concat(count(if(resultid=2, PriceItemId, null)), '(', count(DISTINCT if(resultid=2, PriceItemId, null)), ')') as CHAR) as FormCount,
        cast(ifnull(max(if(resultid=2, logtime, null)), '2000-01-01') as CHAR) as LastForm

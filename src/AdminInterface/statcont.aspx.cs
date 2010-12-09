@@ -52,7 +52,7 @@ FROM    logs.clientsinfo ci
         JOIN farm.regions r ON r.regioncode = cl.RegionCode 
 		LEFT JOIN future.Users usr ON usr.Id = ci.UserId
 		LEFT JOIN `accessright`.`regionaladmins` ra ON ra.UserName = ci.UserName
-WHERE   ci.WriteTime >= ?FromDate AND ci.WriteTime >= ?ToDate  
+WHERE   ci.WriteTime >= ?FromDate AND ci.WriteTime <= ?ToDate  
 		and (cl.Name like ?SearchText 
 			or ci.Message like ?SearchText 
 			or ci.UserName like ?SearchText
