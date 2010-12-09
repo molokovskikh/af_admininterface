@@ -87,7 +87,9 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
 					.Add(Expression.InG("User", client.Users.ToList()))
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					//.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Ge("RequestTime", beginDate))
+					.Add(Expression.Le("RequestTime", endDate))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -100,7 +102,9 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(UpdateLogEntity))
 					.Add(Expression.Eq("User", user))
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					//.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Ge("RequestTime", beginDate))
+					.Add(Expression.Le("RequestTime", endDate))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -110,7 +114,9 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(session => 
 				session.CreateCriteria(typeof(UpdateLogEntity))
 					.CreateAlias("User", "u", JoinType.InnerJoin)
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					//.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Ge("RequestTime", beginDate))
+					.Add(Expression.Le("RequestTime", endDate))
 					.Add(Expression.Eq("UpdateType", updateType))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());

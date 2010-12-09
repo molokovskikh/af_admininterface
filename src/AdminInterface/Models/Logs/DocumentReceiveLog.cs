@@ -44,7 +44,9 @@ namespace AdminInterface.Models.Logs
 				.CreateAlias("r.Address", "a", JoinType.InnerJoin)
 				.CreateAlias("r.Document", "d", JoinType.LeftOuterJoin)
 				.CreateAlias("r.SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin)
-				.Add(Expression.Between("r.LogTime", begin, end))
+				//.Add(Expression.Between("r.LogTime", begin, end))
+				.Add(Expression.Ge("r.LogTime", begin))
+				.Add(Expression.Le("r.LogTime", end))
 				.AddOrder(Order.Desc("r.LogTime"));
 		}
 
