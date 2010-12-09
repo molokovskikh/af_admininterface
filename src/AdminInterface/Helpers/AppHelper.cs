@@ -1,10 +1,17 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
-using Castle.MonoRail.Framework;
+using AdminInterface.Security;
+using Castle.ActiveRecord.Framework.Internal;
 using Castle.MonoRail.Framework.Helpers;
+using Common.Web.Ui.Helpers;
+using NHibernate;
 
 namespace AdminInterface.Helpers
 {
@@ -12,21 +19,82 @@ namespace AdminInterface.Helpers
 	{
 		public string LinkTo(object item)
 		{
-			var idProperty = item.GetType().GetProperty("Id");
-			var id = idProperty.GetValue(item, null);
-			var nameProperty = item.GetType().GetProperty("Value");
-			var name = nameProperty.GetValue(item, null);
+			var dynamicItem = ((dynamic)item);
+			var id = dynamicItem.Id;
+			var name = dynamicItem.Name;
+
 			var clazz = "";
-			if (!((Address)item).Enabled)
+			if (item is Address && !((Address)item).Enabled)
 				clazz = "DisabledByBilling";
-			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/deliveries/{0}/edit", id);
+
+			var controller = Inflector.Pluralize(NHibernateUtil.GetClass(item).Name);
+			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/{0}/{1}", controller, id);
 			return String.Format("<a class='{1}' href='{2}'>{0}</a>", name, clazz, uri);
+		}
+
+		public string LinkTo(string title, string controller, string method)
+		{
+			if (!HavePermission(controller, method))
+				return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
+
+			if (method.ToLower() == "index")
+				method = "";
+
+			return String.Format("<a href='{1}/{2}/{3}'>{0}</a>", title, LinkHelper.GetVirtualDir(Context), controller, method);
+		}
+
+		private bool HavePermission(string controller, string action)
+		{
+			return SecurityContext.Administrator.HaveAccessTo(controller, action);
+		}
+
+		public string JS(params string[] items)
+		{
+			return Resource(items,
+				"JavaScript",
+				"<script type='text/javascript' src='{0}'></script>");
+		}
+
+		public string CSS(params string[] items)
+		{
+			return Resource(items,
+				"CSS",
+				"<link type='text/css' rel='stylesheet' href='{0}'></link>");
+		}
+
+		private string Resource(string[] items, string path, string template)
+		{
+			var result = new StringBuilder();
+			foreach (var item in items)
+			{
+				string timeStamp;
+				string itemPath;
+				if (item.StartsWith("/"))
+				{
+					itemPath = LinkHelper.GetVirtualDir(Context) + item;
+					timeStamp = GetTimeStamp(Path.Combine(Context.ApplicationPhysicalPath, item));
+				}
+				else
+				{
+					timeStamp = GetTimeStamp(Path.Combine(Path.Combine(Context.ApplicationPhysicalPath, path), item));
+					itemPath = LinkHelper.GetVirtualDir(Context) + "/" + path + "/" + item ;
+				}
+
+				result.AppendFormat(template, itemPath + "?" + timeStamp);
+			}
+			return result.ToString();
+		}
+
+		private string GetTimeStamp(string path)
+		{
+			return new FileInfo(path)
+				.LastWriteTime.ToString("yyyyMMddHHmmss");
 		}
 
 		public string Sortable(string name, string key)
 		{
 			var sorted = false;
-			if (ControllerContext.PropertyBag.Contains("SortBy"))
+			if (ControllerContext.PropertyBag["SortBy"] != null)
 				sorted = ControllerContext.PropertyBag["SortBy"].ToString()
 					.Equals(key, StringComparison.OrdinalIgnoreCase);
 
@@ -36,10 +104,22 @@ namespace AdminInterface.Helpers
 				ControllerContext.PropertyBag["Direction"].ToString().Equals("asc", StringComparison.OrdinalIgnoreCase))
 				direction = "desc";
 
-			var uri = String.Format("{0}/client/{1}?SortBy={2}&Direction={3}", 
+			var uriParams = "";
+			if (ControllerContext.PropertyBag["filter"] != null)
+			{
+				var contributor = ControllerContext.PropertyBag["filter"] as SortableContributor;
+				if (contributor != null)
+				{
+					uriParams = contributor.GetUri();
+				}
+			}
+
+			var uri = String.Format("{0}/{1}?SortBy={2}&Direction={3}&{4}", 
 				LinkHelper.GetVirtualDir(Context),
-				((Client)ControllerContext.PropertyBag["Client"]).Id,
-				key, direction);
+				GetSelfUri(),
+				key,
+				direction,
+				uriParams);
 
 			var clazz = "";
 			if (sorted)
@@ -48,19 +128,81 @@ namespace AdminInterface.Helpers
 			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, uri, clazz);
 		}
 
+		public string GetSelfUri()
+		{
+			if (ControllerContext.PropertyBag["self"] != null)
+				return ControllerContext.PropertyBag["self"].ToString();
+
+			var action = Context.CurrentControllerContext.Action;
+			if (action.ToLower() == "index")
+				action = "";
+
+			return String.Format("{0}/{1}",
+				Context.CurrentControllerContext.Name,
+				action
+			);
+		}
+
 		public string FilterFor(string name)
 		{
 			var value = GetValue(name);
+			var valueType = GetValueType(name);
 			var input = new StringBuilder();
-			if (value is IEnumerable)
+			if (valueType == typeof(string))
 			{
-				EmptyableSelect(name, input, value);
+				Text(input, value, name);
 			}
-			if (value is DatePeriod)
+			else if (typeof(Enum).IsAssignableFrom(valueType))
+			{
+
+			}
+			else if (valueType.IsGenericType && typeof(Nullable<>).IsAssignableFrom(valueType.GetGenericTypeDefinition()))
+			{
+				var arguments = valueType.GetGenericArguments();
+				if (arguments[0].IsEnum)
+				{
+					var values = BindingHelper.GetDescriptionsDictionary(arguments[0])
+						.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
+						.ToList();
+					Label(name, input);
+					EmptyableSelect(name, input, value, values);
+				}
+			}
+			else if (typeof(IEnumerable).IsAssignableFrom(valueType))
+			{
+				var valueName = Inflector.Singularize(name);
+				var currentValue = GetValue(valueName);
+				var selectedValue = "";
+				if (currentValue != null)
+					selectedValue = currentValue.Id.ToString();
+
+				var items = (from dynamic item in (IEnumerable) value
+					let id = item.Id
+					let itemName = item.Name
+					select new Tuple<string, string>(id.ToString(), itemName.ToString())).ToList();
+
+				Label(valueName, input);
+				valueName += ".Id";
+				EmptyableSelect(valueName, input, selectedValue, items);
+			}
+			else if (typeof(DatePeriod).IsAssignableFrom(valueType))
 			{
 				PeriodCalendar(input, value);
 			}
 			return input.ToString();
+		}
+
+		private void Text(StringBuilder input, object value, string name)
+		{
+			var label = "Введите текст для поиска:";
+			input.Append("<tr>");
+			input.Append("<td class='filter-label'>");
+			input.Append(label);
+			input.Append("</td>");
+			input.Append("<td colspan=2>");
+			input.AppendFormat("<input type=text name={0} value='{1}'>", name, value);
+			input.Append("</td>");
+			input.Append("</tr>");
 		}
 
 		private void PeriodCalendar(StringBuilder input, object value)
@@ -86,52 +228,56 @@ namespace AdminInterface.Helpers
 				String.Format("<input type='hidden' id='endDate' name='filter.Period.End' value='{0}'>", ((DatePeriod)value).End.ToShortDateString()));
 		}
 
-		private void EmptyableSelect(string name, StringBuilder input, object value)
+		private void EmptyableSelect(string name, StringBuilder input, object currentValue, IEnumerable<Tuple<string, string>> items)
 		{
-			var label = "";
-			if (name.EndsWith("Addresses"))
-			{
-				label = "Выберите адрес:";
-			}
-			if (name.EndsWith("Users"))
-			{
-				label = "Выберите пользователя:";
-			}
-			var currentValueName = "";
-			if (name.EndsWith("es"))
-			{
-				currentValueName = name.Substring(0, name.Length - 2);
-			}
-			else if (name.EndsWith("s"))
-			{
-				currentValueName = name.Substring(0, name.Length - 1);
-			}
-			var currentValue = GetValue(currentValueName);
-			object currentId = null;
-			if (currentValue != null)
-			{
-				currentId = currentValue.GetType().GetProperty("Id").GetValue(currentValue, null);
-			}
-			var selectName = currentValueName + ".Id";;
-			input.Append("<tr>");
-			input.Append("<td class='filter-label'>");
-			input.Append(label);
-			input.Append("</td>");
 			input.Append("<td colspan=2>");
-			input.AppendFormat("<select name='{0}'>", selectName);
+			input.AppendFormat("<select name='{0}'>", name);
 			input.Append("<option>Все</option>");
-			foreach (var item in (IEnumerable)value)
+			foreach (var item in items)
 			{
-				var id = item.GetType().GetProperty("Id").GetValue(item, null);
-				var itemName = item.GetType().GetProperty("Name").GetValue(item, null);
-				if (Equals(id, currentId))
-					input.AppendFormat("<option value={0} selected>{1}</option>", id, itemName);
+				if (Equals(item.Item1, currentValue))
+					input.AppendFormat("<option value={0} selected>{1}</option>", item.Item1, item.Item2);
 				else
-					input.AppendFormat("<option value={0}>{1}</option>", id, itemName);
+					input.AppendFormat("<option value={0}>{1}</option>", item.Item1, item.Item2);
 			}
 			input.Append("</select>");
 			input.Append("</td>");
 			input.Append("</tr>");
+		}
+
+		private void Label(string name, StringBuilder input)
+		{
+			var label = GetLabel(name);
+			input.Append("<tr>");
+			input.Append("<td class='filter-label'>");
+			input.Append(label);
+			input.Append("</td>");
+		}
+
+		private string GetLabel(string name)
+		{
+			string label = "";
+			if (name.EndsWith("Region"))
+			{
+				label = "Выберите регион:";
+			}
+			else if (name.EndsWith("Recipient"))
+			{
+				label = "Выберите получателя:";
+			}
+			else if (name.EndsWith("Addresse"))
+			{
+				label = "Выберите адрес:";
+			}
+			else if (name.EndsWith("User"))
+			{
+				label = "Выберите пользователя:";
+			}
+			else if (name.EndsWith("Period"))
+			{
+				label = "Выберите период:";
+			}
+			return label;
 		}
 
 		public string BeginFormFor(object filter)
@@ -159,13 +305,34 @@ namespace AdminInterface.Helpers
 ", helper.Submit("Показать"));
 		}
 
-		private object GetValue(string name)
+		private Type GetValueType(string name)
+		{
+			return GetProperty(name).PropertyType;
+		}
+
+		private PropertyInfo GetProperty(string name)
 		{
 			var indexOf = name.IndexOf(".");
+			if (indexOf < 0)
+				throw new Exception(name);
 			var key = name.Substring(0, indexOf);
 			var property = name.Substring(indexOf + 1, name.Length - indexOf - 1);
 			var value = ControllerContext.PropertyBag[key];
-			var propertyInfo = value.GetType().GetProperty(property);
+			if (value == null)
+				throw new Exception(String.Format("Can`t find {0} in property bag", key));
+			return value.GetType().GetProperty(property);
+		}
+
+		private dynamic GetValue(string name)
+		{
+			var indexOf = name.IndexOf(".");
+			if (indexOf < 0)
+				throw new Exception(name);
+			var key = name.Substring(0, indexOf);
+			var property = name.Substring(indexOf + 1, name.Length - indexOf - 1);
+			var value = ControllerContext.PropertyBag[key];
+
+			var propertyInfo = GetProperty(name);
 			return propertyInfo.GetValue(value, null);
 		}
 	}

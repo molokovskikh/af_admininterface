@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Globalization;
 using System.Text;
-using Castle.MonoRail.Framework.Helpers;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 
@@ -21,6 +20,11 @@ namespace AdminInterface.Helpers
 				return (size / 1048576f).ToString("#.##") + " МБ";
 
 			return (size / 1073741824f).ToString("#.##") + " ГБ";
+		}
+
+		public static string[] GetMonths()
+		{
+			return CultureInfo.GetCultureInfo("ru-RU").DateTimeFormat.MonthNames;
 		}
 
 		public static string GetRowStyle(int rowIndex)
@@ -51,26 +55,6 @@ namespace AdminInterface.Helpers
 			if (value)
 				return "Включен";
 			return "Отключен";
-		}
-
-		public static string GetDirection(string sortBy, string direction, string property)
-		{
-			if (sortBy == property && direction == "ascending")
-				return "descending";
-			return "ascending";
-		}
-
-		public static string SortArrow(string sortBy, string direction, string property)
-		{
-			if (sortBy != property)
-				return null;
-			if (String.IsNullOrEmpty(direction))
-				direction = "ascending";
-			direction = direction.ToLower();
-			var url = "../Images/arrow-down-blue-reversed.gif";
-			if (direction == "descending")
-				url = "../Images/arrow-down-blue.gif";
-			return String.Format("<img src=\"{0}\" style=\"border: none;\" />", url);
 		}
 
 		/// <summary>

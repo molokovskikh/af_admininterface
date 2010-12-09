@@ -15,6 +15,7 @@ using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Castle.MonoRail.Views.Brail;
+using IgorO.ExposedObjectProject;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Message = Castle.Components.Common.EmailSender.Message;
@@ -61,16 +62,7 @@ namespace Integration
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
 			mailer.Controller = controller;
-			var config = new MonoRailConfiguration();
-			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
-			config.ViewEngineConfig.ViewPathRoot = Path.Combine(@"..\..\..\AdminInterface", "Views");
-			var manager = new DefaultViewEngineManager();
-			var provider = new TestServiceProvider();
-			provider.Services.Add(typeof(IMonoRailConfiguration), config);
-			provider.Services.Add(typeof(IViewSourceLoader), new FileAssemblyViewSourceLoader(config.ViewEngineConfig.ViewPathRoot));
-			controller.Context.Services.EmailTemplateService = new EmailTemplateService(manager);
-			manager.Service(provider);
-			manager.Initialize();
+			controller.Context.Services.EmailTemplateService = new EmailTemplateService(GetViewManager());
 
 			client = new Client
 			{
@@ -79,6 +71,25 @@ namespace Integration
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" }
 			};
+		}
+
+		public static IViewEngineManager GetViewManager()
+		{
+			var config = new MonoRailConfiguration();
+			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
+			config.ViewEngineConfig.ViewPathRoot = Path.Combine(@"..\..\..\AdminInterface", "Views");
+
+			var provider = new TestServiceProvider();
+			provider.Services.Add(typeof(IMonoRailConfiguration), config);
+			provider.Services.Add(typeof(IViewSourceLoader), new FileAssemblyViewSourceLoader(config.ViewEngineConfig.ViewPathRoot));
+
+			var manager = new DefaultViewEngineManager();
+			manager.Service(provider);
+			manager.Initialize();
+			var namespaces = ExposedObject.From(manager).viewEnginesFastLookup[0].Options.NamespacesToImport;
+			namespaces.Add("Boo.Lang.Builtins");
+			namespaces.Add("AdminInterface.Helpers");
+			return manager;
 		}
 
 		[Test]

@@ -11,6 +11,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -21,11 +22,10 @@ using SortDirection = Common.Tools.SortDirection;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("GeneralWithJQueryOnly"), 
-		Helper(typeof (BindingHelper)), 
+		Layout("GeneralWithJQueryOnly"),
+		Helper(typeof (BindingHelper)),
 		Helper(typeof (ViewHelper)),
-		Secure(PermissionType.Billing, ExecutionOrder = 0),
-		Secure(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore, Required = Required.AnyOf, ExecutionOrder = 1)
+		Secure(PermissionType.Billing),
 	]
 	public class BillingController : ARSmartDispatcherController
 	{
@@ -103,7 +103,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["User"] = user;
 			PropertyBag["Address"] = address;
 			PropertyBag["Tariffs"] = Tariff.FindAll();
-			PropertyBag["Payments"] = Payment.FindCharges(payer, paymentsFrom, paymentsTo);
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["TotalSum"] = payer.TotalSum;

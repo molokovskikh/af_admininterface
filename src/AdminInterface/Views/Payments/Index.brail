@@ -1,0 +1,40 @@
+﻿<% component Bubble, {"bredcrumbs" : [("История платежей", "")]} %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
+	История платежей
+<% end %>
+
+<div class="PageHeader">
+	История платежей
+</div>
+
+${app.BeginFormFor("filter")}
+${app.FilterFor("filter.Period")}
+${app.FilterFor("filter.Recipients")}
+${app.FilterFor("filter.SearchText")}
+${app.EndFormFor("filter")}
+
+<table class=DataTable>
+	<% if payments.Count: %>
+	<tr>
+		<th>${app.Sortable("Получатель", "recipient")}</th>
+		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+		<th>${app.Sortable("Плательщик", "payer")}</th>
+		<th>${app.Sortable("Сумма", "sum")}</th>
+		<th>${app.Sortable("Дата внесения платежа", "registredOn")}</th>
+	</tr>
+	<% for i, payment in enumerate(payments): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${payment.Recipient.Name}</td>
+		<td>${payment.PayedOn}</td>
+		<td>${payment.Sum}</td>
+		<td>${app.LinkTo(payment.Payer)}</td>
+		<td>${payment.RegistredOn}</td>
+	</tr>
+	<% end %>
+	<% else: %>
+	<tr class="EmptyData">
+		<td>По вашему запросу ничего не найдено</td>
+	</tr>
+	<% end %>
+</table>

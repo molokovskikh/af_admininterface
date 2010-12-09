@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -12,7 +13,7 @@ using NHibernate.Transform;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("logs"),
+		Layout("General"),
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(LinkHelper)),
@@ -91,54 +92,32 @@ namespace AdminInterface.Controllers
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
 		{
-			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today, new string[] {},  0);
+			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
-			DateTime beginDate, DateTime endDate, string[] headerNames, int? sortColumnIndex)
+			DateTime beginDate, DateTime endDate)
 		{
-			PropertyBag["Title"] = "Статистика обновлений";
-			IList<UpdateLogEntity> logEntities = null;
+			var filter = new UpdateFilter();
+			filter.BeginDate = beginDate;
+			filter.EndDate = endDate;
+
 			if (updateType.HasValue)
 			{
-				PropertyBag["updateType"] = updateType;
-				var statisticType = (StatisticsType)updateType;
-				PropertyBag["updateTypeName"] = BindingHelper.GetDescription(statisticType);
-				logEntities = UpdateLogEntity.GetEntitiesByUpdateType(updateType, regionMask, beginDate, endDate);
-				PropertyBag["regionMask"] = regionMask;
-				PropertyBag["adminRegionMask"] = SecurityContext.Administrator.RegionMask;
+				filter.UpdateType = updateType;
+				filter.RegionMask = regionMask;
 			}
 			if (clientCode.HasValue)
-			{
-				var client = Client.Find(clientCode.Value);
-				PropertyBag["client"] = client;
-				logEntities = UpdateLogEntity.GetEntitiesFormClient(client.Id,
-					beginDate, endDate.AddDays(1));
-				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-				SecurityContext.Administrator.CheckClientType(client.Type);
-			}
+				filter.Client = Client.Find(clientCode.Value);
 			else if (userId.HasValue)
-			{
-				var user = User.Find(userId.Value);
-				PropertyBag["user"] = user;
-				logEntities = UpdateLogEntity.GetEntitiesByUser(userId.Value,
-					beginDate, endDate.AddDays(1));
-				SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
-				SecurityContext.Administrator.CheckClientType(user.Client.Type);
-			}
-			if ((headerNames.Length > 0) && sortColumnIndex.HasValue)
-				PropertyBag["logEntities"] = logEntities.SortBy(headerNames[Math.Abs(sortColumnIndex.Value) - 1], sortColumnIndex.Value > 0);
-			else
-				PropertyBag["logEntities"] = logEntities;
-			PropertyBag["beginDate"] = beginDate;
-			PropertyBag["endDate"] = endDate;
-			PropertyBag["sortColumnIndex"] = sortColumnIndex.HasValue ? sortColumnIndex.Value : 0;
-			if (clientCode.HasValue)
-				PropertyBag["clientCode"] = clientCode.Value;
-			if (userId.HasValue)
-				PropertyBag["userId"] = userId.Value;
-			if (updateType.HasValue)
-				PropertyBag["updateType"] = updateType.Value;
+				filter.User = User.Find(userId.Value);
+
+			PropertyBag["beginDate"] = filter.BeginDate;
+			PropertyBag["endDate"] = filter.EndDate;
+			PropertyBag["filter"] = filter;
+			PropertyBag["logEntities"] = filter.Find().SortBy(Request["SortBy"], Request["Direction"] == "desc");
+			PropertyBag["SortBy"] = Request["SortBy"];
+			PropertyBag["Direction"] = Request["Direction"];
 		}
 
 		public void PasswordChangeLog(string login)
@@ -211,6 +190,87 @@ namespace AdminInterface.Controllers
 				Begin = DateTime.Today,
 				End = DateTime.Today
 			};
+		}
+	}
+
+	public interface SortableContributor
+	{
+		string GetUri();
+	}
+
+	public class UpdateFilter : SortableContributor
+	{
+		public UpdateType? UpdateType { get; set; }
+		public ulong RegionMask { get; set; }
+		public DateTime BeginDate { get; set; }
+		public DateTime EndDate { get; set; }
+		public Client Client { get; set; }
+		public User User { get; set; }
+
+		public IList<UpdateLogEntity> Find()
+		{
+			if (User != null)
+				return UpdateLogEntity.GetEntitiesByUser(User.Id, BeginDate, EndDate);
+			if (Client != null)
+				return UpdateLogEntity.GetEntitiesFormClient(Client.Id, BeginDate, EndDate);
+
+			return UpdateLogEntity.GetEntitiesByUpdateType(UpdateType, RegionMask, BeginDate, EndDate);
+		}
+
+		public bool ShowRegion()
+		{
+			return UpdateType != null;
+		}
+
+		public bool ShowClient()
+		{
+			return ShowRegion();
+		}
+
+		public bool ShowUpdateType()
+		{
+			return User != null || Client != null;
+		}
+
+		private bool IsDataTransferUpdate()
+		{
+			return UpdateType != null
+				&& (UpdateType == Models.Logs.UpdateType.Cumulative
+					|| UpdateType == Models.Logs.UpdateType.Accumulative);
+		}
+
+		public bool ShowUser()
+		{
+			return Client != null || UpdateType != null;
+		}
+
+		public bool ShowUpdateSize()
+		{
+			return ShowUpdateType();
+		}
+
+		public bool ShowLog()
+		{
+			return ShowUpdateType();
+		}
+
+		public string GetUri()
+		{
+			var result = new StringBuilder();
+			if (UpdateType != null)
+			{
+				result.Append("updateType=" + (int)UpdateType);
+				result.Append("&regionMask=" + RegionMask);
+			}
+			if (Client != null)
+				result.Append("clientcode=" + Client.Id);
+			if (User != null)
+				result.Append("userid=" + User.Id);
+
+			result.Append("&beginDate="+BeginDate.ToShortDateString());
+			result.Append("&endDate="+EndDate.ToShortDateString());
+
+			return result.ToString();
 		}
 	}
 

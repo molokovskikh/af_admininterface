@@ -1,8 +1,5 @@
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
-using AdminInterface.Models.Security;
-using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -11,14 +8,28 @@ using Common.Tools;
 namespace AdminInterface.Controllers
 {
 	[
-		Secure(PermissionType.Billing),
 		Layout("GeneralWithJQueryOnly"),
 	]
-	public class RecipientController : ARSmartDispatcherController
+	public class RecipientsController : ARSmartDispatcherController
 	{
-		public void Show()
+		public void Index()
 		{
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+		}
+
+		public void Edit(uint id)
+		{
+			var recipient = Recipient.Find(id);
+			if (IsPost)
+			{
+				BindObjectInstance(recipient, "recipient");
+				recipient.Save();
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["recipient"] = recipient;
+			}
 		}
 
 		public void Update([ARDataBind("recipients", AutoLoad = AutoLoadBehavior.NewInstanceIfInvalidKey)] Recipient[] recipients)
@@ -38,7 +49,7 @@ namespace AdminInterface.Controllers
 				transaction.VoteCommit();
 			}
 			Flash["isUpdated"] = true;
-			RedirectToAction("show");
+			RedirectToAction("Index");
 		}
 	}
 }

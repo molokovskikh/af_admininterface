@@ -2,6 +2,7 @@
 using System.Globalization;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
@@ -107,116 +108,35 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord("Payments", Schema = "Billing")]
-	public class Payment : ActiveRecordBase<Payment>
+	public class Payment : ActiveRecordLinqBase<Payment>
 	{
 		public Payment()
 		{}
 
-		[Property] 
-		public string Name { get; set; }
-
-		[Property]
-		public PaymentType PaymentType { get; set; }
-
 		[PrimaryKey]
 		public uint Id { get; set; }
 
+		//фактическа дата платежа когда он прошел через банк
 		[Property]
 		public DateTime PayedOn { get; set; }
 
+		//дата занесения платежа
 		[Property]
-		public float Sum { get; set; }
+		public DateTime RegistredOn { get; set; }
 
 		[Property]
-		public float Discount { get; set; }
+		public decimal Sum { get; set; }
 
-		[BelongsTo(Column = "PayerId")]
+		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 
-		public float Total
-		{
-			get { return Sum - Discount; }
-		}
+		[BelongsTo(Column = "RecipientId")]
+		public Recipient Recipient { get; set; }
 
-		public static Payment[] FindBetwen(Payer payer, DateTime form, DateTime to)
+		public void RegisterPayment()
 		{
-			return FindAll(Order.Asc("PayedOn"),
-			               Expression.Between("PayedOn", form, to)
-						   && Expression.Eq("Payer", payer));
-		}
-
-		public static Payment[] FindCharges(Payer payer, DateTime? from, DateTime? to)
-		{
-			if (from == null)
-				from = payer.DefaultBeginPeriod();
-			if (to == null)
-				to = payer.DefaultEndPeriod();
-
-			return FindAll(Order.Asc("PayedOn"),
-						   Expression.Eq("PaymentType", PaymentType.Charge)
-			               && Expression.Between("PayedOn", from, to)
-						   && Expression.Eq("Payer", payer));
-		}
-
-		public static Payment[] FindChargeOffs(Payer payer, Period period)
-		{
-			return FindAll(Order.Asc("PayedOn"),
-						   Expression.Eq("PaymentType", PaymentType.ChargeOff)
-			               && Expression.Between("PayedOn", period.GetPeriodBegin(), period.GetPeriodEnd())
-			               && Expression.Eq("Payer", payer));
-		}
-
-		public float Debit
-		{
-			get
-			{
-				if (PaymentType == PaymentType.ChargeOff)
-					return Total;
-				return 0;
-			}
-		}
-
-		public float Credit
-		{
-			get
-			{
-				if (PaymentType == PaymentType.Charge)
-					return Total;
-				return 0;
-			}
-		}
-
-		public static Payment ChargeOff()
-		{
-			return new Payment {PaymentType = PaymentType.ChargeOff};
-		}
-
-		public static Payment Charge()
-		{
-			return new Payment { PaymentType = PaymentType.ChargeOff, Name = "Оплата"};
-		}
-
-		public static float CreditOn(Payer payer, DateTime on)
-		{
-			return SumFor(on, payer, PaymentType.Charge);
-		}
-
-		private static float SumFor(DateTime on, Payer payer, PaymentType paymentType)
-		{
-			var val = ArHelper.WithSession(session => session.CreateQuery(@"
-select sum(p.Sum)
-from Payment as p 
-where p.PayedOn < :on and p.Payer = :payer and p.PaymentType = :paymentType")
-			                                               	.SetParameter("on", on)
-			                                               	.SetParameter("payer", payer)
-			                                               	.SetParameter("paymentType", paymentType)
-			                                               	.UniqueResult());
-			return Convert.ToSingle(val);
-		}
-
-		public static float DebitOn(Payer payer, DateTime on)
-		{
-			return SumFor(on, payer, PaymentType.ChargeOff);
+			Payer.Balance += Sum;
+			RegistredOn = DateTime.Now;
 		}
 	}
 }

@@ -38,8 +38,8 @@
 				<td>По:</td>
 			</tr>
 			<tr>
-				<td><div style="border: none;" id="fromDateCalendarHolder"></div></td>
-				<td><div style="border: none;" id="toDateCalendarHolder"></div></td>
+				<td><div style="border: none;" class=calendar id="fromDateCalendarHolder"></div></td>
+				<td><div style="border: none;" class=calendar id="toDateCalendarHolder"></div></td>
 			</tr>
 			<tr>
 				<td style="text-align:right;" colspan="2">
@@ -47,7 +47,7 @@
 				</td>
 			</tr>
 		</table>
-	</form>	
+	</form>
 	
 	<div class="CornerHolder">
 		<div class="BottomLeftCorner">
@@ -56,28 +56,6 @@
 		</div>
 	</div>
 </div>
-
-<script type="text/javascript"> 
-  Calendar.setup({
-	date: "${fromDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-    flat: "fromDateCalendarHolder",
-    flatCallback: function (cal) {
-		$("fromDate").value = cal.date.print("%d.%m.%Y");
-    },
-    showOthers: true
-  });
-  
-  Calendar.setup({
-	date: "${toDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-    flat: "toDateCalendarHolder",
-    flatCallback: function (cal) {
-		$("toDate").value = cal.date.print("%d.%m.%Y");
-    },
-    showOthers: true
-  });
-</script>
 
 <table class="DataTable">
 <% if rejects.Length == 0: %>

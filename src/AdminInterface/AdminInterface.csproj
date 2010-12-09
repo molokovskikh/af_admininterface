@@ -24,7 +24,7 @@
     <UpgradeBackupLocation>
     </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -94,6 +94,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\LumiSoft.Net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.ReportViewer.Common, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.ReportViewer.WinForms, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="MySql.Data, Version=5.1.6.1, Culture=neutral, PublicKeyToken=56e353737e921561, processorArchitecture=MSIL">
@@ -121,6 +122,7 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.DirectoryServices" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Management" />
     <Reference Include="System.Runtime.Serialization">
       <RequiredTargetFramework>3.0</RequiredTargetFramework>
     </Reference>
@@ -129,6 +131,11 @@
     </Reference>
     <Reference Include="System.ServiceProcess" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
+    <Reference Include="System.Web.DynamicData" />
+    <Reference Include="System.Web.Entity" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Xml.Linq" />
@@ -140,9 +147,12 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
+    <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
-    <Compile Include="Controllers\RecipientController.cs" />
+    <Compile Include="Controllers\PayersController.cs" />
+    <Compile Include="Controllers\PaymentsController.cs" />
+    <Compile Include="Controllers\RecipientsController.cs" />
     <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
@@ -160,6 +170,7 @@
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
     <Compile Include="Helpers\LinkHelper.cs" />
+    <Compile Include="Helpers\Printer.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\Wav\Structs.cs" />
@@ -169,6 +180,7 @@
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
+    <Compile Include="Models\Billing\Invoice.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
     <Compile Include="Models\Billing\Report.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
@@ -348,6 +360,8 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Themes\WebApp\base.css" />
+    <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="CopySynonym.aspx" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
@@ -367,6 +381,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Invoices\Index.brail" />
+    <None Include="Views\Invoices\Print.brail" />
+    <None Include="Views\Layouts\Print.brail" />
+    <None Include="Views\Payers\Invoices.brail" />
+    <None Include="Views\Payers\Payments.brail" />
+    <None Include="Views\Payments\New.brail" />
     <None Include="Views\Mail\AddressRegistred.brail" />
     <None Include="Views\Mail\DrugstoreRegistred.brail" />
     <None Include="Views\Mail\EnableChanged.brail" />
@@ -382,8 +402,6 @@
   <ItemGroup>
     <Content Include="Views\Billing\Edit.brail">
     </Content>
-    <Content Include="Views\Layouts\billing.brail" />
-    <Content Include="Views\Layouts\contact.brail" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Css\Billing.css" />
@@ -443,7 +461,9 @@
     <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
     <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
     <None Include="Views\Mail\PasswordChange.brail" />
-    <None Include="Views\Recipient\Show.brail" />
+    <None Include="Views\Payments\Index.brail" />
+    <None Include="Views\Recipients\Edit.brail" />
+    <None Include="Views\Recipients\Index.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />
     <None Include="Views\RegionalAdmin\Edit.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />
@@ -469,8 +489,6 @@
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
     <None Include="Views\Layouts\GeneralWithJQuery.brail" />
-    <None Include="Views\Layouts\NewDefault.brail" />
-    <None Include="Views\Layouts\Report.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
     <None Include="Views\Monitoring\Updates.brail" />
@@ -486,8 +504,6 @@
     <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
-    <None Include="Views\Layouts\Common.brail" />
-    <None Include="Views\Layouts\logs.brail" />
     <None Include="Views\Monitoring\Clients.brail" />
     <None Include="Views\Logs\DocumentLog.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
@@ -534,7 +550,9 @@
     <Service Include="{967B4E0D-AD0C-4609-AB67-0FA40C0206D8}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="ClientCard.rdlc" />
+    <EmbeddedResource Include="ClientCard.rdlc">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\lib\MonoRail.Debugger.Toolbar\src\MonoRail.Debugger.Toolbar\MonoRail.Debugger.Toolbar.csproj">

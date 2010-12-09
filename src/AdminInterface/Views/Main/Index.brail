@@ -1,5 +1,4 @@
-﻿<% import System %>
-<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
 	Интерфейс управления клиентами
 <% end %>
 
@@ -54,13 +53,13 @@
 	}
 </style>
 
-<% uriTemplate = "${siteroot}/Logs/UpdateLog.rails?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
+<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
 
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 	<tr>
 		<td valign=top style="padding: 5px 20px 5px 10px;">
 <div id="sidebar" class="Autosize">
-				<div class="block">		            
+				<div class="block">
 					<h3>Административный интерфейс</h3>
 					<ul class="navigation">
 						<li>
@@ -119,38 +118,23 @@
 							<a href="https://stat.analit.net/ReportConf/Reports/base.aspx">
 								Отчеты
 							</a>
-						</li>			
-					</ul>			        
+						</li>
+					</ul>
 				</div>
 				
 				<div class="block">
 					<h3>Биллинг</h3>
 					<ul class="navigation">
-						<li>
-							<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/Billing/Search">Биллинг</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Биллинг</a>
-							<% end %>
-						</li>
-						<li>
-							<% if admin.HavePermisions(PermissionType.Billing) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/Billing/Accounting">Учет</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Учет</a>
-							<% end %>
-						</li>
-						<li>
-							<% if admin.HavePermisions(PermissionType.Billing): %>
-							<a href="${siteroot}/Recipient/Show">Получатели платежей</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Получатели платежей</a>
-							<% end %>
-						</li>
+						<li>${app.LinkTo("Биллинг", "Billing", "Search")}</li>
+						<li>${app.LinkTo("Учет", "Billing", "Accounting")}</li>
+						<li>${app.LinkTo("Получатели платежей", "Recipients", "Index")}</li>
+						<li>${app.LinkTo("Платежи", "Payments", "Index")}</li>
+						<li>${app.LinkTo("Разнесение платежей", "Payments", "New")}</li>
+						<li>${app.LinkTo("Реестр счетов", "Invoices", "Index")}</li>
 					</ul>
-				</div>			    
+				</div>
 				
-				<div class="block">		            
+				<div class="block">
 					<h3>Телефония</h3>
 					<ul class="navigation">
 						<li>
@@ -168,8 +152,8 @@
 							<% end %>
 						</li>
 					</ul>
-				</div>                
-			</div>		
+				</div>
+			</div>
 		</td>
 		<td valign=top>
 			<table id="Table2" bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">
@@ -416,11 +400,11 @@
 				</div>
 				<div style="text-align:left;background-color:#eef8ff; padding: 3px;">
 					<label for="FromCalendar">Начиная с даты:</label>
-					<div style="border: none;" id="beginDateCalendarHolder"></div>
+					<div class=calendar style="border: none;" id="fromCalendarHolder"></div>
 				</div>
 				<div style="text-align:left;background-color:#eef8ff;padding: 3px;">
 					<label for="ToCalendar">По дату:</label>
-					<div style="border: none;" id="endDateCalendarHolder"></div>
+					<div class=calendar style="border: none;" id="toCalendarHolder"></div>
 				</div>
 				<div style="text-align:right;">
 					<input type=submit value=Показать></input>
@@ -437,31 +421,3 @@
 	Пожалуйста не забывайте изменять пароль.
 </p>
 <% end %>
-<script type="text/javascript">
-	function beginDateCallBack(cal) 
-	{
-		document.getElementById("from").value = cal.date.print("%d.%m.%Y");
-	};
-
-	function endDateCallBack(cal) 
-	{
-		document.getElementById("to").value = cal.date.print("%d.%m.%Y");
-	};
-
-  
-  Calendar.setup({
-	date: "${fromDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-	flat: "beginDateCalendarHolder",
-	flatCallback: beginDateCallBack,
-	showOthers: true
-  });
-  
-  Calendar.setup({
-	date: "${toDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-	flat: "endDateCalendarHolder",
-	flatCallback: endDateCallBack,
-	showOthers: true
-  });
-</script>

@@ -59,6 +59,7 @@
 		<tr>
 			<td>
 				<a class="delete" href="javascript:">Удалить</a>
+				<a href="${siteroot}/Recipients/${recipient.Id}/Edit">Редактировать</a>
 			</td>
 			<td>
 				${FormHelper.TextField("recipients[${i}].Name")}

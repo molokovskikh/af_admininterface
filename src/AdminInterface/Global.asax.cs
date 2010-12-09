@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -9,10 +10,14 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
+using Castle.MonoRail.Framework.Container;
+using Castle.MonoRail.Framework.Descriptors;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using log4net;
@@ -25,7 +30,7 @@ using NHibernate.Type;
 
 namespace AddUser
 {
-	public class Global : HttpApplication, IMonoRailConfigurationEvents
+	public class Global : HttpApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
@@ -59,6 +64,22 @@ namespace AddUser
 				.DefaultForController().Is("client")
 				.DefaultForAction().Is("info")
 				.Restrict("cc").ValidInteger);
+
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[action]")
+					.DefaultForAction().Is("index")
+			);
+
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[id]")
+					.DefaultForAction().Is("show")
+					.Restrict("id").ValidInteger
+			);
+
+			RoutingModuleEx.Engine.Add(
+				new PatternRoute("/<controller>/[id]/<action>")
+					.Restrict("id").ValidInteger
+			);
 
 			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[clientId]/orders")
 				.DefaultForController().Is("Logs")
@@ -281,9 +302,24 @@ WHERE PriceCode = ?Id", connection);
 			MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
 #endif
 
-/*			configuration.SmtpConfig.Host = "mail.adc.analit.net";
+/*
+			configuration.SmtpConfig.Host = "mail.adc.analit.net";
 			configuration.ExtensionEntries.Add(new ExtensionEntry(typeof(ExceptionChainingExtension),
-				new MutableConfiguration("mailTo")));*/
+				new MutableConfiguration("mailTo")));
+*/
+		}
+
+		public void Created(IMonoRailContainer container)
+		{}
+
+		public void Initialized(IMonoRailContainer container)
+		{
+			container.ControllerDescriptorProvider.AfterProcess += desc => {
+				if (desc.Helpers.Any(d => d.HelperType == typeof(AppHelper)))
+					return;
+				desc.Helpers = desc.Helpers.Concat(new [] {new HelperDescriptor(typeof(AppHelper), "app"), }).ToArray();
+			};
 		}
 	}
+
 }

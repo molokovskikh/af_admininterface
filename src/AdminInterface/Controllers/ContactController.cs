@@ -9,7 +9,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("contact"),
+		Layout("General"),
 		Secure,
 	]
 	public class ContactController : AbstractContactController

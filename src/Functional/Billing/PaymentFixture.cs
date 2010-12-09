@@ -1,5 +1,6 @@
 using Functional.ForTesting;
 using NUnit.Framework;
+using WatiN.Core;
 
 namespace Functional.Billing
 {
@@ -24,6 +25,15 @@ namespace Functional.Billing
 			var accounting = client.Users[0].Accounting;
 			accounting.Refresh();
 			Assert.That(accounting.Payment, Is.EqualTo(900));
+		}
+
+		[Test]
+		public void View_payments()
+		{
+			using (var browser = Open("/"))
+			{
+				browser.Link(Find.ByText("Платежи")).Click();
+			}
 		}
 	}
 }

@@ -9,7 +9,7 @@ namespace AdminInterface.Controllers
 	[
 		Secure,
 		Helper(typeof(ViewHelper)),
-		Layout("General"),
+		Layout("GeneralWithJQueryOnly"),
 	]
 	public class SmapRejectorController : SmartDispatcherController
 	{
@@ -24,7 +24,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["fromDate"] = fromDate;
 			PropertyBag["toDate"] = toDate;
 			PropertyBag["searchText"] = searchText;
-			PropertyBag["rejects"] = RejectedEmail.Find(searchText, fromDate, toDate);			
+			PropertyBag["rejects"] = RejectedEmail.Find(searchText, fromDate, toDate);
 		}
 	}
 }

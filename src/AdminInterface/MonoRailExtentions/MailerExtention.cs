@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Text;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.Components.Common.EmailSender;
 using Castle.Components.Common.EmailSender.Smtp;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 using Message = Castle.Components.Common.EmailSender.Message;
 
 namespace AdminInterface.MonoRailExtentions
@@ -32,6 +34,7 @@ namespace AdminInterface.MonoRailExtentions
 		protected string Subject;
 		protected bool IsBodyHtml;
 
+		protected string Layout;
 		protected string Template;
 		protected IDictionary PropertyBag = new Dictionary<string, object>();
 
@@ -59,7 +62,7 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected virtual Message GetMessage()
 		{
-			var message = Controller.RenderMailMessage(Template, null, PropertyBag);
+			var message = Controller.RenderMailMessage(Template, Layout, PropertyBag);
 			message.Subject = Subject;
 			message.From = From;
 			message.To = To;
@@ -167,6 +170,18 @@ namespace AdminInterface.MonoRailExtentions
 		public void NotifySupplierAboutDrugstoreRegistration(Client client)
 		{
 
+		}
+
+		public void Invoice(Invoice invoice)
+		{
+			Template = "/Invoices/Print";
+			Layout = "Print";
+			IsBodyHtml = true;
+			From = "billing@analit.net";
+			To = invoice.Payer.GetInvocesAddress();
+			Subject = String.Format("Счет за {0}", BindingHelper.GetDescription(invoice.Period));
+
+			PropertyBag["invoice"] = invoice;
 		}
 	}
 }

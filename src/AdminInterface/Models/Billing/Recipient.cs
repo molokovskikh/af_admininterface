@@ -11,5 +11,35 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public virtual string Name { get; set; }
+
+		[Property]
+		public virtual string FullName { get; set; }
+
+		[Property]
+		public virtual string Address { get; set; }
+		
+		[Property]
+		public virtual string INN { get; set; }
+
+		[Property]
+		public virtual string KPP { get; set; }
+
+		[Property]
+		public virtual string BIC { get; set; }
+
+		[Property]
+		public virtual string Bank { get; set; }
+
+		[Property]
+		public virtual string BankLoroAccount { get; set; }
+
+		[Property]
+		public virtual string BankAccountNumber { get; set; }
+
+		[Property]
+		public virtual string Boss { get; set; }
+
+		[Property]
+		public virtual string Accountant { get; set; }
 	}
 }

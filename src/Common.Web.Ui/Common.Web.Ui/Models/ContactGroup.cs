@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections;
 using System.Linq;
 using Castle.ActiveRecord;
@@ -11,13 +11,14 @@ namespace Common.Web.Ui.Models
 {
 	public enum ContactGroupType
 	{
-		[Description("Общая информация")] General = 0,
-		[Description("Администратор клиентов в автоматизированной системе")] ClientManagers = 1,
-		[Description("Менеджер прайс листов(заказов)")] OrderManagers = 2,
-		[Description("Бухгалтер по расчетам с АК \"Инфорум\"")] AccountantManagers = 3,
-		[Description("Контактная информация для биллинга")] Billing = 4,
-		[Description("Известные телефоны")] KnownPhones,
-		Custom = 5
+		[Description("РћР±С‰Р°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ")] General = 0,
+		[Description("РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ РєР»РёРµРЅС‚РѕРІ РІ Р°РІС‚РѕРјР°С‚РёР·РёСЂРѕРІР°РЅРЅРѕР№ СЃРёСЃС‚РµРјРµ")] ClientManagers = 1,
+		[Description("РњРµРЅРµРґР¶РµСЂ РїСЂР°Р№СЃ Р»РёСЃС‚РѕРІ(Р·Р°РєР°Р·РѕРІ)")] OrderManagers = 2,
+		[Description("Р‘СѓС…РіР°Р»С‚РµСЂ РїРѕ СЂР°СЃС‡РµС‚Р°Рј СЃ РђРљ \"РРЅС„РѕСЂСѓРј\"")] AccountantManagers = 3,
+		[Description("РљРѕРЅС‚Р°РєС‚РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ Р±РёР»Р»РёРЅРіР°")] Billing = 4,
+		[Description("РР·РІРµСЃС‚РЅС‹Рµ С‚РµР»РµС„РѕРЅС‹")] KnownPhones,
+		Custom = 5,
+		[Description("Р Р°СЃСЃС‹Р»РєР° СЃС‡РµС‚РѕРІ")] Invoice = 7,
 	}
 
 	[ActiveRecord("contact_groups", Schema = "contacts", Lazy = true)]
@@ -35,7 +36,7 @@ namespace Common.Web.Ui.Models
 		[JoinedKey("Id")]
 		protected virtual uint ContactGroupId { get; set; }
 
-		[Property, ValidateNonEmpty("Название не может быть пустым")]
+		[Property, ValidateNonEmpty("РќР°Р·РІР°РЅРёРµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ РїСѓСЃС‚С‹Рј")]
 		public virtual string Name { get; set; }
 
 		[Property]
@@ -97,8 +98,8 @@ namespace Common.Web.Ui.Models
 					continue;
 				hiddenContacts.Add(contact);
 			}
-			// Сливаем в один массив отображаемые контакты (существующие + добавленные) и те, 
-			// которые не отображены (могли быть добавлены другими пользователями)
+			// РЎР»РёРІР°РµРј РІ РѕРґРёРЅ РјР°СЃСЃРёРІ РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹Рµ РєРѕРЅС‚Р°РєС‚С‹ (СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ + РґРѕР±Р°РІР»РµРЅРЅС‹Рµ) Рё С‚Рµ, 
+			// РєРѕС‚РѕСЂС‹Рµ РЅРµ РѕС‚РѕР±СЂР°Р¶РµРЅС‹ (РјРѕРіР»Рё Р±С‹С‚СЊ РґРѕР±Р°РІР»РµРЅС‹ РґСЂСѓРіРёРјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё)
 			var contacts = displayedContacts.Concat(hiddenContacts);
 
 			AbstractContactController.UpdateContactForContactOwner(contacts.ToArray(), this);
@@ -137,8 +138,8 @@ namespace Common.Web.Ui.Models
 					continue;
 				hiddenPersons.Add(contact);
 			}
-			// Сливаем в один массив отображаемые контакты (существующие + добавленные) и те, 
-			// которые не отображены (могли быть добавлены другими пользователями)
+			// РЎР»РёРІР°РµРј РІ РѕРґРёРЅ РјР°СЃСЃРёРІ РѕС‚РѕР±СЂР°Р¶Р°РµРјС‹Рµ РєРѕРЅС‚Р°РєС‚С‹ (СЃСѓС‰РµСЃС‚РІСѓСЋС‰РёРµ + РґРѕР±Р°РІР»РµРЅРЅС‹Рµ) Рё С‚Рµ, 
+			// РєРѕС‚РѕСЂС‹Рµ РЅРµ РѕС‚РѕР±СЂР°Р¶РµРЅС‹ (РјРѕРіР»Рё Р±С‹С‚СЊ РґРѕР±Р°РІР»РµРЅС‹ РґСЂСѓРіРёРјРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРјРё)
 			var contacts = displayedPersons.Concat(hiddenPersons);
 
 			UpdatePersonForContactOwner(contacts.ToArray(), this);

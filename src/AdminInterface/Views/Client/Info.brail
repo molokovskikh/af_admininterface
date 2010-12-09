@@ -81,7 +81,7 @@
 				</li>
 				<% if Client.IsDrugstore(): %>
 				<li>
-					<a href="${siteroot}/Logs/UpdateLog.rails?clientCode=${Client.Id}" target="_blank">История обновлений</a>
+					<a href="${siteroot}/Logs/UpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений</a>
 				</li>
 				<% end %>
 				<li>
