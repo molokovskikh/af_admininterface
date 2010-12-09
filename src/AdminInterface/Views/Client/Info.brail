@@ -185,7 +185,7 @@
 					<% for i, address in enumerate(addresses): %>
 						<tr>
 							<td>
-								${app.LinkTo(address)}
+								${app.LinkTo(address, "Edit")}
 							</td>
 							<td>
 								${address.LegalEntity.Name}

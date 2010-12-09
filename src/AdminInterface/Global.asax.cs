@@ -97,16 +97,16 @@ namespace AddUser
 				.Restrict("cc").ValidInteger);
 
 			engine.Add(
-				new BugRoute(
-					new PatternRoute("/<controller>/")
-						.DefaultForAction().Is("index")
-				)
+				new PatternRoute("/<controller>/<id>")
+					.DefaultForAction().Is("show")
+					.Restrict("id").ValidInteger
 			);
 
 			engine.Add(
-				new PatternRoute("/<controller>/[id]")
-					.DefaultForAction().Is("show")
-					.Restrict("id").ValidInteger
+				new BugRoute(
+					new PatternRoute("/<controller>/[action]")
+						.DefaultForAction().Is("index")
+				)
 			);
 
 			engine.Add(
