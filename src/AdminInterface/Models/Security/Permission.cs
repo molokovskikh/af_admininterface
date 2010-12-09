@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -56,6 +57,19 @@ namespace AdminInterface.Models.Security
 		public static IList<Permission> FindAll()
 		{
 			return ActiveRecordMediator<Permission>.FindAll(new [] { Order.Asc("Name") });
+		}
+
+		public bool HaveAccessTo(string controller, string action)
+		{
+			if (Type == PermissionType.Billing)
+			{
+				var billingControllers = new [] {
+					"payments", "invoices", "billing", "payers",
+					"recipients"
+				};
+				return billingControllers.Any(c => c == controller.ToLower());
+			}
+			return false;
 		}
 
 		public bool IsDefaultFor(string departmentDescription)

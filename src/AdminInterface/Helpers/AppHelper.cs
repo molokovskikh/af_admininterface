@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Security;
 using Castle.ActiveRecord.Framework.Internal;
-using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
 using Common.Web.Ui.Helpers;
 using NHibernate;
@@ -44,9 +43,9 @@ namespace AdminInterface.Helpers
 			return String.Format("<a href='{1}/{2}/{3}'>{0}</a>", title, LinkHelper.GetVirtualDir(Context), controller, method);
 		}
 
-		private bool HavePermission(string controller, string method)
+		private bool HavePermission(string controller, string action)
 		{
-			return true;
+			return SecurityContext.Administrator.HaveAccessTo(controller, action);
 		}
 
 		public string JS(params string[] items)

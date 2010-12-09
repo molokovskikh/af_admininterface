@@ -152,7 +152,7 @@
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
     <Compile Include="Controllers\PayersController.cs" />
     <Compile Include="Controllers\PaymentsController.cs" />
-    <Compile Include="Controllers\RecipientController.cs" />
+    <Compile Include="Controllers\RecipientsController.cs" />
     <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\ReportController.cs" />

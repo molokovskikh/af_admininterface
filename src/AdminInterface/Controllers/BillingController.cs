@@ -25,8 +25,7 @@ namespace AdminInterface.Controllers
 		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof (BindingHelper)),
 		Helper(typeof (ViewHelper)),
-		Secure(PermissionType.Billing, ExecutionOrder = 0),
-		Secure(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore, Required = Required.AnyOf, ExecutionOrder = 1)
+		Secure(PermissionType.Billing),
 	]
 	public class BillingController : ARSmartDispatcherController
 	{

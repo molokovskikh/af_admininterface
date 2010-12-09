@@ -303,5 +303,10 @@ namespace AdminInterface.Models.Security
 			}
 			ADHelper.SetLogonHours(login, logonHours);
 		}
+
+		public bool HaveAccessTo(string controller, string action)
+		{
+			return AllowedPermissions.Any(p => p.HaveAccessTo(controller, action));
+		}
 	}
 }
