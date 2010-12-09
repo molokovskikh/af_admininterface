@@ -17,6 +17,21 @@ namespace AdminInterface.Controllers
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
+		public void Edit(uint id)
+		{
+			var recipient = Recipient.Find(id);
+			if (IsPost)
+			{
+				BindObjectInstance(recipient, "recipient");
+				recipient.Save();
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["recipient"] = recipient;
+			}
+		}
+
 		public void Update([ARDataBind("recipients", AutoLoad = AutoLoadBehavior.NewInstanceIfInvalidKey)] Recipient[] recipients)
 		{
 			using (var transaction = new TransactionScope(OnDispose.Rollback))

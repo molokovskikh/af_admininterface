@@ -28,13 +28,13 @@ namespace AdminInterface.Models.Billing
 		public virtual string BIC { get; set; }
 
 		[Property]
-		public virtual string BankAccountNumber { get; set; }
+		public virtual string Bank { get; set; }
 
 		[Property]
 		public virtual string BankLoroAccount { get; set; }
 
 		[Property]
-		public virtual string Bank { get; set; }
+		public virtual string BankAccountNumber { get; set; }
 
 		[Property]
 		public virtual string Boss { get; set; }

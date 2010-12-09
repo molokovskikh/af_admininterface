@@ -1,0 +1,103 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Редактирование получателя платежей
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "${siteroot}/Recipients/"), 
+									  ("Редактирование получателя платежей", "")]} %>
+
+<form method="post">
+	${FormHelper.HiddenField("callback.Id")}
+	<table>
+		<tr>
+			<td>
+				Название:<br>
+				<span style="font-size:smaller">для внутреннего использования</span>
+			</td>
+			<td>${FormHelper.TextField("recipient.Name")}</td>
+		</tr>
+		<tr>
+			<td>
+				Полное название:<br>
+				<span style="font-size:smaller">для печати в документах</span>
+			</td>
+			<td>${FormHelper.TextField("recipient.FullName")}</td>
+		</tr>
+		<tr>
+			<td>
+				Адрес:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.Address")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				ИНН:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.INN")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				КПП:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.KPP")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				БИК:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.BIC")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Банк:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.Bank")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Корреспондентский счет:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.BankLoroAccount")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Номер счета:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.BankAccountNumber")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Руководитель предприятия:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.Boss")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Главный бухгалтер:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.Accountant")}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type=submit value="Сохранить" />
+			</td>
+		</tr>
+	</table>
+</form>

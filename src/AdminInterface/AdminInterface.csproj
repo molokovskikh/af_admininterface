@@ -462,7 +462,8 @@
     <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
     <None Include="Views\Mail\PasswordChange.brail" />
     <None Include="Views\Payments\Index.brail" />
-    <None Include="Views\Recipient\Show.brail" />
+    <None Include="Views\Recipients\Edit.brail" />
+    <None Include="Views\Recipients\Index.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />
     <None Include="Views\RegionalAdmin\Edit.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />
