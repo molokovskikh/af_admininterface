@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -58,68 +59,100 @@ namespace AddUser
 			}
 		}
 
+		public class BugRoute : IRoutingRule
+		{
+			private PatternRoute route;
+
+			public BugRoute(PatternRoute route)
+			{
+				this.route = route;
+			}
+
+			public string CreateUrl(IDictionary parameters)
+			{
+				return route.CreateUrl(parameters);
+			}
+
+			public int Matches(string url, IRouteContext context, RouteMatch match)
+			{
+				if (url.Contains("WebResource.axd"))
+					return 0;
+
+				return route.Matches(url, context, match);
+			}
+
+			public string RouteName
+			{
+				get { return route.RouteName; }
+			}
+		}
+
 		private void SetupRoute()
 		{
-			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[cc]")
+			var engine = RoutingModuleEx.Engine;
+
+			engine.Add(new PatternRoute("/client/[cc]")
 				.DefaultForController().Is("client")
 				.DefaultForAction().Is("info")
 				.Restrict("cc").ValidInteger);
 
-			RoutingModuleEx.Engine.Add(
-				new PatternRoute("/<controller>/[action]")
-					.DefaultForAction().Is("index")
-			);
-
-			RoutingModuleEx.Engine.Add(
-				new PatternRoute("/<controller>/[id]")
+			engine.Add(
+				new PatternRoute("/<controller>/<id>")
 					.DefaultForAction().Is("show")
 					.Restrict("id").ValidInteger
 			);
 
-			RoutingModuleEx.Engine.Add(
+			engine.Add(
+				new BugRoute(
+					new PatternRoute("/<controller>/[action]")
+						.DefaultForAction().Is("index")
+				)
+			);
+
+			engine.Add(
 				new PatternRoute("/<controller>/[id]/<action>")
 					.Restrict("id").ValidInteger
 			);
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/client/[clientId]/orders")
+			engine.Add(new PatternRoute("/client/[clientId]/orders")
 				.DefaultForController().Is("Logs")
 				.DefaultForAction().Is("Orders")
 				.Restrict("clientId").ValidInteger);
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/deliveries/[id]/edit")
+			engine.Add(new PatternRoute("/deliveries/[id]/edit")
 				.DefaultForController().Is("deliveries")
 				.DefaultForAction().Is("edit")
 				.Restrict("id").ValidInteger);
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/ChangePassword")
+			engine.Add(new PatternRoute("/users/[login]/ChangePassword")
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("ChangePassword"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/edit")
+			engine.Add(new PatternRoute("/users/[login]/edit")
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("edit"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/users/[login]/settings")
+			engine.Add(new PatternRoute("/users/[login]/settings")
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("UserSettings"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/users/search")
+			engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")
 				.DefaultForAction().Is("Search"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/RegionalAdmin/[id]/edit")
+			engine.Add(new PatternRoute("/RegionalAdmin/[id]/edit")
 				.DefaultForController().Is("RegionalAdmin")
 				.DefaultForAction().Is("Edit"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
+			engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
 				.DefaultForController().Is("logs")
 				.DefaultForAction().Is("PasswordChangeLog"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("/")
+			engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));
 
-			RoutingModuleEx.Engine.Add(new PatternRoute("default.aspx")
+			engine.Add(new PatternRoute("default.aspx")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));
 		}

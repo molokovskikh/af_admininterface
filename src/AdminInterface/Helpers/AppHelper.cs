@@ -19,6 +19,11 @@ namespace AdminInterface.Helpers
 	{
 		public string LinkTo(object item)
 		{
+			return LinkTo(item, "");
+		}
+
+		public string LinkTo(object item, string action)
+		{
 			var dynamicItem = ((dynamic)item);
 			var id = dynamicItem.Id;
 			var name = dynamicItem.Name;
@@ -27,8 +32,17 @@ namespace AdminInterface.Helpers
 			if (item is Address && !((Address)item).Enabled)
 				clazz = "DisabledByBilling";
 
-			var controller = Inflector.Pluralize(NHibernateUtil.GetClass(item).Name);
-			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/{0}/{1}", controller, id);
+			var className = NHibernateUtil.GetClass(item).Name;
+			if (className == "Address")
+			{
+				className = "Delivery";
+			}
+			if (!String.IsNullOrEmpty(action))
+			{
+				action = "/" + action;
+			}
+			var controller = Inflector.Pluralize(className);
+			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/{0}/{1}{2}", controller, id, action);
 			return String.Format("<a class='{1}' href='{2}'>{0}</a>", name, clazz, uri);
 		}
 

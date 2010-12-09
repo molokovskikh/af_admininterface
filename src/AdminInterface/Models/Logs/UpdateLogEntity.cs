@@ -67,9 +67,9 @@ namespace AdminInterface.Models.Logs
 		public IList<DocumentReceiveLog> GetLoadedDocumentLogs()
 		{
 			//return DocumentLogEntity.FindAllByProperty("SendUpdateId", Id);
-            return ArHelper.WithSession(
+			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(DocumentReceiveLog))
-                    .Add(Expression.Eq("SendUpdateLogEntity", this))
+					.Add(Expression.Eq("SendUpdateLogEntity", this))
 					.AddOrder(Order.Desc("LogTime"))
 					.List<DocumentReceiveLog>());
 		}
@@ -90,6 +90,7 @@ namespace AdminInterface.Models.Logs
 					//.Add(Expression.Between("RequestTime", beginDate, endDate))
 					.Add(Expression.Ge("RequestTime", beginDate))
 					.Add(Expression.Le("RequestTime", endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -105,6 +106,7 @@ namespace AdminInterface.Models.Logs
 					//.Add(Expression.Between("RequestTime", beginDate, endDate))
 					.Add(Expression.Ge("RequestTime", beginDate))
 					.Add(Expression.Le("RequestTime", endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -117,6 +119,7 @@ namespace AdminInterface.Models.Logs
 					//.Add(Expression.Between("RequestTime", beginDate, endDate))
 					.Add(Expression.Ge("RequestTime", beginDate))
 					.Add(Expression.Le("RequestTime", endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.Add(Expression.Eq("UpdateType", updateType))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
