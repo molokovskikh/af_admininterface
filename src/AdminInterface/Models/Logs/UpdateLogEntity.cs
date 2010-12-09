@@ -67,9 +67,9 @@ namespace AdminInterface.Models.Logs
 		public IList<DocumentReceiveLog> GetLoadedDocumentLogs()
 		{
 			//return DocumentLogEntity.FindAllByProperty("SendUpdateId", Id);
-            return ArHelper.WithSession(
+			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(DocumentReceiveLog))
-                    .Add(Expression.Eq("SendUpdateLogEntity", this))
+					.Add(Expression.Eq("SendUpdateLogEntity", this))
 					.AddOrder(Order.Desc("LogTime"))
 					.List<DocumentReceiveLog>());
 		}
@@ -87,7 +87,7 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (UpdateLogEntity))
 					.Add(Expression.InG("User", client.Users.ToList()))
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -100,7 +100,7 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(UpdateLogEntity))
 					.Add(Expression.Eq("User", user))
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
 		}
@@ -110,7 +110,7 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(session => 
 				session.CreateCriteria(typeof(UpdateLogEntity))
 					.CreateAlias("User", "u", JoinType.InnerJoin)
-					.Add(Expression.Between("RequestTime", beginDate, endDate))
+					.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
 					.Add(Expression.Eq("UpdateType", updateType))
 					.AddOrder(Order.Desc("RequestTime"))
 					.List<UpdateLogEntity>());
