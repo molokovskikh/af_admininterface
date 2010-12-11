@@ -9,19 +9,24 @@ namespace AdminInterface.Models
 		public UserUpdateInfo(uint id)
 		{
 			Id = id;
-			AFAppVersion = DefaultValues.Get().AnalitFVersion;
+			var defaults = DefaultValues.Get();
+			AFAppVersion = defaults.AnalitFVersion;
+			TargetVersion = defaults.AnalitFVersion;
 			AFCopyId = "";
 		}
 
 		public UserUpdateInfo() { }
 
 		[PrimaryKey("UserId", Generator = PrimaryKeyType.Assigned)]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		[Property]
-		public string AFCopyId { get; set; }
+		public virtual string AFCopyId { get; set; }
 
 		[Property]
-		public uint AFAppVersion { get; set; }
+		public virtual uint AFAppVersion { get; set; }
+
+		[Property]
+		public virtual uint? TargetVersion { get; set; }
 	}
 }
