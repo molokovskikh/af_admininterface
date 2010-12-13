@@ -138,5 +138,8 @@ namespace AdminInterface.Models
 
 		[Property, Description("Автозаказ"), Auditable]
 		public virtual bool EnableSmartOrder { get; set; }
+
+		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
+		public virtual bool CalculateLeader { get; set; }
 	}
 }
