@@ -4,7 +4,7 @@
 									  ("Настройка пользователя", "")]} %>
 									  
 <h2>
-    Настройки пользователя ${user.Login}
+	Настройки пользователя ${user.Login}
 </h2>
 
 <% if IsDefined("Message"):
@@ -21,20 +21,24 @@
 
 <% if not user.Enabled: %>
 <div class="Warning">
-    <p>Пользователь отключен</p>
+	<p>Пользователь отключен</p>
 </div>
 <% end %>
 
 <div class="TwoColumn" style="width: 49%;">
-    <form id="UserSettingsForm" method=post action="${siteroot}/users/SaveSettings">
-        <input name="user.Id" type=hidden value=${user.Id}>
+	<form id="UserSettingsForm" method=post action="${siteroot}/users/SaveSettings">
+		<input name="user.Id" type=hidden value=${user.Id}>
 		<div class="block">
 			<h3>
 				Общие настройки
 			</h3>
-            <input type=checkbox name=user.EnableUpdate ${"checked" if user.EnableUpdate} value=true> Автоматическое обновление версий<br>
-			<input type=hidden name=user.EnableUpdate value=false>
-			
+			Разрешить обновление до версии
+			<select name="user.TargetVersion">
+				<% for version in user.AvalilableAnalitFVersions: %>
+					<option ${"selected" if user.TargetVersion.ToString() == version} value="${version}">${version}</option>
+				<% end %>
+			</select><br>
+
 			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
 			<input type=hidden name=user.SubmitOrders value=false>
 			
@@ -54,7 +58,7 @@
 				<% end %>
 			</select> Наследовать настройки прайс листов <br>
 		</div>
-    
+	
 		<div class=block>
 			<h3>
 				Права доступа

@@ -18,6 +18,19 @@ using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
+	[ActiveRecord(Schema = "Usersettings")]
+	public class AnalitFVersionRule : ActiveRecordLinqBase<AnalitFVersionRule>
+	{
+		[PrimaryKey]
+		public uint Id { get; set; }
+
+		[Property]
+		public uint SourceVersion { get; set; }
+
+		[Property]
+		public uint DestinationVersion { get; set; }
+	}
+
 	public enum UserADStatus
 	{
 		[Description("")] Ok,
@@ -44,6 +57,8 @@ namespace AdminInterface.Models
 	[ActiveRecord("Users", Schema = "future", Lazy = true)]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
+		private UserUpdateInfo _updateInfo;
+
 		public User()
 		{
 		}
@@ -139,6 +154,51 @@ namespace AdminInterface.Models
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
+
+		public virtual string TargetVersion
+		{
+			get {
+				if (_updateInfo == null)
+					_updateInfo = UserUpdateInfo.Find(Id);
+
+				return _updateInfo.TargetVersion.ToString();
+			}
+			set {
+				if (_updateInfo == null)
+					_updateInfo = UserUpdateInfo.Find(Id);
+
+				uint versionValue;
+				if (uint.TryParse(value, out versionValue))
+					_updateInfo.TargetVersion = versionValue;
+				else
+					_updateInfo.TargetVersion = null;
+			}
+		}
+
+		public virtual List<string> AvalilableAnalitFVersions
+		{
+			get {
+				if (_updateInfo == null)
+					_updateInfo = UserUpdateInfo.Find(Id);
+
+				List<AnalitFVersionRule> rules;
+				if (_updateInfo.TargetVersion != null)
+					rules = AnalitFVersionRule.Queryable
+						.Where(r => r.SourceVersion == _updateInfo.TargetVersion)
+						.ToList();
+				else
+					rules = AnalitFVersionRule.Queryable
+						.Where(r => r.SourceVersion == _updateInfo.AFAppVersion)
+						.ToList();
+
+				var versions = rules.Select(r => r.DestinationVersion).ToList();
+				if (_updateInfo.TargetVersion != null)
+					versions.Add(_updateInfo.TargetVersion.Value);
+				versions.Add(_updateInfo.AFAppVersion);
+				versions.Sort();
+				return new [] {"Любая версия"}.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
+			}
+		}
 
 		public virtual string GetLoginOrName()
 		{

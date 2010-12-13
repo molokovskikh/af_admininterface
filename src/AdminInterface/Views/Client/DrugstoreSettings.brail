@@ -128,7 +128,8 @@
 		"Checkboxes" : { 
 			"IgnoreNewPrices" : drugstore.IgnoreNewPrices,
 			"ServiceClient" : drugstore.ServiceClient,
-			"AllowDelayOfPayment": drugstore.AllowDelayOfPayment }
+			"AllowDelayOfPayment": drugstore.AllowDelayOfPayment,
+			"CalculateLeader" : drugstore.CalculateLeader }
 	}
 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
