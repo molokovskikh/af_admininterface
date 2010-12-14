@@ -267,6 +267,7 @@ set @skip = 0;
 
 		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity newLegalEntity)
 		{
+			Maintainer.MaintainIntersection(newOwner, newLegalEntity);
 			MoveAddressIntersection(newOwner, newLegalEntity,
 				Client, LegalEntity);
 
