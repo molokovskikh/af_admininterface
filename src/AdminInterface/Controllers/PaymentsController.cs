@@ -82,9 +82,10 @@ namespace AdminInterface.Controllers
 				.AsQueryable<Payer>()
 				.Where(p => p.ShortName.Contains(term))
 				.Take(20)
+				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = p.ShortName
+					label = String.Format("[{0}]. {1} »ÕÕ {2}", p.Id, p.ShortName, p.INN)
 				});
 		}
 	}
