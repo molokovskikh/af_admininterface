@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -16,6 +18,13 @@ namespace AdminInterface.Controllers
 	{
 		public void NewContactGroup(uint billingCode)
 		{
+			var payer = Payer.Find(billingCode);
+
+			var types = new List<ContactGroupType> { ContactGroupType.Custom };
+			if (!payer.ContactGroupOwner.ContactGroups.Any(g => g.Type == ContactGroupType.Invoice))
+				types.Add(ContactGroupType.Invoice);
+
+			PropertyBag["groupTypes"] = types;
 			PropertyBag["billingCode"] = billingCode;
 			PropertyBag["contactGroup"] = new ContactGroup();
 		}
@@ -36,7 +45,6 @@ namespace AdminInterface.Controllers
 				return;
 			}
 			var billingInstance = Payer.Find(billingCode);
-			contactGroup.Type = ContactGroupType.Custom;
 			contactGroup.ContactGroupOwner = billingInstance.ContactGroupOwner;
 			using (new TransactionScope())
 			{

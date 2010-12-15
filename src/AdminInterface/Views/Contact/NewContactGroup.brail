@@ -32,6 +32,18 @@
 						%>
 					</td>
 				</tr>
+				<tr>
+					<td class="Line" style="width: 20%">
+						Назначение группы:
+					</td>
+					<td class="Line" style="width: 80%">
+						<select name="ContactGroup.Type">
+							<% for type in groupTypes: %>
+							<option value="${cast(int, type)}">${BindingHelper.GetDescription(type)}</option>
+							<% end %>
+						</select>
+					</td>
+				</tr>
 			</table>
 		</div>
 		<div>

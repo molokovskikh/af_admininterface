@@ -16,9 +16,9 @@ namespace Common.Web.Ui.Models
 		[Description("Менеджер прайс листов(заказов)")] OrderManagers = 2,
 		[Description("Бухгалтер по расчетам с АК \"Инфорум\"")] AccountantManagers = 3,
 		[Description("Контактная информация для биллинга")] Billing = 4,
-		[Description("Известные телефоны")] KnownPhones,
-		Custom = 5,
-		[Description("Рассылка счетов")] Invoice = 7,
+		[Description("Дополнительные контакты")] Custom = 5,
+		[Description("Рассылка счетов")] Invoice = 8,
+		[Description("Известные телефоны")] KnownPhones = 9
 	}
 
 	[ActiveRecord("contact_groups", Schema = "contacts", Lazy = true)]
