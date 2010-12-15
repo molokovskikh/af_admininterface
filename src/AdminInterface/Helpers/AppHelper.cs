@@ -24,9 +24,13 @@ namespace AdminInterface.Helpers
 
 		public string LinkTo(object item, string action)
 		{
+			return LinkTo(item, ((dynamic)item).Name, action);
+		}
+
+		public string LinkTo(object item, object label, string action)
+		{
 			var dynamicItem = ((dynamic)item);
 			var id = dynamicItem.Id;
-			var name = dynamicItem.Name;
 
 			var clazz = "";
 			if (item is Address && !((Address)item).Enabled)
@@ -43,7 +47,7 @@ namespace AdminInterface.Helpers
 			}
 			var controller = Inflector.Pluralize(className);
 			var uri = LinkHelper.GetVirtualDir(Context) + String.Format("/{0}/{1}{2}", controller, id, action);
-			return String.Format("<a class='{1}' href='{2}'>{0}</a>", name, clazz, uri);
+			return String.Format("<a class='{1}' href='{2}'>{0}</a>", label, clazz, uri);
 		}
 
 		public string LinkTo(string title, string controller, string method)

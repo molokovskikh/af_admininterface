@@ -1,12 +1,14 @@
 ﻿<table class=DataTable>
 	<% if invoices.Count: %>
 	<tr>
+		<th>№</th>
 		<th>Сумма счета</th>
 		<th>За период</th>
 		<th>Дата</th>
 	</tr>
 	<% for i, invoice in enumerate(invoices): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
 		<td>${invoice.Sum.ToString("0.##")}</td>
 		<td>${BindingHelper.GetDescription(invoice.Period)}</td>
 		<td>${invoice.Date}</td>

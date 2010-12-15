@@ -44,6 +44,7 @@
 		<table class=DataTable>
 			<% if invoices.Count: %>
 			<tr>
+				<th>${app.Sortable("№", "Id")}</th>
 				<th>${app.Sortable("Договор", "payerId")}</th>
 				<th>${app.Sortable("Получатель платежей", "recipient")}</th>
 				<th>${app.Sortable("Плательщик", "payer")}</th>
@@ -53,6 +54,7 @@
 			</tr>
 			<% for i, invoice in enumerate(invoices): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
 				<td>${invoice.Payer.Id}</td>
 				<td>${invoice.Recipient.Name}</td>
 				<td>${invoice.Payer.Name}</td>

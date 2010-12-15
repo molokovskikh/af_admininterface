@@ -6,7 +6,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord.Linq;
-using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -49,15 +48,11 @@ namespace AdminInterface.Controllers
 				criteria.Add(Expression.Eq("Period", Period));
 
 			if (Region != null)
-			{
 				criteria.CreateCriteria("p.Clients", "c")
 					.Add(Expression.Eq("c.HomeRegion", Region));
-			}
 
 			if (Recipient != null)
-			{
 				criteria.Add(Expression.Eq("Recipient", Recipient));
-			}
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("p.ShortName", SearchText, MatchMode.Anywhere));

@@ -55,6 +55,7 @@ namespace AdminInterface.Models.Billing
 
 		public void Send(Controller controller)
 		{
+/*
 			if (Payer.InvoiceSettings.PrintInvoice)
 			{
 				new Printer().Print(controller.Context.Services.ViewEngineManager, this);
@@ -65,6 +66,7 @@ namespace AdminInterface.Models.Billing
 				mailer.Invoice(this);
 				mailer.Send();
 			}
+*/
 			Payer.Balance -= Sum;
 		}
 	}
