@@ -201,13 +201,13 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.GetById(userId);
 			var administrator = SecurityContext.Administrator;
-
+			
 			administrator
 				.CheckClientType(user.Client.Type)
 				.CheckClientHomeRegion(user.Client.HomeRegion.Id);
-
+			
 			user.CheckLogin();
-
+			
 			var password = User.GeneratePassword();
 		
 			using (new TransactionScope())
@@ -219,7 +219,7 @@ namespace AdminInterface.Controllers
 				DbLogHelper.SetupParametersForTriggerLogging();
 
 				if (user.Client.Type == ClientType.Drugstore)
-					user.Client.ResetUin();
+					user.ResetUin();
 				if (changeLogin)
 				{
 					user.Login = user.Id.ToString();
@@ -240,7 +240,7 @@ namespace AdminInterface.Controllers
 
 				passwordChangeLog.Save();
 			}
-
+			
 			NotificationHelper.NotifyAboutPasswordChange(user.Client,
 				administrator,
 				user,
