@@ -14,7 +14,8 @@
 		var link = "${siteroot}/Client/SearchClient?searchText=" + searchText;
 
 		$.ajax({
-			url: link,
+			url: "${siteroot}/Client/SearchClient",
+			data: ({searchText: searchText}),
 			cache: false,
 			success: function (data) {
 				if (data.length == 0) {
