@@ -12,6 +12,14 @@
 			}
 		});
 		$("#payer").focus();
+
+		$.ui.autocomplete.prototype._renderItem = function (ul, item) {
+			uri = "${siteroot}/Billing/Edit?billingcode=" + item.id;
+			return $("<li></li>")
+				.data("item.autocomplete", item)
+				.append("<a href='" + uri + "'>" + item.label + "</a>")
+				.appendTo(ul);
+		};
 	});
 </script>
 
