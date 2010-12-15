@@ -3,7 +3,7 @@
 	<td colspan='4'>
 		<div id='DownloadLog${updateLogEntityId}'>
 			<pre>
-				${log.Replace('\\', '\\\\')}
+				!{log.Replace('\\', '\\\\')}
 			</pre>
 		</div>
 	</td>
