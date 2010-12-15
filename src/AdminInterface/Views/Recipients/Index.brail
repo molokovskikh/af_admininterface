@@ -47,7 +47,7 @@
 	</tr>
 </table>
 <% else: %>
-<form action="${siteroot}/recipient/update.rails" method="post">
+<form action="${siteroot}/Recipients/Update" method="post">
 	<table class="DataTable" style="width:600px">
 		<tr>
 			<td>
