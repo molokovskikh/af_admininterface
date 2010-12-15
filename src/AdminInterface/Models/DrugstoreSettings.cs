@@ -141,5 +141,9 @@ namespace AdminInterface.Models
 
 		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
+
+		[BelongsTo("SmartOrderRuleId")]
+		public virtual SmartOrderRules SmartOrderRules { get; set; }
+
 	}
 }

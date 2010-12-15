@@ -243,6 +243,13 @@ namespace AdminInterface.Controllers
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
 				.UniqueResult<string>());
 
+			var smartOrder = new SmartOrderRules
+			                 	{
+			                 		AssortimentPriceCode = 4662,
+			                 		ParseAlgorithm = "TestSource",
+			                 	};
+			smartOrder.Save();
+
 			client.Settings = new DrugstoreSettings {
 				Id = client.Id,
 				InvisibleOnFirm =
@@ -255,7 +262,11 @@ namespace AdminInterface.Controllers
 				ParseWaybills = true,
 				ShowAdvertising = true,
 				ShowNewDefecture = true,
+				EnableSmartOrder = true,
+				SmartOrderRules = smartOrder
 			};
+			
+			
 			if (additionalSettings.ShowForOneSupplier)
 				client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.CreateAndFlush();

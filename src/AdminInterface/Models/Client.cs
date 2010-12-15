@@ -52,6 +52,19 @@ namespace AdminInterface.Models
 		public virtual Supplier Supplier { get; set; }
 	}
 
+	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true)]
+	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>
+	{
+		[PrimaryKey("SmartOrderRuleId")]
+		public virtual uint Id { get; set; }
+
+		[Property("ParseAlgorithm")]
+		public virtual string ParseAlgorithm { get; set; }
+
+		[Property("AssortimentPriceCode")]
+		public virtual uint AssortimentPriceCode { get; set; }
+	}
+
 	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)", Lazy = true)]
 	public class Supplier : ActiveRecordLinqBase<Supplier>
 	{

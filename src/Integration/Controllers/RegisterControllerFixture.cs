@@ -108,5 +108,44 @@ namespace Integration.Controllers
 			Assert.That(legalFullName, Is.EqualTo(client1.Payer.JuridicalName));
 			Assert.That(legalAddress, Is.EqualTo(client1.Payer.JuridicalAddress));
 		}
+
+		[Test]
+		public void Create_client_with_smart_order()
+		{
+			using (new SessionScope())
+			{
+				var client = DataMother.CreateTestClient();
+				client.MaskRegion = 1;
+				client.Settings = new DrugstoreSettings
+				                  	{
+				                  		Id = client.Id,
+				                  		WorkRegionMask = client.MaskRegion,
+				                  		OrderRegionMask = 111,
+				                  		ParseWaybills = true,
+				                  		ShowAdvertising = true,
+				                  		ShowNewDefecture = true,
+				                  	};
+				client.Settings.WorkRegionMask = 1;
+				RegionSettings[] regionSettings = new[]
+				                                  	{
+				                                  		new RegionSettings
+				                                  			{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
+				                                  	};
+				AdditionalSettings addsettings = new AdditionalSettings();
+				addsettings.PayerExists = true;
+				Contact[] clientContacts = new[]
+				                           	{
+				                           		new Contact {Id = 1, Type = 0, ContactText = "11@ww.ru"}
+				                           	};
+				Person[] person = new[] {new Person()};
+
+				controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", client.Payer,
+				                          client.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "", "");
+				var client1 = Client.Find(client.Id + 1);
+				Assert.That(client1.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
+				Assert.That(client1.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
+				Assert.That(client1.Settings.EnableSmartOrder, Is.EqualTo(true));
+			}
+		}
 	}
 }

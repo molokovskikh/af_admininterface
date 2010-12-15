@@ -119,6 +119,7 @@
     <Compile Include="AppHelperFixture.cs" />
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
+    <Compile Include="Controllers\UsersControllerFixture.cs" />
     <Compile Include="InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
