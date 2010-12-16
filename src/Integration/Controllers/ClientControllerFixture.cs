@@ -221,5 +221,41 @@ namespace Integration.Controllers
 				}
 			}
 		}*/
+
+		[Test]
+		public void Move_last_user_to_another_client()
+		{
+			Client oldClient;
+			Client newClient;
+			Address address;
+			User user;
+
+			using (new SessionScope())
+			{
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				user = oldClient.Users[0];
+				address = oldClient.Addresses[0];
+				newClient = DataMother.CreateTestClientWithAddressAndUser();
+				user.AvaliableAddresses = new List<Address>();
+				address.AvaliableForUsers.Add(user);
+
+				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
+			}
+			using (new SessionScope())
+			{
+				oldClient.Refresh();
+				newClient.Refresh();
+				user.Refresh();
+				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+
+				Assert.That(newClient.Users.Count, Is.EqualTo(2));
+				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+
+				Assert.That(newClient.Addresses.Count, Is.EqualTo(1));
+				Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
+
+				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.Off));
+			}
+		}
 	}
 }

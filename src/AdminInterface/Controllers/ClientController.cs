@@ -19,6 +19,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Properties;
 using log4net;
+using MySql.Data.MySqlClient;
 using NHibernate;
 
 namespace AdminInterface.Controllers
@@ -357,7 +358,11 @@ where Phone like :phone")
 		{
 			var newClient = Client.Find(clientId);
 			var address = Address.TryFind(addressId);
-			var user = User.TryFind(userId);
+			var user = User.TryFind(Convert.ToUInt32(userId));
+			var clId = ArHelper.WithSession(s => s.CreateSQLQuery(
+					"select clientid from future.Users where Id = :id")
+						.SetParameter("id", userId)
+						.UniqueResult());
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Payer.JuridicalOrganizations.Single();
@@ -387,7 +392,6 @@ where Phone like :phone")
 				user = address.AvaliableForUsers.SingleOrDefault();
 			if (user != null)
 				address = user.AvaliableAddresses.SingleOrDefault();
-
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
@@ -409,6 +413,10 @@ where Phone like :phone")
 				Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { login = user.Login });
 			}
+			var client = Client.Find(Convert.ToUInt32(clId));
+			client.Refresh();
+			if (client.Users.Count == 0) client.Status = ClientStatus.Off;
+			client.Update();
 		}
 	}
 }
