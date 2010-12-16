@@ -99,7 +99,7 @@ namespace AdminInterface.Models
 				var result = session.CreateSQLQuery(String.Format(@"
 SELECT
 	Users.Id as {{UserSearchItem.UserId}},
-	Users.Enabled as {{UserSearchItem.Enabled}},
+	if (Clients.Status = 0, 0, Users.Enabled) as {{UserSearchItem.Enabled}},
 	Clients.Id as {{UserSearchItem.ClientId}},
 	Users.Login as {{UserSearchItem.Login}},
 	Users.Name as {{UserSearchItem.UserName}},

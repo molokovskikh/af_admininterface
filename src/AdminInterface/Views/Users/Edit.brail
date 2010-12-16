@@ -37,7 +37,7 @@
 </div>
 <% end %>
 
-<% if not user.Enabled: %>
+<% if (not user.Enabled or enabled == false): %>
 <div class="Warning">
     <p>Пользователь отключен</p>
 </div>
