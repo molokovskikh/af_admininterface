@@ -454,7 +454,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 									FormHelper.Select("Instance.AutoInvoice", 
 													  {1:"Автоматически", 0:"По запросу"},
 													  {"value":"Key", "text":"Value"}))}
-													  
 		<% if not Instance.IsManualPayments(): %>
 		
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
@@ -468,7 +467,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 									FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
 		<% end %>
 		
-		<% if Instance.IsManualPayments(): %>
 		${WriteInputGroupHeader("Оплата")}
 										
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
@@ -478,8 +476,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
 														"Сумма платежа:"), 
 									FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
-		<% end %>
-									
+
 		${WriteInputGroupHeader("Комментарий")}
 				<tr>
 					<td colspan=2>

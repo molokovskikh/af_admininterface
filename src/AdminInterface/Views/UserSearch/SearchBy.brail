@@ -13,7 +13,7 @@ def WriteHeader(caption as string, columnName as string):
         if SortDirection == "Ascending":
             currentSortDirection = "Descending"
         else:
-            currentSortDirection = "Ascending"            
+            currentSortDirection = "Ascending"
         end
 		if SortDirection == "Ascending":
 			url = "${siteroot}/Images/arrow-down-blue-reversed.gif"
@@ -42,8 +42,8 @@ end
         <tr valign="top">
             <th>${WriteHeader("Договор", "PayerId")}</th>
             <th>${WriteHeader("Код клиента", "ClientId")}</th>
-            <th>${WriteHeader("Код пользователя", "UserId")}</th>            
-            <th>${WriteHeader("Имя клиента", "ClientName")}</th>            
+            <th>${WriteHeader("Код пользователя", "UserId")}</th>
+            <th>${WriteHeader("Имя клиента", "ClientName")}</th>
             <th>${WriteHeader("Логин", "Login")}</th>
             <th>${WriteHeader("Комментарий", "UserName")}</th>
             <th>${WriteHeader("Регион", "RegionName")}</th>
