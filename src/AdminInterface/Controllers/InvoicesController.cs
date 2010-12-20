@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Printing;
 using System.Linq;
 using AdminInterface.Helpers;
@@ -7,6 +8,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord.Linq;
 using Castle.MonoRail.Framework;
+using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
@@ -79,15 +81,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["printers"] = PrinterSettings.InstalledPrinters;
 			PropertyBag["invoices"] = filter.Find();
+			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
 		public void Print(uint id)
 		{
-			LayoutName = "Print";
+			CancelLayout();
+			//LayoutName = "Print";
 			PropertyBag["invoice"] = Invoice.Find(id);
 		}
 
-		public void Build(Period period, string printer)
+		public void Build(Period period, ulong regionId, string printer)
 		{
 			var invoicePeriod = InvoicePeriod.Month;
 			if (period == Period.FirstQuarter ||
@@ -96,12 +100,15 @@ namespace AdminInterface.Controllers
 				period == Period.FourthQuarter)
 				invoicePeriod = InvoicePeriod.Quarter;
 
+/*
 			var payers = ActiveRecordLinqBase<Payer>
 				.Queryable
 				.Where(p => p.AutoInvoice == InvoiceType.Auto && p.PayCycle == invoicePeriod);
+*/
 
 			Printer.SetPrinter(printer);
 
+/*
 			foreach (var payer in payers)
 			{
 				if (!payer.JuridicalOrganizations.Any(j => j.Recipient != null))
@@ -114,6 +121,11 @@ namespace AdminInterface.Controllers
 				invoice.Send(this);
 				invoice.Save();
 			}
+*/
+
+			var info = new ProcessStartInfo(@"C:\Printer\Printer.exe", String.Format("{0} {1}", period, regionId));
+			var process = System.Diagnostics.Process.Start(info);
+			process.WaitForExit(30*1000);
 
 			Flash["message"] = String.Format("—чета за {0} сформированы", BindingHelper.GetDescription(period));
 			RedirectToAction("Index");

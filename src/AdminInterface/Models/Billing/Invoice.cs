@@ -39,6 +39,10 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public Period Period {get; set; }
 
+		public string SumInWords()
+		{
+			return ViewHelper.InWords((float) Sum);
+		}
 
 		public List<InvoicePart> Bills
 		{
@@ -57,7 +61,7 @@ namespace AdminInterface.Models.Billing
 		{
 			if (Payer.InvoiceSettings.PrintInvoice)
 			{
-				new Printer().Print(controller.Context.Services.ViewEngineManager, this);
+				//new Printer().Print(controller.Context.Services.ViewEngineManager, this);
 			}
 			if (Payer.InvoiceSettings.EmailInvoice)
 			{

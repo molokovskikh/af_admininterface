@@ -17,7 +17,7 @@ namespace Integration
 				Recipient = new Recipient(),
 				Sum = 800
 			};
-			print.Print(MailerFixture.GetViewManager(), invoice);
+			//print.Print(MailerFixture.GetViewManager(), invoice);
 		}
 	}
 }
