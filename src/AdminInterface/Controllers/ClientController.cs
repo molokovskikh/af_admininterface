@@ -10,6 +10,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -175,6 +176,16 @@ namespace AdminInterface.Controllers
 				client.UpdateRegionSettings(regionSettings);
 				if (!activateBuyMatrix)
 					drugstore.BuyingMatrixPrice = null;
+				if (drugstore.EnableSmartOrder)
+				{
+					var smartOrder = new SmartOrderRules
+					{
+						AssortimentPriceCode = 4662,
+						ParseAlgorithm = "TestSource",
+					};
+					smartOrder.Save();
+					drugstore.SmartOrderRules = smartOrder;
+				}
 				client.Update();
 				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
@@ -354,15 +365,31 @@ where Phone like :phone")
 				.ToList();
 		}
 
+		public void UpdateClientStatus(uint clientId, bool enabled)
+		{
+			using (new TransactionScope())
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+				var client = Client.Find(clientId);
+				var oldEnabled = client.Enabled;
+				client.Enabled = enabled;
+				if (oldEnabled != client.Enabled)
+				{
+					this.Mail().EnableChanged(client, enabled).Send();
+					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
+				}
+				client.UpdateAndFlush();
+			}
+			CancelView();
+			CancelLayout();
+		}
+
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
 		{
 			var newClient = Client.Find(clientId);
 			var address = Address.TryFind(addressId);
-			var user = User.TryFind(Convert.ToUInt32(userId));
-			var clId = ArHelper.WithSession(s => s.CreateSQLQuery(
-					"select clientid from future.Users where Id = :id")
-						.SetParameter("id", userId)
-						.UniqueResult());
+			var user = User.TryFind(userId);
+			var oldClient = Client.Find(user.Client.Id);
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Payer.JuridicalOrganizations.Single();
@@ -413,10 +440,10 @@ where Phone like :phone")
 				Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { login = user.Login });
 			}
-			var client = Client.Find(Convert.ToUInt32(clId));
-			client.Refresh();
-			if (client.Users.Count == 0) client.Status = ClientStatus.Off;
-			client.Update();
+			oldClient.Refresh();
+			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)
+				UpdateClientStatus(oldClient.Id, false);	
+			oldClient.Update();
 		}
 	}
 }

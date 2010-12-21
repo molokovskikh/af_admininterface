@@ -79,9 +79,9 @@ namespace Integration.Controllers
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
 			AdditionalSettings addsettings = new AdditionalSettings();
 			addsettings.PayerExists = true;
-			Contact[] clientContacts = new[] {
+			var clientContacts = new[] {
 				new Contact{Id = 1, Type = 0, ContactText = "11@33.ru"}};
-			Person[] person = new[] {new Person()};
+			var person = new[] {new Person()};
 
 			controller.RegisterClient(client1, 1, regionSettings, null, addsettings, "address", client1.Payer, 
 				client1.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
@@ -117,27 +117,27 @@ namespace Integration.Controllers
 				var client = DataMother.CreateTestClient();
 				client.MaskRegion = 1;
 				client.Settings = new DrugstoreSettings
-				                  	{
-				                  		Id = client.Id,
-				                  		WorkRegionMask = client.MaskRegion,
-				                  		OrderRegionMask = 111,
-				                  		ParseWaybills = true,
-				                  		ShowAdvertising = true,
-				                  		ShowNewDefecture = true,
-				                  	};
+				{
+					Id = client.Id,
+					WorkRegionMask = client.MaskRegion,
+					OrderRegionMask = 111,
+					ParseWaybills = true,
+					ShowAdvertising = true,
+					ShowNewDefecture = true,
+				};
 				client.Settings.WorkRegionMask = 1;
-				RegionSettings[] regionSettings = new[]
-				                                  	{
-				                                  		new RegionSettings
-				                                  			{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
-				                                  	};
+				var regionSettings = new[]
+				{
+					new RegionSettings
+						{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
+				};
 				AdditionalSettings addsettings = new AdditionalSettings();
 				addsettings.PayerExists = true;
-				Contact[] clientContacts = new[]
-				                           	{
-				                           		new Contact {Id = 1, Type = 0, ContactText = "11@ww.ru"}
-				                           	};
-				Person[] person = new[] {new Person()};
+				var clientContacts = new[]
+				{
+					new Contact {Id = 1, Type = 0, ContactText = "11@ww.ru"}
+				};
+				var person = new[] {new Person()};
 
 				controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", client.Payer,
 				                          client.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "", "");

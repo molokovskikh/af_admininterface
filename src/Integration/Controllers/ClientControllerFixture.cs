@@ -228,25 +228,25 @@ namespace Integration.Controllers
 			Client oldClient;
 			Client newClient;
 			Address address;
-			User user;
+			User oldUser;
 
 			using (new SessionScope())
 			{
 				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				user = oldClient.Users[0];
+				oldUser = oldClient.Users[0];
 				address = oldClient.Addresses[0];
+				oldUser.AvaliableAddresses = new List<Address>();
+				address.AvaliableForUsers.Add(oldUser);
 				newClient = DataMother.CreateTestClientWithAddressAndUser();
-				user.AvaliableAddresses = new List<Address>();
-				address.AvaliableForUsers.Add(user);
-
-				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
+				
+				controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
 			}
 			using (new SessionScope())
 			{
 				oldClient.Refresh();
 				newClient.Refresh();
-				user.Refresh();
-				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+				oldUser.Refresh();
+				Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
 
 				Assert.That(newClient.Users.Count, Is.EqualTo(2));
 				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
@@ -254,7 +254,7 @@ namespace Integration.Controllers
 				Assert.That(newClient.Addresses.Count, Is.EqualTo(1));
 				Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
 
-				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.Off));
+				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
 			}
 		}
 	}

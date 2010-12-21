@@ -244,10 +244,10 @@ namespace AdminInterface.Controllers
 				.UniqueResult<string>());
 
 			var smartOrder = new SmartOrderRules
-			                 	{
-			                 		AssortimentPriceCode = 4662,
-			                 		ParseAlgorithm = "TestSource",
-			                 	};
+			{
+				AssortimentPriceCode = 4662,
+				ParseAlgorithm = "TestSource",
+			};
 			smartOrder.Save();
 
 			client.Settings = new DrugstoreSettings {

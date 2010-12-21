@@ -148,7 +148,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["RegistrationDate"] = user.RegistrationDate;
 			if ((user.ContactGroup != null) && (user.ContactGroup.Contacts != null))
 				PropertyBag["ContactGroup"] = user.ContactGroup;
-			if (user.Client.Status == ClientStatus.Off) 
+			if (user.Client.Status == ClientStatus.Off || user.Enabled == false) 
 				PropertyBag["enabled"] = false;
 			else 
 				PropertyBag["enabled"] = true;
