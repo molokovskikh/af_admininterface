@@ -91,14 +91,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["invoice"] = Invoice.Find(id);
 		}
 
-		public void Build(Period period, ulong regionId, string printer)
+		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate)
 		{
-			var invoicePeriod = InvoicePeriod.Month;
+/*			var invoicePeriod = InvoicePeriod.Month;
 			if (period == Period.FirstQuarter ||
 				period == Period.SecondQuarter ||
 				period == Period.FirstQuarter ||
 				period == Period.FourthQuarter)
-				invoicePeriod = InvoicePeriod.Quarter;
+				invoicePeriod = InvoicePeriod.Quarter;*/
 
 /*
 			var payers = ActiveRecordLinqBase<Payer>
@@ -106,7 +106,7 @@ namespace AdminInterface.Controllers
 				.Where(p => p.AutoInvoice == InvoiceType.Auto && p.PayCycle == invoicePeriod);
 */
 
-			Printer.SetPrinter(printer);
+			//Printer.SetPrinter(printer);
 
 /*
 			foreach (var payer in payers)
@@ -123,7 +123,8 @@ namespace AdminInterface.Controllers
 			}
 */
 
-			var info = new ProcessStartInfo(@"C:\Printer\Printer.exe", String.Format("{0} {1}", period, regionId));
+			var info = new ProcessStartInfo(@"C:\Printer\Printer.exe",
+				String.Format("{0} {1} {2} \"{3}\"", period,regionId, invoiceDate.ToShortDateString(), printer));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
 

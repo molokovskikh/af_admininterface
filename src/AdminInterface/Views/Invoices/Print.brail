@@ -52,8 +52,10 @@
 	</head>
 	<body>
 
-<h3>${invoice.Recipient.FullName}</h3>
-<h3>${invoice.Recipient.Address}</h3>
+<div style="font-weight:bold">
+	<p>Исполнитель: ${invoice.Recipient.FullName}</p>
+	<p>Адрес: ${invoice.Recipient.Address}</p>
+</div>
 <h3>Образец заполнения платежного поручения</h3>
 <table>
 	<tr>
@@ -80,12 +82,12 @@
 	</tr>
 </table>
 
-<h1>Счет №${invoice.Id} от ${invoice.Date.ToShortDateString()}</h1>
+<h2>Счет №${invoice.Id} от ${invoice.Date.ToString("dd MMMM yyyy")}</h2>
 
 <p>
 	Плательщик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
 	<br />
-	Грузополучатель: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
+	Заказчик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
 </p>
 
 <table>
@@ -102,14 +104,14 @@
 		<td>${i + 1}</td>
 		<td>${bill.Name}</td>
 		<td>услуга</td>
-		<td>1</td>
-		<td>${bill.Total}</td>
-		<td>${bill.Total}</td>
+		<td>${bill.Count}</td>
+		<td>${bill.Total.ToString("0.#")}</td>
+		<td>${bill.Total.ToString("0.#")}</td>
 	</tr>
 	<% end %>
 	<tr class="result">
 		<td class="result-label" colspan="5">Итого:</td>
-		<td>${invoice.Sum}</td>
+		<td>${invoice.Sum.ToString("0.#")}</td>
 	</tr>
 	<tr class="result">
 		<td class="result-label" colspan="5">Без налога (НДС):</td>
@@ -117,11 +119,11 @@
 	</tr>
 	<tr class="result">
 		<td class="result-label" colspan="5">Всего к оплате:</td>
-		<td>${invoice.Sum}</td>
+		<td>${invoice.Sum.ToString("0.#")}</td>
 	</tr>
 </table>
 <p>
-	Всего наименований ${invoice.Bills.Count}, на сумму ${invoice.Sum}<br />
+	Всего наименований ${invoice.Bills.Count}, на сумму ${invoice.Sum.ToString("0.#")}<br />
 	<span style="font-weight:bold">${invoice.SumInWords()}</span>
 </p>
 <div>

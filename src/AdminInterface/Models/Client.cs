@@ -110,6 +110,18 @@ namespace AdminInterface.Models
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
 	public class Client : ActiveRecordLinqBase<Client>, IEnablable
 	{
+		public Client()
+		{
+		}
+
+		public Client(Payer payer)
+		{
+			Enabled = true;
+			Payer = payer;
+			Users = new List<User>();
+			Addresses = new List<Address>();
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

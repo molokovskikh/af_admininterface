@@ -217,7 +217,7 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		[OneToOne(PropertyRef = "Accounting")]
 		public virtual User User { get; set; }
 
-		public string Type
+		public override string Type
 		{
 			get { return "Пользователь"; }
 		}
@@ -248,7 +248,7 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 			Payment = 200;
 		}
 
-		public string Type
+		public override string Type
 		{
 			get { return "Адрес"; }
 		}
@@ -320,6 +320,7 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		}
 
 		public abstract bool ShouldPay();
+		public abstract string Type { get; }
 
 		public static IList<Accounting> SearchBy(AccountingSearchProperties filter, Pager pager)
 		{

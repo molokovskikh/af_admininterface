@@ -25,11 +25,12 @@ namespace Printer
 			var logger = LogManager.GetLogger(typeof(Program));
 			try
 			{
-
 				if (args.FirstOrDefault() == "print")
 				{
 					var period = (Period)Period.Parse(typeof(Period), args[1]);
 					var regionId = ulong.Parse(args[2]);
+					var date = DateTime.Parse(args[3]);
+					AdminInterface.Helpers.Printer.SetPrinter(args[4]);
 
 					ActiveRecordStarter.Initialize(new[] {
 						Assembly.Load("AdminInterface"),
@@ -43,12 +44,7 @@ namespace Printer
 					loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "Printer"));
 					var brail = new StandaloneBooViewEngine(loader, options);
 
-					var invoicePeriod = InvoicePeriod.Month;
-					if (period == Period.FirstQuarter ||
-						period == Period.SecondQuarter ||
-						period == Period.FirstQuarter ||
-						period == Period.FourthQuarter)
-						invoicePeriod = InvoicePeriod.Quarter;
+					var invoicePeriod = Invoice.GetInvoicePeriod(period);
 
 					using (new SessionScope(FlushAction.Never))
 					{
@@ -68,17 +64,17 @@ namespace Printer
 							if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
 								continue;
 
-							var invoice = new Invoice(payer, period);
+							var invoice = new Invoice(payer, period, date);
 							if (payer.InvoiceSettings.PrintInvoice)
 							{
-								new AdminInterface.Helpers.Printer().Print(brail, invoice);
-								payer.Balance -= invoice.Sum;
-							}
+								using (var scope = new TransactionScope(OnDispose.Rollback))
+								{
+									payer.Balance -= invoice.Sum;
+									invoice.Save();
+									scope.VoteCommit();
+								}
 
-							using (var scope = new TransactionScope(OnDispose.Rollback))
-							{
-								invoice.Save();
-								scope.VoteCommit();
+								new AdminInterface.Helpers.Printer().Print(brail, invoice);
 							}
 						}
 					}
@@ -87,7 +83,12 @@ namespace Printer
 				{
 					var assembly = Assembly.GetExecutingAssembly();
 					var exe = assembly.Location;
-					ProcessStarter.StartProcessInteractivly(exe + " print " + String.Join(" ", args), "KvasovSam", "vbrhjcrjgbxtcrbq", "analit");
+					var arguments = String.Join(" ", args.Select(a => { 
+						if (!a.Contains(" "))
+							return a;
+						return "\"" + a + "\"";
+					}));
+					ProcessStarter.StartProcessInteractivly(exe + " print " + arguments, "KvasovSam", "vbrhjcrjgbxtcrbq", "analit");
 				}
 			}
 			catch (Exception e)
