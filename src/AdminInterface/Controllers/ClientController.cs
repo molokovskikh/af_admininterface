@@ -179,7 +179,6 @@ namespace AdminInterface.Controllers
 				if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
 				{
 					var smartOrder = SmartOrderRules.TestSmartOrder();
-					smartOrder.Save();
 					drugstore.SmartOrderRules = smartOrder;
 				}
 				client.Update();

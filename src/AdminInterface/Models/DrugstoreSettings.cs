@@ -142,7 +142,7 @@ namespace AdminInterface.Models
 		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
 
-		[BelongsTo("SmartOrderRuleId")]
+		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
 
 	}

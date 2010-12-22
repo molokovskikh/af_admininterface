@@ -244,7 +244,6 @@ namespace AdminInterface.Controllers
 				.UniqueResult<string>());
 
 			var smartOrder = SmartOrderRules.TestSmartOrder();
-			smartOrder.Save();
 
 			client.Settings = new DrugstoreSettings {
 				Id = client.Id,
