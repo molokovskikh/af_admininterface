@@ -105,8 +105,8 @@
 		<td>${bill.Name}</td>
 		<td>услуга</td>
 		<td>${bill.Count}</td>
-		<td>${bill.Total.ToString("0.#")}</td>
-		<td>${bill.Total.ToString("0.#")}</td>
+		<td>${bill.Cost.ToString("0.#")}</td>
+		<td>${bill.Sum.ToString("0.#")}</td>
 	</tr>
 	<% end %>
 	<tr class="result">

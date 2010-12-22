@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
@@ -39,8 +39,8 @@ namespace AdminInterface.Models.Billing
 		private IEnumerable<InvoicePart> GetBillsForPeriod(Period period)
 		{
 			return Payer.GetAccountings()
-				.GroupBy(a => a.Type)
-				.Select(g => new InvoicePart(period, g.Sum(a => a.Payment), g.Count()));
+				.GroupBy(a => a.Payment)
+				.Select(g => new InvoicePart(period, g.Key, g.Count()));
 		}
 
 		[PrimaryKey]
@@ -113,14 +113,16 @@ namespace AdminInterface.Models.Billing
 	public class InvoicePart
 	{
 		public string Name { get; set; }
-		public decimal Total { get; set; }
+		public decimal Cost { get; set; }
+		public decimal Sum { get; set; }
 		public int Count { get; set; }
 
-		public InvoicePart(Period period, decimal total, int count)
+		public InvoicePart(Period period, decimal cost, int count)
 		{
-			Name = String.Format("Информационные услуги за {0}", BindingHelper.GetDescription(period).ToLower());
-			Total = total;
+			Name = String.Format("РњРѕРЅРёС‚РѕСЂРёРЅРі РѕРїС‚РѕРІРѕРіРѕ С„Р°СЂРјСЂС‹РЅРєР° Р·Р° {0}", BindingHelper.GetDescription(period).ToLower());
+			Cost = cost;
 			Count = count;
+			Sum = Cost * Count;
 		}
 	}
 }
