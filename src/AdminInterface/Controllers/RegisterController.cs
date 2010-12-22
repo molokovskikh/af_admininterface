@@ -243,11 +243,7 @@ namespace AdminInterface.Controllers
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
 				.UniqueResult<string>());
 
-			var smartOrder = new SmartOrderRules
-			{
-				AssortimentPriceCode = 4662,
-				ParseAlgorithm = "TestSource",
-			};
+			var smartOrder = SmartOrderRules.TestSmartOrder();
 			smartOrder.Save();
 
 			client.Settings = new DrugstoreSettings {

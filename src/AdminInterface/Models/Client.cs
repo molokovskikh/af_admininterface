@@ -63,6 +63,16 @@ namespace AdminInterface.Models
 
 		[Property("AssortimentPriceCode")]
 		public virtual uint AssortimentPriceCode { get; set; }
+
+		public static SmartOrderRules TestSmartOrder()
+		{
+			var testOrder = new SmartOrderRules
+			{
+				AssortimentPriceCode = 4662,
+				ParseAlgorithm = "TestSource",
+			};
+			return testOrder;
+		}
 	}
 
 	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)", Lazy = true)]

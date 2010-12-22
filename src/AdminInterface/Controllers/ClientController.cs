@@ -176,13 +176,9 @@ namespace AdminInterface.Controllers
 				client.UpdateRegionSettings(regionSettings);
 				if (!activateBuyMatrix)
 					drugstore.BuyingMatrixPrice = null;
-				if (drugstore.EnableSmartOrder)
+				if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
 				{
-					var smartOrder = new SmartOrderRules
-					{
-						AssortimentPriceCode = 4662,
-						ParseAlgorithm = "TestSource",
-					};
+					var smartOrder = SmartOrderRules.TestSmartOrder();
 					smartOrder.Save();
 					drugstore.SmartOrderRules = smartOrder;
 				}
