@@ -24,6 +24,7 @@ task @Build, [@BuildWebSite]:
 	Rm("output/Printer/_PublishedWebsites", true)
 
 task @DeployPrinter:
+	Globals.Project = @Printer
 	Globals.DeployTo = """\\acdcserv.adc.analit.net\Apps\Printer"""
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
 	Engine.Execute("WebDeploy")

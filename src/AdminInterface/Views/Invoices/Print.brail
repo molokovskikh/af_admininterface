@@ -94,8 +94,8 @@
 	<tr>
 		<th>№</th>
 		<th>Наименование товара</th>
-		<th>Удиница измерения</th>
-		<th>Количество</th>
+		<th>Единица измерения</th>
+		<th style="width:1%">Коли-чество</th>
 		<th>Цена</th>
 		<th>Сумма</th>
 	</tr>
@@ -105,8 +105,8 @@
 		<td>${bill.Name}</td>
 		<td>услуга</td>
 		<td>${bill.Count}</td>
-		<td>${bill.Cost.ToString("0.#")}</td>
-		<td>${bill.Sum.ToString("0.#")}</td>
+		<td style="width:10%">${bill.Cost.ToString("0.#")}</td>
+		<td style="width:10%">${bill.Sum.ToString("0.#")}</td>
 	</tr>
 	<% end %>
 	<tr class="result">
