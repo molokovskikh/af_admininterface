@@ -123,7 +123,7 @@ namespace AdminInterface.Controllers
 			}
 */
 
-			var info = new ProcessStartInfo(@"C:\Printer\Printer.exe",
+			var info = new ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
 				String.Format("{0} {1} {2} \"{3}\"", period,regionId, invoiceDate.ToShortDateString(), printer));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
