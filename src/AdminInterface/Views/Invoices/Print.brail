@@ -88,6 +88,8 @@
 	Плательщик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
 	<br />
 	Заказчик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
+	<br>
+	Договор №${invoice.Payer.Id}
 </p>
 
 <table>
@@ -130,9 +132,11 @@
 	<p>
 		Руководитель предприятия______________________________________(${invoice.Recipient.Boss})
 	</p>
+	<% if invoice.Recipient.Accountant: %>
 	<p>
 		Главный бухгалтер____________________________________________(${invoice.Recipient.Accountant})
 	</p>
+	<% end %>
 </div>
 	</body>
 </html>
