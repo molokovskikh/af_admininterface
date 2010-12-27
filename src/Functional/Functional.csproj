@@ -51,6 +51,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.DynamicProxy2.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
+    </Reference>
     <Reference Include="Interop.SHDocVw, Version=1.1.0.0, Culture=neutral, PublicKeyToken=db7cfd3acb5ad44e, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
@@ -58,6 +61,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="MySql.Data, Version=5.1.6.1, Culture=neutral, PublicKeyToken=56e353737e921561, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
@@ -103,6 +107,8 @@
     <Compile Include="AccountingFixture.cs" />
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
+    <Compile Include="Billing\InvoiceFixture.cs" />
+    <Compile Include="Billing\PayerFixture.cs" />
     <Compile Include="Billing\PaymentFixture.cs" />
     <Compile Include="Billing\ReportFixture.cs" />
     <Compile Include="CallHistoryFixture.cs" />

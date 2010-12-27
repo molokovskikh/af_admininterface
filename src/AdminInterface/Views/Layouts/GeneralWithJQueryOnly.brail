@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<title>
-			<% if IsDefined("Title"	): %>
+			<% if IsDefined("Title"): %>
 			${Title}
 			<% else: %>
 			Административный интерфейс
@@ -36,7 +36,8 @@
 			"User.css")}
 	</head>
 	<body>
-		<% if IsDefined("bredcrumbs"): %>
+
+	<% if IsDefined("bredcrumbs"): %>
 		<div class="Navigation">
 			<ul id="breadcrumb">
 				<li>
@@ -55,7 +56,14 @@
 				<% end %>
 			</ul>
 		</div>
-		<% end %>
+	<% end %>
+
+	<% if IsDefined("Message") and Message isa string: %>
+	<div class="flash notice">
+		${Message}
+	</div>
+	<% end %>
+
 	${ChildOutput}
 	</body>
 </html>

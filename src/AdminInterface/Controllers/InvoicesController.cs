@@ -84,6 +84,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
+		public void Cancel(uint id)
+		{
+			var invoice = Invoice.Find(id);
+			invoice.Cancel();
+			Flash["Message"] = "Сохранено";
+			RedirectToReferrer();
+		}
+
 		public void Print(uint id)
 		{
 			CancelLayout();

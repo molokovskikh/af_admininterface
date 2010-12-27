@@ -108,6 +108,12 @@ namespace AdminInterface.Models.Billing
 				return InvoicePeriod.Quarter;
 			return InvoicePeriod.Month;
 		}
+
+		public void Cancel()
+		{
+			Payer.Balance += Sum;
+			Delete();
+		}
 	}
 
 	public class InvoicePart

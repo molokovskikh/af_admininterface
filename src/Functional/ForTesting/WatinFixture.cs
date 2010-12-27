@@ -45,6 +45,11 @@ namespace Functional.ForTesting
 			}
 		}
 
+		protected IE Open(object item)
+		{
+			return null;
+		}
+
 		protected IE Open(string uri)
 		{
 			var browser = new IE(BuildTestUrl(uri));
