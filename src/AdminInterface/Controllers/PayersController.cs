@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -6,7 +7,10 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Controllers
 {
-	[Helper(typeof(BindingHelper))]
+	[
+		Helper(typeof(BindingHelper)),
+		Layout("GeneralWithJQueryOnly")
+	]
 	public class PayersController : SmartDispatcherController
 	{
 		public void Payments(uint id)
@@ -23,6 +27,8 @@ namespace AdminInterface.Controllers
 
 		public void BalanceSummary(uint id)
 		{
+			CancelLayout();
+
 			var payer = Payer.Find(id);
 			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
 			var payments = Payment.Queryable.Where(p => p.Payer == payer).ToList();
@@ -32,6 +38,19 @@ namespace AdminInterface.Controllers
 				.OrderByDescending(i => i.Date)
 				.ToList();
 			PropertyBag["items"] = items;
+		}
+
+		public void NewInvoice(uint id)
+		{
+			var payer = Payer.Find(id);
+			if (IsPost)
+			{
+				var invoice = BindObject<Invoice>("invoice");
+				invoice.SetPayer(payer);
+				invoice.Sum = invoice.Parts.Sum(p => p.Sum);
+				invoice.Save();
+				Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+			}
 		}
 	}
 }

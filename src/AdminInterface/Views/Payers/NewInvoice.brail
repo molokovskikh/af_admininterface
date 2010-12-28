@@ -1,0 +1,82 @@
+﻿<script>
+	$("tr a.add").live('click', function () {
+		var body = $(this).parents("tbody").get(0);
+		maxIndex = $(body).children("tr").length + 1;
+		var row = $($(body).children("tr").get(1)).clone();
+		row.find("input").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+		row.find("textarea").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+
+		row.appendTo(body);
+	});
+
+	$("tr a.delete").live('click', function () {
+		$($(this).parents("tr").get(0)).remove();
+	});
+
+	$("#add-reference").click(function () {
+		$("#bills tr:last textarea").value($("#reference").value());
+	});
+</script>
+<h2>Формирование дополнительного счета</h2>
+<form method=post>
+	<div class=block>
+		<table>
+		<tr>
+			<td>
+				<label>Дата:</label>
+			</td>
+			<td>
+				<input type=text name="invoice.Date" class="required validate-date input-date">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Период:</label>
+			</td>
+			<td>
+				<select name="invoice.Period">
+					<% for pair in BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"): %>
+						<option value="${pair.Key}">${pair.Value}</option>
+					<% end %>
+				</select>
+			</td>
+		</tr>
+		</table>
+	</div>
+	<div class=block>
+		<% if IsDefined(@references): %>
+		<select id=reference>
+			<% for reference in @references: %>
+			<option>${reference}</option>
+			<% end %>
+		</select>
+		<input type=button id="add-reference" value="Вставить услугу из справочника">
+		<% end %>
+		
+		<table id=bills class=DataTable>
+			<tr>
+				<th><a href="javascript:" class=add>Добавить</a></th>
+				<th>Услуга</th>
+				<th>Стоимость</th>
+				<th>Количество</th>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<textarea name="invoice.parts[0].name" cols=30 rows=2 class="required"></textarea>
+				</td>
+				<td>
+					<input name="invoice.parts[0].cost" type=text class="required validate-cost">
+				</td>
+				<td>
+					<input type=text name="invoice.parts[0].count" class="required validate-count">
+				</td>
+			</tr>
+		</table>
+	</div>
+	<input type=submit value=Сохранить>
+</form>

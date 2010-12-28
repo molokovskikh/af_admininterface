@@ -438,6 +438,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 %>		
 	<br />
 
+	<div style="margin-bottom:10px;">
+		<div class="InputGroupHeader">Операции</div>
+		${app.LinkTo(payer, "Доп. счет", @NewInvoice)}
+	</div>
+
 	<div>
 		<form id="PayerInfo" action="update.rails" method="post">
 			<% if IsDefined("Client"): %>

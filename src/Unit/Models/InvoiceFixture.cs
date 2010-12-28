@@ -39,13 +39,13 @@ namespace Unit.Models
 			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
 
 			var invoice = new Invoice(payer, Period.FirstQuarter, DateTime.Now);
-			Assert.That(invoice.Bills.Count, Is.EqualTo(3));
-			Assert.That(invoice.Bills[0].Name, Is.EqualTo("Мониторинг оптового фармрынка за январь"));
-			Assert.That(invoice.Bills[0].Sum, Is.EqualTo(800));
-			Assert.That(invoice.Bills[1].Name, Is.StringContaining("февраль"));
-			Assert.That(invoice.Bills[1].Sum, Is.EqualTo(800));
-			Assert.That(invoice.Bills[2].Name, Is.StringContaining("март"));
-			Assert.That(invoice.Bills[2].Sum, Is.EqualTo(800));
+			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
+			Assert.That(invoice.Parts[0].Name, Is.EqualTo("Мониторинг оптового фармрынка за январь"));
+			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(800));
+			Assert.That(invoice.Parts[1].Name, Is.StringContaining("февраль"));
+			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(800));
+			Assert.That(invoice.Parts[2].Name, Is.StringContaining("март"));
+			Assert.That(invoice.Parts[2].Sum, Is.EqualTo(800));
 			Assert.That(invoice.Sum, Is.EqualTo(2400));
 		}
 
@@ -63,11 +63,11 @@ namespace Unit.Models
 
 			var invoice = new Invoice(payer, Period.April, DateTime.Now);
 
-			Assert.That(invoice.Bills[0].Count, Is.EqualTo(2));
-			Assert.That(invoice.Bills[0].Cost, Is.EqualTo(800));
-			Assert.That(invoice.Bills[0].Sum, Is.EqualTo(1600));
-			Assert.That(invoice.Bills[1].Count, Is.EqualTo(1));
-			Assert.That(invoice.Bills[1].Sum, Is.EqualTo(200));
+			Assert.That(invoice.Parts[0].Count, Is.EqualTo(2));
+			Assert.That(invoice.Parts[0].Cost, Is.EqualTo(800));
+			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(1600));
+			Assert.That(invoice.Parts[1].Count, Is.EqualTo(1));
+			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(200));
 		}
 	}
 }

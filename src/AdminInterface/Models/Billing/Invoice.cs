@@ -26,21 +26,20 @@ namespace AdminInterface.Models.Billing
 
 		public Invoice(Payer payer, Period period, DateTime date)
 		{
-			Recipient = payer.JuridicalOrganizations.First(j => j.Recipient != null).Recipient;
-			Payer = payer;
+			SetPayer(payer);
 			Period = period;
 			Sum = payer.TotalSum;
 			Date = date;
 			CreatedOn = DateTime.Now;
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
 				Sum *= 3;
+			Parts = BuildParts();
 		}
 
-		private IEnumerable<InvoicePart> GetBillsForPeriod(Period period)
+		public void SetPayer(Payer payer)
 		{
-			return Payer.GetAccountings()
-				.GroupBy(a => a.Payment)
-				.Select(g => new InvoicePart(period, g.Key, g.Count()));
+			Recipient = payer.JuridicalOrganizations.First(j => j.Recipient != null).Recipient;
+			Payer = payer;
 		}
 
 		[PrimaryKey]
@@ -64,24 +63,31 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public DateTime CreatedOn { get; set; }
 
+		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		public IList<InvoicePart> Parts { get; set; }
+
 		public string SumInWords()
 		{
 			return ViewHelper.InWords((float) Sum);
 		}
 
-		public List<InvoicePart> Bills
+		public List<InvoicePart> BuildParts()
 		{
-			get
+			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
 			{
-				if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-				{
-					return quaterMap[Period].SelectMany(p => GetBillsForPeriod(p)).ToList();
-				}
-				else
-				{
-					return GetBillsForPeriod(Period).ToList();
-				}
+				return quaterMap[Period].SelectMany(p => GetPartsForPeriod(p)).ToList();
 			}
+			else
+			{
+				return GetPartsForPeriod(Period).ToList();
+			}
+		}
+
+		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period)
+		{
+			return Payer.GetAccountings()
+				.GroupBy(a => a.Payment)
+				.Select(g => new InvoicePart(this, period, g.Key, g.Count()));
 		}
 
 		public void Send(Controller controller)
@@ -112,23 +118,46 @@ namespace AdminInterface.Models.Billing
 		public void Cancel()
 		{
 			Payer.Balance += Sum;
+
 			Delete();
 		}
 	}
 
+	[ActiveRecord(Schema = "billing")]
 	public class InvoicePart
 	{
+		[PrimaryKey]
+		public uint Id { get; set; }
+
+		[Property]
 		public string Name { get; set; }
+
+		[Property]
 		public decimal Cost { get; set; }
-		public decimal Sum { get; set; }
+
+		[Property]
 		public int Count { get; set; }
 
-		public InvoicePart(Period period, decimal cost, int count)
+		[BelongsTo]
+		public Invoice Invoice { get; set; }
+
+		public decimal Sum
 		{
+			get
+			{
+				return Cost * Count;
+			}
+		}
+
+		public InvoicePart()
+		{}
+
+		public InvoicePart(Invoice invoice, Period period, decimal cost, int count)
+		{
+			Invoice = invoice;
 			Name = String.Format("Мониторинг оптового фармрынка за {0}", BindingHelper.GetDescription(period).ToLower());
 			Cost = cost;
 			Count = count;
-			Sum = Cost * Count;
 		}
 	}
 }

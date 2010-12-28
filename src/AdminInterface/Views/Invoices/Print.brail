@@ -100,7 +100,7 @@
 		<th>Цена</th>
 		<th>Сумма</th>
 	</tr>
-	<% for i, bill in enumerate(invoice.Bills): %>
+	<% for i, bill in enumerate(invoice.Parts): %>
 	<tr>
 		<td>${i + 1}</td>
 		<td>${bill.Name}</td>
@@ -124,7 +124,7 @@
 	</tr>
 </table>
 <p>
-	Всего наименований ${invoice.Bills.Count}, на сумму ${invoice.Sum.ToString("0.#")}<br />
+	Всего наименований ${invoice.Parts.Count}, на сумму ${invoice.Sum.ToString("0.#")}<br />
 	<span style="font-weight:bold">${invoice.SumInWords()}</span>
 </p>
 <div>
