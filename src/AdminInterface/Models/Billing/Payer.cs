@@ -164,6 +164,19 @@ namespace AdminInterface.Models
 		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]
 		public virtual IList<Report> Reports { get; set; }
 
+		public virtual string GetMailAddress()
+		{
+			return String.Join(", ",
+				new [] {
+					!String.IsNullOrWhiteSpace(ActualAddressStreet) ? "ул. " + ActualAddressStreet : null,
+					!String.IsNullOrWhiteSpace(ActualAddressHouse) ? "д. " + ActualAddressHouse: null,
+					!String.IsNullOrWhiteSpace(ActualAddressOffice) ? "оф. " + ActualAddressOffice : null,
+					ActualAddressProvince,
+					ActualAddressTown,
+					ActualAddressIndex
+				}.Where(s => !String.IsNullOrWhiteSpace(s)));
+		}
+
 		public virtual string Name
 		{
 			get { return ShortName; }

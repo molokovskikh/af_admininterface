@@ -51,7 +51,6 @@
 		</style>
 	</head>
 	<body>
-
 <div style="font-weight:bold">
 	<p>Исполнитель: ${invoice.Recipient.FullName}</p>
 	<p>Адрес: ${invoice.Recipient.Address}</p>
@@ -138,5 +137,10 @@
 	</p>
 	<% end %>
 </div>
+	<div style="position:fixed; bottom: 0; right:0; width: 8cm;">
+		Кому: для Аптеки<br>
+		${invoice.Payer.JuridicalName}<br>
+		Куда: ${invoice.Payer.GetMailAddress()}
+	</div>
 	</body>
 </html>
