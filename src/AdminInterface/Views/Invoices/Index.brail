@@ -32,6 +32,13 @@
 							<% end %>
 						</select>
 						<br>
+						<label>Получатель</label>
+						<select name=recipientId>
+							<% for recipient in recipients: %>
+								<option value=${recipient.Id}>${recipient.Name}</option>
+							<% end %>
+						</select>
+						<br>
 						<label>Дата счета</label>
 						<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
 						<input type=button class=CalendarInput>

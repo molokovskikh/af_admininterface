@@ -38,7 +38,7 @@ namespace AdminInterface.Models.Billing
 
 		public void SetPayer(Payer payer)
 		{
-			Recipient = payer.JuridicalOrganizations.First(j => j.Recipient != null).Recipient;
+			Recipient = payer.Recipient;
 			Payer = payer;
 		}
 

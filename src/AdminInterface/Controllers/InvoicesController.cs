@@ -99,7 +99,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["invoice"] = Invoice.Find(id);
 		}
 
-		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate)
+		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate, uint recipientId)
 		{
 /*			var invoicePeriod = InvoicePeriod.Month;
 			if (period == Period.FirstQuarter ||
@@ -132,7 +132,7 @@ namespace AdminInterface.Controllers
 */
 
 			var info = new ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
-				String.Format("{0} {1} {2} \"{3}\"", period,regionId, invoiceDate.ToShortDateString(), printer));
+				String.Format("{0} {1} {2} \"{3}\" {4}", period, regionId, invoiceDate.ToShortDateString(), printer, recipientId));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
 
