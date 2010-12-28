@@ -6,8 +6,10 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using NUnit.Framework;
+using AdminInterface.Models.Logs;
 
 namespace Integration.Controllers
 {
@@ -255,6 +257,44 @@ namespace Integration.Controllers
 				Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
 
 				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
+			}
+		}
+
+		[Test]
+		public void Move_user_with_logs()
+		{
+			Client oldClient, newClient;
+			User user;
+			Address address;
+
+			using (new SessionScope())
+			{
+				oldClient = DataMother.CreateTestClientWithAddressAndUser();
+				user = oldClient.Users[0];
+				address = oldClient.Addresses[0];
+				user.AvaliableAddresses = new List<Address>();
+				address.AvaliableForUsers.Add(user);
+				newClient = DataMother.CreateTestClientWithAddressAndUser();
+
+				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
+			}
+			using (new SessionScope())
+			{
+				oldClient.Refresh();
+				newClient.Refresh();
+				var count =
+					ArHelper.WithSession(
+						s => s.CreateSQLQuery(@"select count(*) from logs.clientsinfo where clientcode = :code and userid = :userId")
+						     	.SetParameter("code", newClient.Id)
+						     	.SetParameter("userId", user.Id)
+						     	.UniqueResult());
+
+				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+
+				Assert.That(newClient.Users.Count, Is.EqualTo(2));
+				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+
+				Assert.That(count, Is.EqualTo(2));
 			}
 		}
 	}
