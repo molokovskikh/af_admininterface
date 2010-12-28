@@ -1,6 +1,10 @@
-using System;
+п»їusing System;
+using System.Linq;
+using System.Threading;
+using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
@@ -15,9 +19,21 @@ namespace Functional.Billing
 		public void Show_balance_summary()
 		{
 			Payer payer = null;
-			using (var browser = Open(payer))
+			using(new SessionScope())
 			{
-				browser.Link(Find.ByText(@"Платежи\списания")).Click();
+				var client = DataMother.CreateTestClientWithAddressAndUser();
+				payer = client.Payer;
+				var recipient = Recipient.Queryable.First();
+				client.Payer.JuridicalOrganizations[0].Recipient = recipient;
+				new Invoice(client.Payer, Period.January, new DateTime(2011, 1, 11)).Save();
+				new Payment{ Payer = client.Payer, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800, Recipient = recipient}.Save();
+			}
+
+			using (var browser = Open("Billing/Edit?BillingCode={0}", payer.Id))
+			{
+				Assert.That(browser.Text, Is.StringContaining("РїР»Р°С‚РµР»СЊС‰РёРє"));
+				browser.Link(Find.ByText(@"РџР»Р°С‚РµР¶Рё/РЎС‡РµС‚Р°")).Click();
+				Thread.Sleep(1000);
 				Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
 				Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
 			}
@@ -29,12 +45,12 @@ namespace Functional.Billing
 			Payer payer = null;
 			using (var browser = Open(payer))
 			{
-				browser.Link(Find.ByText("Новый счет")).Click();
+				browser.Link(Find.ByText("РќРѕРІС‹Р№ СЃС‡РµС‚")).Click();
 				browser.Css("#invoice_date").Value = DateTime.Now;
-				browser.Css("#invoice_bills[0]_Name").Value = "Информационные услуги за октябрь";
+				browser.Css("#invoice_bills[0]_Name").Value = "РРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Рµ СѓСЃР»СѓРіРё Р·Р° РѕРєС‚СЏР±СЂСЊ";
 				browser.Css("#invoice_bills[0]_Cost").Value = "500";
 				browser.Css("#invoice_bills[0]_Count").Value = "1";
-				browser.Button(Find.ByText("Сохранить")).Click();
+				browser.Button(Find.ByText("РЎРѕС…СЂР°РЅРёС‚СЊ")).Click();
 			}
 		}
 	}

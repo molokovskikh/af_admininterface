@@ -384,6 +384,7 @@
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Layouts\Print.brail" />
+    <None Include="Views\Payers\BalanceSummary.brail" />
     <None Include="Views\Payers\Invoices.brail" />
     <None Include="Views\Payers\Payments.brail" />
     <None Include="Views\Payments\New.brail" />

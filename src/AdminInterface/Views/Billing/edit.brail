@@ -143,10 +143,7 @@
 			<a id="juridicalOrganization" href="#" ${"class='selected'" if tab == "juridicalOrganization"}>Юридические лица</a>
 		</li>
 		<li>
-			<a id="payer-payments" href="${siteroot}/Payers/${instance.Id}/Payments" class="inline-tab">Платежи</a>
-		</li>
-		<li>
-			<a id="invoices" href="${siteroot}/Payers/${instance.Id}/Invoices" class="inline-tab">Счета</a>
+			<a id="balance-summary" href="${siteroot}/Payers/${instance.Id}/BalanceSummary" class="inline-tab">Платежи/Счета</a>
 		</li>
 	</ul>
 </div>
@@ -163,8 +160,5 @@
 	<% OutputSubView("JuridicalOrganizations") %>
 </div>
 
-<div id="payer-payments-tab" class="tab" ${"style='display:none'" if tab != "payer-payments-tab"}>
-</div>
-
-<div id="invoices-tab" class="tab" ${"style='display:none'" if tab != "invoices-tab"}>
+<div id="balance-summary-tab" class="tab" ${"style='display:none'" if tab != "balance-summary-tab"}>
 </div>

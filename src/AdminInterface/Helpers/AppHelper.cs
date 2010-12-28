@@ -37,7 +37,7 @@ namespace AdminInterface.Helpers
 			return String.Format("<a class='{1}' href='{2}'>{0}</a>", label, clazz, uri);
 		}
 
-		public static string GetUrl(object item, string action)
+		public static string GetUrl(object item, string action = null)
 		{
 			var dynamicItem = ((dynamic)item);
 			var id = dynamicItem.Id;

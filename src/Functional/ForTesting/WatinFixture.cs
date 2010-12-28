@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Threading;
+using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using NUnit.Framework;
 using SHDocVw;
@@ -32,7 +33,9 @@ namespace Functional.ForTesting
 
 		public static string BuildTestUrl(string urlPart)
 		{
-			return String.Format("http://localhost:{0}/{1}",
+			if (!urlPart.StartsWith("/"))
+				urlPart = "/" + urlPart;
+			return String.Format("http://localhost:{0}{1}",
 								 ConfigurationManager.AppSettings["webPort"],
 								 urlPart);
 		}
@@ -47,7 +50,7 @@ namespace Functional.ForTesting
 
 		protected IE Open(object item)
 		{
-			return null;
+			return new IE(BuildTestUrl(AppHelper.GetUrl(item)));
 		}
 
 		protected IE Open(string uri)
