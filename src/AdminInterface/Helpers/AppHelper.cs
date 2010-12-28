@@ -34,7 +34,7 @@ namespace AdminInterface.Helpers
 				clazz = "DisabledByBilling";
 
 			var uri = GetUrl(item, action);
-			return String.Format("<a class='{1}' href='{2}'>{0}</a>", label, clazz, uri);
+			return String.Format("<a class='{1}' href='{3}{2}'>{0}</a>", label, clazz, uri, LinkHelper.GetVirtualDir(Context));
 		}
 
 		public static string GetUrl(object item, string action = null)
