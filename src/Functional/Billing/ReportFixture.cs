@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using WatiNCssSelectorExtensions;

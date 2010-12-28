@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using WatiNCssSelectorExtensions;

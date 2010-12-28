@@ -1,6 +1,7 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 

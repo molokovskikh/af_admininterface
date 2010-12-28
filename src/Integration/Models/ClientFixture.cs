@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models

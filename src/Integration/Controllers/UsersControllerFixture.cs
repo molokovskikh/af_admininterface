@@ -9,7 +9,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Controllers

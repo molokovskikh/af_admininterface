@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Tools;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using System.Threading;

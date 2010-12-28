@@ -1,7 +1,7 @@
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Web.Ui.Helpers;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models

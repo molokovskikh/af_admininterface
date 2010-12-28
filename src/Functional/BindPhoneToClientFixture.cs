@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models.Logs;
 using AdminInterface.Test.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using AdminInterface.Models.Telephony;

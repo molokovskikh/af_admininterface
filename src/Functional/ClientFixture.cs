@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using AdminInterface.Models.Logs;

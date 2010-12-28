@@ -3,6 +3,7 @@ using System.IO;
 using AdminInterface.Models.Security;
 using CassiniDev;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using SecurityContext = AdminInterface.Security.SecurityContext;

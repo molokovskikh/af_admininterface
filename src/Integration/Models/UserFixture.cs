@@ -4,9 +4,9 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Common.Tools;
+using Integration.ForTesting;
 using log4net.Config;
 using NUnit.Framework;
-using Functional.ForTesting;
 
 namespace Integration.Models
 {

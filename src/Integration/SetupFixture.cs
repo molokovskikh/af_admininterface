@@ -1,6 +1,6 @@
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration

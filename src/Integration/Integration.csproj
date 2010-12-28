@@ -121,6 +121,8 @@
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="Controllers\UsersControllerFixture.cs" />
+    <Compile Include="ForTesting\DataMother.cs" />
+    <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
@@ -156,10 +158,6 @@
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
       <Name>Common.Web.Ui</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Functional\Functional.csproj">
-      <Project>{641C9D72-F05E-43CE-BD1A-09DE4819AD93}</Project>
-      <Name>Functional</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

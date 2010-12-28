@@ -1,5 +1,5 @@
 ﻿using AdminInterface.Models;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models

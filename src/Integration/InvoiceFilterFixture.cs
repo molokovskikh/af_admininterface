@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration

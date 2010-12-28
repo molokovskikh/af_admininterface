@@ -119,12 +119,10 @@
     <Compile Include="ClientCloneFixture.cs" />
     <Compile Include="ClientMonitoringFixture.cs" />
     <Compile Include="ForTesting\ContactInformationFixture.cs" />
-    <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="DocumentLogFixture.cs" />
     <Compile Include="DrugstoreFixture.cs" />
     <Compile Include="ForTesting\FixtureForFixture.cs" />
     <Compile Include="ForTesting\FixtureMapping.cs" />
-    <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="ForTesting\Helper.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
     <Compile Include="ForTesting\WatinFixture.cs" />
@@ -162,6 +160,10 @@
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
       <Name>Common.Web.Ui</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Integration\Integration.csproj">
+      <Project>{AFB6C06A-079A-43B4-B314-8E5F6359C77A}</Project>
+      <Name>Integration</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

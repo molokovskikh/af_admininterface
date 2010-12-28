@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models.Billing;
 using Common.Tools.Calendar;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Functional.ForTesting;

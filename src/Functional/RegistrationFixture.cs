@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Integration.ForTesting;
 using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using WatiN.Core;

@@ -5,6 +5,7 @@ using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using System.IO;

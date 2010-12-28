@@ -2,7 +2,7 @@
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models

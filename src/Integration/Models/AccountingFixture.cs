@@ -3,7 +3,7 @@ using System.Linq;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Tools;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models

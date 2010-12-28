@@ -1,7 +1,7 @@
 ﻿using AdminInterface.Models;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
-using Functional.ForTesting;
+using Integration.ForTesting;
 using NHibernate.Criterion;
 using NUnit.Framework;
 

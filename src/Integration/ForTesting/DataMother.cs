@@ -8,7 +8,7 @@ using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
 
-namespace Functional.ForTesting
+namespace Integration.ForTesting
 {
 	public class DataMother
 	{

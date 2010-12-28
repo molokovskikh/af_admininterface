@@ -1,6 +1,7 @@
 ﻿using System;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;
