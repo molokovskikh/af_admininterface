@@ -479,11 +479,6 @@ namespace Functional
 			}
 		}
 
-		private void AddClientWithSamePayer(Payer payer)
-		{
-			
-		}
-
 		[Test(Description = "Тест сворачивания/разворачивания заголовков списков клиентов, пользователей и адресов")]
 		public void Test_collapse_and_spread_headers()
 		{

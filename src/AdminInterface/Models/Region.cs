@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -11,7 +12,7 @@ using System;
 namespace AdminInterface.Models
 {
 	[ActiveRecord("Regions", Schema = "farm")]
-	public class Region : ActiveRecordBase<Region>
+	public class Region : ActiveRecordLinqBase<Region>
 	{
 		[PrimaryKey("RegionCode")]
 		public virtual ulong Id { get; set; }

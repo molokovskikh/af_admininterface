@@ -1,5 +1,61 @@
-﻿<h3>${invoice.Recipient.FullName}</h3>
-<h3>${invoice.Recipient.Address}</h3>
+﻿<% import Boo.Lang.Builtins %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<style>
+			body
+			{
+				font-family: Times New Roman;
+			}
+
+			pre
+			{
+				font-family: Times New Roman;
+				font-size: 100%;
+			}
+
+			table 
+			{
+				width: 100%;
+				border-collapse:collapse;
+			}
+
+			table td
+			{
+				border: solid 1px black;
+			}
+
+			table th
+			{
+				border: solid 1px black;
+				font-weight: normal;
+			}
+
+			h1, h2, h3, h4, h5, h6
+			{
+				text-align: center;
+			}
+
+			.result-label
+			{
+				border-style: none;
+				text-align: right;
+			}
+
+			.result
+			{
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+
+<div style="font-weight:bold">
+	<p>Исполнитель: ${invoice.Recipient.FullName}</p>
+	<p>Адрес: ${invoice.Recipient.Address}</p>
+</div>
 <h3>Образец заполнения платежного поручения</h3>
 <table>
 	<tr>
@@ -26,20 +82,20 @@
 	</tr>
 </table>
 
-<h1>Счет №${invoice.Id} от ${invoice.Date.ToShortDateString()}</h1>
+<h2>Счет №${invoice.Id} от ${invoice.Date.ToString("dd MMMM yyyy")}</h2>
 
 <p>
 	Плательщик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
 	<br />
-	Грузополучатель: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
+	Заказчик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
 </p>
 
 <table>
 	<tr>
 		<th>№</th>
 		<th>Наименование товара</th>
-		<th>Удиница измерения</th>
-		<th>Количество</th>
+		<th>Единица измерения</th>
+		<th style="width:1%">Коли-чество</th>
 		<th>Цена</th>
 		<th>Сумма</th>
 	</tr>
@@ -48,14 +104,14 @@
 		<td>${i + 1}</td>
 		<td>${bill.Name}</td>
 		<td>услуга</td>
-		<td>1</td>
-		<td>${bill.Total}</td>
-		<td>${bill.Total}</td>
+		<td>${bill.Count}</td>
+		<td style="width:10%">${bill.Cost.ToString("0.#")}</td>
+		<td style="width:10%">${bill.Sum.ToString("0.#")}</td>
 	</tr>
 	<% end %>
 	<tr class="result">
 		<td class="result-label" colspan="5">Итого:</td>
-		<td>${invoice.Sum}</td>
+		<td>${invoice.Sum.ToString("0.#")}</td>
 	</tr>
 	<tr class="result">
 		<td class="result-label" colspan="5">Без налога (НДС):</td>
@@ -63,12 +119,12 @@
 	</tr>
 	<tr class="result">
 		<td class="result-label" colspan="5">Всего к оплате:</td>
-		<td>${invoice.Sum}</td>
+		<td>${invoice.Sum.ToString("0.#")}</td>
 	</tr>
 </table>
 <p>
-	Всего наименований ${invoice.Bills.Count}, на сумму ${invoice.Sum}<br />
-	<span style="font-weight:bold">${ViewHelper.InWords(invoice.Sum)}</span>
+	Всего наименований ${invoice.Bills.Count}, на сумму ${invoice.Sum.ToString("0.#")}<br />
+	<span style="font-weight:bold">${invoice.SumInWords()}</span>
 </p>
 <div>
 	<p>
@@ -78,3 +134,5 @@
 		Главный бухгалтер____________________________________________(${invoice.Recipient.Accountant})
 	</p>
 </div>
+	</body>
+</html>

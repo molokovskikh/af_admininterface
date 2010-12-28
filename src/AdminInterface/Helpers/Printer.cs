@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
+using Castle.MonoRail.Views.Brail;
 using Microsoft.Win32;
 
 namespace AdminInterface.Helpers
@@ -41,18 +42,16 @@ namespace AdminInterface.Helpers
 			}
 		}
 
-		public void Print(IViewEngineManager manager, Invoice invoice)
+		public void Print(StandaloneBooViewEngine brail, Invoice invoice)
 		{
 			var file = Path.GetTempFileName();
 			try
 			{
 				using (var writer = new StreamWriter(file))
 				{
-					manager.Process("/invoices/print", "print",
+					brail.Process("print",
 						writer,
-						new Dictionary<string, object> {
-							{"invoice", invoice}
-						});
+						new Dictionary<string, object>{ { "invoice", invoice } });
 				}
 				PrintHtml(file);
 			}

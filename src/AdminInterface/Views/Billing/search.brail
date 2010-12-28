@@ -87,7 +87,7 @@
 
 		<tr style="text-align:left;">
 			<td>
-				Должен\Недолжен:
+				Должен\Не должен:
 			</td>
 			<td>
 				${FormHelper.Select("SearchBy.PayerState",

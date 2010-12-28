@@ -26,34 +26,6 @@
 		${FormHelper.HiddenField("tab", "mail")}
 		
 	<table>
-<!--
-		${WriteInputGroupHeader("Общая информация")}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.ShortName", "Краткое наименование:"), 
-			FormHelper.TextField("Instance.ShortName"))}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.JuridicalName", "Полное наименование:"), 
-			FormHelper.TextField("Instance.JuridicalName"))}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.JuridicalAddress", "Юридический адрес:"), 
-			FormHelper.TextField("Instance.JuridicalAddress"))}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.JuridicalAddress", "Адрес получателя:"), 
-			FormHelper.TextField("Instance.ReceiverAddress"))}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.INN", "ИНН:"),
-			FormHelper.TextField("Instance.INN"))}
-
-		${WriteLabelAndEditControle(
-			FormHelper.LabelFor("Instance.KPP", "КПП:"),
-			FormHelper.TextField("Instance.KPP"))}
-
---!>
 		<%
 		contactGroupIndex = 0
 		component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:

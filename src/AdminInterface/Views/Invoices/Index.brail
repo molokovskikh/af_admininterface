@@ -25,6 +25,17 @@
 							BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
 							BindingHelper.GetDictionaryMapping())}
 						<br>
+						<label>Регион</label>
+						<select name=regionId>
+							<% for region in regions: %>
+								<option value=${region.Id}>${region.Name}</option>
+							<% end %>
+						</select>
+						<br>
+						<label>Дата счета</label>
+						<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
+						<input type=button class=CalendarInput>
+						<br>
 						<label>Принтер</label>
 						<select name=printer>
 						<% for printer in printers: %>

@@ -25,7 +25,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -76,10 +76,12 @@
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
+    <Compile Include="FixutreSetup.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />
     <Compile Include="Models\GetPasswordChangeNotificationAddressFixture.cs" />
+    <Compile Include="Models\InvoiceFixture.cs" />
     <Compile Include="Models\PasswordChangeLogEntityFixture.cs" />
     <Compile Include="Models\PaymentOptionsFixture.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />

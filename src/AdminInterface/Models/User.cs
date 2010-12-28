@@ -74,6 +74,7 @@ namespace AdminInterface.Models
 			Payer = client.Payer;
 			SendRejects = true;
 			SendWaybills = true;
+			Accounting = new UserAccounting(this);
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -295,7 +296,6 @@ namespace AdminInterface.Models
 
 			if (Client.Users == null)
 				Client.Users = new List<User>();
-			Accounting = new UserAccounting(this);
 			Client.Users.Add(this);
 			Client.UpdateBeAccounted();
 			new UserUpdateInfo(Id).Create();

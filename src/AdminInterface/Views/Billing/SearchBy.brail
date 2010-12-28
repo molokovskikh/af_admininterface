@@ -101,9 +101,7 @@ OutputSubView("Search")
 			%>
 			<tr class="${ViewHelper.GetRowStyle(i)}" style="${payerStyle}">
 				<td style="width: 1%;">
-					<% if searchResult.ShowPayDate: %>
-					<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}" />
-					<% end %>
+					<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}">
 					<a href="edit.rails?BillingCode=${searchResult.BillingCode}">${searchResult.BillingCode}</a>
 				</td>
 				<td>
@@ -112,20 +110,16 @@ OutputSubView("Search")
 				<td>
 					${searchResult.Recipients}
 				</td>
-				<% if searchResult.ShowPayDate: %>
 				<td style="width: 1%">
-					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}" />
+					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}">
 				</td>
 				<td>
-					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}" />
+					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}">
 					<input type="button" class="CalendarInput" />
-					
-				</td>
-				<% else: %>
-				<td colspan=2>
+					<% if not searchResult.ShowPayDate: %>
 					Счет выставляется автоматически
+					<% end %>
 				</td>
-				<% end %>
 				<td style="width: 1%">
 					${searchResult.LastClientRegistrationDate.ToShortDateString()}
 				</td>

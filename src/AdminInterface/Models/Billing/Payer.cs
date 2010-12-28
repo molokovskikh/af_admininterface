@@ -231,14 +231,23 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				var users = Users.Select(u => u.Accounting).Where(a => a.ShouldPay());
-				var addresses = Addresses.Select(a => a.Accounting).Where(a => a.ShouldPay());
-
-				var sum = users.Sum(u => u.Payment);
-				sum += addresses.Skip(users.Count()).Sum(a => a.Payment);
-
-				return sum;
+				return GetAccountings().Sum(a => a.Payment);
 			}
+		}
+
+		public virtual IEnumerable<Accounting> GetAccountings()
+		{
+			return UsersForInvoice().Concat(AddressesForInvoice());
+		}
+
+		private IEnumerable<Accounting> AddressesForInvoice()
+		{
+			return Addresses.Select(a => a.Accounting).Where(a => a.ShouldPay()).Skip(UsersForInvoice().Count());
+		}
+
+		private IEnumerable<Accounting> UsersForInvoice()
+		{
+			return Users.Select(u => u.Accounting).Where(a => a.ShouldPay());
 		}
 
 		public override string ToString()

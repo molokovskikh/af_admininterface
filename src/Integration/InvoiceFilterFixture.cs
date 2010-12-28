@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Collections.Generic;
 using AdminInterface.Controllers;
@@ -21,7 +22,7 @@ namespace Integration
 				var client = DataMother.CreateTestClientWithAddressAndUser();
 				client.Payer.JuridicalOrganizations[0].Recipient = Recipient.Queryable.First();
 				client.Payer.JuridicalOrganizations[0].Save();
-				invoice = new Invoice(client.Payer, Period.December);
+				invoice = new Invoice(client.Payer, Period.December, DateTime.Now);
 				invoice.Save();
 				var filter = new InvoiceFilter();
 				filter.Region = client.HomeRegion;
