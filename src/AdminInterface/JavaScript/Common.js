@@ -3,6 +3,14 @@ $(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});
+	$('.input-date').each(function () {
+		$(this).mask("99.99.9999");
+	});
+/*
+	$('.input-sum').each(function () {
+		$(this).mask("999999999,99");
+	});
+*/
 
 	$(".ShowHiden").live('click', function () {
 		ShowHidden(this);

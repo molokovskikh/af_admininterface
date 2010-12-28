@@ -18,6 +18,7 @@
 			"jquery-1.4.2.min.js",
 			"jquery.validate.min.js",
 			"jquery-ui-1.8.6.custom.min.js",
+			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css",

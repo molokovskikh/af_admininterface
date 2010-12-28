@@ -44,14 +44,14 @@
 				</select>
 			</td>
 			<td>
-				<input type=text name=Payment.PayedOn value=${DateTime.Today}>
+				<input type=text class="input-date" name=Payment.PayedOn value=${DateTime.Today}>
 			</td>
 			<td>
 				<input type=hidden id="payment_payer_id" name=Payment.Payer.PayerId>
 				<input type=text id=payer>
 			</td>
 			<td>
-				<input type=text name=Payment.Sum>
+				<input type=text class="input-sum" name=Payment.Sum>
 			</td>
 			<td>
 				<input type=submit value="Добавить">
