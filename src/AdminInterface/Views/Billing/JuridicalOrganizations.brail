@@ -1,21 +1,4 @@
-﻿<%
-def Select(name, value) as string:
-	result = "<select name='${name}'>" + "<option></option>"
-	for recipient in Recipients:
-		selected = ""
-		if value and recipient.Id == value.Id:
-			selected = "selected"
-		end
-		result += "<option ${selected} value=${recipient.Id}>"
-		result += recipient.Name
-		result += "</option>"
-	end
-	result += "</select>"
-	return result
-end
-%>
-
-<% def WriteLabelAndEditControl(labelText as string, editControlText as string) as string: %>
+﻿<% def WriteLabelAndEditControl(labelText as string, editControlText as string) as string: %>
 	<tr align="left">
 		<td style="width: 30%">
 			${labelText}
@@ -62,26 +45,6 @@ def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
 	${WriteLabelAndEditControl(
 		FormHelper.LabelFor("JuridicalOrganization.FullName","Полное наименование:"), 
 		FormHelper.TextFieldValue("JuridicalOrganization.FullName", juridicalOrganization.FullName))}
-
-	${WriteLabelAndEditControl(
-		FormHelper.LabelFor("JuridicalOrganization.Address", "Юридический адрес:"), 
-		FormHelper.TextFieldValue("JuridicalOrganization.Address", juridicalOrganization.Address))}
-
-	${WriteLabelAndEditControl(
-		FormHelper.LabelFor("JuridicalOrganization.ReceiverAddress", "Адрес получателя:"), 
-		FormHelper.TextFieldValue("JuridicalOrganization.ReceiverAddress", juridicalOrganization.ReceiverAddress))}
-
-	${WriteLabelAndEditControl(
-		FormHelper.LabelFor("JuridicalOrganization.INN", "ИНН:"), 
-		FormHelper.TextFieldValue("JuridicalOrganization.INN", juridicalOrganization.Inn))}
-
-	${WriteLabelAndEditControl(
-		FormHelper.LabelFor("JuridicalOrganization.KPP", "КПП:"), 
-		FormHelper.TextFieldValue("JuridicalOrganization.KPP", juridicalOrganization.Kpp))}
-
-	${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.Recipient.Id", "Получатель платежей"),
-			Select("JuridicalOrganization.Recipient.Id", juridicalOrganization.Recipient))}
 <% end %>
 
 <script type="text/javascript">
@@ -109,26 +72,6 @@ def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
 		${WriteLabelAndEditControl(
 			FormHelper.LabelFor("JuridicalOrganization.FullName", "Полное наименование:"),
 			FormHelper.TextField("JuridicalOrganization.FullName"))}
-
-		${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.Address", "Юридический адрес:"),
-			FormHelper.TextField("JuridicalOrganization.Address"))}
-
-		${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.ReceiverAddress", "Адрес получателя:"), 
-			FormHelper.TextField("JuridicalOrganization.ReceiverAddress"))}
-
-		${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.INN", "ИНН:"),
-			FormHelper.TextField("JuridicalOrganization.INN"))}
-
-		${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.KPP", "КПП:"), 
-			FormHelper.TextField("JuridicalOrganization.KPP"))}
-
-		${WriteLabelAndEditControl(
-			FormHelper.LabelFor("JuridicalOrganization.Recipient.Id", "Получатель платежей"),
-			Select("JuridicalOrganization.Recipient.Id", null))}
 
 		<tr><td colspan="10" align="right"><input id="SubmitFormButton" type="submit" value="Создать" onclick="HideFormForAdding()" ></td></tr>
 	</table>

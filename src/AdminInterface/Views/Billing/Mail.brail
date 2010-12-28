@@ -1,4 +1,20 @@
-﻿<% def WriteInputGroupHeader(localHeader as string) as string: %>
+﻿<%
+def Select(name, value) as string:
+	result = "<select name='${name}'>" + "<option></option>"
+	for recipient in Recipients:
+		selected = ""
+		if value and recipient.Id == value.Id:
+			selected = "selected"
+		end
+		result += "<option ${selected} value=${recipient.Id}>"
+		result += recipient.Name
+		result += "</option>"
+	end
+	result += "</select>"
+	return result
+end
+%>
+<% def WriteInputGroupHeader(localHeader as string) as string: %>
 	<tr>
 		<td class="InputGroupHeader" colspan="2">
 			${localHeader}
@@ -51,6 +67,11 @@
 		${WriteLabelAndEditControle(
 				FormHelper.LabelFor("Instance.KPP", "КПП:"),
 				FormHelper.TextField("Instance.KPP"))}
+
+		${WriteLabelAndEditControle(
+			FormHelper.LabelFor("Instance.Recipient.Id", "Получатель платежей"),
+			Select("Instance.Recipient.Id", Instance.Recipient))}
+
 		<%
 		contactGroupIndex = 0
 		component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:

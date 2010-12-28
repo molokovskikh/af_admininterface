@@ -149,6 +149,9 @@ namespace AdminInterface.Models
 		[Nested]
 		public virtual InvoiceSettings InvoiceSettings { get; set; }
 
+		[BelongsTo("RecipientId")]
+		public virtual Recipient Recipient { get; set; }
+
 		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<Client> Clients { get; set; }
 
