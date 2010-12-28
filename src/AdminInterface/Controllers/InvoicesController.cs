@@ -79,9 +79,10 @@ namespace AdminInterface.Controllers
 				filter.Recipient = null;
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters;
+			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("Áóõ"));
 			PropertyBag["invoices"] = filter.Find();
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
+			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
 		public void Cancel(uint id)
