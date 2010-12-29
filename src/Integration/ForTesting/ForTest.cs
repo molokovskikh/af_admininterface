@@ -17,7 +17,6 @@ namespace Integration.ForTesting
 				ActiveRecordStarter.Initialize(new[] {
 					Assembly.Load("AdminInterface"),
 					Assembly.Load("Common.Web.Ui"),
-					Assembly.Load("Functional"),
 				}, ActiveRecordSectionHandler.Instance);
 		}
 

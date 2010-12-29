@@ -55,13 +55,13 @@ namespace AdminInterface.Models
 	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true)]
 	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>
 	{
-		[PrimaryKey("SmartOrderRuleId")]
+		[PrimaryKey("Id")]
 		public virtual uint Id { get; set; }
 
-		[Property("ParseAlgorithm")]
+		[Property]
 		public virtual string ParseAlgorithm { get; set; }
 
-		[Property("AssortimentPriceCode")]
+		[Property]
 		public virtual uint AssortimentPriceCode { get; set; }
 
 		public static SmartOrderRules TestSmartOrder()
