@@ -174,9 +174,8 @@ namespace AdminInterface.Models
 					!String.IsNullOrWhiteSpace(ActualAddressStreet) ? "ул. " + ActualAddressStreet : null,
 					!String.IsNullOrWhiteSpace(ActualAddressHouse) ? "д. " + ActualAddressHouse: null,
 					!String.IsNullOrWhiteSpace(ActualAddressOffice) ? "оф. " + ActualAddressOffice : null,
-					ActualAddressProvince,
-					ActualAddressTown,
-					ActualAddressIndex
+					!String.IsNullOrWhiteSpace(ActualAddressProvince) ? "обл. " + ActualAddressProvince : null,
+					!String.IsNullOrWhiteSpace(ActualAddressTown) ? "г. " + ActualAddressTown : null,
 				}.Where(s => !String.IsNullOrWhiteSpace(s)));
 		}
 

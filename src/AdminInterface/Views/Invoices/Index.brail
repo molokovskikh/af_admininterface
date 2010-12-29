@@ -32,6 +32,13 @@
 							<% end %>
 						</select>
 						<br>
+						<label>Получатель</label>
+						<select name=recipientId>
+							<% for recipient in recipients: %>
+								<option value=${recipient.Id}>${recipient.Name}</option>
+							<% end %>
+						</select>
+						<br>
 						<label>Дата счета</label>
 						<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
 						<input type=button class=CalendarInput>
@@ -55,7 +62,6 @@
 		<table class=DataTable>
 			<% if invoices.Count: %>
 			<tr>
-				<th></th>
 				<th>${app.Sortable("№", "Id")}</th>
 				<th>${app.Sortable("Договор", "payerId")}</th>
 				<th>${app.Sortable("Получатель платежей", "recipient")}</th>
@@ -63,10 +69,10 @@
 				<th>${app.Sortable("Сумма счета", "sum")}</th>
 				<th>${app.Sortable("За период", "period")}</th>
 				<th>${app.Sortable("Дата", "date")}</th>
+				<th></th>
 			</tr>
 			<% for i, invoice in enumerate(invoices): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td>${app.LinkTo(invoice, "Отменить", @Cancel)}</td>
 				<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
 				<td>${invoice.Payer.Id}</td>
 				<td>${invoice.Recipient.Name}</td>
@@ -74,6 +80,11 @@
 				<td>${invoice.Sum.ToString("0.##")}</td>
 				<td>${BindingHelper.GetDescription(invoice.Period)}</td>
 				<td>${invoice.Date.ToShortDateString()}</td>
+				<td>
+					<form method=post action="${siteroot}/Invoices/${invoice.Id}/Cancel">
+						<input type=submit value="Удалить">
+					</form>
+				</td>
 			</tr>
 			<% end %>
 			<% else: %>

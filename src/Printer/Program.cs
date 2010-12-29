@@ -31,6 +31,7 @@ namespace Printer
 					var regionId = ulong.Parse(args[2]);
 					var date = DateTime.Parse(args[3]);
 					AdminInterface.Helpers.Printer.SetPrinter(args[4]);
+					var recipientId = uint.Parse(args[5]);
 
 					ActiveRecordStarter.Initialize(new[] {
 						Assembly.Load("AdminInterface"),
@@ -51,13 +52,13 @@ namespace Printer
 						var region = Region.Find(regionId);
 						var payers = ActiveRecordLinqBase<Payer>
 							.Queryable
-							.Where(p => p.AutoInvoice == InvoiceType.Auto && p.PayCycle == invoicePeriod);
+							.Where(p => p.AutoInvoice == InvoiceType.Auto
+								&& p.PayCycle == invoicePeriod
+								&& p.Recipient != null
+								&& p.Recipient.Id == recipientId);
 
 						foreach (var payer in payers)
 						{
-							if (!payer.JuridicalOrganizations.Any(j => j.Recipient != null))
-								continue;
-
 							if (!payer.Clients.Any(c => c.HomeRegion == region))
 								continue;
 

@@ -84,9 +84,9 @@
 <h2>Счет №${invoice.Id} от ${invoice.Date.ToString("dd MMMM yyyy")}</h2>
 
 <p>
-	Плательщик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
+	Плательщик: ${invoice.Payer.JuridicalName}
 	<br />
-	Заказчик: ${invoice.Payer.JuridicalName}, ${invoice.Payer.ActualAddressRegion}
+	Заказчик: ${invoice.Payer.JuridicalName}
 	<br>
 	Договор №${invoice.Payer.Id}
 </p>
@@ -140,7 +140,8 @@
 	<div style="position:fixed; bottom: 0; right:0; width: 8cm;">
 		Кому: для Аптеки<br>
 		${invoice.Payer.JuridicalName}<br>
-		Куда: ${invoice.Payer.GetMailAddress()}
+		Куда: ${invoice.Payer.GetMailAddress()}<br>
+		${invoice.Payer.ActualAddressIndex}
 	</div>
 	</body>
 </html>
