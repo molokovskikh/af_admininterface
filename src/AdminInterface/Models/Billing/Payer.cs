@@ -40,7 +40,7 @@ namespace AdminInterface.Models
 		public virtual bool PrintInvoice { get; set; }
 	}
 
-	[ActiveRecord("payers", Schema = "billing", Lazy = true)]
+	[ActiveRecord(Schema = "billing", Lazy = true)]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
 		[PrimaryKey]

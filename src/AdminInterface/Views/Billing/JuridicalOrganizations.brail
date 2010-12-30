@@ -82,8 +82,5 @@ def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
 </div>
 
 <% for item in Instance.JuridicalOrganizations: %>
-	<% if item: %>
-		<% WriteHeader(item) %>
-<% end %>
-
+	<% WriteHeader(item) %>
 <% end %>

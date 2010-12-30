@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Integration.ForTesting;
@@ -15,7 +16,8 @@ namespace Integration
 			SecurityContext.GetAdministrator = () => new Administrator{
 				UserName = "test",
 				RegionMask = ulong.MaxValue,
-				ManagerName = "test"
+				ManagerName = "test",
+				AllowedPermissions = new List<Permission>()
 			};
 			Administrator.GetHost = () => "localhost";
 		}

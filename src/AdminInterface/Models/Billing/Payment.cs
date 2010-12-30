@@ -3,8 +3,6 @@ using System.Globalization;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
-using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Billing
 {

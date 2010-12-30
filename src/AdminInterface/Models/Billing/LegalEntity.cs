@@ -3,7 +3,7 @@ using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord("LegalEntities", Schema = "Billing", Lazy = true)]
+	[ActiveRecord(Schema = "Billing", Lazy = true)]
 	public class LegalEntity : ActiveRecordLinqBase<LegalEntity>
 	{
 		[PrimaryKey]
