@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
@@ -79,7 +79,7 @@ namespace AdminInterface.Controllers
 				filter.Recipient = null;
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("Бух"));
+			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("Р‘СѓС…"));
 			PropertyBag["invoices"] = filter.Find();
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
@@ -89,7 +89,7 @@ namespace AdminInterface.Controllers
 		{
 			var invoice = Invoice.Find(id);
 			invoice.Cancel();
-			Flash["Message"] = "Сохранено";
+			Flash["Message"] = "РЎРѕС…СЂР°РЅРµРЅРѕ";
 			RedirectToReferrer();
 		}
 
@@ -132,12 +132,14 @@ namespace AdminInterface.Controllers
 			}
 */
 
+#if !DEBUG
 			var info = new ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
 				String.Format("{0} {1} {2} \"{3}\" {4}", period, regionId, invoiceDate.ToShortDateString(), printer, recipientId));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
+#endif
 
-			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
+			Flash["message"] = String.Format("РЎС‡РµС‚Р° Р·Р° {0} СЃС„РѕСЂРјРёСЂРѕРІР°РЅС‹", BindingHelper.GetDescription(period));
 			RedirectToAction("Index");
 		}
 	}

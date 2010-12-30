@@ -65,16 +65,7 @@ namespace AdminInterface.Models
 
 		public User(Client client)
 		{
-			if (HttpContext.Current != null) // для поддержки авт. тестирования
-				Registrant = SecurityContext.Administrator.UserName;
-
-			RegistrationDate = DateTime.Now;
-			Enabled = true;
-			Client = client;
-			Payer = client.Payer;
-			SendRejects = true;
-			SendWaybills = true;
-			Accounting = new UserAccounting(this);
+			Setup(client);
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -305,6 +296,17 @@ namespace AdminInterface.Models
 		{
 			Client = client;
 			Payer = client.Payer;
+
+			// для поддержки авт. тестирования
+			if (HttpContext.Current != null)
+				Registrant = SecurityContext.Administrator.UserName;
+			RegistrationDate = DateTime.Now;
+
+			Enabled = true;
+			SendRejects = true;
+			SendWaybills = true;
+			Accounting = new UserAccounting(this);
+
 			Setup();
 			AddPrices(client);
 		}

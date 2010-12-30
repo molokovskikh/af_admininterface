@@ -65,7 +65,6 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 
-				user.Client = client;
 				user.Setup(client);
 				password = user.CreateInAd();
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -74,8 +73,6 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.Save();
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
-				user.Registrant = SecurityContext.Administrator.UserName;
-				user.RegistrationDate = DateTime.Now;
 
 				if (address != null)
 				{
