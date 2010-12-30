@@ -10,11 +10,6 @@ namespace Integration.NHibernateExtentions
 	[TestFixture]
 	public class IfProjectionFixture
 	{
-		public IfProjectionFixture()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void IfProjectionInHaving()
 		{

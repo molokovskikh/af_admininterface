@@ -1,6 +1,5 @@
 ﻿using AdminInterface.Models;
 using Castle.ActiveRecord;
-using Integration.ForTesting;
 using NHibernate.Criterion;
 using NUnit.Framework;
 
@@ -9,12 +8,6 @@ namespace Integration.NHibernateExtentions
 	[TestFixture]
 	public class BitOrProjectionTest 
 	{
-		[SetUp]
-		public void SetUp()
-		{
-			ForTest.InitialzeAR();
-		}
-
 		[Test]
 		public void BitOrInWhereTest()
 		{

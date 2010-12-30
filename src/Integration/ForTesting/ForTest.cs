@@ -10,16 +10,6 @@ namespace Integration.ForTesting
 {
 	public class ForTest
 	{
-		static ForTest()
-		{
-			XmlConfigurator.Configure();
-			if (!ActiveRecordStarter.IsInitialized)
-				ActiveRecordStarter.Initialize(new[] {
-					Assembly.Load("AdminInterface"),
-					Assembly.Load("Common.Web.Ui"),
-				}, ActiveRecordSectionHandler.Instance);
-		}
-
 		public static Payer CreatePayer()
 		{
 			return new Payer
@@ -62,11 +52,11 @@ namespace Integration.ForTesting
 
 		public static void InitialzeAR()
 		{
+			XmlConfigurator.Configure();
 			if (!ActiveRecordStarter.IsInitialized)
 				ActiveRecordStarter.Initialize(new[] {
 					Assembly.Load("AdminInterface"),
 					Assembly.Load("Common.Web.Ui"),
-					Assembly.Load("Functional"),
 				}, ActiveRecordSectionHandler.Instance);
 		}
 	}

@@ -18,7 +18,6 @@ namespace Integration.Models
 		[SetUp]
 		public void Setup()
 		{
-			BasicConfigurator.Configure();
 			var client = DataMother.CreateTestClientWithUser();
 			user = client.Users[0];
 		}
