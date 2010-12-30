@@ -65,7 +65,7 @@ namespace AdminInterface.Models
 
 		public User(Client client)
 		{
-			Setup(client);
+			InitUser(client);
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -294,6 +294,13 @@ namespace AdminInterface.Models
 
 		public virtual void Setup(Client client)
 		{
+			InitUser(client);
+			Setup();
+			AddPrices(client);
+		}
+
+		private void InitUser(Client client)
+		{
 			Client = client;
 			Payer = client.Payer;
 
@@ -306,9 +313,6 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Accounting = new UserAccounting(this);
-
-			Setup();
-			AddPrices(client);
 		}
 
 		public virtual bool IsLocked
