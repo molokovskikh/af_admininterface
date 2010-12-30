@@ -180,8 +180,7 @@ from billing.payers p
 	left join future.Users users on users.PayerId = p.PayerId
 		left join future.Clients cd on cd.Id = users.ClientId
 	left join future.Addresses addresses on addresses.PayerId = p.PayerId
-	left join Billing.LegalEntities le on le.PayerId = p.PayerId
-		left join Billing.Recipients r on r.Id = le.RecipientId
+		left join Billing.Recipients r on r.Id = p.RecipientId
 where 1 = 1 {0}
 group by p.payerId
 having {1}
