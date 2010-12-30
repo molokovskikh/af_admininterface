@@ -14,6 +14,8 @@ namespace Integration
 			ForTest.InitialzeAR();
 			SecurityContext.GetAdministrator = () => new Administrator{
 				UserName = "test",
+				RegionMask = ulong.MaxValue,
+				ManagerName = "test"
 			};
 			Administrator.GetHost = () => "localhost";
 		}

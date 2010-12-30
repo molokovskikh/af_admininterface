@@ -8,12 +8,6 @@ namespace Integration.Models
 	[TestFixture]
 	public class ClientRegistrationLogEntityFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			SecurityContext.GetAdministrator = () => new Administrator{ RegionMask = ulong.MaxValue };
-		}
-
 		[Test]
 		public void Get_not_updated_clients()
 		{

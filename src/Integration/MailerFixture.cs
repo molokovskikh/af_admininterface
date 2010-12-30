@@ -46,7 +46,6 @@ namespace Integration
 		[SetUp]
 		public void Setup()
 		{
-			SecurityContext.GetAdministrator = () => new Administrator {UserName = "TestAdmin", ManagerName = "test"};
 			controller = new RegisterController();
 
 			var sender = MockRepository.GenerateStub<IEmailSender>();

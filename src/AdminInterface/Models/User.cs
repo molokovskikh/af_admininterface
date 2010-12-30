@@ -304,9 +304,7 @@ namespace AdminInterface.Models
 			Client = client;
 			Payer = client.Payer;
 
-			// для поддержки авт. тестирования
-			if (HttpContext.Current != null)
-				Registrant = SecurityContext.Administrator.UserName;
+			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
 
 			Enabled = true;
