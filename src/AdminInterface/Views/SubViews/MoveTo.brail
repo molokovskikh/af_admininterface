@@ -49,15 +49,16 @@
 	{
 		$("#MoveToClientButton").attr("disabled", "disabled");
 		$.ajax({
-			cache : false,
-			dataType : "json",
-			url : "${siteroot}/Client/LegalEntities?id=" + $("#clientsList").val(),
-			success : function(data) {
-				if (data.length < 2)
-				{
+			cache: false,
+			dataType: "json",
+			url: "${siteroot}/Client/LegalEntities?id=" + $("#clientsList").val(),
+			success: function (data) {
+				if (data.length < 2) {
 					$("#MoveToClientButton").removeAttr("disabled");
 					return;
 				}
+				$("#DivForSelectClientToMove #LegalEntityId").remove();
+				$("#DivForSelectClientToMove #LegalEntityLabel").remove();
 				var select = $('<select/>')
 					.attr('id', 'LegalEntityId')
 					.attr('name', 'LegalEntityId');
@@ -65,7 +66,7 @@
 					select.append($('<option/>').attr('value', this.Id).append(this.Name));
 				});
 				$("#DivForSelectClientToMove")
-					.append("<span>Выберете юр. лицо:</span>")
+					.append("<span id=LegalEntityLabel>Выберете юр. лицо:</span>")
 					.append(select);
 
 				$("#MoveToClientButton").removeAttr("disabled");
