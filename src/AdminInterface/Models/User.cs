@@ -311,6 +311,7 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Accounting = new UserAccounting(this);
+			AssignedPermissions = new List<UserPermission>();
 		}
 
 		public virtual bool IsLocked
