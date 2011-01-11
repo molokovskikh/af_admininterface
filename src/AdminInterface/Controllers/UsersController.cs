@@ -273,7 +273,7 @@ namespace AdminInterface.Controllers
 		{
 			Session["Register"] = false;
 			Session["Code"] = user.Client.Id;
-			Session["DogN"] = user.Client.Payer.PayerID;
+			Session["DogN"] = user.Client.Payer.Id;
 			Session["Name"] = String.IsNullOrEmpty(user.Client.FullName) ? String.Empty : user.Client.FullName;
 			Session["ShortName"] = String.IsNullOrEmpty(user.Client.Name) ? String.Empty : user.Client.Name;
 			Session["Login"] = String.IsNullOrEmpty(user.Login) ? String.Empty : user.Login;

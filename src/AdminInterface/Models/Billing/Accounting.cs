@@ -287,8 +287,8 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 			get
 			{
 				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Client.Payer.Id;
-				return ((AddressAccounting) this).Address.Client.Payer.Id;
+					return ((UserAccounting) this).User.Payer.Id;
+				return ((AddressAccounting) this).Address.Payer.Id;
 			}
 		}
 
@@ -307,8 +307,8 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 			get
 			{
 				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Client.Payer.ShortName;
-				return ((AddressAccounting) this).Address.Client.Payer.ShortName;
+					return ((UserAccounting) this).User.Payer.ShortName;
+				return ((AddressAccounting) this).Address.Payer.ShortName;
 			}
 		}
 

@@ -153,7 +153,7 @@ namespace AdminInterface.Controllers
 			newUser.UpdateContacts(userContacts);
 
 			Mailer.ClientRegistred(newClient, false);
-			Session["DogN"] = newClient.Payer.PayerID;
+			Session["DogN"] = newClient.Payer.Id;
 			Session["Code"] = newClient.Id;
 			Session["Name"] = newClient.FullName;
 			Session["ShortName"] = newClient.Name;
@@ -173,7 +173,7 @@ namespace AdminInterface.Controllers
 			{
 				sendBillingNotificationNow = false;
 				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-					newClient.Payer.PayerID,
+					newClient.Payer.Id,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}

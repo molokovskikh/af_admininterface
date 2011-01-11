@@ -57,7 +57,7 @@ namespace AdminInterface.Helpers
 						client.FullName,
 						user.Login,
 						client.Id,
-						client.Payer.PayerID,
+						user.Payer.Id,
 						reason,
 						DateTime.Now),
 					"billing@analit.net");

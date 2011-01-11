@@ -83,7 +83,7 @@ namespace AdminInterface.Helpers
 				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
 
 			using (var stream = CreateReport(client.Id,
-				client.Payer.PayerID,
+				client.Payer.Id,
 				client.Name,
 				client.FullName,
 				client.GetHumanReadableType(),
