@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
@@ -352,6 +353,7 @@ WHERE PriceCode = ?Id", connection);
 					return;
 				desc.Helpers = desc.Helpers.Concat(new [] {new HelperDescriptor(typeof(AppHelper), "app"), }).ToArray();
 			};
+			BaseMailer.ViewEngineManager = container.ViewEngineManager;
 		}
 	}
 

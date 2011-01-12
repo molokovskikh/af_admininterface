@@ -1,12 +1,15 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.Components.Common.EmailSender;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
@@ -15,26 +18,15 @@ using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Castle.MonoRail.Views.Brail;
+using Common.Web.Ui.Models;
 using IgorO.ExposedObjectProject;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Message = Castle.Components.Common.EmailSender.Message;
 
 namespace Integration
 {
-	public class TestServiceProvider : IServiceProvider
-	{
-		public Dictionary<Type, object> Services = new Dictionary<Type, object>();
-
-		public object GetService(Type serviceType)
-		{
-			Console.WriteLine(serviceType);
-			if (!Services.ContainsKey(serviceType))
-				return null;
-			return Services[serviceType];
-		}
-	}
-
 	[TestFixture]
 	public class MailerFixture : BaseControllerTest
 	{
@@ -60,14 +52,16 @@ namespace Integration
 			PrepareController(controller, "Registered");
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
+			var manager = GetViewManager();
 			mailer.Controller = controller;
-			controller.Context.Services.EmailTemplateService = new EmailTemplateService(GetViewManager());
+			MonorailMailer.ViewEngineManager = manager;
+			controller.Context.Services.EmailTemplateService = new EmailTemplateService(manager);
 
 			client = new Client
 			{
 				Id = 58,
 				Payer = new Payer { PayerID = 10 },
-				Name = "Тестовый клиент",
+				Name = "РўРµСЃС‚РѕРІС‹Р№ РєР»РёРµРЅС‚",
 				HomeRegion = new Region { Name = "test" }
 			};
 		}
@@ -78,7 +72,7 @@ namespace Integration
 			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
 			config.ViewEngineConfig.ViewPathRoot = Path.Combine(@"..\..\..\AdminInterface", "Views");
 
-			var provider = new TestServiceProvider();
+			var provider = new FakeServiceProvider();
 			provider.Services.Add(typeof(IMonoRailConfiguration), config);
 			provider.Services.Add(typeof(IViewSourceLoader), new FileAssemblyViewSourceLoader(config.ViewEngineConfig.ViewPathRoot));
 
@@ -96,36 +90,36 @@ namespace Integration
 		{
 			mailer.EnableChanged(client, false);
 			mailer.Send();
-			Assert.That(message.Body, Is.StringContaining("Наименование клиента: Тестовый клиент"));
+			Assert.That(message.Body, Is.StringContaining("РќР°РёРјРµРЅРѕРІР°РЅРёРµ РєР»РёРµРЅС‚Р°: РўРµСЃС‚РѕРІС‹Р№ РєР»РёРµРЅС‚"));
 		}
 
 		[Test]
 		public void BillingNotificationTest()
 		{
-			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "Независимая копия" };
+			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "РќРµР·Р°РІРёСЃРёРјР°СЏ РєРѕРїРёСЏ" };
 			client.Payer.AddComment(paymentOptions.GetCommentForPayer());
 
 			mailer.NotifyBillingAboutClientRegistration(client);
 			mailer.Send();
 
-			Assert.That(message, Is.Not.Null, "Сообщение не послано");
+			Assert.That(message, Is.Not.Null, "РЎРѕРѕР±С‰РµРЅРёРµ РЅРµ РїРѕСЃР»Р°РЅРѕ");
 			Assert.That(message.To, Is.EqualTo("billing@analit.net"));
 
 			Assert.That(message.From, Is.EqualTo("register@analit.net"));
 
-			Assert.That(message.Subject, Is.EqualTo("Регистрация нового клиента"));
+			Assert.That(message.Subject, Is.EqualTo("Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ РєР»РёРµРЅС‚Р°"));
 			Assert.That(message.Body, Is.EqualTo(
-				@"Зарегистрирован новый клиент
+				@"Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ РєР»РёРµРЅС‚
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
+РќР°Р·РІР°РЅРёРµ: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>РўРµСЃС‚РѕРІС‹Р№ РєР»РёРµРЅС‚</a>
 <br>
-Код: 58
+РљРѕРґ: 58
 <br>
-Биллинг код: 10
+Р‘РёР»Р»РёРЅРі РєРѕРґ: 10
 <br>
-Кем зарегистрирован: test
+РљРµРј Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ: test
 <br>
-Клиент обслуживается бесплатно
+РљР»РёРµРЅС‚ РѕР±СЃР»СѓР¶РёРІР°РµС‚СЃСЏ Р±РµСЃРїР»Р°С‚РЅРѕ
 "));
 			Assert.That(message.Format, Is.EqualTo(Format.Html));
 		}
@@ -140,18 +134,18 @@ namespace Integration
 			mailer.Send();
 
 			Assert.That(message.Body, Is.EqualTo(
-				@"Зарегистрирован новый клиент
+				@"Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ РєР»РёРµРЅС‚
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
+РќР°Р·РІР°РЅРёРµ: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>РўРµСЃС‚РѕРІС‹Р№ РєР»РёРµРЅС‚</a>
 <br>
-Код: 58
+РљРѕРґ: 58
 <br>
-Биллинг код: 10
+Р‘РёР»Р»РёРЅРі РєРѕРґ: 10
 <br>
-Кем зарегистрирован: test
+РљРµРј Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ: test
 <br>
-Дата начала платного периода: 01.01.2007
-Комментарий: Test comment
+Р”Р°С‚Р° РЅР°С‡Р°Р»Р° РїР»Р°С‚РЅРѕРіРѕ РїРµСЂРёРѕРґР°: 01.01.2007
+РљРѕРјРјРµРЅС‚Р°СЂРёР№: Test comment
 "));
 		}
 
@@ -162,18 +156,38 @@ namespace Integration
 			mailer.Send();
 
 			Assert.That(message.Body, Is.EqualTo(
-				@"Зарегистрирован новый клиент
+				@"Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ РЅРѕРІС‹Р№ РєР»РёРµРЅС‚
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
+РќР°Р·РІР°РЅРёРµ: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>РўРµСЃС‚РѕРІС‹Р№ РєР»РёРµРЅС‚</a>
 <br>
-Код: 58
+РљРѕРґ: 58
 <br>
-Биллинг код: 10
+Р‘РёР»Р»РёРЅРі РєРѕРґ: 10
 <br>
-Кем зарегистрирован: test
+РљРµРј Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅ: test
 <br>
 
 "));
+		}
+
+		[Test]
+		public void Send_invoice()
+		{
+			Invoice invoice;
+			using(new SessionScope())
+			{
+				var client = DataMother.CreateTestClientWithAddressAndUser();
+				client.Payer.Recipient = Recipient.Queryable.First();
+				invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
+				var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
+				group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
+				invoice.Save();
+
+				mailer.Invoice(invoice);
+				mailer.Send();
+			}
+
+			Assert.That(message.Body, Is.StringContaining("РџСЂРёРјРёС‚Рµ СЃС‡РµС‚ Р·Р° РёРЅС„РѕСЂРјР°С†РёРѕРЅРЅРѕРµ РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ РІ РРЎ РђРЅР°Р»РёС‚Р¤Р°СЂРјР°С†РёСЏ."));
 		}
 	}
 }

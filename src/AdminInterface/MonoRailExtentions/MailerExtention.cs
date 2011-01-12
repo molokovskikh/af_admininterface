@@ -2,6 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
+using System.Runtime.Remoting.Contexts;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -36,9 +38,11 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected string Layout;
 		protected string Template;
-		protected IDictionary PropertyBag = new Dictionary<string, object>();
+		protected IDictionary<string, object> PropertyBag = new Dictionary<string, object>();
 
 		private IEmailSender _sender;
+
+		public static IViewEngineManager ViewEngineManager;
 
 		public BaseMailer(IEmailSender sender)
 		{
@@ -62,7 +66,16 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected virtual Message GetMessage()
 		{
-			var message = Controller.RenderMailMessage(Template, Layout, PropertyBag);
+			if (ViewEngineManager == null)
+				throw new Exception("Mailer не инициализирован");
+
+			if (!Template.StartsWith("/"))
+				Template = Path.Combine("mail", Template);
+
+			var writer = new StringWriter();
+			ViewEngineManager.Process(Template, Layout, writer, PropertyBag);
+
+			var message = new Message();
 			message.Subject = Subject;
 			message.From = From;
 			message.To = To;
@@ -71,6 +84,7 @@ namespace AdminInterface.MonoRailExtentions
 				message.Format = Format.Html;
 			else
 				message.Format = Format.Text;
+			message.Body = writer.ToString();
 			return message;
 		}
 	}
@@ -174,7 +188,7 @@ namespace AdminInterface.MonoRailExtentions
 
 		public void Invoice(Invoice invoice)
 		{
-			Template = "/Invoices/Print";
+			Template = "Invoice";
 			Layout = "Print";
 			IsBodyHtml = true;
 			From = "billing@analit.net";

@@ -221,6 +221,7 @@
     <Compile Include="Models\UserSearchProperties.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
+    <Compile Include="MonoRailExtentions\FakeServiceProvider.cs" />
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
@@ -308,7 +309,6 @@
     <Compile Include="OfficeUserRegistrationReport.aspx.designer.cs">
       <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -387,8 +387,10 @@
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Invoices\Index.brail" />
+    <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Layouts\Print.brail" />
+    <None Include="Views\Mail\Invoice.brail" />
     <None Include="Views\Payers\BalanceSummary.brail" />
     <None Include="Views\Payers\Invoices.brail" />
     <None Include="Views\Payers\NewInvoice.brail" />
