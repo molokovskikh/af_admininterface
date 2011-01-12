@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -89,7 +90,10 @@ namespace Printer
 							return a;
 						return "\"" + a + "\"";
 					}));
-					ProcessStarter.StartProcessInteractivly(exe + " print " + arguments, "KvasovSam", "vbrhjcrjgbxtcrbq", "analit");
+					ProcessStarter.StartProcessInteractivly(exe + " print " + arguments,
+						ConfigurationManager.AppSettings["User"],
+						ConfigurationManager.AppSettings["Password"] ,
+						"analit");
 				}
 			}
 			catch (Exception e)
