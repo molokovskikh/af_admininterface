@@ -30,9 +30,6 @@ namespace AdminInterface.Models.Billing
 		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
 
-		[BelongsTo("RecipientId")]
-		public virtual Recipient Recipient { get; set; }
-
 		public override string ToString()
 		{
 			return Name;

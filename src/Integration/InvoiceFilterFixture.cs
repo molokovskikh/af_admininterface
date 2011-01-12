@@ -20,8 +20,7 @@ namespace Integration
 			using (new SessionScope())
 			{
 				var client = DataMother.CreateTestClientWithAddressAndUser();
-				client.Payer.JuridicalOrganizations[0].Recipient = Recipient.Queryable.First();
-				client.Payer.JuridicalOrganizations[0].Save();
+				client.Payer.Recipient = Recipient.Queryable.First();
 				invoice = new Invoice(client.Payer, Period.December, DateTime.Now);
 				invoice.Save();
 				var filter = new InvoiceFilter();

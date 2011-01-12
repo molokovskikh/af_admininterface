@@ -21,10 +21,9 @@ namespace Unit.Models
 				Clients = new List<Client>(),
 				Users = new List<User>(),
 				Addresses = new List<Address>(),
+				Recipient = new Recipient(),
 				JuridicalOrganizations = new List<LegalEntity>{
-					new LegalEntity {
-						Recipient = new Recipient()
-					}
+					new LegalEntity {}
 				}
 			};
 			client = new Client(payer);

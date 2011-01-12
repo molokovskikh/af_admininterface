@@ -22,7 +22,7 @@ namespace Functional.Billing
 			using(new SessionScope())
 			{
 				var client = DataMother.CreateTestClientWithAddressAndUser();
-				client.Payer.JuridicalOrganizations[0].Recipient = Recipient.Queryable.First();
+				client.Payer.Recipient = Recipient.Queryable.First();
 				invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
 				invoice.Save();
 			}

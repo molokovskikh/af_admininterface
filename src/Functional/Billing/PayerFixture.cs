@@ -25,7 +25,7 @@ namespace Functional.Billing
 				var client = DataMother.CreateTestClientWithAddressAndUser();
 				payer = client.Payer;
 				var recipient = Recipient.Queryable.First();
-				client.Payer.JuridicalOrganizations[0].Recipient = recipient;
+				client.Payer.Recipient = recipient;
 				new Invoice(client.Payer, Period.January, new DateTime(2011, 1, 11)).Save();
 				new Payment{ Payer = client.Payer, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800, Recipient = recipient}.Save();
 			}
