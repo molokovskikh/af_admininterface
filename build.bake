@@ -5,7 +5,10 @@ import file from Migration.bake
 import file from Tools.bake
 import file from Test.bake
 import file from AppSupport.bake
+import System
 import System.Linq.Enumerable
+import System.Xml.Linq
+import System.Xml.XPath.Extensions from System.Xml.Linq
 
 Global(
 	Project : "AdminInterface",
@@ -14,12 +17,22 @@ Global(
 	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
+def Ask(question as string):
+	Console.Write(question)
+	return Console.ReadLine()
+
 task @default, [@Build]
 
-task @Build, [@BuildWebSite]:
+task @Build, [@BuildWebSite, @BuildBackground]:
 	oldProject = Globals.Project
 	Globals.Project = @Printer
+	project = @Printer
+	Engine.Tasks.First({t| t.Name == "BuildApp"}).Executed = false
 	Engine.Execute("BuildApp")
+	config = "output/$project/$project.exe.config"
+	doc = XDocument.Load(config)
+	doc.XPathSelectElement("//appSettings/add[@key=\"User\"]").Add(XAttribute("value", Ask("user for acdcserv:")))
+	doc.XPathSelectElement("//appSettings/add[@key=\"Password\"]").Add(XAttribute("value", Ask("password:")))
 	Globals.Project = oldProject
 	Rm("output/Printer/_PublishedWebsites", true)
 
@@ -28,5 +41,22 @@ task @DeployPrinter:
 	Globals.DeployTo = """\\acdcserv.adc.analit.net\Apps\Printer"""
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
 	Engine.Execute("WebDeploy")
+
+task @DeployBackground:
+	Globals.Project = "AdminInterface.Background"
+	Globals.DeployTo = """\\acdcserv.adc.analit.net\Apps\TopShelf\Services\AdminInterface.Background\"""
+	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
+	Engine.Execute("WebDeploy")
+
+task @BuildBackground:
+	oldProject = Globals.Project
+	Globals.Project = "AdminInterface.Background"
+	project = "AdminInterface.Background"
+	Engine.Tasks.First({t| t.Name == "BuildApp"}).Executed = false
+	Engine.Execute("BuildApp")
+	Rm("output/$project/_PublishedWebsites", true)
+	Cp("src/$project/app.release.config", "output/$project/$project.config")
+	Rm("output/$project/$project.*.config")
+	Globals.Project = oldProject
 
 task @deploy, [@Production, @Build, @Migrate, @Backup, @WebDeploy, @DeployPrinter, @SendDeployNotification]
