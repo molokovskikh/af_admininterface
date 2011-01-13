@@ -84,6 +84,7 @@
       <HintPath>..\..\lib\NHibernate.Linq.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -109,6 +110,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="..\AdminInterface\Views\Invoices\InvoiceBody.brail">
+      <Link>InvoiceBody.brail</Link>
+    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="App.release.config" />
   </ItemGroup>

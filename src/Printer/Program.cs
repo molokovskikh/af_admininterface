@@ -42,6 +42,9 @@ namespace Printer
 
 					var options = new BooViewEngineOptions();
 					options.AssembliesToReference.Add(typeof (Controller).Assembly);
+					options.NamespacesToImport.Add("Boo.Lang.Builtins");
+					options.NamespacesToImport.Add("AdminInterface.Helpers");
+
 					var loader = new FileAssemblyViewSourceLoader("");
 					loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "Printer"));
 					var brail = new StandaloneBooViewEngine(loader, options);
