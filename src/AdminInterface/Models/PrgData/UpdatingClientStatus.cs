@@ -9,9 +9,6 @@ namespace AdminInterface.Models.PrgData
 	[SerializableAttribute]
 	public class UpdatingClientStatus : IExtensibleDataObject
 	{
-		[NonSerializedAttribute]
-		private ExtensionDataObject extensionDataField;
-
 		public ExtensionDataObject ExtensionData { get; set; }
 
 		[DataMemberAttribute(Name = "_UserId")]

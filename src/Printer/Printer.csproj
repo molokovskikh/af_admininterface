@@ -94,7 +94,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PInvoke.cs" />
-    <Compile Include="ProcessStarter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Security\GenericSecurity.cs" />
   </ItemGroup>

@@ -63,7 +63,6 @@ namespace AdminInterface.Helpers
 				{
 					client = new StatisticServiceClient();
 					client.ClientCredentials.Windows.AllowedImpersonationLevel = TokenImpersonationLevel.Impersonation;
-					client.ClientCredentials.Windows.AllowNtlm = true;
 					action(client);
 					client.Close();
 				}

@@ -138,7 +138,7 @@ namespace Functional
 				browser.Link(Find.ByText("Региональные администраторы")).Click();
 				browser.Link(Find.ByText(_administratorLogin)).Click();
 				browser.TextField(Find.ByName("administrator.PhoneSupport")).TypeText("123-123123");
-				var id = Convert.ToUInt32(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).GetValue("value"));
+				var id = Convert.ToUInt32(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).GetAttributeValue("value"));
 
 				browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked = true;
 				browser.Button(Find.ByValue("Сохранить")).Click();

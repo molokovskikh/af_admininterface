@@ -301,7 +301,7 @@ WHERE PriceCode = ?Id", connection);
 						builder.AppendLine(String.Format("{0} - {1}", key, Session[key]));
 				}
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{}
 			builder.AppendLine("--------------");
 
