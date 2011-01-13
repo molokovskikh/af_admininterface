@@ -74,18 +74,23 @@ namespace AdminInterface.Background
 						try
 						{
 							invoice.Send();
+							if (_log.IsDebugEnabled)
+								_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
+									BindingHelper.GetDescription(invoice.Period),
+									invoice.Payer.GetInvocesAddress(),
+									invoice.Payer.ShortName,
+									invoice.Id);
 						}
 						catch (DoNotHaveContacts)
 						{
+							if (_log.IsDebugEnabled)
+								_log.DebugFormat("Счет {0} не отправлен тк не задана контактная информация для плательщика {1} - {2}",
+									invoice.Id,
+									invoice.Payer.Id,
+									invoice.Payer.ShortName);
+
 							MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
 						}
-
-						if (_log.IsDebugEnabled)
-							_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
-								BindingHelper.GetDescription(invoice.Period),
-								invoice.Payer.GetInvocesAddress(),
-								invoice.Payer.ShortName,
-								invoice.Id);
 
 						invoice.Update();
 						transaction.VoteCommit();
