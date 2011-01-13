@@ -93,14 +93,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PInvoke.cs" />
     <Compile Include="Program.cs" />
-    <Compile Include="Security\GenericSecurity.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface\AdminInterface.csproj">
       <Project>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</Project>
       <Name>AdminInterface</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Tools\Common.Tools\Common.Tools.csproj">
+      <Project>{72AFCFE8-C9E9-45FA-9698-BEE896A517A3}</Project>
+      <Name>Common.Tools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
