@@ -1,8 +1,9 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -70,9 +71,17 @@ namespace AdminInterface.Background
 				{
 					using (var transaction = new TransactionScope(OnDispose.Rollback))
 					{
-						invoice.Send();
+						try
+						{
+							invoice.Send();
+						}
+						catch (DoNotHaveContacts)
+						{
+							MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
+						}
+
 						if (_log.IsDebugEnabled)
-							_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
+							_log.DebugFormat("РЎС‡РµС‚ {3} РґР»СЏ РїР»Р°С‚РµР»СЊС‰РёРєР° {2} Р·Р° {0} РѕС‚РїСЂР°РІР»РµРЅ РЅР° Р°РґСЂРµСЃР° {1}",
 								BindingHelper.GetDescription(invoice.Period),
 								invoice.Payer.GetInvocesAddress(),
 								invoice.Payer.ShortName,

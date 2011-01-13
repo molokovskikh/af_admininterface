@@ -1,0 +1,3 @@
+﻿Не удалось отправить счет № ${invoice.Id}
+Договор ${invoice.Payer.Id}
+Плательщик ${invoice.Payer.ShortName}

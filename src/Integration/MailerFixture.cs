@@ -173,21 +173,41 @@ namespace Integration
 		[Test]
 		public void Send_invoice()
 		{
-			Invoice invoice;
 			using(new SessionScope())
 			{
-				var client = DataMother.CreateTestClientWithAddressAndUser();
-				client.Payer.Recipient = Recipient.Queryable.First();
-				invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
-				var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
-				group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
-				invoice.Save();
+				var invoice = CreateInvoice();
 
 				mailer.Invoice(invoice);
 				mailer.Send();
 			}
 
 			Assert.That(message.Body, Is.StringContaining("Примите счет за информационное обслуживание в ИС АналитФармация."));
+		}
+
+		[Test]
+		public void Broken_invoice()
+		{
+			using (new SessionScope())
+			{
+				var invoice = CreateInvoice();
+
+				mailer.DoNotHaveInvoiceContactGroup(invoice);
+				mailer.Send();
+
+				Assert.That(message.Body, Is.StringContaining(String.Format("Не удалось отправить счет № {0}", invoice.Id)));
+			}
+		}
+
+		private Invoice CreateInvoice()
+		{
+			Invoice invoice;
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			client.Payer.Recipient = Recipient.Queryable.First();
+			invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
+			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
+			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
+			invoice.Save();
+			return invoice;
 		}
 	}
 }

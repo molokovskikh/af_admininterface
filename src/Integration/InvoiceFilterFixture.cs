@@ -28,8 +28,8 @@ namespace Integration
 				invoices = filter.Find();
 			}
 
-			Assert.That(invoices.Count, Is.EqualTo(1));
-			Assert.That(invoices[0].Payer, Is.EqualTo(invoice.Payer));
+			Assert.That(invoices.Count, Is.GreaterThan(0));
+			Assert.That(invoices.First(i => i.Id == invoice.Id), Is.EqualTo(invoice.Payer));
 		}
 	}
 }

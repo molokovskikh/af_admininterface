@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq.Expressions;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -15,6 +16,13 @@ namespace AdminInterface.MonoRailExtentions
 
 		public MonorailMailer()
 		{}
+
+		public static void Deliver(Action<MonorailMailer> domail)
+		{
+			var mailer = new MonorailMailer();
+			domail(mailer);
+			mailer.Send();
+		}
 
 		public string Me()
 		{
@@ -110,10 +118,21 @@ namespace AdminInterface.MonoRailExtentions
 			Template = "Invoice";
 			Layout = "Print";
 			IsBodyHtml = true;
+
 			From = "billing@analit.net";
 			To = invoice.Payer.GetInvocesAddress();
 			Subject = String.Format("Счет за {0}", BindingHelper.GetDescription(invoice.Period));
 
+			PropertyBag["invoice"] = invoice;
+		}
+
+		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
+		{
+			Template = "DoNotHaveInvoiceContactGroup";
+
+			To = "billing@analit.net";
+			From = "billing@analit.net";
+			Subject = "Не удалось отправить счет";
 			PropertyBag["invoice"] = invoice;
 		}
 	}

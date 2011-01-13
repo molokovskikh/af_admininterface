@@ -43,6 +43,11 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "billing", Lazy = true)]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
+		public Payer()
+		{
+			InvoiceSettings = new InvoiceSettings();
+		}
+
 		[PrimaryKey]
 		public virtual uint PayerID { get; set; }
 
@@ -282,13 +287,30 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual string GetInvocesAddress()
 		{
-			return ContactGroupOwner.ContactGroups
+			var group = ContactGroupOwner.ContactGroups
 				.Where(g => g.Type == ContactGroupType.Invoice)
-				.First()
+				.FirstOrDefault();
+
+			if (group == null)
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, ShortName));
+
+			var contacts = group
 				.Contacts
 				.Where(c => c.Type == ContactType.Email)
 				.Select(c => c.ContactText)
 				.Implode();
+
+			if (String.IsNullOrWhiteSpace(contacts))
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, ShortName));
+
+			return contacts;
+		}
+	}
+
+	public class DoNotHaveContacts : Exception
+	{
+		public DoNotHaveContacts(string message) : base(message)
+		{
 		}
 	}
 }
