@@ -127,9 +127,12 @@ namespace AdminInterface.Models.Billing
 
 		public void Send()
 		{
-			var mailer = new MonorailMailer();
-			mailer.Invoice(this);
-			mailer.Send();
+			if (Payer.InvoiceSettings.EmailInvoice)
+			{
+				var mailer = new MonorailMailer();
+				mailer.Invoice(this);
+				mailer.Send();
+			}
 			SendToEmail = false;
 		}
 	}
