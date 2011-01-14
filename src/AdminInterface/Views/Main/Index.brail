@@ -175,7 +175,7 @@
 					<td class="statistic-value">
 						<% if IsDefined("ConfHL") and ConfHL != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateNormal)}">
-							<acronym title="В скобках указанно количество уникальных пользователей.">${ConfHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${ConfHL}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -197,7 +197,7 @@
 					<td class="statistic-value">
 						<% if IsDefined("CUHL") and CUHL != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateCumulative)}">
-							<acronym title="В скобках указанно количество уникальных пользователей.">${CUHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${CUHL}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -209,7 +209,7 @@
 					<td class="statistic-value">
 						<% if IsDefined("ADHL") and ADHL != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">
-							<acronym title="В скобках указанно количество уникальных пользователей.">${ADHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${ADHL}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -280,7 +280,7 @@
 						Принято:
 					</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указанно количество уникальных пользователей.">${OPLB}</acronym>
+						<acronym title="В скобках указано количество уникальных пользователей.">${OPLB}</acronym>
 					</td>
 				</tr>
 				<tr>
@@ -319,7 +319,7 @@
 				<tr>
 					<td class="statistic-label">Загружено:</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указанно количество уникальных прайс-листов.">${PriceDOKLB}</acronym>
+						<acronym title="В скобках указано количество уникальных прайс-листов.">${PriceDOKLB}</acronym>
 					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
 					<td class="statistic-value">
@@ -329,7 +329,7 @@
 				<tr>
 					<td class="statistic-label">Формализовано:</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указанно количество уникальных прайс-листов.">${PriceFOKLB}</acronym>
+						<acronym title="В скобках указано количество уникальных прайс-листов.">${PriceFOKLB}</acronym>
 					</td>
 					<td class="statistic-label">Последняя формализация:</td>
 					<td class="statistic-value">
@@ -343,13 +343,13 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Загружено:</td>
-					<td class="statistic-value"><acronym title="В скобках указанно количество уникальных клиентов.">${CountDownloadedWaybills}</acronym></td>
+					<td class="statistic-value"><acronym title="В скобках указано количество уникальных клиентов.">${CountDownloadedWaybills}</acronym></td>
 					<td class="statistic-label">Последняя загрузка:</td>
 					<td class="statistic-value">${LastDownloadedWaybillDate}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Разобрано:</td>
-					<td class="statistic-value"><acronym title="В скобках указанно количество уникальных клиентов.">${CountParsedWaybills}</acronym></td>
+					<td class="statistic-value"><acronym title="В скобках указано количество уникальных клиентов.">${CountParsedWaybills}</acronym></td>
 					<td class="statistic-label">Последний разбор:</td>
 					<td class="statistic-value">${LastParsedWaybillDate}</td>
 				</tr>
@@ -366,7 +366,7 @@
 				</tr>
 				<tr>
 					<td class="statistic-top-header" colspan=4>
-						В скобках указанно количество уникальных клиентов.
+						В скобках указано количество уникальных клиентов.
 					</td>
 				</tr>
 				<tr>

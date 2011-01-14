@@ -62,7 +62,6 @@ namespace Integration.Controllers
 		{
 			string legalName = null;
 			string legalFullName = null;
-			string legalAddress = null;
 			var client1 = DataMother.CreateTestClientWithPayer();
 			client1.MaskRegion = 1;
 			client1.Settings = new DrugstoreSettings
@@ -75,9 +74,9 @@ namespace Integration.Controllers
 				ShowNewDefecture = true,
 			};
 			client1.Settings.WorkRegionMask = 1;
-			RegionSettings[] regionSettings = new [] {
+			var regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
-			AdditionalSettings addsettings = new AdditionalSettings();
+			var addsettings = new AdditionalSettings();
 			addsettings.PayerExists = true;
 			var clientContacts = new[] {
 				new Contact{Id = 1, Type = 0, ContactText = "11@33.ru"}};
@@ -85,7 +84,7 @@ namespace Integration.Controllers
 
 			controller.RegisterClient(client1, 1, regionSettings, null, addsettings, "address", client1.Payer, 
 				client1.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
-			var CommandText = String.Format("select id, payerId, name, fullname, address from billing.LegalEntities where payerid = {0}", client1.Payer.PayerID);
+			var CommandText = String.Format("select id, payerId, name, fullname from billing.LegalEntities where payerid = {0}", client1.Payer.PayerID);
 			using (var connection1 = new MySqlConnection(Literals.GetConnectionString()))
 			{
 				connection1.Open();
@@ -95,7 +94,6 @@ namespace Integration.Controllers
 				{
 					while (reader.Read())
 					{
-						legalAddress = reader.GetString("Address");
 						legalFullName = reader.GetString("FullName");
 						legalName = reader.GetString("Name");
 					}
@@ -106,7 +104,6 @@ namespace Integration.Controllers
 			
 			Assert.That(legalName, Is.EqualTo(client1.Payer.ShortName));
 			Assert.That(legalFullName, Is.EqualTo(client1.Payer.JuridicalName));
-			Assert.That(legalAddress, Is.EqualTo(client1.Payer.JuridicalAddress));
 		}
 
 		[Test]
