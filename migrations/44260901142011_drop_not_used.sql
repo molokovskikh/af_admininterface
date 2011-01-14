@@ -1,0 +1,10 @@
+drop table billing.tariffs;
+drop table billing.Recivers;
+alter table Billing.Payers
+drop column Blocked,
+drop column BlockUp,
+drop column BlockingOn,
+drop column PrevUnBlockDate,
+drop column BlockDate,
+drop column BlockingDate,
+drop column ReciverId;
