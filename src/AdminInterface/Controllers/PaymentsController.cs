@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord.Linq;
@@ -75,6 +76,44 @@ namespace AdminInterface.Controllers
 			}
 		}
 
+		public void SavePayments()
+		{
+			var paymenst = (List<Payment>)Session["payments"];
+			foreach (var payment in paymenst)
+				payment.Save();
+
+			RedirectToAction("Index",
+				new Dictionary<string, string>{
+					{"filter.Period.Begin", paymenst.Min(p => p.PayedOn).ToShortDateString() },
+					{"filter.Period.End", paymenst.Max(p => p.PayedOn).ToShortDateString() }
+				});
+		}
+
+		public void CancelPayments()
+		{
+			Session["payments"] = null;
+			RedirectToReferrer();
+		}
+
+		public void ProcessPayments()
+		{
+			if (IsPost)
+			{
+				var file = Request.Files["inputfile"] as HttpPostedFile;
+				if (file == null)
+				{
+					PropertyBag["Message"] = Message.Error("Нужно выбрать файл для загрузки");
+					return;
+				}
+				Session["payments"] = Payment.ParsePayment(file.InputStream);
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["payments"] = Session["payments"];
+			}
+		}
+
 		[return: JSONReturnBinder]
 		public object SearchPayer(string term)
 		{
@@ -85,7 +124,7 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} ��� {2}", p.Id, p.ShortName, p.INN)
+					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.ShortName, p.INN)
 				});
 		}
 	}

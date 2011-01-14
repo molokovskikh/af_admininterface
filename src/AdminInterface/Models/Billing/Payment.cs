@@ -1,5 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
@@ -125,6 +130,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public decimal Sum { get; set; }
 
+		[Property]
+		public string Comment { get; set; }
+
 		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 
@@ -135,6 +143,39 @@ namespace AdminInterface.Models.Billing
 		{
 			Payer.Balance += Sum;
 			RegistredOn = DateTime.Now;
+		}
+
+		public static List<Payment> ParsePayment(string file)
+		{
+			using(var stream = File.OpenRead(file))
+				return ParsePayment(stream);
+		}
+
+		public static List<Payment> ParsePayment(Stream file)
+		{
+			var doc = XDocument.Load(file);
+			var accountNumber = doc.XPathSelectElement("XMLExport/accDescr/AccountCode").Value;
+			var recipient = Recipient.Queryable.FirstOrDefault(r => r.BankAccountNumber == accountNumber);
+			var list = new List<Payment>();
+			foreach (var node in doc.XPathSelectElements("//payment"))
+			{
+				var date = node.XPathSelectElement("DatePorucheniya").Value;
+				var sum = node.XPathSelectElement("Summa").Value;
+				var comment = node.XPathSelectElement("AssignPayment").Value;
+				var inn = node.XPathSelectElement("Payer/INN").Value;
+				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
+
+				list.Add(new Payment {
+					PayedOn = DateTime.Parse(date, CultureInfo.GetCultureInfo("ru-RU")),
+					RegistredOn = DateTime.Now,
+					Sum = Decimal.Parse(sum, CultureInfo.InvariantCulture),
+					Comment = comment,
+					Payer = payer,
+					Recipient = recipient
+				});
+			}
+
+			return list;
 		}
 	}
 }

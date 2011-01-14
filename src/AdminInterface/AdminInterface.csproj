@@ -185,7 +185,6 @@
     <Compile Include="Models\Billing\Report.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
-    <Compile Include="Models\Billing\Tariff.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\Document.cs" />
@@ -473,6 +472,7 @@
     <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
     <None Include="Views\Mail\PasswordChange.brail" />
     <None Include="Views\Payments\Index.brail" />
+    <None Include="Views\Payments\ProcessPayments.brail" />
     <None Include="Views\Recipients\Edit.brail" />
     <None Include="Views\Recipients\Index.brail" />
     <None Include="Views\RegionalAdmin\Add.brail" />

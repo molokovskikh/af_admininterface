@@ -151,6 +151,9 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual decimal Balance { get; set; }
 
+		[Property(NotNull = true, Default = "0")]
+		public virtual bool SendPaymentNotification { get; set; }
+
 		[Nested]
 		public virtual InvoiceSettings InvoiceSettings { get; set; }
 

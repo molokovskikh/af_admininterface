@@ -103,8 +103,6 @@ namespace AdminInterface.Controllers
 							organization.Payer = currentPayer;
 							organization.Name = currentPayer.ShortName;
 							organization.FullName = currentPayer.JuridicalName;
-							organization.Address = currentPayer.JuridicalAddress;
-							organization.ReceiverAddress = currentPayer.ReceiverAddress;
 							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
 							organization.Save();
 						}

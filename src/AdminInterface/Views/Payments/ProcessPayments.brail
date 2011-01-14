@@ -1,0 +1,49 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Загрузка выписки", "")]} %>
+<h3>Загрузка выписки</h3>
+
+<div class=block>
+	<form method=post enctype="multipart/form-data">
+		<label>Выберете файл для загрузки в формате xml</label><br>
+		<input type=file name="inputfile"><br>
+		<input type=submit value="Загрузить">
+	</form>
+</div>
+
+<div class=block>
+	<form method=post action="${siteroot}/Payments/SavePayments" style="display:inline">
+		<input type=submit value="Сохранить">
+	</form>
+
+	<form method=post action="${siteroot}/Payments/CancelPayments" style="display:inline">
+		<input type=submit value="Очистить">
+	</form>
+</div>
+
+<table class=DataTable>
+	<% if payments and payments.Count: %>
+	<tr>
+		<th>${app.Sortable("Получатель", "recipient")}</th>
+		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+		<th>${app.Sortable("Плательщик", "payer")}</th>
+		<th>${app.Sortable("Сумма", "sum")}</th>
+		<th>${app.Sortable("Примечание", "comment")}</th>
+	</tr>
+	<% for i, payment in enumerate(payments): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${payment.Recipient.Name}</td>
+		<td>${payment.PayedOn.ToShortDateString()}</td>
+		<td>
+			<% if payment.Payer: %>
+				${app.LinkTo(payment.Payer)}
+			<% end %>
+		</td>
+		<td>${payment.Sum}</td>
+		<td>!{payment.Comment}</td>
+	</tr>
+	<% end %>
+	<% else: %>
+	<tr class="EmptyData">
+		<td>По вашему запросу ничего не найдено</td>
+	</tr>
+	<% end %>
+</table>

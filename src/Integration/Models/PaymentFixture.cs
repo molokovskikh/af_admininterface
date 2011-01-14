@@ -1,133 +1,34 @@
-﻿/*
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Xml.Linq;
+using System.Xml.XPath;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Linq;
 using NUnit.Framework;
 
 namespace Integration.Models
 {
-	[TestFixture, Ignore("Работа по биллингу заморожена")]
+	[TestFixture]
 	public class PaymentFixture
 	{
 		[Test]
-		public void Debit_is_a_sum_of_charge()
+		public void Parse_payments()
 		{
-			Payment.DeleteAll();
-			var payer1 = new Payer{ ShortName = "test1" };
-			var payer2 = new Payer { ShortName = "test1" };
-			payer1.Save();
-			payer2.Save();
-
-			new Payment
-				{
-					Name = "Оплата",
-					PaymentType = PaymentType.ChargeOff,
-					PayedOn = DateTime.Today.AddDays(-10),
-					Sum = 500,
-					Payer = payer2,
-				}.Save();
-
-			new Payment
-				{
-					Name = "Оплата",
-					PaymentType = PaymentType.ChargeOff,
-					PayedOn = DateTime.Today.AddDays(-10),
-					Sum = 500,
-					Payer = payer1,
-				}.Save();
-
-			new Payment
+			using (new SessionScope())
 			{
-				Name = "Списание",
-				PaymentType = PaymentType.Charge,
-				PayedOn = DateTime.Today.AddDays(-5),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.ChargeOff,
-				PayedOn = DateTime.Today.AddDays(-5),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.ChargeOff,
-				PayedOn = DateTime.Today.AddDays(1),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			Assert.That(payer1.DebitOn(DateTime.Today), Is.EqualTo(600));
-
-			payer1.Delete();
-			payer2.Delete();
-		}
-
-		[Test]
-		public void Credit_is_a_sum_of_charge_offs()
-		{
-			Payment.DeleteAll();
-			var payer1 = new Payer { ShortName = "test1" };
-			var payer2 = new Payer { ShortName = "test1" };
-			payer1.Save();
-			payer2.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.Charge,
-				PayedOn = DateTime.Today.AddDays(-10),
-				Sum = 500,
-				Payer = payer2,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.Charge,
-				PayedOn = DateTime.Today.AddDays(-10),
-				Sum = 500,
-				Payer = payer1,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Списание",
-				PaymentType = PaymentType.ChargeOff,
-				PayedOn = DateTime.Today.AddDays(-5),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.Charge,
-				PayedOn = DateTime.Today.AddDays(-5),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			new Payment
-			{
-				Name = "Оплата",
-				PaymentType = PaymentType.Charge,
-				PayedOn = DateTime.Today.AddDays(1),
-				Sum = 100,
-				Payer = payer1,
-			}.Save();
-
-			Assert.That(payer1.CreditOn(DateTime.Today), Is.EqualTo(600));
-
-			payer1.Delete();
-			payer2.Delete();
+				var file = @"..\..\..\TestData\20110114104609.xml";
+				var payments = Payment.ParsePayment(file);
+				Assert.That(payments.Count, Is.GreaterThan(0));
+				var payment = payments.First();
+				Assert.That(payment.Sum, Is.EqualTo(800));
+				Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));
+				Assert.That(payment.Recipient.FullName, Is.EqualTo("ООО \"Аналитический центр\""));
+				Assert.That(payment.Comment, Is.EqualTo("Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС)."));
+			}
 		}
 	}
 }
-*/

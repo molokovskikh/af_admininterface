@@ -102,7 +102,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 			PropertyBag["User"] = user;
 			PropertyBag["Address"] = address;
-			PropertyBag["Tariffs"] = Tariff.FindAll();
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["TotalSum"] = payer.TotalSum;
@@ -439,10 +438,6 @@ namespace AdminInterface.Controllers
 				var organization = LegalEntity.Find(juridicalOrganization.Id);
 				organization.Name = juridicalOrganization.Name;
 				organization.FullName = juridicalOrganization.FullName;
-				organization.Inn = juridicalOrganization.Inn;
-				organization.Kpp = juridicalOrganization.Kpp;
-				organization.ReceiverAddress = juridicalOrganization.ReceiverAddress;
-				organization.Address = juridicalOrganization.Address;
 
 				organization.Update();
 				scope.VoteCommit();

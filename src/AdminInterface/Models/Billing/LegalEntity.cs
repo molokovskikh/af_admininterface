@@ -15,18 +15,6 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string FullName { get; set; }
 
-		[Property]
-		public virtual string Address { get; set; }
-
-		[Property]
-		public virtual string ReceiverAddress { get; set; }
-
-		[Property]
-		public virtual string Inn { get; set; }
-
-		[Property]
-		public virtual string Kpp { get; set; }
-
 		[BelongsTo("PayerId")]
 		public virtual Payer Payer { get; set; }
 
