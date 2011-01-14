@@ -128,7 +128,7 @@ namespace Integration.Controllers
 					new RegionSettings
 						{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
 				};
-				AdditionalSettings addsettings = new AdditionalSettings();
+				var addsettings = new AdditionalSettings();
 				addsettings.PayerExists = true;
 				var clientContacts = new[]
 				{

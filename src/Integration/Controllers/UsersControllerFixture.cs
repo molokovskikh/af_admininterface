@@ -9,6 +9,8 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -60,6 +62,36 @@ namespace Integration.Controllers
 			info2.Refresh();
 			Assert.That(info1.AFCopyId, Is.Empty);
 			Assert.That(info2.AFCopyId, Is.EqualTo("12345"));
+		}
+
+		[Test]
+		public void Add_user()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			var client1 = DataMother.CreateClientAndUsers();
+			var address = new Address
+			{
+				Client = client,
+				Value = "тестовый адрес"
+			};
+			client.AddAddress(address);
+			user1 = client.Users[0];
+			var user = new User(client);
+			var clientContacts = new[] {
+				new Contact{Id = 1, Type = 0, ContactText = "4411@33.ru, hffty@jhg.ru"}};
+			var regionSettings = new [] {
+				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
+			var person = new[] {new Person()};
+			using (new SessionScope())
+			{
+				controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
+			}
+			var mails = ArHelper.WithSession(s => s
+				.CreateSQLQuery(@"select sentto from logs.passwordchange where targetusername = :userId")
+			    .SetParameter("userId", user.Id)
+			    .UniqueResult());
+ 
+			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru, 11@33.ru, hgf@jhgj.ut"));
 		}
 	}
 }
