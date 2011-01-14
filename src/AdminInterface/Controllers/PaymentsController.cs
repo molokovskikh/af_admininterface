@@ -1,4 +1,4 @@
-Ôªøusing System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -17,6 +17,7 @@ namespace AdminInterface.Controllers
 		public Recipient Recipient { get; set; }
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
+		public bool ShowOnlyUnknown { get; set; }
 
 		public PaymentFilter()
 		{
@@ -38,6 +39,9 @@ namespace AdminInterface.Controllers
 
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
+
+			if (ShowOnlyUnknown)
+				criteria.Add(Expression.IsNull("Payer"));
 
 			return ArHelper.WithSession(s =>
 				criteria.GetExecutableCriteria(s)
@@ -102,7 +106,7 @@ namespace AdminInterface.Controllers
 				var file = Request.Files["inputfile"] as HttpPostedFile;
 				if (file == null)
 				{
-					PropertyBag["Message"] = Message.Error("–ù—É–∂–Ω–æ –≤—ã–±—Ä–∞—Ç—å —Ñ–∞–π–ª –¥–ª—è –∑–∞–≥—Ä—É–∑–∫–∏");
+					PropertyBag["Message"] = Message.Error("ÕÛÊÌÓ ‚˚·‡Ú¸ Ù‡ÈÎ ‰Îˇ Á‡„ÛÁÍË");
 					return;
 				}
 				Session["payments"] = Payment.ParsePayment(file.InputStream);
@@ -124,7 +128,7 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} –ò–ù–ù {2}", p.Id, p.ShortName, p.INN)
+					label = String.Format("[{0}]. {1} »ÕÕ {2}", p.Id, p.ShortName, p.INN)
 				});
 		}
 	}
