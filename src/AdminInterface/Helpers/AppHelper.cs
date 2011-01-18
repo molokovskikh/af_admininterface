@@ -167,6 +167,11 @@ namespace AdminInterface.Helpers
 
 		public string FilterFor(string name)
 		{
+			return FilterFor(GetLabel(name), name);
+		}
+
+		public string FilterFor(string label, string name)
+		{
 			var value = GetValue(name);
 			var valueType = GetValueType(name);
 			var input = new StringBuilder();
@@ -186,8 +191,9 @@ namespace AdminInterface.Helpers
 					var values = BindingHelper.GetDescriptionsDictionary(arguments[0])
 						.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
 						.ToList();
-					Label(name, input);
-					EmptyableSelect(name, input, value, values);
+					FilterTemplate(input,
+						label,
+						EmptyableSelect(name, value, values));
 				}
 			}
 			else if (typeof(IEnumerable).IsAssignableFrom(valueType))
@@ -203,28 +209,43 @@ namespace AdminInterface.Helpers
 					let itemName = item.Name
 					select new Tuple<string, string>(id.ToString(), itemName.ToString())).ToList();
 
-				Label(valueName, input);
 				valueName += ".Id";
-				EmptyableSelect(valueName, input, selectedValue, items);
+				FilterTemplate(input,
+					label,
+					EmptyableSelect(valueName, selectedValue, items));
 			}
 			else if (typeof(DatePeriod).IsAssignableFrom(valueType))
 			{
 				PeriodCalendar(input, value);
+			}
+			else if (typeof(bool).IsAssignableFrom(valueType))
+			{
+				var helper = new FormHelper(Context);
+				FilterTemplate(input,
+					label,
+					helper.CheckboxField(name)
+				);
 			}
 			return input.ToString();
 		}
 
 		private void Text(StringBuilder input, object value, string name)
 		{
-			var label = "Введите текст для поиска:";
-			input.Append("<tr>");
-			input.Append("<td class='filter-label'>");
-			input.Append(label);
-			input.Append("</td>");
-			input.Append("<td colspan=2>");
-			input.AppendFormat("<input type=text name={0} value='{1}'>", name, value);
-			input.Append("</td>");
-			input.Append("</tr>");
+			FilterTemplate(input,
+				"Введите текст для поиска:",
+				String.Format("<input type=text name={0} value='{1}'>", name, value));
+		}
+
+		private void FilterTemplate(StringBuilder result, string label, string input)
+		{
+			result.Append("<tr>");
+			result.Append("<td class='filter-label'>");
+			result.Append(label);
+			result.Append("</td>");
+			result.Append("<td colspan=2>");
+			result.Append(input);
+			result.Append("</td>");
+			result.Append("</tr>");
 		}
 
 		private void PeriodCalendar(StringBuilder input, object value)
@@ -250,9 +271,9 @@ namespace AdminInterface.Helpers
 				String.Format("<input type='hidden' id='endDate' name='filter.Period.End' value='{0}'>", ((DatePeriod)value).End.ToShortDateString()));
 		}
 
-		private void EmptyableSelect(string name, StringBuilder input, object currentValue, IEnumerable<Tuple<string, string>> items)
+		private string EmptyableSelect(string name, object currentValue, IEnumerable<Tuple<string, string>> items)
 		{
-			input.Append("<td colspan=2>");
+			var input = new StringBuilder();
 			input.AppendFormat("<select name='{0}'>", name);
 			input.Append("<option>Все</option>");
 			foreach (var item in items)
@@ -263,17 +284,7 @@ namespace AdminInterface.Helpers
 					input.AppendFormat("<option value={0}>{1}</option>", item.Item1, item.Item2);
 			}
 			input.Append("</select>");
-			input.Append("</td>");
-			input.Append("</tr>");
-		}
-
-		private void Label(string name, StringBuilder input)
-		{
-			var label = GetLabel(name);
-			input.Append("<tr>");
-			input.Append("<td class='filter-label'>");
-			input.Append(label);
-			input.Append("</td>");
+			return input.ToString();
 		}
 
 		private string GetLabel(string name)
