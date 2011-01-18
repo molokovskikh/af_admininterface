@@ -49,6 +49,19 @@ namespace AdminInterface.Controllers
 		}
 	}
 
+	public class PaymentStatistics
+	{
+		public PaymentStatistics(List<Payment> payments)
+		{
+			Count = payments.Count;
+			Sum = payments.Sum(p => p.Sum);
+		}
+
+		public int Count { get; set; }
+		public decimal Sum { get; set; }
+	}
+
+
 	[Layout("GeneralWithJQueryOnly")]
 	public class PaymentsController : ARSmartDispatcherController
 	{
@@ -57,8 +70,10 @@ namespace AdminInterface.Controllers
 			if (filter.Recipient != null && filter.Recipient.Id == 0)
 				filter.Recipient = null;
 
+			var payments = filter.Find();
 			PropertyBag["filter"] = filter;
-			PropertyBag["payments"] = filter.Find();
+			PropertyBag["payments"] = payments;
+			PropertyBag["stat"] = new PaymentStatistics(payments);
 		}
 
 		public void New()

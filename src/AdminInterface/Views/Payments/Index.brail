@@ -15,6 +15,10 @@ ${app.FilterFor("filter.SearchText")}
 ${app.FilterFor("Показывать только неопознанные:", "filter.ShowOnlyUnknown")}
 ${app.EndFormFor("filter")}
 
+<div class=block>
+Всего платежей ${stat.Count} на сумму ${stat.Sum}р
+</div>
+
 <table class=DataTable>
 	<% if payments.Count: %>
 	<tr>
