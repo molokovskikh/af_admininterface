@@ -1,0 +1,116 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Редактирование платежа
+<% end %>
+
+<% component Bubble, {"bredcrumbs" :
+	[("Платежи", "${context.Request.UrlReferrer}"),
+		("Редактирование платежа", "")]} %>
+
+<script>
+	$(function () {
+
+		$("form").validate();
+
+		$("#payment_Payer_Name").autocomplete({
+			source: "SearchPayer",
+			minLength: 2,
+			select: function (event, ui) {
+				$("#payment_Payer_PayerId").val(ui.item.id)
+			}
+		});
+		//$("#payer").focus();
+
+		$.ui.autocomplete.prototype._renderItem = function (ul, item) {
+			uri = "${siteroot}/Billing/Edit?billingcode=" + item.id;
+			return $("<li></li>")
+				.data("item.autocomplete", item)
+				.append("<a href='" + uri + "'>" + item.label + "</a>")
+				.appendTo(ul);
+		};
+	});
+</script>
+
+<% if warning = payment.GetWarning(): %>
+<div class="err flash">
+	${warning}
+</div>
+<% end %>
+
+<form method="post">
+	<% if payment.Id == 0: %>
+	${FormHelper.HiddenField("payment.Id", payment.GetHashCode())}
+	<% else: %>
+	${FormHelper.HiddenField("payment.Id")}
+	<% end %>
+	${FormHelper.HiddenField("payment.Payer.PayerId")}
+	<table>
+
+		<tr>
+			<td>
+				ИНН отправителя:
+			</td>
+			<td>${payment.Inn}</td>
+		</tr>
+		<tr>
+			<td>
+				Примечание:
+			</td>
+			<td>
+				!{payment.Comment}
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				Дата:
+			</td>
+			<td>
+				<input type=text name="payment.PayedOn" value="${payment.PayedOn}" class="input-date required">
+				<input type="button" class="CalendarInput" />
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Сумма:
+			</td>
+			<td>
+				<input type=text name="payment.Sum" value="${payment.Sum}" class="input-sum required">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				№ документа:
+			</td>
+			<td>
+				<input type=text name="payment.DocumentNumber" value="${payment.DocumentNumber}">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Получатель:
+			</td>
+			<td>
+				<select name="payment.Recipient.Id">
+					<% for recipient in recipients: %>
+					<option value=${recipient.Id} ${"selected" if payment.Recipient and recipient.Id == payment.Recipient.Id}>
+					${recipient.Name}
+					</option>
+					<% end %>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Плательщик:
+			</td>
+			<td>
+				${FormHelper.TextField("payment.Payer.Name")}
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<input type=submit value="Сохранить" />
+			</td>
+		</tr>
+	</table>
+</form>

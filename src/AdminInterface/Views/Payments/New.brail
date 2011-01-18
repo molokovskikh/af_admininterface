@@ -4,6 +4,9 @@
 
 <script>
 	$(function () {
+
+		$("form").validate();
+
 		$("#payer").autocomplete({
 			source: "SearchPayer",
 			minLength: 2,
@@ -33,6 +36,7 @@
 			<th>Плательщик</th>
 			<th>Дата платежа</th>
 			<th>Плательщик</th>
+			<th>Номер документа</th>
 			<th>Сумма</th>
 		</tr>
 		<tr>
@@ -44,14 +48,18 @@
 				</select>
 			</td>
 			<td>
-				<input type=text class="input-date" name=Payment.PayedOn value=${DateTime.Today}>
+				<input type=text name=Payment.PayedOn value=${DateTime.Today} class="input-date required">
+				<input type="button" class="CalendarInput" />
 			</td>
 			<td>
 				<input type=hidden id="payment_payer_id" name=Payment.Payer.PayerId>
-				<input type=text id=payer>
+				<input type=text id=payer class="required">
 			</td>
 			<td>
-				<input type=text class="input-sum" name=Payment.Sum>
+				<input type=text name=Payment.DocumentNumber>
+			</td>
+			<td>
+				<input type=text name=Payment.Sum class="input-sum required">
 			</td>
 			<td>
 				<input type=submit value="Добавить">
@@ -64,6 +72,7 @@
 <table class=DataTable>
 	<% if payments.Count: %>
 	<tr>
+		<th></th>
 		<th>${app.Sortable("Получатель", "recipient")}</th>
 		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
 		<th>${app.Sortable("Плательщик", "payer")}</th>
@@ -72,6 +81,7 @@
 	</tr>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${app.LinkTo(payment, "Редактировать", @Edit)}</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn}</td>
 		<td>${payment.Sum}</td>

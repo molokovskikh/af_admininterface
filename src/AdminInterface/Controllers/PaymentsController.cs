@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -104,9 +104,9 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				var file = Request.Files["inputfile"] as HttpPostedFile;
-				if (file == null)
+				if (file == null || file.ContentLength == 0)
 				{
-					PropertyBag["Message"] = Message.Error("Нужно выбрать файл для загрузки");
+					PropertyBag["Message"] = Message.Error("РќСѓР¶РЅРѕ РІС‹Р±СЂР°С‚СЊ С„Р°Р№Р» РґР»СЏ Р·Р°РіСЂСѓР·РєРё");
 					return;
 				}
 				Session["payments"] = Payment.ParsePayment(file.InputStream);
@@ -115,6 +115,51 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payments"] = Session["payments"];
+			}
+		}
+
+		public void EditTemp(uint id)
+		{
+			var payments = (List<Payment>)Session["payments"];
+			var payment = payments.First(p => p.GetHashCode() == id);
+			if (IsPost)
+			{
+				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
+				if (payment.Payer != null && !String.IsNullOrEmpty(payment.Inn))
+				{
+					payment.Payer.INN = payment.Inn;
+					payment.Payer.Save();
+				}
+				Flash["Message"] = Message.Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["payment"] = payment;
+				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				RenderView("Edit");
+			}
+		}
+
+		public void Edit(uint id)
+		{
+			var payment = Payment.TryFind(id);
+			if (IsPost)
+			{
+				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
+				if (payment.Payer != null && !String.IsNullOrEmpty(payment.Inn))
+				{
+					payment.Payer.INN = payment.Inn;
+					payment.Payer.Save();
+				}
+				payment.Update();
+				Flash["Message"] = Message.Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["payment"] = payment;
+				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 			}
 		}
 
@@ -128,7 +173,7 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.ShortName, p.INN)
+					label = String.Format("[{0}]. {1} РРќРќ {2}", p.Id, p.ShortName, p.INN)
 				});
 		}
 	}

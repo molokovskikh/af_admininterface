@@ -24,11 +24,16 @@ namespace AdminInterface.Helpers
 
 		public string LinkTo(object item, string action)
 		{
+			if (item == null)
+				return "";
 			return LinkTo(item, ((dynamic)item).Name, action);
 		}
 
 		public string LinkTo(object item, object label, string action)
 		{
+			if (item == null)
+				return "";
+
 			var clazz = "";
 			if (item is Address && !((Address)item).Enabled)
 				clazz = "DisabledByBilling";
