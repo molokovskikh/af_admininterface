@@ -31,7 +31,10 @@ ${app.EndFormFor("filter")}
 	</tr>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>${app.LinkTo(payment, "Редактировать", @Edit)}</td>
+		<td>
+			${app.LinkTo(payment, "Редактировать", @Edit)}
+			${app.LinkTo(payment, "Удалить", @Delete)}
+		</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
 		<td>${app.LinkTo(payment.Payer)}</td>

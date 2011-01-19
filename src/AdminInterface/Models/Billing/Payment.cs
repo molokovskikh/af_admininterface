@@ -6,6 +6,7 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using AdminInterface.Controllers;
+using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
@@ -232,6 +233,40 @@ namespace AdminInterface.Models.Billing
 				&& p.PayedOn == PayedOn
 				&& p.Sum == Sum
 				&& p.DocumentNumber == DocumentNumber) != null;
+		}
+
+		public void Cancel()
+		{
+			if (Payer != null)
+				Payer.Balance -= Sum;
+
+			Payer.Update();
+			Delete();
+		}
+
+		public void DoUpdate()
+		{
+			if (Payer != null && !String.IsNullOrEmpty(Inn))
+			{
+				Payer.INN = Inn;
+				Payer.Save();
+			}
+
+			var oldPayer = this.OldValue(p => p.Payer);
+			var oldSum = this.OldValue(p => p.Sum);
+			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.Sum))
+			{
+				if (oldPayer != null)
+				{
+					oldPayer.Balance -= oldSum;
+					oldPayer.Save();
+				}
+				if (Payer != null)
+				{
+					Payer.Balance += Sum;
+					Payer.Update();
+				}
+			}
 		}
 	}
 }

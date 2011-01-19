@@ -97,7 +97,7 @@ namespace AdminInterface.Controllers
 
 		public void SavePayments()
 		{
-			var paymenst = (List<Payment>)Session["payments"];
+			var paymenst = TempPayments();
 			foreach (var payment in paymenst)
 				payment.Save();
 
@@ -135,8 +135,7 @@ namespace AdminInterface.Controllers
 
 		public void EditTemp(uint id)
 		{
-			var payments = (List<Payment>)Session["payments"];
-			var payment = payments.First(p => p.GetHashCode() == id);
+			var payment = FindTempPayment(id);
 			if (IsPost)
 			{
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
@@ -156,18 +155,37 @@ namespace AdminInterface.Controllers
 			}
 		}
 
+		private Payment FindTempPayment(uint id)
+		{
+			return TempPayments().First(p => p.GetHashCode() == id);
+		}
+
+		private List<Payment> TempPayments()
+		{
+			return (List<Payment>)Session["payments"];
+		}
+
+		public void Delete(uint id)
+		{
+			var payment = Payment.Find(id);
+			payment.Cancel();
+			RedirectToReferrer();
+		}
+
+		public void DeleteTemp(uint id)
+		{
+			var payment = FindTempPayment(id);
+			TempPayments().Remove(payment);
+			RedirectToReferrer();
+		}
+
 		public void Edit(uint id)
 		{
 			var payment = Payment.TryFind(id);
 			if (IsPost)
 			{
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
-				if (payment.Payer != null && !String.IsNullOrEmpty(payment.Inn))
-				{
-					payment.Payer.INN = payment.Inn;
-					payment.Payer.Save();
-				}
-				payment.Update();
+				payment.DoUpdate();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}

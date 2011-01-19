@@ -34,6 +34,7 @@
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
 			<a href="${siteroot}/Payments/${payment.GetHashCode()}/EditTemp">Редактировать</a>
+			<a href="${siteroot}/Payments/${payment.GetHashCode()}/DeleteTemp">Удалить</a>
 		</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
