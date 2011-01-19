@@ -59,7 +59,7 @@
 					<asp:BoundField HeaderText="Дата" DataField="WriteTime" SortExpression="WriteTime" />
 					<asp:BoundField HeaderText="Оператор" DataField="UserName" SortExpression="UserName" />
 					<asp:HyperLinkField DataTextField="ShortName" HeaderText="Клиент" SortExpression="ShortName" DataNavigateUrlFields="FirmCode" DataNavigateUrlFormatString="Client/{0}" />
-					<asp:HyperLinkField DataTextField="Login" HeaderText="Пользователь" SortExpression="Login" DataNavigateUrlFields="Login" DataNavigateUrlFormatString="users/{0}/edit" />
+					<asp:HyperLinkField DataTextField="Login" HeaderText="Пользователь" SortExpression="Login" DataNavigateUrlFields="Id" DataNavigateUrlFormatString="users/{0}/edit" />
 					<asp:BoundField HeaderText="Регион" DataField="Region" SortExpression="Region" />
 					<asp:BoundField HeaderText="Сообщение" DataField="Message" SortExpression="Message" />
 				</Columns>

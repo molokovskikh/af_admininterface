@@ -1,6 +1,6 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
 									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
-									  ("Пользователь ${user.Login}", "${siteroot}/users/${user.Login}/edit"),
+									  ("Пользователь ${user.Login}", "${siteroot}/users/${user.Id}/edit"),
 									  ("Настройка пользователя", "")]} %>
 									  
 <h2>

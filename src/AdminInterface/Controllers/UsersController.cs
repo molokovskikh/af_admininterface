@@ -123,9 +123,9 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void Edit(string login)
+		public void Edit(uint id)
 		{
-			var user = User.GetByLogin(login);
+			var user = User.GetById(id);
 			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			PropertyBag["admin"] = SecurityContext.Administrator;
@@ -174,13 +174,13 @@ namespace AdminInterface.Controllers
 			}
 
 			Flash["Message"] = new Message("Сохранено");
-			RedirectUsingRoute("users", "Edit", new {login = user.Login});
+			RedirectUsingRoute("users", "Edit", new {id = user.Id});
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
-		public void ChangePassword(string login)
+		public void ChangePassword(uint id)
 		{
-			var user = User.GetByLogin(login);
+			var user = User.GetById(id);
 			var client = user.Client;
 
 			SecurityContext.Administrator.CheckClientPermission(client);
@@ -346,9 +346,9 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void UserSettings(string login)
+		public void UserSettings(uint id)
 		{
-			var user = User.GetByLogin(login);
+			var user = User.GetById(id);
 			PropertyBag["user"] = user;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
@@ -365,7 +365,7 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			Flash["Message"] = Message.Notify("Сохранено");
-			RedirectUsingRoute("users", "Edit", new { login = user.Login });
+			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
 	}
 }

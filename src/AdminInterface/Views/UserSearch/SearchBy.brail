@@ -61,7 +61,7 @@ end
             <td>${item.UserId}</td>            
             <td>${LinkHelper.Client(siteroot, item.ClientId, item.ClientName)}</td>            
             <td>
-                <a href="${siteroot}/users/${item.Login}/edit">${item.Login}</a>
+                <a href="${siteroot}/users/${item.UserId}/edit">${item.Login}</a>
             </td>
             <td>${item.UserName}</td>
             <td>${item.RegionName}</td>

@@ -14,6 +14,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using MySql.Data.MySqlClient;
@@ -60,8 +61,6 @@ namespace Integration.Controllers
 		[Test]
 		public void Create_LegalEntity()
 		{
-			string legalName = null;
-			string legalFullName = null;
 			var client1 = DataMother.CreateTestClientWithPayer();
 			client1.MaskRegion = 1;
 			client1.Settings = new DrugstoreSettings
@@ -84,26 +83,19 @@ namespace Integration.Controllers
 
 			controller.RegisterClient(client1, 1, regionSettings, null, addsettings, "address", client1.Payer, 
 				client1.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
-			var CommandText = String.Format("select id, payerId, name, fullname from billing.LegalEntities where payerid = {0}", client1.Payer.PayerID);
-			using (var connection1 = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection1.Open();
-				var command = new MySqlCommand(CommandText, connection1);
 
-				using (var reader = command.ExecuteReader())
-				{
-					while (reader.Read())
-					{
-						legalFullName = reader.GetString("FullName");
-						legalName = reader.GetString("Name");
-					}
-					reader.Close();
-				}
-				connection1.Close();
-			}
+			var legFullName = ArHelper.WithSession(s => s
+			    .CreateSQLQuery(@"select fullname from billing.LegalEntities where payerid = :payerid")
+			    .SetParameter("payerid", client1.Payer.PayerID)
+			    .UniqueResult());
+
+			var legName = ArHelper.WithSession(s => s
+				.CreateSQLQuery(@"select name from billing.LegalEntities where payerid = :payerid")
+				.SetParameter("payerid", client1.Payer.PayerID)
+				.UniqueResult());
 			
-			Assert.That(legalName, Is.EqualTo(client1.Payer.ShortName));
-			Assert.That(legalFullName, Is.EqualTo(client1.Payer.JuridicalName));
+			Assert.That(legName, Is.EqualTo(client1.Payer.ShortName));
+			Assert.That(legFullName, Is.EqualTo(client1.Payer.JuridicalName));
 		}
 
 		[Test]

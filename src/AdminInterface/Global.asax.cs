@@ -124,19 +124,11 @@ namespace AddUser
 				.DefaultForController().Is("deliveries")
 				.DefaultForAction().Is("edit")
 				.Restrict("id").ValidInteger);
-
-			engine.Add(new PatternRoute("/users/[login]/ChangePassword")
-				.DefaultForController().Is("users")
-				.DefaultForAction().Is("ChangePassword"));
-
-			engine.Add(new PatternRoute("/users/[login]/edit")
-				.DefaultForController().Is("users")
-				.DefaultForAction().Is("edit"));
-
-			engine.Add(new PatternRoute("/users/[login]/settings")
+		
+			engine.Add(new PatternRoute("/users/[id]/settings")
 				.DefaultForController().Is("users")
 				.DefaultForAction().Is("UserSettings"));
-
+			
 			engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")
 				.DefaultForAction().Is("Search"));
@@ -144,11 +136,11 @@ namespace AddUser
 			engine.Add(new PatternRoute("/RegionalAdmin/[id]/edit")
 				.DefaultForController().Is("RegionalAdmin")
 				.DefaultForAction().Is("Edit"));
-
+			
 			engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
 				.DefaultForController().Is("logs")
 				.DefaultForAction().Is("PasswordChangeLog"));
-
+			
 			engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));

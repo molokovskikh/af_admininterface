@@ -405,7 +405,7 @@ where Phone like :phone")
 				else
 				{
 					Flash["Message"] = Message.Error("Пользователь не может быть перемещен т.к. имеет доступ к адресам доставки");
-					RedirectUsingRoute("users", "Edit", new { login = user.Login });
+					RedirectUsingRoute("users", "Edit", new { id = user.Id });
 					return;
 				}
 			}
@@ -433,7 +433,7 @@ where Phone like :phone")
 			else
 			{
 				Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
-				RedirectUsingRoute("users", "Edit", new { login = user.Login });
+				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
 			oldClient.Refresh();
 			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)

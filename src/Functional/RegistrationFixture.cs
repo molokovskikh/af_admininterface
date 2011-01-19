@@ -410,7 +410,7 @@ namespace Functional
 				{
 					var client = Client.Find(clientCode);
 					var user = client.Users[0];
-					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
 					client = Client.Find(clientCode);
 					var elementName = String.Format("persons[{0}].Name", client.Users[0].ContactGroup.Persons[0].Id);
 					Assert.That(browser.TextField(Find.ByName(elementName)).Text, Is.EqualTo("Alice"));
@@ -493,7 +493,7 @@ namespace Functional
 					Assert.That(contacts[1].ContactText, Is.EqualTo("222-111111"));
 					Assert.That(contacts[2].Type, Is.EqualTo(ContactType.Email));
 
-					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
 					var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[1].Id))).Text;
 					var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[1].Id))).Text;
 					Assert.That(contacts[1].ContactText, Is.EqualTo(text));
@@ -559,7 +559,7 @@ namespace Functional
 					Assert.That(contacts[2].Comment, Is.EqualTo("some comment for email"));
 					Assert.That(contacts[2].ContactText, Is.EqualTo("qwerty2@qq.qq"));
 
-					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
 					var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[2].Id))).Text;
 					var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[2].Id))).Text;
 					Assert.That(contacts[2].ContactText, Is.EqualTo(text));
@@ -591,7 +591,7 @@ namespace Functional
 					Assert.That(persons[0].Name, Is.EqualTo("person1"));
 					Assert.That(persons[1].Name, Is.EqualTo("person2"));
 
-					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Login)));
+					browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
 					var person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[0].Id))).Text;
 					Assert.That(persons[0].Name, Is.EqualTo(person));
 					person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[1].Id))).Text;

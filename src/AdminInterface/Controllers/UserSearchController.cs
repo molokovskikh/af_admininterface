@@ -28,14 +28,14 @@ namespace AdminInterface.Controllers
 		{
 			var searchResults = UserSearchItem.SearchBy(SecurityContext.Administrator, searchProperties, "UserName", "Ascending");
 
-			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().Login))
+			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().UserId.ToString()))
 			{
 				var virtualDir = Context.UrlInfo.AppVirtualDir;
 				if (!virtualDir.StartsWith("/"))
 					virtualDir = "/" + virtualDir;
 				if (virtualDir.EndsWith("/"))
 					virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
-				RedirectToUrl(String.Format(virtualDir + "/Users/{0}/edit", searchResults.First().Login));
+				RedirectToUrl(String.Format(virtualDir + "/Users/{0}/edit", searchResults.First().UserId));
 			}
 
 			PropertyBag["SearchResults"] = searchResults;

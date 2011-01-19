@@ -171,7 +171,7 @@
 			<% end %>
 			<% if filter.ShowUser(): %>
 			<td>
-				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Login}/edit">${logEntity.User.GetLoginWithName()}</a>
+				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Id}/edit">${logEntity.User.GetLoginWithName()}</a>
 			</td>
 			<% end %>
 			<% if filter.ShowUpdateSize(): %>

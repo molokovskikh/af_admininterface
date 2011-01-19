@@ -36,7 +36,7 @@ namespace Functional
 				ArHelper.WithSession(session => clientId = session.CreateSQLQuery(sql).UniqueResult().ToString());
 				var client = Client.Find(Convert.ToUInt32(clientId));
 				var user = client.Users.First();
-				using (var browser = Open("users/{0}/edit", user.Login))
+				using (var browser = Open("users/{0}/edit", user.Id))
 				{
 					browser.Link(Find.ByText("История заказов")).Click();
 					using (
@@ -165,7 +165,7 @@ namespace Functional
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
 			{
 				mainWindow.Link(Find.ByText("История обновлений")).Click();
 				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
@@ -231,7 +231,7 @@ namespace Functional
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
 				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
@@ -261,7 +261,7 @@ namespace Functional
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
 				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
@@ -283,7 +283,7 @@ namespace Functional
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Login))
+			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
 			{
 				mainWindow.Link(Find.ByText(@"История обновлений")).Click();
 				using (var browser = IE.AttachTo<IE>(Find.ByTitle(@"Статистика обновлений")))

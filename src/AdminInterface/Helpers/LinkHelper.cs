@@ -10,9 +10,9 @@ namespace AdminInterface.Helpers
 			return String.Format("<a href=\"{0}/deliveries/{1}/edit\">{2}</a>", siteroot, addressId, text);
 		}
 
-		public static string User(string siteroot, string login, string text)
+		public static string User(string siteroot, uint id, string text)
 		{
-			return String.Format("<a href=\"{0}/users/{1}/edit\">{2}</a>", siteroot, login, text);
+			return String.Format("<a href=\"{0}/users/{1}/edit\">{2}</a>", siteroot, id, text);
 		}
 
 		public static string Client(string siteroot, uint clientId, string text)
