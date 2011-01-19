@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -29,29 +30,14 @@ namespace Integration.Models
 	
 	public class AccountingFixture : IntergationFixture
 	{
-		[SetUp]
-		public void Setup()
-		{
-			UserAccounting.Queryable
-				.Where(a => a.ReadyForAcounting)
-				.Each(a => {
-					a.ReadyForAcounting = false;
-					a.BeAccounted = false;
-					a.SaveAndFlush();
-				});
-
-			AddressAccounting.Queryable
-				.Where(a => a.ReadyForAcounting)
-				.Each(a => {
-					a.ReadyForAcounting = false;
-					a.BeAccounted = false;
-					a.SaveAndFlush();
-				});
-		}
-
 		[Test]
 		public void Find_ready_for_accounting()
 		{
+			ArHelper.WithSession(s => s.CreateSQLQuery(@"
+update billing.accounting
+set ReadyForAcounting = 0,
+BeAccounted = 0;
+").ExecuteUpdate());
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 
 			var accountings = Accounting.GetReadyForAccounting(new Pager());
