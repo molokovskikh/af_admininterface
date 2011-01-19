@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -14,12 +15,23 @@ namespace Integration
 	[TestFixture]
 	public class AppHelperFixture
 	{
-		[Test]
-		public void Link_to()
+		private AppHelper helper;
+		private StubEngineContext context;
+
+		[SetUp]
+		public void Setup()
 		{
-			var helper = new AppHelper();
+			helper = new AppHelper();
 			var urlInfo = new UrlInfo("test", "test", "test", "/", "");
-			helper.SetContext(new StubEngineContext(urlInfo));
+			context = new StubEngineContext(urlInfo);
+			context.CurrentControllerContext = new ControllerContext();
+			helper.SetContext(context);
+			helper.SetController(null, context.CurrentControllerContext);
+		}
+
+		[Test]
+		public void Link_to_for_lazy()
+		{
 			using (new SessionScope())
 			{
 				var user = User.Queryable.Take(10).First();
@@ -27,6 +39,20 @@ namespace Integration
 				var linkTo = helper.LinkTo(user.Client);
 				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Clients/{0}'>{1}</a>", user.Client.Id, user.Client.Name)));
 			}
+		}
+
+		public class TestFilter
+		{
+			public bool SomeBool { get; set; }
+		}
+
+		[Test]
+		public void Checkbox_edit()
+		{
+			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
+
+			var result = helper.FilterFor("Тест", "filter.SomeBool");
+			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td><td colspan=2><input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" /><input type=\"hidden\" id=\"filter_SomeBoolH\" name=\"filter.SomeBool\" value=\"false\" /></td></tr>"));
 		}
 	}
 }

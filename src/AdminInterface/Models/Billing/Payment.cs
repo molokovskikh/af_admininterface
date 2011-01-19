@@ -6,8 +6,11 @@ using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using AdminInterface.Controllers;
+using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
+using Common.Tools;
 
 namespace AdminInterface.Models.Billing
 {
@@ -133,16 +136,44 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string Comment { get; set; }
 
+		[Property]
+		public string DocumentNumber { get; set; }
+
 		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 
 		[BelongsTo(Column = "RecipientId")]
 		public Recipient Recipient { get; set; }
 
+		public string Inn { get; set; }
+
 		public void RegisterPayment()
 		{
 			Payer.Balance += Sum;
 			RegistredOn = DateTime.Now;
+		}
+
+		public string GetWarning()
+		{
+			if (Payer != null)
+				return "";
+
+			var payers = ActiveRecordLinq.AsQueryable<Payer>().Where(p => p.INN == Inn).ToList();
+			if (payers.Count == 0)
+			{
+				return String.Format("Не удалось найти ни одного платильщика с ИНН {0}", Inn);
+			}
+			else if (payers.Count == 1)
+			{
+				Payer = payers.Single();
+				return "";
+			}
+			else
+			{
+				return String.Format("Найдено более одного плательщика с ИНН {0}, плательщики с таким ИНН {1}",
+					Inn,
+					payers.Implode(p => p.Name));
+			}
 		}
 
 		public static List<Payment> ParsePayment(string file)
@@ -159,23 +190,83 @@ namespace AdminInterface.Models.Billing
 			var list = new List<Payment>();
 			foreach (var node in doc.XPathSelectElements("//payment"))
 			{
+				var documentNumber = node.XPathSelectElement("NDoc").Value;
 				var date = node.XPathSelectElement("DatePorucheniya").Value;
 				var sum = node.XPathSelectElement("Summa").Value;
 				var comment = node.XPathSelectElement("AssignPayment").Value;
 				var inn = node.XPathSelectElement("Payer/INN").Value;
 				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
 
-				list.Add(new Payment {
+				var payment = new Payment {
+					DocumentNumber = documentNumber,
 					PayedOn = DateTime.Parse(date, CultureInfo.GetCultureInfo("ru-RU")),
 					RegistredOn = DateTime.Now,
 					Sum = Decimal.Parse(sum, CultureInfo.InvariantCulture),
 					Comment = comment,
 					Payer = payer,
-					Recipient = recipient
-				});
+					Recipient = recipient,
+					Inn = inn
+				};
+				if (payment.IsDuplicate())
+					continue;
+				list.Add(payment);
 			}
 
 			return list;
+		}
+
+		[ValidateSelf]
+		public void Validate(ErrorSummary summary)
+		{
+			if (Recipient.Id != Payer.Recipient.Id)
+				summary.RegisterErrorMessage(
+					"Recipient",
+					"Получатель платежей плательщика должен соответствовать получателю платежей выбранном в платеже");
+		}
+
+		private bool IsDuplicate()
+		{
+			if (Payer == null)
+				return false;
+
+			return Queryable.FirstOrDefault(p => p.Payer == Payer
+				&& p.PayedOn == PayedOn
+				&& p.Sum == Sum
+				&& p.DocumentNumber == DocumentNumber) != null;
+		}
+
+		public void Cancel()
+		{
+			if (Payer != null)
+				Payer.Balance -= Sum;
+
+			Payer.Update();
+			Delete();
+		}
+
+		public void DoUpdate()
+		{
+			if (Payer != null && !String.IsNullOrEmpty(Inn))
+			{
+				Payer.INN = Inn;
+				Payer.Save();
+			}
+
+			var oldPayer = this.OldValue(p => p.Payer);
+			var oldSum = this.OldValue(p => p.Sum);
+			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.Sum))
+			{
+				if (oldPayer != null)
+				{
+					oldPayer.Balance -= oldSum;
+					oldPayer.Save();
+				}
+				if (Payer != null)
+				{
+					Payer.Balance += Sum;
+					Payer.Update();
+				}
+			}
 		}
 	}
 }

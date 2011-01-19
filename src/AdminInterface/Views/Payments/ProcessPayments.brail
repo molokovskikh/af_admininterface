@@ -20,23 +20,26 @@
 </div>
 
 <table class=DataTable>
-	<% if payments and payments.Count: %>
+	<% if IsDefined("payments") and payments and payments.Count: %>
 	<tr>
+		<th></th>
 		<th>${app.Sortable("Получатель", "recipient")}</th>
 		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+		<th>${app.Sortable("ИНН", "Inn")}</th>
 		<th>${app.Sortable("Плательщик", "payer")}</th>
 		<th>${app.Sortable("Сумма", "sum")}</th>
 		<th>${app.Sortable("Примечание", "comment")}</th>
 	</tr>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			<a href="${siteroot}/Payments/${payment.GetHashCode()}/EditTemp">Редактировать</a>
+			<a href="${siteroot}/Payments/${payment.GetHashCode()}/DeleteTemp">Удалить</a>
+		</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
-		<td>
-			<% if payment.Payer: %>
-				${app.LinkTo(payment.Payer)}
-			<% end %>
-		</td>
+		<td>${payment.Inn}</td>
+		<td>${app.LinkTo(payment.Payer)}</td>
 		<td>${payment.Sum}</td>
 		<td>!{payment.Comment}</td>
 	</tr>

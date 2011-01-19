@@ -12,19 +12,17 @@ ${app.BeginFormFor("filter")}
 ${app.FilterFor("filter.Period")}
 ${app.FilterFor("filter.Recipients")}
 ${app.FilterFor("filter.SearchText")}
-<tr>
-<td class='filter-label'>
-Показывать только неопознанные:
-</td>
-<td colspan=2>
-<input type=checkbox name=filter.ShowOnlyUnknown value=true ${"checked" if IsDefined("filter") and filter.ShowOnlyUnknown} >
-<td>
-</tr>
+${app.FilterFor("Показывать только неопознанные:", "filter.ShowOnlyUnknown")}
 ${app.EndFormFor("filter")}
+
+<div class=block>
+Всего платежей ${stat.Count} на сумму ${stat.Sum}р
+</div>
 
 <table class=DataTable>
 	<% if payments.Count: %>
 	<tr>
+		<th></th>
 		<th>${app.Sortable("Получатель", "recipient")}</th>
 		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
 		<th>${app.Sortable("Плательщик", "payer")}</th>
@@ -33,13 +31,13 @@ ${app.EndFormFor("filter")}
 	</tr>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			${app.LinkTo(payment, "Редактировать", @Edit)}
+			${app.LinkTo(payment, "Удалить", @Delete)}
+		</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
-		<td>
-			<% if payment.Payer: %>
-				${app.LinkTo(payment.Payer)}
-			<% end %>
-		</td>
+		<td>${app.LinkTo(payment.Payer)}</td>
 		<td>${payment.Sum}</td>
 		<td>${payment.RegistredOn}</td>
 	</tr>

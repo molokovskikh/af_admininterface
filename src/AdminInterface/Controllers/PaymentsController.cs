@@ -1,4 +1,4 @@
-using System;
+Ôªøusing System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -49,6 +49,19 @@ namespace AdminInterface.Controllers
 		}
 	}
 
+	public class PaymentStatistics
+	{
+		public PaymentStatistics(List<Payment> payments)
+		{
+			Count = payments.Count;
+			Sum = payments.Sum(p => p.Sum);
+		}
+
+		public int Count { get; set; }
+		public decimal Sum { get; set; }
+	}
+
+
 	[Layout("GeneralWithJQueryOnly")]
 	public class PaymentsController : ARSmartDispatcherController
 	{
@@ -57,8 +70,10 @@ namespace AdminInterface.Controllers
 			if (filter.Recipient != null && filter.Recipient.Id == 0)
 				filter.Recipient = null;
 
+			var payments = filter.Find();
 			PropertyBag["filter"] = filter;
-			PropertyBag["payments"] = filter.Find();
+			PropertyBag["payments"] = payments;
+			PropertyBag["stat"] = new PaymentStatistics(payments);
 		}
 
 		public void New()
@@ -82,7 +97,7 @@ namespace AdminInterface.Controllers
 
 		public void SavePayments()
 		{
-			var paymenst = (List<Payment>)Session["payments"];
+			var paymenst = TempPayments();
 			foreach (var payment in paymenst)
 				payment.Save();
 
@@ -104,9 +119,9 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				var file = Request.Files["inputfile"] as HttpPostedFile;
-				if (file == null)
+				if (file == null || file.ContentLength == 0)
 				{
-					PropertyBag["Message"] = Message.Error("ÕÛÊÌÓ ‚˚·‡Ú¸ Ù‡ÈÎ ‰Îˇ Á‡„ÛÁÍË");
+					PropertyBag["Message"] = Message.Error("–ù—É–∂–Ω–æ –≤—ã–±—Ä–∞—Ç—å —Ñ–∞–π–ª –¥–ª—è –∑–∞–≥—Ä—É–∑–∫–∏");
 					return;
 				}
 				Session["payments"] = Payment.ParsePayment(file.InputStream);
@@ -115,6 +130,69 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payments"] = Session["payments"];
+			}
+		}
+
+		public void EditTemp(uint id)
+		{
+			var payment = FindTempPayment(id);
+			if (IsPost)
+			{
+				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
+				if (payment.Payer != null && !String.IsNullOrEmpty(payment.Inn))
+				{
+					payment.Payer.INN = payment.Inn;
+					payment.Payer.Save();
+				}
+				Flash["Message"] = Message.Notify("–°–æ—Ö—Ä–∞–Ω–µ–Ω–æ");
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["payment"] = payment;
+				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				RenderView("Edit");
+			}
+		}
+
+		private Payment FindTempPayment(uint id)
+		{
+			return TempPayments().First(p => p.GetHashCode() == id);
+		}
+
+		private List<Payment> TempPayments()
+		{
+			return (List<Payment>)Session["payments"];
+		}
+
+		public void Delete(uint id)
+		{
+			var payment = Payment.Find(id);
+			payment.Cancel();
+			RedirectToReferrer();
+		}
+
+		public void DeleteTemp(uint id)
+		{
+			var payment = FindTempPayment(id);
+			TempPayments().Remove(payment);
+			RedirectToReferrer();
+		}
+
+		public void Edit(uint id)
+		{
+			var payment = Payment.TryFind(id);
+			if (IsPost)
+			{
+				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
+				payment.DoUpdate();
+				Flash["Message"] = Message.Notify("–°–æ—Ö—Ä–∞–Ω–µ–Ω–æ");
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["payment"] = payment;
+				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 			}
 		}
 
@@ -128,7 +206,7 @@ namespace AdminInterface.Controllers
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} »ÕÕ {2}", p.Id, p.ShortName, p.INN)
+					label = String.Format("[{0}]. {1} –ò–ù–ù {2}", p.Id, p.ShortName, p.INN)
 				});
 		}
 	}
