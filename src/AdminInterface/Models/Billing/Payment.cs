@@ -204,7 +204,9 @@ namespace AdminInterface.Models.Billing
 			foreach (var node in doc.XPathSelectElements("//payment"))
 			{
 				var documentNumber = node.XPathSelectElement("NDoc").Value;
-				var date = node.XPathSelectElement("DatePorucheniya").Value;
+				var date = node.XPathSelectElement("SendDate").Value;
+				if (String.IsNullOrEmpty(date))
+					continue;
 				var sum = node.XPathSelectElement("Summa").Value;
 				var comment = node.XPathSelectElement("AssignPayment").Value;
 
@@ -241,7 +243,8 @@ namespace AdminInterface.Models.Billing
 				if (payment.Recipient == null)
 					continue;
 
-				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == payment.RecipientClient.Inn);
+				var inn = payment.PayerClient.Inn;
+				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
 				payment.Payer = payer;
 
 				if (payment.IsDuplicate())

@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class IntergationFixture
+	public class IntegrationFixture
 	{
 		private SessionScope scope;
 
@@ -28,7 +28,7 @@ namespace Integration.Models
 		}
 	}
 	
-	public class AccountingFixture : IntergationFixture
+	public class AccountingFixture : IntegrationFixture
 	{
 		[Test]
 		public void Find_ready_for_accounting()

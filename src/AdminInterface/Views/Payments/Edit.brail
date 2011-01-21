@@ -49,11 +49,11 @@
 		<table>
 			<tr>
 				<td>Наименование:</td>
-				<td>${payment.PayerClient.Inn}</td>
+				<td>${payment.PayerClient.Name}</td>
 			</tr>
 			<tr>
 				<td>ИНН:</td>
-				<td>${payment.PayerClient.Name}</td>
+				<td>${payment.PayerClient.Inn}</td>
 			</tr>
 			<tr>
 				<td>Номер счета:</td>
@@ -133,7 +133,7 @@
 		</tr>
 		<tr>
 			<td>
-				Обновить ИНН плательщика
+				Обновить ИНН плательщика:
 			</td>
 			<td>
 				${FormHelper.CheckboxField("payment.UpdatePayerInn")}
