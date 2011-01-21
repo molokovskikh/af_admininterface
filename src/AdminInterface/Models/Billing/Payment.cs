@@ -205,15 +205,15 @@ namespace AdminInterface.Models.Billing
 			foreach (var node in doc.XPathSelectElements("//payment"))
 			{
 				var documentNumber = node.XPathSelectElement("NDoc").Value;
-				var date = node.XPathSelectElement("SendDate").Value;
-				if (String.IsNullOrEmpty(date))
+				var dateNode = node.XPathSelectElement("SendDate");
+				if (dateNode == null)
 					continue;
 				var sum = node.XPathSelectElement("Summa").Value;
 				var comment = node.XPathSelectElement("AssignPayment").Value;
 
 				var payment = new Payment {
 					DocumentNumber = documentNumber,
-					PayedOn = DateTime.Parse(date, CultureInfo.GetCultureInfo("ru-RU")),
+					PayedOn = DateTime.Parse(dateNode.Value, CultureInfo.GetCultureInfo("ru-RU")),
 					RegistredOn = DateTime.Now,
 					Sum = Decimal.Parse(sum, CultureInfo.InvariantCulture),
 					Comment = comment,

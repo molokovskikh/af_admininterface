@@ -22,5 +22,13 @@ namespace Integration.Models
 			Assert.That(payment.Recipient.FullName, Is.EqualTo("ООО \"Аналитический центр\""));
 			Assert.That(payment.Comment, Is.EqualTo("Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС)."));
 		}
+
+		[Test]
+		public void Parser_with_output_payments()
+		{
+			var file = @"..\..\..\TestData\20110113.xml";
+			var payments = Payment.ParsePayment(file);
+			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
 	}
 }
