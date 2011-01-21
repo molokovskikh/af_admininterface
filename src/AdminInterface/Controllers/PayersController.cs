@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
@@ -33,8 +32,8 @@ namespace AdminInterface.Controllers
 			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
 			var payments = Payment.Queryable.Where(p => p.Payer == payer).ToList();
 			var items = invoices
-				.Select(i => new { i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false })
-				.Union(payments.Select(p => new {Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true}))
+				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false })
+				.Union(payments.Select(p => new {p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true}))
 				.OrderByDescending(i => i.Date)
 				.ToList();
 			PropertyBag["items"] = items;
@@ -42,14 +41,27 @@ namespace AdminInterface.Controllers
 
 		public void NewInvoice(uint id)
 		{
+			//Binder.Validator = Validator;
 			var payer = Payer.Find(id);
 			if (IsPost)
 			{
 				var invoice = BindObject<Invoice>("invoice");
-				invoice.SetPayer(payer);
-				invoice.Sum = invoice.Parts.Sum(p => p.Sum);
-				invoice.Save();
-				Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+/*
+				if (!HasValidationError(invoice))
+				{
+*/
+					invoice.SetPayer(payer);
+					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
+					invoice.Save();
+					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+/*
+				}
+				else
+				{
+					PropertyBag["invoice"] = invoice;
+					PropertyBag["error"] = GetErrorSummary(invoice);
+				}
+*/
 			}
 		}
 	}
