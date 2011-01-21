@@ -152,13 +152,13 @@ namespace AdminInterface.Models.Billing
 		[Nested(ColumnPrefix = "Payer")]
 		public BankClient PayerClient { get; set; }
 
-		[Nested(ColumnPrefix = "Payer")]
+		[Nested(ColumnPrefix = "PayerBank")]
 		public BankInfo PayerBank { get; set; }
 
 		[Nested(ColumnPrefix = "Recipient")]
 		public BankClient RecipientClient { get; set; }
 
-		[Nested(ColumnPrefix = "Recipient")]
+		[Nested(ColumnPrefix = "RecipientBank")]
 		public BankInfo RecipientBank { get; set; }
 
 		public void RegisterPayment()
@@ -169,7 +169,8 @@ namespace AdminInterface.Models.Billing
 
 		public string GetWarning()
 		{
-			if (Payer != null)
+			if (Payer != null
+				|| PayerClient == null)
 				return "";
 
 			var payers = ActiveRecordLinq.AsQueryable<Payer>().Where(p => p.INN == PayerClient.Inn).ToList();
@@ -258,8 +259,11 @@ namespace AdminInterface.Models.Billing
 
 		public class BankInfo
 		{
+			[Property]
 			public string Description { get; set; }
+			[Property]
 			public string Bic { get; set; }
+			[Property]
 			public string AccountCode { get; set; }
 
 			public BankInfo()
@@ -275,8 +279,11 @@ namespace AdminInterface.Models.Billing
 
 		public class BankClient
 		{
+			[Property]
 			public string Inn { get; set; }
+			[Property]
 			public string Name { get; set; }
+			[Property]
 			public string AccountCode { get; set; }
 
 			public BankClient()
@@ -345,7 +352,9 @@ namespace AdminInterface.Models.Billing
 			if (!UpdatePayerInn)
 				return;
 
-			if (Payer != null && !String.IsNullOrEmpty(RecipientClient.Inn))
+			if (Payer != null
+				&& RecipientClient != null
+				&& !String.IsNullOrEmpty(RecipientClient.Inn))
 			{
 				Payer.INN = RecipientClient.Inn;
 				Payer.Save();

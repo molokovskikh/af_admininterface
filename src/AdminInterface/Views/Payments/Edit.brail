@@ -45,6 +45,7 @@
 	${FormHelper.HiddenField("payment.Payer.PayerId")}
 
 	<p>
+		<% if payment.PayerClient: %>
 		<h4>Отправитель</h4>
 		<table>
 			<tr>
@@ -60,7 +61,9 @@
 				<td>${payment.PayerClient.AccountCode}</td>
 			</tr>
 		</table>
+		<% end %>
 
+		<% if payment.PayerBank: %>
 		<h4>Банк отправителя</h4>
 		<table>
 			<tr>
@@ -76,11 +79,14 @@
 				<td>${payment.PayerBank.AccountCode}</td>
 			</tr>
 		</table>
+		<% end %>
 
+		<% if payment.Comment: %>
 		<h4>Примечание</h4>
 		<span>
 			!{payment.Comment}
 		</span>
+		<% end %>
 	</p>
 
 	<table>
