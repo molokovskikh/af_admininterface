@@ -117,7 +117,9 @@ namespace AdminInterface.Models.Billing
 	public class Payment : ActiveRecordLinqBase<Payment>
 	{
 		public Payment()
-		{}
+		{
+			UpdatePayerInn = true;
+		}
 
 		[PrimaryKey]
 		public uint Id { get; set; }
@@ -139,13 +141,25 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string DocumentNumber { get; set; }
 
+		public bool UpdatePayerInn { get; set; }
+
 		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
 		public Payer Payer { get; set; }
 
 		[BelongsTo(Column = "RecipientId")]
 		public Recipient Recipient { get; set; }
 
-		public string Inn { get; set; }
+		[Nested(ColumnPrefix = "Payer")]
+		public BankClient PayerClient { get; set; }
+
+		[Nested(ColumnPrefix = "Payer")]
+		public BankInfo PayerBank { get; set; }
+
+		[Nested(ColumnPrefix = "Recipient")]
+		public BankClient RecipientClient { get; set; }
+
+		[Nested(ColumnPrefix = "Recipient")]
+		public BankInfo RecipientBank { get; set; }
 
 		public void RegisterPayment()
 		{
@@ -158,10 +172,10 @@ namespace AdminInterface.Models.Billing
 			if (Payer != null)
 				return "";
 
-			var payers = ActiveRecordLinq.AsQueryable<Payer>().Where(p => p.INN == Inn).ToList();
+			var payers = ActiveRecordLinq.AsQueryable<Payer>().Where(p => p.INN == PayerClient.Inn).ToList();
 			if (payers.Count == 0)
 			{
-				return String.Format("Не удалось найти ни одного платильщика с ИНН {0}", Inn);
+				return String.Format("Не удалось найти ни одного платильщика с ИНН {0}", PayerClient.Inn);
 			}
 			else if (payers.Count == 1)
 			{
@@ -171,7 +185,7 @@ namespace AdminInterface.Models.Billing
 			else
 			{
 				return String.Format("Найдено более одного плательщика с ИНН {0}, плательщики с таким ИНН {1}",
-					Inn,
+					PayerClient.Inn,
 					payers.Implode(p => p.Name));
 			}
 		}
@@ -184,9 +198,8 @@ namespace AdminInterface.Models.Billing
 
 		public static List<Payment> ParsePayment(Stream file)
 		{
+			var recipients = Recipient.Queryable.ToList();
 			var doc = XDocument.Load(file);
-			var accountNumber = doc.XPathSelectElement("XMLExport/accDescr/AccountCode").Value;
-			var recipient = Recipient.Queryable.FirstOrDefault(r => r.BankAccountNumber == accountNumber);
 			var list = new List<Payment>();
 			foreach (var node in doc.XPathSelectElements("//payment"))
 			{
@@ -194,8 +207,6 @@ namespace AdminInterface.Models.Billing
 				var date = node.XPathSelectElement("DatePorucheniya").Value;
 				var sum = node.XPathSelectElement("Summa").Value;
 				var comment = node.XPathSelectElement("AssignPayment").Value;
-				var inn = node.XPathSelectElement("Payer/INN").Value;
-				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
 
 				var payment = new Payment {
 					DocumentNumber = documentNumber,
@@ -203,16 +214,77 @@ namespace AdminInterface.Models.Billing
 					RegistredOn = DateTime.Now,
 					Sum = Decimal.Parse(sum, CultureInfo.InvariantCulture),
 					Comment = comment,
-					Payer = payer,
-					Recipient = recipient,
-					Inn = inn
+
+					PayerBank = new BankInfo(
+						node.XPathSelectElement("BankPayer/Description").Value,
+						node.XPathSelectElement("BankPayer/BIC").Value,
+						node.XPathSelectElement("BankPayer/AccountCode").Value
+					),
+					PayerClient = new BankClient(
+						node.XPathSelectElement("Payer/Name").Value,
+						node.XPathSelectElement("Payer/INN").Value,
+						node.XPathSelectElement("Payer/AccountCode").Value
+					),
+					RecipientBank = new BankInfo(
+						node.XPathSelectElement("BankRecipient/Description").Value,
+						node.XPathSelectElement("BankRecipient/BIC").Value,
+						node.XPathSelectElement("BankRecipient/AccountCode").Value
+					),
+					RecipientClient = new BankClient(
+						node.XPathSelectElement("Recepient/Client/Name").Value,
+						node.XPathSelectElement("Recepient/Client/INN").Value,
+						node.XPathSelectElement("Recepient/Client/AccountCode").Value
+					),
 				};
+
+				payment.Recipient = recipients.FirstOrDefault(r => r.BankAccountNumber == payment.RecipientClient.AccountCode);
+				if (payment.Recipient == null)
+					continue;
+
+				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == payment.RecipientClient.Inn);
+				payment.Payer = payer;
+
 				if (payment.IsDuplicate())
 					continue;
+
 				list.Add(payment);
 			}
 
 			return list;
+		}
+
+		public class BankInfo
+		{
+			public string Description { get; set; }
+			public string Bic { get; set; }
+			public string AccountCode { get; set; }
+
+			public BankInfo()
+			{}
+
+			public BankInfo(string description, string bic, string accountCode)
+			{
+				Description = description;
+				Bic = bic;
+				AccountCode = accountCode;
+			}
+		}
+
+		public class BankClient
+		{
+			public string Inn { get; set; }
+			public string Name { get; set; }
+			public string AccountCode { get; set; }
+
+			public BankClient()
+			{}
+
+			public BankClient(string name, string inn, string accountCode)
+			{
+				Name = name;
+				Inn = inn;
+				AccountCode = accountCode;
+			}
 		}
 
 		[ValidateSelf]
@@ -246,11 +318,7 @@ namespace AdminInterface.Models.Billing
 
 		public void DoUpdate()
 		{
-			if (Payer != null && !String.IsNullOrEmpty(Inn))
-			{
-				Payer.INN = Inn;
-				Payer.Save();
-			}
+			UpdateInn();
 
 			var oldPayer = this.OldValue(p => p.Payer);
 			var oldSum = this.OldValue(p => p.Sum);
@@ -266,6 +334,18 @@ namespace AdminInterface.Models.Billing
 					Payer.Balance += Sum;
 					Payer.Update();
 				}
+			}
+		}
+
+		public void UpdateInn()
+		{
+			if (!UpdatePayerInn)
+				return;
+
+			if (Payer != null && !String.IsNullOrEmpty(RecipientClient.Inn))
+			{
+				Payer.INN = RecipientClient.Inn;
+				Payer.Save();
 			}
 		}
 	}

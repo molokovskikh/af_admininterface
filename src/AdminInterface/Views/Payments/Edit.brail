@@ -43,23 +43,47 @@
 	${FormHelper.HiddenField("payment.Id")}
 	<% end %>
 	${FormHelper.HiddenField("payment.Payer.PayerId")}
+
+	<p>
+		<h4>Отправитель</h4>
+		<table>
+			<tr>
+				<td>Наименование:</td>
+				<td>${payment.PayerClient.Inn}</td>
+			</tr>
+			<tr>
+				<td>ИНН:</td>
+				<td>${payment.PayerClient.Name}</td>
+			</tr>
+			<tr>
+				<td>Номер счета:</td>
+				<td>${payment.PayerClient.AccountCode}</td>
+			</tr>
+		</table>
+
+		<h4>Банк отправителя</h4>
+		<table>
+			<tr>
+				<td>Наименование:</td>
+				<td>${payment.PayerBank.Description}</td>
+			</tr>
+			<tr>
+				<td>БИК:</td>
+				<td>${payment.PayerBank.Bic}</td>
+			</tr>
+			<tr>
+				<td>Номер счета:</td>
+				<td>${payment.PayerBank.AccountCode}</td>
+			</tr>
+		</table>
+
+		<h4>Примечание</h4>
+		<span>
+			!{payment.Comment}
+		</span>
+	</p>
+
 	<table>
-
-		<tr>
-			<td>
-				ИНН отправителя:
-			</td>
-			<td>${payment.Inn}</td>
-		</tr>
-		<tr>
-			<td>
-				Примечание:
-			</td>
-			<td>
-				!{payment.Comment}
-			</td>
-		</tr>
-
 		<tr>
 			<td>
 				Дата:
@@ -105,6 +129,14 @@
 			</td>
 			<td>
 				${FormHelper.TextField("payment.Payer.Name")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Обновить ИНН плательщика
+			</td>
+			<td>
+				${FormHelper.CheckboxField("payment.UpdatePayerInn")}
 			</td>
 		</tr>
 		<tr>

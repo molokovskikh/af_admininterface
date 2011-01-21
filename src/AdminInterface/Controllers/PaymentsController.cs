@@ -139,11 +139,7 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
-				if (payment.Payer != null && !String.IsNullOrEmpty(payment.Inn))
-				{
-					payment.Payer.INN = payment.Inn;
-					payment.Payer.Save();
-				}
+				payment.UpdateInn();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}
