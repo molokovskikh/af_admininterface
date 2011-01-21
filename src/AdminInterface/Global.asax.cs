@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
@@ -12,12 +13,16 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.Components.Validator;
 using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Container;
 using Castle.MonoRail.Framework.Descriptors;
+using Castle.MonoRail.Framework.Helpers.ValidationStrategy;
 using Castle.MonoRail.Framework.Internal;
+using Castle.MonoRail.Framework.JSGeneration;
+using Castle.MonoRail.Framework.JSGeneration.jQuery;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
@@ -311,6 +316,14 @@ WHERE PriceCode = ?Id", connection);
 
 		public void Configure(IMonoRailConfiguration configuration)
 		{
+			configuration.JSGeneratorConfiguration.AddLibrary("jquery", typeof(JQueryGenerator))
+				.AddExtension(typeof(CommonJSExtension))
+				.ElementGenerator
+					.AddExtension(typeof(JQueryElementGenerator))
+					.Done
+				.BrowserValidatorIs(typeof(JQueryValidator))
+				.SetAsDefault();
+
 			configuration.ControllersConfig.AddAssembly("AdminInterface");
 			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
 			configuration.ViewComponentsConfig.Assemblies = new[] {
@@ -340,6 +353,7 @@ WHERE PriceCode = ?Id", connection);
 
 		public void Initialized(IMonoRailContainer container)
 		{
+			container.ValidatorRegistry = new CachedValidationRegistry(new ResourceManager("Castle.Components.Validator.Messages", typeof(CachedValidationRegistry).Assembly));
 			container.ControllerDescriptorProvider.AfterProcess += desc => {
 				if (desc.Helpers.Any(d => d.HelperType == typeof(AppHelper)))
 					return;

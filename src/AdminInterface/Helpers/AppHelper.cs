@@ -9,6 +9,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord.Framework.Internal;
+using Castle.Components.Validator;
 using Castle.MonoRail.Framework.Helpers;
 using Common.Web.Ui.Helpers;
 using NHibernate;
@@ -17,6 +18,28 @@ namespace AdminInterface.Helpers
 {
 	public class AppHelper : AbstractHelper
 	{
+		public string GetValidationError(string name)
+		{
+			var errorSummary = (ErrorSummary) ControllerContext.PropertyBag["error"];
+			if (errorSummary == null)
+				return "";
+			var errors = errorSummary.GetErrorsForProperty(name);
+			if (errors == null || errors.Length == 0)
+				return "";
+			return String.Format("<label class=\"error\">{0}</label>", errors.First());
+		}
+
+		public string Edit(string name)
+		{
+			var helper = new FormHelper(Context);
+			var type = GetValueType(name);
+			if (type == typeof(string))
+			{
+				return helper.TextField(name);
+			}
+			throw new Exception(String.Format("Не знаю как показать редактор для {0} с типом {1}", name, type));
+		}
+
 		public string LinkTo(object item)
 		{
 			return LinkTo(item, "");
@@ -353,12 +376,16 @@ namespace AdminInterface.Helpers
 			var indexOf = name.IndexOf(".");
 			if (indexOf < 0)
 				throw new Exception(name);
+
 			var key = name.Substring(0, indexOf);
 			var property = name.Substring(indexOf + 1, name.Length - indexOf - 1);
 			var value = ControllerContext.PropertyBag[key];
 			if (value == null)
 				throw new Exception(String.Format("Can`t find {0} in property bag", key));
-			return value.GetType().GetProperty(property);
+			var propertyInfo = value.GetType().GetProperty(property);
+			if (propertyInfo == null)
+				throw new Exception(name);
+			return propertyInfo;
 		}
 
 		private dynamic GetValue(string name)

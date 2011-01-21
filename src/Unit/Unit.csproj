@@ -44,6 +44,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Validator, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
@@ -77,6 +78,7 @@
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
     <Compile Include="FixutreSetup.cs" />
+    <Compile Include="LocalizationFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />

@@ -21,6 +21,7 @@
 		$("#bills tr:last textarea").value($("#reference").value());
 	});
 </script>
+
 <h2>Формирование дополнительного счета</h2>
 <form method=post>
 	<div class=block>
@@ -31,6 +32,7 @@
 			</td>
 			<td>
 				<input type=text name="invoice.Date" class="required validate-date input-date">
+				${app.GetValidationError("Date")}
 			</td>
 		</tr>
 		<tr>
@@ -43,6 +45,7 @@
 						<option value="${pair.Key}">${pair.Value}</option>
 					<% end %>
 				</select>
+				${app.GetValidationError("Period")}
 			</td>
 		</tr>
 		</table>
@@ -68,6 +71,7 @@
 				<td></td>
 				<td>
 					<textarea name="invoice.parts[0].name" cols=30 rows=2 class="required"></textarea>
+
 				</td>
 				<td>
 					<input name="invoice.parts[0].cost" type=text class="required validate-cost">

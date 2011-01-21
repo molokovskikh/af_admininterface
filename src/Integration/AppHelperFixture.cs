@@ -44,6 +44,7 @@ namespace Integration
 		public class TestFilter
 		{
 			public bool SomeBool { get; set; }
+			public string TextField { get; set; }
 		}
 
 		[Test]
@@ -53,6 +54,15 @@ namespace Integration
 
 			var result = helper.FilterFor("Тест", "filter.SomeBool");
 			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td><td colspan=2><input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" /><input type=\"hidden\" id=\"filter_SomeBoolH\" name=\"filter.SomeBool\" value=\"false\" /></td></tr>"));
+		}
+
+		[Test]
+		public void Edit_for_text()
+		{
+			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
+
+			var result = helper.Edit("filter.TextField");
+			Assert.That(result, Is.EqualTo("<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" />"));
 		}
 	}
 }

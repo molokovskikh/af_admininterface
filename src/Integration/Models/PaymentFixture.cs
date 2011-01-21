@@ -15,7 +15,16 @@ namespace Integration.Models
 			var payments = Payment.ParsePayment(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
 			var payment = payments.First();
+			Assert.That(payment.Sum, Is.EqualTo(800));
+			Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));
+			Assert.That(payment.Recipient.FullName, Is.EqualTo("ООО \"Аналитический центр\""));
+			Assert.That(payment.Comment, Is.EqualTo("Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС)."));
 
+			Assert.That(payment.PayerClient.Name, Is.EqualTo("ЗАО ТРИОМЕД"));
+			Assert.That(payment.PayerBank.Description, Is.EqualTo("ФИЛИАЛ ОРУ ОАО \"МИНБ\""));
+
+			Assert.That(payment.RecipientClient.Name, Is.EqualTo(""));
+			Assert.That(payment.RecipientBank.Description, Is.EqualTo(""));
 			Assert.That(payment.Payer, Is.Not.Null);
 			Assert.That(payment.Sum, Is.EqualTo(800));
 			Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));
