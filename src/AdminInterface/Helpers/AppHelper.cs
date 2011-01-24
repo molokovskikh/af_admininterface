@@ -318,19 +318,19 @@ namespace AdminInterface.Helpers
 		private string GetLabel(string name)
 		{
 			string label = "";
-			if (name.EndsWith("Region"))
+			if (name.EndsWith("Regions"))
 			{
 				label = "Выберите регион:";
 			}
-			else if (name.EndsWith("Recipient"))
+			else if (name.EndsWith("Recipients"))
 			{
 				label = "Выберите получателя:";
 			}
-			else if (name.EndsWith("Addresse"))
+			else if (name.EndsWith("Addresses"))
 			{
 				label = "Выберите адрес:";
 			}
-			else if (name.EndsWith("User"))
+			else if (name.EndsWith("Users"))
 			{
 				label = "Выберите пользователя:";
 			}
