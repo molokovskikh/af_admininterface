@@ -312,6 +312,7 @@ WHERE PriceCode = ?Id", connection);
 
 		public void Configure(IMonoRailConfiguration configuration)
 		{
+/*
 			configuration.JSGeneratorConfiguration.AddLibrary("jquery", typeof(JQueryGenerator))
 				.AddExtension(typeof(CommonJSExtension))
 				.ElementGenerator
@@ -319,6 +320,7 @@ WHERE PriceCode = ?Id", connection);
 					.Done
 				.BrowserValidatorIs(typeof(JQueryValidator))
 				.SetAsDefault();
+ */
 
 			configuration.ControllersConfig.AddAssembly("AdminInterface");
 			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
