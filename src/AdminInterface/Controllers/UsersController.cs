@@ -103,9 +103,11 @@ namespace AdminInterface.Controllers
 				var contactEmails = contacts
 					.Where(c => c.Type == ContactType.Email)
 					.Implode(c => c.ContactText);
-				mails = String.Concat(contactEmails, ", ", mails);
+				mails = String.Concat(contactEmails, ",", mails);
 				if (mails.EndsWith(","))
 					mails = mails.Remove(mails.Length - 1);
+				if (mails.StartsWith(","))
+					mails = mails.Substring(1, mails.Length - 1);
 				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user,
 					password,
 					mails);
