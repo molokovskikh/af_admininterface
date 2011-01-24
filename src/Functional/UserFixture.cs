@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -527,67 +529,67 @@ namespace Functional
 		[Test]
 		public void TestUserRegions()
 		{
-				var client = DataMother.CreateTestClientWithUser();
+			var client = DataMother.CreateTestClientWithUser();
 
-				var user = client.Users[0];
-				var setting = DrugstoreSettings.Find(client.Id);
+			var user = client.Users[0];
+			var setting = DrugstoreSettings.Find(client.Id);
 
-				client.MaskRegion = 7;
-				client.Save();
-				setting.OrderRegionMask = 7;
-				setting.Save();
-				user.WorkRegionMask = 2;
-				user.OrderRegionMask = 1;
-				user.Save();
+			client.MaskRegion = 7;
+			client.Save();
+			setting.OrderRegionMask = 7;
+			setting.Save();
+			user.WorkRegionMask = 2;
+			user.OrderRegionMask = 1;
+			user.Save();
 
-				using (var browser = Open("users/{0}/edit", user.Id))
+			using (var browser = Open("users/{0}/edit", user.Id))
+			{
+				Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
+				Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
+				Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
+				Assert.IsFalse(browser.CheckBox("WorkRegions[3]").Exists);
+
+				Assert.IsFalse(browser.CheckBox("OrderRegions[0]").Checked);
+				Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Checked);
+				Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Checked);
+				Assert.IsFalse(browser.CheckBox("OrderRegions[3]").Exists);
+
+				browser.CheckBox("WorkRegions[1]").Checked = true;
+				browser.CheckBox("OrderRegions[0]").Checked = true;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				using (new SessionScope())
 				{
-					Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
-					Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
-					Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
-					Assert.IsFalse(browser.CheckBox("WorkRegions[3]").Exists);
-
-					Assert.IsFalse(browser.CheckBox("OrderRegions[0]").Checked);
-					Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Checked);
-					Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Checked);
-					Assert.IsFalse(browser.CheckBox("OrderRegions[3]").Exists);
-
-					browser.CheckBox("WorkRegions[1]").Checked = true;
-					browser.CheckBox("OrderRegions[0]").Checked = true;
-					browser.Button(Find.ByValue("Сохранить")).Click();
-
-					using (new SessionScope())
-					{
-						client = Client.Find(client.Id);
-						user = client.Users[0];
-					}
-					Assert.AreEqual(3, user.WorkRegionMask);
-					Assert.AreEqual(3, user.OrderRegionMask);
-
-					browser.CheckBox("WorkRegions[1]").Checked = false;
-					browser.CheckBox("OrderRegions[0]").Checked = false;
-					browser.Button(Find.ByValue("Сохранить")).Click();
-
-					using (new SessionScope())
-					{
-						client = Client.Find(client.Id);
-						user = client.Users[0];
-					}
-					Assert.AreEqual(2, user.WorkRegionMask);
-					Assert.AreEqual(1, user.OrderRegionMask);
-
-					client.MaskRegion = 31;
-					client.Save();
-					setting.OrderRegionMask = 3;
-					setting.Save();
-
-					browser.Refresh();
-					Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
-					Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
-					Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);
-					Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
-					Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
+					client = Client.Find(client.Id);
+					user = client.Users[0];
 				}
+				Assert.AreEqual(3, user.WorkRegionMask);
+				Assert.AreEqual(3, user.OrderRegionMask);
+
+				browser.CheckBox("WorkRegions[1]").Checked = false;
+				browser.CheckBox("OrderRegions[0]").Checked = false;
+				browser.Button(Find.ByValue("Сохранить")).Click();
+
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					user = client.Users[0];
+				}
+				Assert.AreEqual(2, user.WorkRegionMask);
+				Assert.AreEqual(1, user.OrderRegionMask);
+
+				client.MaskRegion = 31;
+				client.Save();
+				setting.OrderRegionMask = 3;
+				setting.Save();
+
+				browser.Refresh();
+				Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
+				Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
+				Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);
+				Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
+				Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
+			}
 		}
 
 		[Test]
@@ -658,7 +660,7 @@ namespace Functional
 					Assert.That(client.Users.Count, Is.EqualTo(1));
 					Assert.IsTrue(client.Users[0].Enabled);
 				}
-			}			
+			}
 		}
 
 		[Test, Description("Регистрация пользователя. При добавлении email в контактную информацию, он должен добавляться в список адресов, на которые нужно отсылать регистрационную карту")]
@@ -702,12 +704,7 @@ namespace Functional
 			var client = DataMother.CreateTestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
-				Assert.That(client.Addresses, Is.Null);
-				Assert.That(client.Users, Is.Null);
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
-				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
+				RegisterUserWithAddress(client, browser);
 				browser.Button(Find.ByValue("Создать")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 			}
@@ -726,6 +723,42 @@ namespace Functional
 						.SetParameter("id", address.Id)
 						.List());
 				Assert.That(addressIntersection.Count, Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
+			}
+		}
+
+		private void RegisterUserWithAddress(Client client, IE browser)
+		{
+			Assert.That(client.Addresses, Is.Null);
+			Assert.That(client.Users, Is.Null);
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
+			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
+		}
+
+		[Test]
+		public void Register_user_with_addresses_not_default_legal_entity()
+		{
+			var client = DataMother.CreateTestClient();
+			var payer = client.Payer;
+			var legalEntity = new LegalEntity {
+				Name = "Тестовая организация 2",
+				Payer = payer
+			};
+			legalEntity.Save();
+			payer.JuridicalOrganizations.Add(legalEntity);
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				RegisterUserWithAddress(client, browser);
+				browser.Css("#address_LegalEntity_Id").Select("Тестовая организация 2");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			}
+
+			using(new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				Assert.That(client.Addresses[0].LegalEntity.Name, Is.EqualTo("Тестовая организация 2"));
 			}
 		}
 

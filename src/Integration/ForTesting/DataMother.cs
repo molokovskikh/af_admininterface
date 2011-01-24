@@ -77,17 +77,17 @@ namespace Integration.ForTesting
 			{
 				var contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
-				var juridical = new LegalEntity();
+				var legalEntity = new LegalEntity();
 				var payer = new Payer {
 					ShortName = "test",
 					ContactGroupOwner = contactOwner,
 					JuridicalOrganizations = new List<LegalEntity> {
-						juridical
+						legalEntity
 					}
 				};
-				juridical.Payer = payer;
+				legalEntity.Payer = payer;
 				payer.Save();
-				juridical.Save();
+				legalEntity.Save();
 				contactOwner = new ContactGroupOwner();
 				contactOwner.Save();
 				client = new Client {
