@@ -45,6 +45,7 @@ SELECT  ci.WriteTime,
         ci.Message, 
         cl.Id FirmCode, 
         ci.rowid ,
+		usr.Id,
 		usr.Login,
 		ci.UserId
 FROM    logs.clientsinfo ci

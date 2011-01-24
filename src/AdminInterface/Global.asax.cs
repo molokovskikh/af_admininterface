@@ -137,10 +137,6 @@ namespace AddUser
 				.DefaultForController().Is("RegionalAdmin")
 				.DefaultForAction().Is("Edit"));
 			
-			engine.Add(new PatternRoute("/logs/[login]/PasswordChangeLog")
-				.DefaultForController().Is("logs")
-				.DefaultForAction().Is("PasswordChangeLog"));
-			
 			engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));

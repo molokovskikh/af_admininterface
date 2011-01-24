@@ -120,14 +120,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["Direction"] = Request["Direction"];
 		}
 
-		public void PasswordChangeLog(string login)
+		public void PasswordChangeLog(uint id)
 		{
-			PasswordChangeLog(login, DateTime.Today.AddDays(-1), DateTime.Today);
+			PasswordChangeLog(id, DateTime.Today.AddDays(-1), DateTime.Today);
 		}
 
-		public void PasswordChangeLog(string login, DateTime beginDate, DateTime endDate)
+		public void PasswordChangeLog(uint id, DateTime beginDate, DateTime endDate)
 		{
-			var user = User.GetByLogin(login);
+			var user = User.GetById(id);
 
 			SecurityContext.Administrator.CheckClientType(user.Client.Type);
 			SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
@@ -135,7 +135,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
 				beginDate,
 				endDate.AddDays(1));
-			PropertyBag["login"] = login;
+			PropertyBag["login"] = user.Login;
 			PropertyBag["beginDate"] = beginDate;
 			PropertyBag["endDate"] = endDate;
 		}
@@ -326,7 +326,6 @@ namespace AdminInterface.Controllers
 			return ArHelper.WithSession(s => {
 
 				var sqlFilter = "oh.ClientCode = :clientId and (oh.writetime >= :FromDate AND oh.writetime <= ADDDATE(:ToDate, INTERVAL 1 DAY))";
-					//"oh.ClientCode = :clientId and oh.writetime BETWEEN :FromDate AND ADDDATE(:ToDate, INTERVAL 1 DAY)";
 				if (filter.User != null)
 				{
 					sqlFilter += "and oh.UserId = :UserId ";
