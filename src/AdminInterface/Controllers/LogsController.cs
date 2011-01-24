@@ -282,7 +282,7 @@ namespace AdminInterface.Controllers
 		public DateTime PriceDate { get; set; }
 
 		public uint AddressId { get; set; }
-		public string Login { get; set; }
+		public uint UserId { get; set; }
 
 		public string Drugstore { get; set; }
 		public string Address { get; set; }
@@ -344,7 +344,7 @@ SELECT  oh.rowid as Id,
 		c.Name as Drugstore,
 		a.Address,
 		a.Id as AddressId,
-		u.Login as Login,
+		u.Id as UserId,
 		if (u.Name is not null and length(u.Name) > 0, u.Name, u.Login) as User,
 		firm.shortname as Supplier,
 		pd.PriceName,
