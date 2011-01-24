@@ -299,7 +299,7 @@ namespace AdminInterface.Models
 			AddPrices(client);
 		}
 
-		private void InitUser(Client client)
+		public virtual void InitUser(Client client)
 		{
 			Client = client;
 			Payer = client.Payer;
@@ -311,7 +311,8 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Accounting = new UserAccounting(this);
-			AssignedPermissions = new List<UserPermission>();
+			if (AssignedPermissions == null)
+				AssignedPermissions = new List<UserPermission>();
 		}
 
 		public virtual bool IsLocked

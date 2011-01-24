@@ -93,5 +93,19 @@ namespace Integration.Controllers
  
 			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru, 11@33.ru, hgf@jhgj.ut"));
 		}
+
+		[Test]
+		public void Create_user_with_permissions()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			user1 = client.Users[0];
+			var permission = new UserPermission();
+			permission.Id = 1;
+			user1.AddPermission(permission);            
+			user1.Save();
+			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
+			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
+			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));
+		}
 	}
 }
