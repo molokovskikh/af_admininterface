@@ -70,7 +70,7 @@
 				</tr>
 				<tr>
 					<td wisth="20%">Юридическое лицо</td>
-					<td>${FormHelper.Select("address.JuridicalOrganization.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
+					<td>${FormHelper.Select("address.LegalEntity.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
 				<tr/>
 			</table>
 		</div>

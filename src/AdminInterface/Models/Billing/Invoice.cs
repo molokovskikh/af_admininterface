@@ -6,8 +6,8 @@ using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
@@ -45,7 +45,10 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[BelongsTo]
+		[
+			BelongsTo,
+			ValidateNonEmpty("У плательщика должен быть установлен получатель платежей")
+		]
 		public Recipient Recipient { get; set; }
 
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
@@ -54,10 +57,10 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public decimal Sum { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public DateTime Date { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public Period Period { get; set; }
 
 		[Property]
@@ -66,7 +69,10 @@ namespace AdminInterface.Models.Billing
 		[Property(NotNull = true, Default = "0")]
 		public bool SendToEmail { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		[
+			HasMany(Cascade = ManyRelationCascadeEnum.All),
+			ValidateCollectionNotEmpty("Нужно задать список услуг")
+		]
 		public IList<InvoicePart> Parts { get; set; }
 
 		public string SumInWords()
@@ -134,88 +140,6 @@ namespace AdminInterface.Models.Billing
 				mailer.Send();
 			}
 			SendToEmail = false;
-		}
-	}
-
-	[ActiveRecord(Schema = "billing")]
-	public class InvoicePart
-	{
-		[PrimaryKey]
-		public uint Id { get; set; }
-
-		[Property]
-		public string Name { get; set; }
-
-		[Property]
-		public decimal Cost { get; set; }
-
-		[Property]
-		public int Count { get; set; }
-
-		[BelongsTo]
-		public Invoice Invoice { get; set; }
-
-		public decimal Sum
-		{
-			get
-			{
-				return Cost * Count;
-			}
-		}
-
-		public InvoicePart()
-		{}
-
-		public InvoicePart(Invoice invoice, Period period, decimal cost, int count)
-		{
-			Invoice = invoice;
-			if (invoice.Recipient.Id == 4)
-				Name = String.Format("Обеспечение доступа к ИС (мониторингу фармрынка) в {0}", GetPeriodName(period));
-			else
-				Name = String.Format("Мониторинг оптового фармрынка за {0}", BindingHelper.GetDescription(period).ToLower());
-			Cost = cost;
-			Count = count;
-		}
-
-		public string GetPeriodName(Period period)
-		{
-			switch (period)
-			{
-				case Period.January:
-					return "январе";
-				case Period.February:
-					return "феврале";
-				case Period.March:
-					return "марте";
-				case Period.April:
-					return "апреле";
-				case Period.August:
-					return "августе";
-				case Period.December:
-					return "декабре";
-				case Period.July:
-					return "июле";
-				case Period.June:
-					return "июне";
-				case Period.May:
-					return "мае";
-				case Period.November:
-					return "ноябре";
-				case Period.October:
-					return "октябре";
-				case Period.September:
-					return "сентябре";
-				case Period.FirstQuarter:
-					return "первом квартале";
-				case Period.SecondQuarter:
-					return "втором квартале";
-				case Period.ThirdQuarter:
-					return "третьем квартале";
-				case Period.FourthQuarter:
-					return "четвертом квартале";
-				default:
-					throw new Exception(String.Format("не знаю что за период такой {0}", period));
-			}
 		}
 	}
 }

@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Integration.Models
 {
-	public class OffersFixture : IntergationFixture
+	public class OffersFixture : IntegrationFixture
 	{
 		[Test]
 		public void Search_should_return_offers()

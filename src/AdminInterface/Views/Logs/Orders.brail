@@ -33,7 +33,7 @@ ${app.EndFormFor("filter")}
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>
 			<td>${LinkHelper.Address(siteroot, order.AddressId, order.Address)}</td>
-			<td>${LinkHelper.User(siteroot, order.Login, order.User)}</td>
+			<td>${LinkHelper.User(siteroot, order.UserId, order.User)}</td>
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>

@@ -38,7 +38,7 @@
 		</td>
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
-		<td>${payment.Inn}</td>
+		<td>${payment.PayerClient.Inn}</td>
 		<td>${app.LinkTo(payment.Payer)}</td>
 		<td>${payment.Sum}</td>
 		<td>!{payment.Comment}</td>
