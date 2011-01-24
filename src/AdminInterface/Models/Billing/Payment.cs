@@ -353,10 +353,10 @@ namespace AdminInterface.Models.Billing
 				return;
 
 			if (Payer != null
-				&& RecipientClient != null
-				&& !String.IsNullOrEmpty(RecipientClient.Inn))
+				&& PayerClient != null
+				&& !String.IsNullOrEmpty(PayerClient.Inn))
 			{
-				Payer.INN = RecipientClient.Inn;
+				Payer.INN = PayerClient.Inn;
 				Payer.Save();
 			}
 		}
