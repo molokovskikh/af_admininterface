@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -91,7 +87,7 @@ namespace Integration.Controllers
 			    .SetParameter("userId", user.Id)
 			    .UniqueResult());
  
-			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru, 11@33.ru, hgf@jhgj.ut"));
+			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
 		}
 
 		[Test]
@@ -101,7 +97,7 @@ namespace Integration.Controllers
 			user1 = client.Users[0];
 			var permission = new UserPermission();
 			permission.Id = 1;
-			user1.AddPermission(permission);            
+			user1.AddPermission(permission);
 			user1.Save();
 			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
 			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));

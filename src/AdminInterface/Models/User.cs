@@ -65,7 +65,7 @@ namespace AdminInterface.Models
 
 		public User(Client client)
 		{
-			InitUser(client);
+			Init(client);
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -294,12 +294,12 @@ namespace AdminInterface.Models
 
 		public virtual void Setup(Client client)
 		{
-			InitUser(client);
+			Init(client);
 			Setup();
 			AddPrices(client);
 		}
 
-		public virtual void InitUser(Client client)
+		public virtual void Init(Client client)
 		{
 			Client = client;
 			Payer = client.Payer;

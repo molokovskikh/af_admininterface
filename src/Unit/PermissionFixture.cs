@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AdminInterface.Models;
+﻿using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using NUnit.Framework;
 
@@ -12,22 +8,22 @@ namespace Unit
 	public class PermissionFixture
 	{
 		[Test]
-		public void Test()
+		public void Init()
 		{
 			var user = new User();
 			var client = new Client();
-			user.InitUser(client);
+			user.Init(client);
 			Assert.That(user.AssignedPermissions, Is.Empty);
 		}
 
 		[Test]
-		public void Test1()
+		public void Init_with_permissions()
 		{
 			var user = new User();
 			var client = new Client();
 			var permission = new UserPermission();
 			user.AddPermission(permission);  
-   			user.InitUser(client);
+			user.Init(client);
 			Assert.That(user.AssignedPermissions.Count, Is.EqualTo(1));
 		}
 	}
