@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -99,7 +100,10 @@ namespace AdminInterface.Controllers
 		{
 			var paymenst = TempPayments();
 			foreach (var payment in paymenst)
+			{
+				payment.RegisterPayment();
 				payment.Save();
+			}
 
 			RedirectToAction("Index",
 				new Dictionary<string, string>{
@@ -139,6 +143,7 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
+				ActiveRecordMediator.Evict(payment);
 				payment.UpdateInn();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();

@@ -163,7 +163,9 @@ namespace AdminInterface.Models.Billing
 
 		public void RegisterPayment()
 		{
-			Payer.Balance += Sum;
+			if (Payer != null)
+				Payer.Balance += Sum;
+
 			RegistredOn = DateTime.Now;
 		}
 
