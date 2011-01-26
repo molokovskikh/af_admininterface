@@ -95,6 +95,14 @@
 			</td>
 		</tr>
 		<tr>
+			<td>
+				Доверенность на право подписи:
+			</td>
+			<td>
+				${FormHelper.TextField("recipient.AccountWarranty")}
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2">
 				<input type=submit value="Сохранить" />
 			</td>

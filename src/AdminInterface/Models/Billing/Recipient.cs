@@ -44,6 +44,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string Accountant { get; set; }
 
+		[Property]
+		public virtual string AccountWarranty { get; set; }
+
 		public static IList<Recipient> All()
 		{
 			return Queryable.OrderBy(r => r.Name).ToList();

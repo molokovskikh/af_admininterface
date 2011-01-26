@@ -16,9 +16,14 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper))
 	]
 	public class ActsController : ARSmartDispatcherController
-	{	
-		public void Index([ARDataBind("filter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] PayerDocumentFilter filter)
+	{
+		public void Index([DataBind("filter")] PayerDocumentFilter filter)
 		{
+			if (filter.Region != null && filter.Region.Id == 0)
+				filter.Region = null;
+			if (filter.Recipient != null && filter.Recipient.Id == 0)
+				filter.Recipient = null;
+
 			PropertyBag["filter"] = filter;
 			PropertyBag["acts"] = filter.Find<Act>();
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();

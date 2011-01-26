@@ -146,7 +146,7 @@ namespace AdminInterface.Controllers
 */
 
 #if !DEBUG
-			var info = new ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
+			var info = new System.Diagnostics.ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
 				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
