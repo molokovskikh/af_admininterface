@@ -45,6 +45,22 @@ namespace Integration
 		{
 			public bool SomeBool { get; set; }
 			public string TextField { get; set; }
+			public Multivalue Multivalue { get; set; }
+		}
+
+		public class Multivalue
+		{
+			public uint Id { get; set; }
+			public string Name { get; set; }
+			public static IList<Multivalue> All()
+			{
+				return new List<Multivalue> {
+					new Multivalue {
+						Id = 1,
+						Name = "test"
+					}
+				};
+			}
 		}
 
 		[Test]
@@ -63,6 +79,17 @@ namespace Integration
 
 			var result = helper.Edit("filter.TextField");
 			Assert.That(result, Is.EqualTo("<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" />"));
+		}
+
+		[Test]
+		public void Select_edit()
+		{
+			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
+			var result = helper.FilterFor("filter.Multivalue");
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
+				+ "<select name='filter.Multivalue.Id'>"
+				+ "<option>Все</option><option value=1>test</option></select>" 
+				+ "</td></tr>"));
 		}
 	}
 }

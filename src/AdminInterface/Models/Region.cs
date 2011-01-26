@@ -29,6 +29,14 @@ namespace AdminInterface.Models
 			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
 		}
 
+		public static IList<Region> All()
+		{
+			return Queryable
+				.Where(r => r.Id != 0)
+				.OrderBy(r => r.Name)
+				.ToList();
+		}
+
 		public static IList<Region> GetAllRegions()
 		{
 			return ArHelper.WithSession(session => {

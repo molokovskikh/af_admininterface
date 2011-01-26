@@ -79,6 +79,7 @@
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
     <Compile Include="FixutreSetup.cs" />
     <Compile Include="LocalizationFixture.cs" />
+    <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />

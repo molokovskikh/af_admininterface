@@ -200,16 +200,28 @@ namespace AdminInterface.Helpers
 
 		public string FilterFor(string label, string name)
 		{
+			var helper = new FormHelper(Context);
+
 			var value = GetValue(name);
 			var valueType = GetValueType(name);
-			var input = new StringBuilder();
+
+			var result = new StringBuilder();
+			string input = null;
 			if (valueType == typeof(string))
 			{
-				Text(input, value, name);
+				label = "Введите текст для поиска:";
+				input = String.Format("<input type=text name={0} value='{1}'>", name, value);
+			}
+			else if (typeof(bool).IsAssignableFrom(valueType))
+			{
+				input = helper.CheckboxField(name);
 			}
 			else if (typeof(Enum).IsAssignableFrom(valueType))
 			{
-
+				var values = BindingHelper.GetDescriptionsDictionary(valueType)
+					.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
+					.ToList();
+				input = Select(name, value, values);
 			}
 			else if (valueType.IsGenericType && typeof(Nullable<>).IsAssignableFrom(valueType.GetGenericTypeDefinition()))
 			{
@@ -219,9 +231,7 @@ namespace AdminInterface.Helpers
 					var values = BindingHelper.GetDescriptionsDictionary(arguments[0])
 						.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
 						.ToList();
-					FilterTemplate(input,
-						label,
-						EmptyableSelect(name, value, values));
+					input = EmptyableSelect(name, value, values);
 				}
 			}
 			else if (typeof(IEnumerable).IsAssignableFrom(valueType))
@@ -232,36 +242,40 @@ namespace AdminInterface.Helpers
 				if (currentValue != null)
 					selectedValue = currentValue.Id.ToString();
 
-				var items = (from dynamic item in (IEnumerable) value
-					let id = item.Id
-					let itemName = item.Name
-					select new Tuple<string, string>(id.ToString(), itemName.ToString())).ToList();
-
+				var items = GetSelectOptions(value);
 				valueName += ".Id";
-				FilterTemplate(input,
-					label,
-					EmptyableSelect(valueName, selectedValue, items));
+				input = EmptyableSelect(valueName, selectedValue, items);
 			}
 			else if (typeof(DatePeriod).IsAssignableFrom(valueType))
 			{
-				PeriodCalendar(input, value);
+				PeriodCalendar(result, value);
 			}
-			else if (typeof(bool).IsAssignableFrom(valueType))
+			else
 			{
-				var helper = new FormHelper(Context);
-				FilterTemplate(input,
-					label,
-					helper.CheckboxField(name)
-				);
+				var method = valueType.GetMethod("All", BindingFlags.Static | BindingFlags.Public);
+				var selectedValue = "";
+				if (value != null)
+					selectedValue = value.Id.ToString();
+
+				if (method != null)
+				{
+					var all = method.Invoke(null, null);
+					input = EmptyableSelect(name + ".Id", selectedValue, GetSelectOptions(all));
+				}
 			}
-			return input.ToString();
+
+			if (input != null)
+				FilterTemplate(result, label, input);
+
+			return result.ToString();
 		}
 
-		private void Text(StringBuilder input, object value, string name)
+		private List<Tuple<string, string>> GetSelectOptions(object value)
 		{
-			FilterTemplate(input,
-				"Введите текст для поиска:",
-				String.Format("<input type=text name={0} value='{1}'>", name, value));
+			return (from dynamic item in (IEnumerable)value
+				let id = item.Id
+				let itemName = item.Name
+				select new Tuple<string, string>(id.ToString(), itemName.ToString())).ToList();
 		}
 
 		private void FilterTemplate(StringBuilder result, string label, string input)
@@ -315,14 +329,29 @@ namespace AdminInterface.Helpers
 			return input.ToString();
 		}
 
+		private string Select(string name, object currentValue, IEnumerable<Tuple<string, string>> items)
+		{
+			var input = new StringBuilder();
+			input.AppendFormat("<select name='{0}'>", name);
+			foreach (var item in items)
+			{
+				if (Equals(item.Item1, currentValue))
+					input.AppendFormat("<option value={0} selected>{1}</option>", item.Item1, item.Item2);
+				else
+					input.AppendFormat("<option value={0}>{1}</option>", item.Item1, item.Item2);
+			}
+			input.Append("</select>");
+			return input.ToString();
+		}
+
 		private string GetLabel(string name)
 		{
 			string label = "";
-			if (name.EndsWith("Regions"))
+			if (name.EndsWith("Regions") || name.EndsWith("Region"))
 			{
 				label = "Выберите регион:";
 			}
-			else if (name.EndsWith("Recipients"))
+			else if (name.EndsWith("Recipients") || name.EndsWith("Recipient"))
 			{
 				label = "Выберите получателя:";
 			}
@@ -373,6 +402,14 @@ namespace AdminInterface.Helpers
 
 		private PropertyInfo GetProperty(string name)
 		{
+			var property = FindProperty(name);
+			if (property == null)
+				throw new Exception(String.Format("Не могу найти свойство {0}", name));
+			return property;
+		}
+
+		private PropertyInfo FindProperty(string name)
+		{
 			var indexOf = name.IndexOf(".");
 			if (indexOf < 0)
 				throw new Exception(name);
@@ -382,10 +419,7 @@ namespace AdminInterface.Helpers
 			var value = ControllerContext.PropertyBag[key];
 			if (value == null)
 				throw new Exception(String.Format("Can`t find {0} in property bag", key));
-			var propertyInfo = value.GetType().GetProperty(property);
-			if (propertyInfo == null)
-				throw new Exception(name);
-			return propertyInfo;
+			return value.GetType().GetProperty(property);
 		}
 
 		private dynamic GetValue(string name)

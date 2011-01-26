@@ -24,12 +24,12 @@ namespace AdminInterface.Models.Billing
 		public Invoice()
 		{}
 
-		public Invoice(Payer payer, Period period, DateTime date)
+		public Invoice(Payer payer, Period period, DateTime invoiceDate)
 		{
 			SetPayer(payer);
 			Period = period;
 			Sum = payer.TotalSum;
-			Date = date;
+			Date = invoiceDate;
 			CreatedOn = DateTime.Now;
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
 				Sum *= 3;

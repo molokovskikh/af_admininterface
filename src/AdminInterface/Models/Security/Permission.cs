@@ -64,8 +64,12 @@ namespace AdminInterface.Models.Security
 			if (Type == PermissionType.Billing)
 			{
 				var billingControllers = new [] {
-					"payments", "invoices", "billing", "payers",
-					"recipients"
+					"payments",
+					"invoices",
+					"billing",
+					"payers",
+					"recipients",
+					"acts"
 				};
 				return billingControllers.Any(c => c == controller.ToLower());
 			}

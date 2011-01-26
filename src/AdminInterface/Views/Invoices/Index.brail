@@ -7,8 +7,8 @@
 				<h3>Реестр счетов</h3>
 				${app.BeginFormFor("filter")}
 				${app.FilterFor("filter.Period")}
-				${app.FilterFor("filter.Regions")}
-				${app.FilterFor("filter.Recipients")}
+				${app.FilterFor("filter.Region")}
+				${app.FilterFor("filter.Recipient")}
 				${app.FilterFor("filter.SearchText")}
 				${app.EndFormFor("filter")}
 			</div>

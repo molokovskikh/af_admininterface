@@ -31,23 +31,9 @@ namespace Printer
 					var date = DateTime.Parse(args[3]);
 					AdminInterface.Helpers.Printer.SetPrinter(args[4]);
 					var recipientId = uint.Parse(args[5]);
-
-					ActiveRecordStarter.Initialize(new[] {
-						Assembly.Load("AdminInterface"),
-						Assembly.Load("Common.Web.Ui")
-					},
-						ActiveRecordSectionHandler.Instance);
-
-					var options = new BooViewEngineOptions();
-					options.AssembliesToReference.Add(typeof (Controller).Assembly);
-					options.NamespacesToImport.Add("Boo.Lang.Builtins");
-					options.NamespacesToImport.Add("AdminInterface.Helpers");
-
-					var loader = new FileAssemblyViewSourceLoader("");
-					loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "Printer"));
-					var brail = new StandaloneBooViewEngine(loader, options);
-
 					var invoicePeriod = Invoice.GetInvoicePeriod(period);
+
+					var brail = Init();
 
 					using (new SessionScope(FlushAction.Never))
 					{
@@ -102,6 +88,24 @@ namespace Printer
 				logger.Error("ошибка", e);
 				
 			}
+		}
+
+		private static StandaloneBooViewEngine Init()
+		{
+			ActiveRecordStarter.Initialize(new[] {
+				Assembly.Load("AdminInterface"),
+				Assembly.Load("Common.Web.Ui")
+			},
+				ActiveRecordSectionHandler.Instance);
+
+			var options = new BooViewEngineOptions();
+			options.AssembliesToReference.Add(typeof (Controller).Assembly);
+			options.NamespacesToImport.Add("Boo.Lang.Builtins");
+			options.NamespacesToImport.Add("AdminInterface.Helpers");
+
+			var loader = new FileAssemblyViewSourceLoader("");
+			loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "Printer"));
+			return new StandaloneBooViewEngine(loader, options);
 		}
 	}
 }

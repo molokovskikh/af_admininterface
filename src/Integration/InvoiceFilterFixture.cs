@@ -23,13 +23,13 @@ namespace Integration
 				client.Payer.Recipient = Recipient.Queryable.First();
 				invoice = new Invoice(client.Payer, Period.December, DateTime.Now);
 				invoice.Save();
-				var filter = new InvoiceFilter();
+				var filter = new PayerDocumentFilter();
 				filter.Region = client.HomeRegion;
-				invoices = filter.Find();
+				invoices = filter.Find<Invoice>();
 			}
 
 			Assert.That(invoices.Count, Is.GreaterThan(0));
-			Assert.That(invoices.First(i => i.Id == invoice.Id), Is.EqualTo(invoice.Payer));
+			Assert.That(invoices.First(i => i.Id == invoice.Id).Payer, Is.EqualTo(invoice.Payer));
 		}
 	}
 }

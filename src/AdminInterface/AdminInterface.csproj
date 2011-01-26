@@ -146,6 +146,7 @@
     <Compile Include="Components\Bubble.cs" />
     <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
@@ -181,6 +182,7 @@
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
+    <Compile Include="Models\Billing\Act.cs" />
     <Compile Include="Models\Billing\Invoice.cs" />
     <Compile Include="Models\Billing\InvoicePart.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
@@ -388,6 +390,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />

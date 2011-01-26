@@ -132,6 +132,7 @@
 						<li>${app.LinkTo("Разнесение платежей", "Payments", "New")}</li>
 						<li>${app.LinkTo("Загрузка выписки", "Payments", "ProcessPayments")}</li>
 						<li>${app.LinkTo("Реестр счетов", "Invoices", "Index")}</li>
+						<li>${app.LinkTo("Акты", "Acts", "Index")}</li>
 					</ul>
 				</div>
 				
