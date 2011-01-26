@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Controllers;
@@ -26,44 +28,66 @@ namespace Printer
 			{
 				if (args.FirstOrDefault() == "print")
 				{
-					var period = (Period)Period.Parse(typeof(Period), args[1]);
-					var regionId = ulong.Parse(args[2]);
-					var date = DateTime.Parse(args[3]);
-					AdminInterface.Helpers.Printer.SetPrinter(args[4]);
-					var recipientId = uint.Parse(args[5]);
-					var invoicePeriod = Invoice.GetInvoicePeriod(period);
+					var printer = args[2];
+					AdminInterface.Helpers.Printer.SetPrinter(printer);
 
 					var brail = Init();
 
-					using (new SessionScope(FlushAction.Never))
+					if (args[1] == "invoice")
 					{
-						var region = Region.Find(regionId);
-						var payers = ActiveRecordLinqBase<Payer>
-							.Queryable
-							.Where(p => p.AutoInvoice == InvoiceType.Auto
-								&& p.PayCycle == invoicePeriod
-								&& p.Recipient != null
-								&& p.Recipient.Id == recipientId);
+						var period = (Period)Period.Parse(typeof(Period), args[3]);
+						var regionId = ulong.Parse(args[4]);
+						var date = DateTime.Parse(args[5]);
+						var recipientId = uint.Parse(args[6]);
+						var invoicePeriod = Invoice.GetInvoicePeriod(period);
 
-						foreach (var payer in payers)
+						using (new SessionScope(FlushAction.Never))
 						{
-							if (!payer.Clients.Any(c => c.HomeRegion == region))
-								continue;
+							var region = Region.Find(regionId);
+							var payers = ActiveRecordLinqBase<Payer>
+								.Queryable
+								.Where(p => p.AutoInvoice == InvoiceType.Auto
+									&& p.PayCycle == invoicePeriod
+									&& p.Recipient != null
+									&& p.Recipient.Id == recipientId);
 
-							if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
-								continue;
-
-							var invoice = new Invoice(payer, period, date);
-							if (payer.InvoiceSettings.PrintInvoice)
+							foreach (var payer in payers)
 							{
-								using (var scope = new TransactionScope(OnDispose.Rollback))
-								{
-									payer.Balance -= invoice.Sum;
-									invoice.Save();
-									scope.VoteCommit();
-								}
+								if (!payer.Clients.Any(c => c.HomeRegion == region))
+									continue;
 
-								new AdminInterface.Helpers.Printer().Print(brail, invoice);
+								if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
+									continue;
+
+								var invoice = new Invoice(payer, period, date);
+								if (payer.InvoiceSettings.PrintInvoice)
+								{
+									using (var scope = new TransactionScope(OnDispose.Rollback))
+									{
+										payer.Balance -= invoice.Sum;
+										invoice.Save();
+										scope.VoteCommit();
+									}
+
+									new AdminInterface.Helpers.Printer().PrintView(brail,
+										"Print",
+										new Dictionary<string, object>{ { "invoice", invoice } });
+								}
+							}
+						}
+					}
+					else if (args[1] == "act")
+					{
+						var ids = args[3];
+
+						using (new SessionScope(FlushAction.Never))
+						{
+							foreach (var id in ids.Split(','))
+							{
+								var act = Act.Find(Convert.ToUInt32(id.Trim()));
+								new AdminInterface.Helpers.Printer().PrintView(brail,
+									"Views/Acts/Print",
+									new Dictionary<string, object> { { "act", act } });
 							}
 						}
 					}
@@ -77,16 +101,19 @@ namespace Printer
 							return a;
 						return "\"" + a + "\"";
 					}));
+#if DEBUG
+					Process.Start(exe, "print " + arguments).WaitForExit();
+#else
 					ProcessStarter.StartProcessInteractivly(exe + " print " + arguments,
 						ConfigurationManager.AppSettings["User"],
 						ConfigurationManager.AppSettings["Password"] ,
 						"analit");
+#endif
 				}
 			}
 			catch (Exception e)
 			{
 				logger.Error("ошибка", e);
-				
 			}
 		}
 

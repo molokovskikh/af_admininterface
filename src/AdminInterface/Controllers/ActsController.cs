@@ -1,10 +1,12 @@
-using System;
+Ôªøusing System;
+using System.Diagnostics;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Controllers
@@ -15,16 +17,16 @@ namespace AdminInterface.Controllers
 	]
 	public class ActsController : ARSmartDispatcherController
 	{	
-		public void Index([DataBind("filter")] PayerDocumentFilter filter)
+		public void Index([ARDataBind("filter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] PayerDocumentFilter filter)
 		{
 			PropertyBag["filter"] = filter;
 			PropertyBag["acts"] = filter.Find<Act>();
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("¡Ûı"));
+			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("–ë—É—Ö"));
 		}
 
-		public void Build([DataBind("filter")] DocumentBuilderFilter filter, DateTime actDate)
+		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
 		{
 			var invoices = filter.Find<Invoice>();
 			var acts = invoices.GroupBy(i => i.Payer).Select(g => new Act(actDate, g.ToArray()));
@@ -33,24 +35,37 @@ namespace AdminInterface.Controllers
 			RedirectToAction("Index", filter.ToUrl());
 		}
 
-		public void Process([DataBind("acts")] Act[] acts)
+		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)
 		{
-			if (Form["submit"] == "”‰‡ÎËÚ¸")
+			if (Form["delete"] != null)
 			{
 				foreach (var act in acts)
 					act.Delete();
 
+				Flash["message"] = "–£–¥–∞–ª–µ–Ω–æ";
 				RedirectToReferrer();
 			}
-			if (Form["submit"] == "Õ‡ÔÂ˜‡Ú‡Ú¸")
+			if (Form["print"] != null)
 			{
-
+				var printer = Form["printer"];
+				var path = @"U:\Apps\Printer\";
+#if DEBUG
+				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\");
+#endif
+#if !DEBUG
+				var info = new ProcessStartInfo(Path.Combine(path, "Printer.exe"),
+					String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id.ToString())));
+				var process = System.Diagnostics.Process.Start(info);
+				process.WaitForExit(30*1000);
+#endif
+				Flash["message"] = "–û—Ç–ø—Ä–∞–≤–ª–µ–Ω–æ –Ω–∞ –ø–µ—á–∞—Ç—å";
 				RedirectToReferrer();
 			}
 		}
 
 		public void Print(uint id)
 		{
+			CancelLayout();
 			PropertyBag["act"] = Act.Find(id);
 		}
 	}

@@ -55,10 +55,12 @@ namespace AdminInterface.Controllers
 
 			criteria.Add(Expression.Eq("Period", Period));
 
-			criteria.CreateCriteria("p.Clients", "c")
-				.Add(Expression.Eq("c.HomeRegion", Region));
+			if (Region != null)
+				criteria.CreateCriteria("p.Clients", "c")
+					.Add(Expression.Eq("c.HomeRegion", Region));
 
-			criteria.Add(Expression.Eq("Recipient", Recipient));
+			if (Recipient != null)
+				criteria.Add(Expression.Eq("Recipient", Recipient));
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
@@ -145,7 +147,7 @@ namespace AdminInterface.Controllers
 
 #if !DEBUG
 			var info = new ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
-				String.Format("{0} {1} {2} \"{3}\" {4}", period, regionId, invoiceDate.ToShortDateString(), printer, recipientId));
+				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
 #endif

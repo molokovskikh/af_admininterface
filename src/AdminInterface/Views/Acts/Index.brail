@@ -1,8 +1,18 @@
-﻿<div style="padding: 10px">
+﻿<script>
+	$(function () {
+		$("input[type=checkbox].all").click(function () {
+			$(this)
+				.parents("table")
+				.find("input[type=checkbox]")
+				.attr("checked", this.checked);
+		});
+	});
+</script>
+<div style="padding: 10px">
 	<% component Bubble, {"bredcrumbs" : [("Акты", "")]} %>
 
-	<div class=block style="float:left; width: 100%;padding:0;">
-		<div style="float:left; width: 50%">
+	<div class=block style="float:left; width: 100%;padding:0; margin:0;">
+		<div style="float:left; width: 50%;padding:0; margin:0;">
 			<div style="margin:10px">
 				<h3>Акты</h3>
 				${app.BeginFormFor("filter")}
@@ -14,7 +24,7 @@
 			</div>
 		</div>
 
-		<div style="float:left; width: 50%">
+		<div style="float:left; width: 50%;padding:0; margin:0;">
 			<div style="margin:10px">
 				<h3>Сформировать акты</h3>
 				<form action='${siteroot}/Acts/Build' method=post>
@@ -25,7 +35,7 @@
 						<tr>
 							<td class="filter-label">Дата акта:</td>
 							<td colspan=2>
-								<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
+								<input type="text" name="actDate" value="${System.DateTime.Now.ToShortDateString()}">
 								<input type=button class=CalendarInput>
 							</td>
 						</tr>
@@ -42,9 +52,9 @@
 
 	<form method=post action="${siteroot}/Acts/Process">
 		<div class=block>
-			<input type=submit value="Удалить">
+			<input name=delete type=submit value="Удалить">
 
-			<input type=submit value="Напечатать">
+			<input name=print type=submit value="Напечатать">
 			<label>Принтер</label>
 			<select name=printer>
 			<% for printer in printers: %>
@@ -58,7 +68,9 @@
 			<table class=DataTable>
 				<% if acts.Count: %>
 				<tr>
-					<th></th>
+					<th>
+						<input type=checkbox class=all>
+					</th>
 					<th>${app.Sortable("№", "Id")}</th>
 					<th>${app.Sortable("Договор", "payerId")}</th>
 					<th>${app.Sortable("Получатель платежей", "recipient")}</th>
@@ -68,7 +80,7 @@
 					<th>${app.Sortable("Дата", "date")}</th>
 					<th></th>
 				</tr>
-				<% for i, invoice in enumerate(invoices): %>
+				<% for i, act in enumerate(acts): %>
 				<tr class="${ViewHelper.GetRowStyle(i)}">
 					<td>
 						<input type=checkbox name="acts[${i}].Id" value=${act.Id}>
@@ -79,12 +91,7 @@
 					<td>${act.Payer.Name}</td>
 					<td>${act.Sum.ToString("0.##")}</td>
 					<td>${BindingHelper.GetDescription(act.Period)}</td>
-					<td>${act.Date.ToShortDateString()}</td>
-					<td>
-						<form method=post action="${siteroot}/Invoices/${invoice.Id}/Cancel">
-							<input type=submit value="Удалить">
-						</form>
-					</td>
+					<td>${act.ActDate.ToShortDateString()}</td>
 				</tr>
 				<% end %>
 				<% else: %>

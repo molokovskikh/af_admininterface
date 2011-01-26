@@ -24,18 +24,27 @@ namespace AdminInterface.Models.Billing
 				.GroupBy(p => new {p.Name, p.Cost})
 				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 				.ToList();
+			Sum = Parts.Sum(p => p.Count * p.Cost);
 		}
 		
 		[PrimaryKey]
 		public uint Id { get; set; }
+
 		[Property]
 		public Period Period { get; set; }
+
 		[Property]
 		public DateTime ActDate { get; set; }
+
+		[Property]
+		public decimal Sum { get; set; }
+
 		[BelongsTo]
 		public Recipient Recipient { get; set; }
+
 		[BelongsTo]
 		public Payer Payer { get; set; }
+
 		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
 		public IList<ActPart> Parts { get; set; }
 	}
@@ -55,13 +64,24 @@ namespace AdminInterface.Models.Billing
 
 		[PrimaryKey]
 		public uint Id { get; set; }
+
 		[Property]
 		public string Name { get; set; }
+
 		[Property]
 		public decimal Cost { get; set; }
+
 		[Property]
 		public int Count { get; set; }
+
+		public decimal Sum
+		{
+			get { return Count * Cost; }
+		}
+
 		[BelongsTo]
 		public Act Act { get; set; }
+
+
 	}
 }

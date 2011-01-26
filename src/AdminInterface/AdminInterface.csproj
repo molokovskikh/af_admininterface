@@ -391,6 +391,7 @@
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Acts\Index.brail" />
+    <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />

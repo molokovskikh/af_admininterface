@@ -114,6 +114,9 @@
     <EmbeddedResource Include="..\AdminInterface\Views\Invoices\InvoiceBody.brail">
       <Link>InvoiceBody.brail</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\AdminInterface\Views\Acts\Print.brail">
+      <Link>Views\Acts\Print.brail</Link>
+    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="App.release.config" />
   </ItemGroup>

@@ -42,16 +42,16 @@ namespace AdminInterface.Helpers
 			}
 		}
 
-		public void Print(StandaloneBooViewEngine brail, Invoice invoice)
+		public void PrintView(StandaloneBooViewEngine brail, string name, Dictionary<string, object> parameters)
 		{
 			var file = Path.GetTempFileName();
 			try
 			{
 				using (var writer = new StreamWriter(file))
 				{
-					brail.Process("print",
+					brail.Process(name,
 						writer,
-						new Dictionary<string, object>{ { "invoice", invoice } });
+						parameters);
 				}
 				PrintHtml(file);
 			}
