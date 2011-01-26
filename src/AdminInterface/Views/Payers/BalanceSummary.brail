@@ -16,6 +16,9 @@
 			<% if item.IsInvoice: %>
 			<a href="${siteroot}/Invoices/${item.Id}/Print">${item.Id}</a>
 			<% end %>
+			<% if item.IsAct: %>
+			<a href="${siteroot}/Acts/${item.Id}/Print">${item.Id}</a>
+			<% end %>
 		</td>
 		<td>${item.Date.ToShortDateString()}</td>
 

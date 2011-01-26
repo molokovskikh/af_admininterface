@@ -31,9 +31,11 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
 			var payments = Payment.Queryable.Where(p => p.Payer == payer).ToList();
+			var acts = Act.Queryable.Where(p => p.Payer == payer).ToList();
 			var items = invoices
 				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false })
 				.Union(payments.Select(p => new {p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true}))
+				.Union(acts.Select(a => new {a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false}))
 				.OrderByDescending(i => i.Date)
 				.ToList();
 			PropertyBag["items"] = items;
