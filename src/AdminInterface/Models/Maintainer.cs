@@ -19,6 +19,7 @@ INTO Future.Intersection (
 	PriceId,
 	LegalEntityId,
 	CostId,
+	AgencyEnabled,
 	AvailableForClient
 )
 SELECT  DISTINCT drugstore.Id,
@@ -26,12 +27,13 @@ SELECT  DISTINCT drugstore.Id,
 		pricesdata.pricecode,
 		:legalEntityId,
 		(
-		  SELECT costcode
-		  FROM    pricescosts pcc
-		  WHERE   basecost
-				  AND pcc.PriceCode = pricesdata.PriceCode
-		) as CostCode,
-		if(pricesdata.PriceType = 0, 1, 0) as AvailableForClient
+			SELECT costcode
+			FROM pricescosts pcc
+			WHERE basecost
+				AND pcc.PriceCode = pricesdata.PriceCode
+		),
+		if(a.IgnoreNewPrices = 1, 0, 1),
+		if(pricesdata.PriceType = 0, 1, 0)
 FROM Future.Clients as drugstore
 	JOIN retclientsset as a ON a.clientcode = drugstore.Id
 	JOIN clientsdata supplier ON supplier.firmsegment = drugstore.Segment
