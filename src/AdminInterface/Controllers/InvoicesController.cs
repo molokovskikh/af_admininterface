@@ -38,6 +38,9 @@ namespace AdminInterface.Controllers
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
+				.ToList()
+				.GroupBy(i => ((dynamic)i).Id)
+				.Select(g => g.First())
 				.ToList();
 		}
 	}
@@ -64,6 +67,9 @@ namespace AdminInterface.Controllers
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
+				.ToList()
+				.GroupBy(i => ((dynamic)i).Id)
+				.Select(g => g.First())
 				.ToList();
 		}
 

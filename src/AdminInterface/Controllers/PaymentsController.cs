@@ -98,8 +98,8 @@ namespace AdminInterface.Controllers
 
 		public void SavePayments()
 		{
-			var paymenst = TempPayments();
-			foreach (var payment in paymenst)
+			var payments = TempPayments();
+			foreach (var payment in payments)
 			{
 				payment.RegisterPayment();
 				payment.Save();
@@ -107,8 +107,8 @@ namespace AdminInterface.Controllers
 
 			RedirectToAction("Index",
 				new Dictionary<string, string>{
-					{"filter.Period.Begin", paymenst.Min(p => p.PayedOn).ToShortDateString() },
-					{"filter.Period.End", paymenst.Max(p => p.PayedOn).ToShortDateString() }
+					{"filter.Period.Begin", payments.Min(p => p.PayedOn).ToShortDateString() },
+					{"filter.Period.End", payments.Max(p => p.PayedOn).ToShortDateString() }
 				});
 		}
 
@@ -128,6 +128,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["Message"] = Message.Error("Нужно выбрать файл для загрузки");
 					return;
 				}
+
 				Session["payments"] = Payment.ParsePayment(file.InputStream);
 				RedirectToReferrer();
 			}
@@ -143,7 +144,6 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				BindObjectInstance(payment, "payment", AutoLoadBehavior.NullIfInvalidKey);
-				ActiveRecordMediator.Evict(payment);
 				payment.UpdateInn();
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();

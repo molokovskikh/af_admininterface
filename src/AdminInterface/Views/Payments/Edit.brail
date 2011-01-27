@@ -37,11 +37,7 @@
 <% end %>
 
 <form method="post">
-	<% if payment.Id == 0: %>
-	${FormHelper.HiddenField("payment.Id", payment.GetHashCode())}
-	<% else: %>
 	${FormHelper.HiddenField("payment.Id")}
-	<% end %>
 	${FormHelper.HiddenField("payment.Payer.PayerId")}
 
 	<p>
