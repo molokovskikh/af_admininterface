@@ -101,6 +101,12 @@ namespace AdminInterface.Controllers
 			var payments = TempPayments();
 			foreach (var payment in payments)
 			{
+				//если зайти в два платежа и отредактировать их
+				//то получим двух плательщиков из разных сесей
+				//правим это
+				if (payment.Payer != null)
+					payment.Payer = Payer.Find(payment.Payer.Id);
+
 				payment.RegisterPayment();
 				payment.Save();
 			}
