@@ -12,6 +12,11 @@ namespace AdminInterface.Controllers
 	]
 	public class PayersController : SmartDispatcherController
 	{
+		public void Show(uint id)
+		{
+			Redirect("Billing", "Edit", new {BillingCode = id});
+		}
+
 		public void Payments(uint id)
 		{
 			var payer = Payer.Find(id);

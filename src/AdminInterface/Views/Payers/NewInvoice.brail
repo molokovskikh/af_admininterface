@@ -32,6 +32,7 @@
 			</td>
 			<td>
 				<input type=text name="invoice.Date" class="required validate-date input-date">
+				<input type=button class=CalendarInput>
 				${app.GetValidationError("Date")}
 			</td>
 		</tr>
