@@ -34,9 +34,9 @@ namespace AdminInterface.Controllers
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
 		{
 			var invoices = filter.Find<Invoice>();
-			var acts = invoices.GroupBy(i => i.Payer).Select(g => new Act(actDate, g.ToArray()));
-			foreach (var act in acts)
+			foreach (var act in Act.Build(invoices, actDate))
 				act.Save();
+
 			RedirectToAction("Index", filter.ToUrl());
 		}
 

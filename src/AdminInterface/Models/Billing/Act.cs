@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
@@ -47,6 +48,20 @@ namespace AdminInterface.Models.Billing
 
 		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
 		public IList<ActPart> Parts { get; set; }
+
+		public bool IsDuplicateDocument()
+		{
+			return Queryable.FirstOrDefault(a => a.Period == Period && a.Payer == Payer) != null;
+		}
+
+		public static IEnumerable<Act> Build(List<Invoice> invoices, DateTime documentDate)
+		{
+			return invoices
+				.GroupBy(i => i.Payer)
+				.Select(g => new Act(documentDate, g.ToArray()))
+				.Where(a => !a.IsDuplicateDocument())
+				.ToList();
+		}
 	}
 
 	[ActiveRecord(Schema = "Billing")]

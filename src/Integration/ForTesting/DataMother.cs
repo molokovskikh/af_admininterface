@@ -129,6 +129,13 @@ namespace Integration.ForTesting
 			}
 		}
 
+		public static Payer BuildPayerForBillingDocumentTest()
+		{
+			var client = CreateTestClientWithAddressAndUser();
+			client.Payer.Recipient = Recipient.Queryable.First();
+			return client.Payer;
+		}
+
 		public static Client CreateTestClientWithAddressAndUser()
 		{
 			return CreateTestClientWithAddressAndUser(1UL);

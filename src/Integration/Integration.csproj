@@ -126,6 +126,7 @@
     <Compile Include="InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
+    <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AddressFixture.cs" />
     <Compile Include="Models\BillingSearchItemFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />
