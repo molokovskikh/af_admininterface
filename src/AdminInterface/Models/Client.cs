@@ -346,11 +346,14 @@ group by u.ClientId")
 			return false;
 		}
 
-		public virtual int? WorkCopyCount()
+		public virtual List<User> UsersForPayer(Payer payer)
 		{
-			if (Type == ClientType.Drugstore)
-				return Users.Count;
-			return null;
+			return Users.Where(u => u.Payer == payer).ToList();
+		}
+
+		public virtual List<Address> AddressesForPayer(Payer payer)
+		{
+			return Addresses.Where(a => a.Payer == payer).ToList();
 		}
 
 		public virtual bool HaveLockedUsers()
