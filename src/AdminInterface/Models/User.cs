@@ -95,6 +95,12 @@ namespace AdminInterface.Models
 		[Property, Description("Аудитор"), Auditable]
 		public virtual bool Auditor { get; set; }
 
+		[Property, Description("Разрешить обновление до версии"), Auditable]
+		public virtual uint? TargetVersion { get; set; }
+
+		[Property, Description("Сохранять подготовленные данные")]
+		public virtual bool SaveAFDataFiles { get; set; }
+
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
 
@@ -147,26 +153,6 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
 
-		public virtual string TargetVersion
-		{
-			get {
-				if (_updateInfo == null)
-					_updateInfo = UserUpdateInfo.Find(Id);
-
-				return _updateInfo.TargetVersion.ToString();
-			}
-			set {
-				if (_updateInfo == null)
-					_updateInfo = UserUpdateInfo.Find(Id);
-
-				uint versionValue;
-				if (uint.TryParse(value, out versionValue))
-					_updateInfo.TargetVersion = versionValue;
-				else
-					_updateInfo.TargetVersion = null;
-			}
-		}
-
 		public virtual List<string> AvalilableAnalitFVersions
 		{
 			get {
@@ -174,9 +160,9 @@ namespace AdminInterface.Models
 					_updateInfo = UserUpdateInfo.Find(Id);
 
 				List<AnalitFVersionRule> rules;
-				if (_updateInfo.TargetVersion != null)
+				if (TargetVersion != null)
 					rules = AnalitFVersionRule.Queryable
-						.Where(r => r.SourceVersion == _updateInfo.TargetVersion)
+						.Where(r => r.SourceVersion == TargetVersion)
 						.ToList();
 				else
 					rules = AnalitFVersionRule.Queryable
@@ -184,8 +170,8 @@ namespace AdminInterface.Models
 						.ToList();
 
 				var versions = rules.Select(r => r.DestinationVersion).ToList();
-				if (_updateInfo.TargetVersion != null)
-					versions.Add(_updateInfo.TargetVersion.Value);
+				if (TargetVersion != null)
+					versions.Add(TargetVersion.Value);
 				versions.Add(_updateInfo.AFAppVersion);
 				versions.Sort();
 				return new [] {"Любая версия"}.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
@@ -302,8 +288,10 @@ namespace AdminInterface.Models
 		public virtual void Init(Client client)
 		{
 			Client = client;
-			Payer = client.Payer;
+			if (Payer == null)
+				Payer = client.Payers.Single();
 
+			TargetVersion = DefaultValues.Get().AnalitFVersion;
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
 

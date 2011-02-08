@@ -35,9 +35,12 @@
 			Разрешить обновление до версии
 			<select name="user.TargetVersion">
 				<% for version in user.AvalilableAnalitFVersions: %>
-					<option ${"selected" if user.TargetVersion.ToString() == version} value="${version}">${version}</option>
+					<option ${"selected" if user.TargetVersion and user.TargetVersion.ToString() == version} value="${version if version != "Любая версия"}">${version}</option>
 				<% end %>
 			</select><br>
+
+			<input type=checkbox name=user.SaveAFDataFiles ${"checked" if user.SaveAFDataFiles} value=true> Сохранять подготовленные данные<br>
+			<input type=hidden name=user.SaveAFDataFiles value=false>
 
 			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
 			<input type=hidden name=user.SubmitOrders value=false>
