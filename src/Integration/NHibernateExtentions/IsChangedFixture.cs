@@ -14,7 +14,7 @@ namespace Integration.NHibernateExtentions
 		{
 			using (new SessionScope())
 			{
-				var client = DataMother.CreateTestClient();
+				var client = DataMother.TestClient();
 				var oldValue = client.Name;
 				client.Name = "123";
 				Assert.That(client.IsChanged(c => c.Name), Is.True);
@@ -25,7 +25,7 @@ namespace Integration.NHibernateExtentions
 		[Test]
 		public void Update_property()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (new SessionScope())
 			{
 				var loadedClient = Client.Find(client.Id);

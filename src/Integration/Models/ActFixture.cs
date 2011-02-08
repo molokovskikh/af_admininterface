@@ -15,8 +15,8 @@ namespace Integration.Models
 		[Test]
 		public void Do_not_build_duplicate_document()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			var invoice = new Invoice(client.Payer, Period.December, DateTime.Now);
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var invoice = new Invoice(payer, Period.December, DateTime.Now);
 			invoice.Save();
 
 			var acts = Act.Build(new List<Invoice> { invoice }, DateTime.Now);

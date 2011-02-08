@@ -224,7 +224,7 @@ namespace Functional
 		[Test]
 		public void Show_all_regions()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -245,7 +245,7 @@ namespace Functional
 		[Test]
 		public void Regions_must_be_checked_when_show_all()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -268,7 +268,7 @@ namespace Functional
 		[Test]
 		public void Change_common_settings()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -361,7 +361,7 @@ namespace Functional
 		[Test]
 		public void Try_to_send_message()
 		{
-			var testClient = DataMother.CreateTestClient();
+			var testClient = DataMother.TestClient();
 			using (var browser = new IE(BuildTestUrl("client/" + testClient.Id)))
 			{
 				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
@@ -374,7 +374,7 @@ namespace Functional
 		[Test]
 		public void Try_to_search_offers()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			client.Name = "Client for test offers";
 			client.Update();
 			using (var browser = new IE(BuildTestUrl("client/" + client.Id)))
@@ -417,7 +417,7 @@ namespace Functional
 		[Test]
 		public void Try_to_update_general_info()
 		{
-			var testClient = DataMother.CreateTestClient();
+			var testClient = DataMother.TestClient();
 			testClient.FullName = "Full name for test update general info";
 			testClient.Name = "Name for test update general info";
 			testClient.Update();
@@ -440,7 +440,7 @@ namespace Functional
 		[Test]
 		public void ManageManualComparison()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			var drugstoreSettings = DrugstoreSettings.Find(client.Id);
 			var uri = BuildTestUrl("client/" + client.Id);
 			using (var browser = new IE(uri))
@@ -461,7 +461,7 @@ namespace Functional
 		[Test]
 		public void When_change_home_region_it_must_be_selected()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -477,7 +477,7 @@ namespace Functional
 		[Test]
 		public void When_add_region_for_browse_it_must_be_in_intersection()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -515,7 +515,7 @@ where i.ClientId = :ClientId
 		[Test]
 		public void Test_option_ignore_new_prices()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				var controlName = "drugstore.IgnoreNewPrices";
@@ -543,7 +543,7 @@ where i.ClientId = :ClientId
 		[Test]
 		public void Max_weekly_orders_sum()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				var controlName = "drugstore.MaxWeeklyOrdersSum";
@@ -571,8 +571,8 @@ where i.ClientId = :ClientId
 		[Test, Description("Зашумлять цены для всех поставщиков кроме одного")]
 		public void Set_costs_noising_except_one_supplier()
 		{
-			var client = DataMother.CreateTestClient();
-			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payer; });
+			var client = DataMother.TestClient();
+			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -592,7 +592,7 @@ where i.ClientId = :ClientId
 		[Test, Description("Зашумлять цены для всех поставщиков")]
 		public void Set_costs_noising_for_all_suppliers()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("Client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText("Настройка")).Click();
@@ -614,8 +614,8 @@ where i.ClientId = :ClientId
 		[Test, Description("Тест снятия галки 'зашумлять цены'")]
 		public void Unset_costs_noising()
 		{
-			var client = DataMother.CreateTestClient();
-			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payer; });
+			var client = DataMother.TestClient();
+			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
 			using (new SessionScope())
 			{
 				client.Settings.NoiseCosts = true;
@@ -648,7 +648,7 @@ where i.ClientId = :ClientId
 			Client client;
 			using (new SessionScope())
 			{
-				client = DataMother.CreateTestClient();
+				client = DataMother.TestClient();
 			}
 
 			using (var browser = Open("client/{0}", client.Id))

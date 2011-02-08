@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -240,8 +241,8 @@ namespace Integration.Controllers
 				oldUser.AvaliableAddresses = new List<Address>();
 				address.AvaliableForUsers.Add(oldUser);
 				newClient = DataMother.CreateTestClientWithAddressAndUser();
-				
-				controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
+
+				controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
 			}
 			using (new SessionScope())
 			{
@@ -276,7 +277,7 @@ namespace Integration.Controllers
 				address.AvaliableForUsers.Add(user);
 				newClient = DataMother.CreateTestClientWithAddressAndUser();
 
-				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Payer.JuridicalOrganizations[0].Id, false);
+				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
 			}
 			using (new SessionScope())
 			{

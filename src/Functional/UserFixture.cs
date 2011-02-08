@@ -193,7 +193,7 @@ namespace Functional
 		[Test]
 		public void Create_user()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 
 			using (var browser = Open("client/{0}", client.Id))
 			{
@@ -595,7 +595,7 @@ namespace Functional
 		[Test]
 		public void TestRegionsByCreatingNewUser()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			var drugstore = DrugstoreSettings.Find(client.Id);
 			// Id-шники регионов
 			var browseRegions = new ulong[] { 1, 8, 16, 256 };
@@ -647,7 +647,7 @@ namespace Functional
 		[Test]
 		public void User_must_be_enabled_after_registration()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				using (new SessionScope())
@@ -666,7 +666,7 @@ namespace Functional
 		[Test, Description("Регистрация пользователя. При добавлении email в контактную информацию, он должен добавляться в список адресов, на которые нужно отсылать регистрационную карту")]
 		public void Add_email_for_registration_card_by_adding_contact_email()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				using (new SessionScope())
@@ -679,7 +679,7 @@ namespace Functional
 		[Test, Description("Регистрация пользователя. Проверка валидатора списка email-ов для отправки регистрационной карты")]
 		public void Validate_email_list_for_sending_registration_card()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				using (new SessionScope())
@@ -701,7 +701,7 @@ namespace Functional
 		[Test, Description("Тест для регистрации адреса при регистрации пользователя")]
 		public void Create_user_with_address()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				RegisterUserWithAddress(client, browser);
@@ -739,8 +739,8 @@ namespace Functional
 		[Test]
 		public void Register_user_with_addresses_not_default_legal_entity()
 		{
-			var client = DataMother.CreateTestClient();
-			var payer = client.Payer;
+			var client = DataMother.TestClient();
+			var payer = client.Payers.First();
 			var legalEntity = new LegalEntity {
 				Name = "Тестовая организация 2",
 				Payer = payer
@@ -765,7 +765,7 @@ namespace Functional
 		[Test]
 		public void Create_user_with_contact_person_info()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				browser.Link(Find.ByText("Новый пользователь")).Click();
@@ -789,7 +789,7 @@ namespace Functional
 		[Test]
 		public void Update_person_contact_info()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				browser.Link(Find.ByText("Новый пользователь")).Click();

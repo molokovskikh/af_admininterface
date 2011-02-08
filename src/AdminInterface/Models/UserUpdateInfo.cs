@@ -11,7 +11,6 @@ namespace AdminInterface.Models
 			Id = id;
 			var defaults = DefaultValues.Get();
 			AFAppVersion = defaults.AnalitFVersion;
-			TargetVersion = defaults.AnalitFVersion;
 			AFCopyId = "";
 		}
 
@@ -25,8 +24,5 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual uint AFAppVersion { get; set; }
-
-		[Property]
-		public virtual uint? TargetVersion { get; set; }
 	}
 }

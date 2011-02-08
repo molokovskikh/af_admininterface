@@ -17,8 +17,8 @@ namespace Integration
 			Client client;
 			string oldName;
 			using (new SessionScope())
-			{ 
-				client = DataMother.CreateTestClient();
+			{
+				client = DataMother.TestClient();
 				oldName = client.Name;
 				client.Name += "1";
 				client.Save();

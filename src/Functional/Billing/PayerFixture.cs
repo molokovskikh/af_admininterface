@@ -19,15 +19,12 @@ namespace Functional.Billing
 		[Test]
 		public void Show_balance_summary()
 		{
-			Payer payer = null;
+			Payer payer;
 			using(new SessionScope())
 			{
-				var client = DataMother.CreateTestClientWithAddressAndUser();
-				payer = client.Payer;
-				var recipient = Recipient.Queryable.First();
-				client.Payer.Recipient = recipient;
-				new Invoice(client.Payer, Period.January, new DateTime(2011, 1, 11)).Save();
-				new Payment{ Payer = client.Payer, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800, Recipient = recipient}.Save();
+				payer = DataMother.BuildPayerForBillingDocumentTest();
+				new Invoice(payer, Period.January, new DateTime(2011, 1, 11)).Save();
+				new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 			}
 
 			using (var browser = Open("Billing/Edit?BillingCode={0}", payer.Id))

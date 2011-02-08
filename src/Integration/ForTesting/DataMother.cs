@@ -12,84 +12,21 @@ namespace Integration.ForTesting
 {
 	public class DataMother
 	{
-		public static Client CreateTestClientWithAddress()
-		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var client = CreateTestClient();
-				var address = new Address {
-					Client = client,
-					Value = "тестовый адрес"
-				};
-				client.AddAddress(address);
-				client.Update();
-				address.MaintainIntersection();
-				scope.VoteCommit();
-				return client;
-			}
-		}
-
-		public static Client CreateTestClient(Client client)
-		{
-			using(var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var payer = new Payer {
-					ShortName = "test",
-				};
-				payer.Save();
-				var contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
-
-				client.Status = ClientStatus.On;
-				client.Segment = Segment.Wholesale;
-				client.Type = ClientType.Drugstore;
-				if (client.Name == null)
-					client.FullName = "test";
-				if (client.FullName == null)
-					client.FullName = "test";
-				if (client.HomeRegion == null)
-					client.HomeRegion = ActiveRecordBase<Region>.Find(1UL);
-				if (client.MaskRegion == 0)
-					client.MaskRegion = 1UL;
-				client.Payer = payer;
-				client.ContactGroupOwner = contactOwner;
-				client.SaveAndFlush();
-				var drugstoreSettings = new DrugstoreSettings(client.Id) {
-					BasecostPassword = "",
-				};
-				drugstoreSettings.CreateAndFlush();
-				client.MaintainIntersection();
-
-				scope.VoteCommit();
-			}
-			return client;
-		}
-
-		public static Client CreateTestClient()
-		{
-			return CreateTestClient(1UL);
-		}
-
-		public static Client CreateTestClient(ulong maskRegion)
+		public static Client TestClient(Action<Client> action = null)
 		{
 			Client client;
-			using(var scope = new TransactionScope(OnDispose.Rollback))
+			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
 				var legalEntity = new LegalEntity();
-				var payer = new Payer {
+				var payer = new Payer
+				{
 					ShortName = "test",
-					ContactGroupOwner = contactOwner,
+					ContactGroupOwner = new ContactGroupOwner(),
 					JuridicalOrganizations = new List<LegalEntity> {
 						legalEntity
 					}
 				};
 				legalEntity.Payer = payer;
-				payer.Save();
-				legalEntity.Save();
-				contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
 				client = new Client {
 					Status = ClientStatus.On,
 					Segment = Segment.Wholesale,
@@ -97,11 +34,20 @@ namespace Integration.ForTesting
 					Name = "test",
 					FullName = "test",
 					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-					MaskRegion = maskRegion,
-					Payer = payer,
-					ContactGroupOwner = contactOwner,
+					MaskRegion = 1UL,
+					ContactGroupOwner = new ContactGroupOwner(),
 				};
-				payer.Clients = new List<Client>{ client };
+				client.JoinPayer(payer);
+				payer.Clients = new List<Client> { client };
+				if (action != null)
+					action(client);
+
+				client.Payers.Each(p => {
+					p.ContactGroupOwner.Save();
+					p.Save();
+					p.JuridicalOrganizations.Each(l => l.Save());
+				});
+				client.ContactGroupOwner.Save();
 				client.SaveAndFlush();
 				client.Settings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",
@@ -115,25 +61,38 @@ namespace Integration.ForTesting
 			return client;
 		}
 
+		public static Client CreateTestClientWithAddress()
+		{
+			return TestClient(c => {
+				var address = new Address {
+					Client = c,
+					Value = "тестовый адрес"
+				};
+				c.AddAddress(address);
+			});
+		}
+
+		public static Client CreateTestClient(ulong maskRegion)
+		{
+			return TestClient();
+		}
+
 		public static Client CreateTestClientWithUser()
 		{
-			using (var transaction = new TransactionScope(OnDispose.Rollback))
-			{
-				var client = CreateTestClient();
-				var user = new User(client) {
+			return TestClient(c => {
+				var user = new User(c) {
 					Name = "test"
 				};
-				user.Setup(client);
-				transaction.VoteCommit();
-				return client;
-			}
+				user.Setup(c);
+			});
 		}
 
 		public static Payer BuildPayerForBillingDocumentTest()
 		{
 			var client = CreateTestClientWithAddressAndUser();
-			client.Payer.Recipient = Recipient.Queryable.First();
-			return client.Payer;
+			var payer = client.Payers.First();
+			payer.Recipient = Recipient.Queryable.First();
+			return payer;
 		}
 
 		public static Client CreateTestClientWithAddressAndUser()
@@ -143,10 +102,9 @@ namespace Integration.ForTesting
 
 		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
 		{
-			Client client;
+			var client = CreateTestClient(clientRegionMask);;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				client = CreateTestClient(clientRegionMask);
 				var user = new User(client) {
 					Name = "test"
 				};
@@ -230,33 +188,32 @@ namespace Integration.ForTesting
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var document = new Document
-					{
-						ClientCode = client.Id,
-						DocumentDate = DateTime.Now.AddDays(-1),
-						FirmCode = supplier.Id,
-						ProviderDocumentId = "123",
-						Log = documentLogEntity,
-						AddressId = null,
-					};
+				var document = new Document {
+					ClientCode = client.Id,
+					DocumentDate = DateTime.Now.AddDays(-1),
+					FirmCode = supplier.Id,
+					ProviderDocumentId = "123",
+					Log = documentLogEntity,
+					AddressId = null,
+				};
 				document.Create();
 
-				var documentLine = new DocumentLine
-					{
-						Certificates = "Test certificate",
-						Code = "999",
-						Country = "Test country",
-						Nds = 10,
-						Period = "01.10.2010",
-						Producer = "Test producer",
-						ProducerCost = 10.10M,
-						VitallyImportant = true,
-						Document = document,
-					};
+				var documentLine = new DocumentLine {
+					Certificates = "Test certificate",
+					Code = "999",
+					Country = "Test country",
+					Nds = 10,
+					Period = "01.10.2010",
+					Producer = "Test producer",
+					ProducerCost = 10.10M,
+					VitallyImportant = true,
+					Document = document,
+				};
 				documentLine.Create();
 
-				document.Lines = new List<DocumentLine>();
-				document.Lines.Add(documentLine);
+				document.Lines = new List<DocumentLine> {
+					documentLine
+				};
 				document.SaveAndFlush();
 
 				scope.VoteCommit();
@@ -268,116 +225,33 @@ namespace Integration.ForTesting
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var updateEntity = new UpdateLogEntity()
-					{
-						User = client.Users[0],
-						AppVersion = 1000,
-						Addition = "Test update",
-						Commit = false,
-						RequestTime = DateTime.Now,
-						UpdateType = UpdateType.LoadingDocuments,
-						UserName = client.Users[0].Name,
-					};
+				var updateEntity = new UpdateLogEntity {
+					User = client.Users[0],
+					AppVersion = 1000,
+					Addition = "Test update",
+					Commit = false,
+					RequestTime = DateTime.Now,
+					UpdateType = UpdateType.LoadingDocuments,
+					UserName = client.Users[0].Name,
+				};
 				updateEntity.CreateAndFlush();
 				scope.VoteCommit();
 				return updateEntity;
 			}
 		}
 
-		public static Client CreateTestClientWithPayer()
-		{
-			Client client;
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
-				var payer = new Payer
-				{
-					ShortName = "test",
-					ContactGroupOwner = contactOwner,
-					JuridicalName = "testName",
-					JuridicalAddress = "testAddress",
-					ReceiverAddress = "testRecAddress",
-				};
-				payer.Save();
-				contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
-				client = new Client
-				{
-					Status = ClientStatus.On,
-					Segment = Segment.Wholesale,
-					Type = ClientType.Drugstore,
-					Name = "test",
-					FullName = "test",
-					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-					MaskRegion = 1UL,
-					Payer = payer,
-					ContactGroupOwner = contactOwner,
-				};
-				payer.Clients = new List<Client> { client };
-				client.SaveAndFlush();
-				client.Settings = new DrugstoreSettings(client.Id)
-				{
-					BasecostPassword = "",
-					OrderRegionMask = 1UL,
-				};
-				client.Settings.CreateAndFlush();
-
-				scope.VoteCommit();
-				return client;
-			}
-		}
-
 		public static Client CreateClientAndUsers()
 		{
-			Client client;
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
-				var payer = new Payer
-				{
-					ShortName = "test",
-					ContactGroupOwner = contactOwner,
-					JuridicalName = "testName",
-					JuridicalAddress = "testAddress",
-					ReceiverAddress = "testRecAddress",
-				};
-				payer.Save();
-				contactOwner = new ContactGroupOwner();
-				contactOwner.Save();
-				client = new Client
-				{
-					Status = ClientStatus.On,
-					Segment = Segment.Wholesale,
-					Type = ClientType.Drugstore,
-					Name = "test",
-					FullName = "test",
-					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-					MaskRegion = 1UL,
-					Payer = payer,
-					ContactGroupOwner = contactOwner,
-				};
-				client.SaveAndFlush();
-				client.Settings = new DrugstoreSettings(client.Id)
-				{
-					BasecostPassword = "",
-					OrderRegionMask = 1UL,
-				};
-				client.Settings.CreateAndFlush();
-				var user1 = new User(client)
-				{
+			return TestClient(c => {
+				var user1 = new User(c) {
 					Name = "test"
 				};
-				user1.Setup(client);
-				var user2 = new User(client)
-				{
+				user1.Setup(c);
+				var user2 = new User(c) {
 					Name = "test"
 				};
-				user2.Setup(client);
-				scope.VoteCommit();
-				return client;
-			}
+				user2.Setup(c);
+			});
 		}
 
 	}

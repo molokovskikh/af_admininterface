@@ -117,7 +117,7 @@ namespace AdminInterface.Models
 		public Client(Payer payer)
 		{
 			Enabled = true;
-			Payer = payer;
+			JoinPayer(payer);
 			Users = new List<User>();
 			Addresses = new List<Address>();
 		}
@@ -155,9 +155,6 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupOwnerId")]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
-		[BelongsTo("PayerId")]
-		public virtual Payer Payer { get; set; }
-
 		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]
 		public virtual Region HomeRegion { get; set; }
 
@@ -166,6 +163,14 @@ namespace AdminInterface.Models
 
 		[HasMany(ColumnKey = "ClientId", Inverse = true, Lazy = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
+
+		[HasAndBelongsToMany(typeof (Payer),
+			Lazy = true,
+			ColumnKey = "ClientId",
+			Table = "PayerClients",
+			Schema = "Billing",
+			ColumnRef = "PayerId")]
+		public virtual IList<Payer> Payers { get; set; }
 
 		public virtual bool Enabled
 		{
@@ -284,7 +289,7 @@ where
 
 		public virtual string GetEmailsForBilling()
 		{
-			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), Payer.ContactGroupOwner.ContactGroups.ToArray());
+			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), Payers.SelectMany(p => p.ContactGroupOwner.ContactGroups).ToArray());
 		}
 
 		private string GetEmails(bool unionEmails, ContactGroup generalGroup, params ContactGroup[] specialGroup)
@@ -386,10 +391,13 @@ group by u.ClientId")
 
 		public virtual void MaintainIntersection()
 		{
-			foreach (var legalEntity in Payer.JuridicalOrganizations)
-			{
+			foreach (var legalEntity in Orgs())
 				Maintainer.MaintainIntersection(this, legalEntity);
-			}
+		}
+
+		public virtual IEnumerable<LegalEntity> Orgs()
+		{
+			return Payers.SelectMany(p => p.JuridicalOrganizations);
 		}
 
 		public virtual Address AddAddress(string address)
@@ -402,12 +410,14 @@ group by u.ClientId")
 			if (Addresses == null)
 				Addresses = new List<Address>();
 			if (address.LegalEntity == null)
-				address.LegalEntity = Payer.JuridicalOrganizations.Single();
+			{
+				address.LegalEntity = Orgs().Single();
+				address.Payer = address.LegalEntity.Payer;
+			}
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
 			address.Registrant = SecurityContext.Administrator.UserName;
 			address.RegistrationDate = DateTime.Now;
-			address.Payer = Payer;
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);
@@ -418,7 +428,7 @@ group by u.ClientId")
 
 		public virtual bool ShouldSendNotification()
 		{
-			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payer.Id != 921;
+			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payers.All(p => p.Id != 921);
 		}
 
 		public virtual void UpdateRegionSettings(RegionSettings[] regionSettings)
@@ -477,8 +487,15 @@ group by u.ClientId")
 			if (String.IsNullOrEmpty(comment))
 				return;
 
-			Payer.AddComment(comment);
+			Payers.Single().AddComment(comment);
 			new ClientInfoLogEntity(comment, this).Save();
+		}
+
+		public virtual void JoinPayer(Payer payer)
+		{
+			if (Payers == null)
+				Payers = new List<Payer>();
+			Payers.Add(payer);
 		}
 	}
 }

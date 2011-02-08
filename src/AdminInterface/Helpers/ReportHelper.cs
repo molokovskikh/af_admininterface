@@ -58,36 +58,24 @@ namespace AdminInterface.Helpers
 			return stream;
 		}
 
-		public static int SendClientCardAfterPasswordChange(User user, string password, string additionTo)
-		{
-			return SendClientCard(user.Client,
-				user.Login,
-				password,
-				null,
-				additionTo,
-				false);
-		}
-
-		public static int SendClientCard(Client client,
-			string login,
+		public static int SendClientCard(User user,
 			string password,
-			string generalTo,
-			string additionTo,
-			bool isRegistration)
+			bool isRegistration,
+			params string[] mails)
 		{
 			string body;
-
+			var client = user.Client;
 			if (client.IsDrugstore())
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
 			else
 				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
 
 			using (var stream = CreateReport(client.Id,
-				client.Payer.Id,
+				user.Payer.Id,
 				client.Name,
 				client.FullName,
 				client.GetHumanReadableType(),
-				login,
+				user.Login,
 				password,
 				DateTime.Now,
 				isRegistration))
@@ -99,8 +87,9 @@ namespace AdminInterface.Helpers
 				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
 			})
 			{
-				EmailHelper.BuildAttachementFromString(additionTo, message);
-				EmailHelper.BuildAttachementFromString(generalTo, message);
+				foreach (var mail in mails)
+					EmailHelper.BuildAttachementFromString(mail, message);
+
 				return Func.Send(message);
 			}
 		}

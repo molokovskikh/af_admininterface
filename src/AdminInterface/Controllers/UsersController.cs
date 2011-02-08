@@ -41,7 +41,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["regions"] = regions;
-			PropertyBag["Organizations"] = client.Payer.JuridicalOrganizations;
+			PropertyBag["Organizations"] = client.Orgs().ToArray();
 			PropertyBag["UserRegistration"] = true;
 		}
 
@@ -108,8 +108,9 @@ namespace AdminInterface.Controllers
 					mails = mails.Remove(mails.Length - 1);
 				if (mails.StartsWith(","))
 					mails = mails.Substring(1, mails.Length - 1);
-				var smtpId = ReportHelper.SendClientCardAfterPasswordChange(user,
+				var smtpId = ReportHelper.SendClientCard(user,
 					password,
+					false,
 					mails);
 				passwordChangeLog.SetSentTo(smtpId, mails);
 				passwordChangeLog.Update();
@@ -234,9 +235,10 @@ namespace AdminInterface.Controllers
 
 				if (isSendClientCard)
 				{
-					var smtpId = ReportHelper.SendClientCardAfterPasswordChange(
+					var smtpId = ReportHelper.SendClientCard(
 						user,
 						password,
+						false,
 						emailsForSend);
 					passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 				}
@@ -275,7 +277,7 @@ namespace AdminInterface.Controllers
 		{
 			Session["Register"] = false;
 			Session["Code"] = user.Client.Id;
-			Session["DogN"] = user.Client.Payer.Id;
+			Session["DogN"] = user.Client.Payers.First().Id;
 			Session["Name"] = String.IsNullOrEmpty(user.Client.FullName) ? String.Empty : user.Client.FullName;
 			Session["ShortName"] = String.IsNullOrEmpty(user.Client.Name) ? String.Empty : user.Client.Name;
 			Session["Login"] = String.IsNullOrEmpty(user.Login) ? String.Empty : user.Login;

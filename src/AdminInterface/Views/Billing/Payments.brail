@@ -228,7 +228,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<% if IsDefined("Client") and client.Id == Client.Id: %>
 						<strong>${client.Name}</strong>
 					<% else: %>
-						<a href="edit.rails?ClientCode=${client.Id}&showClients=true&tab=payments">
+						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&showClients=true&tab=payments">
 							${client.Name}
 						</a>
 					<% end %>

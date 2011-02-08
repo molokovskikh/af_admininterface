@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AdminInterface.Test.ForTesting;
+﻿using System.Linq;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 
-namespace Functional
+namespace Functional.Billing
 {
 	public class AccountingFixture : WatinFixture
 	{

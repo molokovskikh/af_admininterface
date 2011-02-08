@@ -48,17 +48,9 @@ namespace AdminInterface.Controllers
 			uint currentJuridicalOrganizationId)
 		{
 			Client client = null;
-			Payer payer;
-
+			var payer = Payer.Find(billingCode);
 			if (clientCode != 0)
-			{
 				client = Client.Find(clientCode);
-				payer = client.Payer;
-			}
-			else
-			{
-				payer = Payer.Find(billingCode);
-			}
 
 			var user = (userId != 0) ? User.Find(userId) : payer.Users.FirstOrDefault();
 			var address = (addressId != 0) ? Address.Find(addressId) : payer.Addresses.FirstOrDefault();

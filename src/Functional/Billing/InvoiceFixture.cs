@@ -21,9 +21,8 @@ namespace Functional.Billing
 			Invoice invoice;
 			using(new SessionScope())
 			{
-				var client = DataMother.CreateTestClientWithAddressAndUser();
-				client.Payer.Recipient = Recipient.Queryable.First();
-				invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
+				var payer = DataMother.BuildPayerForBillingDocumentTest();
+				invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
 				invoice.Save();
 			}
 

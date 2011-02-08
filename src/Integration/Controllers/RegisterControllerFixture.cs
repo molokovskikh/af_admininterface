@@ -1,28 +1,15 @@
 ﻿using System;
-using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
-using AdminInterface.Models.Billing;
-using AdminInterface.Models.Security;
-using AdminInterface.Security;
-using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
-using MySql.Data.MySqlClient;
-using System.Collections.Generic;
 using Common.Web.Ui.Models;
-using System.Configuration;
-
 
 namespace Integration.Controllers
 {
@@ -30,112 +17,74 @@ namespace Integration.Controllers
 	public class RegisterControllerFixture : BaseControllerTest
 	{
 		private RegisterController controller;
+		private Client client;
+		private Payer payer;
+		private RegionSettings[] regionSettings;
+		private AdditionalSettings addsettings;
+		private Contact[] clientContacts;
+		private Person[] person;
 
 		[SetUp]
 		public void Setup()
 		{
+			var workerRequest = new SimpleWorkerRequest("", "", "", "http://test", new StreamWriter(new MemoryStream()));
+			var context = new HttpContext(workerRequest);
+			HttpContext.Current = context;
+
 			controller = new RegisterController();
 			PrepareController(controller, "Registered");
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
+
+			client = DataMother.TestClient();
+			payer = client.Payers.First();
+
+			regionSettings = new [] {
+				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
+			};
+			addsettings = new AdditionalSettings {PayerExists = true};
+			clientContacts = new[] {new Contact{Id = 1, Type = 0, ContactText = "11@33.ru"}};
+			person = new[] {new Person()};
 		}
 
 		[Test, Ignore("Чинить. Нужно вместо null передавать объект JuridicalOrganisation")]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
-			var workerRequest = new SimpleWorkerRequest("", "", "", "http://test", new StreamWriter(new MemoryStream()));
-			var context = new HttpContext(workerRequest);
-			HttpContext.Current = context;
-			
-			Client client = DataMother.CreateTestClient();
-			Payer payer = client.Payer;
 			payer.Comment = "ata";
 			payer.Update();
+
 			Context.Session["ShortName"] = "Test";
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
 			controller.Registered(payer, null, paymentOptions, client.Id, false);
 
-			Assert.That(Payer.Find(payer.PayerID).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
+			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
 
 		[Test]
 		public void Create_LegalEntity()
 		{
-			var client1 = DataMother.CreateTestClientWithPayer();
-			client1.MaskRegion = 1;
-			client1.Settings = new DrugstoreSettings
-			{
-				Id = client1.Id,
-				WorkRegionMask = client1.MaskRegion,
-				OrderRegionMask = 111,
-				ParseWaybills = true,
-				ShowAdvertising = true,
-				ShowNewDefecture = true,
-			};
-			client1.Settings.WorkRegionMask = 1;
-			var regionSettings = new [] {
-				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
-			var addsettings = new AdditionalSettings();
-			addsettings.PayerExists = true;
-			var clientContacts = new[] {
-				new Contact{Id = 1, Type = 0, ContactText = "11@33.ru"}};
-			var person = new[] {new Person()};
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", payer, 
+				payer.Id, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
 
-			controller.RegisterClient(client1, 1, regionSettings, null, addsettings, "address", client1.Payer, 
-				client1.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
-
-			var legFullName = ArHelper.WithSession(s => s
-			    .CreateSQLQuery(@"select fullname from billing.LegalEntities where payerid = :payerid")
-			    .SetParameter("payerid", client1.Payer.PayerID)
-			    .UniqueResult());
-
-			var legName = ArHelper.WithSession(s => s
-				.CreateSQLQuery(@"select name from billing.LegalEntities where payerid = :payerid")
-				.SetParameter("payerid", client1.Payer.PayerID)
-				.UniqueResult());
-			
-			Assert.That(legName, Is.EqualTo(client1.Payer.ShortName));
-			Assert.That(legFullName, Is.EqualTo(client1.Payer.JuridicalName));
+			payer.Refresh();
+			Assert.That(payer.JuridicalOrganizations.Count, Is.EqualTo(1));
+			var org = payer.JuridicalOrganizations.Single();
+			Assert.That(org.Name, Is.EqualTo(payer.ShortName));
+			Assert.That(org.FullName, Is.EqualTo(payer.JuridicalName));
+			Assert.That(client.Addresses[0].LegalEntity, Is.EqualTo(org));
 		}
 
 		[Test]
 		public void Create_client_with_smart_order()
 		{
-			using (new SessionScope())
-			{
-				var client = DataMother.CreateTestClient();
-				client.MaskRegion = 1;
-				client.Settings = new DrugstoreSettings
-				{
-					Id = client.Id,
-					WorkRegionMask = client.MaskRegion,
-					OrderRegionMask = 111,
-					ParseWaybills = true,
-					ShowAdvertising = true,
-					ShowNewDefecture = true,
-				};
-				client.Settings.WorkRegionMask = 1;
-				var regionSettings = new[]
-				{
-					new RegionSettings
-						{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
-				};
-				var addsettings = new AdditionalSettings();
-				addsettings.PayerExists = true;
-				var clientContacts = new[]
-				{
-					new Contact {Id = 1, Type = 0, ContactText = "11@ww.ru"}
-				};
-				var person = new[] {new Person()};
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", payer,
+				payer.Id, null, clientContacts, null, new Contact[0], person, "", "");
 
-				controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", client.Payer,
-				                          client.Payer.PayerID, null, clientContacts, null, new Contact[0], person, "", "");
-				var client1 = Client.Find(client.Id + 1);
-				Assert.That(client1.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
-				Assert.That(client1.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
-				Assert.That(client1.Settings.EnableSmartOrder, Is.EqualTo(true));
-			}
+			client = Client.Find(client.Id);
+			Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
+			Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
+			Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 	}
 }

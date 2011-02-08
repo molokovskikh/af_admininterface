@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
@@ -17,10 +18,10 @@ namespace Integration.Models
 			LegalEntity legalEntity;
 			using (new TransactionScope())
 			{
-				var client = DataMother.CreateTestClient();
+				var client = DataMother.TestClient();
 				legalEntity = new LegalEntity {
 					Name = "тараканов и сыновья",
-					Payer = client.Payer
+					Payer = client.Payers.First()
 				};
 				legalEntity.Save();
 			}

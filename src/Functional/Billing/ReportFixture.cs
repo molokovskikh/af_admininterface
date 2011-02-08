@@ -27,14 +27,16 @@ namespace Functional.Billing
 		public void SetUp()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
+			var payer = client.Payers.First();
 			report = new Report {
 				Allow = true,
 				Comment = "עוסעמגûי מעקוע",
-				Payer = client.Payer,
+				Payer = payer,
 			};
 			report.Save();
-			client.Payer.Reports = new List<Report>();
-			client.Payer.Reports.Add(report);
+			
+			payer.Reports = new List<Report>();
+			payer.Reports.Add(report);
 
 			browser = Open("Billing/Edit.rails?ClientCode={0}", client.Id);
 		}

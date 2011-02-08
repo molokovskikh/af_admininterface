@@ -122,7 +122,7 @@ namespace AdminInterface.Controllers
 				};
 				if (currentPayer == null)
 					currentPayer = CreatePayer(newClient);
-				newClient.Payer = currentPayer;
+				newClient.JoinPayer(currentPayer);
 				newClient.AddAddress(deliveryAddress);
 				newClient.SaveAndFlush();
 
@@ -151,7 +151,7 @@ namespace AdminInterface.Controllers
 			newUser.UpdateContacts(userContacts);
 
 			Mailer.ClientRegistred(newClient, false);
-			Session["DogN"] = newClient.Payer.Id;
+			Session["DogN"] = newClient.Payers.Single().Id;
 			Session["Code"] = newClient.Id;
 			Session["Name"] = newClient.FullName;
 			Session["ShortName"] = newClient.Name;
@@ -171,7 +171,7 @@ namespace AdminInterface.Controllers
 			{
 				sendBillingNotificationNow = false;
 				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-					newClient.Payer.Id,
+					newClient.Payers.Single().Id,
 					additionalSettings.ShowRegistrationCard,
 					newClient.Id);
 			}
@@ -192,12 +192,11 @@ namespace AdminInterface.Controllers
 		{
 			var mailTo = client.GetAddressForSendingClientCard();
 
-			var smtpid = ReportHelper.SendClientCard(client,
-				user.Login,
+			var smtpid = ReportHelper.SendClientCard(user,
 				password,
+				true,
 				mailTo,
-				additionalEmails,
-				true);
+				additionalEmails);
 
 			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, user.GetEmails(), additionalEmails));
 			return log;

@@ -327,7 +327,7 @@ namespace Functional
 				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
 				var client = Client.Find(clientcode);
-				Assert.That(client.Payer.PayerID, Is.EqualTo(testPayerId));
+				Assert.That(client.Payers.First().Id, Is.EqualTo(testPayerId));
 
 				var settings = DrugstoreSettings.Find(clientcode);
 				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
@@ -338,7 +338,7 @@ namespace Functional
 		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя")]
 		public void Check_flags_by_adding_user()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
 				browser.Link(Find.ByText("Новый пользователь")).Click();
@@ -658,34 +658,6 @@ namespace Functional
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button("RegisterButton").Click();
 				Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
-			}
-		}
-
-		[Test]
-		public void Register_client_with_payer_and_juridical_organization()
-		{
-			uint clientCode;
-
-			using (var browser = Open("Register/Register.rails"))
-			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
-				browser.CheckBox("ShowRegistrationCard").Checked = true;
-				browser.CheckBox("FillBillingInfo").Checked = true;
-
-				browser.Button(Find.ByValue("Зарегистрировать")).Click();
-
-				browser.TextField(Find.ByName("JuridicalOrganization.Name")).TypeText("TestJuridicalOrganizationName");
-				browser.Button(Find.ByValue("Сохранить")).Click();
-
-				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			}
-
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientCode);
-				Assert.That(client.Payer.JuridicalOrganizations.Count, Is.EqualTo(1));
-				Assert.That(client.Payer.JuridicalOrganizations[0].Name, Is.EqualTo("TestJuridicalOrganizationName"));
-				Assert.That(client.Addresses[0].LegalEntity, Is.Not.Null);
 			}
 		}
 	}

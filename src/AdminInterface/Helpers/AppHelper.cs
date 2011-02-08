@@ -52,34 +52,20 @@ namespace AdminInterface.Helpers
 			return LinkTo(item, ((dynamic)item).Name, action);
 		}
 
-		public string LinkTo(object item, object label, string action)
+		public string LinkTo(object item, object title, string action)
 		{
 			if (item == null)
 				return "";
+
+			if (!HavePermission(GetControllerName(item), action))
+				return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
 
 			var clazz = "";
 			if (item is Address && !((Address)item).Enabled)
 				clazz = "DisabledByBilling";
 
 			var uri = GetUrl(item, action);
-			return String.Format("<a class='{1}' href='{3}{2}'>{0}</a>", label, clazz, uri, LinkHelper.GetVirtualDir(Context));
-		}
-
-		public static string GetUrl(object item, string action = null)
-		{
-			var dynamicItem = ((dynamic)item);
-			var id = dynamicItem.Id;
-			var className = NHibernateUtil.GetClass(item).Name;
-			if (className == "Address")
-			{
-				className = "Delivery";
-			}
-			if (!String.IsNullOrEmpty(action))
-			{
-				action = "/" + action;
-			}
-			var controller = Inflector.Pluralize(className);
-			return String.Format("/{0}/{1}{2}", controller, id, action);
+			return String.Format("<a class='{1}' href='{3}{2}'>{0}</a>", title, clazz, uri, LinkHelper.GetVirtualDir(Context));
 		}
 
 		public string LinkTo(string title, string controller, string method)
@@ -91,6 +77,26 @@ namespace AdminInterface.Helpers
 				method = "";
 
 			return String.Format("<a href='{1}/{2}/{3}'>{0}</a>", title, LinkHelper.GetVirtualDir(Context), controller, method);
+		}
+
+		public static string GetUrl(object item, string action = null)
+		{
+			var dynamicItem = ((dynamic)item);
+			var id = dynamicItem.Id;
+			var controller = GetControllerName(item);
+			if (!String.IsNullOrEmpty(action))
+				action = "/" + action;
+			return String.Format("/{0}/{1}{2}", controller, id, action);
+		}
+
+		private static string GetControllerName(object item)
+		{
+			var className = NHibernateUtil.GetClass(item).Name;
+			if (className == "Address")
+			{
+				className = "Delivery";
+			}
+			return Inflector.Pluralize(className);
 		}
 
 		private bool HavePermission(string controller, string action)

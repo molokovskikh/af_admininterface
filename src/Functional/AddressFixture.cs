@@ -42,7 +42,7 @@ namespace Functional
 		[Test]
 		public void Create_address()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 
 			using(var browser = Open("client/{0}", client.Id))
 			{
@@ -111,7 +111,7 @@ namespace Functional
 		public void AddContactInformation()
 		{
 			var applyButtonText = "Создать";
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			var countContacts = 0;
 			using (var browser = Open("client/{0}", client.Id))
 			{
@@ -134,7 +134,7 @@ namespace Functional
 		[Test]
 		public void Address_must_be_enabled_after_registration()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				using (new SessionScope())

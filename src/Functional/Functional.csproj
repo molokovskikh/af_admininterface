@@ -104,7 +104,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AccountingFixture.cs" />
+    <Compile Include="Billing\AccountingFixture.cs" />
     <Compile Include="AddressFixture.cs" />
     <Compile Include="BillingFixture.cs" />
     <Compile Include="Billing\ActsFixture.cs" />

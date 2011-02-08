@@ -196,7 +196,7 @@ namespace AdminInterface.Controllers
 		{
 			CancelLayout();
 			var client = Client.FindAndCheck(clientId);
-			var suppliers = Supplier.GetByPayerId(client.Payer.PayerID);
+			var suppliers = client.Payers.SelectMany(p => Supplier.GetByPayerId(p.Id)).OrderBy(s => s.Name).ToList();
 			PropertyBag["suppliers"] = suppliers;
 			if (client.Settings.NoiseCostExceptSupplier != null)
 				PropertyBag["FirmCodeOnly"] = client.Settings.NoiseCostExceptSupplier.Id;
@@ -345,7 +345,7 @@ where Phone like :phone")
 		public object[] LegalEntities(uint id)
 		{
 			var client = Client.FindAndCheck(id);
-			return client.Payer.JuridicalOrganizations.Select(j => new {j.Id, j.Name}).ToArray();
+			return client.Orgs().Select(j => new {j.Id, j.Name}).ToArray();
 		}
 
 		public void SearchAssortmentPrices(string text)
@@ -387,7 +387,7 @@ where Phone like :phone")
 			var oldClient = Client.Find(user.Client.Id);
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
-				legalEntity = newClient.Payer.JuridicalOrganizations.Single();
+				legalEntity = newClient.Orgs().Single();
 
 			// Если нужно перенести вместе с пользователем,
 			// адрес привязан только к этому пользователю и у пользователя нет других адресов,

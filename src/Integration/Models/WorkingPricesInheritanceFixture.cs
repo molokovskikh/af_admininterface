@@ -13,7 +13,7 @@ namespace Integration.Models
 		[Test]
 		public void Inherit_working_prices()
 		{
-			var client = DataMother.CreateTestClient();
+			var client = DataMother.TestClient();
 			var parent = new User(client);
 			var child = new User(client);
 

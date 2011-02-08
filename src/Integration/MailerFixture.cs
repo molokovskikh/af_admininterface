@@ -34,6 +34,7 @@ namespace Integration
 		private MonorailMailer mailer;
 		private Message message;
 		private Client client;
+		private Payer payer;
 
 		[SetUp]
 		public void Setup()
@@ -57,13 +58,13 @@ namespace Integration
 			MonorailMailer.ViewEngineManager = manager;
 			controller.Context.Services.EmailTemplateService = new EmailTemplateService(manager);
 
-			client = new Client
-			{
+			client = new Client {
 				Id = 58,
-				Payer = new Payer { PayerID = 10 },
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" }
 			};
+			payer = new Payer { PayerID = 10 };
+			client.JoinPayer(payer);
 		}
 
 		public static IViewEngineManager GetViewManager()
@@ -97,7 +98,7 @@ namespace Integration
 		public void BillingNotificationTest()
 		{
 			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "Независимая копия" };
-			client.Payer.AddComment(paymentOptions.GetCommentForPayer());
+			payer.AddComment(paymentOptions.GetCommentForPayer());
 
 			mailer.NotifyBillingAboutClientRegistration(client);
 			mailer.Send();
@@ -128,7 +129,7 @@ namespace Integration
 		public void Billing_notification_for_client_with_basic_submission()
 		{
 			var paymentOptions = new PaymentOptions { PaymentPeriodBeginDate = new DateTime(2007, 1, 1), Comment = "Test comment"};
-			client.Payer.AddComment(paymentOptions.GetCommentForPayer());
+			payer.AddComment(paymentOptions.GetCommentForPayer());
 
 			mailer.NotifyBillingAboutClientRegistration(client);
 			mailer.Send();
@@ -200,10 +201,8 @@ namespace Integration
 
 		private Invoice CreateInvoice()
 		{
-			Invoice invoice;
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Payer.Recipient = Recipient.Queryable.First();
-			invoice = new Invoice(client.Payer, Period.January, new DateTime(2010, 12, 27));
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
 			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
 			invoice.Save();

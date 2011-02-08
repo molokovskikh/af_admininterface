@@ -18,11 +18,11 @@ namespace Integration.Models
 			Recipient recipient;
 			using (new SessionScope())
 			{
+				var client = DataMother.TestClient();
+				payer = client.Payers.First();
 				recipient = Recipient.Queryable.First();
-				var client = DataMother.CreateTestClient();
-				client.Payer.Recipient = recipient;
-				client.Payer.Save();
-				payer = client.Payer;
+				payer.Recipient = recipient;
+				payer.Save();
 			}
 
 			var items = BillingSearchItem.FindBy(new BillingSearchProperties{

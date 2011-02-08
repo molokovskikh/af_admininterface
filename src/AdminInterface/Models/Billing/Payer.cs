@@ -140,15 +140,6 @@ namespace AdminInterface.Models
 		public virtual bool SendScannedDocuments { get; set; }
 
 		[Property]
-		public virtual uint DiscountValue { get; set; }
-
-		[Property]
-		public virtual DiscountType DiscountType { get; set; }
-
-		[Property]
-		public virtual bool ShowDiscount { get; set; }
-
-		[Property]
 		public virtual decimal Balance { get; set; }
 
 		[Property(NotNull = true, Default = "0")]
@@ -159,9 +150,6 @@ namespace AdminInterface.Models
 
 		[BelongsTo("RecipientId")]
 		public virtual Recipient Recipient { get; set; }
-
-		[HasMany(typeof (Client), Lazy = true, Inverse = true, OrderBy = "Name")]
-		public virtual IList<Client> Clients { get; set; }
 
 		[HasMany(typeof (User), Lazy = true, Inverse = true, OrderBy = "Name")]
 		public virtual IList<User> Users { get; set; }
@@ -174,6 +162,15 @@ namespace AdminInterface.Models
 
 		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]
 		public virtual IList<Report> Reports { get; set; }
+
+		[HasAndBelongsToMany(typeof (Client),
+			Lazy = true,
+			Inverse = true,
+			ColumnKey = "PayerId",
+			Table = "PayerClients",
+			Schema = "Billing",
+			ColumnRef = "ClientId")]
+		public virtual IList<Client> Clients { get; set; }
 
 		public virtual string GetMailAddress()
 		{
@@ -190,13 +187,6 @@ namespace AdminInterface.Models
 		public virtual string Name
 		{
 			get { return ShortName; }
-		}
-
-		public virtual float ApplyDiscount(float sum)
-		{
-			if (DiscountType == DiscountType.Currency)
-				return Math.Max(sum - DiscountValue, 0);
-			return Math.Max(sum - sum * DiscountValue / 100, 0);
 		}
 
 		public virtual bool IsManualPayments()

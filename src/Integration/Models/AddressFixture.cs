@@ -1,4 +1,5 @@
 using System.Linq;
+using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -12,9 +13,9 @@ namespace Integration.Models
 		public void Move_address()
 		{
 			var client = DataMother.CreateTestClientWithAddress();
-			var recepient = DataMother.CreateTestClient();
+			var recepient = DataMother.TestClient();
 			var address = client.Addresses.First();
-			var legalEntity = recepient.Payer.JuridicalOrganizations.First();
+			var legalEntity = recepient.Orgs().First();
 			address.MoveToAnotherClient(recepient, legalEntity);
 
 			ArHelper.WithSession(s => {
@@ -27,7 +28,7 @@ where i.PriceId = 4832 and ai.AddressId = :addressId ")
 			});
 
 			Assert.That(address.Client, Is.EqualTo(recepient));
-			Assert.That(address.Payer, Is.EqualTo(recepient.Payer));
+			Assert.That(address.Payer, Is.EqualTo(legalEntity.Payer));
 			Assert.That(address.LegalEntity, Is.EqualTo(legalEntity));
 			ArHelper.WithSession(s => {
 				var supplierDeliveryId = s.CreateSQLQuery(@"

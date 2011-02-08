@@ -1,6 +1,4 @@
-﻿using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
-using Functional.ForTesting;
+﻿using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
@@ -12,12 +10,12 @@ namespace Functional
 		[Test]
 		public void Try_to_clone_client()
 		{
-			var client1 = DataMother.CreateTestClient(new Client {
-				Name = "тестовый 1"
+			var client1 = DataMother.TestClient(c => {
+				c.Name = "тестовый 1";
 			});
 
-			var client2 = DataMother.CreateTestClient(new Client {
-				Name = "тестовый 2"
+			var client2 = DataMother.TestClient(c => {
+				c.Name = "тестовый 2";
 			});
 
 			using (var browser = Open("main/index"))
