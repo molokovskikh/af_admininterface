@@ -187,6 +187,7 @@ namespace AdminInterface.Models
 		public virtual string Name
 		{
 			get { return ShortName; }
+			set { ShortName = value; }
 		}
 
 		public virtual bool IsManualPayments()

@@ -63,7 +63,7 @@ namespace Integration
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" }
 			};
-			payer = new Payer { PayerID = 10 };
+			payer = new Payer { PayerID = 10, Name = "Тестовый плательщик"};
 			client.JoinPayer(payer);
 		}
 
@@ -112,7 +112,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
+Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
 <br>
 Код: 58
 <br>
@@ -134,17 +134,7 @@ namespace Integration
 			mailer.NotifyBillingAboutClientRegistration(client);
 			mailer.Send();
 
-			Assert.That(message.Body, Is.EqualTo(
-				@"Зарегистрирован новый клиент
-<br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
-<br>
-Код: 58
-<br>
-Биллинг код: 10
-<br>
-Кем зарегистрирован: test
-<br>
+			Assert.That(message.Body, Is.StringContaining(@"
 Дата начала платного периода: 01.01.2007
 Комментарий: Test comment
 "));
@@ -159,7 +149,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?clientCode=58'>Тестовый клиент</a>
+Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
 <br>
 Код: 58
 <br>

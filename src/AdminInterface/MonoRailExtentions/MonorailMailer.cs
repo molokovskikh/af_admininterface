@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Linq.Expressions;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -99,6 +100,7 @@ namespace AdminInterface.MonoRailExtentions
 			Subject = "Регистрация нового клиента";
 
 			PropertyBag["client"] = client;
+			PropertyBag["payer"] = client.Payers.First();
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["Me"] = Me();
 		}
