@@ -242,14 +242,12 @@ namespace Integration.ForTesting
 		public static Client CreateClientAndUsers()
 		{
 			return TestClient(c => {
-				var user1 = new User(c) {
+				c.AddUser(new User(c) {
 					Name = "test"
-				};
-				user1.Setup(c);
-				var user2 = new User(c) {
+				});
+				c.AddUser(new User(c) {
 					Name = "test"
-				};
-				user2.Setup(c);
+				});
 			});
 		}
 
