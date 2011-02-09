@@ -135,6 +135,14 @@
 		</tr>
 		<tr>
 			<td>
+				Примечание:
+			</td>
+			<td>
+				<textarea cols=30 rows=2 name=payment.OperatorComment>${payment.OperatorComment}</textarea>
+			</td>
+		</tr>
+		<tr>
+			<td>
 				Обновить ИНН плательщика:
 			</td>
 			<td>

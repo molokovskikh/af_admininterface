@@ -136,6 +136,9 @@ namespace AdminInterface.Models.Billing
 		public decimal Sum { get; set; }
 
 		[Property]
+		public string OperatorComment { get; set; }
+
+		[Property]
 		public string Comment { get; set; }
 
 		[Property]

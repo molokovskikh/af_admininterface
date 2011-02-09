@@ -44,6 +44,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Binder, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.Components.Common.EmailSender, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
       <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
@@ -121,6 +122,7 @@
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="Controllers\UsersControllerFixture.cs" />
+    <Compile Include="Core\BetterBinderFixture.cs" />
     <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="InvoiceFilterFixture.cs" />

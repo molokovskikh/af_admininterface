@@ -13,7 +13,6 @@ using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
 using Common.Web.Ui.Helpers;
-using IgorO.ExposedObjectProject;
 using NHibernate;
 
 namespace AdminInterface.Helpers
