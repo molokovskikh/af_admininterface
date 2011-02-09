@@ -10,17 +10,19 @@ using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.ActiveRecord.Framework.Internal;
 using Castle.Components.Validator;
+using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
 using Common.Web.Ui.Helpers;
+using IgorO.ExposedObjectProject;
 using NHibernate;
 
 namespace AdminInterface.Helpers
 {
 	public class AppHelper : AbstractHelper
 	{
-		public string GetValidationError(string name)
+		public string GetValidationError(object item, string name)
 		{
-			var errorSummary = (ErrorSummary) ControllerContext.PropertyBag["error"];
+			var errorSummary = ((SmartDispatcherController)Controller).Binder.GetValidationSummary(item);
 			if (errorSummary == null)
 				return "";
 			var errors = errorSummary.GetErrorsForProperty(name);
@@ -93,9 +95,9 @@ namespace AdminInterface.Helpers
 		{
 			var className = NHibernateUtil.GetClass(item).Name;
 			if (className == "Address")
-			{
 				className = "Delivery";
-			}
+			else if (className == "Client")
+				return "Client";
 			return Inflector.Pluralize(className);
 		}
 

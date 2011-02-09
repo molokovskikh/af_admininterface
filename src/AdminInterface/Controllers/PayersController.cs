@@ -48,27 +48,25 @@ namespace AdminInterface.Controllers
 
 		public void NewInvoice(uint id)
 		{
-			//Binder.Validator = Validator;
+			Binder.Validator = Validator;
 			var payer = Payer.Find(id);
+			var invoice = new Invoice(payer);
+			PropertyBag["invoice"] = invoice;
+
 			if (IsPost)
 			{
-				var invoice = BindObject<Invoice>("invoice");
-/*
+				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice))
 				{
-*/
 					invoice.SetPayer(payer);
 					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
 					invoice.Save();
 					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
-/*
 				}
-				else
-				{
-					PropertyBag["invoice"] = invoice;
-					PropertyBag["error"] = GetErrorSummary(invoice);
-				}
-*/
+			}
+			else
+			{
+				invoice.Parts.Add(new InvoicePart());
 			}
 		}
 	}

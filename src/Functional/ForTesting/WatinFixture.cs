@@ -48,9 +48,9 @@ namespace Functional.ForTesting
 			}
 		}
 
-		protected IE Open(object item)
+		protected IE Open(object item, string action = null)
 		{
-			return new IE(BuildTestUrl(AppHelper.GetUrl(item)));
+			return new IE(BuildTestUrl(AppHelper.GetUrl(item, action)));
 		}
 
 		protected IE Open(string uri)

@@ -63,7 +63,7 @@ namespace Functional
 			var clientId = String.Empty;
 			ArHelper.WithSession(session => clientId = session.CreateSQLQuery(sql).UniqueResult().ToString());
 			var client = Client.Find(Convert.ToUInt32(clientId));
-			using (var browser = Open("client/{0}", clientId))
+			using (var browser = Open(client))
 			{
 				browser.Link(Find.ByText("История заказов")).Click();
 				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История заказов клиента {0}", client.Name))))

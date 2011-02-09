@@ -946,7 +946,7 @@ namespace Functional
 			}
 			var oldCountUserPrices = GetCountUserPrices(user.Id);
 
-			using (var browser = Open("users/{0}/edit", user.Id.ToString()))
+			using (var browser = Open(user, "edit"))
 			{
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 				browser.Button(Find.ById("SearchClientButton")).Click();
@@ -1001,7 +1001,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				address = oldClient.Addresses[0];
 				newClient = DataMother.CreateTestClientWithAddressAndUser();
 			}
-			using (var browser = Open("users/{0}/edit", user.Id.ToString()))
+			using (var browser = Open(user, "edit"))
 			{
 				// Даем доступ пользователю к адресу доставки
 				browser.CheckBox(Find.ByName("user.AvaliableAddresses[0].Id")).Checked = true;

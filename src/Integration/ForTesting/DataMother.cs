@@ -92,6 +92,7 @@ namespace Integration.ForTesting
 			var client = CreateTestClientWithAddressAndUser();
 			var payer = client.Payers.First();
 			payer.Recipient = Recipient.Queryable.First();
+			payer.Refresh();
 			return payer;
 		}
 

@@ -24,9 +24,16 @@ namespace AdminInterface.Models.Billing
 		public Invoice()
 		{}
 
-		public Invoice(Payer payer, Period period, DateTime invoiceDate)
+		public Invoice(Payer payer)
 		{
+			Parts = new List<InvoicePart>();
+			Date = DateTime.Now;
 			SetPayer(payer);
+		}
+
+		public Invoice(Payer payer, Period period, DateTime invoiceDate)
+			: this(payer)
+		{
 			Period = period;
 			Sum = payer.TotalSum;
 			Date = invoiceDate;
