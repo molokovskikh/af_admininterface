@@ -22,13 +22,23 @@
 	});
 </script>
 
+<% if invoice.Id: %>
+<h2>Редактирование счета №${invoice.Id}</h2>
+<% else: %>
 <h2>Формирование дополнительного счета</h2>
+<% end %>
 
 ${app.GetValidationError(invoice, "Recipient")}
 
 <form class="accountant-friendly" method=post>
 	<div class=block>
 		<table>
+		<tr>
+			<td>Плательщик:</td>
+			<td>
+				${app.LinkTo(invoice.Payer)}
+			</td>
+		</tr>
 		<tr>
 			<td>
 				<label>Дата:</label>

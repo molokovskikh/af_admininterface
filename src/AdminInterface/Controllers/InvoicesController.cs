@@ -119,6 +119,26 @@ namespace AdminInterface.Controllers
 			PropertyBag["invoice"] = Invoice.Find(id);
 		}
 
+		public void Edit(uint id)
+		{
+			Binder.Validator = Validator;
+			RenderView("/Payers/NewInvoice");
+
+			var invoice = Invoice.Find(id);
+			PropertyBag["invoice"] = invoice;
+
+			if (IsPost)
+			{
+				BindObjectInstance(invoice, "invoice");
+				if (!HasValidationError(invoice))
+				{
+					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
+					invoice.Save();
+					Redirect("Invoice", "Edit", new {invoice.Id});
+				}
+			}
+		}
+
 		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate, uint recipientId)
 		{
 /*			var invoicePeriod = InvoicePeriod.Month;
