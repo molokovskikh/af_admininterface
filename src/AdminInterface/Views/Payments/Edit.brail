@@ -36,7 +36,7 @@
 </div>
 <% end %>
 
-<form method="post">
+<form class="accountant-friendly" method="post">
 	${FormHelper.HiddenField("payment.Id")}
 	${FormHelper.HiddenField("payment.Payer.PayerId")}
 

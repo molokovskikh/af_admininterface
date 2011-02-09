@@ -26,7 +26,7 @@
 
 ${app.GetValidationError(invoice, "Recipient")}
 
-<form method=post>
+<form class="accountant-friendly" method=post>
 	<div class=block>
 		<table>
 		<tr>

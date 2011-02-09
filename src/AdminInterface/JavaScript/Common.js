@@ -11,6 +11,19 @@ $(function () {
 		$(this).mask("999999999,99");
 	});
 */
+	$("form.accountant-friendly input[type=text],form.accountant-friendly select,form.accountant-friendly textarea").keydown(function (e) {
+		if (event.keyCode == 13) {
+			var items = $(this).parents("form").find("input[type=text],select,textarea");
+			var currentIndex = items.index(this);
+			var nextItem = items.get(currentIndex + 1);
+			if (nextItem) {
+				nextItem.focus();
+				nextItem.select();
+				event.preventDefault();
+				return false;
+			}
+		}
+	});
 
 	$(".ShowHiden").live('click', function () {
 		ShowHidden(this);
