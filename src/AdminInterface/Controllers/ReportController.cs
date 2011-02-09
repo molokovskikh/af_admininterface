@@ -37,28 +37,6 @@ namespace AdminInterface.Controllers
 	]
 	public class ReportController : SmartDispatcherController
 	{
-		public void Bill(uint payerId, Period period)
-		{
-/*			var payer = Payer.Find(payerId);
-			PropertyBag["payer"] = payer;
-			PropertyBag["fromDate"] = DateTime.Now;
-			var bills = payer.FindBills(period);
-			PropertyBag["bills"] = bills;
-			PropertyBag["total"] = bills.Sum(p => p.Total);
-			PropertyBag["Number"] = 1;*/
-		}
-
-		public void Act(uint payerId, Period period)
-		{
-/*			var payer = Payer.Find(payerId);
-			PropertyBag["payer"] = payer;
-			PropertyBag["fromDate"] = DateTime.Now;
-			var bills = payer.FindBills(period);
-			PropertyBag["acts"] = bills;
-			PropertyBag["total"] = bills.Sum(p => p.Total);
-			PropertyBag["Number"] = 1;*/
-		}
-
 		public void RevisionAct(uint payerId, DateTime from, DateTime to)
 		{
 /*			var payer = Payer.Find(payerId);
