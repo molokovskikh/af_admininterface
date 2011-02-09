@@ -43,7 +43,22 @@ namespace AdminInterface.Controllers
 				.Union(acts.Select(a => new {a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false}))
 				.OrderByDescending(i => i.Date)
 				.ToList();
+			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = items;
+		}
+
+		public void NewPayment(uint id)
+		{
+			Binder.Validator = Validator;
+			var payer = Payer.Find(id);
+			var payment = new Payment(payer);
+			BindObjectInstance(payment, "payment");
+			if (!HasValidationError(payment))
+			{
+				payment.RegisterPayment();
+				payment.Save();
+			}
+			RedirectToReferrer();
 		}
 
 		public void NewInvoice(uint id)

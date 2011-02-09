@@ -116,6 +116,12 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Payments", Schema = "Billing")]
 	public class Payment : ActiveRecordLinqBase<Payment>
 	{
+		public Payment(Payer payer)
+		{
+			Payer = payer;
+			Recipient = payer.Recipient;
+		}
+
 		public Payment()
 		{
 			UpdatePayerInn = true;
@@ -125,14 +131,14 @@ namespace AdminInterface.Models.Billing
 		public uint Id { get; set; }
 
 		//фактическа дата платежа когда он прошел через банк
-		[Property]
+		[Property, ValidateNonEmpty]
 		public DateTime PayedOn { get; set; }
 
 		//дата занесения платежа
 		[Property]
 		public DateTime RegistredOn { get; set; }
 
-		[Property]
+		[Property, ValidateGreaterThanZero]
 		public decimal Sum { get; set; }
 
 		[Property]

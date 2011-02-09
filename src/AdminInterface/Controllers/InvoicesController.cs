@@ -99,7 +99,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["invoices"] = filter.Find<Invoice>();
 
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("Бух"));
+			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
+				.Cast<string>()
+				.Where(p => p.Contains("Бух"))
+				.OrderBy(p => p)
+				.ToList();
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}

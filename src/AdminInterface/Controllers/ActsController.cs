@@ -28,7 +28,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["acts"] = filter.Find<Act>();
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters.Cast<string>().Where(p => p.Contains("Бух"));
+			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
+				.Cast<string>()
+				.Where(p => p.Contains("Бух"))
+				.OrderBy(p => p)
+				.ToList();
 		}
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
