@@ -11,6 +11,10 @@ namespace Integration.Models
 		[Test]
 		public void Parse_payments()
 		{
+			var existsPayment = Payment.Queryable.FirstOrDefault(p => p.Comment == "Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС).");
+			if (existsPayment != null)
+				existsPayment.DeleteAndFlush();
+
 			var file = @"..\..\..\TestData\20110114104609.xml";
 			var payments = Payment.ParsePayment(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
@@ -23,8 +27,8 @@ namespace Integration.Models
 			Assert.That(payment.PayerClient.Name, Is.EqualTo("ЗАО ТРИОМЕД"));
 			Assert.That(payment.PayerBank.Description, Is.EqualTo("ФИЛИАЛ ОРУ ОАО \"МИНБ\""));
 
-			Assert.That(payment.RecipientClient.Name, Is.EqualTo(""));
-			Assert.That(payment.RecipientBank.Description, Is.EqualTo(""));
+			Assert.That(payment.RecipientClient.Name, Is.EqualTo("\\366601001 ООО\"Аналитический центр\""));
+			Assert.That(payment.RecipientBank.Description, Is.EqualTo("ВОРОНЕЖСКИЙ Ф-Л ОАО \"ПРОМСВЯЗЬБАНК\" г ВОРОНЕЖ"));
 			Assert.That(payment.Payer, Is.Not.Null);
 			Assert.That(payment.Sum, Is.EqualTo(800));
 			Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));

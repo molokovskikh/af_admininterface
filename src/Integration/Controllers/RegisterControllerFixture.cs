@@ -69,7 +69,9 @@ namespace Integration.Controllers
 			Context.Session["ShortName"] = "Test";
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
-			controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, client.Id, false);
+
+			using(new SessionScope())
+				controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, client.Id, false);
 
 			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
