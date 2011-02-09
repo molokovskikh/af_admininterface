@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Integration.ForTesting;
@@ -36,8 +38,17 @@ namespace Integration.Controllers
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
 
-			client = DataMother.TestClient();
-			payer = client.Payers.First();
+			client = new Client {
+				Status = ClientStatus.On,
+				Segment = Segment.Wholesale,
+				Type = ClientType.Drugstore,
+				Name = "test",
+				FullName = "test",
+			};
+
+			payer = new Payer {
+				ShortName = "test",
+			};
 
 			regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
@@ -47,16 +58,19 @@ namespace Integration.Controllers
 			person = new[] {new Person()};
 		}
 
-		[Test, Ignore("Чинить. Нужно вместо null передавать объект JuridicalOrganisation")]
+		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
+			client = DataMother.TestClient();
+			payer = client.Payers.First();
+
 			payer.Comment = "ata";
 			payer.Update();
 
 			Context.Session["ShortName"] = "Test";
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
-			controller.Registered(payer, null, paymentOptions, client.Id, false);
+			controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, client.Id, false);
 
 			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
@@ -64,27 +78,40 @@ namespace Integration.Controllers
 		[Test]
 		public void Create_LegalEntity()
 		{
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", payer, 
-				payer.Id, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
+				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
 
-			payer.Refresh();
-			Assert.That(payer.JuridicalOrganizations.Count, Is.EqualTo(1));
-			var org = payer.JuridicalOrganizations.Single();
-			Assert.That(org.Name, Is.EqualTo(payer.ShortName));
-			Assert.That(org.FullName, Is.EqualTo(payer.JuridicalName));
-			Assert.That(client.Addresses[0].LegalEntity, Is.EqualTo(org));
+			using(new SessionScope())
+			{
+				var registredClient = RegistredClient();
+				var registredPayer = registredClient.Payers.Single();
+
+				Assert.That(registredPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
+				var org = registredPayer.JuridicalOrganizations.Single();
+				Assert.That(org.Name, Is.EqualTo(registredPayer.ShortName));
+				Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
+				Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
+			}
 		}
 
 		[Test]
 		public void Create_client_with_smart_order()
 		{
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", payer,
-				payer.Id, null, clientContacts, null, new Contact[0], person, "", "");
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address",
+				null, null, null, clientContacts, null, new Contact[0], person, "", "");
 
-			client = Client.Find(client.Id);
-			Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
-			Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
-			Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
+			using(new SessionScope())
+			{
+				client = RegistredClient();
+				Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
+				Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
+				Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
+			}
+		}
+
+		private Client RegistredClient()
+		{
+			return Client.Find(Convert.ToUInt32(Context.Session["Code"]));
 		}
 	}
 }
