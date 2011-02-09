@@ -273,7 +273,9 @@ namespace AdminInterface.Models
 
 			if (Client.Users == null)
 				Client.Users = new List<User>();
-			Client.Users.Add(this);
+			if (!Client.Users.Any(u => u == this))
+				Client.Users.Add(this);
+
 			Client.UpdateBeAccounted();
 			new UserUpdateInfo(Id).Create();
 		}

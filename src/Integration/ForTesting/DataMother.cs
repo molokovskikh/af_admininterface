@@ -27,7 +27,7 @@ namespace Integration.ForTesting
 					}
 				};
 				legalEntity.Payer = payer;
-				client = new Client {
+				client = new Client(payer) {
 					Status = ClientStatus.On,
 					Segment = Segment.Wholesale,
 					Type = ClientType.Drugstore,
@@ -37,7 +37,6 @@ namespace Integration.ForTesting
 					MaskRegion = 1UL,
 					ContactGroupOwner = new ContactGroupOwner(),
 				};
-				client.JoinPayer(payer);
 				payer.Clients = new List<Client> { client };
 				if (action != null)
 					action(client);
@@ -49,6 +48,8 @@ namespace Integration.ForTesting
 				});
 				client.ContactGroupOwner.Save();
 				client.SaveAndFlush();
+				client.Users.Each(u => u.Setup());
+
 				client.Settings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",
 					OrderRegionMask = 1UL,
@@ -80,10 +81,7 @@ namespace Integration.ForTesting
 		public static Client CreateTestClientWithUser()
 		{
 			return TestClient(c => {
-				var user = new User(c) {
-					Name = "test"
-				};
-				user.Setup(c);
+				c.AddUser(new User{ Name = "test"});
 			});
 		}
 
@@ -103,7 +101,7 @@ namespace Integration.ForTesting
 
 		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
 		{
-			var client = CreateTestClient(clientRegionMask);;
+			var client = CreateTestClient(clientRegionMask);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var user = new User(client) {

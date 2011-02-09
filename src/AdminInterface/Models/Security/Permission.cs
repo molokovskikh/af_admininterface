@@ -73,6 +73,13 @@ namespace AdminInterface.Models.Security
 				};
 				return billingControllers.Any(c => c == controller.ToLower());
 			}
+			if (Type == PermissionType.ViewDrugstore)
+			{
+				var billingControllers = new [] {
+					"client", "users", "deliveries"
+				};
+				return billingControllers.Any(c => c == controller.ToLower());
+			}
 			return false;
 		}
 

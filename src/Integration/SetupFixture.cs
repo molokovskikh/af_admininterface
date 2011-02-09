@@ -17,7 +17,10 @@ namespace Integration
 				UserName = "test",
 				RegionMask = ulong.MaxValue,
 				ManagerName = "test",
-				AllowedPermissions = new List<Permission>()
+				AllowedPermissions = new List<Permission> {
+					new Permission{Type = PermissionType.Billing},
+					new Permission{Type = PermissionType.ViewDrugstore},
+				}
 			};
 			Administrator.GetHost = () => "localhost";
 		}

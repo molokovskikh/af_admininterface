@@ -37,7 +37,7 @@ namespace Integration
 				var user = User.Queryable.Take(10).First();
 				Assert.That(NHibernateUtil.IsInitialized(user.Client), Is.False);
 				var linkTo = helper.LinkTo(user.Client);
-				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Clients/{0}'>{1}</a>", user.Client.Id, user.Client.Name)));
+				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Client/{0}'>{1}</a>", user.Client.Id, user.Client.Name)));
 			}
 		}
 

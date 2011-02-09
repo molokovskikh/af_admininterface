@@ -497,5 +497,13 @@ group by u.ClientId")
 				Payers = new List<Payer>();
 			Payers.Add(payer);
 		}
+
+		public virtual void AddUser(User user)
+		{
+			if (Users == null)
+				Users = new List<User>();
+			user.Init(this);
+			Users.Add(user);
+		}
 	}
 }
