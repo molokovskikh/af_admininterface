@@ -11,7 +11,7 @@ namespace Unit
 		public void Init()
 		{
 			var user = new User();
-			var client = new Client();
+			var client = new Client(new Payer());
 			user.Init(client);
 			Assert.That(user.AssignedPermissions, Is.Empty);
 		}
@@ -20,7 +20,7 @@ namespace Unit
 		public void Init_with_permissions()
 		{
 			var user = new User();
-			var client = new Client();
+			var client = new Client(new Payer());
 			var permission = new UserPermission();
 			user.AddPermission(permission);
 			user.Init(client);
