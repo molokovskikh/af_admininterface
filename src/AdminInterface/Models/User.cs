@@ -267,6 +267,7 @@ namespace AdminInterface.Models
 			Enabled = true;
 			Logs = new AuthorizationLogEntity();
 			Logs.User = this;
+			TargetVersion = DefaultValues.Get().AnalitFVersion;
 			Save();
 			Login = Id.ToString();
 			Update();
@@ -293,7 +294,6 @@ namespace AdminInterface.Models
 			if (Payer == null)
 				Payer = client.Payers.Single();
 
-			TargetVersion = DefaultValues.Get().AnalitFVersion;
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
 

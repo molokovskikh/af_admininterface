@@ -13,7 +13,7 @@ namespace Unit
 		[SetUp]
 		public void Setup()
 		{
-			client = new Client();
+			client = new Client(new Payer());
 			client.HomeRegion = new Region{
 				Id = 1,
 				Name = "Воронеж"

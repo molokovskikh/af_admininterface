@@ -22,7 +22,7 @@ namespace Unit
 			var user = new User();
 			var client = new Client();
 			var permission = new UserPermission();
-			user.AddPermission(permission);  
+			user.AddPermission(permission);
 			user.Init(client);
 			Assert.That(user.AssignedPermissions.Count, Is.EqualTo(1));
 		}

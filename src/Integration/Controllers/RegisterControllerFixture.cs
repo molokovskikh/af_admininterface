@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
-using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
