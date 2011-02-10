@@ -371,5 +371,15 @@ namespace AdminInterface.Controllers
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
+
+		public void SearchOffers(uint id, string searchText)
+		{
+			var user = User.Find(id);
+			if (!String.IsNullOrEmpty(searchText))
+			{
+				PropertyBag["Offers"] = Offer.Search(user, searchText);
+			}
+			PropertyBag["user"] = user;
+		}
 	}
 }

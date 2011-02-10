@@ -87,11 +87,6 @@
 				<li>
 					<a href="${siteroot}/client/${client.Id}/orders/" target="_blank">История заказов</a>
 				</li>
-				<% if client.IsDrugstore(): %>
-				<li>
-					<a href="SearchOffers.rails?clientCode=${Client.Id}" target="_blank">Поиск предложений</a>
-				</li>
-				<% end %>
 			</ul>
 		</div>
 

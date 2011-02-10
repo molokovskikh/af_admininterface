@@ -9,16 +9,16 @@ namespace Integration.Models
 		[Test]
 		public void Search_should_return_offers()
 		{
-			var client = DataMother.TestClient();
-			var offers = Offer.Search(client, "папа");
+			var client = DataMother.CreateTestClientWithUser();
+			var offers = Offer.Search(client.Users[0], "папа");
 			Assert.That(offers.Count, Is.GreaterThan(0));
 		}
 
 		[Test]
 		public void Request_for_not_exist_name_should_return_zero_elements()
 		{
-			var client = DataMother.TestClient();
-			var offers = Offer.Search(client, "sdfaefawefsdf");
+			var client = DataMother.CreateTestClientWithUser();
+			var offers = Offer.Search(client.Users[0], "sdfaefawefsdf");
 			Assert.That(offers.Count, Is.EqualTo(0));
 		}
 	}

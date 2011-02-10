@@ -24,19 +24,7 @@ namespace Integration.Controllers
 		public void SetUp()
 		{
 			controller = new ClientController();
-
-			var admin = new Administrator {
-				UserName = "TestAdmin",
-				RegionMask = 1,
-				AllowedPermissions = new List<Permission> {
-					new Permission {Type = PermissionType.ChangePassword},
-					new Permission {Type = PermissionType.ViewSuppliers},
-					new Permission {Type = PermissionType.ViewDrugstore},
-				},
-			};
 			PrepareController(controller);
-			SecurityContext.GetAdministrator = () => admin;
-
 			client = DataMother.CreateTestClientWithUser();
 		}
 

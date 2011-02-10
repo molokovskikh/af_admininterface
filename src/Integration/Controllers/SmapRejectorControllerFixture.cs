@@ -24,6 +24,10 @@ namespace Integration.Controllers
 				RejectedEmail.Queryable
 					.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
 					.Each(r => r.Delete());
+
+				RejectedEmail.Queryable
+					.Where(r => r.LogTime >= new DateTime(2008, 10, 1) && r.LogTime <= new DateTime(2008, 10, 4))
+					.Each(r => r.Delete());
 			}
 		}
 

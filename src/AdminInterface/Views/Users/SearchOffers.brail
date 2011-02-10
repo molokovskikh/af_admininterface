@@ -1,16 +1,15 @@
 ﻿<% component CaptureFor, {"id" : "Title"}:%>
-	 Поиск предложений для клиента ${client.Name}
+	 Поиск предложений для пользователя ${user.Name}
 <% end %>
 
 <form action="SearchOffers.rails" method="post">
-	<input type="hidden" name="ClientCode" value="${Client.Id}" />
-	<h5>Введите наименование или форму выпуска</h5>	
+	<input type="hidden" name="id" value="${User.Id}" />
+	<h5>Введите наименование или форму выпуска</h5>
 	<input type="text" name="SearchText" value="${ SearchText if IsDefined("SearchText") }"/>
 	<input type="submit" value="Искать" />
 </form>
 
-<% if IsDefined("Offers"): %>
-	<% if Offers.Count > 0: %>
+<% if IsDefined("Offers") and Offers.Count: %>
 	<table class="DataTable">
 		<tr>
 			<th>Каталожное наименование</th>
@@ -31,9 +30,8 @@
 		</tr>
 		<% end %>
 	</table>
-	<% else: %>
-	<div class="EmptyData">
-		Предложений с такой формой выпуска или наименованием не найдено
-	</div>
-	<% end %>
+<% else: %>
+<div class="EmptyData">
+	Предложений с такой формой выпуска или наименованием не найдено
+</div>
 <% end %>

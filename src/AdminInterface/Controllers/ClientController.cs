@@ -239,25 +239,6 @@ where Phone like :phone")
 			RedirectToReferrer();
 		}
 
-		//[AccessibleThrough(Verb.Get)]
-		public void SearchOffers(uint clientCode)
-		{
-			var client = Client.FindAndCheck(clientCode);
-			PropertyBag["client"] = client;
-		}
-
-		//[AccessibleThrough(Verb.Post)]
-		public void SearchOffers(uint clientCode, string searchText)
-		{
-			var client = Client.FindAndCheck(clientCode);
-			if (!String.IsNullOrEmpty(searchText))
-			{
-				var offers = Offer.Search(client, searchText);
-				PropertyBag["Offers"] = offers;
-			}
-			PropertyBag["Client"] = client;
-		}
-
 		public void Unlock(uint clientCode)
 		{
 			var client = Client.FindAndCheck(clientCode);

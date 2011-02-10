@@ -52,6 +52,7 @@ namespace Integration.ForTesting
 
 				client.Settings = new DrugstoreSettings(client.Id) {
 					BasecostPassword = "",
+					WorkRegionMask = 1UL,
 					OrderRegionMask = 1UL,
 				};
 				client.Settings.CreateAndFlush();
@@ -81,7 +82,11 @@ namespace Integration.ForTesting
 		public static Client CreateTestClientWithUser()
 		{
 			return TestClient(c => {
-				c.AddUser(new User{ Name = "test"});
+				c.AddUser(new User {
+					Name = "test",
+					WorkRegionMask = c.MaskRegion,
+					OrderRegionMask = c.MaskRegion
+				});
 			});
 		}
 

@@ -11,15 +11,14 @@ namespace AdminInterface.Models
 		public string CatalogName { get; set; }
 		public decimal Cost { get; set; }
 
-		public static IList<Offer> Search(Client client, string text)
+		public static IList<Offer> Search(User user, string text)
 		{
 			IList<Offer> offers = null;
 			using (new TransactionScope())
 			{
-				ArHelper.WithSession(s =>
-				{
-					s.CreateSQLQuery(@"call future.GetActivePrices(:ClientCode)")
-						.SetParameter("ClientCode", client.Id)
+				ArHelper.WithSession(s => {
+					s.CreateSQLQuery(@"call future.GetActivePrices(:userid)")
+						.SetParameter("userid", user.Id)
 						.ExecuteUpdate();
 
 					offers = s.CreateSQLQuery(@"

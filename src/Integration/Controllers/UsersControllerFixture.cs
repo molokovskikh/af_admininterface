@@ -23,17 +23,6 @@ namespace Integration.Controllers
 		[SetUp]
 		public void Setup()
 		{
-			var admin = new Administrator
-			{
-				UserName = "TestAdmin",
-				RegionMask = 1,
-				AllowedPermissions = new List<Permission> {
-					new Permission {Type = PermissionType.ChangePassword},
-					new Permission {Type = PermissionType.ViewSuppliers},
-					new Permission {Type = PermissionType.ViewDrugstore},
-				},
-			};
-			SecurityContext.GetAdministrator = () => admin;
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
 		}

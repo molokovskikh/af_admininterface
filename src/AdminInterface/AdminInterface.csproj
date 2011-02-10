@@ -539,7 +539,7 @@
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
     <None Include="Views\Client\LegendView.brail" />
-    <None Include="Views\Client\SearchOffers.brail" />
+    <None Include="Views\Users\SearchOffers.brail" />
     <None Include="Views\Main\Settings.brail" />
     <None Include="Views\Users\Add.brail" />
     <None Include="Views\Users\Edit.brail" />

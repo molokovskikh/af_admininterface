@@ -12,7 +12,6 @@ namespace Unit.Models
 		[Test]
 		public void Message_on_status_change()
 		{
-			SecurityContext.GetAdministrator = () => new Administrator();
 			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.Off, new Client()).Message, 
 				Is.EqualTo("$$$Клиент отключен"));
 			Assert.That(ClientInfoLogEntity.StatusChange(ClientStatus.On, new Client()).Message, 
