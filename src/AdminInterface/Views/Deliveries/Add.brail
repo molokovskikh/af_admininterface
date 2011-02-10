@@ -31,7 +31,7 @@
 		<div class="block">
 			<h3>Юридическое лицо</h3>
 			<select name="delivery.LegalEntity.Id" style="width: 80%;">
-			<% for i,item in enumerate(client.Payer.JuridicalOrganizations): %>
+			<% for i,item in enumerate(client.Orgs()): %>
 				<option value="${item.Id}" ${"selected" if (i == 0)}>${item.Name}</option>
 			<% end %>
 			</select>
