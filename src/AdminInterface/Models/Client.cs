@@ -414,6 +414,9 @@ group by u.ClientId")
 				address.LegalEntity = Orgs().Single();
 				address.Payer = address.LegalEntity.Payer;
 			}
+			if (address.Payer == null)
+				address.Payer = address.LegalEntity.Payer;
+
 			if (address.Accounting == null)
 				address.Accounting = new AddressAccounting(address);
 			address.Registrant = SecurityContext.Administrator.UserName;
