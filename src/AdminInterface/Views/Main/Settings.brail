@@ -4,10 +4,8 @@
 
 <% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
 
-<% if IsDefined("Message"): %>
-<div class="flash notice">${Message}</div>
-<% end %>
 <h3>Настройки по умолчанию</h3>
+
 <form method=post action=UpdateSettings>
 	<input type=hidden value=${defaults.Id} name="defaults.Id" />
 	<fieldset style="width:400px">

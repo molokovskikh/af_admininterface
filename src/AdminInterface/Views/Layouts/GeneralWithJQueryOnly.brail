@@ -60,10 +60,16 @@
 		</div>
 	<% end %>
 
-	<% if IsDefined("Message") and Message isa string: %>
-	<div class="flash notice">
-		${Message}
-	</div>
+	<% if IsDefined("Message"): %>
+		<% if Message isa string: %>
+		<div class="flash notice">
+			${Message}
+		</div>
+		<% else: %>
+		<div class="flash ${Message.GetClass()}">
+			${Message}
+		</div>
+		<% end %>
 	<% end %>
 
 	${ChildOutput}

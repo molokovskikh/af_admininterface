@@ -150,6 +150,23 @@
 			</td>
 		</tr>
 		<tr>
+			<td>
+				За рекламу:
+			</td>
+			<td>
+				${FormHelper.CheckboxField("payment.ForAd")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Сумма за рекламу:
+			</td>
+			<td>
+				${FormHelper.TextField("payment.AdSum")}
+
+			</td>
+		</tr>
+		<tr>
 			<td colspan="2">
 				<input type=submit value="Сохранить" />
 			</td>

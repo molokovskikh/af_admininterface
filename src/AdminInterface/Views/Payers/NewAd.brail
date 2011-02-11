@@ -1,0 +1,46 @@
+﻿<% component Bubble, {"bredcrumbs" : [("${payer.Name}", "${siteroot}/Payers/${payer.Id}"), ("Реклама", "")]} %>
+
+<h2>Новая реклама</h2>
+
+<form method=post>
+	<div class=block>
+		<table>
+			<tr>
+				<td>Плательщик:</td>
+				<td>
+					${app.LinkTo(ad.Payer)}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Начало:</label>
+				</td>
+				<td>
+					<input type=text name="ad.Begin" class="input-date" value="${ad.Begin.ToShortDateString() if ad.Begin != null}">
+					<input type=button class=CalendarInput>
+					${app.GetValidationError(ad, "Begin")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Окончание:</label>
+				</td>
+				<td>
+					<input type=text name="ad.End" class="input-date" value="${ad.End.ToShortDateString() if ad.End != null}">
+					<input type=button class=CalendarInput>
+					${app.GetValidationError(ad, "End")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label>Стоимость:</label>
+				</td>
+				<td>
+					<input type=text name="ad.Cost" value="${ad.Cost.ToString()}">
+					${app.GetValidationError(ad, "Cost")}
+				</td>
+			</tr>
+		</table>
+	</div>
+	<input type=submit value=Сохранить>
+</form>

@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Web;
 using Castle.ActiveRecord;
 using NHibernate;
 
@@ -47,6 +48,16 @@ namespace Common.Web.Ui.Helpers
 		public static T WithSession<T>(Func<ISession, T> sessionDelegate)
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			//хак что бы обойти ошибку в ActiveRecord
+			//в OnSave и OnUpdate нельзя обратиться к текущей сесии тк она считается уже удаленной
+			if (HttpContext.Current != null)
+			{
+				var scope = (SessionScope)HttpContext.Current.Items["SessionScopeWebModule.session"];
+				var factory = sessionHolder.GetSessionFactory(typeof(ActiveRecordBase));
+				var s = scope.GetSession(factory);
+				return sessionDelegate(s);
+			}
+
 			var session = sessionHolder.CreateSession(typeof(ActiveRecordBase));
 			try
 			{

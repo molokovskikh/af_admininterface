@@ -1,0 +1,40 @@
+﻿<% component Bubble, {"bredcrumbs" : [("${payer.Name}", "${siteroot}/Payers/${payer.Id}"), ("Реклама", "")]} %>
+
+<div class=block>
+	${app.LinkTo(payer, "Новая реклама", @NewAd)}
+</div>
+
+<table class="DataTable">
+	<% if ads.Count: %>
+	<thead>
+		<tr>
+			<th></th>
+			<th>Начало</th>
+			<th>Окончание</th>
+			<th>Стоимость</th>
+			<th>Оплачено</th>
+		</tr>
+	</thead>
+	<% for i, ad in enumerate(ads): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			${app.LinkTo(ad, "Редактировать", @Edit)}
+		</td>
+		<td>${ad.Begin.ToShortDateString() if ad.Begin != null}</td>
+		<td>${ad.End.ToShortDateString() if ad.End != null}</td>
+		<td>${ad.Cost}</td>
+		<td>
+			<% if ad.Payment: %>
+			Да
+			<% else: %>
+			Нет
+			<% end %>
+		</td>
+	</tr>
+	<% end %>
+	<% else: %>
+	<tr class=EmptyData>
+		<td>По вашему запросу ничего не найдено</td>
+	</tr>
+	<% end %>
+</table>

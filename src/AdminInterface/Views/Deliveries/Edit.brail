@@ -3,18 +3,6 @@
 									  ("Адрес доставки ${delivery.Value}", "")]} %>
 <div style="width: 600px;">
 
-	<% if IsDefined("Message"):
-		clazz = "notice"
-		if message.IsError:
-			clazz = "err"
-		end
-	%>
-
-	<div class="flash ${clazz}">
-		${Message.MessageText}
-	</div>
-	<% end %>
-	
     <% if not delivery.Enabled: %>
     <div class="Warning">
         <p>Адрес отключен</p>

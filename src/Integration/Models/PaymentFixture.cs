@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -42,6 +43,22 @@ namespace Integration.Models
 			var file = @"..\..\..\TestData\20110113.xml";
 			var payments = Payment.ParsePayment(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Before_save_new_paymen_for_ad_create_ad()
+		{
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payment = new Payment(payer);
+			payment.Sum  = 800;
+			payment.ForAd = true;
+			payment.AdSum = 800;
+			payment.SaveAndFlush();
+
+			Assert.That(payment.Ad, Is.Not.Null);
+			Assert.That(payment.Ad.Payer, Is.EqualTo(payer));
+			Assert.That(payment.Ad.Payment, Is.EqualTo(payment));
+			Assert.That(payment.Ad.Cost, Is.EqualTo(800));
 		}
 	}
 }

@@ -84,5 +84,32 @@ namespace AdminInterface.Controllers
 				invoice.Parts.Add(new InvoicePart());
 			}
 		}
+
+		public void Ad(uint id)
+		{
+			var payer = Payer.Find(id);
+			PropertyBag["payer"] = payer;
+			PropertyBag["ads"] = Advertising.Queryable.Where(a => a.Payer == payer)
+				.OrderBy(a => a.Begin).ToList();
+		}
+
+		public void NewAd(uint id)
+		{
+			Binder.Validator = Validator;
+
+			var payer = Payer.Find(id);
+			var ad = new Advertising(payer);
+			if (IsPost)
+			{
+				BindObjectInstance(ad, "ad");
+				if (!HasValidationError(ad))
+				{
+					ad.Save();
+					Redirect("Payers", "Ad", new{payer.Id});
+				}
+			}
+			PropertyBag["ad"] = ad;
+			PropertyBag["payer"] = payer;
+		}
 	}
 }

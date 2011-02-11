@@ -119,18 +119,6 @@
 
 <H3>Плательщик ${Instance.ShortName}</H3>
 
-<div id="StatusBar" style="padding-bottom: 10px;">
-	<table Class="CenterBlock ${Message.GetClass() if IsDefined("Message")}">
-		<tr>
-			<td>
-				<% if IsDefined("Message"): %>
-					${Message.MessageText}
-				<% end %>
-			</td>
-		</tr>
-	</table>
-</div>
-
 <div class="tabs">
 	<ul>
 		<li>

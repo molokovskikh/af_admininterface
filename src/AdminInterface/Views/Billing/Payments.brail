@@ -433,6 +433,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	<div style="margin-bottom:10px;">
 		<div class="InputGroupHeader">Операции</div>
 		${app.LinkTo(payer, "Доп. счет", @NewInvoice)}
+		${app.LinkTo(payer, "Реклама", @Ad)}
 	</div>
 
 	<div>

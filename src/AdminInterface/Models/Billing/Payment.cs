@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -11,6 +12,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
@@ -149,6 +151,15 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public string DocumentNumber { get; set; }
+
+		[Property]
+		public bool ForAd { get; set; }
+
+		[Property, ValidateDecimal]
+		public decimal? AdSum { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.All)]
+		public Advertising Ad { get; set; }
 
 		public bool UpdatePayerInn { get; set; }
 
@@ -335,6 +346,40 @@ namespace AdminInterface.Models.Billing
 
 			Payer.Update();
 			Delete();
+		}
+
+		protected override void OnUpdate()
+		{
+			UpdateAd();
+			base.OnUpdate();
+		}
+
+		protected override bool BeforeSave(IDictionary state)
+		{
+			UpdateAd();
+			return base.BeforeSave(state);
+		}
+
+		private void UpdateAd()
+		{
+			if (Payer != null
+				&& ForAd
+				&& this.IsChanged(p => p.ForAd))
+			{
+				Advertising ad = null;
+				ArHelper.WithSession(s => {
+					ad = s.AsQueryable<Advertising>().FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
+				});
+				//var ad = Advertising.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
+				if (ad == null)
+				{
+					ad = new Advertising(Payer);
+					ad.Cost = AdSum.Value;
+				}
+				Ad = ad;
+				ad.PayedSum = AdSum;
+				ad.Payment = this;
+			}
 		}
 
 		public void DoUpdate()

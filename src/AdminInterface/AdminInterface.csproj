@@ -147,6 +147,7 @@
     <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
+    <Compile Include="Controllers\AdsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
@@ -183,6 +184,7 @@
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\Act.cs" />
+    <Compile Include="Models\Billing\Advertising.cs" />
     <Compile Include="Models\Billing\Invoice.cs" />
     <Compile Include="Models\Billing\InvoicePart.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
@@ -392,14 +394,17 @@
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />
+    <None Include="Views\Advertisings\Index.brail" />
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
+    <None Include="Views\Payers\Ad.brail" />
     <None Include="Views\Payers\BalanceSummary.brail" />
     <None Include="Views\Payers\Invoices.brail" />
+    <None Include="Views\Payers\NewAd.brail" />
     <None Include="Views\Payers\NewInvoice.brail" />
     <None Include="Views\Payers\Payments.brail" />
     <None Include="Views\Payments\Edit.brail" />

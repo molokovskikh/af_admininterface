@@ -7,18 +7,6 @@
 	Настройки пользователя ${user.Login}
 </h2>
 
-<% if IsDefined("Message"):
-	clazz = "notice"
-	if message.IsError:
-		clazz = "err"
-	end
-%>
-
-<div class="flash ${clazz}">
-	${Message.MessageText}
-</div>
-<% end %>
-
 <% if not user.Enabled: %>
 <div class="Warning">
 	<p>Пользователь отключен</p>

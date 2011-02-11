@@ -1,0 +1,51 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Реклама", "")]} %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
+	Реклама
+<% end %>
+
+<div class="PageHeader">
+	Реклама
+</div>
+
+${app.BeginFormFor("filter")}
+${app.FilterFor("Показачать только неоплаченную:", "filter.ShowWithoutPayment")}
+${app.FilterFor("Покачать только не размещенную:", "filter.ShowWithoutDates")}
+${app.EndFormFor("filter")}
+
+<table class=DataTable>
+	<% if ads.Count: %>
+	<thead>
+		<tr>
+			<th></th>
+			<th>Плательщик</th>
+			<th>Начало</th>
+			<th>Окончание</th>
+			<th>Стоимость</th>
+			<th>Оплачено</th>
+		</tr>
+	</thead>
+	<% for i, ad in enumerate(ads): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			${app.LinkTo(ad, "Редактировать", @Edit)}
+		</td>
+		<td>${app.LinkTo(ad.Payer)}</td>
+		<td>${ad.Begin.ToShortDateString() if ad.Begin != null}</td>
+		<td>${ad.End.ToShortDateString() if ad.End != null}</td>
+		<td>${ad.Cost}</td>
+		<td>
+			<% if ad.Payment: %>
+			Да
+			<% else: %>
+			Нет
+			<% end %>
+		</td>
+	</tr>
+	<% end %>
+	<% else: %>
+	<tr class=EmptyData>
+		<td>По вашему запросу ничего не найдено</td>
+	</tr>
+	<% end %>
+</table>

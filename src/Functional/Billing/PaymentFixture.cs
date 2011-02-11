@@ -1,3 +1,5 @@
+﻿using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -7,25 +9,35 @@ namespace Functional.Billing
 {
 	public class PaymentFixture : WatinFixture
 	{
+		private Payer payer;
+		private Payment payment;
+
 		public PaymentFixture()
 		{
 			UseTestScope = true;
 		}
 
-		[Test]
-		public void Update_payment()
+		[SetUp]
+		public void Setup()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			using (var browser = Open("Billing/Edit.rails?BillingCode=", client.Id))
-			{
-				var payment = browser.TextField("");
-				Assert.That(payment.Text, Is.EqualTo(800));
-				payment.TypeText(900.ToString());
-			}
+			payer = DataMother.BuildPayerForBillingDocumentTest();
+			payment = new Payment(payer);
+			payment.Sum = 800;
+			payment.RegisterPayment();
+			payment.Save();
+		}
 
-			var accounting = client.Users[0].Accounting;
-			accounting.Refresh();
-			Assert.That(accounting.Payment, Is.EqualTo(900));
+		[Test]
+		public void Set_payment_for_advertising()
+		{
+			using(var browser = Open(payment, "Edit"))
+			{
+				Assert.That(browser.Text, Is.StringContaining("Редактирование платежа"));
+				browser.CheckBox(Find.ByName("payment.ForAd")).Checked = true;
+				browser.TextField(Find.ByName("payment.AdSum")).TypeText(payment.Sum.ToString());
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			}
 		}
 
 		[Test]
@@ -33,7 +45,7 @@ namespace Functional.Billing
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("�������")).Click();
+				browser.Link(Find.ByText("Платежи")).Click();
 			}
 		}
 	}

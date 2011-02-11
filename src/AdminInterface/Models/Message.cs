@@ -22,8 +22,13 @@ namespace AdminInterface.Models
 		public string GetClass()
 		{
 			if (IsError)
-				return "Error";
-			return "Success";
+				return "err";
+			return "notice";
+		}
+
+		public override string ToString()
+		{
+			return MessageText;
 		}
 
 		public static Message Error(string message)
