@@ -123,8 +123,8 @@ namespace Integration.Controllers
 		[Test]
 		public void Payer_registration()
 		{
-			var newPayer = new Payer{Name = "test", JuridicalName = "test full"};
-			controller.Registered(newPayer, new LegalEntity(), new PaymentOptions(), 0, false);
+			var newPayer = new Payer();
+			controller.Registered(newPayer, new LegalEntity{Name = "test", FullName = "test full"}, new PaymentOptions(), 0, false);
 
 			Assert.That(newPayer.Id, Is.Not.EqualTo(0));
 			Assert.That(newPayer.JuridicalOrganizations.Count, Is.EqualTo(1));

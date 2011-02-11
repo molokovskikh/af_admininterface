@@ -428,7 +428,7 @@ WHERE   intersection.pricecode IS NULL
 				payer.JuridicalName = juridicalOrganization.FullName;
 				payer.Save();
 
-				if (String.IsNullOrEmpty(juridicalOrganization.Name))
+				if (payer.JuridicalOrganizations == null)
 				{
 					payer.JuridicalOrganizations = new List<LegalEntity> {
 						juridicalOrganization
