@@ -20,7 +20,7 @@ namespace Integration.NHibernateExtentions
 							.CreateAlias("Clients", "cd")
 							.SetProjection(Projections.ProjectionList()
 							               	.Add(Projections.Id())
-							               	.Add(Projections.Property("ShortName"))
+							               	.Add(Projections.Property("Name"))
 							               	.Add(Projections.GroupProperty("PayerID")))
 							.Add(Restrictions.Ge(new AggregateProjection2("sum",
 							                                            Projections.Conditional(Expression.Eq("cd.Status", ClientStatus.Off),
@@ -43,7 +43,7 @@ namespace Integration.NHibernateExtentions
 							.CreateAlias("Clients", "cd")
 							.SetProjection(Projections.ProjectionList()
 							               	.Add(Projections.Id())
-							               	.Add(Projections.Property("ShortName"))
+							               	.Add(Projections.Property("Name"))
 							               	.Add(Projections.GroupProperty("PayerID"))
 							               	.Add(new AggregateProjection2("sum",
 							               	                              Projections.Conditional(

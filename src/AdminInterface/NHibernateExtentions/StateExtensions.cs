@@ -41,7 +41,7 @@ namespace AdminInterface.NHibernateExtentions
 					throw new TransientObjectException("proxy was not associated with the session");
 
 				var li = proxy.HibernateLazyInitializer;
-				context.GetEntry(li.GetImplementation());
+				entry = context.GetEntry(li.GetImplementation());
 			}
 			else
 			{
