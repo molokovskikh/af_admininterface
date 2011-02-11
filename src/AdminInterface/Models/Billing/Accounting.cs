@@ -307,8 +307,8 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 			get
 			{
 				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Payer.ShortName;
-				return ((AddressAccounting) this).Address.Payer.ShortName;
+					return ((UserAccounting) this).User.Payer.Name;
+				return ((AddressAccounting) this).Address.Payer.Name;
 			}
 		}
 

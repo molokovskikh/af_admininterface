@@ -78,7 +78,7 @@ namespace AdminInterface.Background
 								_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
 									BindingHelper.GetDescription(invoice.Period),
 									invoice.Payer.GetInvocesAddress(),
-									invoice.Payer.ShortName,
+									invoice.Payer.Name,
 									invoice.Id);
 						}
 						catch (DoNotHaveContacts)
@@ -87,7 +87,7 @@ namespace AdminInterface.Background
 								_log.DebugFormat("Счет {0} не отправлен тк не задана контактная информация для плательщика {1} - {2}",
 									invoice.Id,
 									invoice.Payer.Id,
-									invoice.Payer.ShortName);
+									invoice.Payer.Name);
 
 							MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
 						}

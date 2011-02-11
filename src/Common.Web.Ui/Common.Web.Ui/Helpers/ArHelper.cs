@@ -53,9 +53,12 @@ namespace Common.Web.Ui.Helpers
 			if (HttpContext.Current != null)
 			{
 				var scope = (SessionScope)HttpContext.Current.Items["SessionScopeWebModule.session"];
-				var factory = sessionHolder.GetSessionFactory(typeof(ActiveRecordBase));
-				var s = scope.GetSession(factory);
-				return sessionDelegate(s);
+				if (scope != null)
+				{
+					var factory = sessionHolder.GetSessionFactory(typeof(ActiveRecordBase));
+					var s = scope.GetSession(factory);
+					return sessionDelegate(s);
+				}
 			}
 
 			var session = sessionHolder.CreateSession(typeof(ActiveRecordBase));

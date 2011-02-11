@@ -20,7 +20,7 @@ namespace Integration.ForTesting
 				var legalEntity = new LegalEntity();
 				var payer = new Payer
 				{
-					ShortName = "test",
+					Name = "test",
 					ContactGroupOwner = new ContactGroupOwner(),
 					JuridicalOrganizations = new List<LegalEntity> {
 						legalEntity
@@ -139,7 +139,7 @@ namespace Integration.ForTesting
 			{
 				var juridicalOrganization = new LegalEntity();
 				var payer = new Payer {
-					ShortName = "test",
+					Name = "test",
 					JuridicalOrganizations = new List<LegalEntity> {
 						juridicalOrganization
 					}

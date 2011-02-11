@@ -29,7 +29,7 @@ namespace Functional
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
-			payer.ShortName += payer.Id;
+			payer.Name += payer.Id;
 			payer.UpdateAndFlush();
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
@@ -47,7 +47,7 @@ namespace Functional
 			using (var scope = new TransactionScope())
 			{
 				var payer = Payer.Find(921u);
-				payer.ShortName = "Офис123";
+				payer.Name = "Офис123";
 				payer.UpdateAndFlush();
 				scope.VoteCommit();
 			}
@@ -76,9 +76,9 @@ namespace Functional
 				browser.TextField(Find.ById("SearchText")).TypeText(payer.Id.ToString());
 				browser.Button(Find.ByValue("Найти")).Click();
 
-				Assert.That(browser.Text, Is.StringContaining(payer.ShortName));
+				Assert.That(browser.Text, Is.StringContaining(payer.Name));
 				browser.Link(Find.ByText(payer.Id.ToString())).Click();
-				Assert.That(browser.Text, Is.StringContaining("Плательщик " + payer.ShortName));
+				Assert.That(browser.Text, Is.StringContaining("Плательщик " + payer.Name));
 			}
 		}
 
@@ -891,7 +891,7 @@ namespace Functional
 
 			using (var browser = Open(payer))
 			{
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", payer.ShortName)));
+				Assert.That(browser.Text, Is.StringContaining(String.Format("Плательщик {0}", payer.Name)));
 			}
 		}
 

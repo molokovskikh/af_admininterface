@@ -208,12 +208,12 @@ namespace AdminInterface.Controllers
 		{
 			return ActiveRecordLinq
 				.AsQueryable<Payer>()
-				.Where(p => p.ShortName.Contains(term))
+				.Where(p => p.Name.Contains(term))
 				.Take(20)
 				.ToList()
 				.Select(p => new {
 					id = p.PayerID,
-					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.ShortName, p.INN)
+					label = String.Format("[{0}]. {1} ИНН {2}", p.Id, p.Name, p.INN)
 				});
 		}
 	}

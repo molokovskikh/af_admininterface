@@ -56,8 +56,8 @@ namespace AdminInterface.Models
 			get { return PayerID; }
 		}
 
-		[Property]
-		public virtual string ShortName { get; set; }
+		[Property("ShortName")]
+		public virtual string Name { get; set; }
 
 		[Property]
 		public virtual string JuridicalName { get; set; }
@@ -184,10 +184,10 @@ namespace AdminInterface.Models
 				}.Where(s => !String.IsNullOrWhiteSpace(s)));
 		}
 
-		public virtual string Name
+		public virtual string ShortName
 		{
-			get { return ShortName; }
-			set { ShortName = value; }
+			get { return Name; }
+			set { Name = value; }
 		}
 
 		public virtual bool IsManualPayments()
@@ -266,7 +266,7 @@ ORDER BY {Payer}.shortname;";
 
 		public override string ToString()
 		{
-			return ShortName;
+			return Name;
 		}
 
 		public virtual void AddComment(string comment)
@@ -286,7 +286,7 @@ ORDER BY {Payer}.shortname;";
 				.FirstOrDefault();
 
 			if (group == null)
-				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, ShortName));
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
 
 			var contacts = group
 				.Contacts
@@ -295,7 +295,7 @@ ORDER BY {Payer}.shortname;";
 				.Implode();
 
 			if (String.IsNullOrWhiteSpace(contacts))
-				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, ShortName));
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
 
 			return contacts;
 		}

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
@@ -46,7 +47,7 @@ namespace Integration.Controllers
 			};
 
 			payer = new Payer {
-				ShortName = "test",
+				Name = "test",
 			};
 
 			regionSettings = new [] {
@@ -89,7 +90,7 @@ namespace Integration.Controllers
 
 				Assert.That(registredPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
 				var org = registredPayer.JuridicalOrganizations.Single();
-				Assert.That(org.Name, Is.EqualTo(registredPayer.ShortName));
+				Assert.That(org.Name, Is.EqualTo(registredPayer.Name));
 				Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
 				Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
 			}
@@ -108,6 +109,28 @@ namespace Integration.Controllers
 				Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
 				Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
 			}
+		}
+
+		[Test]
+		public void Register_payer()
+		{
+			controller.RegisterPayer(0, 0, false);
+
+			var payer = (Payer)ControllerContext.PropertyBag["Instance"];
+			Assert.That(payer, Is.Not.Null);
+		}
+
+		[Test]
+		public void Payer_registration()
+		{
+			var newPayer = new Payer{Name = "test", JuridicalName = "test full"};
+			controller.Registered(newPayer, new LegalEntity(), new PaymentOptions(), 0, false);
+
+			Assert.That(newPayer.Id, Is.Not.EqualTo(0));
+			Assert.That(newPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
+			var org = newPayer.JuridicalOrganizations[0];
+			Assert.That(org.Name, Is.EqualTo("test"));
+			Assert.That(org.FullName, Is.EqualTo("test full"));
 		}
 
 		private Client RegistredClient()

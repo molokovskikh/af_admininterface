@@ -101,7 +101,7 @@ namespace AdminInterface.Controllers
 						{
 							var organization = new LegalEntity();
 							organization.Payer = currentPayer;
-							organization.Name = currentPayer.ShortName;
+							organization.Name = currentPayer.Name;
 							organization.FullName = currentPayer.JuridicalName;
 							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
 							organization.Save();
@@ -217,7 +217,7 @@ namespace AdminInterface.Controllers
 				OldTariff = 0,
 				OldPayDate = DateTime.Now,
 				Comment = String.Format("Дата регистрации: {0}", DateTime.Now),
-				ShortName = client.Name,
+				Name = client.Name,
 				JuridicalName = client.FullName,
 				BeforeNamePrefix = prefix,
 				ContactGroupOwner = contactGroupOwner,
@@ -393,18 +393,26 @@ WHERE   intersection.pricecode IS NULL
 
 		public void RegisterPayer(uint id, uint clientCode, bool showRegistrationCard)
 		{
-			var instance = Payer.Find(id);
-			var client = Client.Find(clientCode);
+			var payer = Payer.TryFind(id);
+			if (payer == null)
+			{
+				payer = new Payer {
+					JuridicalOrganizations = new List<LegalEntity> {
+						new LegalEntity()
+					}
+				};
+			}
 
-			PropertyBag["Instance"] = instance;
+			PropertyBag["Instance"] = payer;
+			PropertyBag["payer"] = payer;
+			PropertyBag["JuridicalOrganization"] = payer.JuridicalOrganizations.First();
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 			PropertyBag["clientCode"] = clientCode;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["JuridicalOrganization"] = client.Addresses[0].LegalEntity;
 		}
 
-		public void Registered([ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
+		public void Registered([ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
 			[DataBind("JuridicalOrganization")] LegalEntity juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			uint clientCode,
@@ -413,28 +421,46 @@ WHERE   intersection.pricecode IS NULL
 			Client client;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				client = Client.Find(clientCode);
+				payer.ContactGroupOwner = new ContactGroupOwner();
+				payer.ContactGroupOwner.Save();
 				payer.AddComment(paymentOptions.GetCommentForPayer());
-				payer.UpdateAndFlush();
+				payer.Name = juridicalOrganization.Name;
+				payer.JuridicalName = juridicalOrganization.FullName;
+				payer.Save();
 
-				juridicalOrganization.Payer = payer;
-				juridicalOrganization.UpdateAndFlush();
-
-				if (client.Addresses.Count > 0)
+				if (String.IsNullOrEmpty(juridicalOrganization.Name))
 				{
-					client.Addresses[0].LegalEntity = juridicalOrganization;
-					client.Addresses[0].UpdateAndFlush();
+					payer.JuridicalOrganizations = new List<LegalEntity> {
+						juridicalOrganization
+					};
+				}
+				juridicalOrganization.Payer = payer;
+				juridicalOrganization.Save();
+
+				client = Client.TryFind(clientCode);
+				if (client != null)
+				{
+					if (client.Addresses.Count > 0)
+					{
+						client.Addresses[0].LegalEntity = juridicalOrganization;
+						client.Addresses[0].UpdateAndFlush();
+					}
 				}
 
 				scope.VoteCommit();
 			}
-			this.Mail().NotifyBillingAboutClientRegistration(client);
+
+			if (client != null)
+				this.Mail().NotifyBillingAboutClientRegistration(client);
 
 			string redirectUrl;
 			if (showRegistrationCard)
 				redirectUrl = "~/report.aspx";
+			else if (client != null)
+				redirectUrl = String.Format("~/Client/{0}", client.Id);
 			else
-				redirectUrl = String.Format("~/client/{0}", clientCode);
+				redirectUrl = String.Format("~/Payers/{0}", payer.Id);
+
 			RedirectToUrl(redirectUrl);
 		}
 

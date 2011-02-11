@@ -1,7 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Регистрация аптеки. Шаг 1.", "${siteroot}/Register/Register"),
-									  ("Регистрация аптеки. Шаг 2", "")]} %>
-
-<%
+﻿<%
 def WriteInputGroupHeader(localHeader as string) as string:
 %>
 	<tr>
@@ -26,9 +23,23 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 end
 %>
 
-<% component CaptureFor, {"id" : "Title"}:%>
-	Регистрация клиента, шаг 2: Заполнения информации о плательщике
+<% if payer.Id: %>
+
+	<% component Bubble, {"bredcrumbs" : [("Регистрация аптеки. Шаг 1.", "${siteroot}/Register/Register"),
+										  ("Регистрация аптеки. Шаг 2", "")]} %>
+	<% component CaptureFor, {"id" : "Title"}: %>
+		Регистрация клиента, шаг 2: Заполнения информации о плательщике
+	<% end %>
+
+<% else: %>
+
+	<% component Bubble, {"bredcrumbs" : [("Регистрация плательщика", "")]} %>
+	<% component CaptureFor, {"id" : "Title"}:%>
+		Регистрация плательщика
+	<% end %>
+
 <% end %>
+
 
 <script>
 	document.observe("dom:loaded", function() {
@@ -122,7 +133,8 @@ end
 	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Kpp", 
 													"КПП:"), 
 								FormHelper.TextField("JuridicalOrganization.Kpp", {"class" : "BillingInput"}))}
-																		
+
+	<% if payer.Id: %>
 	<%
 	contactGroupIndex = 0
 	component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:
@@ -169,7 +181,8 @@ end
 		end
 	end
 	%>
-																		
+	<% end %>
+
 		${WriteInputGroupHeader("Опции выставки счета")}
 					
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
