@@ -366,7 +366,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>Примечание:</td>
+								<td>Сообщение в биллинг:</td>
 								<td><input type="text" name="clientContacts[0].Comment" style="width: 100%" /></td>
 							</tr>
 							</table>
