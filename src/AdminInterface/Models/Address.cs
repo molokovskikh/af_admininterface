@@ -137,7 +137,8 @@ insert into Future.Intersection(ClientId, RegionId, PriceId, LegalEntityId, Cost
 select i.ClientId, i.RegionId, i.PriceId, :legalEntityId, i.CostId, i.AvailableForClient, i.AgencyEnabled, i.PriceMarkup
 from Future.Intersection i
 left join Future.Intersection li on li.ClientId = i.ClientId and i.RegionId = li.RegionId and i.PriceId = li.PriceId and li.LegalEntityId = :legalEntityId
-where i.clientId = :clientId and li.Id is null;
+where i.clientId = :clientId and li.Id is null
+group by i.ClientId, i.RegionId, i.PriceId;
 
 insert into Future.AddressIntersection(AddressId, IntersectionId)
 select a.Id, i.Id
