@@ -728,8 +728,8 @@ namespace Functional
 
 		private void RegisterUserWithAddress(Client client, IE browser)
 		{
-			Assert.That(client.Addresses, Is.Null);
-			Assert.That(client.Users, Is.Null);
+			Assert.That(client.Addresses, Is.Null.Or.Empty);
+			Assert.That(client.Users, Is.Null.Or.Empty);
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");

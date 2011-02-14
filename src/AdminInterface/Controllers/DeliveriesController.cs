@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers
 		Layout("GeneralWithJQueryOnly"),
 		Secure,
 	]
-	public class DeliveriesController : SmartDispatcherController
+	public class DeliveriesController : ARSmartDispatcherController
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("delivery")] Address address,
+		public void Add([ARDataBind("delivery", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
 			[DataBind("contacts")] Contact[] contacts,
 			uint clientId,
 			string comment)
