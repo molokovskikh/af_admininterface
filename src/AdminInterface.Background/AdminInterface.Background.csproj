@@ -32,19 +32,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Castle.ActiveRecord">
-      <HintPath>..\..\lib\Castle\Castle.ActiveRecord.dll</HintPath>
+      <HintPath>..\..\lib\Castle.ActiveRecord.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.ActiveRecord.Linq">
-      <HintPath>..\..\lib\Castle\Castle.ActiveRecord.Linq.dll</HintPath>
+    <Reference Include="Castle.Core">
+      <HintPath>..\..\lib\Castle.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.Core, Version=1.1.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Castle\Castle.Core.dll</HintPath>
+    <Reference Include="Castle.MonoRail.Framework">
+      <HintPath>..\..\lib\Castle.MonoRail.Framework.dll</HintPath>
     </Reference>
-    <Reference Include="Castle.MonoRail.Framework, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Castle\Castle.MonoRail.Framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Castle.MonoRail.Views.Brail, Version=1.0.3.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
-      <HintPath>..\..\lib\Castle\Castle.MonoRail.Views.Brail.dll</HintPath>
+    <Reference Include="Castle.MonoRail.Views.Brail">
+      <HintPath>..\..\lib\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
     <Reference Include="ExposedObject">
       <HintPath>..\..\lib\ExposedObject.dll</HintPath>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Telephony
@@ -20,10 +21,14 @@ namespace AdminInterface.Models.Telephony
 		{
 			get
 			{
-				return (from call in Queryable
+				return new string[0];
+/*				return (from call in Queryable
 						orderby call.Id descending
-						group call by call.PhoneNumber into c
+						group call by call.PhoneNumber).Take(5).ToArray().Select(c => c.Key).ToArray();*/
+/*
+//by call.PhoneNumber into c
 						select c.Key).Take(5).ToArray();
+*/
 			}
 		}
 	}

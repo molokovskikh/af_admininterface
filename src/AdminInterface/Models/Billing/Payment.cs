@@ -9,6 +9,7 @@ using System.Xml.XPath;
 using AdminInterface.Controllers;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;

@@ -160,11 +160,12 @@ namespace AddUser
 			configuration.FilterDefinitions.Add("RegionFilter",
 				new FilterDefinition("RegionFilter",
 					"",
-					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}}));
+					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}},
+					true));
 			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
-				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>()));
+				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>(), true));
 			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
-				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>()));
+				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
 
 			var payerMapping = configuration.GetClassMapping(typeof (Payer));
 			var colection = (Collection) payerMapping.GetProperty("Clients").Value;
@@ -336,7 +337,7 @@ WHERE PriceCode = ?Id", connection);
 			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
 
 #if DEBUG
-			MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
+			//MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
 #endif
 
 /*
@@ -358,6 +359,8 @@ WHERE PriceCode = ?Id", connection);
 				desc.Helpers = desc.Helpers.Concat(new [] {new HelperDescriptor(typeof(AppHelper), "app"), }).ToArray();
 			};
 			BaseMailer.ViewEngineManager = container.ViewEngineManager;
+			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("AdminInterface"));
+			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("Common.Web.Ui"));
 		}
 	}
 

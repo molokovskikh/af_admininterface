@@ -5,6 +5,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;

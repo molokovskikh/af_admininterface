@@ -2,6 +2,7 @@
 using System.Linq;
 using Castle.ActiveRecord;
 using System.Collections.Generic;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using NHibernate.Criterion;
 

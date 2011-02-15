@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Common.MySql;
 using Common.Web.Ui.Helpers;

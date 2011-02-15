@@ -5,6 +5,7 @@ using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models
