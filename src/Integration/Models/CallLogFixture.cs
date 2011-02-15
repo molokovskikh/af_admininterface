@@ -2,7 +2,6 @@
 using Castle.ActiveRecord;
 using NUnit.Framework;
 
-
 namespace Integration.Models
 {
 	[TestFixture]

@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Linq;
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Telephony
 {
@@ -21,13 +20,18 @@ namespace AdminInterface.Models.Telephony
 		{
 			get
 			{
-				return new string[0];
-/*				return (from call in Queryable
-						orderby call.Id descending
-						group call by call.PhoneNumber).Take(5).ToArray().Select(c => c.Key).ToArray();*/
+				var criteria = DetachedCriteria.For<UnresolvedCall>()
+					.SetProjection(Projections.Group<UnresolvedCall>(l => l.PhoneNumber))
+					.AddOrder(Order.Desc("Id"))
+					.SetMaxResults(5);
+
+				return ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).List<string>().ToArray());
+
 /*
-//by call.PhoneNumber into c
-						select c.Key).Take(5).ToArray();
+				return (from call in Queryable
+					orderby call.Id descending
+					group call by call.PhoneNumber into c
+					select c.Key).Take(5).ToArray();
 */
 			}
 		}

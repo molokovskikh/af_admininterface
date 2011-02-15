@@ -3,6 +3,8 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Logs
 {
@@ -38,11 +40,21 @@ namespace AdminInterface.Models.Logs
 
 		public static string[] LastCalls()
 		{
-			return (from call in Queryable
-			        where call.Id2 == IdentificationStatus.Unknow && call.Direction == CallDirection.Input
-					orderby call.LogTime descending
-			        group call by call.From into c
-			        select c.Key).Take(5).ToArray();
+			//сломан хибер
+/*			return (from call in Queryable
+				where call.Id2 == IdentificationStatus.Unknow && call.Direction == CallDirection.Input
+				orderby call.LogTime descending
+				group call by call.From into c
+				select c.Key).Take(5).ToArray();
+ */
+			var criteria = DetachedCriteria.For<CallLog>()
+				.Add(Restrictions.Where<CallLog>(c => c.Id2 == IdentificationStatus.Unknow && c.Direction == CallDirection.Input))
+				.SetProjection(Projections.Group<CallLog>(l => l.From))
+				.AddOrder(Order.Desc("LogTime"))
+				.SetMaxResults(5);
+
+			return ArHelper.WithSession(s => criteria.GetExecutableCriteria(s).List<string>().ToArray());
+
 		}
 	}
 }
