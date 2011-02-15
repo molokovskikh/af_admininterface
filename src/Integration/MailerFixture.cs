@@ -74,7 +74,6 @@ namespace Integration
 
 			var manager = new DefaultViewEngineManager();
 			manager.Service(provider);
-			manager.Initialize();
 			var namespaces = ExposedObject.From(manager).viewEnginesFastLookup[0].Options.NamespacesToImport;
 			namespaces.Add("Boo.Lang.Builtins");
 			namespaces.Add("AdminInterface.Helpers");
@@ -99,9 +98,9 @@ namespace Integration
 			mailer.Send();
 
 			Assert.That(message, Is.Not.Null, "Сообщение не послано");
-			Assert.That(message.To, Is.EqualTo("billing@analit.net"));
+			Assert.That(message.To.ToString(), Is.EqualTo("billing@analit.net"));
 
-			Assert.That(message.From, Is.EqualTo("register@analit.net"));
+			Assert.That(message.From.ToString(), Is.EqualTo("register@analit.net"));
 
 			Assert.That(message.Subject, Is.EqualTo("Регистрация нового клиента"));
 			Assert.That(message.Body, Is.EqualTo(
