@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
+using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
-using Castle.Components.Common.EmailSender;
+using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Internal;
@@ -17,7 +18,6 @@ using IgorO.ExposedObjectProject;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
-using Message = Castle.Components.Common.EmailSender.Message;
 using Castle.MonoRail.Views.Brail;
 
 namespace Integration
@@ -27,7 +27,7 @@ namespace Integration
 	{
 		private RegisterController controller;
 		private MonorailMailer mailer;
-		private Message message;
+		private MailMessage message;
 		private Client client;
 		private Payer payer;
 
@@ -39,7 +39,7 @@ namespace Integration
 			var sender = MockRepository.GenerateStub<IEmailSender>();
 			sender.Stub(s => s.Send(message)).IgnoreArguments()
 				.Repeat.Any()
-				.Callback(new Delegates.Function<bool, Message>(m => {
+				.Callback(new Delegates.Function<bool, MailMessage>(m => {
 					message = m;
 					return true;
 				}));
@@ -117,7 +117,7 @@ namespace Integration
 <br>
 Клиент обслуживается бесплатно
 "));
-			Assert.That(message.Format, Is.EqualTo(Format.Html));
+			Assert.That(message.IsBodyHtml, Is.True);
 		}
 
 		[Test]

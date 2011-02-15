@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Linq;
-using System.Linq.Expressions;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
-using Castle.Components.Common.EmailSender;
+using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.MonoRailExtentions

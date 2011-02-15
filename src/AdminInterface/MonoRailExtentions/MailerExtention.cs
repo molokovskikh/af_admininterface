@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Runtime.Remoting.Contexts;
 using System.Text;
-using Castle.Components.Common.EmailSender;
-using Castle.Components.Common.EmailSender.Smtp;
+using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
-using Message = Castle.Components.Common.EmailSender.Message;
+using System.Net.Mail;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -46,7 +43,7 @@ namespace AdminInterface.MonoRailExtentions
 
 		public BaseMailer()
 		{
-			_sender = new SmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
+			_sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
 		}
 
 		public virtual void Send()
@@ -54,12 +51,15 @@ namespace AdminInterface.MonoRailExtentions
 			var message = GetMessage();
 #if DEBUG
 			if (!UnderTest)
-				message.To = ConfigurationManager.AppSettings["DebugMail"];
+			{
+				message.To.Clear();
+				message.To.Add(ConfigurationManager.AppSettings["DebugMail"]);
+			}
 #endif 
 			_sender.Send(message);
 		}
 
-		protected virtual Message GetMessage()
+		protected virtual MailMessage GetMessage()
 		{
 			if (ViewEngineManager == null)
 				throw new Exception("Mailer не инициализирован");
@@ -70,15 +70,13 @@ namespace AdminInterface.MonoRailExtentions
 			var writer = new StringWriter();
 			ViewEngineManager.Process(Template, Layout, writer, PropertyBag);
 
-			var message = new Message();
+			var message = new MailMessage();
 			message.Subject = Subject;
-			message.From = From;
-			message.To = To;
-			message.Encoding = Encoding.UTF8;
-			if (IsBodyHtml)
-				message.Format = Format.Html;
-			else
-				message.Format = Format.Text;
+			message.From = new MailAddress(From);
+			message.To.Add(To);
+			message.BodyEncoding = Encoding.UTF8;
+			message.HeadersEncoding = Encoding.UTF8;
+			message.IsBodyHtml = IsBodyHtml;
 			message.Body = writer.ToString();
 			return message;
 		}
