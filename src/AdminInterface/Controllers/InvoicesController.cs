@@ -34,7 +34,7 @@ namespace AdminInterface.Controllers
 				criteria.Add(Expression.Eq("Recipient", Recipient));
 
 			if (!String.IsNullOrEmpty(SearchText))
-				criteria.Add(Expression.Like("p.ShortName", SearchText, MatchMode.Anywhere));
+				criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
