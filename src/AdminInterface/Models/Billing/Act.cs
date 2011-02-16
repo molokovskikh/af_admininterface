@@ -47,7 +47,7 @@ namespace AdminInterface.Models.Billing
 		[BelongsTo]
 		public Payer Payer { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
 
 		public bool IsDuplicateDocument()

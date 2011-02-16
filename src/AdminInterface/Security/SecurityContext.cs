@@ -6,24 +6,26 @@ namespace AdminInterface.Security
 {
 	public static class SecurityContext
 	{
-		private const string AdministratorKey = "Admin";
+		private const string AdministratorKey = "AdminInterface.Security.Admin";
 
 		public static Func<Administrator> GetAdministrator = () => {
-			Administrator administrator = null;
+			var httpContext = HttpContext.Current;
+			var admin = (Administrator)httpContext.Items[AdministratorKey];
 #if !DEBUG
-			administrator = (Administrator)HttpContext.Current.Session[AdministratorKey];
+			administrator = httpContext.Session[AdministratorKey];
 #endif
-			if (administrator == null)
+			if (admin == null)
 			{
-				administrator = Administrator.GetByName(HttpContext.Current.User.Identity.Name);
-				if (administrator != null)
+				admin = Administrator.GetByName(httpContext.User.Identity.Name);
+				if (admin != null)
 				{
-					HttpContext.Current.Session["UserName"] = administrator.UserName;
-					HttpContext.Current.Session[AdministratorKey] = administrator;
+					httpContext.Session["UserName"] = admin.UserName;
+					httpContext.Session[AdministratorKey] = admin;
+					httpContext.Items[AdministratorKey] = admin;
 				}
 			}
 
-			return administrator;
+			return admin;
 		};
 
 		public static Administrator Administrator

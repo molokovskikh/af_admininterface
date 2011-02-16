@@ -78,7 +78,7 @@ namespace AdminInterface.Models.Billing
 		public bool SendToEmail { get; set; }
 
 		[
-			HasMany(Cascade = ManyRelationCascadeEnum.All),
+			HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true),
 			ValidateCollectionNotEmpty("Нужно задать список услуг")
 		]
 		public IList<InvoicePart> Parts { get; set; }
