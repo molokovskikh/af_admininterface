@@ -3,7 +3,7 @@
 <% end %>
 
 <% component Bubble, {"bredcrumbs" :
-	[("Платежи", "${context.Request.UrlReferrer}"),
+	[("Платежи", "${siteroot}/Payment/"),
 		("Редактирование платежа", "")]} %>
 
 <script>
@@ -130,7 +130,7 @@
 				Плательщик:
 			</td>
 			<td>
-				${FormHelper.TextField("payment.Payer.Name")}
+				<input type=text id="payment_Payer_Name" value="${payment.Payer.Name if payment.Payer}">
 			</td>
 		</tr>
 		<tr>
