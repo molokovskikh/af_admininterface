@@ -12,7 +12,7 @@ namespace AdminInterface.Security
 			var httpContext = HttpContext.Current;
 			var admin = (Administrator)httpContext.Items[AdministratorKey];
 #if !DEBUG
-			administrator = httpContext.Session[AdministratorKey];
+			admin = httpContext.Session[AdministratorKey];
 #endif
 			if (admin == null)
 			{

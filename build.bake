@@ -1,7 +1,7 @@
 ﻿import file from WebSiteSupport.bake
 import file from Deploy.bake
 import file from Lib.bake
-#import file from Migration.bake
+import file from Migration.bake
 import file from Tools.bake
 import file from Test.bake
 import file from AppSupport.bake
@@ -60,4 +60,4 @@ task @BuildBackground:
 	Rm("output/$project/$project.*.config")
 	Globals.Project = oldProject
 
-task @deploy, [@Production, @Build, @Migrate, @Backup, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
+task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
