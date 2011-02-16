@@ -19,7 +19,6 @@ $(function () {
 			if (nextItem) {
 				nextItem.focus();
 				nextItem.select();
-				event.preventDefault();
 				return false;
 			}
 		}
