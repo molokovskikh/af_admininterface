@@ -243,7 +243,12 @@ namespace AdminInterface.Helpers
 					var values = BindingHelper.GetDescriptionsDictionary(arguments[0])
 						.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
 						.ToList();
-					input = EmptyableSelect(name, value, values);
+
+					var selectedValue = "";
+					if (value != null)
+						selectedValue = Convert.ToInt32(value).ToString();
+
+					input = EmptyableSelect(name, selectedValue, values);
 				}
 			}
 			else if (typeof(IEnumerable).IsAssignableFrom(valueType))
