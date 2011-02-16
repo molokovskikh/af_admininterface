@@ -337,7 +337,7 @@ WHERE PriceCode = ?Id", connection);
 			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
 
 #if DEBUG
-			//MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
+			MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
 #endif
 
 /*

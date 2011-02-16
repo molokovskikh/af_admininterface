@@ -566,6 +566,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\lib\MonoRail.Debugger.Toolbar\src\MonoRail.Debugger.Toolbar\MonoRail.Debugger.Toolbar.csproj">
+      <Project>{BF858A13-1FE7-42F0-AF78-D9909FA193D1}</Project>
+      <Name>MonoRail.Debugger.Toolbar</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common.MySql\Common.MySql\Common.MySql.csproj">
       <Project>{8A680813-C83B-497A-85E6-E8F07B7D7650}</Project>
       <Name>Common.MySql</Name>
