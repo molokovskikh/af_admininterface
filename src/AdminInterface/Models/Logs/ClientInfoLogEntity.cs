@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -20,6 +21,7 @@ namespace AdminInterface.Models.Logs
 		{
 			Message = message;
 			UserName = SecurityContext.Administrator.UserName;
+			Administrator = SecurityContext.Administrator;
 			WriteTime = DateTime.Now;
 		}
 
@@ -65,6 +67,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public string UserName { get; set; }
 
+		[BelongsTo]
+		public Administrator Administrator { get; set;}
+
 		[Property]
 		public string Message { get; set; }
 
@@ -103,7 +108,9 @@ namespace AdminInterface.Models.Logs
 
 		public string GetHumanReadableOperatorName()
 		{
-			return ViewHelper.GetHumanReadableOperatorName(UserName);
+			if (Administrator != null)
+				return Administrator.ManagerName;
+			return UserName;
 		}
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)

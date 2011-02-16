@@ -89,7 +89,11 @@ namespace AdminInterface.Background
 									invoice.Payer.Id,
 									invoice.Payer.Name);
 
-							MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
+							if (invoice.ShouldNotify())
+							{
+								invoice.LastErrorNotification = DateTime.Now;
+								MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
+							}
 						}
 
 						invoice.Update();

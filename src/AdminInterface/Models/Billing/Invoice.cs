@@ -77,6 +77,9 @@ namespace AdminInterface.Models.Billing
 		[Property(NotNull = true, Default = "0")]
 		public bool SendToEmail { get; set; }
 
+		[Property]
+		public DateTime? LastErrorNotification { get; set; }
+
 		[
 			HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true),
 			ValidateCollectionNotEmpty("Нужно задать список услуг")
@@ -148,6 +151,11 @@ namespace AdminInterface.Models.Billing
 				mailer.Send();
 			}
 			SendToEmail = false;
+		}
+
+		public bool ShouldNotify()
+		{
+			return LastErrorNotification == null || (DateTime.Now - LastErrorNotification.Value).TotalDays > 1;
 		}
 	}
 }

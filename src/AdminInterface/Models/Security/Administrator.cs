@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
@@ -9,8 +8,6 @@ using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using NHibernate.Criterion;
-using NHibernate.Type;
-using PropertyAccess = Castle.ActiveRecord.PropertyAccess;
 
 namespace AdminInterface.Models.Security
 {
@@ -64,7 +61,7 @@ namespace AdminInterface.Models.Security
 			Schema = "accessright",
 			ColumnKey = "AdminId", 
 			ColumnRef = "PermissionId", 
-			Lazy = false)]
+			Lazy = true)]
 		public IList<Permission> AllowedPermissions { get; set; }
 
 		public static Administrator GetByName(string name)
