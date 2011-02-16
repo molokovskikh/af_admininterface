@@ -11,6 +11,12 @@
 <div style="padding: 10px">
 	<% component Bubble, {"bredcrumbs" : [("Акты", "")]} %>
 
+	<div class=block>
+		${app.LinkTo("Счета", "Invoices", "index")}
+		${app.LinkTo("Акты", "Acts", "index")}
+		${app.LinkTo("Платежи", "Payments", "index")}
+	</div>
+
 	<div class=block style="float:left; width: 100%;padding:0; margin:0;">
 		<div style="float:left; width: 50%;padding:0; margin:0;">
 			<div style="margin:10px">

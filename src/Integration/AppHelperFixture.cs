@@ -9,6 +9,7 @@ using Castle.MonoRail.Framework.Adapters;
 using Castle.MonoRail.Framework.Test;
 using NHibernate;
 using NUnit.Framework;
+using DescriptionAttribute=System.ComponentModel.DescriptionAttribute;
 
 namespace Integration
 {
@@ -41,11 +42,18 @@ namespace Integration
 			}
 		}
 
+		public enum TestEnum
+		{
+			[Description("Value1")] Value1,
+			[Description("Value2")] Value2
+		}
+
 		public class TestFilter
 		{
 			public bool SomeBool { get; set; }
 			public string TextField { get; set; }
 			public Multivalue Multivalue { get; set; }
+			public TestEnum Enum { get; set; }
 		}
 
 		public class Multivalue
@@ -79,6 +87,20 @@ namespace Integration
 
 			var result = helper.Edit("filter.TextField");
 			Assert.That(result, Is.EqualTo("<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" />"));
+		}
+
+		[Test]
+		public void Selected_value_for_enum()
+		{
+			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter{ Enum = TestEnum.Value2 };
+
+			var result = helper.FilterFor("filter.Enum");
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
+				+ "<select name='filter.Enum'>"
+				+ "<option value=0>Value1</option>"
+				+ "<option value=1 selected>Value2</option>"
+				+ "</select>"
+				+ "</td></tr>"));
 		}
 
 		[Test]

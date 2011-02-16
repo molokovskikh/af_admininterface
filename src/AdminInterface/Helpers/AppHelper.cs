@@ -228,7 +228,12 @@ namespace AdminInterface.Helpers
 				var values = BindingHelper.GetDescriptionsDictionary(valueType)
 					.Select(p => new Tuple<string, string>(p.Key.ToString(), p.Value))
 					.ToList();
-				input = Select(name, value, values);
+
+				var selectedValue = "";
+				if (value != null)
+					selectedValue = Convert.ToInt32(value).ToString();
+
+				input = Select(name, selectedValue, values);
 			}
 			else if (valueType.IsGenericType && typeof(Nullable<>).IsAssignableFrom(valueType.GetGenericTypeDefinition()))
 			{

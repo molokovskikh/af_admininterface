@@ -43,6 +43,15 @@ namespace AdminInterface.Controllers
 				.Select(g => g.First())
 				.ToList();
 		}
+
+		public string[] ToUrl()
+		{
+			return new [] {
+				String.Format("filter.Period={0}", (int)Period),
+				String.Format("filter.Region.Id={0}", Region.Id),
+				String.Format("filter.Recipient.Id={0}", Recipient.Id),
+			};
+		}
 	}
 
 	public class DocumentBuilderFilter
@@ -183,7 +192,12 @@ namespace AdminInterface.Controllers
 #endif
 
 			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
-			RedirectToAction("Index");
+			RedirectToAction("Index",
+				new PayerDocumentFilter {
+					Period = period,
+					Region = Region.Find(regionId),
+					Recipient = Recipient.Find(recipientId)
+				}.ToUrl());
 		}
 	}
 }

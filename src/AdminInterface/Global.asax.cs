@@ -361,7 +361,7 @@ WHERE PriceCode = ?Id", connection);
 			BaseMailer.ViewEngineManager = container.ViewEngineManager;
 			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("AdminInterface"));
 			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("Common.Web.Ui"));
+			container.UrlBuilder.UseExtensions = false;
 		}
 	}
-
 }

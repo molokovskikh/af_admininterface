@@ -4,19 +4,24 @@
 	История платежей
 <% end %>
 
-<div class="PageHeader">
-	История платежей
+<div class=block>
+	${app.LinkTo("Счета", "Invoices", "index")}
+	${app.LinkTo("Акты", "Acts", "index")}
+	${app.LinkTo("Платежи", "Payments", "index")}
 </div>
 
-${app.BeginFormFor("filter")}
-${app.FilterFor("filter.Period")}
-${app.FilterFor("filter.Recipients")}
-${app.FilterFor("filter.SearchText")}
-${app.FilterFor("Показывать только неопознанные:", "filter.ShowOnlyUnknown")}
-${app.EndFormFor("filter")}
+<div class=block>
+	<h3>История платежей</h3>
+	${app.BeginFormFor("filter")}
+	${app.FilterFor("filter.Period")}
+	${app.FilterFor("filter.Recipients")}
+	${app.FilterFor("filter.SearchText")}
+	${app.FilterFor("Показывать только неопознанные:", "filter.ShowOnlyUnknown")}
+	${app.EndFormFor("filter")}
+</div>
 
 <div class=block>
-Всего платежей ${stat.Count} на сумму ${stat.Sum}р
+	Всего платежей ${stat.Count} на сумму ${stat.Sum}р
 </div>
 
 <table class=DataTable>
