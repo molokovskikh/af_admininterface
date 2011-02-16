@@ -239,7 +239,7 @@ LOWER(Persons.Name) like '{0}' ",
 						break;
 					}
 				case SearchUserBy.ByPayerId: {
-						filter = AddFilterCriteria(filter, String.Format(" Clients.PayerId = {0} ",
+						filter = AddFilterCriteria(filter, String.Format(" Users.PayerId = {0} ",
                             searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
