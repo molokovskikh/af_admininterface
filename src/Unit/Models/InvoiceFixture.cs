@@ -68,5 +68,13 @@ namespace Unit.Models
 			Assert.That(invoice.Parts[1].Count, Is.EqualTo(1));
 			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(200));
 		}
+
+		[Test]
+		public void Send_invoice_to_email_if_should()
+		{
+			payer.InvoiceSettings.EmailInvoice = true;
+			var invoice = new Invoice(payer, Period.April, DateTime.Now);
+			Assert.That(invoice.SendToEmail, Is.True);
+		}
 	}
 }

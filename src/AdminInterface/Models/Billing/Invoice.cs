@@ -39,9 +39,9 @@ namespace AdminInterface.Models.Billing
 			Sum = payer.TotalSum;
 			Date = invoiceDate;
 			CreatedOn = DateTime.Now;
-			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-				Sum *= 3;
 			Parts = BuildParts();
+			Sum = Parts.Sum(p => p.Sum);
+			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
 		}
 
 		public void SetPayer(Payer payer)
