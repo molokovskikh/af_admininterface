@@ -142,6 +142,12 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual decimal Balance { get; set; }
 
+		[Property]
+		public virtual decimal BeginBalance { get; set; }
+
+		[Property]
+		public virtual DateTime? BeginBalanceDate { get; set; }
+
 		[Property(NotNull = true, Default = "0")]
 		public virtual bool SendPaymentNotification { get; set; }
 

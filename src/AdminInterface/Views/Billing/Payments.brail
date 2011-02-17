@@ -463,6 +463,20 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
 									FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendPaymentNotification", "Отправлять извещения об оплате:"),
+									FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
+									FormHelper.TextField("Instance.BeginBalance"))}
+
+		value = ""
+		<% if Instance.BeginBalanceDate != null: %>
+			<% value = Instance.BeginBalanceDate.ToShortDateString() %>
+		<% end %>
+
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
+									FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
 		<% end %>
 		
 		${WriteInputGroupHeader("Оплата")}
