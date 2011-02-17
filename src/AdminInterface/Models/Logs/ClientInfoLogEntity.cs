@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
 using Common.Web.Ui.Helpers;
 using System.Linq;
 
@@ -89,7 +87,12 @@ namespace AdminInterface.Models.Logs
 
 		public string Operator
 		{
-			get { return GetHumanReadableOperatorName(); }
+			get
+			{
+				if (Administrator != null)
+					return Administrator.ManagerName;
+				return UserName;
+			}
 		}
 
 		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
@@ -104,13 +107,6 @@ namespace AdminInterface.Models.Logs
 		public bool IsStatusChange()
 		{
 			return Message.Contains("$$$Клиент ");
-		}
-
-		public string GetHumanReadableOperatorName()
-		{
-			if (Administrator != null)
-				return Administrator.ManagerName;
-			return UserName;
 		}
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)

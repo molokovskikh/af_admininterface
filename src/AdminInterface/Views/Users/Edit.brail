@@ -233,7 +233,7 @@
 				<% for i, log in enumerate(logs): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 					<td>${log.WriteTime}</td>
-					<td>${log.GetHumanReadableOperatorName()}</td>
+					<td>${log.Operator}</td>
 					<td>${ViewHelper.FormatMessage(HttpUtility.HtmlEncode(log.Message))}</td>
 				</tr>
 				<% end %>
