@@ -366,7 +366,7 @@
 								</td>
 							</tr>
 							<tr>
-								<td>Сообщение в биллинг:</td>
+								<td>Примечание:</td>
 								<td><input type="text" name="clientContacts[0].Comment" style="width: 100%" /></td>
 							</tr>
 							</table>
@@ -410,7 +410,7 @@
 	</div>
 
 	<div class=block>
-		<h3>Примечание</h3>
+		<h3>Сообщение в биллинг</h3>
 		<textarea cols=60 rows=4 name=comment></textarea>
 	</div>
 
