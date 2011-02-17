@@ -7,6 +7,7 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using NHibernate;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Security
@@ -66,7 +67,9 @@ namespace AdminInterface.Models.Security
 
 		public static Administrator GetByName(string name)
 		{
-			return ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
+			var admin = ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
+			NHibernateUtil.Initialize(admin.AllowedPermissions);
+			return admin;
 		}
 
 		public static Administrator GetById(uint id)
