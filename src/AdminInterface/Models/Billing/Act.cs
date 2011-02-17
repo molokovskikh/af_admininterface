@@ -25,7 +25,7 @@ namespace AdminInterface.Models.Billing
 				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 				.ToList();
 			Sum = Parts.Sum(p => p.Count * p.Cost);
-			PayerName = invoices.Select(i => i.PayerName).Single();
+			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
 		}
 		
 		[PrimaryKey]

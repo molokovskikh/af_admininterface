@@ -42,13 +42,13 @@ namespace AdminInterface.Models.Billing
 			Parts = BuildParts();
 			Sum = Parts.Sum(p => p.Sum);
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
-			PayerName = payer.JuridicalName;
 		}
 
 		public void SetPayer(Payer payer)
 		{
 			Recipient = payer.Recipient;
 			Payer = payer;
+			PayerName = payer.JuridicalName;
 		}
 
 		[PrimaryKey]
