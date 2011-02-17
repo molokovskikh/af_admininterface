@@ -13,15 +13,19 @@ namespace Integration
 		public void Setup()
 		{
 			ForTest.InitialzeAR();
-			SecurityContext.GetAdministrator = () => new Administrator{
+			var admin = new Administrator{
 				UserName = "test",
+				Email = "kvasovtest@analit.net",
+				PhoneSupport = "112",
 				RegionMask = ulong.MaxValue,
 				ManagerName = "test",
 				AllowedPermissions = new List<Permission> {
-					new Permission{Type = PermissionType.Billing},
-					new Permission{Type = PermissionType.ViewDrugstore},
+					Permission.Find(PermissionType.Billing),
+					Permission.Find(PermissionType.ViewDrugstore),
 				}
 			};
+			admin.Save();
+			SecurityContext.GetAdministrator = () => admin;
 			Administrator.GetHost = () => "localhost";
 		}
 	}
