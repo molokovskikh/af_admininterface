@@ -68,7 +68,9 @@ namespace AdminInterface.Models.Security
 		public static Administrator GetByName(string name)
 		{
 			var admin = ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
-			NHibernateUtil.Initialize(admin.AllowedPermissions);
+			if (admin != null)
+				NHibernateUtil.Initialize(admin.AllowedPermissions);
+
 			return admin;
 		}
 
