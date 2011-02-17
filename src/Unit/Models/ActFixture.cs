@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -12,11 +12,13 @@ namespace Unit.Models
 	{
 		private Payer payer;
 		private Client client;
+		private Invoice invoice;
 
 		[SetUp]
 		public void Setup()
 		{
 			payer = new Payer {
+				JuridicalName = "РћРћРћ 'Р РѕРіР° Рё РєРѕРїС‹С‚Р°'",
 				Recipient = new Recipient(),
 				Addresses = new List<Address>()
 			};
@@ -26,41 +28,49 @@ namespace Unit.Models
 			payer.Users = new List<User> {
 				user
 			};
+
+			invoice = new Invoice(payer, Period.January, DateTime.Now);
 		}
 
 		[Test]
 		public void Build_act()
 		{
-			var invoice = new Invoice(payer, Period.January, DateTime.Now);
 			var act = new Act(DateTime.Now, invoice);
 			Assert.That(act.Parts.Count, Is.EqualTo(1));
 			var part = act.Parts[0];
 			Assert.That(part.Count, Is.EqualTo(1));
 			Assert.That(part.Cost, Is.EqualTo(800));
-			Assert.That(part.Name, Is.StringContaining("Мониторинг оптового фармрынка"));
+			Assert.That(part.Name, Is.StringContaining("РњРѕРЅРёС‚РѕСЂРёРЅРі РѕРїС‚РѕРІРѕРіРѕ С„Р°СЂРјСЂС‹РЅРєР°"));
 		}
 
 		[Test]
 		public void Build_multi_invoice_act()
 		{
-			var invoice = new Invoice(payer, Period.January, DateTime.Now);
 			var invoice1 = new Invoice();
 			invoice1.SetPayer(payer);
 			invoice1.Period = Period.January;
 			invoice1.Date = DateTime.Now;
 			invoice1.Parts = new List<InvoicePart>();
-			invoice1.Parts.Add(new InvoicePart(invoice1, Period.January, 150, 1) { Name = "Информационные услуги" });
+			invoice1.Parts.Add(new InvoicePart(invoice1, Period.January, 150, 1) { Name = "РРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Рµ СѓСЃР»СѓРіРё" });
 
 			var act = new Act(DateTime.Now, invoice, invoice1);
 			Assert.That(act.Parts.Count, Is.EqualTo(2));
 			var part = act.Parts[0];
 			Assert.That(part.Count, Is.EqualTo(1));
 			Assert.That(part.Cost, Is.EqualTo(800));
-			Assert.That(part.Name, Is.StringContaining("Мониторинг оптового фармрынка"));
+			Assert.That(part.Name, Is.StringContaining("РњРѕРЅРёС‚РѕСЂРёРЅРі РѕРїС‚РѕРІРѕРіРѕ С„Р°СЂРјСЂС‹РЅРєР°"));
 			var part1 = act.Parts[1];
 			Assert.That(part1.Count, Is.EqualTo(1));
 			Assert.That(part1.Cost, Is.EqualTo(150));
-			Assert.That(part1.Name, Is.EqualTo("Информационные услуги"));
+			Assert.That(part1.Name, Is.EqualTo("РРЅС„РѕСЂРјР°С†РёРѕРЅРЅС‹Рµ СѓСЃР»СѓРіРё"));
+		}
+
+		[Test]
+		public void Payer_name_in_act_should_be_same_as_invoice()
+		{
+			payer.JuridicalName = "РћРћРћ 'РҐРІРѕСЃС‚С‹ Рё РїР»РµС‚РєРё'";
+			var act = new Act(DateTime.Now, invoice);
+			Assert.That(act.PayerName, Is.EqualTo("РћРћРћ 'Р РѕРіР° Рё РєРѕРїС‹С‚Р°'"));
 		}
 	}
 }

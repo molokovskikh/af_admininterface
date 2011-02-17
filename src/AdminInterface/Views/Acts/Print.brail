@@ -57,7 +57,7 @@
 		</p>
 
 		<h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.ActDate.ToString("dd MMMM yyyy")}</h2>
-		<p>Заказчик: ${act.Payer.JuridicalName}</p>
+		<p>Заказчик: ${act.PayerName}</p>
 		<table>
 			<tr>
 				<th>№</th>
@@ -113,7 +113,7 @@
 		</table>
 		<div style="position:fixed; bottom: 0; right:0; width: 8cm;">
 			Кому: для Аптеки<br>
-			${act.Payer.JuridicalName}<br>
+			${act.PayerName}<br>
 			Куда: ${act.Payer.GetMailAddress()}<br>
 			${act.Payer.ActualAddressIndex}
 		</div>

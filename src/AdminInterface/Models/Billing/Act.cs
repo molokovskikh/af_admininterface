@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
 
 namespace AdminInterface.Models.Billing
 {
@@ -27,6 +25,7 @@ namespace AdminInterface.Models.Billing
 				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 				.ToList();
 			Sum = Parts.Sum(p => p.Count * p.Cost);
+			PayerName = invoices.Select(i => i.PayerName).Single();
 		}
 		
 		[PrimaryKey]
@@ -46,6 +45,9 @@ namespace AdminInterface.Models.Billing
 
 		[BelongsTo]
 		public Payer Payer { get; set; }
+
+		[Property]
+		public string PayerName { get; set; }
 
 		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
@@ -97,7 +99,5 @@ namespace AdminInterface.Models.Billing
 
 		[BelongsTo]
 		public Act Act { get; set; }
-
-
 	}
 }

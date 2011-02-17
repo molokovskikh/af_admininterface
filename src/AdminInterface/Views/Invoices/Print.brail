@@ -68,7 +68,7 @@
 		</div>
 		<div style="position:fixed; bottom: 0; right:0; width: 8cm;">
 			Кому: для Аптеки<br>
-			${invoice.Payer.JuridicalName}<br>
+			${invoice.PayerName}<br>
 			Куда: ${invoice.Payer.GetMailAddress()}<br>
 			${invoice.Payer.ActualAddressIndex}
 		</div>

@@ -42,6 +42,7 @@ namespace AdminInterface.Models.Billing
 			Parts = BuildParts();
 			Sum = Parts.Sum(p => p.Sum);
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
+			PayerName = payer.JuridicalName;
 		}
 
 		public void SetPayer(Payer payer)
@@ -64,6 +65,9 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public decimal Sum { get; set; }
+
+		[Property]
+		public string PayerName { get; set; }
 
 		[Property, ValidateNonEmpty]
 		public DateTime Date { get; set; }

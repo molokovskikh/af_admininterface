@@ -27,9 +27,9 @@
 <h2>Счет №${invoice.Id} от ${invoice.Date.ToString("dd MMMM yyyy")}</h2>
 
 <p>
-	Плательщик: ${invoice.Payer.JuridicalName}
+	Плательщик: ${invoice.PayerName}
 	<br />
-	Заказчик: ${invoice.Payer.JuridicalName}
+	Заказчик: ${invoice.PayerName}
 	<br>
 	Договор №${invoice.Payer.Id}
 </p>
