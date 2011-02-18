@@ -5,7 +5,7 @@ using Castle.Components.Validator;
 namespace AdminInterface.Models
 {
 	[ActiveRecord(Table = "UserUpdateInfo", Schema = "usersettings")]
-	public class ClientMessage : ActiveRecordValidationBase<ClientMessage>
+	public class UserMessage : ActiveRecordValidationBase<UserMessage>
 	{
 		[PrimaryKey("UserId")]
 		public uint ClientCode { get; set; }
@@ -21,7 +21,7 @@ namespace AdminInterface.Models
 			return ShowMessageCount > 0;
 		}
 
-		public static ClientMessage FindClientMessage(uint clientCode)
+		public static UserMessage FindClientMessage(uint clientCode)
 		{
 			var client = Client.Find(clientCode);
 			var user = client.Users.FirstOrDefault();
@@ -30,7 +30,7 @@ namespace AdminInterface.Models
 			return TryFind((user.Id));
 		}
 
-		public static ClientMessage FindUserMessage(uint userId)
+		public static UserMessage FindUserMessage(uint userId)
 		{
 			return TryFind(userId);
 		}

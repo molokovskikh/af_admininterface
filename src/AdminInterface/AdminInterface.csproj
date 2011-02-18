@@ -295,7 +295,7 @@
     <Compile Include="managep.aspx.designer.cs">
       <DependentUpon>managep.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Models\ClientMessage.cs" />
+    <Compile Include="Models\UserMessage.cs" />
     <Compile Include="Models\Security\Permission.cs" />
     <Compile Include="NHibernateExtentions\Projections2.cs" />
     <Compile Include="OfficeUserRegistrationReport.aspx.cs">

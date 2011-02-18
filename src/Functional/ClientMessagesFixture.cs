@@ -18,11 +18,11 @@ namespace Functional
 		[Test, Ignore("Этот тест эквивалентен тесту Send_message_to_user в BillingFixture")]
 		public void User_can_send_message_to_client()
 		{
-			List<ClientMessage> messages = null;
+			List<UserMessage> messages = null;
 
 			using (new SessionScope())
 			{
-				messages = Client.Find(2575u).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+				messages = Client.Find(2575u).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 				foreach (var message in messages)
 				{
 					message.Message = "1";
@@ -50,11 +50,11 @@ namespace Functional
 		[Test, Ignore("Этот тест эквивалентен тесту Cancel_message_for_user в BillingFixture")]
 		public void Cancel_message_for_client()
 		{
-			List<ClientMessage> messages;
+			List<UserMessage> messages;
 
 			using (new SessionScope())
 			{
-				messages = Client.Find(2575u).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+				messages = Client.Find(2575u).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 				foreach (var message in messages)
 				{
 					message.Message = "тестовое сообщение";

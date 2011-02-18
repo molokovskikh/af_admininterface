@@ -124,7 +124,6 @@ namespace AdminInterface.Background
 
 			var manager = new DefaultViewEngineManager();
 			manager.Service(provider);
-			manager.Initialize();
 			var namespaces = ExposedObject.From(manager).viewEnginesFastLookup[0].Options.NamespacesToImport;
 			namespaces.Add("Boo.Lang.Builtins");
 			namespaces.Add("AdminInterface.Helpers");

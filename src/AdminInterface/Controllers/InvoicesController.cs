@@ -147,7 +147,7 @@ namespace AdminInterface.Controllers
 				{
 					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
 					invoice.Save();
-					Redirect("Invoice", "Edit", new {invoice.Id});
+					Redirect("Invoices", "Edit", new {invoice.Id});
 				}
 			}
 		}

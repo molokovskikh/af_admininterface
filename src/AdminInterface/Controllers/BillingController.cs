@@ -55,14 +55,14 @@ namespace AdminInterface.Controllers
 			var user = (userId != 0) ? User.Find(userId) : payer.Users.FirstOrDefault();
 			var address = (addressId != 0) ? Address.Find(addressId) : payer.Addresses.FirstOrDefault();
 
-			var usersMessages = new List<ClientMessage>();
+			var usersMessages = new List<UserMessage>();
 			var usersLogs = new List<UserLogRecord>();
 			var addressesLogs = new List<AddressLogRecord>();
 			var clients = payer.Users.Select(u => u.Client).Distinct().ToList();
 			var countUsersWithMessages = 0;
 			foreach (var item in payer.Users)
 			{
-				var message = ClientMessage.FindUserMessage(item.Id);
+				var message = UserMessage.FindUserMessage(item.Id);
 				if (message != null && message.IsContainsNotShowedMessage())
 					countUsersWithMessages++;
 				usersMessages.Add(message);
@@ -121,7 +121,7 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] ClientMessage message,
+		public void SendMessage([DataBind("NewClientMessage")] UserMessage message,
 			uint clientId,
 			uint payerId,
 			bool sendMessageToClientEmails,
@@ -162,10 +162,10 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		private void SendMessageToUser(User user, ClientMessage clientMessage)
+		private void SendMessageToUser(User user, UserMessage clientMessage)
 		{
 			DbLogHelper.SetupParametersForTriggerLogging();
-			var message = ClientMessage.Find(user.Id);
+			var message = UserMessage.Find(user.Id);
 			message.Message = clientMessage.Message;
 			message.ShowMessageCount = clientMessage.ShowMessageCount;
 			message.Update();
@@ -283,7 +283,7 @@ namespace AdminInterface.Controllers
 		public void ShowMessageForUser(uint userId)
 		{
 			CancelLayout();
-			var message = ClientMessage.FindUserMessage(userId);
+			var message = UserMessage.FindUserMessage(userId);
 			PropertyBag["Message"] = message;
 			PropertyBag["user"] = User.Find(message.ClientCode);
 		}
@@ -292,7 +292,7 @@ namespace AdminInterface.Controllers
 		{
 			using (new TransactionScope())
 			{
-				var message = ClientMessage.Find(userId);
+				var message = UserMessage.Find(userId);
 				message.ShowMessageCount = 0;
 				message.Update();
 			}

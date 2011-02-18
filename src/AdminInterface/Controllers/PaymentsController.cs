@@ -100,6 +100,12 @@ namespace AdminInterface.Controllers
 		public void SavePayments()
 		{
 			var payments = TempPayments();
+			if (payments == null)
+			{
+				Flash["Message"] = Message.Error("Время сесии истекло. Загрузите выписку повторно.");
+				RedirectToReferrer();
+			}
+
 			foreach (var payment in payments)
 			{
 				//если зайти в два платежа и отредактировать их

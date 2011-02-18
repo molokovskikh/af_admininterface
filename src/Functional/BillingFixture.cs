@@ -585,7 +585,7 @@ namespace Functional
 				browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 				Thread.Sleep(500);
 				Assert.That(browser.Text, Is.StringContaining(messageText));
-				var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+				var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 				messages[0].Refresh();
 				Assert.That(messages[0].Message, Is.EqualTo(messageText));
 				Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
@@ -595,7 +595,7 @@ namespace Functional
 		[Test]
 		public void Cancel_message_for_user()
 		{
-			ClientMessage message;
+			UserMessage message;
 			string messageText;
 
 			using (var browser = Open(client))
@@ -610,7 +610,7 @@ namespace Functional
 				browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 				Thread.Sleep(500);
 				browser.Button(String.Format("CancelViewMessage{0}", client.Users[0].Id)).Click();
-				var messages = Client.Find(client.Id).Users.Select(u => ClientMessage.Find(u.Id)).ToList();
+				var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 				message = messages[0];
 			}
 
