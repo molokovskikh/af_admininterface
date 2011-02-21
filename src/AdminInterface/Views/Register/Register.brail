@@ -109,16 +109,17 @@
 		var searchText = jQuery("#SearchSupplierTextPattern").val();
 		if (searchText.length == 0)
 			return;
-		var url = "SearchSuppliers?searchPattern=" + searchText;
 		if (jQuery('#PayerComboBox').val() != null) {
 			var payerId = parseInt(jQuery('#PayerComboBox').val());
 			searchText += "&payerId=" + payerId;
 		}
-		jQuery.get(url, function(htmlOptions) {
+		jQuery.get("SearchSuppliers",
+			{"searchPattern" : searchText},
+			function(htmlOptions) {
 			jQuery('#SupplierComboBox').find('option').remove().end();
 			if (htmlOptions.length == 0) {
 				jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-				jQuery("#SearchSupplierButton").attr("disabled", "");	            
+				jQuery("#SearchSupplierButton").attr("disabled", "");
 				jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
 				return;
 			}
@@ -126,8 +127,8 @@
 			ViewDiv(false, "#SearchSupplierDiv");
 			ViewDiv(true, "#SelectSupplierDiv");
 			jQuery("#MessageForSupplier").html("");
-			OnSupplierChange();	        
-		});	    
+			OnSupplierChange();
+		});
 		jQuery("#MessageForSupplier").html("<i>Выполняется поиск<i/>");
 		jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
 		jQuery("#SearchSupplierButton").attr("disabled", "disabled");	    
@@ -148,8 +149,9 @@
 		var searchText = jQuery("#SearchPayerTextPattern").val();
 		if (searchText.length == 0)
 			return;
-		var url = "SearchPayers?searchPattern=" + searchText;
-		jQuery.get(url, function(htmlOptions) {
+		jQuery.get("SearchPayers",
+			{"searchPattern" : searchText},
+			function(htmlOptions) {
 			jQuery('#PayerComboBox').find('option').remove().end();
 			if (htmlOptions.length == 0) {
 				jQuery("#SearchPayerTextPattern").attr("disabled", "");
