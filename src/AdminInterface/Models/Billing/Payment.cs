@@ -220,13 +220,19 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public static List<Payment> ParsePayment(string file)
+		public static List<Payment> ParseXml(string file)
 		{
 			using(var stream = File.OpenRead(file))
-				return ParsePayment(stream);
+				return ParseXml(stream);
 		}
 
-		public static List<Payment> ParsePayment(Stream file)
+		public static List<Payment> ParseText(Stream file)
+		{
+			return null;
+			//var reader = new Stread
+		}
+
+		public static List<Payment> ParseXml(Stream file)
 		{
 			var recipients = Recipient.Queryable.ToList();
 			var doc = XDocument.Load(file);
