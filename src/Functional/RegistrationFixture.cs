@@ -326,12 +326,15 @@ namespace Functional
 				browser.Button(Find.ById("RegisterButton")).Click();
 				clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
-				var client = Client.Find(clientcode);
-				Assert.That(client.Payers.First().Id, Is.EqualTo(testPayerId));
+				using(new SessionScope())
+				{
+					var client = Client.Find(clientcode);
+					Assert.That(client.Payers.First().Id, Is.EqualTo(testPayerId));
 
-				var settings = DrugstoreSettings.Find(clientcode);
-				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
-				Assert.That(settings.FirmCodeOnly, Is.Null);
+					var settings = DrugstoreSettings.Find(clientcode);
+					Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
+					Assert.That(settings.FirmCodeOnly, Is.Null);
+				}
 			}
 		}
 
