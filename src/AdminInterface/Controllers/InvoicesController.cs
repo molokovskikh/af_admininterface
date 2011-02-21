@@ -74,21 +74,29 @@ namespace AdminInterface.Controllers
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
 
-			return ArHelper.WithSession(s => criteria
-				.GetExecutableCriteria(s).List<T>())
-				.ToList()
+			List<T> items = null;
+
+			ArHelper.WithSession(s => {
+				items = criteria
+				.GetExecutableCriteria(s).List<T>()
 				.GroupBy(i => ((dynamic)i).Id)
 				.Select(g => g.First())
 				.ToList();
+			});
+			return items;
 		}
 
 		public Dictionary<string, string> ToUrl()
 		{
-			return new Dictionary<string, string> {
+			var map = new Dictionary<string, string> {
 				{"filter.Period", Period.ToString()},
-				{"filter.Region.Id", Region.Id.ToString()},
-				{"filter.Recipient.Id", Recipient.Id.ToString()},
 			};
+			if (Region != null)
+				map.Add("filter.Region.Id", Region.Id.ToString());
+
+			if (Recipient != null)
+				map.Add("filter.Recipient.Id", Recipient.Id.ToString());
+			return map;
 		}
 	}
 
