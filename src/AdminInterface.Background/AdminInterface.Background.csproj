@@ -94,7 +94,9 @@
     <EmbeddedResource Include="..\AdminInterface\Views\Mail\DoNotHaveInvoiceContactGroup.brail">
       <Link>Views\Mail\DoNotHaveInvoiceContactGroup.brail</Link>
     </EmbeddedResource>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="App.release.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

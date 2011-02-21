@@ -17,7 +17,6 @@ namespace Unit.MonoRailExtentions
 			[return: AnonymousTypeToPropertyBagBinder]
 			public object Test()
 			{
-				Console.WriteLine("invoke");
 				return new { i1 = 1, s1 = "123" };
 			}
 		}
