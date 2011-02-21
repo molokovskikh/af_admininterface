@@ -17,7 +17,7 @@ namespace Integration.Models
 				existsPayment.DeleteAndFlush();
 
 			var file = @"..\..\..\TestData\20110114104609.xml";
-			var payments = Payment.ParsePayment(file);
+			var payments = Payment.ParseXml(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
 			var payment = payments.First();
 			Assert.That(payment.Sum, Is.EqualTo(800));
@@ -38,10 +38,18 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void Parse_raiffeisen_payments()
+		{
+			var payments = Payment.ParseXml(@"..\..\..\TestData\1c.txt");
+			Assert.That(payments.Count, Is.GreaterThan(0));
+
+		}
+
+		[Test]
 		public void Parser_with_output_payments()
 		{
 			var file = @"..\..\..\TestData\20110113.xml";
-			var payments = Payment.ParsePayment(file);
+			var payments = Payment.ParseXml(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
 		}
 

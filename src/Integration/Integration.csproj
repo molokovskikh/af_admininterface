@@ -127,6 +127,7 @@
     <Compile Include="Models\ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="Models\MaintainerFixture.cs" />
     <Compile Include="Models\OrdersViewFixture.cs" />
+    <Compile Include="Models\PayerFixture.cs" />
     <Compile Include="Models\PaymentFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
