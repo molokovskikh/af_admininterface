@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Configuration;
-using System.Threading;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using NUnit.Framework;
-using SHDocVw;
 using WatiN.Core;
 
 namespace Functional.ForTesting
@@ -14,6 +12,8 @@ namespace Functional.ForTesting
 	{
 		protected SessionScope scope;
 		protected bool UseTestScope;
+
+		protected Browser browser;
 
 		[SetUp]
 		public void Setup()
@@ -29,6 +29,12 @@ namespace Functional.ForTesting
 				return;
 			scope.Dispose();
 			scope = null;
+
+			if (browser != null)
+			{
+				browser.Dispose();
+				browser = null;
+			}
 		}
 
 		public static string BuildTestUrl(string urlPart)

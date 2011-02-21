@@ -119,6 +119,12 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Payments", Schema = "Billing")]
 	public class Payment : ActiveRecordLinqBase<Payment>
 	{
+		public Payment(Payer payer, DateTime payedOn, decimal sum) : this(payer)
+		{
+			Sum = sum;
+			PayedOn = payedOn;
+		}
+
 		public Payment(Payer payer)
 		{
 			Payer = payer;

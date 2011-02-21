@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Security;
@@ -107,9 +108,25 @@ namespace AdminInterface.Helpers
 
 		public string JS(params string[] items)
 		{
+			if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled)
+			{
+				items = items.Select(Deminifie).ToArray();
+			}
 			return Resource(items,
 				"JavaScript",
 				"<script type='text/javascript' src='{0}'></script>");
+		}
+
+		private string Deminifie(string item)
+		{
+			if (item.EndsWith(".min.js"))
+			{
+				var js = item.Replace(".min.js", ".js");
+				if (File.Exists(Path.Combine(Context.ApplicationPhysicalPath, "JavaScript", js)))
+					return js;
+				return item;
+			}
+			return item;
 		}
 
 		public string CSS(params string[] items)

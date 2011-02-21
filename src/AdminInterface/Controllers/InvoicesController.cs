@@ -145,7 +145,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice))
 				{
-					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
+					invoice.CalculateSum();
 					invoice.Save();
 					Redirect("Invoices", "Edit", new {invoice.Id});
 				}

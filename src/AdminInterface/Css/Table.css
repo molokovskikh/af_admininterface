@@ -16,12 +16,12 @@ tr.SelectedRow.OddRow
 	width: 100%
 }
 
-.DataTable .EvenRow
+.DataTable .EvenRow, tr.even
 {
 	background-color: #F6F6F6;
 }
 
-.DataTable .OddRow
+.DataTable .OddRow, tr.odd
 {
 	background-color: #EEF8FF;
 }

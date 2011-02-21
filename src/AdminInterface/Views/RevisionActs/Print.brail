@@ -1,0 +1,152 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	АКТ СВЕРКИ
+<% end %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
+		<style>
+			body
+			{
+				font-family: Times New Roman;
+			}
+
+			pre
+			{
+				font-family: Times New Roman;
+				font-size: 100%;
+			}
+
+			table 
+			{
+				width: 100%;
+				border-collapse:collapse;
+			}
+
+			table td
+			{
+				border: solid 1px black;
+			}
+
+			table th
+			{
+				border: solid 1px black;
+				font-weight: normal;
+			}
+
+			h1, h2, h3, h4, h5, h6
+			{
+				text-align: center;
+			}
+
+			.result-label
+			{
+				border-style: none;
+				text-align: right;
+			}
+
+			.result
+			{
+				font-weight: bold;
+			}
+		</style>
+	</head>
+	<body>
+<h4>АКТ СВЕРКИ</h4>
+<p style="text-align: center;">
+	взаимных расчетов по состоянию на ${act.BeginDate.ToShortDateString()}
+	между ${payer.Recipient.FullName}
+	и ${payer.JuridicalName} по договору № ${payer.PayerID}
+</p>
+<P>
+Мы, нижеподписавшиеся, __________________ ${payer.Recipient.FullName} _________________________,
+с одной стороны, и ________________________ ${payer.JuridicalName} __________________________, 
+с другой стороныб составили настоящий акт сверки в том, что состояние взаимных расчетов по данным учета следующее:
+</P>
+<table>
+	<tr>
+		<td colspan=4>По данным ${payer.Recipient.FullName}, руб.</td>
+		<td colspan=4>По данным ${payer.JuridicalName}, руб.</td>
+	</tr>
+	<tr>
+		<th>№ п/п</th>
+		<th>Наименование операции, документы</th>
+		<th>Дебет</th>
+		<th>Кредит</th>
+		<th>№ п/п</th>
+		<th>Наименование операции, документы</th>
+		<th>Дебет</th>
+		<th>Кредит</th>
+	</tr>
+	<tr>
+		<td>1</td>
+		<td>Сальдо на ${act.BeginDate.ToShortDateString()}</td>
+		<td>${act.BeginDebit.ToString("#.#") if act.BeginDebit > 0}</td>
+		<td>${act.BeginCredit.ToString("#.#") if act.BeginCredit > 0}</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+<% index = 0 %>
+<% for i, move in enumerate(act.Movements): %>
+	<tr>
+		<td>${i + 2}</td>
+		<td>${move.Name}</td>
+		<td>${move.Debit.ToString("#.#") if move.Debit > 0}</td>
+		<td>${move.Credit.ToString("#.#") if move.Credit > 0}</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+<% index = i %>
+<% end %>
+	<tr>
+		<td>${index + 3}</td>
+		<td>Обороты за период</td>
+		<td>${act.DebitSum.ToString("#.#")}</td>
+		<td>${act.CreditSum.ToString("#.#")}</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+	<tr>
+		<td>${index + 4}</td>
+		<td>Сальдо на ${act.EndDate.ToShortDateString()}</td>
+		<td>${act.EndDebit.ToString("#.#") if act.EndDebit > 0}</td>
+		<td>${act.EndCredit.ToString("#.#") if act.EndCredit > 0}</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
+
+<p>
+По данным ${payer.Recipient.FullName} <br />
+<span style="font-weight:bold">на ${act.EndDate.ToShortDateString()} задолженность в пользу
+<% if act.CreditSum > act.DebitSum: %>
+	${payer.JuridicalName} ${act.Balance.ToString("#.#")} руб.
+<% else: %>
+	${payer.Recipient.FullName} ${act.Balance.ToString("#.#")} руб.
+<% end %>
+</span>
+</p>
+<pre style="float: left; margin-right: 200px">
+От ${payer.Recipient.FullName}
+
+
+___________________________
+</pre>
+
+<pre style="float: left;">
+От ${payer.JuridicalName}
+
+
+_________________________
+</pre>
+	</body>
+</html>

@@ -40,7 +40,7 @@ namespace AdminInterface.Models.Billing
 			Date = invoiceDate;
 			CreatedOn = DateTime.Now;
 			Parts = BuildParts();
-			Sum = Parts.Sum(p => p.Sum);
+			CalculateSum();
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
 		}
 
@@ -160,6 +160,11 @@ namespace AdminInterface.Models.Billing
 		public bool ShouldNotify()
 		{
 			return LastErrorNotification == null || (DateTime.Now - LastErrorNotification.Value).TotalDays > 1;
+		}
+
+		public void CalculateSum()
+		{
+			Sum = Parts.Sum(p => p.Sum);
 		}
 	}
 }

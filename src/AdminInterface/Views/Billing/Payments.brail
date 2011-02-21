@@ -434,6 +434,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader">Операции</div>
 		${app.LinkTo(payer, "Доп. счет", @NewInvoice)}
 		${app.LinkTo(payer, "Реклама", @Ad)}
+		<a href="${siteroot}/RevisionActs/${payer.Id}">Акт сверки</a>
 	</div>
 
 	<div>
@@ -470,7 +471,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
 									FormHelper.TextField("Instance.BeginBalance"))}
 
-		value = ""
+		<% value = "" %>
 		<% if Instance.BeginBalanceDate != null: %>
 			<% value = Instance.BeginBalanceDate.ToShortDateString() %>
 		<% end %>

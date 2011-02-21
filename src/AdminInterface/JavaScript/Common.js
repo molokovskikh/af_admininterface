@@ -1,4 +1,12 @@
-$(function () {
+﻿$(function () {
+
+	$.validator.addMethod("validateEmailList", function (value, element) {
+		if (value.toString().length > 0) {
+			return /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
+		}
+		return true;
+	}, "Поле содержит некорректный адрес электронной почты");
+
 	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });

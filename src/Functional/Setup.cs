@@ -1,5 +1,6 @@
-﻿using System.Configuration;
-using System.IO;
+﻿using System.IO;
+using System.Configuration;
+using System.Collections.Generic;
 using AdminInterface.Models.Security;
 using CassiniDev;
 using Functional.ForTesting;
@@ -19,7 +20,20 @@ namespace Functional
 		public void SetupFixture()
 		{
 			ForTest.InitialzeAR();
-			SecurityContext.GetAdministrator = () => new Administrator{UserName = "test"};
+			var admin = new Administrator{
+				UserName = "test",
+				Email = "kvasovtest@analit.net",
+				PhoneSupport = "112",
+				RegionMask = ulong.MaxValue,
+				ManagerName = "test",
+				AllowedPermissions = new List<Permission> {
+					Permission.Find(PermissionType.Billing),
+					Permission.Find(PermissionType.ViewDrugstore),
+				}
+			};
+			admin.Save();
+
+			SecurityContext.GetAdministrator = () => admin;
 
 			var port = int.Parse(ConfigurationManager.AppSettings["webPort"]);
 			var webDir = ConfigurationManager.AppSettings["webDirectory"];

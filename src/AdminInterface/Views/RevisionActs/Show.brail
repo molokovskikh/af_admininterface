@@ -1,0 +1,79 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Акт сверки
+<% end %>
+
+<% component Bubble, {"bredcrumbs" :
+	[("Плательщик ${payer.ShortName}", "${siteroot}/Payers/${payer.Id}"),
+		("Акт сверки", "")]} %>
+<script>
+	$(function () {
+		$("form").each(function () {
+			$(this).validate();
+		});
+	});
+</script>
+
+<div class=block>
+	<form id="show">
+		<label>Начало периода:</label>
+		<input type=text value="${beginDate.ToShortDateString()}" class="input-date required" name=begin>
+		<input type="button" class="CalendarInput">
+		<br>
+		<label>Окончание периода:</label>
+		<input type=text value="${endDate.ToShortDateString()}" class="input-date required" name=end>
+		<input type="button" class="CalendarInput">
+		<br>
+		<input type=submit value="Показать" >
+	</form>
+</div>
+
+<div class=block>
+	<a href="${siteroot}/RevisionActs/${payer.Id}/Print?begin=${beginDate.ToShortDateString()}&end=${endDate.ToShortDateString()}">Печать</a>
+	<a href="${siteroot}/RevisionActs/${payer.Id}/Excel?begin=${beginDate.ToShortDateString()}&end=${endDate.ToShortDateString()}">Excel</a>
+</div>
+
+<div class=block>
+	<h3>Отправить акт по e-mail</h3>
+	<form method=post id="mail">
+		<label>Список e-mail через запятую:</label>
+		<br>
+		<textarea name=emails rows=3 cols=20 class="required validateEmailList">
+		</textarea>
+		<br>
+		<input type=submit value="Отправить">
+	</form>
+</div>
+
+<% if IsDefined("act"): %>
+<table class=DataTable>
+	<thead>
+		<tr>
+			<th>Наименование операции, документа</th>
+			<th>Дебет</th>
+			<th>Кредит</th>
+		</tr>
+	</thead>
+	<tr class=even>
+		<td>Сальдо на ${act.BeginDate.ToShortDateString()}</td>
+		<td>${act.BeginDebit.ToString("#.#")}</td>
+		<td>${act.BeginCredit.ToString("#.#")}</td>
+	</tr>
+<% for i, move in enumerate(act.Movements): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${move.Name}</td>
+		<td>${move.Debit.ToString("#.#")}</td>
+		<td>${move.Credit.ToString("#.#")}</td>
+	</tr>
+<% end %>
+	<tr class=even>
+		<td>Обороты за период</td>
+		<td>${act.DebitSum.ToString("#.#")}</td>
+		<td>${act.CreditSum.ToString("#.#")}</td>
+	</tr>
+	<tr class=even>
+		<td>Сальдо на ${act.EndDate.ToShortDateString()}</td>
+		<td>${act.EndDebit.ToString("#.#")}</td>
+		<td>${act.EndCredit.ToString("#.#")}</td>
+	</tr>
+</table>
+<% end %>
