@@ -5,6 +5,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
@@ -306,6 +307,28 @@ ORDER BY {Payer}.shortname;";
 				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
 
 			return contacts;
+		}
+
+		private void UpdateBalance()
+		{
+			if (this.IsChanged(p => p.BeginBalance))
+			{
+				var oldBeginBalance = this.OldValue(p => p.BeginBalance);
+				Balance += BeginBalance;
+				Balance -= oldBeginBalance;
+			}
+		}
+
+		protected override void OnSave()
+		{
+			UpdateBalance();
+			base.OnSave();
+		}
+
+		protected override void OnUpdate()
+		{
+			UpdateBalance();
+			base.OnUpdate();
 		}
 	}
 

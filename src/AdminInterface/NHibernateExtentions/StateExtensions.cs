@@ -64,6 +64,8 @@ namespace AdminInterface.NHibernateExtentions
 			return ArHelper.WithSession(s => {
 				var entry = s.GetEntry(activeRecord);
 				var index = entry.Persister.PropertyNames.IndexOf(n => n.Equals(property, StringComparison.OrdinalIgnoreCase));
+				if (entry.LoadedState == null)
+					return default(TResult);
 				return (TResult)entry.LoadedState[index];
 			});
 		}

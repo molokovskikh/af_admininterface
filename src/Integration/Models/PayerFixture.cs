@@ -22,5 +22,19 @@ namespace Integration.Models
 			Assert.That(payers.Count(), Is.EqualTo(1));
 			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
 		}
+
+		[Test]
+		public void Before_save_if_begin_balance_changed_update_balance()
+		{
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+
+			payer.BeginBalance = 1000;
+			payer.SaveAndFlush();
+			Assert.That(payer.Balance, Is.EqualTo(1000));
+			payer.Balance = 2000;
+			payer.BeginBalance = -500;
+			payer.SaveAndFlush();
+			Assert.That(payer.Balance, Is.EqualTo(500));
+		}
 	}
 }
