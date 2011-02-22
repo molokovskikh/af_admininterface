@@ -38,6 +38,13 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void Parse_payments_without_bank_account_code()
+		{
+			var payments = Payment.Parse(@"..\..\..\TestData\201102_21.xml");
+			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
 		public void Parse_raiffeisen_payments()
 		{
 			var payments = Payment.Parse(@"..\..\..\TestData\1c.txt");

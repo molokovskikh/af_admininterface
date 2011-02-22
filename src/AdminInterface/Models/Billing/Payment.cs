@@ -379,6 +379,11 @@ namespace AdminInterface.Models.Billing
 				var sum = node.XPathSelectElement("Summa").Value;
 				var comment = node.XPathSelectElement("AssignPayment").Value;
 
+				//если платеж из банка россии (ЦБ) то у него нет корсчета
+				var bankAccountantCode = "";
+				if (node.XPathSelectElement("BankPayer/AccountCode") != null)
+					bankAccountantCode = node.XPathSelectElement("BankPayer/AccountCode").Value;
+
 				var payment = new Payment {
 					DocumentNumber = documentNumber,
 					PayedOn = DateTime.Parse(dateNode.Value, CultureInfo.GetCultureInfo("ru-RU")),
@@ -389,7 +394,7 @@ namespace AdminInterface.Models.Billing
 					PayerBank = new BankInfo(
 						node.XPathSelectElement("BankPayer/Description").Value,
 						node.XPathSelectElement("BankPayer/BIC").Value,
-						node.XPathSelectElement("BankPayer/AccountCode").Value
+						bankAccountantCode
 					),
 					PayerClient = new BankClient(
 						node.XPathSelectElement("Payer/Name").Value,
