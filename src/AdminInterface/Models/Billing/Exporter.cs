@@ -108,7 +108,7 @@ namespace AdminInterface.Models.Billing
 			foreach (var move in act.Movements)
 			{
 				Row(table, 
-					index, move.Name, move.Debit, move.Credit, 
+					index, move.Name, move.Debit.ToString("#.#"), move.Credit.ToString("#.#"),
 					"", "", "", "");
 				index++;
 			}
