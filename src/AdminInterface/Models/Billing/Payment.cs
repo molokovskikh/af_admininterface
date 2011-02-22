@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using AdminInterface.Controllers;
@@ -139,42 +140,19 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
+		//информация ниже получается из выписки
 		//фактическа дата платежа когда он прошел через банк
 		[Property, ValidateNonEmpty]
 		public DateTime PayedOn { get; set; }
 
-		//дата занесения платежа
-		[Property]
-		public DateTime RegistredOn { get; set; }
-
 		[Property, ValidateGreaterThanZero]
 		public decimal Sum { get; set; }
-
-		[Property]
-		public string OperatorComment { get; set; }
 
 		[Property]
 		public string Comment { get; set; }
 
 		[Property]
 		public string DocumentNumber { get; set; }
-
-		[Property]
-		public bool ForAd { get; set; }
-
-		[Property, ValidateDecimal]
-		public decimal? AdSum { get; set; }
-
-		[BelongsTo(Cascade = CascadeEnum.All)]
-		public Advertising Ad { get; set; }
-
-		public bool UpdatePayerInn { get; set; }
-
-		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
-		public Payer Payer { get; set; }
-
-		[BelongsTo(Column = "RecipientId")]
-		public Recipient Recipient { get; set; }
 
 		[Nested(ColumnPrefix = "Payer")]
 		public BankClient PayerClient { get; set; }
@@ -187,6 +165,31 @@ namespace AdminInterface.Models.Billing
 
 		[Nested(ColumnPrefix = "RecipientBank")]
 		public BankInfo RecipientBank { get; set; }
+
+		//все что выше получается из выписки
+		//дата занесения платежа
+		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
+		public Payer Payer { get; set; }
+
+		[BelongsTo(Column = "RecipientId")]
+		public Recipient Recipient { get; set; }
+
+		[Property]
+		public DateTime RegistredOn { get; set; }
+
+		[Property]
+		public string OperatorComment { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.All)]
+		public Advertising Ad { get; set; }
+
+		[Property]
+		public bool ForAd { get; set; }
+
+		[Property, ValidateDecimal]
+		public decimal? AdSum { get; set; }
+
+		public bool UpdatePayerInn { get; set; }
 
 		public void RegisterPayment()
 		{
@@ -220,23 +223,153 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public static List<Payment> ParseXml(string file)
+		public static List<Payment> Parse(string file)
 		{
 			using(var stream = File.OpenRead(file))
-				return ParseXml(stream);
+			{
+				return Parse(file, stream);
+			}
+		}
+
+		public static List<Payment> Parse(string file, Stream stream)
+		{
+			List<Payment> payments;
+			if (Path.GetExtension(file).ToLower() == ".txt")
+				payments = ParseText(stream);
+			else
+				payments = ParseXml(stream);
+
+			return Identify(payments).ToList();
+		}
+
+		private static IEnumerable<Payment> Identify(IEnumerable<Payment> payments)
+		{
+			var recipients = Recipient.Queryable.ToList();
+			foreach (var payment in payments)
+			{
+				payment.Recipient = recipients.FirstOrDefault(r => r.BankAccountNumber == payment.RecipientClient.AccountCode);
+				if (payment.Recipient == null)
+					continue;
+
+				var inn = payment.PayerClient.Inn;
+				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
+				payment.Payer = payer;
+
+				if (payment.IsDuplicate())
+					continue;
+
+				yield return payment;
+			}
 		}
 
 		public static List<Payment> ParseText(Stream file)
 		{
-			return null;
-			//var reader = new Stread
+			var reader = new StreamReader(file, Encoding.GetEncoding(1251));
+			string line;
+			var payments = new List<Payment>();
+			while ((line = reader.ReadLine()) != null)
+			{
+				if (line.Equals("СекцияДокумент=Платежное поручение", StringComparison.CurrentCultureIgnoreCase))
+				{
+					var payment = ParsePayment(reader);
+					payments.Add(payment);
+				}
+			}
+			return payments;
+		}
+
+		public static Payment ParsePayment(StreamReader reader)
+		{
+			string line;
+			var payment = new Payment();
+			payment.PayerClient = new BankClient();
+			payment.PayerBank = new BankInfo();
+			payment.RecipientBank = new BankInfo();
+			payment.RecipientClient = new BankClient();
+			while((line = reader.ReadLine()) != null)
+			{
+				if (line.Equals("КонецДокумента", StringComparison.CurrentCultureIgnoreCase))
+					break;
+
+				if (!line.Contains("="))
+					continue;
+				var parts = line.Split('=');
+				if (parts.Length < 2)
+					continue;
+				var label = parts[0];
+				var value = parts[1];
+				if (label.Equals("Дата", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayedOn = DateTime.ParseExact(value, "dd.MM.yyyy", CultureInfo.CurrentCulture);
+				}
+				else if (label.Equals("Сумма", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.Sum = decimal.Parse(value, CultureInfo.InvariantCulture);
+				}
+				else if (label.Equals("НазначениеПлатежа", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.Comment = value;
+				}
+				else if (label.Equals("Номер", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.DocumentNumber = value;
+				}
+				else if (label.Equals("ПлательщикСчет", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerClient.AccountCode = value;
+				}
+				else if (label.Equals("Плательщик1", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerClient.Name = value;
+				}
+				else if (label.Equals("ПлательщикИНН", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerClient.Inn = value;
+				}
+				else if (label.Equals("ПлательщикБИК", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerBank.Bic = value;
+				}
+				else if (label.Equals("ПлательщикБанк1", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerBank.Description = value;
+				}
+				else if (label.Equals("ПлательщикКорсчет", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.PayerBank.AccountCode = value;
+				}
+				else if (label.Equals("ПолучательСчет", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientClient.AccountCode = value;
+				}
+				else if (label.Equals("Получатель1", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientClient.Name = value;
+				}
+				else if (label.Equals("ПолучательИНН", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientClient.Inn = value;
+				}
+				else if (label.Equals("ПолучательБИК", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientBank.Bic = value;
+				}
+				else if (label.Equals("ПолучательБанк1", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientBank.Description = value;
+				}
+				else if (label.Equals("ПолучательКорсчет", StringComparison.CurrentCultureIgnoreCase))
+				{
+					payment.RecipientBank.AccountCode = value;
+				}
+			}
+			return payment;
 		}
 
 		public static List<Payment> ParseXml(Stream file)
 		{
-			var recipients = Recipient.Queryable.ToList();
 			var doc = XDocument.Load(file);
-			var list = new List<Payment>();
+			var payments = new List<Payment>();
 			foreach (var node in doc.XPathSelectElements("//payment"))
 			{
 				var documentNumber = node.XPathSelectElement("NDoc").Value;
@@ -275,21 +408,10 @@ namespace AdminInterface.Models.Billing
 					),
 				};
 
-				payment.Recipient = recipients.FirstOrDefault(r => r.BankAccountNumber == payment.RecipientClient.AccountCode);
-				if (payment.Recipient == null)
-					continue;
-
-				var inn = payment.PayerClient.Inn;
-				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
-				payment.Payer = payer;
-
-				if (payment.IsDuplicate())
-					continue;
-
-				list.Add(payment);
+				payments.Add(payment);
 			}
 
-			return list;
+			return payments;
 		}
 
 		public class BankInfo

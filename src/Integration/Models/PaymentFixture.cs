@@ -17,7 +17,7 @@ namespace Integration.Models
 				existsPayment.DeleteAndFlush();
 
 			var file = @"..\..\..\TestData\20110114104609.xml";
-			var payments = Payment.ParseXml(file);
+			var payments = Payment.Parse(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
 			var payment = payments.First();
 			Assert.That(payment.Sum, Is.EqualTo(800));
@@ -40,16 +40,23 @@ namespace Integration.Models
 		[Test]
 		public void Parse_raiffeisen_payments()
 		{
-			var payments = Payment.ParseXml(@"..\..\..\TestData\1c.txt");
+			var payments = Payment.Parse(@"..\..\..\TestData\1c.txt");
 			Assert.That(payments.Count, Is.GreaterThan(0));
-
+			Assert.That(payments.Count, Is.EqualTo(4));
+			var payment = payments.First();
+			Assert.That(payment.Sum, Is.EqualTo(3000));
+			Assert.That(payment.Comment, Is.EqualTo("Обеспечение доступа ИС услуги за 1 квартал 2011г. оплата по счету N 1815 от 11 января 2011 г. Без НДС"));
+			Assert.That(payment.DocumentNumber, Is.EqualTo("18"));
+			Assert.That(payment.PayedOn, Is.EqualTo(new DateTime(2011, 1, 27)));
+			Assert.That(payment.Payer.Id, Is.EqualTo(2072));
+			Assert.That(payment.Recipient.Id, Is.EqualTo(4));
 		}
 
 		[Test]
 		public void Parser_with_output_payments()
 		{
 			var file = @"..\..\..\TestData\20110113.xml";
-			var payments = Payment.ParseXml(file);
+			var payments = Payment.Parse(file);
 			Assert.That(payments.Count, Is.GreaterThan(0));
 		}
 

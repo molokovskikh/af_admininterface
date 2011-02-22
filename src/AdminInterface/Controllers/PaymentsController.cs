@@ -142,7 +142,7 @@ namespace AdminInterface.Controllers
 					return;
 				}
 
-				Session["payments"] = Payment.ParseXml(file.InputStream);
+				Session["payments"] = Payment.Parse(file.FileName, file.InputStream);
 				RedirectToReferrer();
 			}
 			else
