@@ -1,16 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
-using ExcelLibrary.SpreadSheet;
 
 namespace AdminInterface.Controllers
 {
 	public class RevisionActPart
 	{
+		public RevisionActPart(string name, decimal debit, decimal credit, DateTime date)
+		{
+			Name = name;
+			Debit = debit;
+			Credit = credit;
+			Date = date;
+		}
+
 		public RevisionActPart(Invoice invoice)
 		{
 			Name = String.Format("Продажа ({0:dd.MM.yy} № {1})", invoice.Date, invoice.Id);
@@ -33,8 +40,10 @@ namespace AdminInterface.Controllers
 
 	public class RevisionAct
 	{
+
 		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Invoice> invoices, IEnumerable<Payment> payments)
 		{
+			Payer = payer;
 			BeginDate = begin;
 			EndDate = end;
 
@@ -57,8 +66,28 @@ namespace AdminInterface.Controllers
 
 			Balance = Math.Abs(Balance);
 
+			movements.Insert(0,
+				new RevisionActPart(String.Format("Сальдо на {0}", BeginDate.ToShortDateString()),
+					BeginDebit,
+					BeginCredit,
+					BeginDate));
+
+			movements.Add(
+				new RevisionActPart("Обороты за период",
+					DebitSum,
+					CreditSum,
+					EndDate));
+
+			movements.Add(
+				new RevisionActPart(String.Format("Сальдо на {0}", EndDate.ToShortDateString()),
+					EndDebit,
+					EndCredit,
+					EndDate));
+
 			Movements = movements;
 		}
+
+		public Payer Payer { get; set; }
 
 		public IEnumerable<RevisionActPart> Movements { get; set; }
 
@@ -75,6 +104,22 @@ namespace AdminInterface.Controllers
 		public decimal EndCredit { get; set; }
 
 		public decimal Balance { get; set; }
+
+		public string Result
+		{
+			get
+			{
+				string creditor;
+				if (Balance == 0)
+					return String.Format("на {0:dd.MM.yyyy} задолженность отсутствует.", EndDate);
+				else if (EndDebit > 0)
+					creditor = Payer.Recipient.FullName;
+				else
+					creditor = Payer.JuridicalName;
+
+				return String.Format("на {0:dd.MM.yyyy} задолженность в пользу {1} {2} руб.", EndDate, creditor, Balance.ToString("#.#"));
+			}
+		}
 	}
 
 	[Layout("GeneralWithJQueryOnly")]
@@ -109,7 +154,8 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				PropertyBag["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				RedirectToReferrer();
 				return;
 			}
 
@@ -126,12 +172,13 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 		}
 
-		public void Excel(uint id, DateTime? begin, DateTime? end)
+		public void Mail(uint id, DateTime? begin, DateTime? end, string emails)
 		{
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				PropertyBag["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				RedirectToReferrer();
 				return;
 			}
 
@@ -145,48 +192,36 @@ namespace AdminInterface.Controllers
 				end.Value,
 				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
-			CancelView();
 
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition", 
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("Акт сверки.xls")));
-			Response.ContentType = "application/vnd.ms-excel";
-			
-			using(var stream = new MemoryStream())
+			this.Mail().RevisionAct(act, emails).Send();
+
+			Flash["Message"] = Message.Notify("Отправлено");
+			RedirectToReferrer();
+		}
+
+		public void Excel(uint id, DateTime? begin, DateTime? end)
+		{
+			var payer = Payer.Find(id);
+			if (payer.Recipient == null)
 			{
-				var book = new Workbook();
-				var worksheet = new Worksheet("Акт сверки");
-				book.Worksheets.Add(worksheet);
-				book.Save(stream);
-				stream.Position = 0;
-				stream.CopyTo(Response.OutputStream);
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				RedirectToReferrer();
+				return;
 			}
+
+			if (begin == null)
+				begin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+			if (end == null)
+				end = DateTime.Now;
+
+			var act = new RevisionAct(payer,
+				begin.Value,
+				end.Value,
+				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
+				Payment.Queryable.Where(p => p.Payer == payer).ToList());
+
+			Exporter.ToResponse(Response, Exporter.Export(act));
+			CancelView();
 		}
-
-		private void BuildExcel(Worksheet worksheet)
-		{
-			
-		}
-	}
-
-	public class ExcelReport
-	{
-		public void Build()
-		{
-			
-		}
-
-		public void Cells(params object[] args)
-		{
-			Cells("Акт сверки", new Merge(8));
-			//Cells()
-		}
-	}
-
-	public class Merge
-	{
-		public Merge(int count)
-		{}
-
 	}
 }

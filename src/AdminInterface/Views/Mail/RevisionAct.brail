@@ -1,0 +1,2 @@
+﻿Во вложении акт сверки на ${act.EndDate.ToShortDateString()}
+между ${act.Payer.Recipient.FullName} и ${act.Payer.JuridicalName} по договору № ${act.Payer.Id}

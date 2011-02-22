@@ -88,7 +88,7 @@ namespace AdminInterface.Models.Billing
 		public InvoicePart(Invoice invoice, Period period, decimal cost, int count)
 		{
 			Invoice = invoice;
-			if (invoice.Recipient.Id == 4)
+			if (invoice != null && invoice.Recipient.Id == 4)
 				Name = String.Format("Обеспечение доступа к ИС (мониторингу фармрынка) в {0}", GetPeriodName(period));
 			else
 				Name = String.Format("Мониторинг оптового фармрынка за {0}", BindingHelper.GetDescription(period).ToLower());

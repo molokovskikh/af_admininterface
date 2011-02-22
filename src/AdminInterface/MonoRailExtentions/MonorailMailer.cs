@@ -1,11 +1,15 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Net.Mail;
+using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
+using ExcelLibrary.SpreadSheet;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -135,6 +139,25 @@ namespace AdminInterface.MonoRailExtentions
 			From = "billing@analit.net";
 			Subject = "Не удалось отправить счет";
 			PropertyBag["invoice"] = invoice;
+		}
+
+		public MonorailMailer RevisionAct(RevisionAct act, string emails)
+		{
+			Template = "RevisionAct";
+
+			To = emails;
+			From = "billing@analit.net";
+			Subject = String.Format("Акт сверки");
+
+			var file = new MemoryStream();
+			var book = new Workbook();
+			book.Worksheets.Add(Exporter.Export(act));
+			book.Save(file);
+			file.Position = 0;
+
+			Attachments.Add(new Attachment(file, "Акт сверки.xls"));
+			PropertyBag["act"] = act;
+			return this;
 		}
 	}
 }

@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
@@ -94,7 +96,7 @@ namespace Integration.ForTesting
 		{
 			var client = CreateTestClientWithAddressAndUser();
 			var payer = client.Payers.First();
-			payer.Recipient = Recipient.Queryable.First();
+			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
 			payer.UpdateAndFlush();
 			payer.Refresh();
 			return payer;
@@ -149,7 +151,7 @@ namespace Integration.ForTesting
 				juridicalOrganization.Save();
 				var supplier = new Supplier {
 					Payer = payer,
-					HomeRegion = Region.FindAll().Last(),
+					HomeRegion = ActiveRecordBase<Region>.FindAll().Last(),
 					Name = "Test supplier",
 					Status = ClientStatus.On
 				};
@@ -257,5 +259,34 @@ namespace Integration.ForTesting
 			});
 		}
 
+		public static RevisionAct GetAct()
+		{
+			var payer = new Payer {
+				JuridicalName = "ООО \"Фармаимпекс\"",
+				Recipient = new Recipient {
+					FullName = "ООО \"АналитФАРМАЦИЯ\""
+				}
+			};
+
+			var invoice1 = new Invoice(payer,
+				Period.January,
+				new DateTime(2011, 1, 10),
+				new List<InvoicePart> { new InvoicePart(null, Period.December, 500, 2) }) {
+					Id = 1,
+				};
+
+			var invoice2 = new Invoice(payer,
+				Period.January,
+				new DateTime(2011, 1, 20),
+				new List<InvoicePart>{ new InvoicePart(null, Period.December, 1000, 1)});
+
+			return new RevisionAct(payer,
+				new DateTime(2011, 1, 1),
+				new DateTime(2011, 2, 1),
+				new List<Invoice> { invoice1, invoice2 },
+				new List<Payment> {
+					new Payment(payer, new DateTime(2011, 1, 15), 1000)
+				});
+		}
 	}
 }

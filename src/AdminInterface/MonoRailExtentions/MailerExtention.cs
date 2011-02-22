@@ -30,6 +30,7 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected string Layout;
 		protected string Template;
+		protected List<Attachment> Attachments = new List<Attachment>();
 		protected IDictionary<string, object> PropertyBag = new Dictionary<string, object>();
 
 		private IEmailSender _sender;
@@ -78,6 +79,8 @@ namespace AdminInterface.MonoRailExtentions
 			message.HeadersEncoding = Encoding.UTF8;
 			message.IsBodyHtml = IsBodyHtml;
 			message.Body = writer.ToString();
+			foreach (var attachment in Attachments)
+				message.Attachments.Add(attachment);
 			return message;
 		}
 	}

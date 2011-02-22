@@ -79,20 +79,9 @@
 		<th>Дебет</th>
 		<th>Кредит</th>
 	</tr>
-	<tr>
-		<td>1</td>
-		<td>Сальдо на ${act.BeginDate.ToShortDateString()}</td>
-		<td>${act.BeginDebit.ToString("#.#") if act.BeginDebit > 0}</td>
-		<td>${act.BeginCredit.ToString("#.#") if act.BeginCredit > 0}</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-	</tr>
-<% index = 0 %>
 <% for i, move in enumerate(act.Movements): %>
 	<tr>
-		<td>${i + 2}</td>
+		<td>${i + 1}</td>
 		<td>${move.Name}</td>
 		<td>${move.Debit.ToString("#.#") if move.Debit > 0}</td>
 		<td>${move.Credit.ToString("#.#") if move.Credit > 0}</td>
@@ -101,39 +90,12 @@
 		<td></td>
 		<td></td>
 	</tr>
-<% index = i %>
 <% end %>
-	<tr>
-		<td>${index + 3}</td>
-		<td>Обороты за период</td>
-		<td>${act.DebitSum.ToString("#.#")}</td>
-		<td>${act.CreditSum.ToString("#.#")}</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-	</tr>
-	<tr>
-		<td>${index + 4}</td>
-		<td>Сальдо на ${act.EndDate.ToShortDateString()}</td>
-		<td>${act.EndDebit.ToString("#.#") if act.EndDebit > 0}</td>
-		<td>${act.EndCredit.ToString("#.#") if act.EndCredit > 0}</td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-	</tr>
 </table>
 
 <p>
 По данным ${payer.Recipient.FullName} <br />
-<span style="font-weight:bold">на ${act.EndDate.ToShortDateString()} задолженность в пользу
-<% if act.CreditSum > act.DebitSum: %>
-	${payer.JuridicalName} ${act.Balance.ToString("#.#")} руб.
-<% else: %>
-	${payer.Recipient.FullName} ${act.Balance.ToString("#.#")} руб.
-<% end %>
-</span>
+<span style="font-weight:bold">${act.Result}</span>
 </p>
 <pre style="float: left; margin-right: 200px">
 От ${payer.Recipient.FullName}

@@ -179,6 +179,7 @@
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\Act.cs" />
     <Compile Include="Models\Billing\Advertising.cs" />
+    <Compile Include="Models\Billing\Exporter.cs" />
     <Compile Include="Models\Billing\Invoice.cs" />
     <Compile Include="Models\Billing\InvoicePart.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
@@ -396,6 +397,7 @@
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
+    <None Include="Views\Mail\RevisionAct.brail" />
     <None Include="Views\Payers\Ad.brail" />
     <None Include="Views\Payers\BalanceSummary.brail" />
     <None Include="Views\Payers\Invoices.brail" />

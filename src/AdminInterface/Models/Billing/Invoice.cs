@@ -32,22 +32,33 @@ namespace AdminInterface.Models.Billing
 			SetPayer(payer);
 		}
 
+		public Invoice(Payer payer, Period period, DateTime invoiceDate, IEnumerable<InvoicePart> parts)
+			: this(payer)
+		{
+			Period = period;
+			Date = invoiceDate;
+			CreatedOn = DateTime.Now;
+			foreach (var part in parts)
+				part.Invoice = this;
+			Parts = parts.ToList();
+			CalculateSum();
+		}
+
 		public Invoice(Payer payer, Period period, DateTime invoiceDate)
 			: this(payer)
 		{
 			Period = period;
-			Sum = payer.TotalSum;
 			Date = invoiceDate;
 			CreatedOn = DateTime.Now;
 			Parts = BuildParts();
 			CalculateSum();
-			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
 		}
 
 		public void SetPayer(Payer payer)
 		{
 			Recipient = payer.Recipient;
 			Payer = payer;
+			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
 			PayerName = payer.JuridicalName;
 		}
 

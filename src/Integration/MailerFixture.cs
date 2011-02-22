@@ -183,6 +183,20 @@ namespace Integration
 			}
 		}
 
+		[Test]
+		public void Revision_act()
+		{
+			var act = DataMother.GetAct();
+			mailer.RevisionAct(act, "kvasovtest@analit.net");
+			mailer.Send();
+			Assert.That(message.Subject, Is.EqualTo("Акт сверки"));
+			Assert.That(message.From.ToString(), Is.EqualTo("billing@analit.net"));
+			Assert.That(message.To.ToString(), Is.EqualTo("kvasovtest@analit.net"));
+			Assert.That(message.Body, Is.StringContaining("Во вложении акт сверки на 01.02.2011"));
+			Assert.That(message.Attachments.Count, Is.EqualTo(1));
+			Assert.That(message.Attachments[0].Name, Is.EqualTo("Акт сверки.xls"));
+		}
+
 		private Invoice CreateInvoice()
 		{
 			var payer = DataMother.BuildPayerForBillingDocumentTest();

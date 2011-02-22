@@ -34,11 +34,14 @@
 
 <div class=block>
 	<h3>Отправить акт по e-mail</h3>
-	<form method=post id="mail">
+	<form method=post id="mail" action="${siteroot}/RevisionActs/Mail">
+		<input type=hidden name=id value="${payer.Id}">
+		<input type=hidden name=begin value="${beginDate.ToShortDateString()}">
+		<input type=hidden name=end value="${endDate.ToShortDateString()}">
+
 		<label>Список e-mail через запятую:</label>
 		<br>
-		<textarea name=emails rows=3 cols=20 class="required validateEmailList">
-		</textarea>
+		<textarea name=emails rows=3 cols=20 class="required validateEmailList"></textarea>
 		<br>
 		<input type=submit value="Отправить">
 	</form>
@@ -53,11 +56,6 @@
 			<th>Кредит</th>
 		</tr>
 	</thead>
-	<tr class=even>
-		<td>Сальдо на ${act.BeginDate.ToShortDateString()}</td>
-		<td>${act.BeginDebit.ToString("#.#")}</td>
-		<td>${act.BeginCredit.ToString("#.#")}</td>
-	</tr>
 <% for i, move in enumerate(act.Movements): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>${move.Name}</td>
@@ -65,15 +63,5 @@
 		<td>${move.Credit.ToString("#.#")}</td>
 	</tr>
 <% end %>
-	<tr class=even>
-		<td>Обороты за период</td>
-		<td>${act.DebitSum.ToString("#.#")}</td>
-		<td>${act.CreditSum.ToString("#.#")}</td>
-	</tr>
-	<tr class=even>
-		<td>Сальдо на ${act.EndDate.ToShortDateString()}</td>
-		<td>${act.EndDebit.ToString("#.#")}</td>
-		<td>${act.EndCredit.ToString("#.#")}</td>
-	</tr>
 </table>
 <% end %>
