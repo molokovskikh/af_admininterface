@@ -12,15 +12,21 @@ namespace Unit.Models
 	public class RevisionActFixture
 	{
 		private RevisionAct act;
+		private Payer payer;
 
 		[SetUp]
 		public void Setup()
 		{
-			var payer = new Payer {
+			payer = new Payer {
 				Recipient = new Recipient {
 					FullName = "ООО \"АналитФАРМАЦИЯ\""
 				}
 			};
+			BuildAct();
+		}
+
+		private void BuildAct()
+		{
 			var invoice = new Invoice(payer) {
 				Date = new DateTime(2010, 12, 10),
 			};
@@ -66,7 +72,7 @@ namespace Unit.Models
 
 			Assert.That(act.Balance, Is.EqualTo(2000));
 
-			Assert.That(act.Movements.Count(), Is.EqualTo(3));
+			Assert.That(act.Movements.Count(), Is.EqualTo(6));
 			var move = act.Movements.ElementAt(1);
 			Assert.That(move.Debit, Is.EqualTo(1000));
 			Assert.That(move.Name, Is.EqualTo("Продажа (10.01.11 № 1)"));
@@ -96,6 +102,16 @@ namespace Unit.Models
 		public void Result_text()
 		{
 			Assert.That(act.Result, Is.EqualTo("на 01.02.2011 задолженность в пользу ООО \"АналитФАРМАЦИЯ\" 2000 руб."));
+		}
+
+		[Test]
+		public void Respect_begin_balance()
+		{
+			payer.BeginBalance = -500;
+
+			BuildAct();
+			Assert.That(act.BeginDebit, Is.EqualTo(1500));
+			Assert.That(act.BeginCredit, Is.EqualTo(0));
 		}
 	}
 }

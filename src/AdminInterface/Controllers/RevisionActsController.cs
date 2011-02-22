@@ -40,7 +40,6 @@ namespace AdminInterface.Controllers
 
 	public class RevisionAct
 	{
-
 		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Invoice> invoices, IEnumerable<Payment> payments)
 		{
 			Payer = payer;
@@ -49,6 +48,12 @@ namespace AdminInterface.Controllers
 
 			BeginDebit = invoices.Where(i => i.Date < begin).Sum(i => i.Sum);
 			BeginCredit = payments.Where(p => p.PayedOn < begin).Sum(p => p.Sum);
+
+			if (payer.BeginBalance > 0)
+				BeginCredit += payer.BeginBalance;
+			else
+				BeginDebit += Math.Abs(payer.BeginBalance);
+
 			var movements = invoices.Where(i => i.Date >= begin && i.Date <= end)
 					.Select(i => new RevisionActPart(i))
 				.Union(payments.Where(p => p.PayedOn >= begin && p.PayedOn <= end)
