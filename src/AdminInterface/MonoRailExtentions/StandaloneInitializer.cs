@@ -24,7 +24,8 @@ namespace AdminInterface.MonoRailExtentions
 			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
 
 			var loader = new FileAssemblyViewSourceLoader("");
-			loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "AdminInterface.Background.Views"));
+			var assembly = Assembly.GetEntryAssembly();
+			loader.AddAssemblySource(new AssemblySourceInfo(assembly, assembly.GetName().Name + ".Views"));
 
 			var provider = new FakeServiceProvider();
 			provider.Services.Add(typeof(IMonoRailConfiguration), config);
