@@ -100,15 +100,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\AdminInterface\Views\Invoices\Print.brail">
-      <Link>Print.brail</Link>
+      <Link>Views\Invoices\Print.brail</Link>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\AdminInterface\Views\Invoices\InvoiceBody.brail">
-      <Link>InvoiceBody.brail</Link>
+      <Link>Views\Invoices\InvoiceBody.brail</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="..\AdminInterface\Views\Acts\Print.brail">
       <Link>Views\Acts\Print.brail</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\AdminInterface\Views\Layouts\Print.brail">
+      <Link>Views\Layouts\Print.brail</Link>
     </EmbeddedResource>
     <None Include="App.config" />
     <None Include="App.release.config" />

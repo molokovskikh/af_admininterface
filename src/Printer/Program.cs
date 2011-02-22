@@ -1,19 +1,15 @@
 ﻿using System;
+using Common.Tools;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Framework.Config;
-using Castle.ActiveRecord.Linq;
-using Castle.MonoRail.Framework;
-using Castle.MonoRail.Views.Brail;
-using Common.Tools;
 using log4net;
 using log4net.Config;
 
@@ -32,7 +28,7 @@ namespace Printer
 					var printer = args[2];
 					AdminInterface.Helpers.Printer.SetPrinter(printer);
 
-					var brail = Init();
+					var brail = StandaloneInitializer.Init();
 
 					if (args[1] == "invoice")
 					{
@@ -71,6 +67,7 @@ namespace Printer
 									}
 
 									new AdminInterface.Helpers.Printer().PrintView(brail,
+										"Views/Invoices/Print",
 										"Print",
 										new Dictionary<string, object>{ { "invoice", invoice } });
 								}
@@ -88,6 +85,7 @@ namespace Printer
 								var act = Act.Find(Convert.ToUInt32(id.Trim()));
 								new AdminInterface.Helpers.Printer().PrintView(brail,
 									"Views/Acts/Print",
+									"Print",
 									new Dictionary<string, object> { { "act", act } });
 							}
 						}
@@ -116,24 +114,6 @@ namespace Printer
 			{
 				logger.Error("ошибка", e);
 			}
-		}
-
-		private static StandaloneBooViewEngine Init()
-		{
-			ActiveRecordStarter.Initialize(new[] {
-				Assembly.Load("AdminInterface"),
-				Assembly.Load("Common.Web.Ui")
-			},
-				ActiveRecordSectionHandler.Instance);
-
-			var options = new BooViewEngineOptions();
-			options.AssembliesToReference.Add(typeof (Controller).Assembly);
-			options.NamespacesToImport.Add("Boo.Lang.Builtins");
-			options.NamespacesToImport.Add("AdminInterface.Helpers");
-
-			var loader = new FileAssemblyViewSourceLoader("");
-			loader.AddAssemblySource(new AssemblySourceInfo(Assembly.GetExecutingAssembly(), "Printer"));
-			return new StandaloneBooViewEngine(loader, options);
 		}
 	}
 }

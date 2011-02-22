@@ -135,8 +135,7 @@ namespace AdminInterface.Controllers
 
 		public void Print(uint id)
 		{
-			CancelLayout();
-			//LayoutName = "Print";
+			LayoutName = "Print";
 			PropertyBag["invoice"] = Invoice.Find(id);
 		}
 

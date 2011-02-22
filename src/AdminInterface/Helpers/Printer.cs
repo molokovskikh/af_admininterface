@@ -7,9 +7,7 @@ using System.Management;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
-using Castle.MonoRail.Views.Brail;
 using Microsoft.Win32;
 
 namespace AdminInterface.Helpers
@@ -42,14 +40,15 @@ namespace AdminInterface.Helpers
 			}
 		}
 
-		public void PrintView(StandaloneBooViewEngine brail, string name, Dictionary<string, object> parameters)
+		public void PrintView(IViewEngineManager brail, string template, string layout, Dictionary<string, object> parameters)
 		{
 			var file = Path.GetTempFileName();
 			try
 			{
 				using (var writer = new StreamWriter(file))
 				{
-					brail.Process(name,
+					brail.Process(template,
+						layout,
 						writer,
 						parameters);
 				}

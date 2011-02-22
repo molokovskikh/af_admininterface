@@ -224,6 +224,7 @@
     <Compile Include="MonoRailExtentions\FakeServiceProvider.cs" />
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
+    <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />

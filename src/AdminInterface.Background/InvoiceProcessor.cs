@@ -48,7 +48,7 @@ namespace AdminInterface.Background
 
 		public void DoStart()
 		{
-			InvoiceProcessor.Init();
+			StandaloneInitializer.Init();
 			Start();
 		}
 
@@ -101,33 +101,6 @@ namespace AdminInterface.Background
 					}
 				}
 			}
-		}
-
-		public static void Init()
-		{
-			ActiveRecordStarter.Initialize(
-				new[] {
-					Assembly.Load("AdminInterface"),
-					Assembly.Load("Common.Web.Ui")
-				},
-				ActiveRecordSectionHandler.Instance);
-
-			var config = new MonoRailConfiguration();
-			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
-
-			var provider = new FakeServiceProvider();
-			provider.Services.Add(typeof(IMonoRailConfiguration), config);
-			var loader = new FileAssemblyViewSourceLoader("");
-			var executingAssembly = Assembly.GetExecutingAssembly();
-			loader.AddAssemblySource(new AssemblySourceInfo(executingAssembly, "AdminInterface.Background.Views"));
-			provider.Services.Add(typeof(IViewSourceLoader), loader);
-
-			var manager = new DefaultViewEngineManager();
-			manager.Service(provider);
-			var namespaces = ExposedObject.From(manager).viewEnginesFastLookup[0].Options.NamespacesToImport;
-			namespaces.Add("Boo.Lang.Builtins");
-			namespaces.Add("AdminInterface.Helpers");
-			BaseMailer.ViewEngineManager = manager;
 		}
 	}
 }

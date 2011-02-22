@@ -74,7 +74,7 @@ namespace AdminInterface.Controllers
 
 		public void Print(uint id)
 		{
-			CancelLayout();
+			LayoutName = "Print";
 			PropertyBag["act"] = Act.Find(id);
 		}
 	}

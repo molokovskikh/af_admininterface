@@ -1,121 +1,66 @@
-﻿<% import Boo.Lang.Builtins %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-		<style>
-			body
-			{
-				font-family: Times New Roman;
-			}
+﻿<p style="font-weight:bold">
+Исполнитель:${act.Recipient.FullName}<br />
+Адрес:${act.Recipient.Address}
+</p>
 
-			pre
-			{
-				font-family: Times New Roman;
-				font-size: 100%;
-			}
-
-			table 
-			{
-				width: 100%;
-				border-collapse:collapse;
-			}
-
-			table td
-			{
-				border: solid 1px black;
-			}
-
-			table th
-			{
-				border: solid 1px black;
-				font-weight: normal;
-			}
-
-			h1, h2, h3, h4, h5, h6
-			{
-				text-align: center;
-			}
-
-			.result-label
-			{
-				border-style: none;
-				text-align: right;
-			}
-
-			.result
-			{
-				font-weight: bold;
-			}
-		</style>
-	</head>
-	<body>
-		<p style="font-weight:bold">
-		Исполнитель:${act.Recipient.FullName}<br />
-		Адрес:${act.Recipient.Address}
-		</p>
-
-		<h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.ActDate.ToString("dd MMMM yyyy")}</h2>
-		<p>Заказчик: ${act.PayerName}</p>
-		<table>
-			<tr>
-				<th>№</th>
-				<th>Наименование работы (услуги)</th>
-				<th style="width:5em">Ед. изм.</th>
-				<th style="width:1%">Коли-чество</th>
-				<th>Цена</th>
-				<th>Сумма</th>
-			</tr>
-		<% for i, part in enumerate(act.Parts): %>
-			<tr>
-				<td>${i + 1}</td>
-				<td>${part.Name}</td>
-				<td>услуга</td>
-				<td>${part.Count}</td>
-				<td style="width:10%">${part.Cost.ToString("0.#")}</td>
-				<td style="width:10%">${part.Sum.ToString("0.#")}</td>
-			</tr>
+<h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.ActDate.ToString("dd MMMM yyyy")}</h2>
+<p>Заказчик: ${act.PayerName}</p>
+<table>
+	<tr>
+		<th>№</th>
+		<th>Наименование работы (услуги)</th>
+		<th style="width:5em">Ед. изм.</th>
+		<th style="width:1%">Коли-чество</th>
+		<th>Цена</th>
+		<th>Сумма</th>
+	</tr>
+<% for i, part in enumerate(act.Parts): %>
+	<tr>
+		<td>${i + 1}</td>
+		<td>${part.Name}</td>
+		<td>услуга</td>
+		<td>${part.Count}</td>
+		<td style="width:10%">${part.Cost.ToString("0.#")}</td>
+		<td style="width:10%">${part.Sum.ToString("0.#")}</td>
+	</tr>
+<% end %>
+	<tr class="result">
+		<td colspan=5 class="result-label">Итого:</td>
+		<td class="result">${act.Sum.ToString("0.#")}</td>
+	</tr>
+</table>
+<p style="font-style:italic">
+	Всего оказано услуг на сумму: ${ViewHelper.InWords(act.Sum)}, в т.ч.: НДС - Ноль рублей 00 копеек
+</p>
+<p>
+	Вышепреречисленные услуги выполнены полностью и в срок. 
+	Заказчик претензий по объему, качеству и срокам оказания услуг не имеет.
+</p>
+<table style="width:auto">
+	<tr>
+		<td style="border:none"><pre>Исполнитель:    </pre></td>
+		<% if System.String.IsNullOrEmpty(act.Recipient.AccountWarranty): %>
+		<td style="border:none">_____________________ ${act.Recipient.Boss}</td>
+		<% else: %>
+		<td style="border:none">_____________________ ${act.Recipient.Accountant}</td>
 		<% end %>
-			<tr class="result">
-				<td colspan=5 class="result-label">Итого:</td>
-				<td class="result">${act.Sum.ToString("0.#")}</td>
-			</tr>
-		</table>
-		<p style="font-style:italic">
-			Всего оказано услуг на сумму: ${ViewHelper.InWords(act.Sum)}, в т.ч.: НДС - Ноль рублей 00 копеек
-		</p>
-		<p>
-			Вышепреречисленные услуги выполнены полностью и в срок. 
-			Заказчик претензий по объему, качеству и срокам оказания услуг не имеет.
-		</p>
-		<table style="width:auto">
-			<tr>
-				<td style="border:none"><pre>Исполнитель:    </pre></td>
-				<% if System.String.IsNullOrEmpty(act.Recipient.AccountWarranty): %>
-				<td style="border:none">_____________________ ${act.Recipient.Boss}</td>
-				<% else: %>
-				<td style="border:none">_____________________ ${act.Recipient.Accountant}</td>
-				<% end %>
-				<td style="border:none"><pre>                     Заказчик:    </pre></td>
-				<td style="border:none">_____________________</td>
-			</tr>
-			<tr>
-				<td style="border:none"></td>
-				<% if System.String.IsNullOrEmpty(act.Recipient.AccountWarranty): %>
-				<td style="border:none">М.П.</td>
-				<% else: %>
-				<td style="border:none"><pre>М.П.       ${act.Recipient.AccountWarranty}</pre></td>
-				<% end %>
-				<td style="border:none"></td>
-				<td style="border:none">М.П.</td>
-			</tr>
-		</table>
-		<div style="position:fixed; bottom: 0; right:0; width: 8cm;">
-			Кому: для Аптеки<br>
-			${act.PayerName}<br>
-			Куда: ${act.Payer.GetMailAddress()}<br>
-			${act.Payer.ActualAddressIndex}
-		</div>
-	</body>
-</html>
+		<td style="border:none"><pre>                     Заказчик:    </pre></td>
+		<td style="border:none">_____________________</td>
+	</tr>
+	<tr>
+		<td style="border:none"></td>
+		<% if System.String.IsNullOrEmpty(act.Recipient.AccountWarranty): %>
+		<td style="border:none">М.П.</td>
+		<% else: %>
+		<td style="border:none"><pre>М.П.       ${act.Recipient.AccountWarranty}</pre></td>
+		<% end %>
+		<td style="border:none"></td>
+		<td style="border:none">М.П.</td>
+	</tr>
+</table>
+<div id="mail_address">
+	Кому: для Аптеки<br>
+	${act.PayerName}<br>
+	Куда: ${act.Payer.GetMailAddress()}<br>
+	${act.Payer.ActualAddressIndex}
+</div>

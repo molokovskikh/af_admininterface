@@ -47,6 +47,14 @@
 			{
 				font-weight: bold;
 			}
+
+			#mail_address
+			{
+				position:fixed;
+				bottom: 0.5cm;
+				right:0;
+				width: 8cm;
+			}
 		</style>
 	</head>
 	<body>
