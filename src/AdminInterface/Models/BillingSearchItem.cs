@@ -145,7 +145,7 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 
 				if (properties.RecipientId != 0)
 				{
-					groupFilter += AddFilterCriteria(groupFilter, " le.RecipientId = " + properties.RecipientId);
+					groupFilter = AddFilterCriteria(groupFilter, " p.RecipientId = " + properties.RecipientId);
 				}
 
 				//.SetParameter("RegionId", properties.RegionId)

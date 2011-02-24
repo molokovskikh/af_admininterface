@@ -35,5 +35,15 @@ namespace Integration.Models
 			Assert.That(result.BillingCode, Is.EqualTo(payer.Id));
 			Assert.That(result.Recipients, Is.EqualTo(recipient.Name));
 		}
+
+		[Test]
+		public void Search_by_recipient_id()
+		{
+			var items = BillingSearchItem.FindBy(new BillingSearchProperties{
+				RegionId = UInt64.MaxValue,
+				RecipientId = Recipient.Queryable.First().Id
+			});
+			Assert.That(items.Count, Is.GreaterThan(0));
+		}
 	}
 }
