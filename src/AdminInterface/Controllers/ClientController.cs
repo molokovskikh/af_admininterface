@@ -102,14 +102,12 @@ namespace AdminInterface.Controllers
 			var users = client.Users;
 			var addresses = client.Addresses;
 
-			PropertyBag["self"] = "client/" + client.Id;
 			PropertyBag["Client"] = client;
 			PropertyBag["Registrant"] = client.GetRegistrant();
 			PropertyBag["Admin"] = SecurityContext.Administrator;
 
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
-			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
 
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
