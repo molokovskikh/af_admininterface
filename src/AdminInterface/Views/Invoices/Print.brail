@@ -13,9 +13,4 @@
 	</p>
 	<% end %>
 </div>
-<div id="mail_address">
-	Кому: для Аптеки<br>
-	${invoice.PayerName}<br>
-	Куда: ${invoice.Payer.GetMailAddress()}<br>
-	${invoice.Payer.ActualAddressIndex}
-</div>
+<% OutputSubView("/SubViews/MailAddressSubView") %>

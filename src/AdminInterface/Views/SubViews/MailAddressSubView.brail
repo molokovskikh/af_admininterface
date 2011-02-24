@@ -1,0 +1,9 @@
+﻿<div id="mail_address">
+	Кому: ${invoice.Payer.GetNamePrefix()}<br>
+	${invoice.PayerName}<br>
+	<% if invoice.Payer.AfterNamePrefix: %>
+	${invoice.Payer.AfterNamePrefix} <br>
+	<% end %>
+	Куда: ${invoice.Payer.GetMailAddress()}<br>
+	${invoice.Payer.ActualAddressIndex}
+</div>

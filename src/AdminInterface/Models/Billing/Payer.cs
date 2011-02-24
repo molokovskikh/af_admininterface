@@ -197,6 +197,13 @@ namespace AdminInterface.Models
 			set { Name = value; }
 		}
 
+		public virtual string GetNamePrefix()
+		{
+			if (String.IsNullOrWhiteSpace(BeforeNamePrefix))
+				return "для Аптеки";
+			return BeforeNamePrefix;
+		}
+
 		public virtual bool IsManualPayments()
 		{
 			return AutoInvoice == InvoiceType.Manual;

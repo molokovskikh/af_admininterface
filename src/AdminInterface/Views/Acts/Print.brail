@@ -58,9 +58,4 @@
 		<td style="border:none">М.П.</td>
 	</tr>
 </table>
-<div id="mail_address">
-	Кому: для Аптеки<br>
-	${act.PayerName}<br>
-	Куда: ${act.Payer.GetMailAddress()}<br>
-	${act.Payer.ActualAddressIndex}
-</div>
+<% OutputSubView("/SubViews/MailAddressSubView") %>

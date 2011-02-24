@@ -492,6 +492,7 @@
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
     <None Include="Views\RevisionActs\Show.brail" />
+    <None Include="Views\SubViews\MailAddressSubView.brail" />
     <None Include="Views\SubViews\MoveTo.brail">
       <SubType>Designer</SubType>
     </None>
