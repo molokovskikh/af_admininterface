@@ -56,7 +56,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 			<td>
 				<select name="invoice.Period">
 					<% for pair in BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Billing.Period, AdminInterface"): %>
-						<option value="${pair.Key}">${pair.Value}</option>
+						<option value="${pair.Key}" ${"selected" if pair.Key == cast(int, invoice.Period)}>${pair.Value}</option>
 					<% end %>
 				</select>
 				${app.GetValidationError(invoice, "Period")}
