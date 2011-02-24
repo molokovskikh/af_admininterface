@@ -1,4 +1,5 @@
-using System.Linq;
+﻿using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -14,7 +15,21 @@ namespace AdminInterface.Controllers
 	{
 		public void Index()
 		{
-			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+			var recipients = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+			if (IsPost)
+			{
+				var forSave = (Recipient[])BindObject(ParamStore.Form, typeof(Recipient[]), "recipients", AutoLoadBehavior.NewInstanceIfInvalidKey);
+				var deleted = recipients.Where(r => !forSave.Any(n => n.Id == r.Id));
+				deleted.Each(d => d.Delete());
+				foreach (var recipient in forSave)
+					recipient.Save();
+				Flash["Message"] = Message.Notify("Сохранено");
+				RedirectToAction("Index");
+			}
+			else
+			{
+				PropertyBag["Recipients"] = recipients;
+			}
 		}
 
 		public void Edit(uint id)
@@ -30,26 +45,6 @@ namespace AdminInterface.Controllers
 			{
 				PropertyBag["recipient"] = recipient;
 			}
-		}
-
-		public void Update([ARDataBind("recipients", AutoLoad = AutoLoadBehavior.NewInstanceIfInvalidKey)] Recipient[] recipients)
-		{
-			using (var transaction = new TransactionScope(OnDispose.Rollback))
-			{
-				var all = Recipient.Queryable.ToList();
-				var deleted = all.Where(r => !recipients.Any(n => n.Id == r.Id));
-				deleted.Each(d => d.Delete());
-				foreach (var recipient in recipients)
-				{
-					if (recipient.Id == 0)
-						recipient.Save();
-					else
-						recipient.Save();
-				}
-				transaction.VoteCommit();
-			}
-			Flash["isUpdated"] = true;
-			RedirectToAction("Index");
 		}
 	}
 }

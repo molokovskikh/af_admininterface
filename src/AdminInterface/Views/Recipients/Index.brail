@@ -34,10 +34,6 @@
 
 <% component Bubble, {"bredcrumbs" : [("Получатели платежей", "")]} %>
 
-<% if IsDefined("isUpdated"): %>
-<div class="flash notice">Сохранено.</div>
-<% end %>
-
 <% if recipients.Count ==  0: %>
 <table class="DataTable">
 	<tr>
@@ -47,7 +43,7 @@
 	</tr>
 </table>
 <% else: %>
-<form action="${siteroot}/Recipients/Update" method="post">
+<form method="post">
 	<table class="DataTable" style="width:600px">
 		<tr>
 			<td>
