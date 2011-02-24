@@ -1,4 +1,4 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.statcont" CodePage="1251"
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.statcont"
 	Theme="Main" CodeBehind="statcont.aspx.cs" MasterPageFile="~/Main.Master" %>
 
 <asp:Content ID="Content1" runat="server" ContentPlaceHolderID="MainContentPlaceHolder">

@@ -1,4 +1,4 @@
-<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.CopySynonym" CodePage="1251"
+<%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.CopySynonym"
 	CodeBehind="CopySynonym.aspx.cs" MasterPageFile="~/Main.Master" Theme="Main" %>
 
 
