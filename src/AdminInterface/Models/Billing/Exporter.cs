@@ -114,7 +114,7 @@ namespace AdminInterface.Models.Billing
 					act.Payer.JuridicalName,
 					act.Payer.Id),
 				new Merge(8));
-			row.Height = 1440/72*25;
+			row.Height = 1440/72*43;
 			row = Row(longWord,
 				String.Format("Мы, нижеподписавшиеся, __________________ {0} _________________________,"
 					+ "с одной стороны, и ________________________ {1} __________________________, "
