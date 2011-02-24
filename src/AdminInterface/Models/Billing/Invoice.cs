@@ -27,11 +27,16 @@ namespace AdminInterface.Models.Billing
 			: this(ad.Payer)
 		{
 			Period = GetPeriod(Date);
-			Parts.Add(new InvoicePart(this,
+			Parts.Add(PartForAd(ad));
+			CalculateSum();
+		}
+
+		private InvoicePart PartForAd(Advertising ad)
+		{
+			return new InvoicePart(this,
 				"Рекламное объявление в информационной системе",
 				ad.Cost,
-				1));
-			CalculateSum();
+				1);
 		}
 
 		public Invoice(Payer payer)
@@ -62,7 +67,7 @@ namespace AdminInterface.Models.Billing
 			CalculateSum();
 		}
 
-		public Period GetPeriod(DateTime dateTime)
+		public static Period GetPeriod(DateTime dateTime)
 		{
 			return (Period)dateTime.Month + 4;
 		}
@@ -121,14 +126,18 @@ namespace AdminInterface.Models.Billing
 
 		public List<InvoicePart> BuildParts()
 		{
+			var result = new List<InvoicePart>();
+			foreach (var ad in Payer.Ads.Where(a => a.Invoice == null))
+			{
+				result.Add(PartForAd(ad));
+				ad.Invoice = this;
+			}
+
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-			{
-				return quaterMap[Period].SelectMany(p => GetPartsForPeriod(p)).ToList();
-			}
+				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p)).ToList());
 			else
-			{
-				return GetPartsForPeriod(Period).ToList();
-			}
+				result.AddRange(GetPartsForPeriod(Period).ToList());
+			return result;
 		}
 
 		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period)

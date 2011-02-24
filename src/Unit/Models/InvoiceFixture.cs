@@ -24,6 +24,7 @@ namespace Unit.Models
 				Users = new List<User>(),
 				Addresses = new List<Address>(),
 				Recipient = new Recipient(),
+				Ads = new List<Advertising>(),
 				JuridicalOrganizations = new List<LegalEntity>{
 					new LegalEntity {}
 				}
@@ -82,8 +83,7 @@ namespace Unit.Models
 		[Test]
 		public void Invoice_for_ad()
 		{
-			var ad = new Advertising(payer);
-			ad.Cost = 800;
+			var ad = new Advertising(payer) {Cost = 800};
 			var invoice = new Invoice(ad);
 			Assert.That(invoice.Payer, Is.EqualTo(payer));
 			Assert.That(invoice.Sum, Is.EqualTo(800));
@@ -99,7 +99,15 @@ namespace Unit.Models
 		[Test]
 		public void Include_ad_in_next_building_invoice()
 		{
-
+			var ad = new Advertising(payer) {Cost = 1500};
+			payer.Ads.Add(ad);
+			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			Assert.That(invoice.Sum, Is.EqualTo(1500));
+			var part = invoice.Parts.Single();
+			Assert.That(part.Name, Is.EqualTo("Рекламное объявление в информационной системе"));
+			Assert.That(part.Cost, Is.EqualTo(1500));
+			Assert.That(part.Count, Is.EqualTo(1));
+			Assert.That(ad.Invoice, Is.EqualTo(invoice));
 		}
 	}
 }

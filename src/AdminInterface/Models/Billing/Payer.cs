@@ -170,6 +170,9 @@ namespace AdminInterface.Models
 		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]
 		public virtual IList<Report> Reports { get; set; }
 
+		[HasMany(typeof(Advertising), Lazy = true, Inverse = true, Cascade = ManyRelationCascadeEnum.SaveUpdate)]
+		public virtual IList<Advertising> Ads { get; set; }
+
 		[HasAndBelongsToMany(typeof (Client),
 			Lazy = true,
 			Inverse = true,
@@ -302,7 +305,7 @@ ORDER BY {Payer}.shortname;";
 				.FirstOrDefault();
 
 			if (group == null)
-				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
+				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для от правки счетов", Id, Name));
 
 			var contacts = group
 				.Contacts
