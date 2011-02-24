@@ -72,6 +72,14 @@ namespace AdminInterface.Controllers
 			RedirectToUrl(LinkHelper.GetVirtualDir(Context) + AppHelper.GetUrl(ad.Act, "Print"));
 		}
 
+		public void Delete(uint id)
+		{
+			var ad = Advertising.Find(id);
+			ad.Delete();
+			Flash["Message"] = Message.Notify("Удалено");
+			RedirectToReferrer();
+		}
+
 		public void Edit(uint id)
 		{
 			Binder.Validator = Validator;

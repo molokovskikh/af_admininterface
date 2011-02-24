@@ -19,6 +19,9 @@
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
 			${app.LinkTo(ad, "Редактировать", @Edit)}
+			<form method=post action="${siteroot}/Advertisings/${ad.Id}/Delete" style="display: inline">
+				<input type=submit value="Удалить">
+			</form>
 		</td>
 		<td>${ad.Begin.ToShortDateString() if ad.Begin != null}</td>
 		<td>${ad.End.ToShortDateString() if ad.End != null}</td>
