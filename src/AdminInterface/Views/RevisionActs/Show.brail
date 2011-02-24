@@ -10,6 +10,20 @@
 		$("form").each(function () {
 			$(this).validate();
 		});
+		$("#add_mail").click(function () {
+			var email = $("#email option:selected").val();
+			var currentValue = $("#emails").val();
+			if (currentValue.length == 0) {
+				currentValue = email;
+			}
+			else {
+				if (!/\s*,\s*$/.test(currentValue)) {
+					currentValue += ", ";
+				}
+				currentValue += email;
+			}
+			$("#emails").val(currentValue);
+		});
 	});
 </script>
 
@@ -34,6 +48,14 @@
 
 <div class=block>
 	<h3>Отправить акт по e-mail</h3>
+	<% if payer.Emails().Count: %>
+	<select id=email>
+		<% for email in payer.Emails(): %>
+		<option>${email}</option>
+		<% end %>
+	</select>
+	<input id="add_mail" type=button value="Добавить">
+	<% end %>
 	<form method=post id="mail" action="${siteroot}/RevisionActs/Mail">
 		<input type=hidden name=id value="${payer.Id}">
 		<input type=hidden name=begin value="${beginDate.ToShortDateString()}">
@@ -41,7 +63,7 @@
 
 		<label>Список e-mail через запятую:</label>
 		<br>
-		<textarea name=emails rows=3 cols=20 class="required validateEmailList"></textarea>
+		<textarea id=emails name=emails rows=3 cols=20 class="required validateEmailList"></textarea>
 		<br>
 		<input type=submit value="Отправить">
 	</form>

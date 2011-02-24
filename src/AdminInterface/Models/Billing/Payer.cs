@@ -200,6 +200,16 @@ namespace AdminInterface.Models
 			set { Name = value; }
 		}
 
+		public virtual List<string> Emails()
+		{
+			return ContactGroupOwner.ContactGroups
+				.SelectMany(c => c.Contacts)
+				.Where(c => c.Type == ContactType.Email)
+				.Select(c => c.ContactText)
+				.Distinct()
+				.ToList();
+		}
+
 		public virtual string GetNamePrefix()
 		{
 			if (String.IsNullOrWhiteSpace(BeforeNamePrefix))
