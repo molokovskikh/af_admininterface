@@ -13,6 +13,7 @@ namespace Unit.Models
 	{
 		private RevisionAct act;
 		private Payer payer;
+		private List<Payment> payments;
 
 		[SetUp]
 		public void Setup()
@@ -21,6 +22,9 @@ namespace Unit.Models
 				Recipient = new Recipient {
 					FullName = "ООО \"АналитФАРМАЦИЯ\""
 				}
+			};
+			payments = new List<Payment> {
+				new Payment(payer, new DateTime(2011, 1, 15), 1000)
 			};
 			BuildAct();
 		}
@@ -50,9 +54,7 @@ namespace Unit.Models
 				new DateTime(2011, 1, 1),
 				new DateTime(2011, 2, 1),
 				new List<Invoice> { invoice, invoice1, invoice2 },
-				new List<Payment> {
-					new Payment(payer, new DateTime(2011, 1, 15), 1000)
-				});
+				payments);
 		}
 
 		[Test]
@@ -96,6 +98,15 @@ namespace Unit.Models
 			Assert.That(end.Name, Is.EqualTo("Сальдо на 01.02.2011"));
 			Assert.That(end.Debit, Is.EqualTo(2000));
 			Assert.That(end.Credit, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Calculate_begin_saldo()
+		{
+			payments.Add(new Payment(payer, new DateTime(2010, 12, 15), 1000));
+			BuildAct();
+			Assert.That(act.BeginCredit, Is.EqualTo(0));
+			Assert.That(act.BeginDebit, Is.EqualTo(0));
 		}
 
 		[Test]

@@ -46,13 +46,16 @@ namespace AdminInterface.Controllers
 			BeginDate = begin;
 			EndDate = end;
 
-			BeginDebit = invoices.Where(i => i.Date < begin).Sum(i => i.Sum);
-			BeginCredit = payments.Where(p => p.PayedOn < begin).Sum(p => p.Sum);
+			var beginDebit = invoices.Where(i => i.Date < begin).Sum(i => i.Sum);
+			var beginCredit = payments.Where(p => p.PayedOn < begin).Sum(p => p.Sum);
 
-			if (payer.BeginBalance > 0)
-				BeginCredit += payer.BeginBalance;
+			var beginBalance = beginCredit - beginDebit;
+			beginBalance += payer.BeginBalance;
+
+			if (beginBalance > 0)
+				BeginCredit = beginBalance;
 			else
-				BeginDebit += Math.Abs(payer.BeginBalance);
+				BeginDebit = Math.Abs(beginBalance);
 
 			var movements = invoices.Where(i => i.Date >= begin && i.Date <= end)
 					.Select(i => new RevisionActPart(i))
