@@ -166,6 +166,7 @@ namespace AdminInterface.Controllers
 				RedirectToReferrer();
 				return;
 			}
+			LayoutName = "Print";
 
 			if (begin == null)
 				begin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);

@@ -1,63 +1,11 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
 	АКТ СВЕРКИ
 <% end %>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
-		<style>
-			body
-			{
-				font-family: Times New Roman;
-			}
-
-			pre
-			{
-				font-family: Times New Roman;
-				font-size: 100%;
-			}
-
-			table 
-			{
-				width: 100%;
-				border-collapse:collapse;
-			}
-
-			table td
-			{
-				border: solid 1px black;
-			}
-
-			table th
-			{
-				border: solid 1px black;
-				font-weight: normal;
-			}
-
-			h1, h2, h3, h4, h5, h6
-			{
-				text-align: center;
-			}
-
-			.result-label
-			{
-				border-style: none;
-				text-align: right;
-			}
-
-			.result
-			{
-				font-weight: bold;
-			}
-		</style>
-	</head>
-	<body>
 <h4>АКТ СВЕРКИ</h4>
 <p style="text-align: center;">
 	взаимных расчетов по состоянию на ${act.BeginDate.ToShortDateString()}
 	между ${payer.Recipient.FullName}
-	и ${payer.JuridicalName} по договору № ${payer.PayerID}
+	и ${payer.JuridicalName} по договору № ${payer.Id}
 </p>
 <P>
 Мы, нижеподписавшиеся, __________________ ${payer.Recipient.FullName} _________________________,
@@ -110,5 +58,3 @@ ___________________________
 
 _________________________
 </pre>
-	</body>
-</html>

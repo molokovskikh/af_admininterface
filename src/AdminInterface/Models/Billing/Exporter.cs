@@ -88,6 +88,15 @@ namespace AdminInterface.Models.Billing
 				Warp = true,
 			};
 
+			var mark = new CellStyle {
+				HorizontalAlignment = HorizontalAlignment.Center,
+				Warp = true,
+			};
+
+			var longWord = new CellStyle {
+				Warp = true
+			};
+
 			var underScrore = new CellStyle {
 				Borders = new Borders{Bottom = BorderStyle.Thin}
 			};
@@ -98,6 +107,22 @@ namespace AdminInterface.Models.Billing
 			};
 
 			Row(h1, "Акт сверки", new Merge(8));
+			var row = Row(mark, 
+				String.Format("взаимных расчетов по состоянию на {0} между {1} и {2} по договору № {3}", 
+					act.EndDate.ToShortDateString(),
+					act.Payer.Recipient.FullName,
+					act.Payer.JuridicalName,
+					act.Payer.Id),
+				new Merge(8));
+			row.Height = 1440/72*25;
+			row = Row(longWord,
+				String.Format("Мы, нижеподписавшиеся, __________________ {0} _________________________,"
+					+ "с одной стороны, и ________________________ {1} __________________________, "
+					+ "с другой стороны составили настоящий акт сверки в том, что состояние взаимных расчетов по данным учета следующее:",
+					act.Payer.Recipient.FullName,
+					act.Payer.JuridicalName),
+				new Merge(8));
+			row.Height = 1440/72*48;
 			Row(table,
 				String.Format("По данным {0}, руб.", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("По данным {0}, руб.", act.Payer.JuridicalName), new Merge(4));
@@ -114,7 +139,7 @@ namespace AdminInterface.Models.Billing
 			}
 			Skip();
 			Row(String.Format("По данным {0}", act.Payer.Recipient.FullName), new Merge(4));
-			var row = Row(h2, act.Result, new Merge(4));
+			row = Row(h2, act.Result, new Merge(4));
 			row.Height = 480;//1440/72*24
 			Skip();
 			Row(String.Format("От {0}", act.Payer.Recipient.FullName), new Merge(4),
