@@ -39,6 +39,7 @@ namespace AdminInterface.Controllers
 			{
 				BindObjectInstance(recipient, "recipient");
 				recipient.Save();
+				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}
 			else
