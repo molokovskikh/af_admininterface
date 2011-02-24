@@ -140,7 +140,7 @@
     <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
-    <Compile Include="Controllers\AdsController.cs" />
+    <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />

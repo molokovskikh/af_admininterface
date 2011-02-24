@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using Common.Tools;
 using System.Collections.Generic;
 using System.Diagnostics;

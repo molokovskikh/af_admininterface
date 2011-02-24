@@ -28,7 +28,7 @@
 						<label>За период</label>
 						${FormHelper.Select(
 							"period",
-							BindingHelper.GetDescriptionsDictionary("AdminInterface.Controllers.Period, AdminInterface"),
+							BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Billing.Period, AdminInterface"),
 							BindingHelper.GetDictionaryMapping())}
 						<br>
 						<label>Регион</label>
