@@ -39,6 +39,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public uint EnabledAddressesCount { get; set; }
+
+		[Property]
+		public uint EnabledClientCount { get; set; }
 		
 		[Property]
 		public string Regions { get; set; }
@@ -59,7 +62,7 @@ namespace AdminInterface.Models
 
 		public bool IsDisabled
 		{
-			get { return (EnabledUsersCount == 0) || (EnabledAddressesCount == 0); }
+			get { return EnabledUsersCount == 0 || EnabledClientCount == 0; }
 		}
 
 		public string GetSegments()
@@ -162,6 +165,7 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.oldpaydate as {{BillingSearchItem.PayDate}},
 		p.oldtariff as {{BillingSearchItem.PaySum}},
 		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
+		count(distinct if(cd.Status = 1, cd.Id, null)) as {{BillingSearchItem.EnabledClientCount}},
 		count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
 		count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
 		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
