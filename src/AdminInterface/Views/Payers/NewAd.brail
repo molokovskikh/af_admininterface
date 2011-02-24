@@ -1,6 +1,30 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("${payer.Name}", "${siteroot}/Payers/${payer.Id}"), ("Реклама", "")]} %>
 
+<% if ad.Id: %>
+<h2>Редактирование рекламы</h2>
+<% else: %>
 <h2>Новая реклама</h2>
+<% end %>
+
+<% if ad.Id: %>
+<div class=block>
+	<% if ad.Invoice: %>
+		<a href="${siteroot}/Invoices/${ad.Invoice.Id}/Print">Реклама включена в счет №${ad.Invoice.Id}</a>
+	<% else: %>
+	<form method=post action="${siteroot}/Advertisings/${ad.Id}/BuildInvoice">
+		<input type=submit value="Сформировать счет">
+	</form>
+	<% end %>
+	<br>
+	<% if ad.Act: %>
+		<a href="${siteroot}/Acts/${ad.Act.Id}/Print">Реклама включена в акт №${ad.Act.Id}</a>
+	<% else: %>
+	<form method=post action="${siteroot}/Advertisings/${ad.Id}/BuildAct">
+		<input type=submit value="Сформировать акт">
+	</form>
+	<% end %>
+</div>
+<% end %>
 
 <form method=post>
 	<div class=block>

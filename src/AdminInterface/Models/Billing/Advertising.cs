@@ -36,5 +36,11 @@ namespace AdminInterface.Models.Billing
 
 		[BelongsTo]
 		public Payment Payment { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
+		public Invoice Invoice { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
+		public Act Act { get; set; }
 	}
 }

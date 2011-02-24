@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -75,6 +77,29 @@ namespace Unit.Models
 			payer.InvoiceSettings.EmailInvoice = true;
 			var invoice = new Invoice(payer, Period.April, DateTime.Now);
 			Assert.That(invoice.SendToEmail, Is.True);
+		}
+
+		[Test]
+		public void Invoice_for_ad()
+		{
+			var ad = new Advertising(payer);
+			ad.Cost = 800;
+			var invoice = new Invoice(ad);
+			Assert.That(invoice.Payer, Is.EqualTo(payer));
+			Assert.That(invoice.Sum, Is.EqualTo(800));
+
+			Assert.That(invoice.Period.ToString(),
+				Is.EqualTo(CultureInfo.InvariantCulture.DateTimeFormat.MonthNames[DateTime.Now.Month]));
+			var part = invoice.Parts.Single();
+			Assert.That(part.Cost, Is.EqualTo(800));
+			Assert.That(part.Count, Is.EqualTo(1));
+			Assert.That(part.Name, Is.EqualTo("Рекламное объявление в информационной системе"));
+		}
+
+		[Test]
+		public void Include_ad_in_next_building_invoice()
+		{
+
 		}
 	}
 }

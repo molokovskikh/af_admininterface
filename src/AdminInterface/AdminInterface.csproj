@@ -151,7 +151,6 @@
     <Compile Include="Controllers\RecipientsController.cs" />
     <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
-    <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="Controllers\RevisionActsController.cs" />
     <Compile Include="Controllers\UserSearchController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />

@@ -85,6 +85,14 @@ namespace AdminInterface.Models.Billing
 		public InvoicePart()
 		{}
 
+		public InvoicePart(Invoice invoice, string name, decimal cost, int count)
+		{
+			Invoice = invoice;
+			Name = name;
+			Cost = cost;
+			Count = count;
+		}
+
 		public InvoicePart(Invoice invoice, Period period, decimal cost, int count)
 		{
 			Invoice = invoice;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,26 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
+	public enum Period
+	{
+		[Description("Первый квартал")] FirstQuarter,
+		[Description("Второй квартал")] SecondQuarter,
+		[Description("Третий квартал")] ThirdQuarter,
+		[Description("Четвертый квартал")] FourthQuarter,
+		[Description("Январь")] January,
+		[Description("Февраль")] February,
+		[Description("Март")] March,
+		[Description("Апрель")] April,
+		[Description("Май")] May,
+		[Description("Июнь")] June,
+		[Description("Июль")] July,
+		[Description("Август")] August,
+		[Description("Сентябрь")] September,
+		[Description("Ноябрь")] November,
+		[Description("Октябрь")] October,
+		[Description("Декабрь")] December,
+	}
+
 	public static class PeriodExtension
 	{
 		public static DateTime GetPeriodBegin(this Period period)
@@ -109,12 +130,6 @@ namespace AdminInterface.Models.Billing
 
 			return new DateTime(year, 9, calendar.GetDaysInMonth(year, 9));
 		}
-	}
-
-	public enum PaymentType
-	{
-		Charge = 0,
-		ChargeOff = 1,
 	}
 
 	[ActiveRecord("Payments", Schema = "Billing")]

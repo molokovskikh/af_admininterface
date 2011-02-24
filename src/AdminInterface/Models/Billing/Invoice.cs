@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 
@@ -25,10 +23,22 @@ namespace AdminInterface.Models.Billing
 		public Invoice()
 		{}
 
+		public Invoice(Advertising ad)
+			: this(ad.Payer)
+		{
+			Period = GetPeriod(Date);
+			Parts.Add(new InvoicePart(this,
+				"Рекламное объявление в информационной системе",
+				ad.Cost,
+				1));
+			CalculateSum();
+		}
+
 		public Invoice(Payer payer)
 		{
 			Parts = new List<InvoicePart>();
 			Date = DateTime.Now;
+			CreatedOn = DateTime.Now;
 			SetPayer(payer);
 		}
 
@@ -37,7 +47,6 @@ namespace AdminInterface.Models.Billing
 		{
 			Period = period;
 			Date = invoiceDate;
-			CreatedOn = DateTime.Now;
 			foreach (var part in parts)
 				part.Invoice = this;
 			Parts = parts.ToList();
@@ -49,9 +58,13 @@ namespace AdminInterface.Models.Billing
 		{
 			Period = period;
 			Date = invoiceDate;
-			CreatedOn = DateTime.Now;
 			Parts = BuildParts();
 			CalculateSum();
+		}
+
+		public Period GetPeriod(DateTime dateTime)
+		{
+			return (Period)dateTime.Month + 4;
 		}
 
 		public void SetPayer(Payer payer)
