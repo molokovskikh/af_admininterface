@@ -76,6 +76,7 @@ namespace AdminInterface.Controllers
 		{
 			LayoutName = "Print";
 			PropertyBag["act"] = Act.Find(id);
+			PropertyBag["doc"] = PropertyBag["act"];
 		}
 	}
 }

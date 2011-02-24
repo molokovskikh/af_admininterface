@@ -1,9 +1,9 @@
 ﻿<div id="mail_address">
-	Кому: ${invoice.Payer.GetNamePrefix()}<br>
-	${invoice.PayerName}<br>
-	<% if invoice.Payer.AfterNamePrefix: %>
-	${invoice.Payer.AfterNamePrefix} <br>
+	Кому: ${doc.Payer.GetNamePrefix()}<br>
+	${doc.PayerName}<br>
+	<% if doc.Payer.AfterNamePrefix: %>
+	${doc.Payer.AfterNamePrefix} <br>
 	<% end %>
-	Куда: ${invoice.Payer.GetMailAddress()}<br>
-	${invoice.Payer.ActualAddressIndex}
+	Куда: ${doc.Payer.GetMailAddress()}<br>
+	${doc.Payer.ActualAddressIndex}
 </div>

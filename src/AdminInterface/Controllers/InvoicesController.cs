@@ -137,6 +137,7 @@ namespace AdminInterface.Controllers
 		{
 			LayoutName = "Print";
 			PropertyBag["invoice"] = Invoice.Find(id);
+			PropertyBag["doc"] = PropertyBag["invoice"];
 		}
 
 		public void Edit(uint id)
