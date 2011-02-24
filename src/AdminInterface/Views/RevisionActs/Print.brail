@@ -49,7 +49,7 @@
 От ${payer.Recipient.FullName}
 
 
-___________________________
+___________________________(${act.Payer.Recipient.Boss})
 </pre>
 
 <pre style="float: left;">

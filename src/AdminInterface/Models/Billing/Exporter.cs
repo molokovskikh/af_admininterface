@@ -69,12 +69,12 @@ namespace AdminInterface.Models.Billing
 			_worksheet = new Worksheet("Акт сверки");
 			_worksheet.Cells.ColumnWidth[0] = 5 * 256;
 			_worksheet.Cells.ColumnWidth[1] = 26 * 256;
-			_worksheet.Cells.ColumnWidth[2] = 11 * 256;
-			_worksheet.Cells.ColumnWidth[3] = 11 * 256;
+			_worksheet.Cells.ColumnWidth[2] = 14 * 256;
+			_worksheet.Cells.ColumnWidth[3] = 14 * 256;
 			_worksheet.Cells.ColumnWidth[4] = 5 * 256;
 			_worksheet.Cells.ColumnWidth[5] = 26 * 256;
-			_worksheet.Cells.ColumnWidth[6] = 11 * 256;
-			_worksheet.Cells.ColumnWidth[7] = 11 * 256;
+			_worksheet.Cells.ColumnWidth[6] = 14 * 256;
+			_worksheet.Cells.ColumnWidth[7] = 14 * 256;
 			var h1 = new CellStyle {
 				Font = new Font("Arial", 11) {
 					Bold = true
@@ -145,7 +145,7 @@ namespace AdminInterface.Models.Billing
 			Row(String.Format("От {0}", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("От {0}", act.Payer.JuridicalName), new Merge(4));
 			Skip(2);
-			Row("", underScrore, "", underScrore, "", "",
+			Row("", underScrore, "", underScrore, String.Format("({0})", act.Payer.Recipient.Boss), "",
 				"", underScrore, "", underScrore, "", "");
 			Skip();
 			Row("М.П.", "", "", "",
