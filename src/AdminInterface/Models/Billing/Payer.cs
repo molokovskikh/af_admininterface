@@ -204,6 +204,7 @@ namespace AdminInterface.Models
 		{
 			return ContactGroupOwner.ContactGroups
 				.SelectMany(c => c.Contacts)
+				.Union(ContactGroupOwner.ContactGroups.SelectMany(c => c.Persons).SelectMany(p => p.Contacts))
 				.Where(c => c.Type == ContactType.Email)
 				.Select(c => c.ContactText)
 				.Distinct()

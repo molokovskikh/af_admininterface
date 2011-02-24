@@ -63,7 +63,7 @@
 
 		<label>Список e-mail через запятую:</label>
 		<br>
-		<textarea id=emails name=emails rows=3 cols=20 class="required validateEmailList"></textarea>
+		<textarea id=emails name=emails rows=3 cols=60 class="required validateEmailList"></textarea>
 		<br>
 		<input type=submit value="Отправить">
 	</form>
