@@ -24,8 +24,10 @@ namespace AdminInterface.Models.Billing
 				.GroupBy(p => new {p.Name, p.Cost})
 				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 				.ToList();
-			Sum = Parts.Sum(p => p.Count * p.Cost);
+			Sum = Parts.Sum(p => p.Sum);
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
+			foreach(var part in invoices.SelectMany(i => i.Parts).Where(p => p.Ad != null))
+				part.Ad.Act = this;
 		}
 		
 		[PrimaryKey]

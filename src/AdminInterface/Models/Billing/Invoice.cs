@@ -36,7 +36,9 @@ namespace AdminInterface.Models.Billing
 			return new InvoicePart(this,
 				"Рекламное объявление в информационной системе",
 				ad.Cost,
-				1);
+				1) {
+					Ad = ad
+				};
 		}
 
 		public Invoice(Payer payer)

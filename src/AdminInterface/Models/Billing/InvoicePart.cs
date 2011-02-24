@@ -74,6 +74,9 @@ namespace AdminInterface.Models.Billing
 		[BelongsTo]
 		public Invoice Invoice { get; set; }
 
+		[BelongsTo]
+		public Advertising Ad { get; set; }
+
 		public decimal Sum
 		{
 			get

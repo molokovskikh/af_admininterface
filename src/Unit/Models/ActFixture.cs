@@ -20,7 +20,8 @@ namespace Unit.Models
 			payer = new Payer {
 				JuridicalName = "ООО 'Рога и копыта'",
 				Recipient = new Recipient(),
-				Addresses = new List<Address>()
+				Addresses = new List<Address>(),
+				Ads = new List<Advertising>()
 			};
 			client = new Client(payer);
 			var user = new User(client);
@@ -71,6 +72,17 @@ namespace Unit.Models
 			payer.JuridicalName = "ООО 'Хвосты и плетки'";
 			var act = new Act(DateTime.Now, invoice);
 			Assert.That(act.PayerName, Is.EqualTo("ООО 'Рога и копыта'"));
+		}
+
+		[Test]
+		public void After_build_act_update_ad_act_reference()
+		{
+			var ad = new Advertising(payer) {Cost = 1500};
+			payer.Ads.Add(ad);
+			invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var act = new Act(DateTime.Now, invoice);
+			Assert.That(ad.Act, Is.EqualTo(act));
+			Assert.That(act.Sum, Is.EqualTo(2300));
 		}
 	}
 }
