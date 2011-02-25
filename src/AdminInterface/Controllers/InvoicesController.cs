@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
+using System.IO;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -118,8 +119,10 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
 				.Cast<string>()
+#if !DEBUG
 				.Where(p => p.Contains("Бух"))
 				.OrderBy(p => p)
+#endif
 				.ToList();
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
@@ -192,12 +195,14 @@ namespace AdminInterface.Controllers
 			}
 */
 
-#if !DEBUG
-			var info = new System.Diagnostics.ProcessStartInfo(@"U:\Apps\Printer\Printer.exe",
+			var printerPath = @"U:\Apps\Printer\Printer.exe";
+#if DEBUG
+			printerPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\Printer.exe");
+#endif
+			var info = new System.Diagnostics.ProcessStartInfo(printerPath,
 				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId));
 			var process = System.Diagnostics.Process.Start(info);
 			process.WaitForExit(30*1000);
-#endif
 
 			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
 			RedirectToAction("Index",
