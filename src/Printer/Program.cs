@@ -68,7 +68,7 @@ namespace Printer
 									}
 
 									new AdminInterface.Helpers.Printer().PrintView(brail,
-										"Views/Invoices/Print",
+										"Invoices/Print",
 										"Print",
 										new Dictionary<string, object>{ { "invoice", invoice } });
 								}
@@ -85,7 +85,7 @@ namespace Printer
 							{
 								var act = Act.Find(Convert.ToUInt32(id.Trim()));
 								new AdminInterface.Helpers.Printer().PrintView(brail,
-									"Views/Acts/Print",
+									"Acts/Print",
 									"Print",
 									new Dictionary<string, object> { { "act", act } });
 							}

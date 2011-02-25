@@ -30,8 +30,10 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
 				.Cast<string>()
+#if !DEBUG
 				.Where(p => p.Contains("Бух"))
 				.OrderBy(p => p)
+#endif
 				.ToList();
 		}
 
