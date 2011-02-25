@@ -59,7 +59,7 @@ OutputSubView("Search")
 					${WriteHeader("Сумма платежа", "PaySum")}
 				</th>
 				<th style="width: 190px;">
-					${WriteHeader("Дата платежа", "PayDate")}
+					${WriteHeader("Баланс", "Balance")}
 				</th>				
 				<th>
 					${WriteHeader("Дата регистрации", "LastClientRegistrationDate")}
@@ -85,6 +85,7 @@ OutputSubView("Search")
 			</tr>
 			<% 
 			i = 0
+			paymentStyle = ""
 			for searchResult in searchResults:
 
 				if searchResult.IsDisabled:
@@ -114,10 +115,9 @@ OutputSubView("Search")
 					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}">
 				</td>
 				<td>
-					<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PayDate" value="${searchResult.PayDate.ToShortDateString()}">
-					<input type="button" class="CalendarInput" />
+					${searchResult.Balance.ToString("0.#")}
 					<% if not searchResult.ShowPayDate: %>
-					Счет выставляется автоматически
+					<br>Счет выставляется автоматически
 					<% end %>
 				</td>
 				<td style="width: 1%">

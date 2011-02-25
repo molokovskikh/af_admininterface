@@ -23,7 +23,7 @@ namespace AdminInterface.Models
 		public double PaySum { get; set; }
 
 		[Property]
-		public DateTime PayDate { get; set; }
+		public decimal Balance {get; set; }
 
 		[Property]
 		public DateTime LastClientRegistrationDate { get; set; }
@@ -57,7 +57,7 @@ namespace AdminInterface.Models
 
 		public bool IsDebitor()
 		{
-			return DateTime.Now - PayDate > TimeSpan.FromDays(1);
+			return Balance < 0;
 		}
 
 		public bool IsDisabled
@@ -109,12 +109,12 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 				switch (properties.PayerState)
 				{
 					case PayerStateFilter.Debitors:
-						debitorFilterBlock = "and p.oldpaydate <= curDate()";
+						debitorFilterBlock = "and p.Balance < 0";
 						break;
 					case PayerStateFilter.NotDebitors:
-						debitorFilterBlock = "and p.oldpaydate > curDate()";
+						debitorFilterBlock = "and p.oldpaydate >= 0";
 						break;
-				}				
+				}
 
 				switch(properties.Segment)
 				{
@@ -162,7 +162,7 @@ or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + prop
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
 		p.shortname as {{BillingSearchItem.ShortName}},
-		p.oldpaydate as {{BillingSearchItem.PayDate}},
+		p.Balance as {{BillingSearchItem.Balance}},
 		p.oldtariff as {{BillingSearchItem.PaySum}},
 		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
 		count(distinct if(cd.Status = 1, cd.Id, null)) as {{BillingSearchItem.EnabledClientCount}},
