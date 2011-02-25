@@ -113,6 +113,9 @@
     <EmbeddedResource Include="..\AdminInterface\Views\Layouts\Print.brail">
       <Link>Views\Layouts\Print.brail</Link>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\AdminInterface\Views\SubViews\MailAddressSubView.brail">
+      <Link>Views\SubViews\MailAddressSubView.brail</Link>
+    </EmbeddedResource>
     <None Include="App.config" />
     <None Include="App.release.config" />
   </ItemGroup>

@@ -63,12 +63,10 @@ namespace AdminInterface.Controllers
 #if DEBUG
 				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\");
 #endif
-#if !DEBUG
 				var info = new ProcessStartInfo(Path.Combine(path, "Printer.exe"),
 					String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id.ToString())));
 				var process = System.Diagnostics.Process.Start(info);
 				process.WaitForExit(30*1000);
-#endif
 				Flash["message"] = "Отправлено на печать";
 				RedirectToReferrer();
 			}

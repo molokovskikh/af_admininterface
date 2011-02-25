@@ -11,6 +11,12 @@ namespace AdminInterface.Models.Billing
 		public Advertising()
 		{}
 
+		public Advertising(Payer payer, decimal cost)
+		{
+			Payer = payer;
+			Cost = cost;
+		}
+
 		public Advertising(Payer payer)
 		{
 			Payer = payer;

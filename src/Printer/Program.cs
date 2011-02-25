@@ -70,7 +70,10 @@ namespace Printer
 									new AdminInterface.Helpers.Printer().PrintView(brail,
 										"Invoices/Print",
 										"Print",
-										new Dictionary<string, object>{ { "invoice", invoice } });
+										new Dictionary<string, object> {
+											{ "invoice", invoice },
+											{ "doc", invoice }
+										});
 								}
 							}
 						}
@@ -87,7 +90,10 @@ namespace Printer
 								new AdminInterface.Helpers.Printer().PrintView(brail,
 									"Acts/Print",
 									"Print",
-									new Dictionary<string, object> { { "act", act } });
+									new Dictionary<string, object> {
+										{ "act", act },
+										{ "doc", act }
+									});
 							}
 						}
 					}
