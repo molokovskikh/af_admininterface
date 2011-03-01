@@ -47,7 +47,7 @@
 		var searchText = jQuery("#SearchBuymatrixText").val();
 		jQuery.ajax({
 			url: "${siteroot}/Client/SearchAssortmentPrices",
-			data: ({test: searchText}),
+			data: {"text": searchText},
 			cache: false,
 			success: function (data) {
 				if (data.length == 0) {

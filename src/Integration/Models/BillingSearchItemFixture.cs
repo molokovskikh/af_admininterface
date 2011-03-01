@@ -2,28 +2,22 @@ using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class BillingSearchItemFixture
+	public class BillingSearchItemFixture : IntegrationFixture
 	{
 		[Test]
 		public void Search_payer()
 		{
-			Payer payer;
-			Recipient recipient;
-			using (new SessionScope())
-			{
-				var client = DataMother.TestClient();
-				payer = client.Payers.First();
-				recipient = Recipient.Queryable.First();
-				payer.Recipient = recipient;
-				payer.Save();
-			}
+			var client = DataMother.TestClient();
+			var payer = client.Payers.First();
+			var recipient = Recipient.Queryable.First();
+			payer.Recipient = recipient;
+			payer.SaveAndFlush();
 
 			var items = BillingSearchItem.FindBy(new BillingSearchProperties{
 				SearchBy = SearchBy.BillingCode,
@@ -44,6 +38,12 @@ namespace Integration.Models
 				RecipientId = Recipient.Queryable.First().Id
 			});
 			Assert.That(items.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Check_for_detached_entity()
+		{
+			
 		}
 	}
 }

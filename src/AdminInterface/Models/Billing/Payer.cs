@@ -330,6 +330,16 @@ ORDER BY {Payer}.shortname;";
 			return contacts;
 		}
 
+		public virtual void RecalculateBalance()
+		{
+			var invoices = Invoice.Queryable.Where(i => i.Payer == this).ToList();
+			var payments = Payment.Queryable.Where(p => p.Payer == this).ToList();
+			Balance = 0;
+			Balance += BeginBalance;
+			Balance += payments.Sum(p => p.Sum);
+			Balance -= invoices.Sum(i => i.Sum);
+		}
+
 		private void UpdateBalance()
 		{
 			if (this.IsChanged(p => p.BeginBalance))

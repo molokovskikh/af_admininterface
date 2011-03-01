@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.ActiveRecord.Framework.Internal;
 using Castle.Components.Validator;
 using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
@@ -47,11 +48,18 @@ namespace AddUser
 			{
 				XmlConfigurator.Configure();
 				GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
-				ActiveRecordStarter.Initialize(new[] {
-					Assembly.Load("AdminInterface"),
-					Assembly.Load("Common.Web.Ui")
-				},
-					ActiveRecordSectionHandler.Instance);
+
+				var types = Assembly.GetExecutingAssembly().GetTypes()
+					.Where(t => t.Namespace != null && t.Namespace.EndsWith(".Initializers"));
+
+				foreach (var type in types)
+				{
+					if (type.GetMethod("Initialize") == null)
+						continue;
+
+					var initializer = (dynamic)Activator.CreateInstance(type);
+					initializer.Initialize(ActiveRecordSectionHandler.Instance);
+				}
 
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 

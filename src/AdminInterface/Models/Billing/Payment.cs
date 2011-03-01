@@ -133,7 +133,7 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord("Payments", Schema = "Billing")]
-	public class Payment : ActiveRecordLinqBase<Payment>
+	public class Payment : BalanceUpdater<Payment>
 	{
 		public Payment(Payer payer, DateTime payedOn, decimal sum) : this(payer)
 		{
@@ -142,12 +142,14 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Payment(Payer payer)
+			: this()
 		{
 			Payer = payer;
 			Recipient = payer.Recipient;
 		}
 
 		public Payment()
+			: base(BalanceUpdaterType.Payment)
 		{
 			UpdatePayerInn = true;
 		}
@@ -161,7 +163,7 @@ namespace AdminInterface.Models.Billing
 		public DateTime PayedOn { get; set; }
 
 		[Property, ValidateGreaterThanZero]
-		public decimal Sum { get; set; }
+		public override decimal Sum { get; set; }
 
 		[Property]
 		public string Comment { get; set; }
@@ -184,7 +186,7 @@ namespace AdminInterface.Models.Billing
 		//все что выше получается из выписки
 		//дата занесения платежа
 		[BelongsTo(Column = "PayerId", Cascade = CascadeEnum.SaveUpdate)]
-		public Payer Payer { get; set; }
+		public override Payer Payer { get; set; }
 
 		[BelongsTo(Column = "RecipientId")]
 		public Recipient Recipient { get; set; }
@@ -499,7 +501,6 @@ namespace AdminInterface.Models.Billing
 			if (Payer != null)
 				Payer.Balance -= Sum;
 
-			Payer.Update();
 			Delete();
 		}
 
@@ -509,10 +510,10 @@ namespace AdminInterface.Models.Billing
 			base.OnUpdate();
 		}
 
-		protected override bool BeforeSave(IDictionary state)
+		protected override void OnSave()
 		{
 			UpdateAd();
-			return base.BeforeSave(state);
+			base.OnSave();
 		}
 
 		private void UpdateAd()
@@ -540,22 +541,6 @@ namespace AdminInterface.Models.Billing
 		public void DoUpdate()
 		{
 			UpdateInn();
-
-			var oldPayer = this.OldValue(p => p.Payer);
-			var oldSum = this.OldValue(p => p.Sum);
-			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.Sum))
-			{
-				if (oldPayer != null)
-				{
-					oldPayer.Balance -= oldSum;
-					oldPayer.Save();
-				}
-				if (Payer != null)
-				{
-					Payer.Balance += Sum;
-					Payer.Update();
-				}
-			}
 		}
 
 		public void UpdateInn()

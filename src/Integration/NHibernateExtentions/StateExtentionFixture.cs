@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Integration.NHibernateExtentions
 {
 	[TestFixture]
-	public class IsChangedFixture
+	public class StateExtentionFixture
 	{
 		[Test]
 		public void If_property_changed_should_be_true()

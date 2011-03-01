@@ -1865,6 +1865,21 @@
             </code>
             </example>
         </member>
+        <member name="F:Castle.ActiveRecord.PropertyAccess.FieldPascalcaseUnderscore">
+            <summary>
+            Use the field that is the backing store for this property to get/set the value of this property.
+            The field is using the same name as the property, in pascal case and with an initial m underscore.
+            _Name for the property Name.
+            </summary>
+            <example>
+            <code>
+            string _UserName;//this will be use to get or set the value
+            
+            [Property(Access=PropertyAccess.FieldPascalcaseMUnderscore)]
+            public string UserName { get {... } set { ... } }
+            </code>
+            </example>
+        </member>
         <member name="F:Castle.ActiveRecord.PropertyAccess.FieldPascalcaseMUnderscore">
             <summary>
             Use the field that is the backing store for this property to get/set the value of this property.
@@ -6432,7 +6447,7 @@
         </member>
         <member name="M:Castle.ActiveRecord.Framework.Internal.AbstractDepthFirstVisitor.VisitDependentObject(Castle.ActiveRecord.Framework.Internal.DependentObjectModel)">
             <summary>
-            Visits the Dependent Object à
+            Visits the Dependent Object а
             </summary>
             <param name="model">The model</param>
         </member>

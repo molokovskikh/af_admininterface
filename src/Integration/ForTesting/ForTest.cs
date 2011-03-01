@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Reflection;
-using AdminInterface.Models;
+﻿using AdminInterface.Initializers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using log4net.Config;
@@ -14,10 +11,7 @@ namespace Integration.ForTesting
 		{
 			XmlConfigurator.Configure();
 			if (!ActiveRecordStarter.IsInitialized)
-				ActiveRecordStarter.Initialize(new[] {
-					Assembly.Load("AdminInterface"),
-					Assembly.Load("Common.Web.Ui"),
-				}, ActiveRecordSectionHandler.Instance);
+				new ActiveRecord().Initialize(ActiveRecordSectionHandler.Instance);
 		}
 	}
 }

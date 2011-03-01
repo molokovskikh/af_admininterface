@@ -58,7 +58,10 @@
     <Reference Include="Castle.MonoRail.Views.Brail">
       <HintPath>..\..\lib\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
-    <Reference Include="ExcelLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="ExcelLibrary, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\ExcelLibrary\ExcelLibrary.dll</HintPath>
+    </Reference>
     <Reference Include="ExposedObject">
       <HintPath>..\..\lib\ExposedObject.dll</HintPath>
     </Reference>
@@ -137,7 +140,7 @@
     <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
-    <Compile Include="NHibernateExtentions\IsChangedFixture.cs" />
+    <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="SetupFixture.cs" />
   </ItemGroup>

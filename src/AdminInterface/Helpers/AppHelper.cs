@@ -13,6 +13,7 @@ using Castle.ActiveRecord.Framework.Internal;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Helpers;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 
@@ -252,7 +253,7 @@ namespace AdminInterface.Helpers
 
 				input = Select(name, selectedValue, values);
 			}
-			else if (valueType.IsGenericType && typeof(Nullable<>).IsAssignableFrom(valueType.GetGenericTypeDefinition()))
+			else if (valueType.IsNullable())
 			{
 				var arguments = valueType.GetGenericArguments();
 				if (arguments[0].IsEnum)

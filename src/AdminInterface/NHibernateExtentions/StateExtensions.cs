@@ -29,11 +29,11 @@ namespace AdminInterface.NHibernateExtentions
 
 		//activeRecord может быть как proxy так и уже загруженным объектом
 		//по этому нужно получать EntityEntry по id объекта
-		private static EntityEntry GetEntry<TActiveRecord>(this ISession s, TActiveRecord activeRecord)
+		private static EntityEntry GetEntry(this ISession s, object activeRecord)
 		{
 			var context = s.GetSessionImplementation().PersistenceContext;
 
-			EntityEntry entry = null;
+			EntityEntry entry;
 			var proxy = activeRecord as INHibernateProxy;
 			if (proxy != null)
 			{
@@ -48,13 +48,6 @@ namespace AdminInterface.NHibernateExtentions
 				entry = context.GetEntry(activeRecord);
 			}
 
-			if (entry == null)
-			{
-				throw new TransientObjectException(
-					"object references an unsaved transient instance - save the transient instance before flushing: "
-					+ activeRecord.GetType().FullName);
-			}
-
 			return entry;
 		}
 
@@ -63,6 +56,11 @@ namespace AdminInterface.NHibernateExtentions
 			var property = GetProperty(expression);
 			return ArHelper.WithSession(s => {
 				var entry = s.GetEntry(activeRecord);
+				if (entry == null)
+					throw new Exception(String.Format(
+						"Не могу получить значение свойства загруженного из базы т.к. сесия в которой был загружен объект {0} уже закрыта",
+						activeRecord));
+
 				var index = entry.Persister.PropertyNames.IndexOf(n => n.Equals(property, StringComparison.OrdinalIgnoreCase));
 				if (entry.LoadedState == null)
 					return default(TResult);

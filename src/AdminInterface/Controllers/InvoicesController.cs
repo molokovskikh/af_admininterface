@@ -131,7 +131,7 @@ namespace AdminInterface.Controllers
 		public void Cancel(uint id)
 		{
 			var invoice = Invoice.Find(id);
-			invoice.Cancel();
+			invoice.Delete();
 			Flash["Message"] = "Сохранено";
 			RedirectToReferrer();
 		}

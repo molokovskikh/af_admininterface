@@ -172,12 +172,14 @@
     <Compile Include="Helpers\Wav\Structs.cs" />
     <Compile Include="Helpers\Wav\WaveFileReader.cs" />
     <Compile Include="Helpers\Wav\WavHelper.cs" />
+    <Compile Include="Initializers\ActiveRecord.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\Act.cs" />
     <Compile Include="Models\Billing\Advertising.cs" />
+    <Compile Include="Models\Billing\BalanceUpdater.cs" />
     <Compile Include="Models\Billing\Exporter.cs" />
     <Compile Include="Models\Billing\Invoice.cs" />
     <Compile Include="Models\Billing\InvoicePart.cs" />

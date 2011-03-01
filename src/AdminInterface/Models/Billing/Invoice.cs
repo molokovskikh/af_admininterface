@@ -4,14 +4,13 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "billing")]
-	public class Invoice : ActiveRecordLinqBase<Invoice>
+	public class Invoice : BalanceUpdater<Invoice>
 	{
 		private static Dictionary<Period, Period[]> quaterMap = new Dictionary<Period, Period[]> {
 			{ Period.FirstQuarter, new[] { Period.January, Period.February, Period.March } },
@@ -21,6 +20,7 @@ namespace AdminInterface.Models.Billing
 		};
 
 		public Invoice()
+			: base(BalanceUpdaterType.ChargeOff)
 		{}
 
 		public Invoice(Advertising ad)
@@ -42,6 +42,7 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Invoice(Payer payer)
+			: this()
 		{
 			Parts = new List<InvoicePart>();
 			Date = DateTime.Now;
@@ -92,10 +93,10 @@ namespace AdminInterface.Models.Billing
 		public Recipient Recipient { get; set; }
 
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
-		public Payer Payer { get; set; }
+		public override Payer Payer { get; set; }
 
 		[Property]
-		public decimal Sum { get; set; }
+		public override decimal Sum { get; set; }
 
 		[Property]
 		public string PayerName { get; set; }
@@ -161,7 +162,6 @@ namespace AdminInterface.Models.Billing
 				mailer.Invoice(this);
 				mailer.Send();
 			}
-			Payer.Balance -= Sum;
 		}
 
 		public static InvoicePeriod GetInvoicePeriod(Period period)
@@ -172,13 +172,6 @@ namespace AdminInterface.Models.Billing
 				period == Period.FourthQuarter)
 				return InvoicePeriod.Quarter;
 			return InvoicePeriod.Month;
-		}
-
-		public void Cancel()
-		{
-			Payer.Balance += Sum;
-
-			Delete();
 		}
 
 		public void Send()
