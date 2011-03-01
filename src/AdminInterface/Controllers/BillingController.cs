@@ -394,8 +394,7 @@ namespace AdminInterface.Controllers
 			var pager = new Pager(currentPage, pageSize, rowsCount.HasValue);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 			{
-				var unaccountedItems = Models.Billing.Accounting.GetReadyForAccounting(pager);
-				PropertyBag["unaccountedItems"] = unaccountedItems;
+				PropertyBag["unaccountedItems"] = Models.Billing.Accounting.GetReadyForAccounting(pager);
 			}
 			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 			{

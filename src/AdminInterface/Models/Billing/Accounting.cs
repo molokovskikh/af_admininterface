@@ -15,6 +15,9 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Accounting", Schema = "Billing", Lazy = true)]
 	public class AccountingItem : ActiveRecordLinqBase<AccountingItem>
 	{
+		private User _user;
+		private Address _address;
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
@@ -39,12 +42,26 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public virtual User User 
+		public virtual Payer Payer
+		{
+			get
+			{
+				if (User != null)
+					return User.Payer;
+				return Address.Payer;
+			}
+		}
+
+		public virtual User User
 		{
 			get
 			{
 				if (Type.Equals(AccountingItemType.User))
-					return User.Queryable.First(u => u.Accounting.Id == Id);
+				{
+					if (_user == null)
+						_user = User.Queryable.First(u => u.Accounting.Id == Id);
+					return _user;
+				}
 				return null;
 			}
 		}
@@ -54,8 +71,22 @@ namespace AdminInterface.Models.Billing
 			get
 			{
 				if (Type.Equals(AccountingItemType.Address))
-					return Address.Queryable.First(a => a.Accounting.Id == Id);
+				{
+					if (_address == null)
+						_address = Address.Queryable.First(a => a.Accounting.Id == Id);
+					return _address;
+				}
 				return null;
+			}
+		}
+
+		public virtual string AccountingName
+		{
+			get
+			{
+				if (User != null)
+					return User.GetLoginOrName();
+				return Address.Value;
 			}
 		}
 
@@ -298,18 +329,18 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 			get
 			{
 				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Name;
+					return ((UserAccounting) this).User.GetLoginOrName();
 				return ((AddressAccounting) this).Address.Value;
 			}
 		}
 
-		public virtual string PayerName
+		public virtual Payer Payer
 		{
 			get
 			{
 				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Payer.Name;
-				return ((AddressAccounting) this).Address.Payer.Name;
+					return ((UserAccounting) this).User.Payer;
+				return ((AddressAccounting) this).Address.Payer;
 			}
 		}
 

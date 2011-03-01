@@ -78,41 +78,26 @@
 	<thead>
 		<th>Дата учета</th>
 		<th>Договор</th>
-		<th>Регион</th>
 		<th>Плательщик</th>
 		<th>Клиент</th>
+		<th>Регион</th>
 		<th>Объект</th>
 		<th>Имя</th>
 		<th>Оператор</th>
 	</thead>
 	<tbody class="HighLightCurrentRow">
 <% for i,item in enumerate(accountingHistoryItems): %>
-    <tr class="${ViewHelper.GetRowStyle(i)}">
-
-        <td>${item.WriteTime}</td>
-<%      if (item.Type.Equals(AdminInterface.Models.Billing.AccountingItemType.Address)):
-            payerId = item.Address.Client.Payer.Id %>
-
-            <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
-			<td>${item.Client.HomeRegion.Name}</td>
-            <td>${item.Address.Client.Payer.ShortName}</td>
-			<td>${item.Client.Name}</td>
-            <td>${BindingHelper.GetDescription(item.Type)}</td>
-            <td>${item.Address.Value}</td>
-            
-<%      elif (item.Type.Equals(AdminInterface.Models.Billing.AccountingItemType.User)):
-            payerId = item.User.Client.Payer.Id %>
-            
-            <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${payerId}">${payerId}</a></td>
-			<td>${item.Client.HomeRegion.Name}</td>
-            <td>${item.User.Client.Payer.ShortName}</td>
-			<td>${item.Client.Name}</td>
-            <td>${BindingHelper.GetDescription(item.Type)}</td>
-            <td>${item.User.GetLoginWithName()}</td>
-<%		break unless i < pageSize %>
-<%      end %>
-        <td>${ViewHelper.GetHumanReadableOperatorName(item.Operator)}</td>
-    </tr>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>${item.WriteTime}</td>
+		<td>${item.Payer.Id}</td>
+		<td>${app.LinkTo(item.Payer)}</td>
+		<td>${app.LinkTo(item.Client)}</td>
+		<td>${item.Client.HomeRegion.Name}</td>
+		<td>${BindingHelper.GetDescription(item.Type)}</td>
+		<td>${item.AccountingName}</td>
+		<td>${ViewHelper.GetHumanReadableOperatorName(item.Operator)}</td>
+		<% break unless i < pageSize %>
+	</tr>
 <% end %>
 	</tbody>
 	<tr>

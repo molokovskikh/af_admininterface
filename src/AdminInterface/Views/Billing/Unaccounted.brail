@@ -11,8 +11,8 @@
 	<tbody class="HighLightCurrentRow">
 <% for i,item in enumerate(unaccountedItems): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${item.PayerId}">${item.PayerId}</a></td>
-		<td>${item.PayerName}</td>
+		<td>${item.Payer.Id}</td>
+		<td>${app.LinkTo(item.Payer)}</td>
 		<td>${item.Type}</td>
 		<td>${item.Name}</td>
 	</tr>
