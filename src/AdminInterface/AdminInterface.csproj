@@ -317,13 +317,6 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="report.aspx.cs">
-      <DependentUpon>report.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="report.aspx.designer.cs">
-      <DependentUpon>report.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Rescue\NotAllowed.aspx.cs">
       <DependentUpon>NotAllowed.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -384,7 +377,6 @@
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
-    <Content Include="report.aspx" />
     <Content Include="statcont.aspx" />
     <Content Include="ViewAdministrators.aspx" />
   </ItemGroup>
@@ -400,6 +392,7 @@
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
     <None Include="Views\Mail\RevisionAct.brail" />
+    <None Include="Views\Main\Report.brail" />
     <None Include="Views\Payers\Ad.brail" />
     <None Include="Views\Payers\BalanceSummary.brail" />
     <None Include="Views\Payers\Invoices.brail" />

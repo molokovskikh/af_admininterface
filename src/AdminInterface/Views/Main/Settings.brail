@@ -6,27 +6,32 @@
 
 <h3>Настройки по умолчанию</h3>
 
-<form method=post action=UpdateSettings>
+<form method=post>
 	<input type=hidden value=${defaults.Id} name="defaults.Id" />
-	<fieldset style="width:400px">
+	<fieldset style="width:600px">
 		<legend>Для аптеки</legend>
-		<label>Версия AnalitF</label>
+		<label>Версия AnalitF:</label>
 		<input name="defaults.AnalitFVersion" value="${defaults.AnalitFVersion}" />
 	</fieldset>
-	<fieldset style="width:400px">
-		<legend>Для поставщика</legend>
-		<label>Формат заказа</label>
+	<fieldset style="width:600px">
+		<legend>Для поставщика:</legend>
+		<label>Формат заказа:</label>
 		<select name="defaults.Formater.Id">
 			<% for formater in formaters: %>
 			<option value=${formater.Id} ${"selected" if formater.Id == defaults.Formater.Id}>${formater.ClassName}</option>
 			<% end %>
 		</select>
-		<label>Отправщик</label>
+		<br>
+		<label>Отправщик:</label>
 		<select name="defaults.Formater.Id">
 			<% for sender in senders: %>
 			<option value=${sender.Id} ${"selected" if sender.Id == defaults.Sender.Id}>${sender.ClassName}</option>
 			<% end %>
 		</select>
+		<p>
+			<label>Подпись к письмам:</label><br>
+			<textarea  name="defaults.EmailFooter" cols=50 rows=10>!{defaults.EmailFooter}</textarea>
+		</p>
 	</fieldset>
 	<input type=submit value="Сохранить" />
 </form>

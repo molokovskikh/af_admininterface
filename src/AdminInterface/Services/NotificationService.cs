@@ -21,9 +21,7 @@ namespace AdminInterface.Services
 
 Адрес доставки накладных: {4}@waybills.analit.net
 Адрес доставки отказов: {4}@refused.analit.net
-
-С уважением, Аналитическая компания 'Инфорум', г. Воронеж
-".Replace('\'', '\"') + Settings.Default.InforoomContactPhones;
+".Replace('\'', '\"');
 
 		private readonly string _messageTemplateForSupplierAfterAddressRegistration =
 @"Добрый день.
@@ -33,27 +31,26 @@ namespace AdminInterface.Services
 
 Адрес доставки накладных: {4}@waybills.analit.net
 Адрес доставки отказов: {4}@refused.analit.net
-
-С уважением, Аналитическая компания 'Инфорум', г. Воронеж
-".Replace('\'', '\"') + Settings.Default.InforoomContactPhones;
+".Replace('\'', '\"');
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
 			if (!address.Client.ShouldSendNotification())
 				return;
 
+			var defaults = DefaultValues.Get();
 			var client = address.Client;
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",
 					"Аналитическая Компания Инфорум",
 					"Новый адрес доставки в системе \"АналитФАРМАЦИЯ\"",
-					String.Format(_messageTemplateForSupplierAfterAddressRegistration,
+					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAfterAddressRegistration,
 						client.FullName,
 						client.Name,
 						client.HomeRegion.Name,
 						address.Value,
-						address.Id),
+						address.Id)),
 					email,
 					"",
 					null);
@@ -69,17 +66,18 @@ namespace AdminInterface.Services
 			if (!client.ShouldSendNotification())
 				return;
 
+			var defaults = DefaultValues.Get();
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",
 					"Аналитическая Компания Инфорум",
 					"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-					String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
+					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
 						client.FullName,
 						client.Name,
 						client.Addresses.First().Value,
 						client.HomeRegion.Name,
-						client.Addresses.First().Id),
+						client.Addresses.First().Id)),
 					email,
 					"",
 					null);

@@ -151,41 +151,33 @@ namespace AdminInterface.Controllers
 			newUser.UpdateContacts(userContacts);
 
 			Mailer.ClientRegistred(newClient, false);
-			Session["DogN"] = newClient.Payers.Single().Id;
-			Session["Code"] = newClient.Id;
-			Session["Name"] = newClient.FullName;
-			Session["ShortName"] = newClient.Name;
-			Session["Login"] = newUser.Login;
-			Session["Password"] = password;
-			Session["Tariff"] = newClient.Type.GetDescription();
-			Session["Register"] = true;
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)
 				log = SendRegistrationCard(log, newClient, newUser, password, additionalEmailsForSendingCard);
 			log.Save();
 
-			var sendBillingNotificationNow = true;
-			string redirectTo;
-			if (additionalSettings.FillBillingInfo)
-			{
-				sendBillingNotificationNow = false;
-				redirectTo = String.Format("/Register/RegisterPayer.rails?id={0}&clientCode={2}&showRegistrationCard={1}",
-					newClient.Payers.Single().Id,
-					additionalSettings.ShowRegistrationCard,
-					newClient.Id);
-			}
-			else if (additionalSettings.ShowRegistrationCard)
-				redirectTo = "/report.aspx";
-			else
-				redirectTo = String.Format("/Client/{0}", newClient.Id);
-			redirectTo = LinkHelper.GetVirtualDir(Context) + redirectTo;
-
-			if (sendBillingNotificationNow)
+			if (!additionalSettings.FillBillingInfo)
 				this.Mail().NotifyBillingAboutClientRegistration(newClient);
 
-			Flash["Message"] = Message.Notify("Регистрация завершена успешно");
-			RedirectToUrl(redirectTo);
+			if (additionalSettings.FillBillingInfo)
+			{
+				Session["password"] = password;
+				Redirect("Register", "RegisterPayer", new {
+					id = newClient.Payers.Single().Id,
+					showRegistrationCard = additionalSettings.ShowRegistrationCard
+				});
+			}
+			else if (newClient.Users.Count > 0 && additionalSettings.ShowRegistrationCard)
+			{
+				Flash["password"] = password;
+				Redirect("main", "report", new{id = newClient.Users.First().Id});
+			}
+			else
+			{
+				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
+				RedirectToUrl(LinkHelper.GetVirtualDir(Context)+  String.Format("/Client/{0}", newClient.Id));
+			}
 		}
 
 		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, Client client, User user, string password, string additionalEmails)
@@ -391,7 +383,7 @@ WHERE   intersection.pricecode IS NULL
 			owner.Save();
 		}
 
-		public void RegisterPayer(uint id, uint clientCode, bool showRegistrationCard)
+		public void RegisterPayer(uint id, bool showRegistrationCard)
 		{
 			var payer = Payer.TryFind(id);
 			if (payer == null)
@@ -407,7 +399,6 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["payer"] = payer;
 			PropertyBag["JuridicalOrganization"] = payer.JuridicalOrganizations.First();
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
-			PropertyBag["clientCode"] = clientCode;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
 			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
@@ -415,10 +406,8 @@ WHERE   intersection.pricecode IS NULL
 		public void Registered([ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
 			[DataBind("JuridicalOrganization")] LegalEntity juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
-			uint clientCode,
 			bool showRegistrationCard)
 		{
-			Client client;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				payer.ContactGroupOwner = new ContactGroupOwner();
@@ -437,25 +426,16 @@ WHERE   intersection.pricecode IS NULL
 				juridicalOrganization.Payer = payer;
 				juridicalOrganization.Save();
 
-				client = Client.TryFind(clientCode);
-				if (client != null)
-				{
-					if (client.Addresses.Count > 0)
-					{
-						client.Addresses[0].LegalEntity = juridicalOrganization;
-						client.Addresses[0].UpdateAndFlush();
-					}
-				}
-
 				scope.VoteCommit();
 			}
 
+			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
 				this.Mail().NotifyBillingAboutClientRegistration(client);
 
 			string redirectUrl;
-			if (showRegistrationCard)
-				redirectUrl = "~/report.aspx";
+			if (showRegistrationCard && client != null && client.Users.Count > 0)
+				redirectUrl = String.Format("~/main/report?id={0}", client.Users.First());
 			else if (client != null)
 				redirectUrl = String.Format("~/Client/{0}", client.Id);
 			else

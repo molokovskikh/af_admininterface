@@ -106,7 +106,6 @@ end
 
 <form id="PayerInfo" action="registered.rails" method="post">
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
-	<input type="hidden" name="clientCode" value="${clientCode}" />
 	${FormHelper.HiddenField("Instance.PayerID")}
 
 <table>

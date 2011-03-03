@@ -22,6 +22,9 @@ namespace AdminInterface.Models
 		[Property]
 		public uint AnalitFVersion { get; set; }
 
+		[Property]
+		public string EmailFooter { get; set; }
+
 		[BelongsTo("FormaterId")]
 		public OrderHandler Formater { get; set; }
 
@@ -31,6 +34,11 @@ namespace AdminInterface.Models
 		public static DefaultValues Get()
 		{
 			return FindAll().First();
+		}
+
+		public string AppendFooter(string format)
+		{
+			throw new NotImplementedException();
 		}
 	}
 

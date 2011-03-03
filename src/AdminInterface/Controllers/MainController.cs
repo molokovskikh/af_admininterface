@@ -15,6 +15,7 @@ using System.Linq;
 namespace AdminInterface.Controllers
 {
 	[
+		Helper(typeof(BindingHelper)),
 		Layout("GeneralWithJQueryOnly"),
 		Secure
 	]
@@ -205,17 +206,28 @@ WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateP
 		[RequiredPermission(PermissionType.EditSettings)]
 		public void Settings()
 		{
-			PropertyBag["Defaults"] = DefaultValues.Get();
-			PropertyBag["Formaters"] = OrderHandler.GetFormaters();
-			PropertyBag["Senders"] = OrderHandler.GetSenders();
+			var defaults = DefaultValues.Get();
+			if (IsPost)
+			{
+				BindObjectInstance(defaults, ParamStore.Form, "defaults", AutoLoadBehavior.Always);
+				Flash["Message"] = Message.Notify("Сохранено");
+				RedirectToReferrer();
+			}
+			else
+			{
+				PropertyBag["Defaults"] = defaults;
+				PropertyBag["Formaters"] = OrderHandler.GetFormaters();
+				PropertyBag["Senders"] = OrderHandler.GetSenders();
+			}
 		}
 
-		[AccessibleThrough(Verb.Post), RequiredPermission(PermissionType.EditSettings)]
-		public void UpdateSettings([ARDataBind("defaults", AutoLoad = AutoLoadBehavior.Always)] DefaultValues defauls)
+		public void Report(uint id, bool isPasswordChange)
 		{
-			defauls.Update();
-			Flash["Message"] = "Сохранено";
-			RedirectToReferrer();
+			CancelLayout();
+			PropertyBag["now"] = DateTime.Now;
+			PropertyBag["password"] = Session["Password"];
+			PropertyBag["user"] = User.Find(id);
+			PropertyBag["IsPasswordChange"] = isPasswordChange;
 		}
 	}
 }

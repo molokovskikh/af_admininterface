@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -120,8 +121,8 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				PrepareSessionForReport(user, password, true);
-				RedirectToUrl("../report.aspx");
+				Flash["password"] = password;
+				Redirect("main", "report", new {id = user.Id});
 			}
 		}
 
@@ -260,31 +261,13 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				PrepareSessionForReport(user, password, false);
-				var virtualDir = Context.UrlInfo.AppVirtualDir;
-				if (!virtualDir.StartsWith("/"))
-					virtualDir = "/" + virtualDir;
-				if (virtualDir.EndsWith("/"))
-					virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
-				RedirectToUrl(virtualDir + "/report.aspx");
+				Flash["password"] = password;
+				Redirect("main", "report", new {id = user.Id, isPasswordChange = true});
 			}
 		}
 
 		public void SuccessPasswordChanged()
 		{}
-
-		private void PrepareSessionForReport(User user, string password, bool isRegistration)
-		{
-			Session["Register"] = false;
-			Session["Code"] = user.Client.Id;
-			Session["DogN"] = user.Client.Payers.First().Id;
-			Session["Name"] = String.IsNullOrEmpty(user.Client.FullName) ? String.Empty : user.Client.FullName;
-			Session["ShortName"] = String.IsNullOrEmpty(user.Client.Name) ? String.Empty : user.Client.Name;
-			Session["Login"] = String.IsNullOrEmpty(user.Login) ? String.Empty : user.Login;
-			Session["Password"] = String.IsNullOrEmpty(password) ? String.Empty : password;
-			Session["Tariff"] = user.Client.Type.Description();
-			Session["IsRegistration"] = isRegistration;
-		}
 
 		public void Unlock(string login)
 		{

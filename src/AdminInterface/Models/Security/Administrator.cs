@@ -4,9 +4,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.DirectoryServices;
 using System.Web;
+using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 using NHibernate;
 using NHibernate.Criterion;
 

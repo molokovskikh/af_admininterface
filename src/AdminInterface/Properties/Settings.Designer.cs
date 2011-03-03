@@ -95,20 +95,10 @@ namespace AdminInterface.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://prg4.adc.analit.net:900/RemotePriceProcessorService")]
+        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://localhost:900/RemotePriceProcessorService")]
         public string WCFServiceUrl {
             get {
                 return ((string)(this["WCFServiceUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Москва +7 495 6628727\r\nС.-Петербург +7 812 3090521\r\nВоронеж +7 4732 606000\r\nЧеляб" +
-            "инск +7 351 7298143\r\nТюмень +7 3452 500319")]
-        public string InforoomContactPhones {
-            get {
-                return ((string)(this["InforoomContactPhones"]));
             }
         }
     }

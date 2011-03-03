@@ -63,6 +63,7 @@ namespace AdminInterface.Helpers
 			bool isRegistration,
 			params string[] mails)
 		{
+			var defaults = DefaultValues.Get();
 			string body;
 			var client = user.Client;
 			if (client.IsDrugstore())
@@ -83,7 +84,7 @@ namespace AdminInterface.Helpers
 			{
 				From = new MailAddress("tech@analit.net"),
 				Subject = "Регистрационная карта для работы в системе АналитФармация",
-				Body = body,
+				Body = defaults.AppendFooter(body),
 				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
 			})
 			{
