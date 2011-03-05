@@ -63,7 +63,9 @@ namespace Common.Web.Ui.Helpers
 
 		public static string GetDescription(PropertyInfo property)
 		{
-			var attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), false);
+			var attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), true);
+			if (attributes.Length == 0)
+				throw new Exception(String.Format("Свойство {0} не содержит DescriptionAttribute", property));
 			return ((DescriptionAttribute)attributes[0]).Description;
 		}
 	}

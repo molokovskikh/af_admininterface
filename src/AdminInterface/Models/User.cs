@@ -114,6 +114,9 @@ namespace AdminInterface.Models
 		[Property, Description("Регионы заказа"), Auditable]
 		public virtual ulong OrderRegionMask { get; set; }
 
+		[Property, Description("Проверять текущие цены и остатки пред отправкой заказов"), Auditable]
+		public virtual bool UseAdjustmentOrders { get; set; }
+
 		[Property(Column = "Free")]
 		public virtual bool IsFree { get; set; }
 

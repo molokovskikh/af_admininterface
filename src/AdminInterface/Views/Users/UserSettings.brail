@@ -30,6 +30,8 @@
 			<input type=checkbox name=user.SaveAFDataFiles ${"checked" if user.SaveAFDataFiles} value=true> Сохранять подготовленные данные<br>
 			<input type=hidden name=user.SaveAFDataFiles value=false>
 
+			${app.Edit("user.UseAdjustmentOrders")}<br>
+
 			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
 			<input type=hidden name=user.SubmitOrders value=false>
 			

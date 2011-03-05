@@ -37,8 +37,14 @@ namespace AdminInterface.Helpers
 			var helper = new FormHelper(Context);
 			var type = GetValueType(name);
 			if (type == typeof(string))
-			{
 				return helper.TextField(name);
+			if (type == typeof(bool))
+			{
+				var result = new StringBuilder();
+				result.Append(helper.CheckboxField(name));
+				result.Append(" ");
+				result.Append(GetLabel(name));
+				return result.ToString();
 			}
 			throw new Exception(String.Format("Не знаю как показать редактор для {0} с типом {1}", name, type));
 		}
@@ -381,28 +387,45 @@ namespace AdminInterface.Helpers
 
 		private string GetLabel(string name)
 		{
-			string label = "";
+			var label = GetBuiltinLabel(name);
+			if (label == null)
+			{
+				label = GetLabelFromDescription(name);
+			}
+			return label;
+		}
+
+		private string GetBuiltinLabel(string name)
+		{
 			if (name.EndsWith("Regions") || name.EndsWith("Region"))
 			{
-				label = "Выберите регион:";
+				return "Выберите регион:";
 			}
 			else if (name.EndsWith("Recipients") || name.EndsWith("Recipient"))
 			{
-				label = "Выберите получателя:";
+				return "Выберите получателя:";
 			}
 			else if (name.EndsWith("Addresses"))
 			{
-				label = "Выберите адрес:";
+				return "Выберите адрес:";
 			}
 			else if (name.EndsWith("Users"))
 			{
-				label = "Выберите пользователя:";
+				return "Выберите пользователя:";
 			}
 			else if (name.EndsWith("Period"))
 			{
-				label = "Выберите период:";
+				return "Выберите период:";
 			}
-			return label;
+			return null;
+		}
+
+		private string GetLabelFromDescription(string name)
+		{
+			var property = FindProperty(name);
+			if (property == null)
+				return null;
+			return BindingHelper.GetDescription(property);
 		}
 
 		public string BeginFormFor(object filter)
@@ -454,7 +477,7 @@ namespace AdminInterface.Helpers
 			var value = ControllerContext.PropertyBag[key];
 			if (value == null)
 				throw new Exception(String.Format("Can`t find {0} in property bag", key));
-			return value.GetType().GetProperty(property);
+			return NHibernateUtil.GetClass(value).GetProperty(property);
 		}
 
 		private dynamic GetValue(string name)
