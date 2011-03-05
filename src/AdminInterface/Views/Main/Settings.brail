@@ -32,6 +32,10 @@
 			<label>Подпись к письмам:</label><br>
 			<textarea  name="defaults.EmailFooter" cols=50 rows=10>!{defaults.EmailFooter}</textarea>
 		</p>
+		<p>
+			<label>Телефоны в регистрационной карте:</label><br>
+			<textarea  name="defaults.Phones" cols=50 rows=10>!{defaults.Phones}</textarea>
+		</p>
 	</fieldset>
 	<input type=submit value="Сохранить" />
 </form>

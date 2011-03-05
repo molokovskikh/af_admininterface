@@ -25,6 +25,9 @@ namespace AdminInterface.Models
 		[Property]
 		public string EmailFooter { get; set; }
 
+		[Property]
+		public string Phones { get; set; }
+
 		[BelongsTo("FormaterId")]
 		public OrderHandler Formater { get; set; }
 
@@ -36,9 +39,14 @@ namespace AdminInterface.Models
 			return FindAll().First();
 		}
 
-		public string AppendFooter(string format)
+		public IEnumerable<string> GetPhones()
 		{
-			throw new NotImplementedException();
+			return Phones.Split(new [] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
+		}
+
+		public string AppendFooter(string body)
+		{
+			return body + "\r\n\r\n" + EmailFooter;
 		}
 	}
 

@@ -115,11 +115,9 @@
 									<br />
 									Телефоны:
                                     <ul style="list-style-type:none;  margin:0 0 0 10px; ">
-										<li>Москва:+7 495 6628727</li>
-										<li>С.-Петербург: +7 812 3090521</li>
-										<li>Воронеж: +7 4732 606000</li>
-										<li>Челябинск: +7 351 7298143</li>
-										<li>Тюмень +7 3452 500319</li>
+										<% for phone in defaults.GetPhones(): %>
+											<li>!{phone}</li>
+										<% end %>
                                     </ul>
                                     e-mail: <a>tech@analit.net</a>
                                 </font>

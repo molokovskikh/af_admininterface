@@ -37,6 +37,12 @@ namespace AdminInterface.Helpers
   </DeviceInfo>";
 			Warning[] warnings;
 
+			var phones = DefaultValues.Get().Phones;
+			phones = "Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени\r\n"
+				+ "Телефоны:\r\n"
+				+ phones + "\r\n"
+				+ "e-mail: tech@analit.net";
+			
 			report.SetParameters(new List<ReportParameter> {
 				new ReportParameter("ClientCode", clientCode.ToString()),
 				new ReportParameter("BillingCode", billingCode.ToString()),
@@ -46,7 +52,8 @@ namespace AdminInterface.Helpers
 				new ReportParameter("ClientLogin", clientLogin),
 				new ReportParameter("ClientPassword", clientPassword),
 				new ReportParameter("OperationDate", operationDate.ToString()),
-				new ReportParameter("IsRegistration", isRegistration.ToString())
+				new ReportParameter("IsRegistration", isRegistration.ToString()),
+				new ReportParameter("Phones", phones)
 			});
 
 			var stream = new MemoryStream();

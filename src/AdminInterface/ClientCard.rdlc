@@ -1,6 +1,718 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Report xmlns="http://schemas.microsoft.com/sqlserver/reporting/2005/01/reportdefinition" xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner">
-  <InteractiveHeight>29.7cm</InteractiveHeight>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition">
+  <Body>
+    <ReportItems>
+      <Textbox Name="textbox1">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>="Регистрационная карта № " + Parameters!ClientCode.Value.ToString() + "/" + Parameters!ClientLogin.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox1</rd:DefaultName>
+        <Top>0.25cm</Top>
+        <Left>7.25cm</Left>
+        <Height>1cm</Height>
+        <Width>8cm</Width>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox2">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>="Договор № " + Parameters!BillingCode.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox2</rd:DefaultName>
+        <Top>1.25cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>1</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox3">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>[Изменение пароля по инициативе клиента]</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox3</rd:DefaultName>
+        <Top>2.25cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.5cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>2</ZIndex>
+        <Visibility>
+          <Hidden>=Parameters!IsRegistration.Value</Hidden>
+        </Visibility>
+        <DataElementOutput>NoOutput</DataElementOutput>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox4">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>="Дата операции: " + Parameters!OperationDate.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox4</rd:DefaultName>
+        <Top>1.75cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.5cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>3</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox8">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Учетные данные:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox8</rd:DefaultName>
+        <Top>3cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.63492cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>4</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox9">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Краткое наименование:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox9</rd:DefaultName>
+        <Top>4.5cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>6.75cm</Width>
+        <ZIndex>5</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox10">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Тип доступа:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox10</rd:DefaultName>
+        <Top>5.25cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>6.75cm</Width>
+        <ZIndex>6</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox11">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Имя для доступа к серверу(login):</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox11</rd:DefaultName>
+        <Top>6cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>6.75cm</Width>
+        <ZIndex>7</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox12">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Пароль:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox12</rd:DefaultName>
+        <Top>6.75cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>6.75cm</Width>
+        <ZIndex>8</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox13">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Служба поддержки пользователей:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Center</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox13</rd:DefaultName>
+        <Top>8cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>9</ZIndex>
+        <Style>
+          <TopBorder>
+            <Color>Black</Color>
+            <Style>Solid</Style>
+          </TopBorder>
+          <BottomBorder>
+            <Color>Black</Color>
+            <Style>Solid</Style>
+          </BottomBorder>
+          <LeftBorder>
+            <Color>Black</Color>
+            <Style>Solid</Style>
+          </LeftBorder>
+          <RightBorder>
+            <Color>Black</Color>
+            <Style>Solid</Style>
+          </RightBorder>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox14">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Полное наименование:</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style>
+              <TextAlign>Right</TextAlign>
+            </Style>
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox14</rd:DefaultName>
+        <Top>3.75cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.75cm</Height>
+        <Width>6.75cm</Width>
+        <ZIndex>10</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox15">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!Phones.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox15</rd:DefaultName>
+        <Top>8.75cm</Top>
+        <Left>0.5cm</Left>
+        <Height>2.5cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>11</ZIndex>
+        <Style>
+          <TopBorder>
+            <Style>None</Style>
+          </TopBorder>
+          <BottomBorder>
+            <Style>Solid</Style>
+          </BottomBorder>
+          <LeftBorder>
+            <Style>Solid</Style>
+          </LeftBorder>
+          <RightBorder>
+            <Style>Solid</Style>
+          </RightBorder>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox18">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Управление персональными настройками и изменение пароля осуществляется на сайте www.analit.net
+в разделе "Для зарегистрированных пользователей"</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox18</rd:DefaultName>
+        <Top>11.5cm</Top>
+        <Left>0.5cm</Left>
+        <Height>1cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>12</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox19">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Желательно, чтобы новый пароль: 
+
+	• Не совпадал с логином или не был логином, записанным в обратном порядке. 
+	• Не был одиночным английским словом или русским словом, набранным английскими буквами. 
+	• Не был тем же, что в предыдущем пункте, но с цифрой в конце. 
+	• Не был Вашим именем, кличкой Вашей собаки, номером Вашей машины. 
+	• Не был просто числом. 
+	• Хорошо бы изменять пароли не реже раза в месяц. 
+
+Обязательные требования к новому паролю: 
+
+	• Не должен содержать символов пробела и точки с запятой. 
+	• Не должен быть менее 8 (восьми) символов. 
+	• Не должен содержать только цифры. 
+	• Использование русских букв недопустимо.</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox19</rd:DefaultName>
+        <Top>13.25cm</Top>
+        <Left>0.5cm</Left>
+        <Height>6.25cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>13</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Image Name="image1">
+        <Source>Embedded</Source>
+        <Value>logo</Value>
+        <MIMEType>image/gif</MIMEType>
+        <Sizing>Fit</Sizing>
+        <Top>0.25cm</Top>
+        <Left>0.5cm</Left>
+        <Height>2.25cm</Height>
+        <Width>6.57361cm</Width>
+        <ZIndex>14</ZIndex>
+        <Style />
+      </Image>
+      <Textbox Name="textbox5">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>Настоятельно рекомендуем изменить пароль перед началом работы!</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>7pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox5</rd:DefaultName>
+        <Top>12.75cm</Top>
+        <Left>0.5cm</Left>
+        <Height>0.5cm</Height>
+        <Width>14.75cm</Width>
+        <ZIndex>15</ZIndex>
+        <Style>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox6">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!ClientFullName.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox6</rd:DefaultName>
+        <Top>3.75cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>16</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox7">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!ClientShortName.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox7</rd:DefaultName>
+        <Top>4.5cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>17</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox16">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!ClientPassword.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox16</rd:DefaultName>
+        <Top>6.75cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>18</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox17">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!ClientType.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox17</rd:DefaultName>
+        <Top>5.25cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>19</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Textbox Name="textbox20">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>=Parameters!ClientLogin.Value.ToString()</Value>
+                <Style>
+                  <FontFamily>Verdana</FontFamily>
+                  <FontSize>9pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>textbox20</rd:DefaultName>
+        <Top>6cm</Top>
+        <Left>7.25cm</Left>
+        <Height>0.75cm</Height>
+        <Width>8cm</Width>
+        <ZIndex>20</ZIndex>
+        <Style>
+          <VerticalAlign>Middle</VerticalAlign>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+    </ReportItems>
+    <Height>19.5cm</Height>
+    <Style />
+  </Body>
   <ReportParameters>
     <ReportParameter Name="ClientCode">
       <DataType>Integer</DataType>
@@ -47,488 +759,36 @@
       <AllowBlank>true</AllowBlank>
       <Prompt>Report_Parameter_8</Prompt>
     </ReportParameter>
+    <ReportParameter Name="Phones">
+      <DataType>String</DataType>
+      <Prompt>ReportParameter1</Prompt>
+    </ReportParameter>
   </ReportParameters>
-  <rd:DrawGrid>true</rd:DrawGrid>
-  <InteractiveWidth>21cm</InteractiveWidth>
-  <rd:GridSpacing>0.25cm</rd:GridSpacing>
-  <rd:SnapToGrid>true</rd:SnapToGrid>
-  <RightMargin>2.5cm</RightMargin>
-  <LeftMargin>2.5cm</LeftMargin>
-  <BottomMargin>2.5cm</BottomMargin>
-  <rd:ReportID>79268fa9-688b-4997-8140-0a172ef18ff3</rd:ReportID>
+  <Width>16cm</Width>
+  <Page>
+    <PageHeight>29.7cm</PageHeight>
+    <PageWidth>21cm</PageWidth>
+    <LeftMargin>2.5cm</LeftMargin>
+    <RightMargin>2.5cm</RightMargin>
+    <TopMargin>2.5cm</TopMargin>
+    <BottomMargin>2.5cm</BottomMargin>
+    <ColumnSpacing>1cm</ColumnSpacing>
+    <Style />
+  </Page>
   <EmbeddedImages>
     <EmbeddedImage Name="logo">
       <MIMEType>image/gif</MIMEType>
       <ImageData>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
-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</ImageData>
+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</ImageData>
     </EmbeddedImage>
   </EmbeddedImages>
-  <PageWidth>21cm</PageWidth>
-  <Code />
-  <Width>16cm</Width>
-  <Body>
-    <ColumnSpacing>1cm</ColumnSpacing>
-    <ReportItems>
-      <Textbox Name="textbox20">
-        <rd:DefaultName>textbox20</rd:DefaultName>
-        <Top>6cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>20</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>=Parameters!ClientLogin.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox17">
-        <rd:DefaultName>textbox17</rd:DefaultName>
-        <Top>5.25cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>19</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>=Parameters!ClientType.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox16">
-        <rd:DefaultName>textbox16</rd:DefaultName>
-        <Top>6.75cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>18</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>=Parameters!ClientPassword.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox7">
-        <rd:DefaultName>textbox7</rd:DefaultName>
-        <Top>4.5cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>17</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>=Parameters!ClientShortName.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox6">
-        <rd:DefaultName>textbox6</rd:DefaultName>
-        <Top>3.75cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>16</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>=Parameters!ClientFullName.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox5">
-        <rd:DefaultName>textbox5</rd:DefaultName>
-        <Top>12.75cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>15</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.5cm</Height>
-        <Value>Настоятельно рекомендуем изменить пароль перед началом работы!</Value>
-      </Textbox>
-      <Image Name="image1">
-        <Sizing>Fit</Sizing>
-        <Top>0.25cm</Top>
-        <Width>6.75cm</Width>
-        <MIMEType>image/gif</MIMEType>
-        <Source>Embedded</Source>
-        <Style />
-        <ZIndex>14</ZIndex>
-        <Left>0.5cm</Left>
-        <Height>2.25cm</Height>
-        <Value>logo</Value>
-      </Image>
-      <Textbox Name="textbox19">
-        <rd:DefaultName>textbox19</rd:DefaultName>
-        <Top>13.25cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>13</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>6.25cm</Height>
-        <Value>Желательно, чтобы новый пароль: 
-
-	• Не совпадал с логином или не был логином, записанным в обратном порядке. 
-	• Не был одиночным английским словом или русским словом, набранным английскими буквами. 
-	• Не был тем же, что в предыдущем пункте, но с цифрой в конце. 
-	• Не был Вашим именем, кличкой Вашей собаки, номером Вашей машины. 
-	• Не был просто числом. 
-	• Хорошо бы изменять пароли не реже раза в месяц. 
-
-Обязательные требования к новому паролю: 
-
-	• Не должен содержать символов пробела и точки с запятой. 
-	• Не должен быть менее 8 (восьми) символов. 
-	• Не должен содержать только цифры. 
-	• Использование русских букв недопустимо.</Value>
-      </Textbox>
-      <Textbox Name="textbox18">
-        <rd:DefaultName>textbox18</rd:DefaultName>
-        <Top>11.5cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>12</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>1cm</Height>
-        <Value>Управление персональными настройками и изменение пароля осуществляется на сайте www.analit.net
-в разделе "Для зарегистрированных пользователей"</Value>
-      </Textbox>
-      <Textbox Name="textbox15">
-        <rd:DefaultName>textbox15</rd:DefaultName>
-        <Top>8.75cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <BorderStyle>
-            <Left>Solid</Left>
-            <Right>Solid</Right>
-            <Top>None</Top>
-            <Bottom>Solid</Bottom>
-          </BorderStyle>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>11</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>2.5cm</Height>
-        <Value>Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени
-Телефоны:  
-  Москва: +7 495 6628727
-  С.-Петербург: +7 812 3090521
-  Воронеж: +7 4732 606000
-  Челябинск: +7 351 7298143
-e-mail: tech@analit.net</Value>
-      </Textbox>
-      <Textbox Name="textbox14">
-        <rd:DefaultName>textbox14</rd:DefaultName>
-        <Top>3.75cm</Top>
-        <Width>6.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Right</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>10</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Полное наименование:</Value>
-      </Textbox>
-      <Textbox Name="textbox13">
-        <rd:DefaultName>textbox13</rd:DefaultName>
-        <Top>8cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <BorderColor>
-            <Left>Black</Left>
-            <Right>Black</Right>
-            <Top>Black</Top>
-            <Bottom>Black</Bottom>
-          </BorderColor>
-          <BorderStyle>
-            <Left>Solid</Left>
-            <Right>Solid</Right>
-            <Top>Solid</Top>
-            <Bottom>Solid</Bottom>
-          </BorderStyle>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Center</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>9</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Служба поддержки пользователей:</Value>
-      </Textbox>
-      <Textbox Name="textbox12">
-        <rd:DefaultName>textbox12</rd:DefaultName>
-        <Top>6.75cm</Top>
-        <Width>6.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Right</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>8</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Пароль:</Value>
-      </Textbox>
-      <Textbox Name="textbox11">
-        <rd:DefaultName>textbox11</rd:DefaultName>
-        <Top>6cm</Top>
-        <Width>6.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Right</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>7</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Имя для доступа к серверу(login):</Value>
-      </Textbox>
-      <Textbox Name="textbox10">
-        <rd:DefaultName>textbox10</rd:DefaultName>
-        <Top>5.25cm</Top>
-        <Width>6.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Right</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>6</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Тип доступа:</Value>
-      </Textbox>
-      <Textbox Name="textbox9">
-        <rd:DefaultName>textbox9</rd:DefaultName>
-        <Top>4.5cm</Top>
-        <Width>6.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Right</TextAlign>
-          <VerticalAlign>Middle</VerticalAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>5</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.75cm</Height>
-        <Value>Краткое наименование:</Value>
-      </Textbox>
-      <Textbox Name="textbox8">
-        <rd:DefaultName>textbox8</rd:DefaultName>
-        <Top>3cm</Top>
-        <Width>14.75cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Center</TextAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>4</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>0.5cm</Left>
-        <Height>0.63492cm</Height>
-        <Value>Учетные данные:</Value>
-      </Textbox>
-      <Textbox Name="textbox4">
-        <rd:DefaultName>textbox4</rd:DefaultName>
-        <Top>1.75cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <TextAlign>Center</TextAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>3</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.5cm</Height>
-        <Value>="Дата операции: " + Parameters!OperationDate.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox3">
-        <rd:DefaultName>textbox3</rd:DefaultName>
-        <Visibility>
-          <Hidden>=Parameters!IsRegistration.Value</Hidden>
-        </Visibility>
-        <Top>2.25cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>7pt</FontSize>
-          <TextAlign>Center</TextAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>2</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.5cm</Height>
-        <Value>[Изменение пароля по инициативе клиента]</Value>
-      </Textbox>
-      <Textbox Name="textbox2">
-        <rd:DefaultName>textbox2</rd:DefaultName>
-        <Top>1.25cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Center</TextAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <ZIndex>1</ZIndex>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>0.75cm</Height>
-        <Value>="Договор № " + Parameters!BillingCode.Value.ToString()</Value>
-      </Textbox>
-      <Textbox Name="textbox1">
-        <rd:DefaultName>textbox1</rd:DefaultName>
-        <Top>0.25cm</Top>
-        <Width>8cm</Width>
-        <Style>
-          <FontFamily>Verdana</FontFamily>
-          <FontSize>9pt</FontSize>
-          <FontWeight>700</FontWeight>
-          <TextAlign>Center</TextAlign>
-          <PaddingLeft>2pt</PaddingLeft>
-          <PaddingRight>2pt</PaddingRight>
-          <PaddingTop>2pt</PaddingTop>
-          <PaddingBottom>2pt</PaddingBottom>
-        </Style>
-        <CanGrow>true</CanGrow>
-        <Left>7.25cm</Left>
-        <Height>1cm</Height>
-        <Value>="Регистрационная карта № " + Parameters!ClientCode.Value.ToString() + "/" + Parameters!ClientLogin.Value.ToString()</Value>
-      </Textbox>
-    </ReportItems>
-    <Height>25.75cm</Height>
-  </Body>
   <Language>en-US</Language>
-  <TopMargin>2.5cm</TopMargin>
-  <PageHeight>29.7cm</PageHeight>
+  <ConsumeContainerWhitespace>true</ConsumeContainerWhitespace>
+  <rd:ReportID>79268fa9-688b-4997-8140-0a172ef18ff3</rd:ReportID>
+  <rd:ReportUnitType>Cm</rd:ReportUnitType>
 </Report>
