@@ -61,6 +61,14 @@ namespace Common.Web.Ui.Helpers
 			return GetDescription(property);
 		}
 
+		public static string TryGetDescription(PropertyInfo property)
+		{
+			var attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), true);
+			if (attributes.Length == 0)
+				return null;
+			return ((DescriptionAttribute)attributes[0]).Description;
+		}
+
 		public static string GetDescription(PropertyInfo property)
 		{
 			var attributes = property.GetCustomAttributes(typeof(DescriptionAttribute), true);

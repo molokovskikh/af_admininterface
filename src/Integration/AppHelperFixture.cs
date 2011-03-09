@@ -19,6 +19,8 @@ namespace Integration
 		private AppHelper helper;
 		private StubEngineContext context;
 
+		private TestFilter filter;
+
 		[SetUp]
 		public void Setup()
 		{
@@ -28,6 +30,9 @@ namespace Integration
 			context.CurrentControllerContext = new ControllerContext();
 			helper.SetContext(context);
 			helper.SetController(null, context.CurrentControllerContext);
+
+			filter = new TestFilter();
+			context.CurrentControllerContext.PropertyBag["filter"] = filter;
 		}
 
 		[Test]
@@ -74,8 +79,6 @@ namespace Integration
 		[Test]
 		public void Checkbox_edit()
 		{
-			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
-
 			var result = helper.FilterFor("Тест", "filter.SomeBool");
 			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td><td colspan=2><input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" /><input type=\"hidden\" id=\"filter_SomeBoolH\" name=\"filter.SomeBool\" value=\"false\" /></td></tr>"));
 		}
@@ -83,8 +86,6 @@ namespace Integration
 		[Test]
 		public void Edit_for_text()
 		{
-			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
-
 			var result = helper.Edit("filter.TextField");
 			Assert.That(result, Is.EqualTo("<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" />"));
 		}
@@ -92,7 +93,7 @@ namespace Integration
 		[Test]
 		public void Selected_value_for_enum()
 		{
-			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter{ Enum = TestEnum.Value2 };
+			filter.Enum = TestEnum.Value2;
 
 			var result = helper.FilterFor("filter.Enum");
 			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
@@ -106,12 +107,17 @@ namespace Integration
 		[Test]
 		public void Select_edit()
 		{
-			context.CurrentControllerContext.PropertyBag["filter"] = new TestFilter();
 			var result = helper.FilterFor("filter.Multivalue");
 			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
 				+ "<select name='filter.Multivalue.Id'>"
 				+ "<option>Все</option><option value=1>test</option></select>" 
 				+ "</td></tr>"));
+		}
+
+		[Test]
+		public void Return_null_if_description_not_found()
+		{
+			Assert.That(helper.GetLabel("filter.TextField"), Is.Null);
 		}
 	}
 }

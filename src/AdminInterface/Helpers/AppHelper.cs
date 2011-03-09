@@ -385,7 +385,7 @@ namespace AdminInterface.Helpers
 			return input.ToString();
 		}
 
-		private string GetLabel(string name)
+		public string GetLabel(string name)
 		{
 			var label = GetBuiltinLabel(name);
 			if (label == null)
@@ -425,7 +425,7 @@ namespace AdminInterface.Helpers
 			var property = FindProperty(name);
 			if (property == null)
 				return null;
-			return BindingHelper.GetDescription(property);
+			return BindingHelper.TryGetDescription(property);
 		}
 
 		public string BeginFormFor(object filter)
