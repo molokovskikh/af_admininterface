@@ -99,5 +99,15 @@ namespace Integration.Models
 			payment.SaveAndFlush();
 			Assert.That(payment.Ad.Id, Is.EqualTo(ad.Id));
 		}
+
+		[Test]
+		public void Update_payer_balance()
+		{
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payment = new Payment(payer);
+			payment.Sum  = 800;
+			payment.SaveAndFlush();
+			Assert.That(payer.Balance, Is.EqualTo(800));
+		}
 	}
 }
