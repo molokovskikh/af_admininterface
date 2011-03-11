@@ -26,9 +26,13 @@ namespace Integration.Controllers
 		private Contact[] clientContacts;
 		private Person[] person;
 
+		private DateTime begin;
+
 		[SetUp]
 		public void Setup()
 		{
+			begin = DateTime.Now;
+
 			var workerRequest = new SimpleWorkerRequest("", "", "", "http://test", new StreamWriter(new MemoryStream()));
 			var context = new HttpContext(workerRequest);
 			HttpContext.Current = context;
@@ -61,11 +65,14 @@ namespace Integration.Controllers
 		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
-			client = DataMother.TestClient();
-			payer = client.Payers.First();
+			using(new SessionScope())
+			{
+				client = DataMother.TestClient();
+				payer = client.Payers.First();
 
-			payer.Comment = "ata";
-			payer.Update();
+				payer.Comment = "ata";
+				payer.Update();
+			}
 
 			Context.Session["ShortName"] = "Test";
 
@@ -135,7 +142,10 @@ namespace Integration.Controllers
 
 		private Client RegistredClient()
 		{
-			return Client.Find(Convert.ToUInt32(Context.Session["Code"]));
+			var registredClient = Client.Queryable.FirstOrDefault(c => c.RegistrationDate >= begin);
+			if (registredClient == null)
+				throw new Exception("не зарегистрировалли клиента");
+			return registredClient;
 		}
 	}
 }

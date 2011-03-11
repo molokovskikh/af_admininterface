@@ -47,6 +47,7 @@ namespace AdminInterface.Models
 		public Payer()
 		{
 			InvoiceSettings = new InvoiceSettings();
+			Clients = new List<Client>();
 		}
 
 		[PrimaryKey]
@@ -376,10 +377,13 @@ ORDER BY {Payer}.shortname;";
 			base.OnUpdate();
 		}
 
-		public void InitGroupOwner()
+		public virtual void InitGroupOwner()
 		{
 			if (ContactGroupOwner == null)
+			{
 				ContactGroupOwner = new ContactGroupOwner();
+				ContactGroupOwner.ContactGroups = new List<ContactGroup>();
+			}
 			if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
 				ContactGroupOwner.AddContactGroup(ContactGroupType.Billing);
 		}

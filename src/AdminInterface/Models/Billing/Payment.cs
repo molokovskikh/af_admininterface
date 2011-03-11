@@ -522,11 +522,11 @@ namespace AdminInterface.Models.Billing
 				&& ForAd
 				&& this.IsChanged(p => p.ForAd))
 			{
+				//магия будь бдителен!
+				//запрос должен быть в другой сесии а то будет stackoverflow
 				Advertising ad = null;
-				ArHelper.WithSession(s => {
-					ad = s.AsQueryable<Advertising>().FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
-				});
-				//var ad = Advertising.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
+				using(new SessionScope())
+					ad = Advertising.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
 				if (ad == null)
 				{
 					ad = new Advertising(Payer);
