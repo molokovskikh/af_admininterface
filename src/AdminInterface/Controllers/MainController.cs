@@ -225,7 +225,6 @@ WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateP
 		{
 			CancelLayout();
 			PropertyBag["now"] = DateTime.Now;
-			PropertyBag["password"] = Session["Password"];
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = DefaultValues.Get();
