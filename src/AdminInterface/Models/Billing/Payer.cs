@@ -77,7 +77,7 @@ namespace AdminInterface.Models
 		[ValidateRegExp("", "ИНН может содержать 10 или 12 цифр")]
 		public virtual string INN { get; set; }
 
-		[BelongsTo(Column = "ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo(Column = "ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.SaveUpdate)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[Property]
@@ -350,6 +350,20 @@ ORDER BY {Payer}.shortname;";
 			}
 		}
 
+		public virtual List<ContactGroupType> NewGroupTypes
+		{
+			get
+			{
+				var types = new List<ContactGroupType>();
+				if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
+					types.Add(ContactGroupType.Billing);
+				if (!ContactGroupOwner.HaveGroup(ContactGroupType.Invoice))
+					types.Add(ContactGroupType.Invoice);
+				types.Add(ContactGroupType.Custom);
+				return types;
+			}
+		}
+
 		protected override void OnSave()
 		{
 			UpdateBalance();
@@ -360,6 +374,14 @@ ORDER BY {Payer}.shortname;";
 		{
 			UpdateBalance();
 			base.OnUpdate();
+		}
+
+		public void InitGroupOwner()
+		{
+			if (ContactGroupOwner == null)
+				ContactGroupOwner = new ContactGroupOwner();
+			if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
+				ContactGroupOwner.AddContactGroup(ContactGroupType.Billing);
 		}
 	}
 

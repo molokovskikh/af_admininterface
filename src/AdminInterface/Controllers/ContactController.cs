@@ -20,23 +20,19 @@ namespace AdminInterface.Controllers
 		{
 			var payer = Payer.Find(billingCode);
 
-			var types = new List<ContactGroupType> { ContactGroupType.Custom };
-			if (!payer.ContactGroupOwner.ContactGroups.Any(g => g.Type == ContactGroupType.Invoice))
-				types.Add(ContactGroupType.Invoice);
-
-			PropertyBag["groupTypes"] = types;
 			PropertyBag["billingCode"] = billingCode;
+			PropertyBag["groupTypes"] = payer.NewGroupTypes;
 			PropertyBag["contactGroup"] = new ContactGroup();
 		}
 
 		public void AddContactGroup(uint billingCode,
-		                            [DataBind("ContactGroup")] ContactGroup contactGroup,
-		                            [DataBind("Contacts")] Contact[] contacts)
+			[DataBind("ContactGroup")] ContactGroup contactGroup,
+			[DataBind("Contacts")] Contact[] contacts)
 		{
 
 			PopulateValidatorErrorSummary(contactGroup, Binder.GetValidationSummary(contactGroup));
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
-			    || ValidationHelper.IsCollectionHasNotValideObject(contacts))
+				|| ValidationHelper.IsCollectionHasNotValideObject(contacts))
 			{
 				contactGroup.Contacts = CleanUp(contacts);
 				PropertyBag["billingCode"] = billingCode;
@@ -56,8 +52,8 @@ namespace AdminInterface.Controllers
 		}
 
 		public override void AddPerson(uint contactGroupId,
-		                               [DataBind("CurrentPerson")] Person person,
-		                               [DataBind("Contacts")] Contact[] contacts)
+			[DataBind("CurrentPerson")] Person person,
+			[DataBind("Contacts")] Contact[] contacts)
 		{
 			base.AddPerson(contactGroupId, person, contacts);
 			if (Response.StatusCode == 302)
@@ -65,7 +61,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public override void UpdateContactGroup(uint contactGroupId,
-		                                        [DataBind("Contacts")] Contact[] contacts)
+			[DataBind("Contacts")] Contact[] contacts)
 		{
 			base.UpdateContactGroup(contactGroupId, contacts);
 			if (Response.StatusCode == 302)
@@ -73,7 +69,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public override void UpdatePerson([DataBind("CurrentPerson")] Person person,
-		                                  [DataBind("Contacts")] Contact[] contacts)
+			[DataBind("Contacts")] Contact[] contacts)
 		{
 			base.UpdatePerson(person, contacts);
 			if (Response.StatusCode == 302)

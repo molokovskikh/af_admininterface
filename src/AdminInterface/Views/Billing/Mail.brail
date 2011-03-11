@@ -72,6 +72,12 @@ end
 			FormHelper.LabelFor("Instance.Recipient.Id", "Получатель платежей"),
 			Select("Instance.Recipient.Id", Instance.Recipient))}
 
+		<% if payer.ContactGroupOwner.ContactGroups.Count == 0: %>
+			<td class="InputGroupHeader" colspan="2">
+				<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+			</td>
+		<% end %>
+
 		<%
 		contactGroupIndex = 0
 		component ContactViewer, {"ContactGroups" : Instance.ContactGroupOwner.ContactGroups}:

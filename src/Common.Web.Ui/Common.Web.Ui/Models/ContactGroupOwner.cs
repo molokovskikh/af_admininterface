@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Castle.ActiveRecord;
 using System.Collections.Generic;
 using Common.Web.Ui.Helpers;
@@ -28,7 +29,12 @@ namespace Common.Web.Ui.Models
 			group.Specialized = specialized;
 			group.ContactGroupOwner = this;
 			ContactGroups.Add(group);
-			return group;			
+			return group;
+		}
+
+		public bool HaveGroup(ContactGroupType type)
+		{
+			return ContactGroups.Any(g => g.Type == type);
 		}
 	}
 }

@@ -315,7 +315,7 @@ namespace AdminInterface.Models.Billing
 					continue;
 				var label = parts[0];
 				var value = parts[1];
-				if (label.Equals("Дата", StringComparison.CurrentCultureIgnoreCase))
+				if (label.Equals("ДатаПоступило", StringComparison.CurrentCultureIgnoreCase))
 				{
 					payment.PayedOn = DateTime.ParseExact(value, "dd.MM.yyyy", CultureInfo.CurrentCulture);
 				}

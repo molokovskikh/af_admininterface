@@ -200,11 +200,6 @@ namespace AdminInterface.Controllers
 			if (client.IsDrugstore())
 				prefix = "Аптека";
 
-			var contactGroupOwner = new ContactGroupOwner();
-			var group = contactGroupOwner.AddContactGroup(ContactGroupType.Billing);
-			contactGroupOwner.Save();
-			group.Save();
-
 			var payer = new Payer {
 				OldTariff = 0,
 				OldPayDate = DateTime.Now,
@@ -212,8 +207,8 @@ namespace AdminInterface.Controllers
 				Name = client.Name,
 				JuridicalName = client.FullName,
 				BeforeNamePrefix = prefix,
-				ContactGroupOwner = contactGroupOwner,
 			};
+			payer.InitGroupOwner();
 			payer.Save();
 
 			var organization = new LegalEntity();
@@ -403,15 +398,14 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
 
-		public void Registered([ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
+		public void Registered(
+			[ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
 			[DataBind("JuridicalOrganization")] LegalEntity juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			bool showRegistrationCard)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				payer.ContactGroupOwner = new ContactGroupOwner();
-				payer.ContactGroupOwner.Save();
 				payer.AddComment(paymentOptions.GetCommentForPayer());
 				payer.Name = juridicalOrganization.Name;
 				payer.JuridicalName = juridicalOrganization.FullName;
@@ -423,6 +417,9 @@ WHERE   intersection.pricecode IS NULL
 						juridicalOrganization
 					};
 				}
+				if (payer.ContactGroupOwner == null)
+					payer.InitGroupOwner();
+
 				juridicalOrganization.Payer = payer;
 				juridicalOrganization.Save();
 
