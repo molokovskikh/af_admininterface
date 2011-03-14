@@ -37,13 +37,19 @@ namespace AdminInterface.Controllers
 		public List<Payment> Find()
 		{
 			var criteria = DetachedCriteria.For<Payment>()
-				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Le("PayedOn", Period.End));
+				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Le("PayedOn", Period.End.AddDays(1)));
 
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
 
 			if (ShowOnlyUnknown)
 				criteria.Add(Expression.IsNull("Payer"));
+
+			if (!String.IsNullOrWhiteSpace(SearchText))
+			{
+				criteria.CreateAlias("Payer", "p");
+				criteria.Add(Expression.Like("p.Name", SearchText));
+			}
 
 			return ArHelper.WithSession(s =>
 				criteria.GetExecutableCriteria(s)

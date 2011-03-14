@@ -158,6 +158,7 @@ namespace AdminInterface.Controllers
 				{
 					invoice.CalculateSum();
 					invoice.Save();
+					Flash["Message"] = "Сохранено";
 					Redirect("Invoices", "Edit", new {invoice.Id});
 				}
 			}
