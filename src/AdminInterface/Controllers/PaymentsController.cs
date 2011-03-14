@@ -219,9 +219,11 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public object SearchPayer(string term)
 		{
+			uint id;
+			uint.TryParse(term, out id);
 			return ActiveRecordLinq
 				.AsQueryable<Payer>()
-				.Where(p => p.Name.Contains(term))
+				.Where(p => p.Name.Contains(term) || p.PayerID == id)
 				.Take(20)
 				.ToList()
 				.Select(p => new {
