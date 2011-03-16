@@ -9,6 +9,7 @@ using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
@@ -24,12 +25,29 @@ namespace AdminInterface.Helpers
 		public string GetValidationError(object item, string name)
 		{
 			var errorSummary = ((SmartDispatcherController)Controller).Binder.GetValidationSummary(item);
+
+			if (item is ActiveRecordValidationBase)
+				errorSummary = FromBaseClass((ActiveRecordValidationBase)item);
+
 			if (errorSummary == null)
 				return "";
 			var errors = errorSummary.GetErrorsForProperty(name);
 			if (errors == null || errors.Length == 0)
 				return "";
 			return String.Format("<label class=\"error\">{0}</label>", errors.First());
+		}
+
+		private ErrorSummary FromBaseClass(ActiveRecordValidationBase item)
+		{
+			var errorSummary = new ErrorSummary();
+			if (item.PropertiesValidationErrorMessages == null)
+				return errorSummary;
+
+			foreach (PropertyInfo property in item.PropertiesValidationErrorMessages.Keys)
+				foreach (var message in (ArrayList)item.PropertiesValidationErrorMessages[property])
+					errorSummary.RegisterErrorMessage(property.Name, message.ToString());
+
+			return errorSummary;
 		}
 
 		public string Edit(string name)

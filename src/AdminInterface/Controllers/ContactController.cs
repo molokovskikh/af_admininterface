@@ -29,13 +29,15 @@ namespace AdminInterface.Controllers
 			[DataBind("ContactGroup")] ContactGroup contactGroup,
 			[DataBind("Contacts")] Contact[] contacts)
 		{
-
 			PopulateValidatorErrorSummary(contactGroup, Binder.GetValidationSummary(contactGroup));
 			if (ValidationHelper.IsInstanceHasValidationError(contactGroup)
 				|| ValidationHelper.IsCollectionHasNotValideObject(contacts))
 			{
 				contactGroup.Contacts = CleanUp(contacts);
-				PropertyBag["billingCode"] = billingCode;
+				var payer = Payer.Find(billingCode);
+				PropertyBag["billingCode"] = payer.Id;
+				PropertyBag["groupTypes"] = payer.NewGroupTypes;
+				PropertyBag["Invalid"] = true;
 				PropertyBag["contactGroup"] = contactGroup;
 				RenderView("NewContactGroup");
 				return;

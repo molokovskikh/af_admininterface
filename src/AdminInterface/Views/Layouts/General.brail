@@ -20,7 +20,8 @@
 		"Common.css",
 		"Contacts.css",
 		"Highlight.css",
-		"Contacts.css")}
+		"Contacts.css",
+		"Form.css")}
 
 	${app.JS("calendar.js",
 		"calendar-ru_win_.js",
