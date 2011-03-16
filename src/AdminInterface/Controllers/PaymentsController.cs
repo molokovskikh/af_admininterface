@@ -37,7 +37,7 @@ namespace AdminInterface.Controllers
 		public List<Payment> Find()
 		{
 			var criteria = DetachedCriteria.For<Payment>()
-				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Le("PayedOn", Period.End.AddDays(1)));
+				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Le("PayedOn", Period.End));
 
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));

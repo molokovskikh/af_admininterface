@@ -82,12 +82,13 @@
 			return false;
 	}
 
+	beginCalendar = null;
+	endCalendar = null;
+
 	$(".calendar").each(function () {
 		var id = this.id.substring(0, this.id.indexOf("CalendarHolder"));
 		var value = $("#" + id).get(0).value;
 
-		beginCalendar = null;
-		endCalendar = null;
 
 		var calendar = Calendar.setup({
 			daFormat: "%d.%m.%Y",
@@ -113,9 +114,12 @@
 			endCalendar = calendar;
 			calendar.setDateStatusHandler(endDateAllowed);
 		}
-
-		calendar.refresh();
 	});
+
+	if (beginCalendar)
+		beginCalendar.refresh();
+	if (endCalendar)
+		endCalendar.refresh();
 });
 
 function ShowHidden(folder) {
