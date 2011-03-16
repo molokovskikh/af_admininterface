@@ -1,8 +1,0 @@
-﻿<% component CaptureFor, {"id" : "Title"}:%>
-	Редактирование контактной информации
-<% end %>
-
-<form action="UpdatePerson.rails" method="post">
-	${FormHelper.HiddenField("CurrentPerson.Id")}
-	<% OutputSubView("EditPersonSubView") %>
-</form>
