@@ -49,6 +49,8 @@ namespace AdminInterface.Controllers
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("c.Name", SearchText, MatchMode.Anywhere));
 
+			criteria.AddOrder(Order.Asc("c.Name"));
+
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
 				.ToList()
