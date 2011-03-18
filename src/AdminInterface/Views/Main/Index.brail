@@ -119,6 +119,9 @@
 								Отчеты
 							</a>
 						</li>
+						<li>
+							<a href="${siteroot}/Promotions/Index">Промо-акции</a>
+						</li>
 					</ul>
 				</div>
 				

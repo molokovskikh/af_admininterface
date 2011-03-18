@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {

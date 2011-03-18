@@ -1,0 +1,48 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Выбор поставщика для акции
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Выбор поставщика для акции", "")], "pageTitle":"Выбор поставщика для акции"} %>
+
+<div class="block">Выбор поставщика для акции</div>
+
+<div style="padding: 10px">
+
+	<div class=block style="padding:0;">
+			<div style="margin:10px" align="center">
+				<h3>Список поставщиков</h3>
+				${app.BeginFormFor("filter")}
+				${app.FilterFor("filter.SearchText")}
+				${app.EndFormFor("filter")}
+			</div>
+	</div>
+
+	<div class=block>
+		<table class="DataTable HighLightCurrentRow" style="width: 100%;">
+			<% if suppliers.Count: %>
+			<tr>
+				<th>Наименование</th>
+				<th>Регион</th>
+			</tr>
+			<% for i, supplier in enumerate(suppliers): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td><a href="${siteroot}/Promotions/SelectName.rails?filter.SupplierId=${supplier.Id}">${supplier.Name}</a></td>
+				<td>${supplier.HomeRegion.Name}</td>
+			</tr>
+			<% end %>
+			<tr>
+				<td colspan="2" align="right">
+					<div class="Paginator">
+						${PaginatorHelper.ShowPaginator()}
+					</div>
+				</td>
+				</tr>
+			<% else: %>
+			<tr class=EmptyData>
+				<td>По вашему запросу ничего не найдено</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+
+</div>
