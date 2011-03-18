@@ -93,7 +93,7 @@ namespace AdminInterface.Controllers
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
-				.CreateAlias("Promotions", "sp", JoinType.LeftOuterJoin, Expression.Eq("sp.Supplier.Id", 14u))
+				.CreateAlias("Promotions", "sp", JoinType.LeftOuterJoin, Expression.Eq("sp.Supplier.Id", SupplierId))
 				.CreateAlias("sp.Supplier", "s", JoinType.LeftOuterJoin);
 
 			criteria.Add(Expression.Eq("Hidden", false));
