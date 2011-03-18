@@ -412,7 +412,7 @@ namespace AdminInterface.Models.Billing
 					),
 					PayerClient = new BankClient(
 						node.XPathSelectElement("Payer/Name").Value,
-						node.XPathSelectElement("Payer/INN").Value,
+						null,
 						node.XPathSelectElement("Payer/AccountCode").Value
 					),
 					RecipientBank = new BankInfo(
@@ -426,6 +426,9 @@ namespace AdminInterface.Models.Billing
 						node.XPathSelectElement("Recepient/Client/AccountCode").Value
 					),
 				};
+				var element = node.XPathSelectElement("Payer/INN");
+				if (element != null)
+					payment.PayerClient.Inn = element.Value;
 
 				payments.Add(payment);
 			}

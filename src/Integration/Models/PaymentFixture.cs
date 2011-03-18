@@ -109,5 +109,12 @@ namespace Integration.Models
 			payment.SaveAndFlush();
 			Assert.That(payer.Balance, Is.EqualTo(800));
 		}
+
+		[Test]
+		public void Parse_payment_without_inn()
+		{
+			var payments = Payment.ParseXml(File.OpenRead(@"..\..\..\TestData\\201103_04-16.03.xml"));
+			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
 	}
 }
