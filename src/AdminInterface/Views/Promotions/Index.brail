@@ -1,0 +1,70 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Акции
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Акции", "")], "pageTitle":"Акции"} %>
+
+<div class="block">Акции</div>
+
+<div style="padding: 10px">
+
+	<div class=block style="padding:0;">
+			<div style="margin:10px" align="center">
+				<h3>Список акций</h3>
+				${app.BeginFormFor("filter")}
+				${app.FilterFor("filter.PromotionStatus")}
+				${app.FilterFor("filter.SearchText")}
+				${app.EndFormFor("filter")}
+			</div>
+	</div>
+
+	<div class=block style="padding:5px;text-align: center;">
+		<form method=post action="${siteroot}/Promotions/SelectSupplier.rails">
+			<input type=submit value="Добавить новую акцию">
+		</form>
+	</div>
+
+	<div class=block>
+		<table class="DataTable HighLightCurrentRow" style="width: 100%;">
+			<% if promotions.Count: %>
+			<tr>
+				<th>${app.Sortable("№", "Id")}</th>
+				<th>${app.Sortable("Включена", "Enabled")}</th>
+				<th>${app.Sortable("Отключена АК Инфорум", "AgencyDisabled")}</th>
+				<th>${app.Sortable("Наименование", "CatalogName")}</th>
+				<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+				<th></th>
+				<th></th>
+			</tr>
+			<% for i, promotion in enumerate(promotions): %>
+			<tr id="SupplierPromotionRow${promotion.Id}" class="${ViewHelper.GetRowStyle(i)}">
+				<td>${promotion.Id}</td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/ChangeState.rails?id=${promotion.Id}&${filter.ToUrlQuery()}">
+						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.Enabled} onclick="submit();">
+					</form>
+				</td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/ChangeDisabled.rails?id=${promotion.Id}&${filter.ToUrlQuery()}">
+						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.AgencyDisabled} onclick="submit();">
+					</form>
+				</td>
+				<td>${promotion.Catalog.Name}</td>
+				<td>${promotion.Supplier.Name}</td>
+				<td><a href="${siteroot}/Promotions/Edit.rails?id=${promotion.Id}">Редактировать</a></td>
+				<td>
+					<form method=post action="${siteroot}/Promotions/Delete.rails?id=${promotion.Id}">
+						<input type=submit value="Удалить">
+					</form>
+				</td>
+			</tr>
+			<% end %>
+			<% else: %>
+			<tr class=EmptyData>
+				<td>По вашему запросу ничего не найдено</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+
+</div>

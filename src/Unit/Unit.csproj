@@ -72,6 +72,7 @@
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
+    <Compile Include="Extentions\SortExtentionsFixture.cs" />
     <Compile Include="FixutreSetup.cs" />
     <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
@@ -85,7 +86,6 @@
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
     <Compile Include="PermissionFixture.cs" />
     <Compile Include="SortFixture.cs" />
-    <Compile Include="ViewHelperFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface\AdminInterface.csproj">

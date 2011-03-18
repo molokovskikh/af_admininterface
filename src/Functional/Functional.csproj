@@ -120,6 +120,7 @@
     <Compile Include="ForTesting\WatinFixture.cs" />
     <Compile Include="LogsFixture.cs" />
     <Compile Include="MainViewFixure.cs" />
+    <Compile Include="PromotionsFixture.cs" />
     <Compile Include="RegionalAdminFixture.cs" />
     <Compile Include="RegistrationFixture.cs" />
     <Compile Include="SearchClientFixture.cs" />

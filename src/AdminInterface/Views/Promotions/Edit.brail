@@ -1,0 +1,55 @@
+﻿<% if promotion.Id: %>
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Редактирование акции", "")], "pageTitle":"Акции"} %>
+
+<div class="block">Редактирование акции №${promotion.Id}</div>
+<% else: %>
+<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Создание новой акции", "")], "pageTitle":"Акции"} %>
+
+<div class="block">Создание новой акции</div>
+<% end %>
+
+
+<form method=post enctype="multipart/form-data">
+	<table style="width: 100%;">
+		<tr>
+			<td width=5% style="vertical-align: top;">Наименование:</td>
+			<td>${promotion.Catalog.Name}</td>
+		</tr>
+		<tr>
+			<td width=5% style="vertical-align: top;">Поставщик:</td>
+			<td>${promotion.Supplier.Name}</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Включена:</td>
+			<td>${app.Edit("promotion.Enabled")}</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Отключена АК Инфорум:</td>
+			<td>${app.Edit("promotion.AgencyDisabled")}</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Аннотация:</td>
+			<td>
+				${FormHelper.TextAreaValue("promotion.Annotation", promotion.Annotation, {"rows":"5", "style" : "width: 100%"})}
+				${app.GetValidationError(promotion, "Annotation")}
+			</td>
+		</tr>
+		<tr>
+			<td style="vertical-align: top;">Файл:</td>
+			<td>
+				<% if promotion.Id: %>
+					<% if promotion.PromoFile: %>
+					<a href="${siteroot}/Promotions/GetPromoFile.rails?Id=${promotion.Id}" target="_blank">${promotion.PromoFile}</a>
+					<% else: %>
+					&lt;не установлен&gt;
+					<% end %>
+				<% end %>
+				<div class="blockDiv">
+					<label>Выберете файл для загрузки в форматах ${allowedExtentions}</label><br>
+					<input type=file name="inputfile"><br>
+				</div>
+			</td>
+		</tr>
+	</table>
+	<input type=submit value=Сохранить>
+</form>
