@@ -5,6 +5,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
@@ -159,6 +160,10 @@ namespace AdminInterface.Models
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
+
+		public virtual IList<Service> Services { get; set; }
+
+		public virtual IList<User> ImpersonableUsers { set; get; }
 
 		public virtual List<string> AvalilableAnalitFVersions
 		{

@@ -14,7 +14,8 @@ namespace AdminInterface.Models.Security
 	{
 		Base = 0,
 		AnalitFExcel = 1,
-		AnalitFPrint = 2
+		AnalitFPrint = 2,
+		SupplierInterface = 3
 	}
 
 	[ActiveRecord("UserPermissions", Schema = "usersettings")]

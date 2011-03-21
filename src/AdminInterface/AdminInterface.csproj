@@ -26,6 +26,7 @@
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <UseIISExpress>false</UseIISExpress>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -215,6 +216,8 @@
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\SupplierPromotion.cs" />
+    <Compile Include="Models\Suppliers\Service.cs" />
+    <Compile Include="Models\Suppliers\Supplier.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\Telephony\CallRecordFile.cs" />
