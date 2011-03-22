@@ -33,9 +33,13 @@ namespace AdminInterface.MonoRailExtentions
 
 			var manager = new DefaultViewEngineManager();
 			manager.Service(provider);
-			var namespaces = ((BooViewEngine)manager.ResolveEngine(".brail")).Options.NamespacesToImport;
+			var options = ((BooViewEngine)manager.ResolveEngine(".brail")).Options;
+			options.AssembliesToReference.Add(Assembly.Load("Common.Web.Ui"));
+			var namespaces = options.NamespacesToImport;
 			namespaces.Add("Boo.Lang.Builtins");
 			namespaces.Add("AdminInterface.Helpers");
+			namespaces.Add("Common.Web.Ui.Helpers");
+
 			BaseMailer.ViewEngineManager = manager;
 			return manager;
 		}

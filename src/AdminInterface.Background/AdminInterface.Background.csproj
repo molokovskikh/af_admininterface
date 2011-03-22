@@ -43,9 +43,6 @@
     <Reference Include="Castle.MonoRail.Views.Brail">
       <HintPath>..\..\lib\Castle.MonoRail.Views.Brail.dll</HintPath>
     </Reference>
-    <Reference Include="ExposedObject">
-      <HintPath>..\..\lib\ExposedObject.dll</HintPath>
-    </Reference>
     <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
       <HintPath>..\..\lib\log4net.dll</HintPath>
     </Reference>
