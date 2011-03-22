@@ -6,26 +6,26 @@ UserPermission(Name: "Просматривать\\редактировать к�
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Изменять пароль",
-	Shortcut: "VendorAllowChangePassword",
+UserPermission(Name: "Управлять условиями работы клиентов",
+	Shortcut: "VendorAllowClients",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Управлять заказами",
-	Shortcut: "VendorAllowOrdersManage",
+UserPermission(Name: "Управлять прайс-листами",
+	Shortcut: "VendorAllowPricesSet",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Управлять прайс листами",
-	Shortcut: "VendorAllowPricesProcess",
+UserPermission(Name: "Управлять источниками прайс-листов",
+	Shortcut: "VendorAllowPricesSources",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Просматривать отчеты",
-	Shortcut: "VendorAllowReports",
+UserPermission(Name: "Управлять формализацией прайс-листов",
+	Shortcut: "VendorAllowPricesFormalization",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
@@ -36,26 +36,14 @@ UserPermission(Name: "Управлять сопоставлением",
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Управлять условиями работы клиентов",
-	Shortcut: "VendorAllowClients",
+UserPermission(Name: "Управлять заказами",
+	Shortcut: "VendorAllowOrdersManage",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Управлять формализацией",
-	Shortcut: "VendorAllowPricesSet",
-	Type: UserPermissionTypes.SupplierInterface,
-	AssignDefaultValue: true,
-	AvailableFor: UserPermissionAvailability.All).Save()
-
-UserPermission(Name: "Управлять источниками прайс листов",
-	Shortcut: "VendorAllowPricesSources",
-	Type: UserPermissionTypes.SupplierInterface,
-	AssignDefaultValue: true,
-	AvailableFor: UserPermissionAvailability.All).Save()
-
-UserPermission(Name: "Управлять доставкой документов",
-	Shortcut: "VendorAllowDocumentSettings",
+UserPermission(Name: "Управлять отправкой заказов",
+	Shortcut: "VendorAllowSourceOrders",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
@@ -66,8 +54,20 @@ UserPermission(Name: "Просматривать статистику докум
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()
 
-UserPermission(Name: "Управлять отправкой заказов",
-	Shortcut: "VendorAllowSourceOrders",
+UserPermission(Name: "Управлять доставкой документов",
+	Shortcut: "VendorAllowDocumentSettings",
+	Type: UserPermissionTypes.SupplierInterface,
+	AssignDefaultValue: true,
+	AvailableFor: UserPermissionAvailability.All).Save()
+
+UserPermission(Name: "Изменять пароль",
+	Shortcut: "VendorAllowChangePassword",
+	Type: UserPermissionTypes.SupplierInterface,
+	AssignDefaultValue: true,
+	AvailableFor: UserPermissionAvailability.All).Save()
+
+UserPermission(Name: "Просматривать отчеты",
+	Shortcut: "VendorAllowReports",
 	Type: UserPermissionTypes.SupplierInterface,
 	AssignDefaultValue: true,
 	AvailableFor: UserPermissionAvailability.All).Save()

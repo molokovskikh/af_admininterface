@@ -16,6 +16,9 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual string FullName { get; set; }
 
+		[Property]
+		public virtual ulong RegionMask { get; set; }
+
 		[BelongsTo]
 		public virtual Region HomeRegion { get; set; }
 

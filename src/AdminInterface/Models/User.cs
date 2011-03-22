@@ -56,7 +56,31 @@ namespace AdminInterface.Models
 		bool Enabled { get; }
 	}
 
-	[ActiveRecord("Users", Schema = "future", Lazy = true)]
+	[ActiveRecord(Schema = "Future", Lazy = true)]
+	public class AssignedService
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual ulong RegionMask { get; set; }
+
+		[BelongsTo]
+		public virtual User User { get; set; }
+
+		[BelongsTo]
+		public virtual Service Service { set; get; }
+
+		[HasAndBelongsToMany(typeof (UserPermission),
+			Lazy = true,
+			ColumnKey = "AssignedServiceId",
+			ColumnRef = "PermissionId",
+			Table = "AssignedServicePermissions",
+			Schema = "Future")]
+		public virtual IList<UserPermission> Permissions { get; set; }
+	}
+
+	[ActiveRecord(Schema = "future", Lazy = true)]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
 		private UserUpdateInfo _updateInfo;
@@ -161,7 +185,11 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
 
-		public virtual IList<Service> Services { get; set; }
+		[HasMany(Inverse = true, Lazy = true)]
+		public virtual IList<AssignedService> Services { get; set; }
+
+		[BelongsTo]
+		public virtual Service RootService { get; set; }
 
 		public virtual IList<User> ImpersonableUsers { set; get; }
 

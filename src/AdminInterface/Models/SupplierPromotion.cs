@@ -7,7 +7,7 @@ using Castle.Components.Validator;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("usersettings.supplierpromotions")]
+	[ActiveRecord("supplierpromotions", Schema = "usersettings")]
 	public class SupplierPromotion : ActiveRecordLinqBase<SupplierPromotion>
 	{
 		[PrimaryKey]
@@ -22,7 +22,7 @@ namespace AdminInterface.Models
 		[BelongsTo(Column = "SupplierId"), ValidateNonEmpty]
 		public Supplier Supplier { get; set; }
 
-		[BelongsTo(Column = "CatalogId"), ValidateNonEmpty]
+		//[BelongsTo(Column = "CatalogId"), ValidateNonEmpty]
 		public Catalog Catalog { get; set; }
 
 		[Property, ValidateNonEmpty("Аннотация должна быть заполненна.")]
