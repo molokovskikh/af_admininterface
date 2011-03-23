@@ -8,6 +8,8 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
+using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -37,8 +39,7 @@ namespace AdminInterface.Controllers
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
-				.CreateAlias("Supplier", "s", JoinType.InnerJoin)
-				.CreateAlias("Catalog", "c", JoinType.InnerJoin);
+				.CreateAlias("Supplier", "s", JoinType.InnerJoin);
 
 			if (PromotionStatus == Controllers.PromotionStatus.Enabled)
 				criteria.Add(Expression.Eq("Enabled", true));
@@ -47,9 +48,9 @@ namespace AdminInterface.Controllers
 					criteria.Add(Expression.Eq("Enabled", false));
 
 			if (!String.IsNullOrEmpty(SearchText))
-				criteria.Add(Expression.Like("c.Name", SearchText, MatchMode.Anywhere));
+				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
 
-			criteria.AddOrder(Order.Asc("c.Name"));
+			criteria.AddOrder(Order.Asc("Name"));
 
 			return ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
@@ -211,27 +212,53 @@ namespace AdminInterface.Controllers
 
 		public int CurrentPage { get; set; }
 	}
-	
+
+	public class PromotionBinder : DataBinder
+	{
+		protected override bool PerformCustomBinding(object instance, string prefix, Node node)
+		{
+			if (prefix == "Catalogs" && instance.GetType() == typeof(Catalog) && node.Name == "0")
+				return true;
+			else
+				return base.PerformCustomBinding(instance, prefix, node);
+		}
+	}
+
 	[
-		Layout("GeneralWithJQuery"),
+		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof(BindingHelper)), 
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
 		Helper(typeof(LinkHelper)),
-		Helper(typeof(PaginatorHelper)),
+		Helper(typeof(PaginatorHelper), "paginator"),
 	]
 	public class PromotionsController : SmartDispatcherController
 	{
 		private Dictionary<string, string> _allowedExtentions;
 
-		public PromotionsController()
+		private void InitExtentions()
 		{
 			_allowedExtentions = new Dictionary<string, string> 
 			{
 				{".htm", "text/HTML"},
+				{".html", "text/HTML"},
 				{".jpg", "image/JPEG"},
+				{".jpeg", "image/JPEG"},
 				{".txt", "text/plain"},
 			};
+		}
+
+		public PromotionsController(IDataBinder binder)
+//			: base(new PromotionBinder())
+			: base(binder)
+		{
+			InitExtentions();
+		}
+
+		public PromotionsController()
+			//: base(new PromotionBinder())
+		{
+			InitExtentions();
 		}
 
 		private bool IsAllowedExtention(string extention)
@@ -261,18 +288,28 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void Edit(uint id)
+		public void Edit(
+			uint id,
+			[DataBind("PromoRegions")] ulong[] promoRegions)
 		{
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
 
 			var promotion = SupplierPromotion.Find(id);
 			PropertyBag["promotion"] = promotion;
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.Supplier.MaskRegion).OrderBy(reg => reg.Name);
+
 
 			if (IsPost)
 			{
 				BindObjectInstance(promotion, "promotion");
-				if (!HasValidationError(promotion))
+
+				var onDelete = promotion.Catalogs.Where(c => c.Id < 1).ToList();
+				onDelete.Each(c => promotion.Catalogs.Remove(c));
+
+				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
+
+				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
 				{
 
 					var file = Request.Files["inputfile"] as HttpPostedFile;
@@ -298,10 +335,15 @@ namespace AdminInterface.Controllers
 					}
 
 					promotion.Save();
+
 					RedirectToAction("Index");
 				}
 				else
+				{
+					if (promotion.Catalogs.Count == 0)
+						Flash["Message"] = Message.Error("Список препаратов не может быть пустым.");
 					ActiveRecordMediator.Evict(promotion);
+				}
 			}
 		}
 
@@ -330,7 +372,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["catalogNames"] = filter.Find<Catalog>();
 		}
 
-		public void New(uint catalogId, uint supplierId)
+		public void New(uint supplierId,
+			[DataBind("PromoRegions")] ulong[] promoRegions)
 		{
 			RenderView("/Promotions/Edit");
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
@@ -338,20 +381,29 @@ namespace AdminInterface.Controllers
 
 			var client = Supplier.Find(supplierId);
 
-			var catalog = Catalog.Find(catalogId);
 			var promotion = new SupplierPromotion
 			{
 				Enabled = true,
-				Catalog = catalog,
-				Supplier = client
+				Catalogs = new List<Catalog>(),
+				Supplier = client,
+				RegionMask = client.HomeRegion.Id,
+				Begin = DateTime.Now.AddDays(-7) .Date,
+				End = DateTime.Now.Date,
 			};
 
 			PropertyBag["promotion"] = promotion;
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.Supplier.MaskRegion).OrderBy(reg => reg.Name);
 
 			if (IsPost)
 			{
 				BindObjectInstance(promotion, "promotion");
-				if (!HasValidationError(promotion))
+
+				var onDelete = promotion.Catalogs.Where(c => c.Id < 1).ToList();
+				onDelete.Each(c => promotion.Catalogs.Remove(c));
+
+				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
+
+				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
 				{
 					var file = Request.Files["inputfile"] as HttpPostedFile;
 					if (file != null && file.ContentLength > 0)
@@ -379,7 +431,11 @@ namespace AdminInterface.Controllers
 					RedirectToAction("Index");
 				}
 				else
+				{
+					if (promotion.Catalogs.Count == 0)
+						Flash["Message"] = Message.Error("Список препаратов не может быть пустым.");
 					ActiveRecordMediator.Evict(promotion);
+				}
 			}
 		}
 
@@ -417,6 +473,21 @@ namespace AdminInterface.Controllers
 		{
 			PropertyBag["filter"] = filter;
 			PropertyBag["suppliers"] = filter.Find<Supplier>();
+		}
+
+		[return: JSONReturnBinder]
+		public object SearchCatalog(string term)
+		{
+			return ActiveRecordLinq
+				.AsQueryable<Catalog>()
+				.Where(c => !c.Hidden  && c.Name.Contains(term))
+				.Take(20)
+				.ToList()
+				.Select(c => new
+				{
+					id = c.Id,
+					label = c.Name
+				});
 		}
 
 	}

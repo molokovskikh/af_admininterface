@@ -97,6 +97,9 @@ namespace AdminInterface.Models
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
 		public virtual IList<Price> Prices { get; set; }
 
+		[Property, Description("Регионы работы")]
+		public virtual ulong MaskRegion { get; set; }
+
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
 			return Queryable.Where(p => p.Payer.PayerID == payerId).OrderBy(s => s.Name).ToList();

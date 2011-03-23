@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,6 +20,7 @@ namespace Functional
 	[TestFixture]
 	public class PromotionsFixture : WatinFixture
 	{
+
 		private Supplier _supplier;
 		private Catalog _catalog;
 		private SupplierPromotion _promotion;
@@ -28,14 +29,14 @@ namespace Functional
 		public void Init()
 		{
 			ArHelper.WithSession(s =>
-			                     	{
-			                     		s.CreateSQLQuery(
-			                     			@"
+									{
+										s.CreateSQLQuery(
+											@"
 delete from 
-  usersettings.SupplierPromotions
+	usersettings.SupplierPromotions
 where
-  SupplierId in (select FirmCode from usersettings.ClientsData where ShortName like 'Test supplier%')")
-			                     			.ExecuteUpdate();
+	SupplierId in (select FirmCode from usersettings.ClientsData where ShortName like 'Test supplier%')")
+											.ExecuteUpdate();
 			});
 
 		}
@@ -58,7 +59,8 @@ select
 	catalog.Id
 from
 	catalogs.catalog
-	left join usersettings.SupplierPromotions sp on sp.CatalogId = catalogId
+	left join usersettings.PromotionCatalogs pc on pc.CatalogId = catalogId
+	left join usersettings.SupplierPromotions sp on sp.Id = pc.PromotionId
 	left join usersettings.clientsdata cd on cd.FirmCode = sp.SupplierId and cd.ShortName like 'Test supplier%'
 where
 	catalog.Hidden = 0
@@ -74,8 +76,11 @@ limit 1")
 			{
 				Enabled = true,
 				Supplier = supplier,
-				Catalog = catalog,
-				Annotation = catalog.Name
+				Annotation = catalog.Name,
+				Name = catalog.Name,
+				Begin = DateTime.Now.Date.AddDays(-7),
+				End = DateTime.Now.Date,
+				Catalogs = new List<Catalog> { catalog }
 			};
 			supplierPromotion.Save();
 			return supplierPromotion;
@@ -100,21 +105,21 @@ limit 1")
 		}
 
 
-		[Test(Description = "проверяем отображение основной страницы с акциями")]
+		[Test(Description = "РїСЂРѕРІРµСЂСЏРµРј РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ РѕСЃРЅРѕРІРЅРѕР№ СЃС‚СЂР°РЅРёС†С‹ СЃ Р°РєС†РёСЏРјРё")]
 		public void OpenIndexPage()
 		{
 			using (var browser = Open("/"))
 			{
-				var link = browser.Link(Find.ByText("Промо-акции"));
-				Assert.That(link, Is.Not.Null, "Не найдена ссылка с промо-акциями");
+				var link = browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё"));
+				Assert.That(link, Is.Not.Null, "РќРµ РЅР°Р№РґРµРЅР° СЃСЃС‹Р»РєР° СЃ РїСЂРѕРјРѕ-Р°РєС†РёСЏРјРё");
 				link.Click();
 
-				Assert.That(browser.Text, Is.StringContaining("Список акций"));
-				Assert.That(browser.Text, Is.StringContaining("Введите текст для поиска"));
-				Assert.That(browser.Text, Is.StringContaining("Статус:"));
+				Assert.That(browser.Text, Is.StringContaining("РЎРїРёСЃРѕРє Р°РєС†РёР№"));
+				Assert.That(browser.Text, Is.StringContaining("Р’РІРµРґРёС‚Рµ С‚РµРєСЃС‚ РґР»СЏ РїРѕРёСЃРєР°"));
+				Assert.That(browser.Text, Is.StringContaining("РЎС‚Р°С‚СѓСЃ:"));
 				var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
 				Assert.That(list.Exists, Is.True);
-				Assert.That(list.SelectedItem, Is.EqualTo("Включенные")); 
+				Assert.That(list.SelectedItem, Is.EqualTo("Р’РєР»СЋС‡РµРЅРЅС‹Рµ")); 
 			}
 		}
 
@@ -129,7 +134,7 @@ limit 1")
 			var row = browser.TableRow("SupplierPromotionRow" + _promotion.Id);
 			Assert.That(row.Exists, Is.True);
 			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Supplier.Name)).Exists, Is.True);
-			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Catalog.Name)).Exists, Is.True);
+			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Name)).Exists, Is.True);
 			Assert.That(row.OwnTableCells[1].CheckBoxes.Count, Is.EqualTo(1));
 			Assert.That(row.OwnTableCells[1].CheckBoxes[0].Checked, Is.EqualTo(promotion.Enabled));
 			Assert.That(row.OwnTableCells[2].CheckBoxes.Count, Is.EqualTo(1));
@@ -137,57 +142,57 @@ limit 1")
 			return row;
 		}
 
-		[Test(Description = "проверяем работу фильтра по статусам акций")]
+		[Test(Description = "РїСЂРѕРІРµСЂСЏРµРј СЂР°Р±РѕС‚Сѓ С„РёР»СЊС‚СЂР° РїРѕ СЃС‚Р°С‚СѓСЃР°Рј Р°РєС†РёР№")]
 		public void CheckFilterStatus()
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("Промо-акции")).Click();
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
 
-				//Только что созданная акция должна быть в списке
+				//РўРѕР»СЊРєРѕ С‡С‚Рѕ СЃРѕР·РґР°РЅРЅР°СЏ Р°РєС†РёСЏ РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІ СЃРїРёСЃРєРµ
 				RowPromotionExists(browser, _promotion);
 
-				//ее не должно быть в списке отключенных
+				//РµРµ РЅРµ РґРѕР»Р¶РЅРѕ Р±С‹С‚СЊ РІ СЃРїРёСЃРєРµ РѕС‚РєР»СЋС‡РµРЅРЅС‹С…
 				var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
-				list.Select("Отключенные");
-				browser.Button(Find.ByValue("Показать")).Click();
+				list.Select("РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ");
+				browser.Button(Find.ByValue("РџРѕРєР°Р·Р°С‚СЊ")).Click();
 
 				RowPromotionNotExists(browser, _promotion);
 
-				//она должна быть в списке "Все"
+				//РѕРЅР° РґРѕР»Р¶РЅР° Р±С‹С‚СЊ РІ СЃРїРёСЃРєРµ "Р’СЃРµ"
 				list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
-				list.Select("Все");
-				browser.Button(Find.ByValue("Показать")).Click();
+				list.Select("Р’СЃРµ");
+				browser.Button(Find.ByValue("РџРѕРєР°Р·Р°С‚СЊ")).Click();
 
 				RowPromotionExists(browser, _promotion);
 			}
 
 		}
 
-		[Test(Description = "проверяем включение/выключение акций")]
+		[Test(Description = "РїСЂРѕРІРµСЂСЏРµРј РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ Р°РєС†РёР№")]
 		public void DisabledPromotion()
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("Промо-акции")).Click();
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
 
-				//отключаем акцию
+				//РѕС‚РєР»СЋС‡Р°РµРј Р°РєС†РёСЋ
 				var row = RowPromotionExists(browser, _promotion);
 				row.OwnTableCells[1].CheckBoxes[0].Click();
 
-				//проверяем отключение
+				//РїСЂРѕРІРµСЂСЏРµРј РѕС‚РєР»СЋС‡РµРЅРёРµ
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.False);
 				Assert.That(_promotion.AgencyDisabled, Is.False);
 				RowPromotionNotExists(browser, _promotion);
 
-				//находим ее в списке отключенных
+				//РЅР°С…РѕРґРёРј РµРµ РІ СЃРїРёСЃРєРµ РѕС‚РєР»СЋС‡РµРЅРЅС‹С…
 				var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
-				list.Select("Отключенные");
-				browser.Button(Find.ByValue("Показать")).Click();
+				list.Select("РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ");
+				browser.Button(Find.ByValue("РџРѕРєР°Р·Р°С‚СЊ")).Click();
 				row = RowPromotionExists(browser, _promotion);
 
-				//включаем обратно
+				//РІРєР»СЋС‡Р°РµРј РѕР±СЂР°С‚РЅРѕ
 				row.OwnTableCells[1].CheckBoxes[0].Click();
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.True);
@@ -196,24 +201,24 @@ limit 1")
 			}
 		}
 
-		[Test(Description = "проверяем включение/выключение акций административно АК Инфорум")]
+		[Test(Description = "РїСЂРѕРІРµСЂСЏРµРј РІРєР»СЋС‡РµРЅРёРµ/РІС‹РєР»СЋС‡РµРЅРёРµ Р°РєС†РёР№ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РёРІРЅРѕ РђРљ РРЅС„РѕСЂСѓРј")]
 		public void AgencyDisabledPromotion()
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("Промо-акции")).Click();
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
 
-				//отключаем акцию
+				//РѕС‚РєР»СЋС‡Р°РµРј Р°РєС†РёСЋ
 				var row = RowPromotionExists(browser, _promotion);
 				row.OwnTableCells[2].CheckBoxes[0].Click();
 
-				//проверяем отключение
+				//РїСЂРѕРІРµСЂСЏРµРј РѕС‚РєР»СЋС‡РµРЅРёРµ
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.True);
 				Assert.That(_promotion.AgencyDisabled, Is.True);
 				row = RowPromotionExists(browser, _promotion);
 
-				//включаем обратно
+				//РІРєР»СЋС‡Р°РµРј РѕР±СЂР°С‚РЅРѕ
 				row.OwnTableCells[2].CheckBoxes[0].Click();
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.True);
@@ -222,16 +227,16 @@ limit 1")
 			}
 		}
 
-		[Test(Description = "удаление акции")]
+		[Test(Description = "СѓРґР°Р»РµРЅРёРµ Р°РєС†РёРё")]
 		public void DeletePromotion()
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("Промо-акции")).Click();
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
 
 				var row = RowPromotionExists(browser, _promotion);
 
-				row.Button(Find.ByValue("Удалить")).Click();
+				row.Button(Find.ByValue("РЈРґР°Р»РёС‚СЊ")).Click();
 
 				var deletedPromotion = SupplierPromotion.TryFind(_promotion.Id);
 				Assert.That(deletedPromotion, Is.Null);
@@ -240,38 +245,49 @@ limit 1")
 			}
 		}
 
-		[Test(Description = "редактирование акции")]
+		[Test(Description = "СЂРµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р°РєС†РёРё")]
 		public void EditPromotion()
 		{
 			using (var browser = Open("/"))
 			{
-				browser.Link(Find.ByText("Промо-акции")).Click();
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
 
 				var row = RowPromotionExists(browser, _promotion);
 
-				row.Link(Find.ByText("Редактировать")).Click();
+				row.Link(Find.ByText("Р РµРґР°РєС‚РёСЂРѕРІР°С‚СЊ")).Click();
 
-				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
-				Assert.That(browser.Text, Is.StringContaining(_promotion.Catalog.Name));
+				Assert.That(browser.Text, Is.StringContaining("Р РµРґР°РєС‚РёСЂРѕРІР°РЅРёРµ Р°РєС†РёРё в„–" + _promotion.Id));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
 				Assert.That(browser.Text, Is.StringContaining(_promotion.Supplier.Name));
 
 				Console.WriteLine(browser.Html);
 
 				browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
 				browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
-				browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
+				browser.TextField(Find.ByName("promotion.Annotation")).TypeText("РЅРѕРІРѕРµ РєСЂСѓС‚РѕРµ РѕРїРёСЃР°РЅРёРµ");
 
-				browser.Button(Find.ByValue("Сохранить")).Click();
+				browser.Button(Find.ByValue("РЎРѕС…СЂР°РЅРёС‚СЊ")).Click();
 
-				Assert.That(browser.Text, Is.StringContaining("Список акций"));
+				Assert.That(browser.Text, Is.StringContaining("РЎРїРёСЃРѕРє Р°РєС†РёР№"));
 				RowPromotionNotExists(browser, _promotion);
 
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.False);
 				Assert.That(_promotion.AgencyDisabled, Is.True);
-				Assert.That(_promotion.Annotation, Is.EqualTo("новое крутое описание"));
+				Assert.That(_promotion.Annotation, Is.EqualTo("РЅРѕРІРѕРµ РєСЂСѓС‚РѕРµ РѕРїРёСЃР°РЅРёРµ"));
 			}
 		}
 
+		[Test(Description = "РїСЂРѕРІРµСЂСЏРµРј СЃРѕР·РґР°РЅРёРµ РЅРѕРІРѕР№ Р°РєС†РёРё")]
+		public void CreateNewPromotion()
+		{
+			using (var browser = Open("/"))
+			{
+				browser.Link(Find.ByText("РџСЂРѕРјРѕ-Р°РєС†РёРё")).Click();
+
+				var addButton = browser.Button(Find.ByValue("Р”РѕР±Р°РІРёС‚СЊ РЅРѕРІСѓСЋ Р°РєС†РёСЋ"));
+				Assert.That(addButton.Exists, Is.True, "РќРµ РЅР°Р№РґРµРЅР° РєРЅРѕРїРєР° РґРѕР±Р°РІР»РµРЅРёСЏ Р°РєС†РёРё");
+			}
+		}
 	}
 }
