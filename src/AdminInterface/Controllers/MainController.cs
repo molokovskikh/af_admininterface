@@ -16,7 +16,7 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(BindingHelper)),
-		Layout("GeneralWithJQueryOnly"),
+		Layout("Main"),
 		Secure
 	]
 	public class MainController : ARSmartDispatcherController

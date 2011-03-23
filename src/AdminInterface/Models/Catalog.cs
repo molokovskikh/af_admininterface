@@ -3,7 +3,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("catalogs.catalog")]
+	[ActiveRecord("Catalog", Schema = "catalogs")]
 	public class Catalog : ActiveRecordBase<Catalog>
 	{
 		[PrimaryKey]
@@ -15,7 +15,13 @@ namespace AdminInterface.Models
 		[Property]
 		public string Name { get; set; }
 
-		[HasMany(ColumnKey = "CatalogId", Inverse = false, Lazy = true)]
+		[HasAndBelongsToMany(typeof(SupplierPromotion),
+			Lazy = true,
+			Inverse=true,
+			ColumnKey = "CatalogId",
+			Table = "PromotionCatalogs",
+			Schema = "usersettings",
+			ColumnRef = "PromotionId")]
 		public virtual IList<SupplierPromotion> Promotions { get; set; }
 	}
 }
