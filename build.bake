@@ -23,7 +23,11 @@ def Ask(question as string):
 
 task @default, [@Build]
 
-task @Build, [@BuildWebSite, @BuildBackground]:
+task @Build, [@BuildWebSite]
+
+task @BuildFull, [@BuildWebSite, @BuildBackground, @BuildPrinter]
+
+task @BuildPrinter:
 	oldProject = Globals.Project
 	Globals.Project = @Printer
 	project = @Printer
@@ -62,4 +66,4 @@ task @BuildBackground:
 
 task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @SendDeployNotification]
 
-task @FullDeploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
+task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
