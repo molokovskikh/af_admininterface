@@ -7,41 +7,18 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("Regions", Schema = "farm")]
-	public class Region : ActiveRecordLinqBase<Region>
+	public static class RegionHelper
 	{
-		[PrimaryKey("RegionCode")]
-		public virtual ulong Id { get; set; }
-
-		[Property("Region")]
-		public virtual string Name { get; set; }
-
-		[Property("DefaultShowRegionMask")]
-		public virtual UInt64 DefaultShowRegionMask { get; set; }
-
-		public bool IsAll { get; set; }
-
-		public static Region[] GetRegionsByMask(ulong mask)
-		{
-			return FindAll(Expression.Sql(String.Format("(RegionCode & {0}) > 0", mask)));
-		}
-
-		public static IList<Region> All()
-		{
-			return Queryable
-				.Where(r => r.Id != 0)
-				.OrderBy(r => r.Name)
-				.ToList();
-		}
-
 		public static IList<Region> GetAllRegions()
 		{
-			return ArHelper.WithSession(session => {
-			
+			return ArHelper.WithSession(session =>
+			{
+
 				var regions = session.CreateSQLQuery(@"
 select
 	(select sum(regioncode) from farm.regions) as {Region.Id},
@@ -62,11 +39,6 @@ ORDER BY IsAll Desc, {Region.Name};")
 				regions.Each(session.Evict);
 				return regions;
 			});
-		}
-
-		public override string ToString()
-		{
-			return Name;
 		}
 	}
 

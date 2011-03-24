@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["SearchResults"] = searchResults;
 			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = Region.GetAllRegions();
+			PropertyBag["regions"] = RegionHelper.GetAllRegions();
 			PropertyBag["SortDirection"] = "Ascending";
 			PropertyBag["SortColumnName"] = "UserName";
 
@@ -53,7 +53,7 @@ namespace AdminInterface.Controllers
 		{
 			var searchProperties = new UserSearchProperties { SearchBy = SearchUserBy.Auto };
 			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = Region.GetAllRegions();
+			PropertyBag["regions"] = RegionHelper.GetAllRegions();
 		}
 
 		public void OrderBy([DataBind("SearchBy")] UserSearchProperties searchProperties,
@@ -66,7 +66,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["SearchResults"] = searchResults;
 			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = Region.GetAllRegions();
+			PropertyBag["regions"] = RegionHelper.GetAllRegions();
 			PropertyBag["SortColumnName"] = sortColumnName;
 			PropertyBag["SortDirection"] = sortDirection;
 			PropertyBag["rowsCount"] = rowsCount;

@@ -12,6 +12,7 @@ using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using System.Collections;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {

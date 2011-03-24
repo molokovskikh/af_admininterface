@@ -4,8 +4,6 @@
 
 <% component Bubble, {"bredcrumbs" : [("Акции", "")], "pageTitle":"Акции"} %>
 
-<div class="block">Акции</div>
-
 <div style="padding: 10px">
 
 	<div class=block style="padding:0;">
@@ -31,7 +29,7 @@
 				<th>${app.Sortable("№", "Id")}</th>
 				<th>${app.Sortable("Включена", "Enabled")}</th>
 				<th>${app.Sortable("Отключена АК Инфорум", "AgencyDisabled")}</th>
-				<th>${app.Sortable("Наименование", "CatalogName")}</th>
+				<th>${app.Sortable("Наименование", "Name")}</th>
 				<th>${app.Sortable("Поставщик", "SupplierName")}</th>
 				<th></th>
 				<th></th>
@@ -49,8 +47,8 @@
 						<input type=checkbox name="promotions[${i}].Id" ${"checked" if promotion.AgencyDisabled} onclick="submit();">
 					</form>
 				</td>
-				<td>${promotion.Catalog.Name}</td>
-				<td>${promotion.Supplier.Name}</td>
+				<td>${promotion.Name}</td>
+				<td>${promotion.PromotionOwnerSupplier.Name}</td>
 				<td><a href="${siteroot}/Promotions/Edit.rails?id=${promotion.Id}">Редактировать</a></td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/Delete.rails?id=${promotion.Id}">

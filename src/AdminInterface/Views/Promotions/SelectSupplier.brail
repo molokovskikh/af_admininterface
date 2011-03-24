@@ -26,14 +26,14 @@
 			</tr>
 			<% for i, supplier in enumerate(suppliers): %>
 			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td><a href="${siteroot}/Promotions/SelectName.rails?filter.SupplierId=${supplier.Id}">${supplier.Name}</a></td>
+				<td><a href="${siteroot}/Promotions/New.rails?supplierId=${supplier.Id}">${supplier.Name}</a></td>
 				<td>${supplier.HomeRegion.Name}</td>
 			</tr>
 			<% end %>
 			<tr>
 				<td colspan="2" align="right">
 					<div class="Paginator">
-						${PaginatorHelper.ShowPaginator()}
+						${paginator.ShowPaginator()}
 					</div>
 				</td>
 				</tr>

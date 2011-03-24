@@ -22,6 +22,7 @@ using AdminInterface.Properties;
 using log4net;
 using MySql.Data.MySqlClient;
 using NHibernate;
+using Supplier = AdminInterface.Models.Supplier;
 
 namespace AdminInterface.Controllers
 {

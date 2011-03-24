@@ -9,6 +9,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 using System.Linq;
 
@@ -16,7 +17,7 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(BindingHelper)),
-		Layout("GeneralWithJQueryOnly"),
+		Layout("Main"),
 		Secure
 	]
 	public class MainController : ARSmartDispatcherController
@@ -27,7 +28,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
 			});
 
-			var regions = Region.GetAllRegions();
+			var regions = RegionHelper.GetAllRegions();
 			PropertyBag["Regions"] = regions;
 			PropertyBag["RegionId"] = regions.Where(region => region.Name.ToLower().Equals("все")).First().Id;
 			PropertyBag["admin"] = SecurityContext.Administrator;

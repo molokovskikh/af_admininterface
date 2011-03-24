@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 

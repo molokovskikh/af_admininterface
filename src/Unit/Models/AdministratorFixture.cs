@@ -2,6 +2,7 @@
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Common.Web.Ui.Models;
 using NUnit.Framework;
 
 namespace Unit.Models
