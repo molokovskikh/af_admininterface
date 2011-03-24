@@ -13,6 +13,7 @@ using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 
@@ -39,13 +40,13 @@ namespace AdminInterface.Controllers
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
-				.CreateAlias("Supplier", "s", JoinType.InnerJoin);
+				.CreateAlias("PromotionOwnerSupplier", "s", JoinType.InnerJoin);
 
 			if (PromotionStatus == Controllers.PromotionStatus.Enabled)
-				criteria.Add(Expression.Eq("Enabled", true));
+				criteria.Add(Expression.Eq("Status", true));
 			else
 				if (PromotionStatus == Controllers.PromotionStatus.Disabled)
-					criteria.Add(Expression.Eq("Enabled", false));
+					criteria.Add(Expression.Eq("Status", false));
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
@@ -96,8 +97,8 @@ namespace AdminInterface.Controllers
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
-				.CreateAlias("Promotions", "sp", JoinType.LeftOuterJoin, Expression.Eq("sp.Supplier.Id", SupplierId))
-				.CreateAlias("sp.Supplier", "s", JoinType.LeftOuterJoin);
+				.CreateAlias("Promotions", "sp", JoinType.LeftOuterJoin, Expression.Eq("sp.PromotionOwnerSupplier.Id", SupplierId))
+				.CreateAlias("sp.PromotionOwnerSupplier", "s", JoinType.LeftOuterJoin);
 
 			criteria.Add(Expression.Eq("Hidden", false));
 			criteria.Add(Expression.IsNull("s.Id"));
@@ -297,7 +298,7 @@ namespace AdminInterface.Controllers
 
 			var promotion = SupplierPromotion.Find(id);
 			PropertyBag["promotion"] = promotion;
-			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.Supplier.MaskRegion).OrderBy(reg => reg.Name);
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 
 			if (IsPost)
@@ -367,7 +368,7 @@ namespace AdminInterface.Controllers
 
 		public void SelectName([DataBind("filter")] CatalogFilter filter)
 		{
-			PropertyBag["supplier"] = Supplier.Find(filter.SupplierId);
+			PropertyBag["supplier"] = PromotionOwnerSupplier.Find(filter.SupplierId);
 			PropertyBag["filter"] = filter;
 			PropertyBag["catalogNames"] = filter.Find<Catalog>();
 		}
@@ -379,20 +380,20 @@ namespace AdminInterface.Controllers
 			PropertyBag["allowedExtentions"] = GetAllowedExtentions();
 			Binder.Validator = Validator;
 
-			var client = Supplier.Find(supplierId);
+			var client = PromotionOwnerSupplier.Find(supplierId);
 
 			var promotion = new SupplierPromotion
 			{
 				Enabled = true,
 				Catalogs = new List<Catalog>(),
-				Supplier = client,
+				PromotionOwnerSupplier = client,
 				RegionMask = client.HomeRegion.Id,
 				Begin = DateTime.Now.AddDays(-7) .Date,
 				End = DateTime.Now.Date,
 			};
 
 			PropertyBag["promotion"] = promotion;
-			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.Supplier.MaskRegion).OrderBy(reg => reg.Name);
+			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 			if (IsPost)
 			{
@@ -472,7 +473,7 @@ namespace AdminInterface.Controllers
 		public void SelectSupplier([DataBind("filter")] SupplierFilter filter)
 		{
 			PropertyBag["filter"] = filter;
-			PropertyBag["suppliers"] = filter.Find<Supplier>();
+			PropertyBag["suppliers"] = filter.Find<PromotionOwnerSupplier>();
 		}
 
 		[return: JSONReturnBinder]
