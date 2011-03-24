@@ -28,6 +28,7 @@ using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
+using Common.Web.Ui.Models;
 using log4net;
 using log4net.Config;
 using MySql.Data.MySqlClient;

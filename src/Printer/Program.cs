@@ -11,6 +11,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.Models;
 using log4net;
 using log4net.Config;
 

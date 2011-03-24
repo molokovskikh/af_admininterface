@@ -188,7 +188,6 @@
     <Compile Include="Models\Billing\Report.cs" />
     <Compile Include="Models\Billing\SwitchLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
-    <Compile Include="Models\Catalog.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
     <Compile Include="Models\Document.cs" />
@@ -214,7 +213,6 @@
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
-    <Compile Include="Models\SupplierPromotion.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\Telephony\CallRecordFile.cs" />

@@ -7,6 +7,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using log4net;
 using NHibernate;
 using NHibernate.Cfg;

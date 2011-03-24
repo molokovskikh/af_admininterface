@@ -5,6 +5,7 @@ using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {

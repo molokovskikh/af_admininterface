@@ -17,6 +17,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using SortDirection = Common.Tools.SortDirection;
 
 namespace AdminInterface.Controllers
@@ -301,7 +302,7 @@ namespace AdminInterface.Controllers
 
 		private static IList<Region> GetRegions()
 		{
-			var regions = Region.GetAllRegions();
+			var regions = RegionHelper.GetAllRegions();
 			regions.First(r => r.Name == "Все").Id = ulong.MaxValue;
 			return regions;
 		}

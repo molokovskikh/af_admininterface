@@ -58,7 +58,7 @@ from billing.Payers
 		{
 			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
 			Assert.That(browser.Text, Is.StringContaining("Сообщения пользователя"));
-			Assert.That(browser.Text, Is.StringContaining("Доступ к адресам доставки "));
+			Assert.That(browser.Text, Is.StringContaining("Доступ к адресам доставки"));
 		}
 
 		[Test]

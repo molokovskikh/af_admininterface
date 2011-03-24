@@ -9,6 +9,7 @@ using Common.Tools;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
+using Supplier = AdminInterface.Models.Supplier;
 
 namespace Integration.ForTesting
 {

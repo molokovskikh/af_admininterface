@@ -18,6 +18,7 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
+using Supplier = AdminInterface.Models.Supplier;
 
 namespace AdminInterface.Controllers
 {
