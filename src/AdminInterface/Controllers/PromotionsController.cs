@@ -298,6 +298,7 @@ namespace AdminInterface.Controllers
 
 			var promotion = SupplierPromotion.Find(id);
 			PropertyBag["promotion"] = promotion;
+			ActiveRecordMediator.Evict(promotion);
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 
@@ -340,12 +341,10 @@ namespace AdminInterface.Controllers
 					RedirectToAction("Index");
 				}
 				else
-				{
-					if (promotion.Catalogs.Count == 0)
-						Flash["Message"] = Message.Error("Список препаратов не может быть пустым.");
 					ActiveRecordMediator.Evict(promotion);
-				}
 			}
+			else
+				ActiveRecordMediator.Evict(promotion);
 		}
 
 		public void ChangeState(uint id, [DataBind("filter")] PromotionFilter filter)
@@ -393,6 +392,7 @@ namespace AdminInterface.Controllers
 			};
 
 			PropertyBag["promotion"] = promotion;
+			ActiveRecordMediator.Evict(promotion);
 			PropertyBag["AllowRegions"] = Region.GetRegionsByMask(promotion.PromotionOwnerSupplier.MaskRegion).OrderBy(reg => reg.Name);
 
 			if (IsPost)
@@ -432,12 +432,10 @@ namespace AdminInterface.Controllers
 					RedirectToAction("Index");
 				}
 				else
-				{
-					if (promotion.Catalogs.Count == 0)
-						Flash["Message"] = Message.Error("Список препаратов не может быть пустым.");
 					ActiveRecordMediator.Evict(promotion);
-				}
 			}
+			else
+				ActiveRecordMediator.Evict(promotion);
 		}
 
 		private string GetPromoFile(SupplierPromotion promotion)
