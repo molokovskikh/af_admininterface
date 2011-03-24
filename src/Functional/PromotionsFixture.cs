@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using log4net;
@@ -21,7 +21,7 @@ namespace Functional
 	public class PromotionsFixture : WatinFixture
 	{
 
-		private Supplier _supplier;
+		private PromotionOwnerSupplier _supplier;
 		private Catalog _catalog;
 		private SupplierPromotion _promotion;
 
@@ -41,12 +41,12 @@ where
 
 		}
 
-		private Supplier CreateSupplier()
+		private PromotionOwnerSupplier CreateSupplier()
 		{
 			var supplier = DataMother.CreateTestSupplier();
 			supplier.Name += " " + supplier.Id;
 			supplier.Save();
-			return supplier;
+			return PromotionOwnerSupplier.Find(supplier.Id);
 		}
 
 		private Catalog FindFirstFreeCatalog()
@@ -70,12 +70,12 @@ limit 1")
 			return Catalog.Find(catalogId);
 		}
 
-		private SupplierPromotion CreatePromotion(Supplier supplier, Catalog catalog)
+		private SupplierPromotion CreatePromotion(PromotionOwnerSupplier supplier, Catalog catalog)
 		{
 			var supplierPromotion = new SupplierPromotion
 			{
 				Enabled = true,
-				Supplier = supplier,
+				PromotionOwnerSupplier = supplier,
 				Annotation = catalog.Name,
 				Name = catalog.Name,
 				Begin = DateTime.Now.Date.AddDays(-7),
@@ -92,7 +92,7 @@ limit 1")
 			{
 				promotion.Refresh();
 				NHibernateUtil.Initialize(promotion);
-				NHibernateUtil.Initialize(promotion.Supplier);
+				NHibernateUtil.Initialize(promotion.PromotionOwnerSupplier);
 			}
 		}
 
@@ -133,7 +133,7 @@ limit 1")
 		{
 			var row = browser.TableRow("SupplierPromotionRow" + _promotion.Id);
 			Assert.That(row.Exists, Is.True);
-			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Supplier.Name)).Exists, Is.True);
+			Assert.That(row.OwnTableCell(Find.ByText(_promotion.PromotionOwnerSupplier.Name)).Exists, Is.True);
 			Assert.That(row.OwnTableCell(Find.ByText(_promotion.Name)).Exists, Is.True);
 			Assert.That(row.OwnTableCells[1].CheckBoxes.Count, Is.EqualTo(1));
 			Assert.That(row.OwnTableCells[1].CheckBoxes[0].Checked, Is.EqualTo(promotion.Enabled));
@@ -216,6 +216,12 @@ limit 1")
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.True);
 				Assert.That(_promotion.AgencyDisabled, Is.True);
+				RowPromotionNotExists(browser, _promotion);
+
+				//находим ее в списке отключенных
+				var list = browser.SelectList(Find.ByName("filter.PromotionStatus"));
+				list.Select("Отключенные");
+				browser.Button(Find.ByValue("Показать")).Click();
 				row = RowPromotionExists(browser, _promotion);
 
 				//включаем обратно
@@ -223,7 +229,7 @@ limit 1")
 				RefreshPromotion(_promotion);
 				Assert.That(_promotion.Enabled, Is.True);
 				Assert.That(_promotion.AgencyDisabled, Is.False);
-				RowPromotionExists(browser, _promotion);
+				RowPromotionNotExists(browser, _promotion);
 			}
 		}
 
@@ -258,7 +264,7 @@ limit 1")
 
 				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
 				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
-				Assert.That(browser.Text, Is.StringContaining(_promotion.Supplier.Name));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
 				Console.WriteLine(browser.Html);
 
@@ -287,6 +293,72 @@ limit 1")
 
 				var addButton = browser.Button(Find.ByValue("Добавить новую акцию"));
 				Assert.That(addButton.Exists, Is.True, "Не найдена кнопка добавления акции");
+			}
+		}
+
+		[Test]
+		public void TestSaving()
+		{
+			//using (var transaction = new TransactionScope())
+			//{
+			//    _promotion.Enabled = false;
+			//    Assert.That(_promotion.IsActive(), Is.False);
+			//    _promotion.Save();
+			//    transaction.VoteCommit();
+			//}
+
+			//using (var transaction = new TransactionScope())
+			//{
+			//    var changedPromo = SupplierPromotion.Find(_promotion.Id);
+
+			//    Assert.That(changedPromo.Enabled, Is.False);
+			//    Assert.That(changedPromo.IsActive(), Is.False);
+			//}
+
+
+			var catalog = Catalog.FindFirst();
+
+			uint id;
+			using (var transaction = new TransactionScope())
+			{
+				var supplierPromotion = new SupplierPromotion
+				{
+					Enabled = true,
+					PromotionOwnerSupplier = PromotionOwnerSupplier.FindFirst(),
+					Annotation = "12121",
+					Name = "212121",
+					Begin = DateTime.Now.Date.AddDays(-7),
+					End = DateTime.Now.Date,
+					Catalogs = new List<Catalog> { catalog }
+				};
+				supplierPromotion.Save();
+
+				id = supplierPromotion.Id;
+
+
+				//Assert.That(supplierPromotion.IsActive(), Is.True);
+			}
+
+			using (var transaction = new TransactionScope())
+			{
+				var newPromo = SupplierPromotion.Find(id);
+				//Assert.That(newPromo.IsActive(), Is.True);
+			}
+
+			using (var transaction = new TransactionScope())
+			{
+				var changedPromo = SupplierPromotion.Find(id);
+				changedPromo.Enabled = false;
+				changedPromo.Save();
+
+				//Assert.That(changedPromo.IsActive(), Is.False);
+			}
+
+			using (var transaction = new TransactionScope())
+			{
+				var readPromo = SupplierPromotion.Find(id);
+
+				//Assert.That(readPromo.IsActive(), Is.False);
 			}
 		}
 	}

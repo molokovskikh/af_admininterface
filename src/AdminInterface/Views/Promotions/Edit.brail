@@ -28,19 +28,22 @@
 
 	function AddPromotionCatalog()
 	{
-		var row = $("#catalogs tbody")
-			.append($("<tr/>", { "class": "PromotionCatalog" })
-				.append($("<td/>")
-					.append($("<input/>", { "type": "hidden", "id": "promotionCatalogId", "name": "promotion.Catalogs[].Id", "value": "0" }))
-					.append($("<input/>", { "type": "text", "id": "promotionCatalogName" })))
-				.append($("<td/>")
-					.append($("<input/>", { "type": "button", "value": "Удалить" })
-								.click(function () { deleteCurrentRow(this); })
+		if ($("#CatalogId").val() != 0)
+		{
+			var row = $("#catalogs tbody")
+				.append($("<tr/>", { "class": "PromotionCatalog" })
+					.append($("<td/>")
+						.append($("<input/>", { "type": "hidden", "id": "promotionCatalogId", "name": "promotion.Catalogs[].Id", "value": $("#CatalogId").val() }))
+						.append($("#CatalogName").val()))
+					.append($("<td/>")
+						.append($("<input/>", { "type": "button", "value": "Удалить" })
+									.click(function () { deleteCurrentRow(this); })
+								)
 							)
-						)
-				);
+					);
 
-		UpdateRowIndexs();
+			UpdateRowIndexs();
+		}
 	}
 
 
@@ -53,10 +56,8 @@
 
 		if ($("#catalogs tbody tr[class='PromotionCatalog']").length > 1) {
 			table.deleteRow(rowIndex);
-			UpdateRowIndexs();		}		else {
-		    $("#promotionCatalogId").val("0");
-		    $("#promotionCatalogName").val("");
-		};
+			UpdateRowIndexs();
+		}
 	}
 
 	function UpdateRowIndexs()
@@ -68,15 +69,7 @@
 			if (row.className == "PromotionCatalog")
 			{
 				var idInput = row.cells[0].getElementsByTagName("input")[0];
-				var edit = row.cells[0].getElementsByTagName("input")[1];
 				idInput.name = "promotion.Catalogs[" + (i - 1).toString()  + "].Id";
-				$(edit).autocomplete({
-					source: "SearchCatalog",
-					minLength: 2,
-					select: function (event, ui) {
-						$(idInput).val(ui.item.id)
-					}
-				});
 			}
 		}
 	}	
@@ -85,6 +78,14 @@
 	{
 		$("form").validate();
 
+		$("#CatalogName").autocomplete({
+			source: "SearchCatalog",
+			minLength: 2,
+			select: function (event, ui) {
+				$("#CatalogId").val(ui.item.id)
+			}
+		});
+
 		UpdateRowIndexs();
 	}
 	});
@@ -92,6 +93,17 @@
 </script>
 
 <form method=post enctype="multipart/form-data">
+<% if promotion.Id: %>
+	<% if promotion.IsActive(): %>
+		<div class="flash notice">
+			Акция активна
+		</div>
+	<% else: %>
+		<div class="flash err">
+			Акция не активна
+		</div>
+	<% end %>
+<% end %>
 	<table style="width: 100%;">
 		<tr>
 			<td class="DisplayName">Наименование:</td>
@@ -102,24 +114,29 @@
 		</tr>
 		<tr>
 			<td class="DisplayName">Поставщик:</td>
-			<td>${promotion.Supplier.Name}</td>
+			<td>${promotion.PromotionOwnerSupplier.Name}</td>
 		</tr>
 		<tr>
 			<td class="DisplayName">Список препаратов:</td>
 			<td>
 				<div class="block">
-					<table id="catalogs" cellpadding="3px" cellspacing="3px">	
+					<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">	
 						<tr>
-							<td style="background-color:#f6f6f6; padding:5px;" colspan="2">
+							<td style="background-color:#f6f6f6; padding:5px;">
+								<input type=hidden id="CatalogId" value="0">
+								<input type=text id="CatalogName" value="" style="width: 60%">
+							</td>
+							<td>
 								<input type="button" value="Добавить препарат" onclick="return AddPromotionCatalog();" /> 
 							</td>
 						</tr>
 						<% if promotion.Catalogs.Count: %>
 							<% for i, catalog in enumerate(promotion.Catalogs): %>
 								<tr class="PromotionCatalog">
-									<td>
+									<td >
 										<input type=hidden id="promotionCatalogId" name=promotion.Catalogs[${i}].Id value="${promotion.Catalogs[i].Id}">
-										<input type=text id="promotionCatalogName" value="${promotion.Catalogs[i].Name}">
+										${promotion.Catalogs[i].Name}
+										<!-- <input type=text id="promotionCatalogName" value="" style="width: 100%"> -->
 									</td>
 									<td>
 										<input type="button" value="Удалить" onclick="return deleteCurrentRow(this);" /> 
@@ -127,6 +144,7 @@
 								</tr>
 							<% end %>
 						<% else: %>
+<!-- 
 							<tr class="PromotionCatalog">
 								<td>
 									<input type=hidden id="promotionCatalogId" name=promotion.Catalogs[0].Id>
@@ -136,6 +154,7 @@
 									<input type="button" value="Удалить" onclick="return deleteCurrentRow(this);" /> 
 								</td>
 							</tr>
+-->
 						<% end %>
 					</table>
 					<!--   -->

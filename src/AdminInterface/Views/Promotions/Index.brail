@@ -48,7 +48,7 @@
 					</form>
 				</td>
 				<td>${promotion.Name}</td>
-				<td>${promotion.Supplier.Name}</td>
+				<td>${promotion.PromotionOwnerSupplier.Name}</td>
 				<td><a href="${siteroot}/Promotions/Edit.rails?id=${promotion.Id}">Редактировать</a></td>
 				<td>
 					<form method=post action="${siteroot}/Promotions/Delete.rails?id=${promotion.Id}">
