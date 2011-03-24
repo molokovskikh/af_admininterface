@@ -23,7 +23,7 @@ namespace AdminInterface.Initializers
 				//тут баг для nested объектов я не выставлю is null
 				foreach(var property in clazz.PropertyIterator)
 				{
-					var getter = (BasicPropertyAccessor.BasicGetter)property.GetGetter(clazz.MappedClass);
+					var getter = (IGetter)property.GetGetter(clazz.MappedClass);
 					var type = getter.ReturnType;
 					foreach (Column column in property.ColumnIterator)
 					{
