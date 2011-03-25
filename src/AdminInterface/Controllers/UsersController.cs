@@ -205,14 +205,8 @@ namespace AdminInterface.Controllers
 									 string reason)
 		{
 			var user = User.GetById(userId);
-			var administrator = SecurityContext.Administrator;
-			
-			administrator
-				.CheckClientType(user.Client.Type)
-				.CheckClientHomeRegion(user.Client.HomeRegion.Id);
-			
 			user.CheckLogin();
-			
+			var administrator = SecurityContext.Administrator;
 			var password = User.GeneratePassword();
 		
 			using (new TransactionScope())

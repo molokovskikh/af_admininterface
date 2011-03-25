@@ -364,7 +364,7 @@ where Phone like :phone")
 			var newClient = Client.Find(clientId);
 			var address = Address.TryFind(addressId);
 			var user = User.TryFind(userId);
-			var oldClient = Client.Find(user.Client.Id);
+			var oldClient = user.Client;
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Orgs().Single();
@@ -417,7 +417,7 @@ where Phone like :phone")
 			}
 			oldClient.Refresh();
 			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)
-				UpdateClientStatus(oldClient.Id, false);	
+				UpdateClientStatus(oldClient.Id, false);
 			oldClient.Update();
 		}
 	}

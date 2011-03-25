@@ -45,7 +45,6 @@ namespace AdminInterface.Controllers
 			else
 			{
 				var user = User.Find(userId.Value);
-				Client.FindAndCheck(user.Client.Id);
 				PropertyBag["user"] = user;
 				documentLogs = DocumentSendLog.GetEnitiesForUser(user,
 					beginDate, endDate.AddDays(1));
@@ -128,9 +127,6 @@ namespace AdminInterface.Controllers
 		public void PasswordChangeLog(uint id, DateTime beginDate, DateTime endDate)
 		{
 			var user = User.GetById(id);
-
-			SecurityContext.Administrator.CheckClientType(user.Client.Type);
-			SecurityContext.Administrator.CheckClientHomeRegion(user.Client.HomeRegion.Id);
 
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
 				beginDate,
