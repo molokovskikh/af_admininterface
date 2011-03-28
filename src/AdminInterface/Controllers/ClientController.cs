@@ -116,26 +116,8 @@ namespace AdminInterface.Controllers
 
 			sort.Apply(PropertyBag);
 
-			try
-			{
-				var usersInfo = ADHelper.GetPartialUsersInformation(users);
-				PropertyBag["usersInfo"] = usersInfo;
-			}
-			catch (Exception ex)
-			{
-				var userInfo = new ADUserInformationCollection();
-				var usersNames = "";
-				foreach (var user in users)
-				{
-					userInfo.Add(new ADUserInformation {Login = user.Login});
-					usersNames += user.Login + ", ";
-				}
-				PropertyBag["usersInfo"] = userInfo;
-
-				Logger.Error(
-					String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
-						client.Id, SecurityContext.Administrator.UserName, usersNames), ex);
-			}
+			var usersInfo = ADHelper.GetPartialUsersInformation(users);
+			PropertyBag["usersInfo"] = usersInfo;
 		}
 
 		private Sort GetSort()
