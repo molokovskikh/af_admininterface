@@ -98,34 +98,32 @@ namespace AdminInterface.Models
 					filter = String.Format(" and ({0}) ", filter);
 				var result = session.CreateSQLQuery(String.Format(@"
 SELECT
-	Users.Id as {{UserSearchItem.UserId}},
-	if (Clients.Status = 0, 0, Users.Enabled) as {{UserSearchItem.Enabled}},
-	Clients.Id as {{UserSearchItem.ClientId}},
-	Users.Login as {{UserSearchItem.Login}},
-	Users.Name as {{UserSearchItem.UserName}},
-	Users.PayerId as {{UserSearchItem.PayerId}},
-	Clients.Name as {{UserSearchItem.ClientName}},
-	Regions.Region as {{UserSearchItem.RegionName}},
+	u.Id as {{UserSearchItem.UserId}},
+	u.Login as {{UserSearchItem.Login}},
+	u.Name as {{UserSearchItem.UserName}},
+	u.PayerId as {{UserSearchItem.PayerId}},
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as {{UserSearchItem.UpdateDate}},
 	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as {{UserSearchItem.UpdateIsUncommited}},
 	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
-	if(Clients.Segment = 1, 1, 2) as {{UserSearchItem.Segment}},
-	rcs.InvisibleOnFirm as {{UserSearchItem.InvisibleOnFirm}},
+
+	s.ServiceType as {{UserSearchItem.ClientType}},
+	u.RootService, s as {{UserSearchItem.ClientId}},
+	s.Name as {{UserSearchItem.ClientName}},
+	s.Disabled as {{UserSearchItem.Disabled}},
+
 	p.JuridicalName as {{UserSearchItem.JuridicalName}},
-	1 as {{UserSearchItem.ClientType}}
+	Regions.Region as {{UserSearchItem.RegionName}}
 FROM
-	future.Users
-	JOIN future.Clients ON Clients.Id = Users.ClientId
-		LEFT JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
-		LEFT JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
+	future.Users u
+	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
+	join future.Services s on s.Id = u.RootService
+		join farm.Regions r ON r.RegionCode = s.HomeRegion
+	left JOIN future.Clients ON Clients.Id = u.ClientId
+		left JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
+		left JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
 		LEFT JOIN contacts.Persons ON Persons.ContactGroupId = cg.Id
-	JOIN farm.Regions ON Regions.RegionCode = Clients.RegionCode
-	JOIN usersettings.RetClientsSet rcs ON rcs.ClientCode = Clients.Id
-	JOIN billing.Payers p ON users.PayerId = p.PayerID
-	LEFT JOIN usersettings.UserUpdateInfo uui ON uui.UserId = Users.Id
 WHERE
-	(Regions.RegionCode & :AdminRegionMask > 0) AND
-	(Clients.RegionCode & :RegionId > 0)
+	(r.RegionCode & :AdminRegionMask & :RegionId > 0) AND
 	{0}
 GROUP BY {{UserSearchItem.UserId}}
 {1}
@@ -180,11 +178,11 @@ GROUP BY {{UserSearchItem.UserId}}
 			switch (status)
 			{
 				case SearchClientStatus.Enabled: {
-						filter = AddFilterCriteria(filter, " Users.Enabled = 1 ");
+						filter = AddFilterCriteria(filter, " u.Enabled = 1 ");
 						break;
 					}
 				case SearchClientStatus.Disabled: {
-						filter = AddFilterCriteria(filter, " Users.Enabled = 0 ");
+						filter = AddFilterCriteria(filter, " u.Enabled = 0 ");
 						break;
 					}
 			}
@@ -206,15 +204,14 @@ GROUP BY {{UserSearchItem.UserId}}
 				case SearchUserBy.Auto: {
 						filter = AddFilterCriteria(filter,
 							String.Format(@"
-LOWER(Users.Login) like '{0}' or
-LOWER(Users.Name) like '{0}' or
-LOWER(Clients.Name) like '{0}' or
-LOWER(Clients.FullName) like '{0}' or 
+LOWER(u.Login) like '{0}' or
+LOWER(u.Name) like '{0}' or
+LOWER(s.Name) like '{0}' or
 (LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0) or
 LOWER(Persons.Name) like '{0}' ",
 								sqlSearchText));
 						if (searchTextIsNumber)
-							filter += String.Format(@" or Users.Id = {0} or Clients.Id = {0} ", searchText);
+							filter += String.Format(@" or u.Id = {0} or s.Id = {0} ", searchText);
 						if (searchTextIsPhone && searchText.Length >= 5)
 							filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) ",
 								sqlSearchText.Replace("-", ""));
@@ -222,11 +219,11 @@ LOWER(Persons.Name) like '{0}' ",
 					}
 				case SearchUserBy.ByClientName: {
 						filter = AddFilterCriteria(filter,
-							String.Format(" LOWER(Clients.Name) like '{0}' or LOWER(Clients.FullName) like '{0}' ", sqlSearchText));
+							String.Format(" LOWER(s.Name) like '{0}'", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByClientId: {
-						filter = AddFilterCriteria(filter, String.Format(" Clients.Id = {0} ",
+						filter = AddFilterCriteria(filter, String.Format(" s.Id = {0} ",
 							searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
@@ -235,20 +232,20 @@ LOWER(Persons.Name) like '{0}' ",
 						break;
 					}
 				case SearchUserBy.ByLogin: {
-						filter = AddFilterCriteria(filter, String.Format(" LOWER(Users.Login) like '{0}' ", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(u.Login) like '{0}' ", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByPayerId: {
-						filter = AddFilterCriteria(filter, String.Format(" Users.PayerId = {0} ",
+						filter = AddFilterCriteria(filter, String.Format(" u.PayerId = {0} ",
                             searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserId: {
-						filter = AddFilterCriteria(filter, String.Format(" Users.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
+						filter = AddFilterCriteria(filter, String.Format(" u.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserName: {
-						filter = AddFilterCriteria(filter, String.Format(" LOWER(Users.Name) like '{0}' ", sqlSearchText));
+						filter = AddFilterCriteria(filter, String.Format(" LOWER(u.Name) like '{0}' ", sqlSearchText));
 						break;
 					}
 				case SearchUserBy.ByContacts: {

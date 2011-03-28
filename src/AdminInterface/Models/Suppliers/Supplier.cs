@@ -7,11 +7,11 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
 	public class ServiceSupplier : Service
 	{
-		[JoinedKey]
+		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
 		[Property]
-		public virtual string Name { get; set; }
+		public override string Name { get; set; }
 
 		[Property]
 		public virtual string FullName { get; set; }
@@ -19,8 +19,11 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual ulong RegionMask { get; set; }
 
+		[Property]
+		public override bool Disabled { get; set; }
+
 		[BelongsTo]
-		public virtual Region HomeRegion { get; set; }
+		public override Region HomeRegion { get; set; }
 
 		[Property]
 		public virtual string Registrant { get; set; }

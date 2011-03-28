@@ -17,18 +17,18 @@ namespace AddUser
 	{
 		private readonly Dictionary<object, string> _configuratedCostTypes
 			= new Dictionary<object, string>
-			  	{
-			  		{0, "Мультиколоночный"},
-			  		{1, "Многофайловый"},
-			  	};
+				{
+					{0, "Мультиколоночный"},
+					{1, "Многофайловый"},
+				};
 
 		private readonly Dictionary<object, string> _unconfiguratedCostTypes
 			= new Dictionary<object, string>
-			  	{
-			  		{0, "Мультиколоночный"},
-			  		{1, "Многофайловый"},
-			  		{DBNull.Value, "Не настроенный"},
-			  	};
+				{
+					{0, "Мультиколоночный"},
+					{1, "Многофайловый"},
+					{DBNull.Value, "Не настроенный"},
+				};
 
 		private DataSet Data
 		{
@@ -91,35 +91,35 @@ namespace AddUser
 			var pricesCommandText =
 @"
 SELECT  cd.firmcode, 
-        ShortName, 
-        pricesdata.PriceCode, 
-        PriceName, 
-        pricesdata.AgencyEnabled, 
-        pricesdata.Enabled, 
-        AlowInt,  
-        pi.PriceDate, 
+		ShortName, 
+		pricesdata.PriceCode, 
+		PriceName, 
+		pricesdata.AgencyEnabled, 
+		pricesdata.Enabled, 
+		AlowInt,  
+		pi.PriceDate, 
 		UpCost,
 		PriceType,
 		CostType
 FROM (clientsdata as cd, farm.regions, pricesdata)
-    JOIN usersettings.pricescosts pc on pricesdata.PriceCode = pc.PriceCode and pc.BaseCost = 1
-        JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+	JOIN usersettings.pricescosts pc on pricesdata.PriceCode = pc.PriceCode and pc.BaseCost = 1
+		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE   regions.regioncode                            =cd.regioncode  
-        AND pricesdata.firmcode                       =cd.firmcode 
-        AND cd.firmcode                               =?ClientCode 
+		AND pricesdata.firmcode                       =cd.firmcode 
+		AND cd.firmcode                               =?ClientCode 
 GROUP BY pricesdata.PriceCode;
 ";
 			var regionSettingsCommnadText = @"
 SELECT  RowID, 
 		r.RegionCode,
-        Region,
-        Enabled, 
-        `Storage`, 
-        AdminMail, 
-        TmpMail, 
-        SupportPhone, 
-        ContactInfo, 
-        OperativeInfo  
+		Region,
+		Enabled, 
+		`Storage`, 
+		AdminMail, 
+		TmpMail, 
+		SupportPhone, 
+		ContactInfo, 
+		OperativeInfo  
 FROM    usersettings.regionaldata rd  
 	JOIN farm.regions r ON rd.regioncode = r.regioncode  
 WHERE rd.FirmCode      = ?ClientCode
@@ -127,21 +127,21 @@ WHERE rd.FirmCode      = ?ClientCode
 
 			var regionsCommandText = @"
 SELECT  RegionCode,   
-        Region
+		Region
 FROM Farm.Regions
 WHERE regionCode & ?AdminRegionMask > 0
 ORDER BY region;";
 
 			var enableRegionsCommandText = @"
 SELECT  a.RegionCode,
-        a.Region,
+		a.Region,
 		cd.MaskRegion & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
-        farm.regions as b, 
-        clientsdata as cd
+		farm.regions as b, 
+		clientsdata as cd
 WHERE   b.regioncode = ?HomeRegion
-        AND cd.firmcode = ?ClientCode
-        AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
+		AND cd.firmcode = ?ClientCode
+		AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
 GROUP BY regioncode
 ORDER BY region;";
 
@@ -277,7 +277,7 @@ SET @InUser = ?UserName;
 INSERT INTO PricesData
 SET UpCost = ?UpCost,
 	PriceType = ?PriceType,
-    CostType = ?CostType,
+	CostType = ?CostType,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
 	AlowInt = ?AlowInt,
@@ -302,56 +302,56 @@ call UpdateCostType(@InsertedPriceCode, ?CostType);
 
 INSERT 
 INTO    pricesregionaldata
-        (
-                regioncode, 
-                pricecode, 
-                enabled
-        )    
+		(
+				regioncode, 
+				pricecode, 
+				enabled
+		)    
 SELECT  r.RegionCode,
 		p.PriceCode, 
-        if(p.pricetype<>1, 1, 0) 
+		if(p.pricetype<>1, 1, 0) 
 FROM    pricesdata p,   
-        clientsdata cd,   
-        farm.regions r  
+		clientsdata cd,   
+		farm.regions r  
 WHERE   p.PriceCode  = @InsertedPriceCode
-        AND p.FirmCode = cd.FirmCode 
-        AND (r.RegionCode & cd.MaskRegion > 0)  
-        AND not exists
-        (
+		AND p.FirmCode = cd.FirmCode 
+		AND (r.RegionCode & cd.MaskRegion > 0)  
+		AND not exists
+		(
 			SELECT * 
 			FROM    pricesregionaldata prd 
 			WHERE   prd.PriceCode      = p.PriceCode 
-				    AND prd.RegionCode = r.RegionCode
-        );
+					AND prd.RegionCode = r.RegionCode
+		);
 
 
 INSERT 
 INTO    intersection
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode, 
-                invisibleonclient, 
-                InvisibleonFirm, 
-                costcode,
+		(
+				ClientCode, 
+				regioncode, 
+				pricecode, 
+				invisibleonclient, 
+				InvisibleonFirm, 
+				costcode,
 				FirmClientCode,
 				FirmClientCode2,
 				FirmClientCode3
-        )
+		)
 SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode,  
-        if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-        a.invisibleonfirm,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode,
-        rootIntersection.FirmClientCode,
-        rootIntersection.FirmClientCode2,
-        rootIntersection.FirmClientCode3
+		regions.regioncode, 
+		pricesdata.pricecode,  
+		if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
+		a.invisibleonfirm,
+		(
+		  SELECT costcode
+		  FROM    pricescosts pcc
+		  WHERE   basecost
+				  AND pcc.PriceCode = pricesdata.PriceCode
+		) as CostCode,
+		rootIntersection.FirmClientCode,
+		rootIntersection.FirmClientCode2,
+		rootIntersection.FirmClientCode3
 FROM pricesdata 
 	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
 		JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
@@ -362,7 +362,7 @@ FROM pricesdata
 	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = clientsdata.FirmCode)
 		LEFT JOIN intersection as rootIntersection on rootIntersection.PriceCode = rootPrice.PriceCode and rootIntersection.RegionCode = Regions.RegionCode and rootIntersection.ClientCode = clientsdata2.FirmCode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmtype = 0
+		AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @InsertedPriceCode
 		AND clientsdata2.firmtype = 1;
 ");
@@ -560,7 +560,7 @@ where id = ?Id;");
 			{
 				commandText = @"
 SELECT  a.RegionCode,   
-        a.Region,
+		a.Region,
 		cd.MaskRegion & a.regioncode > 0 as Enable
 FROM farm.regions as a, clientsdata as cd
 WHERE a.regionCode & ?AdminRegionMask > 0 and cd.firmcode = ?ClientCode
@@ -570,14 +570,14 @@ ORDER BY region;";
 			{
 				commandText = @"
 SELECT  a.RegionCode,
-        a.Region,
+		a.Region,
 		cd.MaskRegion & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
-        farm.regions as b, 
-        clientsdata as cd
+		farm.regions as b, 
+		clientsdata as cd
 WHERE   b.regioncode = ?HomeRegion
-        and cd.firmcode = ?ClientCode
-        and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
+		and cd.firmcode = ?ClientCode
+		and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
 GROUP BY regioncode
 ORDER BY region;";
 			}
@@ -625,62 +625,62 @@ WHERE FirmCode = ?ClientCode;
 
 INSERT 
 INTO    pricesregionaldata
-        (
-                regioncode, 
-                pricecode, 
-                enabled
-        )    
+		(
+				regioncode, 
+				pricecode, 
+				enabled
+		)    
 SELECT  r.RegionCode,
 		p.PriceCode, 
-        if(p.pricetype<>1, 1, 0) 
+		if(p.pricetype<>1, 1, 0) 
 FROM    pricesdata p,   
-        clientsdata cd,   
-        farm.regions r  
+		clientsdata cd,   
+		farm.regions r  
 WHERE     cd.FirmCode  = ?ClientCode  
-        AND p.FirmCode = cd.FirmCode  
-        AND (r.RegionCode & cd.MaskRegion > 0)  
-        AND not exists
-        (SELECT * 
-        FROM    pricesregionaldata prd 
-        WHERE   prd.PriceCode      = p.PriceCode 
-                AND prd.RegionCode = r.RegionCode
-        );
+		AND p.FirmCode = cd.FirmCode  
+		AND (r.RegionCode & cd.MaskRegion > 0)  
+		AND not exists
+		(SELECT * 
+		FROM    pricesregionaldata prd 
+		WHERE   prd.PriceCode      = p.PriceCode 
+				AND prd.RegionCode = r.RegionCode
+		);
 
 INSERT INTO regionaldata(FirmCode, RegionCode)
 SELECT  cd.FirmCode, 
-        r.RegionCode 
+		r.RegionCode 
 FROM    ClientsData cd, 
-        Farm.Regions r 
+		Farm.Regions r 
 WHERE   cd.FirmCode = ?ClientCode 
-        AND(r.RegionCode & cd.MaskRegion) > 0 
-        AND NOT exists 
-        (SELECT * 
-        FROM    regionaldata rd 
-        WHERE   rd.FirmCode       = cd.FirmCode 
-                AND rd.RegionCode = r.RegionCode
+		AND(r.RegionCode & cd.MaskRegion) > 0 
+		AND NOT exists 
+		(SELECT * 
+		FROM    regionaldata rd 
+		WHERE   rd.FirmCode       = cd.FirmCode 
+				AND rd.RegionCode = r.RegionCode
 );
 
 INSERT 
 INTO    intersection
-        (
-                ClientCode, 
-                regioncode, 
-                pricecode, 
-                invisibleonclient, 
-                InvisibleonFirm, 
-                costcode
-        )
+		(
+				ClientCode, 
+				regioncode, 
+				pricecode, 
+				invisibleonclient, 
+				InvisibleonFirm, 
+				costcode
+		)
 SELECT  DISTINCT clientsdata2.firmcode,
-        regions.regioncode, 
-        pricesdata.pricecode,  
-        if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-        a.invisibleonfirm,
-        (
-          SELECT costcode
-          FROM    pricescosts pcc
-          WHERE   basecost
-                  AND pcc.PriceCode = pricesdata.PriceCode
-        ) as CostCode
+		regions.regioncode, 
+		pricesdata.pricecode,  
+		if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
+		a.invisibleonfirm,
+		(
+		  SELECT costcode
+		  FROM    pricescosts pcc
+		  WHERE   basecost
+				  AND pcc.PriceCode = pricesdata.PriceCode
+		) as CostCode
 FROM clientsdata
 	JOIN pricesdata on pricesdata.firmcode = clientsdata.firmcode
 	JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
@@ -689,8 +689,8 @@ FROM clientsdata
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
 WHERE   intersection.pricecode IS NULL
-        AND clientsdata.firmstatus = 1
-        AND clientsdata.firmtype = 0
+		AND clientsdata.firmstatus = 1
+		AND clientsdata.firmtype = 0
 		AND clientsdata.firmcode = ?ClientCode
 		AND clientsdata2.FirmType = 1;", connection);
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
@@ -731,7 +731,7 @@ WHERE FirmCode = ?ClientCode;", connection, transaction);
 			{
 				connection.Open();
 				var homeRegionCommand = new MySqlCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;",
-				                                         connection);
+														 connection);
 				homeRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
 
 				return Convert.ToUInt64(homeRegionCommand.ExecuteScalar());

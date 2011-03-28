@@ -154,6 +154,7 @@
     <Compile Include="Controllers\RegionalAdminController.cs" />
     <Compile Include="Controllers\RegionsController.cs" />
     <Compile Include="Controllers\RevisionActsController.cs" />
+    <Compile Include="Controllers\SuppliersController.cs" />
     <Compile Include="Controllers\UserSearchController.cs" />
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
@@ -495,11 +496,13 @@
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
     <None Include="Views\RevisionActs\Show.brail" />
+    <None Include="Views\SubViews\EnterMessage.brail" />
     <None Include="Views\SubViews\MailAddressSubView.brail" />
     <None Include="Views\SubViews\MoveTo.brail">
       <SubType>Designer</SubType>
     </None>
     <None Include="Views\SubViews\PersonInfo.brail" />
+    <None Include="Views\Suppliers\Show.brail" />
     <None Include="Views\UserSearch\LegendView.brail" />
     <None Include="Views\UserSearch\Search.brail" />
     <None Include="Views\SubViews\ContactInfo.brail" />

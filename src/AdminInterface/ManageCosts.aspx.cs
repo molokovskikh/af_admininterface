@@ -83,7 +83,7 @@ namespace AddUser
 			UpdateLB.Text = "";
 			try
 			{
-                FillDataSet();
+				FillDataSet();
 				MyCn.Open();
 				PriceRegionSettings.DataSource = DS;
 				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
@@ -140,7 +140,7 @@ namespace AddUser
 				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
 				UpdCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-                UpdCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				UpdCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 
 				UpdCommand.CommandText =
@@ -150,9 +150,9 @@ set @inUser = ?UserName;
 
 UPDATE pricescosts 
 SET		BaseCost	 =?BaseCost, 
-        CostName     =?CostName, 
-        Enabled      =?Enabled, 
-        AgencyEnabled=?AgencyEnabled 
+		CostName     =?CostName, 
+		Enabled      =?Enabled, 
+		AgencyEnabled=?AgencyEnabled 
 WHERE   CostCode     =?CostCode;
 ";
 				MyDA.Update(DS, "Costs");
@@ -162,8 +162,8 @@ WHERE   CostCode     =?CostCode;
 @"
 UPDATE PricesRegionalData
 SET UpCost = ?UpCost,
-    MinReq = ?MinReq, 
-    Enabled = ?Enabled
+	MinReq = ?MinReq, 
+	Enabled = ?Enabled
 WHERE RowID = ?Id
 ";
 
@@ -198,20 +198,20 @@ WHERE RowID = ?Id
 
 		public string IsChecked(bool Checked)
 		{
-		    if (Checked)
+			if (Checked)
 				return "checked";
 
-		    return "";
+			return "";
 		}
 
-	    protected void Page_Load(object sender, EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 
 			MyCn.ConnectionString = Literals.GetConnectionString();
 			PriceCode = Convert.ToInt32(Request["pc"]);
-            if (!IsPostBack)
-                PostDataToGrid();
+			if (!IsPostBack)
+				PostDataToGrid();
 		}
 
 		protected void CreateCost_Click(object sender, EventArgs e)
@@ -219,8 +219,8 @@ WHERE RowID = ?Id
 			Int32 FirmCode;
 			var adapter = new MySqlDataAdapter(@"
 SELECT  pd.FirmCode, 
-        pd.PriceName, 
-        cd.ShortName, 
+		pd.PriceName, 
+		cd.ShortName, 
 		pd.CostType,
 		r.Region
 FROM pricesdata pd
@@ -233,7 +233,7 @@ WHERE pd.pricecode = ?PriceCode; ", MyCn);
 
 				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
 
-                adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
+				adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
 				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 				var MyReader = adapter.SelectCommand.ExecuteReader();
@@ -245,16 +245,16 @@ WHERE pd.pricecode = ?PriceCode; ", MyCn);
 				var costType = Convert.ToInt32(MyReader["CostType"]);
 				MyReader.Close();
 
-                adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", FirmCode);
+				adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", FirmCode);
 
 
 
-                if (costType == 0)
-                    adapter.SelectCommand.CommandText +=
+				if (costType == 0)
+					adapter.SelectCommand.CommandText +=
 @"
 SELECT pc.PriceItemId
 FROM Usersettings.PricesData pd
-    JOIN Usersettings.PricesCosts pc on pd.PriceCode = pc.PriceCode
+	JOIN Usersettings.PricesCosts pc on pd.PriceCode = pc.PriceCode
 WHERE pd.PriceCode = ?PriceCode and pc.BaseCost = 1
 INTO @NewPriceItemId;
 
@@ -263,8 +263,8 @@ SET @NewPriceCostId:=Last_Insert_ID();
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 ";
-                else
-                    adapter.SelectCommand.CommandText +=
+				else
+					adapter.SelectCommand.CommandText +=
 @"
 INSERT INTO farm.formrules() VALUES();   
 SET @NewFormRulesId = Last_Insert_ID();
@@ -281,7 +281,7 @@ SET @NewPriceCostId:=Last_Insert_ID();
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 ";
 
-			    adapter.SelectCommand.ExecuteNonQuery();
+				adapter.SelectCommand.ExecuteNonQuery();
 
 				adapter.SelectCommand.Transaction.Commit();
 				NotificationHelper.NotifyAboutRegistration(
@@ -313,76 +313,76 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 		}
 
 		private void FillDataSet()
-        {
-            try
-            {
-                MyCn.Open();
-                var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-                MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
-                SelCommand.Transaction = transaction;
-                SelCommand.CommandText = @"
+		{
+			try
+			{
+				MyCn.Open();
+				var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+				MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
+				SelCommand.Transaction = transaction;
+				SelCommand.CommandText = @"
 select pd.PriceName, pd.CostType, cd.regioncode
 from pricesdata pd
 	join clientsdata cd on cd.firmcode = pd.firmcode
 where PriceCode=?PriceCode";
-                int costType;
-                using (var reader = SelCommand.ExecuteReader())
-                {
-                    reader.Read();
-                    PriceNameLB.Text = reader.GetString("PriceName");
-                    costType = reader.GetInt32("CostType");
+				int costType;
+				using (var reader = SelCommand.ExecuteReader())
+				{
+					reader.Read();
+					PriceNameLB.Text = reader.GetString("PriceName");
+					costType = reader.GetInt32("CostType");
 					SecurityContext.Administrator.CheckClientHomeRegion(reader.GetUInt64("RegionCode"));
-                }
+				}
 
-                if (costType == 0)
-                {
-                    foreach (DataGridColumn column in CostsDG.Columns)
-                    {
-                        if (column.HeaderText == "Дата ценовой колонки")
-                        {
-                            column.Visible = false;
-                            break;
-                        }
-                    }
-                }
+				if (costType == 0)
+				{
+					foreach (DataGridColumn column in CostsDG.Columns)
+					{
+						if (column.HeaderText == "Дата ценовой колонки")
+						{
+							column.Visible = false;
+							break;
+						}
+					}
+				}
 
-                SelCommand.CommandText =
+				SelCommand.CommandText =
 @"
 SELECT  pc.CostCode, 
-        cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
-        pc.CostName,
-        pi.PriceDate, 
-        pc.BaseCost, 
-        pc.Enabled, 
-        pc.AgencyEnabled  
+		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
+		pc.CostName,
+		pi.PriceDate, 
+		pc.BaseCost, 
+		pc.Enabled, 
+		pc.AgencyEnabled  
 FROM usersettings.pricescosts pc
-    JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
-        JOIN farm.sources s on pi.SourceId = s.Id
-    JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
+	JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
+		JOIN farm.sources s on pi.SourceId = s.Id
+	JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
 WHERE pc.PriceCode = ?PriceCode;";
-                
-                MyDA.Fill(DS, "Costs");
+				
+				MyDA.Fill(DS, "Costs");
 
-                SelCommand.CommandText = @"
+				SelCommand.CommandText = @"
 SELECT  RowId, 
-        Region, 
-        UpCost, 
-        MinReq, 
-        Enabled  
+		Region, 
+		UpCost, 
+		MinReq, 
+		Enabled  
 FROM PricesRegionalData prd   
-    JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode  
+	JOIN Farm.Regions r ON prd.RegionCode = r.RegionCode  
 WHERE PriceCode = ?PriceCode  
 	  and r.RegionCode & ?AdminRegionMask > 0;";
 
-            	SelCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-                MyDA.Fill(DS, "PriceRegionSettings");
-                transaction.Commit();
-            }
-            finally
-            {
-                MyCn.Close();
-            }
-        }
+				SelCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+				MyDA.Fill(DS, "PriceRegionSettings");
+				transaction.Commit();
+			}
+			finally
+			{
+				MyCn.Close();
+			}
+		}
 
 		protected void CostsDG_DeleteCommand(object source, DataGridCommandEventArgs e)
 		{

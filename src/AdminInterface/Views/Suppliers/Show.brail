@@ -1,0 +1,166 @@
+﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
+									  ("Информация о клиенте", "")]} %>
+
+<script>
+	document.observe("dom:loaded", function () {
+
+		Validation.add("uin-reuired",
+			   "Нужно указать причину сброса",
+				function (v) {
+					return !Validation.get('IsEmpty').test(v);
+				});
+		var validation = new Validation("ReseteUin");
+
+		jQuery("form#MessagesForm").validate({
+			rules: {
+				"message": "required"
+			}
+		});
+	});
+</script>
+
+<style>
+	.InfoRow
+	{
+		height: 20px;
+	}
+	
+	input 
+	{
+		border-style:groove;
+	}
+	
+	textarea
+	{
+		border-style:groove;
+	}
+	
+	input[type='text']
+	{
+		width: 70%;
+	}
+</style>
+	
+<h2>Клиент ${client.Name}, Код ${client.Id}</h2>
+
+<div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
+
+	<% if not client.IsClientActive(): %>
+	<div class="Warning">
+		<p>Клиент отключен</p>
+	</div>
+	<% end %>
+
+	<div class="TwoColumn">
+
+		<div class=block>
+			<ul class="navigation-menu">
+				<li>
+					<a ${"href=${siteroot}/managep.aspx?cc=${supplier.Id}" if admin.ManageSuppliers}>Настройка</a>
+				</li>
+				<li>
+					<a href="${siteroot}/Supplier/${supplier.Id}/Documents" target="_blank">История документов</a>
+				</li>
+				<li>
+					<a href="${siteroot}/Supplier/${supplier.Id}/Orders" target="_blank">История заказов</a>
+				</li>
+				<li>
+					${app.LinkTo(supplier.Payer)}
+				</li>
+			</ul>
+		</div>
+
+		<div class=block>
+			<div class=contextual>
+				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
+			</div>
+			<h3>Пользователи</h3>
+			<table style="width:100%;" name="usersTable">
+				<tr valign="top" align="left">
+					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
+					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>
+					<th>Комментарий</th>
+					<th>Последнее использование сервисов</th>
+				</tr>
+				<% for user in users: %>
+					<% userInfo = usersInfo[user.Login] %>
+					<tr>
+						<td><a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
+						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
+							<a href="${siteroot}/users/${user.Id}/edit"">${user.Login}</a>
+						</td>
+						<td>${user.Name}</td>
+						<td>${user.Logs.GetLastServicesUsage()}</td>
+					</tr>
+				<% end %>
+			</table>
+		</div>
+
+		<div class=block>
+			<h3>Общая информация</h3>
+			<div>
+				<% if not Registrant: %>
+				Регистратор не указан, дата регистрации ${client.RegistrationDate}
+				<% else: %>
+				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
+				<% end %>
+			</div>
+			<form action="Update.rails" method=post style="padding:0; margin:0;">
+				<div>
+					${FormHelper.HiddenField("supplier.Id")}
+					<p>
+						Полное наименование<br>
+						${FormHelper.TextField("supplier.FullName")}
+					</p>
+					<p>
+						Краткое наименование<br>
+						${FormHelper.TextField("supplier.Name")}
+					</p>
+				</div>
+				<div>
+					<input type=submit value="Сохранить" />
+				</div>
+			</form>
+		</div>
+		
+		<%
+			component ContactViewer, {"ContactGroups" : ContactGroups}:
+				section ContactGroupHeaderLink:
+				%>
+					<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+				<%
+				end
+				section Person:
+				%>
+					<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+				<%
+				end
+			end
+		%>
+		
+		<div>
+			<h4 style="margin-bottom:0">Неопознанные звонки:</h4>
+			<table id="UnknownPhones" class="DataTable">
+			<% if CallLogs.Length == 0: %>
+				<tr><td class="EmptyData">Нет звонков</td></tr>
+			<% else: %>
+				<% for i, call in enumerate(CallLogs): %>
+				<tr class="${ViewHelper.GetRowStyle(i)}">
+					<td>
+						<form action="BindPhone?clientcode=${client.Id}&phone=${call}" method=post>
+							<input type=submit value="Связать" />
+						</form>
+					</td>
+					<td>${call}</td>
+				</tr>
+				<% end %>
+			<% end %>
+			</table>
+		</div>
+
+		<% OutputSubView("LegendView") %>
+	</div>
+
+	<% OutputSubView("/SubViews/EnterMessage") %>
+
+</div>

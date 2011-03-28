@@ -56,9 +56,9 @@ end
     <tbody id="SearchResults" class="HighLightCurrentRow">
     <% for i,item in enumerate(searchResults): %>
         <tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if(not item.Enabled)} ${'DisabledInAd' if(item.IsLoginExists and item.IsDisabled)} ${'LockedUser' if(item.IsLoginExists and item.IsLocked)} ${'NotExistsUser' if(not item.IsLoginExists)}">
-            <td><a href="${siteroot}/Billing/Edit.rails?BillingCode=${item.PayerId}">${item.PayerId}</a></td>
+            <td><a href="${siteroot}/Payers/${item.PayerId}">${item.PayerId}</a></td>
             <td>${item.ClientId}</td>
-            <td>${item.UserId}</td>            
+            <td>${item.UserId}</td>
             <td>${LinkHelper.Client(siteroot, item.ClientId, item.ClientName)}</td>            
             <td>
                 <a href="${siteroot}/users/${item.UserId}/edit">${item.Login}</a>
