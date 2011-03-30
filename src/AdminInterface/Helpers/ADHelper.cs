@@ -86,7 +86,7 @@ namespace AdminInterface.Helpers
 			}
 			catch (Exception ex)
 			{
-				log.Error(String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
+				log.Error(String.Format("Не смогли получить информацию о пользователе AD. Admin={0}, Users=({1})",
 						SecurityContext.Administrator.UserName, logins.Implode()), ex);
 			}
 			return result;
