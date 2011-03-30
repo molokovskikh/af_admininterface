@@ -1,5 +1,4 @@
 alter table future.Users add column RootService INTEGER UNSIGNED;
-alter table Future.Suppliers add column RegionMask BIGINT UNSIGNED default 0 not null;
 
     create table Future.AssignedServices (
         Id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
