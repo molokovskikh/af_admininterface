@@ -1,3 +1,4 @@
+using System;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 
@@ -27,5 +28,10 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual bool Disabled { get; set; }
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

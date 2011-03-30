@@ -68,7 +68,7 @@ namespace AdminInterface.Models
 		[BelongsTo]
 		public virtual User User { get; set; }
 
-		[BelongsTo]
+		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Service Service { set; get; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),
@@ -87,6 +87,10 @@ namespace AdminInterface.Models
 
 		public User()
 		{
+			SendRejects = true;
+			SendWaybills = true;
+			Enabled = true;
+			Services = new List<AssignedService>();
 		}
 
 		public User(Client client)
@@ -148,7 +152,7 @@ namespace AdminInterface.Models
 		[Property(Column = "Free")]
 		public virtual bool IsFree { get; set; }
 
-		[BelongsTo("ClientId", NotNull = true, Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
+		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
 		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
@@ -185,7 +189,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
 
-		[HasMany(Inverse = true, Lazy = true)]
+		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<AssignedService> Services { get; set; }
 
 		[BelongsTo]
@@ -560,6 +564,14 @@ where userid = :userId")
 				return null;
 
 			return Administrator.GetByName(Registrant);
+		}
+
+		public virtual void AssignService(ServiceSupplier supplier)
+		{
+			if (Services.Any(s => s.Service == supplier))
+				throw new Exception(String.Format("Услуга {0} уже подключена", supplier));
+
+			Services.Add(new AssignedService{ User = this, Service = supplier});
 		}
 	}
 }

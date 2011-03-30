@@ -22,16 +22,19 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public override bool Disabled { get; set; }
 
-		[BelongsTo]
-		public override Region HomeRegion { get; set; }
-
 		[Property]
 		public virtual string Registrant { get; set; }
 
 		[Property]
 		public virtual DateTime? RegistrationDate { get; set; }
 
-		[BelongsTo("ContactGroupOwnerId")]
+		[BelongsTo]
+		public virtual Payer Payer { get; set; }
+
+		[BelongsTo]
+		public override Region HomeRegion { get; set; }
+
+		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 	}
 }

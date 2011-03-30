@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
@@ -288,6 +289,31 @@ namespace Integration.ForTesting
 				new List<Payment> {
 					new Payment(payer, new DateTime(2011, 1, 15), 1000)
 				});
+		}
+
+		public static User CreateSupplierUser()
+		{
+			var payer = new Payer {
+				Name = "Тестовый плательщик"
+			};
+			payer.Save();
+			var supplier = new ServiceSupplier {
+				Payer = payer,
+				HomeRegion = Region.Find(1UL),
+				RegionMask = 1,
+				Name = "Тестовый поставщик",
+				FullName = "Тестовый поставщик",
+				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
+			};
+			var user = new User();
+			user.Payer = payer;
+			user.RootService = supplier;
+			user.AssignService(supplier);
+			user.Login = "temporary-login";
+			user.Save();
+			user.Login = user.Id.ToString();
+			user.Update();
+			return user;
 		}
 	}
 }

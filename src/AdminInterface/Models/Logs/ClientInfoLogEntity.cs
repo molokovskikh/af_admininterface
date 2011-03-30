@@ -140,7 +140,7 @@ namespace AdminInterface.Models.Logs
 		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
 		{
 			return Queryable
-				.Where(l => l.User == user || (l.ClientCode == user.Client.Id && l.User == null))
+				.Where(l => l.User == user || (l.ClientCode == user.RootService.Id && l.User == null))
 				.OrderByDescending(l => l.WriteTime)
 				.ToList();
 		}

@@ -313,7 +313,6 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void SendMessage(string message, uint clientCode, uint userId)
 		{
-			var client = Client.FindAndCheck(clientCode);
 			var user = User.Find(userId);
 
 			if (!String.IsNullOrEmpty(message))

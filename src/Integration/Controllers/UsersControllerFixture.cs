@@ -20,11 +20,21 @@ namespace Integration.Controllers
 		private Client client;
 		private UserUpdateInfo info1, info2;
 
+		private SessionScope session;
+
 		[SetUp]
 		public void Setup()
 		{
+			session = new SessionScope();
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			if (session != null)
+				session.Dispose();
 		}
 
 		[Test]
@@ -91,6 +101,13 @@ namespace Integration.Controllers
 			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
 			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
 			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));
+		}
+
+		[Test]
+		public void Show_supplier_client()
+		{
+			var user = DataMother.CreateSupplierUser();
+			controller.Edit(user.Id);
 		}
 	}
 }

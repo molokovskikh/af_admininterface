@@ -50,10 +50,7 @@ namespace AdminInterface.Models
 		public bool UpdateIsUncommited { get; set; }
 
 		[Property]
-		public bool Enabled { get; set; }
-
-		[Property]
-		public bool InvisibleOnFirm { get; set; }
+		public bool Disabled { get; set; }
 
 		[Property]
 		public string JuridicalName { get; set; }
@@ -106,13 +103,14 @@ SELECT
 	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as {{UserSearchItem.UpdateIsUncommited}},
 	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
 
-	s.ServiceType as {{UserSearchItem.ClientType}},
-	u.RootService, s as {{UserSearchItem.ClientId}},
+	s.Type as {{UserSearchItem.ClientType}},
+	s.Id as {{UserSearchItem.ClientId}},
 	s.Name as {{UserSearchItem.ClientName}},
 	s.Disabled as {{UserSearchItem.Disabled}},
 
 	p.JuridicalName as {{UserSearchItem.JuridicalName}},
-	Regions.Region as {{UserSearchItem.RegionName}}
+	r.Region as {{UserSearchItem.RegionName}},
+	0 as {{UserSearchItem.Segment}}
 FROM
 	future.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
@@ -122,8 +120,9 @@ FROM
 		left JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
 		left JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
 		LEFT JOIN contacts.Persons ON Persons.ContactGroupId = cg.Id
+	join Billing.Payers p on p.PayerId = u.PayerId
 WHERE
-	(r.RegionCode & :AdminRegionMask & :RegionId > 0) AND
+	(r.RegionCode & :AdminRegionMask & :RegionId > 0)
 	{0}
 GROUP BY {{UserSearchItem.UserId}}
 {1}
