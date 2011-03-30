@@ -176,13 +176,6 @@ namespace AddUser
 			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
 				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
 
-			var payerMapping = configuration.GetClassMapping(typeof (Payer));
-			var colection = (Collection) payerMapping.GetProperty("Clients").Value;
-
-			colection.AddFilter("RegionFilter", "RegionCode & :AdminRegionMask > 0");
-			colection.AddFilter("DrugstoreOnlyFilter", "FirmType = 1");
-			colection.AddFilter("SupplierOnlyFilter", "FirmType = 0");
-
 			var regionMapping = configuration.GetClassMapping(typeof (Region));
 			regionMapping.AddFilter("RegionFilter", "RegionCode & :AdminRegionMask > 0");
 		}
