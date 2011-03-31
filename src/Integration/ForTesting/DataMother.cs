@@ -275,16 +275,18 @@ namespace Integration.ForTesting
 				new List<InvoicePart> { new InvoicePart(null, Period.December, 500, 2) }) {
 					Id = 1,
 				};
+			var act = new Act(invoice1.Date, invoice1);
 
 			var invoice2 = new Invoice(payer,
 				Period.January,
 				new DateTime(2011, 1, 20),
 				new List<InvoicePart>{ new InvoicePart(null, Period.December, 1000, 1)});
+			var act2 = new Act(invoice2.Date, invoice2);
 
 			return new RevisionAct(payer,
 				new DateTime(2011, 1, 1),
 				new DateTime(2011, 2, 1),
-				new List<Invoice> { invoice1, invoice2 },
+				new List<Act> { act, act2 },
 				new List<Payment> {
 					new Payment(payer, new DateTime(2011, 1, 15), 1000)
 				});

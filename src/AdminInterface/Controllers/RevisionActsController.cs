@@ -18,11 +18,11 @@ namespace AdminInterface.Controllers
 			Date = date;
 		}
 
-		public RevisionActPart(Invoice invoice)
+		public RevisionActPart(Act act)
 		{
-			Name = String.Format("Продажа ({0:dd.MM.yy} № {1})", invoice.Date, invoice.Id);
-			Date = invoice.Date;
-			Debit = invoice.Sum;
+			Name = String.Format("Продажа ({0:dd.MM.yy} № {1})", act.ActDate, act.Id);
+			Date = act.ActDate;
+			Debit = act.Sum;
 		}
 
 		public RevisionActPart(Payment payment)
@@ -40,13 +40,13 @@ namespace AdminInterface.Controllers
 
 	public class RevisionAct
 	{
-		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Invoice> invoices, IEnumerable<Payment> payments)
+		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Act> acts, IEnumerable<Payment> payments)
 		{
 			Payer = payer;
 			BeginDate = begin;
 			EndDate = end;
 
-			var beginDebit = invoices.Where(i => i.Date < begin).Sum(i => i.Sum);
+			var beginDebit = acts.Where(i => i.ActDate < begin).Sum(i => i.Sum);
 			var beginCredit = payments.Where(p => p.PayedOn < begin).Sum(p => p.Sum);
 
 			var beginBalance = beginCredit - beginDebit;
@@ -57,7 +57,7 @@ namespace AdminInterface.Controllers
 			else
 				BeginDebit = Math.Abs(beginBalance);
 
-			var movements = invoices.Where(i => i.Date >= begin && i.Date <= end)
+			var movements = acts.Where(i => i.ActDate >= begin && i.ActDate <= end)
 					.Select(i => new RevisionActPart(i))
 				.Union(payments.Where(p => p.PayedOn >= begin && p.PayedOn <= end)
 					.Select(p => new RevisionActPart(p)))
@@ -152,7 +152,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["act"] = new RevisionAct(payer,
 				begin.Value,
 				end.Value,
-				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
+				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 			PropertyBag["payer"] = payer;
 		}
@@ -176,7 +176,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["act"] = new RevisionAct(payer,
 				begin.Value,
 				end.Value,
-				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
+				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 			PropertyBag["payer"] = payer;
 		}
@@ -199,7 +199,7 @@ namespace AdminInterface.Controllers
 			var act = new RevisionAct(payer,
 				begin.Value,
 				end.Value,
-				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
+				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 
 			this.Mail().RevisionAct(act, emails).Send();
@@ -226,7 +226,7 @@ namespace AdminInterface.Controllers
 			var act = new RevisionAct(payer,
 				begin.Value,
 				end.Value,
-				Invoice.Queryable.Where(i => i.Payer == payer).ToList(),
+				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 
 			Exporter.ToResponse(Response, Exporter.Export(act));
