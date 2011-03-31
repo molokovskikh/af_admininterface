@@ -213,18 +213,23 @@ namespace AdminInterface.Helpers
 				}
 			}
 
-			var uri = String.Format("{0}/{1}?SortBy={2}&Direction={3}&{4}", 
-				LinkHelper.GetVirtualDir(Context),
-				GetSelfUri(),
+			var querystring = String.Format("SortBy={0}&Direction={1}", 
 				key,
-				direction,
-				uriParams);
+				direction);
+			if (!String.IsNullOrEmpty(uriParams))
+				querystring += "&" + uriParams;
+
+			var url = UrlHelper.For(new Dictionary<string, object> {
+				{"querystring", querystring},
+				{"encode", "false"},
+				{"params", Context.CurrentControllerContext.RouteMatch.Parameters}
+			});
 
 			var clazz = "";
 			if (sorted)
 				clazz = "sort " + direction;
 
-			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, uri, clazz);
+			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, url, clazz);
 		}
 
 		public string GetSelfUri()

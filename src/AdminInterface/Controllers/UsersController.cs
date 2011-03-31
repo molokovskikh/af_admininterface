@@ -130,7 +130,7 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var user = User.GetById(id);
-			PropertyBag["CiUrl"] = Settings.Default.ClientInterfaceUrl;
+			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["client"] = user.Client;
@@ -313,7 +313,7 @@ namespace AdminInterface.Controllers
 				user.ResetUin();
 				Flash["Message"] = Message.Notify("УИН сброшен");
 				RedirectToReferrer();
-			}			
+			}
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -333,7 +333,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void UserSettings(uint id)
+		public void Settings(uint id)
 		{
 			var user = User.GetById(id);
 			PropertyBag["user"] = user;

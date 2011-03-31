@@ -106,11 +106,6 @@ namespace AddUser
 		{
 			var engine = RoutingModuleEx.Engine;
 
-			engine.Add(new PatternRoute("/client/[cc]")
-				.DefaultForController().Is("client")
-				.DefaultForAction().Is("info")
-				.Restrict("cc").ValidInteger);
-
 			engine.Add(
 				new PatternRoute("/<controller>/<id>")
 					.DefaultForAction().Is("show")
@@ -125,8 +120,7 @@ namespace AddUser
 			);
 
 			engine.Add(
-				new PatternRoute("/<controller>/[id]/<action>")
-					.Restrict("id").ValidInteger
+				new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger
 			);
 
 			engine.Add(new PatternRoute("/client/[clientId]/orders")
@@ -138,19 +132,11 @@ namespace AddUser
 				.DefaultForController().Is("deliveries")
 				.DefaultForAction().Is("edit")
 				.Restrict("id").ValidInteger);
-		
-			engine.Add(new PatternRoute("/users/[id]/settings")
-				.DefaultForController().Is("users")
-				.DefaultForAction().Is("UserSettings"));
-			
+
 			engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")
 				.DefaultForAction().Is("Search"));
 
-			engine.Add(new PatternRoute("/RegionalAdmin/[id]/edit")
-				.DefaultForController().Is("RegionalAdmin")
-				.DefaultForAction().Is("Edit"));
-			
 			engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));

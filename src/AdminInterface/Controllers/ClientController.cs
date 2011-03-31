@@ -96,10 +96,10 @@ namespace AdminInterface.Controllers
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
-		public void Info(uint cc)
+		public void Show(uint id)
 		{
 			var sort = GetSort();
-			var client = Client.FindAndCheck(cc);
+			var client = Client.FindAndCheck(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
 

@@ -6,6 +6,9 @@ using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Adapters;
+using Castle.MonoRail.Framework.Helpers;
+using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using NHibernate;
 using NUnit.Framework;
@@ -20,14 +23,24 @@ namespace Integration
 		private StubEngineContext context;
 
 		private TestFilter filter;
+		private RoutingEngine engine;
 
 		[SetUp]
 		public void Setup()
 		{
 			helper = new AppHelper();
-			var urlInfo = new UrlInfo("test", "test", "test", "/", "");
-			context = new StubEngineContext(urlInfo);
-			context.CurrentControllerContext = new ControllerContext();
+			var urlInfo = new UrlInfo("", "home", "index", "/", "");
+			context = new StubEngineContext(urlInfo) {
+				CurrentControllerContext = new ControllerContext("", "home", "index", null)
+			};
+			engine = new RoutingEngine();
+			helper.UrlHelper = new UrlHelper(context) {
+				UrlBuilder = new DefaultUrlBuilder {
+					RoutingEngine = engine,
+					ServerUtil = new StubServerUtility(),
+					UseExtensions = false,
+				},
+			};
 			helper.SetContext(context);
 			helper.SetController(null, context.CurrentControllerContext);
 
@@ -118,6 +131,24 @@ namespace Integration
 		public void Return_null_if_description_not_found()
 		{
 			Assert.That(helper.GetLabel("filter.TextField"), Is.Null);
+		}
+
+		[Test]
+		public void Build_sortable_url()
+		{
+			var link = helper.Sortable("test", "test");
+			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc' class=''>test</a>"));
+		}
+
+		[Test]
+		public void Build_sortable_url_for_routing()
+		{
+			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
+			var match = engine.FindMatch("users/1/edit", new RouteContext(context.Request, null, "/", null));
+			context.CurrentControllerContext.RouteMatch = match;
+
+			var link = helper.Sortable("test", "test");
+			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc' class=''>test</a>"));
 		}
 	}
 }
