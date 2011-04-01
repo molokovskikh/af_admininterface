@@ -61,6 +61,10 @@ namespace AdminInterface.Models.Billing
 			CalculateSum();
 		}
 
+		public Invoice(Payer payer, DateTime invoiceDate) 
+			: this(payer, GetPeriod(invoiceDate), invoiceDate)
+		{}
+
 		public Invoice(Payer payer, Period period, DateTime invoiceDate)
 			: this(payer)
 		{

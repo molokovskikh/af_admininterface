@@ -383,6 +383,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Advertisings\Index.brail" />

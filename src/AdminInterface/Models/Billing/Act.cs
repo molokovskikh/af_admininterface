@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 
 namespace AdminInterface.Models.Billing
 {
@@ -85,13 +86,13 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string Name { get; set; }
 
-		[Property]
+		[Property, ValidateGreaterThanZero]
 		public decimal Cost { get; set; }
 
-		[Property]
+		[Property, ValidateGreaterThanZero]
 		public int Count { get; set; }
 
 		public decimal Sum

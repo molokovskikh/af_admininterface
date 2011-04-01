@@ -72,6 +72,7 @@ namespace Integration
 			public string TextField { get; set; }
 			public Multivalue Multivalue { get; set; }
 			public TestEnum Enum { get; set; }
+			public DateTime Date { get; set; }
 		}
 
 		public class Multivalue
@@ -149,6 +150,13 @@ namespace Integration
 
 			var link = helper.Sortable("test", "test");
 			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc' class=''>test</a>"));
+		}
+
+		[Test]
+		public void Edit_date()
+		{
+			var edit = helper.Edit("filter.Date");
+			Assert.That(edit, Is.EqualTo("<input type=text name='filter.Date' class='required validate-date input-date' value='01.01.0001'><input type=button class=CalendarInput>"));
 		}
 	}
 }
