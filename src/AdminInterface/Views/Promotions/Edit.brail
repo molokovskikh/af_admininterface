@@ -19,79 +19,6 @@
 	}
 </style>
 
-<script>
-	function GetId(elemId)
-	{
-		var preffix = "promotionCatalogName";
-		return nameElem.slice(preffix.length);
-	}
-
-	function AddPromotionCatalog()
-	{
-		if ($("#CatalogId").val() != 0)
-		{
-			var row = $("#catalogs tbody")
-				.append($("<tr/>", { "class": "PromotionCatalog" })
-					.append($("<td/>")
-						.append($("<input/>", { "type": "hidden", "id": "promotionCatalogId", "name": "promotion.Catalogs[].Id", "value": $("#CatalogId").val() }))
-						.append($("#CatalogName").val()))
-					.append($("<td/>")
-						.append($("<input/>", { "type": "button", "value": "Удалить" })
-									.click(function () { deleteCurrentRow(this); })
-								)
-							)
-					);
-
-			UpdateRowIndexs();
-		}
-	}
-
-
-	function deleteCurrentRow(obj)
-	{
-		delRow = obj.parentNode.parentNode;
-	
-		var table = delRow.parentNode.parentNode;
-		var rowIndex = delRow.sectionRowIndex;
-
-		if ($("#catalogs tbody tr[class='PromotionCatalog']").length > 1) {
-			table.deleteRow(rowIndex);
-			UpdateRowIndexs();
-		}
-	}
-
-	function UpdateRowIndexs()
-	{
-		table = document.getElementById("catalogs");
-		for(i = 1; i < table.rows.length; i++)
-		{		
-			row = table.rows[i];
-			if (row.className == "PromotionCatalog")
-			{
-				var idInput = row.cells[0].getElementsByTagName("input")[0];
-				idInput.name = "promotion.Catalogs[" + (i - 1).toString()  + "].Id";
-			}
-		}
-	}	
-
-	$(function () {
-	{
-		$("form").validate();
-
-		$("#CatalogName").autocomplete({
-			source: "SearchCatalog",
-			minLength: 2,
-			select: function (event, ui) {
-				$("#CatalogId").val(ui.item.id)
-			}
-		});
-
-		UpdateRowIndexs();
-	}
-	});
-
-</script>
-
 <form method=post enctype="multipart/form-data">
 <% if promotion.Id: %>
 	<% if promotion.IsActive(): %>
@@ -120,46 +47,22 @@
 			<td class="DisplayName">Список препаратов:</td>
 			<td>
 				<div class="block">
-					<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">	
-						<tr>
-							<td style="background-color:#f6f6f6; padding:5px;">
-								<input type=hidden id="CatalogId" value="0">
-								<input type=text id="CatalogName" value="" style="width: 60%">
-							</td>
-							<td>
-								<input type="button" value="Добавить препарат" onclick="return AddPromotionCatalog();" /> 
-							</td>
-						</tr>
-						<% if promotion.Catalogs.Count: %>
-							<% for i, catalog in enumerate(promotion.Catalogs): %>
-								<tr class="PromotionCatalog">
-									<td >
-										<input type=hidden id="promotionCatalogId" name=promotion.Catalogs[${i}].Id value="${promotion.Catalogs[i].Id}">
-										${promotion.Catalogs[i].Name}
-										<!-- <input type=text id="promotionCatalogName" value="" style="width: 100%"> -->
-									</td>
-									<td>
-										<input type="button" value="Удалить" onclick="return deleteCurrentRow(this);" /> 
-									</td>
-								</tr>
+					<% if promotion.Id: %>
+						<a href="${siteroot}/Promotions/EditCatalogs.rails?id=${promotion.Id}">Редактировать список препаратов</a>
+						<table id="catalogs" cellpadding="3px" cellspacing="3px" style="width: 60%;">	
+							<% if promotion.Catalogs.Count: %>
+								<% for i, catalog in enumerate(promotion.Catalogs): %>
+									<tr class="PromotionCatalog">
+										<td >
+											${promotion.Catalogs[i].Name}
+										</td>
+									</tr>
+								<% end %>
 							<% end %>
-						<% else: %>
-<!-- 
-							<tr class="PromotionCatalog">
-								<td>
-									<input type=hidden id="promotionCatalogId" name=promotion.Catalogs[0].Id>
-									<input type=text id="promotionCatalogName" value="">
-								</td>
-								<td>
-									<input type="button" value="Удалить" onclick="return deleteCurrentRow(this);" /> 
-								</td>
-							</tr>
--->
-						<% end %>
-					</table>
-					<!--   -->
+						</table>
 
-					${app.GetValidationError(promotion, "Catalogs")}
+						${app.GetValidationError(promotion, "Catalogs")}
+					<% end %>
 				</div>
 			</td>
 		</tr>

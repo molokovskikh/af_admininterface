@@ -90,18 +90,15 @@ namespace AdminInterface.Controllers
 	{
 		public string SearchText { get; set; }
 
-		public uint SupplierId { get; set; }
+		public SupplierPromotion Promotion;
 
 		private int _lastRowsCount;
 
 		public List<T> Find<T>()
 		{
-			var criteria = DetachedCriteria.For<T>()
-				.CreateAlias("Promotions", "sp", JoinType.LeftOuterJoin, Expression.Eq("sp.PromotionOwnerSupplier.Id", SupplierId))
-				.CreateAlias("sp.PromotionOwnerSupplier", "s", JoinType.LeftOuterJoin);
+			var criteria = DetachedCriteria.For<T>();
 
 			criteria.Add(Expression.Eq("Hidden", false));
-			criteria.Add(Expression.IsNull("s.Id"));
 
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("Name", SearchText, MatchMode.Anywhere));
@@ -126,8 +123,8 @@ namespace AdminInterface.Controllers
 		public string[] ToUrl()
 		{
 			return new[] {
-				String.Format("filter.SearchText={0}", SearchText),
-				String.Format("filter.SupplierId={0}", SupplierId)
+				String.Format("Id={0}", Promotion.Id),
+				String.Format("filter.SearchText={0}", SearchText)
 			};
 		}
 
@@ -367,7 +364,6 @@ namespace AdminInterface.Controllers
 
 		public void SelectName([DataBind("filter")] CatalogFilter filter)
 		{
-			PropertyBag["supplier"] = PromotionOwnerSupplier.Find(filter.SupplierId);
 			PropertyBag["filter"] = filter;
 			PropertyBag["catalogNames"] = filter.Find<Catalog>();
 		}
@@ -387,8 +383,8 @@ namespace AdminInterface.Controllers
 				Catalogs = new List<Catalog>(),
 				PromotionOwnerSupplier = client,
 				RegionMask = client.HomeRegion.Id,
-				Begin = DateTime.Now.AddDays(-7) .Date,
-				End = DateTime.Now.Date,
+				Begin = DateTime.Now.Date,
+				End = DateTime.Now.AddDays(6).Date,
 			};
 
 			PropertyBag["promotion"] = promotion;
@@ -429,7 +425,7 @@ namespace AdminInterface.Controllers
 						}
 					}
 
-					RedirectToAction("Index");
+					RedirectToAction("EditCatalogs", new string[] { "id=" + promotion.Id });
 				}
 				else
 					ActiveRecordMediator.Evict(promotion);
@@ -487,6 +483,66 @@ namespace AdminInterface.Controllers
 					id = c.Id,
 					label = c.Name
 				});
+		}
+
+		public void EditCatalogs(
+			uint id,
+			[DataBind("filter")] CatalogFilter filter)
+		{
+			var promotion = SupplierPromotion.Find(id);
+			PropertyBag["promotion"] = promotion;
+
+			filter.Promotion = promotion;
+			PropertyBag["filter"] = filter;
+			PropertyBag["catalogNames"] = filter.Find<Catalog>();
+
+			if (IsPost)
+			{
+				if (Request.Params["delBtn"] != null)
+				{
+					foreach (string key in Request.Params.AllKeys)
+						if (key.StartsWith("chd"))
+						{
+							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
+							var index = promotion.Catalogs.IndexOf(c => c.Id == catalog.Id);
+							if (index >= 0)
+								promotion.Catalogs.RemoveAt(index);
+						}
+				}
+
+				if (Request.Params["addBtn"] != null)
+				{
+					foreach (string key in Request.Params.AllKeys)
+						if (key.StartsWith("cha"))
+						{
+							var catalog = Catalog.Find(Convert.ToUInt32(Request.Params[key]));
+
+							if (promotion.Catalogs.FirstOrDefault(c => c.Id == catalog.Id) == null)
+								promotion.Catalogs.Add(catalog);
+						}
+				}
+
+				ActiveRecordMediator.Evict(promotion);
+				if (Validator.IsValid(promotion) && promotion.Catalogs.Count > 0)
+				{
+					Flash["Message"] = "Сохранено";
+					promotion.Save();
+				}
+				else
+				{
+					var summary = String.Empty;
+					if (Validator.GetErrorSummary(promotion) != null)
+						summary = String.Join(Environment.NewLine, Validator.GetErrorSummary(promotion).ErrorMessages);
+
+					if (promotion.Catalogs.Count == 0)
+						summary = String.Join(Environment.NewLine, summary, "Список препаратов не может быть пустым.");
+
+					Flash["Message"] = Message.Error(summary);
+					ActiveRecordMediator.Evict(promotion);
+					var discardedPromotion = SupplierPromotion.Find(id);
+					PropertyBag["promotion"] = discardedPromotion;
+				}
+			}
 		}
 
 	}

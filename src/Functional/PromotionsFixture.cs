@@ -266,8 +266,6 @@ limit 1")
 				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
 				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
-				Console.WriteLine(browser.Html);
-
 				browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
 				browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
 				browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
@@ -296,70 +294,26 @@ limit 1")
 			}
 		}
 
-		[Test]
-		public void TestSaving()
+		[Test(Description = "редактирование списка препартов акции")]
+		public void EditPromotionCatalogs()
 		{
-			//using (var transaction = new TransactionScope())
-			//{
-			//    _promotion.Enabled = false;
-			//    Assert.That(_promotion.IsActive(), Is.False);
-			//    _promotion.Save();
-			//    transaction.VoteCommit();
-			//}
-
-			//using (var transaction = new TransactionScope())
-			//{
-			//    var changedPromo = SupplierPromotion.Find(_promotion.Id);
-
-			//    Assert.That(changedPromo.Enabled, Is.False);
-			//    Assert.That(changedPromo.IsActive(), Is.False);
-			//}
-
-
-			var catalog = Catalog.FindFirst();
-
-			uint id;
-			using (var transaction = new TransactionScope())
+			using (var browser = Open("/"))
 			{
-				var supplierPromotion = new SupplierPromotion
-				{
-					Enabled = true,
-					PromotionOwnerSupplier = PromotionOwnerSupplier.FindFirst(),
-					Annotation = "12121",
-					Name = "212121",
-					Begin = DateTime.Now.Date.AddDays(-7),
-					End = DateTime.Now.Date,
-					Catalogs = new List<Catalog> { catalog }
-				};
-				supplierPromotion.Save();
+				browser.Link(Find.ByText("Промо-акции")).Click();
 
-				id = supplierPromotion.Id;
+				var row = RowPromotionExists(browser, _promotion);
 
+				row.Link(Find.ByText("Редактировать")).Click();
 
-				//Assert.That(supplierPromotion.IsActive(), Is.True);
-			}
+				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
-			using (var transaction = new TransactionScope())
-			{
-				var newPromo = SupplierPromotion.Find(id);
-				//Assert.That(newPromo.IsActive(), Is.True);
-			}
+				browser.Link(Find.ByText("Редактировать список препаратов")).Click();
 
-			using (var transaction = new TransactionScope())
-			{
-				var changedPromo = SupplierPromotion.Find(id);
-				changedPromo.Enabled = false;
-				changedPromo.Save();
-
-				//Assert.That(changedPromo.IsActive(), Is.False);
-			}
-
-			using (var transaction = new TransactionScope())
-			{
-				var readPromo = SupplierPromotion.Find(id);
-
-				//Assert.That(readPromo.IsActive(), Is.False);
+				Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
 			}
 		}
+
 	}
 }
