@@ -7,12 +7,22 @@ using WatiN.Core;
 
 namespace Functional.ForTesting
 {
+	public class WatinFixture2 : WatinFixture
+	{
+		public WatinFixture2()
+		{
+			UseTestScope = true;
+			SaveBrowser = true;
+		}
+	}
+
 	[TestFixture]
 	public class WatinFixture
 	{
-		protected SessionScope scope;
 		protected bool UseTestScope;
+		protected bool SaveBrowser;
 
+		protected SessionScope scope;
 		protected Browser browser;
 
 		[SetUp]
@@ -42,8 +52,8 @@ namespace Functional.ForTesting
 			if (!urlPart.StartsWith("/"))
 				urlPart = "/" + urlPart;
 			return String.Format("http://localhost:{0}{1}",
-								 ConfigurationManager.AppSettings["webPort"],
-								 urlPart);
+				ConfigurationManager.AppSettings["webPort"],
+				urlPart);
 		}
 
 		protected static void CheckForError(IE browser)
@@ -56,7 +66,7 @@ namespace Functional.ForTesting
 
 		protected IE Open(object item, string action = null)
 		{
-			return new IE(BuildTestUrl(AppHelper.GetUrl(item, action)));
+			return Open(AppHelper.GetUrl(item, action));
 		}
 
 		protected IE Open(string uri)
@@ -69,6 +79,8 @@ namespace Functional.ForTesting
 				//Assert.That(browser.Text, Is.Not.ContainsSubstring("exception"));
 			};
 */
+			if (SaveBrowser)
+				this.browser = browser;
 			return browser;
 		}
 

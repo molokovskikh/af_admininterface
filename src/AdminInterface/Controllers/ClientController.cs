@@ -240,7 +240,7 @@ where Phone like :phone")
 			{
 				foreach (var user in client.Users)
 				{
-					var file = String.Format(Settings.Default.UserPreparedDataFormatString, user.Id);
+					var file = String.Format(Properties.Settings.Default.UserPreparedDataFormatString, user.Id);
 					if (File.Exists(file))
 						File.Delete(file);
 				}
@@ -272,9 +272,9 @@ where Phone like :phone")
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void DrugstoreSettings(uint clientId)
+		public void Settings(uint id)
 		{
-			var client = Client.Find(clientId);
+			var client = Client.Find(id);
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;

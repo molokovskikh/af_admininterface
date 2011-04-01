@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using NHibernate;
 using NHibernate.Criterion;
@@ -69,7 +70,8 @@ namespace AdminInterface.Models.Security
 
 		public static Administrator GetByName(string name)
 		{
-			var admin = ActiveRecordMediator<Administrator>.FindOne(Expression.Eq("UserName", name.Replace("ANALIT\\", "")));
+			name = name.Replace("ANALIT\\", "");
+			var admin = ActiveRecordLinq.AsQueryable<Administrator>().FirstOrDefault(a => a.UserName == name);
 			if (admin != null)
 				NHibernateUtil.Initialize(admin.AllowedPermissions);
 
