@@ -55,8 +55,6 @@ namespace AdminInterface.Helpers
 			var helper = new FormHelper(Context);
 			var type = GetValueType(name);
 			var value = GetValue(name);
-			if (type == typeof(string))
-				return helper.TextField(name);
 			if (type == typeof(bool))
 			{
 				var result = new StringBuilder();
@@ -282,7 +280,7 @@ namespace AdminInterface.Helpers
 			var helper = new FormHelper(Context);
 			if (valueType == typeof(string))
 			{
-				helper.TextField(name);
+				return helper.TextField(name);
 			}
 			else if (typeof(bool).IsAssignableFrom(valueType))
 			{

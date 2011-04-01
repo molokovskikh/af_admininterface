@@ -105,6 +105,14 @@ namespace Integration
 		}
 
 		[Test]
+		public void Filter_for_text()
+		{
+			var result = helper.FilterFor("filter.TextField");
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'>Введите текст для поиска:</td><td colspan=2>"
+				+"<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" /></td></tr>"));
+		}
+
+		[Test]
 		public void Selected_value_for_enum()
 		{
 			filter.Enum = TestEnum.Value2;
