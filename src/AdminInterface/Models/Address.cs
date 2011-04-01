@@ -25,6 +25,11 @@ namespace AdminInterface.Models
 	[ActiveRecord("Addresses", Schema = "Future", Lazy = true)]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable
 	{
+		public Address()
+		{
+			AvaliableForUsers = new List<User>();
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

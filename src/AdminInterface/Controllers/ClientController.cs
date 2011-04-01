@@ -346,7 +346,11 @@ where Phone like :phone")
 			var newClient = Client.Find(clientId);
 			var address = Address.TryFind(addressId);
 			var user = User.TryFind(userId);
-			var oldClient = Client.Find(user.Client.Id);
+			Client oldClient = null;
+			if (user != null)
+				oldClient = user.Client;
+			if (address != null)
+				oldClient = address.Client;
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Orgs().Single();

@@ -77,11 +77,6 @@ namespace Integration.ForTesting
 			});
 		}
 
-		public static Client CreateTestClient(ulong maskRegion)
-		{
-			return TestClient();
-		}
-
 		public static Client CreateTestClientWithUser()
 		{
 			return TestClient(c => {
@@ -110,7 +105,7 @@ namespace Integration.ForTesting
 
 		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
 		{
-			var client = CreateTestClient(clientRegionMask);
+			var client = TestClient();
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var user = new User(client) {
