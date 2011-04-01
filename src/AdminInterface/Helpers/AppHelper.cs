@@ -265,7 +265,10 @@ namespace AdminInterface.Helpers
 				label = "Введите текст для поиска:";
 
 			if (typeof(DatePeriod).IsAssignableFrom(valueType))
+			{
 				PeriodCalendar(result, value);
+				return result.ToString();
+			}
 
 			var input = GetEdit(name, valueType, value);
 

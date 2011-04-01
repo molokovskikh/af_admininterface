@@ -43,11 +43,17 @@ namespace Functional.Billing
 		public void Edit_act()
 		{
 			Open("/acts/");
-			browser.Link(Find.ByText("редактировать")).Click();
-			browser.Button(Find.ByText("Сохранить")).Click();
-			var newActDate = DateTime.Now.AddDays(10);
-			browser.Input<Act>(a => act.ActDate, newActDate);
+			browser.Link(Find.ByText("Редактировать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Редактирование акта"));
+
+			Open(act, "Edit");
+			var newActDate = DateTime.Today.AddDays(10);
+			var date = browser.Css("input[name='act.ActDate']");
+			date.Clear();
+			date.TypeText(newActDate.ToString("ddMMyyyy"));
+			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
 			act.Refresh();
 			Assert.That(act.ActDate, Is.EqualTo(newActDate));
 		}

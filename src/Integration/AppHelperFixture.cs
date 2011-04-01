@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
@@ -73,6 +74,8 @@ namespace Integration
 			public Multivalue Multivalue { get; set; }
 			public TestEnum Enum { get; set; }
 			public DateTime Date { get; set; }
+
+			public DatePeriod Period { get; set; }
 		}
 
 		public class Multivalue
@@ -102,6 +105,14 @@ namespace Integration
 		{
 			var result = helper.Edit("filter.TextField");
 			Assert.That(result, Is.EqualTo("<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" />"));
+		}
+
+		[Test]
+		public void Filter_for_period()
+		{
+			filter.Period = new DatePeriod();
+			var result = helper.FilterFor("filter.Period");
+			Assert.That(result, Is.StringContaining("calendar"));
 		}
 
 		[Test]

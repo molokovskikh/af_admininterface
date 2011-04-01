@@ -509,7 +509,7 @@
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\SubViews\RegionSettings.brail" />
     <None Include="Views\UserSearch\SearchBy.brail" />
-    <None Include="Views\Users\UserSettings.brail" />
+    <None Include="Views\Users\Settings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
