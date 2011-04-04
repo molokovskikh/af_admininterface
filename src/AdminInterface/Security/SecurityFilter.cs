@@ -13,7 +13,8 @@ namespace AdminInterface.Security
 			IController controller,
 			IControllerContext controllerContext)
 		{
-			if (SecurityContext.Administrator == null)
+			var administrator = SecurityContext.Administrator;
+			if (administrator == null)
 			{
 				context.Response.RedirectToUrl("~/Rescue/NotAuthorized.aspx");
 				return false;
@@ -22,9 +23,9 @@ namespace AdminInterface.Security
 			bool isPermissionGranted;
 
 			if (_attribute.Required == Required.All)
-				isPermissionGranted = SecurityContext.Administrator.HavePermisions(_attribute.PermissionTypes);
+				isPermissionGranted = administrator.HavePermisions(_attribute.PermissionTypes);
 			else
-				isPermissionGranted = SecurityContext.Administrator.HaveAnyOfPermissions(_attribute.PermissionTypes);
+				isPermissionGranted = administrator.HaveAnyOfPermissions(_attribute.PermissionTypes);
 
 			if (!isPermissionGranted)
 			{
@@ -39,14 +40,18 @@ namespace AdminInterface.Security
 			else
 				action = (MethodInfo) mayBeActions;
 
+			if (action == null)
+				return true;
+
 			var attributes = action.GetCustomAttributes(typeof (RequiredPermissionAttribute), true);
+
 
 			foreach (RequiredPermissionAttribute attribute in attributes)
 			{
 				if (attribute.Required == Required.All)
-					isPermissionGranted = SecurityContext.Administrator.HavePermisions(attribute.PermissionTypes);
+					isPermissionGranted = administrator.HavePermisions(attribute.PermissionTypes);
 				else
-					isPermissionGranted = SecurityContext.Administrator.HaveAnyOfPermissions(attribute.PermissionTypes);
+					isPermissionGranted = administrator.HaveAnyOfPermissions(attribute.PermissionTypes);
 
 				if (!isPermissionGranted)
 				{

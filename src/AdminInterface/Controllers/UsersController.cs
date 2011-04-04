@@ -117,7 +117,7 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.Update();
 
 				Flash["Message"] = new Message("Пользователь создан");
-				RedirectUsingRoute("client", "info", new {cc = client.Id});
+				RedirectUsingRoute("client", "show", new {client.Id});
 			}
 			else
 			{
