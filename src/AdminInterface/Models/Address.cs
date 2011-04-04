@@ -274,6 +274,10 @@ set @skip = 0;
 
 		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity newLegalEntity)
 		{
+			if (!newOwner.Orgs().Any(o => o.Id == newLegalEntity.Id))
+				throw new Exception(String.Format("Не могу переместить адрес {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
+					this, newLegalEntity, newOwner));
+
 			Maintainer.MaintainIntersection(newOwner, newLegalEntity);
 			MoveAddressIntersection(newOwner, newLegalEntity,
 				Client, LegalEntity);

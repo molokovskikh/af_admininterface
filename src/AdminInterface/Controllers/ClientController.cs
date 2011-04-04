@@ -403,7 +403,7 @@ where Phone like :phone")
 			}
 			oldClient.Refresh();
 			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)
-				UpdateClientStatus(oldClient.Id, false);	
+				UpdateClientStatus(oldClient.Id, false);
 			oldClient.Update();
 		}
 	}

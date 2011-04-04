@@ -513,6 +513,10 @@ WHERE
 		
 		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
+			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))
+				throw new Exception(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
+					this, legalEntity, newOwner));
+
 			var regions = Region.FindAll();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
 			// которых не было у старого клиента, но они есть у нового клиента
