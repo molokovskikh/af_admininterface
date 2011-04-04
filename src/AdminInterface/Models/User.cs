@@ -225,6 +225,21 @@ namespace AdminInterface.Models
 				throw new CantChangePassword("Запрещено изменять пароль для пользователей из офиса.");
 		}
 
+		public virtual bool CanChangePassword
+		{
+			get
+			{
+				try
+				{
+					return !ADHelper.IsBelongsToOfficeContainer(Login);
+				}
+				catch(Exception e)
+				{
+					return false;
+				}
+			}
+		}
+
 		public override string ToString()
 		{
 			return Login;
@@ -316,7 +331,14 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+				try
+				{
+					return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+				}
+				catch (Exception)
+				{
+					return false;
+				}
 			}
 		}
 
