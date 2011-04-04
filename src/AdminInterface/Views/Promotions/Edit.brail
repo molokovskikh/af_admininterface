@@ -35,7 +35,7 @@
 		<tr>
 			<td class="DisplayName">Наименование:</td>
 			<td>
-				${app.Edit("promotion.Name")}
+				${FormHelper.TextFieldValue("promotion.Name", promotion.Name, {"style" : "width: 100%"})}
 				${app.GetValidationError(promotion, "Name")}
 			</td>
 		</tr>
