@@ -211,17 +211,6 @@ namespace AdminInterface.Controllers
 		public int CurrentPage { get; set; }
 	}
 
-	public class PromotionBinder : DataBinder
-	{
-		protected override bool PerformCustomBinding(object instance, string prefix, Node node)
-		{
-			if (prefix == "Catalogs" && instance.GetType() == typeof(Catalog) && node.Name == "0")
-				return true;
-			else
-				return base.PerformCustomBinding(instance, prefix, node);
-		}
-	}
-
 	[
 		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof(BindingHelper)), 
