@@ -16,10 +16,10 @@ namespace AdminInterface.Models.Billing
 
 		public Act(DateTime actDate, params Invoice[] invoices)
 		{
-			ActDate = actDate;
 			Period = invoices.Select(i => i.Period).Distinct().Single();
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
 			Recipient = invoices.Select(i => i.Recipient).Distinct().Single();
+			ActDate = Payer.GetDocumentDate(actDate);
 			Parts = invoices
 				.SelectMany(i => i.Parts)
 				.GroupBy(p => new {p.Name, p.Cost})

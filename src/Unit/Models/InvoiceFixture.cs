@@ -110,5 +110,13 @@ namespace Unit.Models
 			Assert.That(part.Ad, Is.EqualTo(ad));
 			Assert.That(ad.Invoice, Is.EqualTo(invoice));
 		}
+
+		[Test]
+		public void Document_on_last_working_day()
+		{
+			payer.InvoiceSettings.DocumentsOnLastWorkingDay = true;
+			var invoice = new Invoice(payer, new DateTime(2011, 1, 10));
+			Assert.That(invoice.Date, Is.EqualTo(new DateTime(2011, 1, 31)));
+		}
 	}
 }

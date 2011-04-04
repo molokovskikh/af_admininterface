@@ -233,7 +233,7 @@ namespace AdminInterface.Models
 				{
 					return !ADHelper.IsBelongsToOfficeContainer(Login);
 				}
-				catch(Exception e)
+				catch(Exception)
 				{
 					return false;
 				}

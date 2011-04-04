@@ -5,6 +5,7 @@ using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
+using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
@@ -42,34 +43,34 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Invoice(Payer payer)
+			: this(payer, DateTime.Now)
+		{}
+
+		public Invoice(Payer payer, DateTime date)
 			: this()
 		{
 			Parts = new List<InvoicePart>();
-			Date = DateTime.Now;
 			CreatedOn = DateTime.Now;
+
 			SetPayer(payer);
+			Date = Payer.GetDocumentDate(date);
+			Period = GetPeriod(Date);
 		}
 
 		public Invoice(Payer payer, Period period, DateTime invoiceDate, IEnumerable<InvoicePart> parts)
-			: this(payer)
+			: this(payer, invoiceDate)
 		{
 			Period = period;
-			Date = invoiceDate;
 			foreach (var part in parts)
 				part.Invoice = this;
 			Parts = parts.ToList();
 			CalculateSum();
 		}
 
-		public Invoice(Payer payer, DateTime invoiceDate) 
-			: this(payer, GetPeriod(invoiceDate), invoiceDate)
-		{}
-
 		public Invoice(Payer payer, Period period, DateTime invoiceDate)
-			: this(payer)
+			: this(payer, invoiceDate)
 		{
 			Period = period;
-			Date = invoiceDate;
 			Parts = BuildParts();
 			CalculateSum();
 		}
