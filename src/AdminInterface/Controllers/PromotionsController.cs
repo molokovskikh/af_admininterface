@@ -236,14 +236,12 @@ namespace AdminInterface.Controllers
 		}
 
 		public PromotionsController(IDataBinder binder)
-//			: base(new PromotionBinder())
 			: base(binder)
 		{
 			InitExtentions();
 		}
 
 		public PromotionsController()
-			//: base(new PromotionBinder())
 		{
 			InitExtentions();
 		}
@@ -290,12 +288,9 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
-				BindObjectInstance(promotion, "promotion");
-
-				var onDelete = promotion.Catalogs.Where(c => c.Id < 1).ToList();
-				onDelete.Each(c => promotion.Catalogs.Remove(c));
-
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
+
+				BindObjectInstance(promotion, "promotion");
 
 				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
 				{
@@ -351,12 +346,6 @@ namespace AdminInterface.Controllers
 			RedirectToAction("Index", filter.ToUrl());
 		}
 
-		public void SelectName([DataBind("filter")] CatalogFilter filter)
-		{
-			PropertyBag["filter"] = filter;
-			PropertyBag["catalogNames"] = filter.Find<Catalog>();
-		}
-
 		public void New(uint supplierId,
 			[DataBind("PromoRegions")] ulong[] promoRegions)
 		{
@@ -382,12 +371,9 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
-				BindObjectInstance(promotion, "promotion");
-
-				var onDelete = promotion.Catalogs.Where(c => c.Id < 1).ToList();
-				onDelete.Each(c => promotion.Catalogs.Remove(c));
-
 				promotion.RegionMask = promoRegions.Aggregate(0UL, (v, a) => a + v);
+
+				BindObjectInstance(promotion, "promotion");
 
 				if (!HasValidationError(promotion) && Binder.Validator.IsValid(promotion))
 				{

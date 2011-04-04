@@ -483,7 +483,6 @@
     <None Include="Views\Promotions\Edit.brail" />
     <None Include="Views\Promotions\EditCatalogs.brail" />
     <None Include="Views\Promotions\Index.brail" />
-    <None Include="Views\Promotions\SelectName.brail" />
     <None Include="Views\Promotions\SelectSupplier.brail" />
     <None Include="Views\Recipients\Edit.brail" />
     <None Include="Views\Recipients\Index.brail" />
