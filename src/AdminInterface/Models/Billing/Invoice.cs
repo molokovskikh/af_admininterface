@@ -121,6 +121,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public DateTime? LastErrorNotification { get; set; }
 
+		[BelongsTo]
+		public virtual Act Act { get; set; }
+
 		[
 			HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true),
 			ValidateCollectionNotEmpty("Нужно задать список услуг")

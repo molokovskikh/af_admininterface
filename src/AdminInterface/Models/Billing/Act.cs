@@ -27,8 +27,12 @@ namespace AdminInterface.Models.Billing
 				.ToList();
 			Sum = Parts.Sum(p => p.Sum);
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
+
 			foreach(var part in invoices.SelectMany(i => i.Parts).Where(p => p.Ad != null))
 				part.Ad.Act = this;
+
+			foreach (var invoice in invoices)
+				invoice.Act = this;
 		}
 		
 		[PrimaryKey]
@@ -52,6 +56,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string PayerName { get; set; }
 
+		[HasMany(Lazy = true)]
+		public IList<Invoice> Invoices { get; set; }
+
 		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
 
@@ -63,9 +70,9 @@ namespace AdminInterface.Models.Billing
 		public static IEnumerable<Act> Build(List<Invoice> invoices, DateTime documentDate)
 		{
 			return invoices
+				.Where(i => i.Act == null)
 				.GroupBy(i => i.Payer)
 				.Select(g => new Act(documentDate, g.ToArray()))
-				.Where(a => !a.IsDuplicateDocument())
 				.ToList();
 		}
 	}
