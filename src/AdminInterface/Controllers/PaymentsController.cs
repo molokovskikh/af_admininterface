@@ -188,7 +188,7 @@ namespace AdminInterface.Controllers
 		public void Delete(uint id)
 		{
 			var payment = Payment.Find(id);
-			payment.Cancel();
+			payment.Delete();
 			RedirectToReferrer();
 		}
 
