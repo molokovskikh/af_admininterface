@@ -502,6 +502,7 @@ namespace AdminInterface.Controllers
 				{
 					Flash["Message"] = "Сохранено";
 					promotion.Save();
+					RedirectToAction("EditCatalogs", filter.ToUrl());
 				}
 				else
 				{

@@ -309,9 +309,37 @@ limit 1")
 				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
 				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
+				//Переходим на форму редактирования списка
 				browser.Link(Find.ByText("Редактировать список препаратов")).Click();
 
 				Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
+
+				//Выбираем наименования и отмечаем их в таблице
+				var chaBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("cha")).ToList();
+				Assert.That(chaBoxes.Count, Is.GreaterThan(3), "Не найдено достаточное количество наименований в каталоге");
+				if (chaBoxes.Count > 3)
+					for (int i = 0; i < 3; i++)
+						chaBoxes[i].Click();
+
+				//Производим сохранение
+				var addBtn = browser.Button(Find.ById("addBtn"));
+				Assert.That(addBtn.Exists, Is.True, "Не найдена кнопка добавления наименований к списку выбранных прератов");
+				addBtn.Click();
+				Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
+				RefreshPromotion(_promotion);
+				var promoBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("chd")).ToList();
+				Assert.That(promoBoxes.Count, Is.EqualTo(_promotion.Catalogs.Count), "Не совпадает количество доступных для удаления препаратов со списом препаратов акции");
+				foreach (var catalog in _promotion.Catalogs)
+					Assert.That(promoBoxes.Exists(box => box.Name == "chd" + catalog.Id), Is.True, "Не найден checkbox для удаления препарата с Id:{0} Name:{1}", catalog.Id, catalog.Name);
+
+				var parentPromo = browser.Link(Find.ByText("Редактирование акции"));
+				Assert.That(parentPromo.Exists, "Не найдена ссылка на родительскую промо-акцию");
+				parentPromo.Click();
+
+				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.Not.StringContaining("Сохранено"));
 			}
 		}
 
