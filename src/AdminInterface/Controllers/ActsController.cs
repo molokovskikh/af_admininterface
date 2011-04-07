@@ -84,6 +84,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(act, "act");
 				if (!HasValidationError(act))
 				{
+					act.CalculateSum();
 					act.Save();
 					Flash["Message"] = "Сохранено";
 					RedirectUsingRoute("Acts", "Edit", new {act.Id});
