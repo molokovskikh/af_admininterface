@@ -16,7 +16,7 @@ namespace AdminInterface.Security
 #endif
 			if (admin == null)
 			{
-				admin = Administrator.GetByName(/*httpContext.User.Identity.Name*/"nelli");
+				admin = Administrator.GetByName(httpContext.User.Identity.Name);
 				if (admin != null)
 				{
 					httpContext.Session["UserName"] = admin.UserName;
