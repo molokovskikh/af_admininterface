@@ -294,11 +294,6 @@ namespace AdminInterface.Models
 			Login = Id.ToString();
 			Update();
 
-			if (Client.Users == null)
-				Client.Users = new List<User>();
-			if (!Client.Users.Any(u => u == this))
-				Client.Users.Add(this);
-
 			Client.UpdateBeAccounted();
 			new UserUpdateInfo(Id).Create();
 		}
@@ -314,7 +309,21 @@ namespace AdminInterface.Models
 		{
 			Client = client;
 			if (Payer == null)
+			{
 				Payer = client.Payers.Single();
+				if (Payer.Users == null)
+					Payer.Users = new List<User>();
+
+				if (!Payer.Users.Any(u => u == this))
+					Payer.Users.Add(this);
+			}
+
+			if (Client.Users == null)
+				Client.Users = new List<User>();
+
+			if (!Client.Users.Any(u => u == this))
+				Client.Users.Add(this);
+
 
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;

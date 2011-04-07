@@ -77,7 +77,7 @@ namespace AdminInterface.Models.Billing
 
 		public static Period GetPeriod(DateTime dateTime)
 		{
-			return (Period)dateTime.Month + 4;
+			return (Period)dateTime.Month + 3;
 		}
 
 		public void SetPayer(Payer payer)
@@ -153,9 +153,17 @@ namespace AdminInterface.Models.Billing
 
 		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period)
 		{
-			return Payer.GetAccountings()
-				.GroupBy(a => a.Payment)
-				.Select(g => new InvoicePart(this, period, g.Key, g.Count()));
+			if (Payer.InvoiceSettings.DoNotGroupParts)
+			{
+				return Payer.GetAccountings()
+					.Select(a => new InvoicePart(this, period, a.Payment, 1));
+			}
+			else
+			{
+				return Payer.GetAccountings()
+					.GroupBy(a => a.Payment)
+					.Select(g => new InvoicePart(this, period, g.Key, g.Count()));
+			}
 		}
 
 		public void Send(Controller controller)

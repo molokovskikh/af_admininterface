@@ -20,15 +20,24 @@ namespace AdminInterface.Models.Billing
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
 			Recipient = invoices.Select(i => i.Recipient).Distinct().Single();
 			ActDate = Payer.GetDocumentDate(actDate);
-			Parts = invoices
-				.SelectMany(i => i.Parts)
-				.GroupBy(p => new {p.Name, p.Cost})
-				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
-				.ToList();
+			var invoiceParts = invoices.SelectMany(i => i.Parts);
+			if (Payer.InvoiceSettings.DoNotGroupParts)
+			{
+				Parts = invoiceParts
+					.Select(p => new ActPart(p.Name, p.Count, p.Cost))
+					.ToList();
+			}
+			else
+			{
+				Parts = invoiceParts
+					.GroupBy(p => new {p.Name, p.Cost})
+					.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
+					.ToList();
+			}
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
 			CalculateSum();
 
-			foreach(var part in invoices.SelectMany(i => i.Parts).Where(p => p.Ad != null))
+			foreach(var part in invoiceParts.Where(p => p.Ad != null))
 				part.Ad.Act = this;
 
 			foreach (var invoice in invoices)

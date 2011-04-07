@@ -43,6 +43,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual bool DocumentsOnLastWorkingDay { get; set; }
+
+		[Property]
+		public virtual bool DoNotGroupParts { get; set; }
 	}
 
 	[ActiveRecord(Schema = "billing", Lazy = true)]

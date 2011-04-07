@@ -471,6 +471,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DocumentsOnLastWorkingDay", "Формировать документы последним числом месяца:"),
 			FormHelper.CheckboxField("Instance.InvoiceSettings.DocumentsOnLastWorkingDay"))}
 
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DoNotGroupParts", "Не объединять позиции в актах, счетах:"),
+			FormHelper.CheckboxField("Instance.InvoiceSettings.DoNotGroupParts"))}
+
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
 									FormHelper.TextField("Instance.BeginBalance"))}
 
