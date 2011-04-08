@@ -50,7 +50,7 @@ namespace AdminInterface.Controllers
 			client.Users.Each(u => address.SetAccessControl(u.Login));
 			Mailer.Registred(address, comment);
 			Flash["Message"] = new Message("Адрес доставки создан");
-			RedirectUsingRoute("client", "info", new { cc = client.Id });
+			RedirectUsingRoute("client", "show", new { client.Id });
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -84,7 +84,7 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			Flash["Message"] = new Message("Сохранено");
-			RedirectUsingRoute("client", "info", new {cc = address.Client.Id});
+			RedirectUsingRoute("client", "show", new { address.Client.Id });
 		}
 
 		[AccessibleThrough(Verb.Post)]

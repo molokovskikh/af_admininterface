@@ -1,0 +1,82 @@
+﻿<script>
+	$("tr a.add").live('click', function () {
+		var body = $(this).parents("tbody").get(0);
+		maxIndex = $(body).children("tr").length + 1;
+		var row = $($(body).children("tr").get(1)).clone();
+		row.find("input").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+		row.find("textarea").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+
+		row.appendTo(body);
+	});
+
+	$("tr a.delete").live('click', function () {
+		$($(this).parents("tr").get(0)).remove();
+	});
+</script>
+
+<h2>Редактирование акта №${act.Id}</h2>
+
+<form class="accountant-friendly" method=post>
+	<div class=block>
+		<table>
+		<tr>
+			<td>Плательщик:</td>
+			<td>
+				${app.LinkTo(act.Payer)}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Дата:</label>
+			</td>
+			<td>
+				${app.Edit("act.ActDate")}
+				${app.GetValidationError(act, "ActDate")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>Период:</label>
+			</td>
+			<td>
+				${app.Edit("act.Period")}
+				${app.GetValidationError(act, "Period")}
+			</td>
+		</tr>
+		</table>
+	</div>
+	<div class=block>
+		<table class=DataTable>
+			<tr>
+				<th><a href="javascript:" class=add>Добавить</a></th>
+				<th>Услуга</th>
+				<th>Стоимость</th>
+				<th>Количество</th>
+			</tr>
+			<% for i, part in enumerate(act.Parts): %>
+			<tr>
+				<td>
+					<a href="javascript:" class=delete>Удалить</a>
+				</td>
+				<td>
+					<textarea name="act.parts[${i}].name" cols=30 rows=2 class="required">${part.Name}</textarea>
+					${app.GetValidationError(part, "Name")}
+				</td>
+				<td>
+					<input name="act.parts[${i}].cost" type=text class="required validate-cost" value="${part.Cost}">
+					${app.GetValidationError(part, "Cost")}
+				</td>
+				<td>
+					<input type=text name="act.parts[${i}].count" class="required validate-count" value="${part.Count}">
+					${app.GetValidationError(part, "Count")}
+				</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+	<input type=submit value=Сохранить>
+</form>

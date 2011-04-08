@@ -53,12 +53,12 @@
 			dataType: "json",
 			url: "${siteroot}/Client/LegalEntities?id=" + $("#clientsList").val(),
 			success: function (data) {
+				$("#DivForSelectClientToMove #LegalEntityId").remove();
+				$("#DivForSelectClientToMove #LegalEntityLabel").remove();
 				if (data.length < 2) {
 					$("#MoveToClientButton").removeAttr("disabled");
 					return;
 				}
-				$("#DivForSelectClientToMove #LegalEntityId").remove();
-				$("#DivForSelectClientToMove #LegalEntityLabel").remove();
 				var select = $('<select/>')
 					.attr('id', 'LegalEntityId')
 					.attr('name', 'LegalEntityId');

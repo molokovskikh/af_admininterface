@@ -1,0 +1,119 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Акции", "Index.rails"), ("Редактирование акции", "Edit.rails?id="+promotion.Id), ("Редактирование списка препаратов акции", "")], "pageTitle":"Акции"} %>
+
+
+<script type="text/javascript">
+	var nsChecked = false;
+	var sChecked = false;
+	
+	jQuery(document).ready(function() {
+		jQuery('#nsAll').click(MarkNotselected);
+		jQuery('#sAll').click(MarkSelected);
+	});
+
+	function MarkNotselected() {
+		nsChecked = !nsChecked;
+		jQuery('.nsCheckBox').attr('checked', nsChecked);
+	}
+
+	function MarkSelected() {
+		sChecked = !sChecked;
+		jQuery('.sCheckBox').attr('checked', sChecked);
+	}
+</script>
+
+<div class="block NarrowDocumentHeader">Редактирование списка препаратов акции №${promotion.Id}</div>
+
+<div style="padding: 10px">
+
+	<div class=block style="padding:0;">
+		<div style="margin:10px" align="center">
+			<h3>Список препаратов</h3>
+			${app.BeginFormFor("filter")}
+			${FormHelper.HiddenField("id", promotion.Id)}
+			${app.FilterFor("filter.SearchText")}
+			${app.EndFormFor("filter")}
+		</div>
+	</div>
+
+		
+<form method="post" action="${siteroot}/Promotions/EditCatalogs.rails?${filter.ToUrlQuery()}">
+			<table style="width:100%;">
+				<tr>
+					<td class="DocumentHeader" style="width:45%;">Список препаратов</td>
+					
+					<td></td>
+					
+					<td class="DocumentHeader" style="width:45%;">Выбранные препараты</td>
+				</tr>
+				
+				<tr>
+				
+				<td style="width:45%; border: solid 1px #dadada; vertical-align:top;"> <!-- Левая колонка препаратов -->
+					<table id="catalogsAll" class="HighLightCurrentRow DataTable" style="width: 100%;">
+						<% if catalogNames.Count: %>
+						<tr class="NoHighLightRow">
+							<th><input id="nsAll" name="nsAll" type="checkbox" /></th>
+							<th>Наименование</th>
+						</tr>
+						<% for i, catalogName in enumerate(catalogNames): %>
+						<tr class="${ViewHelper.GetRowStyle(i)}">
+							<td>
+								<input type="checkbox" name="cha${catalogName.Id}" id="chb${catalogName.Id}" value="${catalogName.Id}" class="nsCheckBox"/>
+							</td>
+							<td>${catalogName.Name}</td>
+						</tr>
+						<% end %>
+						<tr>
+							<td colspan="2" align="right">
+								<div class="Paginator">
+									${paginator.ShowPaginator()}
+								</div>
+							</td>
+						</tr>
+						<% else: %>
+						<tr class=EmptyData>
+							<td>По вашему запросу ничего не найдено</td>
+						</tr>
+						<% end %>
+					</table>
+				</td>
+				
+				<td style="vertical-align: middle; text-align: center;">
+					<div style="padding-bottom:6px;">
+						<input type="submit" id="addBtn" name="addBtn" value="--&gt;" title="Добавить"/>
+					</div>
+					<div style="padding-top:6px;">
+						<input type="submit" id="delBtn" name="delBtn" value="&lt;--" title="Удалить"/>
+					</div>
+				</td>
+				
+				<td style="width:45%; vertical-align: top; border: solid 1px #dadada;"> <!-- Правая колонка препаратов -->
+
+					<table id="catalogs" class="HighLightCurrentRow DataTable" style="width: 100%;">	
+						<tr class="NoHighLightRow">
+							<th><input id="sAll" name="sAll" type="checkbox" /></th>
+							<th>Наименование</th>
+						</tr>
+						<% if promotion.Catalogs.Count: %>
+							<% for i, catalog in enumerate(promotion.Catalogs): %>
+								<tr class="${ViewHelper.GetRowStyle(i)}">
+									<td>
+										<input type="checkbox" name="chd${promotion.Catalogs[i].Id}" id="chd${promotion.Catalogs[i].Id}" value="${promotion.Catalogs[i].Id}" class="sCheckBox"/>
+									</td>
+									<td >
+										<input type=hidden id="promotionCatalogId" name=promotion.Catalogs[${i}].Id value="${promotion.Catalogs[i].Id}">
+										<input type=hidden id="promotionCatalogName" name=promotion.Catalogs[${i}].Name value="${promotion.Catalogs[i].Name}">
+										${promotion.Catalogs[i].Name}
+									</td>
+								</tr>
+							<% end %>
+						<% end %>
+					</table>
+					</td>
+				</tr>
+			</table>
+</form>
+
+</div>
+
+

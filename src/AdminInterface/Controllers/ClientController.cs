@@ -96,10 +96,10 @@ namespace AdminInterface.Controllers
 	]
 	public class ClientController : ARSmartDispatcherController
 	{
-		public void Info(uint cc)
+		public void Show(uint id)
 		{
 			var sort = GetSort();
-			var client = Client.FindAndCheck(cc);
+			var client = Client.FindAndCheck(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
 
@@ -116,26 +116,8 @@ namespace AdminInterface.Controllers
 
 			sort.Apply(PropertyBag);
 
-			try
-			{
-				var usersInfo = ADHelper.GetPartialUsersInformation(users);
-				PropertyBag["usersInfo"] = usersInfo;
-			}
-			catch (Exception ex)
-			{
-				var userInfo = new ADUserInformationCollection();
-				var usersNames = "";
-				foreach (var user in users)
-				{
-					userInfo.Add(new ADUserInformation {Login = user.Login});
-					usersNames += user.Login + ", ";
-				}
-				PropertyBag["usersInfo"] = userInfo;
-
-				Logger.Error(
-					String.Format("Не смогли получить информацию о пользователе AD. ClientId={0}, Admin={1}, Users=({2})",
-						client.Id, SecurityContext.Administrator.UserName, usersNames), ex);
-			}
+			var usersInfo = ADHelper.GetPartialUsersInformation(users);
+			PropertyBag["usersInfo"] = usersInfo;
 		}
 
 		private Sort GetSort()
@@ -258,7 +240,7 @@ where Phone like :phone")
 			{
 				foreach (var user in client.Users)
 				{
-					var file = String.Format(Settings.Default.UserPreparedDataFormatString, user.Id);
+					var file = String.Format(Properties.Settings.Default.UserPreparedDataFormatString, user.Id);
 					if (File.Exists(file))
 						File.Delete(file);
 				}
@@ -290,9 +272,9 @@ where Phone like :phone")
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void DrugstoreSettings(uint clientId)
+		public void Settings(uint id)
 		{
-			var client = Client.Find(clientId);
+			var client = Client.Find(id);
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
@@ -364,7 +346,13 @@ where Phone like :phone")
 			var newClient = Client.Find(clientId);
 			var address = Address.TryFind(addressId);
 			var user = User.TryFind(userId);
-			var oldClient = user.Client;
+
+			Client oldClient = null;
+			if (user != null)
+				oldClient = user.Client;
+			if (address != null)
+				oldClient = address.Client;
+
 			var legalEntity = LegalEntity.TryFind(legalEntityId);
 			if (legalEntity == null)
 				legalEntity = newClient.Orgs().Single();

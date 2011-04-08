@@ -72,6 +72,26 @@ namespace AdminInterface.Controllers
 			}
 		}
 
+		public void Edit(uint id)
+		{
+			Binder.Validator = Validator;
+
+			var act = Act.Find(id);
+			PropertyBag["act"] = act;
+
+			if (IsPost)
+			{
+				BindObjectInstance(act, "act");
+				if (!HasValidationError(act))
+				{
+					act.CalculateSum();
+					act.Save();
+					Flash["Message"] = "Сохранено";
+					RedirectUsingRoute("Acts", "Edit", new {act.Id});
+				}
+			}
+		}
+
 		public void Print(uint id)
 		{
 			LayoutName = "Print";

@@ -36,6 +36,9 @@ namespace Integration
 		{
 			controller = new RegisterController();
 
+			PrepareController(controller, "Registered");
+			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
+			((StubRequest)Request).ApplicationPath = "/Adm";
 			var sender = MockRepository.GenerateStub<IEmailSender>();
 			sender.Stub(s => s.Send(message)).IgnoreArguments()
 				.Repeat.Any()
@@ -43,15 +46,12 @@ namespace Integration
 					message = m;
 					return true;
 				}));
-			mailer = new MonorailMailer(sender);
-			mailer.UnderTest = true;
-			PrepareController(controller, "Registered");
-			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
-			((StubRequest)Request).ApplicationPath = "/Adm";
-			var manager = GetViewManager();
-			mailer.Controller = controller;
-			MonorailMailer.ViewEngineManager = manager;
-			controller.Context.Services.EmailTemplateService = new EmailTemplateService(manager);
+			mailer = new MonorailMailer(sender) {
+				UnderTest = true,
+				Controller = controller
+			};
+
+			ForTest.InitializeMailer();
 
 			client = new Client {
 				Id = 58,
@@ -60,24 +60,6 @@ namespace Integration
 			};
 			payer = new Payer { PayerID = 10, Name = "Тестовый плательщик"};
 			client.JoinPayer(payer);
-		}
-
-		public static IViewEngineManager GetViewManager()
-		{
-			var config = new MonoRailConfiguration();
-			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
-			config.ViewEngineConfig.ViewPathRoot = Path.Combine(@"..\..\..\AdminInterface", "Views");
-
-			var provider = new FakeServiceProvider();
-			provider.Services.Add(typeof(IMonoRailConfiguration), config);
-			provider.Services.Add(typeof(IViewSourceLoader), new FileAssemblyViewSourceLoader(config.ViewEngineConfig.ViewPathRoot));
-
-			var manager = new DefaultViewEngineManager();
-			manager.Service(provider);
-			var namespaces = ExposedObject.From(manager).viewEnginesFastLookup[0].Options.NamespacesToImport;
-			namespaces.Add("Boo.Lang.Builtins");
-			namespaces.Add("AdminInterface.Helpers");
-			return manager;
 		}
 
 		[Test]

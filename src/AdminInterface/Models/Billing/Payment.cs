@@ -133,7 +133,7 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord("Payments", Schema = "Billing")]
-	public class Payment : BalanceUpdater<Payment>
+	public class	Payment : BalanceUpdater<Payment>
 	{
 		public Payment(Payer payer, DateTime payedOn, decimal sum) : this(payer)
 		{
@@ -494,14 +494,6 @@ namespace AdminInterface.Models.Billing
 				&& p.PayedOn == PayedOn
 				&& p.Sum == Sum
 				&& p.DocumentNumber == DocumentNumber) != null;
-		}
-
-		public void Cancel()
-		{
-			if (Payer != null)
-				Payer.Balance -= Sum;
-
-			Delete();
 		}
 
 		protected override void OnUpdate()

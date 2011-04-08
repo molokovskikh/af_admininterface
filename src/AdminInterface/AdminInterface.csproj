@@ -386,6 +386,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Advertisings\Index.brail" />
@@ -469,8 +470,8 @@
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
-    <None Include="Views\Client\DrugstoreSettings.brail" />
-    <None Include="Views\Client\Info.brail" />
+    <None Include="Views\Client\Settings.brail" />
+    <None Include="Views\Client\Show.brail" />
     <None Include="Views\Client\SearchAssortmentPrices.brail" />
     <None Include="Views\Client\SearchClientSubview.brail" />
     <None Include="Views\Client\SuppliersForCostNoising.brail" />
@@ -483,8 +484,8 @@
     <None Include="Views\Payments\Index.brail" />
     <None Include="Views\Payments\ProcessPayments.brail" />
     <None Include="Views\Promotions\Edit.brail" />
+    <None Include="Views\Promotions\EditCatalogs.brail" />
     <None Include="Views\Promotions\Index.brail" />
-    <None Include="Views\Promotions\SelectName.brail" />
     <None Include="Views\Promotions\SelectSupplier.brail" />
     <None Include="Views\Recipients\Edit.brail" />
     <None Include="Views\Recipients\Index.brail" />
@@ -512,7 +513,7 @@
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\SubViews\RegionSettings.brail" />
     <None Include="Views\UserSearch\SearchBy.brail" />
-    <None Include="Views\Users\UserSettings.brail" />
+    <None Include="Views\Users\Settings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />
     <None Include="Views\Deliveries\Edit.brail" />
@@ -614,7 +615,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>64761</DevelopmentServerPort>
+          <DevelopmentServerPort>50280</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

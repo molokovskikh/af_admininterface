@@ -32,7 +32,6 @@ namespace Unit.Models
 			client = new Client(payer);
 			payer.Clients.Add(client);
 			client.Users.Add(new User(client));
-			payer.Users.Add(client.Users[0]);
 		}
 
 		[Test]
@@ -109,6 +108,29 @@ namespace Unit.Models
 			Assert.That(part.Count, Is.EqualTo(1));
 			Assert.That(part.Ad, Is.EqualTo(ad));
 			Assert.That(ad.Invoice, Is.EqualTo(invoice));
+		}
+
+		[Test]
+		public void Document_on_last_working_day()
+		{
+			payer.InvoiceSettings.DocumentsOnLastWorkingDay = true;
+			var invoice = new Invoice(payer, new DateTime(2011, 1, 10));
+			Assert.That(invoice.Date, Is.EqualTo(new DateTime(2011, 1, 31)));
+		}
+
+		[Test]
+		public void Do_not_group_parts()
+		{
+			payer.InvoiceSettings.DoNotGroupParts = true;
+			client.Users.Add(new User(client));
+			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
+
+			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			Assert.That(invoice.Parts.Count, Is.EqualTo(2), invoice.Parts.Implode());
+			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(800), invoice.Parts.Implode());
+			Assert.That(invoice.Parts[0].Count, Is.EqualTo(1), invoice.Parts.Implode());
+			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(800), invoice.Parts.Implode());
+			Assert.That(invoice.Parts[1].Count, Is.EqualTo(1), invoice.Parts.Implode());
 		}
 	}
 }

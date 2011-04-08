@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Common.Tools;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -26,10 +27,6 @@ namespace Unit.Models
 			client = new Client(payer);
 			var user = new User(client);
 			user.Accounting.ReadyForAcounting = true;
-			payer.Users = new List<User> {
-				user
-			};
-
 			invoice = new Invoice(payer, Period.January, DateTime.Now);
 		}
 
@@ -83,6 +80,23 @@ namespace Unit.Models
 			var act = new Act(DateTime.Now, invoice);
 			Assert.That(ad.Act, Is.EqualTo(act));
 			Assert.That(act.Sum, Is.EqualTo(2300));
+		}
+
+		[Test]
+		public void Do_not_group_option()
+		{
+			payer.InvoiceSettings.DoNotGroupParts = true;
+
+			var user = new User(client);
+			user.Accounting.ReadyForAcounting = true;
+
+			invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var act = new Act(DateTime.Now, invoice);
+			Assert.That(act.Parts.Count, Is.EqualTo(2), act.Parts.Implode());
+			Assert.That(act.Parts[0].Sum, Is.EqualTo(800), act.Parts.Implode());
+			Assert.That(act.Parts[0].Count, Is.EqualTo(1), act.Parts.Implode());
+			Assert.That(act.Parts[1].Sum, Is.EqualTo(800), act.Parts.Implode());
+			Assert.That(act.Parts[1].Count, Is.EqualTo(1), act.Parts.Implode());
 		}
 	}
 }

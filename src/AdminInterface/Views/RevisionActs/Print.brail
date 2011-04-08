@@ -3,7 +3,7 @@
 <% end %>
 <h4>АКТ СВЕРКИ</h4>
 <p style="text-align: center;">
-	взаимных расчетов по состоянию на ${act.BeginDate.ToShortDateString()}
+	взаимных расчетов по состоянию на ${act.EndDate.ToShortDateString()}
 	между ${payer.Recipient.FullName}
 	и ${payer.JuridicalName} по договору № ${payer.Id}
 </p>

@@ -54,8 +54,7 @@ namespace AdminInterface.Helpers
 		{
 			var helper = new FormHelper(Context);
 			var type = GetValueType(name);
-			if (type == typeof(string))
-				return helper.TextField(name);
+			var value = GetValue(name);
 			if (type == typeof(bool))
 			{
 				var result = new StringBuilder();
@@ -64,7 +63,10 @@ namespace AdminInterface.Helpers
 				result.Append(GetLabel(name));
 				return result.ToString();
 			}
-			throw new Exception(String.Format("Не знаю как показать редактор для {0} с типом {1}", name, type));
+			var edit = GetEdit(name, type, value);
+			if (String.IsNullOrEmpty((string) edit))
+				throw new Exception(String.Format("Не знаю как показать редактор для {0} с типом {1}", name, type));
+			return edit;
 		}
 
 		public string LinkTo(object item)
@@ -213,18 +215,24 @@ namespace AdminInterface.Helpers
 				}
 			}
 
-			var uri = String.Format("{0}/{1}?SortBy={2}&Direction={3}&{4}", 
-				LinkHelper.GetVirtualDir(Context),
-				GetSelfUri(),
-				key,
-				direction,
-				uriParams);
+			var querystring = String.Format("SortBy={0}&Direction={1}", key, direction);
+			if (!String.IsNullOrEmpty(uriParams))
+				querystring += "&" + uriParams;
+
+			var parameters = new Dictionary<string, object> {
+				{"querystring", querystring},
+				{"encode", "false"},
+			};
+			if (Context.CurrentControllerContext.RouteMatch != null)
+				parameters.Add("params", Context.CurrentControllerContext.RouteMatch.Parameters);
+
+			var url = UrlHelper.For(parameters);
 
 			var clazz = "";
 			if (sorted)
 				clazz = "sort " + direction;
 
-			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, uri, clazz);
+			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, url, clazz);
 		}
 
 		public string GetSelfUri()
@@ -249,21 +257,37 @@ namespace AdminInterface.Helpers
 
 		public string FilterFor(string label, string name)
 		{
-			var helper = new FormHelper(Context);
-
+			var result = new StringBuilder();
 			var value = GetValue(name);
 			var valueType = GetValueType(name);
 
-			var result = new StringBuilder();
-			string input = null;
+			if (valueType == typeof(string))
+				label = "Введите текст для поиска:";
+
+			if (typeof(DatePeriod).IsAssignableFrom(valueType))
+			{
+				PeriodCalendar(result, value);
+				return result.ToString();
+			}
+
+			var input = GetEdit(name, valueType, value);
+
+			if (input != null)
+				FilterTemplate(result, label, input);
+
+			return result.ToString();
+		}
+
+		private string GetEdit(string name, Type valueType, dynamic value)
+		{
+			var helper = new FormHelper(Context);
 			if (valueType == typeof(string))
 			{
-				label = "Введите текст для поиска:";
-				input = String.Format("<input type=text name={0} value='{1}'>", name, value);
+				return helper.TextField(name);
 			}
 			else if (typeof(bool).IsAssignableFrom(valueType))
 			{
-				input = helper.CheckboxField(name);
+				return helper.CheckboxField(name);
 			}
 			else if (typeof(Enum).IsAssignableFrom(valueType))
 			{
@@ -275,7 +299,7 @@ namespace AdminInterface.Helpers
 				if (value != null)
 					selectedValue = Convert.ToInt32(value).ToString();
 
-				input = Select(name, selectedValue, values);
+				return Select(name, selectedValue, values);
 			}
 			else if (valueType.IsNullable())
 			{
@@ -290,7 +314,7 @@ namespace AdminInterface.Helpers
 					if (value != null)
 						selectedValue = Convert.ToInt32(value).ToString();
 
-					input = EmptyableSelect(name, selectedValue, values);
+					return EmptyableSelect(name, selectedValue, values);
 				}
 			}
 			else if (typeof(IEnumerable).IsAssignableFrom(valueType))
@@ -303,11 +327,15 @@ namespace AdminInterface.Helpers
 
 				var items = GetSelectOptions(value);
 				valueName += ".Id";
-				input = EmptyableSelect(valueName, selectedValue, items);
+				return EmptyableSelect(valueName, selectedValue, items);
 			}
-			else if (typeof(DatePeriod).IsAssignableFrom(valueType))
+			if (valueType == typeof(DateTime))
 			{
-				PeriodCalendar(result, value);
+				var result = new StringBuilder();
+				var stringValue = (string)value.ToShortDateString();
+				result.AppendFormat("<input type=text name='{0}' class='required validate-date input-date' value='{1}'>", name, stringValue);
+				result.Append("<input type=button class=CalendarInput>");
+				return result.ToString();
 			}
 			else
 			{
@@ -319,17 +347,13 @@ namespace AdminInterface.Helpers
 				if (method != null)
 				{
 					var all = method.Invoke(null, null);
-					input = EmptyableSelect(name + ".Id", selectedValue, GetSelectOptions(all));
+					return EmptyableSelect(name + ".Id", selectedValue, GetSelectOptions(all));
 				}
 			}
-
-			if (input != null)
-				FilterTemplate(result, label, input);
-
-			return result.ToString();
+			return null;
 		}
 
-		private List<Tuple<string, string>> GetSelectOptions(object value)
+		private IEnumerable<Tuple<string, string>> GetSelectOptions(object value)
 		{
 			return (from dynamic item in (IEnumerable)value
 				let id = item.Id

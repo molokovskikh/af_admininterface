@@ -110,9 +110,10 @@
     <Compile Include="CallbackRulesFixture.cs" />
     <Compile Include="ClientCloneFixture.cs" />
     <Compile Include="ClientMonitoringFixture.cs" />
+    <Compile Include="Drugstore\SettingsFixture.cs" />
     <Compile Include="ForTesting\ContactInformationFixture.cs" />
     <Compile Include="DocumentLogFixture.cs" />
-    <Compile Include="DrugstoreFixture.cs" />
+    <Compile Include="Drugstore\DrugstoreFixture.cs" />
     <Compile Include="ForTesting\FixtureForFixture.cs" />
     <Compile Include="ForTesting\FixtureMapping.cs" />
     <Compile Include="ForTesting\Helper.cs" />

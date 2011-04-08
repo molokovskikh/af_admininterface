@@ -147,5 +147,10 @@ namespace AdminInterface.Models.Billing
 					throw new Exception(String.Format("не знаю что за период такой {0}", period));
 			}
 		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

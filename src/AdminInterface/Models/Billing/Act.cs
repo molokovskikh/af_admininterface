@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 
 namespace AdminInterface.Models.Billing
 {
@@ -15,19 +16,32 @@ namespace AdminInterface.Models.Billing
 
 		public Act(DateTime actDate, params Invoice[] invoices)
 		{
-			ActDate = actDate;
 			Period = invoices.Select(i => i.Period).Distinct().Single();
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
 			Recipient = invoices.Select(i => i.Recipient).Distinct().Single();
-			Parts = invoices
-				.SelectMany(i => i.Parts)
-				.GroupBy(p => new {p.Name, p.Cost})
-				.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
-				.ToList();
-			Sum = Parts.Sum(p => p.Sum);
+			ActDate = Payer.GetDocumentDate(actDate);
+			var invoiceParts = invoices.SelectMany(i => i.Parts);
+			if (Payer.InvoiceSettings.DoNotGroupParts)
+			{
+				Parts = invoiceParts
+					.Select(p => new ActPart(p.Name, p.Count, p.Cost))
+					.ToList();
+			}
+			else
+			{
+				Parts = invoiceParts
+					.GroupBy(p => new {p.Name, p.Cost})
+					.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
+					.ToList();
+			}
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
-			foreach(var part in invoices.SelectMany(i => i.Parts).Where(p => p.Ad != null))
+			CalculateSum();
+
+			foreach(var part in invoiceParts.Where(p => p.Ad != null))
 				part.Ad.Act = this;
+
+			foreach (var invoice in invoices)
+				invoice.Act = this;
 		}
 		
 		[PrimaryKey]
@@ -51,6 +65,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string PayerName { get; set; }
 
+		[HasMany(Lazy = true)]
+		public IList<Invoice> Invoices { get; set; }
+
 		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
 
@@ -62,10 +79,15 @@ namespace AdminInterface.Models.Billing
 		public static IEnumerable<Act> Build(List<Invoice> invoices, DateTime documentDate)
 		{
 			return invoices
+				.Where(i => i.Act == null)
 				.GroupBy(i => i.Payer)
 				.Select(g => new Act(documentDate, g.ToArray()))
-				.Where(a => !a.IsDuplicateDocument())
 				.ToList();
+		}
+
+		public void CalculateSum()
+		{
+			Sum = Parts.Sum(p => p.Sum);
 		}
 	}
 
@@ -85,13 +107,13 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string Name { get; set; }
 
-		[Property]
+		[Property, ValidateGreaterThanZero]
 		public decimal Cost { get; set; }
 
-		[Property]
+		[Property, ValidateGreaterThanZero]
 		public int Count { get; set; }
 
 		public decimal Sum

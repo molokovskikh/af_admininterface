@@ -234,6 +234,21 @@ namespace AdminInterface.Models
 				throw new CantChangePassword("Запрещено изменять пароль для пользователей из офиса.");
 		}
 
+		public virtual bool CanChangePassword
+		{
+			get
+			{
+				try
+				{
+					return !ADHelper.IsBelongsToOfficeContainer(Login);
+				}
+				catch(Exception)
+				{
+					return false;
+				}
+			}
+		}
+
 		public override string ToString()
 		{
 			return Login;
@@ -288,11 +303,6 @@ namespace AdminInterface.Models
 			Login = Id.ToString();
 			Update();
 
-			if (Client.Users == null)
-				Client.Users = new List<User>();
-			if (!Client.Users.Any(u => u == this))
-				Client.Users.Add(this);
-
 			Client.UpdateBeAccounted();
 			new UserUpdateInfo(Id).Create();
 		}
@@ -308,7 +318,21 @@ namespace AdminInterface.Models
 		{
 			Client = client;
 			if (Payer == null)
+			{
 				Payer = client.Payers.Single();
+				if (Payer.Users == null)
+					Payer.Users = new List<User>();
+
+				if (!Payer.Users.Any(u => u == this))
+					Payer.Users.Add(this);
+			}
+
+			if (Client.Users == null)
+				Client.Users = new List<User>();
+
+			if (!Client.Users.Any(u => u == this))
+				Client.Users.Add(this);
+
 
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
@@ -325,7 +349,14 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+				try
+				{
+					return (ADHelper.IsLoginExists(Login) && ADHelper.IsLocked(Login));
+				}
+				catch (Exception)
+				{
+					return false;
+				}
 			}
 		}
 
@@ -500,6 +531,10 @@ WHERE
 		
 		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
+			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))
+				throw new Exception(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
+					this, legalEntity, newOwner));
+
 			var regions = Region.FindAll();
 			// Если маски регионов не совпадают, добавляем записи в UserPrices для тех регионов,
 			// которых не было у старого клиента, но они есть у нового клиента

@@ -7,6 +7,9 @@ using AdminInterface.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using AdminInterface.Security;
+using Common.Tools;
+using log4net;
 
 namespace AdminInterface.Helpers
 {
@@ -61,30 +64,32 @@ namespace AdminInterface.Helpers
 
 	public class ADHelper
 	{
+		private static ILog log = LogManager.GetLogger(typeof(ADHelper));
+
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
 
 		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<User> users)
 		{
-			var result = new ADUserInformationCollection();
-			var filter= new StringBuilder();
-			foreach (var user in users)
-			{
-				filter.Append("(sAMAccountName=" + user.Login + ")");
-				result.Add(new ADUserInformation() {Login = user.Login});
-			}
-			return GetInformation(result, filter);
+			return GetPartialUsersInformation(users.Select(u => u.Login));
 		}
 
 		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<string> logins)
 		{
 			var result = new ADUserInformationCollection();
-			var filter = new StringBuilder();
-			foreach (var login in logins)
+			result.AddRange(logins.Select(user => new ADUserInformation {Login = user}));
+			try
 			{
-				filter.Append("(sAMAccountName=" + login + ")");
-				result.Add(new ADUserInformation() { Login = login });
+				var filter = new StringBuilder();
+				foreach (var login in logins)
+					filter.Append("(sAMAccountName=" + login + ")");
+				return GetInformation(result, filter);
 			}
-			return GetInformation(result, filter);
+			catch (Exception ex)
+			{
+				log.Error(String.Format("Не смогли получить информацию о пользователе AD. Admin={0}, Users=({1})",
+						SecurityContext.Administrator.UserName, logins.Implode()), ex);
+			}
+			return result;
 		}
 
 		private static ADUserInformationCollection GetInformation(ADUserInformationCollection usersInfo, StringBuilder filter)
@@ -93,7 +98,6 @@ namespace AdminInterface.Helpers
 				return null;
 			if (usersInfo.Count > 1)
 				filter.Insert(0, "|");
-			Console.WriteLine("begin - {0:ss.fff}", DateTime.Now);
 
 			using (var searcher = new DirectorySearcher(String.Format(@"(&(objectClass=user)({0}))", filter)))
 			{
@@ -114,15 +118,12 @@ namespace AdminInterface.Helpers
 			var tempResult = new ADUserInformation();
 			if (searchResult == null)
 				return null;
-			Console.WriteLine("{1} - {0:ss.fff}", DateTime.Now, searchResult.Properties["sAMAccountName"][0].ToString());
 			tempResult.IsLoginExists = true;
 			tempResult.Login = searchResult.Properties["sAMAccountName"][0].ToString();
 
 			var directoryEntry = searchResult.GetDirectoryEntry();
-			Console.WriteLine("{0:ss.fff}", DateTime.Now);
 			tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
 			tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
-			Console.WriteLine("{0:ss.fff}", DateTime.Now);
 
 			return tempResult;
 		}

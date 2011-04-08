@@ -82,7 +82,12 @@ namespace AdminInterface.Models.Logs
 
 		public string Login
 		{
-			get { return User.Login; }
+			get
+			{
+				if (User != null)
+					return User.Login;
+				return "";
+			}
 		}
 
 		public string Operator

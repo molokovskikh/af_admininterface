@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Adapters;
+using Castle.MonoRail.Framework.Helpers;
+using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using NHibernate;
 using NUnit.Framework;
@@ -20,14 +24,24 @@ namespace Integration
 		private StubEngineContext context;
 
 		private TestFilter filter;
+		private RoutingEngine engine;
 
 		[SetUp]
 		public void Setup()
 		{
 			helper = new AppHelper();
-			var urlInfo = new UrlInfo("test", "test", "test", "/", "");
-			context = new StubEngineContext(urlInfo);
-			context.CurrentControllerContext = new ControllerContext();
+			var urlInfo = new UrlInfo("", "home", "index", "/", "");
+			context = new StubEngineContext(urlInfo) {
+				CurrentControllerContext = new ControllerContext("", "home", "index", null)
+			};
+			engine = new RoutingEngine();
+			helper.UrlHelper = new UrlHelper(context) {
+				UrlBuilder = new DefaultUrlBuilder {
+					RoutingEngine = engine,
+					ServerUtil = new StubServerUtility(),
+					UseExtensions = false,
+				},
+			};
 			helper.SetContext(context);
 			helper.SetController(null, context.CurrentControllerContext);
 
@@ -59,6 +73,9 @@ namespace Integration
 			public string TextField { get; set; }
 			public Multivalue Multivalue { get; set; }
 			public TestEnum Enum { get; set; }
+			public DateTime Date { get; set; }
+
+			public DatePeriod Period { get; set; }
 		}
 
 		public class Multivalue
@@ -91,6 +108,22 @@ namespace Integration
 		}
 
 		[Test]
+		public void Filter_for_period()
+		{
+			filter.Period = new DatePeriod();
+			var result = helper.FilterFor("filter.Period");
+			Assert.That(result, Is.StringContaining("calendar"));
+		}
+
+		[Test]
+		public void Filter_for_text()
+		{
+			var result = helper.FilterFor("filter.TextField");
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'>Введите текст для поиска:</td><td colspan=2>"
+				+"<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" /></td></tr>"));
+		}
+
+		[Test]
 		public void Selected_value_for_enum()
 		{
 			filter.Enum = TestEnum.Value2;
@@ -118,6 +151,31 @@ namespace Integration
 		public void Return_null_if_description_not_found()
 		{
 			Assert.That(helper.GetLabel("filter.TextField"), Is.Null);
+		}
+
+		[Test]
+		public void Build_sortable_url()
+		{
+			var link = helper.Sortable("test", "test");
+			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc' class=''>test</a>"));
+		}
+
+		[Test]
+		public void Build_sortable_url_for_routing()
+		{
+			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
+			var match = engine.FindMatch("users/1/edit", new RouteContext(context.Request, null, "/", null));
+			context.CurrentControllerContext.RouteMatch = match;
+
+			var link = helper.Sortable("test", "test");
+			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc' class=''>test</a>"));
+		}
+
+		[Test]
+		public void Edit_date()
+		{
+			var edit = helper.Edit("filter.Date");
+			Assert.That(edit, Is.EqualTo("<input type=text name='filter.Date' class='required validate-date input-date' value='01.01.0001'><input type=button class=CalendarInput>"));
 		}
 	}
 }

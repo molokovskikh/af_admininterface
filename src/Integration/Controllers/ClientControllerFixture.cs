@@ -20,12 +20,23 @@ namespace Integration.Controllers
 		private ClientController controller;
 		private Client client;
 
+		private SessionScope session;
+
 		[SetUp]
 		public void SetUp()
 		{
 			controller = new ClientController();
 			PrepareController(controller);
 			client = DataMother.CreateTestClientWithUser();
+			session = new SessionScope();
+			ForTest.InitializeMailer();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			if (session != null)
+				session.Dispose();
 		}
 
 /*		[Test]
@@ -285,6 +296,26 @@ namespace Integration.Controllers
 
 				Assert.That(count, Is.EqualTo(2));
 			}
+		}
+
+		[Test]
+		public void Move_address()
+		{
+			var sourceClient = DataMother.CreateTestClientWithAddress();
+			var destinationClient = DataMother.TestClient();
+
+			var address = sourceClient.Addresses[0];
+			controller.MoveUserOrAddress(destinationClient.Id,
+				0u,
+				address.Id,
+				destinationClient.Orgs().First().Id,
+				true);
+			destinationClient.Refresh();
+			sourceClient.Refresh();
+
+			Assert.That(sourceClient.Addresses.Count, Is.EqualTo(0));
+			Assert.That(destinationClient.Addresses.Count, Is.EqualTo(1));
+			Assert.That(destinationClient.Addresses[0].Id, Is.EqualTo(address.Id));
 		}
 	}
 }

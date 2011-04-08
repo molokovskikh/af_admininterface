@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -72,6 +73,15 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			Assert.That(client.Users[0].Logs, Is.Not.Null);
+		}
+
+		[Test]
+		public void Move_user()
+		{
+			var otherClient = DataMother.TestClient();
+			var clien = DataMother.TestClient();
+			var exception = Assert.Throws<Exception>(() => user.MoveToAnotherClient(clien, otherClient.Orgs().First()));
+			Assert.That(exception.Message, Is.EqualTo(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо  не принадлежит клиенту test", user.Id)));
 		}
 	}
 }

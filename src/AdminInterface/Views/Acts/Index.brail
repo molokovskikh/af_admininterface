@@ -77,6 +77,7 @@
 					<th>
 						<input type=checkbox class=all>
 					</th>
+					<th style="width:1%"></th>
 					<th>${app.Sortable("№", "Id")}</th>
 					<th>${app.Sortable("Договор", "payerId")}</th>
 					<th>${app.Sortable("Получатель платежей", "recipient")}</th>
@@ -91,6 +92,7 @@
 					<td>
 						<input type=checkbox name="acts[${i}].Id" value=${act.Id}>
 					</td>
+					<td>${app.LinkTo(act, "Редактировать", @Edit)}</td>
 					<td>${app.LinkTo(act, act.Id, @Print)}</td>
 					<td>${act.Payer.Id}</td>
 					<td>${act.Recipient.Name}</td>

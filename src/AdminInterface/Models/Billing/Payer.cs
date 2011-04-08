@@ -10,6 +10,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Tools.Calendar;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
@@ -39,6 +40,12 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual bool PrintInvoice { get; set; }
+
+		[Property]
+		public virtual bool DocumentsOnLastWorkingDay { get; set; }
+
+		[Property]
+		public virtual bool DoNotGroupParts { get; set; }
 	}
 
 	[ActiveRecord(Schema = "billing", Lazy = true)]
@@ -387,6 +394,24 @@ ORDER BY {Payer}.shortname;";
 			if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
 				ContactGroupOwner.AddContactGroup(ContactGroupType.Billing);
 		}
+
+		public virtual DateTime GetDocumentDate(DateTime date)
+		{
+			if (!InvoiceSettings.DocumentsOnLastWorkingDay)
+			{
+				return date;
+			}
+
+			var lastDay = date.LastDayOfMonth();
+			if (lastDay.DayOfWeek == DayOfWeek.Saturday)
+				return lastDay.AddDays(-1);
+			else if (lastDay.DayOfWeek == DayOfWeek.Sunday)
+				return lastDay.AddDays(-2);
+			else
+				return lastDay;
+		}
+
+
 	}
 
 	public class DoNotHaveContacts : Exception

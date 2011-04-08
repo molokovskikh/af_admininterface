@@ -266,8 +266,6 @@ limit 1")
 				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
 				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
-				Console.WriteLine(browser.Html);
-
 				browser.CheckBox(Find.ByName("promotion.Enabled")).Click();
 				browser.CheckBox(Find.ByName("promotion.AgencyDisabled")).Click();
 				browser.TextField(Find.ByName("promotion.Annotation")).TypeText("новое крутое описание");
@@ -296,70 +294,54 @@ limit 1")
 			}
 		}
 
-		[Test]
-		public void TestSaving()
+		[Test(Description = "редактирование списка препартов акции")]
+		public void EditPromotionCatalogs()
 		{
-			//using (var transaction = new TransactionScope())
-			//{
-			//    _promotion.Enabled = false;
-			//    Assert.That(_promotion.IsActive(), Is.False);
-			//    _promotion.Save();
-			//    transaction.VoteCommit();
-			//}
-
-			//using (var transaction = new TransactionScope())
-			//{
-			//    var changedPromo = SupplierPromotion.Find(_promotion.Id);
-
-			//    Assert.That(changedPromo.Enabled, Is.False);
-			//    Assert.That(changedPromo.IsActive(), Is.False);
-			//}
-
-
-			var catalog = Catalog.FindFirst();
-
-			uint id;
-			using (var transaction = new TransactionScope())
+			using (var browser = Open("/"))
 			{
-				var supplierPromotion = new SupplierPromotion
-				{
-					Enabled = true,
-					PromotionOwnerSupplier = PromotionOwnerSupplier.FindFirst(),
-					Annotation = "12121",
-					Name = "212121",
-					Begin = DateTime.Now.Date.AddDays(-7),
-					End = DateTime.Now.Date,
-					Catalogs = new List<Catalog> { catalog }
-				};
-				supplierPromotion.Save();
+				browser.Link(Find.ByText("Промо-акции")).Click();
 
-				id = supplierPromotion.Id;
+				var row = RowPromotionExists(browser, _promotion);
 
+				row.Link(Find.ByText("Редактировать")).Click();
 
-				//Assert.That(supplierPromotion.IsActive(), Is.True);
-			}
+				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.Name));
+				Assert.That(browser.Text, Is.StringContaining(_promotion.PromotionOwnerSupplier.Name));
 
-			using (var transaction = new TransactionScope())
-			{
-				var newPromo = SupplierPromotion.Find(id);
-				//Assert.That(newPromo.IsActive(), Is.True);
-			}
+				//Переходим на форму редактирования списка
+				browser.Link(Find.ByText("Редактировать список препаратов")).Click();
 
-			using (var transaction = new TransactionScope())
-			{
-				var changedPromo = SupplierPromotion.Find(id);
-				changedPromo.Enabled = false;
-				changedPromo.Save();
+				Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
 
-				//Assert.That(changedPromo.IsActive(), Is.False);
-			}
+				//Выбираем наименования и отмечаем их в таблице
+				var chaBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("cha")).ToList();
+				Assert.That(chaBoxes.Count, Is.GreaterThan(3), "Не найдено достаточное количество наименований в каталоге");
+				if (chaBoxes.Count > 3)
+					for (int i = 0; i < 3; i++)
+						chaBoxes[i].Click();
 
-			using (var transaction = new TransactionScope())
-			{
-				var readPromo = SupplierPromotion.Find(id);
+				//Производим сохранение
+				var addBtn = browser.Button(Find.ById("addBtn"));
+				Assert.That(addBtn.Exists, Is.True, "Не найдена кнопка добавления наименований к списку выбранных прератов");
+				addBtn.Click();
+				Assert.That(browser.Text, Is.StringContaining("Редактирование списка препаратов акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-				//Assert.That(readPromo.IsActive(), Is.False);
+				RefreshPromotion(_promotion);
+				var promoBoxes = browser.CheckBoxes.Where(cb => cb.Name.StartsWith("chd")).ToList();
+				Assert.That(promoBoxes.Count, Is.EqualTo(_promotion.Catalogs.Count), "Не совпадает количество доступных для удаления препаратов со списом препаратов акции");
+				foreach (var catalog in _promotion.Catalogs)
+					Assert.That(promoBoxes.Exists(box => box.Name == "chd" + catalog.Id), Is.True, "Не найден checkbox для удаления препарата с Id:{0} Name:{1}", catalog.Id, catalog.Name);
+
+				var parentPromo = browser.Link(Find.ByText("Редактирование акции"));
+				Assert.That(parentPromo.Exists, "Не найдена ссылка на родительскую промо-акцию");
+				parentPromo.Click();
+
+				Assert.That(browser.Text, Is.StringContaining("Редактирование акции №" + _promotion.Id));
+				Assert.That(browser.Text, Is.Not.StringContaining("Сохранено"));
 			}
 		}
+
 	}
 }
