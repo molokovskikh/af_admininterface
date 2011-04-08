@@ -308,7 +308,6 @@ namespace Integration.ForTesting
 			var user = new User();
 			user.Payer = payer;
 			user.RootService = supplier;
-			user.AssignService(supplier);
 			user.Login = "temporary-login";
 			user.Save();
 			user.Login = user.Id.ToString();

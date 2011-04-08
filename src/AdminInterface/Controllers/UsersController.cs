@@ -139,9 +139,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			var setting = user.Client.Settings;
-			PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy( reg => reg.Name);
-			PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
+			if (user.Client != null)
+			{
+				var setting = user.Client.Settings;
+				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
+				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy(reg => reg.Name);
+			}
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
 			else 
@@ -149,7 +152,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["RegistrationDate"] = user.RegistrationDate;
 			if ((user.ContactGroup != null) && (user.ContactGroup.Contacts != null))
 				PropertyBag["ContactGroup"] = user.ContactGroup;
-			if (user.Client.Status == ClientStatus.Off || user.Enabled == false) 
+
+			if (user.RootService.Disabled || user.Enabled == false)
 				PropertyBag["enabled"] = false;
 			else 
 				PropertyBag["enabled"] = true;

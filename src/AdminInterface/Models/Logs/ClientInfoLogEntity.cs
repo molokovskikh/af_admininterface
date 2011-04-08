@@ -43,7 +43,7 @@ namespace AdminInterface.Models.Logs
 			else if (entity is User)
 			{
 				User = (User)entity;
-				ClientCode = User.Client.Id;
+				ClientCode = User.RootService.Id;
 			}
 			else if (entity is Address)
 			{

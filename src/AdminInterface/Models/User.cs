@@ -56,30 +56,6 @@ namespace AdminInterface.Models
 		bool Enabled { get; }
 	}
 
-	[ActiveRecord(Schema = "Future", Lazy = true)]
-	public class AssignedService
-	{
-		[PrimaryKey]
-		public virtual uint Id { get; set; }
-
-		[Property]
-		public virtual ulong RegionMask { get; set; }
-
-		[BelongsTo]
-		public virtual User User { get; set; }
-
-		[BelongsTo(Cascade = CascadeEnum.All)]
-		public virtual Service Service { set; get; }
-
-		[HasAndBelongsToMany(typeof (UserPermission),
-			Lazy = true,
-			ColumnKey = "AssignedServiceId",
-			ColumnRef = "PermissionId",
-			Table = "AssignedServicePermissions",
-			Schema = "Future")]
-		public virtual IList<UserPermission> Permissions { get; set; }
-	}
-
 	[ActiveRecord(Schema = "future", Lazy = true)]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
@@ -90,7 +66,6 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Enabled = true;
-			Services = new List<AssignedService>();
 		}
 
 		public User(Client client)
@@ -189,10 +164,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Accounting Accounting { get; set; }
 
-		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
-		public virtual IList<AssignedService> Services { get; set; }
-
-		[BelongsTo]
+		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Service RootService { get; set; }
 
 		public virtual IList<User> ImpersonableUsers { set; get; }
@@ -564,14 +536,6 @@ where userid = :userId")
 				return null;
 
 			return Administrator.GetByName(Registrant);
-		}
-
-		public virtual void AssignService(ServiceSupplier supplier)
-		{
-			if (Services.Any(s => s.Service == supplier))
-				throw new Exception(String.Format("Услуга {0} уже подключена", supplier));
-
-			Services.Add(new AssignedService{ User = this, Service = supplier});
 		}
 	}
 }
