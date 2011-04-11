@@ -207,6 +207,7 @@
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
+    <Compile Include="Models\Suppliers\Price.cs" />
     <Compile Include="Models\RedmineUser.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
     <Compile Include="Models\Logs\AuthorizationLogEntity.cs" />
@@ -215,6 +216,7 @@
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
     <Compile Include="Models\ShowRelationship.cs" />
+    <Compile Include="Models\SmartOrderRules.cs" />
     <Compile Include="Models\Suppliers\Service.cs" />
     <Compile Include="Models\Suppliers\Supplier.cs" />
     <Compile Include="Models\Telephony\Callback.cs" />

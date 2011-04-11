@@ -6,6 +6,7 @@ using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
@@ -45,7 +46,7 @@ namespace Integration.Controllers
 			client = new Client {
 				Status = ClientStatus.On,
 				Segment = Segment.Wholesale,
-				Type = ClientType.Drugstore,
+				Type = ServiceType.Drugstore,
 				Name = "test",
 				FullName = "test",
 			};

@@ -32,10 +32,7 @@ namespace AdminInterface.Controllers
 			IList<DocumentSendLog> documentLogs;
 			if (!userId.HasValue)
 			{
-				var client = Client.Find(clientCode.Value);
-
-				SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-				SecurityContext.Administrator.CheckClientType(client.Type);
+				var client = Client.FindAndCheck(clientCode.Value);
 
 				documentLogs = DocumentSendLog.GetEnitiesForClient(client,
 					beginDate, endDate.AddDays(1));

@@ -32,9 +32,9 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs", Lazy = true)]
 	public class AuthorizationLogEntity : ActiveRecordLinqBase<AuthorizationLogEntity>
 	{
-		public AuthorizationLogEntity(uint id)
+		public AuthorizationLogEntity(User user)
 		{
-			Id = id;
+			User = user;
 		}
 
 		public AuthorizationLogEntity() {}

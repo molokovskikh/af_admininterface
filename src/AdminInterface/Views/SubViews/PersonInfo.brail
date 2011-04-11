@@ -16,8 +16,8 @@
 		}
 	}
 
-	function addPersonRow(rowId, clientId, text) {
-		$("#HolderPerson" + clientId).append("<tr id='rowPerson" + rowId + "' name='rowPerson" + rowId + "'>" +
+	function addPersonRow(rowId, text) {
+		$("#PersonHolder").append("<tr id='rowPerson" + rowId + "' name='rowPerson" + rowId + "'>" +
 			"<td class='PersonInfoCell'>" + "Ф.И.О.:" +
 			"</td>" +
 			"<td style = 'width: 50%;padding-left: 10px;'>" +
@@ -25,7 +25,7 @@
 				"<input type='text' style='width: 100%' name='persons[" + rowId + "].Name' id='persons[" + rowId + "].Name' value='" + text + "'/>" +
 			"</td>" +
 			"<td style='vertical-align: top;padding-left: 10px'>" +
-				"<input type='button' value='Удалить' name='persons[" + rowId + "].Delete' onclick='deletePersonRow(" + clientId + "," + rowId + ")' />" +
+				"<input type='button' value='Удалить' name='persons[" + rowId + "].Delete' onclick='deletePersonRow(" + rowId + ")' />" +
 			"</td>" +
 		"</tr>");
 	}
@@ -41,13 +41,13 @@
 </script>
 
 <div class="contextual">
-	<a id="addPersonLink${client.Id}" class="icon icon-add" href="javascript:" onclick="addPersonRow(--insertId, ${client.Id}, '', '')">Добавить</a>
+	<a id="addPersonLink" class="icon icon-add" href="javascript:" onclick="addPersonRow(--insertId, '', '')">Добавить</a>
 </div>
 <h3>Контактные лица</h3>
 <table width="100%" cellspacing="5">
 	<tr>
 		<td>
-			<table name="HolderPerson${client.Id}" id="HolderPerson${client.Id}" style="width: 100%">
+			<table name="HolderPerson" id="PersonHolder" style="width: 100%">
 			</table>
 		</td>
 	</tr>

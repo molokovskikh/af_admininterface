@@ -185,7 +185,7 @@ namespace AdminInterface.Controllers
 					this.Mail().EnableChanged(client, enabled).Send();
 					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
 				}
-				client.UpdateAndFlush();
+				client.Save();
 			}
 			CancelView();
 			CancelLayout();

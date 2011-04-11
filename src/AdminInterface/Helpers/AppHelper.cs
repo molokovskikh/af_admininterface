@@ -22,6 +22,12 @@ namespace AdminInterface.Helpers
 {
 	public class AppHelper : AbstractHelper
 	{
+		public AppHelper()
+		{}
+
+		public AppHelper(IEngineContext engineContext) : base(engineContext)
+		{}
+
 		public string GetValidationError(object item, string name)
 		{
 			var errorSummary = ((SmartDispatcherController)Controller).Binder.GetValidationSummary(item);
@@ -94,7 +100,32 @@ namespace AdminInterface.Helpers
 				clazz = "DisabledByBilling";
 
 			var uri = GetUrl(item, action);
-			return String.Format("<a class='{1}' href='{3}{2}'>{0}</a>", title, clazz, uri, LinkHelper.GetVirtualDir(Context));
+			return String.Format("<a class='{1}' href='{2}'>{0}</a>", title, clazz, uri);
+		}
+
+		public string GetUrl(object item)
+		{
+			return GetUrl(item, null);
+		}
+
+		public string GetUrl(object item, string action = null)
+		{
+			var dynamicItem = ((dynamic)item);
+			var id = dynamicItem.Id;
+			var controller = GetControllerName(item);
+			if (!String.IsNullOrEmpty(action))
+				action = "/" + action;
+			return String.Format("{0}/{1}/{2}{3}", LinkHelper.GetVirtualDir(Context), controller, id, action);
+		}
+
+		public static string GetShortUrl(object item, string action = null)
+		{
+			var dynamicItem = ((dynamic)item);
+			var id = dynamicItem.Id;
+			var controller = GetControllerName(item);
+			if (!String.IsNullOrEmpty(action))
+				action = "/" + action;
+			return String.Format("{0}/{1}/{2}{3}", controller, id, action);
 		}
 
 		public string LinkTo(string title, string controller, string method)
@@ -106,16 +137,6 @@ namespace AdminInterface.Helpers
 				method = "";
 
 			return String.Format("<a href='{1}/{2}/{3}'>{0}</a>", title, LinkHelper.GetVirtualDir(Context), controller, method);
-		}
-
-		public static string GetUrl(object item, string action = null)
-		{
-			var dynamicItem = ((dynamic)item);
-			var id = dynamicItem.Id;
-			var controller = GetControllerName(item);
-			if (!String.IsNullOrEmpty(action))
-				action = "/" + action;
-			return String.Format("/{0}/{1}{2}", controller, id, action);
 		}
 
 		private static string GetControllerName(object item)

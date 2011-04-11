@@ -163,7 +163,7 @@ namespace AddUser
 				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
 
 			var regionMapping = configuration.GetClassMapping(typeof (Region));
-			regionMapping.AddFilter("RegionFilter", "RegionCode & :AdminRegionMask > 0");
+			regionMapping.AddFilter("RegionFilter", "if(RegionCode is null, 1, RegionCode & :AdminRegionMask > 0)");
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)

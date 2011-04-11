@@ -42,7 +42,7 @@ namespace AdminInterface.Models.Security
 		public static UserPermission[] FindPermissionsAvailableFor(Client client)
 		{
 			UserPermissionAvailability clientTypeFilter;
-			if (client.Type == ClientType.Drugstore)
+			if (client.IsDrugstore())
 				clientTypeFilter = UserPermissionAvailability.Drugstore;
 			else
 				clientTypeFilter = UserPermissionAvailability.Supplier;

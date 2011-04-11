@@ -41,13 +41,13 @@
 	}
 </style>
 	
-<h2>Клиент ${client.Name}, Код ${client.Id}</h2>
+<h2>Поставщик ${supplier.Name}, Код ${supplier.Id}</h2>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
-	<% if not client.IsClientActive(): %>
+	<% unless supplier.Enabled: %>
 	<div class="Warning">
-		<p>Клиент отключен</p>
+		<p>Поставщик отключен</p>
 	</div>
 	<% end %>
 
@@ -72,7 +72,7 @@
 
 		<div class=block>
 			<div class=contextual>
-				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
+				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${supplier.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
 			<table style="width:100%;" name="usersTable">
@@ -100,9 +100,9 @@
 			<h3>Общая информация</h3>
 			<div>
 				<% if not Registrant: %>
-				Регистратор не указан, дата регистрации ${client.RegistrationDate}
+				Регистратор не указан, дата регистрации ${supplier.RegistrationDate}
 				<% else: %>
-				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
+				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${supplier.RegistrationDate}
 				<% end %>
 			</div>
 			<form action="Update.rails" method=post style="padding:0; margin:0;">
@@ -147,7 +147,7 @@
 				<% for i, call in enumerate(CallLogs): %>
 				<tr class="${ViewHelper.GetRowStyle(i)}">
 					<td>
-						<form action="BindPhone?clientcode=${client.Id}&phone=${call}" method=post>
+						<form action="BindPhone?clientcode=${supplier.Id}&phone=${call}" method=post>
 							<input type=submit value="Связать" />
 						</form>
 					</td>

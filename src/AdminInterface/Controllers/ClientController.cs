@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -9,6 +8,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
@@ -18,11 +18,6 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using AdminInterface.Properties;
-using log4net;
-using MySql.Data.MySqlClient;
-using NHibernate;
-using Supplier = AdminInterface.Models.Supplier;
 
 namespace AdminInterface.Controllers
 {
@@ -133,7 +128,7 @@ namespace AdminInterface.Controllers
 			using (new TransactionScope())
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				client.Update();
+				client.Save();
 			}
 
 			Flash["Message"] = Message.Notify("Сохранено");
@@ -162,7 +157,7 @@ namespace AdminInterface.Controllers
 					var smartOrder = SmartOrderRules.TestSmartOrder();
 					drugstore.SmartOrderRules = smartOrder;
 				}
-				client.Update();
+				client.Save();
 				drugstore.UpdateAndFlush();
 				if (oldMaskRegion != client.MaskRegion)
 					client.MaintainIntersection();
@@ -335,7 +330,7 @@ where Phone like :phone")
 					this.Mail().EnableChanged(client, enabled).Send();
 					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
 				}
-				client.UpdateAndFlush();
+				client.Save();
 			}
 			CancelView();
 			CancelLayout();
@@ -406,7 +401,7 @@ where Phone like :phone")
 			oldClient.Refresh();
 			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)
 				UpdateClientStatus(oldClient.Id, false);
-			oldClient.Update();
+			oldClient.Save();
 		}
 	}
 }

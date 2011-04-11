@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 
 namespace AdminInterface.Models

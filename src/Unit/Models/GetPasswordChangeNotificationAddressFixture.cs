@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 
@@ -8,19 +9,15 @@ namespace Unit.Models
 	[TestFixture]
 	public class GetPasswordChangeNotificationAddressFixture
 	{
-		private Client _client;
+		private Client client;
 
 		[SetUp]
 		public void Setup()
 		{
-			_client = new Client
-			{
-				ContactGroupOwner = new ContactGroupOwner
-				{
-					ContactGroups = new List<ContactGroup>
-					{
-						new ContactGroup
-						{
+			client = new Client {
+				ContactGroupOwner = new ContactGroupOwner {
+					ContactGroups = new List<ContactGroup> {
+						new ContactGroup {
 							Type = ContactGroupType.General,
 							Persons = new List<Person>(),
 							Contacts = new List<Contact>
@@ -42,14 +39,12 @@ namespace Unit.Models
 								},
 							}
 						},
-						new ContactGroup
-						{
+						new ContactGroup {
 							Type = ContactGroupType.OrderManagers,
 							Contacts = new List<Contact>(),
 							Persons = new List<Person>(),
 						},
-						new ContactGroup
-						{
+						new ContactGroup {
 							Type = ContactGroupType.ClientManagers,
 							Contacts = new List<Contact>(),
 							Persons = new List<Person>(),
@@ -62,17 +57,17 @@ namespace Unit.Models
 		[Test]
 		public void GetPasswordChangeNotificationAddressWithoutAddress()
 		{
-			_client.ContactGroupOwner.ContactGroups[0].Contacts.Clear();
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo(""));
+			client.ContactGroupOwner.ContactGroups[0].Contacts.Clear();
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo(""));
 		}
 
 		[Test]
 		public void GetPasswordChangeNotificationAddressForDrugstoreTest()
 		{
-			_client.Type = ClientType.Drugstore;
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru, g2@mail.ru"));
+			client.Type = ServiceType.Drugstore;
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru, g2@mail.ru"));
 
-			var orderGroup = _client.ContactGroupOwner.ContactGroups[1];
+			var orderGroup = client.ContactGroupOwner.ContactGroups[1];
 
 			orderGroup.Contacts = new List<Contact>
 			{
@@ -93,17 +88,17 @@ namespace Unit.Models
 				},
 			};
 
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, o2@mail.ru"));
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, o2@mail.ru"));
 		}
 
 		[Test]
 		public void GetPasswordChangeNotificationAddressForSupplierTest()
 		{
-			_client.Type = ClientType.Supplier;
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru, g2@mail.ru"));
+			client.Type = ServiceType.Supplier;
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru, g2@mail.ru"));
 
-			var orderGroup = _client.ContactGroupOwner.ContactGroups[1];
-			var clientGroup = _client.ContactGroupOwner.ContactGroups[2];
+			var orderGroup = client.ContactGroupOwner.ContactGroups[1];
+			var clientGroup = client.ContactGroupOwner.ContactGroups[2];
 
 			clientGroup.Contacts = new List<Contact>
 			{
@@ -144,14 +139,14 @@ namespace Unit.Models
 				},
 			};
 
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, o2@mail.ru, c1@mail.ru, c2@mail.ru"));
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, o2@mail.ru, c1@mail.ru, c2@mail.ru"));
 		}
 
 		[Test]
 		public void ReadAddressFromPersons()
 		{
-			_client.Type = ClientType.Supplier;
-			_client.ContactGroupOwner.ContactGroups[0].Persons.Add(new Person
+			client.Type = ServiceType.Supplier;
+			client.ContactGroupOwner.ContactGroups[0].Persons.Add(new Person
 			{
 				Contacts = new List<Contact>
 				{
@@ -163,19 +158,19 @@ namespace Unit.Models
 				},
 			});
 
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("pg1@mail.ru, g1@mail.ru, g2@mail.ru"));
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("pg1@mail.ru, g1@mail.ru, g2@mail.ru"));
 		}
 
 		[Test]
 		public void SkipEqualsAddress()
 		{
-			_client.Type = ClientType.Supplier;
-			_client.ContactGroupOwner.ContactGroups[0].Contacts[1].ContactText = "g1@mail.ru";
+			client.Type = ServiceType.Supplier;
+			client.ContactGroupOwner.ContactGroups[0].Contacts[1].ContactText = "g1@mail.ru";
 
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru"));
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("g1@mail.ru"));
 
-			var orderGroup = _client.ContactGroupOwner.ContactGroups[1];
-			var clientGroup = _client.ContactGroupOwner.ContactGroups[2];
+			var orderGroup = client.ContactGroupOwner.ContactGroups[1];
+			var clientGroup = client.ContactGroupOwner.ContactGroups[2];
 
 			clientGroup.Contacts = new List<Contact>
 			{
@@ -216,7 +211,7 @@ namespace Unit.Models
 				},
 			};
 
-			Assert.That(_client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, c1@mail.ru"));
+			Assert.That(client.GetAddressForSendingClientCard(), Is.EqualTo("o1@mail.ru, c1@mail.ru"));
 		}
 	}
 }

@@ -52,7 +52,9 @@ namespace AdminInterface.Controllers
 			}
 			ad.Invoice = new Invoice(ad);
 			ad.UpdateAndFlush();
-			RedirectToUrl(LinkHelper.GetVirtualDir(Context) + AppHelper.GetUrl(ad.Invoice, "Print"));
+
+			var app = new AppHelper(Context);
+			RedirectToUrl(app.GetUrl(ad.Invoice, "Print"));
 		}
 
 		public void BuildAct(uint id)
@@ -69,7 +71,9 @@ namespace AdminInterface.Controllers
 
 			ad.Act = new Act(invoice.Date, invoice);
 			ad.UpdateAndFlush();
-			RedirectToUrl(LinkHelper.GetVirtualDir(Context) + AppHelper.GetUrl(ad.Act, "Print"));
+
+			var app = new AppHelper(Context);
+			RedirectToUrl(app.GetUrl(ad.Act, "Print"));
 		}
 
 		public void Delete(uint id)

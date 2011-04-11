@@ -66,7 +66,7 @@ namespace Functional.ForTesting
 
 		protected IE Open(object item, string action = null)
 		{
-			return Open(AppHelper.GetUrl(item, action));
+			return Open(AppHelper.GetShortUrl(item, action));
 		}
 
 		protected IE Open(string uri)

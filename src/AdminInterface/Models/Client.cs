@@ -7,6 +7,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -25,94 +26,14 @@ namespace AdminInterface.Models
 		[Description("Включен")] On = 1,
 	}
 
-	public enum ClientType
-	{
-		[Description("Поставщик")] Supplier = 0,
-		[Description("Аптека")] Drugstore = 1,
-	}
-
 	public enum Segment
 	{
 		[Description("Опт")] Wholesale = 0,
 		[Description("Розница")] Retail = 1,
 	}
 
-	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
-	public class Price : ActiveRecordLinqBase<Price>
-	{
-		[PrimaryKey("PriceCode")]
-		public virtual uint Id { get; set; }
-
-		[Property("PriceName")]
-		public virtual string Name { get; set; }
-
-		[Property]
-		public virtual int? PriceType { get; set; }
-
-		[BelongsTo("FirmCode")]
-		public virtual Supplier Supplier { get; set; }
-	}
-
-	[ActiveRecord("smart_order_rules", Schema = "ordersendrules", Lazy = true)]
-	public class SmartOrderRules : ActiveRecordLinqBase<SmartOrderRules>
-	{
-		[PrimaryKey("Id")]
-		public virtual uint Id { get; set; }
-
-		[Property]
-		public virtual string ParseAlgorithm { get; set; }
-
-		[Property]
-		public virtual uint AssortimentPriceCode { get; set; }
-
-		public static SmartOrderRules TestSmartOrder()
-		{
-			var testOrder = new SmartOrderRules
-			{
-				AssortimentPriceCode = 4662,
-				ParseAlgorithm = "TestSource",
-			};
-			return testOrder;
-		}
-	}
-
-	[ActiveRecord("ClientsData", Schema = "Usersettings", Where = "(FirmType = 0)", Lazy = true)]
-	public class Supplier : ActiveRecordLinqBase<Supplier>
-	{
-		[PrimaryKey("FirmCode")]
-		public virtual uint Id { get; set;}
-
-		[Property("ShortName", NotNull = true)]
-		public virtual string Name { get; set; }
-
-		[Property("FirmStatus")]
-		public virtual ClientStatus Status { get; set; }
-
-		[BelongsTo("RegionCode")]
-		public virtual Region HomeRegion { get; set; }
-
-		[BelongsTo("BillingCode")]
-		public virtual Payer Payer { get; set; }
-
-		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
-		public virtual IList<Price> Prices { get; set; }
-
-		[Property, Description("Регионы работы")]
-		public virtual ulong MaskRegion { get; set; }
-
-		public static IList<Supplier> GetByPayerId(uint payerId)
-		{
-			return Queryable.Where(p => p.Payer.PayerID == payerId).OrderBy(s => s.Name).ToList();
-		}
-
-		public override string ToString()
-		{
-			return Name;
-		}
-	}
-
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
-	public class Client : ActiveRecordLinqBase<Client>, IEnablable
+	public class Client : Service, IEnablable// ActiveRecordLinqBase<Client>, IEnablable
 	{
 		public Client()
 		{
@@ -126,11 +47,11 @@ namespace AdminInterface.Models
 			Addresses = new List<Address>();
 		}
 
-		[PrimaryKey]
-		public virtual uint Id { get; set; }
+		[JoinedKey("Id")]
+		public virtual uint SupplierId { get; set; }
 
 		[Property, Description("Краткое наименование"), Auditable]
-		public virtual string Name { get; set; }
+		public override string Name { get; set; }
 
 		[Property, Description("Полное наименование"), Auditable]
 		public virtual string FullName { get; set; }
@@ -139,7 +60,7 @@ namespace AdminInterface.Models
 		public virtual ClientStatus Status { get; set; }
 
 		[Property("FirmType")]
-		public virtual ClientType Type { get; set; }
+		public override ServiceType Type { get; set; }
 
 		[Property]
 		public virtual Segment Segment { get; set; }
@@ -160,7 +81,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]
-		public virtual Region HomeRegion { get; set; }
+		public override Region HomeRegion { get; set; }
 
 		[HasMany(ColumnKey = "ClientId", Lazy = true, Inverse = true, OrderBy = "Address", Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Address> Addresses { get; set; }
@@ -226,7 +147,7 @@ where
 
 		public virtual bool IsDrugstore()
 		{
-			return Type == ClientType.Drugstore;
+			return Type == ServiceType.Drugstore;
 		}
 
 		public virtual bool IsClientActive()
@@ -260,7 +181,7 @@ where
 
 		public virtual string GetAddressForSendingClientCard()
 		{
-			if (Type == ClientType.Drugstore)
+			if (IsDrugstore())
 				return Build(GetContactGroup(ContactGroupType.General),
 							 GetContactGroup(ContactGroupType.OrderManagers));
 
@@ -473,6 +394,44 @@ group by u.ClientId")
 					Settings.OrderRegionMask &= ~setting.Id;
 					Users.Each(u => u.OrderRegionMask &= ~setting.Id);
 				}
+			}
+		}
+
+		public static Client Find(uint id)
+		{
+			return ActiveRecordLinqBase<Client>.Find(id);
+		}
+
+		public virtual void Save()
+		{
+			ActiveRecordMediator<Client>.Save(this);
+		}
+
+		public virtual void SaveAndFlush()
+		{
+			ActiveRecordMediator<Client>.SaveAndFlush(this);
+		}
+
+		public virtual void Update()
+		{
+			ActiveRecordMediator<Client>.Update(this);
+		}
+
+		public virtual void UpdateAndFlush()
+		{
+			ActiveRecordMediator<Client>.UpdateAndFlush(this);
+		}
+
+		public virtual void Refresh()
+		{
+			ActiveRecordMediator<Client>.Refresh(this);
+		}
+
+		public static IOrderedQueryable<Client> Queryable
+		{
+			get
+			{
+				return ActiveRecordLinqBase<Client>.Queryable;
 			}
 		}
 

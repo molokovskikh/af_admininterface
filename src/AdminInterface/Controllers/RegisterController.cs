@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using AdminInterface.Services;
@@ -18,7 +19,6 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
-using Supplier = AdminInterface.Models.Supplier;
 
 namespace AdminInterface.Controllers
 {
@@ -458,7 +458,7 @@ WHERE   intersection.pricecode IS NULL
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = Supplier.Queryable
-					.Where(s => (s.Status == ClientStatus.On) && s.Name.Contains(searchPattern))
+					.Where(s => s.Enabled && s.Name.Contains(searchPattern))
 					.Take(50);
 			if (payerId.HasValue && (payerId.Value > 0))
 				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);

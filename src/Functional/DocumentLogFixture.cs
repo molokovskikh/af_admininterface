@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Test.ForTesting;
 using Functional.ForTesting;
 using Integration.ForTesting;

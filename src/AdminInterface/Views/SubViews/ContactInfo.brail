@@ -34,18 +34,18 @@
         }
     }
 
-    function deleteContactRow(clientId, rowId) {
+    function deleteContactRow(rowId) {
         $("#row" + rowId).remove();
         if (rowId > 0)
         {
-            $("#Holder" + clientId).append("<input type='hidden' name='deletedContacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "' />");
+            $("#ContactHolder").append("<input type='hidden' name='deletedContacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "' />");
         }
     }
 
-    function addContactRow(rowId, clientId, text, comment, contactType) {
+    function addContactRow(rowId, text, comment, contactType) {
 		var imageLink = "<a id='contactActionLink" + rowId + "' href='' name='" + text + "'><img id='contactActionImage" + rowId + "' src='${siteroot}/Images/email.png' border=0 /></a>";
 
-        $("#Holder" + clientId).append("<tr id='row" + rowId + "' name='row" + rowId + "' valign='top'>" +
+        $("#ContactHolder").append("<tr id='row" + rowId + "' name='row" + rowId + "' valign='top'>" +
 			"<td align='right'>" + imageLink + "</td>" +
             "<td class='ContactInfoCell' align='right'>" +
                 "<input type='hidden' name='contacts[" + rowId + "].Id' id='contacts[" + rowId + "].Id' value='" + rowId + "'/>" +
@@ -60,7 +60,7 @@
                 "<input type='text' style='width: 100%' name='contacts[" + rowId + "].Comment' id='contacts[" + rowId + "].Comment' value='" + comment + "'/>" +
             "</td>" +
             "<td style='vertical-align: top;padding-left: 10px'>" +
-                "<input type='button' value='Удалить' name='contacts[" + rowId + "].Delete' onclick='deleteContactRow(" + clientId + "," + rowId + ")' />" +
+                "<input type='button' value='Удалить' name='contacts[" + rowId + "].Delete' onclick='deleteContactRow(" + rowId + ")' />" +
             "</td>" +
         "</tr>");
         
@@ -82,7 +82,7 @@
     $(document).ready(function(){
         <% if IsDefined('ContactGroup'): %>
             <% for contact in ContactGroup.Contacts: %>
-                addContactRow(${contact.Id}, ${client.Id}, '${contact.ContactText}', '${contact.Comment}', '${contact.Type}');
+                addContactRow(${contact.Id}, '${contact.ContactText}', '${contact.Comment}', '${contact.Type}');
             <% end %>
         <% end %>
         $("#mainForm").validate();
@@ -106,15 +106,15 @@
         }, "Некорректный адрес электронной почты");  
     });
 </script>
-		
+
 <div class=contextual>
-    <a id="addContactLink${client.Id}" class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, ${client.Id}, '', '')">Добавить</a>
-</div>		    
+    <a id="addContactLink" class="icon icon-add" href="javascript:" onclick="addContactRow(--insertId, '', '')">Добавить</a>
+</div>
 <h3>Контактная информация</h3>
 <table width="100%" cellspacing="5">
     <tr>
         <td>
-            <table name="Holder${client.Id}" id="Holder${client.Id}" style="width: 100%">
+            <table name="ContactHolder" id="ContactHolder" style="width: 100%">
             </table>
         </td>
     </tr>

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
@@ -20,7 +21,7 @@ namespace AdminInterface.Models
 		{
 			Log = log;
 			WriteTime = DateTime.Now;
-			FirmCode = log.FromSupplier.Id;
+			Supplier = log.FromSupplier;
 			ClientCode = log.ForClient.Id;
 			//AddressId = log.AddressId;
 		}
@@ -36,6 +37,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public uint FirmCode { get; set; }
+
+		[BelongsTo("FirmCode")]
+		public Supplier Supplier { get; set; }
 
 		[Property]
 		public uint ClientCode { get; set; }
@@ -68,11 +72,6 @@ namespace AdminInterface.Models
 			line.Document = this;
 			Lines.Add(line);
 			return line;
-		}
-
-		public Supplier Supplier
-		{
-            get { return Supplier.Find(FirmCode); }
 		}
 	}
 

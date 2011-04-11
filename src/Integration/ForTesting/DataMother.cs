@@ -10,7 +10,6 @@ using Common.Tools;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
-using Supplier = AdminInterface.Models.Supplier;
 
 namespace Integration.ForTesting
 {
@@ -34,7 +33,7 @@ namespace Integration.ForTesting
 				client = new Client(payer) {
 					Status = ClientStatus.On,
 					Segment = Segment.Wholesale,
-					Type = ClientType.Drugstore,
+					Type = ServiceType.Drugstore,
 					Name = "test",
 					FullName = "test",
 					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
@@ -150,10 +149,9 @@ namespace Integration.ForTesting
 					Payer = payer,
 					HomeRegion = ActiveRecordBase<Region>.FindAll().Last(),
 					Name = "Test supplier",
-					Status = ClientStatus.On
 				};
 				action(supplier);
-				supplier.Create();
+				supplier.Save();
 				scope.VoteCommit();
 				return supplier;
 			}
@@ -294,7 +292,7 @@ namespace Integration.ForTesting
 				Name = "Тестовый плательщик"
 			};
 			payer.Save();
-			var supplier = new ServiceSupplier {
+			var supplier = new AdminInterface.Models.Suppliers.Supplier {
 				Payer = payer,
 				HomeRegion = Region.Find(1UL),
 				RegionMask = 1,
@@ -302,10 +300,9 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
-			var user = new User();
-			user.Payer = payer;
-			user.RootService = supplier;
-			user.Login = "temporary-login";
+			var user = new User(payer, supplier) {
+				Login = "temporary-login"
+			};
 			user.Save();
 			user.Login = user.Id.ToString();
 			user.Update();

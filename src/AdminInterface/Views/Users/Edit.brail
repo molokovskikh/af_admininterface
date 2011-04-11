@@ -1,7 +1,7 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
+									  ("Клиент ${user.RootService.Name}", app.GetUrl(user.RootService)),
 									  ("Пользователь ${user.Login}", "")]} %>
-									  
+
 <link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
 
 <script>
@@ -32,18 +32,24 @@
 <% end %>
 
 <div class="TwoColumn" style="width: 49%;">
-    <div class=block>
-        <ul class="navigation-menu">
-            <li><a href="${siteroot}/users/${user.Id}/Settings">Настройка</a></li>
-		  <% if admin.AlowChangePassword and user.CanChangePassword: %>
-        	<li><a href="${siteroot}/users/${user.Id}/ChangePassword" target=_blank>Изменить пароль</a></li>
-        	<li><a href="${siteroot}/logs/${user.Id}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
-          <% end %>
+	<div class=block>
+		<ul class="navigation-menu">
+			<% if user.Client: %>
+			<li><a href="${siteroot}/users/${user.Id}/Settings">Настройка</a></li>
+			<% end %>
+			<% if admin.AlowChangePassword and user.CanChangePassword: %>
+			<li><a href="${siteroot}/users/${user.Id}/ChangePassword" target=_blank>Изменить пароль</a></li>
+			<li><a href="${siteroot}/logs/${user.Id}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
+			<% end %>
+			<% if user.Client: %>
 			<li><a href="${siteroot}/Logs/UpdateLog?userId=${user.Id}" target="_blank">История обновлений</a></li>
 			<li><a href="${siteroot}/Logs/DocumentLog?userId=${user.Id}" target="_blank">История документов</a></li>
 			<li><a href="${siteroot}/client/${user.Client.Id}/Orders?filter.User.Id=${user.Id}" target="_blank">История заказов</a></li>
+			<% end %>
         	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
+			<% if user.Client: %>
 			<li><a href="${siteroot}/Users/${user.Id}/SearchOffers" target="_blank">Поиск предложений</a></li>
+			<% end %>
 		</ul>
 	</div>
 
@@ -164,10 +170,11 @@
 			<% OutputSubView("/SubViews/PersonInfo") %>
 		</div>
 
+		<% if user.Client: %>
 		<div class=block>
 			<h3>Доступ к адресам доставки</h3>
 			<div>
-				<% for i, address in enumerate(client.Addresses): %>
+				<% for i, address in enumerate(user.Client.Addresses): %>
 					<div style="width: 100%" class="${'DisabledByBilling' if not address.Enabled}">
 					<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id}
 						${"checked" if address.AvaliableFor(user)} ${"disabled" if not address.Enabled} />
@@ -176,7 +183,9 @@
 				<% end %>
 			</div>
 		</div>
-		
+		<% end %>
+
+		<% if user.Client: %>
 		<div class="block">
 			<h3>Региональные настройки</h3>
 			<table style="width: 100%;">
@@ -205,7 +214,8 @@
 				</tr>
 			</table>
 		</div>
-		
+		<% end %>
+
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>
@@ -216,7 +226,6 @@
 	<form id="MessagesForm" action="../SendMessage.rails" method="post">
 	<div class="block" style="width: auto;">
 		<h3>Сообщения пользователя</h3>
-		<input type=hidden value=${client.Id} name="clientCode" />
 		<input type=hidden value=${user.Id} name="userId" />
 		Новое сообщение:
 		<textarea style="height: 150px; width:100%;" name=message></textarea>

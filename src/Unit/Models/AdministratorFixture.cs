@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
@@ -110,7 +111,7 @@ namespace Unit.Models
 		public void FailCheckForDrugstorePermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
-			Assert.That(() => _adm.CheckClientType(ClientType.Drugstore),
+			Assert.That(() => _adm.CheckClientType(ServiceType.Drugstore),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
@@ -119,7 +120,7 @@ namespace Unit.Models
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
 
-			Assert.That(() => _adm.CheckClientType(ClientType.Supplier),
+			Assert.That(() => _adm.CheckClientType(ServiceType.Supplier),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
@@ -142,7 +143,7 @@ namespace Unit.Models
 		public void CheckForSupplierPermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
-			_adm.CheckClientType(ClientType.Supplier);
+			_adm.CheckClientType(ServiceType.Supplier);
 		}
 
 		[Test]
@@ -190,7 +191,7 @@ namespace Unit.Models
 		{
 			var client = new Client {
 				HomeRegion = new Region {Id = 1},
-				Type = ClientType.Drugstore,
+				Type = ServiceType.Drugstore,
 			};
 			_adm.RegionMask = 1;
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
@@ -203,7 +204,7 @@ namespace Unit.Models
 		{
 			var client = new Client {
 				HomeRegion = new Region {Id = 1},
-				Type = ClientType.Drugstore,
+				Type = ServiceType.Drugstore,
 			};
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
 			_adm.CheckClientPermission(client);
@@ -215,7 +216,7 @@ namespace Unit.Models
 		{
 			var client = new Client {
 				HomeRegion = new Region {Id = 1},
-				Type = ClientType.Drugstore,
+				Type = ServiceType.Drugstore,
 			};
 			_adm.RegionMask = 1;
 			_adm.CheckClientPermission(client);

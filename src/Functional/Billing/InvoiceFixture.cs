@@ -55,7 +55,7 @@ namespace Functional.Billing
 	{
 		public static Link LinkFor(this Browser browser, object item, string action)
 		{
-			var url = AppHelper.GetUrl(item, action);
+			var url = AppHelper.GetShortUrl(item, action);
 			return browser.Link(l => l.Url.EndsWith(url));
 		}
 

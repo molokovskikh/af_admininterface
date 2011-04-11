@@ -6,6 +6,7 @@ using System.DirectoryServices;
 using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -156,25 +157,23 @@ namespace AdminInterface.Models.Security
 
 		public void CheckPermisions(params PermissionType[] permissions)
 		{
-			foreach (var permission in permissions)
-				if (!HavePermision(permission))
-					throw new NotHavePermissionException();
+			if (permissions.Any(p => !HavePermision(p)))
+				throw new NotHavePermissionException();
 		}
 
 		public void CheckAnyOfPermissions(params PermissionType[] permissions)
 		{
-			foreach (var permission in permissions)
-				if (HavePermision(permission))
-					return;
+			if (permissions.Any(HavePermision))
+				return;
 
 			throw new NotHavePermissionException();
 		}
 
-		public Administrator CheckClientType(ClientType clientType)
+		public Administrator CheckClientType(ServiceType clientType)
 		{
-			if (clientType == ClientType.Drugstore && !HavePermisions(PermissionType.ViewDrugstore))
+			if (clientType == ServiceType.Drugstore && !HavePermisions(PermissionType.ViewDrugstore))
 				throw new NotHavePermissionException();
-			if (clientType == ClientType.Supplier && !HavePermisions(PermissionType.ViewSuppliers))
+			if (clientType == ServiceType.Supplier && !HavePermisions(PermissionType.ViewSuppliers))
 				throw new NotHavePermissionException();
 
 			return this;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;

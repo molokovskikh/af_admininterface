@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;

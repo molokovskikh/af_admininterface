@@ -59,13 +59,20 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "future", Lazy = true)]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
-		private UserUpdateInfo _updateInfo;
-
 		public User()
 		{
 			SendRejects = true;
 			SendWaybills = true;
 			Enabled = true;
+		}
+
+		public User(Payer payer, Service rootService)
+			: this()
+		{
+			UserUpdateInfo = new UserUpdateInfo(this);
+			Logs = new AuthorizationLogEntity(this);
+			Payer = payer;
+			RootService = rootService;
 		}
 
 		public User(Client client)
@@ -145,6 +152,9 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual AuthorizationLogEntity Logs { get; set; }
 
+		[OneToOne(Cascade = CascadeEnum.All)]
+		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
+
 		[HasAndBelongsToMany(typeof (UserPermission),
 			Lazy = true,
 			ColumnKey = "UserId",
@@ -172,9 +182,6 @@ namespace AdminInterface.Models
 		public virtual List<string> AvalilableAnalitFVersions
 		{
 			get {
-				if (_updateInfo == null)
-					_updateInfo = UserUpdateInfo.Find(Id);
-
 				List<AnalitFVersionRule> rules;
 				if (TargetVersion != null)
 					rules = AnalitFVersionRule.Queryable
@@ -182,13 +189,13 @@ namespace AdminInterface.Models
 						.ToList();
 				else
 					rules = AnalitFVersionRule.Queryable
-						.Where(r => r.SourceVersion == _updateInfo.AFAppVersion)
+						.Where(r => r.SourceVersion == UserUpdateInfo.AFAppVersion)
 						.ToList();
 
 				var versions = rules.Select(r => r.DestinationVersion).ToList();
 				if (TargetVersion != null)
 					versions.Add(TargetVersion.Value);
-				versions.Add(_updateInfo.AFAppVersion);
+				versions.Add(UserUpdateInfo.AFAppVersion);
 				versions.Sort();
 				return new [] {"Любая версия"}.Concat(versions.Distinct().Select(v => v.ToString())).ToList();
 			}
@@ -256,10 +263,7 @@ namespace AdminInterface.Models
 
 		public virtual bool IsPermissionAssigned(UserPermission permission)
 		{
-			foreach (var userPermission in AssignedPermissions)
-				if (permission.Shortcut == userPermission.Shortcut)
-					return true;
-			return false;
+			return AssignedPermissions.Any(p => permission.Shortcut == p.Shortcut);
 		}
 
 		public virtual bool IsChangePasswordByOneself()
@@ -296,15 +300,14 @@ namespace AdminInterface.Models
 		{
 			Login = "temporary-login";
 			Enabled = true;
-			Logs = new AuthorizationLogEntity();
-			Logs.User = this;
+			Logs = new AuthorizationLogEntity(this);
+			UserUpdateInfo = new UserUpdateInfo(this);
 			TargetVersion = DefaultValues.Get().AnalitFVersion;
 			Save();
 			Login = Id.ToString();
 			Update();
 
 			Client.UpdateBeAccounted();
-			new UserUpdateInfo(Id).Create();
 		}
 
 		public virtual void Setup(Client client)
@@ -417,7 +420,7 @@ where uui.UserId = :userCode")
 				var groupOwner = Client.ContactGroupOwner;
 				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 				group.Save();
-				this.ContactGroup = group;
+				ContactGroup = group;
 				scope.VoteCommit();
 			}
 		}

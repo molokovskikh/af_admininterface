@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Helpers;

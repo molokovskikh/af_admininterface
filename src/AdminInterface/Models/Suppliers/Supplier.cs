@@ -1,22 +1,26 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
 {
 	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
-	public class ServiceSupplier : Service
+	public class Supplier : Service, IEnablable
 	{
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property]
+		[Property(NotNull = true)]
 		public override string Name { get; set; }
 
 		[Property]
 		public virtual string FullName { get; set; }
 
-		[Property]
+		[Property, Description("Регионы работы")]
 		public virtual ulong RegionMask { get; set; }
 
 		[Property]
@@ -36,5 +40,51 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
+
+		[HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
+		public virtual IList<User> Users { get; set; }
+
+		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
+		public virtual IList<Price> Prices { get; set; }
+
+		public bool Enabled
+		{
+			get { return !Disabled; }
+		}
+
+		public static IList<Supplier> GetByPayerId(uint payerId)
+		{
+			return Queryable
+				.Where(p => p.Payer.PayerID == payerId).OrderBy(s => s.Name)
+				.ToList();
+		}
+
+		public static IOrderedQueryable<Supplier> Queryable
+		{
+			get
+			{
+				return ActiveRecordLinqBase<Supplier>.Queryable;
+			}
+		}
+
+		public static Supplier Find(uint id)
+		{
+			return ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
+		}
+
+		public void Save()
+		{
+			ActiveRecordMediator.Save(this);
+		}
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
+
+/*	public class SupplierUser : User
+	{
+		public Supplier
+	}*/
 }

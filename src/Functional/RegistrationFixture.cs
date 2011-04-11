@@ -109,7 +109,7 @@ namespace Functional
 		{
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
 				Test_search_and_select(browser, "Payer");
 			}
@@ -120,7 +120,7 @@ namespace Functional
 		{
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 				Assert.That(browser.CheckBox(Find.ById("PayerExists")).Enabled, Is.False);
 				Test_search_and_select(browser, "Supplier");
@@ -181,7 +181,7 @@ namespace Functional
 			uint clientCode;
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.SelectList(Find.ById("clientType")).Select("Аптека");
 				browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
 				browser.Button(Find.ById("RegisterButton")).Click();
@@ -217,7 +217,7 @@ namespace Functional
 		{
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Button(Find.ById("RegisterButton")).Click();
 				browser.ContainsText("Реистрация клиента, шаг 2: Заполнения информации о плательщике");
 				browser.TextField(Find.ByName("PaymentOptions.Comment")).TypeText("Комментарий");
@@ -232,7 +232,7 @@ namespace Functional
 		{
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button(Find.ById("RegisterButton")).Click();
 				var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
@@ -269,10 +269,10 @@ namespace Functional
 			{
 				var supplier = DataMother.CreateTestSupplier();
 				supplier.Name += supplier.Id;
-				supplier.UpdateAndFlush();
+				supplier.Save();
 				testSupplierId = supplier.Id;
 
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 
 				browser.TextField(Find.ById("SearchSupplierTextPattern")).TypeText(supplier.Name.ToLower());
@@ -292,7 +292,7 @@ namespace Functional
 			});
 		}
 
-		private void SetupGeneralInformation(IE browser, ClientType clientType)
+		private void SetupGeneralInformation(IE browser)
 		{
 			browser.TextField(Find.ById("JuridicalName")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("ShortName")).TypeText(_randomClientName);
@@ -303,8 +303,7 @@ namespace Functional
 			browser.TextField("UserContactPhone").TypeText("123-456789");
 			browser.TextField("UserContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Если это аптека, заполняем адрес доставки			
-			if (clientType == ClientType.Drugstore)
-				browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
+			browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
 		}
 
 		[Test]
@@ -314,7 +313,7 @@ namespace Functional
 			var testPayerId = 921;
 			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
 
 				browser.TextField(Find.ById("SearchPayerTextPattern")).TypeText("офис");
@@ -367,7 +366,7 @@ namespace Functional
 		{
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link(Find.ByText("Показать все регионы")).Click();
 				Thread.Sleep(500);
 				var regions = Region.FindAllByProperty("Name", "Чебоксары");
@@ -404,7 +403,7 @@ namespace Functional
 		{
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("Alice");
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button("RegisterButton").Click();
@@ -426,7 +425,7 @@ namespace Functional
 		{
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				Assert.IsFalse(browser.CheckBox(Find.ById("ignoreNewPrices")).Checked);
 				browser.CheckBox(Find.ById("ignoreNewPrices")).Checked = true;
@@ -443,7 +442,7 @@ namespace Functional
 			uint clientCode = 0;
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link("clientaddPhoneLink").Click();
 				browser.Link("clientaddPhoneLink").Click();
 				Thread.Sleep(500);
@@ -476,7 +475,7 @@ namespace Functional
 			uint clientCode = 0;
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link("useraddPhoneLink").Click();
 				Thread.Sleep(500);
 				browser.TextField(Find.ByName("userContacts[0].ContactText")).TypeText("111-111111");
@@ -511,7 +510,7 @@ namespace Functional
 			uint clientCode = 0;
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link("clientaddEmailLink").Click();
 				Thread.Sleep(500);
 				browser.TextField(Find.ByName("clientContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
@@ -542,7 +541,7 @@ namespace Functional
 			uint clientCode = 0;
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link("useraddEmailLink").Click();
 				Thread.Sleep(500);
 				browser.TextField(Find.ByName("userContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
@@ -577,7 +576,7 @@ namespace Functional
 			uint clientCode = 0;
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.Link("useraddPersonLink").Click();
 				Thread.Sleep(500);
 				browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("person1");
@@ -610,7 +609,7 @@ namespace Functional
 
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox("FillBillingInfo").Checked = false;
 				browser.Button("RegisterButton").Click();
 				clientId = Helper.GetClientCodeFromRegistrationCard(browser);
@@ -630,7 +629,7 @@ namespace Functional
 		{
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 				browser.TextField(Find.ByName("SearchSupplierTextPattern")).TypeText("12839046eqwuiywiuryer");
 				browser.Button(Find.ByName("SearchSupplierButton")).Click();
@@ -648,7 +647,7 @@ namespace Functional
 		{
 			using (var browser = Open("Register/Register.rails"))
 			{
-				SetupGeneralInformation(browser, ClientType.Drugstore);
+				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("PayerExists")).Checked = true;
 				browser.TextField(Find.ByName("SearchPayerTextPattern")).TypeText("12839046eqwuiywiuryer");
 				browser.Button(Find.ByName("SearchPayerButton")).Click();

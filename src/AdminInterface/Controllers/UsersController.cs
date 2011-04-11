@@ -132,8 +132,11 @@ namespace AdminInterface.Controllers
 			var user = User.GetById(id);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
+			if (user.Client != null)
+			{
+				PropertyBag["client"] = user.Client;
+			}
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["client"] = user.Client;
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
@@ -150,7 +153,7 @@ namespace AdminInterface.Controllers
 			else 
 				PropertyBag["Registrant"] = Administrator.GetByName(user.Registrant);
 			PropertyBag["RegistrationDate"] = user.RegistrationDate;
-			if ((user.ContactGroup != null) && (user.ContactGroup.Contacts != null))
+			if (user.ContactGroup != null && user.ContactGroup.Contacts != null)
 				PropertyBag["ContactGroup"] = user.ContactGroup;
 
 			if (user.RootService.Disabled || user.Enabled == false)
@@ -221,7 +224,7 @@ namespace AdminInterface.Controllers
 
 				DbLogHelper.SetupParametersForTriggerLogging();
 
-				if (user.Client.Type == ClientType.Drugstore)
+				if (user.Client.IsDrugstore())
 					user.ResetUin();
 				if (changeLogin)
 				{
