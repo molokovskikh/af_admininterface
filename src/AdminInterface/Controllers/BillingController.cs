@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof (ViewHelper)),
 		Secure(PermissionType.Billing),
 	]
-	public class BillingController : ARSmartDispatcherController
+	public class BillingController : ARController
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint billingCode, string tab, uint currentJuridicalOrganizationId)
@@ -196,7 +196,6 @@ namespace AdminInterface.Controllers
 			var billingSearchProperties = new BillingSearchProperties {
 				ClientStatus = SearchClientStatus.Enabled
 			};
-			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["FindBy"] = billingSearchProperties;
 		}
@@ -205,7 +204,6 @@ namespace AdminInterface.Controllers
 		{
 			var searchResults = BillingSearchItem.FindBy(searchProperties);
 
-			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["regions"] = GetRegions();
 			PropertyBag["sortColumnName"] = "ShortName";
 			PropertyBag["sortDirection"] = "Ascending";
@@ -263,7 +261,7 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				sentEntity.UserName = SecurityContext.Administrator.UserName;
+				sentEntity.UserName = Administrator.UserName;
 				sentEntity.SaveAndFlush();
 				Flash["Message"] = new Message("Cохранено");
 			}

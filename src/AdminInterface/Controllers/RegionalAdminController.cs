@@ -13,6 +13,7 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using System.Collections;
 using Common.Web.Ui.Models;
+using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -22,7 +23,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.ManageAdministrators)
 	]
-	public class RegionalAdminController : SmartDispatcherController
+	public class RegionalAdminController : Controller
 	{
 		private IList<string> _avaliableComputers = new List<string> { "ACDCSERV", "FMS", "OFFDC" };
 
@@ -103,7 +104,6 @@ namespace AdminInterface.Controllers
 		{
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			var admin = Administrator.GetById(id);
-			PropertyBag["admin"] = admin;
 			PropertyBag["permissions"] = Permission.FindAll();
 			PropertyBag["computers"] = ADHelper.GetDomainComputers();
 			PropertyBag["accessibleComputers"] = ADHelper.GetAccessibleComputers(admin.UserName);

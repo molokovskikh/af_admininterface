@@ -89,7 +89,7 @@ namespace AdminInterface.Controllers
 		Layout("GeneralWithJQuery"),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class ClientController : ARSmartDispatcherController
+	public class ClientController : ARController
 	{
 		public void Show(uint id)
 		{
@@ -100,7 +100,6 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["Client"] = client;
 			PropertyBag["Registrant"] = client.GetRegistrant();
-			PropertyBag["Admin"] = SecurityContext.Administrator;
 
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
@@ -123,7 +122,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
-			SecurityContext.Administrator.CheckClientPermission(client);
+			Administrator.CheckClientPermission(client);
 
 			using (new TransactionScope())
 			{
@@ -143,7 +142,7 @@ namespace AdminInterface.Controllers
 			ulong homeRegion,
 			bool activateBuyMatrix)
 		{
-			SecurityContext.Administrator.CheckClientPermission(client);
+			Administrator.CheckClientPermission(client);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
@@ -257,7 +256,7 @@ where Phone like :phone")
 				DbLogHelper.SetupParametersForTriggerLogging(
 					new {
 						inHost = Request.UserHostAddress,
-						inUser = SecurityContext.Administrator.UserName,
+						inUser = Administrator.UserName,
 						ResetIdCause = reason
 					});
 				ClientInfoLogEntity.ReseteUin(client, reason).Save();

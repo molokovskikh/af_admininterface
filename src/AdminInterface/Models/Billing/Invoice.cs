@@ -166,7 +166,7 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public void Send(Controller controller)
+		public void Send(Castle.MonoRail.Framework.Controller controller)
 		{
 			if (Payer.InvoiceSettings.PrintInvoice)
 			{

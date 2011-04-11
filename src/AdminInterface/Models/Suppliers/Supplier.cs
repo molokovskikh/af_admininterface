@@ -41,8 +41,10 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
-		[HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
+/*
+ * [HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
 		public virtual IList<User> Users { get; set; }
+ */
 
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
 		public virtual IList<Price> Prices { get; set; }

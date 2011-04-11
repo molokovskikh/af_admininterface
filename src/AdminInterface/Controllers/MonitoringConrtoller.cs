@@ -11,6 +11,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -21,7 +22,7 @@ namespace AdminInterface.Controllers
 		Layout("GeneralWithJQueryOnly"),
 		Filter(ExecuteWhen.BeforeAction, typeof (SecurityActivationFilter))
 	]
-	public class MonitoringController : SmartDispatcherController
+	public class MonitoringController : Controller
 	{
 		public void Updates(string sortBy, string direction)
 		{
@@ -86,7 +87,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["sort"] = sort;
 			PropertyBag["direction"] = direction;
 			PropertyBag["regions"] = Region.FindAll();
-			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			if (filter == 4)
 				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotUpdated(days, type, region, sort, direction);

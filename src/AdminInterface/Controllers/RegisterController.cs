@@ -19,6 +19,7 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
+using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -40,7 +41,7 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class RegisterController : SmartDispatcherController
+	public class RegisterController : Controller
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void Register()
@@ -118,7 +119,7 @@ namespace AdminInterface.Controllers
 					HomeRegion = Region.Find(homeRegion),
 					Segment = client.Segment,
 					MaskRegion = browseRegionMask,
-					Registrant = SecurityContext.Administrator.UserName,
+					Registrant = Administrator.UserName,
 					RegistrationDate = DateTime.Now,
 				};
 				if (currentPayer == null)
@@ -396,7 +397,6 @@ WHERE   intersection.pricecode IS NULL
 			PropertyBag["JuridicalOrganization"] = payer.JuridicalOrganizations.First();
 			PropertyBag["showRegistrationCard"] = showRegistrationCard;
 			PropertyBag["PaymentOptions"] = new PaymentOptions();
-			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
 
 		public void Registered(
@@ -454,7 +454,7 @@ WHERE   intersection.pricecode IS NULL
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
+			var allowViewSuppliers = Administrator.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = Supplier.Queryable

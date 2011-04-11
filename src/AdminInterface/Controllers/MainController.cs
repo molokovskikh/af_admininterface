@@ -4,6 +4,7 @@ using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -20,22 +21,21 @@ namespace AdminInterface.Controllers
 		Layout("Main"),
 		Secure
 	]
-	public class MainController : ARSmartDispatcherController
+	public class MainController : ARController
 	{
 		public void Index(ulong? regioncode, DateTime? from, DateTime? to)
 		{
 			RemoteServiceHelper.Try(() => {
-				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(SecurityContext.Administrator.UserName);
+				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Administrator.UserName);
 			});
 
 			var regions = RegionHelper.GetAllRegions();
 			PropertyBag["Regions"] = regions;
 			PropertyBag["RegionId"] = regions.Where(region => region.Name.ToLower().Equals("все")).First().Id;
-			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			if (regioncode == null || from == null || to == null)
 			{
-				regioncode = SecurityContext.Administrator.RegionMask;
+				regioncode = Administrator.RegionMask;
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
@@ -120,7 +120,7 @@ FROM documents.documentheaders dheaders
 WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateParam) AND dheaders.DocumentType = 1;", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
-					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & SecurityContext.Administrator.RegionMask);
+					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Administrator.RegionMask);
 					adapter.Fill(data);
 				});
 			//Заказы

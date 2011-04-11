@@ -17,6 +17,7 @@ using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
+using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -26,7 +27,7 @@ namespace AdminInterface.Controllers
 		Secure,
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class UsersController : SmartDispatcherController
+	public class UsersController : Controller
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
@@ -133,10 +134,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			if (user.Client != null)
-			{
 				PropertyBag["client"] = user.Client;
-			}
-			PropertyBag["admin"] = SecurityContext.Administrator;
+
 			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
@@ -194,7 +193,7 @@ namespace AdminInterface.Controllers
 			var user = User.GetById(id);
 			var client = user.Client;
 
-			SecurityContext.Administrator.CheckClientPermission(client);
+			Administrator.CheckClientPermission(client);
 			
 			user.CheckLogin();
 
@@ -213,7 +212,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.GetById(userId);
 			user.CheckLogin();
-			var administrator = SecurityContext.Administrator;
+			var administrator = Administrator;
 			var password = User.GeneratePassword();
 		
 			using (new TransactionScope())
@@ -307,7 +306,7 @@ namespace AdminInterface.Controllers
 					new
 					{
 						inHost = Request.UserHostAddress,
-						inUser = SecurityContext.Administrator.UserName,
+						inUser = Administrator.UserName,
 						ResetIdCause = reason
 					});
 				ClientInfoLogEntity.ReseteUin(user, reason).Save();

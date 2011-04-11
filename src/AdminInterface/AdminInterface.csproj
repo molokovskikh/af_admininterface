@@ -143,6 +143,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
+    <Compile Include="MonoRailExtentions\Controller.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
