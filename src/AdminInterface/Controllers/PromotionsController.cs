@@ -227,8 +227,6 @@ namespace AdminInterface.Controllers
 		{
 			_allowedExtentions = new Dictionary<string, string> 
 			{
-				{".htm", "text/HTML"},
-				{".html", "text/HTML"},
 				{".jpg", "image/JPEG"},
 				{".jpeg", "image/JPEG"},
 				{".txt", "text/plain"},
