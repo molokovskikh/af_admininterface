@@ -82,7 +82,6 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ADHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(HttpUtility)),
-		Helper(typeof(AppHelper), "app"),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
@@ -99,19 +98,15 @@ namespace AdminInterface.Controllers
 			var addresses = client.Addresses;
 
 			PropertyBag["Client"] = client;
-			PropertyBag["Registrant"] = client.GetRegistrant();
-
 			PropertyBag["ContactGroups"] = client.ContactGroupOwner.ContactGroups;
-			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
-
-			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
 			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 
-			sort.Apply(PropertyBag);
+			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
+			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
+			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
 
-			var usersInfo = ADHelper.GetPartialUsersInformation(users);
-			PropertyBag["usersInfo"] = usersInfo;
+			sort.Apply(PropertyBag);
 		}
 
 		private Sort GetSort()

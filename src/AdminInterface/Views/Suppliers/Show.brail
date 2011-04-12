@@ -99,10 +99,12 @@
 		<div class=block>
 			<h3>Общая информация</h3>
 			<div>
-				<% if not Registrant: %>
-				Регистратор не указан, дата регистрации ${supplier.RegistrationDate}
+				<% if not supplier.Registration: %>
+				Регистратор не указан, дата регистрации неизвестна
+				<% elif not supplier.Registration.GetRegistrant(): %>
+				Регистратор не указан, дата регистрации ${supplier.Registration.RegistrationDate}
 				<% else: %>
-				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${supplier.RegistrationDate}
+				Зарегистрирован пользователем ${supplier.Registration.GetRegistrant().ManagerName}, дата регистрации ${supplier.Registration.RegistrationDate}
 				<% end %>
 			</div>
 			<form action="Update.rails" method=post style="padding:0; margin:0;">
@@ -122,7 +124,7 @@
 				</div>
 			</form>
 		</div>
-		
+
 		<%
 			component ContactViewer, {"ContactGroups" : ContactGroups}:
 				section ContactGroupHeaderLink:
@@ -137,7 +139,7 @@
 				end
 			end
 		%>
-		
+
 		<div>
 			<h4 style="margin-bottom:0">Неопознанные звонки:</h4>
 			<table id="UnknownPhones" class="DataTable">
@@ -158,9 +160,9 @@
 			</table>
 		</div>
 
-		<% OutputSubView("LegendView") %>
+		<% OutputSubView("/Client/LegendView") %>
 	</div>
 
-	<% OutputSubView("/SubViews/EnterMessage") %>
+	
 
 </div>

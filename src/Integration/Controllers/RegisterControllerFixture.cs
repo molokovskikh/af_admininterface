@@ -143,7 +143,7 @@ namespace Integration.Controllers
 
 		private Client RegistredClient()
 		{
-			var registredClient = Client.Queryable.FirstOrDefault(c => c.RegistrationDate >= begin);
+			var registredClient = Client.Queryable.FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
 			if (registredClient == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registredClient;

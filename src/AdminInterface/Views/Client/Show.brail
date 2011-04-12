@@ -146,10 +146,12 @@
 		<div class=block>
 			<h3>Общая информация</h3>
 			<div>
-				<% if not Registrant: %>
-				Регистратор не указан, дата регистрации ${client.RegistrationDate}
+				<% if not client.Registration: %>
+				Регистратор не указан, дата регистрации неизвестна
+				<% elif not client.Registration.GetRegistrant(): %>
+				Регистратор не указан, дата регистрации ${client.Registration.RegistrationDate}
 				<% else: %>
-				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${client.RegistrationDate}
+				Зарегистрирован пользователем ${client.Registration.GetRegistrant().ManagerName}, дата регистрации ${client.Registration.RegistrationDate}
 				<% end %>
 			</div>
 			<form action="Update.rails" method=post style="padding:0; margin:0;">

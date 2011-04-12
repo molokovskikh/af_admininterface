@@ -7,6 +7,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Common.MySql;
 using MySql.Data.MySqlClient;
@@ -88,26 +89,25 @@ namespace AddUser
 				Data = new DataSet();
 			else 
 				Data.Clear();
+
+			var supplier = Supplier.Find(Convert.ToUInt32(_clientCode));
+
 			var pricesCommandText =
 @"
-SELECT  cd.firmcode, 
-		ShortName, 
-		pricesdata.PriceCode, 
-		PriceName, 
-		pricesdata.AgencyEnabled, 
-		pricesdata.Enabled, 
-		AlowInt,  
-		pi.PriceDate, 
-		UpCost,
-		PriceType,
-		CostType
-FROM (clientsdata as cd, farm.regions, pricesdata)
-	JOIN usersettings.pricescosts pc on pricesdata.PriceCode = pc.PriceCode and pc.BaseCost = 1
+SELECT  pd.PriceCode,
+		pd.PriceName,
+		pd.AgencyEnabled,
+		pd.Enabled,
+		pd.AlowInt,
+		pi.PriceDate,
+		pd.UpCost,
+		pd.PriceType,
+		pd.CostType
+FROM pricesdata pd
+	JOIN usersettings.pricescosts pc pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
-WHERE   regions.regioncode                            =cd.regioncode  
-		AND pricesdata.firmcode                       =cd.firmcode 
-		AND cd.firmcode                               =?ClientCode 
-GROUP BY pricesdata.PriceCode;
+WHERE pd.firmcode = ?supplierId
+GROUP BY pd.PriceCode;
 ";
 			var regionSettingsCommnadText = @"
 SELECT  RowID, 

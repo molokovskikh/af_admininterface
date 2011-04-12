@@ -15,6 +15,21 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual int? PriceType { get; set; }
 
+		[Property]
+		public virtual int? CostType { get; set; }
+
+		[Property]
+		public virtual bool AgencyEnabled { get; set; }
+
+		[Property]
+		public virtual bool Enabled { get; set; }
+
+		[Property]
+		public virtual decimal UpCost { get; set; }
+
+		[Property]
+		public virtual bool AlowInt { get; set; }
+
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 	}

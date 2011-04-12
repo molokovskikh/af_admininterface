@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
@@ -11,13 +12,19 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
 	public class Supplier : Service, IEnablable
 	{
+		public Supplier()
+		{
+			Registration = new RegistrationInfo();
+			OrderRules = new List<OrderSendRules>();
+		}
+
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property(NotNull = true)]
+		[Property, ValidateNonEmpty]
 		public override string Name { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property, Description("Регионы работы")]
@@ -26,11 +33,8 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public override bool Disabled { get; set; }
 
-		[Property]
-		public virtual string Registrant { get; set; }
-
-		[Property]
-		public virtual DateTime? RegistrationDate { get; set; }
+		[Nested]
+		public virtual RegistrationInfo Registration { get; set;}
 
 		[BelongsTo]
 		public virtual Payer Payer { get; set; }
@@ -42,12 +46,28 @@ namespace AdminInterface.Models.Suppliers
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 /*
- * [HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
-		public virtual IList<User> Users { get; set; }
- */
+	[HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
+	public virtual IList<User> Users { get; set; }
+
+	public class SupplierUser : User
+	{
+		public Supplier
+	}
+*/
 
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
 		public virtual IList<Price> Prices { get; set; }
+
+		[HasMany]
+		public virtual IList<OrderSendRules> OrderRules { get; set; }
+
+		public IList<User> Users
+		{
+			get
+			{
+				return User.Queryable.Where(u => u.RootService == this).ToList();
+			}
+		}
 
 		public bool Enabled
 		{
@@ -84,9 +104,4 @@ namespace AdminInterface.Models.Suppliers
 			return Name;
 		}
 	}
-
-/*	public class SupplierUser : User
-	{
-		public Supplier
-	}*/
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
@@ -56,18 +57,18 @@ namespace AdminInterface.Models
 		public OrderSendRules()
 		{}
 
-		public OrderSendRules(DefaultValues defaults, uint firmCode)
+		public OrderSendRules(DefaultValues defaults, Supplier supplier)
 		{
 			Formater = defaults.Formater;
 			Sender = defaults.Sender;
-			FirmCode = firmCode;
+			Supplier = supplier;
 		}
 
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
-		public uint FirmCode { get; set; }
+		[BelongsTo("FirmCode")]
+		public Supplier Supplier { get; set; }
 
 		[BelongsTo("FormaterId")]
 		public OrderHandler Formater { get; set; }

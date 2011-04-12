@@ -119,8 +119,7 @@ namespace AdminInterface.Controllers
 					HomeRegion = Region.Find(homeRegion),
 					Segment = client.Segment,
 					MaskRegion = browseRegionMask,
-					Registrant = Administrator.UserName,
-					RegistrationDate = DateTime.Now,
+					Registration = new RegistrationInfo(Administrator),
 				};
 				if (currentPayer == null)
 					currentPayer = CreatePayer(newClient);
@@ -256,9 +255,9 @@ namespace AdminInterface.Controllers
 			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 
-		public void CreateSupplier(DefaultValues defaults, Client client)
+		public void CreateSupplier(DefaultValues defaults, Supplier supplier)
 		{
-			var orderSendRules = new OrderSendRules(defaults, client.Id);
+			var orderSendRules = new OrderSendRules(defaults, supplier);
 			orderSendRules.Save();
 
 /*			command.CommandText = @"

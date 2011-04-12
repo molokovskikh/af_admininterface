@@ -32,11 +32,38 @@ namespace AdminInterface.Models
 		[Description("Розница")] Retail = 1,
 	}
 
+	public class RegistrationInfo
+	{
+		public RegistrationInfo()
+		{}
+
+		public RegistrationInfo(Administrator administrator)
+		{
+			Registrant = administrator.UserName;
+			RegistrationDate = DateTime.Now;
+		}
+
+		[Property]
+		public virtual DateTime RegistrationDate { get; set; }
+
+		[Property]
+		public virtual string Registrant { get; set; }
+
+		public virtual Administrator GetRegistrant()
+		{
+			if (String.IsNullOrEmpty(Registrant))
+				return null;
+			
+			return Administrator.GetByName(Registrant);
+		}
+	}
+
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
 	public class Client : Service, IEnablable// ActiveRecordLinqBase<Client>, IEnablable
 	{
 		public Client()
 		{
+			Registration = new RegistrationInfo();
 		}
 
 		public Client(Payer payer)
@@ -65,14 +92,11 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual Segment Segment { get; set; }
 
-		[Property]
-		public virtual DateTime RegistrationDate { get; set; }
-
-		[Property]
-		public virtual string Registrant { get; set; }
-
 		[Property, Description("Регионы работы")]
 		public virtual UInt64 MaskRegion { get; set; }
+
+		[Nested]
+		public virtual RegistrationInfo Registration { get; set;}
 
 		[OneToOne]
 		public virtual DrugstoreSettings Settings { get; set; }
@@ -433,14 +457,6 @@ group by u.ClientId")
 			{
 				return ActiveRecordLinqBase<Client>.Queryable;
 			}
-		}
-
-		public virtual object GetRegistrant()
-		{
-			if (String.IsNullOrEmpty(Registrant))
-				return null;
-			
-				return Administrator.GetByName(Registrant);
 		}
 
 		public override string ToString()
