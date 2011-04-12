@@ -135,7 +135,7 @@ namespace AdminInterface.Controllers
 				if (newClient.IsDrugstore())
 					CreateDrugstore(newClient, additionalSettings, orderRegionMask, supplier);
 				else
-					CreateSupplier(defaults, newClient);
+					CreateSupplier(defaults, null/*newClient*/);
 
 				if (newClient.IsDrugstore() && newClient.Addresses.Count > 0)
 				{
