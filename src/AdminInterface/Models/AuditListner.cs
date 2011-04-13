@@ -51,7 +51,14 @@ namespace AdminInterface.Models
 
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
 			{
-				SpecialCase((ulong)newValue, (ulong)oldValue);
+				ulong newRegionValue = 0;
+				if (newValue != null)
+					newRegionValue = (ulong)newValue;
+				ulong oldRegionValue = 0;
+				if (oldValue != null)
+					oldRegionValue = (ulong)oldValue;
+
+				SpecialCase(newRegionValue, oldRegionValue);
 				return;
 			}
 

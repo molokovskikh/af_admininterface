@@ -104,7 +104,7 @@ SELECT  pd.PriceCode,
 		pd.PriceType,
 		pd.CostType
 FROM pricesdata pd
-	JOIN usersettings.pricescosts pc pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
+	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
 WHERE pd.firmcode = ?supplierId
 GROUP BY pd.PriceCode;
@@ -175,7 +175,8 @@ order by r.Region;";
 			With.Connection(
 				c => {
 					var dataAdapter = new MySqlDataAdapter(pricesCommandText, c);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?supplierId", supplier.Id);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
 
@@ -209,7 +210,7 @@ order by r.Region;";
 					ShowRegulationHelper.Load(dataAdapter, Data);
 				});
 
-			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", Data.Tables["Prices"].DefaultView[0]["ShortName"]);
+			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
 		}
 
 

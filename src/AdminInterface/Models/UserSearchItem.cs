@@ -61,6 +61,14 @@ namespace AdminInterface.Models
 
 		public bool IsDisabled { get; set; }
 
+		public bool IsDrugstore
+		{
+			get
+			{
+				return ClientType == SearchClientType.Drugstore;
+			}
+		}
+
 		private static string ProcessFilter(string filter)
 		{
 			if (filter.Contains('№'))

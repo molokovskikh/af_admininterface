@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <siteMap xmlns="http://schemas.microsoft.com/AspNet/SiteMap-File-1.0" >
-  <siteMapNode url="default.aspx" title="Административный интерфейс" >
-	<siteMapNode url="CopySynonym.aspx" title="Клонирование"  />
-	<siteMapNode url="statcont.aspx" title="Статистика обращений" />
-	<siteMapNode url="ViewAdministrators.aspx" title="Региональные администраторы" />
-  </siteMapNode>
+	<siteMapNode url="default.aspx" title="Административный интерфейс">
+		<siteMapNode url="managep.aspx" title="Настройка поставщика">
+			<siteMapNode url="EditRegionalInfo.aspx" title="Информация о прайс листе" />
+			<siteMapNode url="managecosts.aspx" title="Настройка ценовых колонок" />
+			<siteMapNode url="SenderProperties.aspx" title="Свойства отправки заказов" />
+		</siteMapNode>
+		<siteMapNode url="CopySynonym.aspx" title="Клонирование" />
+		<siteMapNode url="statcont.aspx" title="Статистика обращений" />
+		<siteMapNode url="ViewAdministrators.aspx" title="Региональные администраторы" />
+	</siteMapNode>
 </siteMap>
