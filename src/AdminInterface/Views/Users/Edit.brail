@@ -89,9 +89,11 @@
 		</form>
 	</div>
 
+	<% if user.Client: %>
 	<div class="block">
 		<% OutputSubView("/SubViews/MoveTo") %>
 	</div>
+	<% end %>
 
 	<div class="block">
 		<h3>Статистика использования</h3>
