@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 		public void SendMessage(uint id, string message)
 		{
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
-			if (string.IsNullOrWhiteSpace(message))
+			if (!string.IsNullOrWhiteSpace(message))
 			{
 				new ClientInfoLogEntity(message, supplier).Save();
 				Flash["Message"] = Message.Notify("Сохранено");

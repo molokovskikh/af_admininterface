@@ -37,9 +37,9 @@ namespace AdminInterface.Models.Logs
 
 		public ClientInfoLogEntity(string message, object entity) : this(message)
 		{
-			if (entity is Client)
+			if (entity is Service)
 			{
-				ClientCode = ((Client)entity).Id;
+				ClientCode = ((Service)entity).Id;
 			}
 			else if (entity is User)
 			{
