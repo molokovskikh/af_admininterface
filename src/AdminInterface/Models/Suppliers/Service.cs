@@ -1,14 +1,16 @@
 using System;
+using System.ComponentModel;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
 {
 	public enum ServiceType
 	{
-		Supplier = 0,
-		Drugstore = 1,
-		Reference = 2
+		[Description("Поставщик")] Supplier = 0,
+		[Description("Аптека")] Drugstore = 1,
+		[Description("Справка")] Reference = 2
 	}
 
 	[ActiveRecord(Schema = "Future"), JoinedBase]
@@ -29,9 +31,30 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual bool Disabled { get; set; }
 
+		public virtual string FullName
+		{
+			get
+			{
+				if (this is Client)
+				{
+					return ((Client)this).FullName;
+				}
+				else if (this is Supplier)
+				{
+					return ((Supplier)this).FullName;
+				}
+				return "";
+			}
+		}
+
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual string GetHumanReadableType()
+		{
+			return BindingHelper.GetDescription(Type);
 		}
 	}
 }

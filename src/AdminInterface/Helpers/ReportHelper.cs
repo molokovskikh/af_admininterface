@@ -72,17 +72,16 @@ namespace AdminInterface.Helpers
 		{
 			var defaults = DefaultValues.Get();
 			string body;
-			var client = user.Client;
-			if (client.IsDrugstore())
+			if (user.RootService is Client)
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
 			else
 				body = Settings.Default.RegistrationCardEmailBodyForSupplier;
 
-			using (var stream = CreateReport(client.Id,
+			using (var stream = CreateReport(user.RootService.Id,
 				user.Payer.Id,
-				client.Name,
-				client.FullName,
-				client.GetHumanReadableType(),
+				user.RootService.Name,
+				user.RootService.FullName,
+				user.RootService.GetHumanReadableType(),
 				user.Login,
 				password,
 				DateTime.Now,

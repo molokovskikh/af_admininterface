@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -30,7 +31,7 @@ namespace AdminInterface.Models.Logs
 
 		public ClientInfoLogEntity(string message, User user) : this(message)
 		{
-			ClientCode = user.Client.Id;
+			ClientCode = user.RootService.Id;
 			User = user;
 		}
 
@@ -134,10 +135,10 @@ namespace AdminInterface.Models.Logs
 			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user);
 		}
 
-		public static IList<ClientInfoLogEntity> MessagesForClient(Client client)
+		public static IList<ClientInfoLogEntity> MessagesForClient(Service service)
 		{
 			return Queryable
-				.Where(l => l.ClientCode == client.Id)
+				.Where(l => l.ClientCode == service.Id)
 				.OrderByDescending(l => l.WriteTime)
 				.ToList();
 		}

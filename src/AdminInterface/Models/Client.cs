@@ -203,23 +203,9 @@ where
 					.UniqueResult<Client>());
 		}
 
-		public virtual string GetAddressForSendingClientCard()
-		{
-			if (IsDrugstore())
-				return Build(GetContactGroup(ContactGroupType.General),
-							 GetContactGroup(ContactGroupType.OrderManagers));
-
-			return Build(GetContactGroup(ContactGroupType.General),
-						 GetContactGroup(ContactGroupType.OrderManagers),
-						 GetContactGroup(ContactGroupType.ClientManagers));
-		}
-
 		public virtual ContactGroup GetContactGroup(ContactGroupType type)
 		{
-			foreach (var contactGroup in ContactGroupOwner.ContactGroups)
-				if (contactGroup.Type == type)
-					return contactGroup;
-			return null;
+			return ContactGroupOwner.ContactGroups.FirstOrDefault(contactGroup => contactGroup.Type == type);
 		}
 
 		public virtual void ProcessEmails(List<string> emails, params ContactOwner[] contactGroups)
@@ -229,11 +215,6 @@ where
 				foreach (var contact in contactGroup.Contacts)
 					if (contact.Type == ContactType.Email && !emails.Contains(contact.ContactText.Trim()))
 						emails.Add(contact.ContactText.Trim());
-		}
-
-		private string Build(ContactGroup generalGroup, params ContactGroup[] specialGroup)
-		{
-			return GetEmails(false, generalGroup, specialGroup);
 		}
 
 		public virtual string GetEmailsForBilling()
@@ -313,11 +294,6 @@ group by u.ClientId")
 		public virtual bool HaveLockedUsers()
 		{
 			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
-		}
-
-		public virtual string GetHumanReadableType()
-		{
-			return BindingHelper.GetDescription(Type);
 		}
 
 		public virtual void UpdateBeAccounted()

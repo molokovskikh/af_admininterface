@@ -155,7 +155,7 @@ namespace AdminInterface.Controllers
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)
-				log = SendRegistrationCard(log, newClient, newUser, password, additionalEmailsForSendingCard);
+				log = SendRegistrationCard(log, newUser, password, additionalEmailsForSendingCard);
 			log.Save();
 
 			if (!additionalSettings.FillBillingInfo)
@@ -181,9 +181,9 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, Client client, User user, string password, string additionalEmails)
+		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, User user, string password, string additionalEmails)
 		{
-			var mailTo = client.GetAddressForSendingClientCard();
+			var mailTo = user.GetAddressForSendingClientCard();
 
 			var smtpid = ReportHelper.SendClientCard(user,
 				password,

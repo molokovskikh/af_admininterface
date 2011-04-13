@@ -9,6 +9,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Criterion;
@@ -64,18 +65,29 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Enabled = true;
+			AssignedPermissions = new List<UserPermission>();
 		}
 
 		public User(Payer payer, Service rootService)
+			: this(rootService)
+		{
+			Payer = payer;
+		}
+
+		public User(Service service)
 			: this()
 		{
 			UserUpdateInfo = new UserUpdateInfo(this);
 			Logs = new AuthorizationLogEntity(this);
-			Payer = payer;
-			RootService = rootService;
+			Accounting = new UserAccounting(this);
+
+			RootService = service;
+			if (service is Client)
+				Client = (Client)RootService;
 		}
 
 		public User(Client client)
+			: this((Service)client)
 		{
 			Init(client);
 		}
@@ -320,6 +332,7 @@ namespace AdminInterface.Models
 		public virtual void Init(Client client)
 		{
 			Client = client;
+			RootService = client;
 			if (Payer == null)
 			{
 				Payer = client.Payers.Single();
@@ -336,16 +349,8 @@ namespace AdminInterface.Models
 			if (!Client.Users.Any(u => u == this))
 				Client.Users.Add(this);
 
-
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
-
-			Enabled = true;
-			SendRejects = true;
-			SendWaybills = true;
-			Accounting = new UserAccounting(this);
-			if (AssignedPermissions == null)
-				AssignedPermissions = new List<UserPermission>();
 		}
 
 		public virtual bool IsLocked
@@ -574,6 +579,31 @@ where userid = :userId")
 				return null;
 
 			return Administrator.GetByName(Registrant);
+		}
+
+		public virtual string GetAddressForSendingClientCard()
+		{
+			ContactGroupOwner owner = null;
+			var groups = new ContactGroupType[0];
+			if (RootService is Client)
+			{
+				groups = new[] {ContactGroupType.OrderManagers};
+				owner = ((Client)RootService).ContactGroupOwner;
+			}
+			else if (RootService is Supplier)
+			{
+				groups = new[] {ContactGroupType.OrderManagers, ContactGroupType.ClientManagers};
+				owner = ((Supplier)RootService).ContactGroupOwner;
+			}
+
+			if (owner == null)
+				return "";
+
+			var emails = owner.GetEmails(groups);
+			if (emails.Count() > 0)
+				return emails.Implode();
+
+			return owner.GetEmails(ContactGroupType.General).Implode();
 		}
 	}
 }

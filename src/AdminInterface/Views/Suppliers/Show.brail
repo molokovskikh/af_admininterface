@@ -163,6 +163,43 @@
 		<% OutputSubView("/Client/LegendView") %>
 	</div>
 
-	
+	<div class="TwoColumn" style="margin-left: 10px">
+		<form action="SendMessage" method="post" id="MessagesForm">
+		<div class="block">
+			<h3>Сообщения пользователя</h3>
+			<input type=hidden value=${supplier.Id} name=id />
+			Новое сообщение:
+			<textarea style="height: 150px; width:100%;" class="reuired" name="message"></textarea>
+			<br />
+			<input type=submit value="Принять" class="RightButton"/>
+			<p>
+				<% if messages.Count: %>
+				<table class="DataTable HighLightCurrentRow" id="ClientMessagesTable" style="text-align:left">
+					<tr>
+						<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
+						<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+						<th>${app.Sortable("Пользователь", "Messages.Login")}</th>
+						<th>Событие</th>
+					</tr>
+					<% for i, log in enumerate(messages): %>
+					<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
+						<td>${log.WriteTime}</td>
+						<td>${log.Operator}</td>
+						<td>${log.User.GetLoginOrName() if log.User != null}</td>
+						<td>${ViewHelper.FormatMessage(HttpUtility.HtmlEncode(log.Message))}</td>
+					</tr>
+					<% end %>
+				</table>
+				<% else: %>
+				<table class="DataTable">
+					<tr class="EmptyData">
+						<td>Сообщений нет.</td>
+					</tr>
+				</table>
+				<% end %>
+			</p>
+		</div>
+		</form>
+	</div>
 
 </div>

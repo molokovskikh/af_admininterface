@@ -29,8 +29,7 @@ namespace AdminInterface.Helpers
 
 Причина: {6}";
 
-		public static void NotifyAboutPasswordChange(Client client, 
-													 Administrator administrator, 
+		public static void NotifyAboutPasswordChange(Administrator administrator, 
 													 User user,
 													 string password,
 													 bool isFree, 
@@ -39,24 +38,24 @@ namespace AdminInterface.Helpers
 		{
 			if (isFree)
 				Func.Mail("register@analit.net",
-					String.Format("Бесплатное изменение пароля - {0}", client.FullName),
+					String.Format("Бесплатное изменение пароля - {0}", user.RootService.FullName),
 					String.Format(_messageTemplateAfterFreePasswordChange,
 						administrator.UserName,
 						host,
 						user.Login,
-						client.Name,
-						client.Id,
+						user.RootService.Name,
+						user.RootService.Id,
 						DateTime.Now,
 						reason),
 					"RegisterList@subscribe.analit.net");
 
 			else
 				Func.Mail("register@analit.net",
-					String.Format("Платное изменение пароля - {0}", client.FullName),
+					String.Format("Платное изменение пароля - {0}", user.RootService.FullName),
 					String.Format(_messageTemplateForBillingAfterPassordChange,
-						client.FullName,
+						user.RootService.FullName,
 						user.Login,
-						client.Id,
+						user.RootService.Id,
 						user.Payer.Id,
 						reason,
 						DateTime.Now),

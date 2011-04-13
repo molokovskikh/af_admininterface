@@ -8,6 +8,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -33,16 +34,16 @@ namespace AdminInterface.Controllers
 		public void Add(uint clientId)
 		{
 			var client = Client.FindAndCheck(clientId);
+			var user = new User((Service)client);
 			PropertyBag["client"] = client;
 			PropertyBag["drugstore"] = client.Settings;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
-			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
+			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
-			PropertyBag["regions"] = regions;
+			PropertyBag["regions"] = Region.All();
 			PropertyBag["Organizations"] = client.Orgs().ToArray();
 			PropertyBag["UserRegistration"] = true;
 		}
@@ -191,15 +192,10 @@ namespace AdminInterface.Controllers
 		public void ChangePassword(uint id)
 		{
 			var user = User.GetById(id);
-			var client = user.Client;
-
-			Administrator.CheckClientPermission(client);
-			
 			user.CheckLogin();
 
-			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
-			PropertyBag["emailForSend"] = client.GetAddressForSendingClientCard();
+			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 		}
 
 		[RequiredPermission(PermissionType.ChangePassword)]
@@ -222,9 +218,7 @@ namespace AdminInterface.Controllers
 					ADHelper.RenameUser(user.Login, user.Id.ToString());
 
 				DbLogHelper.SetupParametersForTriggerLogging();
-
-				if (user.Client.IsDrugstore())
-					user.ResetUin();
+				user.ResetUin();
 				if (changeLogin)
 				{
 					user.Login = user.Id.ToString();
@@ -247,8 +241,7 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.Save();
 			}
 			
-			NotificationHelper.NotifyAboutPasswordChange(user.Client,
-				administrator,
+			NotificationHelper.NotifyAboutPasswordChange(administrator,
 				user,
 				password,
 				isFree,
