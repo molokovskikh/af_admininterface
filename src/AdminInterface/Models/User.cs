@@ -163,6 +163,9 @@ namespace AdminInterface.Models
 		public virtual List<string> AvalilableAnalitFVersions
 		{
 			get {
+				if (Id == 0)
+					return null;
+
 				if (_updateInfo == null)
 					_updateInfo = UserUpdateInfo.Find(Id);
 
@@ -317,9 +320,6 @@ namespace AdminInterface.Models
 				if (!Payer.Users.Any(u => u == this))
 					Payer.Users.Add(this);
 			}
-
-			if (Client.Users == null)
-				Client.Users = new List<User>();
 
 			if (!Client.Users.Any(u => u == this))
 				Client.Users.Add(this);

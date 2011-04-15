@@ -52,6 +52,11 @@ namespace AdminInterface.Helpers
 
 		public string Edit(string name)
 		{
+			return Edit(name, null);
+		}
+
+		public string Edit(string name, object options)
+		{
 			var helper = new FormHelper(Context);
 			var type = GetValueType(name);
 			var value = GetValue(name);
@@ -63,7 +68,7 @@ namespace AdminInterface.Helpers
 				result.Append(GetLabel(name));
 				return result.ToString();
 			}
-			var edit = GetEdit(name, type, value);
+			var edit = GetEdit(name, type, value, options);
 			if (String.IsNullOrEmpty((string) edit))
 				throw new Exception(String.Format("Не знаю как показать редактор для {0} с типом {1}", name, type));
 			return edit;
@@ -270,7 +275,7 @@ namespace AdminInterface.Helpers
 				return result.ToString();
 			}
 
-			var input = GetEdit(name, valueType, value);
+			var input = GetEdit(name, valueType, value, null);
 
 			if (input != null)
 				FilterTemplate(result, label, input);
@@ -278,7 +283,7 @@ namespace AdminInterface.Helpers
 			return result.ToString();
 		}
 
-		private string GetEdit(string name, Type valueType, dynamic value)
+		private string GetEdit(string name, Type valueType, dynamic value, object options)
 		{
 			var helper = new FormHelper(Context);
 			if (valueType == typeof(string))
@@ -339,18 +344,35 @@ namespace AdminInterface.Helpers
 			}
 			else
 			{
-				var method = valueType.GetMethod("All", BindingFlags.Static | BindingFlags.Public);
+				var isNullable = false;
+				if (options == null)
+				{
+					options = GetOptions(valueType);
+					isNullable = true;
+				}
+
 				var selectedValue = "";
 				if (value != null)
 					selectedValue = value.Id.ToString();
 
-				if (method != null)
+				if (options != null)
 				{
-					var all = method.Invoke(null, null);
-					return EmptyableSelect(name + ".Id", selectedValue, GetSelectOptions(all));
+					var selectName = name + ".Id";
+					if (isNullable)
+						return EmptyableSelect(selectName, selectedValue, GetSelectOptions(options));
+					else
+						return Select(selectName, selectedValue, GetSelectOptions(options));
 				}
 			}
 			return null;
+		}
+
+		private object GetOptions(Type valueType)
+		{
+			var method = valueType.GetMethod("All", BindingFlags.Static | BindingFlags.Public);
+			if (method == null)
+				return null;
+			return method.Invoke(null, null);
 		}
 
 		private IEnumerable<Tuple<string, string>> GetSelectOptions(object value)
