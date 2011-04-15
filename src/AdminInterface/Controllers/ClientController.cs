@@ -11,6 +11,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -390,6 +391,18 @@ where Phone like :phone")
 					address.MoveToAnotherClient(newClient, legalEntity);
 				scope.VoteCommit();
 			}
+
+			if (address != null)
+			{
+				this.Mail()
+					.AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity))
+					.Send();
+			}
+
+			if (user != null)
+				this.Mail()
+					.UserMoved(user, oldClient, user.OldValue(u => u.Payer))
+					.Send();
 
 			if (moveAddress)
 			{

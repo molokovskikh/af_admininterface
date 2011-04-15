@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -7,18 +7,12 @@ using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Core.Smtp;
-using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Configuration;
-using Castle.MonoRail.Framework.Internal;
-using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Models;
-using IgorO.ExposedObjectProject;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
-using Castle.MonoRail.Views.Brail;
 
 namespace Integration
 {
@@ -58,7 +52,7 @@ namespace Integration
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" }
 			};
-			payer = new Payer { PayerID = 10, Name = "Тестовый плательщик"};
+			payer = new Payer("Тестовый плательщик") { PayerID = 10};
 			client.JoinPayer(payer);
 		}
 
@@ -177,6 +171,54 @@ namespace Integration
 			Assert.That(message.Body, Is.StringContaining("Во вложении акт сверки на 01.02.2011"));
 			Assert.That(message.Attachments.Count, Is.EqualTo(1));
 			Assert.That(message.Attachments[0].Name, Is.EqualTo("Акт сверки.xls"));
+		}
+
+		[Test]
+		public void Send_user_move_notification()
+		{
+			var user = new User(client) {
+				Id = 1,
+				Login = "1"
+			};
+			client.Name = "Фармаимпекс";
+			user.Payer.Name = "Фармаимпекс";
+			var oldPayer = new Payer {
+				Name = "Биона"
+			};
+			var oldClient = new Client(oldPayer) {
+				Name = "Биона"
+			};
+			mailer.UserMoved(user, oldClient, oldPayer);
+			mailer.Send();
+			Assert.That(message.Subject, Is.EqualTo("Перемещение пользователя"));
+			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
+			Assert.That(message.Body, Is.EqualTo(@"Пользователь 1 перемещен
+Старый клиент Биона плательщик Биона
+Новый клиент Фармаимпекс плательщик Фармаимпекс"));
+		}
+
+		[Test]
+		public void Send_address_move_notification()
+		{
+			var address = new Address(client, payer.JuridicalOrganizations.First()) {
+				Value = "N14 г.Бугульма, ул.Якупова, д.40"
+			};
+			client.Name = "Фармаимпекс";
+			address.Payer.Name = "Фармаимпекс";
+			address.LegalEntity.Name = "Фармаимпекс";
+
+			var oldPayer = new Payer("Биона");
+			var oldLegalEntity = oldPayer.JuridicalOrganizations.First();
+			var oldClient = new Client(oldPayer) {
+				Name = "Биона"
+			};
+			mailer.AddressMoved(address, oldClient, oldLegalEntity);
+			mailer.Send();
+			Assert.That(message.Subject, Is.EqualTo("Перемещение адреса доставки"));
+			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
+			Assert.That(message.Body, Is.EqualTo(@"Адрес N14 г.Бугульма, ул.Якупова, д.40
+Старый клиент Биона плательщик Биона юр.лицо Биона
+Новый клиент Фармаимпекс плательщик Фармаимпекс юр.лицо Фармаимпекс"));
 		}
 
 		private Invoice CreateInvoice()

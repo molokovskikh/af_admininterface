@@ -159,5 +159,33 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["act"] = act;
 			return this;
 		}
+
+		public MonorailMailer UserMoved(User user, Client oldClient, Payer oldPayer)
+		{
+			Template = "UserMoved";
+
+			From = "register@analit.net";
+			Subject = "Перемещение пользователя";
+			To = "RegisterList@subscribe.analit.net";
+			PropertyBag["user"] = user;
+			PropertyBag["oldClient"] = oldClient;
+			PropertyBag["oldPayer"] = oldPayer;
+
+			return this;
+		}
+
+		public MonorailMailer AddressMoved(Address address, Client oldClient, LegalEntity oldLegalEntity)
+		{
+			Template = "AddressMoved";
+
+			From = "register@analit.net";
+			Subject = "Перемещение адреса доставки";
+			To = "RegisterList@subscribe.analit.net";
+			PropertyBag["address"] = address;
+			PropertyBag["oldClient"] = oldClient;
+			PropertyBag["oldLegalEntity"] = oldLegalEntity;
+
+			return this;
+		}
 	}
 }
