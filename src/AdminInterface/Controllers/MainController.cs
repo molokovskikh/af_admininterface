@@ -225,6 +225,9 @@ WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateP
 		public void Report(uint id, bool isPasswordChange)
 		{
 			CancelLayout();
+			if (Session["password"] != null)
+				PropertyBag["password"] = Session["password"];
+
 			PropertyBag["now"] = DateTime.Now;
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
