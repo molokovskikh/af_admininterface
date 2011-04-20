@@ -314,7 +314,9 @@ namespace AdminInterface.Models
 			Enabled = true;
 			Logs = new AuthorizationLogEntity(this);
 			UserUpdateInfo = new UserUpdateInfo(this);
-			TargetVersion = DefaultValues.Get().AnalitFVersion;
+			var defaults = DefaultValues.Get();
+			TargetVersion = defaults.AnalitFVersion;
+			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			Save();
 			Login = Id.ToString();
 			Update();
@@ -579,6 +581,15 @@ where userid = :userId")
 				return null;
 
 			return Administrator.GetByName(Registrant);
+		}
+
+		public virtual string GetEmailForBilling()
+		{
+			var mails = Payer.ContactGroupOwner.GetEmails(ContactGroupType.Billing);
+			if (Client != null)
+				mails = Client.ContactGroupOwner.GetEmails(ContactGroupType.Billing).Concat(mails);
+
+			return mails.Distinct().Implode();
 		}
 
 		public virtual string GetAddressForSendingClientCard()

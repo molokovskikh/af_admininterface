@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using log4net.Config;
 using NUnit.Framework;

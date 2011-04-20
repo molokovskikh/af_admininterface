@@ -150,7 +150,7 @@ namespace AdminInterface.Models.Billing
 
 		public override string ToString()
 		{
-			return Name;
+			return String.Format("{0} цена {1} количество {2}", Name, Cost, Count);
 		}
 	}
 }

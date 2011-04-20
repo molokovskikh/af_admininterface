@@ -173,8 +173,41 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		$("#addresses input, #users input").change(function () {
 			Update("${siteroot}/Account/Update", this);
 		});
+
+		$("div.collapsible").each(function () {
+			var folder = $(this).find("div.VisibleFolder");
+			var triggers = $(this).find("div.trigger");
+
+			var count = folder.find("table tr").length;
+			if (count > 0)
+				count--;
+			if (count == 0) {
+				if (folder.find("table").length == 0) {
+					count = folder.children().length;
+				}
+			}
+
+			if (count > 5) {
+				triggers.addClass("ShowHiden");
+				folder.addClass("hidden")
+			}
+			else {
+				triggers.addClass("HideVisible");
+			}
+		});
 	});
 </script>
+
+<style>
+	.InputGroupHeader.collapsible
+	{
+		margin-bottom:10px;
+	}
+	div.VisibleFolder
+	{
+		margin-top:10px;
+	}
+</style>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
 </div>
@@ -190,21 +223,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	</div>
 	<% end %>
 
-	<div class="InputGroupHeader" style="margin-bottom:10px;width: 100%;">
-		<%
-		headerCssClass = "ShowHiden"
-		bodyCssClass = "hidden"
-		if (IsDefined("ShowClients") and ShowClients) or Instance.Clients.Count < 5:
-			headerCssClass = "HideVisible"
-			bodyCssClass = ""
-		end
-		%>
-		<div class="${headerCssClass}">
+	<div class="InputGroupHeader collapsible">
+
+		<div class=trigger>
 			<a href="javascript:">Клиенты</a>
 		</div>
 
-		<div class="VisibleFolder ${bodyCssClass}">
-			<table id=clients class="DataTable"">
+		<div class="VisibleFolder">
+			<table id=clients class="DataTable">
 				<tr>
 					<th>Включен</th>
 					<th>Код</th>
@@ -218,7 +244,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th></th>
 				</tr>
 				<% for i, client in enumerate(clients): %>
-				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${"DisabledByBilling" if not client.IsClientActive()}" align="center">
+				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td style="width: 50px">
 						<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
 						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
@@ -228,7 +254,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<% if IsDefined("Client") and client.Id == Client.Id: %>
 						<strong>${client.Name}</strong>
 					<% else: %>
-						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&showClients=true&tab=payments">
+						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments">
 							${client.Name}
 						</a>
 					<% end %>
@@ -243,10 +269,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						${client.AddressesForPayer(payer).Count}
 					</td>
 					<td>
-						${client.RegistrationDate.ToShortDateString()}
+						${client.Registration.RegistrationDate.ToShortDateString() if client.Registration}
 					</td>
 					<td>
-						<a href="mailto:${client.GetEmailsForBilling()}"><img src="${siteroot}/Images/email.png" border="0" /></a>
+						<a href="mailto:${client.GetEmailsForBilling()}" class="icon icon-email"></a>
 					</td>
 				</tr>
 				<% end %>
@@ -254,96 +280,120 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 	</div>
 
-	<div class="InputGroupHeader" style="margin-bottom:10px;">
-		<%
-		headerCssClass = "ShowHiden"
-		bodyCssClass = "hidden"
-		if (IsDefined("ShowUsers") and ShowUsers) or users.Count < 5:
-			headerCssClass = "HideVisible" 
-			bodyCssClass =""
-		end
-		%>
-		<div id="UserListHeader" class="${headerCssClass}">
+	<div class="InputGroupHeader collapsible">
+
+		<div class=trigger>
+			<a href="javascript:">Поставщики</a>
+		</div>
+
+		<div class="VisibleFolder">
+			<table class="DataTable"">
+				<tr>
+					<th>Включен</th>
+					<th>Код</th>
+					<th>Название</th>
+					<th>Регион</th>
+					<th>Дата регистрации</th>
+					<th></th>
+				</tr>
+				<% for i, supplier in enumerate(suppliers): %>
+				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier)}" align="center">
+					<td style="width: 50px">
+						<input type="checkbox" ${"checked" unless supplier.Disabled} onclick="SetClientStatus(${supplier.Id}, this.checked)" />
+					</td>
+					<td>${supplier.Id}</td>
+					<td>
+						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments">
+							${supplier.Name}
+						</a>
+					</td>
+					<td>${supplier.HomeRegion.Name}</td>
+					<td>
+						${supplier.Registration.RegistrationDate.ToShortDateString() if supplier.Registration}
+					</td>
+					<td>
+						<a class="icon icon-email" href="mailto:${supplier.GetEmailsForBilling()}"></a>
+					</td>
+				</tr>
+				<% end %>
+			</table>
+		</div>
+	</div>
+
+	<div class="InputGroupHeader collapsible">
+
+		<div id="UserListHeader" class=trigger>
 			<a href="javascript:">Пользователи</a>
 		</div>
 
-		<div id="UserListBody" class="VisibleFolder ${bodyCssClass}">
+		<div id="UserListBody" class="VisibleFolder">
 			<% if IsDefined("Client") and clients.Count: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'users')">Показать всех</a>
 			</div>
 			<% end %>
-			<br />
-				<div align="left">
-					<table class="DataTable" id="users">
-						<tr align="center" valign="top">
-							<th>Включен</th>
-							<th>Учтен</th>
-							<th>Бесплатно</th>
-							<th>Платеж</th>
-							<th>Код пользователя</th>
-							<th>Адреса</th>
-							<th>Комментарий</th>
-							<th>Дата последнего обновления</th>
-							<th>Клиент</th>
-						</tr>
-						<% for i, user in enumerate(Users): %>
-						<% hidden = IsDefined("Client") and Client.Id != user.Client.Id %>
-						<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
-							align="center" name="Client${user.Client.Id}">
-							<td class=short>
-								<input name=id type=hidden value=${user.Accounting.Id}>
-								<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if not user.Client.IsClientActive()} />
-							</td>
-							<td class=short>
-								<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
-							</td>
-							<td class=short>
-								<input name=free type="checkbox" ${"checked" if user.IsFree} />
-							</td>
-							<td class=short>
-								<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}"> 
-							</td>
-							<td>
-								<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
-							</td>
-							<td class=short>
-								<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
-									<img src="${siteroot}/Images/kfm_home.png" border="0" />
-								</a>
-							</td>
-							<td>${user.Name}</td>
-							<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
-							<td>${user.Client.Name}</td>
-						</tr>
-						<tr id="UserRowHidden${user.Id}" class='${'hidable hidden' if hidden}'">
-							<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
-						</tr>
-						<% end %>
-					</table>
-				</div>
+			<div align="left">
+				<table class="DataTable" id="users">
+					<tr align="center" valign="top">
+						<th>Включен</th>
+						<th>Учтен</th>
+						<th>Бесплатно</th>
+						<th>Платеж</th>
+						<th>Код пользователя</th>
+						<th>Адреса</th>
+						<th>Комментарий</th>
+						<th>Дата последнего обновления</th>
+						<th>Клиент</th>
+					</tr>
+					<% for i, user in enumerate(Users): %>
+					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled}"
+						align="center" name="Client${user.RootService.Id}">
+						<td class=short>
+							<input name=id type=hidden value=${user.Accounting.Id}>
+							<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if user.RootService.Disabled} />
+						</td>
+						<td class=short>
+							<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
+						</td>
+						<td class=short>
+							<input name=free type="checkbox" ${"checked" if user.IsFree} />
+						</td>
+						<td class=short>
+							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}"> 
+						</td>
+						<td>
+							<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
+						</td>
+						<td class=short>
+							<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
+								<img src="${siteroot}/Images/kfm_home.png" border="0" />
+							</a>
+						</td>
+						<td>${user.Name}</td>
+						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
+						<td>${user.RootService.Name}</td>
+					</tr>
+					<tr id="UserRowHidden${user.Id}">
+						<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
+					</tr>
+					<% end %>
+				</table>
 			</div>
 		</div>
+	</div>
 			
-		<div class="InputGroupHeader" style="margin-bottom:10px;">
-			<%
-			headerCssClass = "ShowHiden"
-			bodyCssClass = "hidden"
-			if (IsDefined("ShowAddresses") and ShowAddresses) or addresses.Count < 5:
-				headerCssClass = "HideVisible"
-				bodyCssClass = ""
-			end
-			%>
-			<div id="AddressListHeader" class="${headerCssClass}">
+		<div class="InputGroupHeader collapsible">
+
+			<div id="AddressListHeader" class=trigger>
 				<a href="javascript:">Адреса доставки</a>
 			</div>
-			<div id="AddressListBody" class="VisibleFolder ${bodyCssClass}">
+
+			<div id="AddressListBody" class="VisibleFolder">
 				<% if IsDefined("Client") and clients.Count > 1: %>
 				<div align="right">
 					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'addresses')">Показать всех</a>
 				</div>
 				<% end %>
-				<br />
 				<div align="left">
 					<table class="DataTable" id="addresses">
 						<tr align="center" valign="top">
@@ -397,28 +447,30 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 
 		<% if reports.Count: %>
-		<div class="InputGroupHeader" id=reports style="margin-bottom:10px;">
-			<div class="HideVisible">
-				<a href="javascript:">Отчеты</a>
+			<div class="InputGroupHeader collapsible" id=reports>
+
+				<div class=trigger>
+					<a href="javascript:">Отчеты</a>
+				</div>
+
+				<div class="VisibleFolder">
+					<table class="DataTable">
+						<tr align="center" valign="top">
+							<th>Включен</th>
+							<th>Примечание</th>
+						</tr>
+						<% for i, report in enumerate(reports): %>
+						<tr class="${ViewHelper.GetRowStyle(i)}">
+							<td class=short>
+								<input name=id type=hidden value=${report.Id}>
+								<input name=allow type="checkbox" ${"checked" if report.Allow} />
+							</td>
+							<td>!{report.Comment}</td>
+						</tr>
+						<% end %>
+					</table>
+				</div>
 			</div>
-			<div>
-				<table class="DataTable">
-					<tr align="center" valign="top">
-						<th>Включен</th>
-						<th>Примечание</th>
-					</tr>
-					<% for i, report in enumerate(reports): %>
-					<tr class="${ViewHelper.GetRowStyle(i)}">
-						<td class=short>
-							<input name=id type=hidden value=${report.Id}>
-							<input name=allow type="checkbox" ${"checked" if report.Allow} />
-						</td>
-						<td>!{report.Comment}</td>
-					</tr>
-					<% end %>
-				</table>
-			</div>
-		</div>
 		<% end %>
 
 <%
@@ -514,88 +566,79 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="right">
 <% if IsDefined("UsersMessages") and Users.Count: %>
 		<div class="UseCaseGroup">
-		<form id="SendMessageForm" action="sendMessage.rails" method="post">
+		<form id="SendMessageForm" action="SendMessage" method="post">
 			<% if IsDefined("Client"): %>
 			${FormHelper.HiddenField("clientId", Client.Id)}
 			<% end %>
 			${FormHelper.HiddenField("payerId", Instance.Id)}
 			${FormHelper.HiddenField("tab", "payments")}
-			<table style="width:100%">
-					<tr>
-						<% if (CountUsersWithMessages > 0): %>
-						<td class="InputGroupHeader" title="Сообщения для пользователей">
-						<% cssClassHeader = "ShowHiden"
-							cssClassBody = "hidden"
-							if (CountUsersWithMessages < 5):
-								cssClassHeader = "HideVisible"
-								cssClassBody = ""
-							end %>
-							<div class="${cssClassHeader}" title="Сообщения для пользователей">
-								<a href="javascript:" title="Сообщения для пользователей">Не показанные сообщения</a>
-							</div>
-							<div class="VisibleFolder ${cssClassBody}" title="Сообщения для пользователей">
-								<br />
-							<% for i, user in enumerate(Users): 
-								if (UsersMessages[i] != null) and UsersMessages[i].IsContainsNotShowedMessage(): %>
-								<div id="CurrentMessageForUser${user.Id}" style="text-align: left">
-								Остались не показанные сообщения для пользователя ${user.GetLoginOrName()}.
-									<a href="javascript:void(0);" id="ViewMessageForUser${user.Id}" onclick="return ShowMessage(${user.Id});">Просмотреть сообщение</a>
-								</div>
-							<% end
-							end %>
-							</div>
-							<% end %>
-						</td>
-					</tr>
-					<tr><td><br /></td></tr>
-					<tr>
-						<td class="InputGroupHeader">
-							Сообщение для пользователя:
-							<select id="messageReceiverComboBox" name="NewClientMessage.ClientCode">
-								<option value="0" selected="selected">Для всех пользователей</option>
-								<% for i, user in enumerate(Users): %>
-								<option value="${user.Id}">${user.GetLoginOrName()}</option>
-								<% end %>
-							</select>
-						</td>
-					</tr>
-					<% if IsDefined("SendError"): %>
-					<tr>
-						<td class="ValidationErrorMessage">
-							${SendError}
-						</td>
-					</tr>
+
+			<% if UsersMessages.Count: %>
+				<div class="InputGroupHeader collapsible">
+					<div class="trigger">
+						<a href="javascript:">Не показанные сообщения</a>
+					</div>
+
+					<div class="VisibleFolder">
+					<% for i, message in enumerate(UsersMessages): %>
+						<div id="CurrentMessageForUser${message.User.Id}" style="text-align: left">
+							Остались не показанные сообщения для пользователя ${message.User.GetLoginOrName()}.
+							<a href="javascript:void(0);" id="ViewMessageForUser${message.User.Id}" onclick="return ShowMessage(${message.User.Id});">Просмотреть сообщение</a>
+						</div>
 					<% end %>
-					<tr id="EmailSubjectRow" style="display: none;">
-						<td>Тема письма:<input type="text" style="width: 100%;" name="subjectForEmailToClient" /></td>
-					</tr>
-					<tr>
-						<td>
-							<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<p>
-								<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" onclick="ShowOrHideTheme(this.checked)" />
-								<label for="sendMessageToClientEmails">Отправлять это сообщение также на Email клиенту</label>
-								<input type="hidden" name="sendMessageToClientEmails" value="false" />
-							</p>
-							Показать
-							<select name="NewClientMessage.ShowMessageCount">
-								<option>1</option>
-								<option>2</option>
-								<option>5</option>
-								<option>10</option>
-							</select>
-							раз.
-						</td>
-					</tr>
-					<tr style="text-align:right">
-						<td>
-							<input type="submit" value="Отправить сообщение" ${"disabled" if (Users.Count == 0)} />
-						</td>
-					</tr>
+					</div>
+				</div>
+			<% end %>
+
+			<table style="width:100%">
+				<tr>
+					<td class="InputGroupHeader">
+						Сообщение для пользователя:
+						<select id="messageReceiverComboBox" name="NewClientMessage.Id">
+							<option value="0" selected="selected">Для всех пользователей</option>
+							<% for i, user in enumerate(Users): %>
+							<option value="${user.Id}">${user.GetLoginOrName()}</option>
+							<% end %>
+						</select>
+					</td>
+				</tr>
+				<% if IsDefined("SendError"): %>
+				<tr>
+					<td class="ValidationErrorMessage">
+						${SendError}
+					</td>
+				</tr>
+				<% end %>
+				<tr id="EmailSubjectRow" style="display: none;">
+					<td>Тема письма:<input type="text" style="width: 100%;" name="subjectForEmailToClient" /></td>
+				</tr>
+				<tr>
+					<td>
+						<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<p>
+							<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" onclick="ShowOrHideTheme(this.checked)" />
+							<label for="sendMessageToClientEmails">Отправлять это сообщение также на Email клиенту</label>
+							<input type="hidden" name="sendMessageToClientEmails" value="false" />
+						</p>
+						Показать
+						<select name="NewClientMessage.ShowMessageCount">
+							<option>1</option>
+							<option>2</option>
+							<option>5</option>
+							<option>10</option>
+						</select>
+						раз.
+					</td>
+				</tr>
+				<tr style="text-align:right">
+					<td>
+						<input type="submit" value="Отправить сообщение" ${"disabled" if (Users.Count == 0)} />
+					</td>
+				</tr>
 			</table>
 		</form>
 		</div>

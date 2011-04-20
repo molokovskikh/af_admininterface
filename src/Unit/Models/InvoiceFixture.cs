@@ -54,7 +54,6 @@ namespace Unit.Models
 		public void Split_services_by_type()
 		{
 			client.Users.Add(new User(client));
-			payer.Users.Add(client.Users[1]);
 			client.AddAddress("test");
 			client.AddAddress("test");
 			client.AddAddress("test");
@@ -64,9 +63,10 @@ namespace Unit.Models
 
 			var invoice = new Invoice(payer, Period.April, DateTime.Now);
 
-			Assert.That(invoice.Parts[0].Count, Is.EqualTo(2));
-			Assert.That(invoice.Parts[0].Cost, Is.EqualTo(800));
-			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(1600));
+			var part = invoice.Parts[0];
+			Assert.That(part.Count, Is.EqualTo(2), part.ToString());
+			Assert.That(part.Cost, Is.EqualTo(800));
+			Assert.That(part.Sum, Is.EqualTo(1600));
 			Assert.That(invoice.Parts[1].Count, Is.EqualTo(1));
 			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(200));
 		}
@@ -88,7 +88,7 @@ namespace Unit.Models
 			Assert.That(invoice.Sum, Is.EqualTo(800));
 
 			Assert.That(invoice.Period.ToString(),
-				Is.EqualTo(CultureInfo.InvariantCulture.DateTimeFormat.MonthNames[DateTime.Now.Month]));
+				Is.EqualTo(CultureInfo.InvariantCulture.DateTimeFormat.MonthNames[DateTime.Now.Month - 1]));
 			var part = invoice.Parts.Single();
 			Assert.That(part.Cost, Is.EqualTo(800));
 			Assert.That(part.Count, Is.EqualTo(1));

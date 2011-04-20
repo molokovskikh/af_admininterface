@@ -34,7 +34,7 @@ namespace AdminInterface.Models.Billing
 		{
 			get
 			{
-				if (User != null)
+				if (User != null && User.Client != null)
 					return User.Client;
 				if (Address != null)
 					return Address.Client;
@@ -264,7 +264,7 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 
 		public override bool ShouldPay()
 		{
-			return User.Client.Enabled && User.Enabled && !User.IsFree && (ReadyForAcounting || BeAccounted);
+			return !User.RootService.Disabled && User.Enabled && !User.IsFree && (ReadyForAcounting || BeAccounted);
 		}
 	}
 

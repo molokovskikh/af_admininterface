@@ -54,7 +54,9 @@ namespace AdminInterface.Models
 		public Payer()
 		{
 			InvoiceSettings = new InvoiceSettings();
+			Users = new List<User>();
 			Clients = new List<Client>();
+			Addresses = new List<Address>();
 		}
 
 		[PrimaryKey]

@@ -7,13 +7,13 @@
         </td>
         <td>
             ${user.GetLoginOrName()}<br />
-            ${message.ShowMessageCount} раз            
+            ${message.ShowMessageCount} раз
         </td>
     </tr>
     <tr><td colspan="2">${ViewHelper.FormatMessage(message.Message)}</td></tr>
     <tr>
         <td colspan="2" align="right">
-            <input id="CancelViewMessage${user.Id}" type=button onclick="return RemoveMessage(${message.ClientCode})" value="Отменить показ сообщения"></input>
+            <input id="CancelViewMessage${user.Id}" type=button onclick="return RemoveMessage(${message.Id})" value="Отменить показ сообщения"></input>
         </td>
     </tr>
 </table>

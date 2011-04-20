@@ -145,9 +145,9 @@ Email: {2}
 			}
 		}
 
-		public static void SendMessageFromBillingToClient(Client client, string text, string subject)
+		public static void SendMessageFromBillingToClient(User user, string text, string subject)
 		{
-			Func.Mail("billing@analit.net", subject, text, client.GetEmailsForBilling());
+			Func.Mail("billing@analit.net", subject, text, user.GetEmailForBilling());
 		}
 
 		public static void NotifySupplierAboutAddressRegistration(Address address)

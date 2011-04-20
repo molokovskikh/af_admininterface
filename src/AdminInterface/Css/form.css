@@ -77,6 +77,11 @@ h2
 	background-image: url(../images/add.png);
 }
 
+.icon-email
+{
+	background-image: url(../images/email.png);
+}
+
 .navigation-menu
 {
 	list-style-type: none;

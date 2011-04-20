@@ -5,6 +5,7 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
+using Common.Tools;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
@@ -12,6 +13,7 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
 	public class Supplier : Service, IEnablable
 	{
+
 		public Supplier()
 		{
 			Registration = new RegistrationInfo();
@@ -36,7 +38,7 @@ namespace AdminInterface.Models.Suppliers
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
-		[BelongsTo]
+		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Payer Payer { get; set; }
 
 		[BelongsTo]
@@ -44,6 +46,14 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
+
+		public virtual Segment Segment
+		{
+			get
+			{
+				return Segment.Wholesale;
+			}
+		}
 
 /*
 	[HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
@@ -102,6 +112,13 @@ namespace AdminInterface.Models.Suppliers
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual string GetEmailsForBilling()
+		{
+			return ContactGroupOwner
+				.GetEmails(ContactGroupType.Billing)
+				.Implode();
 		}
 	}
 }

@@ -28,6 +28,16 @@ namespace AdminInterface.Helpers
 		public AppHelper(IEngineContext engineContext) : base(engineContext)
 		{}
 
+		public string Style(object item)
+		{
+			if (item is IEnablable)
+			{
+				if (!((IEnablable)item).Enabled)
+					return "DisabledByBilling";
+			}
+			return "";
+		}
+
 		public string GetValidationError(object item, string name)
 		{
 			var errorSummary = ((SmartDispatcherController)Controller).Binder.GetValidationSummary(item);

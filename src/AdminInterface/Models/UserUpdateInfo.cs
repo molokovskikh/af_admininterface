@@ -11,9 +11,6 @@ namespace AdminInterface.Models
 		{
 			User = user;
 			AFCopyId = "";
-
-			var defaults = DefaultValues.Get();
-			AFAppVersion = defaults.AnalitFVersion;
 		}
 
 		public UserUpdateInfo() { }

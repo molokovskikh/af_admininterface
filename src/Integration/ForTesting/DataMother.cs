@@ -20,16 +20,7 @@ namespace Integration.ForTesting
 			Client client;
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var legalEntity = new LegalEntity();
-				var payer = new Payer
-				{
-					Name = "test",
-					ContactGroupOwner = new ContactGroupOwner(),
-					JuridicalOrganizations = new List<LegalEntity> {
-						legalEntity
-					}
-				};
-				legalEntity.Payer = payer;
+				var payer = CreatePayer();
 				client = new Client(payer) {
 					Status = ClientStatus.On,
 					Segment = Segment.Wholesale,
@@ -64,6 +55,20 @@ namespace Integration.ForTesting
 				scope.VoteCommit();
 			}
 			return client;
+		}
+
+		public static Payer CreatePayer()
+		{
+			var legalEntity = new LegalEntity();
+			var payer = new Payer {
+				Name = "test",
+				ContactGroupOwner = new ContactGroupOwner(),
+				JuridicalOrganizations = new List<LegalEntity> {
+					legalEntity
+				}
+			};
+			legalEntity.Payer = payer;
+			return payer;
 		}
 
 		public static Client CreateTestClientWithAddress()

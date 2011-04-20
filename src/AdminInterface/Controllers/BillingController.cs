@@ -8,6 +8,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -33,16 +34,13 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint billingCode, string tab, uint currentJuridicalOrganizationId)
 		{
-			Edit(billingCode, 0, 0, 0, false, false, false, tab, null, null, currentJuridicalOrganizationId);
+			Edit(billingCode, 0, 0, 0, tab, null, null, currentJuridicalOrganizationId);
 		}
 
 		public void Edit(uint billingCode,
 			uint clientCode,
 			uint userId,
 			uint addressId,
-			bool showClients,
-			bool showAddresses,
-			bool showUsers,
 			string tab,
 			DateTime? paymentsFrom,
 			DateTime? paymentsTo,
@@ -56,24 +54,19 @@ namespace AdminInterface.Controllers
 			var user = (userId != 0) ? User.Find(userId) : payer.Users.FirstOrDefault();
 			var address = (addressId != 0) ? Address.Find(addressId) : payer.Addresses.FirstOrDefault();
 
-			var usersMessages = new List<UserMessage>();
 			var usersLogs = new List<UserLogRecord>();
 			var addressesLogs = new List<AddressLogRecord>();
-			var clients = payer.Users.Select(u => u.Client).Distinct().ToList();
-			var countUsersWithMessages = 0;
+			var clients = payer.Clients;
 			foreach (var item in payer.Users)
 			{
-				var message = UserMessage.FindUserMessage(item.Id);
-				if (message != null && message.IsContainsNotShowedMessage())
-					countUsersWithMessages++;
-				usersMessages.Add(message);
 				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
 			}
 			foreach (var item in payer.Addresses)
 				addressesLogs.AddRange(AddressLogRecord.GetAddressLogRecords(item));
-			PropertyBag["CountUsersWithMessages"] = countUsersWithMessages;
-			PropertyBag["UsersMessages"] = usersMessages;
-			PropertyBag["ShowClients"] = showClients;
+			PropertyBag["UsersMessages"] = payer.Users
+				.Select(u => UserMessage.FindUserMessage(u.Id))
+				.Where(m => m != null && m.IsContainsNotShowedMessage())
+				.ToList();
 
 			if (String.IsNullOrEmpty(tab))
 				tab = "payments";
@@ -91,6 +84,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["Client"] = client;
 
 			PropertyBag["Clients"] = clients;
+			PropertyBag["suppliers"] = Supplier.Queryable.Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["User"] = user;
@@ -130,29 +124,29 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				Client client = null;
+				User notificationUser = null;
 				using (var scope = new TransactionScope(OnDispose.Rollback))
 				{
 					DbLogHelper.SetupParametersForTriggerLogging();
-					if (message.ClientCode != 0)
+					if (message.Id != 0)
 					{
-						var user = User.Find(message.ClientCode);
-						client = user.Client;
+						var user = User.Find(message.Id);
+						notificationUser = user;
 						SendMessageToUser(user, message);
 					}
 					else
 					{
 						var payer = Payer.Find(payerId);
-						foreach(var user in payer.Users)
+						foreach (var user in payer.Users)
 						{
-							client = user.Client;
+							notificationUser = user;
 							SendMessageToUser(user, message);
 						}
 					}
 					scope.VoteCommit();
 				}
 				if (sendMessageToClientEmails)
-					Mailer.SendMessageFromBillingToClient(client, message.Message, subjectForEmailToClient);
+					Mailer.SendMessageFromBillingToClient(notificationUser, message.Message, subjectForEmailToClient);
 				Flash["Message"] = new Message("Сообщение сохранено");
 			}
 			catch (ValidationException exception)
@@ -165,8 +159,9 @@ namespace AdminInterface.Controllers
 
 		private void SendMessageToUser(User user, UserMessage clientMessage)
 		{
-			DbLogHelper.SetupParametersForTriggerLogging();
-			var message = UserMessage.Find(user.Id);
+			var message = UserMessage.FindUserMessage(user.Id);
+			if (message == null)
+				return;
 			message.Message = clientMessage.Message;
 			message.ShowMessageCount = clientMessage.ShowMessageCount;
 			message.Update();
@@ -284,7 +279,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var message = UserMessage.FindUserMessage(userId);
 			PropertyBag["Message"] = message;
-			PropertyBag["user"] = User.Find(message.ClientCode);
+			PropertyBag["user"] = User.Find(message.Id);
 		}
 
 		public void CancelMessage(uint userId)

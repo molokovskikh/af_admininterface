@@ -208,41 +208,6 @@ where
 			return ContactGroupOwner.ContactGroups.FirstOrDefault(contactGroup => contactGroup.Type == type);
 		}
 
-		public virtual void ProcessEmails(List<string> emails, params ContactOwner[] contactGroups)
-		{
-			contactGroups = contactGroups.Where(g => g != null).ToArray();
-			foreach (var contactGroup in contactGroups)
-				foreach (var contact in contactGroup.Contacts)
-					if (contact.Type == ContactType.Email && !emails.Contains(contact.ContactText.Trim()))
-						emails.Add(contact.ContactText.Trim());
-		}
-
-		public virtual string GetEmailsForBilling()
-		{
-			return GetEmails(true, GetContactGroup(ContactGroupType.Billing), Payers.SelectMany(p => p.ContactGroupOwner.ContactGroups).ToArray());
-		}
-
-		private string GetEmails(bool unionEmails, ContactGroup generalGroup, params ContactGroup[] specialGroup)
-		{
-			specialGroup = specialGroup.Where(g => g != null && g.Persons != null).ToArray();
-			var emails = new List<string>();
-			foreach (var person in specialGroup.SelectMany(g => g.Persons))
-				ProcessEmails(emails, person);
-
-			ProcessEmails(emails, specialGroup);
-
-			if ((emails.Count > 0) && !unionEmails)
-				return String.Join(", ", emails.ToArray());
-
-			if (generalGroup != null && generalGroup.Persons != null)
-				foreach (var person in generalGroup.Persons)
-					ProcessEmails(emails, person);
-
-			ProcessEmails(emails, generalGroup);
-
-			return String.Join(", ", emails.ToArray());
-		}
-
 		public virtual void ResetUin()
 		{
 			ArHelper.WithSession(session =>
@@ -462,6 +427,13 @@ group by u.ClientId")
 				Users = new List<User>();
 			user.Init(this);
 			Users.Add(user);
+		}
+
+		public virtual string GetEmailsForBilling()
+		{
+			return ContactGroupOwner
+				.GetEmails(ContactGroupType.Billing)
+				.Implode();
 		}
 	}
 }
