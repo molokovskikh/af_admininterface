@@ -45,9 +45,7 @@
 			<li><a href="${siteroot}/Logs/UpdateLog?userId=${user.Id}" target="_blank">История обновлений</a></li>
 			<li><a href="${siteroot}/Logs/DocumentLog?userId=${user.Id}" target="_blank">История документов</a></li>
 			<li><a href="${siteroot}/client/${user.Client.Id}/Orders?filter.User.Id=${user.Id}" target="_blank">История заказов</a></li>
-			<% end %>
-        	<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
-			<% if user.Client: %>
+			<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
 			<li><a href="${siteroot}/Users/${user.Id}/SearchOffers" target="_blank">Поиск предложений</a></li>
 			<% end %>
 		</ul>

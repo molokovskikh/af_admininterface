@@ -67,6 +67,9 @@
 				<li>
 					${app.LinkTo(supplier.Payer)}
 				</li>
+				<li>
+					<li><a href="${CiUrl}?sid=${supplier.Id}" target="_blank">Интерфейс поставщика</a></li>
+				</li>
 			</ul>
 		</div>
 

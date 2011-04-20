@@ -26,6 +26,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(supplier);
+			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 		}
 
 		public void SendMessage(uint id, string message)
