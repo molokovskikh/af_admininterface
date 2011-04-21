@@ -66,6 +66,7 @@ namespace AdminInterface.Models
 			SendWaybills = true;
 			Enabled = true;
 			AssignedPermissions = new List<UserPermission>();
+			AvaliableAddresses = new List<Address>();
 		}
 
 		public User(Payer payer, Service rootService)
@@ -90,6 +91,8 @@ namespace AdminInterface.Models
 			: this((Service)client)
 		{
 			Init(client);
+			WorkRegionMask = client.MaskRegion;
+			OrderRegionMask = client.Settings.OrderRegionMask;
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -321,7 +324,8 @@ namespace AdminInterface.Models
 			Login = Id.ToString();
 			Update();
 
-			Client.UpdateBeAccounted();
+			if (Client != null)
+				Client.UpdateBeAccounted();
 		}
 
 		public virtual void Setup(Client client)

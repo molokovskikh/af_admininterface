@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -10,7 +8,6 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
-using AdminInterface.Services;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -18,7 +15,6 @@ using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
-using MySql.Data.MySqlClient;
 using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
@@ -44,7 +40,109 @@ namespace AdminInterface.Controllers
 	public class RegisterController : Controller
 	{
 		[AccessibleThrough(Verb.Get)]
-		public void Register()
+		public void RegisterSupplier()
+		{
+			PropertyBag["regions"] = Region.All().ToArray();
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void RegisterSupplier(
+			[DataBind("supplier")] Supplier supplier,
+			[DataBind("supplierContacts")] Contact[] supplierContacts,
+			ulong homeRegion, 
+			[DataBind("regionSettings")] RegionSettings[] regionSettings,
+			[DataBind("flags")] AdditionalSettings additionalSettings, 
+
+			[DataBind("payer")] Payer payer,
+			uint? existingPayerId,
+
+			string userName,
+			[DataBind("userContacts")] Contact[] userContacts,
+			[DataBind("userPersons")] Person[] userPersons,
+
+			string additionalEmailsForSendingCard,
+			string comment)
+		{
+			User user;
+			string password;
+
+			using (var scope = new TransactionScope(OnDispose.Rollback))
+			{
+				DbLogHelper.SetupParametersForTriggerLogging();
+				Payer currentPayer = null;
+
+				if (additionalSettings.PayerExists)
+				{
+					if (payer != null || existingPayerId.HasValue)
+					{
+						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
+						currentPayer = Payer.Find(id);
+						if (currentPayer.JuridicalOrganizations.Count == 0)
+						{
+							var organization = new LegalEntity();
+							organization.Payer = currentPayer;
+							organization.Name = currentPayer.Name;
+							organization.FullName = currentPayer.JuridicalName;
+							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
+							organization.Save();
+						}
+					}
+				}
+
+				supplier.Registration = new RegistrationInfo(Administrator);
+				if (currentPayer == null)
+					currentPayer = CreatePayer(supplier);
+				supplier.Payer = currentPayer;
+				AddContactsToClient(supplier.ContactGroupOwner, supplierContacts);
+				supplier.Save();
+				CreateSupplier(DefaultValues.Get(), supplier);
+
+				user = new User(supplier.Payer, supplier) {
+					Name = userName,
+				};
+
+				user.UpdateContacts(userContacts);
+				foreach (var person in userPersons)
+					user.AddContactPerson(person.Name);
+				user.Setup();
+				user.SaveAndFlush();
+				password = user.CreateInAd();
+
+				supplier.AddComment(comment);
+
+				scope.VoteCommit();
+			}
+
+			Mailer.SupplierRegistred(supplier);
+
+			var log = new PasswordChangeLogEntity(user.Login);
+			if (additionalSettings.SendRegistrationCard)
+				log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
+			log.Save();
+
+			if (additionalSettings.FillBillingInfo)
+			{
+				Session["password"] = password;
+				Redirect("Register", "RegisterPayer", new {
+					id = supplier.Payer.Id,
+					showRegistrationCard = additionalSettings.ShowRegistrationCard
+				});
+			}
+			else if (supplier.Users.Count > 0 && additionalSettings.ShowRegistrationCard)
+			{
+				Flash["password"] = password;
+				Redirect("main", "report", new{id = supplier.Users.First().Id});
+			}
+			else
+			{
+				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
+				RedirectToUrl(LinkHelper.GetVirtualDir(Context) + String.Format("/Supplier/{0}", supplier.Id));
+			}
+		}
+
+
+		[AccessibleThrough(Verb.Get)]
+		public void RegisterClient()
 		{
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
@@ -68,25 +166,14 @@ namespace AdminInterface.Controllers
 			string additionalEmailsForSendingCard,
 			string comment)
 		{
-			ulong browseRegionMask = 0;
-			ulong orderRegionMask = 0;
 			User newUser;
 			Client newClient;
 			string password;
-			var trimSymbols = new[] {' '};
 
 			if (!String.IsNullOrEmpty(userName))
-				userName = userName.Replace("№", "N").Trim(trimSymbols);
+				userName = userName.Replace("№", "N").Trim();
 			if (!String.IsNullOrEmpty(deliveryAddress))
-				deliveryAddress = deliveryAddress.Replace("№", "N").Trim(trimSymbols);
-
-			foreach (var region in regionSettings)
-			{
-				if (region.IsAvaliableForBrowse)
-					browseRegionMask |= region.Id;
-				if (region.IsAvaliableForOrder)
-					orderRegionMask |= region.Id;
-			}
+				deliveryAddress = deliveryAddress.Replace("№", "N").Trim();
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -114,35 +201,26 @@ namespace AdminInterface.Controllers
 				newClient = new Client {
 					Status = ClientStatus.On,
 					Type = client.Type,
-					FullName = client.FullName.Replace("№", "N").Trim(trimSymbols),
-					Name = client.Name.Replace("№", "N").Trim(trimSymbols),
+					FullName = client.FullName.Replace("№", "N").Trim(),
+					Name = client.Name.Replace("№", "N").Trim(),
 					HomeRegion = Region.Find(homeRegion),
 					Segment = client.Segment,
-					MaskRegion = browseRegionMask,
+					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Administrator),
+					ContactGroupOwner = new ContactGroupOwner()
 				};
 				if (currentPayer == null)
 					currentPayer = CreatePayer(newClient);
 				newClient.JoinPayer(currentPayer);
 				newClient.AddAddress(deliveryAddress);
+				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				newClient.SaveAndFlush();
 
-				AddContactsToClient(newClient, clientContacts);
+				AddContactsToClient(newClient.ContactGroupOwner, clientContacts);
 
-				newUser = CreateUser(newClient, userName, permissions, browseRegionMask, orderRegionMask, userPersons);
+				newUser = CreateUser(newClient, userName, permissions, userPersons);
 				password = newUser.CreateInAd();
-				var defaults = DefaultValues.Get();
-				if (newClient.IsDrugstore())
-					CreateDrugstore(newClient, additionalSettings, orderRegionMask, supplier);
-				else
-					CreateSupplier(defaults, null/*newClient*/);
-
-				if (newClient.IsDrugstore() && newClient.Addresses.Count > 0)
-				{
-					if (newUser.AvaliableAddresses == null)
-						newUser.AvaliableAddresses = new List<Address>();
-					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
-				}
+				newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
 
 				newClient.AddComment(comment);
@@ -195,18 +273,18 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private Payer CreatePayer(Client client)
+		private Payer CreatePayer(Service service)
 		{
 			var prefix = String.Empty;
-			if (client.IsDrugstore())
+			if (service is Client)
 				prefix = "Аптека";
 
 			var payer = new Payer {
 				OldTariff = 0,
 				OldPayDate = DateTime.Now,
 				Comment = String.Format("Дата регистрации: {0}", DateTime.Now),
-				Name = client.Name,
-				JuridicalName = client.FullName,
+				Name = service.Name,
+				JuridicalName = service.FullName,
 				BeforeNamePrefix = prefix,
 			};
 			payer.InitGroupOwner();
@@ -214,8 +292,8 @@ namespace AdminInterface.Controllers
 
 			var organization = new LegalEntity();
 			organization.Payer = payer;
-			organization.Name = client.Name;
-			organization.FullName = client.FullName;
+			organization.Name = service.Name;
+			organization.FullName = service.FullName;
 			payer.JuridicalOrganizations = new List<LegalEntity> {organization};
 			organization.Save();
 
@@ -255,13 +333,13 @@ namespace AdminInterface.Controllers
 			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 
-		public void CreateSupplier(DefaultValues defaults, Supplier supplier)
+		private void CreateSupplier(DefaultValues defaults, Supplier supplier)
 		{
 			var orderSendRules = new OrderSendRules(defaults, supplier);
 			orderSendRules.Save();
 
-/*			command.CommandText = @"
-INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(?ClientCode, null);
+			var command = @"
+INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(:ClientCode, null);
 SET @NewPriceCode:=Last_Insert_ID(); 
 
 INSERT INTO farm.formrules() VALUES();
@@ -288,7 +366,7 @@ SELECT  DISTINCT regions.regioncode,
 FROM (clientsdata, farm.regions, pricesdata)  
 	LEFT JOIN regionaldata ON regionaldata.firmcode = clientsdata.firmcode AND regionaldata.regioncode = regions.regioncode  
 WHERE   pricesdata.firmcode = clientsdata.firmcode  
-		AND clientsdata.firmcode = ?ClientCode  
+		AND clientsdata.firmcode = :ClientCode  
 		AND (clientsdata.maskregion & regions.regioncode)>0  
 		AND regionaldata.firmcode is null; 
 
@@ -305,7 +383,7 @@ LEFT JOIN pricesregionaldata
 		ON pricesregionaldata.pricecode = pricesdata.pricecode 
 		AND pricesregionaldata.regioncode = regions.regioncode  
 WHERE   pricesdata.firmcode = clientsdata.firmcode  
-		AND clientsdata.firmcode = ?ClientCode  
+		AND clientsdata.firmcode = :ClientCode  
 		AND (clientsdata.maskregion & regions.regioncode)>0  
 		AND pricesregionaldata.pricecode is null; 
 
@@ -342,17 +420,17 @@ WHERE   intersection.pricecode IS NULL
 		AND clientsdata.firmtype = 0
 		AND pricesdata.PriceCode = @NewPriceCode
 		AND clientsdata2.firmtype = 1;";
-			command.Parameters.AddWithValue("?ClientCode", client.Id);
-			command.ExecuteNonQuery();*/
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery(command)
+					.SetParameter(":ClientCode", supplier.Id)
+					.ExecuteUpdate();
+			});
 		}
 
-		private User CreateUser(Client client, string userName, UserPermission[] permissions,
-			ulong workRegionMask, ulong orderRegionMask, Person[] persons)
+		private User CreateUser(Client client, string userName, UserPermission[] permissions, Person[] persons)
 		{
 			var user = new User(client) {
 				Name = userName,
-				WorkRegionMask = workRegionMask,
-				OrderRegionMask = orderRegionMask,
 			};
 
 			if (permissions != null && permissions.Count() > 0)
@@ -368,11 +446,8 @@ WHERE   intersection.pricecode IS NULL
 			return user;
 		}
 
-		private void AddContactsToClient(Client client, Contact[] clientContacts)
+		private void AddContactsToClient(ContactGroupOwner owner, Contact[] clientContacts)
 		{
-			var owner = new ContactGroupOwner();
-			client.ContactGroupOwner = owner;
-
 			var generalGroup = owner.AddContactGroup(ContactGroupType.General);
 			foreach (var contact in clientContacts)
 				if (contact.ContactText!=null) generalGroup.AddContact(contact);

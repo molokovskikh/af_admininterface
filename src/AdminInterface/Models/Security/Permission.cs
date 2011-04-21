@@ -61,6 +61,11 @@ namespace AdminInterface.Models.Security
 
 		public bool HaveAccessTo(string controller, string action)
 		{
+			if (controller.ToLower() == "register" && action.ToLower() == "registerpayer")
+				return Type == PermissionType.RegisterDrugstore
+					|| Type == PermissionType.RegisterSupplier
+					|| Type == PermissionType.Billing;
+
 			if (Type == PermissionType.Billing)
 			{
 				var billingControllers = new [] {
@@ -71,17 +76,29 @@ namespace AdminInterface.Models.Security
 					"recipients",
 					"acts",
 					"advertisings",
-
-					"register"
 				};
 				return billingControllers.Any(c => c == controller.ToLower());
 			}
 			if (Type == PermissionType.ViewDrugstore)
 			{
-				var billingControllers = new [] {
+				var drugstore = new [] {
 					"client", "users", "deliveries"
 				};
-				return billingControllers.Any(c => c == controller.ToLower());
+				return drugstore.Any(c => c == controller.ToLower());
+			}
+			if (Type == PermissionType.RegisterSupplier)
+			{
+				if (controller.ToLower() == "register"
+					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
+					return true;
+			}
+			if (Type == PermissionType.RegisterDrugstore)
+			{
+				if (controller.ToLower() == "register"
+					&& (action.ToLower() == "RegisterClient".ToLower()
+						|| action.ToLower() == "SearchSuppliers".ToLower()
+						|| action.ToLower() == "SearchPayers".ToLower()))
+					return true;
 			}
 			return false;
 		}

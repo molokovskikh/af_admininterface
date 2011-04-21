@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -13,11 +14,11 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
 	public class Supplier : Service, IEnablable
 	{
-
 		public Supplier()
 		{
 			Registration = new RegistrationInfo();
 			OrderRules = new List<OrderSendRules>();
+			Type = ServiceType.Supplier;
 		}
 
 		[JoinedKey("Id")]
@@ -119,6 +120,15 @@ namespace AdminInterface.Models.Suppliers
 			return ContactGroupOwner
 				.GetEmails(ContactGroupType.Billing)
 				.Implode();
+		}
+
+		public virtual void AddComment(string comment)
+		{
+			if (String.IsNullOrEmpty(comment))
+				return;
+
+			Payer.AddComment(comment);
+			new ClientInfoLogEntity(comment, this).Save();
 		}
 	}
 }

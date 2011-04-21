@@ -498,6 +498,7 @@
     <None Include="Views\Register\Register.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
+    <None Include="Views\Register\RegisterSupplier.brail" />
     <None Include="Views\RevisionActs\Show.brail" />
     <None Include="Views\SubViews\EnterMessage.brail" />
     <None Include="Views\SubViews\MailAddressSubView.brail" />

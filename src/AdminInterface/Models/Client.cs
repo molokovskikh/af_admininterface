@@ -20,6 +20,12 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Models
 {
+	public enum ClientType
+	{
+		[Description("Поставщик")] Supplier = 0,
+		[Description("Аптека")] Drugstore = 1,
+	}
+
 	public enum ClientStatus
 	{
 		[Description("Отключен")] Off = 0,

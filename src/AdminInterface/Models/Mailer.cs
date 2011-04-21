@@ -3,6 +3,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using AdminInterface.Models.Security;
 using AdminInterface.Services;
@@ -153,6 +154,21 @@ Email: {2}
 		public static void NotifySupplierAboutAddressRegistration(Address address)
 		{
 			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+		}
+
+		public static void SupplierRegistred(Supplier supplier)
+		{
+			SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
+
+			NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
+				String.Format(
+					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					SecurityContext.Administrator.UserName,
+					supplier.HomeRegion.Name,
+					supplier.Users.First().Login,
+					supplier.Id,
+					supplier.Segment.GetDescription(),
+					supplier.Type.GetDescription()));
 		}
 
 		public static void ClientRegistred(Client client, bool renotification)
