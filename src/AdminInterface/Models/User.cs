@@ -164,10 +164,10 @@ namespace AdminInterface.Models
 
 		//не работает какая то фигня в хибере
 		//[OneToOne(Cascade = CascadeEnum.All, Constrained = true)]
-		[OneToOne(Cascade = CascadeEnum.All, Constrained = true)]
+		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual AuthorizationLogEntity Logs { get; set; }
 
-		[OneToOne(Cascade = CascadeEnum.All, Constrained = true)]
+		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
 
 		[HasAndBelongsToMany(typeof (UserPermission),

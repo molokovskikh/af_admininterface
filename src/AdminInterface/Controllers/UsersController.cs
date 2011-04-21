@@ -44,7 +44,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			PropertyBag["regions"] = Region.All();
+			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["Organizations"] = client.Orgs().ToArray();
 			PropertyBag["UserRegistration"] = true;
 		}
