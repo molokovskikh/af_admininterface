@@ -2,8 +2,10 @@ using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Models.Telephony;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Controller = AdminInterface.MonoRailExtentions.Controller;
@@ -12,7 +14,8 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(HttpUtility)),
-		Layout("GeneralWithJQuery")
+		Layout("GeneralWithJQuery"),
+		Secure(PermissionType.ViewSuppliers),
 	]
 	public class SuppliersController : Controller
 	{

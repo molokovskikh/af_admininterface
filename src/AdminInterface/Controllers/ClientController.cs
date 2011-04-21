@@ -85,7 +85,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(HttpUtility)),
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
-		Secure(PermissionType.ViewDrugstore, PermissionType.ViewDrugstore, Required = Required.AnyOf),
+		Secure(PermissionType.ViewDrugstore),
 		Layout("GeneralWithJQuery"),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]

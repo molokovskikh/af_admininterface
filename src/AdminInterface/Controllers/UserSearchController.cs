@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
 		Helper(typeof(LinkHelper)),
-		Secure(PermissionType.ViewDrugstore, Required = Required.AnyOf),
+		Secure(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class UserSearchController : ARSmartDispatcherController
