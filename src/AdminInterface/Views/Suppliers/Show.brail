@@ -65,7 +65,7 @@
 					<a href="${siteroot}/Logs/Orders?filter.Supplier.Id=${supplier.Id}" target="_blank">История заказов</a>
 				</li>
 				<li>
-					${app.LinkTo(supplier.Payer)}
+					${app.LinkTo(supplier.Payer, "Биллинг", "Show")}
 				</li>
 				<li>
 					<li><a href="${CiUrl}?sid=${supplier.Id}" target="_blank">Интерфейс поставщика</a></li>
