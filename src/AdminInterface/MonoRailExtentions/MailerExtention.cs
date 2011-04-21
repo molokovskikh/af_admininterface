@@ -11,9 +11,13 @@ namespace AdminInterface.MonoRailExtentions
 {
 	public static class MailerExtention
 	{
+		public static IEmailSender SenderForTest;
+
 		public static MonorailMailer Mail(this SmartDispatcherController controller)
 		{
 			var mailer = new MonorailMailer();
+			if (SenderForTest != null)
+				mailer = new MonorailMailer(SenderForTest);
 			mailer.Controller = controller;
 			return mailer;
 		}

@@ -1,0 +1,3 @@
+﻿Пользователь ${user.GetLoginWithName()} перемещен
+Старый клиент ${oldClient.Name} плательщик ${oldPayer.Name}
+Новый клиент ${user.Client.Name} плательщик ${user.Payer.Name}

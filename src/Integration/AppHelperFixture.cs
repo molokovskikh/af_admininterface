@@ -76,6 +76,15 @@ namespace Integration
 			public DateTime Date { get; set; }
 
 			public DatePeriod Period { get; set; }
+
+			public Entity Entity { get; set; }
+		}
+
+		public class Entity
+		{
+			public uint Id { get; set; }
+
+			public string Name { get; set; }
 		}
 
 		public class Multivalue
@@ -176,6 +185,19 @@ namespace Integration
 		{
 			var edit = helper.Edit("filter.Date");
 			Assert.That(edit, Is.EqualTo("<input type=text name='filter.Date' class='required validate-date input-date' value='01.01.0001'><input type=button class=CalendarInput>"));
+		}
+
+		[Test]
+		public void Select_with_values()
+		{
+			var edit = helper.Edit("filter.Entity", new List<Entity> {
+				new Entity{Id = 1, Name = "Test1"},
+				new Entity{Id = 2, Name = "Test2"}
+			});
+			Assert.That(edit, Is.EqualTo("<select name='filter.Entity.Id'>"
+				+ "<option value=1>Test1</option>"
+				+ "<option value=2>Test2</option>"
+				+ "</select>"));
 		}
 	}
 }

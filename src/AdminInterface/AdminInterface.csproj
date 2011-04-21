@@ -400,6 +400,8 @@
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
+    <None Include="Views\Mail\AddressMoved.brail" />
+    <None Include="Views\Mail\UserMoved.brail" />
     <None Include="Views\Mail\RevisionAct.brail" />
     <None Include="Views\Main\Report.brail" />
     <None Include="Views\Payers\Ad.brail" />
@@ -618,7 +620,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>50280</DevelopmentServerPort>
+          <DevelopmentServerPort>58196</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

@@ -35,6 +35,7 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			var user = new User((Service)client);
+			PropertyBag["user"] = user;
 			PropertyBag["client"] = client;
 			PropertyBag["drugstore"] = client.Settings;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
@@ -68,6 +69,7 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 
+				user.Payer = Payer.Find(user.Payer.Id);
 				user.Setup(client);
 				password = user.CreateInAd();
 				user.WorkRegionMask = regionSettings.GetBrowseMask();

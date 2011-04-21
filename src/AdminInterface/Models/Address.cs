@@ -25,6 +25,14 @@ namespace AdminInterface.Models
 	[ActiveRecord("Addresses", Schema = "Future", Lazy = true)]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable
 	{
+		public Address(Client client, LegalEntity legalEntity)
+			: this()
+		{
+			Client = client;
+			LegalEntity = legalEntity;
+			Payer = legalEntity.Payer;
+		}
+
 		public Address()
 		{
 			AvaliableForUsers = new List<User>();

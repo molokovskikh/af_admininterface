@@ -70,14 +70,15 @@ namespace AdminInterface.Models
 		public Client()
 		{
 			Registration = new RegistrationInfo();
+			Users = new List<User>();
+			Addresses = new List<Address>();
 		}
 
 		public Client(Payer payer)
+			: this()
 		{
 			Enabled = true;
 			JoinPayer(payer);
-			Users = new List<User>();
-			Addresses = new List<Address>();
 		}
 
 		[JoinedKey("Id")]
@@ -429,10 +430,7 @@ group by u.ClientId")
 
 		public virtual void AddUser(User user)
 		{
-			if (Users == null)
-				Users = new List<User>();
 			user.Init(this);
-			Users.Add(user);
 		}
 
 		public virtual string GetEmailsForBilling()

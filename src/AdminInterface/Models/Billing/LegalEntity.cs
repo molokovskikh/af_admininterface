@@ -7,6 +7,15 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(Schema = "Billing", Lazy = true)]
 	public class LegalEntity : ActiveRecordLinqBase<LegalEntity>
 	{
+		public LegalEntity()
+		{}
+
+		public LegalEntity(string name, Payer payer)
+		{
+			Name = name;
+			Payer = payer;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

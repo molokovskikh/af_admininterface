@@ -1,21 +1,47 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.Core.Smtp;
 using Castle.MonoRail.TestSupport;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using AdminInterface.Models.Logs;
+using Rhino.Mocks;
 
 namespace Integration.Controllers
 {
+	public class ControllerFixture : BaseControllerTest
+	{
+		protected List<MailMessage> notifications;
+
+		[SetUp]
+		public void Setup()
+		{
+			notifications = new List<MailMessage>();
+
+			var sender = MockRepository.GenerateStub<IEmailSender>();
+			ForTest.InitializeMailer();
+			sender.Stub(s => s.Send(new MailMessage())).IgnoreArguments()
+				.Repeat.Any()
+				.Callback(new Delegates.Function<bool, MailMessage>(m => {
+					notifications.Add(m);
+					return true;
+				}));
+			MailerExtention.SenderForTest = sender;
+		}
+	}
+
 	[TestFixture]
-	public class ClientControllerFixture : BaseControllerTest
+	public class ClientControllerFixture : ControllerFixture
 	{
 		private ClientController controller;
 		private Client client;
@@ -258,6 +284,8 @@ namespace Integration.Controllers
 
 				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
 			}
+			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение пользователя")),
+				Is.Not.Null, "не могу найти уведомление о перемещении");
 		}
 
 		[Test]
@@ -316,6 +344,8 @@ namespace Integration.Controllers
 			Assert.That(sourceClient.Addresses.Count, Is.EqualTo(0));
 			Assert.That(destinationClient.Addresses.Count, Is.EqualTo(1));
 			Assert.That(destinationClient.Addresses[0].Id, Is.EqualTo(address.Id));
+			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки")),
+				Is.Not.Null, "не могу найти уведомление о перемещении " + notifications.Select(n => n.Subject).Implode());
 		}
 	}
 }

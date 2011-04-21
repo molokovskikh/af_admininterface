@@ -51,8 +51,17 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "billing", Lazy = true)]
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
+		public Payer(string name)
+			: this()
+		{
+			Name = name;
+			JuridicalName = name;
+			JuridicalOrganizations.Add(new LegalEntity(name, this));
+		}
+
 		public Payer()
 		{
+			JuridicalOrganizations = new List<LegalEntity>();
 			InvoiceSettings = new InvoiceSettings();
 			Users = new List<User>();
 			Clients = new List<Client>();
@@ -65,6 +74,7 @@ namespace AdminInterface.Models
 		public virtual uint Id
 		{
 			get { return PayerID; }
+			set { PayerID = value; }
 		}
 
 		[Property("ShortName")]
@@ -364,6 +374,8 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
+				if (ContactGroupOwner == null)
+					return null;
 				var types = new List<ContactGroupType>();
 				if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
 					types.Add(ContactGroupType.Billing);
