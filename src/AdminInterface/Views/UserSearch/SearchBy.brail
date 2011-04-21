@@ -49,6 +49,7 @@ end
             <th>${WriteHeader("Регион", "RegionName")}</th>
             <th>${WriteHeader("Обновление", "UpdateDate")}</th>
             <th>${WriteHeader("Версия", "AFVersion")}</th>
+			<th>${WriteHeader("Тип", "ClientType")}</th>
             <th>${WriteHeader("Сегмент", "Segment")}</th>
         </tr>
     </thead>
@@ -79,9 +80,10 @@ end
             %>
             <td class="${'OldUserUpdate' if (oldUpdate)} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
             <td>${item.AFVersion}</td>
+			<td>${BindingHelper.GetDescription(item.ClientType)}</td>
             <td>${BindingHelper.GetDescription(item.Segment)}</td>
         </tr>
-    <% end %>        
+    <% end %>
     </tbody>
 </table>
 <div style="width: 100%;" align="center"><br /><% OutputSubView("LegendView") %></div>

@@ -98,6 +98,7 @@ namespace AdminInterface.Models
 
 				filter = AddFilterCriteria(filter, GetFilterBy(searchProperties));
 				filter = AddFilterCriteria(filter, GetSegmentFilter(searchProperties.Segment));
+				filter = AddFilterCriteria(filter, GetTypeFilter(searchProperties.ClientType));
 				filter = AddFilterCriteria(filter, GetStatusFilter(searchProperties.SearchStatus));
 				if (!String.IsNullOrEmpty(filter))
 					filter = String.Format(" and ({0}) ", filter);
@@ -111,7 +112,7 @@ SELECT
 	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as {{UserSearchItem.UpdateIsUncommited}},
 	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
 
-	s.Type as {{UserSearchItem.ClientType}},
+	if(s.Type = 0, 2, 1)  as {{UserSearchItem.ClientType}},
 	s.Id as {{UserSearchItem.ClientId}},
 	s.Name as {{UserSearchItem.ClientName}},
 	s.Disabled as {{UserSearchItem.Disabled}},
@@ -175,6 +176,21 @@ GROUP BY {{UserSearchItem.UserId}}
 						filter = AddFilterCriteria(filter, " Clients.Segment = 0 ");
 						break;
 					}
+			}
+			return filter;
+		}
+
+		private static string GetTypeFilter(SearchClientType type)
+		{
+			var filter = String.Empty;
+			switch (type)
+			{
+				case SearchClientType.Drugstore:
+					filter = AddFilterCriteria(filter, " s.Type = 1 ");
+					break;
+				case SearchClientType.Supplier:
+					filter = AddFilterCriteria(filter, " s.Type = 0 ");
+					break;
 			}
 			return filter;
 		}

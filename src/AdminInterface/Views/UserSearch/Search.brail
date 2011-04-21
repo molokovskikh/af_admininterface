@@ -60,9 +60,10 @@
     <fieldset style="padding: 0; margin: 0; text-align: left;">
         <legend>Фильтры:</legend>
         <table style="width:100%" border="0">
-			<col style="width:33%" />
-			<col style="width:33%" />
-			<col style="width:34%" />
+			<col style="width:25%" />
+			<col style="width:25%" />
+			<col style="width:25%" />
+			<col style="width:25%" />
 			<thead>
 			    <tr align="left">
 			        <td style="padding: 5px;">Регион<br />
@@ -71,6 +72,12 @@
 									    regions, 
 									    {"value":"Id", "text":"Name", "class" : "Full"})}
                     </td>
+					<td style="padding: 5px;">Тип<br />
+					${FormHelper.Select("SearchBy.ClientType",
+									    FindBy.ClientType,
+									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientType, AdminInterface"),
+									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+					</td>
 			        <td style="padding: 5px;">Сегмент<br />
 				    ${FormHelper.Select("SearchBy.Segment",
 									    FindBy.Segment,

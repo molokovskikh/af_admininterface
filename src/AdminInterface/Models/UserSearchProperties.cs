@@ -55,6 +55,8 @@ namespace AdminInterface.Models
 
 		public SearchSegment Segment { get; set; }
 
+		public SearchClientType ClientType { get; set; }
+
 		public ulong RegionId { get; set; }
 
 		public ulong AdminRegionMask { get; set; }
