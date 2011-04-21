@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
-using NHibernate.SqlCommand;
 
 namespace AdminInterface.Models.Logs
 {
@@ -33,41 +29,6 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual bool Committed { get; set; }
-
-		public static DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)
-		{
-			return DetachedCriteria.For<DocumentSendLog>()
-				.CreateAlias("Received", "r", JoinType.InnerJoin)
-				.CreateAlias("SendedInUpdate", "su", JoinType.LeftOuterJoin)
-				.CreateAlias("ForUser", "u", JoinType.InnerJoin)
-				.CreateAlias("r.FromSupplier", "fs", JoinType.InnerJoin)
-				.CreateAlias("r.ForClient", "fc", JoinType.InnerJoin)
-				.CreateAlias("r.Address", "a", JoinType.InnerJoin)
-				.CreateAlias("r.Document", "d", JoinType.LeftOuterJoin)
-				.CreateAlias("r.SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin)
-				//.Add(Expression.Between("r.LogTime", begin, end))
-				.Add(Expression.Ge("r.LogTime", begin))
-				.Add(Expression.Le("r.LogTime", end))
-				.AddOrder(Order.Desc("r.LogTime"));
-		}
-
-		public static IList<DocumentSendLog> GetEnitiesForUser(User user, DateTime begin, DateTime end)
-		{
-			return ArHelper.WithSession(
-				s => GetCriteriaForView(begin, end)
-					.Add(Expression.Eq("ForUser", user))
-					.GetExecutableCriteria(s)
-					.List<DocumentSendLog>());
-		}
-
-		public static IList<DocumentSendLog> GetEnitiesForClient(Client client, DateTime begin, DateTime end)
-		{
-			return ArHelper.WithSession(
-				s => GetCriteriaForView(begin, end)
-					.Add(Expression.Eq("r.ForClient", client))
-					.GetExecutableCriteria(s)
-					.List<DocumentSendLog>());
-		}
 	}
 
 	[ActiveRecord("Document_logs", Schema = "Logs")]

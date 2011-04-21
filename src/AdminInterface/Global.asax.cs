@@ -120,7 +120,9 @@ namespace AddUser
 			);
 
 			engine.Add(
-				new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger
+				new PatternRoute("/<controller>/[id]/<action>")
+					.Restrict("id")
+					.ValidInteger
 			);
 
 			engine.Add(new PatternRoute("/client/[clientId]/orders")

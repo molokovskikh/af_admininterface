@@ -27,37 +27,37 @@ namespace AdminInterface.Models
 		}
 
 		[PrimaryKey]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		//[Property]
 		//public uint DownloadId { get; set; }
 
 		[Property]
-		public DateTime WriteTime { get; set; }
+		public virtual DateTime WriteTime { get; set; }
 
 		[Property]
-		public uint FirmCode { get; set; }
+		public virtual uint FirmCode { get; set; }
 
 		[BelongsTo("FirmCode")]
-		public Supplier Supplier { get; set; }
+		public virtual Supplier Supplier { get; set; }
 
 		[Property]
-		public uint ClientCode { get; set; }
+		public virtual uint ClientCode { get; set; }
 
 		[Property]
-		public uint? AddressId { get; set; }
+		public virtual uint? AddressId { get; set; }
 
 		[Property]
-		public string ProviderDocumentId { get; set; }
+		public virtual string ProviderDocumentId { get; set; }
 
 		[Property]
-		public DateTime? DocumentDate { get; set; }
+		public virtual DateTime? DocumentDate { get; set; }
 
 		[BelongsTo("DownloadId")]
-		public DocumentReceiveLog Log { get; set; }
+		public virtual DocumentReceiveLog Log { get; set; }
 
-		[HasMany(ColumnKey = "DocumentId", Cascade = ManyRelationCascadeEnum.All, Inverse = true)]
-		public IList<DocumentLine> Lines { get; set; }
+		[HasMany(ColumnKey = "DocumentId", Cascade = ManyRelationCascadeEnum.All, Inverse = true, Lazy = true)]
+		public virtual IList<DocumentLine> Lines { get; set; }
 
 		public DocumentLine NewLine()
 		{

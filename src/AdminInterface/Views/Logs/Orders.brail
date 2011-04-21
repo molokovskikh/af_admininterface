@@ -6,9 +6,13 @@
 </div>
 
 ${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.Client.Id")}
+${FormHelper.HiddenField("filter.Supplier.Id")}
 ${app.FilterFor("filter.Period")}
+<% if filter.Client != null: %>
 ${app.FilterFor("filter.Users")}
 ${app.FilterFor("filter.Addresses")}
+<% end %>
 ${app.EndFormFor("filter")}
 
 <table class=DataTable>

@@ -1,2 +1,0 @@
-﻿page.InsertHtml("after", "documentFileRow${documentLogId}", {@partial : 'logs/ShowDocumentDetailsPartial.brail' });
-page.VisualEffect("SlideDown", "DocumentDetails${documentLogId}", {"duration" : "0.5"});

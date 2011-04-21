@@ -480,8 +480,7 @@
     <None Include="Views\Client\SuppliersForCostNoising.brail" />
     <None Include="Views\Layouts\GeneralWithJQueryOnly.brail" />
     <None Include="Views\Logs\Orders.brail" />
-    <None Include="Views\Logs\ShowDocumentDetails.brailjs" />
-    <None Include="Views\Logs\ShowDocumentDetailsPartial.brail" />
+    <None Include="Views\Logs\ShowDocumentDetails.brail" />
     <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
     <None Include="Views\Mail\PasswordChange.brail" />
     <None Include="Views\Payments\Index.brail" />
@@ -535,7 +534,7 @@
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Monitoring\Clients.brail" />
-    <None Include="Views\Logs\DocumentLog.brail" />
+    <None Include="Views\Logs\Documents.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
     <None Include="Views\Logs\ShowDownloadLog.brailjs" />

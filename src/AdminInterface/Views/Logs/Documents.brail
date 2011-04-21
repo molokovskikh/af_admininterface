@@ -1,47 +1,38 @@
-﻿<%if IsDefined("client"): %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		Статистика получения\отправки документов клиента ${client.Name}
-	<% end %>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	История документов
+<% end %>
 
-	<% component CaptureFor, {"id" : "PostToServer"}: %>
-		${FormHelper.HiddenField("clientCode", client.Id)}
-	<% end %>
+<div class="PageHeader">
+	История документов
+</div>
 
-	<div class="PageHeader">
-		Статистика получения\отправки документов клиента ${client.Name}
-	</div>
-<%else: %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		Статистика получения\отправки документов пользователя ${user.Login}
-	<% end %>
-
-	<% component CaptureFor, {"id" : "PostToServer"}: %>
-		${FormHelper.HiddenField("userId", user.Id)}
-	<% end %>
-
-	<div class="PageHeader">
-		Статистика получения\отправки документов пользователя ${user.Login}
-	</div>
-<%end %>
-
-<% OutputSubView("SelectDateIntervalSubView") %>
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.Supplier.Id")}
+${FormHelper.HiddenField("filter.Client.Id")}
+${FormHelper.HiddenField("filter.User.Id")}
+${app.FilterFor("filter.Period")}
+${app.EndFormFor("filter")}
 
 <script type="text/javascript">
-    function ShowDownloadResult(id, url, callerDescription) {
+
+	function ShowDownloadResult(id, url, callerDescription) {
 		var isCallerVisible = IsVisible(id, callerDescription)
 		HideAll(id, function() {
-		    if (!isCallerVisible)
-		        Download(url)
+			if (!isCallerVisible)
+				Download(url, id)
 		});
 	}
 
-	function Hide(id, description, afterFinish)
-	{
-	    new Effect.SlideUp(description + id, {
-	    afterFinish: function() {
-	        $(description + "Row" + id).remove();
-	        afterFinish();
-		}, duration: 0.5 });
+	function Hide(id, description, afterFinish) {
+		if ($("#" + description + id).length > 0) {
+			$("#" + description + id).slideUp(500, function () {
+				$("#" + description + "Row" + id).remove();
+				afterFinish();
+			});
+		}
+		else {
+			afterFinish();
+		}
 	}
 
 	function HideAll(id, afterFinish) {
@@ -60,18 +51,19 @@
 	}
 	
 	function IsVisible(id, description) {
-		return $(description + id) != null;
+		return $("#" + description + id).length > 0;
 	}
 	
-	function DisableAction(id)
-	{
-		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
-		$("ShowLogLink" + id).onclick = function() { return false; }
-		$("ShowDocumentDetailsLink" + id).onclick = function() { return false; }
-	}
-
-	function Download(url) {
-		new Ajax.Request(url, { method: 'get' });
+	function Download(url, id) {
+		$.ajax({
+			url: url,
+			success: function (data) {
+				var row = $(data);
+				row.css("display", "none");
+				row.insertAfter("#documentFileRow" + id);
+				//$("#DocumentDetails" + id).slideDown(500);
+			}
+		});
 	}
 </script>
 
@@ -90,9 +82,7 @@
 			<th>На адрес</th>
 			<th>Название файла</th>
 			<th>Размер</th>
-		<%if IsDefined("client"): %>
 			<th>Пользователь получивший документ</th>
-		<% end %>
 			<th>Дата отправки</th>
 			<th>Комментарий</th>
 		</tr>
@@ -113,7 +103,7 @@
 			<td>${logEntity.Received.Address.Value}</td>
 			<td class="${'DocumentNotParsed' if not logEntity.Received.Document and logEntity.Received.SendUpdateLogEntity}">
 				<% if logEntity.Received.Document: %>
-					<a id="ShowDocumentDetailsLink${logEntity.Received.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Received.Id}, 'ShowDocumentDetails.rails?documentLogId=${logEntity.Received.Id}', 'DocumentDetails');">
+					<a id="ShowDocumentDetailsLink${logEntity.Received.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Received.Id}, 'ShowDocumentDetails?documentLogId=${logEntity.Received.Id}', 'DocumentDetails');">
 						!{logEntity.Received.FileName}
 					</a>
 				<% else: %>
@@ -123,9 +113,7 @@
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(logEntity.Received.DocumentSize) if logEntity.Received.DocumentSize}
 			</td>
-		  <% if IsDefined("client"): %>
 			<td>${logEntity.ForUser.Login}</td>
-		  <% end %>
 			<td>${?logEntity.SendedInUpdate.RequestTime}</td>
 			<td>
 				<pre>!{logEntity.Received.Addition}</pre>

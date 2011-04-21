@@ -5,13 +5,66 @@ using System.Text;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
+using NHibernate.SqlCommand;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
 {
+	public class DocumentFilter
+	{
+		public DocumentFilter()
+		{
+			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
+		}
+
+		public DatePeriod Period { get; set; }
+
+		public User User { get; set; }
+		public Client Client { get; set; }
+		public Supplier Supplier { get; set; }
+
+		public IList<DocumentSendLog> Find()
+		{
+			var criteria = GetCriteriaForView(Period.Begin, Period.End);
+			if (User != null)
+				criteria.Add(Expression.Eq("ForUser", User));
+
+			if (Client != null)
+				criteria.Add(Expression.Eq("r.ForClient", Client));
+
+			if (Supplier != null)
+				criteria.Add(Expression.Eq("r.FromSupplier", Supplier));
+
+			return ArHelper.WithSession(
+				s => criteria
+					.GetExecutableCriteria(s)
+					.List<DocumentSendLog>());
+		}
+
+		public static DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)
+		{
+			return DetachedCriteria.For<DocumentSendLog>()
+				.CreateAlias("Received", "r", JoinType.InnerJoin)
+				.CreateAlias("SendedInUpdate", "su", JoinType.LeftOuterJoin)
+				.CreateAlias("ForUser", "u", JoinType.InnerJoin)
+				.CreateAlias("r.FromSupplier", "fs", JoinType.InnerJoin)
+				.CreateAlias("r.ForClient", "fc", JoinType.InnerJoin)
+				.CreateAlias("r.Address", "a", JoinType.InnerJoin)
+				.CreateAlias("r.Document", "d", JoinType.LeftOuterJoin)
+				.CreateAlias("r.SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin)
+				//.Add(Expression.Between("r.LogTime", begin, end))
+				.Add(Expression.Ge("r.LogTime", begin))
+				.Add(Expression.Le("r.LogTime", end))
+				.AddOrder(Order.Desc("r.LogTime"));
+		}
+	}
+
 	[
 		Layout("General"),
 		Helper(typeof(BindingHelper)),
@@ -20,36 +73,14 @@ namespace AdminInterface.Controllers
 		Helper(typeof(AppHelper), "app"),
 		Secure
 	]
-	public class LogsController : SmartDispatcherController
+	public class LogsController : ARSmartDispatcherController
 	{
-		public void DocumentLog(uint? clientCode, uint? userId)
+		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
-			DocumentLog(clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
-		}
+			LayoutName = "GeneralWithJQueryOnly";
 
-		public void DocumentLog(uint? clientCode, uint? userId, DateTime beginDate, DateTime endDate)
-		{
-			IList<DocumentSendLog> documentLogs;
-			if (!userId.HasValue)
-			{
-				var client = Client.FindAndCheck(clientCode.Value);
-
-				documentLogs = DocumentSendLog.GetEnitiesForClient(client,
-					beginDate, endDate.AddDays(1));
-				PropertyBag["logEntities"] = documentLogs;
-				PropertyBag["client"] = client;
-			}
-			else
-			{
-				var user = User.Find(userId.Value);
-				PropertyBag["user"] = user;
-				documentLogs = DocumentSendLog.GetEnitiesForUser(user,
-					beginDate, endDate.AddDays(1));
-				PropertyBag["logEntities"] = documentLogs;
-			}
-
-			PropertyBag["beginDate"] = beginDate;
-			PropertyBag["endDate"] = endDate;
+			PropertyBag["filter"] = filter;
+			PropertyBag["logEntities"] = filter.Find();
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
@@ -75,6 +106,8 @@ namespace AdminInterface.Controllers
 
 		public void ShowDocumentDetails(uint documentLogId)
 		{
+			CancelLayout();
+
 			var documentLog = DocumentReceiveLog.Find(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
@@ -133,22 +166,13 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 		}
 
-		public void Orders(uint? clientId,
-			[DataBind("filter")] OrderFilter filter)
+		public void Orders([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] OrderFilter filter)
 		{
 			LayoutName = "GeneralWithJQueryOnly";
-			if (clientId != null)
-			{
-				filter.Client = Client.Find(clientId.Value);
-				if (filter.Address != null && filter.Address.Id == 0)
-				{
-					filter.Address = null;
-				}
-				if (filter.User != null && filter.User.Id == 0)
-				{
-					filter.User = null;
-				}
-			}
+
+			if (filter.Client == null && filter.User != null)
+				filter.Client = filter.User.Client;
+
 			PropertyBag["orders"] = OrderLog.Load(filter);
 			PropertyBag["filter"] = filter;
 		}
@@ -156,6 +180,15 @@ namespace AdminInterface.Controllers
 
 	public class DatePeriod
 	{
+		public DatePeriod()
+		{}
+
+		public DatePeriod(DateTime begin, DateTime end)
+		{
+			Begin = begin;
+			End = end;
+		}
+
 		public DateTime Begin { get; set; }
 		public DateTime End { get; set; }
 	}
@@ -165,11 +198,12 @@ namespace AdminInterface.Controllers
 		public Client Client { get; set; }
 		public User User { get; set; }
 		public Address Address { get; set; }
+		public Supplier Supplier { get; set; }
 		public DatePeriod Period { get; set; }
 
 		public IList<User> Users
 		{
-			get { return Client.Users.OrderBy(u => u.Name).ToList(); }
+			get { return Client.Users.OrderBy(u => u.GetLoginOrName()).ToList(); }
 		}
 
 		public IList<Address> Addresses
@@ -318,16 +352,18 @@ namespace AdminInterface.Controllers
 		{
 			return ArHelper.WithSession(s => {
 
-				var sqlFilter = "oh.ClientCode = :clientId and (oh.writetime >= :FromDate AND oh.writetime <= ADDDATE(:ToDate, INTERVAL 1 DAY))";
+				var sqlFilter = "(oh.writetime >= :FromDate AND oh.writetime <= ADDDATE(:ToDate, INTERVAL 1 DAY))";
 				if (filter.User != null)
-				{
 					sqlFilter += "and oh.UserId = :UserId ";
 
-				}
 				if (filter.Address != null)
-				{
 					sqlFilter += "and oh.AddressId = :AddressId ";
-				}
+
+				if (filter.Client != null)
+					sqlFilter += "and oh.ClientCode = :ClientId ";
+
+				if (filter.Supplier != null)
+					sqlFilter += "and pd.FirmCode = :SupplierId";
 
 				var query = s.CreateSQLQuery(String.Format(@"
 SELECT  oh.rowid as Id,
@@ -358,18 +394,20 @@ group by oh.rowid
 ORDER BY writetime desc;", sqlFilter))
 					.SetParameter("FromDate", filter.Period.Begin)
 					.SetParameter("ToDate", filter.Period.End)
-					.SetParameter("clientId", filter.Client.Id)
 					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
 					.SetResultTransformer(Transformers.AliasToBean<OrderLog>());
 
 				if (filter.User != null)
-				{
 					query.SetParameter("UserId", filter.User.Id);
-				}
+
 				if (filter.Address != null)
-				{
 					query.SetParameter("AddressId", filter.Address.Id);
-				}
+
+				if (filter.Client != null)
+					query.SetParameter("clientId", filter.Client.Id);
+
+				if (filter.Supplier != null)
+					query.SetParameter("SupplierId", filter.Supplier.Id);
 
 				return query.List<OrderLog>();
 			});
