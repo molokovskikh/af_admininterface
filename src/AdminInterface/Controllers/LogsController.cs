@@ -404,7 +404,7 @@ ORDER BY writetime desc;", sqlFilter))
 					query.SetParameter("AddressId", filter.Address.Id);
 
 				if (filter.Client != null)
-					query.SetParameter("clientId", filter.Client.Id);
+					query.SetParameter("ClientId", filter.Client.Id);
 
 				if (filter.Supplier != null)
 					query.SetParameter("SupplierId", filter.Supplier.Id);
