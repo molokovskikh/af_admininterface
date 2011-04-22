@@ -17,7 +17,7 @@ using Common.Web.Ui.Models;
 namespace Integration.Controllers
 {
 	[TestFixture]
-	public class RegisterControllerFixture : BaseControllerTest
+	public class RegisterControllerFixture : ControllerFixture
 	{
 		private RegisterController controller;
 		private Client client;
@@ -66,14 +66,11 @@ namespace Integration.Controllers
 		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
-			using(new SessionScope())
-			{
-				client = DataMother.TestClient();
-				payer = client.Payers.First();
+			client = DataMother.TestClient();
+			payer = client.Payers.First();
 
-				payer.Comment = "ata";
-				payer.Update();
-			}
+			payer.Comment = "ata";
+			payer.Update();
 
 			Context.Session["ShortName"] = "Test";
 
@@ -91,17 +88,14 @@ namespace Integration.Controllers
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
 
-			using(new SessionScope())
-			{
-				var registredClient = RegistredClient();
-				var registredPayer = registredClient.Payers.Single();
+			var registredClient = RegistredClient();
+			var registredPayer = registredClient.Payers.Single();
 
-				Assert.That(registredPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
-				var org = registredPayer.JuridicalOrganizations.Single();
-				Assert.That(org.Name, Is.EqualTo(registredPayer.Name));
-				Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
-				Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
-			}
+			Assert.That(registredPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
+			var org = registredPayer.JuridicalOrganizations.Single();
+			Assert.That(org.Name, Is.EqualTo(registredPayer.Name));
+			Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
+			Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
 		}
 
 		[Test]
@@ -110,13 +104,10 @@ namespace Integration.Controllers
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address",
 				null, null, null, clientContacts, null, new Contact[0], person, "", "");
 
-			using(new SessionScope())
-			{
-				client = RegistredClient();
-				Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
-				Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
-				Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
-			}
+			client = RegistredClient();
+			Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
+			Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
+			Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 
 		[Test]

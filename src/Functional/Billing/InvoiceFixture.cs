@@ -1,15 +1,12 @@
 using System;
 using System.Linq;
 using AdminInterface.Controllers;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
-using WatiNCssSelectorExtensions;
 
 namespace Functional.Billing
 {
@@ -48,20 +45,6 @@ namespace Functional.Billing
 			{
 				Assert.That(browser.Text, Is.StringContaining(String.Format("Редактирование счета №{0}", invoice.Id)));
 			}
-		}
-	}
-
-	public static class WatinExtentions
-	{
-		public static Link LinkFor(this Browser browser, object item, string action)
-		{
-			var url = AppHelper.GetShortUrl(item, action);
-			return browser.Link(l => l.Url.EndsWith(url));
-		}
-
-		public static dynamic Css(this Browser browser, string selector)
-		{
-			return browser.CssSelect(selector);
 		}
 	}
 }

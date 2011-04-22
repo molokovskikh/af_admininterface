@@ -308,7 +308,7 @@ namespace AdminInterface.Controllers
 
 			var smartOrder = SmartOrderRules.TestSmartOrder();
 
-			client.Settings = new DrugstoreSettings {
+			client.Settings = new DrugstoreSettings(client) {
 				Id = client.Id,
 				InvisibleOnFirm =
 					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,

@@ -22,6 +22,7 @@ namespace Integration.Controllers
 	public class ControllerFixture : BaseControllerTest
 	{
 		protected List<MailMessage> notifications;
+		protected SessionScope session;
 
 		[SetUp]
 		public void Setup()
@@ -37,6 +38,15 @@ namespace Integration.Controllers
 					return true;
 				}));
 			MailerExtention.SenderForTest = sender;
+
+			session = new SessionScope();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			if (session != null)
+				session.Dispose();
 		}
 	}
 
@@ -46,24 +56,14 @@ namespace Integration.Controllers
 		private ClientController controller;
 		private Client client;
 
-		private SessionScope session;
-
 		[SetUp]
 		public void SetUp()
 		{
 			controller = new ClientController();
 			PrepareController(controller);
 			client = DataMother.CreateTestClientWithUser();
-			session = new SessionScope();
-			ForTest.InitializeMailer();
 		}
 
-		[TearDown]
-		public void TearDown()
-		{
-			if (session != null)
-				session.Dispose();
-		}
 
 /*		[Test]
 		public void Throw_not_found_exception_if_login_not_exists()

@@ -14,13 +14,15 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(HttpUtility)),
-		Layout("GeneralWithJQuery"),
+		Layout("GeneralWithJQueryOnly"),
 		Secure(PermissionType.ViewSuppliers),
 	]
 	public class SuppliersController : Controller
 	{
 		public void Show(uint id)
 		{
+			Binder.Validator = Validator;
+
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["users"] = supplier.Users;
@@ -30,6 +32,17 @@ namespace AdminInterface.Controllers
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(supplier);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
+
+			if (IsPost)
+			{
+				BindObjectInstance(supplier, "supplier");
+				if (!HasValidationError(supplier))
+				{
+					Flash["Message"] = Message.Notify("Сохранено");
+					supplier.Save();
+					RedirectToReferrer();
+				}
+			}
 		}
 
 		public void SendMessage(uint id, string message)

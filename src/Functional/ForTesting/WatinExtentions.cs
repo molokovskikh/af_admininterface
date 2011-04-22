@@ -2,14 +2,38 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
+using WatiNCssSelectorExtensions;
 
 namespace Functional.ForTesting
 {
 	public static class WatinExtentions
 	{
+		public static Link LinkFor(this Browser browser, object item, string action)
+		{
+			var url = AppHelper.GetShortUrl(item, action);
+			return browser.Link(l => l.Url.EndsWith(url));
+		}
+
+		public static dynamic Css(this Browser browser, string selector)
+		{
+			return browser.CssSelect(selector);
+		}
+
+		public static void Click(this Browser browser, string name)
+		{
+			var button = browser.Button(Find.ByValue(name));
+			if (button != null)
+			{
+				button.Click();
+				return;
+			}
+			browser.Link(Find.ByText(name)).Click();
+		}
+
 		public static IE AssertThatTableContains<T>(this IE ie, params T[] activeRecords)
 		{
 			var table = Helper.GetDataTable(ie);

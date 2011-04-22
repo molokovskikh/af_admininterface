@@ -17,43 +17,40 @@ namespace Integration.ForTesting
 	{
 		public static Client TestClient(Action<Client> action = null)
 		{
-			Client client;
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				var payer = CreatePayer();
-				client = new Client(payer) {
-					Status = ClientStatus.On,
-					Segment = Segment.Wholesale,
-					Type = ServiceType.Drugstore,
-					Name = "test",
-					FullName = "test",
-					HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-					MaskRegion = 1UL,
-					ContactGroupOwner = new ContactGroupOwner(),
-				};
-				payer.Clients = new List<Client> { client };
-				if (action != null)
-					action(client);
+			var payer = CreatePayer();
+			var client = new Client(payer) {
+				Status = ClientStatus.On,
+				Segment = Segment.Wholesale,
+				Type = ServiceType.Drugstore,
+				Name = "test",
+				FullName = "test",
+				HomeRegion = ActiveRecordBase<Region>.Find(1UL),
+				MaskRegion = 1UL,
+				ContactGroupOwner = new ContactGroupOwner(),
+			};
 
-				client.Payers.Each(p => {
-					p.ContactGroupOwner.Save();
-					p.Save();
-					p.JuridicalOrganizations.Each(l => l.Save());
-				});
-				client.ContactGroupOwner.Save();
-				client.SaveAndFlush();
-				client.Users.Each(u => u.Setup());
+			client.Settings = new DrugstoreSettings(client) {
+				BasecostPassword = "",
+				WorkRegionMask = 1UL,
+				OrderRegionMask = 1UL,
+			};
 
-				client.Settings = new DrugstoreSettings(client.Id) {
-					BasecostPassword = "",
-					WorkRegionMask = 1UL,
-					OrderRegionMask = 1UL,
-				};
-				client.Settings.CreateAndFlush();
-				client.MaintainIntersection();
+			payer.Clients = new List<Client> { client };
+			if (action != null)
+				action(client);
 
-				scope.VoteCommit();
-			}
+			client.Payers.Each(p => {
+				p.ContactGroupOwner.Save();
+				p.Save();
+				p.JuridicalOrganizations.Each(l => l.Save());
+			});
+			client.ContactGroupOwner.Save();
+			client.SaveAndFlush();
+			client.Users.Each(u => u.Setup());
+
+			client.Settings.CreateAndFlush();
+			client.MaintainIntersection();
+
 			return client;
 		}
 
@@ -297,7 +294,7 @@ namespace Integration.ForTesting
 				Name = "Тестовый плательщик"
 			};
 			payer.Save();
-			var supplier = new AdminInterface.Models.Suppliers.Supplier {
+			var supplier = new Supplier {
 				Payer = payer,
 				HomeRegion = Region.Find(1UL),
 				RegionMask = 1,

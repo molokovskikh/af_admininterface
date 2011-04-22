@@ -401,27 +401,12 @@ namespace AdminInterface.Models
 
 		public virtual bool HaveUin()
 		{
-			var result = ArHelper.WithSession(session =>
-				session.CreateSQLQuery(@"
-select sum(length(concat(uui.AFCopyId))) = 0
-from usersettings.UserUpdateInfo uui
-where uui.UserId = :userCode
-")
-					.SetParameter("userCode", Id)
-					.UniqueResult<long?>());
-
-			return result != null && result.Value == 0;
+			return !String.IsNullOrWhiteSpace(UserUpdateInfo.AFCopyId);
 		}
 
 		public virtual void ResetUin()
 		{
-			ArHelper.WithSession(session =>
-				session.CreateSQLQuery(@"
-update usersettings.UserUpdateInfo uui
-set uui.AFCopyId = '' 
-where uui.UserId = :userCode")
-					.SetParameter("userCode", Id)
-					.ExecuteUpdate());
+			UserUpdateInfo.AFCopyId = "";
 		}
 
 		public virtual void AddContactGroup()

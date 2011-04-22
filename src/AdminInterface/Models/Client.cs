@@ -105,7 +105,7 @@ namespace AdminInterface.Models
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
-		[OneToOne]
+		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual DrugstoreSettings Settings { get; set; }
 
 		[BelongsTo("ContactGroupOwnerId")]

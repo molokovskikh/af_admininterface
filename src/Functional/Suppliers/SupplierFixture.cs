@@ -1,4 +1,5 @@
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Functional.Billing;
 using Functional.ForTesting;
@@ -13,11 +14,13 @@ namespace Functional.Suppliers
 	public class SupplierFixture : WatinFixture2
 	{
 		private User user;
+		private Supplier supplier;
 
 		[SetUp]
 		public void SetUp()
 		{
 			user = DataMother.CreateSupplierUser();
+			supplier = (Supplier)user.RootService;
 			scope.Flush();
 		}
 
@@ -43,6 +46,25 @@ namespace Functional.Suppliers
 
 			browser.Link(Find.ByText("Тестовый поставщик")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Поставщик"));
+		}
+
+		[Test]
+		public void Update_supplier_name()
+		{
+			Open(supplier);
+			browser.Css("#supplier_Name").TypeText("Тестовый поставщик обновленный");
+			browser.Click("Сохранить");
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+		}
+
+		[Test]
+		public void Add_user()
+		{
+			Open(supplier);
+			browser.Click("Новый пользователь");
+			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			browser.Click("Сохранить");
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 		}
 	}
 }

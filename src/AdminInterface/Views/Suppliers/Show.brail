@@ -1,24 +1,6 @@
 ﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
 									  ("Информация о клиенте", "")]} %>
 
-<script>
-	document.observe("dom:loaded", function () {
-
-		Validation.add("uin-reuired",
-			   "Нужно указать причину сброса",
-				function (v) {
-					return !Validation.get('IsEmpty').test(v);
-				});
-		var validation = new Validation("ReseteUin");
-
-		jQuery("form#MessagesForm").validate({
-			rules: {
-				"message": "required"
-			}
-		});
-	});
-</script>
-
 <style>
 	.InfoRow
 	{
@@ -110,16 +92,18 @@
 				Зарегистрирован пользователем ${supplier.Registration.GetRegistrant().ManagerName}, дата регистрации ${supplier.Registration.RegistrationDate}
 				<% end %>
 			</div>
-			<form action="Update.rails" method=post style="padding:0; margin:0;">
+			<form method=post>
 				<div>
 					${FormHelper.HiddenField("supplier.Id")}
 					<p>
 						Полное наименование<br>
 						${FormHelper.TextField("supplier.FullName")}
+						${app.GetValidationError(supplier, "FullName")}
 					</p>
 					<p>
 						Краткое наименование<br>
 						${FormHelper.TextField("supplier.Name")}
+						${app.GetValidationError(supplier, "Name")}
 					</p>
 				</div>
 				<div>

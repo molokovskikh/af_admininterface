@@ -31,14 +31,17 @@ namespace AdminInterface.Models
 
 		public DrugstoreSettings() {}
 
-		public DrugstoreSettings(uint id)
+		public DrugstoreSettings(Client client)
 		{
-			Id = id;
+			Client = client;
 		}
 
-		[PrimaryKey("ClientCode", Generator = PrimaryKeyType.Assigned)]
+		[PrimaryKey("ClientCode", Generator = PrimaryKeyType.Foreign)]
 		public virtual uint Id { get; set; }
 
+		[OneToOne]
+		public virtual Client Client { get; set; }
+		
 		[Property, Description("Сотрудник АК \"Инфорум\""), Auditable]
 		public virtual bool ServiceClient { get; set; }
 

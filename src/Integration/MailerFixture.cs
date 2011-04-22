@@ -50,7 +50,8 @@ namespace Integration
 			client = new Client {
 				Id = 58,
 				Name = "Тестовый клиент",
-				HomeRegion = new Region { Name = "test" }
+				HomeRegion = new Region { Name = "test" },
+				Settings = new DrugstoreSettings()
 			};
 			payer = new Payer("Тестовый плательщик") { PayerID = 10};
 			client.JoinPayer(payer);

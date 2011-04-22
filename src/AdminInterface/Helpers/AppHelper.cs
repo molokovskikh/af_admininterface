@@ -140,7 +140,7 @@ namespace AdminInterface.Helpers
 			var controller = GetControllerName(item);
 			if (!String.IsNullOrEmpty(action))
 				action = "/" + action;
-			return String.Format("{0}/{1}/{2}{3}", controller, id, action);
+			return String.Format("{0}/{1}{2}", controller, id, action);
 		}
 
 		public string LinkTo(string title, string controller, string method)

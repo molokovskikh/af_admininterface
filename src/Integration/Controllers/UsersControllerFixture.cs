@@ -1,17 +1,42 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using log4net.Config;
+using NHibernate;
 using NUnit.Framework;
 
 namespace Integration.Controllers
 {
+	public class TransactionlessSession : AbstractScope
+	{
+		public TransactionlessSession()
+			: base(FlushAction.Auto, SessionScopeType.Simple)
+		{}
+
+		public override void FailSession(ISession session)
+		{}
+
+		public override ISession GetSession(object key)
+		{
+			return key2Session[key];
+		}
+
+		public override ISession OpenSession(ISessionFactory sessionFactory, IInterceptor interceptor)
+		{
+			var session = sessionFactory.OpenSession(interceptor);
+			return session;
+		}
+	}
+
 	[TestFixture]
 	public class UsersControllerFixture : BaseControllerTest
 	{
@@ -20,12 +45,12 @@ namespace Integration.Controllers
 		private Client client;
 		private UserUpdateInfo info1, info2;
 
-		private SessionScope session;
+		private ISessionScope session;
 
 		[SetUp]
 		public void Setup()
 		{
-			session = new SessionScope();
+			session = new TransactionlessSession();
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
 		}
@@ -49,10 +74,9 @@ namespace Integration.Controllers
 			info2 = UserUpdateInfo.Find(user2.Id);
 			info2.AFCopyId = "12345";
 			info2.Update();
-			using (new SessionScope())
-			{
-				controller.DoPasswordChange(user1.Id, "", false, true, false, "");
-			}
+
+			controller.DoPasswordChange(user1.Id, "", false, true, false, "");
+
 			info1.Refresh();
 			info2.Refresh();
 			Assert.That(info1.AFCopyId, Is.Empty);
@@ -77,10 +101,9 @@ namespace Integration.Controllers
 			var regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
 			var person = new[] {new Person()};
-			using (new SessionScope())
-			{
-				controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
-			}
+
+			controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
+
 			var mails = ArHelper.WithSession(s => s
 				.CreateSQLQuery(@"select sentto from logs.passwordchange where targetusername = :userId")
 			    .SetParameter("userId", user.Id)

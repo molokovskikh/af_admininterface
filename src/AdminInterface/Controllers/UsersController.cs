@@ -222,10 +222,8 @@ namespace AdminInterface.Controllers
 				DbLogHelper.SetupParametersForTriggerLogging();
 				user.ResetUin();
 				if (changeLogin)
-				{
 					user.Login = user.Id.ToString();
-					user.Save();
-				}
+				user.Save();
 				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
 				var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
