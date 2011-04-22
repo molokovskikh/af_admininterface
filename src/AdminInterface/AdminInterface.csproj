@@ -497,7 +497,7 @@
     <None Include="Views\RegionalAdmin\Edit.brail" />
     <None Include="Views\Regions\DefaultRegions.brail" />
     <None Include="Views\Regions\ShowRegions.brail" />
-    <None Include="Views\Register\Register.brail" />
+    <None Include="Views\Register\RegisterClient.brail" />
     <None Include="Views\Register\SearchPayers.brail" />
     <None Include="Views\Register\SearchSuppliers.brail" />
     <None Include="Views\Register\RegisterSupplier.brail" />
