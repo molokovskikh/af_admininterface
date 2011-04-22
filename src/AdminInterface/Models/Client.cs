@@ -108,7 +108,7 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual DrugstoreSettings Settings { get; set; }
 
-		[BelongsTo("ContactGroupOwnerId")]
+		[BelongsTo("ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
 		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]

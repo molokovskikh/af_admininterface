@@ -31,7 +31,7 @@ namespace Functional
 			var random = new Random();
 			_randomClientName = "test" + random.Next(100000);
 			_mailSuffix = "@test.test";
-			_registerPageUrl = "Register/Register.rails";
+			_registerPageUrl = "Register/RegisterClient";
 		}
 
 		[Test, Ignore("Регистрация поставщиков пока не реализована")]
@@ -364,7 +364,7 @@ namespace Functional
 		[Test]
 		public void Check_user_regions_after_client_registration()
 		{
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link(Find.ByText("Показать все регионы")).Click();
@@ -401,7 +401,7 @@ namespace Functional
 		[Test]
 		public void Register_client_with_user_contact_person_info()
 		{
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("Alice");
@@ -423,7 +423,7 @@ namespace Functional
 		[Test]
 		public void Register_with_flag_ignore_new_prices()
 		{
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.CheckBox("FillBillingInfo").Checked = false;
@@ -440,7 +440,7 @@ namespace Functional
 		public void Register_with_multiple_client_phones()
 		{
 			uint clientCode = 0;
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link("clientaddPhoneLink").Click();
@@ -473,7 +473,7 @@ namespace Functional
 		public void Register_with_multiple_user_phones()
 		{
 			uint clientCode = 0;
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link("useraddPhoneLink").Click();
@@ -508,7 +508,7 @@ namespace Functional
 		public void Register_with_multiple_client_email()
 		{
 			uint clientCode = 0;
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link("clientaddEmailLink").Click();
@@ -539,7 +539,7 @@ namespace Functional
 		public void Register_with_multiple_user_email()
 		{
 			uint clientCode = 0;
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link("useraddEmailLink").Click();
@@ -574,7 +574,7 @@ namespace Functional
 		public void Register_with_multiple_user_persons()
 		{
 			uint clientCode = 0;
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.Link("useraddPersonLink").Click();
@@ -607,7 +607,7 @@ namespace Functional
 		{
 			uint clientId = 0;
 
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.CheckBox("FillBillingInfo").Checked = false;
@@ -627,7 +627,7 @@ namespace Functional
 		[Test, Description("При регистрации клиента была попытка зарегистрировать скрытую копию, но поставщика не нашли")]
 		public void Register_client_with_failed_supplier_searching()
 		{
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
@@ -645,7 +645,7 @@ namespace Functional
 		[Test, Description("При регистрации клиента была попытка зарегистрировать с существующим плательщиком, но плательщика не нашли")]
 		public void Register_client_with_failed_payer_searching()
 		{
-			using (var browser = Open("Register/Register.rails"))
+			using (var browser = Open(_registerPageUrl))
 			{
 				SetupGeneralInformation(browser);
 				browser.CheckBox(Find.ById("PayerExists")).Checked = true;

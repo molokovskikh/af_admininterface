@@ -207,7 +207,7 @@ namespace AdminInterface.Controllers
 					Segment = client.Segment,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Administrator),
-					ContactGroupOwner = new ContactGroupOwner()
+					ContactGroupOwner = new ContactGroupOwner(ContactGroupType.General)
 				};
 				if (currentPayer == null)
 					currentPayer = CreatePayer(newClient);
@@ -324,10 +324,9 @@ namespace AdminInterface.Controllers
 				SmartOrderRules = smartOrder
 			};
 			
-			
 			if (additionalSettings.ShowForOneSupplier)
 				client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.CreateAndFlush();
+			client.Save();
 
 			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());
