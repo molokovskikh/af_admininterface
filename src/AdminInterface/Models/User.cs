@@ -152,7 +152,7 @@ namespace AdminInterface.Models
 		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
-		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.All)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
@@ -411,14 +411,14 @@ namespace AdminInterface.Models
 
 		public virtual void AddContactGroup()
 		{
-			using (var scope = new TransactionScope())
-			{
-				var groupOwner = Client.ContactGroupOwner;
-				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
-				group.Save();
-				ContactGroup = group;
-				scope.VoteCommit();
-			}
+			ContactGroupOwner groupOwner = null;
+			if (RootService is Client)
+				groupOwner = ((Client)RootService).ContactGroupOwner;
+			else if (RootService is Supplier)
+				groupOwner = ((Supplier)RootService).ContactGroupOwner;
+
+			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
+			ContactGroup = group;
 		}
 
 		public virtual void UpdateContacts(Contact[] contacts)
