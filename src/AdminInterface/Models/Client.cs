@@ -78,6 +78,7 @@ namespace AdminInterface.Models
 			: this()
 		{
 			Enabled = true;
+			Settings = new DrugstoreSettings(this);
 			JoinPayer(payer);
 		}
 

@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientFixture
+	public class ClientFixture : IntegrationFixture
 	{
 		[Test]
 		public void ResetUinTest()
@@ -32,22 +32,19 @@ namespace Integration.Models
 		[Test]
 		public void Update_firm_code_only()
 		{
-			using (new SessionScope())
-			{
-				var client = DataMother.CreateTestClientWithUser();
-				client.Settings.NoiseCosts = true;
-				client.Settings.Save();
-				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
+			var client = DataMother.CreateTestClientWithUser();
+			client.Settings.NoiseCosts = true;
+			client.Settings.Save();
+			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
 
-				var supplier = Supplier.Queryable.First();
-				client.Settings.NoiseCostExceptSupplier = supplier;
-				client.Settings.Save();
-				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
+			var supplier = Supplier.Queryable.First();
+			client.Settings.NoiseCostExceptSupplier = supplier;
+			client.Settings.Save();
+			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 
-				client.Settings.NoiseCosts = false;
-				client.Settings.Save();
-				Assert.That(client.Settings.FirmCodeOnly, Is.Null);
-			}
+			client.Settings.NoiseCosts = false;
+			client.Settings.Save();
+			Assert.That(client.Settings.FirmCodeOnly, Is.Null);
 		}
 	}
 }

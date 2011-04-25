@@ -114,7 +114,6 @@
     <Compile Include="ClientCardFixture.cs" />
     <Compile Include="Controllers\InvoicesControllerFixture.cs" />
     <Compile Include="Controllers\UsersControllerFixture.cs" />
-    <Compile Include="Core\BetterBinderFixture.cs" />
     <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
     <Compile Include="InvoiceFilterFixture.cs" />
@@ -130,6 +129,7 @@
     <Compile Include="Controllers\SmapRejectorControllerFixture.cs" />
     <Compile Include="DbLogHelperFixture.cs" />
     <Compile Include="Models\ClientRegistrationLogEntityFixture.cs" />
+    <Compile Include="ForTesting\IntegrationFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />
     <Compile Include="Models\MaintainerFixture.cs" />
     <Compile Include="Models\OrderFilterFixture.cs" />
