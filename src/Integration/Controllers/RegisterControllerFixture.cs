@@ -103,6 +103,8 @@ namespace Integration.Controllers
 					.SetParameter("clientId", registredClient.Id)
 					.UniqueResult<long>());
 
+			var user = registredClient.Users.First();
+			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));
 		}
 

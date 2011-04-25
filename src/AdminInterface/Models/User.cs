@@ -355,6 +355,9 @@ namespace AdminInterface.Models
 			if (!Client.Users.Any(u => u == this))
 				Client.Users.Add(this);
 
+			if (Accounting == null)
+				Accounting = new UserAccounting(this);
+
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;
 		}
