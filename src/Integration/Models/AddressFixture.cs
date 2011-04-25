@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AddressFixture
+	public class AddressFixture : IntegrationFixture
 	{
 		[Test]
 		public void Move_address()

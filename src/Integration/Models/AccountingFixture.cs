@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
@@ -9,25 +8,6 @@ using NUnit.Framework;
 
 namespace Integration.Models
 {
-	[TestFixture]
-	public class IntegrationFixture
-	{
-		private SessionScope scope;
-
-		[SetUp]
-		public void Setup()
-		{
-			scope = new SessionScope(FlushAction.Never);
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			if (scope != null)
-				scope.Dispose();
-		}
-	}
-	
 	public class AccountingFixture : IntegrationFixture
 	{
 		[Test]

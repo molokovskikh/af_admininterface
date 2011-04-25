@@ -214,15 +214,12 @@ namespace AdminInterface.Controllers
 				newClient.JoinPayer(currentPayer);
 				newClient.AddAddress(deliveryAddress);
 				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
-				newClient.SaveAndFlush();
-
 				AddContactsToClient(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
 				password = newUser.CreateInAd();
 				newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
-
 				newClient.AddComment(comment);
 
 				scope.VoteCommit();
@@ -326,7 +323,7 @@ namespace AdminInterface.Controllers
 			
 			if (additionalSettings.ShowForOneSupplier)
 				client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Save();
+			client.SaveAndFlush();
 
 			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());
@@ -485,7 +482,7 @@ WHERE   intersection.pricecode IS NULL
 				payer.JuridicalName = juridicalOrganization.FullName;
 				payer.Save();
 
-				if (payer.JuridicalOrganizations == null)
+				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0)
 				{
 					payer.JuridicalOrganizations = new List<LegalEntity> {
 						juridicalOrganization

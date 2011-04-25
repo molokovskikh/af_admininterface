@@ -10,6 +10,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Models;
@@ -76,14 +77,13 @@ namespace Integration.Controllers
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
 
-			using(new SessionScope())
-				controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, false);
+			controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, false);
 
 			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
 
 		[Test]
-		public void Create_LegalEntity()
+		public void Create_organization()
 		{
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
@@ -96,6 +96,15 @@ namespace Integration.Controllers
 			Assert.That(org.Name, Is.EqualTo(registredPayer.Name));
 			Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
 			Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
+
+			var intersectionCount = ArHelper.WithSession(
+				s => s.CreateSQLQuery("select count(*) from Future.Intersection where clientId = :clientId")
+					.SetParameter("clientId", registredClient.Id)
+					.UniqueResult<long>());
+
+			var user = registredClient.Users.First();
+			Assert.That(user.Accounting, Is.Not.Null);
+			Assert.That(intersectionCount, Is.GreaterThan(0));
 		}
 
 		[Test]
