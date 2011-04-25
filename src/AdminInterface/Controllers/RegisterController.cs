@@ -482,7 +482,7 @@ WHERE   intersection.pricecode IS NULL
 				payer.JuridicalName = juridicalOrganization.FullName;
 				payer.Save();
 
-				if (payer.JuridicalOrganizations == null)
+				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0)
 				{
 					payer.JuridicalOrganizations = new List<LegalEntity> {
 						juridicalOrganization

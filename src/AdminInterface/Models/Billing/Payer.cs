@@ -184,7 +184,7 @@ namespace AdminInterface.Models
 		[HasMany(typeof (Address), Lazy = true, Inverse = true, OrderBy = "Address")]
 		public virtual IList<Address> Addresses { get; set; }
 
-		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, OrderBy = "Name")]
+		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, Cascade = ManyRelationCascadeEnum.All, OrderBy = "Name")]
 		public virtual IList<LegalEntity> JuridicalOrganizations { get; set; }
 
 		[HasMany(typeof(Report), Lazy = true, Inverse = true, OrderBy = "Comment")]

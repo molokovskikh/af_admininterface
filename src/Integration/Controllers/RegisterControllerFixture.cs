@@ -77,8 +77,7 @@ namespace Integration.Controllers
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
 
-			using(new SessionScope())
-				controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, false);
+			controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, false);
 
 			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}

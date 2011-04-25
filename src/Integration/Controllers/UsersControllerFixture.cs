@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
@@ -88,14 +89,13 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			var client1 = DataMother.CreateClientAndUsers();
-			var address = new Address
-			{
+			var address = new Address {
 				Client = client,
 				Value = "тестовый адрес"
 			};
 			client.AddAddress(address);
-			user1 = client.Users[0];
-			var user = new User(client);
+			var user = new User();
+			user.Payer = client1.Payers.First();
 			var clientContacts = new[] {
 				new Contact{Id = 1, Type = 0, ContactText = "4411@33.ru, hffty@jhg.ru"}};
 			var regionSettings = new [] {
@@ -103,6 +103,7 @@ namespace Integration.Controllers
 			var person = new[] {new Person()};
 
 			controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
+			session.Flush();
 
 			var mails = ArHelper.WithSession(s => s
 				.CreateSQLQuery(@"select sentto from logs.passwordchange where targetusername = :userId")
@@ -110,6 +111,7 @@ namespace Integration.Controllers
 			    .UniqueResult());
  
 			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
+			Assert.That(user.Accounting, Is.Not.Null);
 		}
 
 		[Test]
