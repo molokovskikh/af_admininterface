@@ -13,7 +13,7 @@ namespace AdminInterface.Models.Suppliers
 		[Description("Справка")] Reference = 2
 	}
 
-	[ActiveRecord(Schema = "Future"), JoinedBase]
+	[ActiveRecord(Schema = "Future", Lazy = true), JoinedBase]
 	public class Service
 	{
 		[PrimaryKey]

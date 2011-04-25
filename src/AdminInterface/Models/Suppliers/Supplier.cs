@@ -11,7 +11,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord(Schema = "Future", Table = "Suppliers")]
+	[ActiveRecord(Schema = "Future", Lazy = true)]
 	public class Supplier : Service, IEnablable
 	{
 		public Supplier()
@@ -72,7 +72,7 @@ namespace AdminInterface.Models.Suppliers
 		[HasMany]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
 
-		public IList<User> Users
+		public virtual IList<User> Users
 		{
 			get
 			{
@@ -80,7 +80,7 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
-		public bool Enabled
+		public virtual bool Enabled
 		{
 			get { return !Disabled; }
 		}
@@ -105,7 +105,7 @@ namespace AdminInterface.Models.Suppliers
 			return ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 		}
 
-		public void Save()
+		public virtual void Save()
 		{
 			ActiveRecordMediator.Save(this);
 		}

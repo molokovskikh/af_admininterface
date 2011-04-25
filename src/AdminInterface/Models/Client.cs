@@ -65,7 +65,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
-	public class Client : Service, IEnablable// ActiveRecordLinqBase<Client>, IEnablable
+	public class Client : Service, IEnablable
 	{
 		public Client()
 		{
