@@ -16,10 +16,8 @@ namespace Unit.Models
 		[SetUp]
 		public void Setup()
 		{
-			client = new Client {
-				Payers = new List<Payer> {
-					new Payer()
-				},
+			var payer = new Payer();
+			client = new Client(payer) {
 				ContactGroupOwner = new ContactGroupOwner {
 					ContactGroups = new List<ContactGroup> {
 						new ContactGroup {
