@@ -265,15 +265,11 @@ where Phone like :phone")
 		public void Settings(uint id)
 		{
 			var client = Client.Find(id);
-			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
+			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
-			if (drugstore.BuyingMatrixPrice != null)
-				PropertyBag["BuyMatrixPrice"] = drugstore.BuyingMatrixPrice;
-			if (drugstore.AssortimentPrice != null)
-				PropertyBag["AssortimentPrice"] = drugstore.AssortimentPrice;
 		}
 
 		public void NotifySuppliers(uint clientId)

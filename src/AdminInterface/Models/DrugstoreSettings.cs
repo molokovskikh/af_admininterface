@@ -131,14 +131,17 @@ namespace AdminInterface.Models
 		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
-		[BelongsTo("AssortimentPriceId"), Description("Ассортиментный прайс для преобразования накладной в формат dbf"), Auditable]
-		public virtual Price AssortimentPrice { get; set; }
-
 		[Property, Description("Тип матрицы"), Auditable]
 		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
 		[Property, Description("Действие матрицы"), Auditable]
 		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
+
+		[Property, Description("Конвертировать накладную в dbf-файл"), Auditable]
+		public virtual bool IsConvertFormat { get; set; }
+
+		[BelongsTo("AssortimentPriceId"), Description("Ассортиментный прайс для преобразования накладной в формат dbf"), Auditable]
+		public virtual Price AssortimentPrice { get; set; }
 
 		[Property, Description("Обезличенный заказ"), Auditable]
 		public virtual bool EnableImpersonalPrice { get; set; }
@@ -149,8 +152,7 @@ namespace AdminInterface.Models
 		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
 
-		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]
+		[BelongsTo("SmartOrderRuleId")]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
-
 	}
 }

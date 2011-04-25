@@ -23,9 +23,9 @@
 			Search();
 		});
 
-		jQuery("#ActivateAssortimentPrice").click(function(){
+		jQuery("#drugstore_IsConvertFormat").click(function(){
 			if (this.checked)
-				jQuery("#SearchAssortimentPriceBlock").css("display", "")
+				jQuery("#SearchAssortimentPriceBlock").css("display", "");
 			else
 				CancelAssortimentPriceForDbf();
 		});
@@ -48,15 +48,15 @@
 		jQuery("#SearchBuymatrixText").css("disabled", "");
 
 		jQuery("#DivForAssortmentPrice").children().remove().end();
-		jQuery("#ActivateBuyMatrix").get(0).checked = false;		
+		jQuery("#ActivateBuyMatrix").get(0).checked = false;
 	}
 
 	function CancelAssortimentPriceForDbf() {
 		jQuery("#SearchAssortimentPriceBlock").css("display", "none")
 		jQuery("#SearchAssortimentPriceText").css("disabled", "");
 
-		jQuery("#DivForAssortimentPrice").children().remove().end();
-		jQuery("#ActivateAssortimentPrice").get(0).checked = false;
+		jQuery("#DivForAssortimentPrice").empty();
+		jQuery("#drugstore_IsConvertFormat").get(0).checked = false;
 	}
 
 	function setNoise(noiseStatus) {
@@ -108,7 +108,8 @@
 				jQuery("#SearchAssortimentPriceBlock").css("display", "none")
 				jQuery("#SearchAssortimentPriceText").css("disabled", "");
 				jQuery("#SearchAssortimentPriceMessage").html("");
-				jQuery("#DivForAssortimentPrice").append(data);				
+				jQuery("#DivForAssortimentPrice").append(data);
+				jQuery("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPriceId']").attr("name", "drugstore.AssortimentPrice.Id")
 			},
 			error: function (xhr, textStatus, error) {
 				jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
@@ -164,12 +165,11 @@
 					<td>
 						<div id="NotNoiseSupplier">
 						</div>
-					</td>					
+					</td>
 					</tr>
-
 				<tr>
 					<td>
-						<input id=ActivateAssortimentPrice name="ActivateAssortimentPrice" value=true type="checkbox" ${"checked" if drugstore.AssortimentPrice } />
+						${FormHelper.CheckboxField("drugstore.IsConvertFormat")}
 						<label>Конвертировать накладную в dbf-файл</label>
 					</td>
 					<td>
@@ -189,8 +189,8 @@
 							<tr><td id="SearchAssortimentPriceMessage" colspan="10"></td></tr>
 						</table>
 						<div id="DivForAssortimentPrice">
-							<% if IsDefined("AssortimentPrice"): %>
-								${AssortimentPrice.Supplier.Name} - ${AssortimentPrice.Name}
+							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
+								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
 							<% end %>
 						</div>
 					</td>
@@ -252,8 +252,8 @@
 							<tr><td id="SearchBuymatrixMessage" colspan="10"></td></tr>
 						</table>
 						<div id="DivForAssortmentPrice">
-							<% if IsDefined("BuyMatrixPrice"): %>
-								${BuyMatrixPrice.Supplier.Name} - ${BuyMatrixPrice.Name}
+							<% if drugstore.BuyingMatrixPrice: %>
+								${drugstore.BuyMatrixPrice.Supplier.Name} - ${drugstore.BuyMatrixPrice.Name}
 							<% end %>
 						</div>
 						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if not drugstore.BuyingMatrixPrice} >
@@ -265,7 +265,7 @@
 							<option value=1 ${"selected" if drugstore.WarningOnBuyingMatrix == 1}>Выводить предупреждения</option>
 						</select>
 					</td>
-				</tr>				
+				</tr>
 				</table>
 	        </div>
     	    
