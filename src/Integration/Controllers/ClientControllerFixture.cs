@@ -27,6 +27,8 @@ namespace Integration.Controllers
 		[SetUp]
 		public void Setup()
 		{
+			//Services.UrlBuilder.UseExtensions = false;
+
 			notifications = new List<MailMessage>();
 
 			var sender = MockRepository.GenerateStub<IEmailSender>();
@@ -258,32 +260,27 @@ namespace Integration.Controllers
 			Address address;
 			User oldUser;
 
-			using (new SessionScope())
-			{
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				oldUser = oldClient.Users[0];
-				address = oldClient.Addresses[0];
-				oldUser.AvaliableAddresses = new List<Address>();
-				address.AvaliableForUsers.Add(oldUser);
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
+			oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			oldUser = oldClient.Users[0];
+			address = oldClient.Addresses[0];
+			oldUser.AvaliableAddresses = new List<Address>();
+			address.AvaliableForUsers.Add(oldUser);
+			newClient = DataMother.CreateTestClientWithAddressAndUser();
 
-				controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
-			}
-			using (new SessionScope())
-			{
-				oldClient.Refresh();
-				newClient.Refresh();
-				oldUser.Refresh();
-				Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
+			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
 
-				Assert.That(newClient.Users.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+			oldClient.Refresh();
+			newClient.Refresh();
+			oldUser.Refresh();
+			Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
 
-				Assert.That(newClient.Addresses.Count, Is.EqualTo(1));
-				Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
+			Assert.That(newClient.Users.Count, Is.EqualTo(2));
+			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
 
-				Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
-			}
+			Assert.That(newClient.Addresses.Count, Is.EqualTo(1));
+			Assert.That(oldClient.Addresses.Count, Is.EqualTo(1));
+
+			Assert.That(oldClient.Status, Is.EqualTo(ClientStatus.On));
 			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение пользователя")),
 				Is.Not.Null, "не могу найти уведомление о перемещении");
 		}
@@ -295,35 +292,30 @@ namespace Integration.Controllers
 			User user;
 			Address address;
 
-			using (new SessionScope())
-			{
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				user = oldClient.Users[0];
-				address = oldClient.Addresses[0];
-				user.AvaliableAddresses = new List<Address>();
-				address.AvaliableForUsers.Add(user);
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
+			oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			user = oldClient.Users[0];
+			address = oldClient.Addresses[0];
+			user.AvaliableAddresses = new List<Address>();
+			address.AvaliableForUsers.Add(user);
+			newClient = DataMother.CreateTestClientWithAddressAndUser();
 
-				controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
-			}
-			using (new SessionScope())
-			{
-				oldClient.Refresh();
-				newClient.Refresh();
-				var count =
-					ArHelper.WithSession(
-						s => s.CreateSQLQuery(@"select count(*) from logs.clientsinfo where clientcode = :code and userid = :userId")
-						     	.SetParameter("code", newClient.Id)
-						     	.SetParameter("userId", user.Id)
-						     	.UniqueResult());
+			controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
 
-				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+			oldClient.Refresh();
+			newClient.Refresh();
+			var count =
+				ArHelper.WithSession(
+					s => s.CreateSQLQuery(@"select count(*) from logs.clientsinfo where clientcode = :code and userid = :userId")
+						    .SetParameter("code", newClient.Id)
+						    .SetParameter("userId", user.Id)
+						    .UniqueResult());
 
-				Assert.That(newClient.Users.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 
-				Assert.That(count, Is.EqualTo(2));
-			}
+			Assert.That(newClient.Users.Count, Is.EqualTo(2));
+			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
+
+			Assert.That(count, Is.EqualTo(2));
 		}
 
 		[Test]

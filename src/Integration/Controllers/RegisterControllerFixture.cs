@@ -10,6 +10,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Models;
@@ -83,7 +84,7 @@ namespace Integration.Controllers
 		}
 
 		[Test]
-		public void Create_LegalEntity()
+		public void Create_organization()
 		{
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
@@ -96,6 +97,13 @@ namespace Integration.Controllers
 			Assert.That(org.Name, Is.EqualTo(registredPayer.Name));
 			Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
 			Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
+
+			var intersectionCount = ArHelper.WithSession(
+				s => s.CreateSQLQuery("select count(*) from Future.Intersection where clientId = :clientId")
+					.SetParameter("clientId", registredClient.Id)
+					.UniqueResult<long>());
+
+			Assert.That(intersectionCount, Is.GreaterThan(0));
 		}
 
 		[Test]

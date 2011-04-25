@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration.Controllers
 {
 	[TestFixture]
-	public class InvoicesControllerFixture : BaseControllerTest
+	public class InvoicesControllerFixture : ControllerFixture
 	{
 		private InvoicesController controller;
 
@@ -19,7 +19,6 @@ namespace Integration.Controllers
 		{
 			controller = new InvoicesController();
 			PrepareController(controller);
-			Services.UrlBuilder.UseExtensions = false;
 		}
 
 		[Test]
