@@ -22,6 +22,22 @@
 		jQuery("#SearchBuyMatrix").click(function(){
 			Search();
 		});
+
+		jQuery("#ActivateAssortimentPrice").click(function(){
+			if (this.checked)
+				jQuery("#SearchAssortimentPriceBlock").css("display", "")
+			else
+				CancelAssortimentPriceForDbf();
+		});
+
+		jQuery("#SearchAssortimentPrice").click(function(){
+			SearchAssortimentPriceForDbf();
+		});
+
+		jQuery("#CancelAssortimentPrice").click(function(){
+			CancelAssortimentPriceForDbf();
+		});
+
 	});
 
 	function Cancel() {
@@ -32,7 +48,15 @@
 		jQuery("#SearchBuymatrixText").css("disabled", "");
 
 		jQuery("#DivForAssortmentPrice").children().remove().end();
-		jQuery("#ActivateBuyMatrix").get(0).checked = false;
+		jQuery("#ActivateBuyMatrix").get(0).checked = false;		
+	}
+
+	function CancelAssortimentPriceForDbf() {
+		jQuery("#SearchAssortimentPriceBlock").css("display", "none")
+		jQuery("#SearchAssortimentPriceText").css("disabled", "");
+
+		jQuery("#DivForAssortimentPrice").children().remove().end();
+		jQuery("#ActivateAssortimentPrice").get(0).checked = false;
 	}
 
 	function setNoise(noiseStatus) {
@@ -68,6 +92,30 @@
 		});
 		jQuery("#SearchBuymatrixText").css("disabled", "disabled");
 		jQuery("#SearchBuymatrixMessage").html("<i>Идет поиск...</i>");
+	}
+
+	function SearchAssortimentPriceForDbf() {
+		var searchText = jQuery("#SearchAssortimentPriceText").val();
+		jQuery.ajax({
+			url: "${siteroot}/Client/SearchAssortmentPrices",
+			data: {"text": searchText},
+			cache: false,
+			success: function (data) {
+				if (data.length == 0) {
+					jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
+					return;
+				}
+				jQuery("#SearchAssortimentPriceBlock").css("display", "none")
+				jQuery("#SearchAssortimentPriceText").css("disabled", "");
+				jQuery("#SearchAssortimentPriceMessage").html("");
+				jQuery("#DivForAssortimentPrice").append(data);				
+			},
+			error: function (xhr, textStatus, error) {
+				jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+			}
+		});
+		jQuery("#SearchAssortimentPriceText").css("disabled", "disabled");
+		jQuery("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");		
 	}
 
 </script>
@@ -116,12 +164,42 @@
 					<td>
 						<div id="NotNoiseSupplier">
 						</div>
-					</td>
+					</td>					
 					</tr>
+
+				<tr>
+					<td>
+						<input id=ActivateAssortimentPrice name="ActivateAssortimentPrice" value=true type="checkbox" ${"checked" if drugstore.AssortimentPrice } />
+						<label>Конвертировать накладную в dbf-файл</label>
+					</td>
+					<td>
+						<table id="SearchAssortimentPriceBlock" style="width: 100%;display:none">
+							<tr><td align="left">Выберите ассортиментный прайс лист</td></tr>
+							<tr>
+								<td style="padding: 0px 15px 0px 5px;" >
+									<input id="SearchAssortimentPriceText" type="text" style="width :100%;" />
+								</td>
+								<td align="right">
+									<strong>
+										<input id="SearchAssortimentPrice" type="button" value="Найти" />
+										<input id="CancelAssortimentPrice" type="button" value="Отмена" />
+									</strong>
+								</td>
+							</tr>
+							<tr><td id="SearchAssortimentPriceMessage" colspan="10"></td></tr>
+						</table>
+						<div id="DivForAssortimentPrice">
+							<% if IsDefined("AssortimentPrice"): %>
+								${AssortimentPrice.Supplier.Name} - ${AssortimentPrice.Name}
+							<% end %>
+						</div>
+					</td>
+				</tr>
 				<tr><td colspan="2">
 				<input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
 				<input type="hidden" name="client.IsHiddenForProducer" value="false" />
 				Скрыть клиента в интефрейсе поставщика<br />
+				
 <% 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore",
 		"Checkboxes" : { 
@@ -130,7 +208,7 @@
 			"AllowDelayOfPayment": drugstore.AllowDelayOfPayment,
 			"CalculateLeader" : drugstore.CalculateLeader }
 	}
-
+				
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
 		"Checkboxes" : { 
 			"SendWaybillsFromClient" : drugstore.SendWaybillsFromClient,
@@ -187,7 +265,7 @@
 							<option value=1 ${"selected" if drugstore.WarningOnBuyingMatrix == 1}>Выводить предупреждения</option>
 						</select>
 					</td>
-				</tr>
+				</tr>				
 				</table>
 	        </div>
     	    

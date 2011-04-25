@@ -272,6 +272,8 @@ where Phone like :phone")
 			PropertyBag["drugstore"] = drugstore;
 			if (drugstore.BuyingMatrixPrice != null)
 				PropertyBag["BuyMatrixPrice"] = drugstore.BuyingMatrixPrice;
+			if (drugstore.AssortimentPrice != null)
+				PropertyBag["AssortimentPrice"] = drugstore.AssortimentPrice;
 		}
 
 		public void NotifySuppliers(uint clientId)

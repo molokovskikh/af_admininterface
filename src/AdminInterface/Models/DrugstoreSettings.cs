@@ -131,6 +131,9 @@ namespace AdminInterface.Models
 		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
+		[BelongsTo("AssortimentPriceId"), Description("Ассортиментный прайс для преобразования накладной в формат dbf"), Auditable]
+		public virtual Price AssortimentPrice { get; set; }
+
 		[Property, Description("Тип матрицы"), Auditable]
 		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
