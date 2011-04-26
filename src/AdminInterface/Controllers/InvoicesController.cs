@@ -72,7 +72,8 @@ namespace AdminInterface.Controllers
 
 			if (Region != null)
 				criteria.CreateCriteria("p.Clients", "c")
-					.Add(Expression.Eq("c.HomeRegion", Region));
+					.Add(Expression.Sql("{alias}.RegionCode = " + Region.Id));
+					/*.Add(Expression.Eq("c.HomeRegion", Region))*/
 
 			if (Recipient != null)
 				criteria.Add(Expression.Eq("Recipient", Recipient));
