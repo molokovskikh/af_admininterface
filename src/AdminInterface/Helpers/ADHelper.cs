@@ -43,8 +43,8 @@ namespace AdminInterface.Helpers
 	{
 		private int GetIndexByLogin(string login)
 		{
-			for(int i = 0; i < this.Count; i++)
-				if(this[i].Login == login)
+			for(int i = 0; i < Count; i++)
+				if(String.Equals(this[i].Login, login, StringComparison.InvariantCultureIgnoreCase))
 					return i;
 			throw new ArgumentException("Не найдены настройки AD для пользователя " + login, "login");
 		}
