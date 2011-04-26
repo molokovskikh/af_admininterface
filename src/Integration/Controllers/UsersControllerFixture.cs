@@ -6,38 +6,15 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Scopes;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using log4net.Config;
-using NHibernate;
 using NUnit.Framework;
 
 namespace Integration.Controllers
 {
-	public class TransactionlessSession : AbstractScope
-	{
-		public TransactionlessSession()
-			: base(FlushAction.Auto, SessionScopeType.Simple)
-		{}
-
-		public override void FailSession(ISession session)
-		{}
-
-		public override ISession GetSession(object key)
-		{
-			return key2Session[key];
-		}
-
-		public override ISession OpenSession(ISessionFactory sessionFactory, IInterceptor interceptor)
-		{
-			var session = sessionFactory.OpenSession(interceptor);
-			return session;
-		}
-	}
-
 	[TestFixture]
 	public class UsersControllerFixture : BaseControllerTest
 	{

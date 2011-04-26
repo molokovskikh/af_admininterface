@@ -1,57 +1,19 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
-using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Castle.Core.Smtp;
-using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using AdminInterface.Models.Logs;
-using Rhino.Mocks;
 
 namespace Integration.Controllers
 {
-	public class ControllerFixture : BaseControllerTest
-	{
-		protected List<MailMessage> notifications;
-		protected SessionScope session;
-
-		[SetUp]
-		public void Setup()
-		{
-			//Services.UrlBuilder.UseExtensions = false;
-
-			notifications = new List<MailMessage>();
-
-			var sender = MockRepository.GenerateStub<IEmailSender>();
-			ForTest.InitializeMailer();
-			sender.Stub(s => s.Send(new MailMessage())).IgnoreArguments()
-				.Repeat.Any()
-				.Callback(new Delegates.Function<bool, MailMessage>(m => {
-					notifications.Add(m);
-					return true;
-				}));
-			MailerExtention.SenderForTest = sender;
-
-			session = new SessionScope();
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			if (session != null)
-				session.Dispose();
-		}
-	}
-
 	[TestFixture]
 	public class ClientControllerFixture : ControllerFixture
 	{
