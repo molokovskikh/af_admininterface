@@ -6,10 +6,12 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
 using ExcelLibrary.SpreadSheet;
+using NHibernate;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -43,32 +45,39 @@ namespace AdminInterface.MonoRailExtentions
 			var lastDisable = "неизвестно";
 
 			var type = "";
-			if (item is User)
+			var clazz = NHibernateUtil.GetClass(item);
+			if (clazz == typeof(User))
 			{
 				type = "пользователя";
 				var user = ((User) item);
-				PropertyBag["client"] = user.Client;
+				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null)
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 			}
-			if (item is Address)
+			if (clazz == typeof(Address))
 			{
 				type = "адреса";
 				var address = ((Address) item);
-				PropertyBag["client"] = address.Client;
+				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null)
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 			}
-			if (item is Client)
+			if (clazz == typeof(Client))
 			{
 				type = "клиента";
 				var client = (Client) item;
-				PropertyBag["client"] = client;
+				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null)
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+			}
+
+			if (clazz == typeof(Supplier))
+			{
+				type = "поставщика";
+				PropertyBag["service"] = item;
 			}
 			if (item.Enabled)
 				Subject = String.Format("Возобновлена работа {0}", type);

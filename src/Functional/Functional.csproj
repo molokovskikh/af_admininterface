@@ -129,6 +129,7 @@
     <Compile Include="Setup.cs" />
     <Compile Include="StatContFixture.cs" />
     <Compile Include="SupplierFixture.cs" />
+    <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="UserFixture.cs" />

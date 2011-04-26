@@ -161,9 +161,15 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		$("input[name=status]").change(function () {
 			if (this.checked)
+			{
 				$(this).parents("tr").removeClass("DisabledByBilling");
+				$(this).parents("tr").removeClass("disabled");
+			}
 			else
+			{
 				$(this).parents("tr").addClass("DisabledByBilling");
+				$(this).parents("tr").addClass("disabled");
+			}
 		});
 
 		$("#reports input").change(function () {
@@ -299,7 +305,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% for i, supplier in enumerate(suppliers): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier)}" align="center">
 					<td style="width: 50px">
-						<input type="checkbox" ${"checked" unless supplier.Disabled} onclick="SetClientStatus(${supplier.Id}, this.checked)" />
+						<input type="checkbox" name=status ${"checked" unless supplier.Disabled} onclick="SetClientStatus(${supplier.Id}, this.checked)" />
 					</td>
 					<td>${supplier.Id}</td>
 					<td>

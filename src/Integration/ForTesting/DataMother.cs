@@ -276,9 +276,7 @@ namespace Integration.ForTesting
 
 		public static Supplier CreateSupplier()
 		{
-			var payer = new Payer {
-				Name = "Тестовый плательщик"
-			};
+			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
 			return new Supplier {
 				Payer = payer,

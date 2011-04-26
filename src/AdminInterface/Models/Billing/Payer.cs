@@ -56,6 +56,7 @@ namespace AdminInterface.Models
 		{
 			Name = name;
 			JuridicalName = name;
+			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(name, this));
 		}
 
