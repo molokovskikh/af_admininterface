@@ -35,7 +35,7 @@ namespace AdminInterface.MonoRailExtentions
 			return result;
 		}
 
-		public MonorailMailer EnableChanged(IEnablable item, bool oldEnable)
+		public MonorailMailer EnableChanged(IEnablable item)
 		{
 			Template = "EnableChanged";
 			To = "RegisterList@subscribe.analit.net";

@@ -14,7 +14,7 @@ namespace AdminInterface.Models.Suppliers
 	}
 
 	[ActiveRecord(Schema = "Future", Lazy = true), JoinedBase]
-	public class Service
+	public class Service : IEnablable
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -30,6 +30,11 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual bool Disabled { get; set; }
+
+		public virtual bool Enabled
+		{
+			get { return !Disabled; }
+		}
 
 		public virtual string FullName
 		{

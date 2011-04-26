@@ -264,11 +264,23 @@ namespace Integration.ForTesting
 
 		public static User CreateSupplierUser()
 		{
+			var supplier = CreateSupplier();
+			var user = new User(supplier.Payer, supplier) {
+				Login = "temporary-login"
+			};
+			user.Save();
+			user.Login = user.Id.ToString();
+			user.Update();
+			return user;
+		}
+
+		public static Supplier CreateSupplier()
+		{
 			var payer = new Payer {
 				Name = "Тестовый плательщик"
 			};
 			payer.Save();
-			var supplier = new Supplier {
+			return new Supplier {
 				Payer = payer,
 				HomeRegion = Region.Find(1UL),
 				RegionMask = 1,
@@ -276,13 +288,6 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
-			var user = new User(payer, supplier) {
-				Login = "temporary-login"
-			};
-			user.Save();
-			user.Login = user.Id.ToString();
-			user.Update();
-			return user;
 		}
 	}
 }

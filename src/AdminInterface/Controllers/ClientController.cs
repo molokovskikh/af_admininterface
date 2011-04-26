@@ -310,25 +310,6 @@ where Phone like :phone")
 				.ToList();
 		}
 
-		public void UpdateClientStatus(uint clientId, bool enabled)
-		{
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var client = Client.Find(clientId);
-				var oldEnabled = client.Enabled;
-				client.Enabled = enabled;
-				if (oldEnabled != client.Enabled)
-				{
-					this.Mail().EnableChanged(client, enabled).Send();
-					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
-				}
-				client.Save();
-			}
-			CancelView();
-			CancelLayout();
-		}
-
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
 		{
 			var newClient = Client.Find(clientId);
@@ -404,8 +385,14 @@ where Phone like :phone")
 				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
 			oldClient.Refresh();
-			if (oldClient.Users.Count == 0 && oldClient.Addresses.Count == 0)
-				UpdateClientStatus(oldClient.Id, false);
+			if (oldClient.Users.Count == 0
+				&& oldClient.Addresses.Count == 0
+				&& oldClient.Enabled)
+			{
+				oldClient.Disabled = true;
+				this.Mail().EnableChanged(oldClient).Send();
+				ClientInfoLogEntity.StatusChange(oldClient).Save();
+			}
 			oldClient.Save();
 		}
 	}

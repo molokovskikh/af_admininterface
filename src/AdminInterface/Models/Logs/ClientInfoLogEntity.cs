@@ -120,9 +120,14 @@ namespace AdminInterface.Models.Logs
 			return new ClientInfoLogEntity("", user).SetProblem(isFree, user.Login, reason);
 		}
 
-		public static ClientInfoLogEntity StatusChange(ClientStatus status, Client client)
+		public static ClientInfoLogEntity StatusChange(Service client)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", BindingHelper.GetDescription(status).ToLower()), client);
+			string status;
+			if (client.Disabled)
+				status = "отключен";
+			else
+				status = "включен";
+			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), client);
 		}
 
 		public static ClientInfoLogEntity ReseteUin(Client client, string reason)
@@ -149,6 +154,11 @@ namespace AdminInterface.Models.Logs
 				.Where(l => l.User == user || (l.ClientCode == user.RootService.Id && l.User == null))
 				.OrderByDescending(l => l.WriteTime)
 				.ToList();
+		}
+
+		public override string ToString()
+		{
+			return Message;
 		}
 	}
 }

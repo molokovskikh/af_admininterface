@@ -77,7 +77,7 @@ namespace AdminInterface.Models
 		public Client(Payer payer)
 			: this()
 		{
-			Enabled = true;
+			Status = ClientStatus.On;
 			Settings = new DrugstoreSettings(this);
 			JoinPayer(payer);
 		}
@@ -129,10 +129,25 @@ namespace AdminInterface.Models
 			ColumnRef = "PayerId")]
 		public virtual IList<Payer> Payers { get; set; }
 
-		public virtual bool Enabled
+		public override bool Enabled
 		{
 			get { return Status == ClientStatus.On; }
-			set { Status = value ? ClientStatus.On : ClientStatus.Off; }
+		}
+
+		public override bool Disabled
+		{
+			get
+			{
+				return base.Disabled;
+			}
+			set
+			{
+				base.Disabled = value;
+				if (Disabled)
+					Status = ClientStatus.Off;
+				else
+					Status = ClientStatus.On;
+			}
 		}
 
 		public virtual bool IsHiddenForProducer

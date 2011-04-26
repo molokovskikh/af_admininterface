@@ -5,6 +5,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Models;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Controllers

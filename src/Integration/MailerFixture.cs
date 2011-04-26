@@ -60,7 +60,7 @@ namespace Integration
 		[Test]
 		public void Enable_changed()
 		{
-			mailer.EnableChanged(client, false);
+			mailer.EnableChanged(client);
 			mailer.Send();
 			Assert.That(message.Body, Is.StringContaining("Наименование клиента: Тестовый клиент"));
 		}

@@ -172,18 +172,17 @@ namespace AdminInterface.Controllers
 			using(new TransactionScope())
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				var client = Client.Find(clientId);
-				var oldEnabled = client.Enabled;
-				client.Enabled = enabled;
-				if (oldEnabled != client.Enabled)
+				var service = ActiveRecordMediator<Service>.FindByPrimaryKey(clientId);
+				var oldDisabled = service.Disabled;
+				service.Disabled = !enabled;
+				if (oldDisabled != service.Disabled)
 				{
-					this.Mail().EnableChanged(client, enabled).Send();
-					ClientInfoLogEntity.StatusChange(client.Status, client).Save();
+					this.Mail().EnableChanged(service).Send();
+					ClientInfoLogEntity.StatusChange(service).Save();
 				}
-				client.Save();
+				ActiveRecordMediator<Service>.Save(service);
 			}
 			CancelView();
-			CancelLayout();
 		}
 
 		public void Search()

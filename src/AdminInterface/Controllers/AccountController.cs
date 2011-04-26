@@ -47,7 +47,7 @@ namespace AdminInterface.Controllers
 				user.IsFree = free;
 				user.UpdateAndFlush();
 				if (enabled != oldStatus)
-					this.Mail().EnableChanged(user, oldStatus).Send();
+					this.Mail().EnableChanged(user).Send();
 				if (!enabled)
 				{
 					// Если это отключение, то проходим по адресам и
@@ -95,7 +95,7 @@ namespace AdminInterface.Controllers
 				address.Client.UpdateBeAccounted();
 
 				if (enabled != oldStatus)
-					this.Mail().EnableChanged(address, oldStatus).Send();
+					this.Mail().EnableChanged(address).Send();
 				address.Client.Save();
 
 				scope.VoteCommit();

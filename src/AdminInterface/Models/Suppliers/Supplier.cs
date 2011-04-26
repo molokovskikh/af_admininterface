@@ -12,7 +12,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Models.Suppliers
 {
 	[ActiveRecord(Schema = "Future", Lazy = true)]
-	public class Supplier : Service, IEnablable
+	public class Supplier : Service
 	{
 		public Supplier()
 		{
@@ -78,11 +78,6 @@ namespace AdminInterface.Models.Suppliers
 			{
 				return User.Queryable.Where(u => u.RootService == this).ToList();
 			}
-		}
-
-		public virtual bool Enabled
-		{
-			get { return !Disabled; }
 		}
 
 		public static IList<Supplier> GetByPayerId(uint payerId)
