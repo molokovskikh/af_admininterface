@@ -5,6 +5,7 @@ import file from Migration.bake
 import file from Tools.bake
 import file from Test.bake
 import file from AppSupport.bake
+import file from Tools.boo
 import System
 import System.Linq.Enumerable
 import System.Xml.Linq
@@ -16,10 +17,6 @@ Global(
 	HumanReadableName : "Административный интерфейс (Новая реальность)",
 	AdditionalAssemblies : ("Common.Web.UI",)
 )
-
-def Ask(question as string):
-	Console.Write(question)
-	return Console.ReadLine()
 
 task @default, [@Build]
 
