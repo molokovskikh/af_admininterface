@@ -22,7 +22,7 @@ task @default, [@Build]
 
 task @Build, [@BuildWebSite]
 
-task @BuildFull, [@BuildWebSite, @BuildBackground, @BuildPrinter]
+task @BuildFull, [@BuildWebSite,/* @BuildBackground,*/ @BuildPrinter]
 
 task @BuildPrinter:
 	oldProject = Globals.Project
@@ -40,10 +40,10 @@ task @BuildPrinter:
 
 task @DeployPrinter:
 	Globals.Project = @Printer
-	Globals.DeployTo = """\\acdcserv.adc.analit.net\Apps\Printer"""
+	Globals.DeployTo = """\\adc.analit.net\Inforoom\Apps\Printer"""
 	Engine.Tasks.First({t| t.Name == "WebDeploy"}).Executed = false
 	Engine.Execute("WebDeploy")
-
+/*
 task @DeployBackground, [@BuildBackground]:
 	Globals.Project = "AdminInterface.Background"
 	Globals.DeployTo = """\\acdcserv.adc.analit.net\Apps\TopShelf\Services\AdminInterface.Background\"""
@@ -60,7 +60,7 @@ task @BuildBackground:
 	Cp("src/$project/app.release.config", "output/$project/$project.config")
 	Rm("output/$project/$project.*.config")
 	Globals.Project = oldProject
-
+*/
 task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @SendDeployNotification]
 
-task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
+task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter,/* @DeployBackground,*/ @SendDeployNotification]
