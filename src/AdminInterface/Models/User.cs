@@ -563,6 +563,7 @@ where userid = :userId")
 							.SetParameter("userId", Id)
 							.ExecuteUpdate());
 			Client = newOwner;
+			RootService = newOwner;
 			Payer = legalEntity.Payer;
 			Update();
 		}

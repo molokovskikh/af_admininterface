@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class UserFixture
+	public class UserFixture : IntegrationFixture
 	{
 		private User user;
 
@@ -76,12 +76,25 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void Move_user()
+		public void Check_legal_entity_on_user_move()
 		{
 			var otherClient = DataMother.TestClient();
 			var clien = DataMother.TestClient();
 			var exception = Assert.Throws<Exception>(() => user.MoveToAnotherClient(clien, otherClient.Orgs().First()));
 			Assert.That(exception.Message, Is.EqualTo(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо  не принадлежит клиенту test", user.Id)));
+		}
+
+		[Test]
+		public void Move_user()
+		{
+			var otherClient = DataMother.TestClient();
+			var org = otherClient.Orgs().First();
+
+			user.MoveToAnotherClient(otherClient, org);
+
+			Assert.That(user.Client, Is.EqualTo(otherClient));
+			Assert.That(user.RootService, Is.EqualTo(otherClient));
+			Assert.That(user.Payer, Is.EqualTo(org.Payer));
 		}
 	}
 }
