@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
 using AdminInterface.Models.Security;
@@ -21,7 +22,7 @@ namespace Functional
 		{
 			ForTest.InitialzeAR();
 			var admin = new Administrator{
-				UserName = "test",
+				UserName = Environment.UserName,
 				Email = "kvasovtest@analit.net",
 				PhoneSupport = "112",
 				RegionMask = ulong.MaxValue,
