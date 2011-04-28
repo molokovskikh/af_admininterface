@@ -112,13 +112,13 @@ namespace AdminInterface.Test.ForTesting
 			return (cell.Text != null ? cell.Text.Trim() : cell.Text) == value.ToString();
 		}
 
-		public static uint GetClientCodeFromRegistrationCard(IE browser)
+		public static uint GetClientCodeFromRegistrationCard(Browser browser)
 		{
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Регистрационная карта №\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}
 
-		public static uint GetLoginFromRegistrationCard(IE browser)
+		public static uint GetLoginFromRegistrationCard(Browser browser)
 		{
 			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Login:\s*\d+", RegexOptions.IgnoreCase))).Value);
 		}

@@ -6,8 +6,11 @@
 <script type="text/javascript">
 
 	function OnHomeRegionChanged(homeRegionId) {
-				jQuery("#RegionsTableBody").find("tr").remove();
-				var link = "${siteroot}/Regions/DefaultRegions.rails?singleRegions=${SingleRegions}&homeRegionId=" + homeRegionId;
+	jQuery("#RegionsTableBody").find("tr").remove();
+				var link = "${siteroot}/Regions/DefaultRegions.rails?homeRegionId=" + homeRegionId;
+				<% if IsDefined("SingleRegions"): %>
+					link += "&singleRegions=${singleRegions}";
+				<% end %>
 				<% if IsDefined("client"): %>
 					link += "&clientId=${client.Id}";
 				<% end %>

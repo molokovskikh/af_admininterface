@@ -107,6 +107,30 @@ namespace Functional
 			}
 		}
 
+		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя"), Ignore("Тест не в том месте")]
+		public void Check_flags_by_adding_user()
+		{
+			var client = DataMother.TestClient();
+			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			{
+				browser.Link(Find.ByText("Новый пользователь")).Click();
+				browser.Button(Find.ByValue("Создать")).Click();
+				using (new SessionScope())
+				{
+					client = Client.Find(client.Id);
+					Assert.That(client.Users.Count, Is.GreaterThan(0));
+					browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+					browser.Refresh();
+					var userLink = browser.Link(Find.ByText(client.Users[0].Login));
+					Assert.IsTrue(userLink.Exists);
+					userLink.Click();
+					browser.Link(Find.ByText("Настройка")).Click();
+					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
+					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
+				}
+			}
+		}
+
 		[Test]
 		public void Change_password_and_send_card()
 		{
