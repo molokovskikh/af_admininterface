@@ -43,6 +43,7 @@ namespace AdminInterface.Controllers
 		public void RegisterSupplier()
 		{
 			PropertyBag["regions"] = Region.All().ToArray();
+			PropertyBag["SingleRegions"] = true;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -89,8 +90,9 @@ namespace AdminInterface.Controllers
 					}
 				}
 
+				supplier.RegionMask = regionSettings.GetBrowseMask();
 				supplier.HomeRegion = Region.Find(homeRegion);
-				supplier.ContactGroupOwner = new ContactGroupOwner(ContactGroupType.General,
+				supplier.ContactGroupOwner = new ContactGroupOwner(
 					ContactGroupType.ClientManagers,
 					ContactGroupType.OrderManagers);
 				supplier.Registration = new RegistrationInfo(Administrator);
@@ -369,39 +371,39 @@ WHERE   pricesdata.firmcode = clientsdata.firmcode
 		AND (clientsdata.maskregion & regions.regioncode)>0  
 		AND pricesregionaldata.pricecode is null; 
 
-
-INSERT 
-INTO    intersection
-		(
-				ClientCode, 
-				regioncode, 
-				pricecode, 
-				invisibleonclient, 
-				InvisibleonFirm, 
-				costcode
-		)
-SELECT  DISTINCT clientsdata2.firmcode,
-		regions.regioncode, 
-		pricesdata.pricecode,  
-		if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-		a.invisibleonfirm,
-		(
-		  SELECT costcode
-		  FROM    pricescosts pcc
-		  WHERE   basecost
-				  AND pcc.PriceCode = pricesdata.PriceCode
-		) as CostCode
-FROM pricesdata 
+INSERT
+INTO Future.Intersection (
+	ClientId,
+	RegionId,
+	PriceId,
+	LegalEntityId,
+	CostId,
+	AgencyEnabled,
+	AvailableForClient
+)
+SELECT DISTINCT drugstore.Id,
+	regions.regioncode,
+	pricesdata.pricecode,
+	le.Id,
+	(
+		SELECT costcode
+		FROM pricescosts pcc
+		WHERE basecost and pcc.PriceCode = pricesdata.PriceCode
+	) as CostCode,
+	if(DrugstoreSettings.IgnoreNewPrices = 1, 0, 1),
+	if(pricesdata.PriceType = 0, 1, 0)
+FROM pricesdata
 	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
-		JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
-			JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
+		join Future.Clients as drugstore ON clientsdata.FirmSegment = drugstore.Segment
+			join billing.PayerClients p on p.ClientId = drugstore.Id
+				join Billing.LegalEntities le on le.PayerId = p.PayerId
+			join usersettings.RetClientsSet DrugstoreSettings ON DrugstoreSettings.ClientCode = drugstore.Id
+	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-		AND clientsdata.firmtype = 0
-		AND pricesdata.PriceCode = @NewPriceCode
-		AND clientsdata2.firmtype = 1;";
+	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
+WHERE i.Id IS NULL
+	AND clientsdata.firmtype = 0
+	AND clientsdata.firmcode = :ClientCode";
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(command)
 					.SetParameter("ClientCode", supplier.Id)

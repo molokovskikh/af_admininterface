@@ -7,20 +7,30 @@
     end %>
     <tr id="RegionRow${region.Id}" onmouseover="this.setAttribute('class', 'SelectedRow')" onmouseout="this.removeAttribute('class');">
         <td style="text-align: left">${region.Name}</td>
-        <td style="text-align: center">
-            <input id="browseRegion${region.Id}" type="checkbox" ${"checked" if (isForBrowse) }
-                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="true"
-                onclick="if (!this.checked) document.getElementById('orderRegion${region.Id}').checked = this.checked" />
-            <input id="regionSettings[${region.Id}].IsAvaliableForBrowse" type="hidden"
-                name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="false" />
-        </td>
-        <td style="text-align: center">
-            <input id="orderRegion${region.Id}" type="checkbox" ${"checked" if (isForOrder) }
-                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="true"
-                onclick="if (this.checked) document.getElementById('browseRegion${region.Id}').checked = this.checked" />
-            <input id="regionSettings[${region.Id}].IsAvaliableForOrder" type="hidden"
-                name="regionSettings[${region.Id}].IsAvaliableForOrder" value="false" />
-        </td>
+		<% if IsDefined("singleRegions") and singleRegions: %>
+			<td style="text-align: center">
+				<input id="browseRegion${region.Id}" type="checkbox" ${"checked" if (isForBrowse) }
+					name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="true"
+					onclick="if (!this.checked) document.getElementById('orderRegion${region.Id}').checked = this.checked" />
+				<input id="regionSettings[${region.Id}].IsAvaliableForBrowse" type="hidden"
+					name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="false" />
+			</td>
+		<% else: %>
+			<td style="text-align: center">
+				<input id="browseRegion${region.Id}" type="checkbox" ${"checked" if (isForBrowse) }
+					name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="true"
+					onclick="if (!this.checked) document.getElementById('orderRegion${region.Id}').checked = this.checked" />
+				<input id="regionSettings[${region.Id}].IsAvaliableForBrowse" type="hidden"
+					name="regionSettings[${region.Id}].IsAvaliableForBrowse" value="false" />
+			</td>
+			<td style="text-align: center">
+				<input id="orderRegion${region.Id}" type="checkbox" ${"checked" if (isForOrder) }
+					name="regionSettings[${region.Id}].IsAvaliableForOrder" value="true"
+					onclick="if (this.checked) document.getElementById('browseRegion${region.Id}').checked = this.checked" />
+				<input id="regionSettings[${region.Id}].IsAvaliableForOrder" type="hidden"
+					name="regionSettings[${region.Id}].IsAvaliableForOrder" value="false" />
+			</td>
+		<% end %>
         <input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
     </tr>        
 <%  end %>

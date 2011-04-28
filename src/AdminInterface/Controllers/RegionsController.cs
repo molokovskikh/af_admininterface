@@ -47,13 +47,14 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void DefaultRegions(ulong homeRegionId)
+		public void DefaultRegions(ulong homeRegionId, bool singleRegions)
 		{
 			var homeRegion = Region.Find(homeRegionId);
 			var regions = Region.FindAll()
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0)
 				.OrderBy(region => region.Name)
 				.ToArray();
+			PropertyBag["singleRegions"] = singleRegions;
 			PropertyBag["regions"] = regions;
 			PropertyBag["homeRegionId"] = homeRegion.Id;
 			CancelLayout();
