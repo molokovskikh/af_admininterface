@@ -5,6 +5,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -52,12 +53,19 @@ namespace AdminInterface.Models
 	public class Payer : ActiveRecordValidationBase<Payer>
 	{
 		public Payer(string name)
+			: this(name, name)
+		{}
+
+		public Payer(string name, string fullname)
 			: this()
 		{
 			Name = name;
-			JuridicalName = name;
+			JuridicalName = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
-			JuridicalOrganizations.Add(new LegalEntity(name, this));
+			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
+			OldTariff = 0;
+			OldPayDate = DateTime.Now;
+			Comment = String.Format("Дата регистрации: {0}", DateTime.Now);
 		}
 
 		public Payer()
@@ -67,6 +75,7 @@ namespace AdminInterface.Models
 			Users = new List<User>();
 			Clients = new List<Client>();
 			Addresses = new List<Address>();
+			Suppliers = new List<Supplier>();
 		}
 
 		[PrimaryKey]
@@ -184,6 +193,9 @@ namespace AdminInterface.Models
 
 		[HasMany(typeof (Address), Lazy = true, Inverse = true, OrderBy = "Address")]
 		public virtual IList<Address> Addresses { get; set; }
+
+		[HasMany(typeof (Supplier), Lazy = true, Inverse = true, OrderBy = "Name")]
+		public virtual IList<Supplier> Suppliers { get; set; }
 
 		[HasMany(typeof(LegalEntity), Lazy = true, Inverse = true, Cascade = ManyRelationCascadeEnum.All, OrderBy = "Name")]
 		public virtual IList<LegalEntity> JuridicalOrganizations { get; set; }

@@ -62,7 +62,7 @@ namespace Integration
 		{
 			mailer.EnableChanged(client);
 			mailer.Send();
-			Assert.That(message.Body, Is.StringContaining("Наименование клиента: Тестовый клиент"));
+			Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
 		}
 
 		[Test]

@@ -1,4 +1,5 @@
-using System.Collections.Generic;
+using System;
+using System.Linq;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Integration.ForTesting;
@@ -14,16 +15,16 @@ namespace Integration
 		{
 			ForTest.InitialzeAR();
 			var admin = new Administrator{
-				UserName = "test",
+				UserName = Environment.UserName,
 				Email = "kvasovtest@analit.net",
 				PhoneSupport = "112",
 				RegionMask = ulong.MaxValue,
 				ManagerName = "test",
-				AllowedPermissions = new List<Permission> {
-					Permission.Find(PermissionType.Billing),
-					Permission.Find(PermissionType.ViewDrugstore),
-				}
 			};
+			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
+				.Cast<PermissionType>()
+				.Select(t => Permission.Find(t))
+				.ToList();
 			admin.Save();
 			SecurityContext.GetAdministrator = () => admin;
 			Administrator.GetHost = () => "localhost";

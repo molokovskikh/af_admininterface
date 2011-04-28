@@ -25,7 +25,7 @@ namespace Functional.ForTesting
 
 		public static void Click(this Browser browser, string name)
 		{
-			var button = browser.Button(Find.ByValue(name));
+			var button = browser.Buttons.FirstOrDefault(b => String.Equals(b.Value, name, StringComparison.CurrentCultureIgnoreCase));
 			if (button != null)
 			{
 				button.Click();

@@ -310,7 +310,7 @@ namespace AdminInterface.Models
 			var password = GeneratePassword();
 			ADHelper.CreateUserInAD(Login,
 				password,
-				Client.Id);
+				RootService.Id);
 			return password;
 		}
 

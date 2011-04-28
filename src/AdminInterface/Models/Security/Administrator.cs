@@ -61,7 +61,6 @@ namespace AdminInterface.Models.Security
 		public Department Department { get; set; }
 
 		[HasAndBelongsToMany(typeof(Permission), 
-			RelationType.Bag, 
 			Table = "AdminsPermissions", 
 			Schema = "accessright",
 			ColumnKey = "AdminId", 

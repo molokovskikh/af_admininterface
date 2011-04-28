@@ -23,24 +23,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 end
 %>
 
-<% if payer.Id: %>
-
-	<% component Bubble, {"bredcrumbs" : [("Регистрация аптеки. Шаг 1.", "${siteroot}/Register/Register"),
-										  ("Регистрация аптеки. Шаг 2", "")]} %>
-	<% component CaptureFor, {"id" : "Title"}: %>
-		Регистрация клиента, шаг 2: Заполнения информации о плательщике
-	<% end %>
-
-<% else: %>
-
-	<% component Bubble, {"bredcrumbs" : [("Регистрация плательщика", "")]} %>
-	<% component CaptureFor, {"id" : "Title"}:%>
-		Регистрация плательщика
-	<% end %>
-
-<% end %>
-
-
 <script>
 	document.observe("dom:loaded", function() {
 		SetupCalendarElements();
@@ -100,8 +82,13 @@ end
 	});
 </script>
 
+<% component Bubble, {"bredcrumbs" : [("Регистрация плательщика", "")]} %>
+<% component CaptureFor, {"id" : "Title"}:%>
+	Регистрация плательщика
+<% end %>
+
 <h3>
-	Реистрация клиента, шаг 2: Заполнения информации о плательщике
+	Регистрация плательщика
 </h3>
 
 <form id="PayerInfo" action="registered.rails" method="post">
@@ -109,29 +96,28 @@ end
 	${FormHelper.HiddenField("Instance.PayerID")}
 
 <table>
-	<input type="hidden" name="JuridicalOrganization.Id" value="${JuridicalOrganization.Id}" />
 	${WriteInputGroupHeader("Юридическое лицо")}
 
 					
-	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Name", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Name", 
 													"Краткое наименование:"), 
-								FormHelper.TextField("JuridicalOrganization.Name", {"class" : "BillingInput"}))}
+								FormHelper.TextField("Instance.Name", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.FullName", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
 													"Полное наименование:"), 
-								FormHelper.TextField("JuridicalOrganization.FullName", {"class" : "BillingInput"}))}
+								FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Address", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
 													"Юридический адрес:"), 
-								FormHelper.TextField("JuridicalOrganization.Address", {"class" : "BillingInput"}))}
+								FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
 
-	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Inn", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
 													"ИНН:"), 
-								FormHelper.TextField("JuridicalOrganization.Inn", {"class" : "BillingInput"}))}
+								FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("JuridicalOrganization.Kpp", 
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
 													"КПП:"), 
-								FormHelper.TextField("JuridicalOrganization.Kpp", {"class" : "BillingInput"}))}
+								FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
 
 	<% if payer.Id: %>
 	<%

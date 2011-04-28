@@ -69,7 +69,7 @@ namespace Functional.ForTesting
 			return Open(AppHelper.GetShortUrl(item, action));
 		}
 
-		protected IE Open(string uri)
+		protected IE Open(string uri = "/")
 		{
 			var browser = new IE(BuildTestUrl(uri));
 /*

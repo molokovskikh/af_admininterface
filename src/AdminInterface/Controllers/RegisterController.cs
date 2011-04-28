@@ -89,12 +89,21 @@ namespace AdminInterface.Controllers
 					}
 				}
 
+				supplier.HomeRegion = Region.Find(homeRegion);
+				supplier.ContactGroupOwner = new ContactGroupOwner(ContactGroupType.General,
+					ContactGroupType.ClientManagers,
+					ContactGroupType.OrderManagers);
 				supplier.Registration = new RegistrationInfo(Administrator);
 				if (currentPayer == null)
-					currentPayer = CreatePayer(supplier);
+				{
+					currentPayer = new Payer(supplier.Name, supplier.FullName);
+					currentPayer.Save();
+				}
+
 				supplier.Payer = currentPayer;
 				AddContactsToClient(supplier.ContactGroupOwner, supplierContacts);
 				supplier.Save();
+				scope.Flush();
 				CreateSupplier(DefaultValues.Get(), supplier);
 
 				user = new User(supplier.Payer, supplier) {
@@ -136,7 +145,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
-				RedirectToUrl(LinkHelper.GetVirtualDir(Context) + String.Format("/Supplier/{0}", supplier.Id));
+				Redirect("Suppliers", "Show", new{id = supplier.Id});
 			}
 		}
 
@@ -210,7 +219,11 @@ namespace AdminInterface.Controllers
 					ContactGroupOwner = new ContactGroupOwner(ContactGroupType.General)
 				};
 				if (currentPayer == null)
-					currentPayer = CreatePayer(newClient);
+				{
+					currentPayer = new Payer(newClient.Name, newClient.FullName);
+					currentPayer.BeforeNamePrefix = "Аптека";
+					currentPayer.Save();
+				}
 				newClient.JoinPayer(currentPayer);
 				newClient.AddAddress(deliveryAddress);
 				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
@@ -270,33 +283,6 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private Payer CreatePayer(Service service)
-		{
-			var prefix = String.Empty;
-			if (service is Client)
-				prefix = "Аптека";
-
-			var payer = new Payer {
-				OldTariff = 0,
-				OldPayDate = DateTime.Now,
-				Comment = String.Format("Дата регистрации: {0}", DateTime.Now),
-				Name = service.Name,
-				JuridicalName = service.FullName,
-				BeforeNamePrefix = prefix,
-			};
-			payer.InitGroupOwner();
-			payer.Save();
-
-			var organization = new LegalEntity();
-			organization.Payer = payer;
-			organization.Name = service.Name;
-			organization.FullName = service.FullName;
-			payer.JuridicalOrganizations = new List<LegalEntity> {organization};
-			organization.Save();
-
-			return payer;
-		}
-
 		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
 		{
 			var costCrypKey = ArHelper.WithSession(s =>
@@ -336,7 +322,7 @@ namespace AdminInterface.Controllers
 
 			var command = @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(:ClientCode, null);
-SET @NewPriceCode:=Last_Insert_ID(); 
+SET @NewPriceCode = Last_Insert_ID(); 
 
 INSERT INTO farm.formrules() VALUES();
 SET @NewFormRulesId = Last_Insert_ID();
@@ -347,7 +333,7 @@ INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId
 SET @NewPriceItemId = Last_Insert_ID();
 
 INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT @NewPriceCode, 1, @NewPriceItemId;
-SET @NewPriceCostId:=Last_Insert_ID(); 
+SET @NewPriceCostId = Last_Insert_ID(); 
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 
@@ -418,7 +404,7 @@ WHERE   intersection.pricecode IS NULL
 		AND clientsdata2.firmtype = 1;";
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(command)
-					.SetParameter(":ClientCode", supplier.Id)
+					.SetParameter("ClientCode", supplier.Id)
 					.ExecuteUpdate();
 			});
 		}
@@ -471,32 +457,34 @@ WHERE   intersection.pricecode IS NULL
 
 		public void Registered(
 			[ARDataBind("Instance", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Payer payer,
-			[DataBind("JuridicalOrganization")] LegalEntity juridicalOrganization,
 			[DataBind("PaymentOptions")] PaymentOptions paymentOptions,
 			bool showRegistrationCard)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
+				if (payer.ContactGroupOwner == null)
+					payer.InitGroupOwner();
+
 				payer.AddComment(paymentOptions.GetCommentForPayer());
-				payer.Name = juridicalOrganization.Name;
-				payer.JuridicalName = juridicalOrganization.FullName;
-				payer.Save();
 
 				if (payer.JuridicalOrganizations == null || payer.JuridicalOrganizations.Count == 0)
 				{
 					payer.JuridicalOrganizations = new List<LegalEntity> {
-						juridicalOrganization
+						new LegalEntity(payer.Name, payer.JuridicalName, payer)
 					};
 				}
-				if (payer.ContactGroupOwner == null)
-					payer.InitGroupOwner();
+				else
+				{
+					var org = payer.JuridicalOrganizations.First();
+					org.Name = payer.Name;
+					org.FullName = payer.JuridicalName;
+				}
 
-				juridicalOrganization.Payer = payer;
-				juridicalOrganization.Save();
-
+				payer.Save();
 				scope.VoteCommit();
 			}
 
+			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
 				this.Mail().NotifyBillingAboutClientRegistration(client);
@@ -506,6 +494,8 @@ WHERE   intersection.pricecode IS NULL
 				redirectUrl = String.Format("~/main/report?id={0}", client.Users.First());
 			else if (client != null)
 				redirectUrl = String.Format("~/Client/{0}", client.Id);
+			else if (supplier != null)
+				redirectUrl = String.Format("~/Suppliers/{0}", supplier.Id);
 			else
 				redirectUrl = String.Format("~/Payers/{0}", payer.Id);
 

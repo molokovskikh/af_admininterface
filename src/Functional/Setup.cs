@@ -2,10 +2,12 @@
 using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Models.Security;
 using CassiniDev;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core;
 using SecurityContext = AdminInterface.Security.SecurityContext;
@@ -27,11 +29,11 @@ namespace Functional
 				PhoneSupport = "112",
 				RegionMask = ulong.MaxValue,
 				ManagerName = "test",
-				AllowedPermissions = new List<Permission> {
-					Permission.Find(PermissionType.Billing),
-					Permission.Find(PermissionType.ViewDrugstore),
-				}
 			};
+			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
+				.Cast<PermissionType>()
+				.Select(t => Permission.Find(t))
+				.ToList();
 			admin.Save();
 
 			SecurityContext.GetAdministrator = () => admin;

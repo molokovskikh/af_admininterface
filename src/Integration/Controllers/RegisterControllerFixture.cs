@@ -5,11 +5,8 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
-using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
-using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
-using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -77,7 +74,7 @@ namespace Integration.Controllers
 
 			var paymentOptions = new PaymentOptions { WorkForFree = true };
 
-			controller.Registered(payer, payer.JuridicalOrganizations.First(), paymentOptions, false);
+			controller.Registered(payer, paymentOptions, false);
 
 			Assert.That(Payer.Find(payer.Id).Comment, Is.EqualTo("ata\r\nКлиент обслуживается бесплатно"));
 		}
@@ -131,14 +128,39 @@ namespace Integration.Controllers
 		[Test]
 		public void Payer_registration()
 		{
-			var newPayer = new Payer();
-			controller.Registered(newPayer, new LegalEntity{Name = "test", FullName = "test full"}, new PaymentOptions(), false);
+			var newPayer = new Payer {
+				Name = "Тестовый плательщик",
+				JuridicalName = "Тестовый плательщик"
+			};
+			controller.Registered(newPayer, new PaymentOptions(), false);
 
 			Assert.That(newPayer.Id, Is.Not.EqualTo(0));
 			Assert.That(newPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
 			var org = newPayer.JuridicalOrganizations[0];
-			Assert.That(org.Name, Is.EqualTo("test"));
-			Assert.That(org.FullName, Is.EqualTo("test full"));
+			Assert.That(org.Name, Is.EqualTo("Тестовый плательщик"));
+			Assert.That(org.FullName, Is.EqualTo("Тестовый плательщик"));
+		}
+
+		[Test]
+		public void Register_supplier()
+		{
+			var supplier = new Supplier {
+				Name = "Тестовый поставщик",
+				FullName = "Тестовый поставщик"
+			};
+
+			controller.RegisterSupplier(supplier, 
+				new Contact[0], 1,
+				new RegionSettings[0],
+				new AdditionalSettings(),
+				null,
+				null,
+				"тестовый пользователь",
+				new Contact[0],
+				new Person[0], 
+				"",
+				"");
+			Assert.That(supplier.Id, Is.GreaterThan(0));
 		}
 
 		private Client RegistredClient()

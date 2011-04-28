@@ -65,10 +65,13 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("Clients", Schema = "Future", Lazy = true)]
-	public class Client : Service, IEnablable
+	public class Client : Service
 	{
+		private ClientStatus status;
+
 		public Client()
 		{
+			Type = ServiceType.Drugstore;
 			Registration = new RegistrationInfo();
 			Users = new List<User>();
 			Addresses = new List<Address>();
@@ -92,7 +95,19 @@ namespace AdminInterface.Models
 		public virtual string FullName { get; set; }
 
 		[Property, Description("Включен"), Auditable]
-		public virtual ClientStatus Status { get; set; }
+		public virtual ClientStatus Status
+		{
+			get
+			{
+				return status;
+			}
+
+			set
+			{
+				status = value;
+				Disabled = Status == ClientStatus.Off;
+			}
+		}
 
 		[Property("FirmType")]
 		public override ServiceType Type { get; set; }
@@ -144,9 +159,9 @@ namespace AdminInterface.Models
 			{
 				base.Disabled = value;
 				if (Disabled)
-					Status = ClientStatus.Off;
+					status = ClientStatus.Off;
 				else
-					Status = ClientStatus.On;
+					status = ClientStatus.On;
 			}
 		}
 
