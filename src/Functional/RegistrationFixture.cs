@@ -216,13 +216,10 @@ namespace Functional
 		[Test]
 		public void Try_to_register_hiden_client()
 		{
-			uint clientcode;
-			uint testSupplierId = 0;
-
 			var supplier = DataMother.CreateTestSupplier();
 			supplier.Name += supplier.Id;
 			supplier.Save();
-			testSupplierId = supplier.Id;
+			var testSupplierId = supplier.Id;
 
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
@@ -235,7 +232,7 @@ namespace Functional
 			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
 
 			browser.Button(Find.ById("RegisterButton")).Click();
-			clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
+			var clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
 			With.Connection(c => {
 				var client = Client.Find(clientcode);
@@ -261,7 +258,6 @@ namespace Functional
 		[Test]
 		public void Try_to_register_with_existing_payer()
 		{
-			uint clientcode;
 			var testPayerId = 921;
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("PayerExists")).Checked = true;
@@ -273,7 +269,7 @@ namespace Functional
 			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
 
 			browser.Button(Find.ById("RegisterButton")).Click();
-			clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
+			uint clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
 			using(new SessionScope())
 			{
@@ -301,7 +297,7 @@ namespace Functional
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
-			using (var scope = new SessionScope())
+			using (new SessionScope())
 			{
 				var client = Client.Find(clientCode);
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
@@ -355,7 +351,6 @@ namespace Functional
 		[Test, Description("Регистрация клиента с несколькими телефонами для клиента")]
 		public void Register_with_multiple_client_phones()
 		{
-			uint clientCode = 0;
 			SetupGeneralInformation(browser);
 			browser.Link("clientaddPhoneLink").Click();
 			browser.Link("clientaddPhoneLink").Click();
@@ -366,7 +361,7 @@ namespace Functional
 			browser.TextField(Find.ByName("clientContacts[3].ContactText")).TypeText("311-111111");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
 			Assert.That(browser.Text, Is.StringContaining("111-111111 - some comment, 211-111111, 311-111111"));
 
@@ -383,7 +378,6 @@ namespace Functional
 		[Test, Description("Регистрация клиента с несколькими телефонами для пользователя")]
 		public void Register_with_multiple_user_phones()
 		{
-			uint clientCode = 0;
 			SetupGeneralInformation(browser);
 			browser.Link("useraddPhoneLink").Click();
 			Thread.Sleep(500);
@@ -392,7 +386,7 @@ namespace Functional
 			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("comment for user phone");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			using (new SessionScope())
 			{
 				var client = Client.Find(clientCode);
@@ -415,7 +409,6 @@ namespace Functional
 		[Test, Description("Регистрация клиента с несколькими email для клиента")]
 		public void Register_with_multiple_client_email()
 		{
-			uint clientCode = 0;
 			SetupGeneralInformation(browser);
 			browser.Link("clientaddEmailLink").Click();
 			Thread.Sleep(500);
@@ -424,7 +417,7 @@ namespace Functional
 			browser.TextField(Find.ByName("clientContacts[500].Comment")).TypeText("some comment for email");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
 			Assert.That(browser.Text, Is.StringContaining("qwerty1@qq.qq, qwerty2@qq.qq - some comment for email"));
 
