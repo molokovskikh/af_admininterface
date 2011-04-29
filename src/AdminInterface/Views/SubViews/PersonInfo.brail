@@ -9,10 +9,10 @@
 
 <script type="text/javascript">
 
-	function deletePersonRow(clientId, rowId) {
+	function deletePersonRow(rowId) {
 		$("#rowPerson" + rowId).remove();
 		if (rowId > 0) {
-			$("#HolderPerson" + clientId).append("<input type='hidden' name='deletedpersons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "' />");
+			$("#HolderPerson").append("<input type='hidden' name='deletedpersons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "' />");
 		}
 	}
 
@@ -34,7 +34,7 @@
 	$(document).ready(function() {
 		<% if IsDefined('ContactGroup'): %>
 			<% for person in ContactGroup.Persons: %>
-				addPersonRow(${person.Id}, ${client.Id}, '${person.Name}');
+				addPersonRow(${person.Id}, '${person.Name}');
 			<% end %>
 		<% end %>
 	});
