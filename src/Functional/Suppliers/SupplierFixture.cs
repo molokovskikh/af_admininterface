@@ -80,5 +80,18 @@ namespace Functional.Suppliers
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
 		}
+
+		[Test]
+		public void Register_supplier_show_user_card()
+		{
+			Open("Register/RegisterSupplier");
+			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			browser.Css("#JuridicalName").TypeText("тестовый поставщик");
+			browser.Css("#ShortName").TypeText("тестовый");
+			browser.Css("#FillBillingInfo").Click();
+			browser.Click("Зарегистрировать");
+
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+		}
 	}
 }

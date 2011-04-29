@@ -32,7 +32,7 @@
                                 </td>
                                 <td valign="top" align="center">
                                     <font face="Verdana" size="2"><strong>Регистрационная карта №</strong>&nbsp; </font>
-									<label>${user.Client.Id} / ${user.Login}</label
+									<label>${user.RootService.Id} / ${user.Login}</label
 									><br>
 									<label>Договор № ${user.Payer.Id}</label>
                                     <br>
@@ -60,7 +60,7 @@
                                 Полное наименование:
                             </td>
                             <td height="25">
-								${user.Client.FullName}
+								${user.RootService.FullName}
 							</td>
                         </tr>
                         <tr>
@@ -68,14 +68,14 @@
                                 Краткое наименование:
                             </td>
                             <td height="25">
-								${user.Client.Name}
+								${user.RootService.Name}
 							</td>
                         </tr>
                         <tr>
                             <td align="right" height="25">
 								Тип доступа:
                             <td height="25">
-								${BindingHelper.GetDescription(user.Client.Type)}
+								${BindingHelper.GetDescription(user.RootService.Type)}
 							</td>
                         </tr>
                         <tr>
@@ -171,7 +171,7 @@
             <tr>
                 <td align="center" style="font-size:x-small">
                     <p>
-                        <strong>Отрывной талон к карте № ${user.Client.Id}, Договор № ${user.Payer.Id}</strong>
+                        <strong>Отрывной талон к карте № ${user.RootService.Id}, Договор № ${user.Payer.Id}</strong>
 						<br>
 						<% if IsPasswordChange: %>
                         <label>[Изменение пароля]</label>
@@ -187,7 +187,7 @@
                                 <font face="Verdana" size="1">Клиент:&nbsp; </font>
                             </td>
                             <td height="20">
-								${user.Client.FullName}
+								${user.RootService.FullName}
 							</td>
                         </tr>
                         <tr>
@@ -203,7 +203,7 @@
                                 <font face="Verdana" size="1">Доступ:&nbsp; </font>
                             </td>
                             <td height="20">
-                                ${BindingHelper.GetDescription(user.Client.Type)}
+                                ${BindingHelper.GetDescription(user.RootService.Type)}
 							</td>
                         </tr>
                     </table>
