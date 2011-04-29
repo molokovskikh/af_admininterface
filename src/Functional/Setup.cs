@@ -3,6 +3,7 @@ using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
+using AddUser;
 using AdminInterface.Models.Security;
 using CassiniDev;
 using Functional.ForTesting;

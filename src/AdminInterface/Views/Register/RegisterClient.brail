@@ -207,7 +207,7 @@
 		ViewDiv(false, "#SearchSupplierDiv");
 		ViewDiv(false, "#SelectSupplierDiv");
 		if (selectedValue) {
-			ShowSearchSupplierDiv();
+			ShowSearchSupplierDiv();	
 		}
 		else {
 			UnlockPayer();
@@ -228,7 +228,8 @@
 		var payer = jQuery("#SupplierComboBox option:selected").attr("title");
 		SetLockedPayer(payer);
 		var payerId = parseInt(payer);
-		jQuery("#PayerIdValue").val(payerId);
+		if (payerId != NaN)
+			jQuery("#PayerIdValue").val(payerId);
 	}
 	
 	function LockPayer() {
@@ -239,7 +240,7 @@
 		jQuery("#FillBillingInfo").attr('checked', '');
 		jQuery("#FillBillingInfo").attr('disabled', 'disabled');
 		ViewDiv(false, '#SelectPayerDiv');
-		ViewDiv(false, "#SearchPayerDiv");	    
+		ViewDiv(false, "#SearchPayerDiv");
 	}
 	
 	function SetLockedPayer(payerName) {
@@ -257,9 +258,9 @@
 		jQuery("#PayerExistsValue").val(false);
 		jQuery("#PayerExists").attr('disabled', '');
 		jQuery("#PayerComboBox").attr('disabled', '');
-		jQuery("#ResetPayerButton").attr('disabled', '');	
+		jQuery("#ResetPayerButton").attr('disabled', '');
 		jQuery("#FillBillingInfo").attr('checked', '');
-		jQuery("#FillBillingInfo").attr('disabled', '');	        
+		jQuery("#FillBillingInfo").attr('disabled', '');
 		ViewDiv(false, "#SelectPayerDiv");
 	}
 	

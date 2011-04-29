@@ -218,7 +218,7 @@ namespace AdminInterface.Controllers
 					Segment = client.Segment,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Administrator),
-					ContactGroupOwner = new ContactGroupOwner(ContactGroupType.General)
+					ContactGroupOwner = new ContactGroupOwner()
 				};
 				if (currentPayer == null)
 				{
@@ -308,9 +308,12 @@ namespace AdminInterface.Controllers
 				EnableSmartOrder = true,
 				SmartOrderRules = smartOrder
 			};
-			
+
 			if (additionalSettings.ShowForOneSupplier)
-				client.Settings.NoiseCostExceptSupplier = supplier;
+			{
+				client.Settings.NoiseCosts = true;
+				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
+			}
 			client.SaveAndFlush();
 
 			client.MaintainIntersection();
@@ -520,7 +523,7 @@ WHERE i.Id IS NULL
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = Supplier.Queryable
-					.Where(s => s.Enabled && s.Name.Contains(searchPattern))
+					.Where(s => !s.Disabled && s.Name.Contains(searchPattern))
 					.Take(50);
 			if (payerId.HasValue && (payerId.Value > 0))
 				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);

@@ -13,13 +13,14 @@ namespace AdminInterface.Models
 		public virtual string ParseAlgorithm { get; set; }
 
 		[Property]
-		public virtual uint AssortimentPriceCode { get; set; }
+		public virtual uint? AssortimentPriceCode { get; set; }
 
 		public static SmartOrderRules TestSmartOrder()
 		{
-			var testOrder = new SmartOrderRules
-			{
+			var testOrder = new SmartOrderRules {
+#if !DEBUG
 				AssortimentPriceCode = 4662,
+#endif
 				ParseAlgorithm = "TestSource",
 			};
 			return testOrder;

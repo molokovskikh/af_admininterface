@@ -84,6 +84,11 @@ namespace Functional.ForTesting
 			return browser;
 		}
 
+		protected dynamic Css(string selector)
+		{
+			return browser.Css(selector);
+		}
+
 		protected IE Open(string uri, params object[] args)
 		{
 			return Open(String.Format(uri, args));

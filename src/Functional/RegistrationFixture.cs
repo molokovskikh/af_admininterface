@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.MySql;
@@ -38,7 +39,6 @@ namespace Functional
 		[Test]
 		public void Test_drugstore_validate_required_general_info()
 		{
-			browser.SelectList("clientType").Select("Аптека");
 			// Заполняем адрес доставки
 			browser.TextField("deliveryAddress").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
@@ -55,7 +55,6 @@ namespace Functional
 		[Test]
 		public void Test_validate_contact_info()
 		{
-			browser.SelectList("clientType").Select("Аптека");
 			browser.TextField("deliveryAddress").TypeText("Test address");
 			browser.TextField("JuridicalName").TypeText(_randomClientName);
 			browser.TextField("ShortName").TypeText(_randomClientName);
@@ -85,6 +84,46 @@ namespace Functional
 			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 			Assert.That(browser.CheckBox(Find.ById("PayerExists")).Enabled, Is.False);
 			Test_search_and_select(browser, "Supplier");
+		}
+
+		[Test]
+		public void Register_client_for_supplier()
+		{
+			Supplier supplier;
+			using (new SessionScope())
+			{
+				supplier = DataMother.CreateSupplier();
+				supplier.Save();
+				supplier.Name = "Тестовый поставщик " + supplier.Id;
+				supplier.Save();
+			}
+
+			SetupGeneralInformation(browser);
+			browser.Css("#ShowForOneSupplier").Checked = true;
+			Assert.That(browser.Css("#PayerExists").Enabled, Is.False);
+			browser.Css("#SearchSupplierTextPattern").TypeText(supplier.Name);
+			browser.Css("#SearchSupplierButton").Click();
+
+			Thread.Sleep(500);
+			Assert.That(browser.Text, Is.StringContaining(supplier.Name), "не нашли поставщика");
+			browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
+			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
+			Assert.That(browser.Css("#SelectSupplierDiv").Style.Display, Is.EqualTo("block"));
+			Assert.That(browser.Css("#SearchSupplierDiv").Style.Display, Is.EqualTo("none"));
+			Assert.That(browser.Css("#SupplierComboBox").AllContents.Count, Is.GreaterThan(0));
+			Assert.That(browser.Css("#SupplierComboBox").SelectedItem.Length, Is.GreaterThan(0));
+
+			browser.Css("#SendRegistrationCard").Click();
+
+			browser.Click("Зарегистрировать");
+
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			var client = GetRegistredClient();
+			var settings = client.Settings;
+			Assert.That(settings.NoiseCosts, Is.True);
+			Assert.That(settings.NoiseCostExceptSupplier.Id, Is.EqualTo(supplier.Id));
+			Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
+			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id)); 
 		}
 
 		private void Test_search_and_select(Browser browser, string namePart)
@@ -128,6 +167,12 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
 
+		public Client GetRegistredClient()
+		{
+			var id = Helper.GetClientCodeFromRegistrationCard(browser);
+			return Client.Find(id);
+		}
+
 		[Test]
 		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
 		{
@@ -138,21 +183,14 @@ namespace Functional
 				defaults.Update();
 			}
 
-			uint clientCode;
-			using (var browser = new IE(BuildTestUrl(_registerPageUrl)))
-			{
-				SetupGeneralInformation(browser);
-				browser.SelectList(Find.ById("clientType")).Select("Аптека");
-				browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
-				browser.Button(Find.ById("RegisterButton")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
-				clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			}
+			SetupGeneralInformation(browser);
+			browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
+			browser.Button(Find.ById("RegisterButton")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
+
 			using(new SessionScope())
 			{
-				var client = Client.Find(clientCode);
-				Console.WriteLine(client.Id);
-
+				var client = GetRegistredClient();
 				var user = client.Users.First();
 				var updateInfo = UserUpdateInfo.Find(user.Id);
 				Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
@@ -213,34 +251,6 @@ namespace Functional
 			});
 		}
 
-		[Test]
-		public void Try_to_register_hiden_client()
-		{
-			var supplier = DataMother.CreateTestSupplier();
-			supplier.Name += supplier.Id;
-			supplier.Save();
-			var testSupplierId = supplier.Id;
-
-			SetupGeneralInformation(browser);
-			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
-
-			browser.TextField(Find.ById("SearchSupplierTextPattern")).TypeText(supplier.Name.ToLower());
-			browser.Button(Find.ById("SearchSupplierButton")).Click();
-			Thread.Sleep(2000);
-			Assert.That(browser.Text, Is.StringContaining(supplier.Name), "не нашли поставщика");
-			browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
-			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
-
-			browser.Button(Find.ById("RegisterButton")).Click();
-			var clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
-
-			With.Connection(c => {
-				var client = Client.Find(clientcode);
-				Assert.That(client.Settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
-				Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(testSupplierId)); 
-			});
-		}
-
 		private void SetupGeneralInformation(Browser browser)
 		{
 			browser.TextField(Find.ById("JuridicalName")).TypeText(_randomClientName);
@@ -251,35 +261,39 @@ namespace Functional
 			// Заполняем контактную информацию для пользователя
 			browser.TextField("UserContactPhone").TypeText("123-456789");
 			browser.TextField("UserContactEmail").TypeText(_randomClientName + _mailSuffix);
-			// Если это аптека, заполняем адрес доставки			
+			// Если это аптека, заполняем адрес доставки
 			browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
 		}
 
 		[Test]
 		public void Try_to_register_with_existing_payer()
 		{
-			var testPayerId = 921;
+			Payer payer;
+			using (new SessionScope())
+			{
+				var payerClient = DataMother.TestClient();
+				payerClient.SaveAndFlush();
+				payer = payerClient.Payers.First();
+				payer.Name = "Тестовый плательщик " + payer.Id;
+				payer.Update();
+			}
+
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("PayerExists")).Checked = true;
 
-			browser.TextField(Find.ById("SearchPayerTextPattern")).TypeText("офис");
+			browser.TextField(Find.ById("SearchPayerTextPattern")).TypeText(String.Format("Тестовый плательщик {0}", payer.Id));
 			browser.Button(Find.ById("SearchPayerButton")).Click();
 			Thread.Sleep(2000);
-			browser.SelectList(Find.ById("PayerComboBox")).Select("921. Офис123");
-			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
+			Css("#PayerComboBox").Select(String.Format("{0}. Тестовый плательщик {0}", payer.Id));
+			Assert.That(Css("#FillBillingInfo").Enabled, Is.False);
 
 			browser.Button(Find.ById("RegisterButton")).Click();
-			uint clientcode = Helper.GetClientCodeFromRegistrationCard(browser);
 
-			using(new SessionScope())
-			{
-				var client = Client.Find(clientcode);
-				Assert.That(client.Payers.First().Id, Is.EqualTo(testPayerId));
-
-				var settings = DrugstoreSettings.Find(clientcode);
-				Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
-				Assert.That(settings.FirmCodeOnly, Is.Null);
-			}
+			var client = GetRegistredClient();
+			Assert.That(client.Payers.First().Id, Is.EqualTo(payer.Id));
+			var settings = client.Settings;
+			Assert.That(settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Standart));
+			Assert.That(settings.FirmCodeOnly, Is.Null);
 		}
 
 		[Test]
@@ -366,7 +380,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("111-111111 - some comment, 211-111111, 311-111111"));
 
 			var client = Client.Find(clientCode);
-			var contacts = client.ContactGroupOwner.ContactGroups[0].Contacts;
+			var contacts = client.ContactGroupOwner.ContactGroups.First(g => g.Type == ContactGroupType.General).Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(4));
 			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
 			Assert.That(contacts[0].Comment, Is.EqualTo("some comment"));
