@@ -3,6 +3,13 @@ using Castle.ActiveRecord.Framework;
 
 namespace AdminInterface.Models.Suppliers
 {
+	public enum PriceType
+	{
+		Regular,
+		Assortment,
+		Vip
+	}
+
 	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
 	public class Price : ActiveRecordLinqBase<Price>
 	{
@@ -13,7 +20,7 @@ namespace AdminInterface.Models.Suppliers
 		public virtual string Name { get; set; }
 
 		[Property]
-		public virtual int? PriceType { get; set; }
+		public virtual PriceType PriceType { get; set; }
 
 		[Property]
 		public virtual int? CostType { get; set; }

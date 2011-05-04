@@ -76,10 +76,8 @@ namespace Integration.ForTesting
 		public static Client CreateTestClientWithUser()
 		{
 			return TestClient(c => {
-				c.AddUser(new User {
+				c.AddUser(new User((Service)c) {
 					Name = "test",
-					WorkRegionMask = c.MaskRegion,
-					OrderRegionMask = c.MaskRegion
 				});
 			});
 		}
@@ -274,11 +272,11 @@ namespace Integration.ForTesting
 			return user;
 		}
 
-		public static Supplier CreateSupplier()
+		public static Supplier CreateSupplier(Action<Supplier> action = null)
 		{
 			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
-			return new Supplier {
+			var supplier = new Supplier {
 				Payer = payer,
 				HomeRegion = Region.Find(1UL),
 				RegionMask = 1,
@@ -286,6 +284,10 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
+			if (action != null)
+				action(supplier);
+
+			return supplier;
 		}
 	}
 }

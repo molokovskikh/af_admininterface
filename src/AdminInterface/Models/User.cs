@@ -84,15 +84,17 @@ namespace AdminInterface.Models
 
 			RootService = service;
 			if (service is Client)
+			{
 				Client = (Client)RootService;
+				WorkRegionMask = Client.MaskRegion;
+				OrderRegionMask = Client.Settings.OrderRegionMask;
+			}
 		}
 
 		public User(Client client)
 			: this((Service)client)
 		{
 			Init(client);
-			WorkRegionMask = client.MaskRegion;
-			OrderRegionMask = client.Settings.OrderRegionMask;
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -318,8 +320,11 @@ namespace AdminInterface.Models
 		{
 			Login = "temporary-login";
 			Enabled = true;
-			Logs = new AuthorizationLogEntity(this);
-			UserUpdateInfo = new UserUpdateInfo(this);
+			if (Logs == null)
+				Logs = new AuthorizationLogEntity(this);
+			if (UserUpdateInfo == null)
+				UserUpdateInfo = new UserUpdateInfo(this);
+
 			var defaults = DefaultValues.Get();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;

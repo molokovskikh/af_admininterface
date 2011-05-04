@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
@@ -22,6 +23,7 @@ namespace Functional.Drugstore
 		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
+			scope.Flush();
 			settings = client.Settings;
 
 			browser = Open(client, "Settings");
@@ -31,25 +33,35 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_buying_matrix_configuration()
 		{
-			browser.CheckBox("buymatrix").Click();
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Фармаимпекс";
+				s.FullName = "Фармаимпекс";
+				s.AddPrice("Матрица", PriceType.Assortment);
+			});
+			supplier.Save();
+			scope.Flush();
+
+			Css("#ActivateBuyMatrix").Click();
 
 			browser.TextField("SearchBuymatrixText").TypeText("Фармаимпекс");
 			browser.Button("SearchBuyMatrix").Click();
-			Assert.That(browser.SelectList("drugstore.BuyingMatrixPriceId").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
-			Assert.That(browser.SelectList("drugstore.BuyingMatrixType").SelectedItem, Is.EqualTo("Черный список"));
-			Assert.That(browser.SelectList("drugstore.WarningOnBuyingMatrix").SelectedItem, Is.EqualTo("Запрешать"));
+			Thread.Sleep(1000);
+			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixPrice.Id")).SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Click("Настройка");
 
-			Assert.That(browser.SelectList("drugstore.BuyingMatrixPriceId").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
-			Assert.That(browser.SelectList("drugstore.BuyingMatrixType").SelectedItem, Is.EqualTo("Черный список"));
-			Assert.That(browser.SelectList("drugstore.WarningOnBuyingMatrix").SelectedItem, Is.EqualTo("Запрешать"));
+			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
 			client.Refresh();
 
-			Assert.That(client.Settings.BuyingMatrixPrice.Id, Is.EqualTo(4957));
-			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.BlackList));
+			Assert.That(client.Settings.BuyingMatrixPrice.Name, Is.EqualTo("Матрица"));
+			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
 			Assert.That(client.Settings.WarningOnBuyingMatrix, Is.EqualTo(BuyingMatrixAction.Block));
 		}
 
@@ -113,8 +125,8 @@ namespace Functional.Drugstore
 			Assert.IsTrue(UserOrderRegionExists(browser, "Воронеж"));
 			Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
 
-			client.Refresh();
 			var user = client.Users[0];
+			user.Refresh();
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
@@ -145,6 +157,7 @@ namespace Functional.Drugstore
 
 			client.Refresh();
 			var user = client.Users[0];
+			user.Refresh();
 			Assert.IsFalse((user.WorkRegionMask & 1) > 0);
 			Assert.IsFalse((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);
@@ -163,8 +176,8 @@ namespace Functional.Drugstore
 			// При добавлении региона заказа, автоматически должен подключаться такой же регион работы
 			Assert.IsTrue(UserWorkRegionExists(browser, "Липецк"));
 
-			client.Refresh();
 			var user = client.Users[0];
+			user.Refresh();
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 8) > 0);
@@ -197,6 +210,7 @@ namespace Functional.Drugstore
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 			client.Refresh();
 			var user = client.Users[0];
+			user.Refresh();
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);
@@ -288,7 +302,7 @@ namespace Functional.Drugstore
 			Assert.IsTrue(GetOrderRegion(browser, newHomeRegionName).Checked);
 		}
 
-				[Test]
+		[Test]
 		public void Test_option_ignore_new_prices()
 		{
 			var controlName = "drugstore.IgnoreNewPrices";
@@ -297,7 +311,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			var settings = DrugstoreSettings.Find(client.Id);
+			client.Refresh();
 			Assert.IsTrue(settings.IgnoreNewPrices);
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
@@ -320,7 +334,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			var settings = DrugstoreSettings.Find(client.Id);
+			settings.Refresh();
 			Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
@@ -339,7 +353,6 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
 
-			browser.Link(Find.ByText("Настройка")).Click();
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 			Thread.Sleep(1000);
 			browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectByValue(supplier.Id.ToString());
@@ -406,6 +419,7 @@ where i.ClientId = :ClientId
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.UpdateAndFlush();
 
+			browser.Refresh();
 			Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).Exists);
 			Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value,
 				Is.EqualTo(client.Settings.NoiseCostExceptSupplier.Id.ToString()));

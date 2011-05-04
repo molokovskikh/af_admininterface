@@ -135,8 +135,7 @@ namespace AdminInterface.Controllers
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			ulong homeRegion,
-			bool activateBuyMatrix)
+			ulong homeRegion)
 		{
 			Administrator.CheckClientPermission(client);
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -145,8 +144,7 @@ namespace AdminInterface.Controllers
 				var oldMaskRegion = client.MaskRegion;
 				client.HomeRegion = Region.Find(homeRegion);
 				client.UpdateRegionSettings(regionSettings);
-				if (!activateBuyMatrix)
-					drugstore.BuyingMatrixPrice = null;
+				
 				if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
 				{
 					var smartOrder = SmartOrderRules.TestSmartOrder();
@@ -304,7 +302,7 @@ where Phone like :phone")
 			uint id;
 			UInt32.TryParse(text, out id);
 			PropertyBag["prices"] = Price.Queryable
-				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == 1)
+				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == PriceType.Assortment)
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
 				.ToList();

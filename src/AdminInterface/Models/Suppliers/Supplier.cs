@@ -1,13 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
+using System.IO;
 using System.Linq;
+using System.Security.AccessControl;
+using System.Threading;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Models;
+using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
@@ -18,6 +24,7 @@ namespace AdminInterface.Models.Suppliers
 		{
 			Registration = new RegistrationInfo();
 			OrderRules = new List<OrderSendRules>();
+			Prices = new List<Price>();
 			Type = ServiceType.Supplier;
 		}
 
@@ -66,7 +73,7 @@ namespace AdminInterface.Models.Suppliers
 	}
 */
 
-		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true)]
+		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Price> Prices { get; set; }
 
 		[HasMany]
@@ -124,6 +131,108 @@ namespace AdminInterface.Models.Suppliers
 
 			Payer.AddComment(comment);
 			new ClientInfoLogEntity(comment, this).Save();
+		}
+
+		public virtual void CreateDirs()
+		{
+			var root = @"\\adc.analit.net\Inforoom\FTP\OptBox\";
+			var supplierRoot = Path.Combine(root, Id.ToString().PadLeft(3, '0'));
+			var dirs = new[] { "Orders", "Waybills", "Reports", "Rejects" };
+			try
+			{
+				if (!Directory.Exists(supplierRoot))
+					Directory.CreateDirectory(supplierRoot);
+
+				foreach (var directoryToCreate in dirs.Select(d => Path.Combine(supplierRoot, d)))
+				{
+					if (!Directory.Exists(directoryToCreate))
+						Directory.CreateDirectory(directoryToCreate);
+				}
+
+				foreach (var user in Users)
+					SetAccessControl(user.Login, supplierRoot);
+			}
+			catch (Exception e)
+			{
+				LogManager.GetLogger(GetType()).Error(String.Format(@"
+Ошибка при создании папки на ftp для клиента, иди и создавай руками
+Нужно создать папку {0}
+А так же создать под папки Orders, Rejects, Waybills, Reports
+Дать логинам {1} право читать, писать и получать список директорий и удалять под директории в папке Orders",
+					supplierRoot, Users.Implode(u => u.Login)), e);
+			}
+		}
+
+		public virtual void SetAccessControl(string username, string root)
+		{
+			if (!ADHelper.IsLoginExists(username))
+				return;
+
+			while (true)
+			{
+				var index = 0;
+				try
+				{
+					username = String.Format(@"ANALIT\{0}", username);
+					var rootDirectorySecurity = Directory.GetAccessControl(root);
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.Read,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.Write,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+						FileSystemRights.ListDirectory,
+						InheritanceFlags.ContainerInherit |
+							InheritanceFlags.ObjectInherit,
+						PropagationFlags.None,
+						AccessControlType.Allow));
+#if !DEBUG
+					Directory.SetAccessControl(root, rootDirectorySecurity);
+#endif
+					var orders = Path.Combine(root, "Orders");
+					if (Directory.Exists(orders))
+					{
+						var ordersDirectorySecurity = Directory.GetAccessControl(orders);
+						ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
+							FileSystemRights.DeleteSubdirectoriesAndFiles,
+							InheritanceFlags.ContainerInherit |
+								InheritanceFlags.ObjectInherit,
+							PropagationFlags.None,
+							AccessControlType.Allow));
+#if !DEBUG
+						Directory.SetAccessControl(orders, ordersDirectorySecurity);
+#endif
+					}
+					break;
+				}
+				catch(Exception e)
+				{
+					LogManager.GetLogger(typeof(Address)).Error("Ошибка при назначении прав, пробую еще раз", e);
+					index++;
+					Thread.Sleep(500);
+					if (index > 3)
+						break;
+				}
+			}
+		}
+
+		public virtual void AddPrice(string name, PriceType priceType)
+		{
+			var price = new Price {
+				AgencyEnabled = true,
+				Enabled = true,
+				Name = name,
+				Supplier = this,
+				PriceType = priceType
+			};
+			Prices.Add(price);
 		}
 	}
 }

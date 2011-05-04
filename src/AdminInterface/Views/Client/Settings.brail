@@ -232,7 +232,7 @@
 				</td></tr>
 				<tr>
 					<td>
-						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPrice } />
+						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPrice} />
 						<label>Подключить матрицу закупок</label>
 					</td>
 					<td>
@@ -253,7 +253,8 @@
 						</table>
 						<div id="DivForAssortmentPrice">
 							<% if drugstore.BuyingMatrixPrice: %>
-								${drugstore.BuyMatrixPrice.Supplier.Name} - ${drugstore.BuyMatrixPrice.Name}
+								${drugstore.BuyingMatrixPrice.Supplier.Name} - ${drugstore.BuyingMatrixPrice.Name}
+								<input type=hidden name=drugstore.BuyingMatrixPrice.Id value=${drugstore.BuyingMatrixPrice.Id}>
 							<% end %>
 						</div>
 						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if not drugstore.BuyingMatrixPrice} >
