@@ -6,7 +6,7 @@ namespace Integration.ForTesting
 	[TestFixture]
 	public class IntegrationFixture
 	{
-		private SessionScope scope;
+		protected SessionScope scope;
 
 		[SetUp]
 		public void Setup()

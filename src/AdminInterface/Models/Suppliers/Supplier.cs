@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
@@ -37,7 +37,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
-		[Property, Description("Ðåãèîíû ðàáîòû")]
+		[Property, Description("Ð ÐµÐ³Ð¸Ð¾Ð½Ñ‹ Ñ€Ð°Ð±Ð¾Ñ‚Ñ‹")]
 		public virtual ulong RegionMask { get; set; }
 
 		[Property]
@@ -155,10 +155,10 @@ namespace AdminInterface.Models.Suppliers
 			catch (Exception e)
 			{
 				LogManager.GetLogger(GetType()).Error(String.Format(@"
-Îøèáêà ïðè ñîçäàíèè ïàïêè íà ftp äëÿ êëèåíòà, èäè è ñîçäàâàé ðóêàìè
-Íóæíî ñîçäàòü ïàïêó {0}
-À òàê æå ñîçäàòü ïîä ïàïêè Orders, Rejects, Waybills, Reports
-Äàòü ëîãèíàì {1} ïðàâî ÷èòàòü, ïèñàòü è ïîëó÷àòü ñïèñîê äèðåêòîðèé è óäàëÿòü ïîä äèðåêòîðèè â ïàïêå Orders",
+ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ñ€Ð¸ ÑÐ¾Ð·Ð´Ð°Ð½Ð¸Ð¸ Ð¿Ð°Ð¿ÐºÐ¸ Ð½Ð° ftp Ð´Ð»Ñ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°, Ð¸Ð´Ð¸ Ð¸ ÑÐ¾Ð·Ð´Ð°Ð²Ð°Ð¹ Ñ€ÑƒÐºÐ°Ð¼Ð¸
+ÐÑƒÐ¶Ð½Ð¾ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¿Ð°Ð¿ÐºÑƒ {0}
+Ð Ñ‚Ð°Ðº Ð¶Ðµ ÑÐ¾Ð·Ð´Ð°Ñ‚ÑŒ Ð¿Ð¾Ð´ Ð¿Ð°Ð¿ÐºÐ¸ Orders, Rejects, Waybills, Reports
+Ð”Ð°Ñ‚ÑŒ Ð»Ð¾Ð³Ð¸Ð½Ð°Ð¼ {1} Ð¿Ñ€Ð°Ð²Ð¾ Ñ‡Ð¸Ñ‚Ð°Ñ‚ÑŒ, Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ð¸ Ð¿Ð¾Ð»ÑƒÑ‡Ð°Ñ‚ÑŒ ÑÐ¿Ð¸ÑÐ¾Ðº Ð´Ð¸Ñ€ÐµÐºÑ‚Ð¾Ñ€Ð¸Ð¹ Ð¸ ÑƒÐ´Ð°Ð»ÑÑ‚ÑŒ Ð¿Ð¾Ð´ Ð´Ð¸Ñ€ÐµÐºÑ‚Ð¾Ñ€Ð¸Ð¸ Ð² Ð¿Ð°Ð¿ÐºÐµ Orders",
 					supplierRoot, Users.Implode(u => u.Login)), e);
 			}
 		}
@@ -214,7 +214,7 @@ namespace AdminInterface.Models.Suppliers
 				}
 				catch(Exception e)
 				{
-					LogManager.GetLogger(typeof(Address)).Error("Îøèáêà ïðè íàçíà÷åíèè ïðàâ, ïðîáóþ åùå ðàç", e);
+					LogManager.GetLogger(GetType()).Error("ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ñ€Ð¸ Ð½Ð°Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¸ Ð¿Ñ€Ð°Ð², Ð¿Ñ€Ð¾Ð±ÑƒÑŽ ÐµÑ‰Ðµ Ñ€Ð°Ð·", e);
 					index++;
 					Thread.Sleep(500);
 					if (index > 3)
@@ -223,7 +223,7 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
-		public virtual void AddPrice(string name, PriceType priceType)
+		public virtual Price AddPrice(string name, PriceType priceType)
 		{
 			var price = new Price {
 				AgencyEnabled = true,
@@ -232,7 +232,10 @@ namespace AdminInterface.Models.Suppliers
 				Supplier = this,
 				PriceType = priceType
 			};
+			price.AddCost();
+			price.RegionalData.Add(new PriceRegionalData(price, HomeRegion));
 			Prices.Add(price);
+			return price;
 		}
 	}
 }
