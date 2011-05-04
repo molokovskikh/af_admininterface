@@ -7,9 +7,42 @@ import file from Test.bake
 import file from AppSupport.bake
 import file from Tools.boo
 import System
+import System.IO
 import System.Linq.Enumerable
 import System.Xml.Linq
 import System.Xml.XPath.Extensions from System.Xml.Linq
+import System.ComponentModel
+import System.Runtime.InteropServices
+import System.Security.Principal
+import file from Db.bake
+
+[DllImport("advapi32.dll", SetLastError: true, CharSet: CharSet.Unicode)]
+def LogonUser(lpszUsername as String, lpszDomain as String, lpszPassword as String, dwLogonType as int, dwLogonProvider as int, ref phToken as IntPtr) as bool:
+	pass
+
+[DllImport("kernel32.dll", CharSet: CharSet.Auto)]
+def CloseHandle(handle as IntPtr) as bool:
+	pass
+
+def Impersonate(action as Action):
+	Console.Write("user: ")
+	user = Console.ReadLine()
+	Console.Write("password: ")
+	password = Console.ReadLine()
+
+	LOGON32_PROVIDER_DEFAULT = 0;
+	LOGON32_LOGON_INTERACTIVE = 2;
+	tokenHandle = IntPtr.Zero;
+
+	if not LogonUser(user, "", password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, tokenHandle):
+		raise Win32Exception()
+
+	using WindowsIdentity.Impersonate(tokenHandle):
+		try:
+			action()
+		ensure:
+			CloseHandle(tokenHandle);
+
 
 Global(
 	Project : "AdminInterface",
@@ -64,3 +97,39 @@ task @BuildBackground:
 task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @SendDeployNotification]
 
 task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter,/* @DeployBackground,*/ @SendDeployNotification]
+
+task @FindIntruders:
+	Impersonate:
+		for record in Db.Read("select * from Future.Addresses"):
+			source = """\\adc.analit.net\Inforoom\FTP\OptBox\""" + record.Id
+			destination = """\\adc.analit.net\Inforoom\AptBox\""" + record.Id
+			if Directory.Exists(source):
+				print record.Id
+				orderFiles = Path.Combine(source, "Orders")
+				reportFiles = Path.Combine(source, "Reports")
+				if Directory.Exists(reportFiles) and Directory.GetFiles(reportFiles).Length > 0:
+					print "skip $source"
+					continue
+				if Directory.Exists(orderFiles) and Directory.GetFiles(orderFiles).Length > 0:
+					print "skip $source"
+					continue
+				files = FileSet("**.*", BaseDirectory: source).Files
+				for file in files:
+					fileName = Path.GetFileName(file)
+					id = fileName[:fileName.IndexOf("_")]
+					dir = Path.GetFileName(Path.GetDirectoryName(file))
+					destFile = Path.Combine(destination, dir, fileName)
+					Db.Execute("update logs.DocumentSendLogs set Committed = 0, UpdateId = null where DocumentId = $id")
+					print "id = $id"
+					print "copy from $file $destFile"
+					File.Copy(file, destFile, true)
+
+task @CleanFtp:
+	root = """\\adc.analit.net\Inforoom\FTP\OptBox\"""
+	Impersonate:
+		ids = Db.Read("select * from Future.Suppliers").Select({r| Convert.ToUInt32(r.Id)}).ToList()
+		for dir in Directory.GetDirectories(root):
+			id = Convert.ToUInt32(Path.GetFileName(dir))
+			if not ids.Any({i| id == i}):
+				#print "delete $dir"
+				Directory.Delete(dir, true)
