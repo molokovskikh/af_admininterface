@@ -125,6 +125,7 @@ namespace AdminInterface.Controllers
 			}
 
 			Mailer.SupplierRegistred(supplier);
+			supplier.CreateDirs();
 
 			var log = new PasswordChangeLogEntity(user.Login);
 			if (additionalSettings.SendRegistrationCard)
