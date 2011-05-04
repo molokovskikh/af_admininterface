@@ -108,16 +108,19 @@ Email: {2}
 		{
 			Client client;
 			string body;
+			string subject;
 			if (item is User)
 			{
 				var user = ((User)item);
 				body = "Зарегистрирован новый пользователь " + user.Login;
+				subject = "Регистрация нового пользователя";
 				client = user.Client;
 			}
 			else
 			{
 				var address = ((Address)item);
 				body = "Зарегистрирован новый адрес доставки " + address.Value;
+				subject = "Регистрация нового адреса доставки";
 				client = address.Client;
 			}
 
@@ -128,7 +131,7 @@ Email: {2}
 			}
 
 			Func.Mail("register@analit.net", 
-				"Регистрация нового адреса доставки", 
+				subject, 
 				String.Format(@"Для клиента {0} код {1} регион {2}
 {3}
 Регистратор {4}",
