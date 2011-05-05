@@ -109,14 +109,14 @@
 				jQuery("#SearchAssortimentPriceText").css("disabled", "");
 				jQuery("#SearchAssortimentPriceMessage").html("");
 				jQuery("#DivForAssortimentPrice").append(data);
-				jQuery("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPriceId']").attr("name", "drugstore.AssortimentPrice.Id")
+				jQuery("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPrice.Id']").attr("name", "drugstore.AssortimentPrice.Id")
 			},
 			error: function (xhr, textStatus, error) {
 				jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
 			}
 		});
 		jQuery("#SearchAssortimentPriceText").css("disabled", "disabled");
-		jQuery("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");		
+		jQuery("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");
 	}
 
 </script>
