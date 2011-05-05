@@ -4,9 +4,9 @@ using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
-#if !DEBUG
+//#if !DEBUG
 using System.Security.AccessControl;
-#endif
+//#endif
 using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
@@ -172,8 +172,12 @@ set @skip = 0;
 
 		public virtual void CreateFtpDirectory()
 		{
-			var ftpRoot = ConfigurationManager.AppSettings["FtpRoot"];
-			var clientRoot = Path.Combine(ftpRoot, Id.ToString());
+			CreateFtpDirectory(ConfigurationManager.AppSettings["FtpRoot"]);
+		}
+
+		public virtual void CreateFtpDirectory(string root)
+		{
+			var clientRoot = Path.Combine(root, Id.ToString());
 			try
 			{
 				Directory.CreateDirectory(clientRoot);
@@ -183,7 +187,7 @@ set @skip = 0;
 				Directory.CreateDirectory(Path.Combine(clientRoot, "Rejects"));
 				Directory.CreateDirectory(Path.Combine(clientRoot, "Waybills"));
 				foreach (var user in Client.Users)
-					SetAccessControl(user.Login);
+					SetAccessControl(user.Login, clientRoot);
 			}
 			catch(Exception e)
 			{
@@ -198,6 +202,11 @@ set @skip = 0;
 
 		public virtual void SetAccessControl(string username)
 		{
+			SetAccessControl(ConfigurationManager.AppSettings["FtpRoot"], Id.ToString());
+		}
+
+		public virtual void SetAccessControl(string username, string root)
+		{
 			if (!ADHelper.IsLoginExists(username))
 				return;
 
@@ -207,11 +216,8 @@ set @skip = 0;
 				try
 				{
 #if !DEBUG
-					var ftpRoot = ConfigurationManager.AppSettings["FtpRoot"];
-					var clientRoot = Path.Combine(ftpRoot, Id.ToString());
-
 					username = String.Format(@"ANALIT\{0}", username);
-					var rootDirectorySecurity = Directory.GetAccessControl(clientRoot);
+					var rootDirectorySecurity = Directory.GetAccessControl(root);
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Read,
 						InheritanceFlags.ContainerInherit |
@@ -230,9 +236,9 @@ set @skip = 0;
 							InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
 						AccessControlType.Allow));
-					Directory.SetAccessControl(clientRoot, rootDirectorySecurity);
+					Directory.SetAccessControl(root, rootDirectorySecurity);
 
-					var orders = Path.Combine(clientRoot, "Orders");
+					var orders = Path.Combine(root, "Orders");
 					if (Directory.Exists(orders))
 					{
 						var ordersDirectorySecurity = Directory.GetAccessControl(orders);
