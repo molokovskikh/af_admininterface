@@ -105,8 +105,7 @@
     <Compile Include="Billing\ReportFixture.cs" />
     <Compile Include="Billing\RevisionActFixture.cs" />
     <Compile Include="CallHistoryFixture.cs" />
-    <Compile Include="ClientFixture.cs" />
-    <Compile Include="ClientMessagesFixture.cs" />
+    <Compile Include="Drugstore\ClientFixture.cs" />
     <Compile Include="BindPhoneToClientFixture.cs" />
     <Compile Include="CallbackRulesFixture.cs" />
     <Compile Include="ClientCloneFixture.cs" />
@@ -124,17 +123,15 @@
     <Compile Include="MainViewFixure.cs" />
     <Compile Include="PromotionsFixture.cs" />
     <Compile Include="RegionalAdminFixture.cs" />
-    <Compile Include="RegistrationFixture.cs" />
-    <Compile Include="SearchClientFixture.cs" />
-    <Compile Include="ServiceFixture.cs" />
+    <Compile Include="Drugstore\RegistrationFixture.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="StatContFixture.cs" />
     <Compile Include="SupplierFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />
     <Compile Include="UpdateLogFixture.cs" />
-    <Compile Include="UserFixture.cs" />
-    <Compile Include="UserSearchFixture.cs" />
+    <Compile Include="Drugstore\UserFixture.cs" />
+    <Compile Include="Drugstore\UserSearchFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
