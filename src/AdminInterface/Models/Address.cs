@@ -15,6 +15,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using log4net;
 using Common.Web.Ui.Models;
@@ -190,8 +191,8 @@ set @skip = 0;
 Ошибка при создании папки на ftp для клиента, иди и создавай руками
 Нужно создать папку {0}
 А так же создать под папки Orders, Docs, Rejects, Waybills
-Дать логину {1} право читать, писать и получать список директорий и удалять под директории в папке Orders",
-					clientRoot, Client.Users.First().Login), e);
+Дать логинам {1} право читать, писать и получать список директорий и удалять под директории в папке Orders",
+					clientRoot, Client.Users.Implode(u => u.Login)), e);
 			}
 		}
 
