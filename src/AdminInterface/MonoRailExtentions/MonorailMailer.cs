@@ -49,7 +49,7 @@ namespace AdminInterface.MonoRailExtentions
 			if (clazz == typeof(User))
 			{
 				type = "пользователя";
-				var user = ((User) item);
+				var user = (User) item;
 				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null)
@@ -58,7 +58,7 @@ namespace AdminInterface.MonoRailExtentions
 			if (clazz == typeof(Address))
 			{
 				type = "адреса";
-				var address = ((Address) item);
+				var address = (Address) item;
 				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null)
@@ -67,18 +67,18 @@ namespace AdminInterface.MonoRailExtentions
 			if (clazz == typeof(Client))
 			{
 				type = "клиента";
-				var client = (Client) item;
+				var client = Client.Find(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null)
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 			}
-
 			if (clazz == typeof(Supplier))
 			{
 				type = "поставщика";
 				PropertyBag["service"] = item;
 			}
+
 			if (item.Enabled)
 				Subject = String.Format("Возобновлена работа {0}", type);
 			else
