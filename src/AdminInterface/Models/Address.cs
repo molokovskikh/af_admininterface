@@ -172,22 +172,21 @@ set @skip = 0;
 
 		public virtual void CreateFtpDirectory()
 		{
-			CreateFtpDirectory(ConfigurationManager.AppSettings["FtpRoot"]);
+			CreateFtpDirectory(GetAddressRoot());
 		}
 
-		public virtual void CreateFtpDirectory(string root)
+		public virtual void CreateFtpDirectory(string addressRoot)
 		{
-			var clientRoot = Path.Combine(root, Id.ToString());
 			try
 			{
-				Directory.CreateDirectory(clientRoot);
+				Directory.CreateDirectory(addressRoot);
 
-				Directory.CreateDirectory(Path.Combine(clientRoot, "Orders"));
-				Directory.CreateDirectory(Path.Combine(clientRoot, "Docs"));
-				Directory.CreateDirectory(Path.Combine(clientRoot, "Rejects"));
-				Directory.CreateDirectory(Path.Combine(clientRoot, "Waybills"));
+				Directory.CreateDirectory(Path.Combine(addressRoot, "Orders"));
+				Directory.CreateDirectory(Path.Combine(addressRoot, "Docs"));
+				Directory.CreateDirectory(Path.Combine(addressRoot, "Rejects"));
+				Directory.CreateDirectory(Path.Combine(addressRoot, "Waybills"));
 				foreach (var user in Client.Users)
-					SetAccessControl(user.Login, clientRoot);
+					SetAccessControl(user.Login, addressRoot);
 			}
 			catch(Exception e)
 			{
@@ -196,13 +195,18 @@ set @skip = 0;
 Нужно создать папку {0}
 А так же создать под папки Orders, Docs, Rejects, Waybills
 Дать логинам {1} право читать, писать и получать список директорий и удалять под директории в папке Orders",
-					clientRoot, Client.Users.Implode(u => u.Login)), e);
+					addressRoot, Client.Users.Implode(u => u.Login)), e);
 			}
 		}
 
 		public virtual void SetAccessControl(string username)
 		{
-			SetAccessControl(ConfigurationManager.AppSettings["FtpRoot"], Id.ToString());
+			SetAccessControl(username, GetAddressRoot());
+		}
+
+		private string GetAddressRoot()
+		{
+			return Path.Combine(ConfigurationManager.AppSettings["AptBox"], Id.ToString());
 		}
 
 		public virtual void SetAccessControl(string username, string root)

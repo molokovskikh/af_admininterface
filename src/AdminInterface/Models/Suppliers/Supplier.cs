@@ -120,7 +120,11 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual void CreateDirs()
 		{
-			var root = @"\\adc.analit.net\Inforoom\FTP\OptBox\";
+			CreateDirs(ConfigurationManager.AppSettings["OptBox"]);
+		}
+
+		public virtual void CreateDirs(string root)
+		{
 			var supplierRoot = Path.Combine(root, Id.ToString().PadLeft(3, '0'));
 			var dirs = new[] { "Orders", "Waybills", "Reports", "Rejects" };
 			try
@@ -162,20 +166,17 @@ namespace AdminInterface.Models.Suppliers
 					var rootDirectorySecurity = Directory.GetAccessControl(root);
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Read,
-						InheritanceFlags.ContainerInherit |
-							InheritanceFlags.ObjectInherit,
+						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
 						AccessControlType.Allow));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.Write,
-						InheritanceFlags.ContainerInherit |
-							InheritanceFlags.ObjectInherit,
+						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
 						AccessControlType.Allow));
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 						FileSystemRights.ListDirectory,
-						InheritanceFlags.ContainerInherit |
-							InheritanceFlags.ObjectInherit,
+						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
 						AccessControlType.Allow));
 #if !DEBUG
@@ -187,8 +188,7 @@ namespace AdminInterface.Models.Suppliers
 						var ordersDirectorySecurity = Directory.GetAccessControl(orders);
 						ordersDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
 							FileSystemRights.DeleteSubdirectoriesAndFiles,
-							InheritanceFlags.ContainerInherit |
-								InheritanceFlags.ObjectInherit,
+							InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 							PropagationFlags.None,
 							AccessControlType.Allow));
 #if !DEBUG
