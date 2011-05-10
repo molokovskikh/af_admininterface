@@ -119,12 +119,13 @@ SELECT
 
 	p.JuridicalName as {{UserSearchItem.JuridicalName}},
 	r.Region as {{UserSearchItem.RegionName}},
-	0 as {{UserSearchItem.Segment}}
+	if(sup.Segment is null, 2, if(sup.Segment = 0, 2, 1)) as {{UserSearchItem.Segment}}
 FROM
 	future.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
 	join future.Services s on s.Id = u.RootService
 		join farm.Regions r ON r.RegionCode = s.HomeRegion
+	left join Future.Suppliers sup on sup.Id = u.RootService
 	left JOIN future.Clients ON Clients.Id = u.ClientId
 		left JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
 		left JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
@@ -260,7 +261,7 @@ LOWER(Persons.Name) like '{0}' ",
 					}
 				case SearchUserBy.ByPayerId: {
 						filter = AddFilterCriteria(filter, String.Format(" u.PayerId = {0} ",
-                            searchTextIsNumber ? searchText : "-1"));
+							searchTextIsNumber ? searchText : "-1"));
 						break;
 					}
 				case SearchUserBy.ByUserId: {

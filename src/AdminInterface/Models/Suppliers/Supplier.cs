@@ -43,6 +43,9 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public override bool Disabled { get; set; }
 
+		[Property]
+		public virtual Segment Segment { get; set; }
+
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
@@ -54,24 +57,6 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
-
-		public virtual Segment Segment
-		{
-			get
-			{
-				return Segment.Wholesale;
-			}
-		}
-
-/*
-	[HasMany(ColumnKey = "RootService", Lazy = true, Inverse = true, MapType = typeof(User))]
-	public virtual IList<User> Users { get; set; }
-
-	public class SupplierUser : User
-	{
-		public Supplier
-	}
-*/
 
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Price> Prices { get; set; }
