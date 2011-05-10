@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
@@ -203,9 +204,19 @@ namespace AdminInterface.Controllers
 #if DEBUG
 			printerPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\Printer.exe");
 #endif
-			var info = new System.Diagnostics.ProcessStartInfo(printerPath,
-				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId));
+			var info = new ProcessStartInfo(printerPath,
+				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId)) {
+					UseShellExecute = false,
+					CreateNoWindow = true,
+					RedirectStandardError = true,
+					RedirectStandardInput = true,
+					RedirectStandardOutput = true
+				};
 			var process = System.Diagnostics.Process.Start(info);
+			process.OutputDataReceived += (sender, args) => {};
+			process.ErrorDataReceived += (sender, args) => {};
+			process.BeginErrorReadLine();
+			process.BeginOutputReadLine();
 			process.WaitForExit(30*1000);
 
 			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
