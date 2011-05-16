@@ -59,9 +59,10 @@ ${app.EndFormFor("filter")}
 			url: url,
 			success: function (data) {
 				var row = $(data);
-				row.css("display", "none");
 				row.insertAfter("#documentFileRow" + id);
-				//$("#DocumentDetails" + id).slideDown(500);
+				//не работает
+				//row.slideDown(500);
+				row.css("display", "table-row");
 			}
 		});
 	}

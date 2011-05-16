@@ -60,7 +60,7 @@ namespace AdminInterface.Controllers
 				.CreateAlias("r.SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin)
 				//.Add(Expression.Between("r.LogTime", begin, end))
 				.Add(Expression.Ge("r.LogTime", begin))
-				.Add(Expression.Le("r.LogTime", end))
+				.Add(Expression.Le("r.LogTime", end.AddDays(1)))
 				.AddOrder(Order.Desc("r.LogTime"));
 		}
 	}
