@@ -68,7 +68,10 @@ namespace AdminInterface.Models.Suppliers
 		{
 			get
 			{
-				return User.Queryable.Where(u => u.RootService == this).ToList();
+				if (Id > 0)
+					return User.Queryable.Where(u => u.RootService == this).ToList();
+
+				return Enumerable.Empty<User>().ToList();
 			}
 		}
 
@@ -93,6 +96,11 @@ namespace AdminInterface.Models.Suppliers
 		}
 
 		public virtual void Save()
+		{
+			ActiveRecordMediator.Save(this);
+		}
+
+		public virtual void SaveAndFlush()
 		{
 			ActiveRecordMediator.Save(this);
 		}
@@ -157,11 +165,12 @@ namespace AdminInterface.Models.Suppliers
 			if (!ADHelper.IsLoginExists(username))
 				return;
 
+			var index = 0;
 			while (true)
 			{
-				var index = 0;
 				try
 				{
+#if !DEBUG
 					username = String.Format(@"ANALIT\{0}", username);
 					var rootDirectorySecurity = Directory.GetAccessControl(root);
 					rootDirectorySecurity.AddAccessRule(new FileSystemAccessRule(username,
@@ -179,9 +188,8 @@ namespace AdminInterface.Models.Suppliers
 						InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 						PropagationFlags.None,
 						AccessControlType.Allow));
-#if !DEBUG
+
 					Directory.SetAccessControl(root, rootDirectorySecurity);
-#endif
 					var orders = Path.Combine(root, "Orders");
 					if (Directory.Exists(orders))
 					{
@@ -191,10 +199,9 @@ namespace AdminInterface.Models.Suppliers
 							InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
 							PropagationFlags.None,
 							AccessControlType.Allow));
-#if !DEBUG
 						Directory.SetAccessControl(orders, ordersDirectorySecurity);
-#endif
 					}
+#endif
 					break;
 				}
 				catch(Exception e)

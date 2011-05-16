@@ -214,9 +214,9 @@ set @skip = 0;
 			if (!ADHelper.IsLoginExists(username))
 				return;
 
+			var index = 0;
 			while (true)
 			{
-				var index = 0;
 				try
 				{
 #if !DEBUG

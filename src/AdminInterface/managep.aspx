@@ -78,50 +78,6 @@
 			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
-					Показываемые клиенты
-				</h3>
-				<div class="ContentBlock">
-					<asp:GridView ID="ShowClientsGrid" runat="server" AutoGenerateColumns="False" OnRowCommand="ShowClientsGrid_RowCommand" DataMember="ShowClients"
-						OnRowDataBound="ShowClientsGrid_RowDataBound" OnRowDeleting="ShowClientsGrid_RowDeleting">
-						<EmptyDataTemplate>
-							<asp:Button ID="AddButton" runat="server" CommandName="Add" Text="Добавить клиента" />
-						</EmptyDataTemplate>
-						<Columns>
-							<asp:TemplateField>
-								<HeaderTemplate>
-									<asp:Button ID="AddButton" CommandName="Add" runat="server" Text="Добавить" />
-								</HeaderTemplate>
-								<ItemTemplate>
-									<asp:Button ID="DeleteButton" CommandName="Delete" runat="server" Text="Удалить" />
-								</ItemTemplate>
-								<ItemStyle Width="10%" />
-							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Клиент">
-								<ItemTemplate>
-									<asp:TextBox ID="SearchText" runat="server" />
-									<asp:Button ID="SearchButton" CommandName="Search" runat="server" Text="Найти" ValidationGroup="3" />
-									<asp:DropDownList ID="ShowClientsList" runat="server" DataTextField="ShortName" DataValueField="FirmCode">
-									</asp:DropDownList>
-									<asp:CustomValidator ID="ShowCleintsValidator" runat="server" ControlToValidate="ShowClientsList"
-										ErrorMessage="Необходимо выбрать клиента." OnServerValidate="ParentValidator_ServerValidate"
-										ValidateEmptyText="True" ValidationGroup="1">*</asp:CustomValidator>
-								</ItemTemplate>
-							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Тип показываемого клиента">
-								<ItemTemplate>
-									<asp:DropDownList ID="ShowType" runat="server" SelectedValue='<%# Eval("ShowType") %>'>
-										<asp:ListItem Value="0">Базовый</asp:ListItem>
-										<asp:ListItem Value="1">Заказы</asp:ListItem>
-										<asp:ListItem Value="2">Все</asp:ListItem>
-									</asp:DropDownList>
-								</ItemTemplate>
-							</asp:TemplateField>
-						</Columns>
-					</asp:GridView>
-				</div>
-			</div>
-			<div class="BorderedBlock">
-				<h3 class="Header">
 					Региональная настройка
 				</h3>
 				<div class="ContentBlock">

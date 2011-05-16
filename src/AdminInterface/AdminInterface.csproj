@@ -248,7 +248,6 @@
     <Compile Include="Security\NotAuthorizedException.cs" />
     <Compile Include="Helpers\NotificationHelper.cs" />
     <Compile Include="Helpers\ReportHelper.cs" />
-    <Compile Include="Helpers\ShowRegulationHelper.cs" />
     <Compile Include="Main.Master.cs">
       <DependentUpon>Main.Master</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

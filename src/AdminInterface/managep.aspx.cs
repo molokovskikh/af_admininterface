@@ -9,7 +9,9 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -37,30 +39,19 @@ namespace AddUser
 			set { Session["RegionalSettingsData"] = value; }
 		}
 
-		private int _clientCode
-		{
-			get { return Convert.ToInt32(Session["ClientCode"]); }
-			set { Session["ClientCode"] = value; }
-		}
+		private Supplier supplier;
 			
-		private ulong _homeRegion
-		{
-			get { return (ulong) Session["RegionalSettingsHomeRegion"]; }
-			set { Session["RegionalSettingsHomeRegion"] = value;}
-		}
-
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
-		
+			uint id;
+			if (!UInt32.TryParse(Request["cc"], out id))
+				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
+			
+			supplier = Supplier.Find(id);
+
 			if (!IsPostBack)
 			{
-				int clientCode;
-				if (Int32.TryParse(Request["cc"], out clientCode))
-					_clientCode = clientCode;
-				else
-					throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", clientCode), "ClientCode");
-
 				GetData();
 				ConnectDataSource();
 				DataBind();
@@ -77,20 +68,15 @@ namespace AddUser
 			RegionalSettingsGrid.DataSource = Data;
 			WorkRegionList.DataSource = Data;
 			HomeRegion.DataSource = Data;
-			ShowClientsGrid.DataSource = Data;
 			OrderSendRules.DataSource = Data;
 		}
 
 		private void GetData()
 		{
-			_homeRegion = GetHomeRegion();
-			SecurityContext.Administrator.CheckClientHomeRegion(_homeRegion);
 			if (Data == null)
 				Data = new DataSet();
 			else 
 				Data.Clear();
-
-			var supplier = Supplier.Find(Convert.ToUInt32(_clientCode));
 
 			var pricesCommandText =
 @"
@@ -135,24 +121,24 @@ ORDER BY region;";
 			var enableRegionsCommandText = @"
 SELECT  a.RegionCode,
 		a.Region,
-		cd.MaskRegion & a.regioncode > 0 as Enable
+		s.RegionMask & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
 		farm.regions as b, 
-		clientsdata as cd
+		Future.Suppliers as s
 WHERE   b.regioncode = ?HomeRegion
-		AND cd.firmcode = ?ClientCode
-		AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
+		AND s.Id = ?ClientCode
+		AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
 GROUP BY regioncode
 ORDER BY region;";
 
 			var orderSendConfig = @"
-SELECT s.Id, s.SenderId, s.FormaterId, s.SendDebugMessage, s.ErrorNotificationDelay, r.RegionCode
-FROM ordersendrules.order_send_rules s
-	left join farm.regions r on s.regioncode = r.regioncode
-	join usersettings.clientsdata cd on cd.firmcode = s.firmcode
-where s.firmcode = ?ClientCode
-	  and (cd.MaskRegion & ?AdminRegionMask & r.regioncode > 0 or s.regionCode is null)
-order by s.RegionCode;";
+SELECT osr.Id, osr.SenderId, osr.FormaterId, osr.SendDebugMessage, osr.ErrorNotificationDelay, r.RegionCode
+FROM ordersendrules.order_send_rules osr
+	join future.Suppliers s on s.Id = osr.firmcode
+	left join farm.regions r on osr.regioncode = r.regioncode
+where s.Id = ?ClientCode
+	  and (s.RegionMask & ?AdminRegionMask & r.regioncode > 0 or osr.RegionCode is null)
+order by s.HomeRegion;";
 
 			var senders = @"
 SELECT id, classname FROM ordersendrules.order_handlers o
@@ -166,9 +152,9 @@ order by className;";
 
 			var sendRuleRegions = @"
 SELECT r.regioncode, r.region
-FROM (farm.regions r, usersettings.clientsdata cd)
-where cd.firmcode = ?ClientCode
-	  and cd.MaskRegion & ?AdminRegionMask & r.regioncode > 0
+FROM (farm.regions r, Future.Suppliers s)
+where s.Id = ?ClientCode
+	  and s.RegionMask & ?AdminRegionMask & r.regioncode > 0
 order by r.Region;";
 
 
@@ -178,7 +164,7 @@ order by r.Region;";
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?supplierId", supplier.Id);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
 
 					dataAdapter.Fill(Data, "Prices");
 
@@ -206,8 +192,6 @@ order by r.Region;";
 					row["RegionCode"] = DBNull.Value;
 					row["Region"] = "Любой регион";
 					Data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
-
-					ShowRegulationHelper.Load(dataAdapter, Data);
 				});
 
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
@@ -216,7 +200,7 @@ order by r.Region;";
 
 		private void SetRegions()
 		{
-			HomeRegion.SelectedValue = _homeRegion.ToString();
+			HomeRegion.SelectedValue = supplier.HomeRegion.Id.ToString();
 			for (var i = 0; i < Data.Tables["EnableRegions"].Rows.Count; i++)
 				WorkRegionList.Items[i].Selected = Convert.ToBoolean(Data.Tables["EnableRegions"].Rows[i]["Enable"]);
 		}
@@ -301,22 +285,22 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 call UpdateCostType(@InsertedPriceCode, ?CostType);
 
-INSERT 
+INSERT
 INTO    pricesregionaldata
 		(
-				regioncode, 
-				pricecode, 
+				regioncode,
+				pricecode,
 				enabled
-		)    
+		)
 SELECT  r.RegionCode,
-		p.PriceCode, 
-		if(p.pricetype<>1, 1, 0) 
-FROM    pricesdata p,   
-		clientsdata cd,   
-		farm.regions r  
+		p.PriceCode,
+		if(p.pricetype<>1, 1, 0)
+FROM    pricesdata p,
+		future.Suppliers s,
+		farm.regions r
 WHERE   p.PriceCode  = @InsertedPriceCode
-		AND p.FirmCode = cd.FirmCode 
-		AND (r.RegionCode & cd.MaskRegion > 0)  
+		AND p.FirmCode = s.Id
+		AND (r.RegionCode & s.RegionMask > 0)
 		AND not exists
 		(
 			SELECT * 
@@ -352,19 +336,18 @@ SELECT DISTINCT drugstore.Id,
 	if(DrugstoreSettings.IgnoreNewPrices = 1, 0, 1),
 	if(pricesdata.PriceType = 0, 1, 0)
 FROM pricesdata
-	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
-		join Future.Clients as drugstore ON clientsdata.FirmSegment = drugstore.Segment
+	JOIN Future.Suppliers s ON pricesdata.firmcode = s.Id
+		join Future.Clients as drugstore ON s.Segment = drugstore.Segment
 			join billing.PayerClients p on p.ClientId = drugstore.Id
 				join Billing.LegalEntities le on le.PayerId = p.PayerId
 		join usersettings.RetClientsSet DrugstoreSettings ON DrugstoreSettings.ClientCode = drugstore.Id
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
+	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
-	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = clientsdata.FirmCode)
+	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = s.Id)
 		LEFT JOIN future.intersection as rootIntersection on rootIntersection.PriceId = rootPrice.PriceCode and rootIntersection.RegionId = Regions.RegionCode and rootIntersection.ClientId = drugstore.Id
 			and rootIntersection.LegalEntityId = le.Id
 WHERE i.Id IS NULL
-	AND clientsdata.firmtype = 0
 	AND pricesdata.PriceCode = @InsertedPriceCode;
 
 DROP TEMPORARY TABLE IF EXISTS tmp;
@@ -391,7 +374,7 @@ WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.Intersecti
 ");
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 			pricesDataAdapter.InsertCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
@@ -472,7 +455,7 @@ values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?Error
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SendDebugMessage", MySqlDbType.Bit, 0, "SendDebugMessage");
 			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?ErrorNotificationDelay", MySqlDbType.Bit, 0, "ErrorNotificationDelay");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.AddWithValue("?FirmCode", _clientCode);
+			orderSendRulesDataAdapter.InsertCommand.Parameters.AddWithValue("?FirmCode", supplier.Id);
 
 			orderSendRulesDataAdapter.DeleteCommand = new MySqlCommand(@"
 delete FROM ordersendrules.order_send_rules
@@ -500,7 +483,6 @@ where id = ?Id;");
 					pricesDataAdapter.Update(Data.Tables["Prices"]);
 					regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
 					orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
-					ShowRegulationHelper.Update(connection, transaction, Data, _clientCode);
 				});
 			
 			GetData();
@@ -572,8 +554,6 @@ where id = ?Id;");
 				if (Convert.ToUInt32(((TextBox)row.FindControl("SmsSendDelay")).Text) != Convert.ToUInt32(dataRow["ErrorNotificationDelay"]))
 					dataRow["ErrorNotificationDelay"] = Convert.ToUInt32(((TextBox)row.FindControl("SmsSendDelay")).Text);
 			}
-
-			ShowRegulationHelper.ProcessChanges(ShowClientsGrid, Data);
 		}
 
 		protected void ShowAllRegionsCheck_CheckedChanged(object sender, EventArgs e)
@@ -584,9 +564,9 @@ where id = ?Id;");
 				commandText = @"
 SELECT  a.RegionCode,   
 		a.Region,
-		cd.MaskRegion & a.regioncode > 0 as Enable
-FROM farm.regions as a, clientsdata as cd
-WHERE a.regionCode & ?AdminRegionMask > 0 and cd.firmcode = ?ClientCode
+		s.RegionMask & a.regioncode > 0 as Enable
+FROM farm.regions as a, future.Suppliers as s
+WHERE a.regionCode & ?AdminRegionMask > 0 and s.Id = ?ClientCode
 ORDER BY region;";
 			}
 			else
@@ -594,13 +574,13 @@ ORDER BY region;";
 				commandText = @"
 SELECT  a.RegionCode,
 		a.Region,
-		cd.MaskRegion & a.regioncode > 0 as Enable
+		s.RegionMask & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
 		farm.regions as b, 
-		clientsdata as cd
+		future.Suppliers as s
 WHERE   b.regioncode = ?HomeRegion
-		and cd.firmcode = ?ClientCode
-		and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | cd.MaskRegion) > 0
+		and s.Id = ?ClientCode
+		and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
 GROUP BY regioncode
 ORDER BY region;";
 			}
@@ -608,8 +588,8 @@ ORDER BY region;";
 			With.Connection(
 				c => {
 					var adapter = new MySqlDataAdapter(commandText, c);
-					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-					adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", _homeRegion);
+					adapter.SelectCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
+					adapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
 					adapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
 					adapter.Fill(Data, "EnableRegions");
 				});
@@ -622,9 +602,7 @@ ORDER BY region;";
 			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
 			{
 				connection.Open();
-				var maskRegionCommand = new MySqlCommand(@"SELECT MaskRegion FROM ClientsData WHERE FirmCode = ?ClientCode;", connection);
-				maskRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-				var oldMaskRegion = Convert.ToUInt64(maskRegionCommand.ExecuteScalar());
+				var oldMaskRegion = supplier.RegionMask;
 				var newMaskRegion = oldMaskRegion;
 				foreach (ListItem item in WorkRegionList.Items)
 				{
@@ -637,31 +615,30 @@ ORDER BY region;";
 				if (oldMaskRegion == newMaskRegion)
 					return;
 
+				supplier.RegionMask = newMaskRegion;
+				supplier.SaveAndFlush();
+				//здесь длинная транз акция activerecord, что бы изменения были видны запросам комитем
+				SessionScope.Current.Commit();
+
 				var updateCommand = new MySqlCommand(
 						@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
-UPDATE ClientsData
-SET MaskRegion = ?MaskRegion
-WHERE FirmCode = ?ClientCode;
-
 INSERT 
 INTO    pricesregionaldata
 		(
-				regioncode, 
-				pricecode, 
+				regioncode,
+				pricecode,
 				enabled
-		)    
+		)
 SELECT  r.RegionCode,
-		p.PriceCode, 
-		if(p.pricetype<>1, 1, 0) 
-FROM    pricesdata p,   
-		clientsdata cd,   
-		farm.regions r  
-WHERE     cd.FirmCode  = ?ClientCode  
-		AND p.FirmCode = cd.FirmCode  
-		AND (r.RegionCode & cd.MaskRegion > 0)  
+		p.PriceCode,
+		if(p.pricetype<>1, 1, 0)
+FROM pricesdata p, future.Suppliers s, farm.regions r
+WHERE s.Id = ?ClientCode
+		AND p.FirmCode = s.Id
+		AND (r.RegionCode & s.RegionMask > 0)
 		AND not exists
 		(SELECT * 
 		FROM    pricesregionaldata prd 
@@ -670,16 +647,14 @@ WHERE     cd.FirmCode  = ?ClientCode
 		);
 
 INSERT INTO regionaldata(FirmCode, RegionCode)
-SELECT  cd.FirmCode, 
-		r.RegionCode 
-FROM    ClientsData cd, 
-		Farm.Regions r 
-WHERE   cd.FirmCode = ?ClientCode 
-		AND(r.RegionCode & cd.MaskRegion) > 0 
-		AND NOT exists 
-		(SELECT * 
-		FROM    regionaldata rd 
-		WHERE   rd.FirmCode       = cd.FirmCode 
+SELECT s.Id, r.RegionCode
+FROM Future.Suppliers s, Farm.Regions r
+WHERE   s.Id = ?ClientCode
+		AND(r.RegionCode & s.RegionMask) > 0 
+		AND NOT exists
+		(SELECT *
+		FROM regionaldata rd 
+		WHERE rd.FirmCode = s.Id
 				AND rd.RegionCode = r.RegionCode
 );
 
@@ -705,19 +680,18 @@ SELECT DISTINCT drugstore.Id,
 	if(DrugstoreSettings.IgnoreNewPrices = 1, 0, 1),
 	if(pricesdata.PriceType = 0, 1, 0)
 FROM pricesdata
-	JOIN clientsdata ON pricesdata.firmcode = clientsdata.firmcode
-		join Future.Clients as drugstore ON clientsdata.FirmSegment = drugstore.Segment
+	JOIN future.Suppliers s ON pricesdata.firmcode = s.Id
+		join Future.Clients as drugstore ON s.Segment = drugstore.Segment
 			join billing.PayerClients p on p.ClientId = drugstore.Id
 				join Billing.LegalEntities le on le.PayerId = p.PayerId
 			join usersettings.RetClientsSet DrugstoreSettings ON DrugstoreSettings.ClientCode = drugstore.Id
-	JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
+	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
 WHERE i.Id IS NULL
-	AND clientsdata.firmtype = 0
-	AND clientsdata.firmcode = ?ClientCode;", connection);
+	AND s.Id = ?ClientCode;", connection);
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
-				updateCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
+				updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
@@ -727,38 +701,13 @@ WHERE i.Id IS NULL
 		private void UpdateHomeRegion()
 		{
 			var currentHomeRegion = Convert.ToUInt64(HomeRegion.SelectedValue);
-			if (_homeRegion == currentHomeRegion) 
+			if (supplier.HomeRegion.Id == currentHomeRegion) 
 				return;
 
-			With.Transaction(
-				(connection, transaction) =>
-					{
-						var command = new MySqlCommand(@"
-SET @InHost = ?UserHost;
-SET @InUser = ?UserName;
-
-UPDATE ClientsData 
-SET RegionCode = ?RegionCode
-WHERE FirmCode = ?ClientCode;", connection, transaction);
-						command.Parameters.AddWithValue("?RegionCode", currentHomeRegion);
-						command.Parameters.AddWithValue("?ClientCode", _clientCode);
-						command.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
-						command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-						command.ExecuteNonQuery();
-					});
-		}
-		
-		private ulong GetHomeRegion()
-		{
-			using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection.Open();
-				var homeRegionCommand = new MySqlCommand("SELECT RegionCode FROM ClientsData WHERE FirmCode = ?ClientCode;",
-														 connection);
-				homeRegionCommand.Parameters.AddWithValue("?ClientCode", _clientCode);
-
-				return Convert.ToUInt64(homeRegionCommand.ExecuteScalar());
-			}
+			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
+			supplier.SaveAndFlush();
+			//здесь длинная транз акция activerecord, что бы изменения были видны запросам комитем
+			SessionScope.Current.Commit();
 		}
 
 		protected void RegionalSettingsGrid_RowCreated(object sender, GridViewRowEventArgs e)
@@ -778,21 +727,6 @@ WHERE FirmCode = ?ClientCode;", connection, transaction);
 			}
 		}
 
-		protected void ShowClientsGrid_RowDataBound(object sender, GridViewRowEventArgs e)
-		{
-			ShowRegulationHelper.ShowClientsGrid_RowDataBound(sender, e);
-		}
-
-		protected void ShowClientsGrid_RowCommand(object sender, GridViewCommandEventArgs e)
-		{
-			ShowRegulationHelper.ShowClientsGrid_RowCommand(sender, e, Data);
-		}
-
-		protected void ShowClientsGrid_RowDeleting(object sender, GridViewDeleteEventArgs e)
-		{
-			ShowRegulationHelper.ShowClientsGrid_RowDeleting(sender, e, Data);
-		}
-
 		protected void ParentValidator_ServerValidate(object source, ServerValidateEventArgs args)
 		{
 			args.IsValid = !String.IsNullOrEmpty(args.Value);
@@ -802,7 +736,7 @@ WHERE FirmCode = ?ClientCode;", connection, transaction);
 		{
 			if (costType.Equals(DBNull.Value))
 				return _unconfiguratedCostTypes;
-			return _configuratedCostTypes;				
+			return _configuratedCostTypes;
 		}
 
 		protected void OrderSettings_RowCommand(object sender, GridViewCommandEventArgs e)
@@ -825,7 +759,7 @@ WHERE FirmCode = ?ClientCode;", connection, transaction);
 		protected void OrderSettings_RowDeleting(object sender, GridViewDeleteEventArgs e)
 		{
 			Data.Tables["OrderSendConfig"].DefaultView[e.RowIndex].Delete();
-			((GridView)sender).DataBind();			
+			((GridView)sender).DataBind();
 		}
 
 		protected void OrderSettings_RowDataBound(object sender, GridViewRowEventArgs e)
