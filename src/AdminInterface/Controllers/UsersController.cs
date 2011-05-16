@@ -70,8 +70,9 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 
+				user.Init(client);
 				user.Payer = Payer.Find(user.Payer.Id);
-				user.Setup(client);
+				user.Setup();
 				password = user.CreateInAd();
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();

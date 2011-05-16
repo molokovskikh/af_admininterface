@@ -333,14 +333,10 @@ namespace AdminInterface.Models
 			Update();
 
 			if (Client != null)
+			{
 				Client.UpdateBeAccounted();
-		}
-
-		public virtual void Setup(Client client)
-		{
-			Init(client);
-			Setup();
-			AddPrices(client);
+				AddPrices(Client);
+			}
 		}
 
 		public virtual void Init(Client client)

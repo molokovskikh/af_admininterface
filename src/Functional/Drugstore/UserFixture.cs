@@ -45,7 +45,7 @@ namespace Functional
 				mainUser = new User(client) {
 					Name = "test"
 				};
-				mainUser.Setup(client);
+				mainUser.Setup();
 				transaction.VoteCommit();
 			}
 			using(var browser = Open("client/{0}", client.Id))

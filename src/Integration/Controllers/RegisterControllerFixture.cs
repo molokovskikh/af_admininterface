@@ -57,7 +57,7 @@ namespace Integration.Controllers
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
 			};
 			addsettings = new AdditionalSettings {PayerExists = true};
-			clientContacts = new[] {new Contact{Id = 1, Type = 0, ContactText = "11@33.ru"}};
+			clientContacts = new[] {new Contact{Type = ContactType.Email, ContactText = "11@33.ru"}};
 			person = new[] {new Person()};
 		}
 
@@ -87,6 +87,7 @@ namespace Integration.Controllers
 
 			var registredClient = RegistredClient();
 			var registredPayer = registredClient.Payers.Single();
+			var registredUser = registredClient.Users.First();
 
 			Assert.That(registredPayer.JuridicalOrganizations.Count, Is.EqualTo(1));
 			var org = registredPayer.JuridicalOrganizations.Single();
@@ -99,9 +100,15 @@ namespace Integration.Controllers
 					.SetParameter("clientId", registredClient.Id)
 					.UniqueResult<long>());
 
+			var userPriceCount = ArHelper.WithSession(
+				s => s.CreateSQLQuery("select count(*) from Future.UserPrices where userId = :userId")
+					.SetParameter("userId", registredUser.Id)
+					.UniqueResult<long>());
+
 			var user = registredClient.Users.First();
 			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));
+			Assert.That(userPriceCount, Is.GreaterThan(0));
 		}
 
 		[Test]

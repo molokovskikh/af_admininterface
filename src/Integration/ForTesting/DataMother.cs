@@ -103,7 +103,7 @@ namespace Integration.ForTesting
 			var user = new User(client) {
 				Name = "test"
 			};
-			user.Setup(client);
+			user.Setup();
 			var address = new Address {
 				Client = client,
 				Value = "тестовый адрес"

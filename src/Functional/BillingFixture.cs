@@ -102,7 +102,7 @@ namespace Functional
 		public void View_all_users()
 		{
 			var user = new User(client) {Name = "test user for billing",};
-			user.Setup(client);
+			user.Setup();
 			user.SaveAndFlush();
 			client.Users.Add(user);
 			client.UpdateAndFlush();
@@ -443,7 +443,7 @@ namespace Functional
 				for (var i = 0; i < countUsers; i++)
 				{
 					var user = new User(client) { Name = "user", };
-					user.Setup(client);
+					user.Setup();
 					var address = new Address { Client = client, Value = "address", };
 					client.AddAddress(address);
 					address.Save();
@@ -497,7 +497,7 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var user = new User(client) { Name = "test user", Enabled = true, };
-				user.Setup(client);
+				user.Setup();
 				client.AddAddress("address");
 				client.AddAddress("address");
 				client.Users[0].Enabled = true;
@@ -626,7 +626,7 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var usr = new User(client) {Name = "test user",};
-				usr.Setup(client);
+				usr.Setup();
 				scope.VoteCommit();
 			}
 
@@ -690,7 +690,7 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var user = new User(client) {Name = "test user",};
-				user.Setup(client);
+				user.Setup();
 				var address = new Address {Value = "address",};
 				client.AddAddress(address);
 				address.Save();

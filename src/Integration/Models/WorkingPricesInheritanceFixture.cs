@@ -19,8 +19,8 @@ namespace Integration.Models
 
 			using(new SessionScope())
 			{
-				parent.Setup(client);
-				child.Setup(client);
+				parent.Setup();
+				child.Setup();
 
 				ArHelper.WithSession(s => {
 					var prices = s.CreateSQLQuery(@"

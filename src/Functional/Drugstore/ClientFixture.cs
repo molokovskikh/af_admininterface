@@ -22,7 +22,7 @@ namespace Functional
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				var user = new User(client) {Name = "test user", Enabled = true,};
-				user.Setup(client);
+				user.Setup();
 				scope.VoteCommit();
 			}
 			using (var browser = Open(String.Format("Client/{0}", client.Id)))
@@ -65,7 +65,7 @@ namespace Functional
 			using (var scope = new TransactionScope())
 			{				
 				var user = new User(client) {Name = "User2",};
-				user.Setup(client);
+				user.Setup();
 				user.SaveAndFlush();
 				client.Users.Add(user);
 				client.UpdateAndFlush();
