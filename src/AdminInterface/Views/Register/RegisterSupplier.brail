@@ -62,11 +62,11 @@
 	function validateForm() {
 		jQuery("form").validate({
 			rules: {
-				"client.FullName": "required",
-				"client.Name": "required",
-				"clientContacts[0].ContactText" : "required",
+				"supplier.FullName": "required",
+				"supplier.Name": "required",
+				"supplierContacts[0].ContactText" : "required",
 				"additionalEmailsForSendingCard": "validateEmailList",
-				"clientContacts[1].ContactText" : "noEmailAddress"
+				"supplierContacts[1].ContactText" : "noEmailAddress"
 			}
 		});
 	}
