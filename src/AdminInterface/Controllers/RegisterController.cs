@@ -228,13 +228,17 @@ namespace AdminInterface.Controllers
 					currentPayer.Save();
 				}
 				newClient.JoinPayer(currentPayer);
-				newClient.AddAddress(deliveryAddress);
+				if (!String.IsNullOrWhiteSpace(deliveryAddress))
+					newClient.AddAddress(deliveryAddress);
+
 				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				AddContactsToClient(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
 				password = newUser.CreateInAd();
-				newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
+				if (newClient.Addresses.Count > 0)
+					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
+
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
 				newClient.AddComment(comment);
 

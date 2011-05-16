@@ -109,18 +109,20 @@ namespace Integration.Controllers
 			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));
 			Assert.That(userPriceCount, Is.GreaterThan(0));
+
+			//Assert.That(registredClient.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
+			Assert.That(registredClient.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
+			Assert.That(registredClient.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 
 		[Test]
-		public void Create_client_with_smart_order()
+		public void Register_client_without_address()
 		{
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address",
-				null, null, null, clientContacts, null, new Contact[0], person, "", "");
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
+			var registredClient = RegistredClient();
 
-			client = RegistredClient();
-			Assert.That(client.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
-			Assert.That(client.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
-			Assert.That(client.Settings.EnableSmartOrder, Is.EqualTo(true));
+			Assert.That(registredClient.Addresses.Count, Is.EqualTo(0));
 		}
 
 		[Test]
