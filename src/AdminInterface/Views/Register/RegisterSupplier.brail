@@ -27,10 +27,6 @@
 		jQuery("#SearchSupplierDiv").css("display", "none");
 		jQuery("#SelectSupplierDiv").css("display", "none");
 
-		jQuery.validator.addMethod("validateAddress", function(value, element) {
-			return validateAddress(value, element);
-		}, "Некорректное значение адреса");
-
 		jQuery.validator.addMethod("validateEmailList", function(value, element) {
 			if (value.toString().length > 0) {
 				res = /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
