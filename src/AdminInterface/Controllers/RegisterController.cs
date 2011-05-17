@@ -279,15 +279,13 @@ namespace AdminInterface.Controllers
 
 		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, User user, string password, string additionalEmails)
 		{
-			var mailTo = user.GetAddressForSendingClientCard();
-
+			var mailTo = EmailHelper.JoinMails(user.GetAddressForSendingClientCard(), user.GetEmails(), additionalEmails);
 			var smtpid = ReportHelper.SendClientCard(user,
 				password,
 				true,
 				mailTo,
 				additionalEmails);
-
-			log.SetSentTo(smtpid, EmailHelper.JoinMails(mailTo, user.GetEmails(), additionalEmails));
+			log.SetSentTo(smtpid, mailTo);
 			return log;
 		}
 

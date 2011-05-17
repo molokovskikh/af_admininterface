@@ -458,14 +458,11 @@ namespace AdminInterface.Models
 
 		public virtual string GetEmails()
 		{
-			var emails = String.Empty;
-			for (var i = 0; i < ContactGroup.Contacts.Count; i++)
-			{
-				var contact = ContactGroup.Contacts[i];
-				if ((contact.Type == ContactType.Email) && (!emails.Contains(contact.ContactText)))
-					emails += (String.IsNullOrEmpty(emails)) ? contact.ContactText : String.Format(", {0}", contact.ContactText);
-			}
-			return emails;
+			return ContactGroup.Contacts
+				.Where(c => c.Type == ContactType.Email)
+				.Select(c => c.ContactText)
+				.Distinct()
+				.Implode();
 		}
 
 		public virtual void AddPrices(Client client)
