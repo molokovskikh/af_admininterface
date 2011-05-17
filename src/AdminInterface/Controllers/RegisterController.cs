@@ -42,6 +42,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterSupplier()
 		{
+			PropertyBag["supplier"] = new Supplier();
 			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["SingleRegions"] = true;
 		}

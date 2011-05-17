@@ -314,28 +314,6 @@
 		<h3>Общая информация</h3>
 		<table border="0" width="100%" cellpadding="5" cellspacing="0">
 			<tr>
-				<td width="20%">Тип клиента:</td>
-				<td width="50%">
-					<select name="client.Type" id="clientType" style="width: 100%" onchange="OnClientTypeChanged(this.options[this.selectedIndex].value)">
-						<option value="${ClientTypeDrugstore}" selected="selected">Аптека</option>
-						<!-- 
-						Возможность регистрации поставщиков в "новой реальности" пока недоступна
-						<option value="${ClientTypeSupplier}">Поставщик</option>-->
-					</select>
-				</td>
-				<td></td>
-			</tr>
-			<tr>
-				<td>Сегмент:</td>
-				<td>
-					<select name="client.Segment" id="SegmentComboBox" style="width: 100%">
-						<option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
-						<option value="${SegmentTypeRetail}">Розница</option>
-					</select>
-				</td>
-				<td></td>
-			</tr>
-			<tr>
 				<td>Юридическое наименование:</td>
 				<td><input type="text" id="JuridicalName" name="client.FullName" style="width: 100%" /></td>
 				<td></td>

@@ -17,6 +17,15 @@
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
 <script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
 
+<style>
+
+	select[name='supplier.Segment']
+	{
+		width: 100%;
+	}
+
+</style>
+
 <script type="text/javascript">
 
 	jQuery(function() {
@@ -196,10 +205,7 @@
 			<tr>
 				<td>Сегмент:</td>
 				<td>
-					<select name="client.Segment" id="SegmentComboBox" style="width: 100%">
-						<option value="${SegmentTypeWholesale}" selected="selected">Опт</option>
-						<option value="${SegmentTypeRetail}">Розница</option>
-					</select>
+					${app.Edit("supplier.Segment")}
 				</td>
 				<td></td>
 			</tr>
