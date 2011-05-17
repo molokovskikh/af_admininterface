@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Castle.MonoRail.Framework.Test;
 using Common.Web.Ui.Helpers;
@@ -170,6 +171,8 @@ namespace Integration.Controllers
 				"",
 				"");
 			Assert.That(supplier.Id, Is.GreaterThan(0));
+			var user = supplier.Users.First();
+			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
 		}
 
 		private Client RegistredClient()
