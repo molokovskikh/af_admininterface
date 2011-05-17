@@ -42,6 +42,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public uint EnabledClientCount { get; set; }
+
+		[Property]
+		public uint EnabledSupplierCount { get; set; }
 		
 		[Property]
 		public string Regions { get; set; }
@@ -62,7 +65,7 @@ namespace AdminInterface.Models
 
 		public bool IsDisabled
 		{
-			get { return EnabledUsersCount == 0 || EnabledClientCount == 0; }
+			get { return (EnabledUsersCount == 0 || EnabledClientCount == 0) && EnabledSupplierCount == 0; }
 		}
 
 		public string GetSegments()
@@ -170,6 +173,7 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
 		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
 		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
+		count(distinct if(s.Disabled = 0, s.Id, null)) as {{BillingSearchItem.EnabledSupplierCount}},
 
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
@@ -181,10 +185,11 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
 		ifnull(group_concat(distinct ifnull(r.Name, '')), '') as {{BillingSearchItem.Recipients}}
 from billing.payers p
+	left join Billing.Recipients r on r.Id = p.RecipientId
 	left join future.Users users on users.PayerId = p.PayerId
-		left join future.Clients cd on cd.Id = users.ClientId
+	left join future.Clients cd on cd.Id = users.ClientId
 	left join future.Addresses addresses on addresses.PayerId = p.PayerId
-		left join Billing.Recipients r on r.Id = p.RecipientId
+	left join future.Suppliers s on s.Payer = p.PayerId
 where 1 = 1 {0}
 group by p.payerId
 having {1}
