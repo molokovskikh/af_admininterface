@@ -273,11 +273,14 @@ namespace AdminInterface.Models
 SELECT {Payer.*}
 FROM billing.payers {Payer}
 WHERE {Payer}.ShortName like :SearchText
-and exists (
-	select * from Future.Clients c
-		join Billing.PayerClients pc on pc.ClientId = c.Id
-	where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
-)
+and (exists(
+		select * from Future.Clients c
+			join Billing.PayerClients pc on pc.ClientId = c.Id
+		where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
+	) or exists(
+		select * from Future.Suppliers s
+		where s.Payer = {Payer}.PayerId and s.Disabled = 0 and (s.RegionMask & :AdminRegionCode > 0)
+	))
 ORDER BY {Payer}.shortname;";
 				var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
 					.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)

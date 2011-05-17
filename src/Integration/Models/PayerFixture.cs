@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
@@ -16,7 +16,21 @@ namespace Integration.Models
 		{
 			var client = DataMother.TestClient();
 			var payer = client.Payers.First();
-			payer.ShortName = String.Format("�������� ��������� {0}", payer.Id);
+			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
+			payer.UpdateAndFlush();
+
+			var payers = Payer.GetLikeAvaliable(payer.ShortName);
+			Assert.That(payers.Count(), Is.EqualTo(1));
+			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
+		}
+
+		[Test]
+		public void Search_payet_with_supplier()
+		{
+			var supplier = DataMother.CreateSupplier();
+			var payer = supplier.Payer;
+			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
+			supplier.Save();
 			payer.UpdateAndFlush();
 
 			var payers = Payer.GetLikeAvaliable(payer.ShortName);
