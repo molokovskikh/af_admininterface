@@ -56,6 +56,10 @@
 		</div>
 	</div>
 
+	<div class=block>
+		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
+	</div>
+
 	<form method=post action="${siteroot}/Acts/Process">
 		<div class=block>
 			<input name=delete type=submit value="Удалить">

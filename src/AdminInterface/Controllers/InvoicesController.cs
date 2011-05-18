@@ -21,6 +21,9 @@ namespace AdminInterface.Controllers
 		public Recipient Recipient { get; set; }
 		public string SearchText { get; set; }
 
+		public int Count { get; set; }
+		public decimal Sum { get; set; }
+
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
@@ -40,12 +43,17 @@ namespace AdminInterface.Controllers
 			if (!String.IsNullOrEmpty(SearchText))
 				criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 
-			return ArHelper.WithSession(s => criteria
+			var docs = ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
 				.ToList()
 				.GroupBy(i => ((dynamic)i).Id)
 				.Select(g => g.First())
 				.ToList();
+
+			
+			Count = docs.Count;
+			Sum = docs.Sum(d => (decimal)((dynamic)d).Sum);
+			return docs;
 		}
 
 		public string[] ToUrl()

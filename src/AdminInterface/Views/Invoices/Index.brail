@@ -65,6 +65,10 @@
 	</div>
 
 	<div class=block>
+		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
+	</div>
+
+	<div class=block>
 		<table class=DataTable>
 			<% if invoices.Count: %>
 			<tr>
