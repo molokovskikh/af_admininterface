@@ -89,6 +89,11 @@ namespace Functional.ForTesting
 			return browser.Css(selector);
 		}
 
+		protected void Click(string name)
+		{
+			browser.Click(name);
+		}
+
 		protected IE Open(string uri, params object[] args)
 		{
 			return Open(String.Format(uri, args));

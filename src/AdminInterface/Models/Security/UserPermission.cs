@@ -1,4 +1,5 @@
-﻿using Castle.ActiveRecord;
+﻿using System.ComponentModel;
+using Castle.ActiveRecord;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Security
@@ -12,7 +13,7 @@ namespace AdminInterface.Models.Security
 
 	public enum UserPermissionTypes
 	{
-		Base = 0,
+		[Description("Права доступа")] Base = 0,
 		AnalitFExcel = 1,
 		AnalitFPrint = 2,
 		SupplierInterface = 3

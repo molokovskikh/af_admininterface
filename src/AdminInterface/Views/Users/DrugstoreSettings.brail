@@ -1,5 +1,5 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${user.Client.Name}", "${siteroot}/client/${user.Client.Id}"),
+									  ("Клиент ${user.RootService.Name}", app.GetUrl(user.RootService)),
 									  ("Пользователь ${user.Login}", "${siteroot}/users/${user.Id}/edit"),
 									  ("Настройка пользователя", "")]} %>
 									  
@@ -27,20 +27,12 @@
 				<% end %>
 			</select><br>
 
-			<input type=checkbox name=user.SaveAFDataFiles ${"checked" if user.SaveAFDataFiles} value=true> Сохранять подготовленные данные<br>
-			<input type=hidden name=user.SaveAFDataFiles value=false>
-
+			${app.Edit("user.SaveAFDataFiles")}<br>
 			${app.Edit("user.UseAdjustmentOrders")}<br>
+			${app.Edit("user.SubmitOrders")}<br>
+			${app.Edit("user.SendWaybills")}<br>
+			${app.Edit("user.SendRejects")}<br>
 
-			<input type=checkbox name=user.SubmitOrders ${"checked" if user.SubmitOrders} value=true> Подтверждать отправку заказов<br>
-			<input type=hidden name=user.SubmitOrders value=false>
-			
-			<input type=checkbox name=user.SendWaybills ${"checked" if user.SendWaybills} value=true> Получать накладные<br>
-			<input type=hidden name=user.SendWaybills value=false>
-			
-			<input type=checkbox name=user.SendRejects ${"checked" if user.SendRejects} value=true> Получать отказы<br>
-			<input type=hidden name=user.SendRejects value=false>
-			
 			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
 			<input type=hidden name=user.Auditor value=false>
 			</p>

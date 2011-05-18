@@ -267,7 +267,7 @@ namespace Integration.ForTesting
 				Login = "temporary-login"
 			};
 			user.Save();
-			user.Login = user.Id.ToString();
+			user.Setup();
 			user.Update();
 			return user;
 		}

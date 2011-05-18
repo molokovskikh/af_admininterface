@@ -36,7 +36,7 @@
 			"User.css")}
 	</head>
 	<body>
-
+	<% ShowHeader = true %>
 	<% if IsDefined("bredcrumbs"): %>
 		<div class="Navigation">
 			<ul id="breadcrumb">
@@ -47,12 +47,16 @@
 				</li>
 				<% for label, url in bredcrumbs: %>
 				<li>
-					<% if url != "": %>
+					<% if url: %>
 					<a href="${url}">${label}</a>
 					<% else: %>
-				${label}
+					<% ShowHeader = false %>
+					${label}
 					<% end %>
 				</li>
+				<% end %>
+				<% if ShowHeader and IsDefined("Title"): %>
+				<li>${Title}</li>
 				<% end %>
 			</ul>
 		</div>
@@ -68,6 +72,10 @@
 			${Message}
 		</div>
 		<% end %>
+	<% end %>
+
+	<% if ShowHeader and IsDefined("Title"): %>
+	<h2>${Title}</h2>
 	<% end %>
 
 	${ChildOutput}

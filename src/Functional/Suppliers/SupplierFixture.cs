@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
@@ -30,78 +30,101 @@ namespace Functional.Suppliers
 		{
 			Open("/users/search");
 			browser.Css("#SearchText").TypeText(user.Id.ToString());
-			browser.Button(Find.ByValue("Поиск")).Click();
+			browser.Button(Find.ByValue("РџРѕРёСЃРє")).Click();
 			Assert.That(browser.Text, Is.StringContaining(user.Login));
 /*
- *			срабатывает автоматичский вход в пользователя
+ *			СЃСЂР°Р±Р°С‚С‹РІР°РµС‚ Р°РІС‚РѕРјР°С‚РёС‡СЃРєРёР№ РІС…РѕРґ РІ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
 			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поставщик"));
+			Assert.That(browser.Text, Is.StringContaining("РџРѕСЃС‚Р°РІС‰РёРє"));
 */
+		}
+
+		[Test]
+		public void Change_user_permissions()
+		{
+			Open(user, "Edit");
+			Assert.That(browser.Text, Is.StringContaining("РќР°СЃС‚СЂРѕР№РєР°"));
+			Click("РќР°СЃС‚СЂРѕР№РєР°");
+			Assert.That(browser.Text, Is.StringContaining("РќР°СЃС‚СЂРѕР№РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ"));
+			var permission = GetPermission("РЈРїСЂР°РІР»СЏС‚СЊ Р·Р°РєР°Р·Р°РјРё");
+			Assert.That(permission.Checked, Is.True);
+			permission.Click();
+			Click("РЎРѕС…СЂР°РЅРёС‚СЊ");
+			Assert.That(browser.Text, Is.StringContaining("РЎРѕС…СЂР°РЅРµРЅРѕ"));
+			Click("РќР°СЃС‚СЂРѕР№РєР°");
+			permission = GetPermission("РЈРїСЂР°РІР»СЏС‚СЊ Р·Р°РєР°Р·Р°РјРё");
+			Assert.That(permission.Checked, Is.False);
+		}
+
+		private CheckBox GetPermission(string name)
+		{
+			var permission = (CheckBox)browser.Label(Find.ByText(name)).PreviousSibling;
+			return permission;
 		}
 
 		[Test]
 		public void Search_supplier()
 		{
 			Open("/users/search");
-			browser.Css("#SearchText").TypeText("Тестовый поставщик");
-			browser.Button(Find.ByValue("Поиск")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Тестовый поставщик"));
+			browser.Css("#SearchText").TypeText("РўРµСЃС‚РѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє");
+			browser.Button(Find.ByValue("РџРѕРёСЃРє")).Click();
+			Assert.That(browser.Text, Is.StringContaining("РўРµСЃС‚РѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє"));
 
-			browser.Link(Find.ByText("Тестовый поставщик")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Поставщик"));
+			browser.Link(Find.ByText("РўРµСЃС‚РѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє")).Click();
+			Assert.That(browser.Text, Is.StringContaining("РџРѕСЃС‚Р°РІС‰РёРє"));
 		}
 
 		[Test]
 		public void Update_supplier_name()
 		{
 			Open(supplier);
-			browser.Css("#supplier_Name").TypeText("Тестовый поставщик обновленный");
-			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Css("#supplier_Name").TypeText("РўРµСЃС‚РѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє РѕР±РЅРѕРІР»РµРЅРЅС‹Р№");
+			browser.Click("РЎРѕС…СЂР°РЅРёС‚СЊ");
+			Assert.That(browser.Text, Is.StringContaining("РЎРѕС…СЂР°РЅРµРЅРѕ"));
 		}
 
 		[Test]
 		public void Add_user()
 		{
 			Open(supplier);
-			browser.Click("Новый пользователь");
-			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
-			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Click("РќРѕРІС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ");
+			Assert.That(browser.Text, Is.StringContaining("РќРѕРІС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ"));
+			browser.Click("РЎРѕС…СЂР°РЅРёС‚СЊ");
+			Assert.That(browser.Text, Is.StringContaining("РЎРѕС…СЂР°РЅРµРЅРѕ"));
 		}
 
 		[Test]
 		public void Register()
 		{
 			Open();
-			browser.Click("Поставщик");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			browser.Click("РџРѕСЃС‚Р°РІС‰РёРє");
+			Assert.That(browser.Text, Is.StringContaining("Р РµРіРёСЃС‚СЂР°С†РёСЏ РїРѕСЃС‚Р°РІС‰РёРєР°"));
 
 			Prepare();
 
-			browser.Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
-			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
+			browser.Click("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ");
+			Assert.That(browser.Text, Is.StringContaining("Р РµРіРёСЃС‚СЂР°С†РёСЏ РїР»Р°С‚РµР»СЊС‰РёРєР°"));
+			browser.Click("РЎРѕС…СЂР°РЅРёС‚СЊ");
+			Assert.That(browser.Text, Is.StringContaining("РџРѕСЃС‚Р°РІС‰РёРє С‚РµСЃС‚РѕРІС‹Р№"));
 		}
 
 		[Test]
 		public void Register_supplier_show_user_card()
 		{
 			Open("Register/RegisterSupplier");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			Assert.That(browser.Text, Is.StringContaining("Р РµРіРёСЃС‚СЂР°С†РёСЏ РїРѕСЃС‚Р°РІС‰РёРєР°"));
 			Prepare();
 
 			browser.Css("#FillBillingInfo").Click();
-			browser.Click("Зарегистрировать");
+			browser.Click("Р—Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°С‚СЊ");
 
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			Assert.That(browser.Text, Is.StringContaining("Р РµРіРёСЃС‚СЂР°С†РёРѕРЅРЅР°СЏ РєР°СЂС‚Р°"));
 		}
 
 		private void Prepare()
 		{
-			Css("#JuridicalName").TypeText("тестовый поставщик");
-			Css("#ShortName").TypeText("тестовый");
+			Css("#JuridicalName").TypeText("С‚РµСЃС‚РѕРІС‹Р№ РїРѕСЃС‚Р°РІС‰РёРє");
+			Css("#ShortName").TypeText("С‚РµСЃС‚РѕРІС‹Р№");
 			Css("#ClientContactPhone").TypeText("473-2606000");
 			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
 		}

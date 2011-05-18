@@ -112,9 +112,6 @@ namespace AdminInterface.Controllers
 				user = new User(supplier.Payer, supplier) {
 					Name = userName,
 				};
-				user.AssignedPermissions = UserPermission
-					.FindPermissionsByType(UserPermissionTypes.SupplierInterface)
-					.ToList();
 
 				user.UpdateContacts(userContacts);
 				foreach (var person in userPersons)

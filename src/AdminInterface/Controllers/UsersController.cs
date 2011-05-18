@@ -331,9 +331,18 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.GetById(id);
 			PropertyBag["user"] = user;
-			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
-			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
-			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
+			if (user.Client == null)
+			{
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface);
+				RenderView("SupplierSettings");
+			}
+			else
+			{
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
+				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
+				RenderView("DrugstoreSettings");
+			}
 		}
 
 		[AccessibleThrough(Verb.Post)]

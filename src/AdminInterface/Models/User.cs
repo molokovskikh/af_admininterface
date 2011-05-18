@@ -328,6 +328,8 @@ namespace AdminInterface.Models
 			var defaults = DefaultValues.Get();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
+			if (Client == null)
+				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
 			Save();
 			Login = Id.ToString();
 			Update();

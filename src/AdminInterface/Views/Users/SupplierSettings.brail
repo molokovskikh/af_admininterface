@@ -1,0 +1,35 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
+									("Поставщик ${user.RootService.Name}", app.GetUrl(user.RootService)),
+									("Пользователь ${user.Login}", "${siteroot}/users/${user.Id}/edit")]} %>
+<% component CaptureFor, {"id" : "Title"}: %>
+	Настройки пользователя ${user.Login}
+<% end %>
+
+<% if not user.Enabled: %>
+<div class="Warning">
+	<p>Пользователь отключен</p>
+</div>
+<% end %>
+
+<div class="TwoColumn" style="width: 49%;">
+	<form id="UserSettingsForm" method=post action="${siteroot}/users/SaveSettings">
+		<input name="user.Id" type=hidden value=${user.Id}>
+
+		<div class=block>
+			<h3>
+				Права доступа в клиентском интерфейсе
+			</h3>
+			<div>
+				<% for i, permission in enumerate(Permissions): %>
+					<input type=checkbox name=user.AssignedPermissions[${i}].Id value=${permission.Id} ${"checked" if user.IsPermissionAssigned(permission)}>
+					<label>${permission.Name}</label>
+					<br>
+				<% end %>
+			</div>
+		</div>
+
+		<div class=save>
+			<input type=submit value="Сохранить">
+		</div>
+	</form>
+</div>
