@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Collections.Generic;
 using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -18,12 +19,11 @@ namespace Integration.Models
 				existsPayment.DeleteAndFlush();
 
 			var file = @"..\..\..\TestData\20110114104609.xml";
-			var payments = Payment.Parse(file);
+			var payments = Payment.ParseXml(File.OpenRead(file));
 			Assert.That(payments.Count, Is.GreaterThan(0));
 			var payment = payments.First();
 			Assert.That(payment.Sum, Is.EqualTo(800));
 			Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));
-			Assert.That(payment.Recipient.FullName, Is.EqualTo("ООО \"Аналитический центр\""));
 			Assert.That(payment.Comment, Is.EqualTo("Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС)."));
 
 			Assert.That(payment.PayerClient.Name, Is.EqualTo("ЗАО ТРИОМЕД"));
@@ -31,10 +31,8 @@ namespace Integration.Models
 
 			Assert.That(payment.RecipientClient.Name, Is.EqualTo("\\366601001 ООО\"Аналитический центр\""));
 			Assert.That(payment.RecipientBank.Description, Is.EqualTo("ВОРОНЕЖСКИЙ Ф-Л ОАО \"ПРОМСВЯЗЬБАНК\" г ВОРОНЕЖ"));
-			Assert.That(payment.Payer, Is.Not.Null);
 			Assert.That(payment.Sum, Is.EqualTo(800));
 			Assert.That(payment.PayedOn, Is.EqualTo(DateTime.Parse("11.01.2011")));
-			Assert.That(payment.Recipient.FullName, Is.EqualTo("ООО \"Аналитический центр\""));
 			Assert.That(payment.Comment, Is.EqualTo("Оплата за мониторинг оптового фармрынка за январь по счету №161 от 11.01..2011г Cумма 800-00,без налога (НДС)."));
 		}
 
@@ -64,7 +62,7 @@ namespace Integration.Models
 		public void Parser_with_output_payments()
 		{
 			var file = @"..\..\..\TestData\20110113.xml";
-			var payments = Payment.Parse(file);
+			var payments = Payment.ParseXml(File.OpenRead(file));
 			Assert.That(payments.Count, Is.GreaterThan(0));
 		}
 
@@ -115,6 +113,27 @@ namespace Integration.Models
 		{
 			var payments = Payment.ParseXml(File.OpenRead(@"..\..\..\TestData\\201103_04-16.03.xml"));
 			Assert.That(payments.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Ignore_inn_from_black_list()
+		{
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var recipient = Recipient.Queryable.First();
+			new IgnoredInn("7707083893").Save();
+			payer.INN = DataMother.RandomInn();
+			payer.Save();
+
+			var payments = new List<Payment> {
+				new Payment {
+					Sum = 800,
+					RecipientClient = new Payment.BankClient(recipient.Name, recipient.INN, recipient.BankAccountNumber),
+					PayerClient = new Payment.BankClient(payer.Name, payer.INN, "")
+				}
+			};
+
+			var identifyPayments = Payment.Identify(payments);
+			Assert.That(identifyPayments.First().Payer, Is.Null);
 		}
 	}
 }

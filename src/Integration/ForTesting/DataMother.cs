@@ -289,5 +289,16 @@ namespace Integration.ForTesting
 
 			return supplier;
 		}
+
+		public static string RandomInn()
+		{
+			var random = new Random();
+			var inn = "";
+			while (inn.Length < 12)
+			{
+				inn += random.Next(0, 9);
+			}
+			return inn;
+		}
 	}
 }

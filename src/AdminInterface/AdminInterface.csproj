@@ -143,6 +143,8 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
+    <Compile Include="Controllers\IgnoredInnsController.cs" />
+    <Compile Include="Models\Billing\IgnoredInn.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
     <Compile Include="MonoRailExtentions\Controller.cs" />
     <Compile Include="Controllers\DeliveriesController.cs" />
@@ -393,6 +395,7 @@
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Advertisings\Index.brail" />
+    <None Include="Views\IgnoredInns\Index.brail" />
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />

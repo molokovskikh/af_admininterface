@@ -76,6 +76,7 @@ namespace AdminInterface.Models.Security
 					"recipients",
 					"acts",
 					"advertisings",
+					"ignoredinns"
 				};
 				return billingControllers.Any(c => c == controller.ToLower());
 			}

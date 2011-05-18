@@ -1,4 +1,6 @@
 ﻿using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
+using NHibernate;
 using NUnit.Framework;
 
 namespace Integration.ForTesting
@@ -6,12 +8,12 @@ namespace Integration.ForTesting
 	[TestFixture]
 	public class IntegrationFixture
 	{
-		protected SessionScope scope;
+		protected ISessionScope scope;
 
 		[SetUp]
 		public void Setup()
 		{
-			scope = new SessionScope(FlushAction.Never);
+			scope = new TransactionlessSession();
 		}
 
 		[TearDown]

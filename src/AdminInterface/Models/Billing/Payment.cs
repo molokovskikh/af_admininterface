@@ -256,9 +256,10 @@ namespace AdminInterface.Models.Billing
 			return Identify(payments).ToList();
 		}
 
-		private static IEnumerable<Payment> Identify(IEnumerable<Payment> payments)
+		public static IEnumerable<Payment> Identify(IEnumerable<Payment> payments)
 		{
 			var recipients = Recipient.Queryable.ToList();
+			var ignoredInns = IgnoredInn.Queryable.ToList();
 			foreach (var payment in payments)
 			{
 				payment.Recipient = recipients.FirstOrDefault(r => r.BankAccountNumber == payment.RecipientClient.AccountCode);
@@ -266,8 +267,11 @@ namespace AdminInterface.Models.Billing
 					continue;
 
 				var inn = payment.PayerClient.Inn;
-				var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
-				payment.Payer = payer;
+				if (ignoredInns.Any(i => String.Equals(i.Inn, inn, StringComparison.InvariantCultureIgnoreCase)))
+				{
+					var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
+					payment.Payer = payer;
+				}
 
 				if (payment.IsDuplicate())
 					continue;
