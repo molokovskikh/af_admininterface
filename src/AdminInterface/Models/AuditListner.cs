@@ -193,6 +193,11 @@ namespace AdminInterface.Models
 				var attributes = property.GetCustomAttributes(typeof(Auditable), false);
 				if (attributes.Length == 0)
 					continue;
+
+				//свойство может быть перегружено или перекрыто, игнорируем дублирующиеся
+				if (result.Any(r => r.Property.Name == property.Name))
+					continue;
+
 				result.Add(new AuditableProperty(
 					property,
 					((Auditable)attributes[0]).Name,
