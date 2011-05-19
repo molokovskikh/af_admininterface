@@ -60,6 +60,10 @@
 		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
 	</div>
 
+	<div class=block>
+		<a href="PrintIndex?${filter.ToUrlPart()}">Для печати</a>
+	</div>
+
 	<form method=post action="${siteroot}/Acts/Process">
 		<div class=block>
 			<input name=delete type=submit value="Удалить">

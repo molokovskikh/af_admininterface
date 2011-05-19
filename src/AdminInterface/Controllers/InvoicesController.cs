@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate.Criterion;
@@ -21,8 +23,8 @@ namespace AdminInterface.Controllers
 		public Recipient Recipient { get; set; }
 		public string SearchText { get; set; }
 
-		public int Count { get; set; }
-		public decimal Sum { get; set; }
+		public int Count { get; private set; }
+		public decimal Sum { get; private set; }
 
 		public List<T> Find<T>()
 		{
@@ -58,11 +60,19 @@ namespace AdminInterface.Controllers
 
 		public string[] ToUrl()
 		{
-			return new [] {
-				String.Format("filter.Period={0}", (int)Period),
-				String.Format("filter.Region.Id={0}", Region.Id),
-				String.Format("filter.Recipient.Id={0}", Recipient.Id),
-			};
+			var parts = new List<String>();
+			if (Period != null)
+				parts.Add(String.Format("filter.Period={0}", (int)Period));
+			if (Region != null)
+				parts.Add(String.Format("filter.Region.Id={0}", Region.Id));
+			if (Recipient != null)
+				parts.Add(String.Format("filter.Recipient.Id={0}", Recipient.Id));
+			return parts.ToArray();
+		}
+
+		public string ToUrlPart()
+		{
+			return ToUrl().Implode("&");
 		}
 	}
 

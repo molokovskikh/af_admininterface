@@ -1,0 +1,70 @@
+﻿<div>
+	<div>
+		<div>
+			<h3>Реестр актов</h3>
+			<table style="width:auto;">
+				<tr>
+					<td style="border-style:none;">Период:</td>
+					<td style="border-style:none;">
+						<% if filter.Period: %>
+						${BindingHelper.GetDescription(filter.Period)}
+						<% else: %>
+						Все
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td style="border-style:none;">Регион:</td>
+					<td style="border-style:none;">
+						<% if filter.Region: %>
+						${filter.Region.Name}
+						<% else: %>
+						Все
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td style="border-style:none;">Получатель платежей:</td>
+					<td style="border-style:none;">
+						<% if filter.Recipient: %>
+						${filter.Recipient.Name}
+						<% else: %>
+						Все
+						<% end %>
+					</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+
+	<div class=block>
+		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
+	</div>
+
+	<div class=block>
+		<table class=DataTable>
+			<% if acts.Count: %>
+			<tr>
+				<th></th>
+				<th>Дата</th>
+				<th>№</th>
+				<th>Сумма</th>
+				<th>Плательщик</th>
+			</tr>
+			<% for i, act in enumerate(acts): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}">
+				<td>${i + 1}</td>
+				<td>${act.ActDate.ToShortDateString()}</td>
+				<td>${act.Id}</td>
+				<td>${act.Sum.ToString("0.##")}</td>
+				<td>${act.Payer}</td>
+			</tr>
+			<% end %>
+			<% else: %>
+			<tr class=EmptyData>
+				<td>По вашему запросу ничего не найдено</td>
+			</tr>
+			<% end %>
+		</table>
+	</div>
+</div>

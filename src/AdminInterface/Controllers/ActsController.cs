@@ -8,6 +8,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -35,6 +36,23 @@ namespace AdminInterface.Controllers
 				.OrderBy(p => p)
 #endif
 				.ToList();
+		}
+
+		public void PrintIndex([DataBind("filter")] PayerDocumentFilter filter)
+		{
+			LayoutName = "Print";
+			if (filter.Region != null && filter.Region.Id == 0)
+				filter.Region = null;
+			else if (filter.Region != null)
+				filter.Region = Region.Find(filter.Region.Id);
+
+			if (filter.Recipient != null && filter.Recipient.Id == 0)
+				filter.Recipient = null;
+			else if (filter.Recipient != null)
+				filter.Recipient = Recipient.Find(filter.Recipient.Id);
+
+			PropertyBag["filter"] = filter;
+			PropertyBag["acts"] = filter.Find<Act>();
 		}
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime actDate)
