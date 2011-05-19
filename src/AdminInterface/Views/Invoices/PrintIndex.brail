@@ -1,7 +1,7 @@
 ﻿<div>
 	<div>
 		<div>
-			<h3>Реестр актов</h3>
+			<h3>Реестр счетов</h3>
 			<table style="width:auto;">
 				<tr>
 					<td style="border-style:none;">Период:</td>
@@ -43,7 +43,7 @@
 
 	<div class=block>
 		<table class=DataTable>
-			<% if acts.Count: %>
+			<% if invoices.Count: %>
 			<tr>
 				<th></th>
 				<th>Дата</th>
@@ -51,13 +51,13 @@
 				<th>Сумма</th>
 				<th>Плательщик</th>
 			</tr>
-			<% for i, act in enumerate(acts): %>
+			<% for i, invoice in enumerate(invoices): %>
 			<tr>
 				<td>${i + 1}</td>
-				<td>${act.ActDate.ToShortDateString()}</td>
-				<td>${act.Id}</td>
-				<td style="text-align:right;">${act.Sum.ToString("C")}</td>
-				<td>${act.Payer}</td>
+				<td>${invoice.Date.ToShortDateString()}</td>
+				<td>${invoice.Id}</td>
+				<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
+				<td>${invoice.Payer}</td>
 			</tr>
 			<% end %>
 			<% else: %>

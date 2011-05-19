@@ -21,7 +21,7 @@
 </div>
 
 <div class=block>
-	Всего платежей ${stat.Count} на сумму ${stat.Sum}р
+	Всего платежей ${stat.Count} на сумму ${stat.Sum.ToString("C")}
 </div>
 
 <table class=DataTable>
@@ -43,7 +43,7 @@
 		<td>${payment.Recipient.Name}</td>
 		<td>${payment.PayedOn.ToShortDateString()}</td>
 		<td>${app.LinkTo(payment.Payer)}</td>
-		<td>${payment.Sum}</td>
+		<td style="text-align:right;">${payment.Sum.ToString("C")}</td>
 		<td>${payment.RegistredOn}</td>
 	</tr>
 	<% end %>

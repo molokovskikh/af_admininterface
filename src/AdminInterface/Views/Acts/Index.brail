@@ -57,7 +57,7 @@
 	</div>
 
 	<div class=block>
-		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
+		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("C")}
 	</div>
 
 	<div class=block>
@@ -105,7 +105,7 @@
 					<td>${act.Payer.Id}</td>
 					<td>${act.Recipient.Name}</td>
 					<td>${app.LinkTo(act.Payer)}</td>
-					<td>${act.Sum.ToString("0.##")}</td>
+					<td style="text-align:right;">${act.Sum.ToString("C")}</td>
 					<td>${BindingHelper.GetDescription(act.Period)}</td>
 					<td>${act.ActDate.ToShortDateString()}</td>
 				</tr>

@@ -400,6 +400,7 @@
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Acts\PrintIndex.brail" />
+    <None Include="Views\Invoices\PrintIndex.brail" />
     <None Include="Views\Layouts\Main.brail" />
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />

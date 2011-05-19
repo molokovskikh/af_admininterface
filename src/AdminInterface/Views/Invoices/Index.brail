@@ -65,7 +65,11 @@
 	</div>
 
 	<div class=block>
-		Всего актов ${filter.Count} на сумму ${filter.Sum.ToString("0.##")}р
+		Всего счетов ${filter.Count} на сумму ${filter.Sum.ToString("C")}
+	</div>
+
+	<div class=block>
+		<a href="PrintIndex?${filter.ToUrlPart()}">Для печати</a>
 	</div>
 
 	<div class=block>
@@ -89,7 +93,7 @@
 				<td>${invoice.Payer.Id}</td>
 				<td>${invoice.Recipient.Name}</td>
 				<td>${app.LinkTo(invoice.Payer)}</td>
-				<td>${invoice.Sum.ToString("0.##")}</td>
+				<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
 				<td>${BindingHelper.GetDescription(invoice.Period)}</td>
 				<td>${invoice.Date.ToShortDateString()}</td>
 				<td>
