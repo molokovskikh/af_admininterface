@@ -284,6 +284,7 @@ namespace Integration.ForTesting
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
+			supplier.AddPrice("Базовый", PriceType.Regular);
 			if (action != null)
 				action(supplier);
 

@@ -7,6 +7,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
@@ -83,6 +84,8 @@ namespace Integration.Controllers
 		[Test]
 		public void Create_organization()
 		{
+			DataMother.CreateSupplier().Save();
+
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
 
@@ -173,6 +176,53 @@ namespace Integration.Controllers
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			var user = supplier.Users.First();
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Register_supplier_in_retail_segment()
+		{
+			//если нет то создаем специального клиента на для справки
+			var count = ArHelper.WithSession(s => s
+				.CreateSQLQuery(@"select count(*) from Usersettings.Clientsdata where firmcode = 4474")
+				.UniqueResult<long>());
+			if (count == 0)
+				ArHelper.WithSession(s => s
+					.CreateSQLQuery(@"
+insert into Usersettings.Clientsdata(FirmCode, FirmSegment, FirmStatus, FirmType, RegionCode, MaskRegion, FullName, ShortName)
+select 4474, 1, 1, 1, 1, 7, 'Веб-справка', 'Веб-справка';
+insert into Usersettings.RetClientsSet(ClientCode)
+select 4474;")
+					.ExecuteUpdate());
+
+			var supplier = new Supplier {
+				Name = "Тестовый поставщик",
+				FullName = "Тестовый поставщик",
+				Segment = Segment.Retail
+			};
+
+			controller.RegisterSupplier(supplier, 
+				new Contact[0], 1,
+				new [] {
+					new RegionSettings {
+						Id = 1,
+						IsAvaliableForBrowse = true
+					}, 
+				},
+				new AdditionalSettings(),
+				null,
+				null,
+				"тестовый пользователь",
+				new Contact[0],
+				new Person[0], 
+				"",
+				"");
+			var price = Price.Queryable.First(p => p.Supplier == supplier);
+			Assert.That(supplier.Id, Is.GreaterThan(0));
+			var intersectionCount = ArHelper.WithSession(s => s
+				.CreateSQLQuery("select count(*) from Usersettings.Intersection where PriceCode = :PriceId")
+				.SetParameter("PriceId", price.Id)
+				.UniqueResult<long>());
+			Assert.That(intersectionCount, Is.GreaterThan(0));
 		}
 
 		private Client RegistredClient()
