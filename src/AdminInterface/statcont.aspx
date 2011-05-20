@@ -54,7 +54,7 @@
 		</div>
 		<p align="center">
 			<asp:GridView ID="StatisticGrid" runat="server" AllowSorting="True" AutoGenerateColumns="False"
-				OnRowCreated="StatisticGrid_RowCreated" OnSorting="StatisticGrid_Sorting">
+				OnRowCreated="StatisticGrid_RowCreated" OnSorting="StatisticGrid_Sorting" OnRowDataBound="StatisticGrid_DataBound">
 				<Columns>
 					<asp:BoundField HeaderText="Дата" DataField="WriteTime" SortExpression="WriteTime" />
 					<asp:BoundField HeaderText="Оператор" DataField="UserName" SortExpression="UserName" />
