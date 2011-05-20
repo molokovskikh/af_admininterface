@@ -115,6 +115,9 @@ Email: {2}
 				body = "Зарегистрирован новый пользователь " + user.Login;
 				subject = "Регистрация нового пользователя";
 				client = user.Client;
+
+				if (!String.IsNullOrEmpty(comment))
+					new ClientInfoLogEntity(comment, item).Save();
 			}
 			else
 			{
@@ -122,12 +125,15 @@ Email: {2}
 				body = "Зарегистрирован новый адрес доставки " + address.Value;
 				subject = "Регистрация нового адреса доставки";
 				client = address.Client;
+
+				if (!String.IsNullOrEmpty(comment))
+					foreach (var user in address.AvaliableForUsers)
+						new ClientInfoLogEntity(comment, user).Save();
 			}
 
 			if (!String.IsNullOrEmpty(comment))
 			{
-				body += "\r\nПримечание " + comment;
-				new ClientInfoLogEntity(comment, item).Save();
+				body += "\r\nСообщение в биллинг " + comment;
 			}
 
 			Func.Mail("register@analit.net", 

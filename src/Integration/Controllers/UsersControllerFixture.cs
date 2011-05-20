@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
-using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
-using Common.Web.Ui.Helpers;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
-using log4net.Config;
 using NUnit.Framework;
 using TransactionlessSession = Integration.ForTesting.TransactionlessSession;
 
@@ -83,13 +80,26 @@ namespace Integration.Controllers
 			controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
 			session.Flush();
 
-			var mails = ArHelper.WithSession(s => s
-				.CreateSQLQuery(@"select sentto from logs.passwordchange where targetusername = :userId")
-			    .SetParameter("userId", user.Id)
-			    .UniqueResult());
- 
-			Assert.That(mails, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
+			var logs = PasswordChangeLogEntity.Queryable.Where(l => l.TargetUserName == user.Login).ToList();
+
+ 			Assert.That(logs.Count, Is.EqualTo(1));
+			Assert.That(logs.Single().SentTo, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
 			Assert.That(user.Accounting, Is.Not.Null);
+		}
+
+		[Test]
+		public void Register_user_with_comment()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			var user = new User();
+			controller.Add(user, new Contact[0], new[] {
+					new RegionSettings {
+						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+					},
+				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+
+			var messages = ClientInfoLogEntity.Queryable.Where(l => l.User == user);
+			Assert.That(messages.Any(m => m.Message == "тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 
 		[Test]

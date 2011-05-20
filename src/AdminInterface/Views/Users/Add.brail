@@ -38,11 +38,12 @@
 			<input type="checkbox" name="user.SendRejects" value="true" checked="checked" /> Получать отказы<br>
 			<input type="hidden" name="user.SendRejects" value="false" />
 		</div>
+
 		<div class=block>
-			<h3>Примечание</h3>
+			<h3>Сообщение в биллинг</h3>
 			<textarea cols=60 rows=4 name=comment></textarea>
-			
 		</div>
+
 		<div class=block>
 			<h3>
 				<input id="sendClientCard" name="sendClientCard" type="checkbox" checked="checked" />

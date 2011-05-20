@@ -12,7 +12,7 @@ namespace Integration.ForTesting
 	public class ControllerFixture : BaseControllerTest
 	{
 		protected List<MailMessage> notifications;
-		protected SessionScope session;
+		protected ISessionScope session;
 
 		[SetUp]
 		public void Setup()
@@ -31,7 +31,7 @@ namespace Integration.ForTesting
 				}));
 			MailerExtention.SenderForTest = sender;
 
-			session = new SessionScope();
+			session = new TransactionlessSession();
 		}
 
 		[TearDown]

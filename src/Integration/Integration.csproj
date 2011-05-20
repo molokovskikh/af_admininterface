@@ -112,6 +112,7 @@
     <Compile Include="AuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="ClientCardFixture.cs" />
+    <Compile Include="Controllers\AddressesControllerFixture.cs" />
     <Compile Include="Controllers\BillingControllerFixture.cs" />
     <Compile Include="ForTesting\ControllerFixture.cs" />
     <Compile Include="Controllers\InvoicesControllerFixture.cs" />

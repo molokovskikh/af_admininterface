@@ -270,13 +270,10 @@ set @skip = 0;
 
 		private void AddContactGroup()
 		{
-			using (var scope = new TransactionScope())
-			{
-				var groupOwner = Client.ContactGroupOwner;
-				var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
-				group.Save();
-				ContactGroup = group;
-			}
+			var groupOwner = Client.ContactGroupOwner;
+			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
+			group.Save();
+			ContactGroup = group;
 		}
 
 		public virtual void UpdateContacts(Contact[] displayedContacts, Contact[] deletedContacts)
