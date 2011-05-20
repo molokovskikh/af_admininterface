@@ -12,7 +12,7 @@
 	function deletePersonRow(rowId) {
 		$("#rowPerson" + rowId).remove();
 		if (rowId > 0) {
-			$("#HolderPerson").append("<input type='hidden' name='deletedpersons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "' />");
+			$("#PersonHolder").append("<input type='hidden' name='deletedpersons[" + rowId + "].Id' id='persons[" + rowId + "].Id' value='" + rowId + "' />");
 		}
 	}
 

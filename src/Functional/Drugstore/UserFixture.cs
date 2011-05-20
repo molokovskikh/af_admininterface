@@ -5,7 +5,6 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
-using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -14,22 +13,30 @@ using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;
 using System.Threading;
-using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
-namespace Functional
+namespace Functional.Drugstore
 {
-	public class UserFixture : WatinFixture
+	public class UserFixture : WatinFixture2
 	{
+		private Client client;
+		private User user;
+
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			user = client.Users.First();
+			scope.Flush();
+
+			Open(client);
+			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+		}
+
 		[Test]
 		public void Edit_user()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users[0];
-			using (var browser = Open("client/" + client.Id))
-			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Text, Is.StringContaining(user.Login));
-			}
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Text, Is.StringContaining(user.Login));
 		}
 
 		[Test]
@@ -67,118 +74,91 @@ namespace Functional
 		[Test]
 		public void View_password_change_statistics()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 
-				browser.Link(Find.ByText("Статистика изменения пароля")).Click();
-				using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login))))
-				{
-					Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
-				}
+			browser.Link(Find.ByText("Статистика изменения пароля")).Click();
+			using (var stat = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика изменения пароля для пользователя {0}", user.Login))))
+			{
+				Assert.That(stat.Text, Is.StringContaining(String.Format("Статистика изменения пароля для пользователя {0}", user.Login)));
 			}
 		}
 
 		[Test]
 		public void Change_password_and_view_card()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			using(var browser = Open("client/{0}", client.Id))
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
+			browser.Link(Find.ByText("Изменить пароль")).Click();
+
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
-				browser.Link(Find.ByText("Изменить пароль")).Click();
+				Assert.That(openedWindow.Text,
+					Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
 
-				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
-				{
-					Assert.That(openedWindow.Text,
-						Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
-
-					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.CheckBox(Find.ByName("isSendClientCard")).Click();
-					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.Text, Is.StringContaining("Регистрационная карта"));
-					Assert.That(openedWindow.Text, Is.StringContaining("Изменение пароля по инициативе клиента"));
-				}
+				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+				openedWindow.CheckBox(Find.ByName("isSendClientCard")).Click();
+				openedWindow.Button(Find.ByValue("Изменить")).Click();
+				Assert.That(openedWindow.Text, Is.StringContaining("Регистрационная карта"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Изменение пароля по инициативе клиента"));
 			}
 		}
 
-		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя"), Ignore("Тест не в том месте")]
+		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя")]
 		public void Check_flags_by_adding_user()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.Button(Find.ByValue("Создать")).Click();
+			using (new SessionScope())
 			{
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.Button(Find.ByValue("Создать")).Click();
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					Assert.That(client.Users.Count, Is.GreaterThan(0));
-					browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-					browser.Refresh();
-					var userLink = browser.Link(Find.ByText(client.Users[0].Login));
-					Assert.IsTrue(userLink.Exists);
-					userLink.Click();
-					browser.Link(Find.ByText("Настройка")).Click();
-					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
-					Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
-				}
+				client = Client.Find(client.Id);
+				Assert.That(client.Users.Count, Is.GreaterThan(0));
+				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+				browser.Refresh();
+				var userLink = browser.Link(Find.ByText(client.Users[0].Login));
+				Assert.IsTrue(userLink.Exists);
+				userLink.Click();
+				browser.Link(Find.ByText("Настройка")).Click();
+				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
+				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
 			}
 		}
 
 		[Test]
 		public void Change_password_and_send_card()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			using (var browser = Open("client/{0}", client.Id))
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
+			browser.Link(Find.ByText("Изменить пароль")).Click();
+
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
 			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
-				browser.Link(Find.ByText("Изменить пароль")).Click();
+				Assert.That(openedWindow.Text,
+					Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
 
-				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
-				{
-					Assert.That(openedWindow.Text,
-						Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
-
-					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
-					openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
-					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-				}
+				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+				openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
+				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
+				openedWindow.Button(Find.ByValue("Изменить")).Click();
+				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
 		}
 
-		[Test, Description("При изменении пароля, если логин не совпадает с UserId и установлена соотв. опция, то изменить логин на UserId")]
+		[Test, NUnit.Framework.Description("При изменении пароля, если логин не совпадает с UserId и установлена соотв. опция, то изменить логин на UserId")]
 		public void Change_login_when_change_password()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			using (new SessionScope())
-			{
-				user.Login = "testLogin" + user.Id;
-				user.SaveAndFlush();
-			}
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				browser.Link(Find.ByText("Изменить пароль")).Click();
+			user.Login = "testLogin" + user.Id;
+			user.SaveAndFlush();
 
-				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
-				{
-					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
-					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
-					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-				}
+			browser.Link(Find.ByText(user.Login)).Click();
+			browser.Link(Find.ByText("Изменить пароль")).Click();
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+			{
+				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
+				Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
+				openedWindow.Button(Find.ByValue("Изменить")).Click();
+				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
 			using (new SessionScope())
 			{
@@ -187,7 +167,7 @@ namespace Functional
 			}
 		}
 
-		[Test, Description("При изменении пароля, если логин совпадает с UserId то изменять логин не нужно")]
+		[Test, NUnit.Framework.Description("При изменении пароля, если логин совпадает с UserId то изменять логин не нужно")]
 		public void Not_change_login_when_change_password()
 		{
 			var client = DataMother.CreateTestClientWithUser();
@@ -217,63 +197,48 @@ namespace Functional
 		[Test]
 		public void Create_user()
 		{
-			var client = DataMother.TestClient();
+			Assert.That(browser.Text, Is.StringContaining("Клиент test"));
+			browser.Link(Find.ByText("Новый пользователь")).Click();
 
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				Assert.That(browser.Text, Is.StringContaining("Клиент test"));
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-
-				Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
-				browser.TextField(Find.ByName("user.Name")).TypeText("test");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
-			}
+			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			browser.TextField(Find.ByName("user.Name")).TypeText("test");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 
 			using(new SessionScope())
 			{
 				client = Client.Find(client.Id);
-				Assert.That(client.Users.Count, Is.EqualTo(1));
+				Assert.That(client.Users.Count, Is.EqualTo(2));
 				var user = client.Users.Single();
 				Assert.That(user.Name, Is.EqualTo("test"));
 				var updateInfo = UserUpdateInfo.Find(user.Id);
 				Assert.That(updateInfo, Is.Not.Null);
 
-				var result = ArHelper.WithSession(s =>
-					s.CreateSQLQuery("select * from future.UserPrices where UserId = :userId")
-					.SetParameter("userId", user.Id)
-					.List());
+				var userPriceCount = user.GetUserPriceCount();
+				var intersecionCount = client.GetIntersectionCount();
 
-				var intersecionCount = Convert.ToUInt32(ArHelper.WithSession(s =>
-					s.CreateSQLQuery("select count(*) from future.intersection where ClientId = :ClientId")
-					.SetParameter("ClientId", client.Id)
-					.UniqueResult()));
-				Assert.That(result.Count, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
-				Assert.That(result.Count, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
+				Assert.That(userPriceCount, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
+				Assert.That(userPriceCount, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
 			}
 		}
 
 		[Test]
 		public void Reset_user_uin()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			var info = UserUpdateInfo.Find(user.Id);
-			info.AFCopyId = "123";
-			info.Update();
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				Assert.That(user.HaveUin(), Is.True);
-				browser.Link(Find.ByText(user.Login)).Click();
-				browser.Button(Find.ByValue("Сбросить УИН")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
-				browser.TextField(Find.ByName("reason")).TypeText("test reason");
-				browser.Button(Find.ByValue("Сбросить УИН")).Click();
-				Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
-				Assert.That(browser.Text, Is.StringContaining(String.Format("$$$ Пользователь: {0}", user.Login)));
-			}
-			info.Refresh();
-			Assert.That(info.AFCopyId, Is.Empty);
+			user.UserUpdateInfo.AFCopyId = "123";
+			user.UserUpdateInfo.UpdateAndFlush();
+
+			Assert.That(user.HaveUin(), Is.True);
+			browser.Link(Find.ByText(user.Login)).Click();
+			browser.Button(Find.ByValue("Сбросить УИН")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
+			browser.TextField(Find.ByName("reason")).TypeText("test reason");
+			browser.Button(Find.ByValue("Сбросить УИН")).Click();
+			Assert.That(browser.Text, Is.StringContaining("УИН сброшен"));
+			Assert.That(browser.Text, Is.StringContaining(String.Format("$$$ Пользователь: {0}", user.Login)));
+
+			user.UserUpdateInfo.Refresh();
+			Assert.That(user.UserUpdateInfo.AFCopyId, Is.Empty);
 		}
 
 		[Test]
@@ -314,28 +279,24 @@ namespace Functional
 		[Test]
 		public void EditAnalitFSettings()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			using(var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText(client.Users[0].Login)).Click();
-				browser.Link(Find.ByText("Настройка")).Click();
+			browser.Link(Find.ByText(client.Users[0].Login)).Click();
+			browser.Link(Find.ByText("Настройка")).Click();
 
-				for (int i = 0; i < 25; i++)
-					browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+			for (int i = 0; i < 25; i++)
+				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-				browser.Back(); browser.Back(); browser.Back();
+			browser.Back(); browser.Back(); browser.Back();
 
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.TextField(Find.ByName("user.Name")).TypeText("test2");
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.TextField(Find.ByName("user.Name")).TypeText("test2");
 
-				for (int i = 0; i < 25; i++ )
-					browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
+			for (int i = 0; i < 25; i++ )
+				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
 
-				browser.Button(Find.ByValue("Создать")).Click();
-			}
+			browser.Button(Find.ByValue("Создать")).Click();
 
 			using(new SessionScope())
 			{
@@ -349,41 +310,36 @@ namespace Functional
 		[Test]
 		public void SendMessage()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
-			{
-				browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
-				browser.Button(Find.ByValue("Принять")).Click();
-				Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
-				browser.Link(Find.ByText("Клиент " + client.Name)).Click();
-				Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
-			}
+			Open(client.Users[0], "Edit");
+
+			browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
+			browser.Button(Find.ByValue("Принять")).Click();
+			Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
+			browser.Link(Find.ByText("Клиент " + client.Name)).Click();
+			Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
 		}
 
 		[Test]
 		public void HistoriesMenuExistance()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+			var baseUrl = browser.Url;
+
+			browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
+			Assert.AreEqual(String.Format("История обновлений пользователя {0}", client.Users[0].Id), browser.Title);
+			browser.GoTo(baseUrl);
+
+			browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
+			Assert.AreEqual("Статистика получения\\отправки документов пользователя " + client.Users[0].Login, browser.Title);
+			browser.GoTo(baseUrl);
+
+			browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
+			Assert.AreEqual("История заказов", browser.Title);
+			browser.GoTo(baseUrl);
+
+			using (browser = Open("client/{0}", client.Id))
 			{
-				string baseUrl = browser.Url;
-
-				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
-				Assert.AreEqual(String.Format("История обновлений пользователя {0}", client.Users[0].Id), browser.Title);
-				browser.GoTo(baseUrl);
-
-				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
-				Assert.AreEqual("Статистика получения\\отправки документов пользователя " + client.Users[0].Login, browser.Title);
-				browser.GoTo(baseUrl);
-
-				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
-				Assert.AreEqual("История заказов", browser.Title);
-				browser.GoTo(baseUrl);
-			}
-
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				string baseUrl = browser.Url;
+				baseUrl = browser.Url;
 
 				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
 				Assert.AreEqual(String.Format("История обновлений клиента {0}", client.Name), browser.Title);
@@ -403,14 +359,11 @@ namespace Functional
 		public void AddContactInformation()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
-			{
-				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			}
+			Open(user, "Edit");
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
 			ContactGroup group;
 			using (new SessionScope())
@@ -430,14 +383,12 @@ namespace Functional
 		public void Add_person_information()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
-			{
-				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			}
+			Open(user, "Edit");
+
+			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			ContactGroup group;
 			using (new SessionScope())
 			{
@@ -458,19 +409,17 @@ namespace Functional
 		public void DeleteContactInformation()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
 			// Удаление контактной записи
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			using (new SessionScope())
 			{
-				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Users[0].ContactGroup;
-					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
+				client = Client.Find(client.Id);
+				var group = client.Users[0].ContactGroup;
+				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+				browser.Button(Find.ByValue("Сохранить")).Click();
 			}
 			// Проверка, что контактная запись удалена
 			var countContacts = ContactInformationFixture.GetCountContactsInDb(client.Users[0].ContactGroup);
@@ -481,21 +430,20 @@ namespace Functional
 		public void Delete_person_information()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+
+			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			using (new SessionScope())
 			{
-				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Users[0].ContactGroup;
-					browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
+				client = Client.Find(client.Id);
+				var group = client.Users[0].ContactGroup;
+				browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
+				browser.Button(Find.ByValue("Сохранить")).Click();
 			}
+
 			// Проверка, что контактная запись удалена
 			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
@@ -506,20 +454,18 @@ namespace Functional
 		public void Delete_person_information_by_fill_empty_string()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+
+			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			using (new SessionScope())
 			{
-				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Users[0].ContactGroup;
-					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
+				client = Client.Find(client.Id);
+				var group = client.Users[0].ContactGroup;
+				browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
+				browser.Button(Find.ByValue("Сохранить")).Click();
 			}
 			// Проверка, что контактная запись удалена
 			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
@@ -531,18 +477,15 @@ namespace Functional
 		public void Change_person_information()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
+			using (new SessionScope())
 			{
-				ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Users[0].ContactGroup;
-					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
-					browser.Button(Find.ByValue("Сохранить")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				}
+				client = Client.Find(client.Id);
+				var group = client.Users[0].ContactGroup;
+				browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
+				browser.Button(Find.ByValue("Сохранить")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
 			// Проверка, что контактная запись изменена
 			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
@@ -671,67 +614,37 @@ namespace Functional
 		[Test]
 		public void User_must_be_enabled_after_registration()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				using (new SessionScope())
-				{
-					browser.Link(Find.ByText("Новый пользователь")).Click();
-					browser.TextField(Find.ByName("user.Name")).TypeText("test user");
-					browser.Button(Find.ByValue("Создать")).Click();
-					browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-					client = Client.Find(client.Id);
-					Assert.That(client.Users.Count, Is.EqualTo(1));
-					Assert.IsTrue(client.Users[0].Enabled);
-				}
-			}
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.TextField(Find.ByName("user.Name")).TypeText("test user");
+			browser.Button(Find.ByValue("Создать")).Click();
+			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+			client = Client.Find(client.Id);
+			Assert.That(client.Users.Count, Is.EqualTo(1));
+			Assert.IsTrue(client.Users[0].Enabled);
 		}
 
-		[Test, Description("Регистрация пользователя. При добавлении email в контактную информацию, он должен добавляться в список адресов, на которые нужно отсылать регистрационную карту")]
-		public void Add_email_for_registration_card_by_adding_contact_email()
-		{
-			var client = DataMother.TestClient();
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				using (new SessionScope())
-				{
-					browser.Link(Find.ByText("Новый пользователь")).Click();
-				}
-			}
-		}
-
-		[Test, Description("Регистрация пользователя. Проверка валидатора списка email-ов для отправки регистрационной карты")]
+		[Test, NUnit.Framework.Description("Регистрация пользователя. Проверка валидатора списка email-ов для отправки регистрационной карты")]
 		public void Validate_email_list_for_sending_registration_card()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				using (new SessionScope())
-				{
-					browser.Link(Find.ByText("Новый пользователь")).Click();
-					browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
-					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
-					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
-					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
-					browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test");
-					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-				}
-			}
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
+			browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test.");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
+			browser.TextField(Find.ByName("mails")).TypeText("test1@test.test,test2@test.test,    test3@test.test");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 		}
 
-		[Test, Description("Тест для регистрации адреса при регистрации пользователя")]
+		[Test, NUnit.Framework.Description("Тест для регистрации адреса при регистрации пользователя")]
 		public void Create_user_with_address()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
-			{
-				RegisterUserWithAddress(client, browser);
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-			}
+			RegisterUserWithAddress(client, browser);
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+
 			using (new SessionScope())
 			{
 				client = Client.Find(client.Id);
@@ -750,7 +663,7 @@ namespace Functional
 			}
 		}
 
-		private void RegisterUserWithAddress(Client client, IE browser)
+		private void RegisterUserWithAddress(Client client, IElementContainer browser)
 		{
 			Assert.That(client.Addresses, Is.Null.Or.Empty);
 			Assert.That(client.Users, Is.Null.Or.Empty);
@@ -763,7 +676,6 @@ namespace Functional
 		[Test]
 		public void Register_user_with_addresses_not_default_legal_entity()
 		{
-			var client = DataMother.TestClient();
 			var payer = client.Payers.First();
 			var legalEntity = new LegalEntity {
 				Name = "Тестовая организация 2",
@@ -771,13 +683,11 @@ namespace Functional
 			};
 			legalEntity.Save();
 			payer.JuridicalOrganizations.Add(legalEntity);
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
-			{
-				RegisterUserWithAddress(client, browser);
-				browser.Css("#address_LegalEntity_Id").Select("Тестовая организация 2");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-			}
+
+			RegisterUserWithAddress(client, browser);
+			browser.Css("#address_LegalEntity_Id").Select("Тестовая организация 2");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 
 			using(new SessionScope())
 			{
@@ -789,24 +699,20 @@ namespace Functional
 		[Test]
 		public void Create_user_with_contact_person_info()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			browser.Link("addPersonLink" + client.Id).Click();
+			browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
+			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			using (new SessionScope())
 			{
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.Link("addPersonLink" + client.Id).Click();
-				browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
-				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
-					var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
-					Assert.That(persons.Count, Is.EqualTo(1));
-					Assert.That(persons[0].Name, Is.EqualTo("Alice"));
-				}
+				client = Client.Find(client.Id);
+				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
+				var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
+				Assert.That(persons.Count, Is.EqualTo(1));
+				Assert.That(persons[0].Name, Is.EqualTo("Alice"));
 			}
 		}
 
@@ -846,34 +752,30 @@ namespace Functional
 		[Test]
 		public void Test_enable_update_setting()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			using (var browser = Open("Client/{0}", client.Id))
+			Assert.IsFalse(client.Users[0].EnableUpdate);
+			browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+			browser.Link(Find.ByText("Настройка")).Click();
+			Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
+			browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			using (new SessionScope())
 			{
-				Assert.IsFalse(client.Users[0].EnableUpdate);
-				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
-				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
-				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					Assert.IsTrue(client.Users[0].EnableUpdate);
-				}
+				client = Client.Find(client.Id);
+				Assert.IsTrue(client.Users[0].EnableUpdate);
+			}
 
-				browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-				browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
-				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
-				browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					Assert.IsFalse(client.Users[0].EnableUpdate);
-				}
+			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+			browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
+			browser.Link(Find.ByText("Настройка")).Click();
+			Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
+			browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			using (new SessionScope())
+			{
+				client = Client.Find(client.Id);
+				Assert.IsFalse(client.Users[0].EnableUpdate);
 			}
 		}
 
@@ -881,26 +783,24 @@ namespace Functional
 		public void Add_comment_for_contact()
 		{
 			var applyButtonText = "Сохранить";
-			var client = DataMother.CreateTestClientWithUser();
 
-			using (var browser = Open("users/{0}/edit", client.Users[0].Id))
+			Open(user, "Edit");
+			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
+			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
+			using (new SessionScope())
 			{
-				ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, client.Id);
-				ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Users[0].ContactGroup;
-					browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
+				client = Client.Find(client.Id);
+				var group = client.Users[0].ContactGroup;
+				browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
+				browser.Button(Find.ByValue("Сохранить")).Click();
 			}
+
 			// Проверка, что комментарий записан
 			var contact = Contact.Find(client.Users[0].ContactGroup.Contacts[0].Id);
 			Assert.That(contact.Comment, Is.EqualTo("some comment"));
 		}
 
-		[Test, Description("Перемещение только пользователя (без адреса доставки) к другому клиенту")]
+		[Test, NUnit.Framework.Description("Перемещение только пользователя (без адреса доставки) к другому клиенту")]
 		public void Move_only_user_to_another_client()
 		{
 			Client oldClient;
@@ -948,7 +848,7 @@ namespace Functional
 
 		[
 			Test,
-			Description(@"
+			NUnit.Framework.Description(@"
 После перемещения пользователя должны быть созданы записи в UserPrices 
 для тех регионов, которых не было у старого клиента, но они есть у нового")
 		]
@@ -968,33 +868,19 @@ namespace Functional
 				user = oldClient.Users[0];
 				address = oldClient.Addresses[0];
 			}
-			var oldCountUserPrices = GetCountUserPrices(user.Id);
+			var oldCountUserPrices = user.GetUserPriceCount();
 
-			using (var browser = Open(user, "edit"))
-			{
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
-			}
+			Open(user, "edit");
+			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+			browser.Button(Find.ById("SearchClientButton")).Click();
+			Thread.Sleep(2000);
+			browser.Button(Find.ByValue("Переместить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
 
-			var newCountUserPricesEntries = GetCountUserPrices(user.Id);
+			var newCountUserPricesEntries = user.GetUserPriceCount();
 			Assert.That(oldCountUserPrices, Is.LessThan(newCountUserPricesEntries));
 
 			Assert.That(GetCountUserPricesForRegion(user.Id, 16UL), Is.GreaterThan(0));
-		}
-
-		private uint GetCountUserPrices(uint userId)
-		{
-			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
-SELECT COUNT(*)
-FROM
-	Future.UserPrices
-WHERE UserId = :UserId
-")
-				.SetParameter("UserId", userId)
-				.UniqueResult()));
 		}
 
 		private uint GetCountUserPricesForRegion(uint userId, ulong regionId)
@@ -1010,7 +896,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				.UniqueResult()));
 		}
 
-		[Test, Description("Перемещение пользователя с адресом доставки к другому клиенту")]
+		[Test, NUnit.Framework.Description("Перемещение пользователя с адресом доставки к другому клиенту")]
 		public void Move_user_with_address_to_another_client()
 		{
 			Client oldClient;

@@ -51,10 +51,10 @@ namespace Functional.ForTesting
 			browser.Button(Find.ByValue(applyButtonText)).Click();			
 		}
 
-		public static void AddPerson(IE browser, string personName, string applyButtonText, uint clientId)
+		public static void AddPerson(Browser browser, string personName, string applyButtonText, uint clientId)
 		{
 			var rowId = 0;
-			browser.Link(Find.ById("addPersonLink" + clientId)).Click();
+			browser.Link(Find.ById("addPersonLink")).Click();
 			browser.TextField(String.Format("persons[{0}].Name", --rowId)).TypeText(personName);
 			browser.Button(Find.ByValue(applyButtonText)).Click();
 		}

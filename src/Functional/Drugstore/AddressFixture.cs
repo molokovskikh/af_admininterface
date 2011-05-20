@@ -66,19 +66,12 @@ namespace Functional.Drugstore
 				var address = client.Addresses.First();
 				Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
 
-				var intersection = ArHelper.WithSession(s =>
-					s.CreateSQLQuery("select * from future.Intersection where ClientId = :id")
-					.SetParameter("id", client.Id)
-					.List());
+				var intersectionCount = client.GetIntersectionCount();
+				var addressIntersectionCount = address.GetAddressIntersectionCount();
 
-				var addressIntersection = ArHelper.WithSession(s =>
-					s.CreateSQLQuery("select * from future.AddressIntersection where AddressId = :id")
-					.SetParameter("id", address.Id)
-					.List());
-
-				Assert.That(intersection.Count, Is.GreaterThan(0), "не создали записей в Intersection, проверрь создание пользователя Client.MaintainIntersection");
-				Assert.That(addressIntersection.Count, Is.GreaterThan(0), "не создали записей в AddressIntersection, адрес не будет доступен в клиентском интерфейсе");
-				Assert.That(addressIntersection.Count, Is.EqualTo(intersection.Count), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
+				Assert.That(intersectionCount, Is.GreaterThan(0), "не создали записей в Intersection, проверрь создание пользователя Client.MaintainIntersection");
+				Assert.That(addressIntersectionCount, Is.GreaterThan(0), "не создали записей в AddressIntersection, адрес не будет доступен в клиентском интерфейсе");
+				Assert.That(addressIntersectionCount, Is.EqualTo(intersectionCount), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
 			}
 		}
 
@@ -252,7 +245,7 @@ namespace Functional.Drugstore
 				user = oldClient.Users[0];
 				address = oldClient.Addresses[0];
 			}
-			var oldCountAddressIntersectionEntries = GetCountAddressIntersectionEntries(address.Id);
+			var oldCountAddressIntersectionEntries = address.GetAddressIntersectionCount();
 
 			using (var browser = Open("deliveries/{0}/edit", oldClient.Addresses[0].Id))
 			{
@@ -263,22 +256,11 @@ namespace Functional.Drugstore
 				Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
 			}
 
-			var newCountAddressInterSectionEntries = GetCountAddressIntersectionEntries(address.Id);
+			var newCountAddressInterSectionEntries = address.GetAddressIntersectionCount();
 
 			Assert.That(oldCountAddressIntersectionEntries, Is.EqualTo(newCountAddressInterSectionEntries));
 			Assert.That(GetCountAddressIntersectionEntriesForClient(address.Id, oldClient.Id), Is.EqualTo(0));
 			Assert.That(GetCountAddressIntersectionEntriesForClient(address.Id, newClient.Id), Is.EqualTo(oldCountAddressIntersectionEntries));
-		}
-
-		private uint GetCountAddressIntersectionEntries(uint addressId)
-		{
-			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
-SELECT COUNT(*)
-FROM Future.AddressIntersection
-WHERE AddressId = :AddressId
-")
-					.SetParameter("AddressId", addressId)
-					.UniqueResult()));
 		}
 
 		private uint GetCountAddressIntersectionEntriesForClient(uint addressId, uint clientId)

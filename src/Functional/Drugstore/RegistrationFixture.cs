@@ -228,27 +228,11 @@ namespace Functional
 			SetupGeneralInformation(browser);
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button(Find.ById("RegisterButton")).Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
+			var client = GetRegistredClient();
 
-			ArHelper.WithSession(s => {
-				var client = Client.Find(clientCode);
-				var command = new MySqlCommand("select count(*) from future.intersection where ClientId = ?ClientCode",
-					(MySqlConnection)s.Connection);
-				command.Parameters.AddWithValue("?ClientCode", clientCode);
-				var count = Convert.ToUInt32(command.ExecuteScalar());
-				Assert.That(count, Is.GreaterThan(0));
-
-				command.CommandText = "select count(*) from future.Users where ClientId = ?ClientCode";
-				var usersCount = Convert.ToUInt32(command.ExecuteScalar());
-				Assert.That(usersCount, Is.EqualTo(1), "у клиента нет пользователей");
-
-				command.CommandText = "select Id from future.Users where ClientId = ?ClientCode";
-				var userId = Convert.ToUInt32(command.ExecuteScalar());
-				command.CommandText = "select count(*) from future.UserPrices where UserId = ?UserId";
-				command.Parameters.AddWithValue("?UserId", userId);
-				count = Convert.ToUInt32(command.ExecuteScalar());
-				Assert.That(count, Is.GreaterThan(0));
-			});
+			Assert.That(client.GetIntersectionCount(), Is.GreaterThan(0));
+			Assert.That(client.Users.Count, Is.GreaterThan(0));
+			Assert.That(client.Users[0].GetUserPriceCount(), Is.GreaterThan(0));
 		}
 
 		private void SetupGeneralInformation(Browser browser)

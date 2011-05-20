@@ -117,6 +117,7 @@
     <Compile Include="ForTesting\FixtureForFixture.cs" />
     <Compile Include="ForTesting\FixtureMapping.cs" />
     <Compile Include="ForTesting\Helper.cs" />
+    <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
     <Compile Include="ForTesting\WatinFixture.cs" />
     <Compile Include="LogsFixture.cs" />

@@ -2,8 +2,6 @@
 using System.Configuration;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Scopes;
-using Common.Web.Ui.ActiveRecord;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -83,7 +81,12 @@ namespace Functional.ForTesting
 			};
 */
 			if (SaveBrowser)
+			{
+				if (this.browser != null)
+					this.browser.Dispose();
+
 				this.browser = browser;
+			}
 			return browser;
 		}
 
