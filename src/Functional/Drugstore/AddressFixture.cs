@@ -2,39 +2,50 @@
 using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core;
 using Common.Web.Ui.Models;
 using System.Threading;
-using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
-namespace Functional
+namespace Functional.Drugstore
 {
-	public class AddressFixture : WatinFixture
+	public class AddressFixture : WatinFixture2
 	{
+		private Client client;
+
+		[SetUp]
+		public void Setup()
+		{
+			var supplier = DataMother.CreateSupplier();
+			supplier.Save();
+			client = DataMother.CreateTestClientWithUser();
+			scope.Flush();
+			Open(client);
+			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+		}
+
 		[Test]
 		public void DeleteContactInformation()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var countContacts = 0;
 			// Удаление контактной записи
-			using (var browser = Open("client/{0}", client.Id))
+			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
+
+			using (new SessionScope())
 			{
-				countContacts = AddContactsToNewDeliveryAddress(browser, client.Id);
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var group = client.Addresses[0].ContactGroup;
-					browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-					Thread.Sleep(500);
-					browser.Button(Find.ByValue("Сохранить")).Click();
-				}
+				client = Client.Find(client.Id);
+				var group = client.Addresses[0].ContactGroup;
+				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+				Thread.Sleep(500);
+				browser.Button(Find.ByValue("Сохранить")).Click();
 			}
-			Thread.Sleep(500);
+
 			// Проверка, что контактная запись удалена
+			Thread.Sleep(500);
 			var count = ContactInformationFixture.GetCountContactsInDb(client.Addresses[0].ContactGroup);
 			Assert.That(count, Is.EqualTo(countContacts - 1));
 		}
@@ -42,16 +53,11 @@ namespace Functional
 		[Test]
 		public void Create_address()
 		{
-			var client = DataMother.TestClient();
-
-			using(var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText("Новый адрес доставки")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
-				browser.TextField(Find.ByName("delivery.value")).TypeText("тестовый адрес");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
-			}
+			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
+			browser.TextField(Find.ByName("delivery.value")).TypeText("тестовый адрес");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
 			using (new SessionScope())
 			{
@@ -89,7 +95,7 @@ namespace Functional
 		}
 
 		// Создает новый адрес доставки и 3 контакта для него (2 email)
-		private int AddContactsToNewDeliveryAddress(IE browser, uint clientId)
+		private int AddContactsToNewDeliveryAddress(uint clientId)
 		{
 			var applyButtonText = "Создать";
 			browser.Link(Find.ByText("Новый адрес доставки")).Click();
@@ -110,13 +116,7 @@ namespace Functional
 		[Test]
 		public void AddContactInformation()
 		{
-			var applyButtonText = "Создать";
-			var client = DataMother.TestClient();
-			var countContacts = 0;
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				countContacts = AddContactsToNewDeliveryAddress(browser, client.Id);
-			}
+			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
 			// Проверка, что контактные записи создались в БД
 			using (new SessionScope())
 			{
@@ -125,6 +125,7 @@ namespace Functional
 				var group = client.Addresses[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 					"Не совпадают Id владельца группы у клиента и у новой группы");
+
 				ContactInformationFixture.CheckContactGroupInDb(group);
 				countContacts = ContactInformationFixture.GetCountContactsInDb(group);
 				Assert.That(countContacts, Is.EqualTo(countContacts));
@@ -134,23 +135,19 @@ namespace Functional
 		[Test]
 		public void Address_must_be_enabled_after_registration()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open("client/{0}", client.Id))
+			using (new SessionScope())
 			{
-				using (new SessionScope())
-				{
-					browser.Link(Find.ByText("Новый адрес доставки")).Click();
-					browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
-					browser.Button(Find.ByValue("Создать")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
-					client = Client.Find(client.Id);
-					Assert.That(client.Addresses.Count, Is.EqualTo(1));
-					Assert.IsTrue(client.Addresses[0].Enabled);
-				}
+				browser.Link(Find.ByText("Новый адрес доставки")).Click();
+				browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
+				browser.Button(Find.ByValue("Создать")).Click();
+				Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+				client = Client.Find(client.Id);
+				Assert.That(client.Addresses.Count, Is.EqualTo(1));
+				Assert.IsTrue(client.Addresses[0].Enabled);
 			}
 		}
 
-		[Test, Description("Перемещение адреса вместе с пользователем к другому клиенту")]
+		[Test, NUnit.Framework.Description("Перемещение адреса вместе с пользователем к другому клиенту")]
 		public void Move_address_with_user_to_another_client()
 		{
 			Client oldClient;
@@ -199,7 +196,7 @@ namespace Functional
 			}
 		}
 
-		[Test, Description("Перемещение только адреса доставки (без пользователя) к другому клиенту")]
+		[Test, NUnit.Framework.Description("Перемещение только адреса доставки (без пользователя) к другому клиенту")]
 		public void Move_only_address_to_another_client()
 		{
 			Client oldClient;
@@ -240,7 +237,7 @@ namespace Functional
 			}
 		}
 
-		[Test, Description("После перемещения адреса доставки, для этого адреса должны быть скопированы записи в таблице AddressesIntersection")]
+		[Test, NUnit.Framework.Description("После перемещения адреса доставки, для этого адреса должны быть скопированы записи в таблице AddressesIntersection")]
 		public void After_moving_address_must_be_copied_address_intersection_entries()
 		{
 			Client newClient;

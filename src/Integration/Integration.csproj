@@ -113,12 +113,12 @@
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="ClientCardFixture.cs" />
     <Compile Include="Controllers\BillingControllerFixture.cs" />
-    <Compile Include="ForTesting\TransactionlessSession.cs" />
     <Compile Include="ForTesting\ControllerFixture.cs" />
     <Compile Include="Controllers\InvoicesControllerFixture.cs" />
     <Compile Include="Controllers\UsersControllerFixture.cs" />
     <Compile Include="ForTesting\DataMother.cs" />
     <Compile Include="ForTesting\ForTest.cs" />
+    <Compile Include="ForTesting\TransactionlessSession.cs" />
     <Compile Include="InvoiceFilterFixture.cs" />
     <Compile Include="MailerFixture.cs" />
     <Compile Include="Models\AccountingFixture.cs" />
@@ -149,6 +149,7 @@
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="SetupFixture.cs" />
+    <Compile Include="ScopeFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface\AdminInterface.csproj">

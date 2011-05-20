@@ -1,4 +1,5 @@
 ﻿using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NUnit.Framework;

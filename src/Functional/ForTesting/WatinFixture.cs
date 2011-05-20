@@ -2,6 +2,8 @@
 using System.Configuration;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
+using Common.Web.Ui.ActiveRecord;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -22,7 +24,7 @@ namespace Functional.ForTesting
 		protected bool UseTestScope;
 		protected bool SaveBrowser;
 
-		protected SessionScope scope;
+		protected ISessionScope scope;
 		protected Browser browser;
 
 		[SetUp]
@@ -35,10 +37,11 @@ namespace Functional.ForTesting
 		[TearDown]
 		public void Teardown()
 		{
-			if (scope == null)
-				return;
-			scope.Dispose();
-			scope = null;
+			if (scope != null)
+			{
+				scope.Dispose();
+				scope = null;
+			}
 
 			if (browser != null)
 			{

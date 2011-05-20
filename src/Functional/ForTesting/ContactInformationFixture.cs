@@ -13,7 +13,7 @@ namespace Functional.ForTesting
 {
 	public class ContactInformationFixture
 	{
-		public static void AddContact(IE browser, ContactType contactType, string applyButtonText, uint clientId)
+		public static void AddContact(Browser browser, ContactType contactType, string applyButtonText, uint clientId)
 		{
 			var validText = String.Empty;
 			var invalidText = String.Empty;
@@ -35,7 +35,7 @@ namespace Functional.ForTesting
 						break;
 					}
 			}
-			browser.Link(Find.ById("addContactLink" + clientId)).Click();
+			browser.Link(Find.ById("addContactLink")).Click();
 			var rowId = 0;
 			if (contactType == ContactType.Phone)
 			{
@@ -61,40 +61,29 @@ namespace Functional.ForTesting
 
 		public static void CheckContactGroupInDb(ContactGroup contactGroup)
 		{
-			using (new SessionScope())
-			{
-				var contactGroupCount = ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
-						.SetParameter("ContactGroupId", contactGroup.Id)
-                        .UniqueResult());
-				Assert.That(Convert.ToInt32(contactGroupCount), Is.EqualTo(1), "Не найдена группа контактной информации");
-			}
+			var contactGroupCount = ArHelper.WithSession(s =>
+				s.CreateSQLQuery("select count(*) from contacts.contact_groups where Id = :ContactGroupId")
+					.SetParameter("ContactGroupId", contactGroup.Id)
+					.UniqueResult());
+			Assert.That(Convert.ToInt32(contactGroupCount), Is.EqualTo(1), "Не найдена группа контактной информации");
 		}
 
 		public static int GetCountContactsInDb(ContactGroup contactGroup)
 		{
-			IList contactIds;
-			using (new SessionScope())
-			{
-				contactIds = ArHelper.WithSession(s =>
-                    s.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
-						.SetParameter("ownerId", contactGroup.Id)
-						.List());
-				return contactIds.Count;
-			}
+			var contactIds = ArHelper.WithSession(s =>
+				s.CreateSQLQuery("select Id from contacts.contacts where ContactOwnerId = :ownerId")
+					.SetParameter("ownerId", contactGroup.Id)
+					.List());
+			return contactIds.Count;
 		}
 
 		public static IList<string> GetPersons(ContactGroup contactGroup)
 		{
-			IList<string> personNames;
-			using (new SessionScope())
-			{
-				personNames = ArHelper.WithSession(s =>
-					s.CreateSQLQuery("select Name from contacts.persons where ContactGroupId = :contactGroupId")
-						.SetParameter("contactGroupId", contactGroup.Id)
-						.List<string>());
-				return personNames;
-			}
+			var personNames = ArHelper.WithSession(s =>
+				s.CreateSQLQuery("select Name from contacts.persons where ContactGroupId = :contactGroupId")
+					.SetParameter("contactGroupId", contactGroup.Id)
+					.List<string>());
+			return personNames;
 		}
 
 		public static void DeleteContact(IE browser, ContactGroup contactGroup)

@@ -7,11 +7,13 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using log4net.Config;
 using NUnit.Framework;
+using TransactionlessSession = Integration.ForTesting.TransactionlessSession;
 
 namespace Integration.Controllers
 {

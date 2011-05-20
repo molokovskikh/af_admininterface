@@ -41,12 +41,16 @@ namespace AdminInterface.Services
 			var defaults = DefaultValues.Get();
 			var client = address.Client;
 			var emails = GetEmailsForNotification(client);
+			var orgName = client.FullName;
+			if (client.Payers.Count > 1 || address.Payer.JuridicalOrganizations.Count > 1)
+				orgName = address.LegalEntity.FullName;
+
 			foreach (var email in emails)
 				Func.Mail("tech@analit.net",
 					"Аналитическая Компания Инфорум",
 					"Новый адрес доставки в системе \"АналитФАРМАЦИЯ\"",
 					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAfterAddressRegistration,
-						client.FullName,
+						orgName,
 						client.Name,
 						client.HomeRegion.Name,
 						address.Value,
@@ -69,18 +73,21 @@ namespace AdminInterface.Services
 			var defaults = DefaultValues.Get();
 			var emails = GetEmailsForNotification(client);
 			foreach (var email in emails)
+			{
+				var address = client.Addresses.First();
 				Func.Mail("tech@analit.net",
 					"Аналитическая Компания Инфорум",
 					"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
 					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
 						client.FullName,
 						client.Name,
-						client.Addresses.First().Value,
+						address.Value,
 						client.HomeRegion.Name,
-						client.Addresses.First().Id)),
+						address.Id)),
 					email,
 					"",
 					null);
+			}
 			// Если это повторная рассылка уведомлений о регистрации, то отсылаем письмо
 			// "Разослано повторное уведомление о регистрации"
 			if (isRenotify)
