@@ -14,6 +14,13 @@ namespace Functional.ForTesting
 			UseTestScope = true;
 			SaveBrowser = true;
 		}
+
+		protected void Refresh()
+		{
+			if (scope != null)
+				scope.Flush();
+			browser.Refresh();
+		}
 	}
 
 	[TestFixture]
@@ -72,6 +79,9 @@ namespace Functional.ForTesting
 
 		protected IE Open(string uri = "/")
 		{
+			if (scope != null)
+				scope.Flush();
+
 			var browser = new IE(BuildTestUrl(uri));
 /*
 			((InternetExplorerClass)browser.InternetExplorer).DocumentComplete += (object disp, ref object url) => {

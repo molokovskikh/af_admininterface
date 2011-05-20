@@ -337,22 +337,7 @@ namespace Functional.Drugstore
 			Assert.AreEqual("История заказов", browser.Title);
 			browser.GoTo(baseUrl);
 
-			using (browser = Open("client/{0}", client.Id))
-			{
-				baseUrl = browser.Url;
 
-				browser.GoTo(browser.Link(Find.ByText("История обновлений")).Url);
-				Assert.AreEqual(String.Format("История обновлений клиента {0}", client.Name), browser.Title);
-				browser.GoTo(baseUrl);
-
-				browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
-				Assert.AreEqual("Статистика получения\\отправки документов клиента " + client.Name, browser.Title);
-				browser.GoTo(baseUrl);
-
-				browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
-				Assert.AreEqual("История заказов", browser.Title);
-				browser.GoTo(baseUrl);
-			}
 		}
 
 		[Test]
@@ -700,7 +685,7 @@ namespace Functional.Drugstore
 		public void Create_user_with_contact_person_info()
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
-			browser.Link("addPersonLink" + client.Id).Click();
+			browser.Link("addPersonLink").Click();
 			browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
