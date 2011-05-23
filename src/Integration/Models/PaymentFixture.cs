@@ -120,9 +120,9 @@ namespace Integration.Models
 		{
 			var payer = DataMother.BuildPayerForBillingDocumentTest();
 			var recipient = Recipient.Queryable.First();
-			new IgnoredInn("7707083893").Save();
 			payer.INN = DataMother.RandomInn();
-			payer.Save();
+			new IgnoredInn(payer.INN).Save();
+			payer.SaveAndFlush();
 
 			var payments = new List<Payment> {
 				new Payment {
@@ -134,6 +134,26 @@ namespace Integration.Models
 
 			var identifyPayments = Payment.Identify(payments);
 			Assert.That(identifyPayments.First().Payer, Is.Null);
+		}
+
+		[Test]
+		public void Identify_payment()
+		{
+			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var recipient = Recipient.Queryable.First();
+			payer.INN = DataMother.RandomInn();
+			payer.SaveAndFlush();
+
+			var payments = new List<Payment> {
+				new Payment {
+					Sum = 800,
+					RecipientClient = new Payment.BankClient(recipient.Name, recipient.INN, recipient.BankAccountNumber),
+					PayerClient = new Payment.BankClient(payer.Name, payer.INN, "")
+				}
+			};
+
+			var identifyPayments = Payment.Identify(payments);
+			Assert.That(identifyPayments.First().Payer, Is.EqualTo(payer));
 		}
 	}
 }
