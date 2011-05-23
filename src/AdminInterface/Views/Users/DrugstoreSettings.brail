@@ -32,6 +32,7 @@
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.SendWaybills")}<br>
 			${app.Edit("user.SendRejects")}<br>
+			${app.Edit("user.AllowDownloadUnconfirmedOrders")}<br>
 
 			<input type=checkbox name=user.Auditor ${"checked" if user.Auditor} value=true> Аудитор, может просматривать заказы всех пользователей текущего клиента и клиентов которые назначены как показываемые<br>
 			<input type=hidden name=user.Auditor value=false>

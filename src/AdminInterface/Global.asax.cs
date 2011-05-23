@@ -239,15 +239,14 @@ WHERE PriceCode = ?Id", connection);
 		void Application_Error(object sender, EventArgs e)
 		{
 			var exception = Server.GetLastError();
-
 			if (exception.InnerException is NotAuthorizedException)
 			{
-				Response.Redirect("~/Rescue/NotAuthorized.aspx");
+				Server.Transfer("~/Rescue/NotAuthorized.aspx");
 				return;
 			}
 			if (exception.InnerException is NotHavePermissionException)
 			{
-				Response.Redirect("~/Rescue/NotAllowed.aspx");
+				Server.Transfer("~/Rescue/NotAllowed.aspx");
 				return;
 			}
 
@@ -290,9 +289,8 @@ WHERE PriceCode = ?Id", connection);
 			builder.AppendLine("--------------");
 
 			_log.Error(builder.ToString());
-#if !DEBUG
-			Response.Redirect("~/Rescue/Error.aspx");
-#endif
+			if (!Context.IsDebuggingEnabled)
+				Server.Transfer("~/Rescue/Error.aspx");
 		}
 
 		void Session_End(object sender, EventArgs e)

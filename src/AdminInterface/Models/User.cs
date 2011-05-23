@@ -130,6 +130,9 @@ namespace AdminInterface.Models
 		[Property, Description("Сохранять подготовленные данные")]
 		public virtual bool SaveAFDataFiles { get; set; }
 
+		[Property, Description("Загружать неподтвержденные заказы")]
+		public virtual bool AllowDownloadUnconfirmedOrders { get; set; }
+
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
 
