@@ -30,8 +30,8 @@ namespace AdminInterface.Models
 
 	public enum InvoicePeriod
 	{
-		Month,
-		Quarter
+		[Description("Помесячно")] Month,
+		[Description("Поквартально")] Quarter
 	}
 
 	public class InvoiceSettings

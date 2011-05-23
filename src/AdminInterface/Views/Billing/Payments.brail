@@ -510,25 +510,20 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			
 		${WriteInputGroupHeader("Опции выставки счета")}
 		
-		
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
-									FormHelper.Select("Instance.AutoInvoice", 
-													  {1:"Автоматически", 0:"По запросу"},
-													  {"value":"Key", "text":"Value"}))}
-		<% if not Instance.IsManualPayments(): %>
+			app.Edit("Instance.AutoInvoice"))}
 		
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
-									FormHelper.Select("Instance.PayCycle", 
-													  {0:"Помесячно", 1:"Поквартально"}, 
-													  {"value":"Key", "text":"Value"}))}
+			app.Edit("Instance.PayCycle"))}
+
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.PrintInvoice", "Печатать счет:"),
-									FormHelper.CheckboxField("Instance.InvoiceSettings.PrintInvoice"))}
+			FormHelper.CheckboxField("Instance.InvoiceSettings.PrintInvoice"))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
-									FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
+			FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendPaymentNotification", "Отправлять извещения об оплате:"),
-									FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
+			FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DocumentsOnLastWorkingDay", "Формировать документы последним числом месяца:"),
 			FormHelper.CheckboxField("Instance.InvoiceSettings.DocumentsOnLastWorkingDay"))}
@@ -537,7 +532,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			FormHelper.CheckboxField("Instance.InvoiceSettings.DoNotGroupParts"))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
-									FormHelper.TextField("Instance.BeginBalance"))}
+			FormHelper.TextField("Instance.BeginBalance"))}
 
 		<% value = "" %>
 		<% if Instance.BeginBalanceDate != null: %>
@@ -546,7 +541,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
 									FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
-		<% end %>
 		
 		${WriteInputGroupHeader("Оплата")}
 										
