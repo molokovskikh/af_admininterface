@@ -180,7 +180,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			Update("${siteroot}/Account/Update", this);
 		});
 
-		$("div.collapsible").each(function () {
+		$("div.collapsible, div.autocollapsible").each(function () {
 			var folder = $(this).find("div.VisibleFolder");
 			var triggers = $(this).find("div.trigger");
 
@@ -193,7 +193,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				}
 			}
 
-			if (count > 5) {
+			if (count > 5 && $(this).hasClass("autocollapsible")) {
 				triggers.addClass("ShowHiden");
 				folder.addClass("hidden")
 			}
@@ -205,10 +205,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 </script>
 
 <style>
-	.InputGroupHeader.collapsible
+	.InputGroupHeader.collapsible, .InputGroupHeader.autocollapsible
 	{
 		margin-bottom:10px;
 	}
+	
 	div.VisibleFolder
 	{
 		margin-top:10px;
@@ -221,11 +222,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="left">
 
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("0.#")}</span> рублей</b>
+		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("C")}</span></b>
 	</div>
 	<% if not payer.IsManualPayments(): %>
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Баланс: <span> ${payer.Balance.ToString("0.#")}</span> рублей</b>
+		<b>Баланс: <span> ${payer.Balance.ToString("C")}</span></b>
 	</div>
 	<% end %>
 
@@ -286,7 +287,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 	</div>
 
-	<div class="InputGroupHeader collapsible">
+	<div class="InputGroupHeader autocollapsible">
 
 		<div class=trigger>
 			<a href="javascript:">Поставщики</a>
@@ -326,7 +327,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 	</div>
 
-	<div class="InputGroupHeader collapsible">
+	<div class="InputGroupHeader autocollapsible">
 
 		<div id="UserListHeader" class=trigger>
 			<a href="javascript:">Пользователи</a>
@@ -390,7 +391,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 	</div>
 			
-		<div class="InputGroupHeader collapsible">
+		<div class="InputGroupHeader autocollapsible">
 
 			<div id="AddressListHeader" class=trigger>
 				<a href="javascript:">Адреса доставки</a>
@@ -457,7 +458,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 
 		<% if reports.Count: %>
-			<div class="InputGroupHeader collapsible" id=reports>
+			<div class="InputGroupHeader autocollapsible" id=reports>
 
 				<div class=trigger>
 					<a href="javascript:">Отчеты</a>
@@ -578,7 +579,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			${FormHelper.HiddenField("tab", "payments")}
 
 			<% if UsersMessages.Count: %>
-				<div class="InputGroupHeader collapsible">
+				<div class="InputGroupHeader autocollapsible">
 					<div class="trigger">
 						<a href="javascript:">Не показанные сообщения</a>
 					</div>
