@@ -350,6 +350,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<th>Комментарий</th>
 						<th>Дата последнего обновления</th>
 						<th>Клиент</th>
+						<th>Дата регистрации</th>
 					</tr>
 					<% for i, user in enumerate(Users): %>
 					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled}"
@@ -378,6 +379,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<td>${user.Name}</td>
 						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
 						<td>${user.RootService.Name}</td>
+						<td>${user.RegistrationDate.ToShortDateString() if user.RegistrationDate != null}</td>
 					</tr>
 					<tr id="UserRowHidden${user.Id}">
 						<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
@@ -411,6 +413,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<th>Пользователи</th>
 							<th>Клиент</th>
 							<th>Юр. лицо</th>
+							<th>Дата регистрации</th>
 						</tr>
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
@@ -442,6 +445,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td>
 								<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.LegalEntity.Id})">${addr.LegalEntity.Name}</a>
 							</td>
+							<td>${addr.RegistrationDate.ToShortDateString() if addr.RegistrationDate != null}</td>
 						</tr>
 						<tr id="AddressRowHidden${addr.Id}" class='${'hidable hidden' if hidden}'>
 							<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>
