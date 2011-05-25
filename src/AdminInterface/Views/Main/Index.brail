@@ -364,6 +364,16 @@
 					<td class="statistic-value">${LastParsedWaybillDate}</td>
 				</tr>
 				<tr>
+					<td class="statistic-label" colspan=2>Всего позиций:</td>
+					<td class="statistic-value" colspan=2>${DocumentLineCount}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Опознано по наименованию:</td>
+					<td class="statistic-value">${DocumentProductIdentifiedCount}(${ViewHelper.InPercent(DocumentProductIdentifiedCount, DocumentLineCount)}%)</td>
+					<td class="statistic-label">Опознано по производителю:</td>
+					<td class="statistic-value">${DocumentProductIdentifiedCount}(${ViewHelper.InPercent(DocumentProducerIdentifiedCount, DocumentLineCount)}%)</td>
+				</tr>
+				<tr>
 					<td colspan="4" class="statistic-header">Службы:</td>
 				</tr>
 				<tr>

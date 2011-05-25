@@ -58,10 +58,10 @@ FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id
 		JOIN usersettings.UserUpdateInfo uui on uui.UserId = u.Id
 WHERE   cd.RegionCode & ?RegionMaskParam > 0
-        AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate <= ?EndDateParam;
+		AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate <= ?EndDateParam;
 		 
 SELECT cast(concat(count(if(resultid=2, PriceItemId, null)), '(', count(DISTINCT if(resultid=2, PriceItemId, null)), ')') as CHAR) as FormCount,
-       cast(ifnull(max(if(resultid=2, logtime, null)), '2000-01-01') as CHAR) as LastForm
+	   cast(ifnull(max(if(resultid=2, logtime, null)), '2000-01-01') as CHAR) as LastForm
 FROM logs.formlogs
 WHERE logtime >= ?StartDateParam AND logtime <= ?EndDateParam;
 			 
@@ -74,21 +74,21 @@ SELECT sum(ol.cost * ol.quantity) as OrderSum,
 	   count(DISTINCT oh.rowid) as TotalOrders,
 	   count(DISTINCT oh.clientcode) as UniqClientOrders,
 	   count(DISTINCT oh.userid) as UniqUserOrders,
-       Max(WriteTime) as MaxOrderTime
+	   Max(WriteTime) as MaxOrderTime
 FROM orders.ordershead oh,
-     orders.orderslist ol, 
-     future.Clients cd, 
-     usersettings.retclientsset rcs
+	 orders.orderslist ol, 
+	 future.Clients cd, 
+	 usersettings.retclientsset rcs
 WHERE oh.rowid = orderid
-      AND cd.Id = oh.clientcode
-      AND cd.PayerId <> 921
-      AND rcs.clientcode = oh.clientcode
-      AND cd.Segment = 0
-      AND rcs.serviceclient = 0 
-      AND oh.regioncode & ?RegionMaskParam   > 0
-      AND oh.Deleted = 0
+	  AND cd.Id = oh.clientcode
+	  AND cd.PayerId <> 921
+	  AND rcs.clientcode = oh.clientcode
+	  AND cd.Segment = 0
+	  AND rcs.serviceclient = 0 
+	  AND oh.regioncode & ?RegionMaskParam   > 0
+	  AND oh.Deleted = 0
 	  AND oh.Submited = 1
-      AND WriteTime >= ?StartDateParam AND WriteTime <= ?EndDateParam;
+	  AND WriteTime >= ?StartDateParam AND WriteTime <= ?EndDateParam;
 
 select count(oh.RowId) as NonProcOrdersCount
 from orders.ordershead oh
@@ -97,27 +97,34 @@ where	oh.processed = 0
 		and oh.deleted = 0;
 
 SELECT ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DataSize,
-       ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DocSize,
-       sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
-       cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
-       cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
-       cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, u.Id, null)) ,')') as CHAR) Updates
+	   ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DocSize,
+	   sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
+	   cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
+	   cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
+	   cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, u.Id, null)) ,')') as CHAR) Updates
 FROM Future.Clients cd
 	join Future.Users u on u.ClientId = cd.Id
 	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE cd.maskregion & ?RegionMaskParam > 0
-      AND afu.RequestTime >= ?StartDateParam AND afu.RequestTime <= ?EndDateParam;
+	  AND afu.RequestTime >= ?StartDateParam AND afu.RequestTime <= ?EndDateParam;
 
 SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
-       max(dlogs.LogTime) as LastDownloadedWaybillDate
+	   max(dlogs.LogTime) as LastDownloadedWaybillDate
 FROM logs.document_logs dlogs
 join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
 WHERE (dlogs.LogTime >= ?StartDateParam AND dlogs.LogTime <= ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
 
 SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
-       max(dheaders.WriteTime) as LastParsedWaybillDate
+	   max(dheaders.WriteTime) as LastParsedWaybillDate
 FROM documents.documentheaders dheaders
-WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateParam) AND dheaders.DocumentType = 1;", c);
+WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateParam) AND dheaders.DocumentType = 1;
+
+select ifnull(sum(if(db.ProductId is not null, 1, 0)), 0) as DocumentProductIdentifiedCount,
+	ifnull(sum(if(db.ProducerId is not null, 1, 0)), 0) as DocumentProducerIdentifiedCount,
+	count(*) as DocumentLineCount
+from documents.documentheaders d
+	join documents.documentbodies db on db.DocumentId = d.Id
+where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
 					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Administrator.RegionMask);
@@ -202,6 +209,10 @@ WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateP
 			PropertyBag["CountParsedWaybills"] = data.Tables[7].Rows[0]["CountParsedWaybills"].ToString();
 			// Дата последнего разбора накладной
 			PropertyBag["LastParsedWaybillDate"] = data.Tables[7].Rows[0]["LastParsedWaybillDate"].ToString();
+
+			PropertyBag["DocumentProductIdentifiedCount"] = data.Tables[8].Rows[0]["DocumentProductIdentifiedCount"];
+			PropertyBag["DocumentProducerIdentifiedCount"] = data.Tables[8].Rows[0]["DocumentProducerIdentifiedCount"];
+			PropertyBag["DocumentLineCount"] = data.Tables[8].Rows[0]["DocumentLineCount"];
 		}
 
 		[RequiredPermission(PermissionType.EditSettings)]
