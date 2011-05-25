@@ -262,6 +262,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
+			LayoutName = "GeneralWithJQueryOnly";
 			var client = Client.Find(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
@@ -296,16 +297,19 @@ where Phone like :phone")
 			return client.Orgs().Select(j => new {j.Id, j.Name}).ToArray();
 		}
 
-		public void SearchAssortmentPrices(string text)
+		[return: JSONReturnBinder]
+		public object[] SearchAssortmentPrices(string text)
 		{
-			CancelLayout();
+//			CancelLayout();
 			uint id;
 			UInt32.TryParse(text, out id);
-			PropertyBag["prices"] = Price.Queryable
+			return Price.Queryable
 				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == PriceType.Assortment)
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
-				.ToList();
+				.ToArray()
+				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name)})
+				.ToArray();
 		}
 
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)

@@ -128,6 +128,19 @@ namespace AdminInterface.Models
 		[Property, Description("Не подключать новые прайс-листы"), Auditable]
 		public virtual bool IgnoreNewPrices { get; set; }
 
+		public virtual bool EnableBuyingMatrix
+		{
+			get
+			{
+				return BuyingMatrixPrice != null;
+			}
+			set
+			{
+				if (!value)
+					BuyingMatrixPrice = null;
+			}
+		}
+
 		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
@@ -154,5 +167,25 @@ namespace AdminInterface.Models
 
 		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.All)]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
+
+		[BelongsTo("OfferMatrixPriceId"), Description("Матрица предложений"), Auditable]
+		public virtual Price OfferMatrixPrice { get; set; }
+
+		[Property, Description("Тип матрицы предложений"), Auditable]
+		public virtual BuyingMatrixType OfferMatrixType { get; set; }
+
+		public virtual bool EnableOfferMatrix
+		{
+			get
+			{
+				return OfferMatrixPrice != null;
+			}
+			set
+			{
+				if (!value)
+					OfferMatrixPrice = null;
+			}
+		}
+
 	}
 }

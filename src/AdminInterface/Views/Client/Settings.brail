@@ -2,121 +2,154 @@
 									  ("Информация о клиенте", "${siteroot}/client/${client.Id}"),
 									  ("Настройка аптеки", "")]} %>
 
+<style>
+	div.search span.message
+	{
+		display:block;
+		clear:both;
+		font-style:italic;
+	}
+	
+	div.search span.message.error
+	{
+		color:Red;
+	}
+</style>
 <script language="javascript">
-	jQuery(function () {
+	$(function () {
 	<% if drugstore.NoiseCosts: %>
 		setNoise(true);
 	<% end %>
 
-		jQuery("#ActivateBuyMatrix").click(function() {
+		$("#drugstore_IsConvertFormat").click(function(){
 			if (this.checked)
-				jQuery("#SearchBuyMatrixBlock").css("display", "")
-			else
-				Cancel();
-		});
-
-		jQuery("#CancelBuyMatrix").click(function(){
-			Cancel();
-		});
-
-		jQuery("#SearchBuyMatrix").click(function(){
-			Search();
-		});
-
-		jQuery("#drugstore_IsConvertFormat").click(function(){
-			if (this.checked)
-				jQuery("#SearchAssortimentPriceBlock").css("display", "");
+				$("#SearchAssortimentPriceBlock").css("display", "");
 			else
 				CancelAssortimentPriceForDbf();
 		});
 
-		jQuery("#SearchAssortimentPrice").click(function(){
+		$("#SearchAssortimentPrice").click(function(){
 			SearchAssortimentPriceForDbf();
 		});
 
-		jQuery("#CancelAssortimentPrice").click(function(){
+		$("#CancelAssortimentPrice").click(function(){
 			CancelAssortimentPriceForDbf();
 		});
 
+
+		$("input[type=checkbox].activate").click(function() {
+			var root = $($(this).parents("td").get(0)).siblings("td");
+			if (this.checked)
+				search(root);
+			else
+				cancel(root);
+		});
+
+		$("input[type=button].cancel-search").live("click", function() {
+			cancel($($(this).parents("td").get(0)));
+		});
+
+		$("input[type=button].search").live("click", function() {
+			var root = $($(this).parents("div.search").get(0));
+			var rootRow = $(root.parents("tr").get(0));
+			var term = root.find("input[type=text].term").val();
+			$.ajax({
+				url: "${siteroot}/Client/SearchAssortmentPrices",
+				data: {"text": term},
+				cache: false,
+				success: function (data) {
+					if (data.length == 0) {
+						root.find("input[type=button].search").css("disabled", "");
+						message(root, "Ничего не найдено.", "error");
+						return;
+					}
+					root.children().remove();
+					rootRow.find(".settings").css("display", "");
+					var select = $("<select>")
+					$.each(data, function () {
+						select.append($("<option>").attr("value", this.id).text(this.name));
+					});
+					select.change(function () {
+						rootRow.find("input[type=hidden]").val($(this).val());
+					});
+					rootRow.find("input[type=hidden]").val(select.val());
+					root.append(select);
+				},
+				error: function (xhr, textStatus, error) {
+					message(root, "Произошла ошибка. Попробуйте еще раз.", "error");
+				}
+			});
+			root.find("input[type=button].search").css("disabled", "disabled");
+			message(root, "Идет поиск...");
+		});
 	});
 
-	function Cancel() {
-		jQuery("#WarningOnBuyingMatrix").css("display", "none");
-		jQuery("#BuyingMatrixType").css("display", "none");
+	function message(root, text, clazz)
+	{
+		root.find(".message").remove();
+		root.append($("<span class=message>" + text +"<span>").addClass(clazz));
+	}
 
-		jQuery("#SearchBuyMatrixBlock").css("display", "none")
-		jQuery("#SearchBuymatrixText").css("disabled", "");
+	function cancel(root)
+	{
+		var activate = $(root.parents("tr").get(0)).find("input[type=checkbox].activate").get(0);
+		activate.checked = false;
+		root.find(".search").remove();
+		root.find(".value").remove();
+		root.find(".settings").css("display", "none");
+		root.find("input[type=hidden]").val("");
+	}
 
-		jQuery("#DivForAssortmentPrice").children().remove().end();
-		jQuery("#ActivateBuyMatrix").get(0).checked = false;
+	function search(root)
+	{
+		root.find(".value").remove();
+		root.find(".settings").css("display", "none");
+		root.prepend("<div class=search><span>Выберите ассортиментный прайс лист</span><br>"
+			+ "<input type='text' class=term />"
+			+ "<input type='button' class=search value='Найти' />"
+			+ "<input type='button' class=cancel-search value='Отмена' />"
+			+ "</div>");
 	}
 
 	function CancelAssortimentPriceForDbf() {
-		jQuery("#SearchAssortimentPriceBlock").css("display", "none")
-		jQuery("#SearchAssortimentPriceText").css("disabled", "");
+		$("#SearchAssortimentPriceBlock").css("display", "none")
+		$("#SearchAssortimentPriceText").css("disabled", "");
 
-		jQuery("#DivForAssortimentPrice").empty();
-		jQuery("#drugstore_IsConvertFormat").get(0).checked = false;
+		$("#DivForAssortimentPrice").empty();
+		$("#drugstore_IsConvertFormat").get(0).checked = false;
 	}
-
+	 
 	function setNoise(noiseStatus) {
-		jQuery("#NotNoiseSupplier").find('select').remove().end();
+		$("#NotNoiseSupplier").find('select').remove().end();
 		if (noiseStatus) {
 			var url = "${siteroot}/Client/SuppliersForCostNoising.rails?clientId=${client.Id}";
-			jQuery.get(url, function(html){ jQuery("#NotNoiseSupplier").append(html); });
+			$.get(url, function(html){ $("#NotNoiseSupplier").append(html); });
 		}
 	}
 
-	function Search() {
-		var searchText = jQuery("#SearchBuymatrixText").val();
-		jQuery.ajax({
-			url: "${siteroot}/Client/SearchAssortmentPrices",
-			data: {"text": searchText},
-			cache: false,
-			success: function (data) {
-				if (data.length == 0) {
-					jQuery("#SearchBuymatrixMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
-					return;
-				}
-				jQuery("#SearchBuyMatrixBlock").css("display", "none")
-				jQuery("#SearchBuymatrixText").css("disabled", "");
-				jQuery("#SearchBuymatrixMessage").html("");
-
-				jQuery("#DivForAssortmentPrice").append(data);
-				jQuery("#BuyingMatrixType").css("display", "");
-				jQuery("#WarningOnBuyingMatrix").css("display", "");
-			},
-			error: function (xhr, textStatus, error) {
-				jQuery("#SearchBuymatrixMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-		jQuery("#SearchBuymatrixText").css("disabled", "disabled");
-		jQuery("#SearchBuymatrixMessage").html("<i>Идет поиск...</i>");
-	}
-
 	function SearchAssortimentPriceForDbf() {
-		var searchText = jQuery("#SearchAssortimentPriceText").val();
-		jQuery.ajax({
+		var searchText = $("#SearchAssortimentPriceText").val();
+		$.ajax({
 			url: "${siteroot}/Client/SearchAssortmentPrices",
 			data: {"text": searchText},
 			cache: false,
 			success: function (data) {
 				if (data.length == 0) {
-					jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
+					$("#SearchAssortimentPriceMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
 					return;
 				}
-				jQuery("#SearchAssortimentPriceBlock").css("display", "none")
-				jQuery("#SearchAssortimentPriceText").css("disabled", "");
-				jQuery("#SearchAssortimentPriceMessage").html("");
-				jQuery("#DivForAssortimentPrice").append(data);
-				jQuery("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPrice.Id']").attr("name", "drugstore.AssortimentPrice.Id")
+				$("#SearchAssortimentPriceBlock").css("display", "none")
+				$("#SearchAssortimentPriceText").css("disabled", "");
+				$("#SearchAssortimentPriceMessage").html("");
+				$("#DivForAssortimentPrice").append(data);
+				$("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPrice.Id']").attr("name", "drugstore.AssortimentPrice.Id")
 			},
 			error: function (xhr, textStatus, error) {
-				jQuery("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
+				$("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
 			}
 		});
-		jQuery("#SearchAssortimentPriceText").css("disabled", "disabled");
-		jQuery("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");
+		$("#SearchAssortimentPriceText").css("disabled", "disabled");
+		$("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");
 	}
 
 </script>
@@ -143,18 +176,18 @@
 	<% end %>
 	
 	<div class="TwoColumn" style="width: 800px;">
-	    <div class="block">
-	        <h3>Операции</h3>
-	        <form id="NotifySuppliers" method="post" action="NotifySuppliers.rails?clientId=${client.Id}" style="margin:0; padding:0">
-	            <input style="border-style:groove;" type="submit" value="Отправить уведомления о регистрации поставщикам" />
-	        </form>
-	    </div>
-	    
-	    <form id="DrugstoreSettingsForm" method=post action="${siteroot}/client/UpdateDrugstore">
-	        ${FormHelper.HiddenField("client.Id")}
-	        ${FormHelper.HiddenField("drugstore.Id")}
-	        <div class="block" id="commonSettings">
-	            <h3>Общая настройка</h3>
+		<div class="block">
+			<h3>Операции</h3>
+			<form id="NotifySuppliers" method="post" action="NotifySuppliers.rails?clientId=${client.Id}" style="margin:0; padding:0">
+				<input style="border-style:groove;" type="submit" value="Отправить уведомления о регистрации поставщикам" />
+			</form>
+		</div>
+		
+		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/client/UpdateDrugstore">
+			${FormHelper.HiddenField("client.Id")}
+			${FormHelper.HiddenField("drugstore.Id")}
+			<div class="block" id="commonSettings">
+				<h3>Общая настройка</h3>
 				<table border="0" style="width: 100%; height: 100%;">
 					<tr>
 					<td style="width: 50%;">
@@ -173,22 +206,7 @@
 						<label>Конвертировать накладную в dbf-файл</label>
 					</td>
 					<td>
-						<table id="SearchAssortimentPriceBlock" style="width: 100%;display:none">
-							<tr><td align="left">Выберите ассортиментный прайс лист</td></tr>
-							<tr>
-								<td style="padding: 0px 15px 0px 5px;" >
-									<input id="SearchAssortimentPriceText" type="text" style="width :100%;" />
-								</td>
-								<td align="right">
-									<strong>
-										<input id="SearchAssortimentPrice" type="button" value="Найти" />
-										<input id="CancelAssortimentPrice" type="button" value="Отмена" />
-									</strong>
-								</td>
-							</tr>
-							<tr><td id="SearchAssortimentPriceMessage" colspan="10"></td></tr>
-						</table>
-						<div id="DivForAssortimentPrice">
+						<div>
 							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
 							<% end %>
@@ -232,69 +250,51 @@
 				</td></tr>
 				<tr>
 					<td>
-						<input id=ActivateBuyMatrix name="ActivateBuyMatrix" value=true type="checkbox" ${"checked" if drugstore.BuyingMatrixPrice} />
+						${FormHelper.CheckboxField("drugstore.EnableBuyingMatrix", {"class" : "activate"})}
 						<label>Подключить матрицу закупок</label>
 					</td>
 					<td>
-						<table id="SearchBuyMatrixBlock" style="width: 100%;display:none">
-							<tr><td align="left">Выберете ассортиментный прайс лист</td></tr>
-							<tr>
-								<td style="padding: 0px 15px 0px 5px;" >
-									<input id="SearchBuymatrixText" type="text" style="width :100%;" />
-								</td>
-								<td align="right">
-									<strong>
-										<input id="SearchBuyMatrix" type="button" value="Найти" />
-										<input id="CancelBuyMatrix" type="button" value="Отмена" />
-									</strong>
-								</td>
-							</tr>
-							<tr><td id="SearchBuymatrixMessage" colspan="10"></td></tr>
-						</table>
-						<div id="DivForAssortmentPrice">
-							<% if drugstore.BuyingMatrixPrice: %>
+						${FormHelper.HiddenField("drugstore.BuyingMatrixPrice.Id")}
+						<% if drugstore.BuyingMatrixPrice: %>
+							<div class=value>
 								${drugstore.BuyingMatrixPrice.Supplier.Name} - ${drugstore.BuyingMatrixPrice.Name}
-								<input type=hidden name=drugstore.BuyingMatrixPrice.Id value=${drugstore.BuyingMatrixPrice.Id}>
-							<% end %>
+							</div>
+						<% end %>
+						<div class=settings ${"style='display:none'" if not drugstore.BuyingMatrixPrice}>
+							${app.Edit("drugstore.BuyingMatrixType")}
+							${app.Edit("drugstore.WarningOnBuyingMatrix")}
 						</div>
-						<select id="BuyingMatrixType" name="drugstore.BuyingMatrixType"  ${ "style='display:none'" if not drugstore.BuyingMatrixPrice} >
-							<option value=0 ${"selected" if drugstore.BuyingMatrixType == 0}>Белый список</option>
-							<option value=1 ${"selected" if drugstore.BuyingMatrixType == 1}>Черный список</option>
-						</select>
-						<select id="WarningOnBuyingMatrix" name="drugstore.WarningOnBuyingMatrix" ${ "style='display:none'" if not drugstore.BuyingMatrixPrice}>
-							<option value=0 ${"selected" if drugstore.WarningOnBuyingMatrix == 0}>Запретить заказ</option>
-							<option value=1 ${"selected" if drugstore.WarningOnBuyingMatrix == 1}>Выводить предупреждения</option>
-						</select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						${FormHelper.CheckboxField("drugstore.EnableOfferMatrix", {"class" : "activate"})}
+						<label>Подключить матрицу предложений</label>
+					</td>
+					<td>
+						${FormHelper.HiddenField("drugstore.OfferMatrixPrice.Id")}
+						<% if drugstore.OfferMatrixPrice: %>
+							<div class=value>
+								${drugstore.OfferMatrixPrice.Supplier.Name} - ${drugstore.OfferMatrixPrice.Name}
+							</div>
+						<% end %>
+						<div class=settings ${"style='display:none'" if not drugstore.OfferMatrixPrice}>
+							${app.Edit("drugstore.OfferMatrixType")}
+						</div>
 					</td>
 				</tr>
 				</table>
-	        </div>
-    	    
-            <!--
-	        <div class="block">
-                <div class=contextual>
-                    <a class="icon icon-add" href="javascript:" onclick="">Добавить</a>
-                </div>		    	    
-	            <h3>Показываемые клиенты</h3>
-	            <table>
-					<tr>
-						<th>Тип клиента</th>
-						<th>Клиент</th>
-						<td></td>
-					</tr>
-	            </table>
-	        </div>
-	        -->
+			</div>
 
-            <div class="block">
-                <h3>Региональная настройка</h3>
-                <% OutputSubView("/SubViews/Regions") %>
-            </div>
+			<div class="block">
+				<h3>Региональная настройка</h3>
+				<% OutputSubView("/SubViews/Regions") %>
+			</div>
 
-		    <div class=save>
-			    <input type=submit value="Сохранить">
-		    </div>
-		    
-	    </form>
-    </div>
+			<div class=save>
+				<input type=submit value="Сохранить">
+			</div>
+			
+		</form>
+	</div>
 </div>
