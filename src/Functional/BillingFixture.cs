@@ -9,7 +9,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using WatiN.Core;
-using WatiNCssSelectorExtensions;
+using WatiN.CssSelectorExtensions;
 using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
 namespace Functional
@@ -314,8 +314,8 @@ namespace Functional
 			using (var browser = Open(payer))
 			{
 				var selector = String.Format("tr#AddressRow{0}", address.Id);
-				var row = (TableRow)browser.CssSelect(selector);
-				var checkbox = (CheckBox)browser.CssSelect(String.Format("tr#AddressRow{0} input[name=status]", address.Id));
+				var row = (TableRow)browser.Css(selector);
+				var checkbox = (CheckBox)browser.Css(String.Format("tr#AddressRow{0} input[name=status]", address.Id));
 				
 				Assert.IsTrue(checkbox.Checked);
 				Assert.That(row.ClassName, Is.Not.StringContaining("Disabled"));

@@ -25,6 +25,7 @@ namespace AdminInterface.Models.Suppliers
 			Registration = new RegistrationInfo();
 			OrderRules = new List<OrderSendRules>();
 			Prices = new List<Price>();
+			RegionalData = new List<RegionalData>();
 			Type = ServiceType.Supplier;
 		}
 
@@ -58,8 +59,11 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
-		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Price> Prices { get; set; }
+
+		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
+		public virtual IList<RegionalData> RegionalData { get; set; }
 
 		[HasMany]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
@@ -229,5 +233,18 @@ namespace AdminInterface.Models.Suppliers
 			Prices.Add(price);
 			return price;
 		}
+	}
+
+	[ActiveRecord("RegionalData", Schema = "Usersettings")]
+	public class RegionalData
+	{
+		[PrimaryKey("RowId")]
+		public uint Id { get; set; }
+
+		[BelongsTo("RegionCode")]
+		public Region Region { get; set; }
+
+		[BelongsTo("FirmCode")]
+		public Supplier Supplier { get; set; }
 	}
 }

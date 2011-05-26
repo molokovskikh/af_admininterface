@@ -58,7 +58,12 @@ namespace AdminInterface.Models.Suppliers
 		public virtual void AddCost()
 		{
 			var isBase = Costs.Count == 0;
-			Costs.Add(new Cost{ Price = this, BaseCost = isBase });
+			Costs.Add(new Cost
+			{
+				Price = this,
+				BaseCost = isBase,
+				PriceItem = new PriceItem { FormRule = new FormRule() }
+			});
 		}
 	}
 
@@ -72,10 +77,14 @@ namespace AdminInterface.Models.Suppliers
 		{
 			Price = price;
 			Region = region;
+			Enabled = true;
 		}
 
 		[PrimaryKey("RowId")]
 		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual bool Enabled { get; set; }
 
 		[BelongsTo("PriceCode")]
 		public virtual Price Price { get; set; }
@@ -95,5 +104,25 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("PriceCode")]
 		public virtual Price Price { get; set; }
+
+		[BelongsTo("PriceItemId", Cascade = CascadeEnum.All)]
+		public virtual PriceItem PriceItem { get; set; }
+	}
+
+	[ActiveRecord("PriceItems", Schema = "Usersettings", Lazy = true)]
+	public class PriceItem
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[BelongsTo("FormRuleId", Cascade = CascadeEnum.All)]
+		public virtual FormRule FormRule { get; set; }
+	}
+
+	[ActiveRecord("FormRules", Schema = "Farm", Lazy = true)]
+	public class FormRule
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
 	}
 }

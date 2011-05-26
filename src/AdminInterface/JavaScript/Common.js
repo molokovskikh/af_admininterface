@@ -1,5 +1,25 @@
 ﻿$(function () {
 
+	$("table.editable tr input[type=button].add, table.editable tr a.add").live('click', function () {
+		var body = $(this).parents("tbody").get(0);
+		var table = $(this).parents("table");
+		var row = table.data("template")(table);
+
+		maxIndex = $(body).children("tr").length + 1;
+		row.find("input").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+		row.find("textarea").each(function () {
+			this.name = this.name.replace(/\d+/, maxIndex);
+		});
+
+		row.appendTo(body);
+	});
+
+	$("table.editable tr input[type=button].delete, table.editable tr a.delete").live('click', function () {
+		$($(this).parents("tr").get(0)).remove();
+	});
+
 	$.validator.addMethod("validateEmailList", function (value, element) {
 		if (value.toString().length > 0) {
 			return /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)

@@ -6,7 +6,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
-using WatiNCssSelectorExtensions;
+using WatiN.CssSelectorExtensions;
 
 namespace Functional.ForTesting
 {
@@ -19,6 +19,11 @@ namespace Functional.ForTesting
 		}
 
 		public static dynamic Css(this Browser browser, string selector)
+		{
+			return browser.CssSelect(selector);
+		}
+
+		public static dynamic Css(this Element browser, string selector)
 		{
 			return browser.CssSelect(selector);
 		}

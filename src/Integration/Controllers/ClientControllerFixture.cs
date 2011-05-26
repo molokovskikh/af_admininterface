@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
+using log4net.Config;
 using NUnit.Framework;
 using AdminInterface.Models.Logs;
 
@@ -300,6 +301,15 @@ namespace Integration.Controllers
 			Assert.That(destinationClient.Addresses[0].Id, Is.EqualTo(address.Id));
 			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки")),
 				Is.Not.Null, "не могу найти уведомление о перемещении " + notifications.Select(n => n.Subject).Implode());
+		}
+
+		[Test]
+		public void Search_suppliers()
+		{
+			DataMother.CreateSupplier().Save();
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
+			var suppliers = controller.SearchSuppliers(client.Id, "тест");
+			Assert.That(suppliers.Length, Is.GreaterThan(0));
 		}
 	}
 }

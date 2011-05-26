@@ -19,6 +19,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
 {
@@ -133,7 +134,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void UpdateDrugstore(
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
-			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always)] DrugstoreSettings drugstore,
+			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
 		{
@@ -300,7 +301,6 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] SearchAssortmentPrices(string text)
 		{
-//			CancelLayout();
 			uint id;
 			UInt32.TryParse(text, out id);
 			return Price.Queryable
@@ -309,6 +309,28 @@ where Phone like :phone")
 				.Take(50)
 				.ToArray()
 				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name)})
+				.ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] SearchSuppliers(uint id, string text)
+		{
+			var client = Client.Find(id);
+			var suppliers = ArHelper.WithSession(s => {
+				s.CreateSQLQuery(@"call future.GetPrices(:userid)")
+					.SetParameter("userid", client.Users.First().Id)
+					.ExecuteUpdate();
+
+				return s.CreateSQLQuery(@"
+select s.Id, s.Name from Prices ap
+join Future.Suppliers s on s.Id = ap.FirmCode
+where s.Name like :SearchText")
+						.SetParameter("SearchText", "%" + text + "%")
+						.List();
+			});
+			return suppliers
+				.Cast<object[]>()
+				.Select(s => new { id = Convert.ToUInt32(s[0]), name = Convert.ToString(s[1])})
 				.ToArray();
 		}
 

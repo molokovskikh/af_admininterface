@@ -276,18 +276,19 @@ namespace Integration.ForTesting
 		{
 			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
+			var homeRegion = Region.Find(1UL);
 			var supplier = new Supplier {
 				Payer = payer,
-				HomeRegion = Region.Find(1UL),
+				HomeRegion = homeRegion,
 				RegionMask = 1,
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)
 			};
+			supplier.RegionalData.Add(new RegionalData{Region = homeRegion, Supplier = supplier});
 			supplier.AddPrice("Базовый", PriceType.Regular);
 			if (action != null)
 				action(supplier);
-
 			return supplier;
 		}
 

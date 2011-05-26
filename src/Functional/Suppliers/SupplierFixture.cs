@@ -8,7 +8,6 @@ using Integration.ForTesting;
 using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core;
-using WatiNCssSelectorExtensions;
 
 namespace Functional.Suppliers
 {

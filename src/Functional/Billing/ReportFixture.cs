@@ -7,7 +7,6 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
-using WatiNCssSelectorExtensions;
 
 namespace Functional.Billing
 {
@@ -68,7 +67,7 @@ namespace Functional.Billing
 		private Element ElementFor<T>(T item, Func<Report, object> property)
 		{
 			var id = item.GetType().GetProperty("Id").GetValue(item, null);
-			var idElement = browser.CssSelect(String.Format("input[type=hidden][name=id][value='{0}']", id));
+			var idElement = browser.Css(String.Format("input[type=hidden][name=id][value='{0}']", id));
 			var propertyName = "allow";
 			var row = (TableRow)idElement.Parents().OfType<TableRow>().First();
 			return row.CheckBox(Find.ByName(propertyName));

@@ -100,6 +100,49 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
+		public void Add_offer_matrix_exclude()
+		{
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Фармаимпекс";
+				s.FullName = "Фармаимпекс";
+				s.AddPrice("Матрица", PriceType.Assortment);
+			});
+			supplier.Save();
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
+			scope.Flush();
+
+			Css("#drugstore_EnableOfferMatrix").Click();
+
+			Css(".term").TypeText("Фармаимпекс");
+			Css(".search[type=button]").Click();
+			Thread.Sleep(1000);
+			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+
+			var excludes = ((Table)Css("#excludes"));
+			excludes.Css("input[value='Добавить']").Click();
+			excludes.Css(".term").TypeText("Фармаимпекс");
+			excludes.Css(".search[type=button]").Click();
+			Thread.Sleep(1000);
+			Assert.That(excludes.Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс"));
+
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Click("Настройка");
+
+			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
+			excludes = ((Table)Css("#excludes"));
+			Assert.That(excludes.Text, Is.StringContaining("Фармаимпекс"));
+
+			client.Refresh();
+
+			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
+			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
+			Assert.That(client.Settings.OfferMatrixExcludes.Count, Is.EqualTo(1));
+			Assert.That(client.Settings.OfferMatrixExcludes[0].Name, Is.EqualTo(supplier.Name));
+		}
+
+		[Test]
 		public void Try_to_send_email_notification()
 		{
 			browser = Open(client, "Settings");

@@ -1,24 +1,12 @@
 ﻿<script>
-	$("tr a.add").live('click', function () {
-		var body = $(this).parents("tbody").get(0);
-		maxIndex = $(body).children("tr").length + 1;
-		var row = $($(body).children("tr").get(1)).clone();
-		row.find("input").each(function () {
-			this.name = this.name.replace(/\d+/, maxIndex);
-		});
-		row.find("textarea").each(function () {
-			this.name = this.name.replace(/\d+/, maxIndex);
+	$(function () {
+		$("#bills").data("template", function (table) {
+			return $(table.find("tr").get(1)).clone();
 		});
 
-		row.appendTo(body);
-	});
-
-	$("tr a.delete").live('click', function () {
-		$($(this).parents("tr").get(0)).remove();
-	});
-
-	$("#add-reference").click(function () {
-		$("#bills tr:last textarea").value($("#reference").value());
+		$("#add-reference").click(function () {
+			$("#bills tr:last textarea").value($("#reference").value());
+		});
 	});
 </script>
 
@@ -74,7 +62,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 		<input type=button id="add-reference" value="Вставить услугу из справочника">
 		<% end %>
 		
-		<table id=bills class=DataTable>
+		<table id=bills class="DataTable editable">
 			<tr>
 				<th><a href="javascript:" class=add>Добавить</a></th>
 				<th>Услуга</th>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
@@ -187,5 +188,11 @@ namespace AdminInterface.Models
 			}
 		}
 
+		[HasAndBelongsToMany(
+			Table = "OfferMatrixSuppliers",
+			Schema = "Usersettings",
+			ColumnKey = "ClientId",
+			ColumnRef = "SupplierId")]
+		public virtual IList<Supplier> OfferMatrixExcludes { get; set; }
 	}
 }

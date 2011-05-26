@@ -17,9 +17,18 @@
 </style>
 <script language="javascript">
 	$(function () {
-	<% if drugstore.NoiseCosts: %>
-		setNoise(true);
-	<% end %>
+
+		$("#excludes").data("template", function() {
+			return $("<tr>")
+				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
+				.append($("<td>")
+					.append(searchTemplate("Выберете поставщика", "${siteroot}/Client/${client.Id}/SearchSuppliers"))
+					.append("<input type=hidden name=drugstore.OfferMatrixExcludes[0].Id>"));
+		});
+
+		<% if drugstore.NoiseCosts: %>
+			setNoise(true);
+		<% end %>
 
 		$("#drugstore_IsConvertFormat").click(function(){
 			if (this.checked)
@@ -50,11 +59,12 @@
 		});
 
 		$("input[type=button].search").live("click", function() {
+			var url = $(this).data("url");
 			var root = $($(this).parents("div.search").get(0));
 			var rootRow = $(root.parents("tr").get(0));
 			var term = root.find("input[type=text].term").val();
 			$.ajax({
-				url: "${siteroot}/Client/SearchAssortmentPrices",
+				url: url,
 				data: {"text": term},
 				cache: false,
 				success: function (data) {
@@ -104,11 +114,18 @@
 	{
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
-		root.prepend("<div class=search><span>Выберите ассортиментный прайс лист</span><br>"
+		var title = "Выберите ассортиментный прайс лист";
+		root.prepend(searchTemplate(title, "${siteroot}/Client/SearchAssortmentPrices"));
+	}
+
+	function searchTemplate(title, url)
+	{
+		return $("<div class=search><span>" + title + "</span><br>"
 			+ "<input type='text' class=term />"
 			+ "<input type='button' class=search value='Найти' />"
 			+ "<input type='button' class=cancel-search value='Отмена' />"
-			+ "</div>");
+			+ "</div>")
+			.find("input[type=button]").data("url", url).end();
 	}
 
 	function CancelAssortimentPriceForDbf() {
@@ -279,7 +296,25 @@
 							</div>
 						<% end %>
 						<div class=settings ${"style='display:none'" if not drugstore.OfferMatrixPrice}>
-							${app.Edit("drugstore.OfferMatrixType")}
+							${app.Edit("drugstore.OfferMatrixType")}<br><br>
+							<h4 style="border:none; color:Black;">Поставщики исключения</h4>
+							<table id=excludes class=editable>
+								<tr>
+									<td><input type=button class=add value=Добавить></td>
+									<th></th>
+								</tr>
+								<% for i, supplier in enumerate(drugstore.OfferMatrixExcludes): %>
+								<tr>
+									<td>
+										<input type=button value=Удалить class=delete>
+									</td>
+									<td>
+										${FormHelper.HiddenField("drugstore.OfferMatrixExcludes[${i}].Id")}
+										${supplier.Name}
+									</td>
+								</tr>
+								<% end %>
+							</table>
 						</div>
 					</td>
 				</tr>

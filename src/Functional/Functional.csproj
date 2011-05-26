@@ -85,12 +85,12 @@
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
-    <Reference Include="WatiN.Core, Version=2.0.20.0, Culture=neutral, PublicKeyToken=db7cfd3acb5ad44e, processorArchitecture=MSIL">
+    <Reference Include="WatiN.Core, Version=2.1.0.1196, Culture=neutral, PublicKeyToken=db7cfd3acb5ad44e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Watin\WatiN.Core.dll</HintPath>
+      <HintPath>..\..\packages\WatiN.2.1.0\lib\net40\WatiN.Core.dll</HintPath>
     </Reference>
-    <Reference Include="WatiNCssSelectorExtensions">
-      <HintPath>..\..\lib\WatiNCssSelectorExtensions\WatiNCssSelectorExtensions.dll</HintPath>
+    <Reference Include="WatiN.CssSelectorExtensions">
+      <HintPath>..\..\lib\WatiNCssSelectorExtensions\WatiN.CssSelectorExtensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
