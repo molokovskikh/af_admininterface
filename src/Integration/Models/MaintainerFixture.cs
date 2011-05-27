@@ -35,7 +35,7 @@ namespace Integration.Models
 		public void Copy_cost_settings_from_root()
 		{
 			var supplier = DataMother.CreateSupplier(s => {
-				s.AddPrice("тестовый", PriceType.Regular).AddCost();
+				s.Prices.First().AddCost();
 			});
 			supplier.Save();
 

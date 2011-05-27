@@ -16,16 +16,17 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users.First();
 
-			var info = UserUpdateInfo.Find(user.Id);
+			var info = user.UserUpdateInfo;
 			info.AFCopyId = "123";
 			info.Update();
+			scope.Flush();
 
 			Assert.That(client.HaveUin(), Is.True);
 
 			client.ResetUin();
 
-			var reloadedInfo = UserUpdateInfo.Find(user.Id);
-			Assert.That(reloadedInfo.AFCopyId, Is.Empty);
+			user.UserUpdateInfo.Refresh();
+			Assert.That(user.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(client.HaveUin(), Is.False);
 		}
 

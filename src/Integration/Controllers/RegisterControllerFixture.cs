@@ -227,7 +227,7 @@ select 4474;")
 
 		private Client RegistredClient()
 		{
-			var registredClient = Client.Queryable.FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+			var registredClient = Client.Queryable.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
 			if (registredClient == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registredClient;

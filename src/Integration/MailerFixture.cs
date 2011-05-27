@@ -68,6 +68,7 @@ namespace Integration
 		[Test]
 		public void BillingNotificationTest()
 		{
+			payer.Comment = "";
 			var paymentOptions = new PaymentOptions{ WorkForFree = true, Comment = "Независимая копия" };
 			payer.AddComment(paymentOptions.GetCommentForPayer());
 
@@ -114,6 +115,7 @@ namespace Integration
 		[Test]
 		public void Billing_notification_for_client_without_payment_options()
 		{
+			payer.Comment = "";
 			mailer.NotifyBillingAboutClientRegistration(client);
 			mailer.Send();
 
