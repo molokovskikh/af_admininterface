@@ -2,10 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -281,7 +283,7 @@ SET @NewPriceItemId = Last_Insert_ID();
 INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT @InsertedPriceCode, 1, @NewPriceItemId;
 SET @NewPriceCostId:=Last_Insert_ID(); 
 
-INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
+INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 call UpdateCostType(@InsertedPriceCode, ?CostType);
 
@@ -309,68 +311,7 @@ WHERE   p.PriceCode  = @InsertedPriceCode
 					AND prd.RegionCode = r.RegionCode
 		);
 
-
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	LegalEntityId,
-	CostId,
-	SupplierClientId,
-	SupplierPaymentId,
-	AgencyEnabled,
-	AvailableForClient
-)
-SELECT DISTINCT drugstore.Id,
-	regions.regioncode,
-	pricesdata.pricecode,
-	le.Id,
-	(
-		SELECT costcode
-		FROM pricescosts pcc
-		WHERE basecost and pcc.PriceCode = pricesdata.PriceCode
-	) as CostCode,
-	rootIntersection.SupplierClientId,
-	rootIntersection.SupplierPaymentId,
-	if(DrugstoreSettings.IgnoreNewPrices = 1, 0, 1),
-	if(pricesdata.PriceType = 0, 1, 0)
-FROM pricesdata
-	JOIN Future.Suppliers s ON pricesdata.firmcode = s.Id
-		join Future.Clients as drugstore ON s.Segment = drugstore.Segment
-			join billing.PayerClients p on p.ClientId = drugstore.Id
-				join Billing.LegalEntities le on le.PayerId = p.PayerId
-		join usersettings.RetClientsSet DrugstoreSettings ON DrugstoreSettings.ClientCode = drugstore.Id
-	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
-	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = s.Id)
-		LEFT JOIN future.intersection as rootIntersection on rootIntersection.PriceId = rootPrice.PriceCode and rootIntersection.RegionId = Regions.RegionCode and rootIntersection.ClientId = drugstore.Id
-			and rootIntersection.LegalEntityId = le.Id
-WHERE i.Id IS NULL
-	AND pricesdata.PriceCode = @InsertedPriceCode;
-
-DROP TEMPORARY TABLE IF EXISTS tmp;
-CREATE TEMPORARY TABLE tmp ENGINE MEMORY
-SELECT adr.Id, rootAdr.SupplierDeliveryId
-  FROM future.AddressIntersection adr
-        join future.Intersection ins on ins.Id = adr.IntersectionId
-        join pricesdata as rootPrice on 
-            rootPrice.PriceCode = 
-             (select min(pricecode) from pricesdata as p where p.firmcode = ?ClientCode)
-         join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
-             and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
-         join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
-             and rootAdr.IntersectionId = rootIns.Id        
- WHERE ins.PriceId = @InsertedPriceCode;
-
-UPDATE Future.AddressIntersection adr
-SET SupplierDeliveryId = 
-  (select tmp.SupplierDeliveryId
-    from tmp tmp
-   where tmp.Id = adr.Id
-limit 1)
-WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = @InsertedPriceCode);
+select @NewPriceCostId;
 ");
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
@@ -462,6 +403,7 @@ delete FROM ordersendrules.order_send_rules
 where id = ?Id;");
 			orderSendRulesDataAdapter.DeleteCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
 
+			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
 			With.Transaction(
 				(connection, transaction) => {
 					pricesDataAdapter.InsertCommand.Connection = connection;
@@ -479,12 +421,48 @@ where id = ?Id;");
 					orderSendRulesDataAdapter.UpdateCommand.Connection = connection;
 					orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
 					orderSendRulesDataAdapter.DeleteCommand.Connection = connection;
-
+					
 					pricesDataAdapter.Update(Data.Tables["Prices"]);
 					regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
 					orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
 				});
-			
+
+			if (updateIntersection)
+			{
+				ActiveRecordMediator.Refresh(supplier);
+				var addedPriceId = supplier.Prices.Max(p => p.Id);
+				Maintainer.MaintainIntersection(supplier);
+				ArHelper.WithSession(s => {
+					s.CreateSQLQuery(@"
+DROP TEMPORARY TABLE IF EXISTS tmp;
+CREATE TEMPORARY TABLE tmp ENGINE MEMORY
+SELECT adr.Id, rootAdr.SupplierDeliveryId
+  FROM future.AddressIntersection adr
+        join future.Intersection ins on ins.Id = adr.IntersectionId
+        join pricesdata as rootPrice on
+            rootPrice.PriceCode =
+             (select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
+         join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
+             and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
+         join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
+             and rootAdr.IntersectionId = rootIns.Id
+ WHERE ins.PriceId = :priceId
+;
+
+UPDATE Future.AddressIntersection adr
+SET SupplierDeliveryId =
+  (select tmp.SupplierDeliveryId
+   from tmp tmp
+   where tmp.Id = adr.Id
+   limit 1)
+WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
+);")
+					.SetParameter("priceId", addedPriceId)
+					.SetParameter("supplierId", supplier.Id)
+					.ExecuteUpdate();
+				});
+			}
+
 			GetData();
 			ConnectDataSource();
 			DataBind();
@@ -617,7 +595,7 @@ ORDER BY region;";
 
 				supplier.RegionMask = newMaskRegion;
 				supplier.SaveAndFlush();
-				//здесь длинная транз акция activerecord, что бы изменения были видны запросам комитем
+				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 				SessionScope.Current.Commit();
 
 				var updateCommand = new MySqlCommand(
@@ -655,46 +633,16 @@ WHERE   s.Id = ?ClientCode
 		(SELECT *
 		FROM regionaldata rd 
 		WHERE rd.FirmCode = s.Id
-				AND rd.RegionCode = r.RegionCode
-);
-
-INSERT
-INTO Future.Intersection (
-	ClientId,
-	RegionId,
-	PriceId,
-	LegalEntityId,
-	CostId,
-	AgencyEnabled,
-	AvailableForClient
-)
-SELECT DISTINCT drugstore.Id,
-	regions.regioncode,
-	pricesdata.pricecode,
-	le.Id,
-	(
-		SELECT costcode
-		FROM pricescosts pcc
-		WHERE basecost and pcc.PriceCode = pricesdata.PriceCode
-	) as CostCode,
-	if(DrugstoreSettings.IgnoreNewPrices = 1, 0, 1),
-	if(pricesdata.PriceType = 0, 1, 0)
-FROM pricesdata
-	JOIN future.Suppliers s ON pricesdata.firmcode = s.Id
-		join Future.Clients as drugstore ON s.Segment = drugstore.Segment
-			join billing.PayerClients p on p.ClientId = drugstore.Id
-				join Billing.LegalEntities le on le.PayerId = p.PayerId
-			join usersettings.RetClientsSet DrugstoreSettings ON DrugstoreSettings.ClientCode = drugstore.Id
-	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
-		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pricesdata.pricecode AND i.RegionId = regions.regioncode AND i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
-WHERE i.Id IS NULL
-	AND s.Id = ?ClientCode;", connection);
+			AND rd.RegionCode = r.RegionCode
+		);
+", connection);
 				updateCommand.Parameters.AddWithValue("?MaskRegion", newMaskRegion);
 				updateCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 				updateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
+
+				Maintainer.MaintainIntersection(supplier);
 			}
 		}
 		
@@ -706,7 +654,7 @@ WHERE i.Id IS NULL
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
 			supplier.SaveAndFlush();
-			//здесь длинная транз акция activerecord, что бы изменения были видны запросам комитем
+			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 			SessionScope.Current.Commit();
 		}
 
