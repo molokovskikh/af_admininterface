@@ -14,7 +14,10 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			Redirect("Billing", "Edit", new {BillingCode = id});
+			var request = Request.QueryString.AllKeys.ToDictionary(k => k, k => Request.QueryString[k]);
+			request.Remove("id");
+			request.Add("BillingCode", id.ToString());
+			Redirect("Billing", "Edit", request);
 		}
 
 		public void Payments(uint id)

@@ -33,7 +33,7 @@ namespace Functional.Billing
 			using (var browser = Open("Invoices/"))
 			{
 				Assert.That(browser.Text, Is.StringContaining("Реестр счетов"));
-				browser.LinkFor(invoice, "Cancel").Click();
+				browser.Button(invoice, "Cancel").Click();
 				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			}
 		}

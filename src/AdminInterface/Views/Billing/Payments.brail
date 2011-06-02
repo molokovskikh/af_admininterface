@@ -69,7 +69,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 	function RefreshTotalSum() {
 		var link = "${siteroot}/Billing/TotalSum.rails?payerId=${Instance.PayerID}";
-		AjaxRequest(link, function(html) { $("#TotalSum").html(html); },
+		AjaxRequest(link,
+			function(html) { $("#TotalSum").html(html); },
 			function(xhr, textStatus, error) { $("#TotalSum").html(""); });
 	}
 
@@ -84,12 +85,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		}
 		var id = "logRow" + typeName + objectId;
 
-		var rows = $("tr[id*='logRow']").each(function (row) { 
-			if (row.id == id) {
-				$(row).attr("style", "display: '';");
+		$("tr[id*='logRow']").each(function () { 
+			if (this.id == id) {
+				$(this).attr("style", "display: '';");
 				return;
 			}
-			$(row).attr("style", "display: none;");
+			$(this).attr("style", "display: none;");
 		});
 
 		markAsSelected(objectId, objectType + "Link", objectType + "Value");
@@ -97,18 +98,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 	function markAsSelected(id, linkIdPart, textIdPart) {
 		var linkId = linkIdPart + id;
-		var links = $("a[id*='" + linkIdPart + "']");
-		var texts = $("div[id*='" + textIdPart + "']");
-
-		for (var i = 0; i < links.size(); i++) {
-			if (links.get(i).Id == linkId) {
-				$(links.get(i)).attr("style", "display: none;");
-				$(texts.get(i)).attr("style", "display: '';");
-				continue;
-			}
-			$(links.get(i)).attr("style", "display: '';");
-			$(texts.get(i)).attr("style", "display: none;");
-		}
+		$("#users .selected-filter, #addresses .selected-filter").removeClass("selected-filter");
+		$("#" + linkId).addClass("selected-filter");
 	}
 
 	function ShowOrHideTheme(show) {
@@ -214,6 +205,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	{
 		margin-top:10px;
 	}
+	
+	a.selected-filter
+	{
+		color:Black;
+		font-weight:bold;
+		text-decoration:none;
+		cursor:default;
+	}
 </style>
 
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
@@ -222,7 +221,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="left">
 
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Всего к оплате: <span id="TotalSum"> ${TotalSum.ToString("C")}</span></b>
+		<b>Всего к оплате: <span id="TotalSum"> ${payer.TotalSum.ToString("C")}</span></b>
 	</div>
 	<% if not payer.IsManualPayments(): %>
 	<div style="font-size:large; margin-bottom: 10px">
@@ -258,13 +257,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${client.Id}</td>
 					<td>
-					<% if IsDefined("Client") and client.Id == Client.Id: %>
-						<strong>${client.Name}</strong>
-					<% else: %>
-						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments">
+						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments" ${'class=selected-filter' if client == filter.Service}>
 							${client.Name}
 						</a>
-					<% end %>
 					</td>
 					<td>${client.HomeRegion.Name}</td>
 					<td>${BindingHelper.GetDescription(client.Type)}</td>
@@ -310,7 +305,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
-						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments">
+						<a href="edit?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments" ${'class=selected-filter' if supplier == filter.Service}>
 							${supplier.Name}
 						</a>
 					</td>
@@ -334,7 +329,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 
 		<div id="UserListBody" class="VisibleFolder">
-			<% if IsDefined("Client") and clients.Count: %>
+			<% if filter.Service: %>
 			<div align="right">
 				<a id="ShowOrHideUsers" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'users')">Показать всех</a>
 			</div>
@@ -354,7 +349,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<th>Дата регистрации</th>
 					</tr>
 					<% for i, user in enumerate(Users): %>
-					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled}"
+					<% hidden = filter.Service and filter.Service.Id != user.RootService.Id %>
+					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
 						align="center" name="Client${user.RootService.Id}">
 						<td class=short>
 							<input name=id type=hidden value=${user.Accounting.Id}>
@@ -382,7 +378,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<td>${user.RootService.Name}</td>
 						<td>${user.RegistrationDate.ToShortDateString() if user.RegistrationDate != null}</td>
 					</tr>
-					<tr id="UserRowHidden${user.Id}">
+					<tr id="UserRowHidden${user.Id}" class="${'hidable hidden' if hidden}">
 						<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
 					</tr>
 					<% end %>
@@ -398,7 +394,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			</div>
 
 			<div id="AddressListBody" class="VisibleFolder">
-				<% if IsDefined("Client") and clients.Count > 1: %>
+				<% if filter.Service: %>
 				<div align="right">
 					<a id="ShowOrHideAddresses" href="javascript:" align="right" onclick="Filter('Показать только для текущего клиента', this, 'addresses')">Показать всех</a>
 				</div>
@@ -418,7 +414,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</tr>
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
-						<% hidden = IsDefined("Client") and Client.Id != addr.Client.Id %>
+						<% hidden = filter.Service and filter.Service.Id != addr.Client.Id %>
 						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'hidable hidden' if hidden}"
 							align="center" name="Client${addr.Client.Id}">
 							<td class=short>
@@ -501,83 +497,74 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	</div>
 
 	<div>
-		<form id="PayerInfo" action="update.rails" method="post">
-			<% if IsDefined("Client"): %>
-			${FormHelper.HiddenField("ClientCode", Client.Id)}
+		${app.Form("update", {"id" : "PayerInfo"})}
+
+		${FormHelper.HiddenField("Instance.PayerID")}
+		<table style="width: 100%">
+
+			${WriteInputGroupHeader("Опции выставки счета")}
+		
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
+				app.Edit("Instance.AutoInvoice"))}
+		
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
+				app.Edit("Instance.PayCycle"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.PrintInvoice", "Печатать счет:"),
+				FormHelper.CheckboxField("Instance.InvoiceSettings.PrintInvoice"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
+				FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendPaymentNotification", "Отправлять извещения об оплате:"),
+				FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DocumentsOnLastWorkingDay", "Формировать документы последним числом месяца:"),
+				FormHelper.CheckboxField("Instance.InvoiceSettings.DocumentsOnLastWorkingDay"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DoNotGroupParts", "Не объединять позиции в актах, счетах:"),
+				FormHelper.CheckboxField("Instance.InvoiceSettings.DoNotGroupParts"))}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
+				FormHelper.TextField("Instance.BeginBalance"))}
+
+			<% value = "" %>
+			<% if Instance.BeginBalanceDate != null: %>
+				<% value = Instance.BeginBalanceDate.ToShortDateString() %>
 			<% end %>
-			${FormHelper.HiddenField("Instance.PayerID")}
-			${FormHelper.HiddenField("tab", "payments")}
-			<table style="width: 100%">
-			
-		${WriteInputGroupHeader("Опции выставки счета")}
+
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
+										FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
 		
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"), 
-			app.Edit("Instance.AutoInvoice"))}
-		
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"), 
-			app.Edit("Instance.PayCycle"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.PrintInvoice", "Печатать счет:"),
-			FormHelper.CheckboxField("Instance.InvoiceSettings.PrintInvoice"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
-			FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendPaymentNotification", "Отправлять извещения об оплате:"),
-			FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DocumentsOnLastWorkingDay", "Формировать документы последним числом месяца:"),
-			FormHelper.CheckboxField("Instance.InvoiceSettings.DocumentsOnLastWorkingDay"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.DoNotGroupParts", "Не объединять позиции в актах, счетах:"),
-			FormHelper.CheckboxField("Instance.InvoiceSettings.DoNotGroupParts"))}
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalance", "Начальный баланс:"),
-			FormHelper.TextField("Instance.BeginBalance"))}
-
-		<% value = "" %>
-		<% if Instance.BeginBalanceDate != null: %>
-			<% value = Instance.BeginBalanceDate.ToShortDateString() %>
-		<% end %>
-
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
-									FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
-		
-		${WriteInputGroupHeader("Оплата")}
+			${WriteInputGroupHeader("Оплата")}
 										
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
-														"Дата платежа:"), 
-									FormHelper.TextFieldValue("Instance.OldPayDate", Instance.OldPayDate.ToShortDateString(), {"class" : "ValidateDate"}) + "<input type=\"button\" class=\"CalendarInput\" />")}
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
+															"Дата платежа:"), 
+										FormHelper.TextFieldValue("Instance.OldPayDate", Instance.OldPayDate.ToShortDateString(), {"class" : "ValidateDate"}) + "<input type=\"button\" class=\"CalendarInput\" />")}
 									
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
-														"Сумма платежа:"), 
-									FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
+			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
+															"Сумма платежа:"), 
+										FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
 
-		${WriteInputGroupHeader("Комментарий")}
-				<tr>
-					<td colspan=2>
-						${FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" })}
-					</td>
-				</tr>
-				<tr style="text-align:right">
-					<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
-				</tr>
-			</table>
-		</form>
+			${WriteInputGroupHeader("Комментарий")}
+			<tr>
+				<td colspan=2>
+					${FormHelper.TextArea("Instance.Comment", {"rows":"20", "class" : "BillingInput" })}
+				</td>
+			</tr>
+			<tr style="text-align:right">
+				<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
+			</tr>
+		</table>
+		${app.End()}
 	</div>
 
 </div>
 
 <div class="right">
 <% if IsDefined("UsersMessages") and Users.Count: %>
-		<div class="UseCaseGroup">
-		<form id="SendMessageForm" action="SendMessage" method="post">
-			<% if IsDefined("Client"): %>
-			${FormHelper.HiddenField("clientId", Client.Id)}
-			<% end %>
-			${FormHelper.HiddenField("payerId", Instance.Id)}
-			${FormHelper.HiddenField("tab", "payments")}
-
+	<div class="UseCaseGroup">
+		${app.Form("SendMessage", {"id" : "SendMessageForm"})}
 			<% if UsersMessages.Count: %>
 				<div class="InputGroupHeader autocollapsible">
 					<div class="trigger">
@@ -645,7 +632,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 				</tr>
 			</table>
-		</form>
+		${app.End()}
 		</div>
 	<% end %>
 	
@@ -670,7 +657,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<td>${logRecord.LogTime}</td>
 				<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
 				<td>${logRecord.Value}</td>
-				<td>${ViewHelper.GetHumanReadableOperatorName(logRecord.OperatorName)}</td>
+				<td>${logRecord.OperatorName}</td>
 				<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
 			</tr>
 		<% end %>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Castle.ActiveRecord;
+using Common.Tools;
 
 namespace AdminInterface.Models.Logs
 {
@@ -27,19 +28,22 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual bool Enabled { get; set; }
 
-		public static IList<AddressLogRecord> GetAddressLogRecords(Address address)
+		public static IList<AddressLogRecord> GetAddressLogRecords(IEnumerable<Address> addresses)
 		{
+			if (addresses.Count() == 0)
+				return Enumerable.Empty<AddressLogRecord>().ToList();
+
 			return (List<AddressLogRecord>)Execute(
 				(session, instance) =>
 					session.CreateSQLQuery(@"
 select {AddressLogRecord.*}
 from logs.AddressLogs {AddressLogRecord}
 where {AddressLogRecord}.Enabled is not null
-		and {AddressLogRecord}.AddressId = :AddressId
+		and {AddressLogRecord}.AddressId in (:addressIds)
 order by logtime desc
-limit 5")
+limit 100")
 				.AddEntity(typeof(AddressLogRecord))
-				.SetParameter("AddressId", address.Id)
+				.SetParameterList("addressIds", addresses.Select(a => a.Id).ToList())
 				.List<AddressLogRecord>(), null);
 		}
 

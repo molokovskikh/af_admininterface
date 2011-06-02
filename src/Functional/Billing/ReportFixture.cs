@@ -37,7 +37,8 @@ namespace Functional.Billing
 			payer.Reports = new List<Report>();
 			payer.Reports.Add(report);
 
-			browser = Open("Billing/Edit.rails?ClientCode={0}", client.Id);
+			browser = Open(payer);
+			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 		}
 
 		[TearDown]
@@ -67,7 +68,7 @@ namespace Functional.Billing
 		private Element ElementFor<T>(T item, Func<Report, object> property)
 		{
 			var id = item.GetType().GetProperty("Id").GetValue(item, null);
-			var idElement = browser.Css(String.Format("input[type=hidden][name=id][value='{0}']", id));
+			var idElement = (Element)browser.Css(String.Format("input[type=hidden][name=id][value='{0}']", id));
 			var propertyName = "allow";
 			var row = (TableRow)idElement.Parents().OfType<TableRow>().First();
 			return row.CheckBox(Find.ByName(propertyName));

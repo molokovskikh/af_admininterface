@@ -34,13 +34,8 @@ end
 <% end %>
 
 <div class="left">
-	<form action="update.rails" method="post">
-		<% if IsDefined("Client"): %>
-		${FormHelper.HiddenField("ClientCode", Client.Id)}
-		<% end %>
-		${FormHelper.HiddenField("Instance.PayerID")}
-		${FormHelper.HiddenField("tab", "mail")}
-		
+	${app.Form("update")}
+		${FormHelper.HiddenField("Instance.PayerId")}
 	<table>
 		${WriteInputGroupHeader("Общая информация")}
 
@@ -184,8 +179,8 @@ end
 		<tr style="text-align:right">
 			<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
 		</tr>
-	</table>	
-	</form>
+	</table>
+	${app.End()}
 </div>
 
 <div class="right">
@@ -194,10 +189,7 @@ end
 			<div class="InputGroupHeader">
 				Отправка корреспонденции
 			</div>
-			<form method="post" action="SentMail.rails">
-				<% if IsDefined("Client"): %>
-				${FormHelper.HiddenField("ClientCode", Client.Id)}
-				<% end %>
+			${app.Form("SentMail")}
 				${FormHelper.HiddenField("MailSentEntity.PayerId", Instance.Id)}
 				${FormHelper.LabelFor("MailSentEntity.SentDate", "Дата отправки:")}
 				<br>
@@ -209,7 +201,7 @@ end
 				<% end %>
 				<textarea name="MailSentEntity.Comment" rows="3" style="width:100%"></textarea>
 				<input type="submit" value="Корреспонденция отправлена" />
-			</form>
+			${app.End()}
 		</div>
 		
 		<div class="UseCaseGroup">

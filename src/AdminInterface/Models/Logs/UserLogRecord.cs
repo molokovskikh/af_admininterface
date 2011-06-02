@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Castle.ActiveRecord;
+using Common.Tools;
 
 namespace AdminInterface.Models.Logs
 {
@@ -33,19 +34,22 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual LogOperation Operation { get; set; }
 
-		public static IList<UserLogRecord> GetUserEnabledLogRecords(User user)
+		public static IList<UserLogRecord> GetUserEnabledLogRecords(IEnumerable<User> users)
 		{
+			if (users.Count() == 0)
+				return Enumerable.Empty<UserLogRecord>().ToList();
+
 			return (List<UserLogRecord>)Execute(
 				(session, instance) =>
 					session.CreateSQLQuery(@"
 select {UserLogRecord.*}
 from `logs`.`UserLogs` {UserLogRecord}
 where {UserLogRecord}.Enabled is not null
-		and {UserLogRecord}.UserId = :UserCode
+		and {UserLogRecord}.UserId in ( :clientId )
 order by logtime desc
-limit 5")
+limit 100")
 				.AddEntity(typeof(UserLogRecord))
-				.SetParameter("UserCode", user.Id)
+				.SetParameterList("clientId", users.Select(u => u.Id).ToList())
 				.List<UserLogRecord>(), null);
 		}
 

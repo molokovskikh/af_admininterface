@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
@@ -12,6 +13,14 @@ namespace Functional.ForTesting
 {
 	public static class WatinExtentions
 	{
+		public static Button Button(this Browser browser, object item, string action)
+		{
+			var url = AppHelper.GetShortUrl(item, action);
+			return (Button)browser
+				.Form(l => l.GetAttributeValue("action") != null && l.GetAttributeValue("action").EndsWith(url))
+				.CssSelect("input[type=submit]");
+		}
+
 		public static Link LinkFor(this Browser browser, object item, string action)
 		{
 			var url = AppHelper.GetShortUrl(item, action);
@@ -26,6 +35,16 @@ namespace Functional.ForTesting
 		public static dynamic Css(this Element browser, string selector)
 		{
 			return browser.CssSelect(selector);
+		}
+
+		public static IEnumerable<Element> Parents(this Element element)
+		{
+			var parent = element.Parent;
+			while (parent != null)
+			{
+				yield return parent;
+				parent = parent.Parent;
+			}
 		}
 
 		public static void Click(this Browser browser, string name)

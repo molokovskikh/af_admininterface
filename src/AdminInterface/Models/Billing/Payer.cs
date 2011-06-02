@@ -294,19 +294,6 @@ ORDER BY {Payer}.shortname;";
 			}
 		}
 
-		public virtual DateTime DefaultBeginPeriod()
-		{
-			if (PayCycle == 0)
-				return DateTime.Today.AddMonths(-2);
-
-			return DateTime.Today.AddMonths(-2 * 3);
-		}
-
-		public virtual DateTime DefaultEndPeriod()
-		{
-			return DateTime.Today;
-		}
-
 		public virtual decimal TotalSum
 		{
 			get

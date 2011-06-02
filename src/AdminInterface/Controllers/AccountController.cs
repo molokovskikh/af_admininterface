@@ -1,4 +1,4 @@
-using AdminInterface.Helpers;
+п»їusing AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
@@ -36,22 +36,24 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 		}
 
-		public void SetUserStatus(uint userId, bool enabled, bool free)
+		public void SetUserStatus(uint userId, bool? enabled, bool? free)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var user = User.Find(userId);
 				var oldStatus = user.Enabled;
-				user.Enabled = enabled;
-				user.IsFree = free;
+				if (enabled.HasValue)
+					user.Enabled = enabled.Value;
+				if (free.HasValue)
+					user.IsFree = free.Value;
 				user.UpdateAndFlush();
 				if (enabled != oldStatus)
 					this.Mail().EnableChanged(user).Send();
-				if (!enabled)
+				if (enabled.HasValue && !enabled.Value)
 				{
-					// Если это отключение, то проходим по адресам и
-					// отключаем адрес, который доступен только отключенным пользователям
+					// Р•СЃР»Рё СЌС‚Рѕ РѕС‚РєР»СЋС‡РµРЅРёРµ, С‚Рѕ РїСЂРѕС…РѕРґРёРј РїРѕ Р°РґСЂРµСЃР°Рј Рё
+					// РѕС‚РєР»СЋС‡Р°РµРј Р°РґСЂРµСЃ, РєРѕС‚РѕСЂС‹Р№ РґРѕСЃС‚СѓРїРµРЅ С‚РѕР»СЊРєРѕ РѕС‚РєР»СЋС‡РµРЅРЅС‹Рј РїРѕР»СЊР·РѕРІР°С‚РµР»СЏРј
 					foreach (var address in user.AvaliableAddresses)
 					{
 						if (address.AvaliableForEnabledUsers)
@@ -60,22 +62,25 @@ namespace AdminInterface.Controllers
 						address.Update();
 					}
 				}
-				user.Client.UpdateBeAccounted();
 				user.Client.Save();
 				scope.VoteCommit();
 			}
 		}
 
-		public void UpdateAccounting(uint accountId, bool accounted, decimal payment)
+		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment)
 		{
 			using (var transaction = new TransactionScope(OnDispose.Rollback))
 			{
 				var account = Accounting.Find(accountId);
-				if (accounted)
-					account.Accounted();
-				else
-					account.BeAccounted = false;
-				account.Payment = payment;
+				if (accounted.HasValue)
+				{
+					if (accounted.Value)
+						account.Accounted();
+					else
+						account.BeAccounted = false;
+				}
+				if (payment.HasValue)
+					account.Payment = payment.Value;
 
 				account.Update();
 				transaction.VoteCommit();
@@ -83,17 +88,17 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		public void SetAddressStatus(uint addressId, bool enabled, bool free)
+		public void SetAddressStatus(uint addressId, bool? enabled, bool? free)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 				var address = Address.Find(addressId);
 				var oldStatus = address.Enabled;
-				address.Enabled = enabled;
-				address.FreeFlag = free;
-				address.Client.UpdateBeAccounted();
-
+				if (enabled.HasValue)
+					address.Enabled = enabled.Value;
+				if (free.HasValue)
+					address.FreeFlag = free.Value;
 				if (enabled != oldStatus)
 					this.Mail().EnableChanged(address).Send();
 				address.Client.Save();

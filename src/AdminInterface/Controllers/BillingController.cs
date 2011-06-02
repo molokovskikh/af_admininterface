@@ -12,6 +12,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -19,10 +20,75 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using NHibernate;
 using SortDirection = Common.Tools.SortDirection;
 
 namespace AdminInterface.Controllers
 {
+	public class BillingFilter
+	{
+		private string _tab;
+
+		public string Tab
+		{
+			get
+			{
+				return _tab;
+			}
+			set
+			{
+				if (String.IsNullOrEmpty(value))
+					return;
+
+				_tab = value;
+			}
+		}
+
+		public uint PayerId { get; set; }
+		public uint ServiceId { get; set; }
+		public string ActiveTab { get; set; }
+
+		private Service service;
+		private Payer payer;
+
+		public BillingFilter()
+		{
+			Tab = "payments";
+		}
+
+		public Payer Payer
+		{
+			get
+			{
+				if (payer == null)
+					payer = Payer.Find(PayerId);
+				return payer;
+			}
+		}
+
+		public Service Service
+		{
+			get
+			{
+				if (service == null && ServiceId != 0)
+					service = ActiveRecordMediator<Service>.FindByPrimaryKey(ServiceId);
+				return service;
+			}
+		}
+
+		public Dictionary<string, string> Parts()
+		{
+			var result = new Dictionary<string, string> {
+				{"BillingCode", PayerId.ToString()}
+			};
+			if (ServiceId != 0)
+				result.Add("ClientCode", ServiceId.ToString());
+			if (!String.IsNullOrEmpty(ActiveTab))
+				result.Add("Tab", ActiveTab);
+			return result;
+		}
+	}
+
 	[
 		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof (BindingHelper)),
@@ -31,69 +97,33 @@ namespace AdminInterface.Controllers
 	]
 	public class BillingController : ARController
 	{
-		[AccessibleThrough(Verb.Get)]
-		public void Edit(uint billingCode, string tab, uint currentJuridicalOrganizationId)
-		{
-			Edit(billingCode, 0, 0, 0, tab, null, null, currentJuridicalOrganizationId);
-		}
-
 		public void Edit(uint billingCode,
 			uint clientCode,
-			uint userId,
-			uint addressId,
 			string tab,
-			DateTime? paymentsFrom,
-			DateTime? paymentsTo,
 			uint currentJuridicalOrganizationId)
 		{
-			Client client = null;
-			var payer = Payer.Find(billingCode);
-			if (clientCode != 0)
-				client = Client.Find(clientCode);
+			var filter = new BillingFilter {
+				ServiceId = clientCode,
+				PayerId = billingCode,
+				Tab = tab
+			};
+			var payer = filter.Payer;
 
-			var user = (userId != 0) ? User.Find(userId) : payer.Users.FirstOrDefault();
-			var address = (addressId != 0) ? Address.Find(addressId) : payer.Addresses.FirstOrDefault();
-
-			var usersLogs = new List<UserLogRecord>();
-			var addressesLogs = new List<AddressLogRecord>();
-			var clients = payer.Clients;
-			foreach (var item in payer.Users)
-			{
-				usersLogs.AddRange(UserLogRecord.GetUserEnabledLogRecords(item));
-			}
-			foreach (var item in payer.Addresses)
-				addressesLogs.AddRange(AddressLogRecord.GetAddressLogRecords(item));
-			PropertyBag["UsersMessages"] = payer.Users
-				.Select(u => UserMessage.FindUserMessage(u.Id))
-				.Where(m => m != null && m.IsContainsNotShowedMessage())
+			var userIds = payer.Users.Select(u => u.Id).ToArray();
+			PropertyBag["UsersMessages"] = ActiveRecordLinqBase<UserMessage>.Queryable
+				.Where(m => userIds.Contains(m.Id) && m.ShowMessageCount > 0)
 				.ToList();
 
-			if (String.IsNullOrEmpty(tab))
-				tab = "payments";
-			
-			PropertyBag["tab"] = tab;
-			PropertyBag["paymentsFrom"] = paymentsFrom ?? payer.DefaultBeginPeriod();
-			PropertyBag["paymentsTo"] = paymentsTo ?? payer.DefaultEndPeriod();
-
-			var clientLogs = ClientLogRecord.GetClientLogRecords(clients);
-			var userLogs = usersLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
-			var addressLogs = addressesLogs.OrderByDescending(logRecord => logRecord.LogTime).ToList();
-			PropertyBag["LogRecords"] = SwitchLogRecord.GetUnionLogs(clientLogs, userLogs, addressLogs);
-
-			if (client != null)
-				PropertyBag["Client"] = client;
-
-			PropertyBag["Clients"] = clients;
-			PropertyBag["suppliers"] = Supplier.Queryable.Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
+			PropertyBag["filter"] = filter;
+			PropertyBag["LogRecords"] = SwitchLogRecord.GetLogs(payer);
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
-			PropertyBag["User"] = user;
-			PropertyBag["Address"] = address;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
 			PropertyBag["Today"] = DateTime.Today;
-			PropertyBag["TotalSum"] = payer.TotalSum;
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
+			PropertyBag["suppliers"] = Supplier.Queryable.Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
+			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
 			PropertyBag["Users"] = payer.Users;
 			PropertyBag["Addresses"] = payer.Addresses;
 			PropertyBag["Reports"] = payer.Reports;
@@ -117,8 +147,9 @@ namespace AdminInterface.Controllers
 		}
 
 		public void SendMessage([DataBind("NewClientMessage")] UserMessage message,
-			uint clientId,
-			uint payerId,
+			uint clientCode,
+			uint billingCode,
+			string tab,
 			bool sendMessageToClientEmails,
 			string subjectForEmailToClient)
 		{
@@ -136,7 +167,7 @@ namespace AdminInterface.Controllers
 					}
 					else
 					{
-						var payer = Payer.Find(payerId);
+						var payer = Payer.Find(billingCode);
 						foreach (var user in payer.Users)
 						{
 							notificationUser = user;
@@ -251,7 +282,7 @@ namespace AdminInterface.Controllers
 			RenderView("SearchBy");
 		}
 
-		public void SentMail(uint clientCode, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
+		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
 		{
 			try
 			{
@@ -263,7 +294,7 @@ namespace AdminInterface.Controllers
 			{
 				Flash["SendMailError"] = ex.ValidationErrorMessages[0];
 			}
-			Redirect("Billing", "Edit", new {clientCode, billingCode = sentEntity.PayerId, tab = "mail"});
+			Redirect("Billing", "Edit", new {clientCode, billingCode = sentEntity.PayerId, tab});
 		}
 
 		public void DeleteMail(uint id)
@@ -302,7 +333,8 @@ namespace AdminInterface.Controllers
 		public void AdditionalUserInfo(uint userId, string cssClassName)
 		{
 			CancelLayout();
-			PropertyBag["user"] = User.Find(userId);
+			var user = User.Find(userId);
+			PropertyBag["user"] = user;
 		}
 
 		public void AdditionalAddressInfo(uint addressId, string cssClassName)
@@ -342,7 +374,6 @@ namespace AdminInterface.Controllers
 				var user = User.Find(userId);
 				var address = Address.Find(addressId);
 				address.AvaliableForUsers.Add(user);
-				address.Client.UpdateBeAccounted();
 				address.Client.Save();
 
 				scope.VoteCommit();
@@ -360,7 +391,6 @@ namespace AdminInterface.Controllers
 				var client = user.Client;
 
 				address.AvaliableForUsers.Remove(user);
-				client.UpdateBeAccounted();
 				client.Save();
 
 				scope.VoteCommit();
@@ -369,11 +399,10 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 		}
 
-		public void TotalSum(uint payerId)
+		[return: JSONReturnBinder]
+		public string TotalSum(uint payerId)
 		{
-			Response.Output.Write(Payer.Find(payerId).TotalSum.ToString("#.#"));
-			CancelView();
-			CancelLayout();
+			return Payer.Find(payerId).TotalSum.ToString("C");
 		}
 
 		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties searchBy, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)

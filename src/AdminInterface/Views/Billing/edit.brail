@@ -1,9 +1,8 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Детальная информация о платильщике ${Instance.ShortName}
+	Плательщик ${payer.Name}
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Биллинг", "${siteroot}/Billing/Search"),
-									  ("Редактирование информации плательщика", "")]} %>
+<% component Bubble, {"bredcrumbs" : [("Поиск плательщиков", "${siteroot}/Billing/Search")]} %>
 
 <script>
 
@@ -117,36 +116,37 @@
 	}
 </style>
 
-<H3>Плательщик ${Instance.ShortName}</H3>
-
 <div class="tabs">
 	<ul>
 		<li>
-			<a id="payments" href="#" ${"class='selected'" if tab == "payments"}>Платежи</a>
+			<a id="payments" href="#" ${"class='selected'" if filter.Tab == "payments"}>Платежи</a>
 		</li>
 		<li>
-			<a id="mail" href="#" ${"class='selected'" if tab == "mail"}>Отправка кореспонденции</a>
+			<a id="mail" href="#" ${"class='selected'" if filter.Tab == "mail"}>Отправка кореспонденции</a>
 		</li>
 		<li>
-			<a id="juridicalOrganization" href="#" ${"class='selected'" if tab == "juridicalOrganization"}>Юридические лица</a>
+			<a id="juridicalOrganization" href="#" ${"class='selected'" if filter.Tab == "juridicalOrganization"}>Юридические лица</a>
 		</li>
 		<li>
-			<a id="balance-summary" href="${siteroot}/Payers/${instance.Id}/BalanceSummary" class="inline-tab">Платежи/Счета</a>
+			<a id="balance-summary" href="${app.GetUrl(payer, @BalanceSummary)}" class="inline-tab">Платежи/Счета</a>
 		</li>
 	</ul>
 </div>
 
-<div id="payments-tab" class="tab" ${"style='display:none'" if tab != "payments"}>
+<div id="payments-tab" class="tab" ${"style='display:none'" if filter.Tab != "payments"}>
+	<% filter.ActiveTab = "payments" %>
 	<% OutputSubView("Payments") %>
 </div>
 
-<div id="mail-tab" class="tab" ${"style='display:none'" if tab != "mail"}>
-	<% OutputSubView("mail") %>
+<div id="mail-tab" class="tab" ${"style='display:none'" if filter.Tab != "mail"}>
+	<% filter.ActiveTab = "mail" %>
+	<% OutputSubView("Mail") %>
 </div>
 
-<div id="juridicalOrganization-tab" class="tab" ${"style='display:none'" if tab != "juridicalOrganization"}>
+<div id="juridicalOrganization-tab" class="tab" ${"style='display:none'" if filter.Tab != "juridicalOrganization"}>
+	<% filter.ActiveTab = "juridicalOrganizations" %>
 	<% OutputSubView("JuridicalOrganizations") %>
 </div>
 
-<div id="balance-summary-tab" class="tab" ${"style='display:none'" if tab != "balance-summary-tab"}>
+<div id="balance-summary-tab" class="tab" ${"style='display:none'" if filter.Tab != "balance-summary-tab"}>
 </div>

@@ -25,9 +25,9 @@ namespace AdminInterface.Models.Logs
 		[Property("Status")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
-		public static IList<ClientLogRecord> GetClientLogRecords(IEnumerable<Client> client)
+		public static IList<ClientLogRecord> GetClientLogRecords(IEnumerable<Client> clients)
 		{
-			if (client == null)
+			if (clients.Count() == 0)
 				return Enumerable.Empty<ClientLogRecord>().ToList();
 
 			return (List<ClientLogRecord>) Execute(
@@ -35,11 +35,11 @@ namespace AdminInterface.Models.Logs
 select {ClientLogRecord.*}
 from logs.ClientLogs {ClientLogRecord}
 where status is not null
-		and clientId in (:ClientCode)
+		and clientId in (:clientId)
 order by logtime desc
-limit 5")
+limit 100")
 						.AddEntity(typeof (ClientLogRecord))
-						.SetParameter("ClientCode", client.Select(c => c.Id).ToArray().Implode())
+						.SetParameterList("clientId", clients.Select(c => c.Id).ToList())
 						.List<ClientLogRecord>(), null);
 		}
 

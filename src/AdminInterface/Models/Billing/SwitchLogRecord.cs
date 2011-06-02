@@ -4,6 +4,9 @@ using System.Linq;
 using System.Web;
 using System.ComponentModel;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 
 namespace AdminInterface.Models.Billing
 {
@@ -33,15 +36,9 @@ namespace AdminInterface.Models.Billing
 			IList<UserLogRecord> userLogs,
 			IList<AddressLogRecord> addressLogs)
 		{
-			var logs = new List<SwitchLogRecord>();
-
-			foreach (var log in clientLogs)
-				logs.Add(GetLogRecord(log));
-			foreach (var log in userLogs)
-				logs.Add(GetLogRecord(log));
-			foreach (var log in addressLogs)
-				logs.Add(GetLogRecord(log));
-
+			var logs = clientLogs.Select(log => GetLogRecord(log)).ToList();
+			logs.AddRange(userLogs.Select(log => GetLogRecord(log)));
+			logs.AddRange(addressLogs.Select(log => GetLogRecord(log)));
 			return logs.OrderByDescending(log => log.LogTime).ToList();
 		}
 
@@ -67,7 +64,7 @@ namespace AdminInterface.Models.Billing
 				Status = addressLogRecord.Enabled,
 				Value = addressLogRecord.Address.Value,
 			};
-			return log;			
+			return log;
 		}
 
 		private static SwitchLogRecord GetLogRecord(UserLogRecord userLogRecord)
@@ -81,6 +78,32 @@ namespace AdminInterface.Models.Billing
 				Value = userLogRecord.User.GetLoginOrName(),
 			};
 			return log;
+		}
+
+		public static IList<SwitchLogRecord> GetLogs(Payer payer)
+		{
+			var userLogs = UserLogRecord.GetUserEnabledLogRecords(payer.Users);
+			var addressLogs = AddressLogRecord.GetAddressLogRecords(payer.Addresses);
+			var clientLogs = ClientLogRecord.GetClientLogRecords(payer.Clients);
+
+			var logs = GetUnionLogs(clientLogs, userLogs, addressLogs);
+			var operators = logs.Select(l => l.OperatorName).Distinct().ToList();
+			var admins = ActiveRecordLinqBase<Administrator>.Queryable
+				.Where(a => operators.Contains(a.UserName))
+				.ToList()
+				.GroupBy(a => a.UserName.ToLowerInvariant())
+				.Select(g => g.First())
+				.ToDictionary(a => a.UserName.ToLowerInvariant());
+			foreach (var log in logs)
+			{
+				var key = log.OperatorName.ToLowerInvariant();
+				if (admins.ContainsKey(key))
+				{
+					var administrator = admins[key];
+					log.OperatorName = administrator.ManagerName;
+				}
+			}
+			return logs;
 		}
 	}
 }

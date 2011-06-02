@@ -286,6 +286,24 @@ namespace AdminInterface.Helpers
 			);
 		}
 
+		public string Form(string url, IDictionary parameters = null)
+		{
+			var helper = new FormHelper(Context);
+			var result = new StringBuilder();
+			result.AppendFormat(helper.FormTag(url, parameters));
+
+			var filter = (dynamic)ControllerContext.PropertyBag["filter"];
+			foreach (var part in filter.Parts())
+				result.Append(helper.HiddenField(part.Key, part.Value));
+
+			return result.ToString();
+		}
+
+		public string End()
+		{
+			return "</form>";
+		}
+
 		public string FilterFor(string name)
 		{
 			return FilterFor(GetLabel(name), name);

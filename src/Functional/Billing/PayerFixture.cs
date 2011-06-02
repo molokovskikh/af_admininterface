@@ -24,7 +24,7 @@ namespace Functional.Billing
 				new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 			}
 
-			using (var browser = Open("Billing/Edit?BillingCode={0}", payer.Id))
+			using (var browser = Open(payer))
 			{
 				Assert.That(browser.Text, Is.StringContaining("плательщик"));
 				browser.Link(Find.ByText(@"Платежи/Счета")).Click();
@@ -34,7 +34,7 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Не реализованно")]
 		public void Custom_invoice()
 		{
 			Payer payer = null;

@@ -299,24 +299,6 @@ group by u.ClientId")
 			return Users.Any(u => ADHelper.IsLoginExists(u.Login) && ADHelper.IsLocked(u.Login));
 		}
 
-		public virtual void UpdateBeAccounted()
-		{
-			if (Addresses == null)
-				Addresses = new List<Address>();
-			if (Users == null)
-				Users = new List<User>();
-
-			var userCount = Users.Count(user => user.Enabled && !user.IsFree);
-			var index = 0;
-			foreach (var address in Addresses)
-			{
-				if (!address.Enabled || address.IsFree)
-					address.Accounting.ReadyForAcounting = false;
-				else
-					address.Accounting.ReadyForAcounting = index++ >= userCount;
-			}
-		}
-
 		public virtual void MaintainIntersection()
 		{
 			foreach (var legalEntity in Orgs())
@@ -352,8 +334,6 @@ group by u.ClientId")
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);
-
-			UpdateBeAccounted();
 			return address;
 		}
 

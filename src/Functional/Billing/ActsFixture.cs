@@ -49,8 +49,9 @@ namespace Functional.Billing
 			Open(act, "Edit");
 			var newActDate = DateTime.Today.AddDays(10);
 			var date = browser.Css("input[name='act.ActDate']");
+			Console.WriteLine(date.Value);
 			date.Clear();
-			date.TypeText(newActDate.ToString("ddMMyyyy"));
+			date.TypeText(newActDate.ToString("dd.MM.yyyy"));
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 

@@ -339,7 +339,6 @@ namespace AdminInterface.Models
 
 			if (Client != null)
 			{
-				Client.UpdateBeAccounted();
 				AddPrices(Client);
 			}
 		}
