@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace AdminInterface.Models.Security
 {
 	public enum Department
 	{
-		[Description("Управление")] Administration = 0,
-		[Description("Бухгалтерия")] Billing = 1,
+		[Description("РЈРїСЂР°РІР»РµРЅРёРµ")] Administration = 0,
+		[Description("Р‘СѓС…РіР°Р»С‚РµСЂРёСЏ")] Billing = 1,
 		[Description("IT")] IT = 2,
-		[Description("Обработка")] Processing = 3,
-		[Description("Техподдержка")] Support = 4,
-		[Description("Отдел регионального развития")] Manager = 5,
+		[Description("РћР±СЂР°Р±РѕС‚РєР°")] Processing = 3,
+		[Description("РўРµС…РїРѕРґРґРµСЂР¶РєР°")] Support = 4,
+		[Description("РћС‚РґРµР» СЂРµРіРёРѕРЅР°Р»СЊРЅРѕРіРѕ СЂР°Р·РІРёС‚РёСЏ")] Manager = 5,
 	}
 
 	[ActiveRecord("Regionaladmins", Schema = "accessright", Lazy = false)]
@@ -70,7 +70,9 @@ namespace AdminInterface.Models.Security
 
 		public static Administrator GetByName(string name)
 		{
-			name = name.Replace("ANALIT\\", "");
+			//СѓРґР°Р»СЏРµРј РёРјСЏ РґРѕРјРµРЅР°, РЅР°РїСЂРёРјРµСЂ Р±С‹Р»Рѕ analit\kvasov СЃС‚Р°Р»Рѕ kvasov
+			if (name.IndexOf(@"\") > 0)
+				name = name.Split(new [] {@"\"}, StringSplitOptions.RemoveEmptyEntries).Last();
 			var admin = ActiveRecordLinq.AsQueryable<Administrator>().FirstOrDefault(a => a.UserName == name);
 			if (admin != null)
 				NHibernateUtil.Initialize(admin.AllowedPermissions);
@@ -225,15 +227,15 @@ namespace AdminInterface.Models.Security
 		{
 			var entry = ADHelper.FindDirectoryEntry(UserName);
 
-			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
-			var root = new DirectoryEntry("LDAP://OU=Офис,DC=adc,DC=analit,DC=net");
+			var adminGroupPath = "LDAP://CN=Р РµРіРёРѕРЅР°Р»СЊРЅС‹Рµ Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂС‹,OU=Р“СЂСѓРїРїС‹,OU=РљР»РёРµРЅС‚С‹,DC=adc,DC=analit,DC=net";
+			var root = new DirectoryEntry("LDAP://OU=РћС„РёСЃ,DC=adc,DC=analit,DC=net");
 
 			if (entry != null)
 			{
 				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
-				// установить pwdLastSet в текущую дату
+				// СѓСЃС‚Р°РЅРѕРІРёС‚СЊ pwdLastSet РІ С‚РµРєСѓС‰СѓСЋ РґР°С‚Сѓ
 				entry.Properties["pwdLastSet"][0] = -1;
-				// сменить пароль
+				// СЃРјРµРЅРёС‚СЊ РїР°СЂРѕР»СЊ
 				entry.Invoke("SetPassword", password);
 				entry.CommitChanges();
 
@@ -252,7 +254,7 @@ namespace AdminInterface.Models.Security
 				return false;
 			}
 
-			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var userGroup = new DirectoryEntry("LDAP://CN=РџРѕР»СЊР·РѕРІР°С‚РµР»Рё РѕС„РёСЃР°,OU=РЈСЂРѕРІРЅРё РґРѕСЃС‚СѓРїР°,OU=РћС„РёСЃ,DC=adc,DC=analit,DC=net");
 			var adminGroup1 = new DirectoryEntry(adminGroupPath);
 			var user = root.Children.Add("CN=" + UserName, "user");
 			user.Properties["samAccountName"].Value = UserName;
@@ -293,7 +295,7 @@ namespace AdminInterface.Models.Security
 
 		public static void SetLogonHours(string login, bool[] weekLogonHours)
 		{
-			// Делаем полноразмерную матрицу 7x24
+			// Р”РµР»Р°РµРј РїРѕР»РЅРѕСЂР°Р·РјРµСЂРЅСѓСЋ РјР°С‚СЂРёС†Сѓ 7x24
 			var logonHours = new bool[7, 24];
 			for (var i = 0; i < 7; i++)
 			{

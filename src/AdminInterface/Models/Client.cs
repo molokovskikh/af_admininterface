@@ -115,7 +115,7 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual Segment Segment { get; set; }
 
-		[Property, Description("Регионы работы")]
+		[Property, Description("Регионы работы"), Auditable]
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[Nested]

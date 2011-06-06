@@ -32,14 +32,17 @@ namespace AdminInterface.Models.Suppliers
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, ValidateNonEmpty]
+		[Property, ValidateNonEmpty, Auditable, Description("Краткое наименование")]
 		public override string Name { get; set; }
 
-		[Property, ValidateNonEmpty]
+		[Property, ValidateNonEmpty, Auditable, Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
-		[Property, Description("Регионы работы")]
+		[Property, Auditable, Description("Регионы работы")]
 		public virtual ulong RegionMask { get; set; }
+
+		[BelongsTo, Auditable, Description("Домашний регион")]
+		public override Region HomeRegion { get; set; }
 
 		[Property]
 		public override bool Disabled { get; set; }
@@ -52,9 +55,6 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Payer Payer { get; set; }
-
-		[BelongsTo]
-		public override Region HomeRegion { get; set; }
 
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }

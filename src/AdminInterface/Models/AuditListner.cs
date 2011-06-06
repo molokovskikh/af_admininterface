@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
@@ -213,7 +214,8 @@ namespace AdminInterface.Models
 			return typeof(Client) == type
 				|| typeof(Address) == type
 				|| typeof(User) == type
-				|| typeof(DrugstoreSettings) == type;
+				|| typeof(DrugstoreSettings) == type
+				|| typeof(Supplier) == type;
 		}
 	}
 }
