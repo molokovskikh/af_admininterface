@@ -44,8 +44,12 @@ namespace AdminInterface.Controllers
 				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false })
 				.Union(payments.Select(p => new {p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true}))
 				.Union(acts.Select(a => new {a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false}))
-				.OrderByDescending(i => i.Date)
 				.ToList();
+			if (payer.BeginBalance != 0 && payer.BeginBalanceDate.HasValue)
+				items.Add(new {Id = 0u, Date = payer.BeginBalanceDate.Value, Sum = payer.BeginBalance, IsInvoice = false, IsAct = false, IsPayment = true});
+
+			items = items.OrderBy(i => i.Date).ToList();
+
 			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = items;
 		}
