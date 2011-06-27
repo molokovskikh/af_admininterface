@@ -184,7 +184,7 @@ namespace AdminInterface.Models.Billing
 		{
 			if (period == Period.FirstQuarter ||
 				period == Period.SecondQuarter ||
-				period == Period.FirstQuarter ||
+				period == Period.ThirdQuarter ||
 				period == Period.FourthQuarter)
 				return InvoicePeriod.Quarter;
 			return InvoicePeriod.Month;
