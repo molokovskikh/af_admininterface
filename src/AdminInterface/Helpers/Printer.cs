@@ -37,6 +37,10 @@ namespace AdminInterface.Helpers
 
 				key.SetValue("footer", "");
 				key.SetValue("header", "");
+				key.SetValue("margin_bottom", "0.750000");
+				key.SetValue("margin_left", "0.750000");
+				key.SetValue("margin_right", "0.750000");
+				key.SetValue("margin_top", "0.750000");
 			}
 		}
 
