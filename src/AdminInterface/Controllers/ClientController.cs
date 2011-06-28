@@ -263,7 +263,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			LayoutName = "GeneralWithJQueryOnly";
+			LayoutName = "Application";
 			var client = Client.Find(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;

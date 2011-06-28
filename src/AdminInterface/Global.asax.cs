@@ -5,12 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
+using Castle.MonoRail.Framework.Container;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Views.Aspx;
@@ -25,7 +27,7 @@ using NHibernate.Type;
 
 namespace AddUser
 {
-	public class Global : WebApplication, IMonoRailConfigurationEvents
+	public class Global : WebApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
@@ -249,6 +251,13 @@ WHERE PriceCode = ?Id", connection);
 
 			if (!Context.IsDebuggingEnabled)
 				Server.Transfer("~/Rescue/Error.aspx");
+		}
+
+		public new void Initialized(IMonoRailContainer container)
+		{
+			BaseMailer.ViewEngineManager = container.ViewEngineManager;
+
+			base.Initialized(container);
 		}
 
 		public new void Configure(IMonoRailConfiguration configuration)

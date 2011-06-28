@@ -77,7 +77,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
-			LayoutName = "GeneralWithJQueryOnly";
+			LayoutName = "Application";
 
 			PropertyBag["filter"] = filter;
 			PropertyBag["logEntities"] = filter.Find();
@@ -168,7 +168,7 @@ namespace AdminInterface.Controllers
 
 		public void Orders([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] OrderFilter filter)
 		{
-			LayoutName = "GeneralWithJQueryOnly";
+			LayoutName = "Application";
 
 			if (filter.Client == null && filter.User != null)
 				filter.Client = filter.User.Client;
