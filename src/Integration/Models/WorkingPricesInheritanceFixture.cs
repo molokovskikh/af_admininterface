@@ -33,7 +33,7 @@ where UserId = :id")
 delete from Future.UserPrices
 where UserId = :userId and priceId = :priceId")
 					.SetParameter("userId", parent.Id)
-					.SetParameter("priceId", prices.Cast<uint>().Where(priceId => priceId == 5u).First())
+					.SetParameter("priceId", prices.Cast<uint>().First())
 					.ExecuteUpdate();
 
 				child.InheritPricesFrom = parent;

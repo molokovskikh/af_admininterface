@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
@@ -12,18 +13,24 @@ namespace Integration.Models
 		[Test]
 		public void Move_address()
 		{
+			var supplier = DataMother.CreateSupplier();
+			supplier.Save();
+			var price = supplier.Prices.First();
+
 			var client = DataMother.CreateTestClientWithAddress();
 			var recepient = DataMother.TestClient();
 			var address = client.Addresses.First();
 			var legalEntity = recepient.Orgs().First();
+
 			address.MoveToAnotherClient(recepient, legalEntity);
 
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(@"update future.AddressIntersection ai
 join future.Intersection i on ai.IntersectionId = i.Id
 set ai.SupplierDeliveryId = '123'
-where i.PriceId = 4832 and ai.AddressId = :addressId ")
+where i.PriceId = :priceId and ai.AddressId = :addressId ")
 					.SetParameter("addressId", address.Id)
+					.SetParameter("priceId", price.Id)
 					.ExecuteUpdate();
 			});
 
@@ -35,8 +42,9 @@ where i.PriceId = 4832 and ai.AddressId = :addressId ")
 select ai.SupplierDeliveryId
 from future.AddressIntersection ai
 join future.Intersection i on ai.IntersectionId = i.Id
-where i.PriceId = 4832 and ai.AddressId = :addressId ")
+where i.PriceId = :priceId and ai.AddressId = :addressId ")
 					.SetParameter("addressId", address.Id)
+					.SetParameter("priceId", price.Id)
 					.UniqueResult<string>();
 				Assert.That(supplierDeliveryId, Is.EqualTo("123"));
 			});
