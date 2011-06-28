@@ -12,7 +12,7 @@ using WatiN.Core;
 
 namespace Functional
 {
-	[TestFixture]
+	[TestFixture, Ignore("Временно до починки")]
 	public class DocumentLogFixture : WatinFixture
 	{
 		[Test]

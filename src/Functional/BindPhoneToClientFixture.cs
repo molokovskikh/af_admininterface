@@ -14,7 +14,7 @@ using Common.Tools;
 
 namespace Functional
 {
-	[TestFixture]
+	[TestFixture, Ignore("Временно до починки")]
 	public class BindPhoneToClientFixture : WatinFixture
 	{
 		[SetUp]
