@@ -3,90 +3,49 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using log4net;
-using NHibernate;
-using NHibernate.Cfg;
-using NHibernate.Engine;
 using NHibernate.Event;
-using NHibernate.Event.Default;
-using NHibernate.Persister.Entity;
 
 namespace AdminInterface.Models
 {
-	public class Auditable : Attribute
+	[EventListener]
+	public class AuditListner : BaseAuditListner
 	{
-		public Auditable()
-		{}
-
-		public Auditable(string name)
+		protected override void Log(PostUpdateEvent @event, string message)
 		{
-			Name = name;
+			@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
 		}
 
-		public string Name { get; set; }
-	}
-
-	public class AuditableProperty
-	{
-		public PropertyInfo Property { get; set; }
-		public string Name { get; set; }
-		public string OldValue { get; set; }
-		public string NewValue { get; set; }
-		public string Message { get ;set; }
-
-		public AuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
+		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState)
 		{
-			Property = property;
-			Name = name;
-
-			if (String.IsNullOrEmpty(name))
-			{
-				Name = BindingHelper.GetDescription(property);
-			}
-
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
 			{
-				ulong newRegionValue = 0;
-				if (newValue != null)
-					newRegionValue = (ulong)newValue;
-				ulong oldRegionValue = 0;
-				if (oldValue != null)
-					oldRegionValue = (ulong)oldValue;
-
-				SpecialCase(newRegionValue, oldRegionValue);
-				return;
+				return new MaskedAuditableProperty(property, name, newState, oldState);
 			}
-
-			if (oldValue == null)
-			{
-				OldValue = "";
-			}
-			else
-			{
-				OldValue = AsString(property, oldValue);
-			}
-
-			if (newValue == null)
-			{
-				NewValue = "";
-			}
-			else
-			{
-				NewValue = AsString(property, newValue);
-			}
-			Message = String.Format("$$$Изменено '{0}' было '{1}' стало '{2}'", Name, OldValue, NewValue);
+			return base.GetAuditableProperty(property, name, newState, oldState);
 		}
+	}
 
-		private void SpecialCase(ulong newValue, ulong oldValue)
+	public class MaskedAuditableProperty : AuditableProperty
+	{
+		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
+			: base(property, name, newValue, oldValue)
+		{}
+
+		protected override void Convert(PropertyInfo property, object newValue, object oldValue)
 		{
-			var current = ToRegionList(newValue);
-			var old = ToRegionList(oldValue);
+			ulong newRegionValue = 0;
+			if (newValue != null)
+				newRegionValue = (ulong)newValue;
+			ulong oldRegionValue = 0;
+			if (oldValue != null)
+				oldRegionValue = (ulong)oldValue;
+
+			var current = ToRegionList(newRegionValue);
+			var old = ToRegionList(oldRegionValue);
 
 			var added = Complement(current, old).ToArray();
 			var removed = Complement(old, current).ToArray();
@@ -122,100 +81,6 @@ namespace AdminInterface.Models
 				.Range(0, 64)
 				.Select(i => (ulong)Math.Pow(2, i))
 				.Where(i => (diff & i) > 0);
-		}
-
-		private string AsString(PropertyInfo property, object value)
-		{
-			if (property.PropertyType.IsEnum)
-			{
-				return BindingHelper.GetDescription(value);
-			}
-			if (property.PropertyType == typeof(bool))
-			{
-				return (bool)value ? "вкл" : "выкл";
-			}
-			if (!NHibernateUtil.IsInitialized(value))
-			{
-				return "";
-/*
-				var asString = value.ToString();
-				new DefaultEvictEventListener().OnEvict(new EvictEvent(value, session));
-				return asString;
-*/
-			}
-
-			return value.ToString();
-		}
-
-		public override string ToString()
-		{
-			return Message;
-		}
-	}
-
-	[EventListener]
-	public class AuditListner : IPostUpdateEventListener
-	{
-		public void OnPostUpdate(PostUpdateEvent @event)
-		{
-			var type = @event.Persister.GetMappedClass(EntityMode.Poco);
-			if (@event.OldState == null)
-				return;
-
-			if (!IsAuditable(type))
-				return;
-
-			var properties = GetDirtyAuditableProperties(@event.Persister, @event.State, @event.OldState, @event.Entity, @event.Session);
-			if (properties.Count == 0)
-				return;
-
-			var message = BuildMessage(properties);
-			@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
-		}
-
-		private string BuildMessage(List<AuditableProperty> properties)
-		{
-			return properties
-				.Select(k => k.ToString())
-				.Implode("\r\n");
-		}
-
-		private List<AuditableProperty> GetDirtyAuditableProperties(IEntityPersister persister, object[] state, object[] oldState, object entity, IEventSource session)
-		{
-			var dirty = persister.FindDirty(state, oldState, entity, session);
-			var result = new List<AuditableProperty>();
-			foreach (var index in dirty)
-			{
-				var name = persister.ClassMetadata.PropertyNames[index];
-				var property = entity.GetType().GetProperty(name, BindingFlags.Instance | BindingFlags.Public);
-				if (property == null)
-					continue;
-
-				var attributes = property.GetCustomAttributes(typeof(Auditable), false);
-				if (attributes.Length == 0)
-					continue;
-
-				//свойство может быть перегружено или перекрыто, игнорируем дублирующиеся
-				if (result.Any(r => r.Property.Name == property.Name))
-					continue;
-
-				result.Add(new AuditableProperty(
-					property,
-					((Auditable)attributes[0]).Name,
-					state[index],
-					oldState[index]
-				));
-			}
-			return result;
-		}
-
-		private bool IsAuditable(Type type)
-		{
-			return typeof(Client) == type
-				|| typeof(Address) == type
-				|| typeof(User) == type
-				|| typeof(DrugstoreSettings) == type
-				|| typeof(Supplier) == type;
 		}
 	}
 }

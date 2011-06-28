@@ -57,7 +57,7 @@ namespace AdminInterface.Models
 		bool Enabled { get; }
 	}
 
-	[ActiveRecord(Schema = "future", Lazy = true)]
+	[ActiveRecord(Schema = "future", Lazy = true), Auditable]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
 		public User()

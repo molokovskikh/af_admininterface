@@ -109,7 +109,7 @@
   <ItemGroup>
     <Compile Include="ADHelperFixture.cs" />
     <Compile Include="AppHelperFixture.cs" />
-    <Compile Include="AuditablePropertyFixture.cs" />
+    <Compile Include="MaskedAuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
     <Compile Include="ClientCardFixture.cs" />
     <Compile Include="Controllers\AddressesControllerFixture.cs" />

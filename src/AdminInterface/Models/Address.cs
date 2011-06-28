@@ -23,7 +23,7 @@ using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("Addresses", Schema = "Future", Lazy = true)]
+	[ActiveRecord("Addresses", Schema = "Future", Lazy = true), Auditable]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable
 	{
 		public Address(Client client, LegalEntity legalEntity)

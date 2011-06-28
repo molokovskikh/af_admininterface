@@ -12,12 +12,13 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord(Schema = "Future", Lazy = true)]
+	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Supplier : Service
 	{
 		public Supplier()

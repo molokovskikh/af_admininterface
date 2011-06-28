@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
 {
@@ -24,7 +25,7 @@ namespace AdminInterface.Models
 		[Description("Выводить предупреждения")] Warning = 1,
 	}
 
-	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true)]
+	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
 	{
 		private bool _noiseCosts;

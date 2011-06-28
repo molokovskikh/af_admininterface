@@ -144,6 +144,8 @@
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\IgnoredInnsController.cs" />
+    <Compile Include="Models\AuditListner.cs" />
+    <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
     <Compile Include="MonoRailExtentions\Controller.cs" />
@@ -181,7 +183,6 @@
     <Compile Include="Helpers\Wav\WavHelper.cs" />
     <Compile Include="Initializers\ActiveRecord.cs" />
     <Compile Include="Models\Address.cs" />
-    <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\Accounting.cs" />
     <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
     <Compile Include="Models\Billing\Act.cs" />
@@ -486,7 +487,7 @@
     <None Include="Views\Client\SearchAssortmentPrices.brail" />
     <None Include="Views\Client\SearchClientSubview.brail" />
     <None Include="Views\Client\SuppliersForCostNoising.brail" />
-    <None Include="Views\Layouts\GeneralWithJQueryOnly.brail" />
+    <None Include="Views\Layouts\Application.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brail" />
     <None Include="Views\Mail\NotifyBillingAboutClientRegistration.brail" />
