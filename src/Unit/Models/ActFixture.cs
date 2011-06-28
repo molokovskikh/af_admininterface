@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -97,6 +98,19 @@ namespace Unit.Models
 			Assert.That(act.Parts[0].Count, Is.EqualTo(1), act.Parts.Implode());
 			Assert.That(act.Parts[1].Sum, Is.EqualTo(800), act.Parts.Implode());
 			Assert.That(act.Parts[1].Count, Is.EqualTo(1), act.Parts.Implode());
+		}
+
+		[Test]
+		public void Build_different_act_if_payer_name_changed()
+		{
+			var invoices = new List<Invoice>();
+			invoices.Add(new Invoice(payer, Period.January, DateTime.Now));
+			payer.JuridicalName = "ООО 'Хвосты и плетки'";
+			invoices.Add(new Invoice(payer, Period.January, DateTime.Now));
+			var acts = Act.Build(invoices, DateTime.Now).ToList();
+			Assert.That(acts.Count, Is.EqualTo(2));
+			Assert.That(acts[0].PayerName, Is.EqualTo("ООО 'Рога и копыта'"));
+			Assert.That(acts[1].PayerName, Is.EqualTo("ООО 'Хвосты и плетки'"));
 		}
 	}
 }

@@ -19,6 +19,8 @@ namespace AdminInterface.Models.Billing
 			Period = invoices.Select(i => i.Period).Distinct().Single();
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
 			Recipient = invoices.Select(i => i.Recipient).Distinct().Single();
+			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
+
 			ActDate = Payer.GetDocumentDate(actDate);
 			var invoiceParts = invoices.SelectMany(i => i.Parts);
 			if (Payer.InvoiceSettings.DoNotGroupParts)
@@ -34,7 +36,6 @@ namespace AdminInterface.Models.Billing
 					.Select(g => new ActPart(g.Key.Name, g.Sum(i => i.Count), g.Key.Cost))
 					.ToList();
 			}
-			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
 			CalculateSum();
 
 			foreach(var part in invoiceParts.Where(p => p.Ad != null))
@@ -80,7 +81,7 @@ namespace AdminInterface.Models.Billing
 		{
 			return invoices
 				.Where(i => i.Act == null)
-				.GroupBy(i => i.Payer)
+				.GroupBy(i => new { i.Payer, i.PayerName, i.Recipient })
 				.Select(g => new Act(documentDate, g.ToArray()))
 				.ToList();
 		}
