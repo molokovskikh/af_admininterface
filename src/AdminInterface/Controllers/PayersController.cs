@@ -8,7 +8,6 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(BindingHelper)),
-		Layout("GeneralWithJQueryOnly")
 	]
 	public class PayersController : SmartDispatcherController
 	{

@@ -45,6 +45,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["homeRegion"] = client.HomeRegion;
 				PropertyBag["drugstore"] = drugstore;
 			}
+			CancelLayout();
 		}
 
 		public void DefaultRegions(ulong homeRegionId, bool singleRegions)

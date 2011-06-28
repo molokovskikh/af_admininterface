@@ -7,7 +7,6 @@ using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
-	[Layout("GeneralWithJQueryOnly")]
 	public class IgnoredInnsController : ARSmartDispatcherController
 	{
 		public void Index()

@@ -33,7 +33,6 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	[Layout("GeneralWithJQueryOnly")]
 	public class AdvertisingsController : SmartDispatcherController
 	{
 		public void Index([DataBind("filter")] AdvertisingFilter filter)

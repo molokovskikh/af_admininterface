@@ -8,9 +8,6 @@ using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
-	[
-		Layout("GeneralWithJQueryOnly"),
-	]
 	public class RecipientsController : ARSmartDispatcherController
 	{
 		public void Index()

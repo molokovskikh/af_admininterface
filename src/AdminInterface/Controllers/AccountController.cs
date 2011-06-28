@@ -33,7 +33,6 @@ namespace AdminInterface.Controllers
 				}
 			}
 			CancelView();
-			CancelLayout();
 		}
 
 		public void SetUserStatus(uint userId, bool? enabled, bool? free)
@@ -65,6 +64,7 @@ namespace AdminInterface.Controllers
 				user.Client.Save();
 				scope.VoteCommit();
 			}
+			CancelView();
 		}
 
 		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment)
@@ -105,6 +105,7 @@ namespace AdminInterface.Controllers
 
 				scope.VoteCommit();
 			}
+			CancelView();
 		}
 	}
 }

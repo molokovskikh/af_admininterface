@@ -14,7 +14,6 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(HttpUtility)),
-		Layout("GeneralWithJQueryOnly"),
 		Secure(PermissionType.ViewSuppliers),
 	]
 	public class SuppliersController : Controller

@@ -3,53 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Resources;
-using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
-using AdminInterface.Models;
-using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
-using Castle.ActiveRecord.Framework.Internal;
-using Castle.Components.Validator;
-using Castle.Core.Configuration;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
-using Castle.MonoRail.Framework.Container;
-using Castle.MonoRail.Framework.Descriptors;
-using Castle.MonoRail.Framework.Helpers.ValidationStrategy;
 using Castle.MonoRail.Framework.Internal;
-using Castle.MonoRail.Framework.JSGeneration;
-using Castle.MonoRail.Framework.JSGeneration.jQuery;
 using Castle.MonoRail.Framework.Routing;
-using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using log4net;
-using log4net.Config;
 using MySql.Data.MySqlClient;
 using NHibernate;
 using NHibernate.Engine;
-using NHibernate.Mapping;
 using NHibernate.Type;
 
 namespace AddUser
 {
-	public class Global : HttpApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
+	public class Global : WebApplication, IMonoRailConfigurationEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
+
+		public Global()
+			: base(Assembly.Load("AdminInterface"))
+		{
+			LibAssemblies.Add(Assembly.Load("Common.Web.Ui"));
+			Logger.ErrorSubject = "Ошибка в Административном интерфейсе";
+			Logger.SmtpHost = "box.analit.net";
+		}
 
 		void Application_Start(object sender, EventArgs e)
 		{
 			try
 			{
-				XmlConfigurator.Configure();
-				GlobalContext.Properties["Version"] = Assembly.GetExecutingAssembly().GetName().Version;
-
 				var types = Assembly.GetExecutingAssembly().GetTypes()
 					.Where(t => t.Namespace != null && t.Namespace.EndsWith(".Initializers"));
 
@@ -236,6 +227,12 @@ WHERE PriceCode = ?Id", connection);
 		void Application_AuthenticateRequest(object sender, EventArgs e)
 		{}
 
+		void Session_End(object sender, EventArgs e)
+		{}
+
+		void Application_End(object sender, EventArgs e)
+		{}
+
 		void Application_Error(object sender, EventArgs e)
 		{
 			var exception = Server.GetLastError();
@@ -250,67 +247,12 @@ WHERE PriceCode = ?Id", connection);
 				return;
 			}
 
-			var builder = new StringBuilder();
-			builder.AppendLine("----UrlReferer-------");
-			builder.AppendLine(Request.UrlReferrer != null ? Request.UrlReferrer.ToString() : String.Empty);
-			builder.AppendLine("----Url-------");
-			builder.AppendLine(Request.Url.ToString());
-			builder.AppendLine("--------------");
-			builder.AppendLine("----Params----");
-			foreach (string name in Request.QueryString)
-				builder.AppendLine(String.Format("{0}: {1}", name, Request.QueryString[name]));
-			builder.AppendLine("--------------");
-			
-			builder.AppendLine("----Error-----");
-			do
-			{
-				builder.AppendLine("Message:");
-				builder.AppendLine(exception.Message);
-				builder.AppendLine("Stack Trace:");
-				builder.AppendLine(exception.StackTrace);
-				builder.AppendLine("--------------");
-				exception = exception.InnerException;
-			} while (exception != null);
-			builder.AppendLine("--------------");
-
-			builder.AppendLine("----Session---");
-			try
-			{
-				foreach (string key in Session.Keys)
-				{
-					if (Session[key] == null)
-						builder.AppendLine(String.Format("{0} - null", key));
-					else
-						builder.AppendLine(String.Format("{0} - {1}", key, Session[key]));
-				}
-			}
-			catch (Exception)
-			{}
-			builder.AppendLine("--------------");
-
-			_log.Error(builder.ToString());
 			if (!Context.IsDebuggingEnabled)
 				Server.Transfer("~/Rescue/Error.aspx");
 		}
 
-		void Session_End(object sender, EventArgs e)
-		{}
-
-		void Application_End(object sender, EventArgs e)
-		{}
-
-		public void Configure(IMonoRailConfiguration configuration)
+		public new void Configure(IMonoRailConfiguration configuration)
 		{
-/*
-			configuration.JSGeneratorConfiguration.AddLibrary("jquery", typeof(JQueryGenerator))
-				.AddExtension(typeof(CommonJSExtension))
-				.ElementGenerator
-					.AddExtension(typeof(JQueryElementGenerator))
-					.Done
-				.BrowserValidatorIs(typeof(JQueryValidator))
-				.SetAsDefault();
- */
-
 			configuration.ControllersConfig.AddAssembly("AdminInterface");
 			configuration.ControllersConfig.AddAssembly("Common.Web.Ui");
 			configuration.ViewComponentsConfig.Assemblies = new[] {
@@ -324,32 +266,7 @@ WHERE PriceCode = ?Id", connection);
 			configuration.ViewEngineConfig.VirtualPathRoot = configuration.ViewEngineConfig.ViewPathRoot;
 			configuration.ViewEngineConfig.ViewPathRoot = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, configuration.ViewEngineConfig.ViewPathRoot);
 
-#if DEBUG
-			MonoRail.Debugger.Toolbar.Toolbar.Init(configuration);
-#endif
-
-/*
-			configuration.SmtpConfig.Host = "mail.adc.analit.net";
-			configuration.ExtensionEntries.Add(new ExtensionEntry(typeof(ExceptionChainingExtension),
-				new MutableConfiguration("mailTo")));
-*/
-		}
-
-		public void Created(IMonoRailContainer container)
-		{}
-
-		public void Initialized(IMonoRailContainer container)
-		{
-			container.ValidatorRegistry = new CachedValidationRegistry(new ResourceManager("Castle.Components.Validator.Messages", typeof(CachedValidationRegistry).Assembly));
-			container.ControllerDescriptorProvider.AfterProcess += desc => {
-				if (desc.Helpers.Any(d => d.HelperType == typeof(AppHelper)))
-					return;
-				desc.Helpers = desc.Helpers.Concat(new [] {new HelperDescriptor(typeof(AppHelper), "app"), }).ToArray();
-			};
-			BaseMailer.ViewEngineManager = container.ViewEngineManager;
-			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("AdminInterface"));
-			((DefaultViewComponentFactory)container.GetService<IViewComponentFactory>()).Inspect(Assembly.Load("Common.Web.Ui"));
-			container.UrlBuilder.UseExtensions = false;
+			base.Configure(configuration);
 		}
 	}
 }

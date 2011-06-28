@@ -19,7 +19,6 @@ namespace AdminInterface.Controllers
 		Secure,
 		Helper(typeof (ViewHelper)),
 		Helper(typeof (BindingHelper)),
-		Layout("GeneralWithJQueryOnly"),
 		Filter(ExecuteWhen.BeforeAction, typeof (SecurityActivationFilter))
 	]
 	public class MonitoringController : Controller

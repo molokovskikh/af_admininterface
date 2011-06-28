@@ -12,10 +12,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[
-		Layout("GeneralWithJQueryOnly"),
-		Helper(typeof(BindingHelper))
-	]
+	[Helper(typeof(BindingHelper))]
 	public class ActsController : ARSmartDispatcherController
 	{
 		public void Index([DataBind("filter")] PayerDocumentFilter filter)

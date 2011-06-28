@@ -212,7 +212,6 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof(BindingHelper)), 
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),

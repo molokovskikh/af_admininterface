@@ -123,10 +123,7 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	[
-		Layout("GeneralWithJQueryOnly"),
-		Helper(typeof(BindingHelper))
-	]
+	[Helper(typeof(BindingHelper))]
 	public class InvoicesController : SmartDispatcherController
 	{
 		public void Index([DataBind("filter")] PayerDocumentFilter filter)

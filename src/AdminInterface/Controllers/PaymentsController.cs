@@ -70,7 +70,6 @@ namespace AdminInterface.Controllers
 	}
 
 
-	[Layout("GeneralWithJQueryOnly")]
 	public class PaymentsController : ARSmartDispatcherController
 	{
 		public void Index([DataBind("filter")] PaymentFilter filter)

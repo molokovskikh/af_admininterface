@@ -90,7 +90,6 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Layout("GeneralWithJQueryOnly"),
 		Helper(typeof (BindingHelper)),
 		Helper(typeof (ViewHelper)),
 		Secure(PermissionType.Billing),

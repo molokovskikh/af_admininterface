@@ -15,10 +15,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[
-		Layout("GeneralWithJQueryOnly"),
-		Secure,
-	]
+	[Secure]
 	public class DeliveriesController : ARSmartDispatcherController
 	{
 		[AccessibleThrough(Verb.Get)]

@@ -9,7 +9,6 @@ namespace AdminInterface.Controllers
 	[
 		Secure,
 		Helper(typeof(ViewHelper)),
-		Layout("GeneralWithJQueryOnly"),
 	]
 	public class SmapRejectorController : SmartDispatcherController
 	{
