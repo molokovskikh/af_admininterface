@@ -118,7 +118,6 @@ namespace Printer
 					{
 						using (var scope = new TransactionScope(OnDispose.Rollback))
 						{
-							payer.Balance -= invoice.Sum;
 							invoice.Save();
 							scope.VoteCommit();
 						}

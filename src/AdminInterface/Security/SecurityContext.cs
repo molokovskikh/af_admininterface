@@ -32,14 +32,12 @@ namespace AdminInterface.Security
 		{
 			get
 			{
-				return GetAdministrator();
-			}
-		}
+				var admin = GetAdministrator();
+				if (admin == null)
+					throw new NotAuthorizedException();
 
-		public static void CheckIsUserAuthorized()
-		{
-			if (Administrator == null)
-				throw new NotAuthorizedException();
+				return admin;
+			}
 		}
 	}
 }
