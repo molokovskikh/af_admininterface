@@ -1,0 +1,10 @@
+import Castle.ActiveRecord
+import AdminInterface.Models
+
+task @UpdateBalance, [@InitActiveRecord]:
+	using SessionScope():
+		for payer in Payer.FindAll():
+			using SessionScope():
+				payer = Payer.Find(payer.Id)
+				payer.RecalculateBalance()
+				payer.Save()
