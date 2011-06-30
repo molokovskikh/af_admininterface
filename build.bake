@@ -16,7 +16,28 @@ import System.Xml.XPath.Extensions from System.Xml.Linq
 import System.ComponentModel
 import System.Runtime.InteropServices
 import System.Security.Principal
+import Boo.Lang.Compiler
+import Boo.Lang.Interpreter
+import Boo.Lang.Compiler.TypeSystem.Reflection
+import NHibernate
+import NHibernate.AdoNet.Util
+import log4net
+import log4net.Appender
+import log4net.Core
+import log4net.Repository.Hierarchy
 import file from Db.bake
+
+class SqlAppender(IAppender):
+
+	property Name as string
+
+	def Close():
+		pass
+
+	def DoAppend(message as LoggingEvent):
+		formatter = BasicFormatter()
+		sql = formatter.Format(message.MessageObject.ToString())
+		print sql
 
 [DllImport("advapi32.dll", SetLastError: true, CharSet: CharSet.Unicode)]
 def LogonUser(lpszUsername as String, lpszDomain as String, lpszPassword as String, dwLogonType as int, dwLogonProvider as int, ref phToken as IntPtr) as bool:
@@ -45,7 +66,6 @@ def Impersonate(action as Action):
 		ensure:
 			CloseHandle(tokenHandle);
 
-
 Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
@@ -53,11 +73,27 @@ Global(
 	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
+
 Assembly.LoadFrom("src/${Globals.Project}/bin/${Globals.Project}.dll")
 if Exist("tasks"):
 	for file in Directory.GetFiles("tasks", "*.bake"):
 		using reader = File.OpenText(file):
 			Engine.Loader.Load(reader, file)
+
+task @DbShell, [@InitActiveRecord]:
+	LoggerProvider.SetLoggersFactory(Log4NetLoggerFactory())
+
+	repository = cast(Hierarchy, LogManager.GetRepository())
+	repository.Configured = true
+	logger = cast(Logger, repository.GetLogger("NHibernate.SQL"))
+	logger.Level = Level.Debug
+	logger.AddAppender(SqlAppender(Name: "test"))
+
+	CompilerParameters.SharedTypeSystemProvider = ReflectionTypeSystemProvider()
+	console = InteractiveInterpreterConsole()
+	console.Eval("import Boo.Lang.Interpreter.Builtins")
+	console.Eval("import ${Globals.Project}.Models")
+	console.ReadEvalPrintLoop()
 
 task @default, [@Build]
 

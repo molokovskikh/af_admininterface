@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -10,14 +9,17 @@ using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
 using AdminInterface.Models.Logs;
-using Document=AdminInterface.Models.Document;
 using System.Threading;
+using Document = AdminInterface.Models.Document;
 
-namespace Functional
+namespace Functional.Drugstore
 {
-	[Ignore("Временно до починки")]
-	public class LogsFixture : WatinFixture
+	public class AnalitFUpdateLogsFixture : WatinFixture2
 	{
+		private Client client;
+		private UpdateLogEntity updateLog;
+		private User user;
+
 		private void Set_calendar_dates(IE browser)
 		{
 			var calendarFrom = browser.Div("beginDateCalendarHolder");
@@ -28,7 +30,40 @@ namespace Functional
 			headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад			
 		}
 
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithAddressAndUser();
+			user = client.Users.First();
+			updateLog = new UpdateLogEntity {
+				User = user,
+				AppVersion = 1000,
+				Addition = "Test update",
+				Commit = true,
+				RequestTime = DateTime.Now,
+				UpdateType = UpdateType.Accumulative,
+				UserName = user.Name,
+			};
+			updateLog.Save();
+
+			Open("Logs/UpdateLog?userId={0}", user.Id);
+			Assert.That(browser.Text, Is.StringContaining("История обновлений"));
+		}
+
 		[Test]
+		public void Show_update_log()
+		{
+			updateLog.Log = "Тестовый лог обновления";
+			updateLog.Save();
+			Refresh();
+
+			Click("Лог");
+			browser.WaitUntilContainsText("Тестовый лог обновления", 1);
+			Assert.That(browser.Text, Is.StringContaining("Тестовый лог обновления"));
+		}
+
+
+		[Test, Ignore("Временно до починки")]
 		public void Check_address_links_when_user_orders_history_show()
 		{
 			using (new SessionScope())
@@ -58,7 +93,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void Check_users_links_when_client_orders_history_show()
 		{
 			var sql = @"select max(ClientCode) from orders.ordershead join future.clients on clients.Id = ordershead.ClientCode";
@@ -121,7 +156,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_from_client_update_history()
 		{
 			Client client = null;
@@ -156,7 +191,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_from_user_update_history()
 		{
 			Client client = null;
@@ -190,7 +225,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_from_client_document_history()
 		{
 			Client client = null;
@@ -222,7 +257,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_from_user_document_history()
 		{
 			Client client = null;
@@ -254,7 +289,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_unparsed_document_documents()
 		{
 			Client client = null;
@@ -276,7 +311,7 @@ namespace Functional
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void View_loaded_documents_details_unparsed_document_updates()
 		{
 			Client client = null;

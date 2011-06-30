@@ -13,13 +13,11 @@
 		});
 	}
 
-	function Hide(id, description, afterFinish)
-	{
-		new Effect.SlideUp(description + id, {
-		afterFinish: function() {
-			$(description + "Row" + id).remove();
+	function Hide(id, description, afterFinish) {
+		$("#" + description + id).slideUp(0.5, function () {
+			$("#" + description + "Row" + id).remove();
 			afterFinish();
-		}, duration: 0.5 });
+		});
 	}
 
 	function HideAll(id, afterFinish) {
@@ -38,18 +36,18 @@
 	}
 	
 	function IsVisible(id, description) {
-		return $(description + id) != null;
+		return $("#" + description + id).length > 0;
 	}
 	
 	function DisableAction(id)
 	{
-		$("ShowUpdateDetailsLink" + id).onclick = function () { return false; }
-		$("ShowLogLink" + id).onclick = function() { return false; }
-		$("ShowDocumentDetailsLink" + id).onclick = function() { return false; }
+		$("#ShowUpdateDetailsLink" + id).onclick = function () { return false; }
+		$("#ShowLogLink" + id).onclick = function() { return false; }
+		$("#ShowDocumentDetailsLink" + id).onclick = function() { return false; }
 	}
 
 	function Download(url) {
-		new Ajax.Request(url, { method: 'get' });
+		$.ajax({ url: url });
 	}
 </script>
 

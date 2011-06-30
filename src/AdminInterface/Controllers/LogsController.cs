@@ -127,6 +127,7 @@ namespace AdminInterface.Controllers
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
 			DateTime beginDate, DateTime endDate)
 		{
+			LayoutName = "Application";
 			var filter = new UpdateFilter();
 			filter.BeginDate = beginDate;
 			filter.EndDate = endDate;

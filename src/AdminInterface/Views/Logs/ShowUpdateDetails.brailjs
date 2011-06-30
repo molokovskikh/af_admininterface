@@ -1,2 +1,2 @@
-﻿page.InsertHtml("after", "logRow${updateLogEntityId}", {@partial : 'logs/ShowUpdateDetailsPartial.brail' });
-page.VisualEffect("SlideDown", "UpdateDetails${updateLogEntityId}", {"duration" : "0.5"});
+﻿page.InsertHtml("after", "#logRow${updateLogEntityId}", {@partial : 'logs/ShowUpdateDetailsPartial.brail' });
+page.VisualEffect("SlideDown", "#UpdateDetails${updateLogEntityId}", {"duration" : "0.5"});

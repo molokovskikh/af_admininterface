@@ -122,7 +122,7 @@
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="ForTesting\WatinExtentions.cs" />
     <Compile Include="ForTesting\WatinFixture.cs" />
-    <Compile Include="LogsFixture.cs" />
+    <Compile Include="Drugstore\AnalitFUpdateLogsFixture.cs" />
     <Compile Include="MainViewFixure.cs" />
     <Compile Include="PromotionsFixture.cs" />
     <Compile Include="RegionalAdminFixture.cs" />
