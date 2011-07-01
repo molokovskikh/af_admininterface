@@ -238,7 +238,6 @@
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
-    <Compile Include="NHibernateExtentions\BitOrProjection.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
@@ -314,7 +313,6 @@
     </Compile>
     <Compile Include="Models\UserMessage.cs" />
     <Compile Include="Models\Security\Permission.cs" />
-    <Compile Include="NHibernateExtentions\Projections2.cs" />
     <Compile Include="OfficeUserRegistrationReport.aspx.cs">
       <DependentUpon>OfficeUserRegistrationReport.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

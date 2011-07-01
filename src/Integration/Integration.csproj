@@ -143,7 +143,6 @@
     <Compile Include="Models\RevisionActFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
-    <Compile Include="NHibernateExtentions\BitOrProjectionTest.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
