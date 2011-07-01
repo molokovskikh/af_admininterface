@@ -80,6 +80,9 @@ namespace Functional.Suppliers
 			browser.Css("#supplier_Name").TypeText("Тестовый поставщик обновленный");
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			Assert.That(browser.Css("#supplier_Name").Text, Is.EqualTo("Тестовый поставщик обновленный"));
+			ActiveRecordMediator.Refresh(supplier);
+			Assert.That(supplier.Name, Is.EqualTo("Тестовый поставщик обновленный"));
 		}
 
 		[Test]

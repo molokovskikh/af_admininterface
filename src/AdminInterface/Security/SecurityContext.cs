@@ -10,6 +10,9 @@ namespace AdminInterface.Security
 
 		public static Func<Administrator> GetAdministrator = () => {
 			var httpContext = HttpContext.Current;
+			if (httpContext == null)
+				throw new Exception("HttpContext не инициализирован");
+
 			var admin = (Administrator)httpContext.Items[AdministratorKey];
 #if !DEBUG
 			admin = (Administrator)httpContext.Session[AdministratorKey];

@@ -3,3 +3,4 @@ obj
 *.log
 build/
 output/
+_Resharper*
