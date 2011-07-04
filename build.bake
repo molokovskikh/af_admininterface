@@ -53,6 +53,7 @@ Global(
 	AdditionalAssemblies : ("Common.Web.UI",)
 )
 
+Engine.Execute("LoadProject")
 
 task @default, [@Build]
 

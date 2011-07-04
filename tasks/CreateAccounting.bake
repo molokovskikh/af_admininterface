@@ -1,0 +1,10 @@
+import Castle.ActiveRecord
+import AdminInterface.Models.Billing
+import AdminInterface.Models
+
+task @CreateAccounting, [@InitActiveRecord]:
+	using SessionScope():
+		for user in User.FindAll():
+			continue if user.Accounting
+			user.Accounting = UserAccounting(user)
+			user.Save()
