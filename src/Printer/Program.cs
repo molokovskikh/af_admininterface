@@ -39,7 +39,7 @@ namespace Printer
 					}
 					else if (args[1] == "act")
 					{
-						var ids = args[3].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToList();
+						var ids = args[3].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToArray();
 
 						PrintActs(brail, ids);
 					}
@@ -69,13 +69,13 @@ namespace Printer
 			}
 		}
 
-		private static void PrintActs(IViewEngineManager brail, IEnumerable<uint> ids)
+		private static void PrintActs(IViewEngineManager brail, uint[] ids)
 		{
 			using (new SessionScope(FlushAction.Never))
 			{
-				foreach (var id in ids)
+				var acts = Act.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName).ToArray();
+				foreach (var act in acts)
 				{
-					var act = Act.Find(id);
 					new AdminInterface.Helpers.Printer().PrintView(brail,
 						"Acts/Print",
 						"Print",
@@ -103,7 +103,9 @@ namespace Printer
 					.Where(p => p.AutoInvoice == InvoiceType.Auto
 						&& p.PayCycle == invoicePeriod
 						&& p.Recipient != null
-						&& p.Recipient.Id == recipientId);
+						&& p.Recipient.Id == recipientId)
+					.OrderBy(p => p.Name)
+					.ToList();
 
 				foreach (var payer in payers)
 				{
