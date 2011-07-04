@@ -118,9 +118,6 @@ namespace AdminInterface.Models
 		[Property, Description("Получать отказы"), Auditable]
 		public virtual bool SendRejects { get; set; }
 
-		[Property, Description("Включить автообновление"), Auditable]
-		public virtual bool EnableUpdate { get; set; }
-
 		[Property, Description("Аудитор"), Auditable]
 		public virtual bool Auditor { get; set; }
 

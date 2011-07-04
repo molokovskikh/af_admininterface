@@ -57,7 +57,7 @@
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${supplier.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;" name="usersTable">
+			<table style="width:100%;" id=users>
 				<tr valign="top" align="left">
 					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
 					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>

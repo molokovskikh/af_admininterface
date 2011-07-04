@@ -330,14 +330,12 @@ namespace Functional.Drugstore
 			browser.GoTo(baseUrl);
 
 			browser.GoTo(browser.Link(Find.ByText("История документов")).Url);
-			Assert.AreEqual("Статистика получения\\отправки документов пользователя " + client.Users[0].Login, browser.Title);
+			Assert.AreEqual("История документов", browser.Title);
 			browser.GoTo(baseUrl);
 
 			browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
 			Assert.AreEqual("История заказов", browser.Title);
 			browser.GoTo(baseUrl);
-
-
 		}
 
 		[Test]
@@ -735,36 +733,6 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
-		public void Test_enable_update_setting()
-		{
-			Assert.IsFalse(client.Users[0].EnableUpdate);
-			browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
-			browser.Link(Find.ByText("Настройка")).Click();
-			Assert.IsFalse(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
-			browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = true;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.IsTrue(client.Users[0].EnableUpdate);
-			}
-
-			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
-			browser.Link(Find.ByText(client.Users[0].Id.ToString())).Click();
-			browser.Link(Find.ByText("Настройка")).Click();
-			Assert.IsTrue(browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked);
-			browser.CheckBox(Find.ByName("user.EnableUpdate")).Checked = false;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.IsFalse(client.Users[0].EnableUpdate);
-			}
-		}
-
-		[Test]
 		public void Add_comment_for_contact()
 		{
 			var applyButtonText = "Сохранить";
@@ -790,20 +758,17 @@ namespace Functional.Drugstore
 		{
 			Client oldClient;
 			Client newClient;
-			uint userIdForMove = 0;
-			using (new SessionScope())
-			{
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
+			oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			newClient = DataMother.CreateTestClientWithAddressAndUser();
 
-				oldClient.Name += oldClient.Id.ToString();
-				oldClient.UpdateAndFlush();
-				userIdForMove = oldClient.Users[0].Id;
-				newClient.Name += newClient.Id.ToString();
-				newClient.UpdateAndFlush();
-			}
+			oldClient.Name += oldClient.Id.ToString();
+			oldClient.UpdateAndFlush();
+			var user = oldClient.Users[0];
+			newClient.Name += newClient.Id.ToString();
+			newClient.UpdateAndFlush();
+			scope.Flush();
 
-			using (var browser = Open("users/{0}/edit", oldClient.Users[0].Id))
+			using (var browser = Open("users/{0}/edit", user.Id))
 			{
 				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
 				browser.Button(Find.ById("SearchClientButton")).Click();
@@ -816,19 +781,14 @@ namespace Functional.Drugstore
 
 				browser.Button(Find.ByValue("Переместить")).Click();
 				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
-				Assert.That(browser.Text, Is.StringContaining(newClient.Name));
-				Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
 			}
 
-			using (new SessionScope())
-			{
-				oldClient.Refresh();
-				newClient.Refresh();
-				var user = User.Find(userIdForMove);
-				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
-				Assert.That(newClient.Users.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Users.Count, Is.EqualTo(0));
-			}
+			oldClient = Client.Find(oldClient.Id);
+			newClient = Client.Find(newClient.Id);
+			user.Refresh();
+			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
+			Assert.That(newClient.Users.Count, Is.EqualTo(2));
+			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
 		}
 
 		[

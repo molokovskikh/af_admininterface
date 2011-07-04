@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Models;
+using AdminInterface.Test.ForTesting;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -179,7 +180,7 @@ from billing.Payers
 				{
 					Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 					foreach (var row in browser.TableBody(Find.ById("SearchResults")).TableRows)
-						Assert.That(row.TableCells[9].Text, Is.EqualTo("Розница"));
+						Assert.That(row.GetCellByHeader("Сегмент").Text, Is.EqualTo("Розница"));
 				}
 				else
 				{

@@ -54,7 +54,7 @@ namespace AdminInterface.Test.ForTesting
 			}
 		}
 
-		public static TableCell GetCellByHeader(TableRow row, string headerText)
+		public static TableCell GetCellByHeader(this TableRow row, string headerText)
 		{
 			var headerRow = row.ContainingTable.TableRows.First();
 			var index = 0;
@@ -65,7 +65,7 @@ namespace AdminInterface.Test.ForTesting
 					if (header.TagName != "TD" && header.TagName != "TH")
 						continue;
 
-					if (header.Text == headerText)
+					if (header.Text.Trim() == headerText)
 						return row.TableCells[index];
 					index++;
 				}

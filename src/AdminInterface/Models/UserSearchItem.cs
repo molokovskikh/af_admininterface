@@ -119,7 +119,7 @@ SELECT
 
 	p.JuridicalName as {{UserSearchItem.JuridicalName}},
 	r.Region as {{UserSearchItem.RegionName}},
-	if(sup.Segment is null, 2, if(sup.Segment = 0, 2, 1)) as {{UserSearchItem.Segment}}
+	if(sup.Segment is null, if(Clients.Segment = 0, 2, 1), if(sup.Segment = 0, 2, 1)) as {{UserSearchItem.Segment}}
 FROM
 	future.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
@@ -170,11 +170,11 @@ GROUP BY {{UserSearchItem.UserId}}
 			switch (segment)
 			{
 				case SearchSegment.Retail: {
-						filter = AddFilterCriteria(filter, " Clients.Segment = 1 ");
+						filter = AddFilterCriteria(filter, " (sup.Segment = 1 or Clients.Segment = 1) ");
 						break;
 					}
 				case SearchSegment.Wholesale: {
-						filter = AddFilterCriteria(filter, " Clients.Segment = 0 ");
+						filter = AddFilterCriteria(filter, " (sup.Segment = 0 or Clients.Segment = 0)");
 						break;
 					}
 			}
