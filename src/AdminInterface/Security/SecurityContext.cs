@@ -14,18 +14,11 @@ namespace AdminInterface.Security
 				throw new Exception("HttpContext не инициализирован");
 
 			var admin = (Administrator)httpContext.Items[AdministratorKey];
-#if !DEBUG
-			admin = (Administrator)httpContext.Session[AdministratorKey];
-#endif
 			if (admin == null)
 			{
 				admin = Administrator.GetByName(httpContext.User.Identity.Name);
 				if (admin != null)
-				{
-					httpContext.Session["UserName"] = admin.UserName;
-					httpContext.Session[AdministratorKey] = admin;
 					httpContext.Items[AdministratorKey] = admin;
-				}
 			}
 
 			return admin;

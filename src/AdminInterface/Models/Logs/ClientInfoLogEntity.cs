@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Web;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -19,8 +20,9 @@ namespace AdminInterface.Models.Logs
 		public ClientInfoLogEntity(string message)
 		{
 			Message = message;
-			UserName = SecurityContext.Administrator.UserName;
-			Administrator = SecurityContext.Administrator;
+			var admin = SecurityContext.Administrator;
+			Administrator = admin;
+			UserName = admin.UserName;
 			WriteTime = DateTime.Now;
 		}
 
