@@ -61,7 +61,7 @@ namespace AdminInterface.Controllers
 						address.Update();
 					}
 				}
-				user.Client.Save();
+				ActiveRecordMediator.Save(user.RootService);
 				scope.VoteCommit();
 			}
 			CancelView();
