@@ -102,8 +102,8 @@ namespace Printer
 					.Queryable
 					.Where(p => p.AutoInvoice == InvoiceType.Auto
 						&& p.PayCycle == invoicePeriod
-							&& p.Recipient != null
-								&& p.Recipient.Id == recipientId);
+						&& p.Recipient != null
+						&& p.Recipient.Id == recipientId);
 
 				foreach (var payer in payers)
 				{
@@ -114,6 +114,9 @@ namespace Printer
 						continue;
 
 					var invoice = new Invoice(payer, period, date);
+					if (invoice.Sum == 0)
+						continue;
+
 					if (payer.InvoiceSettings.PrintInvoice)
 					{
 						using (var scope = new TransactionScope(OnDispose.Rollback))
