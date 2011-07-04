@@ -195,12 +195,10 @@ namespace Functional.Drugstore
 			Client oldClient;
 			Client newClient;
 			uint addressIdForMove = 0;
-			using (new SessionScope())
-			{
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
-				addressIdForMove = oldClient.Addresses[0].Id;
-			}
+			oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			newClient = DataMother.CreateTestClientWithAddressAndUser();
+			addressIdForMove = oldClient.Addresses[0].Id;
+			scope.Flush();
 
 			using (var browser = Open("deliveries/{0}/edit", oldClient.Addresses[0].Id))
 			{
@@ -219,15 +217,12 @@ namespace Functional.Drugstore
 				Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
 			}
 
-			using (new SessionScope())
-			{
-				oldClient.Refresh();
-				newClient.Refresh();
-				var address = Address.Find(addressIdForMove);
-				Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
-				Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
-			}
+			oldClient.Refresh();
+			newClient.Refresh();
+			var address = Address.Find(addressIdForMove);
+			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
+			Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
+			Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
 		}
 
 		[Test, NUnit.Framework.Description("После перемещения адреса доставки, для этого адреса должны быть скопированы записи в таблице AddressesIntersection")]
