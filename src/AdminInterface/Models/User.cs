@@ -89,6 +89,10 @@ namespace AdminInterface.Models
 				WorkRegionMask = Client.MaskRegion;
 				OrderRegionMask = Client.Settings.OrderRegionMask;
 			}
+			else if (service is Supplier)
+			{
+				WorkRegionMask = ulong.MaxValue;
+			}
 		}
 
 		public User(Client client)
