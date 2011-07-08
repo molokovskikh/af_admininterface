@@ -4,6 +4,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Common.MySql;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
 {
@@ -81,87 +82,90 @@ namespace AdminInterface.Models
 
 		public static IList<BillingSearchItem> FindBy(BillingSearchProperties properties)
 		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
-			properties.SearchText = Utils.StringToMySqlString(properties.SearchText);
-			try
+			var detachedSqlQuery = new DetachedSqlQuery();
+			var debitorFilterBlock = "";
+			var searchBlock = "";
+			var groupFilter = "";
+
+			var query = new DetachedSqlQuery();
+			var text = properties.SearchText;
+			switch(properties.SearchBy)
 			{
-				var debitorFilterBlock = "";
-				var searchBlock = "";
-				var groupFilter = "";
+				case SearchBy.Name:
+					searchBlock = String.Format(
+@"(p.ShortName like :searchText
+or p.JuridicalName like :searchText
+or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)");
+					text = "%" + properties.SearchText + "%";
+					break;
+				case SearchBy.Code:
+					searchBlock = "sum(if(cd.Id = :searchText, 1, 0)) > 0";
+					break;
+				case SearchBy.UserId:
+					searchBlock = "sum(if(users.Id = :searchText, 1, 0)) > 0";
+					break;
+				case SearchBy.BillingCode:
+					searchBlock = "p.payerId = :searchText";
+					break;
+			}
+			query.SetParameter("searchText", text);
 
-				switch(properties.SearchBy)
-				{
-					case SearchBy.Name:
-						searchBlock = String.Format(
-@"(p.ShortName like '{0}'
-or p.JuridicalName like '{0}'
-or sum(if(cd.Name like '{0}' or cd.FullName like '{0}', 1, 0)) > 0)", "%" + properties.SearchText + "%");
-						break;
-					case SearchBy.Code:
-						searchBlock = String.Format("sum(if(cd.Id = {0}, 1, 0)) > 0", properties.SearchText);
-						break;
-					case SearchBy.UserId:
-						searchBlock = String.Format("sum(if(users.Id = {0}, 1, 0)) > 0", properties.SearchText);
-						break;
-					case SearchBy.BillingCode:
-						searchBlock = String.Format("p.payerId = {0}", properties.SearchText);
-						break;
-				}
+			switch (properties.PayerState)
+			{
+				case PayerStateFilter.Debitors:
+					debitorFilterBlock = "and p.Balance < 0";
+					break;
+				case PayerStateFilter.NotDebitors:
+					debitorFilterBlock = "and p.oldpaydate >= 0";
+					break;
+			}
 
-				switch (properties.PayerState)
-				{
-					case PayerStateFilter.Debitors:
-						debitorFilterBlock = "and p.Balance < 0";
-						break;
-					case PayerStateFilter.NotDebitors:
-						debitorFilterBlock = "and p.oldpaydate >= 0";
-						break;
-				}
+			switch(properties.Segment)
+			{
+				case SearchSegment.Retail:
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1");
+					break;
+				case SearchSegment.Wholesale:
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0");
+					break;
+			}
 
-				switch(properties.Segment)
-				{
-					case SearchSegment.Retail:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1");
-						break;
-					case SearchSegment.Wholesale:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0");
-						break;
-				}
+			switch(properties.ClientType)
+			{
+				case SearchClientType.Drugstore:
+					groupFilter = AddFilterCriteria(groupFilter, "cd.FirmType = 1");
+					break;
+				case SearchClientType.Supplier:
+					groupFilter = AddFilterCriteria(groupFilter, "s.Id is not null");
+					break;
+			}
 
-				switch(properties.ClientType)
-				{
-					case SearchClientType.Drugstore:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.FirmType = 1");
-						break;
-					case SearchClientType.Supplier:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.FirmType = 0");
-						break;
-				}
+			switch(properties.ClientStatus)
+			{
+				case SearchClientStatus.Enabled:
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 1");
+					break;
+				case SearchClientStatus.Disabled:
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 0");
+					break;
+			}
 
-				switch(properties.ClientStatus)
-				{
-					case SearchClientStatus.Enabled:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 1");
-						break;
-					case SearchClientStatus.Disabled:
-						groupFilter = AddFilterCriteria(groupFilter, "cd.Status = 0");
-						break;
-				}
+			if (properties.RecipientId != 0)
+			{
+				groupFilter = AddFilterCriteria(groupFilter, " p.RecipientId = :recipientId");
+				query.SetParameter("recipientId", properties.RecipientId);
+			}
 
-				if (properties.RecipientId != 0)
-				{
-					groupFilter = AddFilterCriteria(groupFilter, " p.RecipientId = " + properties.RecipientId);
-				}
+			if (properties.RegionId != UInt64.MaxValue)
+			{
+				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
+				query.SetParameter("RegionId", properties.RegionId);
+			}
 
-				//.SetParameter("RegionId", properties.RegionId)
-				if (properties.RegionId != UInt64.MaxValue)
-					groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
+			if (!String.IsNullOrEmpty(groupFilter))
+				searchBlock = AddFilterCriteria(searchBlock, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
-				if (!String.IsNullOrEmpty(groupFilter))
-					searchBlock = AddFilterCriteria(searchBlock, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
-
-				var query = session.CreateSQLQuery(String.Format(@"
+			var sql = String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
 		p.shortname as {{BillingSearchItem.ShortName}},
@@ -194,13 +198,16 @@ where 1 = 1 {0}
 group by p.payerId
 having {1}
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, searchBlock))
-					.AddEntity(typeof(BillingSearchItem));
+", debitorFilterBlock, searchBlock);
 
-				if (properties.RegionId != UInt64.MaxValue)
-					query.SetParameter("RegionId", properties.RegionId);
-
-				var result = query.List<BillingSearchItem>();
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));
+			try
+			{
+				query.Sql = sql;
+				var result = query.GetSqlQuery(session)
+					.AddEntity(typeof(BillingSearchItem))
+					.List<BillingSearchItem>();
 
 				ArHelper.Evict(session, result);
 				return result;

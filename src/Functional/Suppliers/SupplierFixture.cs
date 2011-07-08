@@ -108,6 +108,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
+			Console.WriteLine(browser.Url);
 		}
 
 		[Test]

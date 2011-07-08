@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NUnit.Framework;
+using log4net.Config;
 
 namespace Integration.Models
 {
@@ -36,7 +37,6 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			var payer = supplier.Payer;
 			supplier.Save();
-
 			var items = BillingSearchItem.FindBy(new BillingSearchProperties{
 				SearchBy = SearchBy.BillingCode,
 				SearchText = payer.Id.ToString(),
@@ -49,8 +49,31 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void Search_by_type()
+		{
+			var supplier = DataMother.CreateSupplier();
+			var payer = supplier.Payer;
+			supplier.Save();
+
+			var items = BillingSearchItem.FindBy(new BillingSearchProperties{
+				SearchBy = SearchBy.Name,
+				RegionId = UInt64.MaxValue,
+				ClientType = SearchClientType.Supplier
+			});
+			Assert.That(items.Count, Is.GreaterThan(0));
+			var result = items.FirstOrDefault(i => i.BillingCode == payer.Id);
+			Assert.That(result, Is.Not.Null, "не нашли плательщика {0}", payer.Id);
+		}
+
+		[Test]
 		public void Search_by_recipient_id()
 		{
+			var client = DataMother.TestClient();
+			var payer = client.Payers.First();
+			var recipient = Recipient.Queryable.First();
+			payer.Recipient = recipient;
+			payer.Save();
+
 			var items = BillingSearchItem.FindBy(new BillingSearchProperties{
 				RegionId = UInt64.MaxValue,
 				RecipientId = Recipient.Queryable.First().Id
