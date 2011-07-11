@@ -12,7 +12,7 @@ using Microsoft.Win32;
 
 namespace AdminInterface.Helpers
 {
-	public class Printer
+	public class InternetExplorerPrinterHelper
 	{
 		private TaskScheduler Sta = new StaTaskScheduler(1);
 

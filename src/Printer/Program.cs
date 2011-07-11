@@ -29,7 +29,7 @@ namespace Printer
 				if (args.FirstOrDefault() == "print")
 				{
 					var printer = args[2];
-					AdminInterface.Helpers.Printer.SetPrinter(printer);
+					AdminInterface.Helpers.InternetExplorerPrinterHelper.SetPrinter(printer);
 
 					var brail = StandaloneInitializer.Init();
 
@@ -76,7 +76,7 @@ namespace Printer
 				var acts = Act.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName).ToArray();
 				foreach (var act in acts)
 				{
-					new AdminInterface.Helpers.Printer().PrintView(brail,
+					new AdminInterface.Helpers.InternetExplorerPrinterHelper().PrintView(brail,
 						"Acts/Print",
 						"Print",
 						new Dictionary<string, object> {
@@ -127,7 +127,7 @@ namespace Printer
 							scope.VoteCommit();
 						}
 
-						new AdminInterface.Helpers.Printer().PrintView(brail,
+						new AdminInterface.Helpers.InternetExplorerPrinterHelper().PrintView(brail,
 							"Invoices/Print",
 							"Print",
 							new Dictionary<string, object> {

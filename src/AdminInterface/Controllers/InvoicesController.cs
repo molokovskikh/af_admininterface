@@ -202,54 +202,8 @@ namespace AdminInterface.Controllers
 
 		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate, uint recipientId)
 		{
-/*			var invoicePeriod = InvoicePeriod.Month;
-			if (period == Period.FirstQuarter ||
-				period == Period.SecondQuarter ||
-				period == Period.FirstQuarter ||
-				period == Period.FourthQuarter)
-				invoicePeriod = InvoicePeriod.Quarter;*/
-
-/*
-			var payers = ActiveRecordLinqBase<Payer>
-				.Queryable
-				.Where(p => p.AutoInvoice == InvoiceType.Auto && p.PayCycle == invoicePeriod);
-*/
-
-			//Printer.SetPrinter(printer);
-
-/*
-			foreach (var payer in payers)
-			{
-				if (!payer.JuridicalOrganizations.Any(j => j.Recipient != null))
-					continue;
-
-				if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
-					continue;
-
-				var invoice = new Invoice(payer, period);
-				invoice.Send(this);
-				invoice.Save();
-			}
-*/
-
-			var printerPath = @"U:\Apps\Printer\Printer.exe";
-#if DEBUG
-			printerPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\Printer.exe");
-#endif
-			var info = new ProcessStartInfo(printerPath,
-				String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId)) {
-					UseShellExecute = false,
-					CreateNoWindow = true,
-					RedirectStandardError = true,
-					RedirectStandardInput = true,
-					RedirectStandardOutput = true
-				};
-			var process = System.Diagnostics.Process.Start(info);
-			process.OutputDataReceived += (sender, args) => {};
-			process.ErrorDataReceived += (sender, args) => {};
-			process.BeginErrorReadLine();
-			process.BeginOutputReadLine();
-			process.WaitForExit(30*1000);
+			var arguments = String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId);
+			Printer.Execute(arguments);
 
 			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
 			RedirectToAction("Index",

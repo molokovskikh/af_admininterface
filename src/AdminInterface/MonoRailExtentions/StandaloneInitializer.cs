@@ -11,8 +11,11 @@ namespace AdminInterface.MonoRailExtentions
 {
 	public class StandaloneInitializer
 	{
-		public static IViewEngineManager Init()
+		public static IViewEngineManager Init(Assembly assembly = null)
 		{
+			if (assembly == null)
+				assembly = Assembly.GetEntryAssembly();
+
 			ActiveRecordStarter.Initialize(
 				new[] {
 					Assembly.Load("AdminInterface"),
@@ -24,7 +27,6 @@ namespace AdminInterface.MonoRailExtentions
 			config.ViewEngineConfig.ViewEngines.Add(new ViewEngineInfo(typeof(BooViewEngine), false));
 
 			var loader = new FileAssemblyViewSourceLoader("");
-			var assembly = Assembly.GetEntryAssembly();
 			loader.AddAssemblySource(new AssemblySourceInfo(assembly, assembly.GetName().Name + ".Views"));
 
 			var provider = new FakeServiceProvider();

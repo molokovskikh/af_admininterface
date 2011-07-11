@@ -15,12 +15,12 @@ namespace Integration
 		[Test]
 		public void Print()
 		{
-			var print = new Printer();
+/*			var print = new Printer();
 			var invoice = new Invoice{
 				Payer = new Payer(),
 				Recipient = new Recipient(),
 				Sum = 800
-			};
+			};*/
 			//print.Print(MailerFixture.GetViewManager(), invoice);
 		}
 	}

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
 using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -74,14 +75,8 @@ namespace AdminInterface.Controllers
 			if (Form["print"] != null)
 			{
 				var printer = Form["printer"];
-				var path = @"U:\Apps\Printer\";
-#if DEBUG
-				path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\Printer\bin\debug\");
-#endif
-				var info = new ProcessStartInfo(Path.Combine(path, "Printer.exe"),
-					String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id.ToString())));
-				var process = System.Diagnostics.Process.Start(info);
-				process.WaitForExit(30*1000);
+				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id.ToString()));
+				Printer.Execute(arguments);
 				Flash["message"] = "Отправлено на печать";
 				RedirectToReferrer();
 			}

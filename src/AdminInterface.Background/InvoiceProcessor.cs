@@ -38,7 +38,7 @@ namespace AdminInterface.Background
 
 		public void DoStart()
 		{
-			StandaloneInitializer.Init();
+			StandaloneInitializer.Init(typeof(InvoiceProcessor).Assembly);
 			Start();
 		}
 
