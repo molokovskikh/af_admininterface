@@ -41,6 +41,7 @@ namespace Functional
 			client.UpdateAndFlush();
 			address = client.Addresses[0];
 			Open(payer);
+			browser.WaitUntilContainsText("Плательщик", 2);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 		}
 
