@@ -705,8 +705,8 @@ namespace Functional.Drugstore
 			var client = DataMother.TestClient();
 			using (var browser = Open(String.Format("client/{0}", client.Id)))
 			{
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				browser.Link("addPersonLink" + client.Id).Click();
+				Click("Новый пользователь");
+				browser.Link("addPersonLink").Click();
 				browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
 				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");

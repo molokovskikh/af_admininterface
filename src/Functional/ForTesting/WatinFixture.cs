@@ -2,8 +2,10 @@
 using System.Configuration;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord;
+using Common.Tools.Calendar;
 using NUnit.Framework;
 using WatiN.Core;
+using WatiN.Core.UtilityClasses;
 
 namespace Functional.ForTesting
 {
@@ -96,6 +98,11 @@ namespace Functional.ForTesting
 					this.browser.Dispose();
 
 				this.browser = browser;
+
+				new TryFuncUntilTimeOut(2.Second()) {
+						SleepTime = TimeSpan.FromMilliseconds(50.0),
+						ExceptionMessage = () => string.Format("waiting {0} seconds for document text not null.", 2)
+					}.Try<bool>(() => browser.Text != null);
 			}
 			return browser;
 		}
