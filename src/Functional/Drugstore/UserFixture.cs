@@ -20,11 +20,13 @@ namespace Functional.Drugstore
 	{
 		private Client client;
 		private User user;
+		private DrugstoreSettings settings;
 
 		[SetUp]
 		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
+			settings = client.Settings;
 			user = client.Users.First();
 			scope.Flush();
 
@@ -205,21 +207,17 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 
-			using(new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.That(client.Users.Count, Is.EqualTo(2));
-				var user = client.Users.Single();
-				Assert.That(user.Name, Is.EqualTo("test"));
-				var updateInfo = UserUpdateInfo.Find(user.Id);
-				Assert.That(updateInfo, Is.Not.Null);
+			client.Refresh();
+			Assert.That(client.Users.Count, Is.EqualTo(2));
+			var user = client.Users.OrderBy(u => u.Id).Last();
+			Assert.That(user.Name, Is.EqualTo("test"));
+			Assert.That(user.UserUpdateInfo, Is.Not.Null);
 
-				var userPriceCount = user.GetUserPriceCount();
-				var intersecionCount = client.GetIntersectionCount();
+			var userPriceCount = user.GetUserPriceCount();
+			var intersecionCount = client.GetIntersectionCount();
 
-				Assert.That(userPriceCount, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
-				Assert.That(userPriceCount, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
-			}
+			Assert.That(userPriceCount, Is.GreaterThan(0), "не создали записей в UserPrices, у пользователя ни один прайс не включен");
+			Assert.That(userPriceCount, Is.EqualTo(intersecionCount), "не совпадает кол-во записей в intersection и в UserPrices для данного клиента");
 		}
 
 		[Test]
@@ -419,14 +417,11 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				var group = client.Users[0].ContactGroup;
-				browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
-				browser.Button(Find.ByValue("Сохранить")).Click();
-			}
 
+			user.Refresh();
+			var group = user.ContactGroup;
+			browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
+			browser.Button(Find.ByValue("Сохранить")).Click();
 			// Проверка, что контактная запись удалена
 			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
@@ -443,13 +438,11 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				var group = client.Users[0].ContactGroup;
-				browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
-				browser.Button(Find.ByValue("Сохранить")).Click();
-			}
+
+			user.Refresh();
+			var group = user.ContactGroup;
+			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
+			browser.Button(Find.ByValue("Сохранить")).Click();
 			// Проверка, что контактная запись удалена
 			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
@@ -462,16 +455,14 @@ namespace Functional.Drugstore
 			var applyButtonText = "Сохранить";
 			Open(user, "Edit");
 			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				var group = client.Users[0].ContactGroup;
-				browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			}
+
+			user.Refresh();
+			var group = user.ContactGroup;
+			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			// Проверка, что контактная запись изменена
-			var persons = ContactInformationFixture.GetPersons(client.Users[0].ContactGroup);
+			var persons = ContactInformationFixture.GetPersons(user.ContactGroup);
 			Assert.That(persons.Count, Is.EqualTo(1));
 			Assert.That(persons[0], Is.EqualTo("Test person changed"));
 		}
@@ -479,74 +470,58 @@ namespace Functional.Drugstore
 		[Test]
 		public void TestUserRegions()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-
-			var user = client.Users[0];
-			var setting = DrugstoreSettings.Find(client.Id);
-
 			client.MaskRegion = 7;
 			client.Save();
-			setting.OrderRegionMask = 7;
-			setting.Save();
+			settings.OrderRegionMask = 7;
+			settings.Save();
 			user.WorkRegionMask = 2;
 			user.OrderRegionMask = 1;
 			user.Save();
+			scope.Flush();
 
-			using (var browser = Open("users/{0}/edit", user.Id))
-			{
-				Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
-				Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
-				Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
-				Assert.IsFalse(browser.CheckBox("WorkRegions[3]").Exists);
+			Open(user, "Edit");
+			Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
+			Assert.IsFalse(browser.CheckBox("WorkRegions[1]").Checked);
+			Assert.IsFalse(browser.CheckBox("WorkRegions[2]").Checked);
+			Assert.IsFalse(browser.CheckBox("WorkRegions[3]").Exists);
 
-				Assert.IsFalse(browser.CheckBox("OrderRegions[0]").Checked);
-				Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Checked);
-				Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Checked);
-				Assert.IsFalse(browser.CheckBox("OrderRegions[3]").Exists);
+			Assert.IsFalse(browser.CheckBox("OrderRegions[0]").Checked);
+			Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Checked);
+			Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Checked);
+			Assert.IsFalse(browser.CheckBox("OrderRegions[3]").Exists);
 
-				browser.CheckBox("WorkRegions[1]").Checked = true;
-				browser.CheckBox("OrderRegions[0]").Checked = true;
-				browser.Button(Find.ByValue("Сохранить")).Click();
+			browser.CheckBox("WorkRegions[1]").Checked = true;
+			browser.CheckBox("OrderRegions[0]").Checked = true;
+			browser.Button(Find.ByValue("Сохранить")).Click();
 
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					user = client.Users[0];
-				}
-				Assert.AreEqual(3, user.WorkRegionMask);
-				Assert.AreEqual(3, user.OrderRegionMask);
+			user.Refresh();
+			Assert.AreEqual(3, user.WorkRegionMask);
+			Assert.AreEqual(3, user.OrderRegionMask);
 
-				browser.CheckBox("WorkRegions[1]").Checked = false;
-				browser.CheckBox("OrderRegions[0]").Checked = false;
-				browser.Button(Find.ByValue("Сохранить")).Click();
+			browser.CheckBox("WorkRegions[1]").Checked = false;
+			browser.CheckBox("OrderRegions[0]").Checked = false;
+			browser.Button(Find.ByValue("Сохранить")).Click();
 
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					user = client.Users[0];
-				}
-				Assert.AreEqual(2, user.WorkRegionMask);
-				Assert.AreEqual(1, user.OrderRegionMask);
+			user.Refresh();
+			Assert.AreEqual(2, user.WorkRegionMask);
+			Assert.AreEqual(1, user.OrderRegionMask);
 
-				client.MaskRegion = 31;
-				client.Save();
-				setting.OrderRegionMask = 3;
-				setting.Save();
+			client.MaskRegion = 31;
+			client.Save();
+			settings.OrderRegionMask = 3;
+			settings.Save();
 
-				browser.Refresh();
-				Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
-				Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
-				Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);
-				Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
-				Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
-			}
+			Refresh();
+			Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
+			Assert.IsTrue(browser.CheckBox("WorkRegions[4]").Exists);
+			Assert.IsFalse(browser.CheckBox("WorkRegions[5]").Exists);
+			Assert.IsFalse(browser.CheckBox("OrderRegions[2]").Exists);
+			Assert.IsTrue(browser.CheckBox("OrderRegions[1]").Exists);
 		}
 
 		[Test]
 		public void TestRegionsByCreatingNewUser()
 		{
-			var client = DataMother.TestClient();
-			var drugstore = DrugstoreSettings.Find(client.Id);
 			// Id-шники регионов
 			var browseRegions = new ulong[] { 1, 8, 16, 256 };
 			var orderRegions = new ulong[] { 1, 8, 256 };
@@ -554,44 +529,43 @@ namespace Functional.Drugstore
 			client.MaskRegion = 0;
 			foreach (var region in browseRegions)
 				client.MaskRegion |= region;
-			client.SaveAndFlush();
+			client.Save();
 			foreach (var region in browseRegions)
-				drugstore.WorkRegionMask |= region;
+				settings.WorkRegionMask |= region;
 			foreach (var region in orderRegions)
-				drugstore.OrderRegionMask |= region;
-			drugstore.SaveAndFlush();
+				settings.OrderRegionMask |= region;
+			settings.Save();
+			scope.Flush();
 
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
-			{
-				browser.Link(Find.ByText("Новый пользователь")).Click();
-				Thread.Sleep(2000);
-				Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
-				// Указанные регионы для обзора и для заказа должны быть выделены
-				foreach (var region in browseRegions)
-					Assert.IsTrue(browser.CheckBox(Find.ById("browseRegion" + region)).Checked);
-				foreach (var region in orderRegions)
-					Assert.IsTrue(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
-				// Если регион помечен только для обзора, то галка "Для заказа" должна быть снята
-				var diff = browseRegions.Where(region => !orderRegions.Contains(region));
-				foreach (var region in diff)
-					Assert.IsFalse(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
-				// Снимаем галку "В обзоре" (должна также сняться галка "Доступен для заказа")
-				// и регистрируем нового пользователя
-				browser.CheckBox(Find.ById("browseRegion" + browseRegions[0])).Checked = false;
-				browser.TextField(Find.ByName("user.Name")).TypeText("User for test regions");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Uri.AbsolutePath.Contains("report.aspx"));
-				var login = Helper.GetLoginFromRegistrationCard(browser);				
-				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-				browser.Refresh();
-				browser.Link(Find.ByText(login.ToString())).Click();
-				Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", login)));
-				// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
-				for (var i = 1; i < browseRegions.Length; i++)
-					Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("WorkRegions[{0}]", i))).Checked);
-				for (var i = 1; i < orderRegions.Length; i++)
-					Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("OrderRegions[{0}]", i))).Checked);
-			}
+			browser.Link(Find.ByText("Новый пользователь")).Click();
+			Thread.Sleep(2000);
+			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
+			// Указанные регионы для обзора и для заказа должны быть выделены
+			foreach (var region in browseRegions)
+				Assert.IsTrue(browser.CheckBox(Find.ById("browseRegion" + region)).Checked);
+			foreach (var region in orderRegions)
+				Assert.IsTrue(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
+			// Если регион помечен только для обзора, то галка "Для заказа" должна быть снята
+			var diff = browseRegions.Where(region => !orderRegions.Contains(region));
+			foreach (var region in diff)
+				Assert.IsFalse(browser.CheckBox(Find.ById("orderRegion" + region)).Checked);
+			// Снимаем галку "В обзоре" (должна также сняться галка "Доступен для заказа")
+			// и регистрируем нового пользователя
+			browser.CheckBox(Find.ById("browseRegion" + browseRegions[0])).Checked = false;
+			browser.TextField(Find.ByName("user.Name")).TypeText("User for test regions");
+			browser.Button(Find.ByValue("Создать")).Click();
+			
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта "));
+			var login = Helper.GetLoginFromRegistrationCard(browser);
+			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
+			browser.Refresh();
+			browser.Link(Find.ByText(login.ToString())).Click();
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", login)));
+			// Проверяем, чтобы были доступны нужные регионы. Берем с первого региона, т.к. галку с нулевого сняли
+			for (var i = 1; i < browseRegions.Length; i++)
+				Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("WorkRegions[{0}]", i))).Checked);
+			for (var i = 1; i < orderRegions.Length; i++)
+				Assert.IsTrue(browser.CheckBox(Find.ById(String.Format("OrderRegions[{0}]", i))).Checked);
 		}
 
 		[Test]
@@ -628,28 +602,20 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.That(client.Users.Count, Is.EqualTo(1));
-				Assert.That(client.Addresses.Count, Is.EqualTo(1));
-				Assert.That(client.Users[0].AvaliableAddresses.Count, Is.EqualTo(1));
-				var address = client.Addresses[0];
-				Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(1));
-				Assert.IsTrue(address.AvaliableFor(client.Users[0]));
+			client.Refresh();
+			Assert.That(client.Users.Count, Is.EqualTo(2));
+			Assert.That(client.Addresses.Count, Is.EqualTo(1));
+			var createdUser = client.Users.OrderBy(u => u.Id).Last();
+			Assert.That(createdUser.AvaliableAddresses.Count, Is.EqualTo(1));
+			var createdAddress = client.Addresses.OrderBy(a => a.Id).Last();
+			Assert.That(createdAddress.AvaliableForUsers.Count, Is.EqualTo(1));
+			Assert.IsTrue(createdAddress.AvaliableFor(createdUser));
 
-				var addressIntersection = ArHelper.WithSession(s => s.CreateSQLQuery(
-					"select * from future.AddressIntersection where AddressId = :id")
-						.SetParameter("id", address.Id)
-						.List());
-				Assert.That(addressIntersection.Count, Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
-			}
+			Assert.That(createdAddress.GetAddressIntersectionCount(), Is.GreaterThan(0), "Не найдено записей в AddressIntersection");
 		}
 
 		private void RegisterUserWithAddress(Client client, IElementContainer browser)
 		{
-			Assert.That(client.Addresses, Is.Null.Or.Empty);
-			Assert.That(client.Users, Is.Null.Or.Empty);
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
@@ -672,11 +638,9 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 
-			using(new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.That(client.Addresses[0].LegalEntity.Name, Is.EqualTo("Тестовая организация 2"));
-			}
+			client.Refresh();
+			var createdAddress = client.Addresses.OrderBy(a => a.Id).Last();
+			Assert.That(createdAddress.LegalEntity.Name, Is.EqualTo("Тестовая организация 2"));
 		}
 
 		[Test]

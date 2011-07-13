@@ -193,7 +193,8 @@ namespace AdminInterface.Models
 			Table = "OfferMatrixSuppliers",
 			Schema = "Usersettings",
 			ColumnKey = "ClientId",
-			ColumnRef = "SupplierId")]
+			ColumnRef = "SupplierId",
+			Lazy = true)]
 		public virtual IList<Supplier> OfferMatrixExcludes { get; set; }
 	}
 }
