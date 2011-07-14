@@ -247,27 +247,37 @@ namespace AdminInterface.Helpers
 		public string Sortable(string name, string key)
 		{
 			var sorted = false;
-			if (ControllerContext.PropertyBag["SortBy"] != null)
-				sorted = ControllerContext.PropertyBag["SortBy"].ToString()
-					.Equals(key, StringComparison.OrdinalIgnoreCase);
+			var sortedBy = ControllerContext.PropertyBag["SortBy"] as string;
+			var sortedDirection = ControllerContext.PropertyBag["Direction"] as string;
 
-			var direction = "asc";
+			var sortable = ControllerContext.PropertyBag
+				.Values.OfType<Sortable>().FirstOrDefault();
 
-			if (sorted &&
-				ControllerContext.PropertyBag["Direction"].ToString().Equals("asc", StringComparison.OrdinalIgnoreCase))
-				direction = "desc";
+			var sortByName = "SortBy";
+			var sortByDirection = "Direction";
 
-			var uriParams = "";
-			if (ControllerContext.PropertyBag["filter"] != null)
+			if (sortable != null)
 			{
-				var contributor = ControllerContext.PropertyBag["filter"] as SortableContributor;
-				if (contributor != null)
-				{
-					uriParams = contributor.GetUri();
-				}
+				var prefix = "filter.";
+				sortedBy = sortable.SortBy;
+				sortedDirection = sortable.SortDirection;
+				sortByName = prefix + "SortBy";
+				sortByDirection = prefix + "SortDirection";
 			}
 
-			var querystring = String.Format("SortBy={0}&Direction={1}", key, direction);
+			sorted = String.Equals(sortedBy, key, StringComparison.OrdinalIgnoreCase);
+			if (sorted &&
+				String.Equals(sortedDirection, "asc", StringComparison.OrdinalIgnoreCase))
+				sortedDirection = "desc";
+			else
+				sortedDirection = "asc";
+
+			var uriParams = "";
+			var contributor = ControllerContext.PropertyBag["filter"] as SortableContributor;
+			if (contributor != null)
+				uriParams = contributor.GetUri();
+
+			var querystring = String.Format("{2}={0}&{3}={1}", key, sortedDirection, sortByName, sortByDirection);
 			if (!String.IsNullOrEmpty(uriParams))
 				querystring += "&" + uriParams;
 
@@ -282,7 +292,7 @@ namespace AdminInterface.Helpers
 
 			var clazz = "";
 			if (sorted)
-				clazz = "sort " + direction;
+				clazz = "sort " + sortedDirection;
 
 			return String.Format("<a href='{1}' class='{2}'>{0}</a>", name, url, clazz);
 		}

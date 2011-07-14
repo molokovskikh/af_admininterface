@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
@@ -9,54 +10,9 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui.Helpers;
-using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers
 {
-	public class PaymentFilter
-	{
-		public Recipient Recipient { get; set; }
-		public DatePeriod Period { get; set; }
-		public string SearchText { get; set; }
-		public bool ShowOnlyUnknown { get; set; }
-
-		public PaymentFilter()
-		{
-			Period = new DatePeriod {
-				Begin = DateTime.Today,
-				End = DateTime.Today
-			};
-		}
-
-		public List<Recipient> Recipients
-		{
-			get { return Recipient.Queryable.OrderBy(r => r.Name).ToList(); }
-		}
-
-		public List<Payment> Find()
-		{
-			var criteria = DetachedCriteria.For<Payment>()
-				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Lt("PayedOn", Period.End.AddDays(1)));
-
-			if (Recipient != null)
-				criteria.Add(Expression.Eq("Recipient", Recipient));
-
-			if (ShowOnlyUnknown)
-				criteria.Add(Expression.IsNull("Payer"));
-
-			if (!String.IsNullOrWhiteSpace(SearchText))
-			{
-				criteria.CreateAlias("Payer", "p");
-				criteria.Add(Expression.Like("p.Name", SearchText));
-			}
-
-			return ArHelper.WithSession(s =>
-				criteria.GetExecutableCriteria(s)
-					.List<Payment>()).ToList();
-		}
-	}
-
 	public class PaymentStatistics
 	{
 		public PaymentStatistics(List<Payment> payments)

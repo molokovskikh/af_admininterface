@@ -78,8 +78,8 @@
 			<tr>
 				<th></th>
 				<th>${app.Sortable("№", "Id")}</th>
-				<th>${app.Sortable("Договор", "payerId")}</th>
-				<th>${app.Sortable("Получатель платежей", "recipient")}</th>
+				<th>${app.Sortable("Договор", "Payer")}</th>
+				<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
 				<th>${app.Sortable("Плательщик", "payer")}</th>
 				<th>${app.Sortable("Сумма счета", "sum")}</th>
 				<th>${app.Sortable("За период", "period")}</th>

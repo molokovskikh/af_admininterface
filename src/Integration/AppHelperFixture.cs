@@ -199,5 +199,27 @@ namespace Integration
 				+ "<option value=2>Test2</option>"
 				+ "</select>"));
 		}
+
+		public class TestSortable : Sortable, SortableContributor
+		{
+			public int Filter { get; set; }
+
+			public string GetUri()
+			{
+				return "filter.Filter=" + Filter;
+			}
+		}
+
+		[Test]
+		public void Sortable_support()
+		{
+			context.CurrentControllerContext.PropertyBag["filter"] = new TestSortable {
+				SortBy = "test",
+				SortDirection = "asc",
+				Filter = 1
+			};
+			var link = helper.Sortable("test", "test");
+			Assert.That(link, Is.EqualTo("<a href='/home/index?filter.SortBy=test&filter.SortDirection=desc&filter.Filter=1' class='sort desc'>test</a>"));
+		}
 	}
 }
