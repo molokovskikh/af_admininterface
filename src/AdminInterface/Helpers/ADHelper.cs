@@ -249,6 +249,11 @@ namespace AdminInterface.Helpers
 
 		public static bool[,] GetLogonHours(string login)
 		{
+#if DEBUG
+			var entity = FindDirectoryEntry(login);
+			if (entity == null)
+				return new bool[7, 24];
+#endif
 			var entry = GetDirectoryEntry(login);
 			var week = new List<bool>();
 			var logonHours = (byte[]) entry.Properties["logonHours"].Value;
@@ -395,6 +400,11 @@ namespace AdminInterface.Helpers
 
 		public static IList<string> GetAccessibleComputers(string login)
 		{
+#if DEBUG
+			var entity = FindDirectoryEntry(login);
+			if (entity == null)
+				return Enumerable.Empty<string>().ToList();
+#endif
 			var computers = new List<string>();
 			var user = GetDirectoryEntry(login);
 			var workstations = user.Properties["userWorkstations"];

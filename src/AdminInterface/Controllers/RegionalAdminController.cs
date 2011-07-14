@@ -18,7 +18,6 @@ using Controller = AdminInterface.MonoRailExtentions.Controller;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("GeneralWithJQuery"),
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.ManageAdministrators)
@@ -43,10 +42,11 @@ namespace AdminInterface.Controllers
 		public void Add()
 		{
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
+			PropertyBag["administrator"] = new Administrator();
 			PropertyBag["permissions"] = Permission.FindAll();
 			PropertyBag["computers"] = ADHelper.GetDomainComputers();
 			PropertyBag["regions"] = regions;
-			PropertyBag["avaliableComputers"] = _avaliableComputers;
+			PropertyBag["accessibleComputers"] = _avaliableComputers;
 			PropertyBag["days"] = _weekDays;
 			PropertyBag["logonHours"] = _defaultLogonHours;
 		}
@@ -104,6 +104,7 @@ namespace AdminInterface.Controllers
 		{
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			var admin = Administrator.GetById(id);
+			PropertyBag["administrator"] = admin;
 			PropertyBag["permissions"] = Permission.FindAll();
 			PropertyBag["computers"] = ADHelper.GetDomainComputers();
 			PropertyBag["accessibleComputers"] = ADHelper.GetAccessibleComputers(admin.UserName);

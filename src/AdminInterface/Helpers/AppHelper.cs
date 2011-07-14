@@ -22,6 +22,22 @@ namespace AdminInterface.Helpers
 {
 	public class AppHelper : AbstractHelper
 	{
+		private FormHelper _helper;
+
+		private FormHelper helper
+		{
+			get
+			{
+				if (_helper == null)
+					_helper = ControllerContext.Helpers.Values.OfType<FormHelper>().FirstOrDefault();
+
+				if (_helper == null)
+					_helper = new FormHelper(Context);
+
+				return _helper;
+			}
+		}
+
 		public AppHelper()
 		{}
 
@@ -40,7 +56,8 @@ namespace AdminInterface.Helpers
 
 		public string GetValidationError(object item, string name)
 		{
-			var errorSummary = ((SmartDispatcherController)Controller).Binder.GetValidationSummary(item);
+			var binder = ((SmartDispatcherController)Controller).Binder;
+			var errorSummary = binder.GetValidationSummary(item);
 
 			if (item is ActiveRecordValidationBase)
 				errorSummary = FromBaseClass((ActiveRecordValidationBase)item);
@@ -73,7 +90,6 @@ namespace AdminInterface.Helpers
 
 		public string Edit(string name, object options)
 		{
-			var helper = new FormHelper(Context);
 			var type = GetValueType(name);
 			var value = GetValue(name);
 			if (type == typeof(bool))
@@ -288,7 +304,6 @@ namespace AdminInterface.Helpers
 
 		public string Form(string url, IDictionary parameters = null)
 		{
-			var helper = new FormHelper(Context);
 			var result = new StringBuilder();
 			result.AppendFormat(helper.FormTag(url, parameters));
 
@@ -334,10 +349,9 @@ namespace AdminInterface.Helpers
 
 		private string GetEdit(string name, Type valueType, dynamic value, object options)
 		{
-			var helper = new FormHelper(Context);
 			if (valueType == typeof(string))
 			{
-				return helper.TextField(name);
+				return helper.TextField(name, options as IDictionary);
 			}
 			else if (typeof(bool).IsAssignableFrom(valueType))
 			{
@@ -552,7 +566,6 @@ namespace AdminInterface.Helpers
 
 		public string EndFormFor(object filter)
 		{
-			var helper = new FormHelper(Context);
 			return String.Format(@"
 			<tr>
 				<td></td>

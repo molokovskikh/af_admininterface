@@ -27,23 +27,28 @@ namespace AdminInterface.Models.Security
 	}
 
 	[ActiveRecord("Regionaladmins", Schema = "accessright", Lazy = false)]
-	public class Administrator
+	public class Administrator : ActiveRecordLinqBase<Administrator>
 	{
 		public static Func<string> GetHost = () => HttpContext.Current.Request.UserHostAddress;
+
+		public Administrator()
+		{
+			AllowedPermissions = new List<Permission>();
+		}
 
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string UserName { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string Email { get; set; }
 
 		[Property]
 		public ulong RegionMask { get; set; }
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string ManagerName { get; set; }
 
 		public string Name
@@ -51,7 +56,7 @@ namespace AdminInterface.Models.Security
 			get { return ManagerName; }
 		}
 
-		[Property]
+		[Property, ValidateNonEmpty]
 		public string PhoneSupport { get; set; }
 
 		[Property]

@@ -425,6 +425,7 @@
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Views\RegionalAdmin\AdminEditor.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
   </ItemGroup>
   <ItemGroup>
