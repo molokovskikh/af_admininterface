@@ -1,0 +1,22 @@
+import System.IO
+import System.Reflection
+import Common.Tools from "src/AdminInterface/bin/Common.Tools.dll"
+import System.Security.Principal
+import Castle.ActiveRecord
+import AdminInterface.Models
+import file from Tools.boo
+
+task @CreateFtpDirectories, [@InitActiveRecord]:
+	using SessionScope():
+		root = """\\adc.analit.net\Inforoom\AptBox\"""
+		user, password = AskCredentials("user for create directory in $root:")
+		token = Win32.LogonUser(user, password, "analit")
+		totalCreated = 0
+		using WindowsIdentity.Impersonate(token):
+			for address in Address.FindAll():
+				path = Path.Combine(root, address.Id.ToString())
+				if not Directory.Exists(path):
+					address.CreateFtpDirectory(path)
+					totalCreated++
+					print "created for ${address.Id}"
+		print "total created directories $totalCreated"
