@@ -80,10 +80,10 @@
 				<th>${app.Sortable("№", "Id")}</th>
 				<th>${app.Sortable("Договор", "Payer")}</th>
 				<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
-				<th>${app.Sortable("Плательщик", "payer")}</th>
-				<th>${app.Sortable("Сумма счета", "sum")}</th>
-				<th>${app.Sortable("За период", "period")}</th>
-				<th>${app.Sortable("Дата", "date")}</th>
+				<th>${app.Sortable("Плательщик", "PayerName")}</th>
+				<th>${app.Sortable("Сумма счета", "Sum")}</th>
+				<th>${app.Sortable("За период", "Period")}</th>
+				<th>${app.Sortable("Дата", "Date")}</th>
 				<th></th>
 			</tr>
 			<% for i, invoice in enumerate(invoices): %>

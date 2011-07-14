@@ -87,12 +87,12 @@
 					</th>
 					<th style="width:1%"></th>
 					<th>${app.Sortable("№", "Id")}</th>
-					<th>${app.Sortable("Договор", "payerId")}</th>
+					<th>${app.Sortable("Договор", "Payer")}</th>
 					<th>${app.Sortable("Получатель платежей", "recipient")}</th>
-					<th>${app.Sortable("Плательщик", "payer")}</th>
-					<th>${app.Sortable("Сумма", "sum")}</th>
-					<th>${app.Sortable("За период", "period")}</th>
-					<th>${app.Sortable("Дата", "date")}</th>
+					<th>${app.Sortable("Плательщик", "PayerName")}</th>
+					<th>${app.Sortable("Сумма", "Sum")}</th>
+					<th>${app.Sortable("За период", "Period")}</th>
+					<th>${app.Sortable("Дата", "Date")}</th>
 					<th></th>
 				</tr>
 				<% for i, act in enumerate(acts): %>
