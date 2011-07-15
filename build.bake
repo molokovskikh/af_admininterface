@@ -16,7 +16,7 @@ import System.Xml.XPath.Extensions from System.Xml.Linq
 import System.ComponentModel
 import System.Runtime.InteropServices
 import System.Security.Principal
-import file from Db.bake
+import file from Db.boo
 import file from DbShell.bake
 
 [DllImport("advapi32.dll", SetLastError: true, CharSet: CharSet.Unicode)]

@@ -4,50 +4,11 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
-using Common.Tools;
 using Common.Web.Ui.Helpers;
 using log4net;
-using log4net.Config;
-using Topshelf.Configuration.Dsl;
-using Topshelf.Shelving;
 
 namespace AdminInterface.Background
 {
-	public class Bootstrapper : Bootstrapper<Waiter>
-	{
-		public void InitializeHostedService(IServiceConfigurator<Waiter> cfg)
-		{
-			XmlConfigurator.Configure();
-			cfg.HowToBuildService(n => new Waiter());
-			cfg.WhenStarted(s => s.DoStart());
-			cfg.WhenStopped(s => s.Stop());
-		}
-	}
-
-	public class Waiter : RepeatableCommand
-	{
-		private static ILog log = LogManager.GetLogger(typeof(Waiter));
-
-		public Waiter()
-		{
-			Delay = (int)TimeSpan.FromHours(1).TotalMilliseconds;
-			Action = () => {
-				new InvoiceProcessor().Process();
-			};
-		}
-
-		public void DoStart()
-		{
-			StandaloneInitializer.Init(typeof(InvoiceProcessor).Assembly);
-			Start();
-		}
-
-		public override void Error(Exception e)
-		{
-			log.Error(e);
-		}
-	}
-
 	public class InvoiceProcessor
 	{
 		private static ILog _log = LogManager.GetLogger(typeof(InvoiceProcessor));

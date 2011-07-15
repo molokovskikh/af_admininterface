@@ -21,7 +21,8 @@ namespace AdminInterface.Background
 				var payers = ActiveRecordLinq.AsQueryable<Payer>()
 					.Where(p => p.SendPaymentNotification && p.Balance < 0)
 					.ToList();
-				foreach (var user in payers.SelectMany(p => p.Users))
+				var usersForNotification = payers.SelectMany(p => p.Users).Where(u => u.Client != null);
+				foreach (var user in usersForNotification)
 				{
 					var message = UserMessage.Find(user.Id);
 					message.ShowMessageCount = 4;

@@ -136,6 +136,7 @@
     <Compile Include="Models\ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="ForTesting\IntegrationFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />
+    <Compile Include="Models\JobFixture.cs" />
     <Compile Include="Models\MaintainerFixture.cs" />
     <Compile Include="Models\OrderFilterFixture.cs" />
     <Compile Include="Models\OrdersViewFixture.cs" />
@@ -150,10 +151,15 @@
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
+    <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
     <Compile Include="ScopeFixture.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\AdminInterface.Background\AdminInterface.Background.csproj">
+      <Project>{A5FA2D6E-1E63-41CA-871C-1B64FEC53A8C}</Project>
+      <Name>AdminInterface.Background</Name>
+    </ProjectReference>
     <ProjectReference Include="..\AdminInterface\AdminInterface.csproj">
       <Project>{656DA754-EAFC-4A6B-8183-0F1AAE8D6D60}</Project>
       <Name>AdminInterface</Name>
