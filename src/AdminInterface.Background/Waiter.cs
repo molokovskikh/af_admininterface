@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using AdminInterface.MonoRailExtentions;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Tools.Calendar;
 using Integration.Models;
@@ -18,7 +19,9 @@ namespace AdminInterface.Background
 			Delay = (int)TimeSpan.FromHours(1).TotalMilliseconds;
 			Action = () => {
 				new InvoiceProcessor().Process();
-				jobs.Each(j => j.Run());
+
+				using(new SessionScope())
+					jobs.Each(j => j.Run());
 			};
 		}
 
@@ -26,12 +29,15 @@ namespace AdminInterface.Background
 		{
 			StandaloneInitializer.Init(typeof(InvoiceProcessor).Assembly);
 
-			var job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
-			job.Plan(PlanPeriod.Month, 1.Day());
-			jobs.Add(job);
-			job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
-			job.Plan(PlanPeriod.Month, 15.Days());
-			jobs.Add(job);
+			using(new SessionScope())
+			{
+				var job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
+				job.Plan(PlanPeriod.Month, 1.Day());
+				jobs.Add(job);
+				job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
+				job.Plan(PlanPeriod.Month, 15.Days());
+				jobs.Add(job);
+			}
 
 			Start();
 		}

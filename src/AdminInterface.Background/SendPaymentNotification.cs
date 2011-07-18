@@ -25,7 +25,7 @@ namespace AdminInterface.Background
 				foreach (var user in usersForNotification)
 				{
 					var message = UserMessage.Find(user.Id);
-					message.ShowMessageCount = 4;
+					message.ShowMessageCount = 1;
 					if (IsFirstNotification())
 						message.Message = FirstNotificationText;
 					else
