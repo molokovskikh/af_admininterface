@@ -66,5 +66,15 @@ namespace Integration.Models
 			TimeMachine.ToFuture(9.Days());
 			Assert.That(job.Run(), Is.True);
 		}
+
+		[Test]
+		public void Reapet_run_at_same_day()
+		{
+			SystemTime.Now = () => new DateTime(2011, 7, 15, 15, 52, 48);
+			job.Plan(PlanPeriod.Month, 15.Day());
+			Assert.That(job.Run(), Is.True);
+			SystemTime.Now = () => new DateTime(2011, 7, 15, 18, 09, 43);
+			Assert.That(job.Run(), Is.False);
+		}
 	}
 }
