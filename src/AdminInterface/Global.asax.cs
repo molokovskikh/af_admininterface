@@ -15,6 +15,7 @@ using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Container;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
@@ -24,6 +25,7 @@ using MySql.Data.MySqlClient;
 using NHibernate;
 using NHibernate.Engine;
 using NHibernate.Type;
+using ILoggerFactory = Castle.Core.Logging.ILoggerFactory;
 
 namespace AddUser
 {
@@ -256,6 +258,11 @@ WHERE PriceCode = ?Id", connection);
 		public new void Initialized(IMonoRailContainer container)
 		{
 			BaseMailer.ViewEngineManager = container.ViewEngineManager;
+
+			var monorailContainer = ((DefaultMonoRailContainer)container);
+			var builder = new UrlBuilder();
+			monorailContainer.ServiceInitializer.Initialize(builder, container);
+			monorailContainer.AddService<IUrlBuilder>(builder);
 
 			base.Initialized(container);
 		}

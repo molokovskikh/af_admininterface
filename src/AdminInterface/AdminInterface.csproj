@@ -244,6 +244,7 @@
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
+    <Compile Include="MonoRailExtentions\UrlBuilder.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />

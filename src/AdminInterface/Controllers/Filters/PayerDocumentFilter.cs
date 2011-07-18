@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -11,7 +13,7 @@ using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers.Filters
 {
-	public class PayerDocumentFilter : Sortable, SortableContributor
+	public class PayerDocumentFilter : Sortable, SortableContributor, IUrlContributor
 	{
 		public Period? Period { get; set; }
 		public Region Region { get; set; }
@@ -28,14 +30,14 @@ namespace AdminInterface.Controllers.Filters
 				{"Id", "Id"},
 				{"Payer", "Payer"},
 				{"Recipient", "Recipient"},
-				{"PayerName", "PayerName"},
+				{"PayerName", "p.Name"},
 				{"Sum", "Sum"},
 				{"Period", "Period"},
 				{"Date", "Date"}
 			};
 		}
 
-		public List<T> Find<T>()
+		public IList<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
 				.CreateAlias("Payer", "p", JoinType.InnerJoin);
@@ -60,11 +62,9 @@ namespace AdminInterface.Controllers.Filters
 
 			var docs = ArHelper.WithSession(s => criteria
 				.GetExecutableCriteria(s).List<T>())
-				.ToList()
 				.GroupBy(i => ((dynamic)i).Id)
 				.Select(g => g.First())
 				.ToList();
-
 			
 			Count = docs.Count;
 			Sum = docs.Sum(d => (decimal)((dynamic)d).Sum);
@@ -93,6 +93,24 @@ namespace AdminInterface.Controllers.Filters
 		public string GetUri()
 		{
 			return ToUrlPart();
+		}
+
+		public IDictionary GetQueryString()
+		{
+			var parts = new Dictionary<string, object>();
+			if (Period != null)
+				parts.Add("filter.Period", Period);
+			if (Region != null)
+				parts.Add("filter.Region.Id", Region.Id);
+			if (Recipient != null)
+				parts.Add("filter.Recipient.Id", Recipient.Id);
+			if (SearchText != null)
+				parts.Add("filter.SearchText", SearchText);
+			if (SortBy != null)
+				parts.Add("filter.SortBy", SortBy);
+			if (SortDirection != null)
+				parts.Add("filter.SortDirection", SortDirection);
+			return parts;
 		}
 	}
 }

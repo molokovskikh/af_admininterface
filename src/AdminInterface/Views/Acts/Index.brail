@@ -61,7 +61,7 @@
 	</div>
 
 	<div class=block>
-		<a href="PrintIndex?${filter.ToUrlPart()}">Для печати</a>
+		${UrlHelper.Link("Для печати", {@action: @PrintIndex, @querystring: filter})}
 	</div>
 
 	<form method=post action="${siteroot}/Acts/Process">
@@ -76,7 +76,6 @@
 			<% end %>
 			</select>
 		</div>
-
 
 		<div class=block>
 			<table class=DataTable>

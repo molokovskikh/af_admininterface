@@ -69,7 +69,7 @@
 	</div>
 
 	<div class=block>
-		<a href="PrintIndex?${filter.ToUrlPart()}">Для печати</a>
+		${UrlHelper.Link("Для печати", {@action: @PrintIndex, @querystring: filter})}
 	</div>
 
 	<div class=block>
