@@ -95,8 +95,11 @@ namespace AdminInterface.Controllers
 
 				scope.VoteCommit();
 				Mailer.RegionalAdminCreated(admin);
-				var virtualDir = LinkHelper.GetVirtualDir(Context);
-				RedirectToUrl(virtualDir + @"/OfficeUserRegistrationReport.aspx");
+
+				if (isLoginCreated)
+					RedirectToUrl(@"/OfficeUserRegistrationReport.aspx");
+				else
+					RedirectToUrl("~/ViewAdministrators.aspx");
 			}
 		}
 
@@ -171,6 +174,10 @@ namespace AdminInterface.Controllers
 
 		private bool CreateUserInAD(Administrator administrator)
 		{
+			var isExist = ADHelper.IsLoginExists(administrator.UserName);
+			if (isExist)
+				return false;
+
 			var password = User.GeneratePassword();
 #if !DEBUG
 		var isLoginCreated = administrator.CreateUserInAd(password);
