@@ -2,7 +2,7 @@ using System;
 using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
 
-namespace Functional.ForTesting
+namespace Integration.ForTesting
 {
 	public static class ModelExtension
 	{

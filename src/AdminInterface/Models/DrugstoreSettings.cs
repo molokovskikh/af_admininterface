@@ -127,8 +127,11 @@ namespace AdminInterface.Models
 		[Property, Description("Максимальный недельный заказ"), Auditable]
 		public virtual uint MaxWeeklyOrdersSum { get; set; }
 
-		[Property, Description("Не подключать новые прайс-листы"), Auditable]
+		[Property, Description("Не подключать новые прайсы \"Административно\""), Auditable]
 		public virtual bool IgnoreNewPrices { get; set; }
+
+		[Property, Description("Не подключать новые прайсы \"В работе\""), Auditable]
+		public virtual bool IgnoreNewPriceForUser { get; set; }
 
 		public virtual bool EnableBuyingMatrix
 		{

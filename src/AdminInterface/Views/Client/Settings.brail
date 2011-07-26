@@ -234,16 +234,13 @@
 				<input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
 				<input type="hidden" name="client.IsHiddenForProducer" value="false" />
 				Скрыть клиента в интефрейсе поставщика<br />
+				${app.Edit("drugstore.AllowDelayOfPayment")}<br>
+				${app.Edit("drugstore.ServiceClient")}<br>
+				${app.Edit("drugstore.IgnoreNewPrices")}<br>
+				${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
+				${app.Edit("drugstore.CalculateLeader")}<br><br>
 				
 <% 
-	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore",
-		"Checkboxes" : { 
-			"IgnoreNewPrices" : drugstore.IgnoreNewPrices,
-			"ServiceClient" : drugstore.ServiceClient,
-			"AllowDelayOfPayment": drugstore.AllowDelayOfPayment,
-			"CalculateLeader" : drugstore.CalculateLeader }
-	}
-				
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
 		"Checkboxes" : { 
 			"SendWaybillsFromClient" : drugstore.SendWaybillsFromClient,

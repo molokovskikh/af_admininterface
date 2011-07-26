@@ -15,11 +15,12 @@ namespace Integration.Models
 	public class UserFixture : IntegrationFixture
 	{
 		private User user;
+		private Client client;
 
 		[SetUp]
 		public void Setup()
 		{
-			var client = DataMother.CreateTestClientWithUser();
+			client = DataMother.CreateTestClientWithUser();
 			user = client.Users[0];
 		}
 
@@ -95,6 +96,20 @@ namespace Integration.Models
 			Assert.That(user.Client, Is.EqualTo(otherClient));
 			Assert.That(user.RootService, Is.EqualTo(otherClient));
 			Assert.That(user.Payer, Is.EqualTo(org.Payer));
+		}
+
+		[Test]
+		public void Ignore_new_prices_for_user()
+		{
+			client.Settings.IgnoreNewPriceForUser = true;
+			scope.Flush();
+
+			var pricesCount = user.GetUserPriceCount();
+			var supplier = DataMother.CreateSupplier();
+			supplier.Save();
+			client.MaintainIntersection();
+			var newPricesCount = user.GetUserPriceCount();
+			Assert.That(newPricesCount, Is.EqualTo(pricesCount));
 		}
 	}
 }
