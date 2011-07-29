@@ -65,6 +65,7 @@ namespace AdminInterface.Models
 			SendRejects = true;
 			SendWaybills = true;
 			Enabled = true;
+			ShowSupplierCost = true;
 			AssignedPermissions = new List<UserPermission>();
 			AvaliableAddresses = new List<Address>();
 		}
@@ -133,6 +134,9 @@ namespace AdminInterface.Models
 
 		[Property, Description("Загружать неподтвержденные заказы"), Auditable]
 		public virtual bool AllowDownloadUnconfirmedOrders { get; set; }
+
+		[Property, Description("Отображать реальную цену поставщика"), Auditable]
+		public virtual bool ShowSupplierCost { get; set; }
 
 		[Property]
 		public virtual DateTime RegistrationDate { get; set; }
