@@ -378,6 +378,7 @@
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\Common.js" />
+    <Content Include="Assets\JavaScript\filter.coffee" />
     <Content Include="JavaScript\jquery-1.4.2.js" />
     <Content Include="JavaScript\jquery-1.4.2.min.js" />
     <Content Include="JavaScript\jquery-ui-1.8.6.custom.min.js" />

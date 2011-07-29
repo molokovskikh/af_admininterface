@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Common.Tools;
-using log4net.Config;
 using NUnit.Framework;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -13,10 +12,9 @@ using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using WatiN.Core;
 using WatiN.CssSelectorExtensions;
-using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 using Document = WatiN.Core.Document;
 
-namespace Functional
+namespace Functional.Billing
 {
 	public class BillingFixture : WatinFixture2
 	{
@@ -351,7 +349,7 @@ namespace Functional
 			Assert.That(browser.Div(Find.ById("SearchAddressMessage" + user.Id)).Text, Is.StringContaining("Ничего не найдено"));
 		}
 
-		private void AddUsers(Client client, int countUsers)
+		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -370,37 +368,52 @@ namespace Functional
 		[Test(Description = "Тест сворачивания/разворачивания заголовков списков клиентов, пользователей и адресов")]
 		public void Test_collapse_and_spread_headers()
 		{
-			AddUsers(client, 10);
+			AddUsersAdnAddresses(client, 10);
 			Refresh();
 
-			// Список клиентов должен быть в свернутом виде
-			var clientsHeaderDiv = browser.Div(Find.ById("ClientListHeader"));
-			var clientsBodyDiv = browser.Div(Find.ById("ClientListBody"));
-			Assert.IsTrue(clientsHeaderDiv.ClassName.Trim().ToLower().Equals("showhiden"));
-			Assert.IsTrue(clientsBodyDiv.ClassName.Trim().ToLower().Equals("hidden"));
-			// Щелкаем по заголовку. Список должен свернуться
-			clientsHeaderDiv.Click();
-			Assert.IsTrue(clientsHeaderDiv.ClassName.Trim().ToLower().Equals("hidevisible"));
-			Assert.IsTrue(clientsBodyDiv.ClassName.Trim().ToLower().Equals("visiblefolder"));
+			// Список клиентов должен быть в развернутом виде
+			var collapsible = GetCollapsible("#clients");
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("hidevisible"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.Not.StringContaining("hidden"));
+			collapsible.header.Click();
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("showhiden"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.StringContaining("hidden"));
 
 			// Списки адресов и пользователей должны быть в свернутом виде
-			var addressesHeaderDiv = browser.Div(Find.ById("AddressListHeader"));
-			var addressesBodyDiv = browser.Div(Find.ById("AddressListBody"));
-			Assert.IsTrue(addressesHeaderDiv.ClassName.Trim().ToLower().Equals("showhiden"));
-			Assert.IsTrue(addressesBodyDiv.ClassName.Trim().ToLower().Equals("hidden"));
-			// Открываем адреса
-			addressesHeaderDiv.Click();
-			Assert.IsTrue(addressesHeaderDiv.ClassName.Trim().ToLower().Equals("hidevisible"));
-			Assert.IsTrue(addressesBodyDiv.ClassName.Trim().ToLower().Equals("visiblefolder"));
+			collapsible = GetCollapsible("#addresses");
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("showhiden"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.StringContaining("hidden"));
+			collapsible.header.Click();
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("hidevisible"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.Not.StringContaining("hidden"));
 
-			var usersHeaderDiv = browser.Div(Find.ById("UserListHeader"));
-			var usersBodyDiv = browser.Div(Find.ById("UserListBody"));
-			Assert.IsTrue(usersHeaderDiv.ClassName.Trim().ToLower().Equals("showhiden"));
-			Assert.IsTrue(usersBodyDiv.ClassName.Trim().ToLower().Equals("hidden"));
-			// Открываем пользователей
-			usersHeaderDiv.Click();
-			Assert.IsTrue(usersHeaderDiv.ClassName.Trim().ToLower().Equals("hidevisible"));
-			Assert.IsTrue(usersBodyDiv.ClassName.Trim().ToLower().Equals("visiblefolder"));
+			// Списки адресов и пользователей должны быть в свернутом виде
+			collapsible = GetCollapsible("#users");
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("showhiden"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.StringContaining("hidden"));
+			collapsible.header.Click();
+			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("hidevisible"));
+			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.Not.StringContaining("hidden"));
+		}
+
+		public class Collapsible
+		{
+			public Collapsible(Element header, Element body)
+			{
+				this.header = header;
+				this.body = body;
+			}
+
+			public Element header;
+			public Element body;
+		}
+
+		private Collapsible GetCollapsible(string selector)
+		{
+			var collapsible = ((Table) Css(selector)).Parents().First(p => p.ClassName != null && p.ClassName.ToLower().Contains("collapsible"));
+			var header = collapsible.CssSelect(".trigger");
+			var body = collapsible.CssSelect(".VisibleFolder");
+			return new Collapsible(header, body);
 		}
 
 		[Test]
@@ -552,10 +565,10 @@ namespace Functional
 			}
 		}
 
-		[Test, Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
+		[Test, NUnit.Framework.Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
 		public void FilterLogMessagesByUser()
 		{
-			AddUsers(client, 3);
+			AddUsersAdnAddresses(client, 3);
 			client.Refresh();
 			Refresh();
 
@@ -577,13 +590,13 @@ namespace Functional
 					Assert.That(row.Style.Display, Is.StringContaining("none"));
 			}
 			//Логин-ссылка должна должна получить класс который сделает ее жирной
-			Assert.That(browser.Link("UserLink" + user.Id).ClassName, Is.StringContaining("selected-filter"));
+			Assert.That(browser.Link("UserLink" + user.Id).ClassName, Is.StringContaining("current-filter"));
 		}
 
-		[Test, Description("Проверка, что по клику на логин, этот пользователь выбирается в выпадающем списке 'Сообщение для пользователя:'")]
+		[Test, NUnit.Framework.Description("Проверка, что по клику на логин, этот пользователь выбирается в выпадающем списке 'Сообщение для пользователя:'")]
 		public void SelectUserForSendMessage()
 		{
-			AddUsers(client, 3);
+			AddUsersAdnAddresses(client, 3);
 			Refresh();
 			// Кликаем по логину одного из пользователей
 			var user = client.Users[2];
@@ -592,7 +605,7 @@ namespace Functional
 			Assert.That(browser.SelectList(Find.ByName("NewClientMessage.Id")).SelectedOption.Text, Is.EqualTo(user.GetLoginOrName()));
 		}
 
-		[Test, Description("Проверка, что при выделении клиента, отображаются адреса и пользователи только для выбранного клиента")]
+		[Test, NUnit.Framework.Description("Проверка, что при выделении клиента, отображаются адреса и пользователи только для выбранного клиента")]
 		public void ShowUsersOnlyForSelectedClient()
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
@@ -734,7 +747,7 @@ namespace Functional
 			Assert.That(browser.SelectList(Find.ByName("Instance.Recipient.Id")).SelectedItem, Is.EqualTo(recipient.Name));
 		}
 
-		[Test, Description("Создание нового юридического лица")]
+		[Test, NUnit.Framework.Description("Создание нового юридического лица")]
 		public void Create_new_juridical_organization()
 		{
 			browser.Link(Find.ByText("Юридические лица")).Click();

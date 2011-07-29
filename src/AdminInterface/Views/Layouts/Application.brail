@@ -20,7 +20,8 @@
 			"messages_ru.js",
 			"jquery-ui-1.8.6.custom.min.js",
 			"jquery.maskedinput-1.2.2.min.js",
-			"Common.js")}
+			"Common.js",
+			"coffee-script.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css",
 			"jquery-ui-1.8.6.custom.css",

@@ -4,6 +4,8 @@
 
 <% component Bubble, {"bredcrumbs" : [("Поиск плательщиков", "${siteroot}/Billing/Search")]} %>
 
+${app.Asset("filter.coffee")}
+
 <script>
 
 	function AjaxRequest(link, action) {

@@ -44,6 +44,11 @@ namespace AdminInterface.Helpers
 		public AppHelper(IEngineContext engineContext) : base(engineContext)
 		{}
 
+		public string Asset(string name)
+		{
+			return Resource(new [] {name}, "Assets/JavaScript", "<script type='text/coffeescript' src='{0}'></script>");
+		}
+
 		public string Style(object item)
 		{
 			if (item is IEnablable)

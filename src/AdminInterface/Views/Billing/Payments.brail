@@ -74,34 +74,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function(xhr, textStatus, error) { $("#TotalSum").html(""); });
 	}
 
-	function FilterBy(objectType, objectId) {
-		var typeName = "";
-		if (objectType == "Address")
-			typeName = "${AdminInterface.Models.Billing.SwitchLogType.AddressLog}";
-		if (objectType == "User") {
-			$("select#messageReceiverComboBox option[selected]").removeAttr("selected");
-			$("select#messageReceiverComboBox option[value='" + objectId + "']").attr("selected", "selected");
-			typeName = "${AdminInterface.Models.Billing.SwitchLogType.UserLog}";
-		}
-		var id = "logRow" + typeName + objectId;
-
-		$("tr[id*='logRow']").each(function () { 
-			if (this.id == id) {
-				$(this).attr("style", "display: '';");
-				return;
-			}
-			$(this).attr("style", "display: none;");
-		});
-
-		markAsSelected(objectId, objectType + "Link", objectType + "Value");
-	}
-
-	function markAsSelected(id, linkIdPart, textIdPart) {
-		var linkId = linkIdPart + id;
-		$("#users .selected-filter, #addresses .selected-filter").removeClass("selected-filter");
-		$("#" + linkId).addClass("selected-filter");
-	}
-
 	function ShowOrHideTheme(show) {
 		if (show) {
 			$("#EmailSubjectRow").css("display", "");
@@ -151,13 +123,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		});
 
 		$("input[name=status]").change(function () {
-			if (this.checked)
-			{
+			if (this.checked) {
 				$(this).parents("tr").removeClass("DisabledByBilling");
 				$(this).parents("tr").removeClass("disabled");
 			}
-			else
-			{
+			else {
 				$(this).parents("tr").addClass("DisabledByBilling");
 				$(this).parents("tr").addClass("disabled");
 			}
@@ -165,6 +135,12 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		$("#reports input").change(function () {
 			Update("${siteroot}/Billing/UpdateReport", this);
+		});
+
+		$("#users a[data-id]").click(function () {
+			id = $(this).attr("data-id");
+			$("select#messageReceiverComboBox option[selected]").removeAttr("selected");
+			$("select#messageReceiverComboBox option[value='" + id + "']").attr("selected", "selected");
 		});
 
 		$("#addresses input, #users input").change(function () {
@@ -206,7 +182,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		margin-top:10px;
 	}
 	
-	a.selected-filter
+	a.current-filter
 	{
 		color:Black;
 		font-weight:bold;
@@ -335,7 +311,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			</div>
 			<% end %>
 			<div align="left">
-				<table class="DataTable" id="users">
+				<table class="DataTable filter" id="users">
 					<tr align="center" valign="top">
 						<th>Включен</th>
 						<th>Учтен</th>
@@ -366,7 +342,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}"> 
 						</td>
 						<td>
-							<a id="UserLink${user.Id}" href="javascript:" onclick="FilterBy('User', ${user.Id})">${user.Id}</a>
+							<a id="UserLink${user.Id}" href="javascript:" data-filter="UserLog${user.Id}" data-id="${user.Id}">${user.Id}</a>
 						</td>
 						<td class=short>
 							<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
@@ -400,7 +376,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</div>
 				<% end %>
 				<div align="left">
-					<table class="DataTable" id="addresses">
+					<table class="DataTable filter" id="addresses">
 						<tr align="center" valign="top">
 							<th>Включен</th>
 							<th>Учтен</th>
@@ -431,7 +407,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}"> 
 							</td>
 							<td>
-								<a id="AddressLink${addr.Id}" href="javascript:" onclick="FilterBy('Address', ${addr.Id})">${addr.Value}</a>
+								<a id="AddressLink${addr.Id}" href="javascript:" data-filter="AddressLog${addr.Id}">${addr.Value}</a>
 							</td>
 							<td class=short>
 								<a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">
@@ -640,7 +616,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 			Статистика включений/выключений
 		</div>
-		<table class="DataTable">
+		<a href="javascript:" class="filter-checker" style="display:none"></a>
+		<table class="DataTable filtrable">
 		<% if LogRecords.Count: %>
 			<thead>
 				<tr>
@@ -653,7 +630,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			</thead>
 		<% end %>
 		<% for i,logRecord in enumerate(LogRecords): %>
-			<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logRecord.LogType}${logRecord.ObjectId}">
+			<tr class="${ViewHelper.GetRowStyle(i)}" data-filter="${logRecord.LogType}${logRecord.ObjectId}">
 				<td>${logRecord.LogTime}</td>
 				<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
 				<td>${logRecord.Value}</td>
