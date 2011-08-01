@@ -50,7 +50,9 @@ namespace Integration.ForTesting
 
 		public static Payer CreatePayer()
 		{
-			var legalEntity = new LegalEntity();
+			var legalEntity = new LegalEntity {
+				Name = "Тестовое юр.лицо"
+			};
 			var payer = new Payer {
 				Name = "test",
 				ContactGroupOwner = new ContactGroupOwner(),

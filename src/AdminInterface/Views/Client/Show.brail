@@ -4,21 +4,87 @@
 <script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
 
 <script>
-	document.observe("dom:loaded", function() {
+	$(function () {
 
-		Validation.add("uin-reuired",
-			   "Нужно указать причину сброса",
-				function(v) {
-					return !Validation.get('IsEmpty').test(v);
-				});
-		var validation = new Validation("ReseteUin");
-
-		jQuery("form#MessagesForm").validate({
+		$("form#MessagesForm").validate({
 			rules: {
 				"message": "required"
 			}
 		});
+
+		$("#ReseteUin").validate();
+		$("#ChangePayer").validate();
+
+		$("#ChangePayer select.result").change(function () {
+			var url = "${siteroot}/Client/GetPayerOrgs";
+			var root = $($(this).parents(".result").get(0));
+			$.ajax({
+				url: url,
+				data: { "id": $(this).val() },
+				cache: false,
+				success: function (data) {
+					$(this).css("disabled", "");
+					root.find(".message").remove();
+
+					var select = $("#orgs");
+					select.find("option").remove();
+					$.each(data, function () {
+						select.append($("<option>").attr("value", this.id).text(this.name));
+					});
+				},
+				error: function (xhr, textStatus, error) {
+					$(this).css("disabled", "");
+					message(root, "Произошла ошибка. Попробуйте еще раз.", "error");
+				}
+			});
+			$(this).css("disabled", "disabled");
+			message(root, "Идет поиск...");
+		});
+
+		$("#ChangePayer input[type=button].search").click(function () {
+			var url = "${siteroot}/Client/SearchPayer";
+			var root = $($(this).parents(".search").get(0));
+			var term = root.find("input[type=text].term").val();
+			$.ajax({
+				url: url,
+				data: { "text": term },
+				cache: false,
+				success: function (data) {
+					root.find(".message").remove();
+					if (data.length == 0) {
+						root.find("input[type=button].search").css("disabled", "");
+						message(root, "Ничего не найдено.", "error");
+						return;
+					}
+					root.hide();
+					var result = root.siblings(".result");
+					var select = result.find("select.result");
+					select.find("option").remove();
+					$.each(data, function () {
+						select.append($("<option>").attr("value", this.id).text(this.name));
+					});
+					select.change();
+					result.show();
+				},
+				error: function (xhr, textStatus, error) {
+					root.find("input[type=button].search").css("disabled", "");
+					message(root, "Произошла ошибка. Попробуйте еще раз.", "error");
+				}
+			});
+			root.find("input[type=button].search").css("disabled", "disabled");
+			message(root, "Идет поиск...");
+		});
+
+		$("#ChangePayer input[type=button].cancel").click(function () {
+			$(this).parents(".result").hide().siblings(".search").show();
+		});
 	});
+
+	function message(root, text, clazz) {
+		root.find(".message").remove();
+		root.append($("<span class=message>" + text + "<span>").addClass(clazz));
+	}
+
 </script>
 
 <style>
@@ -41,23 +107,23 @@
 	{
 		width: 70%;
 	}
+
+	span.message
+	{
+		display:block;
+		clear:both;
+		font-style:italic;
+	}
+
+	span.message.error
+	{
+		color:Red;
+	}
 </style>
 	
 <h2>Клиент ${client.Name}, Код ${client.Id}</h2>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
-
-	<% if IsDefined("Message"):
-		clazz = "notice"
-		if message.IsError:
-			clazz = "err"
-		end
-	%>
-
-	<div class="flash ${clazz}">
-		${Message.MessageText}
-	</div>
-	<% end %>
 
 	<% if not client.IsClientActive(): %>
 	<div class="Warning">
@@ -70,17 +136,11 @@
 		<div class=block>
 			<ul class="navigation-menu">
 				<li>
-					<% if Client.IsDrugstore(): %>
-						<a ${"href=${siteroot}/Client/${client.Id}/Settings" if admin.ManageDrugstore}>Настройка</a>
-					<% else: %>
-						<a ${"href=${siteroot}/managep.aspx?cc=${Client.Id}" if admin.ManageSuppliers}>Настройка</a>
-					<% end %>
+					<a ${"href=${siteroot}/Client/${client.Id}/Settings" if admin.ManageDrugstore}>Настройка</a>
 				</li>
-				<% if Client.IsDrugstore(): %>
 				<li>
 					<a href="${siteroot}/Logs/UpdateLog?clientCode=${Client.Id}" target="_blank">История обновлений</a>
 				</li>
-				<% end %>
 				<li>
 					<a href="${siteroot}/Logs/Documents?filter.Client.Id=${Client.Id}" target="_blank">История документов</a>
 				</li>
@@ -90,26 +150,45 @@
 			</ul>
 		</div>
 
-
 		<div class=block>
 			<h3>Операции</h3>
-			<% if Client.IsDrugstore(): %>
-
-				<form id=ReseteUin method=post action=ResetUin.rails style="margin:0; padding:0">
-					<input type=hidden name=clientCode value=${Client.Id} />
-					<% haveUin = Client.HaveUin() %>
-					<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
-					<% if haveUin: %>
-						Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
-					<% else: %> 
-						<span style="color:Green;">Идентификатор не присвоен</span>
-					<% end %>
-				</form>
-			
-			<% end %>
-			
+			<form id=ReseteUin method=post action=ResetUin style="margin:0; padding:0">
+				<input type=hidden name=clientCode value=${Client.Id} />
+				<% haveUin = Client.HaveUin() %>
+				<% if haveUin: %>
+					Причина:<input class=required style="border-style:groove;" type=text name=reason/>
+				<% else: %> 
+					<span style="color:Green;">Идентификатор не присвоен</span>
+				<% end %>
+				<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+			</form>
 		</div>
-			
+
+		<div class=block>
+			<form id=ChangePayer method=post action=ChangePayer>
+				${FormHelper.HiddenField("clientId", client.Id)}
+				<h3>Изменение плательщика</h3>
+				<% if client.CanChangePayer: %>
+				<div class=search>
+					<input type=text class=term class=required>
+					<input type=button class=search value="Найти">
+				</div>
+				<div class=result style="display:none;">
+					<label>Выберете плательщика:</label>
+					<select name=payerId class=result></select>
+					<br>
+					<label>Выберете Юр.Лицо:</label>
+					<select name=orgId id=orgs></select>
+					<br>
+					<input type=submit value="Изменить">
+					<input type=button class=cancel value="Отменить">
+				</div>
+				<% else: %>
+				<p>Плательщик может быть изменен только если клиенту присвоен только один плательщик и с плательщиком связано только одно ют.лицо</p>
+				<% end %>
+			</form>
+		</div>
+
 		<div class=block>
 			<div class=contextual>
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
@@ -154,7 +233,7 @@
 				Зарегистрирован пользователем ${client.Registration.GetRegistrant().ManagerName}, дата регистрации ${client.Registration.RegistrationDate}
 				<% end %>
 			</div>
-			<form action="Update.rails" method=post style="padding:0; margin:0;">
+			<form action="Update" method=post style="padding:0; margin:0;">
 				<div>
 					${FormHelper.HiddenField("client.Id")}
 					<p>
@@ -201,12 +280,12 @@
 			component ContactViewer, {"ContactGroups" : ContactGroups}:
 				section ContactGroupHeaderLink:
 				%>
-					<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
+					<a href='../Contact/EditContactGroup?contactGroupId=${ContactGroupId}' Target="_blank" >${ContactGroupName}</a>
 				<%
 				end
 				section Person:
 				%>
-					<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+					<a href='../Contact/EditPerson?personId=${PersonId}' target='_blank'>${PersonName}</a>
 				<%
 				end
 			end
@@ -235,7 +314,7 @@
 	</div>
 	
 	<div class="TwoColumn" style="margin-left: 10px">
-		<form action="SendMessage.rails" method="post" id="MessagesForm">
+		<form action=SendMessage method="post" id="MessagesForm">
 		<div class="block">
 			<h3>Сообщения пользователя</h3>
 			<input type=hidden value=${client.Id} name=clientCode />

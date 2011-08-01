@@ -149,6 +149,14 @@ namespace AdminInterface.Models
 			get { return Status == ClientStatus.On; }
 		}
 
+		public virtual bool CanChangePayer
+		{
+			get
+			{
+				return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1;
+			}
+		}
+
 		public override bool Disabled
 		{
 			get
@@ -449,6 +457,28 @@ group by u.ClientId")
 			return ContactGroupOwner
 				.GetEmails(ContactGroupType.Billing)
 				.Implode();
+		}
+
+		public virtual void ChangePayer(Payer payer, LegalEntity org)
+		{
+			Payers.Clear();
+			Payers.Add(payer);
+			foreach (var user in Users)
+				user.Payer = payer;
+
+			foreach (var address in Addresses)
+			{
+				address.Payer = payer;
+				address.LegalEntity = org;
+			}
+
+			ArHelper.WithSession(s => s.CreateSQLQuery(@"
+update future.intersection
+set LegalEntityId = :orgId
+where ClientId = :clientId")
+				.SetParameter("clientId", Id)
+				.SetParameter("orgId", org.Id)
+				.ExecuteUpdate());
 		}
 	}
 }

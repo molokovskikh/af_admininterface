@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
@@ -144,6 +146,28 @@ namespace Functional.Drugstore
 		public void Client_page_must_contains_client_id()
 		{
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Клиент {0}, Код {1}", client.Name, client.Id)));
+		}
+
+		[Test]
+		public void Change_client_payer()
+		{
+			var payer = DataMother.CreatePayer();
+			payer.Save();
+			payer.Name = "Тестовый плательщик " + payer.Id;
+			scope.Flush();
+
+			Css("#ChangePayer .term").TypeText(payer.Name);
+			Css("#ChangePayer input[type=button].search").Click();
+
+			browser.WaitUntilContainsText(payer.Name, 1);
+			var select = (SelectList)Css("select[name=payerId]");
+			Assert.That(select.SelectedItem, Is.EqualTo(payer.Name));
+
+			Css("#ChangePayer [type=submit]").Click();
+			Assert.That(browser.Text, Is.StringContaining("Изменено"));
+
+			client.Refresh();
+			Assert.That(client.Payers, Is.EquivalentTo(new [] { payer }));
 		}
 	}
 }

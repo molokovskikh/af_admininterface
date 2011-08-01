@@ -14,6 +14,7 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -87,7 +88,7 @@ namespace AdminInterface.Controllers
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore),
-		Layout("GeneralWithJQuery"),
+		Layout("Application"),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class ClientController : ARController
@@ -263,7 +264,6 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			LayoutName = "Application";
 			var client = Client.Find(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
@@ -282,12 +282,22 @@ where Phone like :phone")
 
 		public void SearchClient(string searchText)
 		{
-			CancelView();
 			CancelLayout();
 			int searchNumber;
 			Int32.TryParse(searchText, out searchNumber);
 			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name).ToList();
 			RenderView("SearchClientSubview");
+		}
+
+		public void ChangePayer(uint clientId, uint payerId, uint orgId)
+		{
+			var client = Client.FindAndCheck(clientId);
+			var payer = Payer.Find(payerId);
+			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
+			client.ChangePayer(payer, org);
+
+			Flash["Message"] = Message.Notify("Изменено");
+			RedirectToAction("Show", new {id = client.Id});
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -310,6 +320,31 @@ where Phone like :phone")
 				.ToArray()
 				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Supplier.Name, p.Name)})
 				.ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] SearchPayer(string text)
+		{
+			return ActiveRecordLinqBase<Payer>
+				.Queryable
+				.Where(p => p.Name.Contains(text))
+				.Take(50)
+				.ToList()
+				.Select(p => new {
+					id = p.Id,
+					name = p.Name
+				})
+				.ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] GetPayerOrgs(uint id)
+		{
+			var payer = Payer.Find(id);
+			return payer.JuridicalOrganizations.Select(o => new {
+				id = o.Id,
+				name = o.Name
+			}).ToArray();
 		}
 
 		[return: JSONReturnBinder]
