@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -29,12 +30,18 @@ namespace AdminInterface.Controllers
 		public string Property;
 		public string Direction;
 
+		public Sort(NameValueCollection query)
+			: this(query["SortBy"], query["Direction"])
+		{}
+
 		public Sort(string property, string direction)
 		{
 			var columns = new [] {
 				"Messages.WriteTime",
 				"Messages.Operator",
-				"Messages.Login",
+				"Messages.Type",
+				"Messages.ObjectId",
+				"Messages.Name",
 
 				"Addresses.Value",
 				"Addresses.LegalName",
@@ -79,6 +86,11 @@ namespace AdminInterface.Controllers
 			bag["SortBy"] = Property;
 			bag["Direction"] = Direction;
 		}
+
+		public static void Make(SmartDispatcherController controller)
+		{
+			new Sort(controller.Query).Apply(controller.PropertyBag);
+		}
 	}
 
 	[
@@ -95,7 +107,6 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			var sort = GetSort();
 			var client = Client.FindAndCheck(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
@@ -109,12 +120,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
 
-			sort.Apply(PropertyBag);
-		}
-
-		private Sort GetSort()
-		{
-			return new Sort(Query["SortBy"], Query["Direction"]);
+			Sort.Make(this);
 		}
 
 		[AccessibleThrough(Verb.Post)]

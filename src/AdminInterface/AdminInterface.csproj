@@ -148,6 +148,7 @@
     <Compile Include="Controllers\IgnoredInnsController.cs" />
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
+    <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Helpers\Sortable.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
@@ -355,13 +356,6 @@
     </Compile>
     <Compile Include="Services\NotificationService.cs" />
     <Compile Include="CustomSettings.cs" />
-    <Compile Include="statcont.aspx.cs">
-      <DependentUpon>statcont.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="statcont.aspx.designer.cs">
-      <DependentUpon>statcont.aspx</DependentUpon>
-    </Compile>
     <Compile Include="ViewAdministrators.aspx.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -394,11 +388,11 @@
     <Content Include="JavaScript\Main.js" />
     <Content Include="ManageCosts.aspx" />
     <Content Include="managep.aspx" />
-    <Content Include="statcont.aspx" />
     <Content Include="ViewAdministrators.aspx" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Messages\Index.brail" />
     <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />

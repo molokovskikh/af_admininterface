@@ -563,12 +563,8 @@ WHERE
 					}
 				}
 			}
-			ArHelper.WithSession(s => s.CreateSQLQuery(@"
-update logs.clientsinfo set clientcode = :code
-where userid = :userId")
-							.SetParameter("code", newOwner.Id)
-							.SetParameter("userId", Id)
-							.ExecuteUpdate());
+
+			ClientInfoLogEntity.UpdateLogs(newOwner.Id, Id);
 			Client = newOwner;
 			RootService = newOwner;
 			Payer = legalEntity.Payer;

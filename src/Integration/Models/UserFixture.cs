@@ -82,7 +82,7 @@ namespace Integration.Models
 			var otherClient = DataMother.TestClient();
 			var clien = DataMother.TestClient();
 			var exception = Assert.Throws<Exception>(() => user.MoveToAnotherClient(clien, otherClient.Orgs().First()));
-			Assert.That(exception.Message, Is.EqualTo(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо  не принадлежит клиенту test", user.Id)));
+			Assert.That(exception.Message, Is.StringContaining("не принадлежит клиенту test"));
 		}
 
 		[Test]

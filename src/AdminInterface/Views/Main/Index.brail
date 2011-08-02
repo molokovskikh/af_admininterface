@@ -78,9 +78,9 @@
 						</li>
 						<li>
 							<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/statcont.aspx">Статистика обращений</a>
+							<a href="${siteroot}/messages">История обращений</a>
 							<% else: %>
-							<a href="#" class="NotAllowedLink">Статистика обращений</a>
+							<a href="#" class="NotAllowedLink">История обращений</a>
 							<% end %>
 						</li>
 						<li>
@@ -96,10 +96,10 @@
 							<% else: %>
 							<a href="#" class="NotAllowedLink">Мониторинг работы клиентов</a>
 							<% end %>
-						</li>		
+						</li>
 						<li>
 							<a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
-						</li>				
+						</li>
 						<li>
 							<% if admin.HavePermisions(PermissionType.EditSettings): %>
 							<a href="${siteroot}/Main/Settings">Настройки</a>
@@ -392,7 +392,7 @@
 				<tr>
 					<td colspan="4" align="center">
 						<br /><br />
-						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy.rails">
+						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy">
 							<input type="hidden" id="Autosearch" name="SearchBy.SearchBy" value="Auto" />
 							<input type="hidden" name="SearchBy.RegionId" value="${RegionId}" />
 							<div class="search-header" style="text-align:center">

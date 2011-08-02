@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Tools;
 
 namespace AdminInterface.Background
 {
@@ -42,7 +43,7 @@ namespace AdminInterface.Background
 
 		private bool IsFirstNotification()
 		{
-			return DateTime.Now.Day < 15;
+			return SystemTime.Now().Day < 15;
 		}
 	}
 }

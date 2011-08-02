@@ -18,6 +18,11 @@ namespace AdminInterface.Controllers
 	[Secure]
 	public class DeliveriesController : ARSmartDispatcherController
 	{
+		public void Show(uint id)
+		{
+			RedirectUsingRoute("Edit", new {id = id});
+		}
+
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{

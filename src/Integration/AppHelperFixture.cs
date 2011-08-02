@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Adapters;
 using Castle.MonoRail.Framework.Helpers;
@@ -220,6 +223,26 @@ namespace Integration
 			};
 			var link = helper.Sortable("test", "test");
 			Assert.That(link, Is.EqualTo("<a href='/home/index?filter.SortBy=test&filter.SortDirection=desc&filter.Filter=1' class='sort desc'>test</a>"));
+		}
+
+		public class UrlContributor : IUrlContributor
+		{
+			public string Name { get; set; }
+			public IDictionary GetQueryString()
+			{
+				return new Dictionary<string, string> {
+					{"controller", "client"},
+					{"action", "index"},
+				};
+			}
+		}
+
+		[Test]
+		public void Get_link_from_url_contributor()
+		{
+			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
+			var link = helper.LinkTo(new UrlContributor{Name = "bad bad test"});
+			Assert.That(link, Is.EqualTo("<a href=\"/clients\">bad bad test</a>"));
 		}
 	}
 }

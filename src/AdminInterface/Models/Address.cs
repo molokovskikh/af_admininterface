@@ -10,6 +10,7 @@ using System.Security.AccessControl;
 using System.Threading;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -301,7 +302,7 @@ set @skip = 0;
 			Client = newOwner;
 			Payer = newLegalEntity.Payer;
 			LegalEntity = newLegalEntity;
-
+			ClientInfoLogEntity.UpdateLogs(newOwner.Id, Id);
 			Update();
 		}
 

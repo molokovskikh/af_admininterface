@@ -32,6 +32,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(supplier);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 
+			Sort.Make(this);
+
 			if (IsPost)
 			{
 				BindObjectInstance(supplier, "supplier");

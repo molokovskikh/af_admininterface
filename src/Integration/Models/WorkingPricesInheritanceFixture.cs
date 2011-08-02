@@ -43,7 +43,7 @@ where UserId = :userId and priceId = :priceId")
 			var pricesForParent = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"
 call Future.GetPrices(:id);
-select * from Usersettings.Prices;")
+select PriceCode from Usersettings.Prices;")
 				.SetParameter("id", parent.Id)
 				.List());
 
@@ -51,11 +51,12 @@ select * from Usersettings.Prices;")
 				s.CreateSQLQuery(@"
 drop temporary table Usersettings.Prices;
 call Future.GetPrices(:id);
-select * from Usersettings.Prices")
+select PriceCode from Usersettings.Prices")
 				.SetParameter("id", child.Id)
 				.List());
 
-			Assert.That(pricesForParent, Is.EquivalentTo(pricesForChild));
+			Assert.That(pricesForParent.Count, Is.EqualTo(pricesForChild.Count));
+			Assert.That(pricesForParent.Cast<uint>().ToArray(), Is.EquivalentTo(pricesForChild.Cast<uint>().ToArray()));
 		}
 	}
 }

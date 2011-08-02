@@ -33,7 +33,7 @@ namespace Integration.Controllers
 			
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ClientCode == supplier.Id).ToList();
+			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен"), Is.Not.Null, logs.Implode());
 		}
 	}

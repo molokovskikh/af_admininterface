@@ -7,7 +7,9 @@ using System.Reflection;
 using System.Text;
 using System.Web;
 using AdminInterface.Controllers;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
@@ -128,7 +130,18 @@ namespace AdminInterface.Helpers
 			if (item == null)
 				return "";
 
-			if (!HavePermission(GetControllerName(item), action))
+			var controller = GetControllerName(item);
+
+			var contributor = item as IUrlContributor;
+			if (contributor != null)
+			{
+				var parameters = contributor.GetQueryString();
+				if (parameters.Contains("controller"))
+					parameters["controller"] = GetControllerName(parameters["controller"].ToString());
+				return UrlHelper.Link(title.ToString(), new Dictionary<string, object>{{"params", parameters}});
+			}
+
+			if (!HavePermission(controller, action))
 				return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
 
 			var clazz = "";
@@ -178,6 +191,11 @@ namespace AdminInterface.Helpers
 		private static string GetControllerName(object item)
 		{
 			var className = NHibernateUtil.GetClass(item).Name;
+			return GetControllerName(className);
+		}
+
+		private static string GetControllerName(string className)
+		{
 			if (className == "Address")
 				className = "Delivery";
 			else if (className == "Client")

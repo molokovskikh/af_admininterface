@@ -1,23 +1,35 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Web;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using System.Linq;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Logs
 {
+	public enum LogObjectType
+	{
+		[Description("Поставщик")] Supplier,
+		[Description("Клиент")] Client,
+		[Description("Пользователь")] User,
+		[Description("Адрес")] Address
+	}
+
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
-	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>
+	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>, IUrlContributor
 	{
 		public ClientInfoLogEntity()
 		{}
 
-		public ClientInfoLogEntity(string message)
+		private ClientInfoLogEntity(string message)
 		{
 			Message = message;
 			var admin = SecurityContext.Administrator;
@@ -26,35 +38,39 @@ namespace AdminInterface.Models.Logs
 			WriteTime = DateTime.Now;
 		}
 
-		public ClientInfoLogEntity(string message, Client client) : this(message)
-		{
-			ClientCode = client.Id;
-		}
-
-		public ClientInfoLogEntity(string message, User user) : this(message)
-		{
-			ClientCode = user.RootService.Id;
-			User = user;
-		}
-
 		public ClientInfoLogEntity(string message, object entity) : this(message)
 		{
+			if (entity is DrugstoreSettings)
+			{
+				entity = ((DrugstoreSettings)entity).Client;
+			}
+
 			if (entity is Service)
 			{
-				ClientCode = ((Service)entity).Id;
+				var service = ((Service)entity);
+				Service = service;
+				ObjectId = Service.Id;
+				Name = service.Name;
+				if (service is Client)
+					Type = LogObjectType.Client;
+				else
+					Type = LogObjectType.Supplier;
 			}
 			else if (entity is User)
 			{
-				User = (User)entity;
-				ClientCode = User.RootService.Id;
+				var user = (User)entity;
+				ObjectId = user.Id;
+				Service = user.RootService;
+				Type = LogObjectType.User;
+				Name = user.GetLoginOrName();
 			}
 			else if (entity is Address)
 			{
-				ClientCode = ((Address)entity).Client.Id;
-			}
-			else if (entity is DrugstoreSettings)
-			{
-				ClientCode = ((DrugstoreSettings)entity).Id;
+				var address = ((Address)entity);
+				ObjectId = address.Id;
+				Service = address.Client;
+				Type = LogObjectType.Address;
+				Name = address.Value;
 			}
 			else
 			{
@@ -72,26 +88,22 @@ namespace AdminInterface.Models.Logs
 		public Administrator Administrator { get; set;}
 
 		[Property]
-		public string Message { get; set; }
-
-		[Property]
-		public uint ClientCode { get; set; }
-
-		[Property]
 		public DateTime WriteTime { get; set; }
 
-		[BelongsTo(Column = "UserId")]
-		public virtual User User { get; set; }
+		[BelongsTo("ServiceId", NotFoundBehaviour = NotFoundBehaviour.Ignore)]
+		public Service Service { get; set; }
 
-		public string Login
-		{
-			get
-			{
-				if (User != null)
-					return User.Login;
-				return "";
-			}
-		}
+		[Property]
+		public uint ObjectId { get; set; }
+
+		[Property]
+		public LogObjectType Type { get; set; }
+
+		[Property]
+		public string Name { get; set; }
+
+		[Property]
+		public string Message { get; set; }
 
 		public string Operator
 		{
@@ -100,6 +112,14 @@ namespace AdminInterface.Models.Logs
 				if (Administrator != null)
 					return Administrator.ManagerName;
 				return UserName;
+			}
+		}
+
+		public string HtmlMessage
+		{
+			get
+			{
+				return AppealHelper.TnasformRedmineToLink(ViewHelper.FormatMessage(HttpUtility.HtmlEncode(Message)));
 			}
 		}
 
@@ -145,22 +165,43 @@ namespace AdminInterface.Models.Logs
 		public static IList<ClientInfoLogEntity> MessagesForClient(Service service)
 		{
 			return Queryable
-				.Where(l => l.ClientCode == service.Id)
+				.Where(l => l.Service == service)
 				.OrderByDescending(l => l.WriteTime)
+				.Fetch(l => l.Administrator)
 				.ToList();
 		}
 
 		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
 		{
 			return Queryable
-				.Where(l => l.User == user || (l.ClientCode == user.RootService.Id && l.User == null))
+				.Where(l => l.ObjectId == user.Id || l.ObjectId == user.RootService.Id)
 				.OrderByDescending(l => l.WriteTime)
+				.Fetch(l => l.Administrator)
 				.ToList();
 		}
 
 		public override string ToString()
 		{
 			return Message;
+		}
+
+		public static void UpdateLogs(uint serviceId, uint objectId)
+		{
+			ArHelper.WithSession(s => s.CreateSQLQuery(@"
+update logs.clientsinfo set ServiceId = :serviceId
+where ObjectId = :objectId")
+				.SetParameter("serviceId", serviceId)
+				.SetParameter("objectId", objectId)
+				.ExecuteUpdate());
+		}
+
+		public IDictionary GetQueryString()
+		{
+			return new Dictionary<string, string> {
+				{"controller", Type.ToString()},
+				{"action", "show"},
+				{"id", ObjectId.ToString()},
+			};
 		}
 	}
 }

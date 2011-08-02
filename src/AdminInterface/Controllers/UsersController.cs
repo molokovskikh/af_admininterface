@@ -30,6 +30,11 @@ namespace AdminInterface.Controllers
 	]
 	public class UsersController : Controller
 	{
+		public void Show(uint id)
+		{
+			RedirectUsingRoute("Edit", new {id = id});
+		}
+
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{
@@ -140,7 +145,7 @@ namespace AdminInterface.Controllers
 			if (user.Client != null)
 				PropertyBag["client"] = user.Client;
 
-			PropertyBag["logs"] = ClientInfoLogEntity.MessagesForUser(user);
+			PropertyBag["Messages"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
@@ -148,8 +153,8 @@ namespace AdminInterface.Controllers
 			if (user.Client != null)
 			{
 				var setting = user.Client.Settings;
-				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask).OrderBy(reg => reg.Name);
-				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion).OrderBy(reg => reg.Name);
+				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
+				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
 			}
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;
@@ -163,6 +168,8 @@ namespace AdminInterface.Controllers
 				PropertyBag["enabled"] = false;
 			else 
 				PropertyBag["enabled"] = true;
+
+			Sort.Make(this);
 		}
 
 		[AccessibleThrough(Verb.Post)]

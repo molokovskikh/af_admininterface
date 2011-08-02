@@ -98,7 +98,7 @@ namespace Integration.Controllers
 					},
 				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
-			var messages = ClientInfoLogEntity.Queryable.Where(l => l.User == user);
+			var messages = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 

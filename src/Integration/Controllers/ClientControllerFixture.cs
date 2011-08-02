@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
@@ -251,27 +252,19 @@ namespace Integration.Controllers
 		[Test]
 		public void Move_user_with_logs()
 		{
-			Client oldClient, newClient;
-			User user;
-			Address address;
-
-			oldClient = DataMother.CreateTestClientWithAddressAndUser();
-			user = oldClient.Users[0];
-			address = oldClient.Addresses[0];
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var user = oldClient.Users[0];
+			var address = oldClient.Addresses[0];
 			user.AvaliableAddresses = new List<Address>();
 			address.AvaliableForUsers.Add(user);
-			newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			var count =
-				ArHelper.WithSession(
-					s => s.CreateSQLQuery(@"select count(*) from logs.clientsinfo where clientcode = :code and userid = :userId")
-						    .SetParameter("code", newClient.Id)
-						    .SetParameter("userId", user.Id)
-						    .UniqueResult());
+			Console.WriteLine(user.Id);
+			var count = ClientInfoLogEntity.Queryable.Count(l => l.Service == newClient && l.ObjectId == user.Id);
 
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 

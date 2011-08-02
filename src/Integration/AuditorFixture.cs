@@ -26,7 +26,7 @@ namespace Integration
 
 			using (new SessionScope())
 			{
-				var logs = ClientInfoLogEntity.Queryable.Where(l => l.ClientCode == client.Id).ToList();
+				var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == client.Id).ToList();
 				Assert.That(logs[0].Message,
 					Is.EqualTo(String.Format("$$$Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
 			}

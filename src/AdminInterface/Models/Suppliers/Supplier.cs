@@ -66,7 +66,7 @@ namespace AdminInterface.Models.Suppliers
 		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<RegionalData> RegionalData { get; set; }
 
-		[HasMany]
+		[HasMany(Inverse = true, Lazy = true)]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
 
 		public virtual IList<User> Users
