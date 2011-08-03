@@ -206,5 +206,8 @@ namespace AdminInterface.Models
 			ColumnRef = "SupplierId",
 			Lazy = true)]
 		public virtual IList<Supplier> OfferMatrixExcludes { get; set; }
+
+		[Property, Description("Включить расписание обновлений"), Auditable]
+		public virtual bool AllowAnalitFSchedule { get; set; }
 	}
 }

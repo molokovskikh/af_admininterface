@@ -238,7 +238,9 @@
 				${app.Edit("drugstore.ServiceClient")}<br>
 				${app.Edit("drugstore.IgnoreNewPrices")}<br>
 				${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
-				${app.Edit("drugstore.CalculateLeader")}<br><br>
+				${app.Edit("drugstore.CalculateLeader")}<br>
+				${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
+				<br>
 				
 <% 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
