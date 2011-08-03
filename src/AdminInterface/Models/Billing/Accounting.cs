@@ -3,6 +3,7 @@ using System.Linq;
 using System.ComponentModel;
 using System.Collections.Generic;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -30,12 +31,12 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string Operator { get; set; }
 
-		public virtual Client Client
+		public virtual Service RootService
 		{
 			get
 			{
-				if (User != null && User.Client != null)
-					return User.Client;
+				if (User != null)
+					return User.RootService;
 				if (Address != null)
 					return Address.Client;
 				return null;

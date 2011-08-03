@@ -24,18 +24,7 @@ namespace Functional
 		public void SetupFixture()
 		{
 			ForTest.InitialzeAR();
-			var admin = new Administrator{
-				UserName = Environment.UserName,
-				Email = "kvasovtest@analit.net",
-				PhoneSupport = "112",
-				RegionMask = ulong.MaxValue,
-				ManagerName = "test",
-			};
-			admin.AllowedPermissions = Enum.GetValues(typeof(PermissionType))
-				.Cast<PermissionType>()
-				.Select(t => Permission.Find(t))
-				.ToList();
-			admin.Save();
+			var admin = Administrator.CreateLocalAdministrator();
 
 			SecurityContext.GetAdministrator = () => admin;
 

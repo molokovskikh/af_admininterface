@@ -46,18 +46,7 @@ namespace AddUser
 		{
 			try
 			{
-				var types = Assembly.GetExecutingAssembly().GetTypes()
-					.Where(t => t.Namespace != null && t.Namespace.EndsWith(".Initializers"));
-
-				foreach (var type in types)
-				{
-					if (type.GetMethod("Initialize") == null)
-						continue;
-
-					var initializer = (dynamic)Activator.CreateInstance(type);
-					initializer.Initialize(ActiveRecordSectionHandler.Instance);
-				}
-
+				Initialize();
 				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
 
 				SetupSecurityFilters();

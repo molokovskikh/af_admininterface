@@ -97,7 +97,7 @@ namespace AdminInterface.Models.Security
 
 		public void Delete()
 		{
-			var user = RedmineUser.Queryable.Where(r => r.Login == UserName).FirstOrDefault();
+			var user = ActiveRecordLinqBase<RedmineUser>.Queryable.Where(r => r.Login == UserName).FirstOrDefault();
 			if (user != null)
 			{
 				user.Status = 3;
@@ -318,6 +318,23 @@ namespace AdminInterface.Models.Security
 		public bool HaveAccessTo(string controller, string action)
 		{
 			return AllowedPermissions.Any(p => p.HaveAccessTo(controller, action));
+		}
+
+		public static Administrator CreateLocalAdministrator()
+		{
+			var admin = new Administrator {
+				UserName = Environment.UserName,
+				Email = "kvasovtest@analit.net",
+				PhoneSupport = "112",
+				RegionMask = UInt64.MaxValue,
+				ManagerName = "Для тестирования",
+			};
+			admin.AllowedPermissions = Enum.GetValues(typeof (PermissionType))
+				.Cast<PermissionType>()
+				.Select(t => Permission.Find(t))
+				.ToList();
+			admin.Save();
+			return admin;
 		}
 	}
 }

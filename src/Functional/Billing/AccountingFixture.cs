@@ -4,13 +4,13 @@ using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 
 namespace Functional.Billing
 {
-	[Ignore("Временно до починки")]
-	public class AccountingFixture : WatinFixture
+	public class AccountingFixture : WatinFixture2
 	{
 		private Client client;
 
@@ -25,7 +25,7 @@ namespace Functional.Billing
 			Assert.That(browser.Table(Find.ById("MainTable")).TableRows.Count(), Is.GreaterThan(1));
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByUser()
 		{
 			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
@@ -34,7 +34,7 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAddress()
 		{
 			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
@@ -43,7 +43,7 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByClient()
 		{
 			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
@@ -52,7 +52,7 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByPayer()
 		{
 			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
@@ -61,7 +61,7 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void SearchInHistoryByAuto()
 		{
 			using (var browser = Open("Billing/Accounting?tab=AccountingHistory"))
@@ -70,7 +70,9 @@ namespace Functional.Billing
 			}
 		}
 
-		[Test, NUnit.Framework.Description("1 пользователь, 2 адреса. 1-й адрес не должне быть в списке неучтенных, 2-й должен быть")]
+		[Test,
+			NUnit.Framework.Description("1 пользователь, 2 адреса. 1-й адрес не должне быть в списке неучтенных, 2-й должен быть"),
+			Ignore("Временно до починки")]
 		public void Check_address_for_accounting()
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -109,7 +111,7 @@ namespace Functional.Billing
 		}
 
 
-		[Test]
+		[Test, Ignore("Временно до починки")]
 		public void Check_user_for_accounting()
 		{
 			client.Users[0].Name = String.Format("Test username for Accounting [{0}]", client.Users[0].Id);
@@ -120,6 +122,18 @@ namespace Functional.Billing
 				Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));
 				Assert.That(browser.Text, Is.StringContaining(client.Users[0].Name));
 			}
+		}
+
+		[Test]
+		public void Show_accounting_history_for_supplier_user()
+		{
+			var user = DataMother.CreateSupplierUser();
+			user.Name = user.Login;
+			user.Accounting.Accounted();
+			Open("Billing/Accounting?tab=AccountingHistory");
+			browser.WaitUntilContainsText("Поиск", 2);
+			Assert.That(browser.Text, Is.StringContaining("Поиск"));
+			Assert.That(browser.Text, Is.StringContaining(user.Login));
 		}
 	}
 }
