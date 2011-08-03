@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Web.Ui.Models;
+using NHibernate;
+using NHibernate.Engine;
 using NHibernate.Mapping;
 using NHibernate.Properties;
+using NHibernate.Type;
 
 namespace AdminInterface.Initializers
 {
@@ -38,6 +43,8 @@ namespace AdminInterface.Initializers
 					}
 				}
 			}
+
+			SetupSecurityFilters();
 		}
 
 		private bool IsNullableType(Type type)
@@ -49,6 +56,25 @@ namespace AdminInterface.Initializers
 				return true;
 
 			return false;
+		}
+
+		private void SetupSecurityFilters()
+		{
+			var configuration = ActiveRecordMediator.GetSessionFactoryHolder()
+				.GetAllConfigurations()[0];
+
+			configuration.FilterDefinitions.Add("RegionFilter",
+				new FilterDefinition("RegionFilter",
+					"",
+					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}},
+					true));
+			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
+				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>(), true));
+			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
+				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
+
+			var regionMapping = configuration.GetClassMapping(typeof (Region));
+			regionMapping.AddFilter("RegionFilter", "if(RegionCode is null, 1, RegionCode & :AdminRegionMask > 0)");
 		}
 	}
 }
