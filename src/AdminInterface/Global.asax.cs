@@ -20,6 +20,7 @@ using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using log4net;
 using MySql.Data.MySqlClient;
 using NHibernate;

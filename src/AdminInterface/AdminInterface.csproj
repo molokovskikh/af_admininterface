@@ -149,7 +149,6 @@
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
-    <Compile Include="Helpers\Sortable.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
@@ -181,7 +180,6 @@
     <Compile Include="Helpers\AppHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
-    <Compile Include="Helpers\LinkHelper.cs" />
     <Compile Include="Helpers\InternetExplorerPrinterHelper.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
@@ -245,7 +243,6 @@
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
-    <Compile Include="MonoRailExtentions\UrlBuilder.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />

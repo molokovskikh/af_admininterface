@@ -11,6 +11,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using System.Linq;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Linq;
 
 namespace AdminInterface.Models.Logs

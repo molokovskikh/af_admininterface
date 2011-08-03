@@ -70,7 +70,6 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(LinkHelper)),
-		Helper(typeof(AppHelper), "app"),
 		Secure
 	]
 	public class LogsController : ARSmartDispatcherController
@@ -179,21 +178,6 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	public class DatePeriod
-	{
-		public DatePeriod()
-		{}
-
-		public DatePeriod(DateTime begin, DateTime end)
-		{
-			Begin = begin;
-			End = end;
-		}
-
-		public DateTime Begin { get; set; }
-		public DateTime End { get; set; }
-	}
-
 	public class OrderFilter
 	{
 		public Client Client { get; set; }
@@ -219,11 +203,6 @@ namespace AdminInterface.Controllers
 				End = DateTime.Today
 			};
 		}
-	}
-
-	public interface SortableContributor
-	{
-		string GetUri();
 	}
 
 	public class UpdateFilter : SortableContributor

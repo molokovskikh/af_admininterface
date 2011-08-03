@@ -7,6 +7,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
+using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.Controllers
 {

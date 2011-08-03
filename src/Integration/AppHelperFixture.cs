@@ -14,8 +14,11 @@ using Castle.MonoRail.Framework.Helpers;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
+using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NUnit.Framework;
+using AppHelper = AdminInterface.Helpers.AppHelper;
 using DescriptionAttribute=System.ComponentModel.DescriptionAttribute;
 
 namespace Integration
@@ -32,12 +35,16 @@ namespace Integration
 		[SetUp]
 		public void Setup()
 		{
-			helper = new AppHelper();
+			helper = new AdminInterface.Helpers.AppHelper();
 			var urlInfo = new UrlInfo("", "home", "index", "/", "");
 			context = new StubEngineContext(urlInfo) {
 				CurrentControllerContext = new ControllerContext("", "home", "index", null)
 			};
 			engine = new RoutingEngine();
+			engine.Add(new PatternRoute("/<controller>/<action>"));
+			var match = engine.FindMatch("home/index", new RouteContext(context.Request, null, "/", null));
+			context.CurrentControllerContext.RouteMatch = match;
+
 			helper.UrlHelper = new UrlHelper(context) {
 				UrlBuilder = new DefaultUrlBuilder {
 					RoutingEngine = engine,
@@ -57,10 +64,10 @@ namespace Integration
 		{
 			using (new SessionScope())
 			{
-				var user = User.Queryable.First();
-				Assert.That(NHibernateUtil.IsInitialized(user.Client), Is.False);
-				var linkTo = helper.LinkTo(user.Client);
-				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Client/{0}'>{1}</a>", user.Client.Id, user.Client.Name)));
+				var user = User.Queryable.Where(u => u.Payer != null).First();
+				Assert.That(NHibernateUtil.IsInitialized(user.Payer), Is.False);
+				var linkTo = helper.LinkTo(user.Payer);
+				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Payers/{0}'>{1}</a>", user.Payer.Id, user.Payer.Name)));
 			}
 		}
 
@@ -169,7 +176,7 @@ namespace Integration
 		public void Build_sortable_url()
 		{
 			var link = helper.Sortable("test", "test");
-			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc' class=''>test</a>"));
+			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc'>test</a>"));
 		}
 
 		[Test]
@@ -180,7 +187,7 @@ namespace Integration
 			context.CurrentControllerContext.RouteMatch = match;
 
 			var link = helper.Sortable("test", "test");
-			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc' class=''>test</a>"));
+			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc'>test</a>"));
 		}
 
 		[Test]
@@ -242,7 +249,7 @@ namespace Integration
 		{
 			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
 			var link = helper.LinkTo(new UrlContributor{Name = "bad bad test"});
-			Assert.That(link, Is.EqualTo("<a href=\"/clients\">bad bad test</a>"));
+			Assert.That(link, Is.EqualTo("<a href=\"/clients/index\">bad bad test</a>"));
 		}
 	}
 }
