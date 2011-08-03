@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Initializers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -47,10 +48,6 @@ namespace AddUser
 			try
 			{
 				Initialize();
-				SiteMap.Providers["SiteMapProvider"].SiteMapResolve += SiteMapResolve;
-
-				SetupSecurityFilters();
-
 				SetupRoute();
 			}
 			catch(Exception ex)
@@ -131,26 +128,6 @@ namespace AddUser
 			engine.Add(new PatternRoute("default.aspx")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));
-		}
-
-		private void SetupSecurityFilters()
-		{
-			var configuration = ActiveRecordMediator
-				.GetSessionFactoryHolder()
-				.GetAllConfigurations()[0];
-
-			configuration.FilterDefinitions.Add("RegionFilter",
-				new FilterDefinition("RegionFilter",
-					"",
-					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}},
-					true));
-			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
-				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>(), true));
-			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
-				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
-
-			var regionMapping = configuration.GetClassMapping(typeof (Region));
-			regionMapping.AddFilter("RegionFilter", "if(RegionCode is null, 1, RegionCode & :AdminRegionMask > 0)");
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
