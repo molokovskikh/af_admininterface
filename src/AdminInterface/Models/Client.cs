@@ -431,13 +431,14 @@ group by u.ClientId")
 			return Name;
 		}
 
-		public virtual void AddComment(string comment)
+		public virtual void AddComment(string billingMessage)
 		{
-			if (String.IsNullOrEmpty(comment))
+			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			Payers.Single().AddComment(comment);
-			new ClientInfoLogEntity(comment, this).Save();
+			billingMessage = "Сообщение в биллинг: " + billingMessage;
+			Payers.Single().AddComment(billingMessage);
+			new ClientInfoLogEntity(billingMessage, this).Save();
 		}
 
 		public virtual void JoinPayer(Payer payer)

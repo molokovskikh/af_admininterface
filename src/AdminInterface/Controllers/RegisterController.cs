@@ -307,10 +307,6 @@ namespace AdminInterface.Controllers
 				ServiceClient = additionalSettings.IsServiceClient,
 				BasecostPassword = costCrypKey,
 				IgnoreNewPrices = additionalSettings.IgnoreNewPrices,
-				ParseWaybills = true,
-				ShowAdvertising = true,
-				ShowNewDefecture = true,
-				EnableSmartOrder = true,
 				SmartOrderRules = smartOrder
 			};
 

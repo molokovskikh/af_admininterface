@@ -31,9 +31,16 @@ namespace AdminInterface.Models
 		private bool _noiseCosts;
 		private Supplier _noiseCostExceptSupplier;
 
-		public DrugstoreSettings() {}
+		public DrugstoreSettings()
+		{
+			ParseWaybills = true;
+			ShowAdvertising = true;
+			ShowNewDefecture = true;
+			EnableSmartOrder = true;
+		}
 
 		public DrugstoreSettings(Client client)
+			: this()
 		{
 			Client = client;
 		}

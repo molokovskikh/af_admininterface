@@ -104,11 +104,14 @@ Email: {2}
 				"farm@analit.net");
 		}
 
-		public static void Registred(object item, string comment)
+		public static void Registred(object item, string billingMessage)
 		{
 			Client client;
 			string body;
 			string subject;
+			if (!String.IsNullOrWhiteSpace(billingMessage))
+				billingMessage = "Сообщение в биллинг: " + billingMessage;
+
 			if (item is User)
 			{
 				var user = ((User)item);
@@ -116,8 +119,8 @@ Email: {2}
 				subject = "Регистрация нового пользователя";
 				client = user.Client;
 
-				if (!String.IsNullOrEmpty(comment))
-					new ClientInfoLogEntity(comment, item).Save();
+				if (!String.IsNullOrEmpty(billingMessage))
+					new ClientInfoLogEntity(billingMessage, item).Save();
 			}
 			else
 			{
@@ -126,14 +129,14 @@ Email: {2}
 				subject = "Регистрация нового адреса доставки";
 				client = address.Client;
 
-				if (!String.IsNullOrEmpty(comment))
+				if (!String.IsNullOrEmpty(billingMessage))
 					foreach (var user in address.AvaliableForUsers)
-						new ClientInfoLogEntity(comment, user).Save();
+						new ClientInfoLogEntity(billingMessage, user).Save();
 			}
 
-			if (!String.IsNullOrEmpty(comment))
+			if (!String.IsNullOrEmpty(billingMessage))
 			{
-				body += "\r\nСообщение в биллинг " + comment;
+				body += "\r\n" + billingMessage;
 			}
 
 			Func.Mail("register@analit.net", 

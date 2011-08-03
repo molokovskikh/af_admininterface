@@ -122,13 +122,14 @@ namespace AdminInterface.Models.Suppliers
 				.Implode();
 		}
 
-		public virtual void AddComment(string comment)
+		public virtual void AddComment(string billingMessage)
 		{
-			if (String.IsNullOrEmpty(comment))
+			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			Payer.AddComment(comment);
-			new ClientInfoLogEntity(comment, this).Save();
+			billingMessage = "Сообщение в биллинг: " + billingMessage;
+			Payer.AddComment(billingMessage);
+			new ClientInfoLogEntity(billingMessage, this).Save();
 		}
 
 		public virtual void CreateDirs()
