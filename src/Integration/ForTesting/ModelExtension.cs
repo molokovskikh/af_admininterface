@@ -1,5 +1,6 @@
 using System;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Helpers;
 
 namespace Integration.ForTesting
@@ -30,6 +31,22 @@ namespace Integration.ForTesting
 					s.CreateSQLQuery("select * from future.AddressIntersection where AddressId = :id")
 					.SetParameter("id", address.Id)
 					.List()).Count;
+		}
+
+		public static Payer MakeNameUniq(this Payer payer)
+		{
+			payer.Save();
+			payer.Name += " " + payer.Id;
+			payer.Save();
+			return payer;
+		}
+
+		public static Supplier MakeNameUniq(this Supplier supplier)
+		{
+			supplier.Save();
+			supplier.Name += " " + supplier.Id;
+			supplier.Save();
+			return supplier;
 		}
 	}
 }

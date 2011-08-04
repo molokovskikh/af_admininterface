@@ -131,6 +131,7 @@
     <Compile Include="SupplierFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />
+    <Compile Include="Suppliers\RegistrationFixture.cs" />
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="Drugstore\UserFixture.cs" />
     <Compile Include="Drugstore\UserSearchFixture.cs" />

@@ -54,7 +54,7 @@ namespace Integration.ForTesting
 				Name = "Тестовое юр.лицо"
 			};
 			var payer = new Payer {
-				Name = "test",
+				Name = "Тестовый плательщик",
 				ContactGroupOwner = new ContactGroupOwner(),
 				JuridicalOrganizations = new List<LegalEntity> {
 					legalEntity

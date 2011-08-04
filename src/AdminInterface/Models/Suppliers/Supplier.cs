@@ -137,6 +137,12 @@ namespace AdminInterface.Models.Suppliers
 			CreateDirs(ConfigurationManager.AppSettings["OptBox"]);
 		}
 
+		public virtual IEnumerable<ContactGroup> GetAditionalContactGroups()
+		{
+			foreach(var type in new [] {ContactGroupType.ClientManagers, ContactGroupType.OrderManagers})
+				yield return new ContactGroup(type);
+		}
+
 		public virtual void CreateDirs(string root)
 		{
 			var supplierRoot = Path.Combine(root, Id.ToString().PadLeft(3, '0'));

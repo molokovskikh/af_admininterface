@@ -1,0 +1,88 @@
+﻿<tr valign="top">
+	<td colspan="2">
+		<div class="contextualNoTopSpace">
+			<a id="${prefix}addPhoneLink" class="icon icon-add" href="javascript:"
+				onclick="addPhone('${prefix}')">Добавить</a>
+		</div>
+		<h4>Телефоны</h4>
+		<table id = "${prefix}Phones" cellpadding="0" cellspacing="10" width="100%" border="0">
+			<tr>
+				<td>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="30%">Номер телефона:</td>
+							<td>
+								<input type="text" id="${prefix}ContactPhone" name="${prefix}Contacts[0].ContactText" class="phone" style="width: 100%" />
+								<input type="hidden" name="${prefix}Contacts[0].Type" value="1" />
+							</td>
+						</tr>
+						<tr>
+							<td>Примечание:</td>
+							<td>
+								<input type="text" name="${prefix}Contacts[0].Comment" style="width: 100%" />
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+	<td></td>
+</tr>
+
+<tr valign="top">
+	<td colspan="2">
+		<div class="contextualNoTopSpace">
+			<a id="${prefix}addEmailLink" class="icon icon-add" href="javascript:"
+				onclick="addEmail('${prefix}')">Добавить</a>
+		</div>
+		<h4>Email</h4>
+		<table id = "${prefix}Emails" cellpadding="0" cellspacing="10" width="100%" border="0">
+			<tr>
+				<td>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="30%">Email:</td>
+							<td>
+								<input type="text" id="${prefix}ContactEmail" name="${prefix}Contacts[1].ContactText" class="email" style="width: 100%" />
+								<input type="hidden" name="${prefix}Contacts[1].Type" value="0" />
+							</td>
+						</tr>
+						<tr>
+							<td>Примечание:</td>
+							<td>
+								<input type="text" name="${prefix}Contacts[1].Comment" style="width: 100%" />
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+	<td></td>
+</tr>
+
+<tr valign="top">
+	<td colspan="2">
+		<div class="contextualNoTopSpace">
+			<a id="${prefix}addPersonLink" class="icon icon-add" href="javascript:"
+				onclick="addPerson('${prefix}')">Добавить</a>
+		</div>
+		<h4>Контактные лица</h4>
+		<table id="${prefix}Persons" cellpadding="0" cellspacing="10" width="100%" border="0">
+			<tr>
+				<td>
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="30%">Ф.И.О.:</td>
+							<td>
+								<input type="text" name="${prefix}Persons[0].Name" style="width: 100%" />
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+		</table>
+	</td>
+	<td></td>
+</tr>

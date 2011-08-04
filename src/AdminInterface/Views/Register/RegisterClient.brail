@@ -1,24 +1,10 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component Bubble, {"bredcrumbs" : []} %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
 	Регистрация клиента
 <% end %>
-<% component Bubble, {"bredcrumbs" : [("Регистрация клиента", "")]} %>
 
-<link href="${siteroot}/App_Themes/Main/Main.css" type="text/css" rel="stylesheet" />
-<link href="${siteroot}/Css/Table.css" type="text/css" rel="stylesheet" />
-
-<h2>Регистрация клиента</h2>
-
-<%
-	ClientTypeDrugstore = cast(int, AdminInterface.Models.ClientType.Drugstore)
-	ClientTypeSupplier = cast(int, AdminInterface.Models.ClientType.Supplier)
-
-	SegmentTypeWholesale = cast(int, AdminInterface.Models.Segment.Wholesale)
-	SegmentTypeRetail = cast(int, AdminInterface.Models.Segment.Retail)
-%>
-
-<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
-<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
-<script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
+${app.JS("contact.registrator.js", "jquery_contact_validation.js")}
 
 <script type="text/javascript">
 
@@ -68,8 +54,6 @@
 	}
 
 	function validateAddress(value, element) {
-		if (jQuery("#clientType").val() == ${ClientTypeSupplier})
-			return true;
 		res = /^.{1,100}$/.test(value)
 		return res;
 	}
@@ -126,14 +110,14 @@
 		});
 		jQuery("#MessageForSupplier").html("<i>Выполняется поиск<i/>");
 		jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
-		jQuery("#SearchSupplierButton").attr("disabled", "disabled");	    
+		jQuery("#SearchSupplierButton").attr("disabled", "disabled");
 	}
 	
 	function ShowSearchSupplierDiv() {
 		jQuery('#SupplierComboBox').find('option').remove().end();
 		jQuery("#MessageForSupplier").html("");
 		jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-		jQuery("#SearchSupplierButton").attr("disabled", "");	    
+		jQuery("#SearchSupplierButton").attr("disabled", "");
 		ViewDiv(false, '#SelectSupplierDiv');
 		ViewDiv(true, "#SearchSupplierDiv");
 		LockPayer();
@@ -150,11 +134,11 @@
 			jQuery('#PayerComboBox').find('option').remove().end();
 			if (htmlOptions.length == 0) {
 				jQuery("#SearchPayerTextPattern").attr("disabled", "");
-				jQuery("#SearchPayerButton").attr("disabled", "");	            
+				jQuery("#SearchPayerButton").attr("disabled", "");
 				jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
 				return;
 			}
-			jQuery("#PayerComboBox").append(htmlOptions);	        
+			jQuery("#PayerComboBox").append(htmlOptions);
 			ViewDiv(false, "#SearchPayerDiv");
 			ViewDiv(true, "#SelectPayerDiv");
 			jQuery("#MessageForPayer").html("");
@@ -183,12 +167,12 @@
 		jQuery(selector).css("display", displayValue);
 	}
 	
-	function OnPayerExistsChanged(selectedValue) {	    
+	function OnPayerExistsChanged(selectedValue) {
 		ViewDiv(false, "#SearchPayerDiv");
 		ViewDiv(false, "#SelectPayerDiv");
 		var disabled = '';
 		var checked = 'checked';
-		if (selectedValue) {	        
+		if (selectedValue) {
 			ShowSearchPayerDiv();
 			disabled = 'disabled';
 			checked = '';
@@ -206,16 +190,6 @@
 		}
 		else {
 			UnlockPayer();
-		}
-	}
-	
-	function OnClientTypeChanged(selectedValue) {
-		if (selectedValue == "${ClientTypeDrugstore}") {
-			ViewDiv(true, "#DeliveryAddressDiv");
-		}
-		
-		if (selectedValue == "${ClientTypeSupplier}") {
-			ViewDiv(false, "#DeliveryAddressDiv");
 		}
 	}
 	
@@ -257,54 +231,6 @@
 		jQuery("#FillBillingInfo").attr('checked', '');
 		jQuery("#FillBillingInfo").attr('disabled', '');
 		ViewDiv(false, "#SelectPayerDiv");
-	}
-	
-	function addPhone(prefix) {
-		var linkSelector = "#" + prefix + "addPhoneLink";
-		var id = parseInt(jQuery(linkSelector).attr('name'));
-		jQuery(linkSelector).attr('name', id + 1);
-		
-		var html = "<tr id='phone" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
-			"<td width='30%'>Номер телефона:</td>" +
-			"<td width='53%'>" +
-			"<input type='text' name='" + prefix + "Contacts[" + id + "].ContactText' class='phone' style='width: 100%' />" +
-			"<input type='hidden' name='" + prefix + "Contacts[" + id + "].Type' value='1' /></td>" +
-			"<td align='right'><input type='button' onclick=removeElement('phone" + id + prefix + "') value='Удалить' /></td>" +
-			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + prefix + "Contacts[" + id + "].Comment' style='width: 100%' /></td>" +
-			"</tr></table></td></tr>";
-		jQuery("#" + prefix + "Phones").append(html);
-	}
-
-	function addEmail(prefix) {
-		var linkSelector = "#" + prefix + "addEmailLink";
-		var id = parseInt(jQuery(linkSelector).attr('name'));
-		jQuery(linkSelector).attr('name', id + 1);
-		
-		var html = "<tr id='email" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
-			"<td width='30%'>Email:</td>" +
-			"<td width='53%'>" +
-			"<input type='text' name='" + prefix + "Contacts[" + id + "].ContactText' class='email' style='width: 100%' />" +
-			"<input type='hidden' name='" + prefix + "Contacts[" + id + "].Type' value='0' /></td>" +
-			"<td align='right'><input type='button' onclick=removeElement('email" + id + prefix + "') value='Удалить' /></td>" +
-			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + prefix + "Contacts[" + id + "].Comment' style='width: 100%' /></td>" +
-			"</tr></table></td></tr>";
-		jQuery("#" + prefix + "Emails").append(html);
-	}
-
-	function addPerson(prefix) {
-		var id = parseInt(jQuery("#" + prefix + "addPersonLink").attr('name'));
-		jQuery("#" + prefix + "addPersonLink").attr('name', id + 1);
-		var html = "<tr id='person" + id + prefix + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
-			"<td width='30%'>Ф.И.О.:</td>" +
-			"<td width='53%'>" +
-			"<input type='text' name='" + prefix + "Persons[" + id + "].Name' style='width: 100%' /></td>" +
-			"<td align='right'><input type='button' onclick=removeElement('person" + id + prefix + "') value='Удалить' /></td>" +
-			"</tr></table></td></tr>";
-		jQuery("#" + prefix + "Persons").append(html);
-	}
-	
-	function removeElement(id) {
-		jQuery("#" + id).remove();
 	}
 </script>
 
@@ -483,89 +409,8 @@
 				<td width="50%"><input type="text" id="UserName" name="userName" style="width: 100%" /></td>
 				<td></td>
 			</tr>
-			
-			<tr valign="top">
-				<td colspan="2">
-					<div class="contextualNoTopSpace">
-						<a id="useraddPhoneLink" class="icon icon-add" name="2" href="javascript:"
-							onclick="addPhone('user')">Добавить</a>
-					</div>
-					<h4>Телефоны</h4>
-					<table id = "userPhones" cellpadding="0" cellspacing="10" width="100%" border="0">
-						<tr>
-							<td>
-							<table width="100%" cellpadding="0" cellspacing="0" border="0">
-							<tr>
-								<td width="30%">Номер телефона:</td>
-								<td>
-									<input type="text" id="UserContactPhone" name="userContacts[0].ContactText" class="phone" style="width: 100%" />
-									<input type="hidden" name="userContacts[0].Type" value="1" />
-								</td>
-							</tr>
-							<tr>
-								<td>Примечание:</td>
-								<td><input type="text" name="userContacts[0].Comment" style="width: 100%" /></td>
-							</tr>
-							</table>
-							</td>
-						</tr>
-					</table>
-				</td>
-				<td></td>
-			</tr>
 
-			<tr valign="top">
-				<td colspan="2">
-					<div class="contextualNoTopSpace">
-						<a id="useraddEmailLink" class="icon icon-add" name="500" href="javascript:"
-							onclick="addEmail('user')">Добавить</a>
-					</div>
-					<h4>Email</h4>
-					<table id = "userEmails" cellpadding="0" cellspacing="10" width="100%" border="0">
-						<tr>
-							<td>
-							<table width="100%" cellpadding="0" cellspacing="0" border="0">
-							<tr>
-								<td width="30%">Email:</td>
-								<td>
-									<input type="text" id="UserContactEmail" name="userContacts[1].ContactText" class="email" style="width: 100%" />
-									<input type="hidden" name="userContacts[1].Type" value="0" />
-								</td>
-							</tr>
-							<tr>
-								<td>Примечание:</td>
-								<td><input type="text" name="userContacts[1].Comment" style="width: 100%" /></td>
-							</tr>
-							</table>
-							</td>
-						</tr>
-					</table>
-				</td>
-				<td></td>
-			</tr>
-
-			<tr valign="top">
-				<td colspan="2">
-					<div class="contextualNoTopSpace">
-						<a id="useraddPersonLink" class="icon icon-add" name="1" href="javascript:"
-							onclick="addPerson('user')">Добавить</a>
-					</div>
-					<h4>Контактные лица</h4>
-					<table id = "userPersons" cellpadding="0" cellspacing="10" width="100%" border="0">
-						<tr>
-							<td>
-								<table width="100%" cellpadding="0" cellspacing="0" border="0">
-									<tr>
-										<td width="30%">Ф.И.О.:</td>
-										<td><input type="text" name="userPersons[0].Name" style="width: 100%" /></td>
-									</tr>
-								</table>
-							</td>
-						</tr>
-					</table>
-				</td>
-				<td></td>
-			</tr>
+			<% OutputSubView("/SubViews/ContactGroupRegistrator", {@prefix: @user}) %>
 		</table>
 	</div>
 

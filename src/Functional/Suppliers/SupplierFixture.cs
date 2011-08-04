@@ -21,7 +21,6 @@ namespace Functional.Suppliers
 		{
 			user = DataMother.CreateSupplierUser();
 			supplier = (Supplier)user.RootService;
-			scope.Flush();
 		}
 
 		[Test]
@@ -93,43 +92,6 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-		}
-
-		[Test]
-		public void Register()
-		{
-			Open();
-			browser.Click("Поставщик");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
-
-			Prepare();
-
-			browser.Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
-			browser.Click("Сохранить");
-			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
-			Console.WriteLine(browser.Url);
-		}
-
-		[Test]
-		public void Register_supplier_show_user_card()
-		{
-			Open("Register/RegisterSupplier");
-			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
-			Prepare();
-
-			browser.Css("#FillBillingInfo").Click();
-			browser.Click("Зарегистрировать");
-
-			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
-		}
-
-		private void Prepare()
-		{
-			Css("#JuridicalName").TypeText("тестовый поставщик");
-			Css("#ShortName").TypeText("тестовый");
-			Css("#ClientContactPhone").TypeText("473-2606000");
-			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
 		}
 	}
 }

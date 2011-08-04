@@ -33,7 +33,7 @@ namespace Integration.Controllers
 			controller.Add(address, new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
 			var messages = ClientInfoLogEntity.Queryable.Where(m => m.ObjectId == user.Id);
-			Assert.That(messages.Any(m => m.Message == "тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
+			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 	}
 }

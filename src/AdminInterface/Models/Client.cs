@@ -347,7 +347,8 @@ group by u.ClientId")
 
 		public virtual bool ShouldSendNotification()
 		{
-			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payers.All(p => p.Id != 921);
+			return !Settings.ServiceClient && Settings.InvisibleOnFirm == DrugstoreType.Standart && Payers.All(p => p.Id != 921)
+				&& Addresses.Count > 0;
 		}
 
 		public virtual void UpdateRegionSettings(RegionSettings[] regionSettings)

@@ -31,7 +31,6 @@ namespace AdminInterface.Controllers
 	}
 
 	[
-		Layout("GeneralWithJQuery"),
 		Helper(typeof(BindingHelper)), 
 		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf),
@@ -93,9 +92,7 @@ namespace AdminInterface.Controllers
 
 				supplier.RegionMask = regionSettings.GetBrowseMask();
 				supplier.HomeRegion = Region.Find(homeRegion);
-				supplier.ContactGroupOwner = new ContactGroupOwner(
-					ContactGroupType.ClientManagers,
-					ContactGroupType.OrderManagers);
+				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Administrator);
 				if (currentPayer == null)
 				{
@@ -104,9 +101,29 @@ namespace AdminInterface.Controllers
 				}
 
 				supplier.Payer = currentPayer;
-				AddContactsToClient(supplier.ContactGroupOwner, supplierContacts);
+				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.Save();
+
+				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
+				{
+					var persons = BindObject<List<Person>>(group.Type + "Persons");
+					var contacts = BindObject<List<Contact>>(group.Type + "Contacts");
+
+					foreach (var contact in contacts.Where(c => String.IsNullOrEmpty(c.ContactText)).ToArray())
+						contacts.Remove(contact);
+
+					foreach (var person in persons.Where(c => String.IsNullOrEmpty(c.Name)).ToArray())
+						persons.Remove(person);
+
+					group.Persons = persons;
+					group.Contacts = contacts;
+					group.Adopt();
+					group.Save();
+					group.Persons.Each(p => p.Save());
+				}
+
 				scope.Flush();
+
 				CreateSupplier(DefaultValues.Get(), supplier);
 				Maintainer.MaintainIntersection(supplier);
 
@@ -234,7 +251,7 @@ namespace AdminInterface.Controllers
 					newClient.AddAddress(deliveryAddress);
 
 				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
-				AddContactsToClient(newClient.ContactGroupOwner, clientContacts);
+				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
 				password = newUser.CreateInAd();
@@ -438,7 +455,7 @@ WHERE   intersection.pricecode IS NULL
 			return user;
 		}
 
-		private void AddContactsToClient(ContactGroupOwner owner, Contact[] clientContacts)
+		private void AddContacts(ContactGroupOwner owner, Contact[] clientContacts)
 		{
 			var generalGroup = owner.AddContactGroup(ContactGroupType.General);
 			foreach (var contact in clientContacts)

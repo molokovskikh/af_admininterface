@@ -72,18 +72,23 @@ namespace Functional
 		[Test]
 		public void Test_select_existsing_payer()
 		{
+			var payer = DataMother.TestClient().Payers.First().MakeNameUniq();
+			scope.Flush();
+
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("PayerExists")).Checked = true;
-			Test_search_and_select(browser, "Payer");
+			Test_search_and_select(browser, "Payer", payer.Name);
 		}
 
 		[Test]
 		public void Test_select_existing_supplier()
 		{
+			var supplier = DataMother.CreateSupplier();
+
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 			Assert.That(browser.CheckBox(Find.ById("PayerExists")).Enabled, Is.False);
-			Test_search_and_select(browser, "Supplier");
+			Test_search_and_select(browser, "Supplier", supplier.Name);
 		}
 
 		[Test]
@@ -126,7 +131,7 @@ namespace Functional
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id)); 
 		}
 
-		private void Test_search_and_select(Browser browser, string namePart)
+		private void Test_search_and_select(Browser browser, string namePart, string searchText)
 		{
 			var errorMessage = "Выберите поставщика";
 			if (namePart.Equals("Payer"))
@@ -138,7 +143,7 @@ namespace Functional
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining(errorMessage));
 
-			browser.TextField(Find.ById("Search" + namePart + "TextPattern")).TypeText("12");
+			browser.TextField(Find.ById("Search" + namePart + "TextPattern")).TypeText(searchText);
 			browser.Button(Find.ById("Search" + namePart + "Button")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Выполняется поиск"));
 
@@ -176,39 +181,33 @@ namespace Functional
 		[Test]
 		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
 		{
-			using (new SessionScope())
-			{
-				var defaults = DefaultValues.Get();
-				defaults.AnalitFVersion = 705;
-				defaults.Update();
-			}
+			var defaults = DefaultValues.Get();
+			defaults.AnalitFVersion = 705;
+			defaults.Update();
 
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
 			browser.Button(Find.ById("RegisterButton")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта №"));
 
-			using(new SessionScope())
-			{
-				var client = GetRegistredClient();
-				var user = client.Users.First();
-				var updateInfo = UserUpdateInfo.Find(user.Id);
-				Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
+			var client = GetRegistredClient();
+			var user = client.Users.First();
+			var updateInfo = UserUpdateInfo.Find(user.Id);
+			Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
-				Assert.That(client.Segment, Is.EqualTo(Segment.Wholesale));
-				Assert.That(client.Status, Is.EqualTo(ClientStatus.On));
-				Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адрес доставки");
+			Assert.That(client.Segment, Is.EqualTo(Segment.Wholesale));
+			Assert.That(client.Status, Is.EqualTo(ClientStatus.On));
+			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адрес доставки");
 
-				var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
-				var passwordChange = logs.SingleOrDefault();
-				Assert.That(passwordChange, Is.Not.Null);
-				Assert.That(passwordChange.UserName, Is.EqualTo(Environment.UserName));
-				Assert.That(passwordChange.TargetUserName, Is.EqualTo(user.Login));
-				Assert.That(passwordChange.SmtpId, Is.Not.EqualTo(0));
-				Assert.That(passwordChange.SentTo.Contains(String.Format(_randomClientName + _mailSuffix)), Is.True);
-				Assert.That(updateInfo, Is.Not.Null, "Не создали запись в UserUpdateInfo");
-			}
-		}		
+			var logs = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.Today, DateTime.Today.AddDays(1));
+			var passwordChange = logs.SingleOrDefault();
+			Assert.That(passwordChange, Is.Not.Null);
+			Assert.That(passwordChange.UserName, Is.EqualTo(Environment.UserName));
+			Assert.That(passwordChange.TargetUserName, Is.EqualTo(user.Login));
+			Assert.That(passwordChange.SentTo.Contains(String.Format(_randomClientName + _mailSuffix)), Is.True);
+			Assert.That(passwordChange.SmtpId, Is.Not.EqualTo(0));
+			Assert.That(updateInfo, Is.Not.Null, "Не создали запись в UserUpdateInfo");
+		}
 
 		[Test]
 		public void Register_client_with_payer_info()
@@ -243,8 +242,8 @@ namespace Functional
 			browser.TextField("ClientContactPhone").TypeText("123-456789");
 			browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Заполняем контактную информацию для пользователя
-			browser.TextField("UserContactPhone").TypeText("123-456789");
-			browser.TextField("UserContactEmail").TypeText(_randomClientName + _mailSuffix);
+			browser.TextField("userContactPhone").TypeText("123-456789");
+			browser.TextField("userContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Если это аптека, заполняем адрес доставки
 			browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
 		}
@@ -318,19 +317,15 @@ namespace Functional
 		public void Register_client_with_user_contact_person_info()
 		{
 			SetupGeneralInformation(browser);
-			browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("Alice");
+			Css("input[name='userPersons[0].Name']").TypeText("Alice");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientCode);
-				var user = client.Users[0];
-				browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
-				client = Client.Find(clientCode);
-				var elementName = String.Format("persons[{0}].Name", client.Users[0].ContactGroup.Persons[0].Id);
-				Assert.That(browser.TextField(Find.ByName(elementName)).Text, Is.EqualTo("Alice"));
-			}
+
+			var client = GetRegistredClient();
+			var user = client.Users[0];
+			Open(user, "Edit");
+			var elementName = String.Format("persons[{0}].Name", client.Users[0].ContactGroup.Persons[0].Id);
+			Assert.That(browser.TextField(Find.ByName(elementName)).Text, Is.EqualTo("Alice"));
 		}
 
 		[Test]
@@ -341,9 +336,9 @@ namespace Functional
 			Assert.IsFalse(browser.CheckBox(Find.ById("ignoreNewPrices")).Checked);
 			browser.CheckBox(Find.ById("ignoreNewPrices")).Checked = true;
 			browser.Button("RegisterButton").Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			var settings = DrugstoreSettings.Find(clientCode);
-			Assert.IsTrue(settings.IgnoreNewPrices);
+
+			var client = GetRegistredClient();
+			Assert.IsTrue(client.Settings.IgnoreNewPrices);
 		}
 
 		[Test, Description("Регистрация клиента с несколькими телефонами для клиента")]
@@ -384,24 +379,22 @@ namespace Functional
 			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("comment for user phone");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientCode);
-				var user = client.Users[0];
-				var contacts = client.Users[0].ContactGroup.Contacts;
-				Assert.That(contacts.Count, Is.EqualTo(3));
-				Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
-				Assert.That(contacts[1].Comment, Is.EqualTo("comment for user phone"));
-				Assert.That(contacts[1].ContactText, Is.EqualTo("222-111111"));
-				Assert.That(contacts[2].Type, Is.EqualTo(ContactType.Email));
 
-				browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
-				var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[1].Id))).Text;
-				var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[1].Id))).Text;
-				Assert.That(contacts[1].ContactText, Is.EqualTo(text));
-				Assert.That(contacts[1].Comment, Is.EqualTo(comment));
-			}
+			var client = GetRegistredClient();
+			var user = client.Users[0];
+			var contacts = client.Users[0].ContactGroup.Contacts;
+			Assert.That(contacts.Count, Is.EqualTo(3));
+			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
+			Assert.That(contacts[1].Comment, Is.EqualTo("comment for user phone"));
+			Assert.That(contacts[1].ContactText, Is.EqualTo("222-111111"));
+			Assert.That(contacts[2].Type, Is.EqualTo(ContactType.Email));
+
+			Open(user, "Edit");
+			Assert.That(browser.Text, Is.StringContaining("Пользователь"));
+			var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[1].Id))).Text;
+			var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[1].Id))).Text;
+			Assert.That(contacts[1].ContactText, Is.EqualTo(text));
+			Assert.That(contacts[1].Comment, Is.EqualTo(comment));
 		}
 
 		[Test, Description("Регистрация клиента с несколькими email для клиента")]
@@ -411,15 +404,12 @@ namespace Functional
 			browser.Link("clientaddEmailLink").Click();
 			Thread.Sleep(500);
 			browser.TextField(Find.ByName("clientContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
-			browser.TextField(Find.ByName("clientContacts[500].ContactText")).TypeText("qwerty2@qq.qq");
-			browser.TextField(Find.ByName("clientContacts[500].Comment")).TypeText("some comment for email");
+			browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("qwerty2@qq.qq");
+			browser.TextField(Find.ByName("clientContacts[2].Comment")).TypeText("some comment for email");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
-			Assert.That(browser.Text, Is.StringContaining("qwerty1@qq.qq, qwerty2@qq.qq - some comment for email"));
 
-			var client = Client.Find(clientCode);
+			var client = GetRegistredClient();
 			var contacts = client.ContactGroupOwner.ContactGroups[0].Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(3));
 			Assert.That(contacts[0].Type, Is.EqualTo(ContactType.Phone));
@@ -427,6 +417,9 @@ namespace Functional
 			Assert.That(contacts[1].Comment, Is.Null);
 			Assert.That(contacts[2].ContactText, Is.EqualTo("qwerty2@qq.qq"));
 			Assert.That(contacts[2].Comment, Is.EqualTo("some comment for email"));
+
+			Open(client);
+			Assert.That(browser.Text, Is.StringContaining("qwerty1@qq.qq, qwerty2@qq.qq - some comment for email"));
 		}
 
 		[Test, Description("Регистрация клиента с несколькими email для пользователя")]
@@ -436,8 +429,8 @@ namespace Functional
 			browser.Link("useraddEmailLink").Click();
 			Thread.Sleep(500);
 			browser.TextField(Find.ByName("userContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
-			browser.TextField(Find.ByName("userContacts[500].ContactText")).TypeText("qwerty2@qq.qq");
-			browser.TextField(Find.ByName("userContacts[500].Comment")).TypeText("some comment for email");
+			browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("qwerty2@qq.qq");
+			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("some comment for email");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
@@ -451,7 +444,7 @@ namespace Functional
 			Assert.That(contacts[2].Comment, Is.EqualTo("some comment for email"));
 			Assert.That(contacts[2].ContactText, Is.EqualTo("qwerty2@qq.qq"));
 
-			browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
+			Open(user, "Edit");
 			var text = browser.TextField(Find.ByName(String.Format("contacts[{0}].ContactText", contacts[2].Id))).Text;
 			var comment = browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", contacts[2].Id))).Text;
 			Assert.That(contacts[2].ContactText, Is.EqualTo(text));
@@ -468,22 +461,19 @@ namespace Functional
 			browser.TextField(Find.ByName("userPersons[1].Name")).TypeText("person2");
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientCode);
-				var user = client.Users[0];
-				var persons = client.Users[0].ContactGroup.Persons;
-				Assert.That(persons.Count, Is.EqualTo(2));
-				Assert.That(persons[0].Name, Is.EqualTo("person1"));
-				Assert.That(persons[1].Name, Is.EqualTo("person2"));
 
-				browser.GoTo(BuildTestUrl(String.Format("users/{0}/edit", user.Id)));
-				var person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[0].Id))).Text;
-				Assert.That(persons[0].Name, Is.EqualTo(person));
-				person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[1].Id))).Text;
-				Assert.That(persons[1].Name, Is.EqualTo(person));
-			}
+			var client = GetRegistredClient();
+			var user = client.Users[0];
+			var persons = client.Users[0].ContactGroup.Persons;
+			Assert.That(persons.Count, Is.EqualTo(2));
+			Assert.That(persons[0].Name, Is.EqualTo("person1"));
+			Assert.That(persons[1].Name, Is.EqualTo("person2"));
+
+			Open(user, "Edit");
+			var person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[0].Id))).Text;
+			Assert.That(persons[0].Name, Is.EqualTo(person));
+			person = browser.TextField(Find.ByName(String.Format("persons[{0}].Name", persons[1].Id))).Text;
+			Assert.That(persons[1].Name, Is.EqualTo(person));
 		}
 
 		[Test, Description("После регистрации клиента, должны бюыть выставлены флаги 'Получать накладные' и 'Получать отказы'")]
@@ -492,15 +482,11 @@ namespace Functional
 			SetupGeneralInformation(browser);
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
-			var clientId = Helper.GetClientCodeFromRegistrationCard(browser);
 
-			using (new SessionScope())
-			{
-				var client = Client.Find(clientId);
-				Assert.That(client.Users.Count, Is.EqualTo(1));
-				Assert.That(client.Users[0].SendWaybills, Is.True);
-				Assert.That(client.Users[0].SendRejects, Is.True);
-			}
+			var client = GetRegistredClient();
+			Assert.That(client.Users.Count, Is.EqualTo(1));
+			Assert.That(client.Users[0].SendWaybills, Is.True);
+			Assert.That(client.Users[0].SendRejects, Is.True);
 		}
 
 		[Test, Description("При регистрации клиента была попытка зарегистрировать скрытую копию, но поставщика не нашли")]
