@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
@@ -35,6 +36,11 @@ namespace Functional
 			_webServer.Start();
 			Settings.Instance.AutoMoveMousePointerToTopLeft = false;
 			Settings.Instance.MakeNewIeInstanceVisible = false;
+
+			if (Debugger.IsAttached)
+			{
+				Settings.Instance.WaitForCompleteTimeOut = int.MaxValue;
+			}
 
 			InitLogger(/*"NHibernate"*/);
 		}

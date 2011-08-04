@@ -1,23 +1,18 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
-using Common.MySql;
-using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
-using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using WatiN.Core;
 using Functional.ForTesting;
-using DescriptionAttribute = NUnit.Framework.DescriptionAttribute;
 
-namespace Functional
+namespace Functional.Drugstore
 {
 	[TestFixture]
 	public class RegistrationFixture : WatinFixture2
@@ -341,7 +336,7 @@ namespace Functional
 			Assert.IsTrue(client.Settings.IgnoreNewPrices);
 		}
 
-		[Test, Description("Регистрация клиента с несколькими телефонами для клиента")]
+		[Test, NUnit.Framework.Description("Регистрация клиента с несколькими телефонами для клиента")]
 		public void Register_with_multiple_client_phones()
 		{
 			SetupGeneralInformation(browser);
@@ -368,7 +363,7 @@ namespace Functional
 			Assert.That(contacts[3].Type, Is.EqualTo(ContactType.Email));
 		}
 
-		[Test, Description("Регистрация клиента с несколькими телефонами для пользователя")]
+		[Test, NUnit.Framework.Description("Регистрация клиента с несколькими телефонами для пользователя")]
 		public void Register_with_multiple_user_phones()
 		{
 			SetupGeneralInformation(browser);
@@ -397,7 +392,7 @@ namespace Functional
 			Assert.That(contacts[1].Comment, Is.EqualTo(comment));
 		}
 
-		[Test, Description("Регистрация клиента с несколькими email для клиента")]
+		[Test, NUnit.Framework.Description("Регистрация клиента с несколькими email для клиента")]
 		public void Register_with_multiple_client_email()
 		{
 			SetupGeneralInformation(browser);
@@ -422,7 +417,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("qwerty1@qq.qq, qwerty2@qq.qq - some comment for email"));
 		}
 
-		[Test, Description("Регистрация клиента с несколькими email для пользователя")]
+		[Test, NUnit.Framework.Description("Регистрация клиента с несколькими email для пользователя")]
 		public void Register_with_multiple_user_email()
 		{
 			SetupGeneralInformation(browser);
@@ -451,7 +446,7 @@ namespace Functional
 			Assert.That(contacts[2].Comment, Is.EqualTo(comment));
 		}
 
-		[Test, Description("Регистрация клиента с несколькими контактными лицами для пользователя")]
+		[Test, NUnit.Framework.Description("Регистрация клиента с несколькими контактными лицами для пользователя")]
 		public void Register_with_multiple_user_persons()
 		{
 			SetupGeneralInformation(browser);
@@ -476,7 +471,7 @@ namespace Functional
 			Assert.That(persons[1].Name, Is.EqualTo(person));
 		}
 
-		[Test, Description("После регистрации клиента, должны бюыть выставлены флаги 'Получать накладные' и 'Получать отказы'")]
+		[Test, NUnit.Framework.Description("После регистрации клиента, должны бюыть выставлены флаги 'Получать накладные' и 'Получать отказы'")]
 		public void After_client_registration_SendWaybills_and_SendRejects_must_be_selected()
 		{
 			SetupGeneralInformation(browser);
@@ -489,7 +484,7 @@ namespace Functional
 			Assert.That(client.Users[0].SendRejects, Is.True);
 		}
 
-		[Test, Description("При регистрации клиента была попытка зарегистрировать скрытую копию, но поставщика не нашли")]
+		[Test, NUnit.Framework.Description("При регистрации клиента была попытка зарегистрировать скрытую копию, но поставщика не нашли")]
 		public void Register_client_with_failed_supplier_searching()
 		{
 			SetupGeneralInformation(browser);
@@ -504,7 +499,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
 
-		[Test, Description("При регистрации клиента была попытка зарегистрировать с существующим плательщиком, но плательщика не нашли")]
+		[Test, NUnit.Framework.Description("При регистрации клиента была попытка зарегистрировать с существующим плательщиком, но плательщика не нашли")]
 		public void Register_client_with_failed_payer_searching()
 		{
 			SetupGeneralInformation(browser);
