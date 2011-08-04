@@ -133,10 +133,10 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 			browser.Link(Find.ByText("Изменить пароль")).Click();
 
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
 			{
-				Assert.That(openedWindow.Text,
-					Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
+				Assert.That(openedWindow.Text, Is.StringContaining(title));
 
 				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 				openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
@@ -151,10 +151,12 @@ namespace Functional.Drugstore
 		{
 			user.Login = "testLogin" + user.Id;
 			user.SaveAndFlush();
+			Refresh();
 
 			browser.Link(Find.ByText(user.Login)).Click();
 			browser.Link(Find.ByText("Изменить пароль")).Click();
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
+			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
 			{
 				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
 				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
@@ -162,38 +164,29 @@ namespace Functional.Drugstore
 				openedWindow.Button(Find.ByValue("Изменить")).Click();
 				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
-			using (new SessionScope())
-			{
-				user = User.Find(user.Id);
-				Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
-			}
+
+			user.Refresh();
+			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 		}
 
 		[Test, NUnit.Framework.Description("При изменении пароля, если логин совпадает с UserId то изменять логин не нужно")]
 		public void Not_change_login_when_change_password()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			Assert.IsTrue(user.Login == user.Id.ToString());
-			using (var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				browser.Link(Find.ByText("Изменить пароль")).Click();
+			browser.Link(Find.ByText(user.Login)).Click();
+			browser.Link(Find.ByText("Изменить пароль")).Click();
 
-				using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
-				{
-					openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-					openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
-					Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
-					openedWindow.Button(Find.ByValue("Изменить")).Click();
-					Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-				}
-			}
-			using (new SessionScope())
+			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
 			{
-				user.Refresh();
-				Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
+				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
+				Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
+				openedWindow.Button(Find.ByValue("Изменить")).Click();
+				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
+
+			user.Refresh();
+			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 		}
 
 		[Test]

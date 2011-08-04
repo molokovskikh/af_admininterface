@@ -99,15 +99,8 @@ namespace Integration.Controllers
 			Assert.That(org.FullName, Is.EqualTo(registredPayer.JuridicalName));
 			Assert.That(registredClient.Addresses[0].LegalEntity, Is.EqualTo(org));
 
-			var intersectionCount = ArHelper.WithSession(
-				s => s.CreateSQLQuery("select count(*) from Future.Intersection where clientId = :clientId")
-					.SetParameter("clientId", registredClient.Id)
-					.UniqueResult<long>());
-
-			var userPriceCount = ArHelper.WithSession(
-				s => s.CreateSQLQuery("select count(*) from Future.UserPrices where userId = :userId")
-					.SetParameter("userId", registredUser.Id)
-					.UniqueResult<long>());
+			var intersectionCount = registredClient.GetIntersectionCount();
+			var userPriceCount = registredUser.GetUserPriceCount();
 
 			var user = registredClient.Users.First();
 			Assert.That(user.Accounting, Is.Not.Null);
