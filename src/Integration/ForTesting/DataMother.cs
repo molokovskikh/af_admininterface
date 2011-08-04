@@ -99,9 +99,13 @@ namespace Integration.ForTesting
 			return CreateTestClientWithAddressAndUser(1UL);
 		}
 
-		public static Client CreateTestClientWithAddressAndUser(ulong clientRegionMask)
+		public static Client CreateTestClientWithAddressAndUser(ulong regionaMask)
 		{
-			var client = TestClient();
+			var client = TestClient(c => {
+				c.MaskRegion = regionaMask;
+				c.Settings.WorkRegionMask = regionaMask;
+				c.Settings.OrderRegionMask = regionaMask;
+			});
 			var user = new User(client) {
 				Name = "test"
 			};
@@ -282,7 +286,7 @@ namespace Integration.ForTesting
 			var supplier = new Supplier {
 				Payer = payer,
 				HomeRegion = homeRegion,
-				RegionMask = 1,
+				RegionMask = homeRegion.Id,
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)

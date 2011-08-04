@@ -241,11 +241,28 @@ namespace AdminInterface.Models.Suppliers
 			Prices.Add(price);
 			return price;
 		}
+
+		public virtual void AddRegion(Region region)
+		{
+			RegionMask |= region.Id;
+			RegionalData.Add(new RegionalData(region, this));
+			foreach (var price in Prices)
+				price.RegionalData.Add(new PriceRegionalData(price, region));
+		}
 	}
 
 	[ActiveRecord("RegionalData", Schema = "Usersettings")]
 	public class RegionalData
 	{
+		public RegionalData()
+		{}
+
+		public RegionalData(Region region, Supplier supplier)
+		{
+			Region = region;
+			Supplier = supplier;
+		}
+
 		[PrimaryKey("RowId")]
 		public uint Id { get; set; }
 

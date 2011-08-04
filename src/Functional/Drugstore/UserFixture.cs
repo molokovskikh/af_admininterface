@@ -756,20 +756,13 @@ namespace Functional.Drugstore
 		]
 		public void After_user_moving_must_be_entries_in_UserPrices()
 		{
-			Client oldClient;
-			Client newClient;
-			Address address;
-			User user;
+			var supplier = DataMother.CreateSupplier(s => {
+				s.AddRegion(Region.Find(16UL));
+			});
+			supplier.Save();
+			var maskRegion = 1UL | 16UL;
+			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
 
-			using (new SessionScope())
-			{
-				var maskRegion = 1UL | 16UL;
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
-
-				user = oldClient.Users[0];
-				address = oldClient.Addresses[0];
-			}
 			var oldCountUserPrices = user.GetUserPriceCount();
 
 			Open(user, "edit");
