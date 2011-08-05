@@ -35,7 +35,8 @@ namespace AdminInterface.Services
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
-			if (!address.Client.ShouldSendNotification())
+			if (!address.Client.ShouldSendNotification()
+				|| !address.Enabled)
 				return;
 
 			var defaults = DefaultValues.Get();
@@ -67,7 +68,7 @@ namespace AdminInterface.Services
 
 			var defaults = DefaultValues.Get();
 			var emails = GetEmailsForNotification(client);
-			foreach (var address in client.Addresses)
+			foreach (var address in client.Addresses.Where(a => a.Enabled))
 			{
 				foreach (var email in emails)
 				{
