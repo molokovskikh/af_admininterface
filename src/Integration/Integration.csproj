@@ -150,6 +150,7 @@
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
+    <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
