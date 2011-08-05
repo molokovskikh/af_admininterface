@@ -60,11 +60,6 @@ namespace AdminInterface.Services
 					null);
 		}
 
-		public void NotifySupplierAboutDrugstoreRegistration(Client client)
-		{
-			NotifySupplierAboutDrugstoreRegistration(client, true);
-		}
-
 		public void NotifySupplierAboutDrugstoreRegistration(Client client, bool isRenotify)
 		{
 			if (!client.ShouldSendNotification())
@@ -72,21 +67,23 @@ namespace AdminInterface.Services
 
 			var defaults = DefaultValues.Get();
 			var emails = GetEmailsForNotification(client);
-			foreach (var email in emails)
+			foreach (var address in client.Addresses)
 			{
-				var address = client.Addresses.First();
-				Func.Mail("tech@analit.net",
-					"Аналитическая Компания Инфорум",
-					"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
-					defaults.AppendFooter(String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
-						client.FullName,
-						client.Name,
-						address.Value,
-						client.HomeRegion.Name,
-						address.Id)),
-					email,
-					"",
-					null);
+				foreach (var email in emails)
+				{
+					Func.Mail("tech@analit.net",
+						"Аналитическая Компания Инфорум",
+						"Новый клиент в системе \"АналитФАРМАЦИЯ\"",
+						defaults.AppendFooter(String.Format(_messageTemplateForSupplierAboutDrugstoreRegistration,
+							client.FullName,
+							client.Name,
+							address.Value,
+							client.HomeRegion.Name,
+							address.Id)),
+						email,
+						"",
+						null);
+				}
 			}
 			// Если это повторная рассылка уведомлений о регистрации, то отсылаем письмо
 			// "Разослано повторное уведомление о регистрации"
