@@ -4,7 +4,7 @@
 	Регистрация клиента
 <% end %>
 
-${app.JS("contact.registrator.js", "jquery_contact_validation.js")}
+${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation.js")}
 
 <script type="text/javascript">
 
@@ -123,41 +123,7 @@ ${app.JS("contact.registrator.js", "jquery_contact_validation.js")}
 		LockPayer();
 		jQuery("#SearchSupplierTextPattern").focus();
 	}
-	
-	function ShowSelectPayerDiv() {	    
-		var searchText = jQuery("#SearchPayerTextPattern").val();
-		if (searchText.length == 0)
-			return;
-		jQuery.get("SearchPayers",
-			{"searchPattern" : searchText},
-			function(htmlOptions) {
-			jQuery('#PayerComboBox').find('option').remove().end();
-			if (htmlOptions.length == 0) {
-				jQuery("#SearchPayerTextPattern").attr("disabled", "");
-				jQuery("#SearchPayerButton").attr("disabled", "");
-				jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
-				return;
-			}
-			jQuery("#PayerComboBox").append(htmlOptions);
-			ViewDiv(false, "#SearchPayerDiv");
-			ViewDiv(true, "#SelectPayerDiv");
-			jQuery("#MessageForPayer").html("");
-		});	    
-		jQuery("#MessageForPayer").html("<i>Выполняется поиск</i>");
-		jQuery("#SearchPayerTextPattern").attr("disabled", "disabled");
-		jQuery("#SearchPayerButton").attr("disabled", "disabled");	    
-	}
-	
-	function ShowSearchPayerDiv() {
-		jQuery('#PayerComboBox').find('option').remove().end();
-		jQuery("#MessageForPayer").html("");
-		jQuery("#SearchPayerTextPattern").attr("disabled", "");
-		jQuery("#SearchPayerButton").attr("disabled", "");	    
-		ViewDiv(false, '#SelectPayerDiv');
-		ViewDiv(true, "#SearchPayerDiv");
-		jQuery("#SearchPayerTextPattern").focus();
-	}
-	
+
 	function ViewDiv(show, selector)
 	{
 		var displayValue = "none";
@@ -165,21 +131,6 @@ ${app.JS("contact.registrator.js", "jquery_contact_validation.js")}
 			displayValue = "block";
 		}
 		jQuery(selector).css("display", displayValue);
-	}
-	
-	function OnPayerExistsChanged(selectedValue) {
-		ViewDiv(false, "#SearchPayerDiv");
-		ViewDiv(false, "#SelectPayerDiv");
-		var disabled = '';
-		var checked = 'checked';
-		if (selectedValue) {
-			ShowSearchPayerDiv();
-			disabled = 'disabled';
-			checked = '';
-		}
-		jQuery("#FillBillingInfo").attr('disabled', disabled);
-		jQuery("#FillBillingInfo").attr('checked', checked);
-		jQuery("#PayerExistsValue").val(selectedValue);
 	}
 	
 	function OnClientViewChanged(selectedValue) {

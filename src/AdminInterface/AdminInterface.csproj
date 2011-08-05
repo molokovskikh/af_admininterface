@@ -379,6 +379,7 @@
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.min.js" />
     <Content Include="JavaScript\jquery.validate.js" />
     <Content Include="JavaScript\jquery_contact_validation.js" />
+    <Content Include="JavaScript\payer.search.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\arrow-down-blue-reversed.gif" />
