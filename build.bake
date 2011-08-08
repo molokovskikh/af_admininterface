@@ -7,6 +7,7 @@ import file from Test.bake
 import file from AppSupport.bake
 import file from Tools.boo
 import file from Db.bake
+import file from Generate.bake
 import System
 import System.Reflection
 import System.IO
@@ -144,42 +145,3 @@ task @TestJs:
 	run = Path.Combine(root, "examples", "run-qunit.js")
 	for file in Directory.GetFiles("test", "*.html"):
 		Sh("$phantom $run $file")
-
-task @GenerateJsTest:
-	testFile = Configuration.file
-	test = Configuration.Maybe.test
-	script = Configuration.Maybe.script
-
-	scriptRoot = "../src/AdminInterface/Assets/JavaScript/"
-	script = testFile + ".js" unless script
-	type = "text/coffeescript"
-	testFile += ".html"
-	template = """<html>
-	<head>
-			<meta http-equiv="content-type" content="text/html; charset=UTF-8">
-			<script src="http://code.jquery.com/jquery-latest.js"></script>
-			<script src="http://code.jquery.com/qunit/git/qunit.js"></script>
-			<script src="../src/AdminInterface/JavaScript/coffee-script.js"></script>
-			<script type="$type" src="$script"></script>
-			<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css"></link>
-	</head>
-	<body>
-		<script type="text/coffeescript">
-			$ ->
-				test "$test", ->
-					ok false, "напиши меня"
-		</script>
-		<h1 id="qunit-header">QUnit example</h1>
-		<h2 id="qunit-banner"></h2>
-		<div id="qunit-testrunner-toolbar"></div>
-		<h2 id="qunit-userAgent"></h2>
-		<ol id="qunit-tests"></ol>
-		<div id="qunit-fixture">test markup, will be hidden</div>
-	</body>
-
-</html>"""
-	testRoot = "test" 
-	testFile = Path.Combine(testRoot, testFile)
-	File.WriteAllText(testFile, template)
-	print "create $testFile"
-	
