@@ -2,10 +2,6 @@
 	История документов
 <% end %>
 
-<div class="PageHeader">
-	История документов
-</div>
-
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}

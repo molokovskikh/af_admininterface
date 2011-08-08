@@ -1,9 +1,6 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
 	История заказов
 <% end %>
-<div class="PageHeader">
-	История заказов
-</div>
 
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Client.Id")}

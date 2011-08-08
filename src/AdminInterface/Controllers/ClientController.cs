@@ -100,7 +100,6 @@ namespace AdminInterface.Controllers
 		Rescue("Fail", typeof(LoginNotFoundException)),
 		Rescue("Fail", typeof(CantChangePassword)),
 		Secure(PermissionType.ViewDrugstore),
-		Layout("Application"),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
 	public class ClientController : ARController

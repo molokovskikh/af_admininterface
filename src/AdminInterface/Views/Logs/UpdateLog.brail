@@ -1,7 +1,6 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-		Статистика обновлений
+	История обновлений
 <% end %>
-<% component Bubble, {"bredcrumbs" : [("Статистика", "")]} %>
 
 <script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
 <script type="text/javascript">
@@ -56,10 +55,6 @@
 			История обновлений клиента ${filter.Client.Name}
 	<% end %>
 
-	<div class="PageHeader">
-		История обновлений клиента ${filter.Client.Name}
-	</div>
-
 	<% component CaptureFor, {"id" : "PostToServer"}: %>
 		${FormHelper.HiddenField("clientCode", filter.Client.Id)}
 	<% end %>
@@ -71,10 +66,6 @@
 		<% component CaptureFor, {"id" : "Title"}: %>
 			История обновлений пользователя ${filter.User.Login}
 		<% end %>
-
-		<div class="PageHeader">
-			История обновлений пользователя ${filter.User.Login}
-		</div>
 
 		<% component CaptureFor, {"id" : "PostToServer"}: %>
 			${FormHelper.HiddenField("userId", filter.User.Id)}
