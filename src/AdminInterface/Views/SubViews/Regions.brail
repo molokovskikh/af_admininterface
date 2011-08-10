@@ -102,7 +102,7 @@
 
 	function updateSelectedRegions()
 	{
-		if (!selectedRegions)
+		if (!window.selectedRegions)
 			return;
 
 		selectedRegions.each(function(r) { selectedRegions.remove(r); });
@@ -150,7 +150,7 @@
 
 	function getRegion(regionId)
 	{
-		if (!regions)
+		if (!window.regions)
 			return null;
 
 		return regions.find(function (region) {

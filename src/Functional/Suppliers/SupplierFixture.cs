@@ -84,7 +84,7 @@ namespace Functional.Suppliers
 			Assert.That(supplier.Name, Is.EqualTo("Тестовый поставщик обновленный"));
 		}
 
-		[Test]
+		[Test, Ignore("Не реализовано")]
 		public void Add_user()
 		{
 			Open(supplier);
