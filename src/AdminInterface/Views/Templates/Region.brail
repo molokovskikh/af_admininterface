@@ -1,0 +1,5 @@
+﻿<input id="${type.ToLower()}Region${region.Id}" type="checkbox" ${"checked" if checked }
+	name="regionSettings[${region.Id}].IsAvaliableFor${type}" value="true"
+	onclick="onClick${Type}Region(${region.Id})" />
+<input id="regionSettings[${region.Id}].IsAvaliableFor${type}" type="hidden"
+	name="regionSettings[${region.Id}].IsAvaliableFor${type}" value="false" />

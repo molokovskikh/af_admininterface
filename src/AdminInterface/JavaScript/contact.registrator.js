@@ -1,7 +1,9 @@
-﻿function addPhone(prefix) {
-	var index = getIndex(1, "#" + prefix + "addEmailLink");
-	var id = "phone" + index + prefix;
-	var name = prefix + "Contacts[" + index + "]";
+﻿function addPhone(namePrefix, idPrefix) {
+	if (!idPrefix)
+		idPrefix = namePrefix;
+	var index = getIndex(1, "#" + idPrefix + "addEmailLink");
+	var id = "phone" + index + idPrefix;
+	var name = namePrefix + "Contacts[" + index + "]";
 	var html = "<tr id='" + id + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
 			"<td width='30%'>Номер телефона:</td>" +
 			"<td width='53%'>" +
@@ -10,13 +12,15 @@
 			"<td align='right'><input type='button' onclick=removeElement('" + id + "') value='Удалить' /></td>" +
 			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + name + ".Comment' style='width: 100%' /></td>" +
 			"</tr></table></td></tr>";
-	jQuery("#" + prefix + "Phones").append(html);
+	jQuery("#" + idPrefix + "Phones").append(html);
 }
 
-function addEmail(prefix) {
-	var index = getIndex(1, "#" + prefix + "addEmailLink");
-	var id = "email" + index + prefix;
-	var name = prefix + "Contacts[" + index + "]";
+function addEmail(namePrefix, idPrefix) {
+	if (!idPrefix)
+		idPrefix = namePrefix;
+	var index = getIndex(1, "#" + idPrefix + "addEmailLink");
+	var id = "email" + index + idPrefix;
+	var name = namePrefix + "Contacts[" + index + "]";
 	var html = "<tr id='"+ id +"'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
 			"<td width='30%'>Email:</td>" +
 			"<td width='53%'>" +
@@ -25,20 +29,22 @@ function addEmail(prefix) {
 			"<td align='right'><input type='button' onclick=removeElement('" + id + "') value='Удалить' /></td>" +
 			"</tr><tr valign='top'><td>Примечание:</td><td><input type='text' name='" + name + ".Comment' style='width: 100%' /></td>" +
 			"</tr></table></td></tr>";
-	jQuery("#" + prefix + "Emails").append(html);
+	jQuery("#" + idPrefix + "Emails").append(html);
 }
 
-function addPerson(prefix) {
-	var index = getIndex(0, "#" + prefix + "addPersonLink");
-	var id = "person" + index + prefix;
-	var name = prefix + "Persons[" + index + "]";
+function addPerson(namePrefix, idPrefix) {
+	if (!idPrefix)
+		idPrefix = namePrefix;
+	var index = getIndex(0, "#" + idPrefix + "addPersonLink");
+	var id = "person" + index + idPrefix;
+	var name = namePrefix + "Persons[" + index + "]";
 	var html = "<tr id='" + id + "'><td><table width='100%' cellpadding='0' cellspacing='0' border='0'><tr valign='top'>" +
 			"<td width='30%'>Ф.И.О.:</td>" +
 			"<td width='53%'>" +
 			"<input type='text' name='" + name + ".Name' style='width: 100%' /></td>" +
 			"<td align='right'><input type='button' onclick=removeElement('" + id + "') value='Удалить' /></td>" +
 			"</tr></table></td></tr>";
-	jQuery("#" + prefix + "Persons").append(html);
+	jQuery("#" + idPrefix + "Persons").append(html);
 }
 
 function getIndex(begin, selector) {

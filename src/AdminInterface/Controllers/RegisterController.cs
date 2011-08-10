@@ -109,14 +109,22 @@ namespace AdminInterface.Controllers
 					var persons = BindObject<List<Person>>(group.Type + "Persons");
 					var contacts = BindObject<List<Contact>>(group.Type + "Contacts");
 
-					foreach (var contact in contacts.Where(c => String.IsNullOrEmpty(c.ContactText)).ToArray())
-						contacts.Remove(contact);
-
-					foreach (var person in persons.Where(c => String.IsNullOrEmpty(c.Name)).ToArray())
-						persons.Remove(person);
-
 					group.Persons = persons;
 					group.Contacts = contacts;
+				}
+
+				var groups = BindObject<RegionalDeliveryGroup[]>("orderDeliveryGroup");
+
+				foreach (var deliveryGroup in groups)
+				{
+					deliveryGroup.Region = Region.Find(deliveryGroup.Region.Id);
+					deliveryGroup.Name = "Доставка заказов " + deliveryGroup.Region.Name;
+					deliveryGroup.ContactGroupOwner = supplier.ContactGroupOwner;
+					supplier.ContactGroupOwner.ContactGroups.Add(deliveryGroup);
+				}
+
+				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
+				{
 					group.Adopt();
 					group.Save();
 					group.Persons.Each(p => p.Save());
@@ -176,8 +184,7 @@ namespace AdminInterface.Controllers
 		public void RegisterClient()
 		{
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
-			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
-			PropertyBag["regions"] = regions;
+			PropertyBag["regions"] = Region.All().ToArray();
 		}
 
 		[AccessibleThrough(Verb.Post)]

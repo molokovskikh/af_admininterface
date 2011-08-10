@@ -53,7 +53,7 @@ namespace Functional.Suppliers
 			browser.Click("Зарегистрировать");
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 
-			var supplier = Supplier.Queryable.OrderByDescending(s => s.Id).First();
+			var supplier = GetSupplier();
 			var group = supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers);
 			Assert.That(group.Persons.Select(p => p.Name).ToArray(),
 				Is.EquivalentTo(new [] {"Родионов Максим Валерьевич"}));
@@ -64,6 +64,46 @@ namespace Functional.Suppliers
 			Assert.That(group.Contacts.Count, Is.EqualTo(2));
 		}
 
+		[Test]
+		public void Register_supplier_with_order_delivery_info()
+		{
+			Open("Register/RegisterSupplier");
+			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			Prepare();
+			browser.Css("#FillBillingInfo").Click();
+
+			Css("#browseRegion4").Click();
+			Css("#browseRegion1").Click();
+
+			Css("#orderDeliveryGroup_4_addEmailLink").Click();
+			Css("input[name='orderDeliveryGroup[4].Contacts[2].ContactText']").TypeText("kvasovtest@analit.net");
+			Css("#orderDeliveryGroup_4_addEmailLink").Click();
+			Css("input[name='orderDeliveryGroup[4].Contacts[3].ContactText']").TypeText("kvasovtest2@analit.net");
+
+			Css("#orderDeliveryGroup_1_addEmailLink").Click();
+			Css("input[name='orderDeliveryGroup[1].Contacts[2].ContactText']").TypeText("kvasovtest1@analit.net");
+			Click("Зарегистрировать");
+
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			var supplier = GetSupplier();
+			var contactGroups = supplier.ContactGroupOwner.ContactGroups.OfType<RegionalDeliveryGroup>().ToList();
+			Assert.That(contactGroups.Count, Is.EqualTo(3));
+
+			var group1 = contactGroups.First(g => g.Region.Id == 1ul);
+			Assert.That(group1.Contacts.Count, Is.EqualTo(1));
+			Assert.That(group1.Contacts[0].ContactText, Is.EqualTo("kvasovtest1@analit.net"));
+
+			var group2 = contactGroups.First(g => g.Region.Id == 4ul);
+			Assert.That(group2.Contacts.Count, Is.EqualTo(2));
+			Assert.That(group2.Contacts[0].ContactText, Is.EqualTo("kvasovtest@analit.net"));
+			Assert.That(group2.Contacts[1].ContactText, Is.EqualTo("kvasovtest2@analit.net"));
+		}
+
+		private static Supplier GetSupplier()
+		{
+			return Supplier.Queryable.OrderByDescending(s => s.Id).First();
+		}
+
 		private void Prepare()
 		{
 			Css("#JuridicalName").TypeText("тестовый поставщик");
@@ -71,6 +111,5 @@ namespace Functional.Suppliers
 			Css("#ClientContactPhone").TypeText("473-2606000");
 			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
 		}
-
 	}
 }

@@ -365,10 +365,14 @@
   <ItemGroup>
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
+    <Content Include="Assets\JavaScript\order.delivery.group.editor.coffee" />
     <Content Include="CopySynonym.aspx" />
     <Content Include="Css\jquery-ui-1.8.6.custom.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
+    <Content Include="JavaScript\backbone-min.js" />
+    <Content Include="JavaScript\backbone.js" />
+    <Content Include="JavaScript\coffee-script.js" />
     <Content Include="JavaScript\Common.js" />
     <Content Include="Assets\JavaScript\filter.coffee" />
     <Content Include="JavaScript\contact.registrator.js" />
@@ -377,9 +381,13 @@
     <Content Include="JavaScript\jquery-ui-1.8.6.custom.min.js" />
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.js" />
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.min.js" />
+    <Content Include="JavaScript\jquery.tmpl.js" />
+    <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.validate.js" />
     <Content Include="JavaScript\jquery_contact_validation.js" />
     <Content Include="JavaScript\payer.search.js" />
+    <Content Include="JavaScript\underscore-min.js" />
+    <Content Include="JavaScript\underscore.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\arrow-down-blue-reversed.gif" />
@@ -428,6 +436,7 @@
     </Content>
     <None Include="Views\RegionalAdmin\AdminEditor.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
+    <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
   </ItemGroup>
   <ItemGroup>
@@ -526,7 +535,6 @@
     <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
-    <None Include="Views\SubViews\RegionSettings.brail" />
     <None Include="Views\UserSearch\SearchBy.brail" />
     <None Include="Views\Users\DrugstoreSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />

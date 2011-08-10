@@ -32,9 +32,25 @@ namespace AdminInterface.Helpers
 		public AppHelper(IEngineContext engineContext) : base(engineContext)
 		{}
 
+		public string Liketemplate(string value)
+		{
+			return "$" + value;
+		}
+
 		public string Asset(string name)
 		{
-			return Resource(new [] {name}, "Assets/JavaScript", "<script type='text/coffeescript' src='{0}'></script>");
+			var compiled = Path.ChangeExtension(name, ".js");
+			var file = Path.Combine(Context.ApplicationPhysicalPath, "Assets/JavaScript", compiled);
+			if (File.Exists(file))
+				name = compiled;
+
+			var type = "";
+			if (Path.GetExtension(name).ToLower() == ".js")
+				type = "text/javascript";
+			else if (Path.GetExtension(name).ToLower() == ".coffee")
+				type = "text/coffeescript";
+
+			return Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
 		}
 
 		public string Style(object item)

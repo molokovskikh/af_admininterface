@@ -4,7 +4,8 @@
 	Регистрация поставщика
 <% end %>
 
-${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation.js")}
+${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation.js", "underscore.js", "backbone.js", "jquery.tmpl.js")}
+${app.Asset("order.delivery.group.editor.coffee")}
 
 <style>
 
@@ -16,6 +17,15 @@ ${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation
 </style>
 
 <script type="text/javascript">
+
+	$(function () {
+		selectedRegions = new window.Regions();
+		regions = new window.Regions();
+		var view = new window.GroupListView({ regions: selectedRegions });
+		<% for region in regions: %>
+			regions.add({id: ${region.Id}, name: "${region.Name}"});
+		<% end %>
+	});
 
 	jQuery(function() {
 		jQuery("#PayerExists").attr({checked : "", disabled : ""});
@@ -80,6 +90,15 @@ ${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation
 	}
 
 </script>
+
+<style>
+	.contact-group
+	{
+		border-width: 0px;
+		width: 100%;
+		border-spacing: 0px;
+	}
+</style>
 
 <div style="width: 800px;">
 <form method="post">
@@ -168,7 +187,9 @@ ${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation
 	<% for group in supplier.GetAditionalContactGroups(): %>
 	<div class=block>
 		<h3>${group.Name}</h3>
+		<table class="contact-group">
 		<% OutputSubView("/SubViews/ContactGroupRegistrator", {@prefix: group.Type}) %>
+		</table>
 	</div>
 	<% end %>
 
@@ -223,9 +244,26 @@ ${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 
+	<script id="orderDeliveryGroup" type="text/x-jquery-tmpl">
+		<div>
+			<input type=hidden value=${app.Liketemplate("{attributes.id}")} name="orderDeliveryGroup[${app.Liketemplate("{attributes.id}")}].Region.Id">
+			<h4>${app.Liketemplate("{attributes.name}")}</h4>
+			<div class="contextualNoTopSpace">
+				<a id="orderDeliveryGroup_${app.Liketemplate("{attributes.id}")}_addEmailLink" class="icon icon-add" href="javascript:"
+					onclick="addEmail('orderDeliveryGroup[${app.Liketemplate("{attributes.id}")}].', 'orderDeliveryGroup_${app.Liketemplate("{attributes.id}")}_')">Добавить</a>
+			</div>
+			<table id="orderDeliveryGroup_${app.Liketemplate("{attributes.id}")}_Emails" class="contact-group">
+			</table>
+		</div>
+	</script>
+
+	<div class=block id=groups>
+		<h3>Доставка заказов</h3>
+	</div>
+
 	<div class="block">
 		<h3>Сведения о пользователе</h3>
-		<table border="0" width="100%" cellpadding="3" cellspacing="0">
+		<table class="contact-group">
 
 			<tr>
 				<td width="20%">Комментарий:</td>
