@@ -21,6 +21,7 @@ namespace AdminInterface.Models.Logs
 		[Description("АвтоЗаказ")] AutoOrder = 10,
 		[Description("Отправка заказов")] NewOrderSending = 11,
 		[Description("Отправка измененных настроек прайс-листов")] PriceSettingSending = 12,
+		[Description("Загрузка отправленных заказов")] OrdersDownload = 13,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
