@@ -5,6 +5,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -458,6 +459,12 @@ namespace Functional.Drugstore
 		[Test]
 		public void When_add_region_for_browse_it_must_be_in_intersection()
 		{
+			var region = Region.Find(64UL);
+			var supplier = DataMother.CreateSupplier(s => {
+				s.AddRegion(region);
+			});
+			supplier.Save();
+
 			browser.Link(Find.ByText("Показать все регионы")).Click();
 			Thread.Sleep(500);
 			Assert.IsFalse(GetWorkRegion(browser, "Челябинск").Checked);
@@ -472,17 +479,16 @@ select
 count(*) 
 from
 future.Intersection i
-join farm.Regions r on i.RegionId = r.RegionCode and Region like :RegionName
-where i.ClientId = :ClientId
+where i.ClientId = :ClientId and i.RegionId = :RegionId
 ";
 			var count = 0;
 			ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
-													.SetParameter("RegionName", "Челябинск")
+													.SetParameter("RegionId", region.Id)
 													.SetParameter("ClientId", client.Id)
 													.UniqueResult()));
 			Assert.That(count, Is.GreaterThan(0));
 			ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
-													.SetParameter("RegionName", "Чебоксары")
+													.SetParameter("RegionId", region.Id)
 													.SetParameter("ClientId", client.Id)
 													.UniqueResult()));
 			Assert.That(count, Is.GreaterThan(0));
