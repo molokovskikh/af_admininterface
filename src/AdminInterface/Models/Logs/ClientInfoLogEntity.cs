@@ -12,6 +12,7 @@ using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using System.Linq;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate;
 using NHibernate.Linq;
 
 namespace AdminInterface.Models.Logs
@@ -124,6 +125,21 @@ namespace AdminInterface.Models.Logs
 			}
 		}
 
+		public static LogObjectType GetLogObjectType(object entity)
+		{
+			var type = NHibernateUtil.GetClass(entity);
+			if (type == typeof(Client))
+				return LogObjectType.Client;
+			if (type == typeof(Supplier))
+				return LogObjectType.Supplier;
+			if (type == typeof(Address))
+				return LogObjectType.Address;
+			if (type == typeof(User))
+				return LogObjectType.User;
+
+			throw new Exception(String.Format("Не могу определить тип объекта для {0}", entity));
+		}
+
 		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
 		{
 			if (isFree)
@@ -174,8 +190,10 @@ namespace AdminInterface.Models.Logs
 
 		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
 		{
+			var objectType = GetLogObjectType(user);
+			var serviceType = GetLogObjectType(user.RootService);
 			return Queryable
-				.Where(l => l.ObjectId == user.Id || l.ObjectId == user.RootService.Id)
+				.Where(l => (l.ObjectId == user.Id && l.Type == objectType) || (l.ObjectId == user.RootService.Id && l.Type == serviceType))
 				.OrderByDescending(l => l.WriteTime)
 				.Fetch(l => l.Administrator)
 				.ToList();
