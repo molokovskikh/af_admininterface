@@ -214,11 +214,9 @@ end
 			if MailSentHistory.Length > 0:
 				for i, mailSentEntity in enumerate(MailSentHistory):
 			%>
-					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)} ${ "DeletedMessage" if mailSentEntity.IsDeleted}">
+					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)}">
 						<td>
-							<% if not mailSentEntity.IsDeleted: %>
 							<input type="button" value="Удалить" onclick="return RemoveMailEntity(${mailSentEntity.Id});"/>
-							<% end %>
 						</td>
 						<td>
 							${mailSentEntity.SentDate.ToShortDateString()}

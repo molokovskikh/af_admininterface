@@ -148,7 +148,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["LogRecords"] = SwitchLogRecord.GetLogs(payer);
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
-			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
+			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
@@ -330,7 +330,7 @@ namespace AdminInterface.Controllers
 		public void DeleteMail(uint id)
 		{
 			var mailSend = MailSentEntity.Find(id);
-			mailSend.IsDeleted = true;
+			mailSend.Delete();
 			CancelView();
 		}
 
