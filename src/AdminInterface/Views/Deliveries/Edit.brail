@@ -42,8 +42,8 @@
 		<div class="block">
 			<h3>Юридическое лицо</h3>
 			<select name="delivery.LegalEntity.Id" style="width: 80%;">
-			<% for item in delivery.LegalEntity.Payer.JuridicalOrganizations: %>
-				<option value="${item.Id}" ${"selected" if (item.Id == delivery.LegalEntity.Id)}>${item.Name}</option>
+			<% for item in delivery.Client.Orgs(): %>
+				<option value="${item.Id}" ${"selected" if (item.Id == delivery.LegalEntity.Id)}>${item.Payer.Name}, ${item.Name}</option>
 			<% end %>
 			</select>
 		</div>

@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Logs;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -81,10 +82,20 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 				address.UpdateContacts(contacts, deletedContacts);
+
+				var oldLegalEntity = address.OldValue(a => a.LegalEntity);
+				if (address.Payer != address.LegalEntity.Payer)
+				{
+					address.Payer = address.LegalEntity.Payer;
+					this.Mail().AddressMoved(address, address.Client, oldLegalEntity).Send();
+				}
+
 				address.Update();
 				if (address.IsChanged(a => a.LegalEntity))
+				{
 					address.MoveAddressIntersection(address.Client, address.LegalEntity,
-						address.Client, address.OldValue(a => a.LegalEntity));
+						address.Client, oldLegalEntity);
+				}
 				scope.VoteCommit();
 			}
 			Flash["Message"] = new Message("Сохранено");
