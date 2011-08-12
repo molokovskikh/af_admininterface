@@ -83,9 +83,8 @@ namespace Integration
 		[Test]
 		public void test()
 		{
-			var adm = new Administrator();
-			adm.UserName = "KvasovT";
-			adm.CreateUserInAd("123456789");
+			var storage = new ActiveDirectoryUserStorage();
+			storage.CreateAdmin("KvasovT", "", "123456789");
 		}
 
 		[Test]
@@ -180,11 +179,11 @@ namespace Integration
 		{
 			using (var user = new TestADUser())
 			{
-				var adm = new Administrator { UserName = user.Login, ManagerName = "test" };
-				adm.CreateUserInAd("123456789");
-				Assert.That(TestADUser.IsMemberOf(adm.UserName,
-				                                  new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
-				            Is.True);
+				var storage = new ActiveDirectoryUserStorage();
+				storage.CreateAdmin(user.Login, "test", "123456789");
+				Assert.That(TestADUser.IsMemberOf(user.Login,
+					new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
+					Is.True);
 			}
 		}
 
@@ -194,12 +193,12 @@ namespace Integration
 			var login = "test" + new Random().Next();
 			try
 			{
-				var adm = new Administrator { UserName = login, ManagerName = "test" };
-				adm.CreateUserInAd("123456789");
+				var storage = new ActiveDirectoryUserStorage();
+				storage.CreateAdmin(login, "test", "123456789");
 				Assert.That(TestADUser.IsLoginExists(login));
 				Assert.That(TestADUser.IsMemberOf(login,
-				                                  new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
-							Is.True);
+					new DirectoryEntry("LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net")),
+					Is.True);
 			}
 			catch (Exception)
 			{

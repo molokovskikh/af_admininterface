@@ -62,11 +62,157 @@ namespace AdminInterface.Helpers
 		}
 	}
 
+	public interface IUserStorage
+	{
+		bool CreateAdmin(string userName, string managerName, string password);
+		IList<string> GetDomainComputers();
+		bool IsLoginExists(string userName);
+		bool[,] GetLogonHours(string userName);
+		IList<string> GetAccessibleComputers(string userName);
+		void AddAccessibleComputer(string userName, string computer);
+	}
+
+	public class MemoryUserStorage : IUserStorage
+	{
+		public static Dictionary<string, Dictionary<string, object>> users
+			= new Dictionary<string, Dictionary<string, object>>(StringComparer.InvariantCultureIgnoreCase);
+
+		public bool CreateAdmin(string userName, string managerName, string password)
+		{
+			if (IsLoginExists(userName))
+				return false;
+
+			users.Add(userName, new Dictionary<string, object> {
+				{"computers", new List<string>()},
+				{"logonHours", new bool[7, 24]}
+			});
+
+			return true;
+		}
+
+		public IList<string> GetDomainComputers()
+		{
+			return new List<string> {
+				"cmp1", "cmp2"
+			};
+		}
+
+		public bool IsLoginExists(string userName)
+		{
+			return users.ContainsKey(userName);
+		}
+
+		public bool[,] GetLogonHours(string userName)
+		{
+			if (!IsLoginExists(userName))
+				return new bool[7, 24];
+			return (bool[,])users[userName]["logonHours"];
+		}
+
+		public IList<string> GetAccessibleComputers(string userName)
+		{
+			if (!IsLoginExists(userName))
+				return Enumerable.Empty<string>().ToList();
+			return (IList<string>)users[userName]["computers"];
+		}
+
+		public void AddAccessibleComputer(string userName, string computer)
+		{
+			if (!IsLoginExists(userName))
+				return;
+			((List<string>)users[userName]["computers"]).Add(computer);
+		}
+	}
+
+	public class ActiveDirectoryUserStorage : IUserStorage
+	{
+		public bool CreateAdmin(string userName, string managerName, string password)
+		{
+			var entry = ADHelper.FindDirectoryEntry(userName);
+
+			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
+			var root = new DirectoryEntry("LDAP://OU=Офис,DC=adc,DC=analit,DC=net");
+
+			if (entry != null)
+			{
+				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
+				// установить pwdLastSet в текущую дату
+				entry.Properties["pwdLastSet"][0] = -1;
+				// сменить пароль
+				entry.Invoke("SetPassword", password);
+				entry.CommitChanges();
+
+				var member = entry.Properties["memberOf"]
+					.OfType<string>()
+					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
+
+				if (String.IsNullOrEmpty(member))
+				{
+					var adminGroup = new DirectoryEntry(adminGroupPath);
+					adminGroup.Invoke("Add", entry.Path);
+					adminGroup.CommitChanges();
+				}
+				entry.MoveTo(root);
+				entry.CommitChanges();
+				return false;
+			}
+
+			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
+			var adminGroup1 = new DirectoryEntry(adminGroupPath);
+			var user = root.Children.Add("CN=" + userName, "user");
+			user.Properties["samAccountName"].Value = userName;
+			if (!String.IsNullOrEmpty(managerName.Trim()))
+				user.Properties["sn"].Value = managerName;
+			user.Properties["logonHours"].Value = ADHelper.LogonHours();
+			user.CommitChanges();
+			user.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
+			user.CommitChanges();
+			user.Invoke("SetPassword", password);
+			user.CommitChanges();
+
+			userGroup.Invoke("Add", user.Path);
+			userGroup.CommitChanges();
+
+			adminGroup1.Invoke("Add", user.Path);
+			adminGroup1.CommitChanges();
+
+			root.CommitChanges();
+			return true;
+		}
+
+		public IList<string> GetDomainComputers()
+		{
+			return ADHelper.GetDomainComputers();
+		}
+
+		public bool IsLoginExists(string userName)
+		{
+			return ADHelper.IsLoginExists(userName);
+		}
+
+		public bool[,] GetLogonHours(string userName)
+		{
+			return ADHelper.GetLogonHours(userName);
+		}
+
+		public IList<string> GetAccessibleComputers(string userName)
+		{
+			return ADHelper.GetAccessibleComputers(userName);
+		}
+
+		public void AddAccessibleComputer(string userName, string computer)
+		{
+			ADHelper.AddAccessibleComputer(userName, computer);
+		}
+	}
+
 	public class ADHelper
 	{
 		private static ILog log = LogManager.GetLogger(typeof(ADHelper));
 
 		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
+
+		public static IUserStorage Storage = new ActiveDirectoryUserStorage();
 
 		public static ADUserInformationCollection GetPartialUsersInformation(IEnumerable<User> users)
 		{
@@ -249,11 +395,6 @@ namespace AdminInterface.Helpers
 
 		public static bool[,] GetLogonHours(string login)
 		{
-#if DEBUG
-			var entity = FindDirectoryEntry(login);
-			if (entity == null)
-				return new bool[7, 24];
-#endif
 			var entry = GetDirectoryEntry(login);
 			var week = new List<bool>();
 			var logonHours = (byte[]) entry.Properties["logonHours"].Value;
@@ -400,11 +541,6 @@ namespace AdminInterface.Helpers
 
 		public static IList<string> GetAccessibleComputers(string login)
 		{
-#if DEBUG
-			var entity = FindDirectoryEntry(login);
-			if (entity == null)
-				return Enumerable.Empty<string>().ToList();
-#endif
 			var computers = new List<string>();
 			var user = GetDirectoryEntry(login);
 			var workstations = user.Properties["userWorkstations"];
@@ -416,7 +552,6 @@ namespace AdminInterface.Helpers
 
 		public static void AddAccessibleComputer(string login, string computerName)
 		{
-#if !DEBUG
 			var entry = GetDirectoryEntry(login);
 			var workstations = entry.Properties["userWorkstations"];
 			if (workstations.Count == 0)
@@ -433,7 +568,6 @@ namespace AdminInterface.Helpers
 			}
 			entry.Properties["userWorkstations"][0] = String.Format("{0},{1}", entry.Properties["userWorkstations"][0], computerName);
 			entry.CommitChanges();
-#endif
 		}
 
 		public static void Delete(string login)

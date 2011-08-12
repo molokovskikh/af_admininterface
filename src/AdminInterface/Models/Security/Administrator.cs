@@ -228,60 +228,6 @@ namespace AdminInterface.Models.Security
 			get { return HavePermisions(PermissionType.SupplierInterface); }
 		}
 
-		public bool CreateUserInAd(string password)
-		{
-			var entry = ADHelper.FindDirectoryEntry(UserName);
-
-			var adminGroupPath = "LDAP://CN=Региональные администраторы,OU=Группы,OU=Клиенты,DC=adc,DC=analit,DC=net";
-			var root = new DirectoryEntry("LDAP://OU=Офис,DC=adc,DC=analit,DC=net");
-
-			if (entry != null)
-			{
-				entry.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
-				// установить pwdLastSet в текущую дату
-				entry.Properties["pwdLastSet"][0] = -1;
-				// сменить пароль
-				entry.Invoke("SetPassword", password);
-				entry.CommitChanges();
-
-				var member = entry.Properties["memberOf"]
-					.OfType<string>()
-					.FirstOrDefault(mebmer => mebmer.Equals(adminGroupPath));
-
-				if (String.IsNullOrEmpty(member))
-				{
-					var adminGroup = new DirectoryEntry(adminGroupPath);
-					adminGroup.Invoke("Add", entry.Path);
-					adminGroup.CommitChanges();
-				}
-				entry.MoveTo(root);
-				entry.CommitChanges();
-				return false;
-			}
-
-			var userGroup = new DirectoryEntry("LDAP://CN=Пользователи офиса,OU=Уровни доступа,OU=Офис,DC=adc,DC=analit,DC=net");
-			var adminGroup1 = new DirectoryEntry(adminGroupPath);
-			var user = root.Children.Add("CN=" + UserName, "user");
-			user.Properties["samAccountName"].Value = UserName;
-			if (!String.IsNullOrEmpty(ManagerName.Trim()))
-				user.Properties["sn"].Value = ManagerName;
-			user.Properties["logonHours"].Value = ADHelper.LogonHours();
-			user.CommitChanges();
-			user.Properties["userAccountControl"][0] = AccountControl.NormalAccount;
-			user.CommitChanges();
-			user.Invoke("SetPassword", password);
-			user.CommitChanges();
-
-			userGroup.Invoke("Add", user.Path);
-			userGroup.CommitChanges();
-
-			adminGroup1.Invoke("Add", user.Path);
-			adminGroup1.CommitChanges();
-
-			root.CommitChanges();
-			return true;
-		}
-
 		public void CheckClientPermission(Client client)
 		{
 			CheckClientHomeRegion(client.HomeRegion.Id);

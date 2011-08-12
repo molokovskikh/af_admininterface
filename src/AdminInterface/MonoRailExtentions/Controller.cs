@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -120,6 +121,14 @@ namespace AdminInterface.MonoRailExtentions
 			get
 			{
 				return SecurityContext.Administrator;
+			}
+		}
+
+		protected IUserStorage Storage
+		{
+			get
+			{
+				return ADHelper.Storage;
 			}
 		}
 	}

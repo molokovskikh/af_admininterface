@@ -44,7 +44,7 @@ namespace AdminInterface.Controllers
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["administrator"] = new Administrator();
 			PropertyBag["permissions"] = Permission.FindAll();
-			PropertyBag["computers"] = ADHelper.GetDomainComputers();
+			PropertyBag["computers"] = Storage.GetDomainComputers();
 			PropertyBag["regions"] = regions;
 			PropertyBag["accessibleComputers"] = _avaliableComputers;
 			PropertyBag["days"] = _weekDays;
@@ -90,7 +90,7 @@ namespace AdminInterface.Controllers
 				var isLoginCreated = CreateUserInAD(admin);
 
 				foreach (var computer in machines)
-					ADHelper.AddAccessibleComputer(admin.UserName, computer);
+					Storage.AddAccessibleComputer(admin.UserName, computer);
 				Administrator.SetLogonHours(admin.UserName, weekLogonHours);
 
 				scope.VoteCommit();
@@ -109,13 +109,13 @@ namespace AdminInterface.Controllers
 			var admin = Administrator.GetById(id);
 			PropertyBag["administrator"] = admin;
 			PropertyBag["permissions"] = Permission.FindAll();
-			PropertyBag["computers"] = ADHelper.GetDomainComputers();
-			PropertyBag["accessibleComputers"] = ADHelper.GetAccessibleComputers(admin.UserName);
+			PropertyBag["computers"] = Storage.GetDomainComputers();
+			PropertyBag["accessibleComputers"] = Storage.GetAccessibleComputers(admin.UserName);
 			PropertyBag["regions"] = regions;
 			PropertyBag["days"] = _weekDays;
 
 			var logonHours = new List<bool>();
-			foreach (var hour in ADHelper.GetLogonHours(admin.UserName))
+			foreach (var hour in Storage.GetLogonHours(admin.UserName))
 				logonHours.Add(hour);
 			PropertyBag["logonHours"] = logonHours;
 		}
@@ -145,7 +145,7 @@ namespace AdminInterface.Controllers
 
 				administrator.Update();
 				foreach (var computer in machines)
-					ADHelper.AddAccessibleComputer(administrator.UserName, computer);
+					Storage.AddAccessibleComputer(administrator.UserName, computer);
 
 				Administrator.SetLogonHours(administrator.UserName, weekLogonHours);
 				scope.VoteCommit();
@@ -174,17 +174,15 @@ namespace AdminInterface.Controllers
 
 		private bool CreateUserInAD(Administrator administrator)
 		{
-			var isExist = ADHelper.IsLoginExists(administrator.UserName);
+			var isExist = Storage.IsLoginExists(administrator.UserName);
 			if (isExist)
 				return false;
 
 			var password = User.GeneratePassword();
-#if !DEBUG
-		var isLoginCreated = administrator.CreateUserInAd(password);
+			var isLoginCreated = Storage.CreateAdmin(administrator.UserName, administrator.ManagerName, password);
 
-		if (!isLoginCreated)
-			return false;
-#endif
+			if (!isLoginCreated)
+				return false;
 			Session["Password"] = password;
 			Session["FIO"] = administrator.ManagerName;
 			Session["Login"] = administrator.UserName;
