@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 
@@ -27,6 +28,17 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
 	public class UpdateLogEntity : ActiveRecordBase<UpdateLogEntity>
 	{
+		public UpdateLogEntity()
+		{}
+
+		public UpdateLogEntity(User user)
+		{
+			RequestTime = DateTime.Now;
+			UpdateType = UpdateType.Accumulative;;
+			User = user;
+			UserName = user.Login;
+		}
+
 		[PrimaryKey("UpdateId")]
 		public uint Id { get; set; }
 
@@ -115,6 +127,7 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(session => 
 				session.CreateCriteria(typeof(UpdateLogEntity))
 					.CreateAlias("User", "u", JoinType.InnerJoin)
+					.Add(Expression.Gt(Projections2.BitOr("u.WorkRegionMask", regionMask), 0))
 					.Add(Expression.Ge("RequestTime", beginDate))
 					.Add(Expression.Le("RequestTime", endDate.AddDays(1)))
 					//.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))

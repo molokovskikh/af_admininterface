@@ -6,6 +6,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -71,7 +72,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(LinkHelper)),
 		Secure
 	]
-	public class LogsController : ARSmartDispatcherController
+	public class LogsController : ARController
 	{
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
@@ -130,7 +131,7 @@ namespace AdminInterface.Controllers
 			if (updateType.HasValue)
 			{
 				filter.UpdateType = updateType;
-				filter.RegionMask = regionMask;
+				filter.RegionMask = regionMask & Administrator.RegionMask;
 			}
 			if (clientCode.HasValue)
 				filter.Client = Client.Find(clientCode.Value);

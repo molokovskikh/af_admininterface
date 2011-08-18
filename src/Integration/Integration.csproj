@@ -144,6 +144,7 @@
     <Compile Include="Models\PayerFixture.cs" />
     <Compile Include="Models\PaymentFixture.cs" />
     <Compile Include="Models\RevisionActFixture.cs" />
+    <Compile Include="Models\UpdateFilterFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
     <Compile Include="MonoRailExtentions\BindParametersFixture.cs" />
@@ -173,6 +174,10 @@
     <ProjectReference Include="..\Common.Web.Ui\Common.Web.Ui\Common.Web.Ui.csproj">
       <Project>{95E2C313-46FA-4B4B-9EFF-3228662908F4}</Project>
       <Name>Common.Web.Ui</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Test.Support\Test.Support\Test.Support.csproj">
+      <Project>{A215E837-1208-49E3-AF93-A9612223122C}</Project>
+      <Name>Test.Support</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

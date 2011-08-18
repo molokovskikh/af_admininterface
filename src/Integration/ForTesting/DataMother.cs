@@ -18,21 +18,22 @@ namespace Integration.ForTesting
 		public static Client TestClient(Action<Client> action = null)
 		{
 			var payer = CreatePayer();
+			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
 			var client = new Client(payer) {
 				Status = ClientStatus.On,
 				Segment = Segment.Wholesale,
 				Type = ServiceType.Drugstore,
 				Name = "test",
 				FullName = "test",
-				HomeRegion = ActiveRecordBase<Region>.Find(1UL),
-				MaskRegion = 1UL,
+				HomeRegion = homeRegion,
+				MaskRegion = homeRegion.Id,
 				ContactGroupOwner = new ContactGroupOwner(),
 			};
 
 			client.Settings = new DrugstoreSettings(client) {
 				BasecostPassword = "",
-				WorkRegionMask = 1UL,
-				OrderRegionMask = 1UL,
+				WorkRegionMask = homeRegion.Id,
+				OrderRegionMask = homeRegion.Id,
 			};
 
 			payer.Clients = new List<Client> { client };
@@ -75,9 +76,11 @@ namespace Integration.ForTesting
 			});
 		}
 
-		public static Client CreateTestClientWithUser()
+		public static Client CreateTestClientWithUser(Region region = null)
 		{
 			return TestClient(c => {
+				if (region != null)
+					c.ChangeHomeRegion(region);
 				c.AddUser(new User((Service)c) {
 					Name = "test",
 				});

@@ -484,5 +484,13 @@ where ClientId = :clientId")
 				.SetParameter("orgId", org.Id)
 				.ExecuteUpdate());
 		}
+
+		public virtual void ChangeHomeRegion(Region region)
+		{
+			HomeRegion = region;
+			MaskRegion = region.Id;
+			Settings.WorkRegionMask = region.Id;
+			Settings.OrderRegionMask = region.Id;
+		}
 	}
 }
