@@ -292,14 +292,24 @@ group by u.ClientId")
 			return false;
 		}
 
-		public virtual List<User> UsersForPayer(Payer payer)
+		public virtual int EnabledUserForPayerCount(Payer payer)
 		{
-			return Users.Where(u => u.Payer == payer).ToList();
+			return Users.Where(u => u.Payer == payer && u.Enabled).Count();
 		}
 
-		public virtual List<Address> AddressesForPayer(Payer payer)
+		public virtual int DisabledUserForPayerCount(Payer payer)
 		{
-			return Addresses.Where(a => a.Payer == payer).ToList();
+			return Users.Where(u => u.Payer == payer && !u.Enabled).Count();
+		}
+
+		public virtual int EnabledAddressForPayerCount(Payer payer)
+		{
+			return Addresses.Where(a => a.Payer == payer && a.Enabled).Count();
+		}
+
+		public virtual int DisabledAddressForPayerCount(Payer payer)
+		{
+			return Addresses.Where(a => a.Payer == payer && !a.Enabled).Count();
 		}
 
 		public virtual bool HaveLockedUsers()
