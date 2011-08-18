@@ -238,7 +238,7 @@ where
 		{
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (Client))
-					.Add(Expression.Eq("Id", clientCode))
+					.Add(Restrictions.Eq("Id", clientCode))
 					.SetFetchMode("BillingInstance", FetchMode.Join)
 					//.SetFetchMode("Payer.Clients", FetchMode.Eager)
 					.SetFetchMode("HomeRegion", FetchMode.Join)
@@ -393,7 +393,7 @@ group by u.ClientId")
 
 		public static Client Find(uint id)
 		{
-			return ActiveRecordLinqBase<Client>.Find(id);
+			return ActiveRecordBase<Client>.Find(id);
 		}
 
 		public virtual void Save()
@@ -403,7 +403,7 @@ group by u.ClientId")
 
 		public virtual void SaveAndFlush()
 		{
-			ActiveRecordMediator<Client>.SaveAndFlush(this);
+			ActiveRecordMediator.SaveAndFlush(this);
 		}
 
 		public virtual void Update()
@@ -413,7 +413,7 @@ group by u.ClientId")
 
 		public virtual void UpdateAndFlush()
 		{
-			ActiveRecordMediator<Client>.UpdateAndFlush(this);
+			ActiveRecordMediator.UpdateAndFlush(this);
 		}
 
 		public virtual void Refresh()

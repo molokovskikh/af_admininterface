@@ -220,8 +220,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th>Регион</th>
 					<th>Тип</th>
 					<th>Сегмент</th>
-					<th>Копий</th>
-					<th>Адресов доставки</th>
+					<th>Работающих копий</th>
+					<th>Отключенных копий</th>
+					<th>Работающих адресов</th>
+					<th>Отключенных адресов</th>
 					<th>Дата регистрации</th>
 					<th></th>
 				</tr>
@@ -241,10 +243,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<td>${BindingHelper.GetDescription(client.Type)}</td>
 					<td>${BindingHelper.GetDescription(client.Segment)}</td>
 					<td>
-						${client.UsersForPayer(payer).Count}
+						${client.UsersForPayer(payer).Where({u| u.Enabled }).Count()}
 					</td>
 					<td>
-						${client.AddressesForPayer(payer).Count}
+						${client.UsersForPayer(payer).Where({u| not u.Enabled }).Count()}
+					</td>
+					<td>
+						${client.AddressesForPayer(payer.Where({a| a.Enabled}).Count()}
+					</td>
+					<td>
+						${client.AddressesForPayer(payer.Where({a| not a.Enabled}).Count()}
 					</td>
 					<td>
 						${client.Registration.RegistrationDate.ToShortDateString() if client.Registration}
