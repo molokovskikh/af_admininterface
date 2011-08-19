@@ -89,7 +89,9 @@ namespace AdminInterface.Models
 
 		public string GetUri()
 		{
-			return PublicPropertiesToUrlParts("filter").Implode(v => String.Format("{0}={1}", v.Key, v.Value), "&");
+			return PublicPropertiesToUrlParts("filter")
+				.Where(v => v.Key != "filter.SortBy" && v.Key != "filter.SortDirection")
+				.Implode(v => String.Format("{0}={1}", v.Key, v.Value), "&");
 		}
 
 		public IDictionary GetQueryString()

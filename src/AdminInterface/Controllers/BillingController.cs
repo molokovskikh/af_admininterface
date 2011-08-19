@@ -167,12 +167,8 @@ namespace AdminInterface.Controllers
 			uint clientCode,
 			string tab)
 		{
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				payer.UpdateAndFlush();
-				Flash.Add("Message", new Message("Изменения сохранены"));
-			}
+			payer.Update();
+			Flash.Add("Message", new Message("Изменения сохранены"));
 			RedirectToReferrer();
 		}
 
@@ -249,7 +245,7 @@ namespace AdminInterface.Controllers
 		public void Search()
 		{
 			var filter = new PayerFilter();
-			if (IsPost || Request.QueryString["filter.SearchBy"] != null)
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
 				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				PropertyBag["searchResults"] = filter.Find();
