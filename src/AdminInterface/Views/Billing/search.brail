@@ -4,162 +4,217 @@
 
 <% component Bubble, {"bredcrumbs" : []} %>
 
-<script type="text/javascript">
-	var titlesAndIds = $H({	"SearchByName" : "Наименованию",
-							"SearchById": "Коду клиента",
-							"SearchByUserId": "Коду пользователя",
-							"SearchByBillingId" : "Биллинг коду"});
-						
-	document.observe("dom:loaded", function() {
-		joinSearchHelper($("SearchText"), titlesAndIds);
-		
-		Validation.add("ValidateSearch", "Код не верный", function(v){
-			if ($("SearchByName").checked)
-				return true;
-			else 
-				return isTitleText($("SearchText"), titlesAndIds) || new RegExp("^\\d{1,10}$$").test(v);
-		});		
-		var val = new Validation("SearchForm", 
-								{ onFormValidate : function(result, form){
-									if (result && isTitleText($("SearchText").value, titlesAndIds))
-										$("SearchText").value = "";
-								}});
-	});
-</script>
-
 <div class="CenterBlock FilterBlock">
-	<div class="CornerHolder">
-		<div class="TopLeftCorner">
-		</div>
-		<div class="TopRightCorner">
-		</div>
-	</div>
 	<h3>
 		Фильтр плательщиков
 	</h3>
 	
-	<form id="SearchForm" action="SearchBy.rails" method="post">
+	<form id="SearchForm" method="post">
 	
-	<fieldset style="padding: 0; margin: 0;">
+	<fieldset>
 		<legend>Искать по:</legend>
 		<table style="width:100%">
 			<col style="width:60%" />
 			<col style="width:40%" />
 			<tr>
-				<td>
-					<input id="SearchText" class="ValidateSearch" type="text" name="SearchBy.SearchText" value="${FindBy.SearchText}" style="width: 99%;" />
+				<td class=value>
+					${app.Edit("filter.SearchText")}
 				</td>
 				<td>
-					<input id="SearchByName" type="radio" name="SearchBy.SearchBy" value="Name" ${"checked" if FindBy.IsSearchByName()} />
-					<label for="SearchByName">Наименование</label>
-					<br />
-					<input id="SearchById" type="radio" name="SearchBy.SearchBy" value="Code" ${"checked" if FindBy.IsSearchByCode()} />
-					<label for="SearchById">Код клиента</label>
-					<br />
-					<input id="SearchByUserId" type="radio" name="SearchBy.SearchBy" value="UserId" ${"checked" if FindBy.IsSearchByUserId()} />
-					<label for="SearchByUserId">Код пользователя</label>
-					<br />
-					<input id="SearchByBillingId" type="radio" name="SearchBy.SearchBy" value="BillingCode" ${"checked" if FindBy.IsSearchByBillingCode()} />
-					<label for="SearchByBillingId">Договор</label>
+					${app.Edit("filter.SearchBy", "RadioList")}
 				</td>
 			</tr>
 		</table>
 	</fieldset>	
 	
-	<fieldset style="padding: 0; margin: 0;">
+	<fieldset>
 		<legend>Фильтры:</legend>
 		<table style="width: 100%;" >
-		<col style="width:40%" />
-		<col style="width:60%" />
+			<col style="width:40%" />
+			<col style="width:60%" />
 
-		<tr style="text-align:left;">
-			<td>
-				Должен\Не должен:
-			</td>
-			<td>
-				${FormHelper.Select("SearchBy.PayerState",
-									FindBy.PayerState,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.PayerStateFilter, AdminInterface"),
-									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
-			</td>
-		</tr>
-		<tr style="text-align:left;">
-			<td>
-				Регион:
-			</td>
-			<td>
-				${FormHelper.Select("SearchBy.RegionId",
-									FindBy.RegionId,
-									regions, 
-									{"value":"Id", "text":"Name", "class" : "Full"})}
-			</td>
-		</tr>
-		<tr style="text-align:left;">
-			<td>
-				Сегмент:
-			</td>
-			<td>
-				${FormHelper.Select("SearchBy.Segment",
-									FindBy.Segment,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchSegment, AdminInterface"),
-									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
-			</td>
-		</tr>
-		<tr style="text-align:left;">
-			<td>
-				Тип:
-			</td>
-			<td>
-				<%
-					clientTypesValues = FindBy.GetClientTypeDescriptions()
-					attr = BindingHelper.GetDictionaryMapping({"class" : "Full"})
-					if clientTypesValues.Count == 1:
-						attr.Add("disabled", "disabled")
-					end
-				%>
-				${FormHelper.Select("SearchBy.ClientType",
-									FindBy.ClientType,
-									clientTypesValues,
-									attr)}
-			</td>
-		</tr>
-		<tr style="text-align:left;">
-			<td>
-				Отключен\Не отключен:
-			</td>
-			<td>
-				${FormHelper.Select("SearchBy.ClientStatus",
-									FindBy.ClientStatus,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientStatus, AdminInterface"),
-									BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
-			</td>
-		</tr>
-		<tr style="text-align:left;">
-			<td>
-				Получатель платежей:
-			</td>
-			<td>
-				<select class="Full" name='SearchBy.RecipientId'>
-					<option>Все</option>
-					<% for recipient in FindBy.Recipients(): %>
-					<option ${"selected" if FindBy.RecipientId == recipient.Id} value=${recipient.Id}>
-						${recipient.Name}
-					</option>
-					<% end %>
-				</select>
-			</td>
-		</tr>
-
+			<tr>
+				<td>
+					Должен\Не должен:
+				</td>
+				<td class=value>
+					${app.Edit("filter.PayerState")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Регион:
+				</td>
+				<td class=value>
+					${app.Edit("filter.Region")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Сегмент:
+				</td>
+				<td class=value>
+					${app.Edit("filter.Segment")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Тип:
+				</td>
+				<td class=value>
+					${app.Edit("filter.ClientType")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Отключен\Не отключен:
+				</td>
+				<td class=value>
+					${app.Edit("filter.ClientStatus")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Получатель платежей:
+				</td>
+				<td class=value>
+					${app.Edit("filter.Recipient")}
+				</td>
+			</tr>
 		</table>
 		</fieldset>
-		<div style="text-align:right; margin-top: 10px;">
+		<div class=submit>
 			${FormHelper.Submit("Найти")}
 		</div>
 	</form>
-	<div class="CornerHolder">
-		<div class="BottomLeftCorner">
-		</div>
-		<div class="BottomRightCorner">
-		</div>
-	</div>
 </div>
+
+<% if IsDefined("searchResults"): %>
+	<% if searchResults.Count == 0: %>
+	<div class="EmptyData">
+		По вашему запросу ничего не найдено
+	</div>
+	<% else: %>
+	<div>
+		<form action=Save method="post">
+			${app.ToHidden(filter)}
+			<table class="HighLightCurrentRow DataTable">
+				<thead>
+					<tr>
+						<th>
+							${app.Sortable("Договор", "BillingCode")}
+						</th>
+						<th>
+							${app.Sortable("Краткое наименование", "ShortName")}
+						</th>
+						<th>
+							${app.Sortable("Получатель платежей", "Recipients")}
+						</th>
+						<th>
+							${app.Sortable("Сумма платежа", "PaySum")}
+						</th>
+						<th style="width: 190px;">
+							${app.Sortable("Баланс", "Balance")}
+						</th>
+						<th>
+							${app.Sortable("Дата регистрации", "LastClientRegistrationDate")}
+						</th>
+						<th>
+							${app.Sortable("Отключенных копий", "DisabledUsersCount")}
+						</th>
+						<th>
+							${app.Sortable("Работающих копий", "EnabledUsersCount")}
+						</th>
+						<th>
+							${app.Sortable("Отключенных адресов", "DisabledAddressesCount")}
+						</th>
+						<th>
+							${app.Sortable("Работающих адресов", "EnabledAddressesCount")}
+						</th>
+						<th>
+							Сегменты
+						</th>
+						<th>
+							Регионы
+						</th>
+					</tr>
+				</thead>
+				<% 
+				paymentStyle = ""
+				for i, searchResult in enumerate(searchResults):
+
+					if searchResult.IsDisabled:
+						payerStyle = "background-color: #ffa642;"
+					else:
+						payerStyle = ""
+					end
+
+					if searchResult.IsDebitor():
+						paymentStyle = "background-color: #ff4b42;"
+					else:
+						paymentStyle = ""
+					end
+				%>
+				<tr class="${ViewHelper.GetRowStyle(i)}" style="${payerStyle}">
+					<td class=short>
+						<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}">
+						<a href="edit.rails?BillingCode=${searchResult.BillingCode}">${searchResult.BillingCode}</a>
+					</td>
+					<td>
+						${searchResult.ShortName}
+					</td>
+					<td>
+						${searchResult.Recipients}
+					</td>
+					<td class=short>
+						<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}">
+					</td>
+					<td>
+						${searchResult.Balance.ToString("0.#")}
+						<% if not searchResult.ShowPayDate: %>
+						<br>Счет выставляется автоматически
+						<% end %>
+					</td>
+					<td class=short>
+						${searchResult.LastClientRegistrationDate.ToShortDateString()}
+					</td>
+					<td class=short>
+						${searchResult.DisabledUsersCount}
+					</td>
+					<td class=short>
+						${searchResult.EnabledUsersCount}
+					</td>
+					<td class=short>
+						${searchResult.DisabledAddressesCount}
+					</td>
+					<td class=short>
+						${searchResult.EnabledAddressesCount}
+					</td>
+					<td>
+						${searchResult.GetSegments()}
+					</td>
+					<td>
+						${searchResult.Regions}
+					</td>
+				</tr>
+				<% end %>
+			</table>
+			<div class=submit>
+				<input type="submit" value="Сохранить" />
+			</div>
+		</form>
+
+		<script type="text/javascript">
+			SetupCalendarElements();
+		</script>
+
+	</div>
+
+		<% 
+		component Legend, { "LegendItems" : {	"Плательщик отключен" : "PayerDisabled", 
+												"Должник" : "Debtor" } } 
+		%>
+	
+
+	<% end %>
+<% end %>

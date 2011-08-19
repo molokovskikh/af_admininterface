@@ -50,7 +50,7 @@ namespace AdminInterface.Helpers
 			else if (Path.GetExtension(name).ToLower() == ".coffee")
 				type = "text/coffeescript";
 
-			return Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
+			return assetHelper.Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
 		}
 
 		public string Style(object item)

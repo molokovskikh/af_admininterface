@@ -4,6 +4,22 @@
 	margin-right:auto;
 }
 
+.FilterBlock fieldset
+{
+	padding: 0;
+	margin: 0;
+}
+
+.FilterBlock td.value select, .FilterBlock td.value input
+{
+	width: 100%;
+}
+form div.submit
+{
+	text-align:right;
+	margin-top: 10px;
+}
+
 .FilterBlock
 {
 	width:40%; 

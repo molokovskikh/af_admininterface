@@ -27,7 +27,7 @@
 		return true;
 	}, "Поле содержит некорректный адрес электронной почты");
 
-	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
+	$('.HighLightCurrentRow tbody tr').not('.NoHighLightRow').each(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});

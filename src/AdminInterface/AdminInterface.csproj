@@ -270,12 +270,12 @@
     <Compile Include="Models\Logs\ClientRegistrationLogEntity.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
-    <Compile Include="Models\MailSentEntity.cs" />
+    <Compile Include="Models\Billing\MailSentEntity.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\PaymentInstance.cs" />
     <Compile Include="Models\Logs\UpdateLogEntity.cs" />
-    <Compile Include="Models\BillingSearchItem.cs" />
-    <Compile Include="Models\BillingSearchProperties.cs" />
+    <Compile Include="Models\Billing\BillingSearchItem.cs" />
+    <Compile Include="Models\Billing\PayerFilter.cs" />
     <Compile Include="Models\Logs\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="CopySynonym.aspx.cs">

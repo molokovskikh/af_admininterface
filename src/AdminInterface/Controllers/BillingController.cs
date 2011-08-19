@@ -248,68 +248,22 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
-			var billingSearchProperties = new BillingSearchProperties {
-				ClientStatus = SearchClientStatus.Enabled
-			};
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["FindBy"] = billingSearchProperties;
-		}
-
-		public void SearchBy([DataBind("SearchBy")] BillingSearchProperties searchProperties)
-		{
-			var searchResults = BillingSearchItem.FindBy(searchProperties);
-
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["sortColumnName"] = "ShortName";
-			PropertyBag["sortDirection"] = "Ascending";
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["searchResults"] = searchResults;
-		}
-
-		public void OrderBy(string columnName, 
-							string sortDirection,
-							string searchText,
-							ulong regionId,
-							uint recipientId,
-							PayerStateFilter payerState,
-							SearchSegment segment,
-							SearchClientType clientType,
-							SearchClientStatus clientStatus,
-							SearchBy searchBy)
-		{
-			var searchProperties = new BillingSearchProperties
+			var filter = new PayerFilter();
+			if (IsPost || Request.QueryString["filter.SearchBy"] != null)
 			{
-				PayerState = payerState,
-				SearchText = searchText,
-				RegionId = regionId,
-				RecipientId = recipientId,
-				Segment = segment,
-				ClientStatus = clientStatus,
-				ClientType = clientType,
-				SearchBy = searchBy
-			};
-			var direction = sortDirection == "Ascending" ? SortDirection.Asc : SortDirection.Desc;
-
-			var searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
-
-			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
-
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["searchResults"] = searchResults;
-			PropertyBag["sortColumnName"] = columnName;
-			PropertyBag["sortDirection"] = sortDirection;
-			RenderView("SearchBy");
+				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
+				PropertyBag["searchResults"] = filter.Find();
+			}
+			PropertyBag["filter"] = filter;
 		}
 
-		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
+		public void Save([DataBind("filter")] PayerFilter filter,
 			[DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
-			using (new TransactionScope())
-				foreach (var instance in paymentInstances)
-					instance.Save();
-			SearchBy(searchProperties);
-			RenderView("SearchBy");
+			foreach (var instance in paymentInstances)
+				instance.Save();
+
+			RedirectToAction("Search", filter.GetQueryString());
 		}
 
 		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
