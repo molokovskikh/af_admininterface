@@ -81,6 +81,14 @@
 					${app.Edit("filter.Recipient")}
 				</td>
 			</tr>
+			<tr>
+				<td>
+					Тип выставления счета:
+				</td>
+				<td class=value>
+					${app.Edit("filter.InvoiceType")}
+				</td>
+			</tr>
 		</table>
 		</fieldset>
 		<div class=submit>

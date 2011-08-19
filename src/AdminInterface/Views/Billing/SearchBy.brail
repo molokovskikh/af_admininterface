@@ -1,6 +1,0 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Поиск плательщиков
-<% end %>
-
-<% OutputSubView("Search") %>
-

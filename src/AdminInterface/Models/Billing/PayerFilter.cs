@@ -67,6 +67,8 @@ namespace AdminInterface.Models
 
 		public SearchClientStatus ClientStatus { get; set; }
 
+		public InvoiceType? InvoiceType { get; set; }
+
 		public SearchBy SearchBy { get; set; }
 
 		public PayerFilter()
@@ -101,9 +103,8 @@ namespace AdminInterface.Models
 
 		public IList<BillingSearchItem> Find()
 		{
-			var detachedSqlQuery = new DetachedSqlQuery();
-			var debitorFilterBlock = "";
-			var searchBlock = "";
+			var where = "";
+			var having = "";
 			var groupFilter = "";
 
 			var query = new DetachedSqlQuery();
@@ -111,20 +112,20 @@ namespace AdminInterface.Models
 			switch(SearchBy)
 			{
 				case SearchBy.Name:
-					searchBlock = String.Format(
+					having = String.Format(
 						@"(p.ShortName like :searchText
 or p.JuridicalName like :searchText
 or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)");
 					text = "%" + SearchText + "%";
 					break;
 				case SearchBy.Code:
-					searchBlock = "sum(if(cd.Id = :searchText, 1, 0)) > 0";
+					having = "sum(if(cd.Id = :searchText, 1, 0)) > 0";
 					break;
 				case SearchBy.UserId:
-					searchBlock = "sum(if(users.Id = :searchText, 1, 0)) > 0";
+					having = "sum(if(users.Id = :searchText, 1, 0)) > 0";
 					break;
 				case SearchBy.BillingCode:
-					searchBlock = "p.payerId = :searchText";
+					having = "p.payerId = :searchText";
 					break;
 			}
 			query.SetParameter("searchText", text);
@@ -132,11 +133,17 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch (PayerState)
 			{
 				case PayerStateFilter.Debitors:
-					debitorFilterBlock = "and p.Balance < 0";
+					where = "and p.Balance < 0";
 					break;
 				case PayerStateFilter.NotDebitors:
-					debitorFilterBlock = "and p.oldpaydate >= 0";
+					where = "and p.oldpaydate >= 0";
 					break;
+			}
+
+			if (InvoiceType.HasValue)
+			{
+				where += "and p.AutoInvoice = :InvoiceType";
+				query.SetParameter("InvoiceType", InvoiceType.Value);
 			}
 
 			switch(Segment)
@@ -162,10 +169,10 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch(ClientStatus)
 			{
 				case SearchClientStatus.Enabled:
-					searchBlock = AddFilterCriteria(searchBlock, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) > 0");
+					having = AddFilterCriteria(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) > 0");
 					break;
 				case SearchClientStatus.Disabled:
-					searchBlock = AddFilterCriteria(searchBlock, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) = 0");
+					having = AddFilterCriteria(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) = 0");
 					break;
 			}
 
@@ -182,7 +189,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			}
 
 			if (!String.IsNullOrEmpty(groupFilter))
-				searchBlock = AddFilterCriteria(searchBlock, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
+				having = AddFilterCriteria(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
 			var sql = String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
@@ -217,7 +224,7 @@ where 1 = 1 {0}
 group by p.payerId
 having {1}
 order by {{BillingSearchItem.ShortName}}
-", debitorFilterBlock, searchBlock);
+", where, having);
 
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var session = sessionHolder.CreateSession(typeof(BillingSearchItem));

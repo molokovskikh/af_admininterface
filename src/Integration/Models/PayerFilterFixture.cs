@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
@@ -10,7 +11,7 @@ using log4net.Config;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class BillingSearchItemFixture : IntegrationFixture
+	public class PayerFilterFixture : IntegrationFixture
 	{
 		[Test]
 		public void Search_payer()
@@ -60,7 +61,7 @@ namespace Integration.Models
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
 			var result = items.FirstOrDefault(i => i.BillingCode == payer.Id);
-			Assert.That(result, Is.Not.Null, "�� ����� ����������� {0}", payer.Id);
+			Assert.That(result, Is.Not.Null, "не нашли плательщика {0}", payer.Id);
 		}
 
 		[Test]
@@ -76,6 +77,20 @@ namespace Integration.Models
 				Recipient = Recipient.Queryable.First()
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Search_payer_by_invoice_type()
+		{
+			QueryCatcher.Catch();
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+			payer.AutoInvoice = InvoiceType.Auto;
+			payer.SaveAndFlush();
+
+			var items = new PayerFilter{InvoiceType = InvoiceType.Manual}.Find();
+			Assert.That(items.Any(i => i.BillingCode == payer.Id), Is.False,
+				"не должны были найти плательщика {0}, есть {1}", payer.Id, items.Implode(i => i.BillingCode.ToString()));
 		}
 	}
 }

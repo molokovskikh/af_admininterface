@@ -552,7 +552,6 @@
     <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\RegisterPayer.brail" />
     <None Include="Views\Billing\Search.brail" />
-    <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Monitoring\Clients.brail" />
