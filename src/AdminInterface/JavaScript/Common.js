@@ -63,47 +63,51 @@
 	SetupCalendarElements();
 
 	var TabRouter = Backbone.Router.extend({
-
 		routes: {
-			"tab-:id": "tab"
+			"tab-:id": "tab",
+			"*actions": "defaultRoute"
 		},
 
-		tab: function(id) {
+		tab: function (id) {
 			showTab(id);
+		},
+
+		defaultRoute: function () {
+			var tabs = $(".tabs ul li a[href='#'], .tabs ul li a.inline-tab");
+			if (tabs.length > 0)
+				showTab(tabs.get(0).id);
 		}
 	});
 
 	new TabRouter();
 	Backbone.history.start();
-	
-	$(".tabs ul li a").click(function () {
-		//showTab(this.id);
+
+	//если он у ссылки есть href и он не inline-tab значит это просто ссылка в виде таба и не надо ее обрабатывать
+	$(".tabs ul li a[href='#'], .tabs ul li a.inline-tab").click(function () {
 		window.location.hash = "tab-" + this.id;
-		if ($(this).attr("href") == "#")
-			return false;
-		else
-			return true;
+		return false;
 	});
 
-	$(".tabs ul li a.inline-tab").click(function () {
-		var id = this.id;
+	function loadTabContent(element) {
 		$.ajax({
-			url: $(this).attr("href"),
+			url: element.attr("href"),
 			success: function (content) {
-				$("#" + id + "-tab").html(content)
+				$("#" + element.attr("id") + "-tab").html(content);
 			},
 			error: function () {
 				alert(error);
 			}
 		});
-		return false;
-	});
+	}
 
 	function showTab(id) {
 		$(".tab").hide();
 		$(".tabs ul li a.selected").removeClass("selected");
 		$("#" + id + "-tab").show();
-		$(id).addClass("selected");
+		var element = $("#" + id);
+		element.addClass("selected");
+		if (element.attr("href") != "#")
+			loadTabContent(element);
 	}
 
 	function beginDateAllowed(date) {
