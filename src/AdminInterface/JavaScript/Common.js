@@ -27,7 +27,7 @@
 		return true;
 	}, "Поле содержит некорректный адрес электронной почты");
 
-	$('.HighLightCurrentRow tbody tr').not('.NoHighLightRow').each(function () {
+	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});
@@ -62,11 +62,23 @@
 
 	SetupCalendarElements();
 
+	var TabRouter = Backbone.Router.extend({
+
+		routes: {
+			"tab-:id": "tab"
+		},
+
+		tab: function(id) {
+			showTab(id);
+		}
+	});
+
+	new TabRouter();
+	Backbone.history.start();
+	
 	$(".tabs ul li a").click(function () {
-		$(".tab").hide();
-		$(".tabs ul li a.selected").removeClass("selected");
-		$("#" + this.id + "-tab").show();
-		$(this).addClass("selected");
+		//showTab(this.id);
+		window.location.hash = "tab-" + this.id;
 		if ($(this).attr("href") == "#")
 			return false;
 		else
@@ -87,6 +99,12 @@
 		return false;
 	});
 
+	function showTab(id) {
+		$(".tab").hide();
+		$(".tabs ul li a.selected").removeClass("selected");
+		$("#" + id + "-tab").show();
+		$(id).addClass("selected");
+	}
 
 	function beginDateAllowed(date) {
 		if (endCalendar)
