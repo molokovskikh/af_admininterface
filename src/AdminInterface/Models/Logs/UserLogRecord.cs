@@ -34,7 +34,7 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual LogOperation Operation { get; set; }
 
-		public static IList<UserLogRecord> GetUserEnabledLogRecords(IEnumerable<User> users)
+		public static IList<UserLogRecord> GetLogs(IEnumerable<User> users)
 		{
 			if (users.Count() == 0)
 				return Enumerable.Empty<UserLogRecord>().ToList();
@@ -56,8 +56,8 @@ limit 100")
 		public static UserLogRecord LastOff(uint userId)
 		{
 			return (UserLogRecord)Execute(
-                (session, instance) =>
-                    session.CreateSQLQuery(@"
+				(session, instance) =>
+					session.CreateSQLQuery(@"
 select {UserLogRecord.*}
 from logs.UserLogs {UserLogRecord}
 where Enabled = 0
@@ -65,8 +65,8 @@ where Enabled = 0
 order by logtime desc
 limit 1")
 				.AddEntity(typeof(UserLogRecord))
-                .SetParameter("UserId", userId)
-                .UniqueResult(), null);
+				.SetParameter("UserId", userId)
+				.UniqueResult(), null);
 		}
 
 	}

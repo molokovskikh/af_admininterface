@@ -26,7 +26,7 @@
     filter = function() {
       var filterValue;
       filterValue = $(".current-filter").attr("data-filter");
-      return $(".filtrable tr[data-filter!=" + filterValue + "]").hide();
+      return $(".filtrable tbody tr[data-filter!=" + filterValue + "]").hide();
     };
     return unfilter = function() {
       return $(".filtrable tr").show();

@@ -15,6 +15,7 @@ namespace AdminInterface.Models.Billing
 		[Description("Клиент")] ClientLog = 0,
 		[Description("Пользователь")] UserLog = 1,
 		[Description("Адрес")] AddressLog = 2,
+		[Description("Поставщик")] SupplierLog = 3,
 	}
 
 	public class SwitchLogRecord
@@ -34,22 +35,38 @@ namespace AdminInterface.Models.Billing
 
 		public static IList<SwitchLogRecord> GetUnionLogs(IList<ClientLogRecord> clientLogs,
 			IList<UserLogRecord> userLogs,
-			IList<AddressLogRecord> addressLogs)
+			IList<AddressLogRecord> addressLogs,
+			IList<SupplierLog> supplierLogs)
 		{
 			var logs = clientLogs.Select(log => GetLogRecord(log)).ToList();
 			logs.AddRange(userLogs.Select(log => GetLogRecord(log)));
 			logs.AddRange(addressLogs.Select(log => GetLogRecord(log)));
+			logs.AddRange(supplierLogs.Select(log => GetLogRecord(log)));
 			return logs.OrderByDescending(log => log.LogTime).ToList();
 		}
 
 		private static SwitchLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
 		{
 			var log = new SwitchLogRecord {
+				ObjectId = clientLogRecord.Client.Id,
 				LogTime = clientLogRecord.LogTime,
 				LogType = SwitchLogType.ClientLog,
 				OperatorName = clientLogRecord.OperatorName,
 				Status = clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On),
 				Value = clientLogRecord.Client.Name,
+			};
+			return log;
+		}
+
+		private static SwitchLogRecord GetLogRecord(SupplierLog supplierLog)
+		{
+			var log = new SwitchLogRecord {
+				ObjectId = supplierLog.Supplier.Id,
+				LogTime = supplierLog.LogTime,
+				LogType = SwitchLogType.SupplierLog,
+				OperatorName = supplierLog.OperatorName,
+				Status = !supplierLog.Disabled.Value,
+				Value = supplierLog.Supplier.Name,
 			};
 			return log;
 		}
@@ -82,11 +99,12 @@ namespace AdminInterface.Models.Billing
 
 		public static IList<SwitchLogRecord> GetLogs(Payer payer)
 		{
-			var userLogs = UserLogRecord.GetUserEnabledLogRecords(payer.Users);
-			var addressLogs = AddressLogRecord.GetAddressLogRecords(payer.Addresses);
-			var clientLogs = ClientLogRecord.GetClientLogRecords(payer.Clients);
+			var userLogs = UserLogRecord.GetLogs(payer.Users);
+			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
+			var clientLogs = ClientLogRecord.GetLogs(payer.Clients);
+			var supplierLogs = SupplierLog.GetLogs(payer.Suppliers);
 
-			var logs = GetUnionLogs(clientLogs, userLogs, addressLogs);
+			var logs = GetUnionLogs(clientLogs, userLogs, addressLogs, supplierLogs);
 			var operators = logs.Select(l => l.OperatorName).Distinct().ToList();
 			var admins = ActiveRecordLinqBase<Administrator>.Queryable
 				.Where(a => operators.Contains(a.UserName))

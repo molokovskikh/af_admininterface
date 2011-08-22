@@ -22,7 +22,7 @@
 
 	filter = () ->
 		filterValue = $(".current-filter").attr("data-filter")
-		$(".filtrable tr[data-filter!=#{ filterValue }]").hide()
+		$(".filtrable tbody tr[data-filter!=#{ filterValue }]").hide()
 
 	unfilter = () ->
 		$(".filtrable tr").show()

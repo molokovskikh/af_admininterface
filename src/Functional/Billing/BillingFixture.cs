@@ -22,11 +22,6 @@ namespace Functional.Billing
 		private Payer payer;
 		private Address address;
 
-		public BillingFixture()
-		{
-			UseTestScope = true;
-		}
-
 		[SetUp]
 		public void Setup()
 		{

@@ -28,7 +28,7 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual bool Enabled { get; set; }
 
-		public static IList<AddressLogRecord> GetAddressLogRecords(IEnumerable<Address> addresses)
+		public static IList<AddressLogRecord> GetLogs(IEnumerable<Address> addresses)
 		{
 			if (addresses.Count() == 0)
 				return Enumerable.Empty<AddressLogRecord>().ToList();

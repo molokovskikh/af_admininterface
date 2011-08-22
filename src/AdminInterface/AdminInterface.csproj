@@ -153,6 +153,7 @@
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
+    <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
     <Compile Include="MonoRailExtentions\Controller.cs" />

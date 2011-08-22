@@ -35,7 +35,7 @@ namespace Functional
 		[Test]
 		public void Check_columns_by_billing_search()
 		{
-			Open("Billing/Search.rails");
+			Open("Billing/Search");
 
 			browser.Button(Find.ByValue("Найти")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Отключенных копий"));

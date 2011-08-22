@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
@@ -74,6 +75,36 @@ namespace AdminInterface.Controllers
 					service = ActiveRecordMediator<Service>.FindByPrimaryKey(ServiceId);
 				return service;
 			}
+		}
+
+		public string FilterRow(dynamic log)
+		{
+			var result = new StringBuilder();
+			var filterValue = (string)(log.LogType.ToString() + log.ObjectId.ToString());
+			result.AppendFormat("data-filter=\"{0}\" ", filterValue);
+			if (IsFiltred)
+			{
+				var currentFilterValue = GetFilterValue(Service);
+
+				if (filterValue.ToLower() != currentFilterValue.ToLower())
+					result.AppendFormat("style=\"display:none\"");
+			}
+			return result.ToString();
+		}
+
+		public string GetFilterValue(Service service)
+		{
+			var currentFilterValue = "Log" + service.Id;
+			if (service is Client)
+				currentFilterValue = "Client" + currentFilterValue;
+			else
+				currentFilterValue = "Supplier" + currentFilterValue;
+			return currentFilterValue;
+		}
+
+		private bool IsFiltred
+		{
+			get { return Service != null; }
 		}
 
 		public Dictionary<string, string> Parts()

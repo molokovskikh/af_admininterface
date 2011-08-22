@@ -233,7 +233,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${client.Id}</td>
 					<td>
-						<a href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments" ${'class=selected-filter' if client == filter.Service}>
+						<a data-filter="${filter.GetFilterValue(client)}" href="edit.rails?billingCode=${payer.Id}&ClientCode=${client.Id}&tab=payments" ${'class=current-filter' if client == filter.Service}>
 							${client.Name}
 						</a>
 					</td>
@@ -265,7 +265,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 
 		<div class="VisibleFolder">
-			<table class="DataTable"">
+			<table class="DataTable">
 				<tr>
 					<th>Включен</th>
 					<th>Код</th>
@@ -281,7 +281,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
-						<a href="edit?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments" ${'class=selected-filter' if supplier == filter.Service}>
+						<a data-filter="${filter.GetFilterValue(supplier)}" href="edit?billingCode=${payer.Id}&ClientCode=${supplier.Id}&tab=payments" ${'class=current-filter' if supplier == filter.Service}>
 							${supplier.Name}
 						</a>
 					</td>
@@ -616,7 +616,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
 			Статистика включений/выключений
 		</div>
+		<% if filter.IsFiltred: %>
+		<a href="javascript:" class="filter-checker">Показать для всех</a>
+		<% else: %>
 		<a href="javascript:" class="filter-checker" style="display:none"></a>
+		<% end %>
 		<table class="DataTable filtrable">
 		<% if LogRecords.Count: %>
 			<thead>
@@ -630,7 +634,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			</thead>
 		<% end %>
 		<% for i,logRecord in enumerate(LogRecords): %>
-			<tr class="${ViewHelper.GetRowStyle(i)}" data-filter="${logRecord.LogType}${logRecord.ObjectId}">
+			<tr class="${ViewHelper.GetRowStyle(i)}" ${filter.FilterRow(logRecord)}>
 				<td>${logRecord.LogTime}</td>
 				<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
 				<td>${logRecord.Value}</td>
