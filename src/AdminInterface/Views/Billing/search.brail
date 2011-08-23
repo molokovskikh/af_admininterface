@@ -211,11 +211,6 @@
 				<input type="submit" value="Сохранить" />
 			</div>
 		</form>
-
-		<script type="text/javascript">
-			SetupCalendarElements();
-		</script>
-
 	</div>
 
 		<% 

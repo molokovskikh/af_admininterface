@@ -16,7 +16,7 @@
 	<h3>
 		Отклоненные сообщения
 	</h3>
-	<form action="search.rails" method="get">
+	<form action="search" method="get">
 		${FormHelper.HiddenField("fromDate", fromDate.ToShortDateString())}
 		${FormHelper.HiddenField("toDate", toDate.ToShortDateString())}
 		<table class="CenterBlock" style="text-align:center;">
@@ -64,19 +64,19 @@
 	</tr>
 <% else: %>
   <tr>
-    <th>Smtp ID</th>
-    <th>Дата</th>
-    <th>Тема</th>
-    <th>Отправитель</th>
-    <th>Причина</th>
+	<th>Smtp ID</th>
+	<th>Дата</th>
+	<th>Тема</th>
+	<th>Отправитель</th>
+	<th>Причина</th>
   </tr>
   <% for i, reject in enumerate(rejects): %>
   <tr class="${ViewHelper.GetRowStyle(i)}">
-    <td>${reject.SmtpId}</td>
-    <td>${reject.LogTime}</td>
-    <td>${reject.Subject}</td>
-    <td>${reject.From}</td>
-    <td>${ViewHelper.FormatMessage(reject.Comment)}</td>
+	<td>${reject.SmtpId}</td>
+	<td>${reject.LogTime}</td>
+	<td>${reject.Subject}</td>
+	<td>${reject.From}</td>
+	<td>${ViewHelper.FormatMessage(reject.Comment)}</td>
   </tr>
   <% end %>
 <% end %>

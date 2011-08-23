@@ -6,7 +6,7 @@
 		Фильтр звонков
 	</h3>
 	
-	<form id="SearchForm" action="ShowCallHistory.rails" method="post">
+	<form id="SearchForm" action="ShowCallHistory" method="post">
 	
 	<table style="width:100%">
 		<tr>
@@ -71,7 +71,7 @@
 			${FormHelper.Submit("Найти")}
 		</div>
     </form>
-    <script type="text/javascript">
-    	    SetupCalendarElements();
+	<script type="text/javascript">
+		SetupCalendarElements();
 	</script>
 </div>

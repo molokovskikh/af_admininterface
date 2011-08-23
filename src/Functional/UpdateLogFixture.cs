@@ -67,7 +67,7 @@ namespace Functional
 
 		private IE ViewUpdateLogFromMainPage(UpdateType updateType)
 		{
-			var uriFormat = "Logs/UpdateLog.rails?BeginDate=01.09.2009 0:00:00&EndDate=15.01.2010 0:00:00&RegionMask=137438953471&updateType={0}";
+			var uriFormat = "Logs/UpdateLog?BeginDate=01.09.2009 0:00:00&EndDate=15.01.2010 0:00:00&RegionMask=137438953471&updateType={0}";
 			var uri = String.Format(uriFormat, (int)updateType);
 			var browser = new IE(BuildTestUrl(uri));
 			Assert.That(browser.Text, Is.StringContaining(BindingHelper.GetDescription((StatisticsType)updateType)));
@@ -89,7 +89,7 @@ namespace Functional
 		[Test]
 		public void ViewUpdateLogFromUserPage()
 		{
-			var uri = String.Format("Logs/UpdateLog.rails?userId={0}", GetId(typeof(User)));			
+			var uri = String.Format("Logs/UpdateLog?userId={0}", GetId(typeof(User)));			
 			using (var browser = new IE(BuildTestUrl(uri)))
 			{
 				var calendarFrom = browser.Div("beginDateCalendarHolder");
@@ -109,7 +109,7 @@ namespace Functional
 		[Test]
 		public void ViewUpdateLogFromClientPage()
 		{
-			var uri = String.Format("Logs/UpdateLog.rails?clientCode={0}", GetId(typeof(Client)));
+			var uri = String.Format("Logs/UpdateLog?clientCode={0}", GetId(typeof(Client)));
 			using (var browser = new IE(BuildTestUrl(uri)))
 			{
 				var calendarFrom = browser.Div("beginDateCalendarHolder");
@@ -166,7 +166,7 @@ where
 		[Test]
 		public void Try_sort_by_columns()
 		{
-			var uri = String.Format("Logs/UpdateLog.rails?clientCode={0}", GetId(typeof(Client)));
+			var uri = String.Format("Logs/UpdateLog?clientCode={0}", GetId(typeof(Client)));
 			using (var browser = new IE(BuildTestUrl(uri)))
 			{
 				var calendarFrom = browser.Div("beginDateCalendarHolder");

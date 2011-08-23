@@ -98,7 +98,7 @@
 							<% end %>
 						</li>
 						<li>
-							<a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
+							<a href="${siteroot}/SmapRejector/Show">Отклоненные сообщения</a>
 						</li>
 						<li>
 							<% if admin.HavePermisions(PermissionType.EditSettings): %>
