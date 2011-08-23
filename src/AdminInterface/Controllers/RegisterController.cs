@@ -515,6 +515,9 @@ WHERE   intersection.pricecode IS NULL
 					org.FullName = payer.JuridicalName;
 				}
 
+				if (string.IsNullOrEmpty(payer.Customer))
+					payer.Customer = payer.JuridicalName;
+
 				payer.Save();
 				scope.VoteCommit();
 			}
