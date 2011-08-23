@@ -86,6 +86,7 @@ namespace AdminInterface.Models.Billing
 			Payer = payer;
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
 			PayerName = payer.JuridicalName;
+			Customer = payer.Customer;
 		}
 
 		[PrimaryKey]
@@ -105,6 +106,9 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public string PayerName { get; set; }
+
+		[Property]
+		public string Customer { get; set; }
 
 		[Property, ValidateNonEmpty]
 		public DateTime Date { get; set; }

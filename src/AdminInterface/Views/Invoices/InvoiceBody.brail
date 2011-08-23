@@ -29,7 +29,7 @@
 <p>
 	Плательщик: ${invoice.PayerName}
 	<br />
-	Заказчик: ${invoice.PayerName}
+	Заказчик: ${invoice.Customer}
 	<br>
 	Договор №${invoice.Payer.Id}
 </p>

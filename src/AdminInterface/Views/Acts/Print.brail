@@ -4,7 +4,7 @@
 </p>
 
 <h2>Акт сдачи-приемки оказанных услуг (выполненных работ) № ${act.Id} от ${act.ActDate.ToString("dd MMMM yyyy")}</h2>
-<p>Заказчик: ${act.PayerName}</p>
+<p>Заказчик: ${act.Customer}</p>
 <table>
 	<tr>
 		<th>№</th>
