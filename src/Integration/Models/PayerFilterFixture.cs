@@ -23,13 +23,13 @@ namespace Integration.Models
 			payer.SaveAndFlush();
 
 			var items = new PayerFilter {
-				SearchBy = SearchBy.BillingCode,
+				SearchBy = SearchBy.PayerId,
 				SearchText = payer.Id.ToString(),
 			}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			var result = items[0];
 			Assert.That(result.BillingCode, Is.EqualTo(payer.Id));
-			Assert.That(result.Recipients, Is.EqualTo(recipient.Name));
+			Assert.That(result.Recipient, Is.EqualTo(recipient.Name));
 		}
 
 		[Test]
@@ -39,7 +39,7 @@ namespace Integration.Models
 			var payer = supplier.Payer;
 			supplier.Save();
 			var items = new PayerFilter{
-				SearchBy = SearchBy.BillingCode,
+				SearchBy = SearchBy.PayerId,
 				SearchText = payer.Id.ToString(),
 			}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));

@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,38 +17,38 @@ namespace AdminInterface.Models
 {
 	public enum PayerStateFilter
 	{
-		[Description("Âñå")] All,
-		[Description("Äîëæíèêè")] Debitors,
-		[Description("Íå äîëæíèêè")] NotDebitors,
+		[Description("Ð’ÑÐµ")] All,
+		[Description("Ð”Ð¾Ð»Ð¶Ð½Ð¸ÐºÐ¸")] Debitors,
+		[Description("ÐÐµ Ð´Ð¾Ð»Ð¶Ð½Ð¸ÐºÐ¸")] NotDebitors,
 	}
 
 	public enum SearchSegment
 	{
-		[Description("Âñå")] All,
-		[Description("Ðîçíèöà")] Retail,
-		[Description("Îïò")] Wholesale,
+		[Description("Ð’ÑÐµ")] All,
+		[Description("Ð Ð¾Ð·Ð½Ð¸Ñ†Ð°")] Retail,
+		[Description("ÐžÐ¿Ñ‚")] Wholesale,
 	}
 
 	public enum SearchClientType
 	{
-		[Description("Âñå")] All,
-		[Description("Àïòåêà")] Drugstore,
-		[Description("Ïîñòàâùèê")] Supplier
+		[Description("Ð’ÑÐµ")] All,
+		[Description("ÐÐ¿Ñ‚ÐµÐºÐ°")] Drugstore,
+		[Description("ÐŸÐ¾ÑÑ‚Ð°Ð²Ñ‰Ð¸Ðº")] Supplier
 	}
 
 	public enum SearchClientStatus
 	{
-		[Description("Âñå")] All,
-		[Description("Îòêëþ÷åííûå")] Disabled,
-		[Description("Âêëþ÷åíûå")] Enabled
+		[Description("Ð’ÑÐµ")] All,
+		[Description("ÐžÑ‚ÐºÐ»ÑŽÑ‡ÐµÐ½Ð½Ñ‹Ðµ")] Disabled,
+		[Description("Ð’ÐºÐ»ÑŽÑ‡ÐµÐ½Ñ‹Ðµ")] Enabled
 	}
 
 	public enum SearchBy
 	{
-		[Description("Íàèìåíîâàíèå")] Name,
-		[Description("Êîä êëèåíòà")] Code,
-		[Description("Êîä ïîëüçîâàòåëÿ")] BillingCode,
-		[Description("Äîãîâîð")] UserId
+		[Description("ÐÐ°Ð¸Ð¼ÐµÐ½Ð¾Ð²Ð°Ð½Ð¸Ðµ")] Name,
+		[Description("ÐšÐ¾Ð´ ÐºÐ»Ð¸ÐµÐ½Ñ‚Ð°")] ClientId,
+		[Description("ÐšÐ¾Ð´ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ")] UserId,
+		[Description("Ð”Ð¾Ð³Ð¾Ð²Ð¾Ñ€")] PayerId,
 	}
 
 	public class PayerFilter : Sortable, SortableContributor, IUrlContributor
@@ -118,13 +118,13 @@ or p.JuridicalName like :searchText
 or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)");
 					text = "%" + SearchText + "%";
 					break;
-				case SearchBy.Code:
+				case SearchBy.ClientId:
 					having = "sum(if(cd.Id = :searchText, 1, 0)) > 0";
 					break;
 				case SearchBy.UserId:
 					having = "sum(if(users.Id = :searchText, 1, 0)) > 0";
 					break;
-				case SearchBy.BillingCode:
+				case SearchBy.PayerId:
 					having = "p.payerId = :searchText";
 					break;
 			}
@@ -149,10 +149,10 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch(Segment)
 			{
 				case SearchSegment.Retail:
-					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1");
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1 or s.Segment = 1");
 					break;
 				case SearchSegment.Wholesale:
-					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0");
+					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0 or s.Segment = 1");
 					break;
 			}
 
@@ -194,16 +194,16 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			var sql = String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
 		p.JuridicalName,
-		p.shortname as {{BillingSearchItem.ShortName}},
+		p.ShortName as {{BillingSearchItem.ShortName}},
 		p.Balance as {{BillingSearchItem.Balance}},
-		p.oldtariff as {{BillingSearchItem.PaySum}},
+		p.OldTariff as {{BillingSearchItem.PaySum}},
 		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
 		count(distinct if(cd.Status = 1, cd.Id, null)) as {{BillingSearchItem.EnabledClientCount}},
+		count(distinct if(s.Disabled = 0, s.Id, null)) as {{BillingSearchItem.EnabledSupplierCount}},
 		count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
 		count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
 		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
 		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
-		count(distinct if(s.Disabled = 0, s.Id, null)) as {{BillingSearchItem.EnabledSupplierCount}},
 
 		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
 
@@ -211,9 +211,9 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 		from farm.regions r
 		where r.regioncode & bit_or(cd.maskregion) > 0) as {{BillingSearchItem.Regions}},
 
-		sum(if(cd.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
-		sum(if(cd.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
-		ifnull(group_concat(distinct ifnull(r.Name, '')), '') as {{BillingSearchItem.Recipients}}
+		sum(if(cd.Segment = 1 or s.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
+		sum(if(cd.Segment = 0 or s.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
+		r.Name as {{BillingSearchItem.Recipients}}
 from billing.payers p
 	left join Billing.Recipients r on r.Id = p.RecipientId
 	left join future.Users users on users.PayerId = p.PayerId

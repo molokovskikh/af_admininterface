@@ -172,7 +172,7 @@
 						${searchResult.ShortName}
 					</td>
 					<td>
-						${searchResult.Recipients}
+						${searchResult.Recipient}
 					</td>
 					<td class=short>
 						<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}">

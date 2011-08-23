@@ -18,7 +18,7 @@ namespace AdminInterface.Models
 		public string ShortName { get; set; }
 
 		[Property]
-		public string Recipients { get; set; }
+		public string Recipient { get; set; }
 
 		[Property]
 		public double PaySum { get; set; }
