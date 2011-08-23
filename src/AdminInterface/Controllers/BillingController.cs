@@ -303,13 +303,6 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		private static IList<Region> GetRegions()
-		{
-			var regions = RegionHelper.GetAllRegions();
-			regions.First(r => r.Name == "Все").Id = ulong.MaxValue;
-			return regions;
-		}
-
 		public void AdditionalUserInfo(uint userId, string cssClassName)
 		{
 			CancelLayout();
