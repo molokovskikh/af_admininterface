@@ -71,6 +71,7 @@ namespace AdminInterface.Models
 		public UserFilter()
 		{
 			SearchBy = SearchUserBy.Auto;
+			SortBy = "UserName";
 			SortKeyMap = new Dictionary<string, string> {
 				{"PayerId", "PayerId"},
 				{"ClientId", "ClientId"},
