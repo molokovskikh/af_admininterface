@@ -238,7 +238,7 @@
     <Compile Include="Models\Telephony\UnresolvedCall.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSearchItem.cs" />
-    <Compile Include="Models\UserSearchProperties.cs" />
+    <Compile Include="Models\UserFilter.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="MonoRailExtentions\FakeServiceProvider.cs" />
@@ -536,7 +536,6 @@
     <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
-    <None Include="Views\UserSearch\SearchBy.brail" />
     <None Include="Views\Users\DrugstoreSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Deliveries\Add.brail" />

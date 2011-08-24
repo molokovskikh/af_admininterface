@@ -12,12 +12,7 @@ def Header(field as string, name as string) as string:
 end 
 %>
 
-<div class="CenterBlock FilterBlock" style="width: 30%;">
-
-	<div class="CornerHolder">
-		<div class="TopLeftCorner"></div>
-		<div class="TopRightCorner"></div>
-	</div>
+<div class="CenterBlock FilterBlock">
 	
 	<h3>
 		Мониторинг работы клиентов
@@ -73,10 +68,6 @@ end
 		</div>
 	</form>
 	
-	<div class="CornerHolder">
-		<div class="BottomLeftCorner"></div>
-		<div class="BottomRightCorner"></div>
-	</div>
 </div>
 
 <div>

@@ -12,8 +12,7 @@ using AdminInterface.Models;
 namespace AdminInterface.Controllers
 {
 	[
-		Layout("GeneralWithJQuery"),
-		Helper(typeof(BindingHelper)), 
+		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
 		Helper(typeof(LinkHelper)),
@@ -22,55 +21,20 @@ namespace AdminInterface.Controllers
 	]
 	public class UserSearchController : ARSmartDispatcherController
 	{
-		private const uint PageSize = 30;
-
-		public void SearchBy([DataBind("SearchBy")] UserSearchProperties searchProperties)
-		{
-			var searchResults = UserSearchItem.SearchBy(SecurityContext.Administrator, searchProperties, "UserName", "Ascending");
-
-			if (searchResults.Count.Equals(1) && !String.IsNullOrEmpty(searchResults.First().UserId.ToString()))
-			{
-				var virtualDir = Context.UrlInfo.AppVirtualDir;
-				if (!virtualDir.StartsWith("/"))
-					virtualDir = "/" + virtualDir;
-				if (virtualDir.EndsWith("/"))
-					virtualDir = virtualDir.Remove(virtualDir.Length - 1, 1);
-				RedirectToUrl(String.Format(virtualDir + "/Users/{0}/edit", searchResults.First().UserId));
-			}
-
-			PropertyBag["SearchResults"] = searchResults;
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = RegionHelper.GetAllRegions();
-			PropertyBag["SortDirection"] = "Ascending";
-			PropertyBag["SortColumnName"] = "UserName";
-
-			PropertyBag["rowsCount"] = searchResults.Count;
-			PropertyBag["pageSize"] = PageSize;
-			PropertyBag["currentPage"] = 0;
-		}
-
 		public void Search()
 		{
-			var searchProperties = new UserSearchProperties { SearchBy = SearchUserBy.Auto };
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = RegionHelper.GetAllRegions();
-		}
-
-		public void OrderBy([DataBind("SearchBy")] UserSearchProperties searchProperties,
-							string sortDirection,
-							string sortColumnName,
-							int rowsCount)
-		{
-			var searchResults = (List<UserSearchItem>)(UserSearchItem.SearchBy(SecurityContext.Administrator,
-				searchProperties, sortColumnName, sortDirection));
-
-			PropertyBag["SearchResults"] = searchResults;
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = RegionHelper.GetAllRegions();
-			PropertyBag["SortColumnName"] = sortColumnName;
-			PropertyBag["SortDirection"] = sortDirection;
-			PropertyBag["rowsCount"] = rowsCount;
-			RenderView("SearchBy");
+			var filter = new UserFilter();
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
+			{
+				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
+				var result = filter.Find();
+				if (result.Count == 1 && !String.IsNullOrEmpty(result.First().UserId.ToString()))
+				{
+					RedirectUsingRoute("users", "edit", new {id = result.First().UserId});
+				}
+				PropertyBag["SearchResults"] = result;
+			}
+			PropertyBag["filter"] = filter;
 		}
 	}
 }

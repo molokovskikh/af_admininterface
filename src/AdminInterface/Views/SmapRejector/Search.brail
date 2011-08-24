@@ -5,14 +5,6 @@
 <% component Bubble, {"bredcrumbs" : [("Отклоненные сообщения", "")]} %>
 
 <div class="CenterBlock FilterBlock">
-
-	<div class="CornerHolder">
-		<div class="TopLeftCorner">
-		</div>
-		<div class="TopRightCorner">
-		</div>
-	</div>
-	
 	<h3>
 		Отклоненные сообщения
 	</h3>
@@ -48,13 +40,6 @@
 			</tr>
 		</table>
 	</form>
-	
-	<div class="CornerHolder">
-		<div class="BottomLeftCorner">
-		</div>
-		<div class="BottomRightCorner">
-		</div>
-	</div>
 </div>
 
 <table class="DataTable">
