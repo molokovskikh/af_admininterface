@@ -1,6 +1,6 @@
 ﻿Зарегистрирован новый клиент
 <br>
-Название: <a href='${me}/Billing/edit.rails?BillingCode=${payer.Id}'>${payer.Name}</a>
+Название: <a href="${siteroot}/Payers/${payer.Id}">${payer.Name}</a>
 <br>
 Код: ${client.Id}
 <br>

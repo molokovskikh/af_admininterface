@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -15,6 +16,8 @@ namespace AdminInterface.Background
 
 		public void Process()
 		{
+			var mailer = new MonorailMailer();
+			mailer.SiteRoot = ConfigurationManager.AppSettings["SiteRoot"];
 			using (new SessionScope(FlushAction.Never))
 			{
 				var invoices = Invoice.Queryable.Where(i => i.SendToEmail && i.Date <= DateTime.Today);
@@ -43,7 +46,8 @@ namespace AdminInterface.Background
 							if (invoice.ShouldNotify())
 							{
 								invoice.LastErrorNotification = DateTime.Now;
-								MonorailMailer.Deliver(m => m.DoNotHaveInvoiceContactGroup(invoice));
+								mailer.DoNotHaveInvoiceContactGroup(invoice);
+								mailer.Send();
 							}
 						}
 

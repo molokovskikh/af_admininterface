@@ -30,13 +30,6 @@ namespace AdminInterface.MonoRailExtentions
 			mailer.Send();
 		}
 
-		public string Me()
-		{
-			var request = Controller.Request;
-			var result = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
-			return result;
-		}
-
 		public MonorailMailer EnableChanged(IEnablable item)
 		{
 			Template = "EnableChanged";
@@ -114,7 +107,6 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["client"] = client;
 			PropertyBag["payer"] = client.Payers.First();
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["Me"] = Me();
 		}
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
@@ -143,6 +135,7 @@ namespace AdminInterface.MonoRailExtentions
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
 		{
 			Template = "DoNotHaveInvoiceContactGroup";
+			IsBodyHtml = true;
 
 			To = "billing@analit.net";
 			From = "billing@analit.net";

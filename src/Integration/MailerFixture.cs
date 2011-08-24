@@ -4,6 +4,7 @@ using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Core.Smtp;
@@ -42,7 +43,7 @@ namespace Integration
 				}));
 			mailer = new MonorailMailer(sender) {
 				UnderTest = true,
-				Controller = controller
+				SiteRoot = "https://stat.analit.net/adm"
 			};
 
 			ForTest.InitializeMailer();
@@ -65,6 +66,22 @@ namespace Integration
 			Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
 		}
 
+		[Test, Ignore("тест для отладки, удалить")]
+		public void test()
+		{
+			uint id;
+			using (new SessionScope())
+			{
+				var client = DataMother.TestClient();
+				id = client.Id;
+			}
+			using (new SessionScope())
+			{
+				mailer.EnableChanged(ActiveRecordMediator<Service>.FindByPrimaryKey(id));
+				mailer.Send();
+			}
+		}
+
 		[Test]
 		public void BillingNotificationTest()
 		{
@@ -84,7 +101,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
+Название: <a href=""https://stat.analit.net/adm/Payers/10"">Тестовый плательщик</a>
 <br>
 Код: 58
 <br>
@@ -122,7 +139,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
+Название: <a href=""https://stat.analit.net/adm/Payers/10"">Тестовый плательщик</a>
 <br>
 Код: 58
 <br>

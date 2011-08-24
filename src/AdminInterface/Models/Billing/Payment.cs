@@ -133,7 +133,7 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord("Payments", Schema = "Billing")]
-	public class	Payment : BalanceUpdater<Payment>
+	public class Payment : BalanceUpdater<Payment>
 	{
 		public Payment(Payer payer, DateTime payedOn, decimal sum) : this(payer)
 		{
