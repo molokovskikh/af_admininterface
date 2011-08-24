@@ -94,8 +94,8 @@
 			success: function (content) {
 				$("#" + element.attr("id") + "-tab").html(content);
 			},
-			error: function () {
-				alert(error);
+			error: function (error) {
+				alert("Во время обработки ващего запроса произошел сбой, попробуйте повторить ваш запрос.");
 			}
 		});
 	}
