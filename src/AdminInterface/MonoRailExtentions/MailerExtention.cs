@@ -18,8 +18,11 @@ namespace AdminInterface.MonoRailExtentions
 			var mailer = new MonorailMailer();
 			if (SenderForTest != null)
 				mailer = new MonorailMailer(SenderForTest);
-			var request = controller.Request;
-			mailer.SiteRoot = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
+			if (controller.Request != null && controller.Request.Uri != null)
+			{
+				var request = controller.Request;
+				mailer.SiteRoot = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
+			}
 			return mailer;
 		}
 	}
