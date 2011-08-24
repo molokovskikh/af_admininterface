@@ -79,7 +79,7 @@ namespace AdminInterface.Models
 			SortKeyMap = new Dictionary<string, string> {
 				{"BillingCode", "BillingCode"},
 				{"ShortName", "ShortName"},
-				{"Recipients", "Recipients"},
+				{"Recipient", "Recipient"},
 				{"Balance", "Balance"},
 				{"LastClientRegistrationDate", "LastClientRegistrationDate"},
 				{"DisabledUsersCount", "DisabledUsersCount"},
@@ -213,7 +213,7 @@ select p.payerId as {{BillingSearchItem.BillingCode}},
 
 		sum(if(cd.Segment = 1 or s.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
 		sum(if(cd.Segment = 0 or s.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
-		r.Name as {{BillingSearchItem.Recipients}}
+		r.Name as {{BillingSearchItem.Recipient}}
 from billing.payers p
 	left join Billing.Recipients r on r.Id = p.RecipientId
 	left join future.Users users on users.PayerId = p.PayerId
