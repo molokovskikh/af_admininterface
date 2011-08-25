@@ -1,10 +1,9 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {@id : @Title}: %>
 	Редактирование платежа
 <% end %>
 
-<% component Bubble, {"bredcrumbs" :
-	[("Платежи", "${siteroot}/Payment/"),
-		("Редактирование платежа", "")]} %>
+<% component Bubble, {@bredcrumbs :
+	[("Платежи", "${siteroot}/Payments/")]} %>
 
 <script>
 	$(function () {
