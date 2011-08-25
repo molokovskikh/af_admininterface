@@ -14,7 +14,8 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				PropertyBag["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				RedirectToReferrer();
 				return;
 			}
 
@@ -38,12 +39,12 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
-			LayoutName = "Print";
 
+			LayoutName = "Print";
 			if (begin == null)
 				begin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 			if (end == null)
@@ -62,7 +63,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
@@ -89,7 +90,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
