@@ -19,7 +19,7 @@ namespace Functional.Billing
 			Payer payer;
 			using(new SessionScope())
 			{
-				payer = DataMother.BuildPayerForBillingDocumentTest();
+				payer = DataMother.CreatePayerForBillingDocumentTest();
 				new Invoice(payer, Period.January, new DateTime(2011, 1, 11)).Save();
 				new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 			}

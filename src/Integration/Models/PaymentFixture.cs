@@ -69,7 +69,7 @@ namespace Integration.Models
 		[Test]
 		public void Before_save_new_paymen_for_ad_create_ad()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
 			payment.Sum  = 800;
 			payment.ForAd = true;
@@ -85,7 +85,7 @@ namespace Integration.Models
 		[Test]
 		public void Join_payment_for_exists_ad()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
 			payment.Sum  = 800;
 			payment.SaveAndFlush();
@@ -101,7 +101,7 @@ namespace Integration.Models
 		[Test]
 		public void Update_payer_balance()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var payment = new Payment(payer);
 			payment.Sum  = 800;
 			payment.SaveAndFlush();
@@ -118,7 +118,7 @@ namespace Integration.Models
 		[Test]
 		public void Ignore_inn_from_black_list()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var recipient = Recipient.Queryable.First();
 			payer.INN = DataMother.RandomInn();
 			new IgnoredInn(payer.INN).Save();
@@ -139,7 +139,7 @@ namespace Integration.Models
 		[Test]
 		public void Identify_payment()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var recipient = Recipient.Queryable.First();
 			payer.INN = DataMother.RandomInn();
 			payer.SaveAndFlush();

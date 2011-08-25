@@ -57,7 +57,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 		}
 
-		public void Mail(uint id, DateTime? begin, DateTime? end, string emails)
+		public void Mail(uint id, DateTime? begin, DateTime? end, string emails, string message)
 		{
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
@@ -78,7 +78,7 @@ namespace AdminInterface.Controllers
 				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 
-			this.Mail().RevisionAct(act, emails).Send();
+			this.Mail().RevisionAct(act, emails, message).Send();
 
 			Flash["Message"] = Message.Notify("Отправлено");
 			RedirectToReferrer();

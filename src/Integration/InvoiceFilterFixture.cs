@@ -15,7 +15,7 @@ namespace Integration
 		[Test]
 		public void Find_invoice_by_home_region()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, Period.December, DateTime.Now);
 			invoice.Save();
 			var filter = new PayerDocumentFilter {Region = payer.Clients.First().HomeRegion};

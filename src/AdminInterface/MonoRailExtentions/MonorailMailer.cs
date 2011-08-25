@@ -143,7 +143,7 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["invoice"] = invoice;
 		}
 
-		public MonorailMailer RevisionAct(RevisionAct act, string emails)
+		public MonorailMailer RevisionAct(RevisionAct act, string emails, string comment)
 		{
 			Template = "RevisionAct";
 
@@ -159,6 +159,7 @@ namespace AdminInterface.MonoRailExtentions
 
 			Attachments.Add(new Attachment(file, "Акт сверки.xls"));
 			PropertyBag["act"] = act;
+			PropertyBag["comment"] = comment;
 			return this;
 		}
 

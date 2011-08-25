@@ -20,7 +20,7 @@ namespace Functional.Billing
 		[SetUp]
 		public void Setup()
 		{
-			payer = DataMother.BuildPayerForBillingDocumentTest();
+			payer = DataMother.CreatePayerForBillingDocumentTest();
 			payment = new Payment(payer);
 			payment.Sum = 800;
 			payment.RegisterPayment();

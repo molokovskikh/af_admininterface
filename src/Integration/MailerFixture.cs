@@ -183,7 +183,7 @@ namespace Integration
 		public void Revision_act()
 		{
 			var act = DataMother.GetAct();
-			mailer.RevisionAct(act, "kvasovtest@analit.net");
+			mailer.RevisionAct(act, "kvasovtest@analit.net", "");
 			mailer.Send();
 			Assert.That(message.Subject, Is.EqualTo("Акт сверки"));
 			Assert.That(message.From.ToString(), Is.EqualTo("billing@analit.net"));
@@ -243,7 +243,7 @@ namespace Integration
 
 		private Invoice CreateInvoice()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
 			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));

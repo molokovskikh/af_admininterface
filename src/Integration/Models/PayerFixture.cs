@@ -41,7 +41,7 @@ namespace Integration.Models
 		[Test]
 		public void Before_save_if_begin_balance_changed_update_balance()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			payer.BeginBalance = 1000;
 			payer.SaveAndFlush();

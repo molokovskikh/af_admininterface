@@ -15,7 +15,7 @@ namespace Functional.Billing
 		[SetUp]
 		public void Setup()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, DateTime.Now);
 			invoice.Save();
 			act = new Act(DateTime.Now, invoice);

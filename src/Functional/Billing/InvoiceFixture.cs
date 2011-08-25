@@ -21,7 +21,7 @@ namespace Functional.Billing
 		{
 			using(new SessionScope())
 			{
-				payer = DataMother.BuildPayerForBillingDocumentTest();
+				payer = DataMother.CreatePayerForBillingDocumentTest();
 				invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
 				invoice.Save();
 			}

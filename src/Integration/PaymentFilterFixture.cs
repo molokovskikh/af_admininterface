@@ -15,7 +15,7 @@ namespace Integration
 		[Test]
 		public void Search_by_payer_name()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			payer.Name = "Тестовый плательщик " + payer.Id;
 			var payment = new Payment(payer, DateTime.Now, 800);
 			payment.SaveAndFlush();
