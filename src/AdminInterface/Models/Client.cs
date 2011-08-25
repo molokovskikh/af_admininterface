@@ -12,6 +12,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -88,10 +89,10 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable]
+		[Property, Description("Краткое наименование"), Auditable, ValidateNonEmpty]
 		public override string Name { get; set; }
 
-		[Property, Description("Полное наименование"), Auditable]
+		[Property, Description("Полное наименование"), Auditable, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property, Description("Включен"), Auditable]

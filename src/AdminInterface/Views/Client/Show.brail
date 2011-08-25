@@ -1,8 +1,5 @@
 ﻿ <% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
 									  ("Информация о клиенте", "")]} %>
-<script type="text/javascript" src="${siteroot}/JavaScript/jquery.validate.min.js"></script>
-<script type="text/javascript" src="${siteroot}/JavaScript/messages_ru.js"></script>
-
 <script>
 	$(function () {
 
@@ -233,22 +230,24 @@
 				Зарегистрирован пользователем ${client.Registration.GetRegistrant().ManagerName}, дата регистрации ${client.Registration.RegistrationDate}
 				<% end %>
 			</div>
-			<form action="Update" method=post style="padding:0; margin:0;">
+			${FormHelper.FormTag("Update", null)}
+				${FormHelper.HiddenField("client.Id")}
 				<div>
-					${FormHelper.HiddenField("client.Id")}
 					<p>
 						Полное наименование<br>
-						${FormHelper.TextField("client.FullName")}
+						${app.Edit("client.FullName")}
+						${app.GetValidationError(client, @FullName)}
 					</p>
 					<p>
 						Краткое наименование<br>
-						${FormHelper.TextField("client.Name")}
+						${app.Edit("client.Name")}
+						${app.GetValidationError(client, @Name)}
 					</p>
 				</div>
 				<div>
 					<input type=submit value="Сохранить" />
 				</div>
-			</form>
+			${FormHelper.EndFormTag()}
 		</div>
 		
 		<div class=block>

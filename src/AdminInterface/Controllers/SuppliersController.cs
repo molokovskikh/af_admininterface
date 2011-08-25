@@ -20,8 +20,6 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			Binder.Validator = Validator;
-
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["users"] = supplier.Users;
@@ -37,10 +35,10 @@ namespace AdminInterface.Controllers
 			if (IsPost)
 			{
 				BindObjectInstance(supplier, "supplier");
-				if (!HasValidationError(supplier))
+				if (IsValid(supplier))
 				{
-					Flash["Message"] = Message.Notify("Сохранено");
 					supplier.Save();
+					Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
 					RedirectToReferrer();
 				}
 			}
@@ -52,7 +50,7 @@ namespace AdminInterface.Controllers
 			if (!string.IsNullOrWhiteSpace(message))
 			{
 				new ClientInfoLogEntity(message, supplier).Save();
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("РЎРѕС…СЂР°РЅРµРЅРѕ");
 			}
 			RedirectToReferrer();
 		}
