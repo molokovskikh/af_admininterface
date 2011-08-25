@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -9,8 +10,10 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Models
 {
@@ -48,15 +51,11 @@ namespace AdminInterface.Models
 		Disabled
 	}
 
-	public class UserFilter : Sortable
+	public class UserFilter : Sortable, SortableContributor, IUrlContributor
 	{
-		private string _searchText;
-
 		public SearchUserBy SearchBy { get; set; }
 
 		public string SearchText { get; set; }
-
-		public ulong PayerId { get; set; }
 
 		public SearchClientStatus SearchStatus { get; set; }
 
@@ -65,8 +64,6 @@ namespace AdminInterface.Models
 		public SearchClientType ClientType { get; set; }
 
 		public Region Region { get; set; }
-
-		public ulong AdminRegionMask { get; set; }
 
 		public UserFilter()
 		{
@@ -358,6 +355,18 @@ LOWER(Persons.Name) like '{0}' ",
 				}
 			}
 			return filter;
+		}
+
+		public string GetUri()
+		{
+			return PublicPropertiesToUrlParts("filter")
+				.Where(v => v.Key != "filter.SortBy" && v.Key != "filter.SortDirection")
+				.Implode(v => String.Format("{0}={1}", v.Key, v.Value), "&");
+		}
+
+		public IDictionary GetQueryString()
+		{
+			return PublicPropertiesToUrlParts("filter");
 		}
 	}
 }
