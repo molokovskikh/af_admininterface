@@ -91,6 +91,8 @@ namespace AdminInterface.Controllers
 				}
 
 				supplier.RegionMask = regionSettings.GetBrowseMask();
+				if (supplier.RegionMask == 0)
+					throw new Exception("Попытка зарегистрировать поставщика без регионов работы");
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Administrator);
