@@ -32,71 +32,69 @@
 			<td>
 			</td>
 			<td>
-				<input type="radio" id="Autosearch" name="SearchBy.SearchBy" value="Auto" ${"checked" if filter.IsSearchAuto()} />
+				<input type="radio" id="Autosearch" name="filter.SearchBy" value="Auto" ${"checked" if filter.IsSearchAuto()} />
 				<label for="Autosearch">Автоматически</label><br />
-				<input type="radio" id="SearchByClientId" name="SearchBy.SearchBy" value="ByClientId" ${"checked" if filter.IsSearchByClientId()} />
+				<input type="radio" id="SearchByClientId" name="filter.SearchBy" value="ByClientId" ${"checked" if filter.IsSearchByClientId()} />
 				<label for="SearchByClientId">Код клиента</label><br />
-				<input type="radio" id="SearchByUserId" name="SearchBy.SearchBy" value="ByUserId" ${"checked" if filter.IsSearchByUserId()} />
+				<input type="radio" id="SearchByUserId" name="filter.SearchBy" value="ByUserId" ${"checked" if filter.IsSearchByUserId()} />
 				<label for="SearchByUserId">Код пользователя</label><br />
-				<input type="radio" id="SearchByLogin" name="SearchBy.SearchBy" value="ByLogin" ${"checked" if filter.IsSearchByLogin()} />
+				<input type="radio" id="SearchByLogin" name="filter.SearchBy" value="ByLogin" ${"checked" if filter.IsSearchByLogin()} />
 				<label for="SearchByLogin">Логин пользователя</label><br />
-				<input type="radio" id="SearchByUserName" name="SearchBy.SearchBy" value="ByUserName" ${"checked" if filter.IsSearchByUserName()} />
+				<input type="radio" id="SearchByUserName" name="filter.SearchBy" value="ByUserName" ${"checked" if filter.IsSearchByUserName()} />
 				<label for="SearchByUserName">Комментарий пользователя</label><br />
 			</td>
 			<td>
-				<input type="radio" id="SearchByClientName" name="SearchBy.SearchBy" value="ByClientName" ${"checked" if filter.IsSearchByClientName()} />
+				<input type="radio" id="SearchByClientName" name="filter.SearchBy" value="ByClientName" ${"checked" if filter.IsSearchByClientName()} />
 				<label for="SearchByClientName">Имя клиента</label><br />
-				<input type="radio" id="SearchByContacts" name="SearchBy.SearchBy" value="ByContacts" ${"checked" if filter.IsSearchByContacts()} />
+				<input type="radio" id="SearchByContacts" name="filter.SearchBy" value="ByContacts" ${"checked" if filter.IsSearchByContacts()} />
 				<label for="SearchByContacts">Email/телефон</label><br />
-				<input type="radio" id="SearchByPersons" name="SearchBy.SearchBy" value="ByPersons" ${"checked" if filter.IsSearchByPersons()} />
+				<input type="radio" id="SearchByPersons" name="filter.SearchBy" value="ByPersons" ${"checked" if filter.IsSearchByPersons()} />
 				<label for="SearchByPersons">Контактное лицо (Ф.И.О.)</label><br />
-				<input type="radio" id="SearchByJuridicalName" name="SearchBy.SearchBy" value="ByJuridicalName" ${"checked" if filter.IsSearchByJuridicalName()} />
+				<input type="radio" id="SearchByJuridicalName" name="filter.SearchBy" value="ByJuridicalName" ${"checked" if filter.IsSearchByJuridicalName()} />
 				<label for="SearchByJuridicalName">Юридическое имя</label><br />
-				<input type="radio" id="SearchByPayerId" name="SearchBy.SearchBy" value="ByPayerId" ${"checked" if filter.IsSearchByPayerId()} />
+				<input type="radio" id="SearchByPayerId" name="filter.SearchBy" value="ByPayerId" ${"checked" if filter.IsSearchByPayerId()} />
 				<label for="SearchByPayerId">Код договора</label><br />
 			</td>
 		</tr>
 	</table>
 	
+	<fieldset style="padding: 0; margin: 0; text-align: left;">
+		<legend>Фильтры:</legend>
+		<table style="width:100%" border="0">
+			<col style="width:25%" />
+			<col style="width:25%" />
+			<col style="width:25%" />
+			<col style="width:25%" />
+			<thead>
+				<tr align="left">
+					<td class=value>
+						Регион<br />
+						${app.Edit("filter.Region")}
+					</td>
+					<td class=value>
+						Тип<br />
+						${app.Edit("filter.ClientType")}
+					</td>
+					<td class=value>
+						Сегмент<br />
+						${app.Edit("filter.Segment")}
+					</td>
+					<td class=value>
+						Статус<br />
+						${app.Edit("filter.SearchStatus")}
+					</td>
+				</tr>
+			</thead>
+		</table>
+	</fieldset>
 	<p>
-		<fieldset style="padding: 0; margin: 0; text-align: left;">
-			<legend>Фильтры:</legend>
-			<table style="width:100%" border="0">
-				<col style="width:25%" />
-				<col style="width:25%" />
-				<col style="width:25%" />
-				<col style="width:25%" />
-				<thead>
-					<tr align="left">
-						<td class=value>
-							Регион<br />
-							${app.Edit("filter.Region")}
-						</td>
-						<td class=value>
-							Тип<br />
-							${app.Edit("filter.ClientType")}
-						</td>
-						<td class=value>
-							Сегмент<br />
-							${app.Edit("filter.Segment")}
-						</td>
-						<td class=value>
-							Статус<br />
-							${app.Edit("filter.SearchStatus")}
-						</td>
-					</tr>
-				</thead>
-			</table>
-		</fieldset>
+		<input type="submit" id="SearchButton" value="Поиск" />
 	</p>
-	<p><input type="submit" id="SearchButton" value="Поиск" /></p>
 </form>
 </div>
 
-<% if IsDefined("searchResults"): %>
-	<% if (searchResults.Count == 0): %>
-	<div class="EmptyData">По вашему запросу ничего не найдено</div>
-	<% else: %>
+<% if ?searchResults: %>
+	<% if searchResults.Count: %>
 		<table class="DataTable">
 			<thead>
 				<tr>
@@ -148,5 +146,7 @@
 		<div style="width: 100%;" align="center">
 			<br /><% OutputSubView("LegendView") %>
 		</div>
+	<% else: %>
+		<div class="EmptyData">По вашему запросу ничего не найдено</div>
 	<% end %>
 <% end %>

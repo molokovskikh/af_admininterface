@@ -75,7 +75,7 @@ namespace AdminInterface.Helpers
 			{
 				var parameters = contributor.GetQueryString();
 				if (parameters.Contains("controller"))
-					parameters["controller"] = GetControllerName(parameters["controller"].ToString());
+					parameters["controller"] = ToControllerName(parameters["controller"].ToString());
 				return UrlHelper.Link(title.ToString(), new Dictionary<string, object>{{"params", parameters}});
 			}
 

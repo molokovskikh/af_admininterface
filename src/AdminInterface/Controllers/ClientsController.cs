@@ -102,7 +102,7 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.ViewDrugstore),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class ClientController : ARController
+	public class ClientsController : ARController
 	{
 		public void Show(uint id)
 		{
@@ -126,13 +126,7 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Administrator.CheckClientPermission(client);
-
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				client.Save();
-			}
-
+			client.Save();
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectToReferrer();
 		}
@@ -145,25 +139,21 @@ namespace AdminInterface.Controllers
 			ulong homeRegion)
 		{
 			Administrator.CheckClientPermission(client);
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var oldMaskRegion = client.MaskRegion;
-				client.HomeRegion = Region.Find(homeRegion);
-				client.UpdateRegionSettings(regionSettings);
-				
-				if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
-				{
-					var smartOrder = SmartOrderRules.TestSmartOrder();
-					drugstore.SmartOrderRules = smartOrder;
-				}
-				client.Save();
-				drugstore.UpdateAndFlush();
-				if (oldMaskRegion != client.MaskRegion)
-					client.MaintainIntersection();
 
-				scope.VoteCommit();
+			var oldMaskRegion = client.MaskRegion;
+			client.HomeRegion = Region.Find(homeRegion);
+			client.UpdateRegionSettings(regionSettings);
+				
+			if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
+			{
+				var smartOrder = SmartOrderRules.TestSmartOrder();
+				drugstore.SmartOrderRules = smartOrder;
 			}
+			client.Save();
+			drugstore.UpdateAndFlush();
+			if (oldMaskRegion != client.MaskRegion)
+				client.MaintainIntersection();
+
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectToUrl(String.Format("../client/{0}", client.Id));
 		}
@@ -207,9 +197,7 @@ where Phone like :phone")
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				using (new TransactionScope())
-					new ClientInfoLogEntity(message, client).Save();
-
+				new ClientInfoLogEntity(message, client).Save();
 				Flash["Message"] = Message.Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -272,6 +260,7 @@ where Phone like :phone")
 			var client = Client.Find(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
+			Logger.Debug("NoiseCosts = " + drugstore.NoiseCosts);
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;

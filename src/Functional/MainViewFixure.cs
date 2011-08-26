@@ -8,15 +8,13 @@ using NUnit.Framework;
 
 namespace Functional
 {
-	public class MainViewFixure : WatinFixture
+	public class MainViewFixure : WatinFixture2
 	{
 		[Test]
 		public void Open_main_view()
 		{
-			using(var browser = Open("main/index"))
-			{
-				Assert.That(browser.Text, Is.StringContaining("Статистика"));
-			}
+			Open("main/index");
+			Assert.That(browser.Text, Is.StringContaining("Статистика"));
 		}
 	}
 }

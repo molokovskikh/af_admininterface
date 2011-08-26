@@ -10,11 +10,12 @@ using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
 	[Helper(typeof(BindingHelper))]
-	public class InvoicesController : SmartDispatcherController
+	public class InvoicesController : Controller
 	{
 		public void Index([DataBind("filter")] PayerDocumentFilter filter)
 		{
@@ -71,7 +72,6 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			Binder.Validator = Validator;
 			RenderView("/Payers/NewInvoice");
 
 			var invoice = Invoice.Find(id);

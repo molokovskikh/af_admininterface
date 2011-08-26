@@ -374,12 +374,12 @@
 				<tr>
 					<td colspan="4" align="center">
 						<br /><br />
-						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy">
-							<input type="hidden" id="Autosearch" name="SearchBy.SearchBy" value="Auto" />
-							<input type="hidden" name="SearchBy.RegionId" value="${RegionId}" />
+						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/Search">
+							<input type="hidden" name="filter.SearchBy" value="Auto" />
+							<input type="hidden" name="filter.Region.Id" value="${RegionId}" />
 							<div class="search-header" style="text-align:center">
 								<label>Поиск пользователей</label>
-								<input type="text" id="SearchText" name="SearchBy.SearchText" style="width: 300px; border-style:groove;" value="" />
+								<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px; border-style:groove;" value="" />
 								<input type="submit" style="border-style:groove; width: auto;" value="Найти" />
 							</div>
 						</form>

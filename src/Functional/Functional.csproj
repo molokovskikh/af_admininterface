@@ -129,7 +129,6 @@
     <Compile Include="Drugstore\RegistrationFixture.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="MessagesFixture.cs" />
-    <Compile Include="SupplierFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />
     <Compile Include="Suppliers\RegistrationFixture.cs" />

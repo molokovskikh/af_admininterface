@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -14,6 +15,7 @@ namespace AdminInterface.MonoRailExtentions
 		public Controller()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
+				Binder.Validator = Validator;
 				controllerContext.PropertyBag["admin"] = Administrator;
 			};
 		}
@@ -130,6 +132,24 @@ namespace AdminInterface.MonoRailExtentions
 			{
 				return ADHelper.Storage;
 			}
+		}
+
+		protected void Notify(string message)
+		{
+			Flash["Message"] = Message.Notify(message);
+		}
+
+		protected void Error(string message)
+		{
+			Flash["Message"] = Message.Error(message);
+		}
+
+		protected bool IsValid(object instance)
+		{
+			var isInvalid = HasValidationError(instance);
+			//if (isInvalid)
+			//ActiveRecordMediator.Evict(instance);
+			return !isInvalid;
 		}
 	}
 

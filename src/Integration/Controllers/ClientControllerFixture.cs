@@ -19,13 +19,13 @@ namespace Integration.Controllers
 	[TestFixture]
 	public class ClientControllerFixture : ControllerFixture
 	{
-		private ClientController controller;
+		private ClientsController controller;
 		private Client client;
 
 		[SetUp]
 		public void SetUp()
 		{
-			controller = new ClientController();
+			controller = new ClientsController();
 			PrepareController(controller);
 			client = DataMother.CreateTestClientWithUser();
 		}

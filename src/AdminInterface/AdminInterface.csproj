@@ -157,7 +157,7 @@
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
     <Compile Include="MonoRailExtentions\Controller.cs" />
-    <Compile Include="Controllers\DeliveriesController.cs" />
+    <Compile Include="Controllers\AddressesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
@@ -173,7 +173,7 @@
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
     <Compile Include="Components\Legend.cs" />
-    <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\ClientsController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
@@ -496,11 +496,11 @@
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
-    <None Include="Views\Client\Settings.brail" />
-    <None Include="Views\Client\Show.brail" />
-    <None Include="Views\Client\SearchAssortmentPrices.brail" />
-    <None Include="Views\Client\SearchClientSubview.brail" />
-    <None Include="Views\Client\SuppliersForCostNoising.brail" />
+    <None Include="Views\Clients\Settings.brail" />
+    <None Include="Views\Clients\Show.brail" />
+    <None Include="Views\Clients\SearchAssortmentPrices.brail" />
+    <None Include="Views\Clients\SearchClientSubview.brail" />
+    <None Include="Views\Clients\SuppliersForCostNoising.brail" />
     <None Include="Views\Layouts\Application.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brail" />
@@ -539,8 +539,8 @@
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
     <None Include="Views\Users\DrugstoreSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
-    <None Include="Views\Deliveries\Add.brail" />
-    <None Include="Views\Deliveries\Edit.brail" />
+    <None Include="Views\Addresses\Add.brail" />
+    <None Include="Views\Addresses\Edit.brail" />
     <None Include="Views\Layouts\GeneralWithJQuery.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
@@ -572,7 +572,7 @@
     <None Include="Views\Layouts\General.brail" />
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
-    <None Include="Views\Client\LegendView.brail" />
+    <None Include="Views\Clients\LegendView.brail" />
     <None Include="Views\Users\SearchOffers.brail" />
     <None Include="Views\Main\Settings.brail" />
     <None Include="Views\Users\Add.brail" />

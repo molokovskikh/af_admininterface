@@ -8,13 +8,8 @@ using WatiN.Core.DialogHandlers;
 
 namespace Functional.Billing
 {
-	public class RevisionActFixture : WatinFixture
+	public class RevisionActFixture : WatinFixture2
 	{
-		public RevisionActFixture()
-		{
-			UseTestScope = true;
-		}
-
 		private Payer payer;
 
 		[SetUp]
@@ -26,7 +21,7 @@ namespace Functional.Billing
 		[Test]
 		public void Show_revision_act()
 		{
-			browser = Open(payer);
+			Open(payer);
 			browser.Link(Find.ByText("Акт сверки")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Акт сверки"));
 		}
@@ -34,7 +29,7 @@ namespace Functional.Billing
 		[Test]
 		public void Print()
 		{
-			browser = Open("RevisionActs/{0}", payer.Id);
+			Open("RevisionActs/{0}", payer.Id);
 			browser.Link(Find.ByText("Печать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("взаимных расчетов по состоянию"));
 		}
@@ -46,7 +41,7 @@ namespace Functional.Billing
 			if (File.Exists(file))
 				File.Delete(file);
 
-			browser = Open("RevisionActs/{0}", payer.Id);
+			Open("RevisionActs/{0}", payer.Id);
 			var handler = new FileDownloadHandler(file);
 			browser.AddDialogHandler(handler);
 			browser.Link(Find.ByText("Excel")).Click();
@@ -57,7 +52,7 @@ namespace Functional.Billing
 		[Test]
 		public void Send_to_email()
 		{
-			browser = Open("RevisionActs/{0}", payer.Id);
+			Open("RevisionActs/{0}", payer.Id);
 			browser.TextField(Find.ByName("emails")).TypeText("kvasovtest@analit.net");
 			browser.Button(Find.ByValue("Отправить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Отправлено"));

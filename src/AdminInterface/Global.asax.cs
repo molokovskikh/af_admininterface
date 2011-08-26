@@ -107,15 +107,29 @@ namespace AddUser
 					.ValidInteger
 			);
 
+			engine.Add(
+				new PatternRoute("/client/[id]/[action]")
+					.DefaultForController().Is("clients")
+					.DefaultForAction().Is("show")
+					.Restrict("id").ValidInteger
+			);
+
+			engine.Add(
+				new PatternRoute("/client/<action>")
+					.DefaultForController().Is("clients")
+			);
+
+			engine.Add(
+				new PatternRoute("/delivery/[id]/[action]")
+					.DefaultForController().Is("addresses")
+					.DefaultForAction().Is("edit")
+					.Restrict("id").ValidInteger
+			);
+
 			engine.Add(new PatternRoute("/client/[clientId]/orders")
 				.DefaultForController().Is("Logs")
 				.DefaultForAction().Is("Orders")
 				.Restrict("clientId").ValidInteger);
-
-			engine.Add(new PatternRoute("/deliveries/[id]/edit")
-				.DefaultForController().Is("deliveries")
-				.DefaultForAction().Is("edit")
-				.Restrict("id").ValidInteger);
 
 			engine.Add(new PatternRoute("/users/search")
 				.DefaultForController().Is("UserSearch")

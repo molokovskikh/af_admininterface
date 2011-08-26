@@ -7,15 +7,10 @@ using WatiN.Core;
 
 namespace Functional.Billing
 {
-	public class AdFixture : WatinFixture
+	public class AdFixture : WatinFixture2
 	{
 		private Advertising ad;
 		private Payer payer;
-
-		public AdFixture()
-		{
-			UseTestScope = true;
-		}
 
 		[SetUp]
 		public void Setup()
@@ -28,7 +23,7 @@ namespace Functional.Billing
 		[Test]
 		public void Build_invoice()
 		{
-			browser = Open(ad, "Edit");
+			Open(ad, "Edit");
 			browser.Button(Find.ByValue("—формировать счет")).Click();
 			Assert.That(browser.Text, Is.StringContaining("—чет"));
 		}
@@ -36,7 +31,7 @@ namespace Functional.Billing
 		[Test]
 		public void Build_act()
 		{
-			browser = Open(ad, "Edit");
+			Open(ad, "Edit");
 			browser.Button(Find.ByValue("—формировать акт")).Click();
 			Assert.That(browser.Text, Is.StringContaining("јкт"));
 		}
