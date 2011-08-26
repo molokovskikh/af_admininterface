@@ -27,7 +27,7 @@ namespace Functional.Drugstore
 			headerRow.TableCells[1].MouseDown();
 			headerRow.TableCells[1].MouseUp();
 			headerRow.TableCells[1].MouseDown();
-			headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад			
+			headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
 		}
 
 		[SetUp]
@@ -35,19 +35,27 @@ namespace Functional.Drugstore
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			user = client.Users.First();
-			updateLog = new UpdateLogEntity {
-				User = user,
+			updateLog = new UpdateLogEntity(user) {
 				AppVersion = 1000,
 				Addition = "Test update",
 				Commit = true,
-				RequestTime = DateTime.Now,
-				UpdateType = UpdateType.Accumulative,
-				UserName = user.Name,
 			};
 			updateLog.Save();
 
 			Open("Logs/UpdateLog?userId={0}", user.Id);
 			Assert.That(browser.Text, Is.StringContaining("История обновлений"));
+		}
+
+		[Test]
+		public void Show_update_reject_for_supplier_user()
+		{
+			var user = DataMother.CreateSupplierUser();
+			updateLog = new UpdateLogEntity(user) {
+				UpdateType = UpdateType.AccessError,
+			};
+			updateLog.Save();
+			Open("Logs/UpdateLog?regionMask={0}&updateType={1}", 18446744073709551615ul, UpdateType.AccessError);
+			Assert.That(browser.Text, Is.StringContaining(user.Login));
 		}
 
 		[Test]
@@ -61,7 +69,6 @@ namespace Functional.Drugstore
 			browser.WaitUntilContainsText("Тестовый лог обновления", 1);
 			Assert.That(browser.Text, Is.StringContaining("Тестовый лог обновления"));
 		}
-
 
 		[Test, Ignore("Временно до починки")]
 		public void Check_address_links_when_user_orders_history_show()

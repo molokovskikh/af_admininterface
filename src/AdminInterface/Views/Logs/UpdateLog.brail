@@ -132,52 +132,54 @@
 		</tr>
 		</thead>
 		<tbody class="HighLightCurrentRow">
-		<% for i, logEntity in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${logEntity.Id}" align="center">
-			<td class="${'NotCommitedUpdate' if not logEntity.Commit}" style="width:1%;">
-				${logEntity.RequestTime}
+		<% for i, log in enumerate(logEntities): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${log.Id}" align="center">
+			<td class="${'NotCommitedUpdate' if not log.Commit}" style="width:1%;">
+				${log.RequestTime}
 			</td>
 			<% if filter.ShowRegion(): %>
 			<td>
-				${logEntity.User.Client.HomeRegion.Name}
+				${?log.User.Client.HomeRegion.Name}
 			</td>
 			<% end %>
 			<% if filter.ShowClient(): %>
 			<td>
-				<a title="ClientSettings" href="${siteroot}/client/${logEntity.User.Client.Id}">${logEntity.User.Client.Name}</a>
+				<% if log.User.Client: %>
+				<a title="ClientSettings" href="${siteroot}/client/${log.User.Client.Id}">${log.User.Client.Name}</a>
+				<% end %>
 			</td>
 			<% end %>
 			<% if filter.ShowUpdateType(): %>
 			<td>
-			<% if logEntity.IsDataTransferUpdateType(): %>
-				<a id="ShowUpdateDetailsLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${logEntity.Id}', 'UpdateDetails');">
-					${BindingHelper.GetDescription(logEntity.UpdateType)}
+			<% if log.IsDataTransferUpdateType(): %>
+				<a id="ShowUpdateDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${log.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${log.Id}', 'UpdateDetails');">
+					${BindingHelper.GetDescription(log.UpdateType)}
 				</a>
 			<% else: %>
-					${BindingHelper.GetDescription(logEntity.UpdateType)}
+					${BindingHelper.GetDescription(log.UpdateType)}
 			<% end %>
 			</td>
 			<% end %>
 			<% if filter.ShowUser(): %>
 			<td>
-				<a title="UserSettings" href="${siteroot}/users/${logEntity.User.Id}/edit">${logEntity.User.GetLoginWithName()}</a>
+				<a title="UserSettings" href="${siteroot}/users/${log.User.Id}/edit">${log.User.GetLoginWithName()}</a>
 			</td>
 			<% end %>
 			<% if filter.ShowUpdateSize(): %>
 				<td>
-					${ViewHelper.ConvertToUserFriendlySize(logEntity.ResultSize)}
+					${ViewHelper.ConvertToUserFriendlySize(log.ResultSize)}
 				</td>
 			<% end %>
 			<td>
-				${logEntity.AppVersion}
+				${log.AppVersion}
 			</td>
 			<td style="text-align:center;">
-				${logEntity.Addition}
+				${log.Addition}
 			</td>
 			<% if filter.ShowLog(): %>
 			<td>
-				<% if not string.IsNullOrEmpty(logEntity.Log): %>
-				<a id="ShowLogLink${logEntity.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${logEntity.Id}', 'DownloadLog');">
+				<% if not string.IsNullOrEmpty(log.Log): %>
+				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${log.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${log.Id}', 'DownloadLog');">
 					Лог
 				</a>
 				<% else: %>
