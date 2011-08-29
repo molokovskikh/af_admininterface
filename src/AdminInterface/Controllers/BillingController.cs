@@ -294,12 +294,9 @@ namespace AdminInterface.Controllers
 
 		public void CancelMessage(uint userId)
 		{
-			using (new TransactionScope())
-			{
-				var message = UserMessage.Find(userId);
-				message.ShowMessageCount = 0;
-				message.Update();
-			}
+			var message = UserMessage.Find(userId);
+			message.ShowMessageCount = 0;
+			message.Update();
 			CancelView();
 		}
 
@@ -342,34 +339,24 @@ namespace AdminInterface.Controllers
 
 		public void ConnectUserToAddress(uint userId, uint addressId)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var user = User.Find(userId);
-				var address = Address.Find(addressId);
-				address.AvaliableForUsers.Add(user);
-				address.Client.Save();
+			var user = User.Find(userId);
+			var address = Address.Find(addressId);
+			address.AvaliableForUsers.Add(user);
+			address.Client.Save();
 
-				scope.VoteCommit();
-			}
 			CancelView();
-			CancelLayout();
 		}
 
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
-			using (var scope = new TransactionScope(OnDispose.Commit))
-			{
-				var user = User.Find(userId);
-				var address = Address.Find(addressId);
-				var client = user.Client;
+			var user = User.Find(userId);
+			var address = Address.Find(addressId);
+			var client = user.Client;
 
-				address.AvaliableForUsers.Remove(user);
-				client.Save();
+			address.AvaliableForUsers.Remove(user);
+			client.Save();
 
-				scope.VoteCommit();
-			}
 			CancelView();
-			CancelLayout();
 		}
 
 		[return: JSONReturnBinder]
@@ -419,35 +406,24 @@ namespace AdminInterface.Controllers
 
 		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var organization = LegalEntity.Find(juridicalOrganization.Id);
-				organization.Name = juridicalOrganization.Name;
-				organization.FullName = juridicalOrganization.FullName;
+			var organization = LegalEntity.Find(juridicalOrganization.Id);
+			organization.Name = juridicalOrganization.Name;
+			organization.FullName = juridicalOrganization.FullName;
+			organization.Update();
 
-				organization.Update();
-				scope.VoteCommit();
-				Flash["Message"] = new Message("Сохранено");
-				var billingCode = organization.Payer.PayerID;
-				Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
-			}
+			Flash["Message"] = new Message("Сохранено");
+			var billingCode = organization.Payer.PayerID;
+			Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
 		}
 
 		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var payer = Payer.Find(payerId);
+			var payer = Payer.Find(payerId);
+			legalEntity.Payer = payer;
+			legalEntity.CreateAndFlush();
+			Maintainer.LegalEntityCreated(legalEntity);
 
-				legalEntity.Payer = payer;
-				legalEntity.CreateAndFlush();
-
-				Maintainer.LegalEntityCreated(legalEntity);
-
-				scope.VoteCommit();
-
-				Flash["Message"] = new Message("Юридическое лицо создано");
-			}
+			Flash["Message"] = new Message("Юридическое лицо создано");
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
 		}
 
