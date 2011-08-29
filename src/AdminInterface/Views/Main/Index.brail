@@ -1,4 +1,8 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿${app.CSS("/App_Themes/Main/Main.css",
+	"/App_Themes/WebApp/base.css",
+	"/App_Themes/WebApp/style.css")}
+
+<% component CaptureFor, {"id" : "Title"}: %>
 	Интерфейс управления клиентами
 <% end %>
 

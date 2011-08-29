@@ -13,7 +13,6 @@ namespace AdminInterface.Controllers
 	[
 		Secure(PermissionType.ManageCallbacks),
 		Helper(typeof(ViewHelper)),
-		Layout("GeneralWithJQuery"),
 	]
 	public class TelephonyController : ARSmartDispatcherController
 	{

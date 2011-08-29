@@ -39,7 +39,7 @@
 	<div class="Navigation">
 		<ul id="breadcrumb">
 			<li>
-				<a title="Административный интерфейс" href="${siteroot}/default.aspx">
+				<a title="Административный интерфейс" href="${siteroot}/">
 					<img class="home" src="${siteroot}/images/home.png" alt="Административный интерфейс" />
 				</a>
 			</li>

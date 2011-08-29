@@ -413,7 +413,6 @@
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Acts\PrintIndex.brail" />
     <None Include="Views\Invoices\PrintIndex.brail" />
-    <None Include="Views\Layouts\Main.brail" />
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
@@ -542,7 +541,6 @@
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
     <None Include="Views\Addresses\Add.brail" />
     <None Include="Views\Addresses\Edit.brail" />
-    <None Include="Views\Layouts\GeneralWithJQuery.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
     <None Include="Views\Monitoring\Updates.brail" />

@@ -16,7 +16,6 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.CallHistory),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(BindingHelper)), 
-		Layout("GeneralWithJQuery"),
 	]
 	public class CallHistoryController : ARSmartDispatcherController
 	{

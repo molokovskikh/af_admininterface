@@ -18,7 +18,6 @@ namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(BindingHelper)),
-		Layout("Main"),
 		Secure
 	]
 	public class MainController : ARController
