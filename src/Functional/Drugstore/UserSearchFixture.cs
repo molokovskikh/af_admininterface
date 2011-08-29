@@ -158,6 +158,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithUser();
 			client.Segment = Segment.Retail;
 			client.Update();
+			scope.Flush();
 
 			browser.SelectList(Find.ByName("filter.Segment")).Select("Розница");
 			browser.Button(Find.ByValue("Поиск")).Click();

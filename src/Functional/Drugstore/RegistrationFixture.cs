@@ -179,6 +179,7 @@ namespace Functional.Drugstore
 			var defaults = DefaultValues.Get();
 			defaults.AnalitFVersion = 705;
 			defaults.Update();
+			scope.Flush();
 
 			SetupGeneralInformation(browser);
 			browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;

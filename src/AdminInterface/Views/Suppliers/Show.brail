@@ -144,7 +144,7 @@
 			</table>
 		</div>
 
-		<% OutputSubView("/Client/LegendView") %>
+		<% OutputSubView("/Clients/LegendView") %>
 	</div>
 
 	<div class="TwoColumn" style="margin-left: 10px">
