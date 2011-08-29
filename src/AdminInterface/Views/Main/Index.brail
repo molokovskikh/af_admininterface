@@ -6,6 +6,10 @@
 	Интерфейс управления клиентами
 <% end %>
 
+<% component CaptureFor, {@id : @ShowHeader}: %>
+	False
+<% end %>
+
 <style type="text/css">
 	.StatisticData
 	{
