@@ -1,6 +1,4 @@
-﻿<script type="text/javascript" src="${siteroot}/JavaScript/jquery_contact_validation.js"></script>
-
-<script type="text/javascript">
+﻿<script type="text/javascript">
 	function allRegions(checked) {
 		var val = '';
 		if (checked)

@@ -4,7 +4,7 @@
 	Регистрация клиента
 <% end %>
 
-${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation.js")}
+${app.JS("contact.registrator.js", "payer.search.js")}
 
 <script type="text/javascript">
 

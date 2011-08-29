@@ -9,44 +9,44 @@
 <% end %>
 
 <% if callbacks.Length == 0: %>
-    <table class="DataTable">
-	    <tr>
-		    <td class="EmptyData">Нет правил обратного звонка. <a href=new.rails>Создать новое?</a></td>
-	    </tr>
+	<table class="DataTable">
+		<tr>
+			<td class="EmptyData">Нет правил обратного звонка. <a href=new>Создать новое?</a></td>
+		</tr>
 	</table>
 <% else: %>
-<form action="updateCallbacks.rails" method="post">
+<form action="updateCallbacks" method="post">
 <table class="DataTable">
   <tr>
 	<td>
-		<a href="new.rails">Новый</a>
+		<a href="new">Новый</a>
 	</td>
-    <th>Номер телефона</th>
-    <th>Включен</th>
-    <th>Дату блокировки</th>
-    <th>Проверять дату блокировки</th>
-    <th>Комментарий</th>
+	<th>Номер телефона</th>
+	<th>Включен</th>
+	<th>Дату блокировки</th>
+	<th>Проверять дату блокировки</th>
+	<th>Комментарий</th>
   </tr>
   <% for i, callback in enumerate(callbacks): %>
   <tr class="${ViewHelper.GetRowStyle(i)}">
 	<td>
-		<a href="delete.rails?id=${callback.Id}">Удалить</a>
-		<a href="edit.rails?id=${callback.Id}">Редактировать</a>
+		<a href="delete?id=${callback.Id}">Удалить</a>
+		<a href="edit?id=${callback.Id}">Редактировать</a>
 	</td>
-    <td>
-        ${callback.CallerPhone}
-        ${FormHelper.HiddenField("callbacks[${i}].Id")}
-     </td>
-    <td>${FormHelper.CheckboxField("callbacks[${i}].Enabled")}</td>
-    <td>${callback.DueDate.ToShortDateString() if callback.DueDate != null}</td>
-    <td>${FormHelper.CheckboxField("callbacks[${i}].CheckDate")}</td>
-    <td>${callback.Comment}</td>
+	<td>
+		${callback.CallerPhone}
+		${FormHelper.HiddenField("callbacks[${i}].Id")}
+	 </td>
+	<td>${FormHelper.CheckboxField("callbacks[${i}].Enabled")}</td>
+	<td>${callback.DueDate.ToShortDateString() if callback.DueDate != null}</td>
+	<td>${FormHelper.CheckboxField("callbacks[${i}].CheckDate")}</td>
+	<td>${callback.Comment}</td>
   </tr>
   <% end %>
   <tr>
-    <td colspan="6">
-        <input type=submit value="Сохранить" />
-    </td>
+	<td colspan="6">
+		<input type=submit value="Сохранить" />
+	</td>
   </tr>
 </table>
 </form>
