@@ -315,8 +315,7 @@ LOWER(Persons.Name) like '{0}' ",
 					break;
 				}
 				case SearchUserBy.ByClientId: {
-					filter = AddFilterCriteria(filter, String.Format(" s.Id = {0} ",
-						searchTextIsNumber ? searchText : "-1"));
+					filter = AddFilterCriteria(filter, String.Format(" s.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
 					break;
 				}
 				case SearchUserBy.ByJuridicalName: {
@@ -328,12 +327,11 @@ LOWER(Persons.Name) like '{0}' ",
 					break;
 				}
 				case SearchUserBy.ByPayerId: {
-					filter = AddFilterCriteria(filter, String.Format(" u.PayerId = {0} ",
-						searchTextIsNumber ? searchText : "-1"));
+					filter = AddFilterCriteria(filter, String.Format(" u.PayerId = {0} ", searchTextIsNumber ? searchText : "-1"));
 					break;
 				}
 				case SearchUserBy.ByUserId: {
-					filter = AddFilterCriteria(filter, String.Format("-1", " u.Id = {0} "));
+					filter = AddFilterCriteria(filter, String.Format(" u.Id = {0} ", searchTextIsNumber ? searchText : "-1"));
 					break;
 				}
 				case SearchUserBy.ByUserName: {
@@ -343,7 +341,7 @@ LOWER(Persons.Name) like '{0}' ",
 				case SearchUserBy.ByContacts: {
 					if (searchTextIsPhone || searchTextIsNumber)
 						filter = AddFilterCriteria(filter,
-							String.Format("-", " REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ", ""));
+							String.Format(" REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ", sqlSearchText.Replace("-", "")));
 					else
 						filter = AddFilterCriteria(filter,
 							String.Format(" LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 ", sqlSearchText));

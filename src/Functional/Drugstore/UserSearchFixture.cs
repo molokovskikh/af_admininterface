@@ -9,6 +9,7 @@ using WatiN.Core;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Castle.ActiveRecord;
+using Common.Tools;
 
 namespace Functional
 {
@@ -30,6 +31,7 @@ namespace Functional
 		{
 			var text = String.Empty;
 			ArHelper.WithSession(session => text = session.CreateSQLQuery(sql).UniqueResult().ToString());
+			Console.WriteLine(text);
 			AssetSearch(browser, searchBy, text);
 		}
 
@@ -322,10 +324,11 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			client.Users[0].AddContactGroup();
-			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-123456", client.Id.ToString().Substring(0, 4))));
+			var phone = String.Format("{0}-123456", client.Id.ToString().RightSlice(4));
+			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, phone));
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("{0}-123456", client.Id.ToString().Substring(0, 4)));
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(phone);
 			browser.RadioButton(Find.ById("SearchByContacts")).Checked = true;
 			browser.Button(Find.ByValue("Поиск")).Click();
 

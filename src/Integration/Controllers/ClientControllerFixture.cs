@@ -263,7 +263,6 @@ namespace Integration.Controllers
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			Console.WriteLine(user.Id);
 			var count = ClientInfoLogEntity.Queryable.Count(l => l.Service == newClient && l.ObjectId == user.Id);
 
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));

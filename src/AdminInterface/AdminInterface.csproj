@@ -150,6 +150,7 @@
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Initializers\Development.cs" />
+    <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
