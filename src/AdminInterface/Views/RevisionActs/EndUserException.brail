@@ -1,5 +1,0 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
-	Акт сверки
-<% end %>
-
-<% component Bubble, {"bredcrumbs" : [("Плательщик ${payer.Name}", app.LinkTo(payer))]} %>
