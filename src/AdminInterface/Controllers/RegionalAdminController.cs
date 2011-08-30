@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Web;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -13,7 +14,6 @@ using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using System.Collections;
 using Common.Web.Ui.Models;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -22,7 +22,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ViewHelper)),
 		Secure(PermissionType.ManageAdministrators)
 	]
-	public class RegionalAdminController : Controller
+	public class RegionalAdminController : AdminInterfaceController
 	{
 		private IList<string> _avaliableComputers = new List<string> { "ACDCSERV", "FMS", "OFFDC" };
 

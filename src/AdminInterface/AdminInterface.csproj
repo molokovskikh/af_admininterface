@@ -158,7 +158,7 @@
     <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
-    <Compile Include="MonoRailExtentions\Controller.cs" />
+    <Compile Include="MonoRailExtentions\AdminInterfaceController.cs" />
     <Compile Include="Controllers\AddressesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\MainController.cs" />

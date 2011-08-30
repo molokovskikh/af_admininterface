@@ -12,7 +12,7 @@ using NHibernate;
 namespace AdminInterface.Controllers
 {
 	[Secure(PermissionType.Billing)]
-	public class AccountController : SmartDispatcherController
+	public class AccountController : AdminInterfaceController
 	{
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
@@ -74,7 +74,10 @@ namespace AdminInterface.Controllers
 					account.BeAccounted = false;
 			}
 			if (payment.HasValue)
+			{
+				Admin.CheckPermisions(PermissionType.ChangePayment);
 				account.Payment = payment.Value;
+			}
 
 			if (account.IsChanged(a => a.Payment))
 				this.Mailer().AccountingChanged(account).Send();

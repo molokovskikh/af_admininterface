@@ -10,6 +10,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -19,7 +20,6 @@ using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 		Secure,
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class UsersController : Controller
+	public class UsersController : AdminInterfaceController
 	{
 		public void Show(uint id)
 		{
@@ -212,7 +212,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.GetById(userId);
 			user.CheckLogin();
-			var administrator = Administrator;
+			var administrator = Admin;
 			var password = User.GeneratePassword();
 		
 			using (new TransactionScope())
@@ -300,7 +300,7 @@ namespace AdminInterface.Controllers
 					new
 					{
 						inHost = Request.UserHostAddress,
-						inUser = Administrator.UserName,
+						inUser = Admin.UserName,
 						ResetIdCause = reason
 					});
 				ClientInfoLogEntity.ReseteUin(user, reason).Save();

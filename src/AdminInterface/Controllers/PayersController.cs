@@ -1,16 +1,16 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using Controller=AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
 	[
 		Helper(typeof(BindingHelper)),
 	]
-	public class PayersController : Controller
+	public class PayersController : AdminInterfaceController
 	{
 		public void Show(uint id)
 		{

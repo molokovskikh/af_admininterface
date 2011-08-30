@@ -15,7 +15,6 @@ using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -36,7 +35,7 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class RegisterController : Controller
+	public class RegisterController : AdminInterfaceController
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterSupplier()
@@ -93,7 +92,7 @@ namespace AdminInterface.Controllers
 				supplier.RegionMask = regionSettings.GetBrowseMask();
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
-				supplier.Registration = new RegistrationInfo(Administrator);
+				supplier.Registration = new RegistrationInfo(Admin);
 				if (currentPayer == null)
 				{
 					currentPayer = new Payer(supplier.Name, supplier.FullName);
@@ -244,7 +243,7 @@ namespace AdminInterface.Controllers
 					HomeRegion = Region.Find(homeRegion),
 					Segment = client.Segment,
 					MaskRegion = regionSettings.GetBrowseMask(),
-					Registration = new RegistrationInfo(Administrator),
+					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
 				if (currentPayer == null)
@@ -552,7 +551,7 @@ WHERE   intersection.pricecode IS NULL
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			var allowViewSuppliers = Administrator.HavePermisions(PermissionType.ViewSuppliers);
+			var allowViewSuppliers = Admin.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = Supplier.Queryable

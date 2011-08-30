@@ -3,12 +3,12 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 using AppHelper = AdminInterface.Helpers.AppHelper;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -35,7 +35,7 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	public class AdvertisingsController : Controller
+	public class AdvertisingsController : AdminInterfaceController
 	{
 		public void Index([DataBind("filter")] AdvertisingFilter filter)
 		{

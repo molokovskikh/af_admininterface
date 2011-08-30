@@ -31,7 +31,8 @@ namespace AdminInterface.Models.Security
 		EditSettings = 19,
 
 		ConfigurerEditProducers = 18,
-		CallHistory = 20
+		CallHistory = 20,
+		ChangePayment = 22
 	}
 
 	[ActiveRecord(Schema = "accessright", Lazy = false)]

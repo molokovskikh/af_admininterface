@@ -11,13 +11,13 @@ using Castle.MonoRail.Framework;
 
 namespace AdminInterface.MonoRailExtentions
 {
-	public class Controller : SmartDispatcherController
+	public class AdminInterfaceController : SmartDispatcherController
 	{
-		public Controller()
+		public AdminInterfaceController()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
 				Binder.Validator = Validator;
-				controllerContext.PropertyBag["admin"] = Administrator;
+				controllerContext.PropertyBag["admin"] = Admin;
 			};
 		}
 
@@ -119,7 +119,7 @@ namespace AdminInterface.MonoRailExtentions
 			return args;
 		}*/
 
-		protected Administrator Administrator
+		protected Administrator Admin
 		{
 			get
 			{
