@@ -350,7 +350,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}"> 
 						</td>
 						<td>
-							<a id="UserLink${user.Id}" href="javascript:" data-filter="UserLog${user.Id}" data-id="${user.Id}">${user.Id}</a>
+							<a id="UserLink${user.Id}" href="javascript:" data-filter="User${user.Id}" data-id="${user.Id}">${user.Id}</a>
 						</td>
 						<td class=short>
 							<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
@@ -415,7 +415,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}"> 
 							</td>
 							<td>
-								<a id="AddressLink${addr.Id}" href="javascript:" data-filter="AddressLog${addr.Id}">${addr.Value}</a>
+								<a id="AddressLink${addr.Id}" href="javascript:" data-filter="Address${addr.Id}">${addr.Value}</a>
 							</td>
 							<td class=short>
 								<a id="usersForAddress${addr.Id}" href="javascript:" onclick="ShowAdditionalInfoForAddress(${addr.Id}, '${ViewHelper.GetRowStyle(i)}')">
@@ -622,7 +622,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	
 	<div class="UseCaseGroup">
 		<div class="InputGroupHeader" style="margin-bottom:10px;">
-			Статистика включений/выключений
+			История
 		</div>
 		<% if filter.IsFiltred: %>
 		<a href="javascript:" class="filter-checker">Показать для всех</a>
@@ -637,17 +637,17 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<th>Объект</th>
 					<th>Имя</th>
 					<th>Оператор</th>
-					<th>Статус</th>
+					<th>Событие</th>
 				</tr>
 			</thead>
 		<% end %>
-		<% for i,logRecord in enumerate(LogRecords): %>
-			<tr class="${ViewHelper.GetRowStyle(i)}" ${filter.FilterRow(logRecord)}>
-				<td>${logRecord.LogTime}</td>
-				<td>${BindingHelper.GetDescription(logRecord.LogType)}</td>
-				<td>${logRecord.Value}</td>
-				<td>${logRecord.OperatorName}</td>
-				<td>${ViewHelper.HumanReadableStatus(logRecord.Status)}</td>
+		<% for i, log in enumerate(LogRecords): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}" ${filter.FilterRow(log)}>
+				<td>${log.LogTime}</td>
+				<td>${BindingHelper.GetDescription(log.LogType)}</td>
+				<td>${log.Name}</td>
+				<td>${log.OperatorName}</td>
+				<td>${log.Message}</td>
 			</tr>
 		<% end %>
 		</table>

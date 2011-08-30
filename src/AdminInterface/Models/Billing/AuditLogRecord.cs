@@ -7,104 +7,93 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
-	public enum SwitchLogType
-	{
-		[Description("Клиент")] ClientLog = 0,
-		[Description("Пользователь")] UserLog = 1,
-		[Description("Адрес")] AddressLog = 2,
-		[Description("Поставщик")] SupplierLog = 3,
-	}
-
-	public class SwitchLogRecord
+	public class AuditLogRecord
 	{
 		// Идентификатор объекта, которому соответствует эта запись (например, идентификатор пользователя или адреса доставки)
 		public uint ObjectId { get; set; }
 
 		public DateTime LogTime { get; set; }
 
-		public SwitchLogType LogType { get; set; }
+		public LogObjectType LogType { get; set; }
 
 		public string OperatorName { get; set; }
 
-		public bool Status { get; set; }
+		public string Name { get; set; }
 
-		public string Value { get; set; }
+		public string Message { get; set; }
 
-		public static IList<SwitchLogRecord> GetUnionLogs(IList<ClientLogRecord> clientLogs,
-			IList<UserLogRecord> userLogs,
-			IList<AddressLogRecord> addressLogs,
-			IList<SupplierLog> supplierLogs)
+		private static AuditLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
 		{
-			var logs = clientLogs.Select(log => GetLogRecord(log)).ToList();
-			logs.AddRange(userLogs.Select(log => GetLogRecord(log)));
-			logs.AddRange(addressLogs.Select(log => GetLogRecord(log)));
-			logs.AddRange(supplierLogs.Select(log => GetLogRecord(log)));
-			return logs.OrderByDescending(log => log.LogTime).ToList();
-		}
-
-		private static SwitchLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
-		{
-			var log = new SwitchLogRecord {
+			var log = new AuditLogRecord {
 				ObjectId = clientLogRecord.Client.Id,
 				LogTime = clientLogRecord.LogTime,
-				LogType = SwitchLogType.ClientLog,
+				LogType = LogObjectType.Client,
 				OperatorName = clientLogRecord.OperatorName,
-				Status = clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On),
-				Value = clientLogRecord.Client.Name,
+				Message = ViewHelper.HumanReadableStatus(clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On)),
+				Name = clientLogRecord.Client.Name,
 			};
 			return log;
 		}
 
-		private static SwitchLogRecord GetLogRecord(SupplierLog supplierLog)
+		private static AuditLogRecord GetLogRecord(SupplierLog supplierLog)
 		{
-			var log = new SwitchLogRecord {
+			var log = new AuditLogRecord {
 				ObjectId = supplierLog.Supplier.Id,
 				LogTime = supplierLog.LogTime,
-				LogType = SwitchLogType.SupplierLog,
+				LogType = LogObjectType.Supplier,
 				OperatorName = supplierLog.OperatorName,
-				Status = !supplierLog.Disabled.Value,
-				Value = supplierLog.Supplier.Name,
+				Message = ViewHelper.HumanReadableStatus(!supplierLog.Disabled.Value),
+				Name = supplierLog.Supplier.Name,
 			};
 			return log;
 		}
 
-		private static SwitchLogRecord GetLogRecord(AddressLogRecord addressLogRecord)
+		private static AuditLogRecord GetLogRecord(AddressLogRecord addressLogRecord)
 		{
-			var log = new SwitchLogRecord {
+			var log = new AuditLogRecord {
 				ObjectId = addressLogRecord.Address.Id,
 				LogTime = addressLogRecord.LogTime,
-				LogType = SwitchLogType.AddressLog,
+				LogType = LogObjectType.Address,
 				OperatorName = addressLogRecord.OperatorName,
-				Status = addressLogRecord.Enabled,
-				Value = addressLogRecord.Address.Value,
+				Message = ViewHelper.HumanReadableStatus(addressLogRecord.Enabled),
+				Name = addressLogRecord.Address.Value,
 			};
 			return log;
 		}
 
-		private static SwitchLogRecord GetLogRecord(UserLogRecord userLogRecord)
+		private static AuditLogRecord GetLogRecord(UserLogRecord userLogRecord)
 		{
-			var log = new SwitchLogRecord {
+			var log = new AuditLogRecord {
 				ObjectId = userLogRecord.User.Id,
 				LogTime = userLogRecord.LogTime,
-				LogType = SwitchLogType.UserLog,
+				LogType = LogObjectType.User,
 				OperatorName = userLogRecord.OperatorName,
-				Status = userLogRecord.Enabled.HasValue && userLogRecord.Enabled.Value,
-				Value = userLogRecord.User.GetLoginOrName(),
+				Message = ViewHelper.HumanReadableStatus(userLogRecord.Enabled.HasValue && userLogRecord.Enabled.Value),
+				Name = userLogRecord.User.GetLoginOrName(),
 			};
 			return log;
 		}
 
-		public static IList<SwitchLogRecord> GetLogs(Payer payer)
+		public static IList<AuditLogRecord> GetLogs(Payer payer)
 		{
 			var userLogs = UserLogRecord.GetLogs(payer.Users);
 			var addressLogs = AddressLogRecord.GetLogs(payer.Addresses);
 			var clientLogs = ClientLogRecord.GetLogs(payer.Clients);
 			var supplierLogs = SupplierLog.GetLogs(payer.Suppliers);
+			var auditLogs = PayerAuditRecord.Find(payer);
 
-			var logs = GetUnionLogs(clientLogs, userLogs, addressLogs, supplierLogs);
+			var logs = clientLogs.Select(log => GetLogRecord(log))
+				.Concat(userLogs.Select(log => GetLogRecord(log)))
+				.Concat(addressLogs.Select(log => GetLogRecord(log)))
+				.Concat(supplierLogs.Select(log => GetLogRecord(log)))
+				.Concat(auditLogs.Select(r => r.ToAuditRecord()))
+				.OrderByDescending(r => r.LogTime)
+				.ToList();
+
 			var operators = logs.Select(l => l.OperatorName).Distinct().ToList();
 			var admins = ActiveRecordLinqBase<Administrator>.Queryable
 				.Where(a => operators.Contains(a.UserName))

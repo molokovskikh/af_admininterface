@@ -6,6 +6,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
@@ -81,6 +82,18 @@ namespace AdminInterface.Models.Logs
 			return ActiveRecordLinqBase<PayerAuditRecord>.Queryable
 				.Where(r => r.Payer == payer)
 				.OrderByDescending(r => r.WriteTime).ToList();
+		}
+
+		public AuditLogRecord ToAuditRecord()
+		{
+			return new AuditLogRecord {
+				ObjectId = ObjectId,
+				LogTime = WriteTime,
+				LogType = ObjectType,
+				OperatorName = UserName,
+				Message = Message,
+				Name = Name,
+			};
 		}
 	}
 }

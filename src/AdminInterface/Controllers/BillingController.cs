@@ -94,7 +94,7 @@ namespace AdminInterface.Controllers
 
 		public string GetFilterValue(Service service)
 		{
-			var currentFilterValue = "Log" + service.Id;
+			var currentFilterValue = service.Id.ToString();
 			if (service is Client)
 				currentFilterValue = "Client" + currentFilterValue;
 			else
@@ -145,7 +145,7 @@ namespace AdminInterface.Controllers
 				.ToList();
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["LogRecords"] = SwitchLogRecord.GetLogs(payer);
+			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer);
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);

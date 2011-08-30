@@ -202,7 +202,7 @@
     <Compile Include="Models\Billing\InvoicePart.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
     <Compile Include="Models\Billing\Report.cs" />
-    <Compile Include="Models\Billing\SwitchLogRecord.cs" />
+    <Compile Include="Models\Billing\AuditLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
