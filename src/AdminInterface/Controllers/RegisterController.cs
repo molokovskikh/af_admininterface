@@ -280,7 +280,7 @@ namespace AdminInterface.Controllers
 			log.Save();
 
 			if (!additionalSettings.FillBillingInfo)
-				this.Mail().NotifyBillingAboutClientRegistration(newClient);
+				this.Mailer().NotifyBillingAboutClientRegistration(newClient);
 
 			if (additionalSettings.FillBillingInfo)
 			{
@@ -525,7 +525,7 @@ WHERE   intersection.pricecode IS NULL
 			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
-				this.Mail().NotifyBillingAboutClientRegistration(client);
+				this.Mailer().NotifyBillingAboutClientRegistration(client);
 
 			string redirectUrl;
 			if (showRegistrationCard && client != null && client.Users.Count > 0)

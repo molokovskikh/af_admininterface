@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
@@ -187,6 +188,32 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["address"] = address;
 			PropertyBag["oldClient"] = oldClient;
 			PropertyBag["oldLegalEntity"] = oldLegalEntity;
+
+			return this;
+		}
+
+		public MonorailMailer AccountingChanged(Accounting account)
+		{
+			Template = "AccountingChanged";
+
+			var payer = account.Payer;
+			Service service = null;
+
+			if (account is UserAccounting)
+				service = ((UserAccounting)account).User.RootService;
+			else
+				service = ((AddressAccounting)account).Address.Client;
+
+			From = "billing@analit.net";
+			To = "billing@analit.net";
+			Subject = String.Format("Изменение стоимости {0} - {1}, {2} - {3}, {4}",
+				payer.Name, payer.Id, service.Name, service.Id, BindingHelper.GetDescription(service.Type));
+
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["payer"] = payer;
+			PropertyBag["service"] = service;
+			PropertyBag["newPayment"] = account.Payment;
+			PropertyBag["oldPayment"] = account.OldValue(a => a.Payment);
 
 			return this;
 		}

@@ -77,7 +77,7 @@ namespace AdminInterface.Controllers
 			if (address.Payer != address.LegalEntity.Payer)
 			{
 				address.Payer = address.LegalEntity.Payer;
-				this.Mail().AddressMoved(address, address.Client, oldLegalEntity).Send();
+				this.Mailer().AddressMoved(address, address.Client, oldLegalEntity).Send();
 			}
 
 			address.Update();

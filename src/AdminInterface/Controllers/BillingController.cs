@@ -234,7 +234,7 @@ namespace AdminInterface.Controllers
 				service.Disabled = !enabled;
 				if (oldDisabled != service.Disabled)
 				{
-					this.Mail().EnableChanged(service).Send();
+					this.Mailer().EnableChanged(service).Send();
 					ClientInfoLogEntity.StatusChange(service).Save();
 				}
 				ActiveRecordMediator<Service>.Save(service);

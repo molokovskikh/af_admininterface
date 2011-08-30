@@ -417,13 +417,13 @@ where s.Name like :SearchText")
 
 			if (address != null)
 			{
-				this.Mail()
+				this.Mailer()
 					.AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity))
 					.Send();
 			}
 
 			if (user != null)
-				this.Mail()
+				this.Mailer()
 					.UserMoved(user, oldClient, user.OldValue(u => u.Payer))
 					.Send();
 
@@ -443,7 +443,7 @@ where s.Name like :SearchText")
 				&& oldClient.Enabled)
 			{
 				oldClient.Disabled = true;
-				this.Mail().EnableChanged(oldClient).Send();
+				this.Mailer().EnableChanged(oldClient).Send();
 				ClientInfoLogEntity.StatusChange(oldClient).Save();
 			}
 			oldClient.Save();

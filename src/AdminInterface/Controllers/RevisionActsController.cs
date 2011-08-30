@@ -79,7 +79,7 @@ namespace AdminInterface.Controllers
 				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 
-			this.Mail().RevisionAct(act, emails, message).Send();
+			this.Mailer().RevisionAct(act, emails, message).Send();
 
 			Flash["Message"] = Message.Notify("Отправлено");
 			RedirectToReferrer();

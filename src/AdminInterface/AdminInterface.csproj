@@ -154,6 +154,7 @@
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
+    <Compile Include="Models\Billing\PayerAuditRecord.cs" />
     <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
@@ -402,6 +403,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Mail\AccountingChanged.brail" />
     <None Include="Views\Messages\Index.brail" />
     <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
@@ -637,7 +639,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>49859</DevelopmentServerPort>
+          <DevelopmentServerPort>63020</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

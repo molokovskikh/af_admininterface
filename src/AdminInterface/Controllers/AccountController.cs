@@ -3,6 +3,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
@@ -45,7 +46,7 @@ namespace AdminInterface.Controllers
 				user.IsFree = free.Value;
 			user.UpdateAndFlush();
 			if (enabled != oldStatus)
-				this.Mail().EnableChanged(user).Send();
+				this.Mailer().EnableChanged(user).Send();
 			if (enabled.HasValue && !enabled.Value)
 			{
 				// Если это отключение, то проходим по адресам и
@@ -75,6 +76,9 @@ namespace AdminInterface.Controllers
 			if (payment.HasValue)
 				account.Payment = payment.Value;
 
+			if (account.IsChanged(a => a.Payment))
+				this.Mailer().AccountingChanged(account).Send();
+
 			account.Update();
 			CancelView();
 		}
@@ -88,7 +92,7 @@ namespace AdminInterface.Controllers
 			if (free.HasValue)
 				address.FreeFlag = free.Value;
 			if (enabled != oldStatus)
-				this.Mail().EnableChanged(address).Send();
+				this.Mailer().EnableChanged(address).Send();
 			address.Client.Save();
 			CancelView();
 		}
