@@ -298,7 +298,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
-				RedirectToUrl(LinkHelper.GetVirtualDir(Context) + String.Format("/Client/{0}", newClient.Id));
+				Redirect(newClient);
 			}
 		}
 

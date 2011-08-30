@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 
@@ -142,6 +143,13 @@ namespace AdminInterface.MonoRailExtentions
 		protected void Error(string message)
 		{
 			Flash["Message"] = Message.Error(message);
+		}
+
+		public void Redirect(object entity)
+		{
+			var controller = AppHelper.GetControllerName(entity);
+			var id = ((dynamic)entity).Id;
+			RedirectUsingRoute(controller, "Show", new {id = id});
 		}
 
 		protected bool IsValid(object instance)
