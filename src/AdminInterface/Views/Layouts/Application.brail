@@ -80,7 +80,7 @@
 		<% end %>
 	<% end %>
 
-	<% if ShowHeader and ?Title: %>
+	<% if ShowHeader and IsDefined("Title"): %>
 	<h2>${Title}</h2>
 	<% end %>
 
