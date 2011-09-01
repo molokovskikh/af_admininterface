@@ -35,7 +35,9 @@ namespace Functional
 			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
 			_webServer.Start();
 			Settings.Instance.AutoMoveMousePointerToTopLeft = false;
+			//ie разрушает мой разум, если поставить true то окно будет видно, false нет
 			Settings.Instance.MakeNewIeInstanceVisible = false;
+			Settings.Instance.AutoCloseDialogs = true;
 
 			if (Debugger.IsAttached)
 			{
