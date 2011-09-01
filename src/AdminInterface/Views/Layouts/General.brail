@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=Edge"> 
+	<meta http-equiv="X-UA-Compatible" content="IE=7">
 	<title>
 		<% if IsDefined("Title"): %>
 			${Title}
@@ -39,7 +39,7 @@
 	<div class="Navigation">
 		<ul id="breadcrumb">
 			<li>
-				<a title="Административный интерфейс" href="${siteroot}/default.aspx">
+				<a title="Административный интерфейс" href="${siteroot}/">
 					<img class="home" src="${siteroot}/images/home.png" alt="Административный интерфейс" />
 				</a>
 			</li>

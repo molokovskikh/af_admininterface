@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Tools;
@@ -16,7 +17,15 @@ namespace AdminInterface.Models
 	{
 		protected override void Log(PostUpdateEvent @event, string message)
 		{
-			@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
+			var auditable = @event.Entity as IAuditable;
+			if (auditable != null)
+			{
+				var record = auditable.GetAuditRecord();
+				record.Message = message.Remove(0, 3);
+				@event.Session.Save(record);
+			}
+			else
+				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
 		}
 
 		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState)

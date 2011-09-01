@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 
@@ -9,7 +10,7 @@ namespace AdminInterface.Controllers
 	[
 		Helper(typeof(BindingHelper)),
 	]
-	public class PayersController : SmartDispatcherController
+	public class PayersController : AdminInterfaceController
 	{
 		public void Show(uint id)
 		{
@@ -55,7 +56,6 @@ namespace AdminInterface.Controllers
 
 		public void NewPayment(uint id)
 		{
-			Binder.Validator = Validator;
 			var payer = Payer.Find(id);
 			var payment = new Payment(payer);
 			BindObjectInstance(payment, "payment");
@@ -69,7 +69,6 @@ namespace AdminInterface.Controllers
 
 		public void NewInvoice(uint id)
 		{
-			Binder.Validator = Validator;
 			var payer = Payer.Find(id);
 			var invoice = new Invoice(payer);
 			PropertyBag["invoice"] = invoice;
@@ -101,8 +100,6 @@ namespace AdminInterface.Controllers
 
 		public void NewAd(uint id)
 		{
-			Binder.Validator = Validator;
-
 			var payer = Payer.Find(id);
 			var ad = new Advertising(payer);
 			if (IsPost)

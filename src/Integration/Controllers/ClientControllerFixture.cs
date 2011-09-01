@@ -19,13 +19,13 @@ namespace Integration.Controllers
 	[TestFixture]
 	public class ClientControllerFixture : ControllerFixture
 	{
-		private ClientController controller;
+		private ClientsController controller;
 		private Client client;
 
 		[SetUp]
 		public void SetUp()
 		{
-			controller = new ClientController();
+			controller = new ClientsController();
 			PrepareController(controller);
 			client = DataMother.CreateTestClientWithUser();
 		}
@@ -263,7 +263,6 @@ namespace Integration.Controllers
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			Console.WriteLine(user.Id);
 			var count = ClientInfoLogEntity.Queryable.Count(l => l.Service == newClient && l.ObjectId == user.Id);
 
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));

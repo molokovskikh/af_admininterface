@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
@@ -28,13 +29,6 @@ namespace AdminInterface.MonoRailExtentions
 			var mailer = new MonorailMailer();
 			domail(mailer);
 			mailer.Send();
-		}
-
-		public string Me()
-		{
-			var request = Controller.Request;
-			var result = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
-			return result;
 		}
 
 		public MonorailMailer EnableChanged(IEnablable item)
@@ -114,7 +108,6 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["client"] = client;
 			PropertyBag["payer"] = client.Payers.First();
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["Me"] = Me();
 		}
 
 		public void NotifySupplierAboutAddressRegistration(Address address)
@@ -143,6 +136,7 @@ namespace AdminInterface.MonoRailExtentions
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
 		{
 			Template = "DoNotHaveInvoiceContactGroup";
+			IsBodyHtml = true;
 
 			To = "billing@analit.net";
 			From = "billing@analit.net";
@@ -150,7 +144,7 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["invoice"] = invoice;
 		}
 
-		public MonorailMailer RevisionAct(RevisionAct act, string emails)
+		public MonorailMailer RevisionAct(RevisionAct act, string emails, string comment)
 		{
 			Template = "RevisionAct";
 
@@ -166,6 +160,7 @@ namespace AdminInterface.MonoRailExtentions
 
 			Attachments.Add(new Attachment(file, "Акт сверки.xls"));
 			PropertyBag["act"] = act;
+			PropertyBag["comment"] = comment;
 			return this;
 		}
 
@@ -193,6 +188,32 @@ namespace AdminInterface.MonoRailExtentions
 			PropertyBag["address"] = address;
 			PropertyBag["oldClient"] = oldClient;
 			PropertyBag["oldLegalEntity"] = oldLegalEntity;
+
+			return this;
+		}
+
+		public MonorailMailer AccountingChanged(Accounting account)
+		{
+			Template = "AccountingChanged";
+
+			var payer = account.Payer;
+			Service service = null;
+
+			if (account is UserAccounting)
+				service = ((UserAccounting)account).User.RootService;
+			else
+				service = ((AddressAccounting)account).Address.Client;
+
+			From = "billing@analit.net";
+			To = "billing@analit.net";
+			Subject = String.Format("Изменение стоимости {0} - {1}, {2} - {3}, {4}",
+				payer.Name, payer.Id, service.Name, service.Id, BindingHelper.GetDescription(service.Type));
+
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["payer"] = payer;
+			PropertyBag["service"] = service;
+			PropertyBag["newPayment"] = account.Payment;
+			PropertyBag["oldPayment"] = account.OldValue(a => a.Payment);
 
 			return this;
 		}

@@ -37,11 +37,11 @@ namespace Functional
 		{
 			Open("Billing/Search");
 
-			browser.Button(Find.ByValue("Найти")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Отключенных копий"));
-			Assert.That(browser.Text, Is.StringContaining("Работающих копий"));
-			Assert.That(browser.Text, Is.StringContaining("Отключенных адресов"));
-			Assert.That(browser.Text, Is.StringContaining("Работающих адресов"));
+			browser.Button(Find.ByValue("РќР°Р№С‚Рё")).Click();
+			Assert.That(browser.Text, Is.StringContaining("РћС‚РєР»СЋС‡РµРЅРЅС‹С… РєРѕРїРёР№"));
+			Assert.That(browser.Text, Is.StringContaining("Р Р°Р±РѕС‚Р°СЋС‰РёС… РєРѕРїРёР№"));
+			Assert.That(browser.Text, Is.StringContaining("РћС‚РєР»СЋС‡РµРЅРЅС‹С… Р°РґСЂРµСЃРѕРІ"));
+			Assert.That(browser.Text, Is.StringContaining("Р Р°Р±РѕС‚Р°СЋС‰РёС… Р°РґСЂРµСЃРѕРІ"));
 		}
 
 		[Test]
@@ -49,15 +49,16 @@ namespace Functional
 		{
 			Open("/");
 
-			browser.Link(Find.ByText("Биллинг")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Фильтр плательщиков"));
-			browser.RadioButton(Find.ById("SearchByBillingId")).Click();
-			browser.TextField(Find.ById("SearchText")).TypeText(payer.Id.ToString());
-			browser.Button(Find.ByValue("Найти")).Click();
+			browser.Link(Find.ByText("Р‘РёР»Р»РёРЅРі")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Р¤РёР»СЊС‚СЂ РїР»Р°С‚РµР»СЊС‰РёРєРѕРІ"));
+			var button = (RadioButton)Css("input[name='filter.SearchBy'][value='3']");
+			button.Click();
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(payer.Id.ToString());
+			browser.Button(Find.ByValue("РќР°Р№С‚Рё")).Click();
 
 			Assert.That(browser.Text, Is.StringContaining(payer.Name));
 			browser.Link(Find.ByText(payer.Id.ToString())).Click();
-			Assert.That(browser.Text, Is.StringContaining("Плательщик " + payer.Name));
+			Assert.That(browser.Text, Is.StringContaining("РџР»Р°С‚РµР»СЊС‰РёРє " + payer.Name));
 		}
 	}
 }

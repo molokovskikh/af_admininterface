@@ -20,6 +20,7 @@ namespace AdminInterface.Models.Billing
 			Payer = invoices.Select(i => i.Payer).Distinct().Single();
 			Recipient = invoices.Select(i => i.Recipient).Distinct().Single();
 			PayerName = invoices.Select(i => i.PayerName).Distinct().Single();
+			Customer = invoices.Select(i => i.Customer).Distinct().Single();
 
 			ActDate = Payer.GetDocumentDate(actDate);
 			var invoiceParts = invoices.SelectMany(i => i.Parts);
@@ -66,6 +67,9 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public string PayerName { get; set; }
 
+		[Property]
+		public string Customer { get; set; }
+
 		[HasMany(Lazy = true)]
 		public IList<Invoice> Invoices { get; set; }
 
@@ -81,7 +85,7 @@ namespace AdminInterface.Models.Billing
 		{
 			return invoices
 				.Where(i => i.Act == null)
-				.GroupBy(i => new { i.Payer, i.PayerName, i.Recipient })
+				.GroupBy(i => new { i.Payer, i.PayerName, i.Customer, i.Recipient })
 				.Select(g => new Act(documentDate, g.ToArray()))
 				.ToList();
 		}

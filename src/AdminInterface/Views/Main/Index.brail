@@ -1,5 +1,13 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿${app.CSS("/App_Themes/Main/Main.css",
+	"/App_Themes/WebApp/base.css",
+	"/App_Themes/WebApp/style.css")}
+
+<% component CaptureFor, {"id" : "Title"}: %>
 	Интерфейс управления клиентами
+<% end %>
+
+<% component CaptureFor, {@id : @ShowHeader}: %>
+	False
 <% end %>
 
 <style type="text/css">
@@ -58,23 +66,12 @@
 <table id="Table1" cellspacing="0" cellpadding="0" width="100%" border="0">
 	<tr>
 		<td valign=top style="padding: 5px 20px 5px 10px;">
-<div id="sidebar" class="Autosize">
+			<div id="sidebar" class="Autosize">
 				<div class="block">
 					<h3>Административный интерфейс</h3>
 					<ul class="navigation">
 						<li>
-							<% if admin.HavePermisions(PermissionType.CopySynonyms, PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/CopySynonym.aspx">Клонирование</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Клонирование</a>
-							<% end %>
-						</li>
-						<li>
-							<% if admin.HaveAnyOfPermissions(PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/users/search">Поиск пользователей</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Поиск пользователей</a>
-							<% end %>
+							<li>${app.LinkTo("Поиск пользователей", "Users", "Search")}</li>
 						</li>
 						<li>
 							<% if admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
@@ -91,14 +88,7 @@
 							<% end %>
 						</li>
 						<li>
-							<% if admin.HavePermisions(PermissionType.MonitorUpdates) and admin.HaveAnyOfPermissions(PermissionType.ViewSuppliers, PermissionType.ViewDrugstore): %>
-							<a href="${siteroot}/Monitoring/Clients">Мониторинг работы клиентов</a>
-							<% else: %>
-							<a href="#" class="NotAllowedLink">Мониторинг работы клиентов</a>
-							<% end %>
-						</li>
-						<li>
-							<a href="${siteroot}/SmapRejector/Show.rails">Отклоненные сообщения</a>
+							<a href="${siteroot}/SmapRejector/Show">Отклоненные сообщения</a>
 						</li>
 						<li>
 							<% if admin.HavePermisions(PermissionType.EditSettings): %>
@@ -392,12 +382,12 @@
 				<tr>
 					<td colspan="4" align="center">
 						<br /><br />
-						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy">
-							<input type="hidden" id="Autosearch" name="SearchBy.SearchBy" value="Auto" />
-							<input type="hidden" name="SearchBy.RegionId" value="${RegionId}" />
+						<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/Search">
+							<input type="hidden" name="filter.SearchBy" value="Auto" />
+							<input type="hidden" name="filter.Region.Id" value="${RegionId}" />
 							<div class="search-header" style="text-align:center">
 								<label>Поиск пользователей</label>
-								<input type="text" id="SearchText" name="SearchBy.SearchText" style="width: 300px; border-style:groove;" value="" />
+								<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px; border-style:groove;" value="" />
 								<input type="submit" style="border-style:groove; width: auto;" value="Найти" />
 							</div>
 						</form>

@@ -4,7 +4,7 @@
 	Регистрация поставщика
 <% end %>
 
-${app.JS("contact.registrator.js", "payer.search.js", "jquery_contact_validation.js", "underscore.js", "backbone.js", "jquery.tmpl.js")}
+${app.JS("contact.registrator.js", "payer.search.js", "jquery.tmpl.js")}
 ${app.Asset("order.delivery.group.editor.coffee")}
 
 <style>

@@ -96,6 +96,7 @@
   <ItemGroup>
     <Compile Include="Billing\BillingSearchFixture.cs" />
     <Compile Include="Billing\AccountingFixture.cs" />
+    <Compile Include="Billing\PayerSecurityFixture.cs" />
     <Compile Include="Billing\SupplierBillingFixture.cs" />
     <Compile Include="Drugstore\AddressFixture.cs" />
     <Compile Include="Billing\BillingFixture.cs" />
@@ -129,7 +130,6 @@
     <Compile Include="Drugstore\RegistrationFixture.cs" />
     <Compile Include="Setup.cs" />
     <Compile Include="MessagesFixture.cs" />
-    <Compile Include="SupplierFixture.cs" />
     <Compile Include="Suppliers\BillingFixture.cs" />
     <Compile Include="Suppliers\SupplierFixture.cs" />
     <Compile Include="Suppliers\RegistrationFixture.cs" />

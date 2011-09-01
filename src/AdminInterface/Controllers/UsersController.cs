@@ -10,6 +10,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -19,7 +20,6 @@ using AdminInterface.Properties;
 using System.Web;
 using Common.Web.Ui.Models;
 using System.Linq;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -28,7 +28,7 @@ namespace AdminInterface.Controllers
 		Secure,
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class UsersController : Controller
+	public class UsersController : AdminInterfaceController
 	{
 		public void Show(uint id)
 		{
@@ -182,19 +182,13 @@ namespace AdminInterface.Controllers
 			[DataBind("persons")] Person[] persons,
 			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
+			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
+			user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
+			user.UpdateContacts(contacts, deletedContacts);
+			user.UpdatePersons(persons, deletedPersons);
+			user.Update();
 
-				user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
-				user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
-				user.UpdateContacts(contacts, deletedContacts);
-				user.UpdatePersons(persons, deletedPersons);
-				user.Update();
-				scope.VoteCommit();
-			}
-
-			Flash["Message"] = new Message("Сохранено");
+			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new {id = user.Id});
 		}
 
@@ -218,7 +212,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.GetById(userId);
 			user.CheckLogin();
-			var administrator = Administrator;
+			var administrator = Admin;
 			var password = User.GeneratePassword();
 		
 			using (new TransactionScope())
@@ -272,11 +266,10 @@ namespace AdminInterface.Controllers
 
 		public void Unlock(string login)
 		{
-#if !DEBUG
 			if (ADHelper.IsLoginExists(login) && ADHelper.IsLocked(login))
 				ADHelper.Unlock(login);
-#endif
-			Flash["Message"] = Message.Notify("Разблокировано");
+
+			Notify("Разблокировано");
 			RedirectToReferrer();
 		}
 
@@ -288,11 +281,11 @@ namespace AdminInterface.Controllers
 				var file = String.Format(CustomSettings.UserPreparedDataFormatString, user.Id);
 				if (File.Exists(file))
 					File.Delete(file);
-				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
+				Notify("Подготовленные данные удалены");
 			}
 			catch
 			{
-				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
+				Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToReferrer();
 		}
@@ -307,12 +300,12 @@ namespace AdminInterface.Controllers
 					new
 					{
 						inHost = Request.UserHostAddress,
-						inUser = Administrator.UserName,
+						inUser = Admin.UserName,
 						ResetIdCause = reason
 					});
 				ClientInfoLogEntity.ReseteUin(user, reason).Save();
 				user.ResetUin();
-				Flash["Message"] = Message.Notify("УИН сброшен");
+				Notify("УИН сброшен");
 				RedirectToReferrer();
 			}
 		}
@@ -327,7 +320,7 @@ namespace AdminInterface.Controllers
 				using (new TransactionScope())
 					new ClientInfoLogEntity(message, user).Save();
 
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("Сохранено");
 			}
 			RedirectToReferrer();
 		}
@@ -354,13 +347,8 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom")] User user)
 		{
-			using (var scope = new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				user.Update();
-				scope.VoteCommit();
-			}
-			Flash["Message"] = Message.Notify("Сохранено");
+			user.Update();
+			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
 
@@ -368,9 +356,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = User.Find(id);
 			if (!String.IsNullOrEmpty(searchText))
-			{
 				PropertyBag["Offers"] = Offer.Search(user, searchText);
-			}
 			PropertyBag["user"] = user;
 		}
 	}

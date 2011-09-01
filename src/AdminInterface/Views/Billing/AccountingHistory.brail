@@ -5,7 +5,7 @@
 </script>
 
 <br />
-<div class="CenterBlock FilterBlock" style="padding: 10px 30px 10px 30px;" align="center">
+<div class="CenterBlock FilterBlock">
 <form id="SearchForm" method="post" action="${siteroot}/Billing/Accounting">
 	<h3>Поиск</h3>
 	<table style="width: 100%;">

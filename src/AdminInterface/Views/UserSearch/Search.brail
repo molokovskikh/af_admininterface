@@ -1,100 +1,152 @@
 ﻿<% component CaptureFor, {"id" : "Title"}: %>
-		Поиск пользователей
+	Поиск пользователей
 <% end %>
-<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "")]} %>
+
+<% component Bubble, {"bredcrumbs" : []} %>
 
 <style type="text/css">
-    p
-    {
-        width: 100%;
-        text-align: center;
-    }
+	p
+	{
+		width: 100%;
+		text-align: center;
+	}
 </style>
 
 <script type="text/javascript">
-    jQuery(document).ready(
-        function() {
-            jQuery("#SearchText").focus();
-        }
-    );
+	jQuery(document).ready(
+		function() {
+			jQuery("#filter_SearchText").focus();
+		}
+	);
 
 </script>
-<div class="CenterBlock FilterBlock" style="padding: 10px 30px 10px 30px;">
-<h3><b>Поиск пользователей</b></h3>
-<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/SearchBy.rails">
-    <p style="text-align: left;">Введите текст для поиска:<br /><input type="text" id="SearchText"  name="SearchBy.SearchText" value="${FindBy.SearchText}" style="width: 100%;" /></p>
-    <table style="width: 100%;" cellpadding="0" cellspacing="0">
-        <tr><td style="text-align: left;">Искать по:</td><td></td><td></td></tr>
-        <tr>
-            <td>
-            </td>
-            <td>
-                <input type="radio" id="Autosearch" name="SearchBy.SearchBy" value="Auto" ${"checked" if FindBy.IsSearchAuto()} />
-                <label for="Autosearch">Автоматически</label><br />
-                <input type="radio" id="SearchByClientId" name="SearchBy.SearchBy" value="ByClientId" ${"checked" if FindBy.IsSearchByClientId()} />
-                <label for="SearchByClientId">Код клиента</label><br />
-                <input type="radio" id="SearchByUserId" name="SearchBy.SearchBy" value="ByUserId" ${"checked" if FindBy.IsSearchByUserId()} />
-                <label for="SearchByUserId">Код пользователя</label><br />
-                <input type="radio" id="SearchByLogin" name="SearchBy.SearchBy" value="ByLogin" ${"checked" if FindBy.IsSearchByLogin()} />
-                <label for="SearchByLogin">Логин пользователя</label><br />
-                <input type="radio" id="SearchByUserName" name="SearchBy.SearchBy" value="ByUserName" ${"checked" if FindBy.IsSearchByUserName()} />
-                <label for="SearchByUserName">Комментарий пользователя</label><br />
-            </td>
-            <td>
-                <input type="radio" id="SearchByClientName" name="SearchBy.SearchBy" value="ByClientName" ${"checked" if FindBy.IsSearchByClientName()} />
-                <label for="SearchByClientName">Имя клиента</label><br />
-                <input type="radio" id="SearchByContacts" name="SearchBy.SearchBy" value="ByContacts" ${"checked" if FindBy.IsSearchByContacts()} />
-                <label for="SearchByContacts">Email/телефон</label><br />
-                <input type="radio" id="SearchByPersons" name="SearchBy.SearchBy" value="ByPersons" ${"checked" if FindBy.IsSearchByPersons()} />
-                <label for="SearchByPersons">Контактное лицо (Ф.И.О.)</label><br />
-                <input type="radio" id="SearchByJuridicalName" name="SearchBy.SearchBy" value="ByJuridicalName" ${"checked" if FindBy.IsSearchByJuridicalName()} />
-                <label for="SearchByJuridicalName">Юридическое имя</label><br />
-                <input type="radio" id="SearchByPayerId" name="SearchBy.SearchBy" value="ByPayerId" ${"checked" if FindBy.IsSearchByPayerId()} />
-                <label for="SearchByPayerId">Код договора</label><br />
-                
-            </td>
-        </tr>
-    </table>
-    
-    <p>
-    <fieldset style="padding: 0; margin: 0; text-align: left;">
-        <legend>Фильтры:</legend>
-        <table style="width:100%" border="0">
+<div class="CenterBlock FilterBlock">
+<form id="SearchForm" name="SearchForm" method=post>
+	<p style="text-align: left;" class=value>
+		Введите текст для поиска:<br />
+		${app.Edit("filter.SearchText")}
+	</p>
+	<table style="width: 100%;" cellpadding="0" cellspacing="0">
+		<tr><td style="text-align: left;">Искать по:</td><td></td><td></td></tr>
+		<tr>
+			<td>
+			</td>
+			<td>
+				<input type="radio" id="Autosearch" name="filter.SearchBy" value="Auto" ${"checked" if filter.IsSearchAuto()} />
+				<label for="Autosearch">Автоматически</label><br />
+				<input type="radio" id="SearchByClientId" name="filter.SearchBy" value="ByClientId" ${"checked" if filter.IsSearchByClientId()} />
+				<label for="SearchByClientId">Код клиента</label><br />
+				<input type="radio" id="SearchByUserId" name="filter.SearchBy" value="ByUserId" ${"checked" if filter.IsSearchByUserId()} />
+				<label for="SearchByUserId">Код пользователя</label><br />
+				<input type="radio" id="SearchByLogin" name="filter.SearchBy" value="ByLogin" ${"checked" if filter.IsSearchByLogin()} />
+				<label for="SearchByLogin">Логин пользователя</label><br />
+				<input type="radio" id="SearchByUserName" name="filter.SearchBy" value="ByUserName" ${"checked" if filter.IsSearchByUserName()} />
+				<label for="SearchByUserName">Комментарий пользователя</label><br />
+			</td>
+			<td>
+				<input type="radio" id="SearchByClientName" name="filter.SearchBy" value="ByClientName" ${"checked" if filter.IsSearchByClientName()} />
+				<label for="SearchByClientName">Имя клиента</label><br />
+				<input type="radio" id="SearchByContacts" name="filter.SearchBy" value="ByContacts" ${"checked" if filter.IsSearchByContacts()} />
+				<label for="SearchByContacts">Email/телефон</label><br />
+				<input type="radio" id="SearchByPersons" name="filter.SearchBy" value="ByPersons" ${"checked" if filter.IsSearchByPersons()} />
+				<label for="SearchByPersons">Контактное лицо (Ф.И.О.)</label><br />
+				<input type="radio" id="SearchByJuridicalName" name="filter.SearchBy" value="ByJuridicalName" ${"checked" if filter.IsSearchByJuridicalName()} />
+				<label for="SearchByJuridicalName">Юридическое имя</label><br />
+				<input type="radio" id="SearchByPayerId" name="filter.SearchBy" value="ByPayerId" ${"checked" if filter.IsSearchByPayerId()} />
+				<label for="SearchByPayerId">Код договора</label><br />
+			</td>
+		</tr>
+	</table>
+	
+	<fieldset style="padding: 0; margin: 0; text-align: left;">
+		<legend>Фильтры:</legend>
+		<table style="width:100%" border="0">
 			<col style="width:25%" />
 			<col style="width:25%" />
 			<col style="width:25%" />
 			<col style="width:25%" />
 			<thead>
-			    <tr align="left">
-			        <td style="padding: 5px;">Регион<br />
-				    ${FormHelper.Select("SearchBy.RegionId",
-									    FindBy.RegionId,
-									    regions, 
-									    {"value":"Id", "text":"Name", "class" : "Full"})}
-                    </td>
-					<td style="padding: 5px;">Тип<br />
-					${FormHelper.Select("SearchBy.ClientType",
-									    FindBy.ClientType,
-									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientType, AdminInterface"),
-									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
+				<tr align="left">
+					<td class=value>
+						Регион<br />
+						${app.Edit("filter.Region")}
 					</td>
-			        <td style="padding: 5px;">Сегмент<br />
-				    ${FormHelper.Select("SearchBy.Segment",
-									    FindBy.Segment,
-									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchSegment, AdminInterface"),
-									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
-			        </td>
-			        <td style="padding: 5px;">Статус<br />
-				    ${FormHelper.Select("SearchBy.SearchStatus",
-									    FindBy.SearchStatus,
-									    BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.SearchClientStatus, AdminInterface"),
-									    BindingHelper.GetDictionaryMapping({"class" : "Full"}))}
-			        </td>
-			    </tr>
+					<td class=value>
+						Тип<br />
+						${app.Edit("filter.ClientType")}
+					</td>
+					<td class=value>
+						Сегмент<br />
+						${app.Edit("filter.Segment")}
+					</td>
+					<td class=value>
+						Статус<br />
+						${app.Edit("filter.SearchStatus")}
+					</td>
+				</tr>
 			</thead>
-        </table>
-    </fieldset>
-    </p>
-    <p><input type="submit" id="SearchButton" value="Поиск" /></p>
+		</table>
+	</fieldset>
+	<p>
+		<input type="submit" id="SearchButton" value="Поиск" />
+	</p>
 </form>
 </div>
+
+<% if ?searchResults: %>
+	<% if searchResults.Count: %>
+		<table class="DataTable">
+			<thead>
+				<tr>
+					<th>${app.Sortable("Договор", "PayerId")}</th>
+					<th>${app.Sortable("Код клиента", "ClientId")}</th>
+					<th>${app.Sortable("Код пользователя", "UserId")}</th>
+					<th>${app.Sortable("Имя клиента", "ClientName")}</th>
+					<th>${app.Sortable("Логин", "Login")}</th>
+					<th>${app.Sortable("Комментарий", "UserName")}</th>
+					<th>${app.Sortable("Регион", "RegionName")}</th>
+					<th>${app.Sortable("Обновление", "UpdateDate")}</th>
+					<th>${app.Sortable("Версия", "AFVersion")}</th>
+					<th>${app.Sortable("Тип", "ClientType")}</th>
+					<th>${app.Sortable("Сегмент", "Segment")}</th>
+				</tr>
+			</thead>
+			<tbody id="SearchResults" class="HighLightCurrentRow">
+			<% for i,item in enumerate(searchResults): %>
+				<tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if item.Disabled} ${'DisabledInAd' if(item.IsLoginExists and item.IsDisabled)} ${'LockedUser' if(item.IsLoginExists and item.IsLocked)} ${'NotExistsUser' if(not item.IsLoginExists)}">
+					<td><a href="${siteroot}/Payers/${item.PayerId}?ClientCode=${item.ClientId}">${item.PayerId}</a></td>
+					<td>${item.ClientId}</td>
+					<td>${item.UserId}</td>
+					<td>
+						<% if item.IsDrugstore: %>
+							${LinkHelper.Client(siteroot, item.ClientId, item.ClientName)}
+						<% else: %>
+							<a href="${siteroot}/Suppliers/${item.ClientId}">${item.ClientName}</a>
+						<% end %>
+					</td>
+					<td>
+						<a href="${siteroot}/Users/${item.UserId}/edit">${item.Login}</a>
+					</td>
+					<td>${item.UserName}</td>
+					<td>${item.RegionName}</td>
+					<%
+						oldUpdate = true
+						if (item.UpdateDate != null):
+							oldUpdate = (System.DateTime.Now.Subtract(item.UpdateDate).TotalDays >= 2)
+						end    
+					%>
+					<td class="${'OldUserUpdate' if (oldUpdate)} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
+					<td>${item.AFVersion}</td>
+					<td>${BindingHelper.GetDescription(item.ClientType)}</td>
+					<td>${BindingHelper.GetDescription(item.Segment)}</td>
+				</tr>
+			<% end %>
+			</tbody>
+		</table>
+		<div style="width: 100%;" align="center">
+			<br /><% OutputSubView("LegendView") %>
+		</div>
+	<% else: %>
+		<div class="EmptyData">По вашему запросу ничего не найдено</div>
+	<% end %>
+<% end %>

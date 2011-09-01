@@ -48,6 +48,10 @@ end
 				FormHelper.TextField("Instance.JuridicalName"))}
 
 		${WriteLabelAndEditControle(
+				FormHelper.LabelFor("Instance.Customer", "Заказчик:"),
+				FormHelper.TextField("Instance.Customer"))}
+
+		${WriteLabelAndEditControle(
 				FormHelper.LabelFor("Instance.JuridicalAddress", "Юридический адрес:"),
 				FormHelper.TextField("Instance.JuridicalAddress"))}
 
@@ -138,43 +142,43 @@ end
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressCountry", 
 														"Страна:"), 
-									FormHelper.TextField("Instance.ActualAddressCountry", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressCountry"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressIndex", 
 														"Индекс:"), 
-									FormHelper.TextField("Instance.ActualAddressIndex", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressIndex"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressProvince", 
 														"Область:"), 
-									FormHelper.TextField("Instance.ActualAddressProvince", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressProvince"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressTown", 
 														"Город:"), 
-									FormHelper.TextField("Instance.ActualAddressTown", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressTown"))}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressRegion", 
 														"Район:"), 
-									FormHelper.TextField("Instance.ActualAddressRegion", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressRegion"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressStreet", 
 														"Улица:"), 
-									FormHelper.TextField("Instance.ActualAddressStreet", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressStreet"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressHouse", 
 														"Дом:"), 
-									FormHelper.TextField("Instance.ActualAddressHouse", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressHouse"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressOffice", 
 														"Офис:"), 
-									FormHelper.TextField("Instance.ActualAddressOffice", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressOffice"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeforeNamePrefix", 
 														"Префикс перед \"Кому\":"), 
-									FormHelper.TextField("Instance.BeforeNamePrefix", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.BeforeNamePrefix"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
 														"Надпись после \"Кому\":"), 
-									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.AfterNamePrefix"))}
 									
 		<tr style="text-align:right">
 			<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
@@ -214,11 +218,9 @@ end
 			if MailSentHistory.Length > 0:
 				for i, mailSentEntity in enumerate(MailSentHistory):
 			%>
-					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)} ${ "DeletedMessage" if mailSentEntity.IsDeleted}">
+					<tr id="mail${mailSentEntity.Id}" class="${ViewHelper.GetRowStyle(i)}">
 						<td>
-							<% if not mailSentEntity.IsDeleted: %>
 							<input type="button" value="Удалить" onclick="return RemoveMailEntity(${mailSentEntity.Id});"/>
-							<% end %>
 						</td>
 						<td>
 							${mailSentEntity.SentDate.ToShortDateString()}

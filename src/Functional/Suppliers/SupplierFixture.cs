@@ -27,8 +27,8 @@ namespace Functional.Suppliers
 		public void Search_supplier_user()
 		{
 			Open("/users/search");
-			browser.Css("#SearchText").TypeText(user.Id.ToString());
-			browser.Button(Find.ByValue("Поиск")).Click();
+			browser.Css("#filter_SearchText").TypeText(user.Id.ToString());
+			Click("Поиск");
 			Assert.That(browser.Text, Is.StringContaining(user.Login));
 /*
  *			срабатывает автоматичский вход в пользователя
@@ -64,8 +64,8 @@ namespace Functional.Suppliers
 		public void Search_supplier()
 		{
 			Open("/users/search");
-			browser.Css("#SearchText").TypeText("Тестовый поставщик");
-			browser.Button(Find.ByValue("Поиск")).Click();
+			browser.Css("#filter_SearchText").TypeText("Тестовый поставщик");
+			Click("Поиск");
 			Assert.That(browser.Text, Is.StringContaining("Тестовый поставщик"));
 
 			browser.Link(Find.ByText("Тестовый поставщик")).Click();

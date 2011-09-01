@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using NHibernate.Criterion;
 
@@ -14,9 +16,6 @@ namespace AdminInterface.Models
 		[Property]
 		public DateTime SentDate { get; set; }
 
-		[Property]
-		public bool IsDeleted { get; set; }
-
 		[Property(NotNull = true), ValidateNonEmpty("Нужно ввести комментарий")]
 		public string Comment { get; set; }
 
@@ -26,10 +25,12 @@ namespace AdminInterface.Models
 		[Property]
 		public uint PayerId { get; set; }
 
-		public static MailSentEntity[] GetHistory(uint payerId)
+		public static MailSentEntity[] GetHistory(Payer payer)
 		{
-			return ActiveRecordMediator<MailSentEntity>.FindAll(new[] {Order.Desc("SentDate")},
-			                                                    Expression.Eq("PayerId", payerId));
+			return ActiveRecordLinqBase<MailSentEntity>.Queryable
+				.Where(m => m.PayerId == payer.PayerID)
+				.OrderByDescending(m => m.SentDate)
+				.ToArray();
 		}
 	}
 }

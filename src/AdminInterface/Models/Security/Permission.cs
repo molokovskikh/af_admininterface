@@ -31,10 +31,11 @@ namespace AdminInterface.Models.Security
 		EditSettings = 19,
 
 		ConfigurerEditProducers = 18,
-		CallHistory = 20
+		CallHistory = 20,
+		ChangePayment = 22
 	}
 
-	[ActiveRecord("permissions", Schema = "accessright", Lazy = false)]
+	[ActiveRecord(Schema = "accessright", Lazy = false)]
 	public class Permission
 	{
 		[PrimaryKey("Id")]
@@ -83,7 +84,7 @@ namespace AdminInterface.Models.Security
 			if (Type == PermissionType.ViewDrugstore)
 			{
 				var drugstore = new [] {
-					"client", "users", "deliveries"
+					"clients", "users", "addresses"
 				};
 				return drugstore.Any(c => c == controller.ToLower());
 			}

@@ -14,7 +14,8 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				PropertyBag["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				RedirectToReferrer();
 				return;
 			}
 
@@ -38,12 +39,12 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
-			LayoutName = "Print";
 
+			LayoutName = "Print";
 			if (begin == null)
 				begin = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
 			if (end == null)
@@ -57,12 +58,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 		}
 
-		public void Mail(uint id, DateTime? begin, DateTime? end, string emails)
+		public void Mail(uint id, DateTime? begin, DateTime? end, string emails, string message)
 		{
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
@@ -78,7 +79,7 @@ namespace AdminInterface.Controllers
 				Act.Queryable.Where(i => i.Payer == payer).ToList(),
 				Payment.Queryable.Where(p => p.Payer == payer).ToList());
 
-			this.Mail().RevisionAct(act, emails).Send();
+			this.Mailer().RevisionAct(act, emails, message).Send();
 
 			Flash["Message"] = Message.Notify("Отправлено");
 			RedirectToReferrer();
@@ -89,7 +90,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получаетля платежей.");
+				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}

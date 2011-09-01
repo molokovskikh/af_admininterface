@@ -15,7 +15,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<td style="width: 30%">
 			${labelText}
 		</td>
-		<td style="width: 70%">
+		<td class="BillingInput">
 			${editControlText}
 		</td>
 	</tr>
@@ -25,7 +25,6 @@ end
 
 <script>
 	document.observe("dom:loaded", function() {
-		SetupCalendarElements();
 		
 		if ($('PaymentOptions_WorkForFree') != null)
 		{
@@ -56,7 +55,7 @@ end
 			var maxFreeWorkWithoutMessage = Date.today().add(45).days();
 			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
 			return paymentPeriodBeginDate < maxFreeWorkWithoutMessage;
-		});		
+		});
 		
 		Validation.add("CheckDate", "Не корректная дата", function(v){
 		
@@ -76,7 +75,7 @@ end
 		
 			var paymentPeriodBeginDate = Date.parse($('CalendarInputField0').value);
 			return paymentPeriodBeginDate >= Date.today();
-		});		
+		});
 
 		new Validation("PayerInfo");
 	});
@@ -91,7 +90,7 @@ end
 	Регистрация плательщика
 </h3>
 
-<form id="PayerInfo" action="registered.rails" method="post">
+<form id="PayerInfo" action="registered" method="post">
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
 	${FormHelper.HiddenField("Instance.PayerID")}
 
@@ -99,25 +98,23 @@ end
 	${WriteInputGroupHeader("Юридическое лицо")}
 
 					
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Name", 
-													"Краткое наименование:"), 
-								FormHelper.TextField("Instance.Name", {"class" : "BillingInput"}))}
-												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", 
-													"Полное наименование:"), 
-								FormHelper.TextField("Instance.JuridicalName", {"class" : "BillingInput"}))}
-												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", 
-													"Юридический адрес:"), 
-								FormHelper.TextField("Instance.JuridicalAddress", {"class" : "BillingInput"}))}
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Name", "Краткое наименование:"),
+								FormHelper.TextField("Instance.Name"))}
 
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", 
-													"ИНН:"), 
-								FormHelper.TextField("Instance.INN", {"class" : "BillingInput"}))}
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalName", "Полное наименование:"), 
+								FormHelper.TextField("Instance.JuridicalName"))}
+
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.Customer", "Заказчик:"), 
+								FormHelper.TextField("Instance.Customer"))}
+
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.JuridicalAddress", "Юридический адрес:"), 
+								FormHelper.TextField("Instance.JuridicalAddress"))}
+
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.INN", "ИНН:"), 
+								FormHelper.TextField("Instance.INN"))}
 												
-	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", 
-													"КПП:"), 
-								FormHelper.TextField("Instance.KPP", {"class" : "BillingInput"}))}
+	${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.KPP", "КПП:"), 
+								FormHelper.TextField("Instance.KPP"))}
 
 	<% if payer.Id: %>
 	<%
@@ -128,7 +125,7 @@ end
 			<tr>
 				<% if contactGroupIndex == 0: %>
 					<td class="InputGroupHeader">
-						<a href="../Contact/NewContactGroup.rails?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
+						<a href="../Contact/NewContactGroup?billingCode=${Instance.PayerID}" target="_blank">Добавить группу контактной информации</a>
 					</td>
 					<td class="InputGroupHeader">
 						${ContactGroupName}
@@ -140,7 +137,7 @@ end
 				<% end %>
 			</tr>
 		<% 
-							contactGroupIndex++;
+			contactGroupIndex++;
 		end
 		section Item:
 		%>
@@ -156,12 +153,12 @@ end
 		end
 		section Person:
 		%>
-				<a href='../Contact/EditPerson.rails?personId=${PersonId}' target='_blank'>${PersonName}</a>
+				<a href='../Contact/EditPerson?personId=${PersonId}' target='_blank'>${PersonName}</a>
 		<%
 		end
 		section ContactGroupHeaderLink:
 		%>
-				<a href='../Contact/EditContactGroup.rails?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
+				<a href='../Contact/EditContactGroup?contactGroupId=${ContactGroupId}' target="_blank" >${ContactGroupName}</a>
 		<%
 		end
 	end
@@ -170,65 +167,53 @@ end
 
 		${WriteInputGroupHeader("Опции выставки счета")}
 					
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", 
-														"Выставлять счет:"), 
-									FormHelper.Select("Instance.AutoInvoice", 
-													  {1:"Автоматически", 0:"По запросу"},
-													  {"value":"Key", "text":"Value"}))}
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AutoInvoice", "Выставлять счет:"),
+									app.Edit("Instance.AutoInvoice"))}
 
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.DetailInvoice", 
-														"Категория счета:"), 
-									FormHelper.Select("Instance.DetailInvoice", 
-													  {0:"Стандартный", 1:"Детализированный"},
-													  {"value":"Key", "text":"Value"}))}
-																  
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", 
-																	"Периодичность выставления счетов:"), 
-									FormHelper.Select("Instance.PayCycle", 
-													  {0:"Помесячно", 1:"Поквартально"}, 
-													  {"value":"Key", "text":"Value"}))}
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.PayCycle", "Периодичность выставления счетов:"),
+									app.Edit("Instance.PayCycle"))}
 
 		${WriteInputGroupHeader("Доставка корреспонденции")}
 
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressCountry", 
 														"Страна:"), 
-									FormHelper.TextField("Instance.ActualAddressCountry", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressCountry"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressIndex", 
 														"Индекс:"), 
-									FormHelper.TextField("Instance.ActualAddressIndex", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressIndex"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressProvince", 
 														"Область:"), 
-									FormHelper.TextField("Instance.ActualAddressProvince", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressProvince"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressTown", 
 														"Город:"), 
-									FormHelper.TextField("Instance.ActualAddressTown", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressTown"))}
 
-		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressRegion", 
+		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressRegion",
 														"Район:"), 
-									FormHelper.TextField("Instance.ActualAddressRegion", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressRegion"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressStreet", 
 														"Улица:"), 
-									FormHelper.TextField("Instance.ActualAddressStreet", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressStreet"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressHouse", 
 														"Дом:"), 
-									FormHelper.TextField("Instance.ActualAddressHouse", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressHouse"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.ActualAddressOffice", 
 														"Офис:"), 
-									FormHelper.TextField("Instance.ActualAddressOffice", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.ActualAddressOffice"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeforeNamePrefix", 
 														"Префикс перед \"Кому\":"), 
-									FormHelper.TextField("Instance.BeforeNamePrefix", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.BeforeNamePrefix"))}
 												
 		${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.AfterNamePrefix", 
 														"Надпись после \"Кому\":"), 
-									FormHelper.TextField("Instance.AfterNamePrefix", {"class" : "BillingInput"}))}
+									FormHelper.TextField("Instance.AfterNamePrefix"))}
 									
 		${WriteInputGroupHeader("Условия оплаты")}
 		

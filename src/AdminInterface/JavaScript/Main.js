@@ -61,35 +61,11 @@ function jQueryJoin(control) {
 	$(control).mouseover(function() { $(this).addClass('SelectedRow'); });
 }
 
-function ValidateLogin(source, args)
-{
-	if (document.getElementById("IncludeCB").checked)
-	{
-		if (document.getElementById("IncludeType") != null)
-		{
-			if (document.getElementById("IncludeType").children.item(document.getElementById("IncludeType").selectedIndex).text != "Базовый")
-				args.IsValid = args.Value.length > 0;
-			else
-				args.IsValid = true;
-		}
-	}
-	else
-	{
-		args.IsValid = args.Value.length > 0;
-	}
-}
-
-function ValidateParent(source, args)
-{
-	if (args.Value == null || args.Value == "")
-		args.IsValid = false;
-}
-
 function ShowHidden(sender)
 {
 	if ($$(".ShowHiden").length > 1 || $$(".hidden").length > 1) {
-        jQuery(".ShowHiden[title=\"" + sender.title + "\"]")[0].className = "HideVisible";        
-        jQuery(".hidden[title=\"" + sender.title + "\"]")[0].className = "VisibleFolder";	
+		jQuery(".ShowHiden[title=\"" + sender.title + "\"]")[0].className = "HideVisible";        
+		jQuery(".hidden[title=\"" + sender.title + "\"]")[0].className = "VisibleFolder";	
 	}
 	else {
 		$$(".ShowHiden").first().className = "HideVisible";
@@ -101,8 +77,8 @@ function ShowHidden(sender)
 function HideVisible(sender)
 {
 	if ($$(".HideVisible").length > 1 || $$(".VisibleFolder").length > 1) {
-        jQuery(".HideVisible[title=\"" + sender.title + "\"]")[0].className = "ShowHiden";
-        jQuery(".VisibleFolder[title=\"" + sender.title + "\"]")[0].className = "hidden";
+		jQuery(".HideVisible[title=\"" + sender.title + "\"]")[0].className = "ShowHiden";
+		jQuery(".VisibleFolder[title=\"" + sender.title + "\"]")[0].className = "hidden";
 	}
 	else {
 		$$(".HideVisible").first().className = "ShowHiden";
@@ -113,9 +89,8 @@ function HideVisible(sender)
 
 function SetupCalendarElements()
 {
-  $$(".CalendarInput")
-	.each(function(value, index)
-			{
+	$$(".CalendarInput")
+		.each(function(value, index) {
 				value.id = "CalendarInput" + index;
 				value.previous().id = "CalendarInputField" + index;
 				Calendar.setup({
@@ -125,7 +100,7 @@ function SetupCalendarElements()
 					weekNumbers: false,
 					showOthers: true
 				})
-			});
+		});
 }
 
 function ShowElement(show, selector) {

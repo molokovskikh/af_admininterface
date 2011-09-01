@@ -89,7 +89,7 @@
 				Зарегистрирован пользователем ${supplier.Registration.GetRegistrant().ManagerName}, дата регистрации ${supplier.Registration.RegistrationDate}
 				<% end %>
 			</div>
-			<form method=post>
+			${FormHelper.FormTag("", null)}
 				<div>
 					${FormHelper.HiddenField("supplier.Id")}
 					<p>
@@ -106,7 +106,7 @@
 				<div>
 					<input type=submit value="Сохранить" />
 				</div>
-			</form>
+			${FormHelper.EndFormTag()}
 		</div>
 
 		<%
@@ -144,7 +144,7 @@
 			</table>
 		</div>
 
-		<% OutputSubView("/Client/LegendView") %>
+		<% OutputSubView("/Clients/LegendView") %>
 	</div>
 
 	<div class="TwoColumn" style="margin-left: 10px">

@@ -138,7 +138,6 @@ namespace AdminInterface.Models.Security
 				if (HavePermision(permission))
 					return true;
 			return false;
-
 		}
 
 		public string GetClientFilterByType(string alias)
@@ -228,6 +227,11 @@ namespace AdminInterface.Models.Security
 			get { return HavePermisions(PermissionType.SupplierInterface); }
 		}
 
+		public bool CanChangePayment
+		{
+			get { return HavePermision(PermissionType.ChangePayment); }
+		}
+
 		public void CheckClientPermission(Client client)
 		{
 			CheckClientHomeRegion(client.HomeRegion.Id);
@@ -281,6 +285,13 @@ namespace AdminInterface.Models.Security
 				.ToList();
 			admin.Save();
 			return admin;
+		}
+
+		public void RemovePermission()
+		{
+			var permission = AllowedPermissions.FirstOrDefault(p => p.Type == PermissionType.ChangePayment);
+			if (permission != null)
+				AllowedPermissions.Remove(permission);
 		}
 	}
 }

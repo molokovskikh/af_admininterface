@@ -4,7 +4,7 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge">
 		<title>
-			<% if IsDefined("Title"): %>
+			<% if ?Title: %>
 			${Title}
 			<% else: %>
 			Административный интерфейс
@@ -17,9 +17,12 @@
 			"date-ru-RU.js",
 			"jquery-1.4.2.min.js",
 			"jquery.validate.min.js",
+			"jquery_contact_validation.js",
 			"messages_ru.js",
 			"jquery-ui-1.8.6.custom.min.js",
 			"jquery.maskedinput-1.2.2.min.js",
+			"underscore.js",
+			"backbone.js",
 			"Common.js",
 			"coffee-script.js")}
 
@@ -37,8 +40,10 @@
 			"User.css")}
 	</head>
 	<body>
-	<% ShowHeader = true %>
-	<% if IsDefined("bredcrumbs"): %>
+	<% unless ?ShowHeader: %>
+		<% ShowHeader = true %>
+	<% end %>
+	<% if ?bredcrumbs: %>
 		<div class="Navigation">
 			<ul id="breadcrumb">
 				<li>
@@ -56,7 +61,7 @@
 					<% end %>
 				</li>
 				<% end %>
-				<% if ShowHeader and IsDefined("Title"): %>
+				<% if ShowHeader and ?Title: %>
 				<li>${Title}</li>
 				<% end %>
 			</ul>

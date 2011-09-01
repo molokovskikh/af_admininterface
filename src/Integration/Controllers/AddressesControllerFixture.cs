@@ -12,7 +12,7 @@ namespace Integration.Controllers
 {
 	public class AddressesControllerFixture : ControllerFixture
 	{
-		private DeliveriesController controller;
+		private AddressesController controller;
 		private Client client;
 		private User user;
 
@@ -21,7 +21,7 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			user = client.Users.First();
-			controller = new DeliveriesController();
+			controller = new AddressesController();
 			PrepareController(controller, "Addresses", "Add");
 		}
 

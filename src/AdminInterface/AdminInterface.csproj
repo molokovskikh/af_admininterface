@@ -150,14 +150,16 @@
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Initializers\Development.cs" />
+    <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
+    <Compile Include="Models\Billing\PayerAuditRecord.cs" />
     <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
-    <Compile Include="MonoRailExtentions\Controller.cs" />
-    <Compile Include="Controllers\DeliveriesController.cs" />
+    <Compile Include="MonoRailExtentions\AdminInterfaceController.cs" />
+    <Compile Include="Controllers\AddressesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MonitoringConrtoller.cs" />
@@ -173,7 +175,7 @@
     <Compile Include="Controllers\SmapRejectorController.cs" />
     <Compile Include="Controllers\TelephonyController.cs" />
     <Compile Include="Components\Legend.cs" />
-    <Compile Include="Controllers\ClientController.cs" />
+    <Compile Include="Controllers\ClientsController.cs" />
     <Compile Include="Controllers\ContactController.cs" />
     <Compile Include="Controllers\LogsController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
@@ -200,7 +202,7 @@
     <Compile Include="Models\Billing\InvoicePart.cs" />
     <Compile Include="Models\Billing\Recipient.cs" />
     <Compile Include="Models\Billing\Report.cs" />
-    <Compile Include="Models\Billing\SwitchLogRecord.cs" />
+    <Compile Include="Models\Billing\AuditLogRecord.cs" />
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
@@ -238,7 +240,7 @@
     <Compile Include="Models\Telephony\UnresolvedCall.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSearchItem.cs" />
-    <Compile Include="Models\UserSearchProperties.cs" />
+    <Compile Include="Models\UserFilter.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="MonoRailExtentions\FakeServiceProvider.cs" />
@@ -270,12 +272,12 @@
     <Compile Include="Models\Logs\ClientRegistrationLogEntity.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
-    <Compile Include="Models\MailSentEntity.cs" />
+    <Compile Include="Models\Billing\MailSentEntity.cs" />
     <Compile Include="Models\Message.cs" />
     <Compile Include="Models\PaymentInstance.cs" />
     <Compile Include="Models\Logs\UpdateLogEntity.cs" />
-    <Compile Include="Models\BillingSearchItem.cs" />
-    <Compile Include="Models\BillingSearchProperties.cs" />
+    <Compile Include="Models\Billing\BillingSearchItem.cs" />
+    <Compile Include="Models\Billing\PayerFilter.cs" />
     <Compile Include="Models\Logs\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
     <Compile Include="CopySynonym.aspx.cs">
@@ -401,6 +403,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Mail\AccountingChanged.brail" />
     <None Include="Views\Messages\Index.brail" />
     <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
@@ -412,7 +415,6 @@
     <None Include="Views\Invoices\Print.brail" />
     <None Include="Views\Acts\PrintIndex.brail" />
     <None Include="Views\Invoices\PrintIndex.brail" />
-    <None Include="Views\Layouts\Main.brail" />
     <None Include="Views\Layouts\Print.brail" />
     <None Include="Views\Mail\DoNotHaveInvoiceContactGroup.brail" />
     <None Include="Views\Mail\Invoice.brail" />
@@ -495,11 +497,11 @@
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\CallHistory\ShowCallHistory.brail" />
-    <None Include="Views\Client\Settings.brail" />
-    <None Include="Views\Client\Show.brail" />
-    <None Include="Views\Client\SearchAssortmentPrices.brail" />
-    <None Include="Views\Client\SearchClientSubview.brail" />
-    <None Include="Views\Client\SuppliersForCostNoising.brail" />
+    <None Include="Views\Clients\Settings.brail" />
+    <None Include="Views\Clients\Show.brail" />
+    <None Include="Views\Clients\SearchAssortmentPrices.brail" />
+    <None Include="Views\Clients\SearchClientSubview.brail" />
+    <None Include="Views\Clients\SuppliersForCostNoising.brail" />
     <None Include="Views\Layouts\Application.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brail" />
@@ -536,23 +538,19 @@
     <None Include="Views\SubViews\Regions.brail" />
     <None Include="Views\SubViews\SelectDateInterval.brail" />
     <None Include="Views\SubViews\SortHeadersSubView.brail" />
-    <None Include="Views\UserSearch\SearchBy.brail" />
     <None Include="Views\Users\DrugstoreSettings.brail" />
     <None Include="Views\Users\SuccessPasswordChanged.brail" />
-    <None Include="Views\Deliveries\Add.brail" />
-    <None Include="Views\Deliveries\Edit.brail" />
-    <None Include="Views\Layouts\GeneralWithJQuery.brail" />
+    <None Include="Views\Addresses\Add.brail" />
+    <None Include="Views\Addresses\Edit.brail" />
     <None Include="Views\Main\Index.brail" />
     <None Include="Views\Monitoring\Prices.brail" />
     <None Include="Views\Monitoring\Updates.brail" />
     <None Include="Views\Monitoring\Orders.brail" />
-    <None Include="Views\Report\Contract.brail" />
     <None Include="Views\RevisionActs\Print.brail" />
     <None Include="Views\SmapRejector\Search.brail" />
     <None Include="Views\Rescues\Fail.brail" />
     <None Include="Views\Register\RegisterPayer.brail" />
     <None Include="Views\Billing\Search.brail" />
-    <None Include="Views\Billing\SearchBy.brail" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
     <None Include="Views\Monitoring\Clients.brail" />
@@ -573,7 +571,7 @@
     <None Include="Views\Layouts\General.brail" />
     <None Include="Views\Telephony\Edit.brail" />
     <None Include="Views\Telephony\Show.brail" />
-    <None Include="Views\Client\LegendView.brail" />
+    <None Include="Views\Clients\LegendView.brail" />
     <None Include="Views\Users\SearchOffers.brail" />
     <None Include="Views\Main\Settings.brail" />
     <None Include="Views\Users\Add.brail" />
@@ -639,7 +637,7 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>58196</DevelopmentServerPort>
+          <DevelopmentServerPort>63020</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>

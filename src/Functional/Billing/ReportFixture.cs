@@ -11,16 +11,10 @@ using WatiN.Core;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class ReportFixture : WatinFixture
+	public class ReportFixture : WatinFixture2
 	{
 		Client client;
-		IE browser;
 		Report report;
-
-		public ReportFixture()
-		{
-			UseTestScope = true;
-		}
 
 		[SetUp]
 		public void SetUp()
@@ -37,14 +31,8 @@ namespace Functional.Billing
 			payer.Reports = new List<Report>();
 			payer.Reports.Add(report);
 
-			browser = Open(payer);
+			Open(payer);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			browser.Dispose();
 		}
 
 		[Test]

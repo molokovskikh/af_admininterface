@@ -77,6 +77,13 @@
 		<% end %>
 	</tr>
 	<% end %>
+	<tr class="${ViewHelper.GetRowStyle(items.Count)}">
+		<td></td>
+		<td></td>
+		<td>${payer.Balance}</td>
+		<td></td>
+		<td></td>
+	<tr>
 	<% else: %>
 	<tr class=EmptyData>
 		<td>По вашему запросу ничего не найдено</td>

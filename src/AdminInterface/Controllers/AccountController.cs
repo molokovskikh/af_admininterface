@@ -3,6 +3,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
@@ -11,7 +12,7 @@ using NHibernate;
 namespace AdminInterface.Controllers
 {
 	[Secure(PermissionType.Billing)]
-	public class AccountController : SmartDispatcherController
+	public class AccountController : AdminInterfaceController
 	{
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
@@ -37,74 +38,65 @@ namespace AdminInterface.Controllers
 
 		public void SetUserStatus(uint userId, bool? enabled, bool? free)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			var user = User.Find(userId);
+			var oldStatus = user.Enabled;
+			if (enabled.HasValue)
+				user.Enabled = enabled.Value;
+			if (free.HasValue)
+				user.IsFree = free.Value;
+			user.UpdateAndFlush();
+			if (enabled != oldStatus)
+				this.Mailer().EnableChanged(user).Send();
+			if (enabled.HasValue && !enabled.Value)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var user = User.Find(userId);
-				var oldStatus = user.Enabled;
-				if (enabled.HasValue)
-					user.Enabled = enabled.Value;
-				if (free.HasValue)
-					user.IsFree = free.Value;
-				user.UpdateAndFlush();
-				if (enabled != oldStatus)
-					this.Mail().EnableChanged(user).Send();
-				if (enabled.HasValue && !enabled.Value)
+				// Если это отключение, то проходим по адресам и
+				// отключаем адрес, который доступен только отключенным пользователям
+				foreach (var address in user.AvaliableAddresses)
 				{
-					// Если это отключение, то проходим по адресам и
-					// отключаем адрес, который доступен только отключенным пользователям
-					foreach (var address in user.AvaliableAddresses)
-					{
-						if (address.AvaliableForEnabledUsers)
-							continue;
-						address.Enabled = false;
-						address.Update();
-					}
+					if (address.AvaliableForEnabledUsers)
+						continue;
+					address.Enabled = false;
+					address.Update();
 				}
-				ActiveRecordMediator.Save(user.RootService);
-				scope.VoteCommit();
 			}
+			ActiveRecordMediator.Save(user.RootService);
 			CancelView();
 		}
 
 		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment)
 		{
-			using (var transaction = new TransactionScope(OnDispose.Rollback))
+			var account = Accounting.Find(accountId);
+			if (accounted.HasValue)
 			{
-				var account = Accounting.Find(accountId);
-				if (accounted.HasValue)
-				{
-					if (accounted.Value)
-						account.Accounted();
-					else
-						account.BeAccounted = false;
-				}
-				if (payment.HasValue)
-					account.Payment = payment.Value;
-
-				account.Update();
-				transaction.VoteCommit();
+				if (accounted.Value)
+					account.Accounted();
+				else
+					account.BeAccounted = false;
 			}
+			if (payment.HasValue)
+			{
+				Admin.CheckPermisions(PermissionType.ChangePayment);
+				account.Payment = payment.Value;
+			}
+
+			if (account.IsChanged(a => a.Payment))
+				this.Mailer().AccountingChanged(account).Send();
+
+			account.Update();
 			CancelView();
 		}
 
 		public void SetAddressStatus(uint addressId, bool? enabled, bool? free)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var address = Address.Find(addressId);
-				var oldStatus = address.Enabled;
-				if (enabled.HasValue)
-					address.Enabled = enabled.Value;
-				if (free.HasValue)
-					address.FreeFlag = free.Value;
-				if (enabled != oldStatus)
-					this.Mail().EnableChanged(address).Send();
-				address.Client.Save();
-
-				scope.VoteCommit();
-			}
+			var address = Address.Find(addressId);
+			var oldStatus = address.Enabled;
+			if (enabled.HasValue)
+				address.Enabled = enabled.Value;
+			if (free.HasValue)
+				address.FreeFlag = free.Value;
+			if (enabled != oldStatus)
+				this.Mailer().EnableChanged(address).Send();
+			address.Client.Save();
 			CancelView();
 		}
 	}

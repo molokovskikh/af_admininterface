@@ -10,7 +10,7 @@ namespace Integration.Models
 		[Test]
 		public void Delete_invoice_for_ad()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var ad = new Advertising(payer, 1000);
 			ad.SaveAndFlush();
 			ad.Invoice = new Invoice(ad);

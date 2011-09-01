@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using log4net.Config;
@@ -41,7 +42,7 @@ namespace Integration.Models
 		[Test]
 		public void Before_save_if_begin_balance_changed_update_balance()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			payer.BeginBalance = 1000;
 			payer.SaveAndFlush();
@@ -50,6 +51,26 @@ namespace Integration.Models
 			payer.BeginBalance = -500;
 			payer.SaveAndFlush();
 			Assert.That(payer.Balance, Is.EqualTo(500));
+		}
+
+		[Test]
+		public void Log_payment_changes()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			user.Accounting.Payment = 200;
+			user.Save();
+			scope.Flush();
+
+			var payer = client.Payers[0];
+			var records = PayerAuditRecord.Find(payer);
+			Assert.That(records.Count, Is.EqualTo(1));
+			var record = records[0];
+			Assert.That(record.Message, Is.EqualTo("Изменено 'Платеж' было '800' стало '200'"));
+			Assert.That(record.Payer, Is.EqualTo(payer));
+			Assert.That(record.ObjectId, Is.EqualTo(user.Id));
+			Assert.That(record.ObjectType, Is.EqualTo(LogObjectType.User));
+			Assert.That(record.Name, Is.EqualTo("test"));
 		}
 	}
 }

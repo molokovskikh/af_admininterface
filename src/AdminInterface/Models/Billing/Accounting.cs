@@ -2,6 +2,7 @@
 using System.Linq;
 using System.ComponentModel;
 using System.Collections.Generic;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -294,8 +295,8 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		}
 	}
 
-	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "3", Schema = "Billing", Lazy = true)]
-	public abstract class Accounting : ActiveRecordLinqBase<Accounting>
+	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "3", Schema = "Billing", Lazy = true), Auditable]
+	public abstract class Accounting : ActiveRecordLinqBase<Accounting>, IAuditable
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -306,32 +307,20 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		[Property]
 		public virtual string Operator { get; set; }
 
-		[Property]
+		[Property, Auditable("Платеж")]
 		public virtual decimal Payment { get; set; }
 
-		[Property(NotNull = true, Default = "0")]
+		[Property]
 		public virtual bool BeAccounted { get; set;  }
 
-		[Property(NotNull = true, Default = "0")]
+		[Property]
 		public virtual bool ReadyForAcounting { get; set; }
 
 		public virtual uint PayerId
 		{
 			get
 			{
-				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Payer.Id;
-				return ((AddressAccounting) this).Address.Payer.Id;
-			}
-		}
-
-		public virtual string Name
-		{
-			get
-			{
-				if (this is UserAccounting)
-					return ((UserAccounting) this).User.GetLoginOrName();
-				return ((AddressAccounting) this).Address.Value;
+				return Payer.Id;
 			}
 		}
 
@@ -342,6 +331,16 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 				if (this is UserAccounting)
 					return ((UserAccounting) this).User.Payer;
 				return ((AddressAccounting) this).Address.Payer;
+			}
+		}
+
+		public virtual string Name
+		{
+			get
+			{
+				if (this is UserAccounting)
+					return ((UserAccounting) this).User.GetLoginOrName();
+				return ((AddressAccounting) this).Address.Value;
 			}
 		}
 
@@ -370,6 +369,11 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 				.Page(pager)
 				.ToList();
 			return accounts;
+		}
+
+		public virtual IAuditRecord GetAuditRecord()
+		{
+			return new PayerAuditRecord(Payer, this);
 		}
 	}
 

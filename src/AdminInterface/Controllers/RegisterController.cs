@@ -15,7 +15,6 @@ using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -36,7 +35,7 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.RegisterDrugstore, PermissionType.RegisterSupplier, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class RegisterController : Controller
+	public class RegisterController : AdminInterfaceController
 	{
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterSupplier()
@@ -95,7 +94,7 @@ namespace AdminInterface.Controllers
 					throw new Exception("Попытка зарегистрировать поставщика без регионов работы");
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
-				supplier.Registration = new RegistrationInfo(Administrator);
+				supplier.Registration = new RegistrationInfo(Admin);
 				if (currentPayer == null)
 				{
 					currentPayer = new Payer(supplier.Name, supplier.FullName);
@@ -246,7 +245,7 @@ namespace AdminInterface.Controllers
 					HomeRegion = Region.Find(homeRegion),
 					Segment = client.Segment,
 					MaskRegion = regionSettings.GetBrowseMask(),
-					Registration = new RegistrationInfo(Administrator),
+					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
 				if (currentPayer == null)
@@ -282,7 +281,7 @@ namespace AdminInterface.Controllers
 			log.Save();
 
 			if (!additionalSettings.FillBillingInfo)
-				this.Mail().NotifyBillingAboutClientRegistration(newClient);
+				this.Mailer().NotifyBillingAboutClientRegistration(newClient);
 
 			if (additionalSettings.FillBillingInfo)
 			{
@@ -300,7 +299,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
-				RedirectToUrl(LinkHelper.GetVirtualDir(Context) + String.Format("/Client/{0}", newClient.Id));
+				Redirect(newClient);
 			}
 		}
 
@@ -517,6 +516,9 @@ WHERE   intersection.pricecode IS NULL
 					org.FullName = payer.JuridicalName;
 				}
 
+				if (string.IsNullOrEmpty(payer.Customer))
+					payer.Customer = payer.JuridicalName;
+
 				payer.Save();
 				scope.VoteCommit();
 			}
@@ -524,7 +526,7 @@ WHERE   intersection.pricecode IS NULL
 			var supplier = payer.Suppliers.FirstOrDefault();
 			var client = payer.Clients.FirstOrDefault();
 			if (client != null)
-				this.Mail().NotifyBillingAboutClientRegistration(client);
+				this.Mailer().NotifyBillingAboutClientRegistration(client);
 
 			string redirectUrl;
 			if (showRegistrationCard && client != null && client.Users.Count > 0)
@@ -551,7 +553,7 @@ WHERE   intersection.pricecode IS NULL
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			var allowViewSuppliers = Administrator.HavePermisions(PermissionType.ViewSuppliers);
+			var allowViewSuppliers = Admin.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
 			var suppliers = Supplier.Queryable

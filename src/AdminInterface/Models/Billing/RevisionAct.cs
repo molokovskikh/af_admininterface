@@ -8,6 +8,9 @@ namespace AdminInterface.Models.Billing
 	{
 		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Act> acts, IEnumerable<Payment> payments)
 		{
+			if (payer.Recipient == null)
+				throw new Exception("У плательщика не указан получатель платежей, выберете получателя платежей.");
+
 			Payer = payer;
 			BeginDate = begin;
 			EndDate = end;

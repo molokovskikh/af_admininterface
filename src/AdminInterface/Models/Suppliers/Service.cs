@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 
@@ -9,8 +10,7 @@ namespace AdminInterface.Models.Suppliers
 	public enum ServiceType
 	{
 		[Description("Поставщик")] Supplier = 0,
-		[Description("Аптека")] Drugstore = 1,
-		[Description("Справка")] Reference = 2
+		[Description("Аптека")] Drugstore = 1
 	}
 
 	[ActiveRecord(Schema = "Future", Lazy = true), JoinedBase]

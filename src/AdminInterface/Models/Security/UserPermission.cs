@@ -19,7 +19,7 @@ namespace AdminInterface.Models.Security
 		SupplierInterface = 3
 	}
 
-	[ActiveRecord("UserPermissions", Schema = "usersettings")]
+	[ActiveRecord(Schema = "usersettings")]
 	public class UserPermission : ActiveRecordBase<UserPermission>
 	{
 		[PrimaryKey("Id")]

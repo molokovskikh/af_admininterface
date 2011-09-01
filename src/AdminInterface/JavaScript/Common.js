@@ -62,31 +62,53 @@
 
 	SetupCalendarElements();
 
-	$(".tabs ul li a").click(function () {
-		$(".tab").hide();
-		$(".tabs ul li a.selected").removeClass("selected");
-		$("#" + this.id + "-tab").show();
-		$(this).addClass("selected");
-		if ($(this).attr("href") == "#")
-			return false;
-		else
-			return true;
+	var TabRouter = Backbone.Router.extend({
+		routes: {
+			"tab-:id": "tab",
+			"*actions": "defaultRoute"
+		},
+
+		tab: function (id) {
+			showTab(id);
+		},
+
+		defaultRoute: function () {
+			var tabs = $(".tabs ul li a[href='#'], .tabs ul li a.inline-tab");
+			if (tabs.length > 0)
+				showTab(tabs.get(0).id);
+		}
 	});
 
-	$(".tabs ul li a.inline-tab").click(function () {
-		var id = this.id;
-		$.ajax({
-			url: $(this).attr("href"),
-			success: function (content) {
-				$("#" + id + "-tab").html(content)
-			},
-			error: function () {
-				alert(error);
-			}
-		});
+	new TabRouter();
+	Backbone.history.start();
+
+	//если он у ссылки есть href и он не inline-tab значит это просто ссылка в виде таба и не надо ее обрабатывать
+	$(".tabs ul li a[href='#'], .tabs ul li a.inline-tab").click(function () {
+		window.location.hash = "tab-" + this.id;
 		return false;
 	});
 
+	function loadTabContent(element) {
+		$.ajax({
+			url: element.attr("href"),
+			success: function (content) {
+				$("#" + element.attr("id") + "-tab").html(content);
+			},
+			error: function (error) {
+				alert("Во время обработки ващего запроса произошел сбой, попробуйте повторить ваш запрос.");
+			}
+		});
+	}
+
+	function showTab(id) {
+		$(".tab").hide();
+		$(".tabs ul li a.selected").removeClass("selected");
+		$("#" + id + "-tab").show();
+		var element = $("#" + id);
+		element.addClass("selected");
+		if (element.attr("href") != "#")
+			loadTabContent(element);
+	}
 
 	function beginDateAllowed(date) {
 		if (endCalendar)

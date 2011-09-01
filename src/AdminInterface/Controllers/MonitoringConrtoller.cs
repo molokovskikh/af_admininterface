@@ -7,11 +7,11 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.PrgData;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using Controller = AdminInterface.MonoRailExtentions.Controller;
 
 namespace AdminInterface.Controllers
 {
@@ -21,7 +21,7 @@ namespace AdminInterface.Controllers
 		Helper(typeof (BindingHelper)),
 		Filter(ExecuteWhen.BeforeAction, typeof (SecurityActivationFilter))
 	]
-	public class MonitoringController : Controller
+	public class MonitoringController : AdminInterfaceController
 	{
 		public void Updates(string sortBy, string direction)
 		{

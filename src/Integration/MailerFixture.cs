@@ -4,6 +4,7 @@ using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Core.Smtp;
@@ -42,7 +43,7 @@ namespace Integration
 				}));
 			mailer = new MonorailMailer(sender) {
 				UnderTest = true,
-				Controller = controller
+				SiteRoot = "https://stat.analit.net/adm"
 			};
 
 			ForTest.InitializeMailer();
@@ -65,6 +66,22 @@ namespace Integration
 			Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
 		}
 
+		[Test, Ignore("тест для отладки, удалить")]
+		public void test()
+		{
+			uint id;
+			using (new SessionScope())
+			{
+				var client = DataMother.TestClient();
+				id = client.Id;
+			}
+			using (new SessionScope())
+			{
+				mailer.EnableChanged(ActiveRecordMediator<Service>.FindByPrimaryKey(id));
+				mailer.Send();
+			}
+		}
+
 		[Test]
 		public void BillingNotificationTest()
 		{
@@ -84,7 +101,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
+Название: <a href=""https://stat.analit.net/adm/Payers/10"">Тестовый плательщик</a>
 <br>
 Код: 58
 <br>
@@ -122,7 +139,7 @@ namespace Integration
 			Assert.That(message.Body, Is.EqualTo(
 				@"Зарегистрирован новый клиент
 <br>
-Название: <a href='https://stat.analit.net/Adm/Billing/edit.rails?BillingCode=10'>Тестовый плательщик</a>
+Название: <a href=""https://stat.analit.net/adm/Payers/10"">Тестовый плательщик</a>
 <br>
 Код: 58
 <br>
@@ -166,7 +183,7 @@ namespace Integration
 		public void Revision_act()
 		{
 			var act = DataMother.GetAct();
-			mailer.RevisionAct(act, "kvasovtest@analit.net");
+			mailer.RevisionAct(act, "kvasovtest@analit.net", "");
 			mailer.Send();
 			Assert.That(message.Subject, Is.EqualTo("Акт сверки"));
 			Assert.That(message.From.ToString(), Is.EqualTo("billing@analit.net"));
@@ -224,9 +241,27 @@ namespace Integration
 Новый клиент Фармаимпекс плательщик Фармаимпекс юр.лицо Фармаимпекс"));
 		}
 
+		[Test]
+		public void Accounting_changed()
+		{
+			using (new SessionScope())
+			{
+				var client = DataMother.CreateTestClientWithUser();
+				var user = client.Users[0];
+				var payer = user.Payer;
+				user.Accounting.Payment = 200;
+				user.Save();
+
+				mailer.AccountingChanged(user.Accounting);
+				mailer.Send();
+				Assert.That(message.Subject, Is.EqualTo(String.Format("Изменение стоимости Тестовый плательщик - {0}, test - {1}, Аптека", payer.Id, client.Id)));
+				Assert.That(message.Body, Is.StringContaining("было 800,00р. стало 200,00р."));
+			}
+		}
+
 		private Invoice CreateInvoice()
 		{
-			var payer = DataMother.BuildPayerForBillingDocumentTest();
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
 			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));

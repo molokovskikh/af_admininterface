@@ -1,0 +1,8 @@
+﻿${admin.Name}
+${System.DateTime.Now}
+${admin.Host}
+договор: ${payer.Id}
+плательщик: ${payer.Name}
+код клиента: ${service.Id}
+название клиента: ${service.Name}
+было ${oldPayment.ToString("C")} стало ${newPayment.ToString("C")}

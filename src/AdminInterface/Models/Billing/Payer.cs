@@ -94,6 +94,9 @@ namespace AdminInterface.Models
 		public virtual string JuridicalName { get; set; }
 
 		[Property]
+		public virtual string Customer { get; set; }
+
+		[Property]
 		public virtual string JuridicalAddress { get; set; }
 
 		[Property]
@@ -142,9 +145,6 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual string Comment { get; set; }
-
-		[Property]
-		public virtual int DetailInvoice { get; set; }
 
 		[Property]
 		public virtual string ChangeServiceNameTo { get; set; }

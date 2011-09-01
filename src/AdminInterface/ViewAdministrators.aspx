@@ -145,7 +145,13 @@
 							<asp:CheckBox ID="CheckBox18" Enabled="false" runat="server" 
 										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.CallHistory) %>' />
 						</ItemTemplate>
-					</asp:TemplateField>					
+					</asp:TemplateField>
+					<asp:TemplateField HeaderText="BCP">
+						<ItemTemplate>
+							<asp:CheckBox ID="CheckBox19" Enabled="false" runat="server" 
+										  Checked='<%# ((Administrator)Container.DataItem).HavePermisions(PermissionType.ChangePayment) %>' />
+						</ItemTemplate>
+					</asp:TemplateField>
 				</Columns>
 			</asp:GridView>
 			<ul class="Legend">
@@ -172,6 +178,7 @@
 				
 				<li><%# GetPermissionShortcut(PermissionType.ConfigurerEditProducers)%> - <%# GetPermissionName(PermissionType.ConfigurerEditProducers)%></li>
 				<li><%# GetPermissionShortcut(PermissionType.CallHistory)%> - <%# GetPermissionName(PermissionType.CallHistory)%></li>
+				<li><%# GetPermissionShortcut(PermissionType.ChangePayment)%> - <%# GetPermissionName(PermissionType.ChangePayment)%></li>
 			</ul>
 		</div>
 	</form>

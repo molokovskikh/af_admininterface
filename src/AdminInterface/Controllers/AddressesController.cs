@@ -17,7 +17,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Secure]
-	public class DeliveriesController : ARSmartDispatcherController
+	public class AddressesController : ARSmartDispatcherController
 	{
 		public void Show(uint id)
 		{
@@ -39,17 +39,10 @@ namespace AdminInterface.Controllers
 			string comment)
 		{
 			var client = Client.FindAndCheck(clientId);
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-
-				client.AddAddress(address);
-				address.UpdateContacts(contacts);
-				address.SaveAndFlush();
-				address.Maintain();
-
-				scope.VoteCommit();
-			}
+			client.AddAddress(address);
+			address.UpdateContacts(contacts);
+			address.SaveAndFlush();
+			address.Maintain();
 
 			address.CreateFtpDirectory();
 			client.Users.Each(u => address.SetAccessControl(u.Login));
@@ -78,26 +71,22 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, 
 			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
-			using (var scope = new TransactionScope())
+			address.UpdateContacts(contacts, deletedContacts);
+
+			var oldLegalEntity = address.OldValue(a => a.LegalEntity);
+			if (address.Payer != address.LegalEntity.Payer)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				address.UpdateContacts(contacts, deletedContacts);
-
-				var oldLegalEntity = address.OldValue(a => a.LegalEntity);
-				if (address.Payer != address.LegalEntity.Payer)
-				{
-					address.Payer = address.LegalEntity.Payer;
-					this.Mail().AddressMoved(address, address.Client, oldLegalEntity).Send();
-				}
-
-				address.Update();
-				if (address.IsChanged(a => a.LegalEntity))
-				{
-					address.MoveAddressIntersection(address.Client, address.LegalEntity,
-						address.Client, oldLegalEntity);
-				}
-				scope.VoteCommit();
+				address.Payer = address.LegalEntity.Payer;
+				this.Mailer().AddressMoved(address, address.Client, oldLegalEntity).Send();
 			}
+
+			address.Update();
+			if (address.IsChanged(a => a.LegalEntity))
+			{
+				address.MoveAddressIntersection(address.Client, address.LegalEntity,
+					address.Client, oldLegalEntity);
+			}
+
 			Flash["Message"] = new Message("Сохранено");
 			RedirectUsingRoute("client", "show", new { address.Client.Id });
 		}

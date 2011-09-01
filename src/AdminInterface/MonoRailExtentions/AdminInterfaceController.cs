@@ -2,19 +2,22 @@
 using System.Collections.Generic;
 using System.Reflection;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.MonoRailExtentions
 {
-	public class Controller : SmartDispatcherController
+	public class AdminInterfaceController : SmartDispatcherController
 	{
-		public Controller()
+		public AdminInterfaceController()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
-				controllerContext.PropertyBag["admin"] = Administrator;
+				Binder.Validator = Validator;
+				controllerContext.PropertyBag["admin"] = Admin;
 			};
 		}
 
@@ -116,7 +119,7 @@ namespace AdminInterface.MonoRailExtentions
 			return args;
 		}*/
 
-		protected Administrator Administrator
+		protected Administrator Admin
 		{
 			get
 			{
@@ -130,6 +133,31 @@ namespace AdminInterface.MonoRailExtentions
 			{
 				return ADHelper.Storage;
 			}
+		}
+
+		protected void Notify(string message)
+		{
+			Flash["Message"] = Message.Notify(message);
+		}
+
+		protected void Error(string message)
+		{
+			Flash["Message"] = Message.Error(message);
+		}
+
+		public void Redirect(object entity)
+		{
+			var controller = AppHelper.GetControllerName(entity);
+			var id = ((dynamic)entity).Id;
+			RedirectUsingRoute(controller, "Show", new {id = id});
+		}
+
+		protected bool IsValid(object instance)
+		{
+			var isInvalid = HasValidationError(instance);
+			//if (isInvalid)
+			//ActiveRecordMediator.Evict(instance);
+			return !isInvalid;
 		}
 	}
 

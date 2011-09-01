@@ -94,7 +94,7 @@ namespace Functional.Billing
 
 		private Table GetLogTable()
 		{
-			var div = browser.Div(Find.ByText("Статистика включений/выключений"));
+			var div = browser.Div(Find.ByText("История"));
 			var table = ((IElementContainer) div.Parent).Tables.First();
 			return table;
 		}

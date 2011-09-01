@@ -67,14 +67,14 @@ namespace AdminInterface.Models.Billing
 		public Worksheet DoExport(RevisionAct act)
 		{
 			_worksheet = new Worksheet("Акт сверки");
-			_worksheet.Cells.ColumnWidth[0] = 5 * 256;
-			_worksheet.Cells.ColumnWidth[1] = 26 * 256;
-			_worksheet.Cells.ColumnWidth[2] = 14 * 256;
-			_worksheet.Cells.ColumnWidth[3] = 14 * 256;
-			_worksheet.Cells.ColumnWidth[4] = 5 * 256;
-			_worksheet.Cells.ColumnWidth[5] = 26 * 256;
-			_worksheet.Cells.ColumnWidth[6] = 14 * 256;
-			_worksheet.Cells.ColumnWidth[7] = 14 * 256;
+			_worksheet.Cells.ColumnWidth[0] = (ushort)2.5 * 256;
+			_worksheet.Cells.ColumnWidth[1] = (ushort)23 * 256;
+			_worksheet.Cells.ColumnWidth[2] = (ushort)7 * 256;
+			_worksheet.Cells.ColumnWidth[3] = (ushort)7 * 256;
+			_worksheet.Cells.ColumnWidth[4] = (ushort)2.5 * 256;
+			_worksheet.Cells.ColumnWidth[5] = (ushort)23 * 256;
+			_worksheet.Cells.ColumnWidth[6] = (ushort)7 * 256;
+			_worksheet.Cells.ColumnWidth[7] = (ushort)7 * 256;
 			var h1 = new CellStyle {
 				Font = new Font("Arial", 11) {
 					Bold = true
@@ -122,7 +122,7 @@ namespace AdminInterface.Models.Billing
 					act.Payer.Recipient.FullName,
 					act.Payer.JuridicalName),
 				new Merge(8));
-			row.Height = 1440/72*48;
+			row.Height = 1440/72*62;
 			Row(table,
 				String.Format("По данным {0}, руб.", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("По данным {0}, руб.", act.Payer.JuridicalName), new Merge(4));
@@ -140,7 +140,7 @@ namespace AdminInterface.Models.Billing
 			Skip();
 			Row(String.Format("По данным {0}", act.Payer.Recipient.FullName), new Merge(4));
 			row = Row(h2, act.Result, new Merge(4));
-			row.Height = 480;//1440/72*24
+			row.Height = 1440/72*29;
 			Skip();
 			Row(String.Format("От {0}", act.Payer.Recipient.FullName), new Merge(4),
 				String.Format("От {0}", act.Payer.JuridicalName), new Merge(4));

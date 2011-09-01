@@ -94,7 +94,7 @@ namespace AdminInterface.Controllers
 
 		public string GetFilterValue(Service service)
 		{
-			var currentFilterValue = "Log" + service.Id;
+			var currentFilterValue = service.Id.ToString();
 			if (service is Client)
 				currentFilterValue = "Client" + currentFilterValue;
 			else
@@ -145,10 +145,10 @@ namespace AdminInterface.Controllers
 				.ToList();
 
 			PropertyBag["filter"] = filter;
-			PropertyBag["LogRecords"] = SwitchLogRecord.GetLogs(payer);
+			PropertyBag["LogRecords"] = AuditLogRecord.GetLogs(payer);
 			PropertyBag["Instance"] = payer;
 			PropertyBag["payer"] = payer;
-			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer.PayerID);
+			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
@@ -167,12 +167,8 @@ namespace AdminInterface.Controllers
 			uint clientCode,
 			string tab)
 		{
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				payer.UpdateAndFlush();
-				Flash.Add("Message", new Message("Изменения сохранены"));
-			}
+			payer.Update();
+			Flash.Add("Message", new Message("Изменения сохранены"));
 			RedirectToReferrer();
 		}
 
@@ -238,7 +234,7 @@ namespace AdminInterface.Controllers
 				service.Disabled = !enabled;
 				if (oldDisabled != service.Disabled)
 				{
-					this.Mail().EnableChanged(service).Send();
+					this.Mailer().EnableChanged(service).Send();
 					ClientInfoLogEntity.StatusChange(service).Save();
 				}
 				ActiveRecordMediator<Service>.Save(service);
@@ -248,68 +244,22 @@ namespace AdminInterface.Controllers
 
 		public void Search()
 		{
-			var billingSearchProperties = new BillingSearchProperties {
-				ClientStatus = SearchClientStatus.Enabled
-			};
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["FindBy"] = billingSearchProperties;
-		}
-
-		public void SearchBy([DataBind("SearchBy")] BillingSearchProperties searchProperties)
-		{
-			var searchResults = BillingSearchItem.FindBy(searchProperties);
-
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["sortColumnName"] = "ShortName";
-			PropertyBag["sortDirection"] = "Ascending";
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["searchResults"] = searchResults;
-		}
-
-		public void OrderBy(string columnName, 
-							string sortDirection,
-							string searchText,
-							ulong regionId,
-							uint recipientId,
-							PayerStateFilter payerState,
-							SearchSegment segment,
-							SearchClientType clientType,
-							SearchClientStatus clientStatus,
-							SearchBy searchBy)
-		{
-			var searchProperties = new BillingSearchProperties
+			var filter = new PayerFilter();
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
-				PayerState = payerState,
-				SearchText = searchText,
-				RegionId = regionId,
-				RecipientId = recipientId,
-				Segment = segment,
-				ClientStatus = clientStatus,
-				ClientType = clientType,
-				SearchBy = searchBy
-			};
-			var direction = sortDirection == "Ascending" ? SortDirection.Asc : SortDirection.Desc;
-
-			var searchResults = (List<BillingSearchItem>)BillingSearchItem.FindBy(searchProperties);
-
-			searchResults.Sort(new PropertyComparer<BillingSearchItem>(direction, columnName));
-
-			PropertyBag["FindBy"] = searchProperties;
-			PropertyBag["regions"] = GetRegions();
-			PropertyBag["searchResults"] = searchResults;
-			PropertyBag["sortColumnName"] = columnName;
-			PropertyBag["sortDirection"] = sortDirection;
-			RenderView("SearchBy");
+				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
+				PropertyBag["searchResults"] = filter.Find();
+			}
+			PropertyBag["filter"] = filter;
 		}
 
-		public void Save([DataBind("SearchBy")] BillingSearchProperties searchProperties,
+		public void Save([DataBind("filter")] PayerFilter filter,
 			[DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
 		{
-			using (new TransactionScope())
-				foreach (var instance in paymentInstances)
-					instance.Save();
-			SearchBy(searchProperties);
-			RenderView("SearchBy");
+			foreach (var instance in paymentInstances)
+				instance.Save();
+
+			RedirectToAction("Search", filter.GetQueryString());
 		}
 
 		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
@@ -330,7 +280,7 @@ namespace AdminInterface.Controllers
 		public void DeleteMail(uint id)
 		{
 			var mailSend = MailSentEntity.Find(id);
-			mailSend.IsDeleted = true;
+			mailSend.Delete();
 			CancelView();
 		}
 
@@ -344,20 +294,10 @@ namespace AdminInterface.Controllers
 
 		public void CancelMessage(uint userId)
 		{
-			using (new TransactionScope())
-			{
-				var message = UserMessage.Find(userId);
-				message.ShowMessageCount = 0;
-				message.Update();
-			}
+			var message = UserMessage.Find(userId);
+			message.ShowMessageCount = 0;
+			message.Update();
 			CancelView();
-		}
-
-		private static IList<Region> GetRegions()
-		{
-			var regions = RegionHelper.GetAllRegions();
-			regions.First(r => r.Name == "Все").Id = ulong.MaxValue;
-			return regions;
 		}
 
 		public void AdditionalUserInfo(uint userId, string cssClassName)
@@ -399,34 +339,24 @@ namespace AdminInterface.Controllers
 
 		public void ConnectUserToAddress(uint userId, uint addressId)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var user = User.Find(userId);
-				var address = Address.Find(addressId);
-				address.AvaliableForUsers.Add(user);
-				address.Client.Save();
+			var user = User.Find(userId);
+			var address = Address.Find(addressId);
+			address.AvaliableForUsers.Add(user);
+			address.Client.Save();
 
-				scope.VoteCommit();
-			}
 			CancelView();
-			CancelLayout();
 		}
 
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
-			using (var scope = new TransactionScope(OnDispose.Commit))
-			{
-				var user = User.Find(userId);
-				var address = Address.Find(addressId);
-				var client = user.Client;
+			var user = User.Find(userId);
+			var address = Address.Find(addressId);
+			var client = user.Client;
 
-				address.AvaliableForUsers.Remove(user);
-				client.Save();
+			address.AvaliableForUsers.Remove(user);
+			client.Save();
 
-				scope.VoteCommit();
-			}
 			CancelView();
-			CancelLayout();
 		}
 
 		[return: JSONReturnBinder]
@@ -476,35 +406,24 @@ namespace AdminInterface.Controllers
 
 		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var organization = LegalEntity.Find(juridicalOrganization.Id);
-				organization.Name = juridicalOrganization.Name;
-				organization.FullName = juridicalOrganization.FullName;
+			var organization = LegalEntity.Find(juridicalOrganization.Id);
+			organization.Name = juridicalOrganization.Name;
+			organization.FullName = juridicalOrganization.FullName;
+			organization.Update();
 
-				organization.Update();
-				scope.VoteCommit();
-				Flash["Message"] = new Message("Сохранено");
-				var billingCode = organization.Payer.PayerID;
-				Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
-			}
+			Flash["Message"] = new Message("Сохранено");
+			var billingCode = organization.Payer.PayerID;
+			Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
 		}
 
 		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
 		{
-			using (var scope = new TransactionScope())
-			{
-				var payer = Payer.Find(payerId);
+			var payer = Payer.Find(payerId);
+			legalEntity.Payer = payer;
+			legalEntity.CreateAndFlush();
+			Maintainer.LegalEntityCreated(legalEntity);
 
-				legalEntity.Payer = payer;
-				legalEntity.CreateAndFlush();
-
-				Maintainer.LegalEntityCreated(legalEntity);
-
-				scope.VoteCommit();
-
-				Flash["Message"] = new Message("Юридическое лицо создано");
-			}
+			Flash["Message"] = new Message("Юридическое лицо создано");
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
 		}
 

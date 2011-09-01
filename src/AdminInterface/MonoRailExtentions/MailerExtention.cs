@@ -13,12 +13,16 @@ namespace AdminInterface.MonoRailExtentions
 	{
 		public static IEmailSender SenderForTest;
 
-		public static MonorailMailer Mail(this SmartDispatcherController controller)
+		public static MonorailMailer Mailer(this SmartDispatcherController controller)
 		{
 			var mailer = new MonorailMailer();
 			if (SenderForTest != null)
 				mailer = new MonorailMailer(SenderForTest);
-			mailer.Controller = controller;
+			if (controller.Request != null && controller.Request.Uri != null)
+			{
+				var request = controller.Request;
+				mailer.SiteRoot = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
+			}
 			return mailer;
 		}
 	}
@@ -26,7 +30,6 @@ namespace AdminInterface.MonoRailExtentions
 	public class BaseMailer
 	{
 		public bool UnderTest;
-		public SmartDispatcherController Controller;
 		protected string To;
 		protected string From;
 		protected string Subject;
@@ -36,7 +39,6 @@ namespace AdminInterface.MonoRailExtentions
 		protected string Template;
 		protected List<Attachment> Attachments = new List<Attachment>();
 		protected IDictionary<string, object> PropertyBag = new Dictionary<string, object>();
-
 		private IEmailSender _sender;
 
 		public static IViewEngineManager ViewEngineManager;
@@ -50,6 +52,8 @@ namespace AdminInterface.MonoRailExtentions
 		{
 			_sender = new DefaultSmtpSender(ConfigurationManager.AppSettings["SmtpServer"]);
 		}
+
+		public string SiteRoot { get; set; }
 
 		public virtual void Send()
 		{
@@ -73,6 +77,7 @@ namespace AdminInterface.MonoRailExtentions
 				Template = Path.Combine("mail", Template);
 
 			var writer = new StringWriter();
+			PropertyBag["siteroot"] = SiteRoot;
 			ViewEngineManager.Process(Template, Layout, writer, PropertyBag);
 
 			var message = new MailMessage();

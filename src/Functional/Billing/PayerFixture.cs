@@ -11,27 +11,33 @@ using WatiN.Core;
 namespace Functional.Billing
 {
 	[TestFixture]
-	public class PayerFixture : WatinFixture
+	public class PayerFixture : WatinFixture2
 	{
 		[Test]
 		public void Show_balance_summary()
 		{
-			Payer payer;
-			using(new SessionScope())
-			{
-				payer = DataMother.BuildPayerForBillingDocumentTest();
-				new Invoice(payer, Period.January, new DateTime(2011, 1, 11)).Save();
-				new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
-			}
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			new Invoice(payer, Period.January, new DateTime(2011, 1, 11)).Save();
+			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 
-			using (var browser = Open(payer))
-			{
-				Assert.That(browser.Text, Is.StringContaining("плательщик"));
-				browser.Link(Find.ByText(@"Платежи/Счета")).Click();
-				Thread.Sleep(1000);
-				Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
-				Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
-			}
+			Open(payer);
+			Assert.That(browser.Text, Is.StringContaining("плательщик"));
+			browser.Link(Find.ByText(@"Платежи/Счета")).Click();
+			Thread.Sleep(1000);
+			Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
+			Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
+		}
+
+		[Test]
+		public void Show_error_on_revision_act_in_not_configured_payer()
+		{
+			var payer = DataMother.CreatePayer();
+			payer.Save();
+
+			Open(payer);
+			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
+			Click("Акт сверки");
+			Assert.That(browser.Text, Is.StringContaining("У плательщика не указан получатель платежей, выберете получателя платежей"));
 		}
 
 		[Test, Ignore("Не реализованно")]

@@ -34,15 +34,11 @@ namespace Functional.Drugstore
 		{
 			// Удаление контактной записи
 			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
-
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				var group = client.Addresses[0].ContactGroup;
-				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
-				Thread.Sleep(500);
-				browser.Button(Find.ByValue("Сохранить")).Click();
-			}
+			client.Refresh();
+			var group = client.Addresses[0].ContactGroup;
+			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
+			Thread.Sleep(500);
+			browser.Button(Find.ByValue("Сохранить")).Click();
 
 			// Проверка, что контактная запись удалена
 			Thread.Sleep(500);
@@ -59,32 +55,28 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");
-				var address = client.Addresses.First();
-				Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
+			client.Refresh();
+			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");
+			var address = client.Addresses.First();
+			Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
 
-				var intersectionCount = client.GetIntersectionCount();
-				var addressIntersectionCount = address.GetAddressIntersectionCount();
+			var intersectionCount = client.GetIntersectionCount();
+			var addressIntersectionCount = address.GetAddressIntersectionCount();
 
-				Assert.That(intersectionCount, Is.GreaterThan(0), "не создали записей в Intersection, проверрь создание пользователя Client.MaintainIntersection");
-				Assert.That(addressIntersectionCount, Is.GreaterThan(0), "не создали записей в AddressIntersection, адрес не будет доступен в клиентском интерфейсе");
-				Assert.That(addressIntersectionCount, Is.EqualTo(intersectionCount), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
-			}
+			Assert.That(intersectionCount, Is.GreaterThan(0), "не создали записей в Intersection, проверрь создание пользователя Client.MaintainIntersection");
+			Assert.That(addressIntersectionCount, Is.GreaterThan(0), "не создали записей в AddressIntersection, адрес не будет доступен в клиентском интерфейсе");
+			Assert.That(addressIntersectionCount, Is.EqualTo(intersectionCount), "Не совпадает число записей в Intersection и AddressIntersection проверь Address.MaintainIntersection");
 		}
 
 		[Test]
 		public void Send_notification()
 		{
 			var client = DataMother.CreateTestClientWithAddress();
-			using (var browser = Open("deliveries/{0}/edit", client.Addresses.First().Id))
-			{
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки"));
-				browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Уведомления отправлены"));
-			}
+			var address = client.Addresses.First();
+			Open(address);
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки"));
+			browser.Button(Find.ByValue("Отправить уведомления о регистрации поставщикам")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Уведомления отправлены"));
 		}
 
 		// Создает новый адрес доставки и 3 контакта для него (2 email)
@@ -111,117 +103,96 @@ namespace Functional.Drugstore
 		{
 			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
 			// Проверка, что контактные записи создались в БД
-			using (new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.NotNull(client.Addresses[0].ContactGroup);
-				var group = client.Addresses[0].ContactGroup;
-				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
-					"Не совпадают Id владельца группы у клиента и у новой группы");
 
-				ContactInformationFixture.CheckContactGroupInDb(group);
-				countContacts = ContactInformationFixture.GetCountContactsInDb(group);
-				Assert.That(countContacts, Is.EqualTo(countContacts));
-			}
+			client.Refresh();
+			Assert.NotNull(client.Addresses[0].ContactGroup);
+			var group = client.Addresses[0].ContactGroup;
+			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
+				"Не совпадают Id владельца группы у клиента и у новой группы");
+
+			ContactInformationFixture.CheckContactGroupInDb(group);
+			countContacts = ContactInformationFixture.GetCountContactsInDb(group);
+			Assert.That(countContacts, Is.EqualTo(countContacts));
 		}
 
 		[Test]
 		public void Address_must_be_enabled_after_registration()
 		{
-			using (new SessionScope())
-			{
-				browser.Link(Find.ByText("Новый адрес доставки")).Click();
-				browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
-				browser.Button(Find.ByValue("Создать")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
-				client = Client.Find(client.Id);
-				Assert.That(client.Addresses.Count, Is.EqualTo(1));
-				Assert.IsTrue(client.Addresses[0].Enabled);
-			}
+			browser.Link(Find.ByText("Новый адрес доставки")).Click();
+			browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
+			browser.Button(Find.ByValue("Создать")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
+
+			client.Refresh();
+			Assert.That(client.Addresses.Count, Is.EqualTo(1));
+			Assert.IsTrue(client.Addresses[0].Enabled);
 		}
 
 		[Test, NUnit.Framework.Description("Перемещение адреса вместе с пользователем к другому клиенту")]
 		public void Move_address_with_user_to_another_client()
 		{
-			Client oldClient;
-			Client newClient;
-			Address address;
-			User user;
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var address = oldClient.Addresses[0];
+			var user = oldClient.Users[0];
 
-			using (new SessionScope())
-			{
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				address = oldClient.Addresses[0];
-				user = oldClient.Users[0];
-			}
+			Open(address);
+			// Даем доступ пользователю к адресу доставки
+			browser.CheckBox(Find.ByName("delivery.AvaliableForUsers[0].Id")).Checked = true;
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			browser.Refresh();
 
-			using (var browser = Open("Deliveries/{0}/Edit", address.Id))
-			{
-				// Даем доступ пользователю к адресу доставки
-				browser.CheckBox(Find.ByName("delivery.AvaliableForUsers[0].Id")).Checked = true;
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				browser.Refresh();
+			browser.Link(Find.ByText(address.Value)).Click();
+			// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
+			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+			browser.Button(Find.ById("SearchClientButton")).Click();
+			Thread.Sleep(2000);
+			//перемещение пользователя не опционально
+			//Assert.That(browser.Text, Is.StringContaining(String.Format("Перемещать пользователя {0}", user.Id)));
+			//Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithUser")).Checked);
+			browser.Button(Find.ByValue("Переместить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
 
-				browser.Link(Find.ByText(address.Value)).Click();
-				// Ищем клиента, к которому нужно передвинуть пользователя и двигаем
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				//перемещение пользователя не опционально
-				//Assert.That(browser.Text, Is.StringContaining(String.Format("Перемещать пользователя {0}", user.Id)));
-				//Assert.IsTrue(browser.CheckBox(Find.ByName("moveWithUser")).Checked);
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
-			}
+			oldClient.Refresh();
+			newClient.Refresh();
+			address.Refresh();
+			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 
-			using (new SessionScope())
-			{
-				oldClient = Client.Find(oldClient.Id);
-				newClient = Client.Find(newClient.Id);
-				address = Address.Find(address.Id);
-				Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
+			//перемещение пользователя не опционально
+			//Assert.That(newClient.Users.Count, Is.EqualTo(2));
+			//Assert.That(oldClient.Users.Count, Is.EqualTo(0));
 
-				//перемещение пользователя не опционально
-				//Assert.That(newClient.Users.Count, Is.EqualTo(2));
-				//Assert.That(oldClient.Users.Count, Is.EqualTo(0));
-
-				Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
-				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
-			}
+			Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
+			Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
 		}
 
 		[Test, NUnit.Framework.Description("Перемещение только адреса доставки (без пользователя) к другому клиенту")]
 		public void Move_only_address_to_another_client()
 		{
-			Client oldClient;
-			Client newClient;
-			uint addressIdForMove = 0;
-			oldClient = DataMother.CreateTestClientWithAddressAndUser();
-			newClient = DataMother.CreateTestClientWithAddressAndUser();
-			addressIdForMove = oldClient.Addresses[0].Id;
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var address = oldClient.Addresses[0];
+			var addressIdForMove = address.Id;
 			scope.Flush();
 
-			using (var browser = Open("deliveries/{0}/edit", oldClient.Addresses[0].Id))
-			{
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
-				Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
+			Open(address);
+			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+			browser.Button(Find.ById("SearchClientButton")).Click();
+			Thread.Sleep(2000);
+			Assert.IsTrue(browser.SelectList(Find.ById("clientsList")).Exists);
+			Assert.That(browser.SelectList(Find.ById("clientsList")).Options.Count, Is.GreaterThan(0));
 
-				Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
-				Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
+			Assert.IsTrue(browser.Button(Find.ByValue("Отмена")).Exists);
+			Assert.IsTrue(browser.Button(Find.ByValue("Переместить")).Exists);
 
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
-				Assert.That(browser.Text, Is.StringContaining(newClient.Name));
-				Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
-			}
+			browser.Button(Find.ByValue("Переместить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
+			Assert.That(browser.Text, Is.StringContaining(newClient.Name));
+			Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			var address = Address.Find(addressIdForMove);
+			address = Address.Find(addressIdForMove);
 			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Addresses.Count, Is.EqualTo(2));
 			Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
@@ -230,28 +201,18 @@ namespace Functional.Drugstore
 		[Test, NUnit.Framework.Description("После перемещения адреса доставки, для этого адреса должны быть скопированы записи в таблице AddressesIntersection")]
 		public void After_moving_address_must_be_copied_address_intersection_entries()
 		{
-			Client newClient;
-			Client oldClient;
-			User user;
-			Address address;
-
-			using (new SessionScope())
-			{
-				oldClient = DataMother.CreateTestClientWithAddressAndUser();
-				newClient = DataMother.CreateTestClientWithAddressAndUser();
-				user = oldClient.Users[0];
-				address = oldClient.Addresses[0];
-			}
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var user = oldClient.Users[0];
+			var address = oldClient.Addresses[0];
 			var oldCountAddressIntersectionEntries = address.GetAddressIntersectionCount();
 
-			using (var browser = Open("deliveries/{0}/edit", oldClient.Addresses[0].Id))
-			{
-				browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
-				browser.Button(Find.ById("SearchClientButton")).Click();
-				Thread.Sleep(2000);
-				browser.Button(Find.ByValue("Переместить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
-			}
+			Open(oldClient.Addresses[0]);
+			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());
+			browser.Button(Find.ById("SearchClientButton")).Click();
+			Thread.Sleep(2000);
+			browser.Button(Find.ByValue("Переместить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
 
 			var newCountAddressInterSectionEntries = address.GetAddressIntersectionCount();
 

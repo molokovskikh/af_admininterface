@@ -110,6 +110,7 @@
     <Compile Include="ADHelperFixture.cs" />
     <Compile Include="AppHelperFixture.cs" />
     <Compile Include="Controllers\AccountControllerFixture.cs" />
+    <Compile Include="Controllers\RevisionActControllerFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="MaskedAuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
@@ -127,7 +128,8 @@
     <Compile Include="Models\AccountingFixture.cs" />
     <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AddressFixture.cs" />
-    <Compile Include="Models\BillingSearchItemFixture.cs" />
+    <Compile Include="Models\AuditLogRecordFixture.cs" />
+    <Compile Include="Models\PayerFilterFixture.cs" />
     <Compile Include="Models\CallLogFixture.cs" />
     <Compile Include="Models\ClientFixture.cs" />
     <Compile Include="Controllers\ClientControllerFixture.cs" />

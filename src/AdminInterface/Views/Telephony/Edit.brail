@@ -2,59 +2,32 @@
 	Редактирование обратного звонка
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "show.rails"), 
+<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "show"), 
 									  ("Редактирование обратного звонка", "")]} %>
 
 
-<script>
-
-    document.observe("dom:loaded", function() {
-	
-	    $$(".CalendarInput")
-	        .each(function(value, index) {
-	            value.id = "CalendarInput" + index;
-	            value.previous().id = "CalendarInputField" + index;
-	            Calendar.setup({
-	                ifFormat: "%d.%m.%Y",
-	                inputField: value.previous().id,
-	                onUpdate: function(cal) {
-	                    $("callback_DueDate").value = cal.date.print("%d.%m.%Y")
-                    },
-	                button: value.id,
-	                weekNumbers: false,
-	                showOthers: true
-	            })
-	        });
-
-		Validation.add("validate-phone-is-not-empty", "Нужно указать телефон", function(v) {
-			return !Validation.get('IsEmpty').test(v)
-		});
-
-		Validation.add("validate-phone", "Телефон должен быть десяти значный", function(v) {
-			return Validation.get('IsEmpty').test(v) || /^\d{10}$/.test(v);
-		});
-
-		new Validation("Callback");
+<script type="text/javascript">
+	$(function() {
+		$("#Callback").validate();
 	})
-
 </script>
 
-<form method="post" id="Callback" action="update.rails">
+<form method="post" id="Callback" action=update>
 	${FormHelper.HiddenField("callback.Id")}
 	<table>
 		<tr>
 			<td>Телефон:</td>
-			<td>${FormHelper.TextField("callback.CallerPhone", {"class" : "validate-phone validate-phone-is-not-empty"})}</td>
+			<td>${FormHelper.TextField("callback.CallerPhone", {"class" : "required mobile-phone"})}</td>
 		</tr>
 		<tr>
 			<td>Включено:</td>
-			<td>${FormHelper.CheckboxField("callback.Enabled")}	</td>
+			<td>${FormHelper.CheckboxField("callback.Enabled")}</td>
 		</tr>
 		<tr>
 			<td>Дату блокировки:</td>
 			<td>
-			    <% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
-			    ${FormHelper.HiddenField("callback.DueDate", dueDate)}
+				<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
+				${FormHelper.HiddenField("callback.DueDate", dueDate)}
 				${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
 				<input type="button" class="CalendarInput" />
 			</td>

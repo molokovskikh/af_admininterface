@@ -30,7 +30,6 @@ namespace Functional.Drugstore
 			var user = new User(client) {Name = "test user"};
 			user.Setup();
 			Refresh();
-			Console.WriteLine(client.Id);
 			Assert.That(browser.Text, Is.StringContaining("клиент"));
 			Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Имя пользователя")).Exists);
@@ -39,7 +38,10 @@ namespace Functional.Drugstore
 			var login1 = Convert.ToInt64(browser.Table("users").TableRows[1].TableCells[0].Text);
 			var login2 = Convert.ToInt64(browser.Table("users").TableRows[2].TableCells[0].Text);
 			Assert.That(login1, Is.LessThan(login2));
-			browser.Link(Find.ByText("Код пользователя")).Click();
+			//по умолчанию мы применяем сортировку сообщений по дате сообщения, по этому нужно
+			//кликнуть 2 раза первый что бы отсортировать в прямом порядке, второй в обратном что и проверяет тест
+			Click("Код пользователя");
+			Click("Код пользователя");
 			login1 = Convert.ToInt64(browser.Table("users").TableRows[1].TableCells[0].Text);
 			login2 = Convert.ToInt64(browser.Table("users").TableRows[2].TableCells[0].Text);
 			Assert.That(login1, Is.GreaterThan(login2));
@@ -106,7 +108,7 @@ namespace Functional.Drugstore
 
 			Assert.IsTrue(browser.Link(Find.ByText("Дата")).Exists);
 			Assert.IsTrue(browser.Link(Find.ByText("Оператор")).Exists);
-			Assert.IsTrue(browser.Link(Find.ByText("Пользователь")).Exists);
+			Assert.IsTrue(browser.Link(Find.ByText("Название")).Exists);
 
 			browser.Link(Find.ByText("Дата")).Click();
 			browser.Link(Find.ByText("Дата")).Click();
@@ -118,8 +120,8 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
 			Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
 
-			browser.Link(Find.ByText("Пользователь")).Click();
-			browser.Link(Find.ByText("Пользователь")).Click();
+			browser.Link(Find.ByText("Название")).Click();
+			browser.Link(Find.ByText("Название")).Click();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
 			Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
 		}

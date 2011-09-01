@@ -46,12 +46,12 @@ def Impersonate(action as Action):
 			action()
 		ensure:
 			CloseHandle(tokenHandle);
-
 Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
 	HumanReadableName : "Административный интерфейс (Новая реальность)",
-	AdditionalAssemblies : ("Common.Web.UI",)
+	AdditionalAssemblies : ("Common.Web.UI",),
+	Environment : @Local
 )
 
 Engine.Execute("LoadProject")

@@ -50,7 +50,7 @@ namespace AdminInterface.Helpers
 			else if (Path.GetExtension(name).ToLower() == ".coffee")
 				type = "text/coffeescript";
 
-			return Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
+			return assetHelper.Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
 		}
 
 		public string Style(object item)
@@ -75,7 +75,7 @@ namespace AdminInterface.Helpers
 			{
 				var parameters = contributor.GetQueryString();
 				if (parameters.Contains("controller"))
-					parameters["controller"] = GetControllerName(parameters["controller"].ToString());
+					parameters["controller"] = ToControllerName(parameters["controller"].ToString());
 				return UrlHelper.Link(title.ToString(), new Dictionary<string, object>{{"params", parameters}});
 			}
 

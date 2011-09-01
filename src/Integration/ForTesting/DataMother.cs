@@ -87,7 +87,7 @@ namespace Integration.ForTesting
 			});
 		}
 
-		public static Payer BuildPayerForBillingDocumentTest()
+		public static Payer CreatePayerForBillingDocumentTest()
 		{
 			var client = CreateTestClientWithAddressAndUser();
 			var payer = client.Payers.First();

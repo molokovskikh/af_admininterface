@@ -9,6 +9,7 @@ using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 using WatiN.Core;
 using DescriptionAttribute=NUnit.Framework.DescriptionAttribute;
 
@@ -500,9 +501,11 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.UpdateAndFlush();
+			client.Settings.Update();
 
-			browser.Refresh();
+			Refresh();
+			//ждем тк список для редактирования отображает js
+			Thread.Sleep(200);
 			Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).Exists);
 			Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value,
 				Is.EqualTo(client.Settings.NoiseCostExceptSupplier.Id.ToString()));

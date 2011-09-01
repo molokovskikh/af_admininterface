@@ -12,6 +12,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -88,10 +89,10 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable]
+		[Property, Description("Краткое наименование"), Auditable, ValidateNonEmpty]
 		public override string Name { get; set; }
 
-		[Property, Description("Полное наименование"), Auditable]
+		[Property, Description("Полное наименование"), Auditable, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property, Description("Включен"), Auditable]
@@ -238,7 +239,7 @@ where
 		{
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof (Client))
-					.Add(Expression.Eq("Id", clientCode))
+					.Add(Restrictions.Eq("Id", clientCode))
 					.SetFetchMode("BillingInstance", FetchMode.Join)
 					//.SetFetchMode("Payer.Clients", FetchMode.Eager)
 					.SetFetchMode("HomeRegion", FetchMode.Join)
@@ -292,14 +293,24 @@ group by u.ClientId")
 			return false;
 		}
 
-		public virtual List<User> UsersForPayer(Payer payer)
+		public virtual int EnabledUserForPayerCount(Payer payer)
 		{
-			return Users.Where(u => u.Payer == payer).ToList();
+			return Users.Where(u => u.Payer == payer && u.Enabled).Count();
 		}
 
-		public virtual List<Address> AddressesForPayer(Payer payer)
+		public virtual int DisabledUserForPayerCount(Payer payer)
 		{
-			return Addresses.Where(a => a.Payer == payer).ToList();
+			return Users.Where(u => u.Payer == payer && !u.Enabled).Count();
+		}
+
+		public virtual int EnabledAddressForPayerCount(Payer payer)
+		{
+			return Addresses.Where(a => a.Payer == payer && a.Enabled).Count();
+		}
+
+		public virtual int DisabledAddressForPayerCount(Payer payer)
+		{
+			return Addresses.Where(a => a.Payer == payer && !a.Enabled).Count();
 		}
 
 		public virtual bool HaveLockedUsers()
@@ -393,7 +404,7 @@ group by u.ClientId")
 
 		public static Client Find(uint id)
 		{
-			return ActiveRecordLinqBase<Client>.Find(id);
+			return ActiveRecordBase<Client>.Find(id);
 		}
 
 		public virtual void Save()
@@ -403,7 +414,7 @@ group by u.ClientId")
 
 		public virtual void SaveAndFlush()
 		{
-			ActiveRecordMediator<Client>.SaveAndFlush(this);
+			ActiveRecordMediator.SaveAndFlush(this);
 		}
 
 		public virtual void Update()
@@ -413,7 +424,7 @@ group by u.ClientId")
 
 		public virtual void UpdateAndFlush()
 		{
-			ActiveRecordMediator<Client>.UpdateAndFlush(this);
+			ActiveRecordMediator.UpdateAndFlush(this);
 		}
 
 		public virtual void Refresh()

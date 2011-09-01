@@ -23,6 +23,11 @@ namespace Functional.ForTesting
 				scope.Flush();
 			browser.Refresh();
 		}
+
+		protected void AssertText(string text)
+		{
+			Assert.That(browser.Text, Is.StringContaining(text));
+		}
 	}
 
 	[TestFixture]

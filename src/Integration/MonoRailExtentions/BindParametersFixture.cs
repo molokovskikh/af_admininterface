@@ -12,7 +12,7 @@ namespace Integration.MonoRailExtentions
 			public string Name { get; set; }
 		}
 
-		public class TestController : Controller
+		public class TestController : AdminInterfaceController
 		{
 			public BindObject @object;
 

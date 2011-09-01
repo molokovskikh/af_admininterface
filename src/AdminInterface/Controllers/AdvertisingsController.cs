@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -34,7 +35,7 @@ namespace AdminInterface.Controllers
 		}
 	}
 
-	public class AdvertisingsController : SmartDispatcherController
+	public class AdvertisingsController : AdminInterfaceController
 	{
 		public void Index([DataBind("filter")] AdvertisingFilter filter)
 		{
@@ -47,7 +48,7 @@ namespace AdminInterface.Controllers
 			var ad = Advertising.Find(id);
 			if (ad.Invoice != null)
 			{
-				Flash["Message"] = Message.Error("Для рекламы уже сформирован счет");
+				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
 			}
 			ad.Invoice = new Invoice(ad);
@@ -62,7 +63,7 @@ namespace AdminInterface.Controllers
 			var ad = Advertising.Find(id);
 			if (ad.Act != null)
 			{
-				Flash["Message"] = Message.Error("Для рекламы уже сформирован счет");
+				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
 			}
 			var invoice = ad.Invoice;
@@ -80,13 +81,12 @@ namespace AdminInterface.Controllers
 		{
 			var ad = Advertising.Find(id);
 			ad.Delete();
-			Flash["Message"] = Message.Notify("Удалено");
+			Notify("Удалено");
 			RedirectToReferrer();
 		}
 
 		public void Edit(uint id)
 		{
-			Binder.Validator = Validator;
 			RenderView("/Payers/NewAd");
 
 			var ad = Advertising.Find(id);
