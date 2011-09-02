@@ -31,7 +31,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 
 			Sort.Make(this);
-
+			var hast = supplier.GetHashCode();
 			if (IsPost)
 			{
 				BindObjectInstance(supplier, "supplier");

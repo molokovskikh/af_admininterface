@@ -2,6 +2,7 @@ using System.Web;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
+using NHibernate.Engine;
 using NHibernate.Event;
 
 namespace Integration.MonoRailExtentions
@@ -34,9 +35,21 @@ namespace Integration.MonoRailExtentions
 
 		public bool OnPreUpdate(PreUpdateEvent @event)
 		{
+			//валидатор может запуститься как и на самом объекте так и на его проски
+			//здесь же мы получим объект а не прокси, по этому ошибки сохраненные для прокси
+			//будут недоступны
 			if (ValidatorAccessor == null)
 				return false;
-			return ValidatorAccessor.Validator.HasErrors(@event.Entity);
+			var hasErrors = ValidatorAccessor.Validator.HasErrors(@event.Entity);
+			if (!hasErrors)
+			{
+				var key = new EntityKey(@event.Id, @event.Persister, @event.Session.EntityMode);
+				var proxy = @event.Session.PersistenceContext.GetProxy(key);
+				if (proxy == null)
+					return false;
+				hasErrors = ValidatorAccessor.Validator.HasErrors(proxy);
+			}
+			return hasErrors;
 		}
 
 		public bool OnPreInsert(PreInsertEvent @event)
