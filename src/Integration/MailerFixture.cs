@@ -61,24 +61,19 @@ namespace Integration
 		[Test]
 		public void Enable_changed()
 		{
-			mailer.EnableChanged(client);
-			mailer.Send();
-			Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
-		}
+			//просто сконструированный клиент больше не подходит 
+			//тк в методе есть хак var client = Client.Find(((Service)item).Id); //(Client) item;
+			//хибер конструирует прокси для item наследуя ее от Service тк он не знает кто это будет Client или Supplier
+			//что бы обойти это и нужен хак, возможно есть какой то правильный сопсоб что бы 
+			//хибер констуировал правельные прокми но я его не знаю
+			//mailer.EnableChanged(client);
 
-		[Test, Ignore("тест для отладки, удалить")]
-		public void test()
-		{
-			uint id;
 			using (new SessionScope())
 			{
-				var client = DataMother.TestClient();
-				id = client.Id;
-			}
-			using (new SessionScope())
-			{
-				mailer.EnableChanged(ActiveRecordMediator<Service>.FindByPrimaryKey(id));
+				var client = DataMother.TestClient(c => c.Name = "Тестовый клиент");
+				mailer.EnableChanged(client);
 				mailer.Send();
+				Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
 			}
 		}
 
