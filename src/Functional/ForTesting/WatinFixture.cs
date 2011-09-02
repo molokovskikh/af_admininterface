@@ -28,6 +28,11 @@ namespace Functional.ForTesting
 		{
 			Assert.That(browser.Text, Is.StringContaining(text));
 		}
+
+		protected void Save(object entity)
+		{
+			ActiveRecordMediator.Save(entity);
+		}
 	}
 
 	[TestFixture]

@@ -31,20 +31,35 @@ namespace Integration
 
 		private TestFilter filter;
 		private RoutingEngine engine;
+		private IDictionary propertyBag;
 
 		[SetUp]
 		public void Setup()
 		{
 			helper = new AdminInterface.Helpers.AppHelper();
-			var urlInfo = new UrlInfo("", "home", "index", "/", "");
+			var area = "";
+			var controllerName = "home";
+			var actionName = "index";
+			var appPath = "";
+			var urlInfo = new UrlInfo(area, controllerName, actionName, appPath, "");
 			context = new StubEngineContext(urlInfo) {
-				CurrentControllerContext = new ControllerContext("", "home", "index", null)
+				CurrentControllerContext = new ControllerContext(area, controllerName, actionName, null)
 			};
+			propertyBag = context.CurrentControllerContext.PropertyBag;
+
 			engine = new RoutingEngine();
 			engine.Add(new PatternRoute("/<controller>/<action>"));
-			var match = engine.FindMatch("home/index", new RouteContext(context.Request, null, "/", null));
+			var match = engine.FindMatch("home/index", new RouteContext(context.Request, null, appPath, null));
 			context.CurrentControllerContext.RouteMatch = match;
 
+			PrepareHelper(helper);
+
+			filter = new TestFilter();
+			propertyBag["filter"] = filter;
+		}
+
+		private void PrepareHelper(AbstractHelper helper)
+		{
 			helper.UrlHelper = new UrlHelper(context) {
 				UrlBuilder = new DefaultUrlBuilder {
 					RoutingEngine = engine,
@@ -54,9 +69,6 @@ namespace Integration
 			};
 			helper.SetContext(context);
 			helper.SetController(null, context.CurrentControllerContext);
-
-			filter = new TestFilter();
-			context.CurrentControllerContext.PropertyBag["filter"] = filter;
 		}
 
 		[Test]
@@ -223,7 +235,7 @@ namespace Integration
 		[Test]
 		public void Sortable_support()
 		{
-			context.CurrentControllerContext.PropertyBag["filter"] = new TestSortable {
+			propertyBag["filter"] = new TestSortable {
 				SortBy = "test",
 				SortDirection = "asc",
 				Filter = 1

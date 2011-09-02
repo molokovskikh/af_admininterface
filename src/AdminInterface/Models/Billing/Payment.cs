@@ -267,7 +267,7 @@ namespace AdminInterface.Models.Billing
 					continue;
 
 				var inn = payment.PayerClient.Inn;
-				if (!ignoredInns.Any(i => String.Equals(i.Inn, inn, StringComparison.InvariantCultureIgnoreCase)))
+				if (!ignoredInns.Any(i => String.Equals(i.Name, inn, StringComparison.InvariantCultureIgnoreCase)))
 				{
 					var payer = ActiveRecordLinq.AsQueryable<Payer>().FirstOrDefault(p => p.INN == inn);
 					payment.Payer = payer;

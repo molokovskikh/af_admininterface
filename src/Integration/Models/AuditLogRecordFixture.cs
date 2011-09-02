@@ -22,7 +22,7 @@ namespace Integration.Models
 
 			var logs = AuditLogRecord.GetLogs(user.Payer);
 			Assert.AreEqual(3, logs.Count);
-			Assert.AreEqual("Изменено 'Платеж' было '800' стало '1000'", logs[2].Message, logs.Implode(l => l.Message));
+			Assert.AreEqual("Изменено 'Платеж' было '800' стало '1000'", logs[0].Message, logs.Implode(l => l.Message));
 		}
 	}
 }

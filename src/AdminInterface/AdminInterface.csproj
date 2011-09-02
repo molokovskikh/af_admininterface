@@ -143,15 +143,16 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
+    <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DocumentBuilderFilter.cs" />
-    <Compile Include="Controllers\IgnoredInnsController.cs" />
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListner.cs" />
+    <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
     <Compile Include="Models\Billing\PayerAuditRecord.cs" />
@@ -248,6 +249,7 @@
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
+    <Compile Include="NHibernateExtentions\ValidEventListner.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
@@ -403,13 +405,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />
     <None Include="Views\Messages\Index.brail" />
     <None Include="Views\Acts\Edit.brail" />
     <None Include="Views\Acts\Index.brail" />
     <None Include="Views\Acts\Print.brail" />
     <None Include="Views\Advertisings\Index.brail" />
-    <None Include="Views\IgnoredInns\Index.brail" />
     <None Include="Views\Invoices\Index.brail" />
     <None Include="Views\Invoices\InvoiceBody.brail" />
     <None Include="Views\Invoices\Print.brail" />
@@ -440,6 +442,7 @@
     <None Include="Views\RegionalAdmin\AdminEditor.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
     <None Include="Views\Templates\Region.brail" />
+    <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
   </ItemGroup>
   <ItemGroup>

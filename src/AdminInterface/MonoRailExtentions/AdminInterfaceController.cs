@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using AdminInterface.Helpers;
@@ -154,10 +155,18 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected bool IsValid(object instance)
 		{
-			var isInvalid = HasValidationError(instance);
-			//if (isInvalid)
-			//ActiveRecordMediator.Evict(instance);
-			return !isInvalid;
+			var errorSummary = Binder.GetValidationSummary(instance);
+			return errorSummary == null || !errorSummary.HasError;
+		}
+
+		protected bool IsValid(IEnumerable enumerable)
+		{
+			foreach (var instance in enumerable)
+			{
+				if (!IsValid(instance))
+					return false;
+			}
+			return true;
 		}
 	}
 

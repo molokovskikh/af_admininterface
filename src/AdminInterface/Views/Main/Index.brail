@@ -121,8 +121,8 @@
 						<li>${app.LinkTo("Разнесение платежей", "Payments", "New")}</li>
 						<li>${app.LinkTo("Загрузка выписки", "Payments", "ProcessPayments")}</li>
 						<li>${app.LinkTo("Получатели платежей", "Recipients", "Index")}</li>
-						<li>${app.LinkTo("Игнорируемые ИНН", "IgnoredInns", "Index")}</li>
 						<li>${app.LinkTo("Реклама", "Advertisings", "Index")}</li>
+						<li>${app.LinkTo("Справочники", @References, @Index)}</li>
 					</ul>
 				</div>
 

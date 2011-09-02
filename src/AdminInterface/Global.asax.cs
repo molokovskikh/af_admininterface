@@ -22,6 +22,7 @@ using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using Integration.MonoRailExtentions;
 using log4net;
 using MySql.Data.MySqlClient;
 using NHibernate;
@@ -47,6 +48,7 @@ namespace AddUser
 		{
 			try
 			{
+				ValidEventListner.ValidatorAccessor = new MonorailValidatorAccessor();
 				Initialize();
 			}
 			catch(Exception ex)

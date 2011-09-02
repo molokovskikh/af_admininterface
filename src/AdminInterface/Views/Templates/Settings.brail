@@ -1,0 +1,29 @@
+﻿<form method="post">
+	<table class="DataTable" data-name="${name}">
+		<% if items.Count ==  0: %>
+			${emptyTemplate}
+		<% else: %>
+			<tr>
+				<td>
+					<a class="new" href="javascript:">Новый</a>
+				</td>
+				<th>${name}</th>
+			</tr>
+			<% for i, item in enumerate(items): %>
+			<tr>
+				<td>
+					<a class="delete" href="javascript:">Удалить</a>
+				</td>
+				<td>
+					${FormHelper.HiddenField("items[${i}].Id", item.Id)}
+					${FormHelper.TextFieldValue("items[${i}].Name", item.Name)}
+					${app.GetValidationError(item, @Name)}
+				</td>
+			</tr>
+			<% end %>
+		<% end %>
+	</table>
+	<p class=save>
+		<input type="submit" name=${id} value="Сохранить" />
+	</p>
+</form>

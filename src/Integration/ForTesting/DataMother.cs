@@ -91,8 +91,11 @@ namespace Integration.ForTesting
 		{
 			var client = CreateTestClientWithAddressAndUser();
 			var payer = client.Payers.First();
+			payer.Users.Each(u => u.Accounting.BeAccounted = true);
+			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
+			client.Save();
 			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
-			payer.UpdateAndFlush();
+			payer.SaveAndFlush();
 			payer.Refresh();
 			return payer;
 		}

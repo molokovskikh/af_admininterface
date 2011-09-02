@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using AdminInterface.Helpers;
 using AdminInterface.Test.ForTesting;
+using Common.Tools;
 using NUnit.Framework;
 using WatiN.Core;
 using WatiN.CssSelectorExtensions;

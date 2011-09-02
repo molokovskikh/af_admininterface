@@ -28,16 +28,28 @@ namespace Functional.Billing
 		public void Cancel_invoice()
 		{
 			Open("Invoices/");
-			Assert.That(browser.Text, Is.StringContaining("������ ������"));
+			Assert.That(browser.Text, Is.StringContaining("Реестр счетов"));
 			browser.Button(invoice, "Cancel").Click();
-			Assert.That(browser.Text, Is.StringContaining("���������"));
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+		}
+
+		[Test]
+		public void Show_predefine_invoice_positions()
+		{
+			Save(new Nomenclature("Мониторинг оптового фармрынка за июль"));
+
+			Open(invoice, "Edit");
+			AssertText("Редактирование счета");
+			Assert.That(Css("#reference").SelectedItem, Is.EqualTo("Мониторинг оптового фармрынка за июль"));
+			Click("Вставить услугу из справочника");
+			Assert.That(Css("[name='invoice.parts[0].name']").Text, Is.EqualTo("Мониторинг оптового фармрынка за июль"));
 		}
 
 		[Test, Ignore]
 		public void Edit_invoice()
 		{
 			Open(invoice, "Edit");
-			Assert.That(browser.Text, Is.StringContaining(String.Format("�������������� ����� �{0}", invoice.Id)));
+			Assert.That(browser.Text, Is.StringContaining(String.Format("Редактирование счета №{0}", invoice.Id)));
 		}
 	}
 }

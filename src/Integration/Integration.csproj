@@ -44,6 +44,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Castle.Components.Binder.dll</HintPath>
     </Reference>
+    <Reference Include="Castle.Components.Validator, Version=2.5.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL" />
     <Reference Include="Castle.Core">
       <HintPath>..\..\lib\Castle.Core.dll</HintPath>
     </Reference>
@@ -150,6 +151,7 @@
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
     <Compile Include="MonoRailExtentions\BindParametersFixture.cs" />
+    <Compile Include="MonoRailExtentions\DoNotUpdateNotValidEntity.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />

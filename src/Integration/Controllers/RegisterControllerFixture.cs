@@ -157,13 +157,13 @@ namespace Integration.Controllers
 
 			controller.RegisterSupplier(supplier, 
 				new Contact[0], 1,
-				new RegionSettings[0],
+				new [] {new RegionSettings{Id = 1, IsAvaliableForBrowse = true}},
 				new AdditionalSettings(),
 				null,
 				null,
 				"тестовый пользователь",
 				new Contact[0],
-				new Person[0], 
+				new Person[0],
 				"",
 				"");
 			Assert.That(supplier.Id, Is.GreaterThan(0));
