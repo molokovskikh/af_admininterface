@@ -67,7 +67,9 @@ namespace AdminInterface.Controllers
 						ActiveRecordMediator.Save(item);
 						
 					Notify("Сохранено");
-					RedirectToReferrer();
+					//ie не передает в referer hash по этому формируем вручную
+					//RedirectToReferrer();
+					RedirectToUrl(String.Format("~/References/#tab-{0}", setting.Id));
 				}
 				else
 				{

@@ -97,6 +97,7 @@
     <Compile Include="Billing\BillingSearchFixture.cs" />
     <Compile Include="Billing\AccountingFixture.cs" />
     <Compile Include="Billing\PayerSecurityFixture.cs" />
+    <Compile Include="Billing\ReferenceFixture.cs" />
     <Compile Include="Billing\SupplierBillingFixture.cs" />
     <Compile Include="Drugstore\AddressFixture.cs" />
     <Compile Include="Billing\BillingFixture.cs" />
