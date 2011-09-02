@@ -134,6 +134,13 @@ namespace AdminInterface.Models.Billing
 		]
 		public IList<InvoicePart> Parts { get; set; }
 
+		protected override void OnDelete()
+		{
+			foreach (var part in Parts.Where(p => p.Ad != null))
+				part.Ad.Invoice = null;
+			base.OnDelete();
+		}
+
 		public string SumInWords()
 		{
 			return ViewHelper.InWords((float) Sum);
