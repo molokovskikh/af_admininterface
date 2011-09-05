@@ -18,7 +18,7 @@ namespace AdminInterface.Controllers
 		{
 			var account = Accounting.TryFind(id);
 			if (accounted != null || payment != null)
-				UpdateAccounting(account.Id, accounted ?? account.BeAccounted, payment ?? account.Payment);
+				UpdateAccounting(account.Id, accounted, payment);
 			if (status != null || free != null)
 			{
 				NHibernateUtil.Initialize(account);
@@ -30,7 +30,7 @@ namespace AdminInterface.Controllers
 				else
 				{
 					var address = ((AddressAccounting)account).Address;
-					SetAddressStatus(address.Id, status ?? address.Enabled, free ?? address.IsFree);
+					SetAddressStatus(address.Id, status, free);
 				}
 			}
 			CancelView();
