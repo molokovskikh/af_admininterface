@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -49,6 +50,8 @@ namespace AdminInterface.Models
 		[Description("Код клиента")] ClientId,
 		[Description("Код пользователя")] UserId,
 		[Description("Договор")] PayerId,
+		[Description("Инн")] Inn,
+		[Description("Адрес доставки")] Address,
 	}
 
 	public class PayerFilter : Sortable, SortableContributor, IUrlContributor
@@ -103,29 +106,35 @@ namespace AdminInterface.Models
 
 		public IList<BillingSearchItem> Find()
 		{
-			var where = "";
-			var having = "";
-			var groupFilter = "";
+			var where = new StringBuilder("1 = 1");
+			var having = new StringBuilder();
+			var groupFilter = new StringBuilder();
 
 			var query = new DetachedSqlQuery();
 			var text = SearchText;
 			switch(SearchBy)
 			{
 				case SearchBy.Name:
-					having = String.Format(
+					And(having, String.Format(
 						@"(p.ShortName like :searchText
 or p.JuridicalName like :searchText
-or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)");
+or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"));
 					text = "%" + SearchText + "%";
 					break;
 				case SearchBy.ClientId:
-					having = "sum(if(cd.Id = :searchText, 1, 0)) > 0";
+					And(having, "sum(if(cd.Id = :searchText, 1, 0)) > 0");
 					break;
 				case SearchBy.UserId:
-					having = "sum(if(users.Id = :searchText, 1, 0)) > 0";
+					And(having, "sum(if(users.Id = :searchText, 1, 0)) > 0");
 					break;
 				case SearchBy.PayerId:
-					having = "p.payerId = :searchText";
+					And(having, "p.payerId = :searchText");
+					break;
+				case SearchBy.Inn:
+					And(where, "p.INN = :searchText");
+					break;
+				case SearchBy.Address:
+					And(having, "sum(if(addresses.Address = :searchText, 1, 0)) > 0");
 					break;
 			}
 			query.SetParameter("searchText", text);
@@ -133,63 +142,63 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch (PayerState)
 			{
 				case PayerStateFilter.Debitors:
-					where = "and p.Balance < 0";
+					And(where, "p.Balance < 0");
 					break;
 				case PayerStateFilter.NotDebitors:
-					where = "and p.oldpaydate >= 0";
+					And(where, "p.oldpaydate >= 0");
 					break;
 			}
 
 			if (InvoiceType.HasValue)
 			{
-				where += "and p.AutoInvoice = :InvoiceType";
+				And(where, "p.AutoInvoice = :InvoiceType");
 				query.SetParameter("InvoiceType", InvoiceType.Value);
 			}
 
 			switch(Segment)
 			{
 				case SearchSegment.Retail:
-					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 1 or s.Segment = 1");
+					And(groupFilter, "cd.Segment = 1 or s.Segment = 1");
 					break;
 				case SearchSegment.Wholesale:
-					groupFilter = AddFilterCriteria(groupFilter, "cd.Segment = 0 or s.Segment = 1");
+					And(groupFilter, "cd.Segment = 0 or s.Segment = 1");
 					break;
 			}
 
 			switch(ClientType)
 			{
 				case SearchClientType.Drugstore:
-					groupFilter = AddFilterCriteria(groupFilter, "cd.Id is not null");
+					And(groupFilter, "cd.Id is not null");
 					break;
 				case SearchClientType.Supplier:
-					groupFilter = AddFilterCriteria(groupFilter, "s.Id is not null");
+					And(groupFilter, "s.Id is not null");
 					break;
 			}
 
 			switch(ClientStatus)
 			{
 				case SearchClientStatus.Enabled:
-					having = AddFilterCriteria(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) > 0");
+					And(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) > 0");
 					break;
 				case SearchClientStatus.Disabled:
-					having = AddFilterCriteria(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) = 0");
+					And(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) = 0");
 					break;
 			}
 
 			if (Recipient != null && Recipient.Id != 0)
 			{
-				groupFilter = AddFilterCriteria(groupFilter, " p.RecipientId = :recipientId");
+				And(groupFilter, " p.RecipientId = :recipientId");
 				query.SetParameter("recipientId", Recipient.Id);
 			}
 
 			if (Region != null && Region.Id != 0)
 			{
-				groupFilter = AddFilterCriteria(groupFilter, "cd.MaskRegion & :RegionId > 0");
+				And(groupFilter, "cd.MaskRegion & :RegionId > 0");
 				query.SetParameter("RegionId", Region.Id);
 			}
 
-			if (!String.IsNullOrEmpty(groupFilter))
-				having = AddFilterCriteria(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
+			if (groupFilter.Length > 0)
+				And(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
 			var sql = String.Format(@"
 select p.payerId as {{BillingSearchItem.BillingCode}},
@@ -220,7 +229,7 @@ from billing.payers p
 	left join future.Clients cd on cd.Id = users.ClientId
 	left join future.Addresses addresses on addresses.PayerId = p.PayerId
 	left join future.Suppliers s on s.Payer = p.PayerId
-where 1 = 1 {0}
+where {0}
 group by p.payerId
 having {1}
 order by {{BillingSearchItem.ShortName}}
@@ -247,12 +256,11 @@ order by {{BillingSearchItem.ShortName}}
 			
 		}
 
-		private static string AddFilterCriteria(string filter, string criteria)
+		private static void And(StringBuilder filter, string criteria)
 		{
-			if (String.IsNullOrEmpty(filter))
-				return criteria;
-
-			return filter + " and " + criteria;
+			if (filter.Length > 0)
+				filter.Append(" and ");
+			filter.Append(criteria);
 		}
 	}
 }

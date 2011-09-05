@@ -82,7 +82,6 @@ namespace Integration.Models
 		[Test]
 		public void Search_payer_by_invoice_type()
 		{
-			QueryCatcher.Catch();
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 			payer.AutoInvoice = InvoiceType.Auto;
@@ -91,6 +90,34 @@ namespace Integration.Models
 			var items = new PayerFilter{InvoiceType = InvoiceType.Manual}.Find();
 			Assert.That(items.Any(i => i.BillingCode == payer.Id), Is.False,
 				"не должны были найти плательщика {0}, есть {1}", payer.Id, items.Implode(i => i.BillingCode.ToString()));
+		}
+
+		[Test]
+		public void Search_by_inn()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+			payer.INN = DataMother.RandomInn();
+			payer.SaveAndFlush();
+
+			var items = new PayerFilter{SearchText = payer.INN, SearchBy = SearchBy.Inn}.Find();
+			Assert.That(items.Count, Is.EqualTo(1));
+			Assert.That(items[0].BillingCode, Is.EqualTo(payer.Id));
+		}
+
+		[Test]
+		public void Search_by_address()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var payer = client.Payers.First();
+			var address = client.Addresses.First();
+			address.Value = address.Value + " " + address.Id;
+			address.SaveAndFlush();
+			client.SaveAndFlush();
+
+			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
+			Assert.That(items.Count, Is.EqualTo(1));
+			Assert.That(items[0].BillingCode, Is.EqualTo(payer.Id));
 		}
 	}
 }
