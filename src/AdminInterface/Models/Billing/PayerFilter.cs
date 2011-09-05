@@ -132,9 +132,11 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					break;
 				case SearchBy.Inn:
 					And(where, "p.INN = :searchText");
+					text = "%" + SearchText + "%";
 					break;
 				case SearchBy.Address:
 					And(having, "sum(if(addresses.Address = :searchText, 1, 0)) > 0");
+					text = "%" + SearchText + "%";
 					break;
 			}
 			query.SetParameter("searchText", text);
