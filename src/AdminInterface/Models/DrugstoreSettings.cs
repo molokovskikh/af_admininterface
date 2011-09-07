@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 
@@ -209,5 +210,27 @@ namespace AdminInterface.Models
 
 		[Property, Description("Включить расписание обновлений"), Auditable]
 		public virtual bool AllowAnalitFSchedule { get; set; }
+
+		protected override void OnUpdate()
+		{
+			var forceReplication = this.IsChanged(s => s.BuyingMatrixPrice)
+				|| this.IsChanged(s => s.BuyingMatrixType)
+				|| this.IsChanged(s => s.WarningOnBuyingMatrix);
+
+			if (!forceReplication)
+				return;
+			using (new SessionScope())
+			{
+				ArHelper.WithSession(s => {
+					s.CreateSQLQuery(@"
+	update Usersettings.AnalitFReplicationInfo r
+	join Future.Users u on u.Id = r.UserId
+	set ForceReplication = 1
+	where u.ClientId = :ClientId")
+						.SetParameter("ClientId", Client.Id)
+						.ExecuteUpdate();
+				});
+			}
+		}
 	}
 }
