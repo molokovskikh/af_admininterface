@@ -1,0 +1,53 @@
+﻿<% component Bubble, {@bredcrumbs : [(payer.Name, "${siteroot}/Payers/${payer.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Настройка счетов
+<% end %>
+
+<div style="width:600px">
+	<div class=block>
+		<p>
+			Для того что бы позиция была сформирована в новом счете, задайте для нее номер группы отличный от других позиций.<br>
+			Позиции с одинаковыми номерами групп будут объединены в один счет
+		</p>
+	</div>
+
+	<% for group in payer.GetInvoiceGroups(): %>
+	<div class=block>
+		<h3>Следующие позиции будут объединены в один счет</h3>
+		<P>
+			${app.LinkTo(payer, "Предварительный просмотр", @InvoicePreview)}
+		<P>
+		<form method=post>
+			<table class="DataTable">
+				<thead>
+					<tr>
+						<th>Код</th>
+						<th>Тип</th>
+						<th>Наименование</th>
+						<th>Стоимость</th>
+						<th>Номер группы</th>
+					</tr>
+				</thead>
+				<tbody>
+				<% for i, account in enumerate(group): %>
+				<tr>
+					<td>${account.Id}</td>
+					<td>${account.Type}</td>
+					<td>${account.Name}</td>
+					<td>${account.Payment.ToString("C")}</td>
+					<td>
+						${FormHelper.HiddenField("accounts[${i}].Id", account.Id)}
+						${FormHelper.TextFieldValue("accounts[${i}].InvoiceGroup", account.InvoiceGroup)}
+					</td>
+				</tr>
+				<% end %>
+				</tbody>
+			</table>
+			<p>
+				<input type=submit value="Сохранить">
+			</p>
+		</form>
+	</div>
+	<% end %>
+</div>

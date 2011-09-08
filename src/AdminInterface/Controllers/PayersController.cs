@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 
@@ -67,6 +69,23 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
+		public void InvoicePreview(uint id)
+		{
+			var payer = Payer.Find(id);
+			if (payer.Recipient == null)
+			{
+				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				RedirectToReferrer();
+				return;
+			}
+
+			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			PropertyBag["doc"] = invoice;
+			PropertyBag["invoice"] = invoice;
+			LayoutName = "Print";
+			RenderView("/Invoices/Print");
+		}
+
 		public void NewInvoice(uint id)
 		{
 			var payer = Payer.Find(id);
@@ -112,6 +131,28 @@ namespace AdminInterface.Controllers
 				}
 			}
 			PropertyBag["ad"] = ad;
+			PropertyBag["payer"] = payer;
+		}
+
+		public void InvoiceGroups(uint id)
+		{
+			var payer = Payer.Find(id);
+
+			if (payer.GetAccountings().Count() == 0)
+				Error("Нет ни одной позиции для формирования счета");
+
+			if (IsPost)
+			{
+				SetBinder(new AccountBinder());
+				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
+				var accounts = BindObject<Accounting[]>(ParamStore.Form, "accounts");
+				foreach (var account in accounts)
+					account.Save();
+
+				Notify("Сохранено");
+				RedirectToReferrer();
+			}
+
 			PropertyBag["payer"] = payer;
 		}
 	}

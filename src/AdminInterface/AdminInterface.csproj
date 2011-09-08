@@ -159,6 +159,7 @@
     <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
+    <Compile Include="MonoRailExtentions\AccountBinder.cs" />
     <Compile Include="MonoRailExtentions\AdminInterfaceController.cs" />
     <Compile Include="Controllers\AddressesController.cs" />
     <Compile Include="Controllers\InvoicesController.cs" />
@@ -405,6 +406,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
+    <None Include="Views\Payers\InvoiceGroups.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />
     <None Include="Views\Messages\Index.brail" />

@@ -67,11 +67,11 @@ namespace AdminInterface.Models.Billing
 			CalculateSum();
 		}
 
-		public Invoice(Payer payer, Period period, DateTime invoiceDate)
+		public Invoice(Payer payer, Period period, DateTime invoiceDate, int invoiceGroup = 0)
 			: this(payer, invoiceDate)
 		{
 			Period = period;
-			Parts = BuildParts();
+			Parts = BuildParts(invoiceGroup);
 			CalculateSum();
 		}
 
@@ -82,6 +82,9 @@ namespace AdminInterface.Models.Billing
 
 		public void SetPayer(Payer payer)
 		{
+			if (payer.Recipient == null)
+				throw new Exception(String.Format("Получатель платежей для плательщика {0} не установлен", payer.Id));
+
 			Recipient = payer.Recipient;
 			Payer = payer;
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
@@ -146,7 +149,7 @@ namespace AdminInterface.Models.Billing
 			return ViewHelper.InWords((float) Sum);
 		}
 
-		public List<InvoicePart> BuildParts()
+		public List<InvoicePart> BuildParts(int invoiceGroup)
 		{
 			var result = new List<InvoicePart>();
 			foreach (var ad in Payer.Ads.Where(a => a.Invoice == null))
@@ -155,23 +158,24 @@ namespace AdminInterface.Models.Billing
 				ad.Invoice = this;
 			}
 
+			var accounts = Payer.GetAccountings().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p)).ToList());
+				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts)).ToList());
 			else
-				result.AddRange(GetPartsForPeriod(Period).ToList());
+				result.AddRange(GetPartsForPeriod(Period, accounts).ToList());
 			return result;
 		}
 
-		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period)
+		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Accounting> accounts)
 		{
 			if (Payer.InvoiceSettings.DoNotGroupParts)
 			{
-				return Payer.GetAccountings()
+				return accounts
 					.Select(a => new InvoicePart(this, period, a.Payment, 1));
 			}
 			else
 			{
-				return Payer.GetAccountings()
+				return accounts
 					.GroupBy(a => a.Payment)
 					.Select(g => new InvoicePart(this, period, g.Key, g.Count()));
 			}

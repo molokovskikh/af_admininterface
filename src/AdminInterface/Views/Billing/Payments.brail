@@ -477,6 +477,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<div class="InputGroupHeader">Операции</div>
 		${app.LinkTo(payer, "Доп. счет", @NewInvoice)}
 		${app.LinkTo(payer, "Реклама", @Ad)}
+		${app.LinkTo(payer, "Настройка счетов", @InvoiceGroups)}
 		<a href="${siteroot}/RevisionActs/${payer.Id}">Акт сверки</a>
 	</div>
 

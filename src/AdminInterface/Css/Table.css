@@ -53,3 +53,13 @@ th a.sort.desc
 {
 	background-image: url("../Images/arrow-down-blue-reversed.gif");
 }
+
+.DataTable tbody tr:nth-child(even)
+{
+	background-color: #F6F6F6;
+}
+
+.DataTable tbody tr:nth-child(odd)
+{
+	background-color: #EEF8FF;
+}

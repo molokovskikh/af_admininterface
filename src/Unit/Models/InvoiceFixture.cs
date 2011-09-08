@@ -20,11 +20,7 @@ namespace Unit.Models
 		public void Setup()
 		{
 			payer = new Payer {
-				Clients = new List<Client>(),
-				Users = new List<User>(),
-				Addresses = new List<Address>(),
 				Recipient = new Recipient(),
-				Ads = new List<Advertising>(),
 				JuridicalOrganizations = new List<LegalEntity>{
 					new LegalEntity {}
 				}
@@ -131,6 +127,25 @@ namespace Unit.Models
 			Assert.That(invoice.Parts[0].Count, Is.EqualTo(1), invoice.Parts.Implode());
 			Assert.That(invoice.Parts[1].Sum, Is.EqualTo(800), invoice.Parts.Implode());
 			Assert.That(invoice.Parts[1].Count, Is.EqualTo(1), invoice.Parts.Implode());
+		}
+
+		[Test]
+		public void Build_invoice_for_invoice_groups()
+		{
+			new User(client);
+			payer.Users[0].Accounting.ReadyForAcounting = true;
+			payer.Users[1].Accounting.ReadyForAcounting = true;
+			payer.Users[1].Accounting.Payment = 600;
+			payer.Users[1].Accounting.InvoiceGroup = 1;
+
+			var invoices = payer.BuildInvoices(DateTime.Now, Invoice.GetPeriod(DateTime.Now)).ToList();
+			Assert.That(invoices.Count, Is.EqualTo(2));
+			var invoice = invoices[0];
+			Assert.That(invoice.Parts.Count, Is.EqualTo(1));
+			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(800));
+			invoice = invoices[1];
+			Assert.That(invoice.Parts.Count, Is.EqualTo(1));
+			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(600));
 		}
 	}
 }

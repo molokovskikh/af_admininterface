@@ -168,6 +168,19 @@ namespace AdminInterface.MonoRailExtentions
 			}
 			return true;
 		}
+
+		protected void SetARDataBinder()
+		{
+			var binder = new ARDataBinder();
+			SetBinder(binder);
+		}
+
+		protected void SetBinder(ARDataBinder binder)
+		{
+			typeof (SmartDispatcherController)
+				.GetField("binder", BindingFlags.NonPublic | BindingFlags.Instance)
+				.SetValue(this, binder);
+		}
 	}
 
 	public class ARController : ARSmartDispatcherController

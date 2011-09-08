@@ -316,6 +316,9 @@ ORDER BY {{AccountingItem.WriteTime}} DESC
 		[Property]
 		public virtual bool ReadyForAcounting { get; set; }
 
+		[Property]
+		public virtual int InvoiceGroup { get; set; }
+
 		public virtual uint PayerId
 		{
 			get

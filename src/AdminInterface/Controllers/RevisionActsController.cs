@@ -7,14 +7,14 @@ using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Controllers
 {
-	public class RevisionActsController : SmartDispatcherController
+	public class RevisionActsController : AdminInterfaceController
 	{
 		public void Show(uint id, DateTime? begin, DateTime? end)
 		{
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
@@ -39,7 +39,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
@@ -63,7 +63,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}
@@ -90,7 +90,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
 			{
-				Flash["Message"] = Message.Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
+				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
 			}

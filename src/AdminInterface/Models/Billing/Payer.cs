@@ -76,6 +76,7 @@ namespace AdminInterface.Models
 			Clients = new List<Client>();
 			Addresses = new List<Address>();
 			Suppliers = new List<Supplier>();
+			Ads = new List<Advertising>();
 		}
 
 		[PrimaryKey]
@@ -428,7 +429,16 @@ ORDER BY {Payer}.shortname;";
 				return lastDay;
 		}
 
+		public virtual IEnumerable<Invoice> BuildInvoices(DateTime date, Period period)
+		{
+			foreach (var invoiceGroup in GetAccountings().GroupBy(a => a.InvoiceGroup))
+				yield return new Invoice(this, period, date, invoiceGroup.Key);
+		}
 
+		public virtual IEnumerable<IGrouping<int, Accounting>> GetInvoiceGroups()
+		{
+			return GetAccountings().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
+		}
 	}
 
 	public class DoNotHaveContacts : Exception

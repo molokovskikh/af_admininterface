@@ -35,7 +35,7 @@ namespace AdminInterface.Controllers
 	{
 		public ReferencesController()
 		{
-			typeof(SmartDispatcherController).GetField("binder", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(this, new ARDataBinder());
+			SetARDataBinder();
 		}
 
 		public void Index()
