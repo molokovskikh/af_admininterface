@@ -1,13 +1,16 @@
 ﻿<%  for i, region in enumerate(regions):
-    isForBrowse = (region.Id == homeRegionId)
-    isForOrder = isForBrowse
-    if (IsDefined("drugstore") and IsDefined("client")):
-        isForBrowse = ((client.MaskRegion & region.Id) > 0) or (region.Id == homeRegionId);
-        isForOrder = ((drugstore.OrderRegionMask & region.Id) > 0) or (region.Id == homeRegionId);
-    end %>
+	isForBrowse = (region.Id == homeRegionId)
+	isForOrder = isForBrowse
+	if (IsDefined("drugstore") and IsDefined("client")):
+		isForBrowse = ((client.MaskRegion & region.Id) > 0) or (region.Id == homeRegionId);
+		isForOrder = ((drugstore.OrderRegionMask & region.Id) > 0) or (region.Id == homeRegionId);
+	end %>
 	<tr id="RegionRow${region.Id}" onmouseover="this.setAttribute('class', 'SelectedRow')" onmouseout="this.removeAttribute('class');">
-		<td style="text-align: left">${region.Name}</td>
-		<% if IsDefined("singleRegions") and singleRegions: %>
+		<td style="text-align: left">
+			${region.Name}
+			<input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
+		</td>
+		<% if IsDefined(@singleRegions) and singleRegions: %>
 			<td style="text-align: center">
 				<% OutputSubView("/Templates/Region", {@checked: isForBrowse, @type: @Browse, @region: region}) %>
 			</td>
@@ -19,6 +22,5 @@
 				<% OutputSubView("/Templates/Region", {@checked: isForOrder, @type: @Order, @region: region}) %>
 			</td>
 		<% end %>
-		<input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
 	</tr>
 <% end %>
