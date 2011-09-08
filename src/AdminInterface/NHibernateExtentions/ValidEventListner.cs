@@ -38,7 +38,7 @@ namespace Integration.MonoRailExtentions
 			//валидатор может запуститься как и на самом объекте так и на его проски
 			//здесь же мы получим объект а не прокси, по этому ошибки сохраненные для прокси
 			//будут недоступны
-			if (ValidatorAccessor == null)
+			if (!IsReady)
 				return false;
 			var hasErrors = ValidatorAccessor.Validator.HasErrors(@event.Entity);
 			if (!hasErrors)
@@ -54,9 +54,22 @@ namespace Integration.MonoRailExtentions
 
 		public bool OnPreInsert(PreInsertEvent @event)
 		{
-			if (ValidatorAccessor == null)
+			if (!IsReady)
 				return false;
 			return ValidatorAccessor.Validator.HasErrors(@event.Entity);
+		}
+
+		private static bool IsReady
+		{
+			get
+			{
+				if (ValidatorAccessor == null)
+					return false;
+				var validator = ValidatorAccessor.Validator;
+				if (validator == null)
+					return false;
+				return true;
+			}
 		}
 	}
 }
