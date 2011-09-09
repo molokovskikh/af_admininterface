@@ -131,11 +131,11 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					And(having, "p.payerId = :searchText");
 					break;
 				case SearchBy.Inn:
-					And(where, "p.INN = :searchText");
+					And(where, "p.INN like :searchText");
 					text = "%" + SearchText + "%";
 					break;
 				case SearchBy.Address:
-					And(having, "sum(if(addresses.Address = :searchText, 1, 0)) > 0");
+					And(having, "sum(if(addresses.Address like :searchText, 1, 0)) > 0");
 					text = "%" + SearchText + "%";
 					break;
 			}

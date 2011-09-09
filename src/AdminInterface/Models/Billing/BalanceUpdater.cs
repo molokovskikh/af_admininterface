@@ -24,19 +24,16 @@ namespace AdminInterface.Models.Billing
 		protected override void OnSave()
 		{
 			UpdateBalance();
-			base.OnSave();
 		}
 
 		protected override void OnUpdate()
 		{
 			UpdateBalance();
-			base.OnUpdate();
 		}
 
 		protected override void OnDelete()
 		{
 			ResetBalance();
-			base.OnDelete();
 		}
 
 		private void Reset(Payer payer, decimal sum)

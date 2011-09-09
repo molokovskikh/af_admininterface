@@ -50,6 +50,7 @@ namespace AdminInterface.Controllers
 			{
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
+				return;
 			}
 			ad.Invoice = new Invoice(ad);
 			ad.UpdateAndFlush();
@@ -65,6 +66,7 @@ namespace AdminInterface.Controllers
 			{
 				Error("Для рекламы уже сформирован счет");
 				RedirectToReferrer();
+				return;
 			}
 			var invoice = ad.Invoice;
 			if (invoice == null)

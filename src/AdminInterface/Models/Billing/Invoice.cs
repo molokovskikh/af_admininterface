@@ -144,6 +144,24 @@ namespace AdminInterface.Models.Billing
 			base.OnDelete();
 		}
 
+		protected override void OnSave()
+		{
+			RegisterInvoice();
+			base.OnSave();
+		}
+
+		protected override void OnUpdate()
+		{
+			RegisterInvoice();
+			base.OnUpdate();
+		}
+
+		private void RegisterInvoice()
+		{
+			foreach (var part in Parts.Where(p => p.Ad != null))
+				part.Ad.Invoice = this;
+		}
+
 		public string SumInWords()
 		{
 			return ViewHelper.InWords((float) Sum);
@@ -153,10 +171,7 @@ namespace AdminInterface.Models.Billing
 		{
 			var result = new List<InvoicePart>();
 			foreach (var ad in Payer.Ads.Where(a => a.Invoice == null))
-			{
 				result.Add(PartForAd(ad));
-				ad.Invoice = this;
-			}
 
 			var accounts = Payer.GetAccountings().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)

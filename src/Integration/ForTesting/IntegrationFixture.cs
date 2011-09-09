@@ -20,5 +20,17 @@ namespace Integration.ForTesting
 			if (scope != null)
 				scope.Dispose();
 		}
+
+		protected void Reopen()
+		{
+			scope.Dispose();
+			scope = new SessionScope();
+		}
+
+		protected void Close()
+		{
+			scope.Dispose();
+			scope = null;
+		}
 	}
 }
