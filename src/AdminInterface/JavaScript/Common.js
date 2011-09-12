@@ -88,9 +88,12 @@
 		return false;
 	});
 
+	//ie агресивно кеширует по этому cache: false
+	//и запрос будет только один раз
 	function loadTabContent(element) {
 		$.ajax({
 			url: element.attr("href"),
+			cache: false,
 			success: function (content) {
 				$("#" + element.attr("id") + "-tab").html(content);
 			},

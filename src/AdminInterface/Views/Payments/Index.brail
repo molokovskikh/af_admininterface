@@ -26,27 +26,31 @@
 
 <table class=DataTable>
 	<% if payments.Count: %>
-	<tr>
-		<th></th>
-		<th>${app.Sortable("Получатель", "recipient")}</th>
-		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
-		<th>${app.Sortable("Плательщик", "payer")}</th>
-		<th>${app.Sortable("Сумма", "sum")}</th>
-		<th>${app.Sortable("Дата внесения платежа", "registredOn")}</th>
-	</tr>
-	<% for i, payment in enumerate(payments): %>
-	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>
-			${app.LinkTo(payment, "Редактировать", @Edit)}
-			${app.LinkTo(payment, "Удалить", @Delete)}
-		</td>
-		<td>${payment.Recipient.Name}</td>
-		<td>${payment.PayedOn.ToShortDateString()}</td>
-		<td>${app.LinkTo(payment.Payer)}</td>
-		<td style="text-align:right;">${payment.Sum.ToString("C")}</td>
-		<td>${payment.RegistredOn}</td>
-	</tr>
-	<% end %>
+	<thead>
+		<tr>
+			<th></th>
+			<th>${app.Sortable("Получатель", "recipient")}</th>
+			<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+			<th>${app.Sortable("Плательщик", "payer")}</th>
+			<th>${app.Sortable("Сумма", "sum")}</th>
+			<th>${app.Sortable("Дата внесения платежа", "registredOn")}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% for i, payment in enumerate(payments): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				${app.LinkTo(payment, "Редактировать", @Edit)}
+				${app.LinkTo(payment, "Удалить", @Delete)}
+			</td>
+			<td>${payment.Recipient.Name}</td>
+			<td>${payment.PayedOn.ToShortDateString()}</td>
+			<td>${app.LinkTo(payment.Payer)}</td>
+			<td style="text-align:right;">${payment.Sum.ToString("C")}</td>
+			<td>${payment.RegistredOn}</td>
+		</tr>
+		<% end %>
+	</tbody>
 	<% else: %>
 	<tr class="EmptyData">
 		<td>По вашему запросу ничего не найдено</td>

@@ -80,35 +80,39 @@
 		<div class=block>
 			<table class=DataTable>
 				<% if acts.Count: %>
-				<tr>
-					<th>
-						<input type=checkbox class=all>
-					</th>
-					<th style="width:1%"></th>
-					<th>${app.Sortable("№", "Id")}</th>
-					<th>${app.Sortable("Договор", "Payer")}</th>
-					<th>${app.Sortable("Получатель платежей", "recipient")}</th>
-					<th>${app.Sortable("Плательщик", "PayerName")}</th>
-					<th>${app.Sortable("Сумма", "Sum")}</th>
-					<th>${app.Sortable("За период", "Period")}</th>
-					<th>${app.Sortable("Дата", "Date")}</th>
-					<th></th>
-				</tr>
-				<% for i, act in enumerate(acts): %>
-				<tr class="${ViewHelper.GetRowStyle(i)}">
-					<td>
-						<input type=checkbox name="acts[${i}].Id" value=${act.Id}>
-					</td>
-					<td>${app.LinkTo(act, "Редактировать", @Edit)}</td>
-					<td>${app.LinkTo(act, act.Id, @Print)}</td>
-					<td>${act.Payer.Id}</td>
-					<td>${act.Recipient.Name}</td>
-					<td>${app.LinkTo(act.Payer)}</td>
-					<td style="text-align:right;">${act.Sum.ToString("C")}</td>
-					<td>${BindingHelper.GetDescription(act.Period)}</td>
-					<td>${act.ActDate.ToShortDateString()}</td>
-				</tr>
-				<% end %>
+				<thead>
+					<tr>
+						<th>
+							<input type=checkbox class=all>
+						</th>
+						<th style="width:1%"></th>
+						<th>${app.Sortable("№", "Id")}</th>
+						<th>${app.Sortable("Договор", "Payer")}</th>
+						<th>${app.Sortable("Получатель платежей", "recipient")}</th>
+						<th>${app.Sortable("Плательщик", "PayerName")}</th>
+						<th>${app.Sortable("Сумма", "Sum")}</th>
+						<th>${app.Sortable("За период", "Period")}</th>
+						<th>${app.Sortable("Дата", "Date")}</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<% for i, act in enumerate(acts): %>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td>
+							<input type=checkbox name="acts[${i}].Id" value=${act.Id}>
+						</td>
+						<td>${app.LinkTo(act, "Редактировать", @Edit)}</td>
+						<td>${app.LinkTo(act, act.Id, @Print)}</td>
+						<td>${act.Payer.Id}</td>
+						<td>${act.Recipient.Name}</td>
+						<td>${app.LinkTo(act.Payer)}</td>
+						<td style="text-align:right;">${act.Sum.ToString("C")}</td>
+						<td>${BindingHelper.GetDescription(act.Period)}</td>
+						<td>${act.ActDate.ToShortDateString()}</td>
+					</tr>
+					<% end %>
+				</tbody>
 				<% else: %>
 				<tr class=EmptyData>
 					<td>По вашему запросу ничего не найдено</td>

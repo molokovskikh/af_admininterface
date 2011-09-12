@@ -75,34 +75,38 @@
 	<div class=block>
 		<table class=DataTable>
 			<% if invoices.Count: %>
-			<tr>
-				<th></th>
-				<th>${app.Sortable("№", "Id")}</th>
-				<th>${app.Sortable("Договор", "Payer")}</th>
-				<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
-				<th>${app.Sortable("Плательщик", "PayerName")}</th>
-				<th>${app.Sortable("Сумма счета", "Sum")}</th>
-				<th>${app.Sortable("За период", "Period")}</th>
-				<th>${app.Sortable("Дата", "Date")}</th>
-				<th></th>
-			</tr>
-			<% for i, invoice in enumerate(invoices): %>
-			<tr class="${ViewHelper.GetRowStyle(i)}">
-				<td>${app.LinkTo(invoice, "Редактировать", @Edit)}</td>
-				<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
-				<td>${invoice.Payer.Id}</td>
-				<td>${invoice.Recipient.Name}</td>
-				<td>${app.LinkTo(invoice.Payer)}</td>
-				<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
-				<td>${BindingHelper.GetDescription(invoice.Period)}</td>
-				<td>${invoice.Date.ToShortDateString()}</td>
-				<td>
-					<form method=post action="${siteroot}/Invoices/${invoice.Id}/Cancel">
-						<input type=submit value="Удалить">
-					</form>
-				</td>
-			</tr>
-			<% end %>
+			<thead>
+				<tr>
+					<th></th>
+					<th>${app.Sortable("№", "Id")}</th>
+					<th>${app.Sortable("Договор", "Payer")}</th>
+					<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
+					<th>${app.Sortable("Плательщик", "PayerName")}</th>
+					<th>${app.Sortable("Сумма счета", "Sum")}</th>
+					<th>${app.Sortable("За период", "Period")}</th>
+					<th>${app.Sortable("Дата", "Date")}</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for i, invoice in enumerate(invoices): %>
+				<tr class="${ViewHelper.GetRowStyle(i)}">
+					<td>${app.LinkTo(invoice, "Редактировать", @Edit)}</td>
+					<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
+					<td>${invoice.Payer.Id}</td>
+					<td>${invoice.Recipient.Name}</td>
+					<td>${app.LinkTo(invoice.Payer)}</td>
+					<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
+					<td>${BindingHelper.GetDescription(invoice.Period)}</td>
+					<td>${invoice.Date.ToShortDateString()}</td>
+					<td>
+						<form method=post action="${siteroot}/Invoices/${invoice.Id}/Cancel">
+							<input type=submit value="Удалить">
+						</form>
+					</td>
+				</tr>
+				<% end %>
+			</tbody>
 			<% else: %>
 			<tr class=EmptyData>
 				<td>По вашему запросу ничего не найдено</td>
