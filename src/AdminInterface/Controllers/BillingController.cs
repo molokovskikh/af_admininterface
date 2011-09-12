@@ -125,8 +125,13 @@ namespace AdminInterface.Controllers
 		Helper(typeof (ViewHelper)),
 		Secure(PermissionType.Billing),
 	]
-	public class BillingController : ARController
+	public class BillingController : AdminInterfaceController
 	{
+		public BillingController()
+		{
+			SetBinder(new ARDataBinder());
+		}
+
 		public void Edit(uint billingCode,
 			uint clientCode,
 			string tab,
@@ -168,7 +173,7 @@ namespace AdminInterface.Controllers
 			string tab)
 		{
 			payer.Update();
-			Flash.Add("Message", new Message("Изменения сохранены"));
+			Notify("Изменения сохранены");
 			RedirectToReferrer();
 		}
 
@@ -204,7 +209,7 @@ namespace AdminInterface.Controllers
 				}
 				if (sendMessageToClientEmails)
 					Mailer.SendMessageFromBillingToClient(notificationUser, message.Message, subjectForEmailToClient);
-				Flash["Message"] = new Message("Сообщение сохранено");
+				Notify("Сообщение сохранено");
 			}
 			catch (ValidationException exception)
 			{
@@ -226,19 +231,15 @@ namespace AdminInterface.Controllers
 
 		public void UpdateClientStatus(uint clientId, bool enabled)
 		{
-			using(new TransactionScope())
+			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(clientId);
+			var oldDisabled = service.Disabled;
+			service.Disabled = !enabled;
+			if (oldDisabled != service.Disabled)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var service = ActiveRecordMediator<Service>.FindByPrimaryKey(clientId);
-				var oldDisabled = service.Disabled;
-				service.Disabled = !enabled;
-				if (oldDisabled != service.Disabled)
-				{
-					this.Mailer().EnableChanged(service).Send();
-					ClientInfoLogEntity.StatusChange(service).Save();
-				}
-				ActiveRecordMediator<Service>.Save(service);
+				this.Mailer().EnableChanged(service).Send();
+				ClientInfoLogEntity.StatusChange(service).Save();
 			}
+			ActiveRecordMediator<Service>.Save(service);
 			CancelView();
 		}
 
@@ -247,7 +248,8 @@ namespace AdminInterface.Controllers
 			var filter = new PayerFilter();
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
-				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
+				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.NullIfInvalidKey;
+				BindObjectInstance(filter, "filter");
 				PropertyBag["searchResults"] = filter.Find();
 			}
 			PropertyBag["filter"] = filter;
@@ -266,9 +268,9 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				sentEntity.UserName = Administrator.UserName;
+				sentEntity.UserName = Admin.UserName;
 				sentEntity.SaveAndFlush();
-				Flash["Message"] = new Message("Cохранено");
+				Notify("Cохранено");
 			}
 			catch (ValidationException ex)
 			{
@@ -411,7 +413,7 @@ namespace AdminInterface.Controllers
 			organization.FullName = juridicalOrganization.FullName;
 			organization.Update();
 
-			Flash["Message"] = new Message("Сохранено");
+			Notify("Сохранено");
 			var billingCode = organization.Payer.PayerID;
 			Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
 		}
@@ -423,7 +425,7 @@ namespace AdminInterface.Controllers
 			legalEntity.CreateAndFlush();
 			Maintainer.LegalEntityCreated(legalEntity);
 
-			Flash["Message"] = new Message("Юридическое лицо создано");
+			Notify("Юридическое лицо создано");
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
 		}
 

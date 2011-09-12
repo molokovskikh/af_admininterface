@@ -102,8 +102,13 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.ViewDrugstore),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class ClientsController : ARController
+	public class ClientsController : AdminInterfaceController
 	{
+		public ClientsController()
+		{
+			SetBinder(new ARDataBinder());
+		}
+
 		public void Show(uint id)
 		{
 			var client = Client.FindAndCheck(id);
@@ -125,7 +130,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
-			Administrator.CheckClientPermission(client);
+			Admin.CheckClientPermission(client);
 			client.Save();
 			Flash["Message"] = Message.Notify("Сохранено");
 			RedirectToReferrer();
@@ -138,7 +143,7 @@ namespace AdminInterface.Controllers
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
 		{
-			Administrator.CheckClientPermission(client);
+			Admin.CheckClientPermission(client);
 
 			var oldMaskRegion = client.MaskRegion;
 			client.HomeRegion = Region.Find(homeRegion);
@@ -245,7 +250,7 @@ where Phone like :phone")
 				DbLogHelper.SetupParametersForTriggerLogging(
 					new {
 						inHost = Request.UserHostAddress,
-						inUser = Administrator.UserName,
+						inUser = Admin.UserName,
 						ResetIdCause = reason
 					});
 				ClientInfoLogEntity.ReseteUin(client, reason).Save();

@@ -74,7 +74,7 @@
 
 		defaultRoute: function () {
 			var tabs = $(".tabs ul li a[href='#'], .tabs ul li a.inline-tab");
-			if (tabs.length > 0)
+			if (tabs.length > 0 && $(".tabs ul li a.selected").length == 0)
 				showTab(tabs.get(0).id);
 		}
 	});

@@ -56,10 +56,10 @@ th a.sort.desc
 
 .DataTable tbody tr:nth-child(even)
 {
-	background-color: #F6F6F6;
+	background-color: #EEF8FF;
 }
 
 .DataTable tbody tr:nth-child(odd)
 {
-	background-color: #EEF8FF;
+	background-color: #F6F6F6;
 }

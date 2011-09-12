@@ -66,7 +66,14 @@ namespace AdminInterface.Controllers
 				payment.RegisterPayment();
 				payment.Save();
 			}
-			RedirectToReferrer();
+			else
+			{
+				Error(Validator.GetErrorSummary(payment).ErrorMessages[0]);
+			}
+
+			//мы должны возвращаться на туже вкладку с которой был совершен переход
+			//RedirectToReferrer();
+			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
 		}
 
 		public void InvoicePreview(uint id)

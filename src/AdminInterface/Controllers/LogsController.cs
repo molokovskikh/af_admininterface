@@ -72,8 +72,13 @@ namespace AdminInterface.Controllers
 		Helper(typeof(LinkHelper)),
 		Secure
 	]
-	public class LogsController : ARController
+	public class LogsController : AdminInterfaceController
 	{
+		public LogsController()
+		{
+			SetBinder(new ARDataBinder());
+		}
+
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
 		{
 			PropertyBag["filter"] = filter;
@@ -131,7 +136,7 @@ namespace AdminInterface.Controllers
 			if (updateType.HasValue)
 			{
 				filter.UpdateType = updateType;
-				filter.RegionMask = regionMask & Administrator.RegionMask;
+				filter.RegionMask = regionMask & Admin.RegionMask;
 			}
 			if (clientCode.HasValue)
 				filter.Client = Client.Find(clientCode.Value);

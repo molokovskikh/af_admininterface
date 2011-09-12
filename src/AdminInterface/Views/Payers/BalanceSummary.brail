@@ -34,13 +34,15 @@
 
 <table class=DataTable>
 	<% if items.Count: %>
-	<tr>
-		<th>№</th>
-		<th>Дата</th>
-		<th>Счет</th>
-		<th>Платеж</th>
-		<th>Акт</th>
-	</tr>
+	<thead>
+		<tr>
+			<th>№</th>
+			<th>Дата</th>
+			<th>Счет</th>
+			<th>Платеж</th>
+			<th>Акт</th>
+		</tr>
+	</thead>
 	<% for i, item in enumerate(items): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>

@@ -3,6 +3,10 @@ using System.Net.Mail;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Core.Smtp;
+using Castle.MonoRail.Framework;
+using Castle.MonoRail.Framework.Routing;
+using Castle.MonoRail.Framework.Services;
+using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using NUnit.Framework;
 using Rhino.Mocks;
@@ -13,6 +17,7 @@ namespace Integration.ForTesting
 	{
 		protected List<MailMessage> notifications;
 		protected ISessionScope session;
+		protected string referer;
 
 		[SetUp]
 		public void Setup()
@@ -39,6 +44,15 @@ namespace Integration.ForTesting
 		{
 			if (session != null)
 				session.Dispose();
+		}
+
+		protected override IMockResponse BuildResponse(UrlInfo info)
+		{
+			return new StubResponse(info,
+				new DefaultUrlBuilder(),
+				new StubServerUtility(),
+				new RouteMatch(),
+				referer);
 		}
 	}
 }

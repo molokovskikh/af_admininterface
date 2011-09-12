@@ -20,12 +20,17 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)),
 		Secure
 	]
-	public class MainController : ARController
+	public class MainController : AdminInterfaceController
 	{
+		public MainController()
+		{
+			SetBinder(new ARDataBinder());
+		}
+
 		public void Index(ulong? regioncode, DateTime? from, DateTime? to)
 		{
 			RemoteServiceHelper.Try(() => {
-				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Administrator.UserName);
+				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName);
 			});
 
 			var regions = RegionHelper.GetAllRegions();
@@ -34,7 +39,7 @@ namespace AdminInterface.Controllers
 
 			if (regioncode == null || from == null || to == null)
 			{
-				regioncode = Administrator.RegionMask;
+				regioncode = Admin.RegionMask;
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
@@ -48,10 +53,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["ToDate"] = toDate;
 
 			var data = new DataSet();
-			With.Connection(
-				c =>
-				{
-					var adapter = new MySqlDataAdapter(@"
+			With.Connection(c => {
+				var adapter = new MySqlDataAdapter(@"
 SELECT max(UpdateDate) MaxUpdateTime
 FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id
@@ -126,7 +129,7 @@ from documents.documentheaders d
 where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
-					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Administrator.RegionMask);
+					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Admin.RegionMask);
 					adapter.Fill(data);
 				});
 			//Заказы
@@ -220,7 +223,8 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 			var defaults = DefaultValues.Get();
 			if (IsPost)
 			{
-				BindObjectInstance(defaults, ParamStore.Form, "defaults", AutoLoadBehavior.Always);
+				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
+				BindObjectInstance(defaults, ParamStore.Form, "defaults");
 				Flash["Message"] = Message.Notify("Сохранено");
 				RedirectToReferrer();
 			}

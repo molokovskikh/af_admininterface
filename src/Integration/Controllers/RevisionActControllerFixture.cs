@@ -20,19 +20,12 @@ namespace Integration.Controllers
 		[SetUp]
 		public void Setup()
 		{
-			payer = DataMother.CreatePayerForBillingDocumentTest();
-			controller = new RevisionActsController();
-			PrepareController(controller, "RevisionActs", "Mail");
-			((StubRequest)Request).UrlReferrer = "https://stat.analit.net/Adm/";
-		}
 
-		protected override IMockResponse BuildResponse(UrlInfo info)
-		{
-			return new StubResponse(info,
-				new DefaultUrlBuilder(),
-				new StubServerUtility(),
-				new RouteMatch(),
-				"https://stat.analit.net/Adm/");
+			payer = DataMother.CreatePayerForBillingDocumentTest();
+
+			controller = new RevisionActsController();
+			referer = "https://stat.analit.net/Adm/";
+			PrepareController(controller, "RevisionActs", "Mail");
 		}
 
 		[Test]

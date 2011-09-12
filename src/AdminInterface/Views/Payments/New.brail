@@ -70,14 +70,17 @@
 
 <table class=DataTable>
 	<% if payments.Count: %>
-	<tr>
-		<th></th>
-		<th>${app.Sortable("Получатель", "recipient")}</th>
-		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
-		<th>${app.Sortable("Плательщик", "payer")}</th>
-		<th>${app.Sortable("Сумма", "sum")}</th>
-		<th>${app.Sortable("Дата внесения платежа", "registredOn")}</th>
-	</tr>
+	<thead>
+		<tr>
+			<th></th>
+			<th>${app.Sortable("Получатель", "recipient")}</th>
+			<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+			<th>${app.Sortable("Плательщик", "payer")}</th>
+			<th>${app.Sortable("Сумма", "sum")}</th>
+			<th>${app.Sortable("Дата внесения платежа", "registredOn")}</th>
+		</tr>
+	</thead>
+	<tbody>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
@@ -96,4 +99,5 @@
 		<td>Платежи за сегоднящний день не вносились</td>
 	</tr>
 	<% end %>
+	<tbody>
 </table>
