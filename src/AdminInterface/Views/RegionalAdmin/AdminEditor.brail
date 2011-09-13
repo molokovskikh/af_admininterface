@@ -15,6 +15,7 @@
 
 <style type="text/css">
 	table.PersonalData input { width: 100%; }
+	table.PersonalData select { width: 100%; }
 </style>
 
 <div class="TwoColumn" style="width: 800px;">
@@ -59,10 +60,7 @@
 		<tr>
 			<td>Подразделение:</td>
 			<td>
-				${FormHelper.Select("administrator.Department",
-									administrator.Department,
-									BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Security.Department, AdminInterface"),
-									BindingHelper.GetDictionaryMapping({"style" : "width: 100%"}))}
+				${app.Edit("administrator.Department")}
 			</td>
 		</tr>
 	</table>
