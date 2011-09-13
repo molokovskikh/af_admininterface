@@ -3,12 +3,14 @@
 		<% if items.Count ==  0: %>
 			${emptyTemplate}
 		<% else: %>
-			<tr>
-				<td>
-					<a class="new" href="javascript:">Новый</a>
-				</td>
-				<th>${name}</th>
-			</tr>
+			<thead>
+				<tr>
+					<td>
+						<a class="new" href="javascript:">Новый</a>
+					</td>
+					<th>${name}</th>
+				</tr>
+			</thead>
 			<% for i, item in enumerate(items): %>
 			<tr>
 				<td>

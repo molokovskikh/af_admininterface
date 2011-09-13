@@ -98,6 +98,7 @@ namespace AdminInterface.Controllers
 			var payer = Payer.Find(id);
 			var invoice = new Invoice(payer);
 			PropertyBag["invoice"] = invoice;
+			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
 			if (IsPost)
 			{
