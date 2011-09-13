@@ -36,6 +36,7 @@
 	<% if items.Count: %>
 	<thead>
 		<tr>
+			<th></th>
 			<th>№</th>
 			<th>Дата</th>
 			<th>Счет</th>
@@ -48,14 +49,21 @@
 		<td>
 			<% if item.Id > 0: %>
 				<% if item.IsPayment: %>
-				<a href="${siteroot}/Payments/${item.Id}/Edit">${item.Id}</a>
+				<a href="${siteroot}/Payments/${item.Id}/Edit">Печать</a>
 				<% end %>
 				<% if item.IsInvoice: %>
-				<a href="${siteroot}/Invoices/${item.Id}/Print">${item.Id}</a>
+				<a href="${siteroot}/Invoices/${item.Id}/Print">Печать</a>
+				<a href="${siteroot}/Invoices/${item.Id}/Edit">Редактировать</a>
 				<% end %>
 				<% if item.IsAct: %>
-				<a href="${siteroot}/Acts/${item.Id}/Print">${item.Id}</a>
+				<a href="${siteroot}/Acts/${item.Id}/Print">Печать</a>
+				<a href="${siteroot}/Acts/${item.Id}/Edit">Редактировать</a>
 				<% end %>
+			<% end %>
+		</td>
+		<td>
+			<% if item.Id > 0: %>
+				${item.Id}
 			<% end %>
 		</td>
 		<td>${item.Date.ToShortDateString()}</td>
@@ -82,7 +90,8 @@
 	<tr class="${ViewHelper.GetRowStyle(items.Count)}">
 		<td></td>
 		<td></td>
-		<td>${payer.Balance}</td>
+		<td></td>
+		<td style="text-align:right;">${payer.Balance.ToString("C")}</td>
 		<td></td>
 		<td></td>
 	<tr>
