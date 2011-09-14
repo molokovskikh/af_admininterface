@@ -83,6 +83,7 @@ namespace AdminInterface.Models
 				{"BillingCode", "BillingCode"},
 				{"ShortName", "ShortName"},
 				{"Recipient", "Recipient"},
+				{"PaySum", "PaySum"},
 				{"Balance", "Balance"},
 				{"LastClientRegistrationDate", "LastClientRegistrationDate"},
 				{"DisabledUsersCount", "DisabledUsersCount"},

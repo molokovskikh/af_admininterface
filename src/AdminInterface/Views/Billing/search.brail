@@ -116,7 +116,7 @@
 							${app.Sortable("Краткое наименование", "ShortName")}
 						</th>
 						<th>
-							${app.Sortable("Получатель платежей", "Recipients")}
+							${app.Sortable("Получатель платежей", "Recipient")}
 						</th>
 						<th>
 							${app.Sortable("Сумма платежа", "PaySum")}
