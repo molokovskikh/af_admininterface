@@ -1,9 +1,8 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {@id : @Title}: %>
 	Редактирование обратного звонка
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "show"), 
-									  ("Редактирование обратного звонка", "")]} %>
+<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "show")]} %>
 
 
 <script type="text/javascript">
@@ -12,38 +11,40 @@
 	})
 </script>
 
-<form method="post" id="Callback" action=update>
-	${FormHelper.HiddenField("callback.Id")}
-	<table>
-		<tr>
-			<td>Телефон:</td>
-			<td>${FormHelper.TextField("callback.CallerPhone", {"class" : "required mobile-phone"})}</td>
-		</tr>
-		<tr>
-			<td>Включено:</td>
-			<td>${FormHelper.CheckboxField("callback.Enabled")}</td>
-		</tr>
-		<tr>
-			<td>Дату блокировки:</td>
-			<td>
-				<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
-				${FormHelper.HiddenField("callback.DueDate", dueDate)}
-				${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
-				<input type="button" class="CalendarInput" />
-			</td>
-		</tr>
-		<tr>
-			<td>Проверять дату блокировки:</td>
-			<td>${FormHelper.CheckboxField("callback.CheckDate")}</td>
-		</tr>
-		<tr>
-			<td>Комментарий:</td>
-			<td>${FormHelper.TextField("callback.Comment")}</td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<input type=submit value="Сохранить" />
-			</td>
-		</tr>
-	</table>
-</form>
+<div class=block>
+	<form method="post" id="Callback" action=update>
+		${FormHelper.HiddenField("callback.Id")}
+		<table>
+			<tr>
+				<td>Телефон:</td>
+				<td>${FormHelper.TextField("callback.CallerPhone", {"class" : "required mobile-phone"})}</td>
+			</tr>
+			<tr>
+				<td>Включено:</td>
+				<td>${FormHelper.CheckboxField("callback.Enabled")}</td>
+			</tr>
+			<tr>
+				<td>Дату блокировки:</td>
+				<td>
+					<% dueDate = callback.DueDate.ToShortDateString() if callback.DueDate != null %>
+					${FormHelper.HiddenField("callback.DueDate", dueDate)}
+					${FormHelper.TextFieldValue("callback.DueDate", dueDate, {"disabled" : "disabled"})}
+					<input type="button" class="CalendarInput" />
+				</td>
+			</tr>
+			<tr>
+				<td>Проверять дату блокировки:</td>
+				<td>${FormHelper.CheckboxField("callback.CheckDate")}</td>
+			</tr>
+			<tr>
+				<td>Комментарий:</td>
+				<td>${FormHelper.TextField("callback.Comment")}</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type=submit value="Сохранить" />
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>

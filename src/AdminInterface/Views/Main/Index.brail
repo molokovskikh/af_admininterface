@@ -147,7 +147,7 @@
 						</li>
 						<li>
 							<% if admin.HavePermisions(PermissionType.CallHistory): %>
-							<a href="${siteroot}/CallHistory/ShowCallHistory">История звонков</a>
+							<a href="${siteroot}/CallHistory/Search">История звонков</a>
 							<% else: %>
 							<a href="#" class="NotAllowedLink">История звонков</a>
 							<% end %>

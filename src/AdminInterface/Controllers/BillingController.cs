@@ -367,7 +367,7 @@ namespace AdminInterface.Controllers
 			return Payer.Find(payerId).TotalSum.ToString("C");
 		}
 
-		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties searchBy, string tab, uint? pageSize, uint? currentPage, uint? rowsCount)
+		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties searchBy, string tab, uint? currentPage)
 		{
 			if (searchBy.BeginDate == null && searchBy.EndDate == null && searchBy.SearchText == null)
 				searchBy = new AccountingSearchProperties();
@@ -375,7 +375,7 @@ namespace AdminInterface.Controllers
 			if (String.IsNullOrEmpty(tab))
 				tab = "unregistredItems";
 
-			var pager = new Pager(currentPage, pageSize, rowsCount.HasValue);
+			var pager = new Pager((int?)currentPage, 30);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 			{
 				PropertyBag["unaccountedItems"] = Models.Billing.Accounting.GetReadyForAccounting(pager);
@@ -388,9 +388,8 @@ namespace AdminInterface.Controllers
 					.ToList();
 				PropertyBag["accountingHistoryItems"] = historyItems;
 			}
-			PropertyBag["pageSize"] = pager.PageSize;
 			PropertyBag["currentPage"] = pager.Page;
-			PropertyBag["rowsCount"] = pager.Total;
+			PropertyBag["totalPages"] = pager.TotalPages;
 
 			PropertyBag["tab"] = tab;
 			PropertyBag["FindBy"] = searchBy;

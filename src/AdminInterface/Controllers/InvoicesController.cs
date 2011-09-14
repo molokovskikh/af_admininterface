@@ -59,7 +59,7 @@ namespace AdminInterface.Controllers
 		{
 			var invoice = Invoice.Find(id);
 			invoice.Delete();
-			Flash["Message"] = "Сохранено";
+			Notify("Сохранено");
 			RedirectToReferrer();
 		}
 
@@ -85,7 +85,7 @@ namespace AdminInterface.Controllers
 				{
 					invoice.CalculateSum();
 					invoice.Save();
-					Flash["Message"] = "Сохранено";
+					Notify("Сохранено");
 					Redirect("Invoices", "Edit", new {invoice.Id});
 				}
 			}
@@ -96,13 +96,13 @@ namespace AdminInterface.Controllers
 			var arguments = String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId);
 			Printer.Execute(arguments);
 
-			Flash["message"] = String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period));
+			Notify(String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period)));
 			RedirectToAction("Index",
 				new PayerDocumentFilter {
 					Period = period,
 					Region = Region.Find(regionId),
 					Recipient = Recipient.Find(recipientId)
-				}.ToUrl());
+				}.GetQueryString());
 		}
 	}
 }

@@ -51,7 +51,7 @@ namespace AdminInterface.Models
 		Disabled
 	}
 
-	public class UserFilter : Sortable, SortableContributor, IUrlContributor
+	public class UserFilter : Sortable
 	{
 		public SearchUserBy SearchBy { get; set; }
 
@@ -353,18 +353,6 @@ LOWER(Persons.Name) like '{0}' ",
 				}
 			}
 			return filter;
-		}
-
-		public string GetUri()
-		{
-			return PublicPropertiesToUrlParts("filter")
-				.Where(v => v.Key != "filter.SortBy" && v.Key != "filter.SortDirection")
-				.Implode(v => String.Format("{0}={1}", v.Key, v.Value), "&");
-		}
-
-		public IDictionary GetQueryString()
-		{
-			return PublicPropertiesToUrlParts("filter");
 		}
 	}
 }

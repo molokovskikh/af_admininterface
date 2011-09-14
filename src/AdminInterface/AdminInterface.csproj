@@ -238,7 +238,7 @@
     <Compile Include="Models\Telephony\Callback.cs" />
     <Compile Include="Models\Telephony\CallRecord.cs" />
     <Compile Include="Models\Telephony\CallRecordFile.cs" />
-    <Compile Include="Models\Telephony\CallSearchProperties.cs" />
+    <Compile Include="Models\Telephony\CallRecordFilter.cs" />
     <Compile Include="Models\Telephony\UnresolvedCall.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSearchItem.cs" />
@@ -449,7 +449,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />
-    <Content Include="JavaScript\Search.js" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\Billing\Edit.brail">
@@ -501,7 +500,6 @@
     <None Include="Views\Billing\Unaccounted.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
-    <None Include="Views\CallHistory\ShowCallHistory.brail" />
     <None Include="Views\Clients\Settings.brail" />
     <None Include="Views\Clients\Show.brail" />
     <None Include="Views\Clients\SearchAssortmentPrices.brail" />

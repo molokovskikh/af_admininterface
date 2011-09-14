@@ -10,15 +10,17 @@ ${app.FilterFor("filter.SearchText")}
 ${app.EndFormFor("filter")}
 
 <% if messages.Count: %>
-<table class="DataTable HighLightCurrentRow" style="text-align:left">
-	<tr>
-		<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
-		<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
-		<th>${app.Sortable("Тип", "Messages.Type")}</th>
-		<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
-		<th>${app.Sortable("Название", "Messages.Name")}</th>
-		<th>Событие</th>
-	</tr>
+<table class="DataTable HighLightCurrentRow">
+	<thead>
+		<tr>
+			<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
+			<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+			<th>${app.Sortable("Тип", "Messages.Type")}</th>
+			<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
+			<th>${app.Sortable("Название", "Messages.Name")}</th>
+			<th>Событие</th>
+		</tr>
+	</thead>
 	<% for i, log in enumerate(messages): %>
 	<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 		<td>${log.WriteTime}</td>

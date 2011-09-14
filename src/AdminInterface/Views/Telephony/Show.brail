@@ -1,8 +1,8 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {@id : @Title}: %>
 	Правила обратного звонка
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
+<% component Bubble, {@bredcrumbs : []} %>
 
 <% if IsDefined("isUpdated"): %>
 <div class="flash notice">Обновление успешно завершено.</div>
@@ -15,39 +15,40 @@
 		</tr>
 	</table>
 <% else: %>
+
 <form action="updateCallbacks" method="post">
-<table class="DataTable">
-  <tr>
-	<td>
-		<a href="new">Новый</a>
-	</td>
-	<th>Номер телефона</th>
-	<th>Включен</th>
-	<th>Дату блокировки</th>
-	<th>Проверять дату блокировки</th>
-	<th>Комментарий</th>
-  </tr>
-  <% for i, callback in enumerate(callbacks): %>
-  <tr class="${ViewHelper.GetRowStyle(i)}">
-	<td>
-		<a href="delete?id=${callback.Id}">Удалить</a>
-		<a href="edit?id=${callback.Id}">Редактировать</a>
-	</td>
-	<td>
-		${callback.CallerPhone}
-		${FormHelper.HiddenField("callbacks[${i}].Id")}
-	 </td>
-	<td>${FormHelper.CheckboxField("callbacks[${i}].Enabled")}</td>
-	<td>${callback.DueDate.ToShortDateString() if callback.DueDate != null}</td>
-	<td>${FormHelper.CheckboxField("callbacks[${i}].CheckDate")}</td>
-	<td>${callback.Comment}</td>
-  </tr>
-  <% end %>
-  <tr>
-	<td colspan="6">
+	<table class="DataTable">
+		<thead>
+			<tr>
+				<td>
+					<a href="new">Новый</a>
+				</td>
+				<th>Номер телефона</th>
+				<th>Включен</th>
+				<th>Дату блокировки</th>
+				<th>Проверять дату блокировки</th>
+				<th>Комментарий</th>
+			</tr>
+		</thead>
+	<% for i, callback in enumerate(callbacks): %>
+	<tr class="${ViewHelper.GetRowStyle(i)}">
+		<td>
+			<a href="delete?id=${callback.Id}">Удалить</a>
+			<a href="edit?id=${callback.Id}">Редактировать</a>
+		</td>
+		<td>
+			${callback.CallerPhone}
+			${FormHelper.HiddenField("callbacks[${i}].Id")}
+			</td>
+		<td>${FormHelper.CheckboxField("callbacks[${i}].Enabled")}</td>
+		<td>${callback.DueDate.ToShortDateString() if callback.DueDate != null}</td>
+		<td>${FormHelper.CheckboxField("callbacks[${i}].CheckDate")}</td>
+		<td>${callback.Comment}</td>
+	</tr>
+	<% end %>
+	</table>
+	<p>
 		<input type=submit value="Сохранить" />
-	</td>
-  </tr>
-</table>
+	</p>
 </form>
 <% end %>

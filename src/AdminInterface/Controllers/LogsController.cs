@@ -11,6 +11,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 using NHibernate.Transform;
@@ -374,8 +375,7 @@ group by oh.rowid
 ORDER BY writetime desc;", sqlFilter))
 					.SetParameter("FromDate", filter.Period.Begin)
 					.SetParameter("ToDate", filter.Period.End)
-					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask)
-					.SetResultTransformer(Transformers.AliasToBean<OrderLog>());
+					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask);
 
 				if (filter.User != null)
 					query.SetParameter("UserId", filter.User.Id);
@@ -389,7 +389,7 @@ ORDER BY writetime desc;", sqlFilter))
 				if (filter.Supplier != null)
 					query.SetParameter("SupplierId", filter.Supplier.Id);
 
-				return query.List<OrderLog>();
+				return query.ToList<OrderLog>();
 			});
 		}
 	}

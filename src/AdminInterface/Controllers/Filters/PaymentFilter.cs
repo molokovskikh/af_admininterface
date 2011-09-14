@@ -9,7 +9,7 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers.Filters
 {
-	public class PaymentFilter : Sortable, SortableContributor
+	public class PaymentFilter : Sortable
 	{
 		public Recipient Recipient { get; set; }
 		public DatePeriod Period { get; set; }
@@ -32,11 +32,6 @@ namespace AdminInterface.Controllers.Filters
 			};
 		}
 
-		public List<Recipient> Recipients
-		{
-			get { return Recipient.Queryable.OrderBy(r => r.Name).ToList(); }
-		}
-
 		public List<Payment> Find()
 		{
 			var criteria = DetachedCriteria.For<Payment>()
@@ -56,25 +51,9 @@ namespace AdminInterface.Controllers.Filters
 
 			ApplySort(criteria);
 
-			return ArHelper.WithSession(s =>
-				criteria.GetExecutableCriteria(s)
-					.List<Payment>()).ToList();
-		}
-
-		public string GetUri()
-		{
-			var parts = new List<string>();
-			if (Period != null)
-				parts.Add(String.Format("filter.Period.Begin={0}&filter.Period.End={1}",
-					Period.Begin.ToShortDateString(),
-					Period.End.ToShortDateString()));
-			if (Recipient != null)
-				parts.Add(String.Format("filter.Recipient.Id={0}", Recipient.Id));
-			if (SearchText != null)
-				parts.Add(String.Format("filter.SearchText={0}", SearchText));
-			if (ShowOnlyUnknown)
-				parts.Add(String.Format("filter.ShowOnlyUnknown={0}", ShowOnlyUnknown));
-			return parts.ToArray().Implode("&");
+			return ArHelper
+				.WithSession(s => criteria.GetExecutableCriteria(s).List<Payment>())
+				.ToList();
 		}
 	}
 }

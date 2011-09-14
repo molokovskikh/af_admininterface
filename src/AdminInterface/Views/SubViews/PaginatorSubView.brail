@@ -7,7 +7,7 @@ def CreateLink(i):
 	    if (IsDefined("formPostBack")):
             link = "<a href=\"javascript:\" onclick=\"document.getElementById('currentPage').value = ${i}; document.${formPostBack}.submit();\">" + (i+1) + "</a>"	    
 	    else:
-            link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url,"currentPage", i.ToString(), "rowsCount", rowsCount.ToString()) + "\">" + (i+1) + "</a>"
+            link = "<a href=\"" + ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", i.ToString()) + "\">" + (i+1) + "</a>"
         end
     else:
         link = "<span class=\"CurrentPage\">" + (i+1) +"</span>"
@@ -15,7 +15,7 @@ def CreateLink(i):
     return link
 end %>
 
-<% lastPage = Math.Ceiling(rowsCount/Convert.ToDouble(pageSize))
+<% lastPage = totalPages
    startPage = Math.Max(0, currentPage - 9)
   
    if lastPage < 18:
@@ -33,8 +33,8 @@ end %>
 		<a href="javascript:" onclick="document.getElementById('currentPage').value = 0; document.${formPostBack}.submit();" title="Первая страница">&laquo; Первая</a>
         <a href="javascript:" onclick="document.getElementById('currentPage').value = ${currentPage - 1}; document.${formPostBack}.submit();" title="Предыдущая страница">&lt;</a>
         <% else: %>
-		<a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", "0", "rowsCount", rowsCount.ToString())}" title="Первая страница">&laquo; Первая</a>
-        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Предыдущая страница">&lt;</a>
+		<a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", "0")}" title="Первая страница">&laquo; Первая</a>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage-1).ToString())}" title="Предыдущая страница">&lt;</a>
         <% end %>
     <% else: %>
 		<span title="Первая страница">&laquo; Первая</span>
@@ -95,8 +95,8 @@ end %>
 		<a href="javascript:" onclick="document.getElementById('currentPage').value = ${currentPage+1}; document.${formPostBack}.submit();" title="Следующая страница">&gt;</a>
         <a href="javascript:" onclick="document.getElementById('currentPage').value = ${lastPage-1}; document.${formPostBack}.submit();" title="Последняя страница">Последняя &raquo;</a>
         <% else: %>
-        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage+1).ToString(), "rowsCount", rowsCount.ToString())}" title="Следующая страница">&gt;</a>
-        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (lastPage-1).ToString(), "rowsCount", rowsCount.ToString())}" title="Последняя страница">Последняя &raquo;</a>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (currentPage+1).ToString())}" title="Следующая страница">&gt;</a>
+        <a href="${ViewHelper.GetUrlWithReplacedParams(request.Url, "currentPage", (lastPage-1).ToString())}" title="Последняя страница">Последняя &raquo;</a>
         <% end %>
     <% else: %>
         <span title="Следующая страница">&gt;</span>

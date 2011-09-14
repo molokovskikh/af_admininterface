@@ -54,7 +54,7 @@ namespace AdminInterface.Models
 		[Description("Адрес доставки")] Address,
 	}
 
-	public class PayerFilter : Sortable, SortableContributor, IUrlContributor
+	public class PayerFilter : Sortable
 	{
 		public string SearchText { get; set; }
 
@@ -90,18 +90,6 @@ namespace AdminInterface.Models
 				{"DisabledAddressesCount", "DisabledAddressesCount"},
 				{"EnabledAddressesCount", "EnabledAddressesCount"}
 			};
-		}
-
-		public string GetUri()
-		{
-			return PublicPropertiesToUrlParts("filter")
-				.Where(v => v.Key != "filter.SortBy" && v.Key != "filter.SortDirection")
-				.Implode(v => String.Format("{0}={1}", v.Key, v.Value), "&");
-		}
-
-		public IDictionary GetQueryString()
-		{
-			return PublicPropertiesToUrlParts("filter");
 		}
 
 		public IList<BillingSearchItem> Find()

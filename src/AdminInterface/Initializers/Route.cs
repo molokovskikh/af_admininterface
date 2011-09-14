@@ -63,6 +63,11 @@ namespace AdminInterface.Initializers
 				.DefaultForController().Is("UserSearch")
 				.DefaultForAction().Is("Search"));
 
+			//для обратной совместимости что бы работали старые ссылки
+			engine.Add(new PatternRoute("/UserSearch/SearchBy")
+				.DefaultForController().Is("UserSearch")
+				.DefaultForAction().Is("Search"));
+
 			engine.Add(new PatternRoute("/")
 				.DefaultForController().Is("Main")
 				.DefaultForAction().Is("Index"));

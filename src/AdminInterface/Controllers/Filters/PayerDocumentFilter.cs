@@ -14,7 +14,7 @@ using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers.Filters
 {
-	public class PayerDocumentFilter : Sortable, SortableContributor, IUrlContributor
+	public class PayerDocumentFilter : Sortable
 	{
 		public Period? Period { get; set; }
 		public Region Region { get; set; }
@@ -70,48 +70,6 @@ namespace AdminInterface.Controllers.Filters
 			Count = docs.Count;
 			Sum = docs.Sum(d => (decimal)((dynamic)d).Sum);
 			return docs;
-		}
-
-		public string[] ToUrl()
-		{
-			var parts = new List<string>();
-			if (Period != null)
-				parts.Add(String.Format("filter.Period={0}", (int)Period));
-			if (Region != null)
-				parts.Add(String.Format("filter.Region.Id={0}", Region.Id));
-			if (Recipient != null)
-				parts.Add(String.Format("filter.Recipient.Id={0}", Recipient.Id));
-			if (SearchText != null)
-				parts.Add(String.Format("filter.SearchText={0}", SearchText));
-			return parts.ToArray();
-		}
-
-		public string ToUrlPart()
-		{
-			return ToUrl().Implode("&");
-		}
-
-		public string GetUri()
-		{
-			return ToUrlPart();
-		}
-
-		public IDictionary GetQueryString()
-		{
-			var parts = new Dictionary<string, object>();
-			if (Period != null)
-				parts.Add("filter.Period", Period);
-			if (Region != null)
-				parts.Add("filter.Region.Id", Region.Id);
-			if (Recipient != null)
-				parts.Add("filter.Recipient.Id", Recipient.Id);
-			if (SearchText != null)
-				parts.Add("filter.SearchText", SearchText);
-			if (SortBy != null)
-				parts.Add("filter.SortBy", SortBy);
-			if (SortDirection != null)
-				parts.Add("filter.SortDirection", SortDirection);
-			return parts;
 		}
 	}
 }
