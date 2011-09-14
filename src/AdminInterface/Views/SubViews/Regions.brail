@@ -60,9 +60,12 @@
 			browseChecked = "checked='checked'";
 		if (isForOrder)
 			orderChecked = "checked='checked'";
-		<% if IsDefined("SingleRegions"): %>
 		var html = "<tr id='RegionRow" + regionId + "'>" +
-			"<td style='text-align: left'>" + regionName + "</td>" +
+			"<td style='text-align: left'>" + regionName + 
+			"<input type='hidden' name='regionSettings[" + regionId + "].Id' value='" + regionId + "' />" +
+			"</td>";
+		<% if IsDefined(@singleRegions) and singleRegions: %>
+		var html = html +
 			"<td style='text-align: center'>" +
 				"<input id='browseRegion" + regionId + "' type='checkbox' " + browseChecked + 
 					"name='regionSettings[" + regionId + "].IsAvaliableForBrowse' value='true'" +
@@ -70,9 +73,7 @@
 				"<input id='regionSettings[" + regionId + "].IsAvaliableForBrowse' type='hidden' name='regionSettings[" + regionId + "].IsAvaliableForBrowse' value='false' />" +
 			"</td>";
 		<% else: %>
-		var html = "<tr id='RegionRow" + regionId + "'>" +
-			"<td style='text-align: left'>" + regionName + "</td>" +
-			"<td style='text-align: center'>" +
+		var html = html + "<td style='text-align: center'>" +
 				"<input id='browseRegion" + regionId + "' type='checkbox' " + browseChecked + 
 					"name='regionSettings[" + regionId + "].IsAvaliableForBrowse' value='true'" +
 					"onclick='onClickBrowseRegion(" + regionId + ")' />" +
@@ -84,7 +85,6 @@
 					"onclick='onClickOrderRegion(" + regionId + ")' />" +
 				"<input id='regionSettings[" + regionId + "].IsAvaliableForOrder' type='hidden' name='regionSettings[" + regionId + "].IsAvaliableForOrder' value='false' />" +
 			"</td>" +
-			"<input type='hidden' name='regionSettings[" + regionId + "].Id' value='" + regionId + "' />" +
 			"</tr>";
 		<% end %>
 		jQuery("#RegionsTableBody").append(html);
@@ -92,7 +92,7 @@
 			// mouseover handler
 			function() { this.setAttribute("class", "SelectedRow"); },
 			// mouseout handler
-			function() { this.removeAttribute("class");	}
+			function() { this.removeAttribute("class"); }
 		);
 	}
 
@@ -214,9 +214,11 @@
 					<% for i, region in enumerate(regions):
 						if (defaultShowRegions.Contains(region.Id) or browseRegions.Contains(region.Id) or (orderRegions.Contains(region.Id))): %>
 					<tr id="RegionRow${region.Id}">
-						<td style="text-align: left">${region.Name}</td>
-
-						<% if IsDefined("singleRegions") and singleRegions: %>
+						<td style="text-align: left">
+							${region.Name}
+							<input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
+						</td>
+						<% if IsDefined(@singleRegions) and singleRegions: %>
 							<td style="text-align: center">
 								<% OutputSubView("/Templates/Region", {@checked: browseRegions.Contains(region.Id), @type: @Browse, @region: region}) %>
 							</td>
@@ -228,7 +230,6 @@
 								<% OutputSubView("/Templates/Region", {@checked: orderRegions.Contains(region.Id), @type: @Order, @region: region}) %>
 							</td>
 						<% end %>
-						<input type="hidden" name="regionSettings[${region.Id}].Id" value="${region.Id}" />
 					</tr>
 					<% end
 					end %>

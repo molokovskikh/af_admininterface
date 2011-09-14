@@ -34,8 +34,8 @@ namespace AdminInterface.Models.Billing
 		[Description("Июль")] July,
 		[Description("Август")] August,
 		[Description("Сентябрь")] September,
-		[Description("Ноябрь")] November,
 		[Description("Октябрь")] October,
+		[Description("Ноябрь")] November,
 		[Description("Декабрь")] December,
 	}
 

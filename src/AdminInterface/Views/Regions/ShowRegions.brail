@@ -1,43 +1,41 @@
-﻿<%
-def WriteRegionRow(regionId as System.UInt64, regionName as string, isForBrowse as bool, isForOrder as bool) as string:
-%>
-    <tr id="${regionId}RegionRow">
-        <td width="60%">${regionName}</td>
-        <td align="center" width="20%">
-            <input id="browseRegion${regionId}" type="checkbox" ${"checked" if (isForBrowse) } name="regionSettings[${regionId}].IsAvaliableForBrowse"
-                value="true" onclick="if (!this.checked) document.getElementById('orderRegion${regionId}').checked = this.checked" />
-            <input id="regionSettings[${regionId}].IsAvaliableForBrowse" type="hidden" name="regionSettings[${regionId}].IsAvaliableForBrowse" value="false" />
-        </td>
-        <td align="center" width="20%">
-            <input id="orderRegion${regionId}" type="checkbox" ${"checked" if (isForOrder) } name="regionSettings[${regionId}].IsAvaliableForOrder"
-                value="true" onclick="if (this.checked) document.getElementById('browseRegion${regionId}').checked = this.checked" />
-            <input id="regionSettings[${regionId}].IsAvaliableForOrder" type="hidden" name="regionSettings[${regionId}].IsAvaliableForOrder" value="false" />
-        </td>
-        <input type="hidden" name="regionSettings[${regionId}].Id" value="${regionId}" />
-    </tr>    
-<%
-end
-%>
+﻿<% def WriteRegionRow(regionId as System.UInt64, regionName as string, isForBrowse as bool, isForOrder as bool) as string: %>
+	<tr id="${regionId}RegionRow">
+		<td width="60%">
+			${regionName}
+			<input type="hidden" name="regionSettings[${regionId}].Id" value="${regionId}" />
+		</td>
+		<td align="center" width="20%">
+			<input id="browseRegion${regionId}" type="checkbox" ${"checked" if (isForBrowse) } name="regionSettings[${regionId}].IsAvaliableForBrowse"
+				value="true" onclick="if (!this.checked) document.getElementById('orderRegion${regionId}').checked = this.checked" />
+			<input id="regionSettings[${regionId}].IsAvaliableForBrowse" type="hidden" name="regionSettings[${regionId}].IsAvaliableForBrowse" value="false" />
+		</td>
+		<td align="center" width="20%">
+			<input id="orderRegion${regionId}" type="checkbox" ${"checked" if (isForOrder) } name="regionSettings[${regionId}].IsAvaliableForOrder"
+				value="true" onclick="if (this.checked) document.getElementById('browseRegion${regionId}').checked = this.checked" />
+			<input id="regionSettings[${regionId}].IsAvaliableForOrder" type="hidden" name="regionSettings[${regionId}].IsAvaliableForOrder" value="false" />
+		</td>
+	</tr>
+<% end %>
 <table border="0" width="100%" cellpadding="0" cellspacing="0" class="HighLightCurrentRow">
 <%
 if IsDefined("defaultRegions"):
-    for region in defaultRegions:
-        if IsDefined("drugstore"):
-            isForBrowse = (drugstore.WorkRegionMask & region.Id) > 0;
-            isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
-        else:
-            isForBrowse = homeRegion.Id == region.Id;
-            isForOrder = isForBrowse;
-        end
-        
-        WriteRegionRow(region.Id, region.Name, isForBrowse, isForOrder);
-    end
+	for region in defaultRegions:
+		if IsDefined("drugstore"):
+			isForBrowse = (drugstore.WorkRegionMask & region.Id) > 0;
+			isForOrder = (drugstore.OrderRegionMask & region.Id) > 0;
+		else:
+			isForBrowse = homeRegion.Id == region.Id;
+			isForOrder = isForBrowse;
+		end
+		
+		WriteRegionRow(region.Id, region.Name, isForBrowse, isForOrder);
+	end
 end
 
 if IsDefined("nonDefaultRegions"):
-    for region in nonDefaultRegions:
-        WriteRegionRow(region.Id, region.Name, false, false);
-    end
+	for region in nonDefaultRegions:
+		WriteRegionRow(region.Id, region.Name, false, false);
+	end
 end
 %>
 </table>

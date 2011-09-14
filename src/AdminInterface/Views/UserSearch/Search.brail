@@ -21,7 +21,7 @@
 
 </script>
 <div class="CenterBlock FilterBlock">
-<form id="SearchForm" name="SearchForm" method=post>
+<form id="SearchForm" name="SearchForm" method=post action="${siteroot}/Users/Search">
 	<p style="text-align: left;" class=value>
 		Введите текст для поиска:<br />
 		${app.Edit("filter.SearchText")}

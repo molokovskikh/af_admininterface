@@ -231,7 +231,6 @@
     <Compile Include="Models\PaymentOptions.cs" />
     <Compile Include="Models\Region.cs" />
     <Compile Include="Models\Security\UserPermission.cs" />
-    <Compile Include="Models\ShowRelationship.cs" />
     <Compile Include="Models\SmartOrderRules.cs" />
     <Compile Include="Models\Suppliers\Service.cs" />
     <Compile Include="Models\Suppliers\Supplier.cs" />
