@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Billing
 			{ Period.FirstQuarter, new[] { Period.January, Period.February, Period.March } },
 			{ Period.SecondQuarter, new[] { Period.April, Period.May, Period.June } },
 			{ Period.ThirdQuarter, new[] { Period.July, Period.August, Period.September } },
-			{ Period.FourthQuarter, new[] { Period.November, Period.October, Period.December } }
+			{ Period.FourthQuarter, new[] { Period.October, Period.November, Period.December } }
 		};
 
 		public Invoice()
