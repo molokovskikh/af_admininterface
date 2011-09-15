@@ -46,6 +46,7 @@ def Impersonate(action as Action):
 			action()
 		ensure:
 			CloseHandle(tokenHandle);
+
 Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
@@ -100,6 +101,8 @@ task @BuildBackground:
 	Globals.Project = oldProject
 
 task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackground, @SendDeployNotification]
+
+task @TestDeploy, [@BuildWebSite, @WebDeploy]
 
 task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter,/* @DeployBackground,*/ @SendDeployNotification]
 

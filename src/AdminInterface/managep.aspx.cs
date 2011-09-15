@@ -10,8 +10,10 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
 using MySql.Data.MySqlClient;
@@ -404,64 +406,72 @@ where id = ?Id;");
 			orderSendRulesDataAdapter.DeleteCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
 
 			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
-			With.Transaction(
-				(connection, transaction) => {
-					pricesDataAdapter.InsertCommand.Connection = connection;
-					pricesDataAdapter.InsertCommand.Transaction = transaction;
-					pricesDataAdapter.UpdateCommand.Connection = connection;
-					pricesDataAdapter.UpdateCommand.Transaction = transaction;
-					pricesDataAdapter.DeleteCommand.Connection = connection;
-					pricesDataAdapter.DeleteCommand.Transaction = transaction;
-					regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
-					regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
+			With.Transaction((connection, transaction) => {
+				pricesDataAdapter.InsertCommand.Connection = connection;
+				pricesDataAdapter.InsertCommand.Transaction = transaction;
+				pricesDataAdapter.UpdateCommand.Connection = connection;
+				pricesDataAdapter.UpdateCommand.Transaction = transaction;
+				pricesDataAdapter.DeleteCommand.Connection = connection;
+				pricesDataAdapter.DeleteCommand.Transaction = transaction;
+				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
+				regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
 
-					orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
-					orderSendRulesDataAdapter.InsertCommand.Connection = connection;
-					orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
-					orderSendRulesDataAdapter.UpdateCommand.Connection = connection;
-					orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
-					orderSendRulesDataAdapter.DeleteCommand.Connection = connection;
+				orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
+				orderSendRulesDataAdapter.InsertCommand.Connection = connection;
+				orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
+				orderSendRulesDataAdapter.UpdateCommand.Connection = connection;
+				orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
+				orderSendRulesDataAdapter.DeleteCommand.Connection = connection;
 					
-					pricesDataAdapter.Update(Data.Tables["Prices"]);
-					regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
-					orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
-				});
+				pricesDataAdapter.Update(Data.Tables["Prices"]);
+				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
+				orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
 
-			if (updateIntersection)
-			{
-				ActiveRecordMediator.Refresh(supplier);
-				var addedPriceId = supplier.Prices.Max(p => p.Id);
-				Maintainer.MaintainIntersection(supplier);
-				ArHelper.WithSession(s => {
-					s.CreateSQLQuery(@"
+				if (updateIntersection)
+				{
+					//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
+					//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
+					//может еще не быть создаваемого прайса
+
+					//FlushAction.Never - что бы не автоматически не запускать транзакцию
+					using (var scope = new ConnectionScope(connection, FlushAction.Never))
+					{
+						var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
+						var addedPriceId = supplier.Prices.Max(p => p.Id);
+						Maintainer.MaintainIntersection(supplier);
+						ArHelper.WithSession(s => {
+				s.CreateSQLQuery(@"
 DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
-  FROM future.AddressIntersection adr
-        join future.Intersection ins on ins.Id = adr.IntersectionId
-        join pricesdata as rootPrice on
-            rootPrice.PriceCode =
-             (select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
-         join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
-             and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
-         join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
-             and rootAdr.IntersectionId = rootIns.Id
- WHERE ins.PriceId = :priceId
+FROM future.AddressIntersection adr
+    join future.Intersection ins on ins.Id = adr.IntersectionId
+    join pricesdata as rootPrice on
+        rootPrice.PriceCode =
+            (select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
+        join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
+            and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
+        join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
+            and rootAdr.IntersectionId = rootIns.Id
+WHERE ins.PriceId = :priceId
 ;
 
 UPDATE Future.AddressIntersection adr
 SET SupplierDeliveryId =
-  (select tmp.SupplierDeliveryId
-   from tmp tmp
-   where tmp.Id = adr.Id
-   limit 1)
+(select tmp.SupplierDeliveryId
+from tmp tmp
+where tmp.Id = adr.Id
+limit 1)
 WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
 );")
-					.SetParameter("priceId", addedPriceId)
-					.SetParameter("supplierId", supplier.Id)
-					.ExecuteUpdate();
-				});
-			}
+							.SetParameter("priceId", addedPriceId)
+							.SetParameter("supplierId", supplier.Id)
+							.ExecuteUpdate();
+						});
+						scope.Flush();
+					}
+				}
+			});
 
 			GetData();
 			ConnectDataSource();
@@ -642,7 +652,9 @@ WHERE   s.Id = ?ClientCode
 				updateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 				updateCommand.ExecuteNonQuery();
 
-				Maintainer.MaintainIntersection(supplier);
+				//описание см ст 430
+				using (new ConnectionScope(connection, FlushAction.Never))
+					Maintainer.MaintainIntersection(supplier);
 			}
 		}
 		
