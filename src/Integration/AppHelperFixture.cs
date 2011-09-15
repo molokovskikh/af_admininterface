@@ -241,7 +241,7 @@ namespace Integration
 				Filter = 1
 			};
 			var link = helper.Sortable("test", "test");
-			Assert.That(link, Is.EqualTo("<a href='/home/index?filter.SortBy=test&filter.SortDirection=desc&filter.Filter=1' class='sort desc'>test</a>"));
+			Assert.That(link, Is.EqualTo("<a href='/home/index?filter.Filter=1&filter.SortBy=test&filter.SortDirection=desc' class='sort desc'>test</a>"));
 		}
 
 		public class UrlContributor : IUrlContributor

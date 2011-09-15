@@ -103,7 +103,6 @@ namespace Unit.Models
 			Assert.That(part.Cost, Is.EqualTo(1500));
 			Assert.That(part.Count, Is.EqualTo(1));
 			Assert.That(part.Ad, Is.EqualTo(ad));
-			Assert.That(ad.Invoice, Is.EqualTo(invoice));
 		}
 
 		[Test]
