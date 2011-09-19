@@ -23,7 +23,7 @@ namespace Integration.Controllers
 		public void Disable_supplier_user()
 		{
 			Assert.That(user.Enabled, Is.True);
-			controller.SetUserStatus(user.Id, false, null);
+			controller.SetUserStatus(user.Id, false);
 			user.Refresh();
 			Assert.That(user.Enabled, Is.False);
 		}

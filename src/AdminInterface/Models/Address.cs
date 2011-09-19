@@ -55,9 +55,6 @@ namespace AdminInterface.Models
 		[Property, Description("Включен"), Auditable]
 		public virtual bool Enabled { get; set; }
 
-		[Property("Free")]
-		public virtual bool FreeFlag { get; set; }
-
 		[Property]
 		public virtual string Registrant { get; set; }
 
@@ -105,23 +102,6 @@ namespace AdminInterface.Models
 			get
 			{
 				return (AvaliableForUsers.Where(user => user.Enabled && (user.Client.Status == ClientStatus.On)).Count() > 0);
-			}
-		}
-
-		public virtual bool IsFree
-		{
-			get
-			{				
-				return (FreeFlag || !HasPaidUsers);
-			}
-		}
-
-		public virtual bool HasPaidUsers
-		{
-			get
-			{
-				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть НЕ нулевым
-				return (AvaliableForUsers != null && AvaliableForUsers.Where(user => !user.IsFree && user.Enabled).Count() > 0);
 			}
 		}
 

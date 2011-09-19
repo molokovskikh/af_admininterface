@@ -211,9 +211,19 @@ WHERE {1} and {2}
 
 		public UserAccounting() {}
 
+		public override Payer Payer
+		{
+			get { return User.Payer; }
+		}
+
+		public override string Name
+		{
+			get { return User.Name; }
+		}
+
 		public override bool ShouldPay()
 		{
-			return !User.RootService.Disabled && User.Enabled && !User.IsFree && (ReadyForAcounting || BeAccounted);
+			return !User.RootService.Disabled && User.Enabled && base.ShouldPay();
 		}
 	}
 
@@ -234,15 +244,63 @@ WHERE {1} and {2}
 			get { return "Адрес"; }
 		}
 
-		public AddressAccounting() { }
+		public AddressAccounting() {}
+
+		public override Payer Payer
+		{
+			get { return Address.Payer; }
+		}
+
+		public override string Name
+		{
+			get { return Address.Name; }
+		}
+
+		public virtual bool HasPaidUsers
+		{
+			get
+			{
+				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть НЕ нулевым
+				return (Address.AvaliableForUsers.Where(user => !user.Accounting.IsFree && user.Enabled).Count() > 0);
+			}
+		}
 
 		public override bool ShouldPay()
 		{
-			return Address.Client.Enabled && Address.Enabled && !Address.FreeFlag && (ReadyForAcounting || BeAccounted);
+			return Address.Client.Enabled && Address.Enabled && HasPaidUsers && base.ShouldPay();
 		}
 	}
 
-	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "3", Schema = "Billing", Lazy = true), Auditable]
+	[ActiveRecord(DiscriminatorValue = "2")]
+	public class ReportAccounting : Accounting
+	{
+		[BelongsTo("ObjectId")]
+		public virtual Report Report { get; set; }
+
+		public override string Type
+		{
+			get { return "Отчет"; }
+		}
+
+		public ReportAccounting() {}
+
+		public override Payer Payer
+		{
+			get { return Report.Payer; }
+		}
+
+		public override string Name
+		{
+			get { return Report.Comment; }
+		}
+
+		public override bool ShouldPay()
+		{
+			return Report.Allow && base.ShouldPay();
+		}
+	}
+
+	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Accounting : ActiveRecordLinqBase<Accounting>, IAuditable
 	{
 		[PrimaryKey]
@@ -266,6 +324,9 @@ WHERE {1} and {2}
 		[Property]
 		public virtual int InvoiceGroup { get; set; }
 
+		[Property]
+		public virtual bool IsFree { get; set; }
+
 		public virtual uint PayerId
 		{
 			get
@@ -274,25 +335,9 @@ WHERE {1} and {2}
 			}
 		}
 
-		public virtual Payer Payer
-		{
-			get
-			{
-				if (this is UserAccounting)
-					return ((UserAccounting) this).User.Payer;
-				return ((AddressAccounting) this).Address.Payer;
-			}
-		}
+		public abstract Payer Payer { get; }
 
-		public virtual string Name
-		{
-			get
-			{
-				if (this is UserAccounting)
-					return ((UserAccounting) this).User.GetLoginOrName();
-				return ((AddressAccounting) this).Address.Value;
-			}
-		}
+		public abstract string Name { get;}
 
 		public virtual void Accounted()
 		{
@@ -301,7 +346,11 @@ WHERE {1} and {2}
 			BeAccounted = true;
 		}
 
-		public abstract bool ShouldPay();
+		public virtual bool ShouldPay()
+		{
+			return (BeAccounted || ReadyForAcounting) && !IsFree;
+		}
+
 		public abstract string Type { get; }
 
 		public static IList<Accounting> SearchBy(AccountingSearchProperties filter, Pager pager)

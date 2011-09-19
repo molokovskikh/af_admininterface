@@ -156,8 +156,6 @@ namespace AdminInterface.Models
 		[Property, Description("Не проверять УИН"), Auditable]
 		public virtual bool DoNotCheckUin { get; set; }
 */
-		[Property(Column = "Free")]
-		public virtual bool IsFree { get; set; }
 
 		[BelongsTo("ClientId", /*NotNull = true, */Lazy = FetchWhen.OnInvoke), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }

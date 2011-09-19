@@ -213,20 +213,22 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		<div class="VisibleFolder">
 			<table id=clients class="DataTable">
-				<tr>
-					<th>Включен</th>
-					<th>Код</th>
-					<th>Название</th>
-					<th>Регион</th>
-					<th>Тип</th>
-					<th>Сегмент</th>
-					<th>Отключенных копий</th>
-					<th>Работающих копий</th>
-					<th>Отключенных адресов</th>
-					<th>Работающих адресов</th>
-					<th>Дата регистрации</th>
-					<th></th>
-				</tr>
+				<thead>
+					<tr>
+						<th>Включен</th>
+						<th>Код</th>
+						<th>Название</th>
+						<th>Регион</th>
+						<th>Тип</th>
+						<th>Сегмент</th>
+						<th>Отключенных копий</th>
+						<th>Работающих копий</th>
+						<th>Отключенных адресов</th>
+						<th>Работающих адресов</th>
+						<th>Дата регистрации</th>
+						<th></th>
+					</tr>
+				</thead>
 				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td style="width: 50px">
@@ -274,14 +276,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		<div class="VisibleFolder">
 			<table class="DataTable">
-				<tr>
-					<th>Включен</th>
-					<th>Код</th>
-					<th>Название</th>
-					<th>Регион</th>
-					<th>Дата регистрации</th>
-					<th></th>
-				</tr>
+				<thead>
+					<tr>
+						<th>Включен</th>
+						<th>Код</th>
+						<th>Название</th>
+						<th>Регион</th>
+						<th>Дата регистрации</th>
+						<th></th>
+					</tr>
+				</thead>
 				<% for i, supplier in enumerate(suppliers): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier)}" align="center">
 					<td style="width: 50px">
@@ -320,21 +324,23 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<% end %>
 			<div align="left">
 				<table class="DataTable filter" id="users">
-					<tr align="center" valign="top">
-						<th>Включен</th>
-						<th>Учтен</th>
-						<th>Бесплатно</th>
-						<th>Платеж</th>
-						<th>Код пользователя</th>
-						<th>Адреса</th>
-						<th>Комментарий</th>
-						<th>Дата последнего обновления</th>
-						<th>Клиент</th>
-						<th>Дата регистрации</th>
-					</tr>
+					<thead>
+						<tr>
+							<th>Включен</th>
+							<th>Учтен</th>
+							<th>Бесплатно</th>
+							<th>Платеж</th>
+							<th>Код пользователя</th>
+							<th>Адреса</th>
+							<th>Комментарий</th>
+							<th>Дата последнего обновления</th>
+							<th>Клиент</th>
+							<th>Дата регистрации</th>
+						</tr>
+					</thead>
 					<% for i, user in enumerate(Users): %>
 					<% hidden = filter.Service and filter.Service.Id != user.RootService.Id %>
-					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
+					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.Accounting.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
 						align="center" name="Client${user.RootService.Id}">
 						<td class=short>
 							<input name=id type=hidden value=${user.Accounting.Id}>
@@ -344,7 +350,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
 						</td>
 						<td class=short>
-							<input name=free type="checkbox" ${"checked" if user.IsFree} />
+							<input name=free type="checkbox" ${"checked" if user.Accounting.IsFree} />
 						</td>
 						<td class=short>
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -385,21 +391,23 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% end %>
 				<div align="left">
 					<table class="DataTable filter" id="addresses">
-						<tr align="center" valign="top">
-							<th>Включен</th>
-							<th>Учтен</th>
-							<th>Бесплатно</th>
-							<th>Платеж</th>
-							<th>Адрес</th>
-							<th>Пользователи</th>
-							<th>Клиент</th>
-							<th>Юр. лицо</th>
-							<th>Дата регистрации</th>
-						</tr>
+						<thead>
+							<tr>
+								<th>Включен</th>
+								<th>Учтен</th>
+								<th>Бесплатно</th>
+								<th>Платеж</th>
+								<th>Адрес</th>
+								<th>Пользователи</th>
+								<th>Клиент</th>
+								<th>Юр. лицо</th>
+								<th>Дата регистрации</th>
+							</tr>
+						</thead>
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
 						<% hidden = filter.Service and filter.Service.Id != addr.Client.Id %>
-						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.FreeFlag} ${'DisabledByBilling' if not addr.Enabled} ${'hidable hidden' if hidden}"
+						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.Accounting.IsFree} ${'DisabledByBilling' if not addr.Enabled} ${'hidable hidden' if hidden}"
 							align="center" name="Client${addr.Client.Id}">
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
@@ -409,7 +417,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=accounted type=checkbox ${"checked" if addr.Accounting.BeAccounted} />
 							</td>
 							<td class=short>
-								<input name=free type=checkbox ${"checked" if addr.FreeFlag} />
+								<input name=free type=checkbox ${"checked" if addr.Accounting.IsFree} />
 							</td>
 							<td class=short>
 								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -446,16 +454,28 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 				<div class="VisibleFolder">
 					<table class="DataTable">
-						<tr align="center" valign="top">
-							<th>Включен</th>
-							<th>Примечание</th>
-						</tr>
+						<thead>
+							<tr>
+								<th>Включен</th>
+								<th>Учтен</th>
+								<th>Бесплатно</th>
+								<th>Платеж</th>
+								<th>Примечание</th>
+							</tr>
+						</thead>
 						<% for i, report in enumerate(reports): %>
 						<tr class="${ViewHelper.GetRowStyle(i)}">
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
 								<input name=allow type="checkbox" ${"checked" if report.Allow} />
 							</td>
+							<td class=short>
+								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />
+							</td>
+							<td  class=short>
+								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+							</td>
+							<td></td>
 							<td>!{report.Comment}</td>
 						</tr>
 						<% end %>

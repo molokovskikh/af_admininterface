@@ -17,33 +17,30 @@ namespace AdminInterface.Controllers
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
 			var account = Accounting.TryFind(id);
-			if (accounted != null || payment != null)
-				UpdateAccounting(account.Id, accounted, payment);
+			UpdateAccounting(account.Id, accounted, payment, free);
 			if (status != null || free != null)
 			{
 				NHibernateUtil.Initialize(account);
 				if (account is UserAccounting)
 				{
 					var user = ((UserAccounting)account).User;
-					SetUserStatus(user.Id, status ?? user.Enabled, free ?? user.IsFree);
+					SetUserStatus(user.Id, status);
 				}
 				else
 				{
 					var address = ((AddressAccounting)account).Address;
-					SetAddressStatus(address.Id, status, free);
+					SetAddressStatus(address.Id, status);
 				}
 			}
 			CancelView();
 		}
 
-		public void SetUserStatus(uint userId, bool? enabled, bool? free)
+		public void SetUserStatus(uint userId, bool? enabled)
 		{
 			var user = User.Find(userId);
 			var oldStatus = user.Enabled;
 			if (enabled.HasValue)
 				user.Enabled = enabled.Value;
-			if (free.HasValue)
-				user.IsFree = free.Value;
 			user.UpdateAndFlush();
 			if (enabled != oldStatus)
 				this.Mailer().EnableChanged(user).Send();
@@ -63,7 +60,7 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment)
+		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)
 		{
 			var account = Accounting.Find(accountId);
 			if (accounted.HasValue)
@@ -73,6 +70,12 @@ namespace AdminInterface.Controllers
 				else
 					account.BeAccounted = false;
 			}
+
+			if (isFree.HasValue)
+			{
+				account.IsFree = isFree.Value;
+			}
+
 			if (payment.HasValue)
 			{
 				Admin.CheckPermisions(PermissionType.ChangePayment);
@@ -86,14 +89,12 @@ namespace AdminInterface.Controllers
 			CancelView();
 		}
 
-		public void SetAddressStatus(uint addressId, bool? enabled, bool? free)
+		public void SetAddressStatus(uint addressId, bool? enabled)
 		{
 			var address = Address.Find(addressId);
 			var oldStatus = address.Enabled;
 			if (enabled.HasValue)
 				address.Enabled = enabled.Value;
-			if (free.HasValue)
-				address.FreeFlag = free.Value;
 			if (enabled != oldStatus)
 				this.Mailer().EnableChanged(address).Send();
 			address.Client.Save();
