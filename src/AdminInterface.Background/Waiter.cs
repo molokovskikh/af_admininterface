@@ -32,7 +32,7 @@ namespace AdminInterface.Background
 			using(new SessionScope())
 			{
 				var job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
-				job.Plan(PlanPeriod.Month, 1.Day());
+				job.Plan(PlanPeriod.Month, 8.Day());
 				jobs.Add(job);
 				job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
 				job.Plan(PlanPeriod.Month, 15.Days());

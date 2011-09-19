@@ -36,6 +36,7 @@ namespace Functional.Billing
 		[Test]
 		public void Show_predefine_invoice_positions()
 		{
+			Nomenclature.DeleteAll();
 			Save(new Nomenclature("Мониторинг оптового фармрынка за июль"));
 
 			Open(invoice, "Edit");

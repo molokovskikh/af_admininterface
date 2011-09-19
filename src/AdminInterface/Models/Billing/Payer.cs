@@ -439,6 +439,11 @@ ORDER BY {Payer}.shortname;";
 		{
 			return GetAccountings().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
 		}
+
+		public virtual bool ShouldNotify()
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	public class DoNotHaveContacts : Exception

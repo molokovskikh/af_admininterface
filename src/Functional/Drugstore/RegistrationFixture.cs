@@ -220,6 +220,10 @@ namespace Functional.Drugstore
 		[Test]
 		public void After_registration_prices_avaliable()
 		{
+			var supplier = DataMother.CreateSupplier(s => s.AddRegion(Region.Find(524288ul)));
+			Save(supplier);
+			scope.Flush();
+
 			SetupGeneralInformation(browser);
 			browser.CheckBox("FillBillingInfo").Checked = false;
 			browser.Button(Find.ById("RegisterButton")).Click();

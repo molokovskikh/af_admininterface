@@ -65,7 +65,7 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord("Clients", Schema = "Future", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Client : Service
 	{
 		private ClientStatus status;

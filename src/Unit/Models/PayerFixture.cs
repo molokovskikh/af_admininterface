@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 
@@ -14,15 +15,7 @@ namespace Unit.Models
 		[Test]
 		public void Payer_get_total_sum_for_supplier()
 		{
-			var legalEntity = new LegalEntity();
-			var payer = new Payer {
-				Name = "test",
-				ContactGroupOwner = new ContactGroupOwner(),
-				JuridicalOrganizations = new List<LegalEntity> {
-					legalEntity
-				}
-			};
-			legalEntity.Payer = payer;
+			var payer = new Payer("Тестовый поставщика", "Тестовый поставщика");
 			var supplier = new Supplier {
 				Payer = payer
 			};
@@ -31,6 +24,31 @@ namespace Unit.Models
 			user.Accounting.Accounted();
 			payer.Users.Add(user);
 			Assert.That(payer.TotalSum, Is.EqualTo(800));
+		}
+
+		[Test, Ignore("Не реализовано #4979, бухгалтерия думает")]
+		public void Do_not_notify_user_if_billing_by_quater_but_current_month_payed()
+		{
+			var payer = new Payer("Тестовый поставщика", "Тестовый поставщика");
+			var client = new Client(payer);
+			var user = new User(client);
+			user.Accounting.Accounted();
+
+			Assert.That(payer.TotalSum, Is.EqualTo(800));
+			payer.PayCycle = InvoicePeriod.Quarter;
+
+			SystemTime.Now = () => new DateTime(2011, 1, 1);
+			payer.Balance = -2400;
+			Assert.That(payer.ShouldNotify(), Is.True);
+			payer.Balance += 800;
+			Assert.That(payer.ShouldNotify(), Is.False);
+
+			SystemTime.Now = () => new DateTime(2011, 2, 1);
+			Assert.That(payer.ShouldNotify(), Is.True);
+			payer.Balance += 800;
+			Assert.That(payer.ShouldNotify(), Is.False);
+			SystemTime.Now = () => new DateTime(2011, 2, 26);
+			Assert.That(payer.ShouldNotify(), Is.False);
 		}
 	}
 }
