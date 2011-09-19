@@ -248,6 +248,7 @@
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
+    <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="NHibernateExtentions\ValidEventListner.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
