@@ -791,7 +791,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				.UniqueResult()));
 		}
 
-		[Test, NUnit.Framework.Description("Перемещение пользователя с адресом доставки к другому клиенту")]
+		[Test, NUnit.Framework.Description("Перемещение пользователя с адресом доставки к другому клиенту"), Ignore("Нет больше флага о переносе адреса")]
 		public void Move_user_with_address_to_another_client()
 		{
 			Client oldClient;

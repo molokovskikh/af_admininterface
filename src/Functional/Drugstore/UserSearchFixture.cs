@@ -31,7 +31,6 @@ namespace Functional
 		{
 			var text = String.Empty;
 			ArHelper.WithSession(session => text = session.CreateSQLQuery(sql).UniqueResult().ToString());
-			Console.WriteLine(text);
 			AssetSearch(browser, searchBy, text);
 		}
 
@@ -89,7 +88,11 @@ namespace Functional
 		[Test]
 		public void SearchByLogin()
 		{
-			TestSearchResultsByUserInfo(browser, "Login", SearchUserBy.ByLogin);
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			scope.Flush();
+
+			AssetSearch(browser, SearchUserBy.ByLogin, user.Login);
 			if (browser.TableBody(Find.ById("SearchResults")).Exists)
 			{
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.EqualTo(1));
@@ -109,7 +112,10 @@ namespace Functional
 		[Test]
 		public void SearchByClientName()
 		{
-			TestSearchResultsByClientInfo(browser, "Name", SearchUserBy.ByClientName);
+			var client = DataMother.CreateTestClientWithUser();
+			client.MakeNameUniq();
+			scope.Flush();
+			AssetSearch(browser, SearchUserBy.ByClientName, client.Name);
 		}
 
 		[Test]

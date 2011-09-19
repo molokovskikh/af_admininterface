@@ -15,16 +15,15 @@ namespace Functional.Suppliers
 		public void Register()
 		{
 			Open();
-			browser.Click("Поставщик");
+			Click("Поставщик");
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 
 			Prepare();
 
-			browser.Click("Зарегистрировать");
+			Click("Зарегистрировать");
 			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
-			browser.Click("Сохранить");
+			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
-			Console.WriteLine(browser.Url);
 		}
 
 		[Test]

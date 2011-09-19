@@ -33,6 +33,14 @@ namespace Integration.ForTesting
 					.List()).Count;
 		}
 
+		public static Client MakeNameUniq(this Client client)
+		{
+			client.Save();
+			client.Name += " " + client.Id;
+			client.Save();
+			return client;
+		}
+
 		public static Payer MakeNameUniq(this Payer payer)
 		{
 			payer.Save();

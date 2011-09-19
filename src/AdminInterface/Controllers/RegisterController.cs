@@ -116,12 +116,16 @@ namespace AdminInterface.Controllers
 
 				var groups = BindObject<RegionalDeliveryGroup[]>("orderDeliveryGroup");
 
-				foreach (var deliveryGroup in groups)
+				foreach (var group in groups)
 				{
-					deliveryGroup.Region = Region.Find(deliveryGroup.Region.Id);
-					deliveryGroup.Name = "Доставка заказов " + deliveryGroup.Region.Name;
-					deliveryGroup.ContactGroupOwner = supplier.ContactGroupOwner;
-					supplier.ContactGroupOwner.ContactGroups.Add(deliveryGroup);
+					group.Region = Region.Find(group.Region.Id);
+					group.Name = "Доставка заказов " + group.Region.Name;
+					group.ContactGroupOwner = supplier.ContactGroupOwner;
+					supplier.ContactGroupOwner.ContactGroups.Add(group);
+
+					//повторная валидация, тк когда производился binding валидация не прошла
+					//тк не было заполнено поле Name
+					Validator.IsValid(group);
 				}
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups)

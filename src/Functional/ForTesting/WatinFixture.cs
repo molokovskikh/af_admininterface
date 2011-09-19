@@ -4,8 +4,11 @@ using AdminInterface.Helpers;
 using Castle.ActiveRecord;
 using Common.Tools.Calendar;
 using NUnit.Framework;
+using SHDocVw;
 using WatiN.Core;
+using WatiN.Core.Native.InternetExplorer;
 using WatiN.Core.UtilityClasses;
+using mshtml;
 
 namespace Functional.ForTesting
 {
@@ -43,6 +46,7 @@ namespace Functional.ForTesting
 
 		protected ISessionScope scope;
 		protected Browser browser;
+		private object httpStatusCode;
 
 		[SetUp]
 		public void Setup()
@@ -95,13 +99,26 @@ namespace Functional.ForTesting
 				scope.Flush();
 
 			var browser = new IE(BuildTestUrl(uri));
-/*
-			((InternetExplorerClass)browser.InternetExplorer).DocumentComplete += (object disp, ref object url) => {
-				Console.WriteLine(Thread.CurrentThread.ManagedThreadId);
-				//Console.WriteLine(browser.Text);
-				//Assert.That(browser.Text, Is.Not.ContainsSubstring("exception"));
+			var internetExplorerClass = ((InternetExplorerClass)((IEBrowser)browser.NativeBrowser).WebBrowser);
+			httpStatusCode = null;
+			internetExplorerClass.NavigateError += (object disp, ref object url, ref object frame, ref object code, ref bool cancel) => {
+				httpStatusCode = code;
+			};
+			internetExplorerClass.BeforeNavigate2 += (object disp, ref object url, ref object flags, ref object name, ref object data, ref object headers, ref bool cancel) => {
+				httpStatusCode = null;
+			};
+
+/*			//ie проглатывает мое исключение
+			internetExplorerClass.NavigateComplete2 += (object disp, ref object url) => {
+				if (httpStatusCode == null)
+					return;
+				if (Convert.ToInt32(httpStatusCode) == 500)
+				{
+					throw new Exception(browser.Html);
+				}
 			};
 */
+
 			if (SaveBrowser)
 			{
 				if (this.browser != null)
@@ -114,7 +131,14 @@ namespace Functional.ForTesting
 						ExceptionMessage = () => string.Format("waiting {0} seconds for document text not null.", 2)
 					}.Try<bool>(() => browser.Text != null);
 			}
+			CheckStatus();
 			return browser;
+		}
+
+		private void CheckStatus()
+		{
+			if (httpStatusCode != null && Convert.ToInt32(httpStatusCode) == 500)
+				throw new Exception(browser.Text);
 		}
 
 		protected dynamic Css(string selector)
@@ -125,6 +149,7 @@ namespace Functional.ForTesting
 		protected void Click(string name)
 		{
 			browser.Click(name);
+			CheckStatus();
 		}
 
 		protected IE Open(string uri, params object[] args)
