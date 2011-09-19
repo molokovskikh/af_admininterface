@@ -89,47 +89,47 @@
 
 <div>
 	<table class="DataTable">
-		<thead>
 		<% if logEntities.Count: %>
-		<tr>
-			<th>
-				${app.Sortable("Дата", "RequestTime")}
-			</th>
-			<% if filter.ShowRegion(): %>
-			<th>
-				${app.Sortable("Регион", "Region")}
-			</th>
-			<% end %>
-			<% if filter.ShowClient(): %>
-			<th>
-				${app.Sortable("Клиент", "ClientName")}
-			</th>
-			<% end %>
-			<% if filter.ShowUpdateType(): %>
-			<th>
-				${app.Sortable("Тип обновления", "UpdateType")}
-			</th>
-			<% end %>
-			<% if filter.ShowUser(): %>
-			<th>
-				${app.Sortable("Пользователь", "Login")}
-			</th>
-			<% end %>
-			<% if filter.ShowUpdateSize(): %>
-			<th>
-				${app.Sortable("Размер приготовленных данных", "ResultSize")}
-			</th>
-			<% end %>
-			<th>
-				${app.Sortable("Версия", "AppVersion")}
-			</th>
-			<th>
-				${app.Sortable("Дополнительно", "Addition")}
-			</th>
-			<% if filter.ShowLog(): %>
-			<th>Лог</th>
-			<% end %>
-		</tr>
+		<thead>
+			<tr>
+				<th>
+					${app.Sortable("Дата", "RequestTime")}
+				</th>
+				<% if filter.ShowRegion(): %>
+				<th>
+					${app.Sortable("Регион", "Region")}
+				</th>
+				<% end %>
+				<% if filter.ShowClient(): %>
+				<th>
+					${app.Sortable("Клиент", "ClientName")}
+				</th>
+				<% end %>
+				<% if filter.ShowUpdateType(): %>
+				<th>
+					${app.Sortable("Тип обновления", "UpdateType")}
+				</th>
+				<% end %>
+				<% if filter.ShowUser(): %>
+				<th>
+					${app.Sortable("Пользователь", "Login")}
+				</th>
+				<% end %>
+				<% if filter.ShowUpdateSize(): %>
+				<th>
+					${app.Sortable("Размер приготовленных данных", "ResultSize")}
+				</th>
+				<% end %>
+				<th>
+					${app.Sortable("Версия", "AppVersion")}
+				</th>
+				<th>
+					${app.Sortable("Дополнительно", "Addition")}
+				</th>
+				<% if filter.ShowLog(): %>
+				<th>Лог</th>
+				<% end %>
+			</tr>
 		</thead>
 		<tbody class="HighLightCurrentRow">
 		<% for i, log in enumerate(logEntities): %>

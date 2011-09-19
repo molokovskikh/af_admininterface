@@ -10,20 +10,22 @@
 		<td class="EmptyData">Никто в данный момент не обновляется</td>
 	</tr>
 <% else: %>
-	<tr>
-		<th>
-			${app.Sortable("Код клиента", "ClientCode")}
-		</th>
-		<th>
-			${app.Sortable("Название", "ShortName")}
-		</th>
-		<th>
-			${app.Sortable("Метод", "MethodName")}
-		</th>
-		<th>
-			${app.Sortable("Дата начала", "StartTime")}
-		</th>
-	</tr>
+	<thead>
+		<tr>
+			<th>
+				${app.Sortable("Код клиента", "ClientCode")}
+			</th>
+			<th>
+				${app.Sortable("Название", "ShortName")}
+			</th>
+			<th>
+				${app.Sortable("Метод", "MethodName")}
+			</th>
+			<th>
+				${app.Sortable("Дата начала", "StartTime")}
+			</th>
+		</tr>
+	</thead>
 <% for i, status in enumerate(statuses): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>${status.ClientCode}</td>

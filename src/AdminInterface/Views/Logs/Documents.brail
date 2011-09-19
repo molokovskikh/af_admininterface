@@ -68,21 +68,23 @@ ${app.EndFormFor("filter")}
 
 	<table class="DataTable">
 	<% if logEntities.Count != 0: %>
-		<tr>
-			<th>Номер документа</th>
-			<th>Дата получения</th>
-			<th>Тип документа</th>
-			<th>Номер поставщика</th>
-			<th>Дата документа</th>
-			<th>Дата разбора</th>
-			<th>От поставщика</th>
-			<th>На адрес</th>
-			<th>Название файла</th>
-			<th>Размер</th>
-			<th>Пользователь получивший документ</th>
-			<th>Дата отправки</th>
-			<th>Комментарий</th>
-		</tr>
+		<thead>
+			<tr>
+				<th>Номер документа</th>
+				<th>Дата получения</th>
+				<th>Тип документа</th>
+				<th>Номер поставщика</th>
+				<th>Дата документа</th>
+				<th>Дата разбора</th>
+				<th>От поставщика</th>
+				<th>На адрес</th>
+				<th>Название файла</th>
+				<th>Размер</th>
+				<th>Пользователь получивший документ</th>
+				<th>Дата отправки</th>
+				<th>Комментарий</th>
+			</tr>
+		</thead>
 	<% for i, logEntity in enumerate(logEntities): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Received.Id}">
 			<td>${logEntity.Received.Id}</td>

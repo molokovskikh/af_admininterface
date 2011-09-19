@@ -56,10 +56,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["direction"] = direction;
 		}
 
-		public void Prices()
-		{
-		}
-
 		public void Orders()
 		{
 			PropertyBag["Orders"] = OrderView.FindNotSendedOrders();

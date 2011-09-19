@@ -14,18 +14,20 @@ ${app.EndFormFor("filter")}
 
 <table class=DataTable>
 	<% if orders.Count > 0: %>
-		<tr>
-			<th>№</th>
-			<th>№ в AnalitF</th>
-			<th>Дата заказа</th>
-			<th>Дата прайса</th>
-			<th>Адрес</th>
-			<th>Пользователь</th>
-			<th>Поставщик</th>
-			<th>Прайс</th>
-			<th>Позиций</th>
-			<th>SmtpID</th>
-		</tr>
+		<thead>
+			<tr>
+				<th>№</th>
+				<th>№ в AnalitF</th>
+				<th>Дата заказа</th>
+				<th>Дата прайса</th>
+				<th>Адрес</th>
+				<th>Пользователь</th>
+				<th>Поставщик</th>
+				<th>Прайс</th>
+				<th>Позиций</th>
+				<th>SmtpID</th>
+			</tr>
+		</thead>
 		<tbody id="SearchResults">
 		<% for i, order in enumerate(orders): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
