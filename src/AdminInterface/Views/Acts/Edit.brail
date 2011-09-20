@@ -39,12 +39,14 @@
 	</div>
 	<div class=block>
 		<table class="DataTable editable">
-			<tr>
-				<th><a href="javascript:" class=add>Добавить</a></th>
-				<th>Услуга</th>
-				<th>Стоимость</th>
-				<th>Количество</th>
-			</tr>
+			<thead>
+				<tr>
+					<th><a href="javascript:" class=add>Добавить</a></th>
+					<th>Услуга</th>
+					<th>Стоимость</th>
+					<th>Количество</th>
+				</tr>
+			</thead>
 			<% for i, part in enumerate(act.Parts): %>
 			<tr>
 				<td>

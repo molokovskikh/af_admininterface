@@ -36,8 +36,9 @@ namespace Functional.Billing
 		[Test]
 		public void View_payments()
 		{
-			Open("/");
-			browser.Link(Find.ByText("Платежи")).Click();
+			Open();
+			Click("Платежи");
+			AssertText("Платежи");
 		}
 	}
 }

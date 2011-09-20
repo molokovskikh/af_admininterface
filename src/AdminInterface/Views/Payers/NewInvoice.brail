@@ -50,7 +50,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 	</div>
 	<div class=block>
 
-		<% if ?references: %>
+		<% if IsDefined(@references) and references.Count: %>
 		<p>
 			<select id=reference>
 				<% for reference in references: %>

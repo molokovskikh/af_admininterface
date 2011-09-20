@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
@@ -7,6 +8,8 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using WatiN.Core;
+using WatiN.CssSelectorExtensions;
 
 namespace Functional.Billing
 {
@@ -46,11 +49,29 @@ namespace Functional.Billing
 			Assert.That(Css("[name='invoice.parts[0].name']").Text, Is.EqualTo("Мониторинг оптового фармрынка за июль"));
 		}
 
-		[Test, Ignore]
+		[Test]
 		public void Edit_invoice()
 		{
 			Open(invoice, "Edit");
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Редактирование счета №{0}", invoice.Id)));
+			AssertText("Редактирование счета");
+			Click("Добавить");
+			Assert.That(Parts().Count(), Is.EqualTo(2));
+			Css("[name='invoice.parts[2].name']").TypeText("Статистические услуги");
+			Css("[name='invoice.parts[2].cost']").TypeText("1500");
+			Css("[name='invoice.parts[2].count']").TypeText("2");
+			Click("Сохранить");
+			AssertText("Сохранено");
+
+			invoice.Refresh();
+			Assert.That(invoice.Parts.Count, Is.EqualTo(2));
+			Assert.That(invoice.Parts[1].Name, Is.EqualTo("Статистические услуги"));
+			Assert.That(invoice.Parts[1].Cost, Is.EqualTo(1500));
+			Assert.That(invoice.Parts[1].Count, Is.EqualTo(2));
+		}
+
+		private IEnumerable<Element> Parts()
+		{
+			return browser.CssSelectAll("#bills tbody tr");
 		}
 	}
 }

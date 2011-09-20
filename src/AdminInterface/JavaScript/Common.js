@@ -1,8 +1,8 @@
 ﻿$(function () {
 
 	$("table.editable tr input[type=button].add, table.editable tr a.add").live('click', function () {
-		var body = $(this).parents("tbody").get(0);
 		var table = $(this).parents("table");
+		var body = table.find("tbody").get(0);
 		var row = table.data("template")(table);
 
 		maxIndex = $(body).children("tr").length + 1;
@@ -20,17 +20,11 @@
 		$($(this).parents("tr").get(0)).remove();
 	});
 
-	$.validator.addMethod("validateEmailList", function (value, element) {
-		if (value.toString().length > 0) {
-			return /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
-		}
-		return true;
-	}, "Поле содержит некорректный адрес электронной почты");
-
 	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});
+
 	$('.input-date').each(function () {
 		$(this).mask("99.99.9999");
 	});
@@ -74,7 +68,11 @@
 
 		defaultRoute: function () {
 			var tabs = $(".tabs ul li a[href='#'], .tabs ul li a.inline-tab");
-			if (tabs.length > 0 && $(".tabs ul li a.selected").length == 0)
+			if (window.skipFirstDefaultRoute) {
+				window.skipFirstDefaultRoute = false;
+				return;
+			}
+			if (tabs.length)
 				showTab(tabs.get(0).id);
 		}
 	});

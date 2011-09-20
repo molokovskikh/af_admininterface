@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doc>
+<assembly><name>V8Bridge.FSharp</name></assembly>
+<members>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="T:V8Bridge.FSharp.AffinitySyncContext">
+<summary>
+ Because V8 can only ever be called from the specific thread that created it,
+ we use this custom synchronization context to control on which thread
+ code in an async workflow executes, by way of Async.SwitchToContext.
+</summary>
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="M:V8Bridge.FSharp.WorkItem.WaitForCompletion">
+<summary>
+ Blocks the current thread until the the action has been run.
+</summary>
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="">
+
+</member>
+<member name="T:V8Bridge.FSharp.ScriptEngine">
+<summary>
+ The ScriptEngine executes javascript code in the underlying V8 or Jurassic
+ engine, ensuring that the underlying engine always runs on the same thread,
+ and only executes one thing at a time. That&apos;s just how V8 rolls, but we 
+ forgive them because it&apos;s so dang fast!
+</summary>
+</member>
+</members>
+</doc>
