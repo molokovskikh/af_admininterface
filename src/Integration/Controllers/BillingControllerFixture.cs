@@ -27,7 +27,7 @@ namespace Integration.Controllers
 		public void Update_supplier_status()
 		{
 			controller.UpdateClientStatus(supplier.Id, false);
-			session.Flush();
+			scope.Flush();
 
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
 			Assert.That(supplier.Disabled, Is.True);

@@ -2,8 +2,12 @@
 ${System.DateTime.Now}
 ${admin.Host}
 договор: ${payer.Id}
-плательщик: ${payer.Name}
+плательщик: ${payer.Name}<%
+if service:
+%>
 код клиента: ${service.Id}
-название клиента: ${service.Name}
+название клиента: ${service.Name}<%
+end
+%>
 {account.Type}, ${account.Name}
 было ${oldPayment.ToString("C")} стало ${newPayment.ToString("C")}

@@ -368,34 +368,6 @@ namespace AdminInterface.Controllers
 			return Payer.Find(payerId).TotalSum.ToString("C");
 		}
 
-		public void Accounting([DataBind("SearchBy")] AccountingSearchProperties searchBy, string tab, uint? currentPage)
-		{
-			if (searchBy.BeginDate == null && searchBy.EndDate == null && searchBy.SearchText == null)
-				searchBy = new AccountingSearchProperties();
-
-			if (String.IsNullOrEmpty(tab))
-				tab = "unregistredItems";
-
-			var pager = new Pager((int?)currentPage, 30);
-			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
-			{
-				PropertyBag["unaccountedItems"] = Models.Billing.Accounting.GetReadyForAccounting(pager);
-			}
-			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
-			{
-				var historyItems = AccountingItem
-					.SearchBy(searchBy, pager)
-					.OrderByDescending(item => item.WriteTime)
-					.ToList();
-				PropertyBag["accountingHistoryItems"] = historyItems;
-			}
-			PropertyBag["currentPage"] = pager.Page;
-			PropertyBag["totalPages"] = pager.TotalPages;
-
-			PropertyBag["tab"] = tab;
-			PropertyBag["FindBy"] = searchBy;
-		}
-
 		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)
 		{
 			var payer = Payer.Find(payerId);
@@ -427,14 +399,6 @@ namespace AdminInterface.Controllers
 
 			Notify("Юридическое лицо создано");
 			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
-		}
-
-		public void UpdateReport(uint id, bool allow)
-		{
-			var report = Report.Find(id);
-			report.Allow = allow;
-			report.Update();
-			CancelView();
 		}
 	}
 }

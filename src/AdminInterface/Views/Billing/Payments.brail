@@ -133,18 +133,14 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			}
 		});
 
-		$("#reports input").change(function () {
-			Update("${siteroot}/Billing/UpdateReport", this);
-		});
-
 		$("#users a[data-id]").click(function () {
 			id = $(this).attr("data-id");
 			$("select#messageReceiverComboBox option[selected]").removeAttr("selected");
 			$("select#messageReceiverComboBox option[value='" + id + "']").attr("selected", "selected");
 		});
 
-		$("#addresses input, #users input").change(function () {
-			Update("${siteroot}/Account/Update", this);
+		$("#addresses input, #users input, #reports input").change(function () {
+			Update("${siteroot}/Accounts/Update", this);
 		});
 
 		$("div.collapsible, div.autocollapsible").each(function () {
@@ -460,14 +456,15 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<th>Учтен</th>
 								<th>Бесплатно</th>
 								<th>Платеж</th>
+								<th>Код</th>
 								<th>Примечание</th>
 							</tr>
 						</thead>
 						<% for i, report in enumerate(reports): %>
-						<tr class="${ViewHelper.GetRowStyle(i)}">
+						<tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if not report.Status}">
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
-								<input name=allow type="checkbox" ${"checked" if report.Report.Allow} />
+								<input name=status type="checkbox" ${"checked" if report.Status} />
 							</td>
 							<td class=short>
 								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />
@@ -477,6 +474,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</td>
 							<td  class=short>
 								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
+							</td>
+							<td>
+								${report.Report.Id}
 							</td>
 							<td>!{report.Name}</td>
 						</tr>

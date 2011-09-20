@@ -140,7 +140,7 @@
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\Bubble.cs" />
     <Compile Include="Components\SettingCheckbox.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
@@ -195,7 +195,7 @@
     <Compile Include="Initializers\ActiveRecord.cs" />
     <Compile Include="Models\Address.cs" />
     <Compile Include="Models\Billing\Accounting.cs" />
-    <Compile Include="Models\Billing\AccountingSearchProperties.cs" />
+    <Compile Include="Models\Billing\AccountFilter.cs" />
     <Compile Include="Models\Billing\Act.cs" />
     <Compile Include="Models\Billing\Advertising.cs" />
     <Compile Include="Models\Billing\BalanceUpdater.cs" />
@@ -488,8 +488,8 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Views\Billing\Accounting.brail" />
-    <None Include="Views\Billing\AccountingHistory.brail" />
+    <None Include="Views\Accounts\Index.brail" />
+    <None Include="Views\Accounts\AccountingHistory.brail" />
     <None Include="Views\Billing\AdditionalUserInfo.brail" />
     <None Include="Views\Billing\JuridicalOrganizations.brail" />
     <None Include="Views\Billing\Mail.brail" />
@@ -497,7 +497,7 @@
     <None Include="Views\Billing\SearchUsersForAddress.brail" />
     <None Include="Views\Billing\AdditionalAddressInfo.brail" />
     <None Include="Views\Billing\ShowMessageForUser.brail" />
-    <None Include="Views\Billing\Unaccounted.brail" />
+    <None Include="Views\Accounts\Unaccounted.brail" />
     <None Include="Views\CallHistory\ListenCallRecord.brail" />
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\Clients\Settings.brail" />

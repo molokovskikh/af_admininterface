@@ -34,20 +34,9 @@ namespace AdminInterface.Models.Logs
 			UserName = Administrator.UserName;
 			WriteTime = DateTime.Now;
 
-			if (accounting is UserAccounting)
-			{
-				var user = ((UserAccounting)accounting).User;
-				ObjectId = user.Id;
-				ObjectType = LogObjectType.User;
-				Name = user.GetLoginOrName();
-			}
-			else
-			{
-				var address = ((AddressAccounting)accounting).Address;
-				ObjectId = address.Id;
-				ObjectType = LogObjectType.Address;
-				Name = address.Name;
-			}
+			ObjectId = accounting.ObjectId;
+			ObjectType = accounting.ObjectType;
+			Name = accounting.Name;
 		}
 
 		[PrimaryKey]

@@ -2,22 +2,19 @@
 	Учет адресов и пользователей
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Учет адресов и пользователей", "")]} %>
-
-<div align="center">
-	<h3>Учет адресов и пользователей</h3>
-</div>
+<% component Bubble, {"bredcrumbs" : []} %>
 
 <div class="tabs">
 	<ul>
 		<li>
-			<a id="unregistredItems" href="${siteroot}/Billing/Accounting?tab=unregistredItems" ${"class='selected'" if tab == "unregistredItems"}>Неучтенные</a>
+			<a id="unregistredItems" href="${siteroot}/Accounts/Index?tab=unregistredItems" ${"class='selected'" if tab == "unregistredItems"}>Неучтенные</a>
 		</li>
 		<li>
-			<a id="AccountingHistory" href="${siteroot}/Billing/Accounting?tab=AccountingHistory" ${"class='selected'" if tab == "AccountingHistory"}>История поставленных на учет</a>
+			<a id="AccountingHistory" href="${siteroot}/Accounts/Index?tab=AccountingHistory" ${"class='selected'" if tab == "AccountingHistory"}>История поставленных на учет</a>
 		</li>
 	</ul>
 </div>
+
 <div id="unregistredItems-tab" class="tab" ${"style='display:none'" if tab != "unregistredItems"}>
 <% if tab == "unregistredItems": %>
 	<% OutputSubView("Unaccounted") %>
@@ -33,5 +30,3 @@
 	<div align="center">Пожалуйста подождите...</div>
 <% end %>
 </div>
-
-<br />

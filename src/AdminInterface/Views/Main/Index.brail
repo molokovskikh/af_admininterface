@@ -112,7 +112,7 @@
 					<h3>Биллинг</h3>
 					<ul class="navigation">
 						<li>${app.LinkTo("Биллинг", "Billing", "Search")}</li>
-						<li>${app.LinkTo("Учет", "Billing", "Accounting")}</li>
+						<li>${app.LinkTo("Учет", "Accounts", "Index")}</li>
 
 						<li>${app.LinkTo("Счета", "Invoices", "Index")}</li>
 						<li>${app.LinkTo("Платежи", "Payments", "Index")}</li>

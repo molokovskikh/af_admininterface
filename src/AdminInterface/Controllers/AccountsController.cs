@@ -1,4 +1,6 @@
-﻿using AdminInterface.Helpers;
+﻿using System;
+using System.Linq;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
@@ -12,13 +14,40 @@ using NHibernate;
 namespace AdminInterface.Controllers
 {
 	[Secure(PermissionType.Billing)]
-	public class AccountController : AdminInterfaceController
+	public class AccountsController : AdminInterfaceController
 	{
+		public void Index([DataBind("SearchBy")] AccountFilter searchBy, string tab, uint? currentPage)
+		{
+			if (searchBy.BeginDate == null && searchBy.EndDate == null && searchBy.SearchText == null)
+				searchBy = new AccountFilter();
+
+			if (String.IsNullOrEmpty(tab))
+				tab = "unregistredItems";
+
+			var pager = new Pager((int?)currentPage, 30);
+			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
+			{
+				PropertyBag["unaccountedItems"] = Models.Billing.Accounting.GetReadyForAccounting(pager);
+			}
+			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
+			{
+				var historyItems = searchBy.Find(pager)
+					.OrderByDescending(item => item.WriteTime)
+					.ToList();
+				PropertyBag["accountingHistoryItems"] = historyItems;
+			}
+			PropertyBag["currentPage"] = pager.Page;
+			PropertyBag["totalPages"] = pager.TotalPages;
+
+			PropertyBag["tab"] = tab;
+			PropertyBag["FindBy"] = searchBy;
+		}
+
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
 			var account = Accounting.TryFind(id);
 			UpdateAccounting(account.Id, accounted, payment, free);
-			if (status != null || free != null)
+			if (status != null)
 			{
 				NHibernateUtil.Initialize(account);
 				if (account is UserAccounting)
@@ -26,10 +55,14 @@ namespace AdminInterface.Controllers
 					var user = ((UserAccounting)account).User;
 					SetUserStatus(user.Id, status);
 				}
-				else
+				else if (account is AddressAccounting)
 				{
 					var address = ((AddressAccounting)account).Address;
 					SetAddressStatus(address.Id, status);
+				}
+				else
+				{
+					account.Status = status.Value;
 				}
 			}
 			CancelView();

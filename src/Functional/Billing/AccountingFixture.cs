@@ -130,7 +130,7 @@ namespace Functional.Billing
 			var user = DataMother.CreateSupplierUser();
 			user.Name = user.Login;
 			user.Accounting.Accounted();
-			Open("Billing/Accounting?tab=AccountingHistory");
+			Open("Accounts/Index?tab=AccountingHistory");
 			browser.WaitUntilContainsText("Поиск", 2);
 			Assert.That(browser.Text, Is.StringContaining("Поиск"));
 			Assert.That(browser.Text, Is.StringContaining(user.Login));

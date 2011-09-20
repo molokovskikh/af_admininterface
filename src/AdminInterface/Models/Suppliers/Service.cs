@@ -26,7 +26,7 @@ namespace AdminInterface.Models.Suppliers
 		public virtual string Name { get; set; }
 
 		[BelongsTo]
-		public virtual Region HomeRegion  { get; set; }
+		public virtual Region HomeRegion { get; set; }
 
 		[Property]
 		public virtual bool Disabled { get; set; }

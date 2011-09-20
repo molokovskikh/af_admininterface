@@ -48,7 +48,7 @@ namespace Integration.Controllers
 			client.Payers.Add(payer);
 			payer.Save();
 			client.Save();
-			session.Flush();
+			scope.Flush();
 
 			address.LegalEntity = payer.JuridicalOrganizations.First();
 			controller.Update(address, new Contact[0], new Contact[0]);

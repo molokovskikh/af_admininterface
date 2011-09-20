@@ -16,7 +16,7 @@ namespace Integration.ForTesting
 	public class ControllerFixture : BaseControllerTest
 	{
 		protected List<MailMessage> notifications;
-		protected ISessionScope session;
+		protected ISessionScope scope;
 		protected string referer;
 
 		[SetUp]
@@ -36,14 +36,14 @@ namespace Integration.ForTesting
 				}));
 			MailerExtention.SenderForTest = sender;
 
-			session = new TransactionlessSession();
+			scope = new TransactionlessSession();
 		}
 
 		[TearDown]
 		public void TearDown()
 		{
-			if (session != null)
-				session.Dispose();
+			if (scope != null)
+				scope.Dispose();
 		}
 
 		protected override IMockResponse BuildResponse(UrlInfo info)

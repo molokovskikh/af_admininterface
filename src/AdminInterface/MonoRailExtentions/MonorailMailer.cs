@@ -204,9 +204,12 @@ namespace AdminInterface.MonoRailExtentions
 			Subject = String.Format("Изменение стоимости {0} - {1}", payer.Name, payer.Id);
 
 			if (service != null)
-				Subject += String.Format(", {0} - {1}", service.Name, service.Id);
-
-			Subject += ", " + BindingHelper.GetDescription(service.Type);
+			{
+				Subject += String.Format(", {0} - {1}, {2}",
+					service.Name,
+					service.Id,
+					BindingHelper.GetDescription(service.Type));
+			}
 
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["payer"] = payer;

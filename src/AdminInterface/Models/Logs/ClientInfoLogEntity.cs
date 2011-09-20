@@ -22,7 +22,8 @@ namespace AdminInterface.Models.Logs
 		[Description("Поставщик")] Supplier,
 		[Description("Клиент")] Client,
 		[Description("Пользователь")] User,
-		[Description("Адрес")] Address
+		[Description("Адрес")] Address,
+		[Description("Отчет")] Report,
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]

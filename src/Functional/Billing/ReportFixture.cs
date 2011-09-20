@@ -15,18 +15,21 @@ namespace Functional.Billing
 	{
 		Client client;
 		Report report;
+		Payer payer;
+		ReportAccounting account;
 
 		[SetUp]
 		public void SetUp()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
-			var payer = client.Payers.First();
+			payer = client.Payers.First();
 			report = new Report {
 				Allow = true,
 				Comment = "тестовый отчет",
 				Payer = payer,
 			};
-			report.Save();
+			account = new ReportAccounting(report);
+			account.Save();
 			
 			payer.Reports = new List<Report>();
 			payer.Reports.Add(report);
@@ -45,7 +48,7 @@ namespace Functional.Billing
 		[Test]
 		public void Disable_report()
 		{
-			var element = (CheckBox)ElementFor(report, r => r.Allow);
+			var element = (CheckBox)ElementFor(account, r => r.Status);
 			element.Click();
 			browser.Eval(String.Format("$('input[name=allow]').change()"));
 
@@ -53,11 +56,29 @@ namespace Functional.Billing
 			Assert.That(report.Allow, Is.False);
 		}
 
-		private Element ElementFor<T>(T item, Func<Report, object> property)
+		[Test]
+		public void Show_unaccounted_report()
+		{
+			Open("/Accounts/Index");
+			AssertText("тестовый отчет");
+		}
+
+		[Test]
+		public void Show_accounted_report()
+		{
+			account.Accounted();
+			account.Save();
+
+			Open("/Accounts/Index");
+			Click("История поставленных на учет");
+			AssertText("тестовый отчет");
+		}
+
+		private Element ElementFor<T>(T item, Func<T, object> property)
 		{
 			var id = item.GetType().GetProperty("Id").GetValue(item, null);
 			var idElement = (Element)browser.Css(String.Format("input[type=hidden][name=id][value='{0}']", id));
-			var propertyName = "allow";
+			var propertyName = "status";
 			var row = (TableRow)idElement.Parents().OfType<TableRow>().First();
 			return row.CheckBox(Find.ByName(propertyName));
 		}

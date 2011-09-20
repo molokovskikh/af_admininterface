@@ -36,9 +36,7 @@ BeAccounted = 0;
 			client.Users[0].Accounting.Accounted();
 			client.SaveAndFlush();
 
-			var accounts = AccountingItem.SearchBy(
-				new AccountingSearchProperties {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()},
-				new Pager());
+			var accounts = new AccountFilter {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()}.Find(new Pager());
 			Assert.That(accounts.Count, Is.EqualTo(1));
 			Assert.That(accounts.Single().Id, Is.EqualTo(client.Users[0].Accounting.Id));
 		}
