@@ -141,10 +141,3 @@ task @CleanFtp:
 			if not ids.Any({i| id == i}):
 				#print "delete $dir"
 				Directory.Delete(dir, true)
-
-task @TestJs:
-	root = Path.GetFullPath("tools/phantomjs-1.2.0")
-	phantom = Path.Combine(root, "phantomjs.exe")
-	run = Path.Combine(root, "examples", "run-qunit.js")
-	for file in Directory.GetFiles("test", "*.html"):
-		Sh("$phantom $run $file")
