@@ -50,7 +50,6 @@ namespace Functional.Billing
 		{
 			var element = (CheckBox)ElementFor(account, r => r.Status);
 			element.Click();
-			browser.Eval(String.Format("$('input[name=allow]').change()"));
 
 			report.Refresh();
 			Assert.That(report.Allow, Is.False);

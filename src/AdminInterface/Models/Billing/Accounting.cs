@@ -128,6 +128,7 @@ namespace AdminInterface.Models.Billing
 		public ReportAccounting(Report report)
 		{
 			Report = report;
+			ReadyForAcounting = true;
 		}
 
 		public ReportAccounting() {}

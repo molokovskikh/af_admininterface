@@ -449,7 +449,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</div>
 
 				<div class="VisibleFolder">
-					<table class="DataTable">
+					<table class="DataTable filter">
 						<thead>
 							<tr>
 								<th>Включен</th>
@@ -476,7 +476,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
 							<td>
-								${report.Report.Id}
+								<a href="javascript:" data-filter="Report${report.Report.Id}">${report.Report.Id}</a>
 							</td>
 							<td>!{report.Name}</td>
 						</tr>
