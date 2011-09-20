@@ -197,21 +197,21 @@ namespace AdminInterface.MonoRailExtentions
 			Template = "AccountingChanged";
 
 			var payer = account.Payer;
-			Service service = null;
-
-			if (account is UserAccounting)
-				service = ((UserAccounting)account).User.RootService;
-			else
-				service = ((AddressAccounting)account).Address.Client;
+			var service = account.Service;
 
 			From = "billing@analit.net";
 			To = "billing@analit.net";
-			Subject = String.Format("Изменение стоимости {0} - {1}, {2} - {3}, {4}",
-				payer.Name, payer.Id, service.Name, service.Id, BindingHelper.GetDescription(service.Type));
+			Subject = String.Format("Изменение стоимости {0} - {1}", payer.Name, payer.Id);
+
+			if (service != null)
+				Subject += String.Format(", {0} - {1}", service.Name, service.Id);
+
+			Subject += ", " + BindingHelper.GetDescription(service.Type);
 
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["payer"] = payer;
 			PropertyBag["service"] = service;
+			PropertyBag["account"] = account;
 			PropertyBag["newPayment"] = account.Payment;
 			PropertyBag["oldPayment"] = account.OldValue(a => a.Payment);
 

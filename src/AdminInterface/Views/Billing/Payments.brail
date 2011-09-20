@@ -467,16 +467,18 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<tr class="${ViewHelper.GetRowStyle(i)}">
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
-								<input name=allow type="checkbox" ${"checked" if report.Allow} />
+								<input name=allow type="checkbox" ${"checked" if report.Report.Allow} />
 							</td>
 							<td class=short>
 								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />
 							</td>
+							<td class=short>
+								<input name=free type=checkbox ${"checked" if report.IsFree} />
+							</td>
 							<td  class=short>
 								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
 							</td>
-							<td></td>
-							<td>!{report.Comment}</td>
+							<td>!{report.Name}</td>
 						</tr>
 						<% end %>
 					</table>

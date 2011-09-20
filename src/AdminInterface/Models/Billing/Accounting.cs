@@ -211,6 +211,14 @@ WHERE {1} and {2}
 
 		public UserAccounting() {}
 
+		public override Service Service
+		{
+			get
+			{
+				return User.RootService;
+			}
+		}
+
 		public override Payer Payer
 		{
 			get { return User.Payer; }
@@ -245,6 +253,14 @@ WHERE {1} and {2}
 		}
 
 		public AddressAccounting() {}
+
+		public override Service Service
+		{
+			get
+			{
+				return Address.Client;
+			}
+		}
 
 		public override Payer Payer
 		{
@@ -339,6 +355,13 @@ WHERE {1} and {2}
 
 		public abstract string Name { get;}
 
+		public abstract string Type { get; }
+
+		public virtual Service Service
+		{
+			get { return null; }
+		}
+
 		public virtual void Accounted()
 		{
 			Operator = SecurityContext.Administrator.UserName;
@@ -350,8 +373,6 @@ WHERE {1} and {2}
 		{
 			return (BeAccounted || ReadyForAcounting) && !IsFree;
 		}
-
-		public abstract string Type { get; }
 
 		public static IList<Accounting> SearchBy(AccountingSearchProperties filter, Pager pager)
 		{

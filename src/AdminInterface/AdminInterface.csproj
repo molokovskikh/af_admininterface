@@ -544,7 +544,6 @@
     <None Include="Views\Addresses\Add.brail" />
     <None Include="Views\Addresses\Edit.brail" />
     <None Include="Views\Main\Index.brail" />
-    <None Include="Views\Monitoring\Prices.brail" />
     <None Include="Views\Monitoring\Updates.brail" />
     <None Include="Views\Monitoring\Orders.brail" />
     <None Include="Views\RevisionActs\Print.brail" />
@@ -554,7 +553,6 @@
     <None Include="Views\Billing\Search.brail" />
     <None Include="Views\Users\ChangePassword.brail" />
     <None Include="Views\Common\CloseWindow.brail" />
-    <None Include="Views\Monitoring\Clients.brail" />
     <None Include="Views\Logs\Documents.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
