@@ -6,5 +6,5 @@ task @CreateAccounting, [@InitActiveRecord]:
 	using SessionScope():
 		for user in User.FindAll():
 			continue if user.Accounting
-			user.Accounting = UserAccounting(user)
+			user.Accounting = UserAccount(user)
 			user.Save()

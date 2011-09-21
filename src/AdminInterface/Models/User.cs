@@ -81,7 +81,7 @@ namespace AdminInterface.Models
 		{
 			UserUpdateInfo = new UserUpdateInfo(this);
 			Logs = new AuthorizationLogEntity(this);
-			Accounting = new UserAccounting(this);
+			Accounting = new UserAccount(this);
 
 			RootService = service;
 			if (service is Client)
@@ -195,7 +195,7 @@ namespace AdminInterface.Models
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
-		public virtual Accounting Accounting { get; set; }
+		public virtual Account Accounting { get; set; }
 
 		[BelongsTo(Cascade = CascadeEnum.All)]
 		public virtual Service RootService { get; set; }
@@ -364,7 +364,7 @@ namespace AdminInterface.Models
 				Client.Users.Add(this);
 
 			if (Accounting == null)
-				Accounting = new UserAccounting(this);
+				Accounting = new UserAccount(this);
 
 			Registrant = SecurityContext.Administrator.UserName;
 			RegistrationDate = DateTime.Now;

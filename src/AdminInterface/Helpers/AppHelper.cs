@@ -92,7 +92,7 @@ namespace AdminInterface.Helpers
 
 			if (parameters.ContainsKey("controller"))
 			{
-				if (parameters["controller"].ToString().ToLower() == "ReportAccountings".ToLower())
+				if (parameters["controller"].ToString().ToLower() == "ReportAccounts".ToLower())
 					parameters["controller"] = "Accounts";
 
 				var controller = parameters["controller"].ToString();

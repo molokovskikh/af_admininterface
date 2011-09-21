@@ -27,7 +27,7 @@ namespace AdminInterface.Controllers
 			var pager = new Pager((int?)currentPage, 30);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 			{
-				PropertyBag["unaccountedItems"] = Models.Billing.Accounting.GetReadyForAccounting(pager);
+				PropertyBag["unaccountedItems"] = Models.Billing.Account.GetReadyForAccounting(pager);
 			}
 			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
 			{
@@ -45,19 +45,19 @@ namespace AdminInterface.Controllers
 
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
-			var account = Accounting.TryFind(id);
+			var account = Account.TryFind(id);
 			UpdateAccounting(account.Id, accounted, payment, free);
 			if (status != null)
 			{
 				NHibernateUtil.Initialize(account);
-				if (account is UserAccounting)
+				if (account is UserAccount)
 				{
-					var user = ((UserAccounting)account).User;
+					var user = ((UserAccount)account).User;
 					SetUserStatus(user.Id, status);
 				}
-				else if (account is AddressAccounting)
+				else if (account is AddressAccount)
 				{
-					var address = ((AddressAccounting)account).Address;
+					var address = ((AddressAccount)account).Address;
 					SetAddressStatus(address.Id, status);
 				}
 				else
@@ -95,7 +95,7 @@ namespace AdminInterface.Controllers
 
 		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)
 		{
-			var account = Accounting.Find(accountId);
+			var account = Account.Find(accountId);
 			if (accounted.HasValue)
 			{
 				if (accounted.Value)
@@ -136,7 +136,7 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			var account = Accounting.Find(id);
+			var account = Account.Find(id);
 			if (IsPost)
 			{
 				BindObjectInstance(account, "account");

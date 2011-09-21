@@ -315,14 +315,14 @@ namespace Integration.ForTesting
 			return inn;
 		}
 
-		public static ReportAccounting Report(Payer payer)
+		public static ReportAccount Report(Payer payer)
 		{
 			var report = new Report {
 				Allow = true,
 				Comment = "тестовый отчет",
 				Payer = payer,
 			};
-			var account = new ReportAccounting(report);
+			var account = new ReportAccount(report);
 			return account;
 		}
 	}

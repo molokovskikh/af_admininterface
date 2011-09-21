@@ -192,7 +192,7 @@ namespace AdminInterface.MonoRailExtentions
 			return this;
 		}
 
-		public MonorailMailer AccountingChanged(Accounting account)
+		public MonorailMailer AccountingChanged(Account account)
 		{
 			Template = "AccountingChanged";
 

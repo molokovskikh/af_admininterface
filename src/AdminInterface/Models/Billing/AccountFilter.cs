@@ -65,7 +65,7 @@ namespace AdminInterface.Models.Billing
 			get { return (SearchBy == AccountingSearchBy.ByReport); }
 		}
 
-		public IList<Accounting> Find(Pager pager)
+		public IList<Account> Find(Pager pager)
 		{
 			var searchText = String.Format("%{0}%", Utils.StringToMySqlString(SearchText));
 			var searchNumber = 0;
@@ -80,21 +80,18 @@ namespace AdminInterface.Models.Billing
 			{
 				case AccountingSearchBy.ByAddress:
 					@from = @"
-from Billing.Accounting c
 	join Future.Addresses a ON a.AccountingId = c.Id AND c.Type = 1";
 					@where = @"
 (a.Address LIKE :SearchText OR a.Id = :SearchNumber)";
 					break;
 				case AccountingSearchBy.ByClient:
 					@from = @"
-from Billing.Accounting c
 	join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
 		join Future.Clients cl ON cl.Id = u.ClientId";
 					@where = "cl.Name LIKE :SearchText OR cl.FullName LIKE :SearchText OR cl.Id = :SearchNumber";
 					break;
 				case AccountingSearchBy.ByPayer:
 					@from = @"
-from Billing.Accounting c
 	join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
 		join Future.Clients cl ON cl.Id = u.ClientId
 			join Billing.PayerClients pc on pc.ClientId = cl.Id
@@ -103,20 +100,17 @@ from Billing.Accounting c
 					break;
 				case AccountingSearchBy.ByUser:
 					@from = @"
-from Billing.Accounting c
 	join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0";
 					@where = @"
 (ifnull(u.Name, '') LIKE :SearchText OR u.Id = :SearchNumber)";
 					break;
 				case AccountingSearchBy.ByReport:
 					@from = @"
-from Billing.Accounting c
 	join Reports.general_reports gr on gr.GeneralReportCode = c.ObjectId and c.Type = 2";
 					@where = @"(gr.Comment LIKE :SearchText OR gr.GeneralReportCode = :SearchNumber)";
 					break;
 				case AccountingSearchBy.Auto:
 					@from = @"
-from Billing.Accounting c
 	left join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
 		left join Future.Clients  cl ON cl.Id = u.ClientId
 			left join Billing.PayerClients pc on pc.ClientId = cl.Id
@@ -131,12 +125,13 @@ from Billing.Accounting c
 )";
 					break;
 				default:
-					return Enumerable.Empty<Accounting>().ToList();
+					return Enumerable.Empty<Account>().ToList();
 			}
 
 			return ArHelper.WithSession(session => {
 				pager.Total = Convert.ToInt32(session.CreateSQLQuery(String.Format(@"
 SELECT count(*)
+from Billing.Accounts c
 {0}
 WHERE {1} and {2}
 ", @from, @where, filter))
@@ -148,6 +143,7 @@ WHERE {1} and {2}
 
 				var items = session.CreateSQLQuery(String.Format(@"
 SELECT c.Id
+from Billing.Accounts c
 {0}
 WHERE {1} and {2}
 {3}
@@ -159,7 +155,7 @@ WHERE {1} and {2}
 					.SetParameter("SearchNumber", searchNumber)
 					.List();
 				var ids = items.Cast<object>().Select(id => Convert.ToUInt32(id)).ToArray();
-				return ActiveRecordLinqBase<Accounting>.Queryable.Where(a => ids.Contains(a.Id)).OrderByDescending(a => a.WriteTime).ToList();
+				return ActiveRecordLinqBase<Account>.Queryable.Where(a => ids.Contains(a.Id)).OrderByDescending(a => a.WriteTime).ToList();
 			});
 		}
 	}

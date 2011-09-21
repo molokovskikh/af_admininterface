@@ -194,7 +194,7 @@
     <Compile Include="Helpers\Wav\WavHelper.cs" />
     <Compile Include="Initializers\ActiveRecord.cs" />
     <Compile Include="Models\Address.cs" />
-    <Compile Include="Models\Billing\Accounting.cs" />
+    <Compile Include="Models\Billing\Account.cs" />
     <Compile Include="Models\Billing\AccountFilter.cs" />
     <Compile Include="Models\Billing\Act.cs" />
     <Compile Include="Models\Billing\Advertising.cs" />

@@ -347,7 +347,7 @@ group by u.ClientId")
 				address.Payer = address.LegalEntity.Payer;
 
 			if (address.Accounting == null)
-				address.Accounting = new AddressAccounting(address);
+				address.Accounting = new AddressAccount(address);
 			address.Registrant = SecurityContext.Administrator.UserName;
 			address.RegistrationDate = DateTime.Now;
 			address.Client = this;

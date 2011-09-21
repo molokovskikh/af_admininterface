@@ -39,7 +39,7 @@ namespace Integration.Controllers
 				Comment = "тестовый отчет",
 				Payer = payer,
 			};
-			var account = new ReportAccounting(report);
+			var account = new ReportAccount(report);
 			account.Save();
 			scope.Flush();
 

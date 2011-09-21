@@ -15,17 +15,17 @@ using Common.Web.Ui.Helpers;
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(DiscriminatorValue = "0")]
-	public class UserAccounting : Accounting
+	public class UserAccount : Account
 	{
-		public UserAccounting() {}
+		public UserAccount() {}
 
-		public UserAccounting(User user)
+		public UserAccount(User user)
 		{
 			Payment = 800;
 			User = user;
 		}
 
-		[OneToOne(PropertyRef = "Accounting")]
+		[BelongsTo("ObjectId")]
 		public virtual User User { get; set; }
 
 		public override uint ObjectId
@@ -63,18 +63,18 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord(DiscriminatorValue = "1")]
-	public class AddressAccounting : Accounting
+	public class AddressAccount : Account
 	{
-		[OneToOne(PropertyRef = "Accounting")]
-		public virtual Address Address { get; set; }
+		public AddressAccount() {}
 
-		public AddressAccounting(Address address)
+		public AddressAccount(Address address)
 		{
 			Address = address;
 			Payment = 200;
 		}
 
-		public AddressAccounting() {}
+		[BelongsTo("ObjectId")]
+		public virtual Address Address { get; set; }
 
 		public override Service Service
 		{
@@ -120,11 +120,11 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord(DiscriminatorValue = "2")]
-	public class ReportAccounting : Accounting
+	public class ReportAccount : Account
 	{
-		public ReportAccounting() {}
+		public ReportAccount() {}
 
-		public ReportAccounting(Report report)
+		public ReportAccount(Report report)
 		{
 			Report = report;
 			ReadyForAcounting = true;
@@ -179,8 +179,8 @@ namespace AdminInterface.Models.Billing
 		}
 	}
 
-	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
-	public abstract class Accounting : ActiveRecordLinqBase<Accounting>, IAuditable
+	[ActiveRecord(DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
+	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
 		private string _description;
 
@@ -284,7 +284,7 @@ namespace AdminInterface.Models.Billing
 			return (BeAccounted || ReadyForAcounting) && !IsFree;
 		}
 
-		public static IEnumerable<Accounting> GetReadyForAccounting(Pager pager)
+		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
 		{
 			var readyForAccounting = Queryable.Where(a => a.ReadyForAcounting && !a.BeAccounted);
 

@@ -153,7 +153,7 @@ namespace AdminInterface.Controllers
 			{
 				SetBinder(new AccountBinder());
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
-				var accounts = BindObject<Accounting[]>(ParamStore.Form, "accounts");
+				var accounts = BindObject<Account[]>(ParamStore.Form, "accounts");
 				foreach (var account in accounts)
 					account.Save();
 

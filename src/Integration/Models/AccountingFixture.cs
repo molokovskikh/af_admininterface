@@ -14,18 +14,18 @@ namespace Integration.Models
 		public void Find_ready_for_accounting()
 		{
 			ArHelper.WithSession(s => s.CreateSQLQuery(@"
-update billing.accounting
+update billing.Accounts
 set ReadyForAcounting = 0,
 BeAccounted = 0;
 ").ExecuteUpdate());
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 
-			var accountings = Accounting.GetReadyForAccounting(new Pager());
+			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAcounting = true;
 			client.SaveAndFlush();
 
-			accountings = Accounting.GetReadyForAccounting(new Pager());
+			accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(1), accountings.Implode(a => a.Name));
 		}
 

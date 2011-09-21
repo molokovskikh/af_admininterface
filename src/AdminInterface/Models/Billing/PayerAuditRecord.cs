@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Logs
 		{
 		}
 
-		public PayerAuditRecord(Payer payer, Accounting accounting)
+		public PayerAuditRecord(Payer payer, Account accounting)
 		{
 			Payer = payer;
 			Administrator = SecurityContext.Administrator;

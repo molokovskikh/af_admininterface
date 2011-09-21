@@ -68,7 +68,7 @@ namespace AdminInterface.Models
 		public virtual Payer Payer { get; set; }
 
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
-		public virtual Accounting Accounting { get; set; }
+		public virtual Account Accounting { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
 			Lazy = true,

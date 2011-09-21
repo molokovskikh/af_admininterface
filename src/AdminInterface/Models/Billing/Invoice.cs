@@ -181,7 +181,7 @@ namespace AdminInterface.Models.Billing
 			return result;
 		}
 
-		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Accounting> accounts)
+		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts)
 		{
 			if (Payer.InvoiceSettings.DoNotGroupParts)
 			{

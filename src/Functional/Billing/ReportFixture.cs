@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
@@ -16,7 +16,7 @@ namespace Functional.Billing
 		Client client;
 		Report report;
 		Payer payer;
-		ReportAccounting account;
+		ReportAccount account;
 
 		[SetUp]
 		public void SetUp()
@@ -74,8 +74,8 @@ namespace Functional.Billing
 		{
 			Click("#reports", "Редактировать");
 			AssertText("Отчет, тестовый отчет");
-			Assert.That(Css("input[name='account.description']").Value, Is.EqualTo("Статистический отчет по фармрынку за {0}"));
-			Css("input[name='account.description']").TypeText("Стат. отчет");
+			Assert.That(Css("[name='account.Description']").Value, Is.EqualTo("Статистический отчет по фармрынку за {0}"));
+			Css("[name='account.Description']").TypeText("Стат. отчет");
 			Click("Сохранить");
 			AssertText("Сохранено");
 

@@ -306,17 +306,17 @@ ORDER BY {Payer}.shortname;";
 			}
 		}
 
-		public virtual IEnumerable<Accounting> GetAccountings()
+		public virtual IEnumerable<Account> GetAccountings()
 		{
 			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(GetReportAccounts());
 		}
 
-		private IEnumerable<Accounting> AddressesForInvoice()
+		private IEnumerable<Account> AddressesForInvoice()
 		{
 			return Addresses.Select(a => a.Accounting).Where(a => a.ShouldPay()).Skip(UsersForInvoice().Count());
 		}
 
-		private IEnumerable<Accounting> UsersForInvoice()
+		private IEnumerable<Account> UsersForInvoice()
 		{
 			return Users.Select(u => u.Accounting).Where(a => a.ShouldPay());
 		}
@@ -438,7 +438,7 @@ ORDER BY {Payer}.shortname;";
 				yield return new Invoice(this, period, date, invoiceGroup.Key);
 		}
 
-		public virtual IEnumerable<IGrouping<int, Accounting>> GetInvoiceGroups()
+		public virtual IEnumerable<IGrouping<int, Account>> GetInvoiceGroups()
 		{
 			return GetAccountings().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
 		}
@@ -448,13 +448,13 @@ ORDER BY {Payer}.shortname;";
 			throw new NotImplementedException();
 		}
 
-		public virtual IList<ReportAccounting> GetReportAccounts()
+		public virtual IList<ReportAccount> GetReportAccounts()
 		{
 			if (Reports.Count == 0)
-				return Enumerable.Empty<ReportAccounting>().ToList();
+				return Enumerable.Empty<ReportAccount>().ToList();
 
 			var reportIds = Reports.Select(r => r.Id).ToArray();
-			return ActiveRecordLinqBase<ReportAccounting>.Queryable
+			return ActiveRecordLinqBase<ReportAccount>.Queryable
 				.Where(a => reportIds.Contains(a.Report.Id))
 				.OrderBy(a => a.Report.Comment)
 				.ToList();
