@@ -169,6 +169,14 @@ namespace AdminInterface.Models.Billing
 				Report.Allow = value;
 			}
 		}
+
+		public override string DefaultDescription
+		{
+			get
+			{
+				return "Статистический отчет по фармрынку за {0}";
+			}
+		}
 	}
 
 	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
@@ -235,20 +243,34 @@ namespace AdminInterface.Models.Billing
 			set { throw new NotImplementedException(); }
 		}
 
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore)]
 		public virtual string Description
 		{
 			get
 			{
-				if (String.IsNullOrEmpty(_description) && Payer.Recipient != null)
-					return Payer.Recipient.Description;
+				if (String.IsNullOrEmpty(_description))
+					return DefaultDescription;
 				return _description;
 			}
 
 			set
 			{
+				if (_description == DefaultDescription)
+					_description = null;
 				_description = value;
 			}
 		}
+
+		public virtual string DefaultDescription
+		{
+			get
+			{
+				if (Payer.Recipient != null)
+					return Payer.Recipient.Description;
+				return "";
+			}
+		}
+
 
 		public virtual void Accounted()
 		{

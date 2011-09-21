@@ -8,6 +8,7 @@ using SHDocVw;
 using WatiN.Core;
 using WatiN.Core.Native.InternetExplorer;
 using WatiN.Core.UtilityClasses;
+using WatiN.CssSelectorExtensions;
 using mshtml;
 
 namespace Functional.ForTesting
@@ -144,6 +145,13 @@ namespace Functional.ForTesting
 		protected dynamic Css(string selector)
 		{
 			return browser.Css(selector);
+		}
+
+		protected void Click(string selector, string name)
+		{
+			var container = (IElementContainer)browser.CssSelect(selector);
+			container.Click(name);
+			CheckStatus();
 		}
 
 		protected void Click(string name)

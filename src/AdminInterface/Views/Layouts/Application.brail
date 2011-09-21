@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+﻿<% import System.Collections %>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -51,13 +52,18 @@
 						<img class="home" src="${siteroot}/images/home.png" alt="Административный интерфейс" />
 					</a>
 				</li>
-				<% for label, url in bredcrumbs: %>
+				<% for crumb in bredcrumbs: %>
 				<li>
-					<% if url: %>
-					<a href="${url}">${label}</a>
+					<% if crumb isa IEnumerable: %>
+						<% label, url = crumb %>
+						<% if url: %>
+							<a href="${url}">${label}</a>
+						<% else: %>
+						<% ShowHeader = false %>
+							${label}
+						<% end %>
 					<% else: %>
-					<% ShowHeader = false %>
-					${label}
+						${app.LinkTo(crumb)}
 					<% end %>
 				</li>
 				<% end %>

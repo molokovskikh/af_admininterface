@@ -49,6 +49,7 @@ namespace Integration
 
 			engine = new RoutingEngine();
 			engine.Add(new PatternRoute("/<controller>/<action>"));
+			engine.Add(new PatternRoute("/<controller>/<id>/[action]"));
 			var match = engine.FindMatch("home/index", new RouteContext(context.Request, null, appPath, null));
 			context.CurrentControllerContext.RouteMatch = match;
 
@@ -79,7 +80,7 @@ namespace Integration
 				var user = User.Queryable.Where(u => u.Payer != null).First();
 				Assert.That(NHibernateUtil.IsInitialized(user.Payer), Is.False);
 				var linkTo = helper.LinkTo(user.Payer);
-				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a class='' href='/Payers/{0}'>{1}</a>", user.Payer.Id, user.Payer.Name)));
+				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a href=""/Payers/{0}"">{1}</a>", user.Payer.Id, user.Payer.Name)));
 			}
 		}
 

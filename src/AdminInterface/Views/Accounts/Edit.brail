@@ -1,0 +1,21 @@
+﻿<% component CaptureFor, {@id : @Title}: %>
+	${account.Type}, ${account.Name}
+<% end %>
+
+<% component Bubble, {@bredcrumbs : [(account.Payer)]} %>
+
+<form method="post">
+	<div>
+		<div>
+			Наименование в счете:<br>
+			<span style="font-size:smaller">символы '{0}' будут заменены на название месяца за который формируется счет</span>
+		</div>
+		<div>
+			${FormHelper.TextArea("account.Description", {@rows: 3, @cols: 50})}
+			${app.GetValidationError(account, "Description")}
+		</div>
+	</div>
+	<div>
+		<input type=submit value="Сохранить" />
+	</div>
+</form>

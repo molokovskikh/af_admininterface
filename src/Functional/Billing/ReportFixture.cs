@@ -26,19 +26,19 @@ namespace Functional.Billing
 			account = DataMother.Report(payer);
 			report = account.Report;
 			account.Save();
-			
+
 			payer.Reports = new List<Report>();
 			payer.Reports.Add(report);
 
 			Open(payer);
-			Assert.That(browser.Text, Is.StringContaining("����������"));
+			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 		}
 
 		[Test]
 		public void Short_report_for_payer()
 		{
-			Assert.That(browser.Text, Is.StringContaining("������"));
-			Assert.That(browser.Text, Is.StringContaining("�������� �����"));
+			Assert.That(browser.Text, Is.StringContaining("Отчеты"));
+			Assert.That(browser.Text, Is.StringContaining("тестовый отчет"));
 		}
 
 		[Test]
@@ -55,7 +55,7 @@ namespace Functional.Billing
 		public void Show_unaccounted_report()
 		{
 			Open("/Accounts/Index");
-			AssertText("�������� �����");
+			AssertText("тестовый отчет");
 		}
 
 		[Test]
@@ -65,8 +65,22 @@ namespace Functional.Billing
 			account.Save();
 
 			Open("/Accounts/Index");
-			Click("������� ������������ �� ����");
-			AssertText("�������� �����");
+			Click("История поставленных на учет");
+			AssertText("тестовый отчет");
+		}
+
+		[Test]
+		public void Edit_report_account_description()
+		{
+			Click("#reports", "Редактировать");
+			AssertText("Отчет, тестовый отчет");
+			Assert.That(Css("input[name='account.description']").Value, Is.EqualTo("Статистический отчет по фармрынку за {0}"));
+			Css("input[name='account.description']").TypeText("Стат. отчет");
+			Click("Сохранить");
+			AssertText("Сохранено");
+
+			account.Refresh();
+			Assert.That(account.Description, Is.EqualTo("Стат. отчет"));
 		}
 
 		private Element ElementFor<T>(T item, Func<T, object> property)

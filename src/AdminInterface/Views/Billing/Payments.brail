@@ -452,6 +452,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<table class="DataTable filter">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Включен</th>
 								<th>Учтен</th>
 								<th>Бесплатно</th>
@@ -462,6 +463,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</thead>
 						<% for i, report in enumerate(reports): %>
 						<tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if not report.Status}">
+							<td class=short>${app.LinkTo(report, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
 								<input name=status type="checkbox" ${"checked" if report.Status} />

@@ -199,8 +199,8 @@ namespace AdminInterface.Models.Billing
 		public string FormatPartDescription(string description, Period period)
 		{
 			if (IsSpecialLangCase(description))
-				return String.Format(description, InvoicePart.GetPeriodName(period).ToLower());
-			return String.Format(description, BindingHelper.GetDescription(period).ToLower());
+				return description.Replace("{0}", InvoicePart.GetPeriodName(period).ToLower());
+			return description.Replace("{0}", BindingHelper.GetDescription(period).ToLower());
 		}
 
 		public bool IsSpecialLangCase(string description)

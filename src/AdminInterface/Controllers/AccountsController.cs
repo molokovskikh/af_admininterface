@@ -133,5 +133,22 @@ namespace AdminInterface.Controllers
 			address.Client.Save();
 			CancelView();
 		}
+
+		public void Edit(uint id)
+		{
+			var account = Accounting.Find(id);
+			if (IsPost)
+			{
+				BindObjectInstance(account, "account");
+				if (IsValid(account))
+				{
+					account.Save();
+					Notify("Сохранено");
+					RedirectToReferrer();
+					return;
+				}
+			}
+			PropertyBag["account"] = account;
+		}
 	}
 }

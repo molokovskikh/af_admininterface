@@ -59,6 +59,17 @@ namespace Functional.ForTesting
 			browser.Link(Find.ByText(name)).Click();
 		}
 
+		public static void Click(this IElementContainer browser, string name)
+		{
+			var button = browser.Buttons.FirstOrDefault(b => String.Equals(b.Value, name, StringComparison.CurrentCultureIgnoreCase));
+			if (button != null)
+			{
+				button.Click();
+				return;
+			}
+			browser.Link(Find.ByText(name)).Click();
+		}
+
 		public static IE AssertThatTableContains<T>(this IE ie, params T[] activeRecords)
 		{
 			var table = Helper.GetDataTable(ie);

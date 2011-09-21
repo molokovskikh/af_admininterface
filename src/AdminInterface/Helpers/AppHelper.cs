@@ -68,23 +68,46 @@ namespace AdminInterface.Helpers
 			if (item == null)
 				return "";
 
-			var controller = GetControllerName(item);
+			var parameters = new Dictionary<string, object>();
 
 			var contributor = item as IUrlContributor;
 			if (contributor != null)
 			{
-				var parameters = contributor.GetQueryString();
-				if (parameters.Contains("controller"))
-					parameters["controller"] = ToControllerName(parameters["controller"].ToString());
-				return UrlHelper.Link(title.ToString(), new Dictionary<string, object>{{"params", parameters}});
+				var queryString = contributor.GetQueryString();
+				if (queryString.Contains("controller"))
+				{
+					parameters.Add("controller", ToControllerName(queryString["controller"].ToString()));
+					queryString.Remove("controller");
+				}
+				parameters.Add("params", queryString);
+			}
+			else
+			{
+				var controller = GetControllerName(item);
+				var dynamicItem = ((dynamic)item);
+				var id = (object)dynamicItem.Id;
+				parameters.Add("controller", controller);
+				parameters.Add("params", new Dictionary<string, object>() {{"id", id}});
 			}
 
-			if (!HavePermission(controller, action))
-				return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
+			if (parameters.ContainsKey("controller"))
+			{
+				if (parameters["controller"].ToString().ToLower() == "ReportAccountings".ToLower())
+					parameters["controller"] = "Accounts";
+
+				var controller = parameters["controller"].ToString();
+				if (!HavePermission(controller, action))
+					return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
+			}
+
+			if (!String.IsNullOrEmpty(action))
+				parameters.Add("action", action);
 
 			var clazz = Style(item);
-			var uri = GetUrl(item, action);
-			return String.Format("<a class='{1}' href='{2}'>{0}</a>", title, clazz, uri);
+			if (!String.IsNullOrEmpty(clazz))
+				parameters.Add("class", clazz);
+
+			return UrlHelper.Link(title.ToString(), parameters);
 		}
 
 		public override bool HavePermission(string controller, string action)
