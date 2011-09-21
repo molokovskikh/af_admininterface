@@ -20,7 +20,7 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public virtual string Address { get; set; }
-		
+
 		[Property]
 		public virtual string INN { get; set; }
 
@@ -47,6 +47,16 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public virtual string AccountWarranty { get; set; }
+
+		public string Description
+		{
+			get
+			{
+				if (Id == 4)
+					return "Обеспечение доступа к ИС (мониторингу фармрынка) в {0}";
+				return "Мониторинг оптового фармрынка за {0}";
+			}
+		}
 
 		public static IList<Recipient> All()
 		{

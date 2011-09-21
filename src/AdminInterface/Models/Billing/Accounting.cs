@@ -122,8 +122,7 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorValue = "2")]
 	public class ReportAccounting : Accounting
 	{
-		[BelongsTo("ObjectId", Cascade = CascadeEnum.All)]
-		public virtual Report Report { get; set; }
+		public ReportAccounting() {}
 
 		public ReportAccounting(Report report)
 		{
@@ -131,7 +130,8 @@ namespace AdminInterface.Models.Billing
 			ReadyForAcounting = true;
 		}
 
-		public ReportAccounting() {}
+		[BelongsTo("ObjectId", Cascade = CascadeEnum.All)]
+		public virtual Report Report { get; set; }
 
 		public override Payer Payer
 		{
@@ -174,6 +174,8 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Accounting", DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Accounting : ActiveRecordLinqBase<Accounting>, IAuditable
 	{
+		private string _description;
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
@@ -231,6 +233,21 @@ namespace AdminInterface.Models.Billing
 		{
 			get { throw new NotImplementedException(); }
 			set { throw new NotImplementedException(); }
+		}
+
+		public virtual string Description
+		{
+			get
+			{
+				if (String.IsNullOrEmpty(_description) && Payer.Recipient != null)
+					return Payer.Recipient.Description;
+				return _description;
+			}
+
+			set
+			{
+				_description = value;
+			}
 		}
 
 		public virtual void Accounted()

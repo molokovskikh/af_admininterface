@@ -96,18 +96,7 @@ namespace AdminInterface.Models.Billing
 			Count = count;
 		}
 
-		public InvoicePart(Invoice invoice, Period period, decimal cost, int count)
-		{
-			Invoice = invoice;
-			if (invoice != null && invoice.Recipient.Id == 4)
-				Name = String.Format("Обеспечение доступа к ИС (мониторингу фармрынка) в {0}", GetPeriodName(period));
-			else
-				Name = String.Format("Мониторинг оптового фармрынка за {0}", BindingHelper.GetDescription(period).ToLower());
-			Cost = cost;
-			Count = count;
-		}
-
-		public string GetPeriodName(Period period)
+		public static string GetPeriodName(Period period)
 		{
 			switch (period)
 			{

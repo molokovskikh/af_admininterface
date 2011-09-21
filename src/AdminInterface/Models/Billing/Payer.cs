@@ -9,6 +9,8 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
+using Castle.Components.DictionaryAdapter;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Tools.Calendar;
@@ -77,6 +79,7 @@ namespace AdminInterface.Models
 			Addresses = new List<Address>();
 			Suppliers = new List<Supplier>();
 			Ads = new List<Advertising>();
+			Reports = new List<Report>();
 		}
 
 		[PrimaryKey]
@@ -305,7 +308,7 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<Accounting> GetAccountings()
 		{
-			return UsersForInvoice().Concat(AddressesForInvoice());
+			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(GetReportAccounts());
 		}
 
 		private IEnumerable<Accounting> AddressesForInvoice()
@@ -443,6 +446,18 @@ ORDER BY {Payer}.shortname;";
 		public virtual bool ShouldNotify()
 		{
 			throw new NotImplementedException();
+		}
+
+		public virtual IList<ReportAccounting> GetReportAccounts()
+		{
+			if (Reports.Count == 0)
+				return Enumerable.Empty<ReportAccounting>().ToList();
+
+			var reportIds = Reports.Select(r => r.Id).ToArray();
+			return ActiveRecordLinqBase<ReportAccounting>.Queryable
+				.Where(a => reportIds.Contains(a.Report.Id))
+				.OrderBy(a => a.Report.Comment)
+				.ToList();
 		}
 	}
 

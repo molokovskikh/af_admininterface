@@ -34,20 +34,20 @@ namespace Unit.Models
 			var invoice = new Invoice(payer,
 				Period.December,
 				new DateTime(2010, 12, 10),
-				new List<InvoicePart>{ new InvoicePart(null, Period.December, 1000, 1)});
+				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1)});
 			var act = new Act(invoice.Date, invoice);
 
 			var invoice1 = new Invoice(payer,
 				Period.December,
 				new DateTime(2011, 1, 10),
-				new List<InvoicePart>{ new InvoicePart(null, Period.January, 500, 2)});
+				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за январь", 500, 2)});
 			var act1 = new Act(invoice1.Date, invoice1);
 			act1.Id = 1;
 
 			var invoice2 = new Invoice(payer,
 				Period.December,
 				new DateTime(2011, 1, 20),
-				new List<InvoicePart>{ new InvoicePart(null, Period.January, 1000, 1)});
+				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за январь", 1000, 1)});
 			var act2 = new Act(invoice2.Date, invoice2);
 			act2.Id = 2;
 

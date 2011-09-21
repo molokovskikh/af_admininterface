@@ -161,8 +161,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
 			PropertyBag["Users"] = payer.Users;
 			PropertyBag["Addresses"] = payer.Addresses;
-			var reportIds = payer.Reports.Select(r => r.Id).ToArray();
-			PropertyBag["Reports"] = ActiveRecordLinqBase<ReportAccounting>.Queryable.Where(a => reportIds.Contains(a.Report.Id)).ToList();
+			PropertyBag["Reports"] = payer.GetReportAccounts();
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;

@@ -19,11 +19,8 @@ namespace Unit.Models
 		[SetUp]
 		public void Setup()
 		{
-			payer = new Payer {
+			payer = new Payer("Тестовый плательщик") {
 				Recipient = new Recipient(),
-				JuridicalOrganizations = new List<LegalEntity>{
-					new LegalEntity {}
-				}
 			};
 			client = new Client(payer);
 			payer.Clients.Add(client);
@@ -54,7 +51,10 @@ namespace Unit.Models
 			client.AddAddress("test");
 			client.AddAddress("test");
 			payer.Addresses = new List<Address>(client.Addresses);
-			payer.Addresses.Each(a => a.Accounting.ReadyForAcounting = true);
+			payer.Addresses.Each(a => {
+				a.Accounting.ReadyForAcounting = true;
+				a.AvaliableForUsers.Add(client.Users[0]);
+			});
 			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
 
 			var invoice = new Invoice(payer, Period.April, DateTime.Now);

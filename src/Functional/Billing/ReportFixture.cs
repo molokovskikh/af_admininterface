@@ -23,12 +23,8 @@ namespace Functional.Billing
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
-			report = new Report {
-				Allow = true,
-				Comment = "עוסעמגûי מעקוע",
-				Payer = payer,
-			};
-			account = new ReportAccounting(report);
+			account = DataMother.Report(payer);
+			report = account.Report;
 			account.Save();
 			
 			payer.Reports = new List<Report>();

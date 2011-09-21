@@ -186,14 +186,32 @@ namespace AdminInterface.Models.Billing
 			if (Payer.InvoiceSettings.DoNotGroupParts)
 			{
 				return accounts
-					.Select(a => new InvoicePart(this, period, a.Payment, 1));
+					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1));
 			}
 			else
 			{
 				return accounts
-					.GroupBy(a => a.Payment)
-					.Select(g => new InvoicePart(this, period, g.Key, g.Count()));
+					.GroupBy(a => new {a.Description, a.Payment})
+					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count()));
 			}
+		}
+
+		public string FormatPartDescription(string description, Period period)
+		{
+			if (IsSpecialLangCase(description))
+				return String.Format(description, InvoicePart.GetPeriodName(period).ToLower());
+			return String.Format(description, BindingHelper.GetDescription(period).ToLower());
+		}
+
+		public bool IsSpecialLangCase(string description)
+		{
+			var word = description.Split(' ');
+			var formatMarkIndex = Array.IndexOf(word, "{0}");
+			if (formatMarkIndex < 1)
+				return false;
+			if (word[formatMarkIndex - 1].ToLower() == "в")
+				return true;
+			return false;
 		}
 
 		public void Send(Castle.MonoRail.Framework.Controller controller)

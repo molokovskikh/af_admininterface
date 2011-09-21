@@ -72,5 +72,21 @@ namespace Integration.Models
 			Assert.That(record.ObjectType, Is.EqualTo(LogObjectType.User));
 			Assert.That(record.Name, Is.EqualTo("test"));
 		}
+
+		[Test]
+		public void Include_report_into_balance_calculation()
+		{
+			var client = DataMother.TestClient();
+			var payer = client.Payers.First();
+			var report = DataMother.Report(payer);
+			report.Payment = 1500;
+
+			client.Save();
+			payer.Save();
+			report.Save();
+
+			payer.Refresh();
+			Assert.That(payer.TotalSum, Is.EqualTo(1500));
+		}
 	}
 }
