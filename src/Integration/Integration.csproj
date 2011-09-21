@@ -160,6 +160,7 @@
     <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
+    <Compile Include="Processors\ReportProcessorFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
     <Compile Include="ScopeFixture.cs" />

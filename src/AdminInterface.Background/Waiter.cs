@@ -19,6 +19,7 @@ namespace AdminInterface.Background
 			Delay = (int)TimeSpan.FromHours(1).TotalMilliseconds;
 			Action = () => {
 				new InvoiceProcessor().Process();
+				new ReportProcessor().Process();
 
 /*				using(new SessionScope())
 					jobs.Each(j => j.Run());*/

@@ -42,6 +42,16 @@ namespace Integration.ForTesting
 				scope.Dispose();
 		}
 
+		public void Save(object entity)
+		{
+			ActiveRecordMediator.Save(entity);
+		}
+
+		public void Delete(object entity)
+		{
+			ActiveRecordMediator.Delete(entity);
+		}
+
 		protected void Reopen()
 		{
 			scope.Dispose();
