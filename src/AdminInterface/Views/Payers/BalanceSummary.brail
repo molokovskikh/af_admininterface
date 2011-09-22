@@ -49,7 +49,7 @@
 		<td>
 			<% if item.Id > 0: %>
 				<% if item.IsPayment: %>
-				<a href="${siteroot}/Payments/${item.Id}/Edit">Печать</a>
+				<a href="${siteroot}/Payments/${item.Id}/Edit">Редактировать</a>
 				<% end %>
 				<% if item.IsInvoice: %>
 				<a href="${siteroot}/Invoices/${item.Id}/Print">Печать</a>
