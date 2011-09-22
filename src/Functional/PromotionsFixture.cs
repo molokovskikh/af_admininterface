@@ -52,7 +52,7 @@ select
 	catalog.Id
 from
 	catalogs.catalog
-	left join usersettings.PromotionCatalogs pc on pc.CatalogId = catalogId
+	left join usersettings.PromotionCatalogs pc on pc.CatalogId = catalog.Id
 	left join usersettings.SupplierPromotions sp on sp.Id = pc.PromotionId
 	left join Future.Suppliers s on s.Id = sp.SupplierId
 where
