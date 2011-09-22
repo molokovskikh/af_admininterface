@@ -16,8 +16,18 @@ namespace AdminInterface.Background
 						.Left.JoinQueryOver(a => a.Report)
 						.WhereRestrictionOn(r => r.Id).IsNull
 						.List<ReportAccount>();
+
 					foreach (var account in accounts)
+					{
+						/* тк отчет удален мы не знаем какой у него был плательщик
+						s.CreateSQLQuery("delete from Billing.PayerAuditRecords where ObjectId = :id and ObjectType = :type")
+							.SetParameter("id", account.Payer.Id)
+							.SetParameter("type", account.ObjectType)
+							.ExecuteUpdate();
+						*/
+
 						account.Delete();
+					}
 				});
 				scope.VoteCommit();
 			}
