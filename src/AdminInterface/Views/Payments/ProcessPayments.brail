@@ -1,5 +1,8 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Загрузка выписки", "")]} %>
-<h3>Загрузка выписки</h3>
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Загрузка выписки
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : []} %>
 
 <div class=block>
 	<form method=post enctype="multipart/form-data">
@@ -21,15 +24,17 @@
 
 <table class=DataTable>
 	<% if IsDefined("payments") and payments and payments.Count: %>
-	<tr>
-		<th></th>
-		<th>${app.Sortable("Получатель", "recipient")}</th>
-		<th>${app.Sortable("Дата платежа", "payedOn")}</th>
-		<th>${app.Sortable("ИНН", "Inn")}</th>
-		<th>${app.Sortable("Плательщик", "payer")}</th>
-		<th>${app.Sortable("Сумма", "sum")}</th>
-		<th>${app.Sortable("Примечание", "comment")}</th>
-	</tr>
+	<thead>
+		<tr>
+			<th></th>
+			<th>${app.Sortable("Получатель", "recipient")}</th>
+			<th>${app.Sortable("Дата платежа", "payedOn")}</th>
+			<th>${app.Sortable("ИНН", "Inn")}</th>
+			<th>${app.Sortable("Плательщик", "payer")}</th>
+			<th>${app.Sortable("Сумма", "sum")}</th>
+			<th>${app.Sortable("Примечание", "comment")}</th>
+		</tr>
+	</thead>
 	<% for i, payment in enumerate(payments): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
@@ -40,7 +45,7 @@
 		<td>${payment.PayedOn.ToShortDateString()}</td>
 		<td>${payment.PayerClient.Inn}</td>
 		<td>${app.LinkTo(payment.Payer)}</td>
-		<td>${payment.Sum}</td>
+		<td style="text-align:right;">${payment.Sum.ToString("C")}</td>
 		<td>!{payment.Comment}</td>
 	</tr>
 	<% end %>

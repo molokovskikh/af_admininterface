@@ -29,12 +29,6 @@
 	});
 </script>
 
-<% if warning = payment.GetWarning(): %>
-<div class="err flash">
-	${warning}
-</div>
-<% end %>
-
 <form class="accountant-friendly" method="post">
 	${FormHelper.HiddenField("payment.Id")}
 	${FormHelper.HiddenField("payment.Payer.PayerId")}

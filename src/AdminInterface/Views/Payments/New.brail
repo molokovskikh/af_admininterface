@@ -1,6 +1,10 @@
 ﻿<% import System %>
 
-<% component Bubble, {"bredcrumbs" : [("Разнесение платежей", "")]} %>
+<% component CaptureFor, {@id : @Title}: %>
+	Разнесение платежей
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : []} %>
 
 <script>
 	$(function () {
@@ -24,8 +28,6 @@
 		};
 	});
 </script>
-
-<h3>Разнесение платежей</h3>
 
 <div class=block>
 <form class="accountant-friendly" method=post>
