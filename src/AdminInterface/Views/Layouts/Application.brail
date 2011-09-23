@@ -21,7 +21,7 @@
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
-			"jquery_contact_validation.js",
+			"jquery.contact.validation.js",
 			"messages_ru.js",
 			"jquery-ui-1.8.6.custom.min.js",
 			"jquery.maskedinput-1.2.2.min.js",

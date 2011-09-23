@@ -4,10 +4,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
     <title>Административный интерфейс</title>
-	<script type="text/javascript" language="javascript" src="./JavaScript/prototype.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/validation.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/Main.js" ></script>
-	<script type="text/javascript" language="javascript" src="./JavaScript/jquery-1.3.2.min.js" ></script>
 	<link rel="stylesheet" type="text/css" href="~/Css/Table.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/Contacts.css" />
 	<link rel="stylesheet" type="text/css" href="~/Css/Billing.css" />
