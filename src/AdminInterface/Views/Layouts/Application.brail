@@ -12,18 +12,19 @@
 			<% end %>
 		</title>
 
+		${app.Asset("jquery-1.6.4.js")}
+		${app.Asset("jquery.validate.js")}
+		${app.Asset("underscore.js")}
+		${app.Asset("backbone.js")}
+
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
 			"calendar-setup.js",
 			"date-ru-RU.js",
-			"jquery-1.4.2.min.js",
-			"jquery.validate.min.js",
 			"jquery_contact_validation.js",
 			"messages_ru.js",
 			"jquery-ui-1.8.6.custom.min.js",
 			"jquery.maskedinput-1.2.2.min.js",
-			"underscore.js",
-			"backbone.js",
 			"Common.js",
 			"coffee-script.js")}
 
