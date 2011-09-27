@@ -1,71 +1,76 @@
 ﻿<script>
-	$(function() {
-		$("a.new").live('click', function() {
-			var index = $(".DataTable tbody").children().length - 1;
-			if (index == 0)
-			{
-				$(".DataTable tbody").children().remove();
-				$(".DataTable tbody").append("<tr><td><a class='new' href='javascript:'>Новый</a></td><th>Наименование</th>");
+	$(function () {
+		$("a.new").live('click', function () {
+			var index = $(".DataTable tbody").children().length;
+			if (index == 1 && $(".DataTable thead").children().length == 0) {
+				$(".DataTable").children().remove();
+				$(".DataTable").append("<thead><tr><td><a class='new' href='javascript:'>Новый</a></td><th>Наименование</th></thead>");
+				$(".DataTable").append("<tbody></tbody>");
 			}
-				
-			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>");
-		})
 
-		$("a.delete").live('click', function() {
+			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>");
+		});
+
+		$("a.delete").live('click', function () {
 			$(this).parents("tr").remove();
-			var index = $(".DataTable tbody").children().length - 1;
-			if (index == 0)
-			{
-				$(".DataTable tbody").children().remove();
-				$(".DataTable tbody").append("<tr><td class='EmptyData'>Нет ни одного получателя платежей. <a class='new' href='javascript:'>Создать нового?</a></td></tr>");
+			var index = $(".DataTable tbody").children().length;
+			if (index == 0) {
+				$(".DataTable thead").children().remove();
+				$(".DataTable").append("<tr><td class='EmptyData'>Нет ни одного получателя платежей. <a class='new' href='javascript:'>Создать нового?</a></td></tr>");
 			}
-		})
-	})
+		});
+	});
 </script>
-<style>
+<style type="text/css">
+	.DataTable
+	{
+		width: 600px;
+	}
+	
 	input[type=text]
 	{
 		width: 400px;
 	}
 </style>
-<% component CaptureFor, {"id" : "Title"}: %>
+
+<% component CaptureFor, {@id: @Title}: %>
 	Получатели платежей
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Получатели платежей", "")]} %>
+<% component Bubble, {@bredcrumbs : []} %>
 
-<% if recipients.Count ==  0: %>
-<table class="DataTable">
-	<tr>
-		<td class="EmptyData">
-			Нет ни одного получателя платежей. <a class=new href="javascript:">Создать нового?</a>
-		</td>
-	</tr>
-</table>
-<% else: %>
 <form method="post">
-	<table class="DataTable" style="width:600px">
+	<table class="DataTable">
+		<% if recipients.Count ==  0: %>
 		<tr>
-			<td>
-				<a class="new" href="javascript:">Новый</a>
-			</td>
-			<th>Наименование</th>
-		</tr>
-		<% for i, recipient in enumerate(recipients): %>
-		<tr>
-			<td>
-				<a class="delete" href="javascript:">Удалить</a>
-				<a href="${siteroot}/Recipients/${recipient.Id}/Edit">Редактировать</a>
-			</td>
-			<td>
-				${FormHelper.TextField("recipients[${i}].Name")}
-				${FormHelper.HiddenField("recipients[${i}].Id")}
+			<td class="EmptyData">
+				Нет ни одного получателя платежей. <a class=new href="javascript:">Создать нового?</a>
 			</td>
 		</tr>
+		<% else: %>
+			<thead>
+				<tr>
+					<td>
+						<a class="new" href="javascript:">Новый</a>
+					</td>
+					<th>Наименование</th>
+				</tr>
+			</thead>
+			<% for i, recipient in enumerate(recipients): %>
+			<tr>
+				<td>
+					<a class="delete" href="javascript:">Удалить</a>
+					<a href="${siteroot}/Recipients/${recipient.Id}/Edit">Редактировать</a>
+				</td>
+				<td>
+					${FormHelper.TextField("recipients[${i}].Name")}
+					${FormHelper.HiddenField("recipients[${i}].Id")}
+				</td>
+			</tr>
+			<% end %>
 		<% end %>
 	</table>
 	<p style="display:block; margin: 1em 0">
 		<input type="submit" value="Сохранить" />
 	</p>
 </form>
-<% end %>

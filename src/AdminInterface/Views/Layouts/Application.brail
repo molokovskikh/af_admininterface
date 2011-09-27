@@ -16,6 +16,8 @@
 		${app.Asset("jquery.validate.js")}
 		${app.Asset("underscore.js")}
 		${app.Asset("backbone.js")}
+		${app.Asset("jquery-ui-1.8.16.js")}
+		${app.Asset("confirmation.js")}
 
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",

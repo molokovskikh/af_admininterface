@@ -1,45 +1,13 @@
 (function() {
   $(function() {
     var onSubmit, submitResult, submited;
-    window.confirmed = false;
-    $("form.confirm").submit(function(event) {
-      var form, processConfirm, validator;
-      if (window.confirmed) {
-        return;
-      }
-      form = $(this);
-      validator = form.data("validator");
-      processConfirm = function() {
-        var confirmInput, message;
-        confirmInput = form.find(".confirm-empty");
-        if (confirmInput.length) {
-          message = confirmInput.attr("data-confirm-message");
-          $("<p>" + message + "</p>").dialog({
-            modal: true,
-            buttons: {
-              "Продолжить": function() {
-                window.confirmed = true;
-                $(this).dialog("destroy");
-                return form.submit();
-              },
-              "Отменить": function() {
-                return $(this).dialog("destroy");
-              }
-            }
-          });
-          return false;
-        }
-      };
-      if (validator) {
-        return validator.settings.submitHandler = processConfirm;
-      } else {
-        return processConfirm();
-      }
-    });
     submited = false;
     submitResult = false;
     onSubmit = null;
+    $("#confirm_validation").validate();
     $("form").submit(function(event) {
+      var callback, result;
+      result = event.result;
       submited = true;
       if (event.result === false) {
         submitResult = false;
@@ -47,14 +15,23 @@
         submitResult = true;
       }
       if (onSubmit) {
-        setTimeout(onSubmit, 30);
+        callback = function() {
+          return onSubmit(result);
+        };
+        setTimeout(callback, 10);
       }
       return false;
     });
-    module("test", {
+    module("confirmation", {
       setup: function() {
+        $(".ui-dialog").dialog("destroy");
         submited = false;
         submitResult = false;
+        onSubmit = null;
+        return window.confirmed = false;
+      },
+      teardown: function() {
+        $(".ui-dialog").dialog("destroy");
         onSubmit = null;
         return window.confirmed = false;
       }
@@ -89,12 +66,41 @@
       $("#update").submit();
       return stop();
     });
-    return test("show confirm if form valid", function() {
+    test("do not show confirm if field filled", function() {
+      $("#update input").val("test");
+      onSubmit = function() {
+        equal($(".ui-dialog").length, 0);
+        equal(submitResult, true);
+        return start();
+      };
+      $("#update").submit();
+      return stop();
+    });
+    test("do not show confirm if form invalid", function() {
       var afterSubmit;
-      $("#confirm_validation").validate();
       onSubmit = afterSubmit = function() {
         equal($(".ui-dialog").length, 0);
         return start();
+      };
+      $("#confirm_validation").submit();
+      return stop();
+    });
+    return test("confirm valid form", function() {
+      var afterContinue, afterSubmit, submitCount;
+      $("#confirm_validation .required").val("test");
+      onSubmit = afterSubmit = function() {
+        onSubmit = afterContinue;
+        return $(".ui-dialog button:contains('Продолжить')").click();
+      };
+      submitCount = 0;
+      afterContinue = function(result) {
+        submitCount++;
+        if (submitCount === 1) {
+          return equal(result, true, "не отправили форму");
+        } else {
+          equal(result, false, "ложное подтверждение от jquery validator");
+          return start();
+        }
       };
       $("#confirm_validation").submit();
       return stop();

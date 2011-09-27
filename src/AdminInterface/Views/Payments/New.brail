@@ -30,7 +30,7 @@
 </script>
 
 <div class=block>
-<form class="accountant-friendly" method=post>
+<form class="accountant-friendly confirm" method=post>
 	<h4>Новый платеж</h4>
 	<table>
 		<tr>
@@ -54,7 +54,7 @@
 			</td>
 			<td>
 				<input type=hidden id="payment_payer_id" name=Payment.Payer.PayerId>
-				<input type=text id=payer class="required">
+				<input type=text id=payer class="confirm-empty" data-confirm-message="Создать неопознанный платеж?">
 			</td>
 			<td>
 				<input type=text name=Payment.DocumentNumber>

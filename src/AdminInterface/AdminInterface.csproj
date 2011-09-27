@@ -371,6 +371,7 @@
   <ItemGroup>
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
+    <Content Include="Assets\JavaScript\confirmation.coffee" />
     <Content Include="Assets\JavaScript\order.delivery.group.editor.coffee" />
     <Content Include="CopySynonym.aspx" />
     <Content Include="Css\jquery-ui-1.8.6.custom.css" />
@@ -385,7 +386,7 @@
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.min.js" />
     <Content Include="JavaScript\jquery.tmpl.js" />
     <Content Include="JavaScript\jquery.tmpl.min.js" />
-    <Content Include="JavaScript\jquery_contact_validation.js" />
+    <Content Include="JavaScript\jquery.contact.validation.js" />
     <Content Include="JavaScript\payer.search.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
@@ -473,7 +474,6 @@
     <Content Include="Images\true.png" />
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />
-    <Content Include="JavaScript\jquery-1.3.2.min.js" />
     <Content Include="JavaScript\messages_ru.js" />
     <Content Include="JavaScript\validation.js" />
     <Content Include="Main.Master" />
