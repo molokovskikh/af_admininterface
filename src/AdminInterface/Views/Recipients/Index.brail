@@ -6,6 +6,7 @@
 				$(".DataTable").children().remove();
 				$(".DataTable").append("<thead><tr><td><a class='new' href='javascript:'>Новый</a></td><th>Наименование</th></thead>");
 				$(".DataTable").append("<tbody></tbody>");
+				index = 0;
 			}
 
 			$(".DataTable tbody").append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='recipients[" + index + "].Name' type='text'></input></td></tr>");
