@@ -80,7 +80,7 @@ namespace Integration
 				var user = User.Queryable.Where(u => u.Payer != null).First();
 				Assert.That(NHibernateUtil.IsInitialized(user.Payer), Is.False);
 				var linkTo = helper.LinkTo(user.Payer);
-				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a href=""/Payers/{0}"">{1}</a>", user.Payer.Id, user.Payer.Name)));
+				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a  href=""/Payers/{0}"">{1}</a>", user.Payer.Id, user.Payer.Name)));
 			}
 		}
 
@@ -262,7 +262,14 @@ namespace Integration
 		{
 			engine.Add(new PatternRoute("/<controller>/[id]/<action>").Restrict("id").ValidInteger);
 			var link = helper.LinkTo(new UrlContributor{Name = "bad bad test"});
-			Assert.That(link, Is.EqualTo("<a href=\"/clients/index\">bad bad test</a>"));
+			Assert.That(link, Is.EqualTo("<a  href=\"/clients/index\">bad bad test</a>"));
+		}
+
+		[Test]
+		public void Style_link()
+		{
+			var link = helper.LinkTo(new Address{Enabled = false, Value = "Test"});
+			Assert.That(link, Is.EqualTo("<a class=\"DisabledByBilling\"  href=\"/Addresses/0\">Test</a>"));
 		}
 	}
 }
