@@ -16,7 +16,7 @@
 	<div class=block>
 		<h3>Следующие позиции будут объединены в один счет</h3>
 		<P>
-			${app.LinkTo(payer, "Предварительный просмотр", @InvoicePreview)}
+			${app.LinkTo(payer, "Предварительный просмотр", @InvoicePreview, {@group: group.Key})}
 		<P>
 		<form method=post>
 			<table class="DataTable">

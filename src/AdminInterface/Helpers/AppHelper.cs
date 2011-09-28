@@ -65,6 +65,11 @@ namespace AdminInterface.Helpers
 
 		public override string LinkTo(object item, object title, string action)
 		{
+			return LinkTo(item, title, action, null);
+		}
+
+		public string LinkTo(object item, object title, string action, IDictionary query = null)
+		{
 			if (item == null)
 				return "";
 
@@ -84,10 +89,11 @@ namespace AdminInterface.Helpers
 			else
 			{
 				var controller = GetControllerName(item);
+				parameters.Add("controller", controller);
+
 				var dynamicItem = ((dynamic)item);
 				var id = (object)dynamicItem.Id;
-				parameters.Add("controller", controller);
-				parameters.Add("params", new Dictionary<string, object>() {{"id", id}});
+				parameters.Add("params", new Dictionary<string, object>{{"id", id}});
 			}
 
 			if (parameters.ContainsKey("controller"))
@@ -102,6 +108,9 @@ namespace AdminInterface.Helpers
 
 			if (!String.IsNullOrEmpty(action))
 				parameters.Add("action", action);
+
+			if (query != null)
+				parameters.Add("querystring", query);
 
 			var attributes = new Dictionary<string, object>();
 			var clazz = Style(item);

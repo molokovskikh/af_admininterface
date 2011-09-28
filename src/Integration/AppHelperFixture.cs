@@ -271,5 +271,12 @@ namespace Integration
 			var link = helper.LinkTo(new Address{Enabled = false, Value = "Test"});
 			Assert.That(link, Is.EqualTo("<a class=\"DisabledByBilling\"  href=\"/Addresses/0\">Test</a>"));
 		}
+
+		[Test]
+		public void Link_with_parameters()
+		{
+			var link = helper.LinkTo(new Address{Enabled = true, Value = "Test"}, "Test", "Index", new Dictionary<string, object>{{"tab", "1"}});
+			Assert.That(link, Is.EqualTo("<a  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
+		}
 	}
 }

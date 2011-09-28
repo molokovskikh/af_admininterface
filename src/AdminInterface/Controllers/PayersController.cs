@@ -76,7 +76,7 @@ namespace AdminInterface.Controllers
 			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
 		}
 
-		public void InvoicePreview(uint id)
+		public void InvoicePreview(uint id, int group)
 		{
 			var payer = Payer.Find(id);
 			if (payer.Recipient == null)
@@ -86,7 +86,7 @@ namespace AdminInterface.Controllers
 				return;
 			}
 
-			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now, group);
 			PropertyBag["doc"] = invoice;
 			PropertyBag["invoice"] = invoice;
 			LayoutName = "Print";

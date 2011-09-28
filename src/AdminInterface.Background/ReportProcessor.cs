@@ -14,8 +14,8 @@ namespace AdminInterface.Background
 				ArHelper.WithSession(s => {
 					s.CreateSQLQuery(
 @"delete a from Billing.Accounts a
-left join Reports.general_reports gr on a.ObjectId = gr.GeneralReportCode and a.Type = 2
-where gr.GeneralReportCode is null")
+left join Reports.general_reports gr on a.ObjectId = gr.GeneralReportCode
+where gr.GeneralReportCode is null and a.Type = 2")
 						.ExecuteUpdate();
 				});
 				scope.VoteCommit();
