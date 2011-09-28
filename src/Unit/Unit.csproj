@@ -74,6 +74,7 @@
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />
     <Compile Include="Extentions\SortExtentionsFixture.cs" />
     <Compile Include="FixutreSetup.cs" />
+    <Compile Include="Models\AccountFixture.cs" />
     <Compile Include="Models\ActFixture.cs" />
     <Compile Include="Models\AdministratorFixture.cs" />
     <Compile Include="Models\ClientInfoLogEntityFixture.cs" />

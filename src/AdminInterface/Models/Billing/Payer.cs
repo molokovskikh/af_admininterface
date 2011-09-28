@@ -457,6 +457,8 @@ ORDER BY {Payer}.shortname;";
 			return ActiveRecordLinqBase<ReportAccount>.Queryable
 				.Where(a => reportIds.Contains(a.Report.Id))
 				.OrderBy(a => a.Report.Comment)
+				.ToList()
+				.Where(a => a.ShouldPay())
 				.ToList();
 		}
 	}
