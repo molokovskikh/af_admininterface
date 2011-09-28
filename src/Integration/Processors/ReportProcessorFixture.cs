@@ -42,8 +42,12 @@ namespace Integration.Processors
 		public void Delete_account_after_delete_report()
 		{
 			var account = DataMother.Report(payer);
-			account.Report = null;
 			Save(account);
+			Assert.That(account.Id, Is.Not.EqualTo(0u));
+			Assert.That(account.Report.Id, Is.Not.EqualTo(0u));
+			session.Clear();
+			session.Delete(account.Report);
+			session.Flush();
 
 			processor.Process();
 

@@ -12,22 +12,11 @@ namespace AdminInterface.Background
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				ArHelper.WithSession(s => {
-					var accounts = s.QueryOver<ReportAccount>()
-						.Left.JoinQueryOver(a => a.Report)
-						.WhereRestrictionOn(r => r.Id).IsNull
-						.List<ReportAccount>();
-
-					foreach (var account in accounts)
-					{
-						/* тк отчет удален мы не знаем какой у него был плательщик
-						s.CreateSQLQuery("delete from Billing.PayerAuditRecords where ObjectId = :id and ObjectType = :type")
-							.SetParameter("id", account.Payer.Id)
-							.SetParameter("type", account.ObjectType)
-							.ExecuteUpdate();
-						*/
-
-						account.Delete();
-					}
+					s.CreateSQLQuery(
+@"delete a from Billing.Accounts a
+left join Reports.general_reports gr on a.ObjectId = gr.GeneralReportCode and a.Type = 2
+where gr.GeneralReportCode is null")
+						.ExecuteUpdate();
 				});
 				scope.VoteCommit();
 			}

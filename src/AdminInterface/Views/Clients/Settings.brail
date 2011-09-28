@@ -250,7 +250,8 @@
 			"SendRetailMarkup": drugstore.SendRetailMarkup,
 			"ParseWaybills": drugstore.ParseWaybills,
 			"EnableImpersonalPrice" : drugstore.EnableImpersonalPrice,
-			"EnableSmartOrder" : drugstore.EnableSmartOrder }
+			"EnableSmartOrder" : drugstore.EnableSmartOrder,
+			"ShowCertificatesWithoutRefSupplier" : drugstore.ShowCertificatesWithoutRefSupplier }
 	}
 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitOnline",

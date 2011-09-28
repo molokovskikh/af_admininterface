@@ -211,6 +211,9 @@ namespace AdminInterface.Models
 		[Property, Description("Включить расписание обновлений"), Auditable]
 		public virtual bool AllowAnalitFSchedule { get; set; }
 
+		[Property, Description("Отображать сертификаты без привязки к поставщику"), Auditable]
+		public virtual bool ShowCertificatesWithoutRefSupplier { get; set; }
+
 		protected override void OnUpdate()
 		{
 			var forceReplication = this.IsChanged(s => s.BuyingMatrixPrice)

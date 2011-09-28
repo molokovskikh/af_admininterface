@@ -103,11 +103,12 @@ namespace AdminInterface.Helpers
 			if (!String.IsNullOrEmpty(action))
 				parameters.Add("action", action);
 
+			var attributes = new Dictionary<string, object>();
 			var clazz = Style(item);
 			if (!String.IsNullOrEmpty(clazz))
-				parameters.Add("class", clazz);
+				attributes.Add("class", clazz);
 
-			return UrlHelper.Link(title.ToString(), parameters);
+			return UrlHelper.Link(title.ToString(), parameters, attributes);
 		}
 
 		public override bool HavePermission(string controller, string action)

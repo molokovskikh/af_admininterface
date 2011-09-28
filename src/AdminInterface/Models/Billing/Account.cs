@@ -179,7 +179,7 @@ namespace AdminInterface.Models.Billing
 		}
 	}
 
-	[ActiveRecord(DiscriminatorColumn = "Type", DiscriminatorValue = "10000", Schema = "Billing", Lazy = true), Auditable]
+	[ActiveRecord(DiscriminatorColumn = "Type", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
 		private string _description;
@@ -281,7 +281,7 @@ namespace AdminInterface.Models.Billing
 
 		public virtual bool ShouldPay()
 		{
-			return (BeAccounted || ReadyForAcounting) && !IsFree;
+			return (BeAccounted || ReadyForAcounting) && !IsFree && Payment > 0;
 		}
 
 		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
