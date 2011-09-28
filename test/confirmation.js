@@ -85,25 +85,29 @@
       $("#confirm_validation").submit();
       return stop();
     });
-    return test("confirm valid form", function() {
-      var afterContinue, afterSubmit, submitCount;
+    test("confirm valid form", function() {
+      var afterContinue, afterSubmit;
       $("#confirm_validation .required").val("test");
       onSubmit = afterSubmit = function() {
         onSubmit = afterContinue;
         return $(".ui-dialog button:contains('Продолжить')").click();
       };
-      submitCount = 0;
       afterContinue = function(result) {
-        submitCount++;
-        if (submitCount === 1) {
-          return equal(result, true, "не отправили форму");
-        } else {
-          equal(result, false, "ложное подтверждение от jquery validator");
-          return start();
-        }
+        equal(result, true, "не отправили форму");
+        return start();
       };
       $("#confirm_validation").submit();
       return stop();
+    });
+    return asyncTest("do not confirm if input filled", function() {
+      $("#confirm_validation .required").val("test");
+      $("#confirm_validation .confirm-empty").val("test");
+      onSubmit = function(result) {
+        equal(result, true);
+        equal($(".ui-dialog").length, 0);
+        return start();
+      };
+      return $("#confirm_validation").submit();
     });
   });
 }).call(this);

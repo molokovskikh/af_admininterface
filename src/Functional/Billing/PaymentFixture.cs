@@ -1,7 +1,11 @@
-﻿using AdminInterface.Models;
+﻿using System;
+using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Common.Tools;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -39,6 +43,34 @@ namespace Functional.Billing
 			Open();
 			Click("Платежи");
 			AssertText("Платежи");
+		}
+
+		[Test]
+		public void Confirm_unknown_payment()
+		{
+			var begin = DateTime.Now;
+
+			Open();
+			Click("Разнесение платежей");
+			AssertText("Разнесение платежей");
+			Css("input[name='Payment.Sum']").TypeText("500");
+			Click("Добавить");
+			AssertText("Создать неопознанный платеж?");
+			var continueButton =  browser.Spans.Where(s => s.Text == "Продолжить").Select(s => (Button)s.Parent).First();
+			continueButton.Click();
+
+			var payments = Payments();
+			Assert.That(payments.Text, Is.StringContaining("500"));
+
+			var saved = session.Query<Payment>().Where(p => p.RegistredOn >= begin && p.Id != payment.Id).ToList();
+			Assert.That(saved.Count, Is.EqualTo(1), saved.Implode());
+			var savedPayment = saved[0];
+			Assert.That(savedPayment.Sum, Is.EqualTo(500));
+		}
+
+		public Table Payments()
+		{
+			return Css(".DataTable");
 		}
 	}
 }

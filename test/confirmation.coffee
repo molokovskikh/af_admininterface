@@ -83,14 +83,20 @@
 			onSubmit = afterContinue
 			$(".ui-dialog button:contains('Продолжить')").click()
 
-		submitCount = 0
 		afterContinue = (result) ->
-			submitCount++
-			if submitCount == 1
-				equal result, true, "не отправили форму"
-			else
-				equal result, false, "ложное подтверждение от jquery validator"
-				start()
+			equal result, true, "не отправили форму"
+			start()
 
 		$("#confirm_validation").submit()
 		stop()
+
+	asyncTest "do not confirm if input filled", ->
+		$("#confirm_validation .required").val("test")
+		$("#confirm_validation .confirm-empty").val("test")
+
+		onSubmit = (result) ->
+			equal result, true
+			equal $(".ui-dialog").length, 0
+			start()
+
+		$("#confirm_validation").submit()
