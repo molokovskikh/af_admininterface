@@ -291,7 +291,7 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<Account> GetAccountings()
 		{
-			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(GetReportAccounts());
+			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(ReportsForInvoice());
 		}
 
 		private IEnumerable<Account> AddressesForInvoice()
@@ -431,6 +431,11 @@ ORDER BY {Payer}.shortname;";
 			throw new NotImplementedException();
 		}
 
+		public virtual IEnumerable<ReportAccount> ReportsForInvoice()
+		{
+			return GetReportAccounts().Where(a => a.ShouldPay());
+		}
+
 		public virtual IList<ReportAccount> GetReportAccounts()
 		{
 			if (Reports.Count == 0)
@@ -440,8 +445,6 @@ ORDER BY {Payer}.shortname;";
 			return ActiveRecordLinqBase<ReportAccount>.Queryable
 				.Where(a => reportIds.Contains(a.Report.Id))
 				.OrderBy(a => a.Report.Comment)
-				.ToList()
-				.Where(a => a.ShouldPay())
 				.ToList();
 		}
 
