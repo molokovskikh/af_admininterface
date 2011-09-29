@@ -1,11 +1,10 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${user.RootService.Name}", app.GetUrl(user.RootService)),
-									  ("Пользователь ${user.Login}", "${siteroot}/users/${user.Id}/edit"),
-									  ("Настройка пользователя", "")]} %>
-									  
-<h2>
+										user.RootService,
+										user]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
 	Настройки пользователя ${user.Login}
-</h2>
+<% end %>
 
 <% if not user.Enabled: %>
 <div class="Warning">

@@ -1,7 +1,8 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									("Поставщик ${user.RootService.Name}", app.GetUrl(user.RootService)),
-									("Пользователь ${user.Login}", "${siteroot}/users/${user.Id}/edit")]} %>
-<% component CaptureFor, {"id" : "Title"}: %>
+									(user.RootService),
+									(user)]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
 	Настройки пользователя ${user.Login}
 <% end %>
 

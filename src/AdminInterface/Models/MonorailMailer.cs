@@ -2,11 +2,10 @@
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
-using AdminInterface.Controllers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
@@ -14,7 +13,7 @@ using Common.Web.Ui.Helpers;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
 
-namespace AdminInterface.MonoRailExtentions
+namespace AdminInterface.Models
 {
 	public class MonorailMailer : BaseMailer
 	{

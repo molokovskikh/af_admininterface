@@ -313,45 +313,18 @@
 	</div>
 	
 	<div class="TwoColumn" style="margin-left: 10px">
-		<form action=SendMessage method="post" id="MessagesForm">
 		<div class="block">
-			<h3>Сообщения пользователя</h3>
-			<input type=hidden value=${client.Id} name=clientCode />
-			Новое сообщение:
-			<textarea style="height: 150px; width:100%;" class="reuired" name="message"></textarea>
-			<br />
-			<input type=submit value="Принять" class="RightButton"/>
-			<p>
-				<% if messages.Count: %>
-				<table class="DataTable HighLightCurrentRow" id="ClientMessagesTable" style="text-align:left">
-					<tr>
-						<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
-						<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
-						<th>${app.Sortable("Тип", "Messages.Type")}</th>
-						<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
-						<th>${app.Sortable("Название", "Messages.Name")}</th>
-						<th>Событие</th>
-					</tr>
-					<% for i, log in enumerate(messages): %>
-					<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
-						<td>${log.WriteTime}</td>
-						<td>${log.Operator}</td>
-						<td>${BindingHelper.GetDescription(log.Type)}</td>
-						<td>${log.ObjectId}</td>
-						<td>${log.Name}</td>
-						<td>${log.HtmlMessage}</td>
-					</tr>
-					<% end %>
-				</table>
-				<% else: %>
-				<table class="DataTable">
-					<tr class="EmptyData">
-						<td>Сообщений нет.</td>
-					</tr>
-				</table>
-				<% end %>
-			</p>
+			<form action=SendMessage method="post" id="MessagesForm">
+				<h3>Сообщения пользователя</h3>
+				<input type=hidden value=${client.Id} name=clientCode />
+				Новое сообщение:
+				<textarea style="height: 150px; width:100%;" class="reuired" name="message"></textarea>
+				<br />
+				<input type=submit value="Принять" class="RightButton"/>
+				<p>
+					<% OutputSubView("/Templates/Messages") %>
+				</p>
+			</form>
 		</div>
-		</form>
 	</div>
 </div>

@@ -1,15 +1,16 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${delivery.Client.Name}", "${siteroot}/client/${delivery.Client.Id}"),
-									  ("Адрес доставки ${delivery.Value}", "")]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), delivery.Client]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Адрес доставки ${delivery.Value}
+<% end %>
+
 <div style="width: 600px;">
 
-    <% if not delivery.Enabled: %>
-    <div class="Warning">
-        <p>Адрес отключен</p>
-    </div>
-    <% end %>	
-
-	<h2>Адрес доставки ${delivery.Value}</h2>
+	<% if not delivery.Enabled: %>
+	<div class="Warning">
+		<p>Адрес отключен</p>
+	</div>
+	<% end %>
 
 	<div class=block>
 		<h3>Операции</h3>

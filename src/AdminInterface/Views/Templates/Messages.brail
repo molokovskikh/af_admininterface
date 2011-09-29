@@ -1,0 +1,30 @@
+﻿<% if messages.Count > 0: %>
+<table class="DataTable HighLightCurrentRow">
+	<thead>
+		<tr>
+			<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
+			<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+			<th>${app.Sortable("Тип", "Messages.Type")}</th>
+			<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
+			<th>${app.Sortable("Название", "Messages.Name")}</th>
+			<th>Событие</th>
+		</tr>
+	</thead>
+	<% for i, log in enumerate(messages): %>
+	<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
+		<td>${log.WriteTime}</td>
+		<td>${log.Operator}</td>
+		<td>${BindingHelper.GetDescription(log.Type)}</td>
+		<td>${log.ObjectId}</td>
+		<td>${log.Name}</td>
+		<td>${log.HtmlMessage}</td>
+	</tr>
+	<% end %>
+</table>
+<% else: %>
+<table class="DataTable">
+	<tr class="EmptyData">
+		<td>Сообщений нет.</td>
+	</tr>
+</table>
+<% end %>

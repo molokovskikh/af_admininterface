@@ -60,6 +60,8 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "future", Lazy = true), Auditable]
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
+		private string _name;
+
 		public User()
 		{
 			SendRejects = true;
@@ -108,8 +110,19 @@ namespace AdminInterface.Models
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
-		[Property, Description("Комментарий"), Auditable]
-		public virtual string Name { get; set; }
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Комментарий"), Auditable]
+		public virtual string Name { 
+			get
+			{
+				if (String.IsNullOrEmpty(_name))
+					return Login;
+				return _name;
+			}
+			set
+			{
+				_name = value;
+			}
+		}
 
 		[Property, Description("Включен"), Auditable]
 		public virtual bool Enabled { get; set; }

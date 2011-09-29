@@ -1,6 +1,8 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), 
-									  ("Информация о клиенте", "${siteroot}/client/${client.Id}"),
-									  ("Настройка аптеки", "")]} %>
+﻿<% component Bubble, {@bredcrumbs : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Настройка аптеки
+<% end %>
 
 <style>
 	div.search span.message

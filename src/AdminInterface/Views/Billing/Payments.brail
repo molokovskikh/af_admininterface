@@ -545,16 +545,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.BeginBalanceDate", "Дата начального баланса:"),
 										FormHelper.TextFieldValue("Instance.BeginBalanceDate", value) + "<input type=\"button\" class=\"CalendarInput\" />")}
 		
-			${WriteInputGroupHeader("Оплата")}
-										
-			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldPayDate", 
-															"Дата платежа:"), 
-										FormHelper.TextFieldValue("Instance.OldPayDate", Instance.OldPayDate.ToShortDateString(), {"class" : "ValidateDate"}) + "<input type=\"button\" class=\"CalendarInput\" />")}
-									
-			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.OldTariff", 
-															"Сумма платежа:"), 
-										FormHelper.TextField("Instance.OldTariff", {"class" : "ValidatePaySum"}))}
-
 			${WriteInputGroupHeader("Комментарий")}
 			<tr>
 				<td colspan=2>

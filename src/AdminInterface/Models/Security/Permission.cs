@@ -95,6 +95,23 @@ namespace AdminInterface.Models.Security
 					&& (action.ToLower() == "RegisterSupplier".ToLower() || action.ToLower() == "SearchPayers".ToLower()))
 					return true;
 			}
+			if (Type == PermissionType.ViewSuppliers)
+			{
+				var controllers = new [] {
+					"suppliers",
+					"users",
+				};
+				return controllers.Any(c => c == controller.ToLower());
+			}
+			if (Type == PermissionType.ViewSuppliers)
+			{
+				var controllers = new [] {
+					"clients",
+					"users",
+					"addresses",
+				};
+				return controllers.Any(c => c == controller.ToLower());
+			}
 			if (Type == PermissionType.RegisterDrugstore)
 			{
 				if (controller.ToLower() == "register"

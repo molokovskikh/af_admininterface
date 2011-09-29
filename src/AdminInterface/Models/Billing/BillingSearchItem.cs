@@ -8,56 +8,43 @@ using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(SchemaAction = "none")]
-	public class BillingSearchItem : ActiveRecordBase
+	public class BillingSearchItem
 	{
-		[PrimaryKey]
-		public uint BillingCode { get; set; }
+		public uint PayerId { get; set; }
 
-		[Property]
 		public string ShortName { get; set; }
 
-		[Property]
+		public string JuridicalName { get; set; }
+
 		public string Recipient { get; set; }
 
-		[Property]
 		public double PaySum { get; set; }
 
-		[Property]
 		public decimal Balance {get; set; }
 
-		[Property]
 		public DateTime LastClientRegistrationDate { get; set; }
 	
-		[Property]
 		public uint DisabledUsersCount { get; set; }
 
-		[Property]
 		public uint EnabledUsersCount { get; set; }
 
-		[Property]
 		public uint DisabledAddressesCount { get; set; }
 
-		[Property]
 		public uint EnabledAddressesCount { get; set; }
 
-		[Property]
 		public uint EnabledClientCount { get; set; }
 
-		[Property]
 		public uint EnabledSupplierCount { get; set; }
 		
-		[Property]
 		public string Regions { get; set; }
 
-		[Property]
 		public bool HasWholesaleSegment { get; set; }
 
-		[Property]
 		public bool HasRetailSegment { get; set; }
 
-		[Property]
 		public bool ShowPayDate { get; set; }
+
+		public decimal PaymentSum { get; set; }
 
 		public bool IsDebitor()
 		{

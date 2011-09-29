@@ -104,113 +104,106 @@
 	</div>
 	<% else: %>
 	<div>
-		<form action=Save method="post">
-			${app.ToHidden(filter)}
-			<table class="HighLightCurrentRow DataTable">
-				<thead>
-					<tr>
-						<th>
-							${app.Sortable("Договор", "BillingCode")}
-						</th>
-						<th>
-							${app.Sortable("Краткое наименование", "ShortName")}
-						</th>
-						<th>
-							${app.Sortable("Получатель платежей", "Recipient")}
-						</th>
-						<th>
-							${app.Sortable("Сумма платежа", "PaySum")}
-						</th>
-						<th style="width: 190px;">
-							${app.Sortable("Баланс", "Balance")}
-						</th>
-						<th>
-							${app.Sortable("Дата регистрации", "LastClientRegistrationDate")}
-						</th>
-						<th>
-							${app.Sortable("Отключенных копий", "DisabledUsersCount")}
-						</th>
-						<th>
-							${app.Sortable("Работающих копий", "EnabledUsersCount")}
-						</th>
-						<th>
-							${app.Sortable("Отключенных адресов", "DisabledAddressesCount")}
-						</th>
-						<th>
-							${app.Sortable("Работающих адресов", "EnabledAddressesCount")}
-						</th>
-						<th>
-							Сегменты
-						</th>
-						<th>
-							Регионы
-						</th>
-					</tr>
-				</thead>
-				<% 
-				paymentStyle = ""
-				for i, searchResult in enumerate(searchResults):
-
-					if searchResult.IsDisabled:
-						payerStyle = "background-color: #ffa642;"
-					else:
-						payerStyle = ""
-					end
-
-					if searchResult.IsDebitor():
-						paymentStyle = "background-color: #ff4b42;"
-					else:
-						paymentStyle = ""
-					end
-				%>
-				<tr class="${ViewHelper.GetRowStyle(i)}" style="${payerStyle}">
-					<td class=short>
-						<input type="hidden" name="PaymentInstances[${i}].Id" value="${searchResult.BillingCode}">
-						<a href="edit.rails?BillingCode=${searchResult.BillingCode}">${searchResult.BillingCode}</a>
-					</td>
-					<td>
-						${searchResult.ShortName}
-					</td>
-					<td>
-						${searchResult.Recipient}
-					</td>
-					<td class=short>
-						<input style="${paymentStyle}" type="text" name="PaymentInstances[${i}].PaySum" value="${searchResult.PaySum}">
-					</td>
-					<td>
-						${searchResult.Balance.ToString("0.#")}
-						<% if not searchResult.ShowPayDate: %>
-						<br>Счет выставляется автоматически
-						<% end %>
-					</td>
-					<td class=short>
-						${searchResult.LastClientRegistrationDate.ToShortDateString()}
-					</td>
-					<td class=short>
-						${searchResult.DisabledUsersCount}
-					</td>
-					<td class=short>
-						${searchResult.EnabledUsersCount}
-					</td>
-					<td class=short>
-						${searchResult.DisabledAddressesCount}
-					</td>
-					<td class=short>
-						${searchResult.EnabledAddressesCount}
-					</td>
-					<td>
-						${searchResult.GetSegments()}
-					</td>
-					<td>
-						${searchResult.Regions}
-					</td>
+		<table class="HighLightCurrentRow DataTable">
+			<thead>
+				<tr>
+					<th>
+						${app.Sortable("Договор", "PayerId")}
+					</th>
+					<th>
+						${app.Sortable("Краткое наименование", "ShortName")}
+					</th>
+					<th>
+						${app.Sortable("Получатель платежей", "Recipient")}
+					</th>
+					<th>
+						${app.Sortable("Сумма платежа", "PaymentSum")}
+					</th>
+					<th style="width: 190px;">
+						${app.Sortable("Баланс", "Balance")}
+					</th>
+					<th>
+						${app.Sortable("Дата регистрации", "LastClientRegistrationDate")}
+					</th>
+					<th>
+						${app.Sortable("Отключенных копий", "DisabledUsersCount")}
+					</th>
+					<th>
+						${app.Sortable("Работающих копий", "EnabledUsersCount")}
+					</th>
+					<th>
+						${app.Sortable("Отключенных адресов", "DisabledAddressesCount")}
+					</th>
+					<th>
+						${app.Sortable("Работающих адресов", "EnabledAddressesCount")}
+					</th>
+					<th>
+						Сегменты
+					</th>
+					<th>
+						Регионы
+					</th>
 				</tr>
-				<% end %>
-			</table>
-			<div class=submit>
-				<input type="submit" value="Сохранить" />
-			</div>
-		</form>
+			</thead>
+			<% 
+			paymentStyle = ""
+			for i, searchResult in enumerate(searchResults):
+
+				if searchResult.IsDisabled:
+					payerStyle = "background-color: #ffa642;"
+				else:
+					payerStyle = ""
+				end
+
+				if searchResult.IsDebitor():
+					paymentStyle = "background-color: #ff4b42;"
+				else:
+					paymentStyle = ""
+				end
+			%>
+			<tr class="${ViewHelper.GetRowStyle(i)}" style="${payerStyle}">
+				<td class=short>
+					<a href="edit?BillingCode=${searchResult.PayerId}">${searchResult.PayerId}</a>
+				</td>
+				<td>
+					${searchResult.ShortName}
+				</td>
+				<td>
+					${searchResult.Recipient}
+				</td>
+				<td class=short>
+					${searchResult.PaymentSum.ToString("C")}
+				</td>
+				<td>
+					${searchResult.Balance.ToString("0.#")}
+					<% if not searchResult.ShowPayDate: %>
+					<br>Счет выставляется автоматически
+					<% end %>
+				</td>
+				<td class=short>
+					${searchResult.LastClientRegistrationDate.ToShortDateString()}
+				</td>
+				<td class=short>
+					${searchResult.DisabledUsersCount}
+				</td>
+				<td class=short>
+					${searchResult.EnabledUsersCount}
+				</td>
+				<td class=short>
+					${searchResult.DisabledAddressesCount}
+				</td>
+				<td class=short>
+					${searchResult.EnabledAddressesCount}
+				</td>
+				<td>
+					${searchResult.GetSegments()}
+				</td>
+				<td>
+					${searchResult.Regions}
+				</td>
+			</tr>
+			<% end %>
+		</table>
 	</div>
 
 		<% 

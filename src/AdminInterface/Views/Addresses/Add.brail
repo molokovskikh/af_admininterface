@@ -1,11 +1,12 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${client.Name}", "${siteroot}/client/${client.Id}"),
-									  ("Новый адрес доставки", "")]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Новый адрес доставки
+<% end %>
 <div style="width: 600px;">
 
 	<form id="mainForm" method=post action="${siteroot}/deliveries/add">
 		<input type=hidden name=clientId value=${client.Id}>
-		<h2>Новый адрес доставки</h2>
 		<div class=block>
 			<h3>Адрес</h3>
 			<input name=delivery.value class="required" style="width: 100%;">

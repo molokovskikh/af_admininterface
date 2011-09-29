@@ -18,12 +18,6 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
-	public enum DiscountType
-	{
-		[Description("В рублях")] Currency,
-		[Description("В процентах")] Percent,
-	}
-
 	public enum InvoiceType
 	{
 		[Description("Вручную")] Manual = 0,
@@ -65,8 +59,6 @@ namespace AdminInterface.Models
 			JuridicalName = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
-			OldTariff = 0;
-			OldPayDate = DateTime.Now;
 			Comment = String.Format("Дата регистрации: {0}", DateTime.Now);
 		}
 
@@ -151,19 +143,10 @@ namespace AdminInterface.Models
 		public virtual string Comment { get; set; }
 
 		[Property]
-		public virtual string ChangeServiceNameTo { get; set; }
-
-		[Property]
 		public virtual InvoiceType AutoInvoice { get; set; }
 
 		[Property]
 		public virtual InvoicePeriod PayCycle { get; set; }
-
-		[Property]
-		public virtual DateTime OldPayDate { get; set;}
-
-		[Property]
-		public virtual double OldTariff { get; set; }
 
 		[Property]
 		public virtual bool HaveContract { get; set; }
@@ -183,7 +166,10 @@ namespace AdminInterface.Models
 		[Property]
 		public virtual DateTime? BeginBalanceDate { get; set; }
 
-		[Property(NotNull = true, Default = "0")]
+		[Property]
+		public virtual decimal PaymentSum { get; set; }
+
+		[Property]
 		public virtual bool SendPaymentNotification { get; set; }
 
 		[Nested]
@@ -466,7 +452,6 @@ ORDER BY {Payer}.shortname;";
 	public class DoNotHaveContacts : Exception
 	{
 		public DoNotHaveContacts(string message) : base(message)
-		{
-		}
+		{}
 	}
 }

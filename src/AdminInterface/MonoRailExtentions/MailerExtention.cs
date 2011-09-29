@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
 using System.Text;
+using AdminInterface.Models;
 using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
 using System.Net.Mail;

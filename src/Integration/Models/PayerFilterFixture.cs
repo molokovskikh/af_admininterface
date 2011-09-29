@@ -28,7 +28,7 @@ namespace Integration.Models
 			}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			var result = items[0];
-			Assert.That(result.BillingCode, Is.EqualTo(payer.Id));
+			Assert.That(result.PayerId, Is.EqualTo(payer.Id));
 			Assert.That(result.Recipient, Is.EqualTo(recipient.Name));
 		}
 
@@ -44,7 +44,7 @@ namespace Integration.Models
 			}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			var result = items[0];
-			Assert.That(result.BillingCode, Is.EqualTo(payer.Id));
+			Assert.That(result.PayerId, Is.EqualTo(payer.Id));
 			Assert.That(result.IsDisabled, Is.False);
 		}
 
@@ -60,7 +60,7 @@ namespace Integration.Models
 				ClientType = SearchClientType.Supplier
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
-			var result = items.FirstOrDefault(i => i.BillingCode == payer.Id);
+			var result = items.FirstOrDefault(i => i.PayerId == payer.Id);
 			Assert.That(result, Is.Not.Null, "не нашли плательщика {0}", payer.Id);
 		}
 
@@ -88,8 +88,8 @@ namespace Integration.Models
 			payer.SaveAndFlush();
 
 			var items = new PayerFilter{InvoiceType = InvoiceType.Manual}.Find();
-			Assert.That(items.Any(i => i.BillingCode == payer.Id), Is.False,
-				"не должны были найти плательщика {0}, есть {1}", payer.Id, items.Implode(i => i.BillingCode.ToString()));
+			Assert.That(items.Any(i => i.PayerId == payer.Id), Is.False,
+				"не должны были найти плательщика {0}, есть {1}", payer.Id, items.Implode(i => i.PayerId.ToString()));
 		}
 
 		[Test]
@@ -102,7 +102,7 @@ namespace Integration.Models
 
 			var items = new PayerFilter{SearchText = payer.INN, SearchBy = SearchBy.Inn}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
-			Assert.That(items[0].BillingCode, Is.EqualTo(payer.Id));
+			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
 		}
 
 		[Test]
@@ -117,7 +117,7 @@ namespace Integration.Models
 
 			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
-			Assert.That(items[0].BillingCode, Is.EqualTo(payer.Id));
+			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
 		}
 	}
 }

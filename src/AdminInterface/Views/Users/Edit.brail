@@ -1,8 +1,15 @@
 ﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  ("Клиент ${user.RootService.Name}", app.GetUrl(user.RootService)),
-									  ("Пользователь ${user.Login}", "")]} %>
+									  (user.RootService)]} %>
 
 <link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
+
+<% component CaptureFor, {@id : @Title}: %>
+	<% if (user.Login == user.Id.ToString()): %>
+		Пользователь ${user.Login}
+	<% else: %>
+		Пользователь ${user.Login}, Код ${user.Id}
+	<% end %>
+<% end %>
 
 <script>
 	$(function() {
@@ -16,18 +23,9 @@
 	});
 </script>
 
-
-<h2>
-	<% if (user.Login == user.Id.ToString()): %>
-		Пользователь ${user.Login}
-	<% else: %>
-		Пользователь ${user.Login}, Код ${user.Id}
-	<% end %>
-</h2>
-
 <% if (enabled == false): %>
 <div class="Warning">
-    <p>Пользователь отключен</p>
+	<p>Пользователь отключен</p>
 </div>
 <% end %>
 
@@ -49,27 +47,27 @@
 		</ul>
 	</div>
 
-    <div class=block>
-        <h3>Операции</h3>
+	<div class=block>
+		<h3>Операции</h3>
 
-        <% isLockedUser = user.IsLocked %>
+		<% isLockedUser = user.IsLocked %>
 
-        <form method=post action="${siteroot}/users/Unlock.rails" style="margin:0; padding:5px 0px 5px 0px">
-            <input type=hidden name=login value=${user.Login} />				
-            <input style="border-style:groove;" type=submit ${"disabled" if not isLockedUser} value="Разблокировать" />
-            <% if IsDefined("UnlockMessage"): %> 
-            <span style="color:Green;">${UnlockMessage}</span>
-            <% end %>
-        </form>
-        
-        <form method=post action="${siteroot}/users/DeletePreparedData.rails" style="margin:0; padding: 5px 0px 5px 0px">
-            <input type=hidden name=userCode value=${User.Id} />
-            <input style="border-style:groove;" type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
-            <% if IsDefined("DeleteMessage"): %>
-                <span style="color:Green;">${DeleteMessage}</span>
-            <% end %>
-            <% if IsDefined("DeleteErrorMessage"): %> 
-			    <span style="color:Red;">${DeleteErrorMessage}</span>
+		<form method=post action="${siteroot}/users/Unlock.rails" style="margin:0; padding:5px 0px 5px 0px">
+			<input type=hidden name=login value=${user.Login} />				
+			<input style="border-style:groove;" type=submit ${"disabled" if not isLockedUser} value="Разблокировать" />
+			<% if IsDefined("UnlockMessage"): %> 
+			<span style="color:Green;">${UnlockMessage}</span>
+			<% end %>
+		</form>
+		
+		<form method=post action="${siteroot}/users/DeletePreparedData.rails" style="margin:0; padding: 5px 0px 5px 0px">
+			<input type=hidden name=userCode value=${User.Id} />
+			<input style="border-style:groove;" type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
+			<% if IsDefined("DeleteMessage"): %>
+				<span style="color:Green;">${DeleteMessage}</span>
+			<% end %>
+			<% if IsDefined("DeleteErrorMessage"): %> 
+				<span style="color:Red;">${DeleteErrorMessage}</span>
 			<% end %>
 		</form>
 
@@ -221,7 +219,7 @@
 </div>
 
 <div class="TwoColumn Messages" style="margin-left: 10px">
-	<form id="MessagesForm" action="../SendMessage.rails" method="post">
+	<form id="MessagesForm" action="SendMessage" method="post">
 	<div class="block" style="width: auto;">
 		<h3>Сообщения пользователя</h3>
 		<input type=hidden value=${user.Id} name="userId" />
@@ -230,34 +228,7 @@
 		<br />
 		<input type=submit value="Принять" class="RightButton"/>
 		<p>
-			<% if messages.Count > 0: %>
-			<table class="DataTable HighLightCurrentRow">
-				<tr>
-					<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
-					<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
-					<th>${app.Sortable("Тип", "Messages.Type")}</th>
-					<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
-					<th>${app.Sortable("Название", "Messages.Name")}</th>
-					<th>Событие</th>
-				</tr>
-				<% for i, log in enumerate(messages): %>
-				<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
-					<td>${log.WriteTime}</td>
-					<td>${log.Operator}</td>
-					<td>${BindingHelper.GetDescription(log.Type)}</td>
-					<td>${log.ObjectId}</td>
-					<td>${log.Name}</td>
-					<td>${log.HtmlMessage}</td>
-				</tr>
-				<% end %>
-			</table>
-			<% else: %>
-			<table class="DataTable">
-				<tr class="EmptyData">
-					<td>Сообщений нет.</td>
-				</tr>
-			</table>
-			<% end %>
+			<% OutputSubView("/Templates/Messages") %>
 		</p>
 	</div>
 	</form>

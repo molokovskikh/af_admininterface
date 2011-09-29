@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -26,16 +27,10 @@ namespace AdminInterface.Controllers
 
 			var pager = new Pager((int?)currentPage, 30);
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
-			{
-				PropertyBag["unaccountedItems"] = Models.Billing.Account.GetReadyForAccounting(pager);
-			}
-			if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
-			{
-				var historyItems = searchBy.Find(pager)
-					.OrderByDescending(item => item.WriteTime)
-					.ToList();
-				PropertyBag["accountingHistoryItems"] = historyItems;
-			}
+				PropertyBag["unaccountedItems"] = Account.GetReadyForAccounting(pager);
+			else if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
+				PropertyBag["accountingHistoryItems"] = searchBy.Find(pager);
+
 			PropertyBag["currentPage"] = pager.Page;
 			PropertyBag["totalPages"] = pager.TotalPages;
 

@@ -80,10 +80,10 @@ namespace AdminInterface.Models
 			SearchBy = SearchBy.Name;
 			SortBy = "ShortName";
 			SortKeyMap = new Dictionary<string, string> {
-				{"BillingCode", "BillingCode"},
+				{"PayerId", "PayerId"},
 				{"ShortName", "ShortName"},
 				{"Recipient", "Recipient"},
-				{"PaySum", "PaySum"},
+				{"PaymentSum", "PaymentSum"},
 				{"Balance", "Balance"},
 				{"LastClientRegistrationDate", "LastClientRegistrationDate"},
 				{"DisabledUsersCount", "DisabledUsersCount"},
@@ -117,7 +117,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					And(having, "sum(if(users.Id = :searchText, 1, 0)) > 0");
 					break;
 				case SearchBy.PayerId:
-					And(having, "p.payerId = :searchText");
+					And(having, "p.PayerId = :searchText");
 					break;
 				case SearchBy.Inn:
 					And(where, "p.INN like :searchText");
@@ -136,7 +136,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 					And(where, "p.Balance < 0");
 					break;
 				case PayerStateFilter.NotDebitors:
-					And(where, "p.oldpaydate >= 0");
+					And(where, "p.Balance >= 0");
 					break;
 			}
 
@@ -192,28 +192,28 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 				And(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
 			var sql = String.Format(@"
-select p.payerId as {{BillingSearchItem.BillingCode}},
+select p.PayerId,
+		p.ShortName,
 		p.JuridicalName,
-		p.ShortName as {{BillingSearchItem.ShortName}},
-		p.Balance as {{BillingSearchItem.Balance}},
-		p.OldTariff as {{BillingSearchItem.PaySum}},
-		max(cd.RegistrationDate) as {{BillingSearchItem.LastClientRegistrationDate}},
-		count(distinct if(cd.Status = 1, cd.Id, null)) as {{BillingSearchItem.EnabledClientCount}},
-		count(distinct if(s.Disabled = 0, s.Id, null)) as {{BillingSearchItem.EnabledSupplierCount}},
-		count(distinct if(users.Enabled = 0, users.Id, null)) as {{BillingSearchItem.DisabledUsersCount}},
-		count(distinct if(users.Enabled = 1, users.Id, null)) as {{BillingSearchItem.EnabledUsersCount}},
-		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as {{BillingSearchItem.DisabledAddressesCount}},
-		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as {{BillingSearchItem.EnabledAddressesCount}},
+		p.Balance,
+		p.PaymentSum,
+		max(cd.RegistrationDate) as LastClientRegistrationDate,
+		count(distinct if(cd.Status = 1, cd.Id, null)) as EnabledClientCount,
+		count(distinct if(s.Disabled = 0, s.Id, null)) as EnabledSupplierCount,
+		count(distinct if(users.Enabled = 0, users.Id, null)) as DisabledUsersCount,
+		count(distinct if(users.Enabled = 1, users.Id, null)) as EnabledUsersCount,
+		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as DisabledAddressesCount,
+		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as EnabledAddressesCount,
 
-		not p.AutoInvoice as {{BillingSearchItem.ShowPayDate}},
+		not p.AutoInvoice as ShowPayDate,
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r
-		where r.regioncode & bit_or(cd.maskregion) > 0) as {{BillingSearchItem.Regions}},
+		where r.regioncode & bit_or(cd.maskregion) > 0) as Regions,
 
-		sum(if(cd.Segment = 1 or s.Segment = 1, 1, 0)) > 0 as {{BillingSearchItem.HasRetailSegment}},
-		sum(if(cd.Segment = 0 or s.Segment = 0, 1, 0)) > 0 as {{BillingSearchItem.HasWholesaleSegment}},
-		r.Name as {{BillingSearchItem.Recipient}}
+		sum(if(cd.Segment = 1 or s.Segment = 1, 1, 0)) > 0 as HasRetailSegment,
+		sum(if(cd.Segment = 0 or s.Segment = 0, 1, 0)) > 0 as HasWholesaleSegment,
+		r.Name as Recipient
 from billing.payers p
 	left join Billing.Recipients r on r.Id = p.RecipientId
 	left join future.Users users on users.PayerId = p.PayerId
@@ -223,7 +223,7 @@ from billing.payers p
 where {0}
 group by p.payerId
 having {1}
-order by {{BillingSearchItem.ShortName}}
+order by p.ShortName
 ", where, having);
 
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
@@ -231,9 +231,7 @@ order by {{BillingSearchItem.ShortName}}
 			try
 			{
 				query.Sql = sql;
-				var result = query.GetSqlQuery(session)
-					.AddEntity(typeof(BillingSearchItem))
-					.List<BillingSearchItem>();
+				var result = query.GetSqlQuery(session).ToList<BillingSearchItem>();
 
 				ArHelper.Evict(session, result);
 				result = result.ToList();

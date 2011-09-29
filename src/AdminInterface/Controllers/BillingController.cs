@@ -255,15 +255,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 		}
 
-		public void Save([DataBind("filter")] PayerFilter filter,
-			[DataBind("PaymentInstances")] PaymentInstance[] paymentInstances)
-		{
-			foreach (var instance in paymentInstances)
-				instance.Save();
-
-			RedirectToAction("Search", filter.GetQueryString());
-		}
-
 		public void SentMail(uint clientCode, string tab, [DataBind("MailSentEntity")] MailSentEntity sentEntity)
 		{
 			try
