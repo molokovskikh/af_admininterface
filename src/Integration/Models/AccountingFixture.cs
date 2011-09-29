@@ -15,14 +15,14 @@ namespace Integration.Models
 		{
 			ArHelper.WithSession(s => s.CreateSQLQuery(@"
 update billing.Accounts
-set ReadyForAcounting = 0,
+set ReadyForAccounting = 0,
 BeAccounted = 0;
 ").ExecuteUpdate());
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
-			client.Users[0].Accounting.ReadyForAcounting = true;
+			client.Users[0].Accounting.ReadyForAccounting = true;
 			client.SaveAndFlush();
 
 			accountings = Account.GetReadyForAccounting(new Pager());

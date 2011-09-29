@@ -127,7 +127,7 @@ namespace AdminInterface.Models.Billing
 		public ReportAccount(Report report)
 		{
 			Report = report;
-			ReadyForAcounting = true;
+			ReadyForAccounting = true;
 		}
 
 		[BelongsTo("ObjectId", Cascade = CascadeEnum.All)]
@@ -182,6 +182,10 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorColumn = "Type", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
+		private bool _beAccounted;
+		private bool _readyForAccounting;
+		private bool _isFree;
+		private decimal _payment;
 		private string _description;
 
 		[PrimaryKey]
@@ -193,20 +197,76 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string Operator { get; set; }
 
-		[Property, Auditable("Платеж")]
-		public virtual decimal Payment { get; set; }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Auditable("Платеж")]
+		public virtual decimal Payment
+		{
+			get
+			{
+				return _payment;
+			}
+			set
+			{
+				if (_payment != value)
+				{
+					_payment = value;
+					Payer.UpdatePaymentSum();
+				}
+			}
+		}
 
-		[Property]
-		public virtual bool BeAccounted { get; set;  }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		public virtual bool BeAccounted
+		{
+			get
+			{
+				return _beAccounted;
+			}
+			set
+			{
+				if (_beAccounted != value)
+				{
+					_beAccounted = value;
+					Payer.UpdatePaymentSum();
+				}
+			}
+		}
 
-		[Property]
-		public virtual bool ReadyForAcounting { get; set; }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		public virtual bool ReadyForAccounting
+		{
+			get
+			{
+				return _readyForAccounting;
+			}
+			set
+			{
+				if (_readyForAccounting != value)
+				{
+					_readyForAccounting = value;
+					Payer.UpdatePaymentSum();
+				}
+			}
+		}
 
 		[Property]
 		public virtual int InvoiceGroup { get; set; }
 
-		[Property]
-		public virtual bool IsFree { get; set; }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		public virtual bool IsFree
+		{
+			get
+			{
+				return _isFree;
+			}
+			set
+			{
+				if (IsFree != value)
+				{
+					_isFree = value;
+					Payer.UpdatePaymentSum();
+				}
+			}
+		}
 
 		public virtual uint PayerId
 		{
@@ -243,7 +303,7 @@ namespace AdminInterface.Models.Billing
 			set { throw new NotImplementedException(); }
 		}
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore)]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
 		public virtual string Description
 		{
 			get
@@ -281,12 +341,12 @@ namespace AdminInterface.Models.Billing
 
 		public virtual bool ShouldPay()
 		{
-			return (BeAccounted || ReadyForAcounting) && !IsFree && Payment > 0;
+			return (BeAccounted || ReadyForAccounting) && !IsFree && Payment > 0;
 		}
 
 		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
 		{
-			var readyForAccounting = Queryable.Where(a => a.ReadyForAcounting && !a.BeAccounted);
+			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting && !a.BeAccounted);
 
 			pager.Total = readyForAccounting.Count();
 			return pager.DoPage(readyForAccounting).ToList();

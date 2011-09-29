@@ -61,6 +61,7 @@ namespace AdminInterface.Models
 	public class User : ActiveRecordLinqBase<User>, IEnablable
 	{
 		private string _name;
+		private bool _enabled;
 
 		public User()
 		{
@@ -124,8 +125,23 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Включен"), Auditable]
-		public virtual bool Enabled { get; set; }
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
+		public virtual bool Enabled
+		{
+			get
+			{
+				return _enabled;
+			}
+			set
+			{
+				if (_enabled != value)
+				{
+					_enabled = value;
+					if (Payer != null)
+						Payer.PaymentSum = Payer.TotalSum;
+				}
+			}
+		}
 
 		[Property, Description("Подтверждать отправку заказов"), Auditable]
 		public virtual bool SubmitOrders { get; set; }

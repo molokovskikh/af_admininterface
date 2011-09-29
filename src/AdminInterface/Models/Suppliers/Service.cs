@@ -16,6 +16,8 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Lazy = true), JoinedBase]
 	public class Service : IEnablable
 	{
+		protected bool _disabled;
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
@@ -28,7 +30,7 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo]
 		public virtual Region HomeRegion { get; set; }
 
-		[Property]
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore)]
 		public virtual bool Disabled { get; set; }
 
 		public virtual bool Enabled

@@ -27,7 +27,7 @@ namespace Unit.Models
 			};
 			client = new Client(payer);
 			var user = new User(client);
-			user.Accounting.ReadyForAcounting = true;
+			user.Accounting.ReadyForAccounting = true;
 			invoice = new Invoice(payer, Period.January, DateTime.Now);
 		}
 
@@ -89,7 +89,7 @@ namespace Unit.Models
 			payer.InvoiceSettings.DoNotGroupParts = true;
 
 			var user = new User(client);
-			user.Accounting.ReadyForAcounting = true;
+			user.Accounting.ReadyForAccounting = true;
 
 			invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
 			var act = new Act(DateTime.Now, invoice);

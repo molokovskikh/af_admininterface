@@ -23,7 +23,7 @@ namespace Functional.Billing
 			client = DataMother.CreateClientAndUsers();
 			payer = client.Payers.First();
 			payer.Recipient = Recipient.Queryable.First();
-			payer.Users.Each(u => u.Accounting.ReadyForAcounting = true);
+			payer.Users.Each(u => u.Accounting.ReadyForAccounting = true);
 			client.Save();
 			payer.Save();
 		}

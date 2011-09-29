@@ -355,7 +355,7 @@ namespace AdminInterface.Controllers
 		[return: JSONReturnBinder]
 		public string TotalSum(uint payerId)
 		{
-			return Payer.Find(payerId).TotalSum.ToString("C");
+			return Payer.Find(payerId).PaymentSum.ToString("C");
 		}
 
 		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)

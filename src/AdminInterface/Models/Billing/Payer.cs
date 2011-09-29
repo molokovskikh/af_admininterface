@@ -447,6 +447,11 @@ ORDER BY {Payer}.shortname;";
 				.Where(a => a.ShouldPay())
 				.ToList();
 		}
+
+		public virtual void UpdatePaymentSum()
+		{
+			PaymentSum = TotalSum;
+		}
 	}
 
 	public class DoNotHaveContacts : Exception

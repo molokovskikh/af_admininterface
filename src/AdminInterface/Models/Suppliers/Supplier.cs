@@ -45,8 +45,23 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo, Auditable, Description("Домашний регион")]
 		public override Region HomeRegion { get; set; }
 
-		[Property]
-		public override bool Disabled { get; set; }
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore)]
+		public override bool Disabled
+		{
+			get
+			{
+				return _disabled;
+			}
+			set
+			{
+				if (_disabled != value)
+				{
+					if (Payer != null)
+						Payer.PaymentSum = Payer.TotalSum;
+					_disabled = value;
+				}
+			}
+		}
 
 		[Property]
 		public virtual Segment Segment { get; set; }

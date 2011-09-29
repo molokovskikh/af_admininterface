@@ -26,6 +26,35 @@ namespace Unit.Models
 			Assert.That(payer.TotalSum, Is.EqualTo(800));
 		}
 
+		[Test]
+		public void Update_payer_payment_sum_on_user_disabled()
+		{
+			var payer = new Payer("Тестовый плательщик");
+			var client = new Client(payer);
+			var user = new User(client);
+			client.AddUser(user);
+			user.Accounting.Accounted();
+			payer.PaymentSum = payer.TotalSum;
+			Assert.That(payer.PaymentSum, Is.EqualTo(800));
+			user.Enabled = false;
+			Assert.That(payer.PaymentSum, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Update_payer_payment_sum_on_client_disabled()
+		{
+			var payer = new Payer("Тестовый плательщик");
+			var client = new Client(payer);
+			var user = new User(client);
+			client.AddUser(user);
+			user.Accounting.Accounted();
+			payer.PaymentSum = payer.TotalSum;
+			Assert.That(payer.PaymentSum, Is.EqualTo(800));
+			client.Disabled = true;
+			Assert.That(payer.PaymentSum, Is.EqualTo(0));
+		}
+
+
 		[Test, Ignore("Не реализовано #4979, бухгалтерия думает")]
 		public void Do_not_notify_user_if_billing_by_quater_but_current_month_payed()
 		{

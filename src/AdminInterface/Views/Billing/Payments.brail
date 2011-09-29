@@ -193,7 +193,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 <div class="left">
 
 	<div style="font-size:large; margin-bottom: 10px">
-		<b>Всего к оплате: <span id="TotalSum"> ${payer.TotalSum.ToString("C")}</span></b>
+		<b>Всего к оплате: <span id="TotalSum"> ${payer.PaymentSum.ToString("C")}</span></b>
 	</div>
 	<% if not payer.IsManualPayments(): %>
 	<div style="font-size:large; margin-bottom: 10px">
@@ -227,7 +227,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</thead>
 				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
-					<td style="width: 50px">
+					<td class=short>
 						<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
 						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
 					</td>
@@ -284,7 +284,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</thead>
 				<% for i, supplier in enumerate(suppliers): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier)}" align="center">
-					<td style="width: 50px">
+					<td class=short>
 						<input type="checkbox" name=status ${"checked" unless supplier.Disabled} onclick="SetClientStatus(${supplier.Id}, this.checked)" />
 					</td>
 					<td>${supplier.Id}</td>

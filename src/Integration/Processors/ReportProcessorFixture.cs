@@ -35,7 +35,7 @@ namespace Integration.Processors
 
 			var account = session.Query<ReportAccount>().FirstOrDefault(r => r.Report == report);
 			Assert.That(account, Is.Not.Null);
-			Assert.That(account.ReadyForAcounting, Is.True);
+			Assert.That(account.ReadyForAccounting, Is.True);
 		}
 
 		[Test]

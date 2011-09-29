@@ -160,14 +160,14 @@ namespace AdminInterface.Models.Logs
 			return new ClientInfoLogEntity("", user).SetProblem(isFree, user.Login, reason);
 		}
 
-		public static ClientInfoLogEntity StatusChange(Service client)
+		public static ClientInfoLogEntity StatusChange(Service service)
 		{
 			string status;
-			if (client.Disabled)
+			if (service.Disabled)
 				status = "отключен";
 			else
 				status = "включен";
-			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), client);
+			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), service);
 		}
 
 		public static ClientInfoLogEntity ReseteUin(Client client, string reason)

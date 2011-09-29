@@ -68,12 +68,13 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Client : Service
 	{
-		private ClientStatus status;
+		private ClientStatus _status;
 
 		public Client()
 		{
 			Type = ServiceType.Drugstore;
 			Registration = new RegistrationInfo();
+			Payers = new List<Payer>();
 			Users = new List<User>();
 			Addresses = new List<Address>();
 		}
@@ -95,18 +96,45 @@ namespace AdminInterface.Models
 		[Property, Description("Полное наименование"), Auditable, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
-		[Property, Description("Включен"), Auditable]
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
 		public virtual ClientStatus Status
 		{
 			get
 			{
-				return status;
+				return _status;
 			}
 
 			set
 			{
-				status = value;
-				Disabled = Status == ClientStatus.Off;
+				if (_status != value)
+				{
+					_status = value;
+					foreach (var payer in Payers)
+						payer.PaymentSum = payer.TotalSum;
+					_disabled = _status == ClientStatus.Off;
+				}
+			}
+		}
+
+		public override bool Disabled
+		{
+			get
+			{
+				return _disabled;
+			}
+			set
+			{
+				if (_disabled != value)
+				{
+					_disabled = value;
+					if (_disabled)
+						_status = ClientStatus.Off;
+					else
+						_status = ClientStatus.On;
+
+					foreach (var payer in Payers)
+						payer.PaymentSum = payer.TotalSum;
+				}
 			}
 		}
 
@@ -155,22 +183,6 @@ namespace AdminInterface.Models
 			get
 			{
 				return Payers.Count == 1 && Payers[0].JuridicalOrganizations.Count == 1;
-			}
-		}
-
-		public override bool Disabled
-		{
-			get
-			{
-				return base.Disabled;
-			}
-			set
-			{
-				base.Disabled = value;
-				if (Disabled)
-					status = ClientStatus.Off;
-				else
-					status = ClientStatus.On;
 			}
 		}
 

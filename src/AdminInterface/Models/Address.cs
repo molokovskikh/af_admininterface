@@ -27,6 +27,8 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable
 	{
+		private bool _enabled;
+
 		public Address(Client client, LegalEntity legalEntity)
 			: this()
 		{
@@ -52,8 +54,23 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
-		[Property, Description("Включен"), Auditable]
-		public virtual bool Enabled { get; set; }
+		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
+		public virtual bool Enabled
+		{
+			get
+			{
+				return _enabled;
+			}
+			set
+			{
+				if (_enabled != value)
+				{
+					if (Payer != null)
+						Payer.PaymentSum = Payer.TotalSum;
+					_enabled = value;
+				}
+			}
+		}
 
 		[Property]
 		public virtual string Registrant { get; set; }

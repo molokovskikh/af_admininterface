@@ -30,7 +30,7 @@ namespace Unit.Models
 		[Test]
 		public void Invoice_by_quater_contains_bill_for_every_month()
 		{
-			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
+			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
 			var invoice = new Invoice(payer, Period.FirstQuarter, DateTime.Now);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
@@ -52,10 +52,10 @@ namespace Unit.Models
 			client.AddAddress("test");
 			payer.Addresses = new List<Address>(client.Addresses);
 			payer.Addresses.Each(a => {
-				a.Accounting.ReadyForAcounting = true;
+				a.Accounting.ReadyForAccounting = true;
 				a.AvaliableForUsers.Add(client.Users[0]);
 			});
-			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
+			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
 			var invoice = new Invoice(payer, Period.April, DateTime.Now);
 
@@ -118,7 +118,7 @@ namespace Unit.Models
 		{
 			payer.InvoiceSettings.DoNotGroupParts = true;
 			client.Users.Add(new User(client));
-			payer.Users.Each(a => a.Accounting.ReadyForAcounting = true);
+			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
 			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(2), invoice.Parts.Implode());
@@ -132,8 +132,8 @@ namespace Unit.Models
 		public void Build_invoice_for_invoice_groups()
 		{
 			new User(client);
-			payer.Users[0].Accounting.ReadyForAcounting = true;
-			payer.Users[1].Accounting.ReadyForAcounting = true;
+			payer.Users[0].Accounting.ReadyForAccounting = true;
+			payer.Users[1].Accounting.ReadyForAccounting = true;
 			payer.Users[1].Accounting.Payment = 600;
 			payer.Users[1].Accounting.InvoiceGroup = 1;
 

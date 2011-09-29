@@ -437,6 +437,7 @@
     </Content>
     <None Include="Views\RegionalAdmin\AdminEditor.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
+    <None Include="Views\Templates\Messages.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />

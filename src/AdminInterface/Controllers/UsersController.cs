@@ -317,9 +317,7 @@ namespace AdminInterface.Controllers
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				using (new TransactionScope())
-					new ClientInfoLogEntity(message, user).Save();
-
+				new ClientInfoLogEntity(message, user).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();

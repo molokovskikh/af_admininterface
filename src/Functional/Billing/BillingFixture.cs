@@ -416,7 +416,7 @@ namespace Functional.Billing
 		{
 			// Создаем 2 пользователя и 3 адреса. 2 пользователя и 2 адреса включены
 			var user = new User(client) { Name = "test user", };
-			user.Accounting.ReadyForAcounting = true;
+			user.Accounting.ReadyForAccounting = true;
 			user.Setup();
 			client.AddAddress("address");
 			client.AddAddress("address");
@@ -426,7 +426,7 @@ namespace Functional.Billing
 			//BasicConfigurator.Configure();
 			foreach (var a in client.Addresses)
 			{
-				a.Accounting.ReadyForAcounting = true;
+				a.Accounting.ReadyForAccounting = true;
 				a.AvaliableForUsers = new List<User> { client.Users[0], client.Users[1] };
 				a.Save();
 			}
