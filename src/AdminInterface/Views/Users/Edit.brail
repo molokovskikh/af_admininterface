@@ -1,5 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-									  (user.RootService)]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), user.RootService]} %>
 
 <link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
 

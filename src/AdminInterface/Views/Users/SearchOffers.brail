@@ -1,8 +1,8 @@
 ﻿<% component CaptureFor, {"id" : "Title"}:%>
-	 Поиск предложений для пользователя ${user.Name}
+	Поиск предложений для пользователя ${user.Name}
 <% end %>
 
-<form action="SearchOffers.rails" method="post">
+<form action="SearchOffers" method="post">
 	<input type="hidden" name="id" value="${User.Id}" />
 	<h5>Введите наименование или форму выпуска</h5>
 	<input type="text" name="SearchText" value="${ SearchText if IsDefined("SearchText") }"/>
@@ -11,11 +11,13 @@
 
 <% if IsDefined("Offers") and Offers.Count: %>
 	<table class="DataTable">
-		<tr>
-			<th>Каталожное наименование</th>
-			<th>Наименование поставщика</th>
-			<th>Цена</th>
-		</tr>
+		<thead>
+			<tr>
+				<th>Каталожное наименование</th>
+				<th>Наименование поставщика</th>
+				<th>Цена</th>
+			</tr>
+		</thead>
 		<% for i, offer in enumerate(offers): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
 			<td>

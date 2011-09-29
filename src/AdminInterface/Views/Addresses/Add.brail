@@ -3,6 +3,7 @@
 <% component CaptureFor, {@id : @Title}: %>
 	Новый адрес доставки
 <% end %>
+
 <div style="width: 600px;">
 
 	<form id="mainForm" method=post action="${siteroot}/deliveries/add">

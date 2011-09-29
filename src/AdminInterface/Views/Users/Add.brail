@@ -1,5 +1,4 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"),
-										client]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
 
 <% component CaptureFor, {"id" : "Title"}: %>
 	Новый пользователь
