@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;

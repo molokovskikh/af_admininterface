@@ -10,7 +10,8 @@ namespace Unit.Models
 		public void Do_not_include_account_with_zero_payment_into_invoice()
 		{
 			var account = new ReportAccount(new Report {
-				Allow = true
+				Allow = true,
+				Payer = new Payer("Тестовый плательщик")
 			});
 			Assert.That(account.ShouldPay(), Is.False);
 		}

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Test.ForTesting;

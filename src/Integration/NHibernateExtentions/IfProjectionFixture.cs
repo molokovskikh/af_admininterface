@@ -1,4 +1,5 @@
 ﻿using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Integration.ForTesting;

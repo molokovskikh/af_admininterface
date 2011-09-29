@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Hosting;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;

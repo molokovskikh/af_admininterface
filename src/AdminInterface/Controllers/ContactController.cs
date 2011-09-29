@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;

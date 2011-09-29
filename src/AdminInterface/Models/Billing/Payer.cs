@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using AdminInterface.Controllers;
-using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.Components.DictionaryAdapter;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Tools.Calendar;
 using Common.Web.Ui.Models;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Billing
 {
 	public enum InvoiceType
 	{

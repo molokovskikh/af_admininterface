@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;

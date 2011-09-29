@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;

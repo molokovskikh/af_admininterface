@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using NUnit.Framework;

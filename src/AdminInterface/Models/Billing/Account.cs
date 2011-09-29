@@ -21,8 +21,8 @@ namespace AdminInterface.Models.Billing
 
 		public UserAccount(User user)
 		{
-			Payment = 800;
 			User = user;
+			_payment = 800;
 		}
 
 		[BelongsTo("ObjectId")]
@@ -70,7 +70,7 @@ namespace AdminInterface.Models.Billing
 		public AddressAccount(Address address)
 		{
 			Address = address;
-			Payment = 200;
+			_payment = 200;
 		}
 
 		[BelongsTo("ObjectId")]
@@ -127,7 +127,7 @@ namespace AdminInterface.Models.Billing
 		public ReportAccount(Report report)
 		{
 			Report = report;
-			ReadyForAccounting = true;
+			_readyForAccounting = true;
 		}
 
 		[BelongsTo("ObjectId", Cascade = CascadeEnum.All)]
@@ -183,9 +183,9 @@ namespace AdminInterface.Models.Billing
 	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
 		private bool _beAccounted;
-		private bool _readyForAccounting;
+		protected bool _readyForAccounting;
 		private bool _isFree;
-		private decimal _payment;
+		protected decimal _payment;
 		private string _description;
 
 		[PrimaryKey]

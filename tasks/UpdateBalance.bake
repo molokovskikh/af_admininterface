@@ -1,5 +1,5 @@
 import Castle.ActiveRecord
-import AdminInterface.Models
+import AdminInterface.Models.Billing
 
 task @UpdateBalance, [@InitActiveRecord]:
 	using SessionScope():

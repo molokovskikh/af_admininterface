@@ -112,7 +112,8 @@ namespace AdminInterface.Models
 		public virtual string Login { get; set; }
 
 		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Комментарий"), Auditable]
-		public virtual string Name { 
+		public virtual string Name
+		{
 			get
 			{
 				if (String.IsNullOrEmpty(_name))
@@ -265,9 +266,9 @@ namespace AdminInterface.Models
 
 		public virtual string GetLoginWithName()
 		{
-			if (String.IsNullOrEmpty(Name))
+			if (String.IsNullOrEmpty(_name))
 				return Login;
-			return String.Format("{0} ({1})", Login, Name);
+			return String.Format("{0} ({1})", Login, _name);
 		}
 
 		public virtual void AddPermission(UserPermission permission)

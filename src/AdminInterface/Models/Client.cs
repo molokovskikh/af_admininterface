@@ -106,12 +106,13 @@ namespace AdminInterface.Models
 
 			set
 			{
-				if (_status != value)
+				var updatePayer = _status != value;
+				_status = value;
+				_disabled = _status == ClientStatus.Off;
+				if (updatePayer)
 				{
-					_status = value;
 					foreach (var payer in Payers)
 						payer.PaymentSum = payer.TotalSum;
-					_disabled = _status == ClientStatus.Off;
 				}
 			}
 		}
@@ -124,14 +125,12 @@ namespace AdminInterface.Models
 			}
 			set
 			{
-				if (_disabled != value)
-				{
-					_disabled = value;
-					if (_disabled)
-						_status = ClientStatus.Off;
-					else
-						_status = ClientStatus.On;
+				var updatePayer = _disabled != value;
+				_disabled = value;
+				_status = _disabled ? ClientStatus.Off : ClientStatus.On;
 
+				if (updatePayer)
+				{
 					foreach (var payer in Payers)
 						payer.PaymentSum = payer.TotalSum;
 				}

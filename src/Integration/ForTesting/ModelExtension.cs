@@ -1,5 +1,6 @@
 using System;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Helpers;
 

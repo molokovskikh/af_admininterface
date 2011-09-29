@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
