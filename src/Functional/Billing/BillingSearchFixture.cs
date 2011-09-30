@@ -25,7 +25,7 @@ namespace Functional
 			payer.UpdateAndFlush();
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
-			client.UpdateAndFlush();
+			client.SaveAndFlush();
 			foreach (var address in client.Addresses)
 			{
 				address.Enabled = false;

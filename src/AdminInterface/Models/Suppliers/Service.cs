@@ -30,8 +30,19 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo]
 		public virtual Region HomeRegion { get; set; }
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore)]
-		public virtual bool Disabled { get; set; }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		public virtual bool Disabled
+		{
+			get
+			{
+				return _disabled;
+			}
+
+			set
+			{
+				_disabled = value;
+			}
+		}
 
 		public virtual bool Enabled
 		{

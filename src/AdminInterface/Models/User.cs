@@ -111,7 +111,7 @@ namespace AdminInterface.Models
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Комментарий"), Auditable]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Комментарий"), Auditable]
 		public virtual string Name
 		{
 			get
@@ -126,7 +126,7 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual bool Enabled
 		{
 			get

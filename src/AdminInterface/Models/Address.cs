@@ -54,7 +54,7 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual bool Enabled
 		{
 			get

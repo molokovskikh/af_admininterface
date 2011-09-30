@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
@@ -26,7 +27,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
-	public class UpdateLogEntity : ActiveRecordBase<UpdateLogEntity>
+	public class UpdateLogEntity : ActiveRecordLinqBase<UpdateLogEntity>
 	{
 		public UpdateLogEntity()
 		{}

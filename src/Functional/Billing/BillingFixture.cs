@@ -31,7 +31,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress("test address for billing");
-			client.UpdateAndFlush();
+			client.SaveAndFlush();
 			address = client.Addresses[0];
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
@@ -606,10 +606,10 @@ namespace Functional.Billing
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 
 			client.Name += client.Id;
-			client.UpdateAndFlush();
+			client.SaveAndFlush();
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.UpdateAndFlush();
+			client2.SaveAndFlush();
 			client.Refresh();
 			client2.Refresh();
 			var testUserId = client2.Users[0].Id;
@@ -641,10 +641,10 @@ namespace Functional.Billing
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 			client.Name += client.Id;
-			client.UpdateAndFlush();
+			client.SaveAndFlush();
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.UpdateAndFlush();
+			client2.SaveAndFlush();
 			client.Refresh();
 			client2.Refresh();
 			var testAddressId = client2.Addresses[0].Id;

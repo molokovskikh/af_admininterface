@@ -713,16 +713,14 @@ namespace Functional.Drugstore
 		[Test, NUnit.Framework.Description("Перемещение только пользователя (без адреса доставки) к другому клиенту")]
 		public void Move_only_user_to_another_client()
 		{
-			Client oldClient;
-			Client newClient;
-			oldClient = DataMother.CreateTestClientWithAddressAndUser();
-			newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			oldClient.Name += oldClient.Id.ToString();
-			oldClient.UpdateAndFlush();
+			oldClient.SaveAndFlush();
 			var user = oldClient.Users[0];
 			newClient.Name += newClient.Id.ToString();
-			newClient.UpdateAndFlush();
+			newClient.SaveAndFlush();
 			scope.Flush();
 
 			using (var browser = Open("users/{0}/edit", user.Id))

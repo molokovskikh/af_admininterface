@@ -69,7 +69,7 @@ namespace Functional.Drugstore
 				user.Setup();
 				user.SaveAndFlush();
 				client.Users.Add(user);
-				client.UpdateAndFlush();
+				client.SaveAndFlush();
 				scope.VoteCommit();
 				client = Client.Find(client.Id);
 			}

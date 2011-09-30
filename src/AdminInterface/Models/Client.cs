@@ -96,7 +96,7 @@ namespace AdminInterface.Models
 		[Property, Description("Полное наименование"), Auditable, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
-		[Property(Access = PropertyAccess.FieldLowercaseUnderscore), Description("Включен"), Auditable]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual ClientStatus Status
 		{
 			get
@@ -426,16 +426,6 @@ group by u.ClientId")
 		public virtual void SaveAndFlush()
 		{
 			ActiveRecordMediator.SaveAndFlush(this);
-		}
-
-		public virtual void Update()
-		{
-			ActiveRecordMediator<Client>.Update(this);
-		}
-
-		public virtual void UpdateAndFlush()
-		{
-			ActiveRecordMediator.UpdateAndFlush(this);
 		}
 
 		public virtual void Refresh()

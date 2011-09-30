@@ -69,6 +69,7 @@
     <Compile Include="InvoiceProcessor.cs" />
     <Compile Include="ReportProcessor.cs" />
     <Compile Include="SendPaymentNotification.cs" />
+    <Compile Include="UpdateAccountProcessor.cs" />
     <Compile Include="Waiter.cs" />
   </ItemGroup>
   <ItemGroup>

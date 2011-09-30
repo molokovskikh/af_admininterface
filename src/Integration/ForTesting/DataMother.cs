@@ -121,13 +121,12 @@ namespace Integration.ForTesting
 				Value = "тестовый адрес"
 			};
 			client.AddAddress(address);
-			client.Update();
 			client.Users[0].Name += client.Users[0].Id;
 			client.Users[0].UpdateAndFlush();
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].UpdateAndFlush();
 			client.Name += client.Id;
-			client.UpdateAndFlush();
+			client.SaveAndFlush();
 			client.Addresses.Single().MaintainIntersection();
 			client.Refresh();
 			return client;

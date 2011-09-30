@@ -20,6 +20,7 @@ namespace AdminInterface.Background
 			Action = () => {
 				new InvoiceProcessor().Process();
 				new ReportProcessor().Process();
+				new UpdateAccountProcessor().Process();
 
 /*				using(new SessionScope())
 					jobs.Each(j => j.Run());*/
