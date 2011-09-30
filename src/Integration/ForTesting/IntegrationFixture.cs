@@ -38,8 +38,7 @@ namespace Integration.ForTesting
 				var holder = ActiveRecordMediator.GetSessionFactoryHolder();
 				holder.ReleaseSession(session);
 			}
-			if (scope != null)
-				scope.Dispose();
+			Close();
 		}
 
 		public void Flush()
@@ -59,14 +58,17 @@ namespace Integration.ForTesting
 
 		protected void Reopen()
 		{
-			scope.Dispose();
+			Close();
 			scope = new SessionScope();
 		}
 
 		protected void Close()
 		{
-			scope.Dispose();
-			scope = null;
+			if (scope != null)
+			{
+				scope.Dispose();
+				scope = null;
+			}
 		}
 	}
 }

@@ -153,6 +153,7 @@
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListner.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
+    <Compile Include="Models\Billing\ReportLogProcessorState.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
     <Compile Include="Models\Billing\PayerAuditRecord.cs" />

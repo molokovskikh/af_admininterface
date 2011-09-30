@@ -67,6 +67,7 @@
   <ItemGroup>
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="InvoiceProcessor.cs" />
+    <Compile Include="ReportLogsProcessor.cs" />
     <Compile Include="ReportProcessor.cs" />
     <Compile Include="SendPaymentNotification.cs" />
     <Compile Include="UpdateAccountProcessor.cs" />
