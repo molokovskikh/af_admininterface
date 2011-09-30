@@ -25,6 +25,7 @@ namespace AdminInterface.Controllers
 				{"Messages.ObjectId", "ObjectId"},
 				{"Messages.Name", "Name"}
 			};
+			SortDirection = "desc";
 			Period = new DatePeriod(DateTime.Today.AddDays(-14), DateTime.Today);
 		}
 
