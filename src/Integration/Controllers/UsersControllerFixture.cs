@@ -14,28 +14,18 @@ using TransactionlessSession = Integration.ForTesting.TransactionlessSession;
 namespace Integration.Controllers
 {
 	[TestFixture]
-	public class UsersControllerFixture : BaseControllerTest
+	public class UsersControllerFixture : ControllerFixture
 	{
 		private UsersController controller;
 		private User user1, user2;
 		private Client client;
 		private UserUpdateInfo info1, info2;
 
-		private ISessionScope session;
-
 		[SetUp]
 		public void Setup()
 		{
-			session = new TransactionlessSession();
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
-		}
-
-		[TearDown]
-		public void TearDown()
-		{
-			if (session != null)
-				session.Dispose();
 		}
 
 		[Test]
@@ -78,11 +68,11 @@ namespace Integration.Controllers
 			var person = new[] {new Person()};
 
 			controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
-			session.Flush();
+			scope.Flush();
 
 			var logs = PasswordChangeLogEntity.Queryable.Where(l => l.TargetUserName == user.Login).ToList();
 
- 			Assert.That(logs.Count, Is.EqualTo(1));
+			Assert.That(logs.Count, Is.EqualTo(1));
 			Assert.That(logs.Single().SentTo, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
 			Assert.That(user.Accounting, Is.Not.Null);
 		}
@@ -106,6 +96,7 @@ namespace Integration.Controllers
 		public void Create_user_with_permissions()
 		{
 			client = DataMother.CreateTestClientWithUser();
+			scope.Flush();
 			user1 = client.Users[0];
 			var permission = new UserPermission();
 			permission.Id = 1;
@@ -120,6 +111,8 @@ namespace Integration.Controllers
 		public void Show_supplier_client()
 		{
 			var user = DataMother.CreateSupplierUser();
+			scope.Flush();
+
 			controller.Edit(user.Id);
 		}
 	}

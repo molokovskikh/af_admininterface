@@ -17,6 +17,7 @@ namespace Integration.Models
 		{
 			var user1 = DataMother.CreateTestClientWithUser().Users[0];
 			var user2 = DataMother.CreateTestClientWithUser(Region.Find(16ul)).Users[0];
+			Flush();
 			var update1 = new UpdateLogEntity(user1);
 			update1.Save();
 			var update2 = new UpdateLogEntity(user2);

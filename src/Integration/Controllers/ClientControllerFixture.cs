@@ -299,6 +299,8 @@ namespace Integration.Controllers
 		public void Search_suppliers()
 		{
 			DataMother.CreateSupplier().Save();
+			scope.Flush();
+
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			var suppliers = controller.SearchSuppliers(client.Id, "тест");
 			Assert.That(suppliers.Length, Is.GreaterThan(0));

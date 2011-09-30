@@ -13,6 +13,8 @@ namespace Integration
 		public void Send_client_card()
 		{
 			var client = DataMother.CreateTestClientWithUser();
+			Flush();
+
 			ReportHelper.SendClientCard(client.Users.First(), "", true, "kvasovtest@analit.net");
 		}
 	}

@@ -22,6 +22,7 @@ namespace Integration.Models
 		{
 			client = DataMother.CreateTestClientWithUser();
 			user = client.Users[0];
+			Flush();
 		}
 
 		[
@@ -72,8 +73,7 @@ namespace Integration.Models
 		[Test]
 		public void Create_user_logs()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			Assert.That(client.Users[0].Logs, Is.Not.Null);
+			Assert.That(user.Logs, Is.Not.Null);
 		}
 
 		[Test]

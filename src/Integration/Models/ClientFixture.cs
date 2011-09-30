@@ -34,11 +34,12 @@ namespace Integration.Models
 		public void Update_firm_code_only()
 		{
 			var client = DataMother.CreateTestClientWithUser();
+			var supplier = DataMother.CreateSupplier();
+			Flush();
 			client.Settings.NoiseCosts = true;
 			client.Settings.Save();
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
 
-			var supplier = Supplier.Queryable.First();
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.Save();
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));

@@ -42,6 +42,11 @@ namespace Integration.ForTesting
 				scope.Dispose();
 		}
 
+		public void Flush()
+		{
+			scope.Flush();
+		}
+
 		public void Save(object entity)
 		{
 			ActiveRecordMediator.Save(entity);

@@ -12,6 +12,8 @@ namespace Integration.Models
 		public void Find_order_for_user()
 		{
 			var client = DataMother.CreateTestClientWithUser();
+			Flush();
+
 			var user = client.Users.First();
 			OrderLog.Load(new OrderFilter {
 				User = user,

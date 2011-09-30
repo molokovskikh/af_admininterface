@@ -19,6 +19,7 @@ namespace Integration.Models
 
 			parent.Setup();
 			child.Setup();
+			Flush();
 
 			ArHelper.WithSession(s => {
 				var prices = s.CreateSQLQuery(@"
