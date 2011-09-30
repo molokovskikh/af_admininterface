@@ -9,17 +9,7 @@
 	{
 		height: 20px;
 	}
-	
-	input 
-	{
-		border-style:groove;
-	}
-	
-	textarea
-	{
-		border-style:groove;
-	}
-	
+
 	input[type='text']
 	{
 		width: 70%;

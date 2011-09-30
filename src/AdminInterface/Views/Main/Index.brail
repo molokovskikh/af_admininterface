@@ -387,8 +387,8 @@
 							<input type="hidden" name="filter.Region.Id" value="${RegionId}" />
 							<div class="search-header" style="text-align:center">
 								<label>Поиск пользователей</label>
-								<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px; border-style:groove;" value="" />
-								<input type="submit" style="border-style:groove; width: auto;" value="Найти" />
+								<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px;" value="" />
+								<input type="submit" style="width: auto;" value="Найти" />
 							</div>
 						</form>
 					</td>

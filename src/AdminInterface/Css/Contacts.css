@@ -64,12 +64,6 @@
 	text-align: right;
 }
 
-/* стиль для кнопки "Сохранить", раньше был SubmitDiv */
-.ContactSubmitDiv input
-{
-	border-style:groove;
-}
-
 /* стиль для блочного элемента с редактируемой контактной информацией для персоны , раньше был BaseDiv */
 .ContactBaseDiv
 {

@@ -90,16 +90,6 @@
 		height: 20px;
 	}
 	
-	input 
-	{
-		border-style:groove;
-	}
-	
-	textarea
-	{
-		border-style:groove;
-	}
-	
 	input[type='text']
 	{
 		width: 70%;
@@ -153,11 +143,11 @@
 				<input type=hidden name=clientCode value=${Client.Id} />
 				<% haveUin = Client.HaveUin() %>
 				<% if haveUin: %>
-					Причина:<input class=required style="border-style:groove;" type=text name=reason/>
+					Причина:<input class=required type=text name=reason/>
 				<% else: %> 
 					<span style="color:Green;">Идентификатор не присвоен</span>
 				<% end %>
-				<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+				<input type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
 			</form>
 		</div>
 

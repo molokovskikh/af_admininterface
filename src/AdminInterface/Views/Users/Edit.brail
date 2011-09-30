@@ -49,19 +49,17 @@
 	<div class=block>
 		<h3>Операции</h3>
 
-		<% isLockedUser = user.IsLocked %>
-
-		<form method=post action="${siteroot}/users/Unlock.rails" style="margin:0; padding:5px 0px 5px 0px">
-			<input type=hidden name=login value=${user.Login} />				
-			<input style="border-style:groove;" type=submit ${"disabled" if not isLockedUser} value="Разблокировать" />
+		<form method=post action="${siteroot}/users/Unlock">
+			<input type=hidden name=login value=${user.Login} />
+			<input type=submit ${"disabled" if not user.IsLocked} value="Разблокировать" />
 			<% if IsDefined("UnlockMessage"): %> 
 			<span style="color:Green;">${UnlockMessage}</span>
 			<% end %>
 		</form>
 		
-		<form method=post action="${siteroot}/users/DeletePreparedData.rails" style="margin:0; padding: 5px 0px 5px 0px">
+		<form method=post action="${siteroot}/users/DeletePreparedData">
 			<input type=hidden name=userCode value=${User.Id} />
-			<input style="border-style:groove;" type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
+			<input type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
 			<% if IsDefined("DeleteMessage"): %>
 				<span style="color:Green;">${DeleteMessage}</span>
 			<% end %>
@@ -70,12 +68,12 @@
 			<% end %>
 		</form>
 
-		<form id=ReseteUin method=post action="${siteroot}/users/ResetUin.rails" style="margin:0; padding:5px 0px 5px 0px">
+		<form id=ReseteUin method=post action="${siteroot}/users/ResetUin">
 			<input type=hidden name=userCode value=${User.Id} />
 			<% haveUin = User.HaveUin() %>
-			<input style="border-style:groove;" type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
+			<input type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
 			<% if haveUin: %>
-				Причина:<input class=uin-reuired style="border-style:groove;" type=text name=reason />
+				Причина:<input class=uin-reuired type=text name=reason />
 			<% else: %>
 				<span style="color:Green;">Идентификатор не присвоен</span>
 			<% end %>
@@ -219,7 +217,7 @@
 
 <div class="TwoColumn Messages" style="margin-left: 10px">
 	<form id="MessagesForm" action="SendMessage" method="post">
-	<div class="block" style="width: auto;">
+	<div class="block">
 		<h3>Сообщения пользователя</h3>
 		<input type=hidden value=${user.Id} name="userId" />
 		Новое сообщение:

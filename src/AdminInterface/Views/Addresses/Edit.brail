@@ -17,7 +17,7 @@
 
 		<form method=post action="${siteroot}/deliveries/notify" style="margin:0; padding:5px 0px 5px 0px">
 			<input type=hidden name=id value=${delivery.Id} />
-			<input style="border-style:groove;" type=submit value="Отправить уведомления о регистрации поставщикам" />
+			<input type=submit value="Отправить уведомления о регистрации поставщикам" />
 		</form>
 	</div>
 

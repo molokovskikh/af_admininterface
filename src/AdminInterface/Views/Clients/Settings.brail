@@ -1,7 +1,7 @@
 ﻿<% component Bubble, {@bredcrumbs : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
-	Настройка аптеки
+	Конфигурация клиента ${client.Name}
 <% end %>
 
 <style>
@@ -17,6 +17,7 @@
 		color:Red;
 	}
 </style>
+
 <script language="javascript">
 	$(function () {
 
@@ -173,20 +174,7 @@
 
 </script>
 
-<h2>Конфигурация клиента ${client.Name}</h2>
-				  
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
-	
-	<% if IsDefined("Message"):
-			clazz = "notice"
-			if message.IsError:
-				clazz = "err"
-			end	%>
-
-		<div class="flash ${clazz}">
-			${Message.MessageText}
-		</div>
-	<% end %>
 
 	<% if not client.IsClientActive(): %>
 		<div class="Warning">
@@ -194,11 +182,11 @@
 		</div>
 	<% end %>
 	
-	<div class="TwoColumn" style="width: 800px;">
+	<div style="width: 800px;">
 		<div class="block">
 			<h3>Операции</h3>
-			<form id="NotifySuppliers" method="post" action="NotifySuppliers.rails?clientId=${client.Id}" style="margin:0; padding:0">
-				<input style="border-style:groove;" type="submit" value="Отправить уведомления о регистрации поставщикам" />
+			<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}">
+				<input type="submit" value="Отправить уведомления о регистрации поставщикам" />
 			</form>
 		</div>
 		
