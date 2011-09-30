@@ -2,6 +2,7 @@
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -62,6 +63,21 @@ namespace Integration.Models
 			var address = client.Addresses[0];
 			Assert.That(address.Payer, Is.EqualTo(payer));
 			Assert.That(address.LegalEntity, Is.EqualTo(payer.JuridicalOrganizations[0]));
+		}
+
+		[Test]
+		public void After_change_payer_update_payment_sum()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			client.Users.Each(u => u.Accounting.Accounted());
+			var oldPayer = client.Payers.First();
+			var newPayer = DataMother.CreatePayer();
+			newPayer.Save();
+			client.ChangePayer(newPayer, newPayer.JuridicalOrganizations.First());
+			client.Save();
+
+			Assert.That(oldPayer.PaymentSum, Is.EqualTo(0));
+			Assert.That(newPayer.PaymentSum, Is.EqualTo(800));
 		}
 	}
 }

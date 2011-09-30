@@ -477,15 +477,22 @@ group by u.ClientId")
 
 		public virtual void ChangePayer(Payer payer, LegalEntity org)
 		{
+			var oldPayers = Payers.ToArray();
 			Payers.Clear();
 			Payers.Add(payer);
 			foreach (var user in Users)
+			{
+				user.Payer.Users.Remove(user);
 				user.Payer = payer;
+				user.Payer.Users.Add(user);
+			}
 
 			foreach (var address in Addresses)
 			{
+				address.Payer.Addresses.Remove(address);
 				address.Payer = payer;
 				address.LegalEntity = org;
+				address.Payer.Addresses.Add(address);
 			}
 
 			ArHelper.WithSession(s => s.CreateSQLQuery(@"
@@ -495,6 +502,10 @@ where ClientId = :clientId")
 				.SetParameter("clientId", Id)
 				.SetParameter("orgId", org.Id)
 				.ExecuteUpdate());
+
+			payer.UpdatePaymentSum();
+			foreach (var oldPayer in oldPayers)
+				oldPayer.UpdatePaymentSum();
 		}
 
 		public virtual void ChangeHomeRegion(Region region)
