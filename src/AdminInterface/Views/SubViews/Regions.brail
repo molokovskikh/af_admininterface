@@ -117,9 +117,9 @@
 
 	function onClickOrderRegion(regionId)
 	{
-		var checked = jQuery("#orderRegion" + regionId).attr('checked');
+		var checked = jQuery("#orderRegion" + regionId).attr("checked");
 		if (checked) {
-			jQuery("#browseRegion" + regionId).attr("checked", true);
+			$("#browseRegion" + regionId).attr("checked", "checked");
 		}
 	}
 
@@ -127,7 +127,7 @@
 	{
 		var checked = jQuery("#browseRegion" + regionId).attr('checked');
 		if (!checked) {
-			jQuery("#orderRegion" + regionId).attr("checked", false);
+			jQuery("#orderRegion" + regionId).removeAttr("checked");
 		}
 
 		if (checked)

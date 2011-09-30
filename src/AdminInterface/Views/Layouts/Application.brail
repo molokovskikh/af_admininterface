@@ -12,7 +12,7 @@
 			<% end %>
 		</title>
 
-		${app.Asset("jquery-1.6.4.js")}
+		${app.Asset("jquery-1.6.2.js")}
 		${app.Asset("jquery.validate.js")}
 		${app.Asset("underscore.js")}
 		${app.Asset("backbone.js")}

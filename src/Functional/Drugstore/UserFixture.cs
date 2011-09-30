@@ -304,9 +304,9 @@ namespace Functional.Drugstore
 			Open(client.Users[0], "Edit");
 
 			browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
-			browser.Button(Find.ByValue("Принять")).Click();
+			Click("Принять");
 			Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
-			browser.Link(Find.ByText("Клиент " + client.Name)).Click();
+			Click(client.Name);
 			Assert.IsTrue(browser.TableCell(Find.ByText("тестовое сообщение")).Exists);
 		}
 

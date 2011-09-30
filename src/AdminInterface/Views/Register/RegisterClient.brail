@@ -9,21 +9,13 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 <script type="text/javascript">
 
 	jQuery(function() {
-		jQuery("#PayerExists").attr({checked : "", disabled : ""});
-		jQuery("#ShowForOneSupplier").attr({checked : "", disabled : ""});
-		jQuery("#FillBillingInfo").attr({checked : "checked", disabled : ""});
+		jQuery("#PayerExists").attr({ checked: null, disabled: null});
+		jQuery("#ShowForOneSupplier").attr({ checked: null, disabled: null});
+		jQuery("#FillBillingInfo").attr({checked : "checked", disabled : null});
 		jQuery("#SearchPayerDiv").css("display", "none");
 		jQuery("#SelectPayerDiv").css("display", "none");
 		jQuery("#SearchSupplierDiv").css("display", "none");
 		jQuery("#SelectSupplierDiv").css("display", "none");
-
-		jQuery.validator.addMethod("validateEmailList", function(value, element) {
-			if (value.toString().length > 0) {
-				res = /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
-				return res;
-			}
-			return true;
-		}, "Поле содержит некорректный адрес электронной почты");
 
 		jQuery.validator.addMethod( "noEmailAddress", function(value, element) {  
 			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 
@@ -97,8 +89,8 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 			function(htmlOptions) {
 			jQuery('#SupplierComboBox').find('option').remove().end();
 			if (htmlOptions.length == 0) {
-				jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-				jQuery("#SearchSupplierButton").attr("disabled", "");
+				jQuery("#SearchSupplierTextPattern").attr("disabled", null);
+				jQuery("#SearchSupplierButton").attr("disabled", null);
 				jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
 				return;
 			}
@@ -116,8 +108,8 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	function ShowSearchSupplierDiv() {
 		jQuery('#SupplierComboBox').find('option').remove().end();
 		jQuery("#MessageForSupplier").html("");
-		jQuery("#SearchSupplierTextPattern").attr("disabled", "");
-		jQuery("#SearchSupplierButton").attr("disabled", "");
+		jQuery("#SearchSupplierTextPattern").attr("disabled", null);
+		jQuery("#SearchSupplierButton").attr("disabled", null);
 		ViewDiv(false, '#SelectSupplierDiv');
 		ViewDiv(true, "#SearchSupplierDiv");
 		LockPayer();
@@ -153,12 +145,12 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	}
 	
 	function LockPayer() {
-		jQuery("#PayerExists").attr('checked', '');
+		jQuery("#PayerExists").removeAttr("checked");
 		jQuery("#PayerExists").click();
 		jQuery("#PayerExistsValue").val(true);
-		jQuery("#PayerExists").attr('disabled', 'disabled');
-		jQuery("#FillBillingInfo").attr('checked', '');
-		jQuery("#FillBillingInfo").attr('disabled', 'disabled');
+		jQuery("#PayerExists").attr("disabled", "disabled");
+		jQuery("#FillBillingInfo").removeAttr("checked");
+		jQuery("#FillBillingInfo").attr("disabled", "disabled");
 		ViewDiv(false, '#SelectPayerDiv');
 		ViewDiv(false, "#SearchPayerDiv");
 	}
@@ -174,13 +166,13 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	}
 	
 	function UnlockPayer() {
-		jQuery("#PayerExists").attr('checked', '');
+		jQuery("#PayerExists").removeAttr('checked');
 		jQuery("#PayerExistsValue").val(false);
-		jQuery("#PayerExists").attr('disabled', '');
-		jQuery("#PayerComboBox").attr('disabled', '');
-		jQuery("#ResetPayerButton").attr('disabled', '');
-		jQuery("#FillBillingInfo").attr('checked', '');
-		jQuery("#FillBillingInfo").attr('disabled', '');
+		jQuery("#PayerExists").removeAttr('disabled');
+		jQuery("#PayerComboBox").removeAttr('disabled');
+		jQuery("#ResetPayerButton").removeAttr('disabled');
+		jQuery("#FillBillingInfo").removeAttr('checked');
+		jQuery("#FillBillingInfo").removeAttr('disabled');
 		ViewDiv(false, "#SelectPayerDiv");
 	}
 </script>

@@ -146,7 +146,7 @@ namespace AdminInterface.Controllers
 		{
 			var payer = Payer.Find(id);
 
-			if (payer.GetAccountings().Count() == 0)
+			if (payer.GetAccounts().Count() == 0)
 				Error("Нет ни одной позиции для формирования счета");
 
 			if (IsPost)

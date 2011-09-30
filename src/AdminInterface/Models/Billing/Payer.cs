@@ -285,11 +285,11 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				return GetAccountings().Sum(a => a.Payment);
+				return GetAccounts().Sum(a => a.Payment);
 			}
 		}
 
-		public virtual IEnumerable<Account> GetAccountings()
+		public virtual IEnumerable<Account> GetAccounts()
 		{
 			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(ReportsForInvoice());
 		}
@@ -417,13 +417,13 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<Invoice> BuildInvoices(DateTime date, Period period)
 		{
-			foreach (var invoiceGroup in GetAccountings().GroupBy(a => a.InvoiceGroup))
+			foreach (var invoiceGroup in GetAccounts().GroupBy(a => a.InvoiceGroup))
 				yield return new Invoice(this, period, date, invoiceGroup.Key);
 		}
 
 		public virtual IEnumerable<IGrouping<int, Account>> GetInvoiceGroups()
 		{
-			return GetAccountings().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
+			return GetAccounts().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
 		}
 
 		public virtual bool ShouldNotify()

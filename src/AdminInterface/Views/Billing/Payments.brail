@@ -54,7 +54,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function(html) {
 				if (status) {
 					$("#ClientRow" + clientId).removeClass("DisabledByBilling");
-					$("tr[name=Client" + clientId + "] input[name=status]").attr("disabled", "");
+					$("tr[name=Client" + clientId + "] input[name=status]").removeAttr("disabled");
 				}
 				else {
 					$("#ClientRow" + clientId).addClass("DisabledByBilling");

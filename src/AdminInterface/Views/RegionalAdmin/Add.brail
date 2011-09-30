@@ -1,9 +1,8 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component Bubble, {"bredcrumbs" : [("Региональные администраторы", "${siteroot}/ViewAdministrators.aspx")]} %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
 	Регистрация регионального администратора
 <% end %>
-
-<% component Bubble, {"bredcrumbs" : [("Региональные администраторы", "${siteroot}/ViewAdministrators.aspx"),
-									  ("Регистрация регионального администратора", "")]} %>
 
 <script type="text/javascript">
 	$(function() {
@@ -20,7 +19,7 @@
 
 	function setDepartmentPermissions(departmentDescription) {
 		<% for i, permission in enumerate(permissions): %>
-			$("#permission${permission.Id}").attr("checked", "");
+			$("#permission${permission.Id}").removeAttr("checked");
 		<% end %>
 		$.ajax({
 			url: "${siteroot}/RegionalAdmin/GetDefaultPermissions?departmentDescription=" + departmentDescription,

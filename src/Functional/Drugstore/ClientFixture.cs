@@ -103,7 +103,7 @@ namespace Functional.Drugstore
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
 			browser.Button(Find.ByValue("Принять")).Click();
-			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
+			Open(client);
 			browser.Refresh();
 
 			Assert.IsTrue(browser.Link(Find.ByText("Дата")).Exists);
@@ -113,17 +113,17 @@ namespace Functional.Drugstore
 			browser.Link(Find.ByText("Дата")).Click();
 			browser.Link(Find.ByText("Дата")).Click();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
-			Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+			Assert.IsTrue(browser.Table("messages").Exists);
 
 			browser.Link(Find.ByText("Оператор")).Click();
 			browser.Link(Find.ByText("Оператор")).Click();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
-			Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+			Assert.IsTrue(browser.Table("messages").Exists);
 
 			browser.Link(Find.ByText("Название")).Click();
 			browser.Link(Find.ByText("Название")).Click();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
-			Assert.IsTrue(browser.Table("ClientMessagesTable").Exists);
+			Assert.IsTrue(browser.Table("messages").Exists);
 		}
 
 		[Test]

@@ -28,20 +28,12 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	});
 
 	jQuery(function() {
-		jQuery("#PayerExists").attr({checked : "", disabled : ""});
-		jQuery("#FillBillingInfo").attr({checked : "checked", disabled : ""});
+		jQuery("#PayerExists").attr({checked : null, disabled : null});
+		jQuery("#FillBillingInfo").attr({checked:"checked", disabled : null});
 		jQuery("#SearchPayerDiv").css("display", "none");
 		jQuery("#SelectPayerDiv").css("display", "none");
 		jQuery("#SearchSupplierDiv").css("display", "none");
 		jQuery("#SelectSupplierDiv").css("display", "none");
-
-		jQuery.validator.addMethod("validateEmailList", function(value, element) {
-			if (value.toString().length > 0) {
-				res = /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
-				return res;
-			}
-			return true;
-		}, "Поле содержит некорректный адрес электронной почты");
 
 		jQuery.validator.addMethod( "noEmailAddress", function(value, element) {  
 			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 

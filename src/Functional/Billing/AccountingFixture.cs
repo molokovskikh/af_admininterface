@@ -14,7 +14,7 @@ namespace Functional.Billing
 	{
 		private Client client;
 
-		public void BaseSearchBy(IE browser, string radioButtonId, string searchText)
+		public void BaseSearchBy(Browser browser, string radioButtonId, string searchText)
 		{
 			browser.TextField(Find.ByName("SearchBy.BeginDate")).TypeText("01.01.2009");
 			browser.RadioButton(radioButtonId).Checked = true;

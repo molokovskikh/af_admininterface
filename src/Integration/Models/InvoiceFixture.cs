@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
@@ -54,9 +55,11 @@ namespace Integration.Models
 			report.Payment = 5000;
 			report.Description = "Стат. отчет за {0}";
 			report.Save();
+			payer.Refresh();
 
 			var invoiceDate = new DateTime(2011, 09, 11);
 			var invoice = new Invoice(payer, Invoice.GetPeriod(invoiceDate), invoiceDate);
+			Assert.That(invoice.Parts.Count, Is.EqualTo(2), invoice.Parts.Implode());
 			var part = invoice.Parts[1];
 			Assert.That(part.Sum, Is.EqualTo(5000));
 			Assert.That(part.Name, Is.EqualTo("Стат. отчет за сентябрь"));

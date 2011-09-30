@@ -1,49 +1,49 @@
 ﻿function OnPayerExistsChanged(selectedValue) {
 	$("#SearchPayerDiv").hide();
 	$("#SelectPayerDiv").hide();
-	var disabled = '';
+	var disabled = null;
 	var checked = 'checked';
 	if (selectedValue) {
 		ShowSearchPayerDiv();
 		disabled = 'disabled';
-		checked = '';
+		checked = null;
 	}
-	jQuery("#FillBillingInfo").attr('disabled', disabled);
-	jQuery("#FillBillingInfo").attr('checked', checked);
-	jQuery("#PayerExistsValue").val(selectedValue);
-	jQuery("#MessageForPayer").html("");
+	$("#FillBillingInfo").attr('disabled', disabled);
+	$("#FillBillingInfo").attr('checked', checked);
+	$("#PayerExistsValue").val(selectedValue);
+	$("#MessageForPayer").html("");
 }
 
 function ShowSearchPayerDiv() {
-	jQuery('#PayerComboBox').find('option').remove().end();
-	jQuery("#MessageForPayer").html("");
-	jQuery("#SearchPayerTextPattern").removeAttr("disabled");
-	jQuery("#SearchPayerButton").removeAttr("disabled");
+	$('#PayerComboBox').find('option').remove().end();
+	$("#MessageForPayer").html("");
+	$("#SearchPayerTextPattern").removeAttr("disabled");
+	$("#SearchPayerButton").removeAttr("disabled");
 	$('#SelectPayerDiv').hide();
 	$("#SearchPayerDiv").show();
-	jQuery("#SearchPayerTextPattern").focus();
+	$("#SearchPayerTextPattern").focus();
 }
 
 function ShowSelectPayerDiv() {
-	var searchText = jQuery("#SearchPayerTextPattern").val();
+	var searchText = $("#SearchPayerTextPattern").val();
 	if (searchText.length == 0)
 		return;
-	jQuery.get("SearchPayers",
+	$.get("SearchPayers",
 			{ "searchPattern": searchText },
 			function (htmlOptions) {
-				jQuery('#PayerComboBox').find('option').remove().end();
+				$('#PayerComboBox').find('option').remove().end();
 				if (htmlOptions.length == 0) {
-					jQuery("#SearchPayerTextPattern").removeAttr("disabled");
-					jQuery("#SearchPayerButton").attr("disabled", "");
-					jQuery("#MessageForPayer").html("<i>Ничего не найдено</i>");
+					$("#SearchPayerTextPattern").removeAttr("disabled");
+					$("#SearchPayerButton").removeAttr("disabled");
+					$("#MessageForPayer").html("<i>Ничего не найдено</i>");
 					return;
 				}
-				jQuery("#PayerComboBox").append(htmlOptions);
+				$("#PayerComboBox").append(htmlOptions);
 				$("#SearchPayerDiv").hide();
 				$("#SelectPayerDiv").show();
-				jQuery("#MessageForPayer").html("");
+				$("#MessageForPayer").html("");
 			});
-	jQuery("#MessageForPayer").html("<i>Выполняется поиск</i>");
-	jQuery("#SearchPayerTextPattern").attr("disabled", "disabled");
-	jQuery("#SearchPayerButton").attr("disabled", "disabled");
+	$("#MessageForPayer").html("<i>Выполняется поиск</i>");
+	$("#SearchPayerTextPattern").attr("disabled", "disabled");
+	$("#SearchPayerButton").attr("disabled", "disabled");
 }

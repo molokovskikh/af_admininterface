@@ -5,15 +5,8 @@
 <% end %>
 
 <script>
-	jQuery(function() {
-			jQuery.validator.addMethod("validateEmailList", function(value, element) {
-			if (value.toString().length > 0) {
-				res = /^\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*(\,\s*\w[\w\.\-]*[@]\w[\w\.\-]*([.]([\w]{1,})){1,3}\s*)*$/.test(value)
-				return res;
-			}
-			return true;
-		}, "Поле содержит некорректный адрес электронной почты");
-		jQuery("form").validate({ rules: { "mails": "validateEmailList", } });
+	$(function() {
+		$("form").validate({ rules: { "mails": "validateEmailList", } });
 	});
 </script>
 

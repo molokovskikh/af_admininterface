@@ -173,7 +173,7 @@ namespace AdminInterface.Models.Billing
 			foreach (var ad in Payer.Ads.Where(a => a.Invoice == null))
 				result.Add(PartForAd(ad));
 
-			var accounts = Payer.GetAccountings().Where(a => a.InvoiceGroup == invoiceGroup);
+			var accounts = Payer.GetAccounts().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
 				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts)).ToList());
 			else

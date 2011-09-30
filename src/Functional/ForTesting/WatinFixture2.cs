@@ -40,33 +40,38 @@ namespace Functional.ForTesting
 				urlPart);
 		}
 
-		protected static void CheckForError(IE browser)
-		{
-			if (browser.ContainsText("Error"))
-			{
-				Console.WriteLine(browser.Text);
-			}
-		}
-
-		protected IE Open(object item, string action = null)
+		protected Browser Open(object item, string action = null)
 		{
 			return Open(AppHelper.GetShortUrl(item, action));
 		}
 
-		protected IE Open(string uri = "/")
+		protected Browser Open(string uri, params object[] args)
+		{
+			return Open(String.Format(uri, args));
+		}
+
+		protected Browser Open(string uri = "/")
 		{
 			if (scope != null)
 				scope.Flush();
 
-			var browser = new IE(BuildTestUrl(uri));
-			var internetExplorerClass = ((InternetExplorerClass)((IEBrowser)browser.NativeBrowser).WebBrowser);
-			httpStatusCode = null;
-			internetExplorerClass.NavigateError += (object disp, ref object url, ref object frame, ref object code, ref bool cancel) => {
-				httpStatusCode = code;
-			};
-			internetExplorerClass.BeforeNavigate2 += (object disp, ref object url, ref object flags, ref object name, ref object data, ref object headers, ref bool cancel) => {
+			uri = BuildTestUrl(uri);
+			if (browser == null)
+			{
+				browser = new IE(uri);
+				var internetExplorerClass = ((InternetExplorerClass)((IEBrowser)browser.NativeBrowser).WebBrowser);
 				httpStatusCode = null;
-			};
+				internetExplorerClass.NavigateError += (object disp, ref object url, ref object frame, ref object code, ref bool cancel) => {
+					httpStatusCode = code;
+				};
+				internetExplorerClass.BeforeNavigate2 += (object disp, ref object url, ref object flags, ref object name, ref object data, ref object headers, ref bool cancel) => {
+					httpStatusCode = null;
+				};
+			}
+			else
+			{
+				browser.GoTo(uri);
+			}
 
 /*			//ie проглатывает мое исключение
 			internetExplorerClass.NavigateComplete2 += (object disp, ref object url) => {
@@ -78,10 +83,6 @@ namespace Functional.ForTesting
 				}
 			};
 */
-			if (this.browser != null)
-				this.browser.Dispose();
-
-			this.browser = browser;
 
 			new TryFuncUntilTimeOut(2.Second()) {
 				SleepTime = TimeSpan.FromMilliseconds(50.0),
@@ -115,11 +116,6 @@ namespace Functional.ForTesting
 			CheckStatus();
 		}
 
-		protected IE Open(string uri, params object[] args)
-		{
-			return Open(String.Format(uri, args));
-		}
-
 		protected void Refresh()
 		{
 			if (scope != null)
@@ -130,11 +126,6 @@ namespace Functional.ForTesting
 		protected void AssertText(string text)
 		{
 			Assert.That(browser.Text, Is.StringContaining(text));
-		}
-
-		protected void Save(object entity)
-		{
-			ActiveRecordMediator.Save(entity);
 		}
 	}
 }
