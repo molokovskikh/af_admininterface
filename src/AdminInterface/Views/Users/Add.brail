@@ -67,20 +67,9 @@
 				<tr/>
 			</table>
 		</div>
-		
-		<div class=block>
-			<h3>Доступ к адресам доставки</h3>
-			<div>
-				<% if client.Addresses.Count == 0: %>
-					Нет адресов для доставки
-				<% end %>
-				<% for i, address in enumerate(client.Addresses): %>
-					<input type=checkbox type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id}>
-					${address.Value}
-					<br />
-				<% end %>
-			</div>
-		</div>
+
+		<% OutputSubView("/Templates/Addresses") %>
+
 		<div class=block>
 			<h3>
 				Права доступа

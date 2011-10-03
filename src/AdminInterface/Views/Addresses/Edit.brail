@@ -37,7 +37,9 @@
 				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${delivery.RegistrationDate}
 				<% end %>
 			</div>
-			<p><input name=delivery.value class="required" style="width: 100%;" value="!{delivery.Value}"></p>
+			<p>
+				<input name=delivery.value class="required" style="width: 100%;" value="!{delivery.Value}">
+			</p>
 		</div>
 
 		<div class="block">
