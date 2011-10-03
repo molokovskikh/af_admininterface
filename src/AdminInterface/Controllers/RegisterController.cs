@@ -179,7 +179,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
+				Notify("Регистрация завершена успешно");
 				Redirect("Suppliers", "Show", new{id = supplier.Id});
 			}
 		}
@@ -302,7 +302,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				Flash["Message"] = Message.Notify("Регистрация завершена успешно");
+				Notify("Регистрация завершена успешно");
 				Redirect(newClient);
 			}
 		}

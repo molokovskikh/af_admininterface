@@ -7,39 +7,56 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using AdminInterface.Models.Security;
 using AdminInterface.Services;
+using log4net;
 
 namespace AdminInterface.Models
 {
 	public class Mailer
 	{
+		private static ILog _log = LogManager.GetLogger(typeof(Mailer));
+
 		public static void RegionalAdminCreated(Administrator admin)
 		{
-			Func.Mail("register@analit.net",
-				"Новый сотрудник",
-				String.Format(
+			try
+			{
+				Func.Mail("register@analit.net",
+					"Новый сотрудник",
+					String.Format(
 @"В системе зарегистрирован новый сотрудник
 Ф.И.О.: {0}
 Телефон: {1}
 Email: {2}
 Подразделение: {3}
-",					admin.ManagerName,
-					admin.PhoneSupport,
-					admin.Email,
-					admin.Department.GetDescription()),
-				"Help@analit.net");
+", admin.ManagerName,
+						admin.PhoneSupport,
+						admin.Email,
+						admin.Department.GetDescription()),
+					"Help@analit.net");
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void RegionalAdminBlocked(Administrator admin)
 		{
-			Func.Mail("register@analit.net",
-				String.Format("Запрет работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
-				String.Format(
+			try
+			{
+				Func.Mail("register@analit.net",
+					String.Format("Запрет работы для {0}, {1}", admin.ManagerName, admin.Department.GetDescription()),
+					String.Format(
 @"В системе ЗАПРЕЩЕНА работа сотрудника
 Ф.И.О.: {0}
 Подразделение: {1}
 ",					admin.ManagerName,
-					admin.Department.GetDescription()),
-				"Help@analit.net");
+						admin.Department.GetDescription()),
+					"Help@analit.net");
+			}
+			catch(Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void RegionalAdminUnblocked(Administrator admin)
@@ -57,154 +74,210 @@ Email: {2}
 
 		public static void ClientRegistrationResened(Client client)
 		{
-			Func.Mail("register@analit.net",
-				"Разослано повторное уведомление о регистрации",
-				String.Format(
+			try
+			{
+				Func.Mail("register@analit.net",
+					"Разослано повторное уведомление о регистрации",
+					String.Format(
 @"Оператор: {0}
 Хост: {1}
 Краткое наименование: {2}
 Полное наименование: {3}
 Домашний регион: {4}",
-					SecurityContext.Administrator.UserName,
-					SecurityContext.Administrator.Host,
-					client.Name,
-					client.FullName,
-					client.HomeRegion.Name),
-				"RegisterList@subscribe.analit.net");
+						SecurityContext.Administrator.UserName,
+						SecurityContext.Administrator.Host,
+						client.Name,
+						client.FullName,
+						client.HomeRegion.Name),
+					"RegisterList@subscribe.analit.net");
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void AddressRegistrationResened(Address address)
 		{
-			var client = address.Client;
-			Func.Mail("register@analit.net",
-				"Разослано повторное уведомление о регистрации адреса",
-				String.Format(
+			try
+			{
+				var client = address.Client;
+				Func.Mail("register@analit.net",
+					"Разослано повторное уведомление о регистрации адреса",
+					String.Format(
 @"Оператор: {0}
 Хост: {1}
 Краткое наименование: {2}
 Полное наименование: {3}
 Домашний регион: {4}
 Адрес доставки: {5}",
-					SecurityContext.Administrator.UserName,
-					SecurityContext.Administrator.Host,
-					client.Name,
-					client.FullName,
-					client.HomeRegion.Name,
-					address.Value),
-				"RegisterList@subscribe.analit.net");
+						SecurityContext.Administrator.UserName,
+						SecurityContext.Administrator.Host,
+						client.Name,
+						client.FullName,
+						client.HomeRegion.Name,
+						address.Value),
+					"RegisterList@subscribe.analit.net");
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void SupplierRegistred(string shortname, string homeregion)
 		{
-			Func.Mail("register@analit.net",
-				"Зарегистрирован новый поставщик",
-				String.Format(
-@"Краткое наименование: {0}
+			try
+			{
+				Func.Mail("register@analit.net",
+					"Зарегистрирован новый поставщик",
+					String.Format(
+	@"Краткое наименование: {0}
 Домашний регион: {1}", shortname, homeregion),
-				"farm@analit.net");
+					"farm@analit.net");
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void Registred(object item, string billingMessage)
 		{
-			Client client;
-			string body;
-			string subject;
-			if (!String.IsNullOrWhiteSpace(billingMessage))
-				billingMessage = "Сообщение в биллинг: " + billingMessage;
-
-			if (item is User)
+			try
 			{
-				var user = ((User)item);
-				body = "Зарегистрирован новый пользователь " + user.Login;
-				subject = "Регистрация нового пользователя";
-				client = user.Client;
+				Client client;
+				string body;
+				string subject;
+				if (!String.IsNullOrWhiteSpace(billingMessage))
+					billingMessage = "Сообщение в биллинг: " + billingMessage;
+
+				if (item is User)
+				{
+					var user = ((User)item);
+					body = "Зарегистрирован новый пользователь " + user.Login;
+					subject = "Регистрация нового пользователя";
+					client = user.Client;
+
+					if (!String.IsNullOrEmpty(billingMessage))
+						new ClientInfoLogEntity(billingMessage, item).Save();
+				}
+				else
+				{
+					var address = ((Address)item);
+					body = "Зарегистрирован новый адрес доставки " + address.Value;
+					subject = "Регистрация нового адреса доставки";
+					client = address.Client;
+
+					if (!String.IsNullOrEmpty(billingMessage))
+						foreach (var user in address.AvaliableForUsers)
+							new ClientInfoLogEntity(billingMessage, user).Save();
+				}
 
 				if (!String.IsNullOrEmpty(billingMessage))
-					new ClientInfoLogEntity(billingMessage, item).Save();
+				{
+					body += "\r\n" + billingMessage;
+				}
+
+				Func.Mail("register@analit.net",
+					subject,
+					String.Format(@"Для клиента {0} код {1} регион {2}
+	{3}
+	Регистратор {4}",
+					client.Name,
+					client.Id,
+					client.HomeRegion.Name,
+					body,
+					SecurityContext.Administrator.ManagerName),
+					"RegisterList@subscribe.analit.net, billing@analit.net");
+
+
+				if (item is Address)
+				{
+					NotifySupplierAboutAddressRegistration((Address)item);
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				var address = ((Address)item);
-				body = "Зарегистрирован новый адрес доставки " + address.Value;
-				subject = "Регистрация нового адреса доставки";
-				client = address.Client;
-
-				if (!String.IsNullOrEmpty(billingMessage))
-					foreach (var user in address.AvaliableForUsers)
-						new ClientInfoLogEntity(billingMessage, user).Save();
-			}
-
-			if (!String.IsNullOrEmpty(billingMessage))
-			{
-				body += "\r\n" + billingMessage;
-			}
-
-			Func.Mail("register@analit.net", 
-				subject, 
-				String.Format(@"Для клиента {0} код {1} регион {2}
-{3}
-Регистратор {4}",
-				client.Name,
-				client.Id,
-				client.HomeRegion.Name,
-				body,
-				SecurityContext.Administrator.ManagerName),
-				"RegisterList@subscribe.analit.net, billing@analit.net");
-
-
-			if (item is Address)
-			{
-				NotifySupplierAboutAddressRegistration((Address)item);
+				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 
 		public static void SendMessageFromBillingToClient(User user, string text, string subject)
 		{
-			Func.Mail("billing@analit.net", subject, text, user.GetEmailForBilling());
+			try
+			{
+				Func.Mail("billing@analit.net", subject, text, user.GetEmailForBilling());
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void NotifySupplierAboutAddressRegistration(Address address)
 		{
-			new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			try
+			{
+				new NotificationService().NotifySupplierAboutAddressRegistration(address);
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void SupplierRegistred(Supplier supplier)
 		{
-			SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
+			try
+			{
+				SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
 
-			NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
-				String.Format(
-					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-					SecurityContext.Administrator.UserName,
-					supplier.HomeRegion.Name,
-					supplier.Users.First().Login,
-					supplier.Id,
-					supplier.Segment.GetDescription(),
-					supplier.Type.GetDescription()));
+				NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
+					String.Format(
+						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+						SecurityContext.Administrator.UserName,
+						supplier.HomeRegion.Name,
+						supplier.Users.First().Login,
+						supplier.Id,
+						supplier.Segment.GetDescription(),
+						supplier.Type.GetDescription()));
+			}
+			catch (Exception e)
+			{
+				_log.Error("Ошибка при отправке уведомления", e);
+			}
 		}
 
 		public static void ClientRegistred(Client client, bool renotification)
 		{
-			if (client.IsDrugstore())
-				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
-			else
-				SupplierRegistred(client.Name, client.HomeRegion.Name);
+			try
+			{
+				if (client.IsDrugstore())
+					new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
+				else
+					SupplierRegistred(client.Name, client.HomeRegion.Name);
 
-			if (renotification)
-			{
-				ClientRegistrationResened(client);
+				if (renotification)
+				{
+					ClientRegistrationResened(client);
+				}
+				else
+				{
+					NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", client.FullName),
+						String.Format(
+							"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+							SecurityContext.Administrator.UserName,
+							client.HomeRegion.Name,
+							client.Users.First().Login,
+							client.Id,
+							client.Segment.GetDescription(),
+							client.Type.GetDescription()));
+				}
 			}
-			else
+			catch (Exception e)
 			{
-				NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", client.FullName),
-					String.Format(
-						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-						SecurityContext.Administrator.UserName,
-						client.HomeRegion.Name,
-						client.Users.First().Login,
-						client.Id,
-						client.Segment.GetDescription(),
-						client.Type.GetDescription()));
+				_log.Error("Ошибка при отправке уведомления", e);
 			}
 		}
 	}

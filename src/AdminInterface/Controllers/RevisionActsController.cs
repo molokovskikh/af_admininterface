@@ -81,7 +81,7 @@ namespace AdminInterface.Controllers
 
 			this.Mailer().RevisionAct(act, emails, message).Send();
 
-			Flash["Message"] = Message.Notify("Отправлено");
+			Notify("Отправлено");
 			RedirectToReferrer();
 		}
 

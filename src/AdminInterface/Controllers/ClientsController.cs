@@ -132,7 +132,7 @@ namespace AdminInterface.Controllers
 		{
 			Admin.CheckClientPermission(client);
 			client.Save();
-			Flash["Message"] = Message.Notify("Сохранено");
+			Notify("Сохранено");
 			RedirectToReferrer();
 		}
 
@@ -159,7 +159,7 @@ namespace AdminInterface.Controllers
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();
 
-			Flash["Message"] = Message.Notify("Сохранено");
+			Notify("Сохранено");
 			RedirectToUrl(String.Format("../client/{0}", client.Id));
 		}
 
@@ -203,7 +203,7 @@ where Phone like :phone")
 			if (!String.IsNullOrEmpty(message))
 			{
 				new ClientInfoLogEntity(message, client).Save();
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("Сохранено");
 			}
 			RedirectToReferrer();
 		}
@@ -216,7 +216,7 @@ where Phone like :phone")
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
 					ADHelper.Unlock(user.Login);
 
-			Flash["Message"] = Message.Notify("Разблокировано");
+			Notify("Разблокировано");
 			RedirectToReferrer();
 		}
 
@@ -232,11 +232,11 @@ where Phone like :phone")
 					if (File.Exists(file))
 						File.Delete(file);
 				}
-				Flash["Message"] = Message.Notify("Подготовленные данные удалены");
+				Notify("Подготовленные данные удалены");
 			}
 			catch
 			{
-				Flash["Message"] = Message.Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
+				Error("Ошибка удаления подготовленных данных, попробуйте позднее.");
 			}
 			RedirectToReferrer();
 		}
@@ -275,7 +275,7 @@ where Phone like :phone")
 		{
 			var client = Client.Find(clientId);
 			Mailer.ClientRegistred(client, true);
-			Flash["Message"] = Message.Notify("Уведомления отправлены");
+			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}
 
@@ -295,7 +295,7 @@ where Phone like :phone")
 			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
 			client.ChangePayer(payer, org);
 
-			Flash["Message"] = Message.Notify("Изменено");
+			Notify("Изменено");
 			RedirectToAction("Show", new {id = client.Id});
 		}
 
@@ -393,13 +393,13 @@ where s.Name like :SearchText")
 			{
 				if (moveAddress)
 				{
-					Flash["Message"] = Message.Error("Адрес доставки не может быть перемещен, т.к. имеет доступ к нему подключены пользователи");
+					Error("Адрес доставки не может быть перемещен, т.к. имеет доступ к нему подключены пользователи");
 					RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 					return;
 				}
 				else
 				{
-					Flash["Message"] = Message.Error("Пользователь не может быть перемещен т.к. имеет доступ к адресам доставки");
+					Error("Пользователь не может быть перемещен т.к. имеет доступ к адресам доставки");
 					RedirectUsingRoute("users", "Edit", new { id = user.Id });
 					return;
 				}
@@ -434,12 +434,12 @@ where s.Name like :SearchText")
 
 			if (moveAddress)
 			{
-				Flash["Message"] = Message.Notify("Адрес доставки успешно перемещен");
+				Notify("Адрес доставки успешно перемещен");
 				RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 			}
 			else
 			{
-				Flash["Message"] = Message.Notify("Пользователь успешно перемещен");
+				Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
 			oldClient.Refresh();
