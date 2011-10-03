@@ -36,7 +36,9 @@ namespace AdminInterface.Models
 
 		public bool UpdateIsUncommited { get; set; }
 
-		public bool Disabled { get; set; }
+		public bool ServiceDisabled { get; set; }
+
+		public bool UserEnabled { get; set; }
 
 		public string JuridicalName { get; set; }
 
@@ -52,6 +54,19 @@ namespace AdminInterface.Models
 			{
 				return ClientType == SearchClientType.Drugstore;
 			}
+		}
+
+		public bool Disabled
+		{
+			get
+			{
+				return ServiceDisabled || !UserEnabled;
+			}
+		}
+
+		public override string ToString()
+		{
+			return UserId.ToString();
 		}
 	}
 }

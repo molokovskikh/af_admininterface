@@ -100,14 +100,15 @@ SELECT
 	u.Login as Login,
 	u.Name as UserName,
 	u.PayerId as PayerId,
+	u.Enabled as UserEnabled,
 	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as UpdateDate,
 	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as UpdateIsUncommited,
 	max(uui.AFAppVersion) as AFVersion,
 
-	if(s.Type = 0, 2, 1)  as ClientType,
+	if(s.Type = 0, 2, 1) as ClientType,
 	s.Id as ClientId,
 	s.Name as ClientName,
-	s.Disabled as Disabled,
+	s.Disabled as ServiceDisabled,
 
 	p.JuridicalName as JuridicalName,
 	r.Region as RegionName,
