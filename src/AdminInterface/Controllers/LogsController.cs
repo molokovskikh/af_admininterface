@@ -355,7 +355,7 @@ SELECT  oh.rowid as Id,
 		a.Id as AddressId,
 		u.Id as UserId,
 		if (u.Name is not null and length(u.Name) > 0, u.Name, u.Login) as User,
-		firm.shortname as Supplier,
+		s.Name as Supplier,
 		pd.PriceName,
 		pd.PriceCode PriceId,
 		oh.RowCount,
@@ -364,7 +364,7 @@ SELECT  oh.rowid as Id,
 		oh.ClientOrderId
 FROM orders.ordershead oh
 	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
-	join usersettings.clientsdata as firm on firm.firmcode = pd.firmcode
+	join Future.Suppliers as s on s.Id = pd.firmcode
 	join Future.Clients c on oh.ClientCode = c.Id
 	join Future.Users u on u.Id = oh.UserId
 	join Future.Addresses a on a.Id = oh.AddressId

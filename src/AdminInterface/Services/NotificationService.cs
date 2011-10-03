@@ -99,37 +99,35 @@ namespace AdminInterface.Services
 				connection.Open();
 				var dataAdapter = new MySqlDataAdapter(@"
 select c.contactText
-from usersettings.clientsdata cd
-  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+from Future.Suppliers s
+  join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
     join contacts.contacts c on cg.Id = c.ContactOwnerId
 where length(c.contactText) > 0
-      and firmcode in (select pd.FirmCode
-                        from pricesdata as pd, pricesregionaldata as prd
-                        where prd.enabled = 1
-                              and firmstatus = 1
-                              and firmtype = 0
-                              and firmsegment = 0
-                              and MaskRegion & ?Region >0)
-      and cg.Type = ?ContactGroupType
-      and c.Type = ?ContactType
+	and s.Id in (select pd.FirmCode
+		from pricesdata as pd, pricesregionaldata as prd
+		where prd.enabled = 1)
+	and s.Disabled = 0
+	and s.Segment = 0
+	and s.RegionMask & ?Region > 0
+	and cg.Type = ?ContactGroupType
+	and c.Type = ?ContactType
 
 union
 
 select c.contactText
-from usersettings.clientsdata cd
-  join contacts.contact_groups cg on cd.ContactGroupOwnerId = cg.ContactGroupOwnerId
+from Future.Suppliers s
+  join contacts.contact_groups cg on s.ContactGroupOwnerId = cg.ContactGroupOwnerId
     join contacts.persons p on cg.id = p.ContactGroupId
       join contacts.contacts c on p.Id = c.ContactOwnerId
 where length(c.contactText) > 0
-      and firmcode in (select pd.FirmCode
-                        from pricesdata as pd, pricesregionaldata as prd
-                        where prd.enabled = 1
-                              and firmstatus = 1
-                              and firmtype = 0
-                              and firmsegment = 0
-                              and MaskRegion & ?Region > 0)
-      and cg.Type = ?ContactGroupType
-      and c.Type = ?ContactType;", connection);
+	and s.Id in (select pd.FirmCode
+		from pricesdata as pd, pricesregionaldata as prd
+		where prd.enabled = 1)
+	and s.Disabled = 0
+	and s.Segment = 0
+	and s.RegionMask & ?Region > 0
+	and cg.Type = ?ContactGroupType
+	and c.Type = ?ContactType;", connection);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?Region", client.HomeRegion.Id);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactGroupType", ContactGroupType.ClientManagers);
 				dataAdapter.SelectCommand.Parameters.AddWithValue("?ContactType", ContactType.Email);

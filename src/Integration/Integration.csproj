@@ -139,7 +139,6 @@
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Controllers\SmapRejectorControllerFixture.cs" />
     <Compile Include="DbLogHelperFixture.cs" />
-    <Compile Include="Models\ClientRegistrationLogEntityFixture.cs" />
     <Compile Include="ForTesting\IntegrationFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />
     <Compile Include="Models\JobFixture.cs" />

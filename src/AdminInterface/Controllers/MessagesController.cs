@@ -25,8 +25,9 @@ namespace AdminInterface.Controllers
 				{"Messages.ObjectId", "ObjectId"},
 				{"Messages.Name", "Name"}
 			};
+			SortBy = "WriteTime";
 			SortDirection = "desc";
-			Period = new DatePeriod(DateTime.Today.AddDays(-14), DateTime.Today);
+			Period = new DatePeriod(DateTime.Today.AddDays(-7), DateTime.Today);
 		}
 
 		public IList<ClientInfoLogEntity> Find()

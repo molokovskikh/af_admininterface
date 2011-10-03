@@ -60,33 +60,5 @@ namespace AdminInterface.Controllers
 		{
 			PropertyBag["Orders"] = OrderView.FindNotSendedOrders();
 		}
-
-		[RequiredPermission(PermissionType.MonitorUpdates, PermissionType.ViewDrugstore)]
-		public void Clients()
-		{
-			Clients(4, 1, 8, 0, null, null);
-		}
-
-		[RequiredPermission(PermissionType.MonitorUpdates, PermissionType.ViewDrugstore)]
-		public void Clients(uint filter, uint type, uint days, ulong region, string sort, string direction)
-		{
-			if (days < 1)
-				days = 1;
-			if (days > 40)
-				days = 40;
-
-			PropertyBag["filter"] = filter;
-			PropertyBag["days"] = days;
-			PropertyBag["type"] = type;
-			PropertyBag["region"] = region;
-			PropertyBag["sort"] = sort;
-			PropertyBag["direction"] = direction;
-			PropertyBag["regions"] = Region.FindAll();
-
-			if (filter == 4)
-				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotUpdated(days, type, region, sort, direction);
-			else if (filter == 5)
-				PropertyBag["logEntities"] = ClientRegistrationLogEntity.NotOrdered(days, type, region, sort, direction);
-		}
 	}
 }

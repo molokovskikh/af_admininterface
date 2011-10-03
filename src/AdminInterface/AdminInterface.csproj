@@ -273,7 +273,6 @@
     <Compile Include="Models\Security\Administrator.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
     <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
-    <Compile Include="Models\Logs\ClientRegistrationLogEntity.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
     <Compile Include="Models\Billing\MailSentEntity.cs" />
@@ -283,13 +282,6 @@
     <Compile Include="Models\Billing\PayerFilter.cs" />
     <Compile Include="Models\Logs\ClientLogRecord.cs" />
     <Compile Include="Controllers\BillingController.cs" />
-    <Compile Include="CopySynonym.aspx.cs">
-      <DependentUpon>CopySynonym.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="CopySynonym.aspx.designer.cs">
-      <DependentUpon>CopySynonym.aspx</DependentUpon>
-    </Compile>
     <Compile Include="EditRegionalInfo.aspx.cs">
       <DependentUpon>EditRegionalInfo.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -373,7 +365,6 @@
     <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="Assets\JavaScript\confirmation.coffee" />
     <Content Include="Assets\JavaScript\order.delivery.group.editor.coffee" />
-    <Content Include="CopySynonym.aspx" />
     <Content Include="Css\jquery-ui-1.8.6.custom.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
