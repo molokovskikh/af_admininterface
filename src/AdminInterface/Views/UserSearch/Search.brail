@@ -31,30 +31,7 @@
 		<tr>
 			<td>
 			</td>
-			<td>
-				<input type="radio" id="Autosearch" name="filter.SearchBy" value="Auto" ${"checked" if filter.IsSearchAuto()} />
-				<label for="Autosearch">Автоматически</label><br />
-				<input type="radio" id="SearchByClientId" name="filter.SearchBy" value="ByClientId" ${"checked" if filter.IsSearchByClientId()} />
-				<label for="SearchByClientId">Код клиента</label><br />
-				<input type="radio" id="SearchByUserId" name="filter.SearchBy" value="ByUserId" ${"checked" if filter.IsSearchByUserId()} />
-				<label for="SearchByUserId">Код пользователя</label><br />
-				<input type="radio" id="SearchByLogin" name="filter.SearchBy" value="ByLogin" ${"checked" if filter.IsSearchByLogin()} />
-				<label for="SearchByLogin">Логин пользователя</label><br />
-				<input type="radio" id="SearchByUserName" name="filter.SearchBy" value="ByUserName" ${"checked" if filter.IsSearchByUserName()} />
-				<label for="SearchByUserName">Комментарий пользователя</label><br />
-			</td>
-			<td>
-				<input type="radio" id="SearchByClientName" name="filter.SearchBy" value="ByClientName" ${"checked" if filter.IsSearchByClientName()} />
-				<label for="SearchByClientName">Имя клиента</label><br />
-				<input type="radio" id="SearchByContacts" name="filter.SearchBy" value="ByContacts" ${"checked" if filter.IsSearchByContacts()} />
-				<label for="SearchByContacts">Email/телефон</label><br />
-				<input type="radio" id="SearchByPersons" name="filter.SearchBy" value="ByPersons" ${"checked" if filter.IsSearchByPersons()} />
-				<label for="SearchByPersons">Контактное лицо (Ф.И.О.)</label><br />
-				<input type="radio" id="SearchByJuridicalName" name="filter.SearchBy" value="ByJuridicalName" ${"checked" if filter.IsSearchByJuridicalName()} />
-				<label for="SearchByJuridicalName">Юридическое имя</label><br />
-				<input type="radio" id="SearchByPayerId" name="filter.SearchBy" value="ByPayerId" ${"checked" if filter.IsSearchByPayerId()} />
-				<label for="SearchByPayerId">Код договора</label><br />
-			</td>
+			${app.Edit("filter.SearchBy", "TwoColumnRadioList")}
 		</tr>
 	</table>
 	

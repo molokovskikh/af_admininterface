@@ -14,41 +14,30 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
 {
 	public enum SearchUserBy
 	{
-		[Description("Автоматически")]
-		Auto,
-		[Description("Код клиента")]
-		ByClientId,
-		[Description("Код пользователя")]
-		ByUserId,
-		[Description("Логин пользователя")]
-		ByLogin,
-		[Description("Комментарий пользователя")]
-		ByUserName,
-		[Description("Email/телефон")]
-		ByContacts,
-		[Description("Контактное лицо (Ф.И.О.)")]
-		ByPersons,
-		[Description("Имя клиента")]
-		ByClientName,
-		[Description("Юридическое имя")]
-		ByJuridicalName,
-		[Description("Код договора")]
-		ByPayerId
+		[Description("Автоматически")] Auto,
+		[Description("Код клиента")] ByClientId,
+		[Description("Код пользователя")] ByUserId,
+		[Description("Логин пользователя")] ByLogin,
+		[Description("Комментарий пользователя")] ByUserName,
+		[Description("Email/телефон")] ByContacts,
+		[Description("Контактное лицо (Ф.И.О.)")] ByPersons,
+		[Description("Имя клиента")] ByClientName,
+		[Description("Юридическое имя")] ByJuridicalName,
+		[Description("Код договора")] ByPayerId,
+		[Description("Адрес для отправки документов")] AddressMail
 	}
 
 	public enum StatusStateFilter
 	{
-		[Description("Все")]
-		All,
-		[Description("Включенные")]
-		Enabled,
-		[Description("Отключенные")]
-		Disabled
+		[Description("Все")] All,
+		[Description("Включенные")] Enabled,
+		[Description("Отключенные")] Disabled
 	}
 
 	public class UserFilter : Sortable
@@ -84,67 +73,17 @@ namespace AdminInterface.Models
 			};
 		}
 
-		public bool IsSearchAuto()
-		{
-			return SearchBy == SearchUserBy.Auto;
-		}
-
-		public bool IsSearchByClientId()
-		{
-			return SearchBy == SearchUserBy.ByClientId;
-		}
-
-		public bool IsSearchByUserId()
-		{
-			return SearchBy == SearchUserBy.ByUserId;
-		}
-
-		public bool IsSearchByClientName()
-		{
-			return SearchBy == SearchUserBy.ByClientName;
-		}
-
-		public bool IsSearchByJuridicalName()
-		{
-			return SearchBy == SearchUserBy.ByJuridicalName;
-		}
-
-		public bool IsSearchByLogin()
-		{
-			return SearchBy == SearchUserBy.ByLogin;
-		}
-
-		public bool IsSearchByPayerId()
-		{
-			return SearchBy == SearchUserBy.ByPayerId;
-		}
-
-		public bool IsSearchByUserName()
-		{
-			return SearchBy == SearchUserBy.ByUserName;
-		}
-
-		public bool IsSearchByContacts()
-		{
-			return SearchBy == SearchUserBy.ByContacts;
-		}
-
-		public bool IsSearchByPersons()
-		{
-			return SearchBy == SearchUserBy.ByPersons;
-		}
-
 		public IList<UserSearchItem> Find()
 		{
 			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var administrator = SecurityContext.Administrator;
 			var session = sessionHolder.CreateSession(typeof(UserSearchItem));
-			var orderFilter = String.Format("ORDER BY {{UserSearchItem.{0}}} {1}", GetSortProperty(), GetSortDirection());
+			var orderFilter = String.Format("ORDER BY {0} {1}", GetSortProperty(), GetSortDirection());
 			try
 			{
 				var filter = String.Empty;
-
-				filter = AddFilterCriteria(filter, GetFilterBy(this));
+				var from = GetAdditionalFrom();
+				filter = AddFilterCriteria(filter, GetFilterBy());
 				filter = AddFilterCriteria(filter, GetSegmentFilter(Segment));
 				filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
 				filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
@@ -157,42 +96,42 @@ namespace AdminInterface.Models
 
 				var result = session.CreateSQLQuery(String.Format(@"
 SELECT
-	u.Id as {{UserSearchItem.UserId}},
-	u.Login as {{UserSearchItem.Login}},
-	u.Name as {{UserSearchItem.UserName}},
-	u.PayerId as {{UserSearchItem.PayerId}},
-	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as {{UserSearchItem.UpdateDate}},
-	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as {{UserSearchItem.UpdateIsUncommited}},
-	max(uui.AFAppVersion) as {{UserSearchItem.AFVersion}},
+	u.Id as UserId,
+	u.Login as Login,
+	u.Name as UserName,
+	u.PayerId as PayerId,
+	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as UpdateDate,
+	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as UpdateIsUncommited,
+	max(uui.AFAppVersion) as AFVersion,
 
-	if(s.Type = 0, 2, 1)  as {{UserSearchItem.ClientType}},
-	s.Id as {{UserSearchItem.ClientId}},
-	s.Name as {{UserSearchItem.ClientName}},
-	s.Disabled as {{UserSearchItem.Disabled}},
+	if(s.Type = 0, 2, 1)  as ClientType,
+	s.Id as ClientId,
+	s.Name as ClientName,
+	s.Disabled as Disabled,
 
-	p.JuridicalName as {{UserSearchItem.JuridicalName}},
-	r.Region as {{UserSearchItem.RegionName}},
-	if(sup.Segment is null, if(Clients.Segment = 0, 2, 1), if(sup.Segment = 0, 2, 1)) as {{UserSearchItem.Segment}}
+	p.JuridicalName as JuridicalName,
+	r.Region as RegionName,
+	if(sup.Segment is null, if(Clients.Segment = 0, 2, 1), if(sup.Segment = 0, 2, 1)) as Segment
 FROM
 	future.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
 	join future.Services s on s.Id = u.RootService
 		join farm.Regions r ON r.RegionCode = s.HomeRegion
 	left join Future.Suppliers sup on sup.Id = u.RootService
-	left JOIN future.Clients ON Clients.Id = u.ClientId
-		left JOIN contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
-		left JOIN contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
-		LEFT JOIN contacts.Persons ON Persons.ContactGroupId = cg.Id
+	left join future.Clients ON Clients.Id = u.ClientId
+		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
+		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
+		left join contacts.Persons ON Persons.ContactGroupId = cg.Id
 	join Billing.Payers p on p.PayerId = u.PayerId
+{2}
 WHERE
 	(r.RegionCode & :RegionMask > 0)
 	{0}
-GROUP BY {{UserSearchItem.UserId}}
+GROUP BY u.Id
 {1}
-", filter, orderFilter))
-					.AddEntity(typeof (UserSearchItem))
+", filter, orderFilter, from))
 					.SetParameter("RegionMask", regionMask)
-					.List<UserSearchItem>();
+					.ToList<UserSearchItem>();
 				ArHelper.Evict(session, result);
 				var logins = new List<string>();
 				for (var i = 0; i < result.Count; i++)
@@ -213,6 +152,19 @@ GROUP BY {{UserSearchItem.UserId}}
 			finally
 			{
 				sessionHolder.ReleaseSession(session);
+			}
+		}
+
+		private string GetAdditionalFrom()
+		{
+			switch (SearchBy)
+			{
+				case SearchUserBy.AddressMail:
+					return @"left join Future.UserAddresses ua on ua.UserId = u.Id
+left join Future.Addresses a on a.Id = ua.AddressId";
+					break;
+				default:
+					return "";
 			}
 		}
 
@@ -282,16 +234,16 @@ GROUP BY {{UserSearchItem.UserId}}
 			return filter;
 		}
 
-		private static string GetFilterBy(UserFilter userFilter)
+		private string GetFilterBy()
 		{
 			var filter = String.Empty;
-			var searchText = String.IsNullOrEmpty(userFilter.SearchText) ? String.Empty : Utils.StringToMySqlString(userFilter.SearchText);
+			var searchText = String.IsNullOrEmpty(SearchText) ? String.Empty : Utils.StringToMySqlString(SearchText);
 
 			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
 			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
 			var searchTextIsPhone = new Regex("^\\d{1,10}$").IsMatch(searchText.Replace("-", ""));
 
-			switch (userFilter.SearchBy)
+			switch (SearchBy)
 			{
 				case SearchUserBy.Auto: {
 					filter = AddFilterCriteria(filter,
@@ -351,6 +303,9 @@ LOWER(Persons.Name) like '{0}' ",
 					filter = AddFilterCriteria(filter, String.Format(" LOWER(Persons.Name) like '{0}' ", sqlSearchText));
 					break;
 				}
+				case SearchUserBy.AddressMail:
+					filter = AddFilterCriteria(filter, String.Format(" (concat(a.Id, '@waybills.analit.net') like '{0}' or concat(a.Id, '@refused.analit.net') like '{0}') ", sqlSearchText));
+					break;
 			}
 			return filter;
 		}

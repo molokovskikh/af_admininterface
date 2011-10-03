@@ -432,6 +432,7 @@
     <None Include="Views\Templates\Messages.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
+    <None Include="Views\Templates\TwoColumnRadioList.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
   </ItemGroup>
   <ItemGroup>
