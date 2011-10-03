@@ -20,6 +20,7 @@ ${app.EndFormFor("filter")}
 				<th>№ в AnalitF</th>
 				<th>Дата заказа</th>
 				<th>Дата прайса</th>
+				<th>Клиент</th>
 				<th>Адрес</th>
 				<th>Пользователь</th>
 				<th>Поставщик</th>
@@ -35,8 +36,9 @@ ${app.EndFormFor("filter")}
 			<td>${order.ClientOrderId}</td>
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>
-			<td>${LinkHelper.Address(siteroot, order.AddressId, order.Address)}</td>
-			<td>${LinkHelper.User(siteroot, order.UserId, order.User)}</td>
+			<td>!{order.Drugstore}</td>
+			<td>${UrlHelper.Link(order.Address, {@controller: @Addresses, @params: {@id: order.AddressId}})}
+			<td>${UrlHelper.Link(order.User, {@controller: @Users, @params: {@id: order.UserId}})}
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>

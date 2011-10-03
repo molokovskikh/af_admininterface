@@ -15,7 +15,6 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
-		Helper(typeof(LinkHelper)),
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]

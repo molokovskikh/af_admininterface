@@ -26,8 +26,10 @@
 		Введите текст для поиска:<br />
 		${app.Edit("filter.SearchText")}
 	</p>
-	<table style="width: 100%;" cellpadding="0" cellspacing="0">
-		<tr><td style="text-align: left;">Искать по:</td><td></td><td></td></tr>
+	<table style="width: 100%;">
+		<tr>
+			<td>Искать по:</td><td></td><td></td>
+		</tr>
 		<tr>
 			<td>
 			</td>
@@ -35,7 +37,7 @@
 		</tr>
 	</table>
 	
-	<fieldset style="padding: 0; margin: 0; text-align: left;">
+	<fieldset>
 		<legend>Фильтры:</legend>
 		<table style="width:100%" border="0">
 			<col style="width:25%" />
@@ -96,9 +98,9 @@
 					<td>${item.UserId}</td>
 					<td>
 						<% if item.IsDrugstore: %>
-							${LinkHelper.Client(siteroot, item.ClientId, item.ClientName)}
+							${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
 						<% else: %>
-							<a href="${siteroot}/Suppliers/${item.ClientId}">${item.ClientName}</a>
+							${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
 						<% end %>
 					</td>
 					<td>

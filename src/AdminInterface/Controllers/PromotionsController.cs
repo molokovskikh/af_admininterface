@@ -215,7 +215,6 @@ namespace AdminInterface.Controllers
 		Helper(typeof(BindingHelper)), 
 		Helper(typeof(ViewHelper)),
 		Helper(typeof(ADHelper)),
-		Helper(typeof(LinkHelper)),
 		Helper(typeof(PaginatorHelper), "paginator"),
 	]
 	public class PromotionsController : SmartDispatcherController
