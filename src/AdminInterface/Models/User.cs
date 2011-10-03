@@ -283,11 +283,6 @@ namespace AdminInterface.Models
 			return ActiveRecordMediator<User>.FindOne(Restrictions.Eq("Login", login));
 		}
 
-		public static User GetById(uint id)
-		{
-			return ActiveRecordMediator<User>.FindByPrimaryKey(id);
-		}
-
 		public virtual void CheckLogin()
 		{
 			if (!ADHelper.IsLoginExists(Login))

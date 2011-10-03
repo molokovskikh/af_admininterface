@@ -49,8 +49,8 @@
 	<div class=block>
 		<h3>Операции</h3>
 
-		<form method=post action="${siteroot}/users/Unlock">
-			<input type=hidden name=login value=${user.Login} />
+		<form id="Unlock" method=post action="${siteroot}/users/Unlock">
+			<input type=hidden name=id value=${user.Id} />
 			<input type=submit ${"disabled" if not user.IsLocked} value="Разблокировать" />
 			<% if IsDefined("UnlockMessage"): %> 
 			<span style="color:Green;">${UnlockMessage}</span>
@@ -58,7 +58,7 @@
 		</form>
 		
 		<form method=post action="${siteroot}/users/DeletePreparedData">
-			<input type=hidden name=userCode value=${User.Id} />
+			<input type=hidden name=id value=${User.Id} />
 			<input type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
 			<% if IsDefined("DeleteMessage"): %>
 				<span style="color:Green;">${DeleteMessage}</span>
@@ -69,7 +69,7 @@
 		</form>
 
 		<form id=ReseteUin method=post action="${siteroot}/users/ResetUin">
-			<input type=hidden name=userCode value=${User.Id} />
+			<input type=hidden name=Id value=${User.Id} />
 			<% haveUin = User.HaveUin() %>
 			<input type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
 			<% if haveUin: %>

@@ -82,3 +82,8 @@ a.Disabled
 {
 	background-color: #faa0a0;
 }
+
+form#Unlock input[type=submit]:enabled
+{
+	background-color: red;
+}

@@ -159,7 +159,7 @@ namespace AdminInterface.Controllers
 
 		public void PasswordChangeLog(uint id, DateTime beginDate, DateTime endDate)
 		{
-			var user = User.GetById(id);
+			var user = User.Find(id);
 
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
 				beginDate,

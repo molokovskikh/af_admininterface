@@ -139,7 +139,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint id)
 		{
-			var user = User.GetById(id);
+			var user = User.Find(id);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			if (user.Client != null)
@@ -195,7 +195,7 @@ namespace AdminInterface.Controllers
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint id)
 		{
-			var user = User.GetById(id);
+			var user = User.Find(id);
 			user.CheckLogin();
 
 			PropertyBag["user"] = user;
@@ -210,7 +210,7 @@ namespace AdminInterface.Controllers
 									 bool changeLogin,
 									 string reason)
 		{
-			var user = User.GetById(userId);
+			var user = User.Find(userId);
 			user.CheckLogin();
 			var administrator = Admin;
 			var password = User.GeneratePassword();
@@ -264,8 +264,10 @@ namespace AdminInterface.Controllers
 		public void SuccessPasswordChanged()
 		{}
 
-		public void Unlock(string login)
+		public void Unlock(uint id)
 		{
+			var user = User.Find(id);
+			var login = user.Login;
 			if (ADHelper.IsLoginExists(login) && ADHelper.IsLocked(login))
 				ADHelper.Unlock(login);
 
@@ -273,11 +275,11 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void DeletePreparedData(uint userCode)
+		public void DeletePreparedData(uint id)
 		{			
 			try
 			{
-				var user = User.GetById(userCode);
+				var user = User.Find(id);
 				var file = String.Format(CustomSettings.UserPreparedDataFormatString, user.Id);
 				if (File.Exists(file))
 					File.Delete(file);
@@ -290,24 +292,16 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void ResetUin(uint userCode, string reason)
+		public void ResetUin(uint id, string reason)
 		{
-			var user = User.GetById(userCode);
-
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging(
-					new
-					{
-						inHost = Request.UserHostAddress,
-						inUser = Admin.UserName,
-						ResetIdCause = reason
-					});
-				ClientInfoLogEntity.ReseteUin(user, reason).Save();
-				user.ResetUin();
-				Notify("УИН сброшен");
-				RedirectToReferrer();
-			}
+			var user = User.Find(id);
+			DbLogHelper.SetupParametersForTriggerLogging(new {
+				ResetIdCause = reason
+			});
+			ClientInfoLogEntity.ReseteUin(user, reason).Save();
+			user.ResetUin();
+			Notify("УИН сброшен");
+			RedirectToReferrer();
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -326,7 +320,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			var user = User.GetById(id);
+			var user = User.Find(id);
 			PropertyBag["user"] = user;
 			if (user.Client == null)
 			{
