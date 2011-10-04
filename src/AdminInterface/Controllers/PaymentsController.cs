@@ -25,7 +25,10 @@ namespace AdminInterface.Controllers
 		public decimal Sum { get; set; }
 	}
 
+	public class SessionExpiredException : Exception
+	{}
 
+	[Rescue(typeof(PaymentsController), "SessionExpired", typeof(SessionExpiredException))]
 	public class PaymentsController : ARSmartDispatcherController
 	{
 		public void Index([DataBind("filter")] PaymentFilter filter)
@@ -61,12 +64,6 @@ namespace AdminInterface.Controllers
 		public void SavePayments()
 		{
 			var payments = TempPayments();
-			if (payments == null)
-			{
-				Flash["Message"] = Message.Error("Время сесии истекло. Загрузите выписку повторно.");
-				RedirectToReferrer();
-			}
-
 			foreach (var payment in payments)
 			{
 				//если зайти в два платежа и отредактировать их
@@ -130,6 +127,12 @@ namespace AdminInterface.Controllers
 			}
 		}
 
+		public void SessionExpired()
+		{
+			Flash["Message"] = Message.Error("Время сессии истекло. Загрузите выписку повторно.");
+			RedirectToAction("ProcessPayments");
+		}
+
 		private Payment FindTempPayment(uint id)
 		{
 			return TempPayments().First(p => p.GetHashCode() == id);
@@ -137,7 +140,10 @@ namespace AdminInterface.Controllers
 
 		private List<Payment> TempPayments()
 		{
-			return (List<Payment>)Session["payments"];
+			var payments = (List<Payment>)Session["payments"];
+			if (payments == null)
+				throw new SessionExpiredException();
+			return payments;
 		}
 
 		public void Delete(uint id)
