@@ -331,7 +331,7 @@ where Phone like :phone")
 				.ToList()
 				.Select(p => new {
 					id = p.Id,
-					name = p.Name
+					name = String.Format("{0}, {1}", p.Id, p.Name)
 				})
 				.ToArray();
 		}
