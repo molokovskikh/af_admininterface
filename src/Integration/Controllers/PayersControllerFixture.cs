@@ -6,6 +6,7 @@ using AdminInterface.Models.Billing;
 using Castle.Components.Binder;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework.Test;
+using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
 

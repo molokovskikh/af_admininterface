@@ -11,6 +11,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
 using WatiN.Core;
+using WatiN.CssSelectorExtensions;
 using DescriptionAttribute=NUnit.Framework.DescriptionAttribute;
 
 namespace Functional.Drugstore
@@ -517,6 +518,32 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 
 			settings.Refresh();
 			Assert.That(settings.FirmCodeOnly, Is.Null);
+		}
+
+		[Test]
+		public void Set_convert_dbf_option()
+		{
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Поставщик для тестирования";
+				s.FullName = "Поставщик для тестирования";
+				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
+			});
+			supplier.Save();
+			Flush();
+
+			var checkbox = (CheckBox) Css("#drugstore_IsConvertFormat");
+			checkbox.Click();
+			var row = checkbox.Parents().OfType<TableRow>().First();
+			((TextField)row.CssSelect("input.term")).TypeText("Поставщик для тестирования");
+			Click(row, "Найти");
+			Thread.Sleep(1000);
+			Assert.That(((SelectList)row.CssSelect("select")).Options.Count, Is.GreaterThan(0));
+			Click("Сохранить");
+			AssertText("Сохранено");
+
+			settings.Refresh();
+			Assert.That(settings.IsConvertFormat, Is.True);
+			Assert.That(settings.AssortimentPrice, Is.Not.Null);
 		}
 		
 		private SelectList GetHomeRegionSelect(Browser browser)

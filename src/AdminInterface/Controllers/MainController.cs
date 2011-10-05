@@ -225,7 +225,7 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				Flash["Message"] = Message.Notify("Сохранено");
+				Notify("Сохранено");
 				RedirectToReferrer();
 			}
 			else

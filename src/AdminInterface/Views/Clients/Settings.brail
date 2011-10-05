@@ -33,22 +33,6 @@
 			setNoise(true);
 		<% end %>
 
-		$("#drugstore_IsConvertFormat").click(function(){
-			if (this.checked)
-				$("#SearchAssortimentPriceBlock").css("display", "");
-			else
-				CancelAssortimentPriceForDbf();
-		});
-
-		$("#SearchAssortimentPrice").click(function(){
-			SearchAssortimentPriceForDbf();
-		});
-
-		$("#CancelAssortimentPrice").click(function(){
-			CancelAssortimentPriceForDbf();
-		});
-
-
 		$("input[type=checkbox].activate").click(function() {
 			var root = $($(this).parents("td").get(0)).siblings("td");
 			if (this.checked)
@@ -97,14 +81,12 @@
 		});
 	});
 
-	function message(root, text, clazz)
-	{
+	function message(root, text, clazz) {
 		root.find(".message").remove();
 		root.append($("<span class=message>" + text +"<span>").addClass(clazz));
 	}
 
-	function cancel(root)
-	{
+	function cancel(root) {
 		var activate = $(root.parents("tr").get(0)).find("input[type=checkbox].activate").get(0);
 		activate.checked = false;
 		root.find(".search").remove();
@@ -113,16 +95,14 @@
 		root.find("input[type=hidden]").val("");
 	}
 
-	function search(root)
-	{
+	function search(root) {
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
 		var title = "Выберите ассортиментный прайс лист";
 		root.prepend(searchTemplate(title, "${siteroot}/Client/SearchAssortmentPrices"));
 	}
 
-	function searchTemplate(title, url)
-	{
+	function searchTemplate(title, url) {
 		return $("<div class=search><span>" + title + "</span><br>"
 			+ "<input type='text' class=term />"
 			+ "<input type='button' class=search value='Найти' />"
@@ -131,14 +111,6 @@
 			.find("input[type=button]").data("url", url).end();
 	}
 
-	function CancelAssortimentPriceForDbf() {
-		$("#SearchAssortimentPriceBlock").css("display", "none")
-		$("#SearchAssortimentPriceText").css("disabled", "");
-
-		$("#DivForAssortimentPrice").empty();
-		$("#drugstore_IsConvertFormat").get(0).checked = false;
-	}
-	 
 	function setNoise(noiseStatus) {
 		$("#NotNoiseSupplier").find('select').remove().end();
 		if (noiseStatus) {
@@ -146,32 +118,6 @@
 			$.get(url, function(html){ $("#NotNoiseSupplier").append(html); });
 		}
 	}
-
-	function SearchAssortimentPriceForDbf() {
-		var searchText = $("#SearchAssortimentPriceText").val();
-		$.ajax({
-			url: "${siteroot}/Client/SearchAssortmentPrices",
-			data: {"text": searchText},
-			cache: false,
-			success: function (data) {
-				if (data.length == 0) {
-					$("#SearchAssortimentPriceMessage").html("<font color='red'><i>Ничего не найдено</i></font>");
-					return;
-				}
-				$("#SearchAssortimentPriceBlock").css("display", "none")
-				$("#SearchAssortimentPriceText").css("disabled", "");
-				$("#SearchAssortimentPriceMessage").html("");
-				$("#DivForAssortimentPrice").append(data);
-				$("#DivForAssortimentPrice select[name='drugstore.BuyingMatrixPrice.Id']").attr("name", "drugstore.AssortimentPrice.Id")
-			},
-			error: function (xhr, textStatus, error) {
-				$("#SearchAssortimentPriceMessage").html("<font color='red'><i>Произошла ошибка. Попробуйте еще раз.</i></font>");
-			}
-		});
-		$("#SearchAssortimentPriceText").css("disabled", "disabled");
-		$("#SearchAssortimentPriceMessage").html("<i>Идет поиск...</i>");
-	}
-
 </script>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
@@ -209,11 +155,11 @@
 					</tr>
 				<tr>
 					<td>
-						${FormHelper.CheckboxField("drugstore.IsConvertFormat")}
-						<label>Конвертировать накладную в dbf-файл</label>
+						${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
 					</td>
 					<td>
-						<div>
+						${FormHelper.HiddenField("drugstore.AssortimentPrice.Id")}
+						<div class=value>
 							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
 							<% end %>

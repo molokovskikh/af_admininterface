@@ -105,8 +105,12 @@ namespace Functional.ForTesting
 
 		protected void Click(string selector, string name)
 		{
-			var container = (IElementContainer)browser.CssSelect(selector);
-			container.Click(name);
+			Click((IElementContainer)browser.CssSelect(selector), name);
+		}
+
+		protected void Click(IElementContainer element, string name)
+		{
+			element.Click(name);
 			CheckStatus();
 		}
 

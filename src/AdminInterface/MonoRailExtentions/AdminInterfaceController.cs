@@ -11,6 +11,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 
 namespace AdminInterface.MonoRailExtentions
 {

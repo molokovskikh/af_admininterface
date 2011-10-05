@@ -265,7 +265,6 @@ where Phone like :phone")
 			var client = Client.Find(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
-			Logger.Debug("NoiseCosts = " + drugstore.NoiseCosts);
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;

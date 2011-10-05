@@ -150,7 +150,7 @@ namespace AdminInterface.Controllers
 				Administrator.SetLogonHours(administrator.UserName, weekLogonHours);
 				scope.VoteCommit();
 			}
-			Flash["Message"] = new Message("Сохранено");
+			Notify("Сохранено");
 			RedirectUsingRoute("RegionalAdmin", "Edit", new { id = administrator.Id });
 		}
 
