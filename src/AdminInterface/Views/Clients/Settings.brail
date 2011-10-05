@@ -18,7 +18,7 @@
 	}
 </style>
 
-<script language="javascript">
+<script>
 	$(function () {
 
 		$("#excludes").data("template", function() {
@@ -114,7 +114,7 @@
 	function setNoise(noiseStatus) {
 		$("#NotNoiseSupplier").find('select').remove().end();
 		if (noiseStatus) {
-			var url = "${siteroot}/Client/SuppliersForCostNoising.rails?clientId=${client.Id}";
+			var url = "${siteroot}/Client/SuppliersForCostNoising?clientId=${client.Id}";
 			$.get(url, function(html){ $("#NotNoiseSupplier").append(html); });
 		}
 	}
