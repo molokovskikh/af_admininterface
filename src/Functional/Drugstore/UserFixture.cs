@@ -235,12 +235,11 @@ namespace Functional.Drugstore
 		[Test]
 		public void Delete_user_prepared_data()
 		{
-			var formatString = CustomSettings.UserPreparedDataFormatString;
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users.First();
 			user.Name = String.Empty;
 			user.Update();
-			var preparedDataPath = String.Format(formatString, user.Id);
+			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}.zip", user.Id);
 			using (var browser = Open("client/{0}", client.Id))
 			{
 				browser.Link(Find.ByText(user.Login)).Click();

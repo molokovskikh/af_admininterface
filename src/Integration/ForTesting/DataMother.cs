@@ -10,6 +10,7 @@ using Common.Tools;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
+using Test.Support.log4net;
 
 namespace Integration.ForTesting
 {
@@ -184,7 +185,7 @@ namespace Integration.ForTesting
 			var document = new Document {
 				ClientCode = client.Id,
 				DocumentDate = DateTime.Now.AddDays(-1),
-				FirmCode = supplier.Id,
+				Supplier = supplier,
 				ProviderDocumentId = "123",
 				Log = documentLogEntity,
 				AddressId = null,

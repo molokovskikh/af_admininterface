@@ -2,6 +2,8 @@
 	История документов
 <% end %>
 
+${app.Asset("details.js")}
+
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}
@@ -9,63 +11,11 @@ ${FormHelper.HiddenField("filter.User.Id")}
 ${app.FilterFor("filter.Period")}
 ${app.EndFormFor("filter")}
 
-<script type="text/javascript">
-
-	function ShowDownloadResult(id, url, callerDescription) {
-		var isCallerVisible = IsVisible(id, callerDescription)
-		HideAll(id, function() {
-			if (!isCallerVisible)
-				Download(url, id)
-		});
-	}
-
-	function Hide(id, description, afterFinish) {
-		if ($("#" + description + id).length > 0) {
-			$("#" + description + id).slideUp(500, function () {
-				$("#" + description + "Row" + id).remove();
-				afterFinish();
-			});
-		}
-		else {
-			afterFinish();
-		}
-	}
-
-	function HideAll(id, afterFinish) {
-	    if (IsVisible(id, "DownloadLog")) {
-	        Hide(id, "DownloadLog", afterFinish);
-	    }
-	    else if (IsVisible(id, "UpdateDetails")) {
-	        Hide(id, "UpdateDetails", afterFinish);
-	    }
-	    else if (IsVisible(id, "DocumentDetails")) {
-	        Hide(id, "DocumentDetails", afterFinish);
-	    }
-	    else {
-	        afterFinish();
-	    }
-	}
-	
-	function IsVisible(id, description) {
-		return $("#" + description + id).length > 0;
-	}
-	
-	function Download(url, id) {
-		$.ajax({
-			url: url,
-			success: function (data) {
-				var row = $(data);
-				row.insertAfter("#documentFileRow" + id);
-				//не работает
-				//row.slideDown(500);
-				row.css("display", "table-row");
-			}
-		});
-	}
-</script>
+<div class=block>
+	Всего документов ${logEntities.Count}
+</div>
 
 <div>
-
 	<table class="DataTable">
 	<% if logEntities.Count != 0: %>
 		<thead>
@@ -85,37 +35,37 @@ ${app.EndFormFor("filter")}
 				<th>Комментарий</th>
 			</tr>
 		</thead>
-	<% for i, logEntity in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${logEntity.Received.Id}">
-			<td>${logEntity.Received.Id}</td>
-			<td>${logEntity.Received.LogTime}</td>
+	<% for i, log in enumerate(logEntities): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
+			<td>${log.Id}</td>
+			<td>${log.LogTime}</td>
 			<td>
-				${BindingHelper.GetDescription(logEntity.Received.DocumentType)}
-				<%if logEntity.Received.SendUpdateLogEntity: %>
+				${BindingHelper.GetDescription(log.DocumentType)}
+				<%if log.SendUpdateId: %>
 					(загрузка документов)
 				<% end %>
 			</td>
-			<td>${?logEntity.Received.Document.ProviderDocumentId}</td>
-			<td>${?logEntity.Received.Document.DocumentDate}</td>
-			<td>${?logEntity.Received.Document.WriteTime}</td>
-			<td>${logEntity.Received.FromSupplier.Name}</td>
-			<td>${logEntity.Received.Address.Value}</td>
-			<td class="${'DocumentNotParsed' if not logEntity.Received.Document and logEntity.Received.SendUpdateLogEntity}">
-				<% if logEntity.Received.Document: %>
-					<a id="ShowDocumentDetailsLink${logEntity.Received.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${logEntity.Received.Id}, 'ShowDocumentDetails?documentLogId=${logEntity.Received.Id}', 'DocumentDetails');">
-						!{logEntity.Received.FileName}
+			<td>${log.ProviderDocumentId}</td>
+			<td>${log.DocumentDate}</td>
+			<td>${log.DocumentWriteTime}</td>
+			<td>${log.Supplier}</td>
+			<td>${log.Address}</td>
+			<td class="${'DocumentNotParsed' if not log.DocumentId and log.SendUpdateId}">
+				<% if log.DocumentId: %>
+					<a id="ShowDocumentDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDocumentDetails?documentLogId=${log.Id}', 'DocumentDetails');">
+						!{log.FileName}
 					</a>
 				<% else: %>
-					!{logEntity.Received.FileName}
+					!{log.FileName}
 				<% end %>
 			</td>
 			<td>
-				${ViewHelper.ConvertToUserFriendlySize(logEntity.Received.DocumentSize) if logEntity.Received.DocumentSize}
+				${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 			</td>
-			<td>${logEntity.ForUser.Login}</td>
-			<td>${?logEntity.SendedInUpdate.RequestTime}</td>
+			<td>${log.Login}</td>
+			<td>${log.RequestTime}</td>
 			<td>
-				<pre>!{logEntity.Received.Addition}</pre>
+				<pre>!{log.Addition}</pre>
 			</td>
 		</tr>
 	<% end %>
@@ -127,5 +77,4 @@ ${app.EndFormFor("filter")}
 		</tr>
 	<% end %>
 	</table>
-
 </div>

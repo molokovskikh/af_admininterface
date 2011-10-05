@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
@@ -431,7 +432,7 @@ namespace AdminInterface.Models
 
 		public virtual bool HavePreparedData()
 		{
-			var file = String.Format(CustomSettings.UserPreparedDataFormatString, Id);
+			var file = String.Format(Global.Config.PromotionsPath, Id);
 			return (File.Exists(file));
 		}
 

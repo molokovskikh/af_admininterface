@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -12,61 +13,10 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
-using NHibernate.Criterion;
-using NHibernate.SqlCommand;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
 {
-	public class DocumentFilter
-	{
-		public DocumentFilter()
-		{
-			Period = new DatePeriod(DateTime.Today.AddDays(-1), DateTime.Today);
-		}
-
-		public DatePeriod Period { get; set; }
-
-		public User User { get; set; }
-		public Client Client { get; set; }
-		public Supplier Supplier { get; set; }
-
-		public IList<DocumentSendLog> Find()
-		{
-			var criteria = GetCriteriaForView(Period.Begin, Period.End);
-			if (User != null)
-				criteria.Add(Expression.Eq("ForUser", User));
-
-			if (Client != null)
-				criteria.Add(Expression.Eq("r.ForClient", Client));
-
-			if (Supplier != null)
-				criteria.Add(Expression.Eq("r.FromSupplier", Supplier));
-
-			return ArHelper.WithSession(
-				s => criteria
-					.GetExecutableCriteria(s)
-					.List<DocumentSendLog>());
-		}
-
-		public static DetachedCriteria GetCriteriaForView(DateTime begin, DateTime end)
-		{
-			return DetachedCriteria.For<DocumentSendLog>()
-				.CreateAlias("Received", "r", JoinType.InnerJoin)
-				.CreateAlias("SendedInUpdate", "su", JoinType.LeftOuterJoin)
-				.CreateAlias("ForUser", "u", JoinType.InnerJoin)
-				.CreateAlias("r.FromSupplier", "fs", JoinType.InnerJoin)
-				.CreateAlias("r.ForClient", "fc", JoinType.InnerJoin)
-				.CreateAlias("r.Address", "a", JoinType.InnerJoin)
-				.CreateAlias("r.Document", "d", JoinType.LeftOuterJoin)
-				.CreateAlias("r.SendUpdateLogEntity", "ru", JoinType.LeftOuterJoin)
-				//.Add(Expression.Between("r.LogTime", begin, end))
-				.Add(Expression.Ge("r.LogTime", begin))
-				.Add(Expression.Le("r.LogTime", end.AddDays(1)))
-				.AddOrder(Order.Desc("r.LogTime"));
-		}
-	}
-
 	[
 		Helper(typeof(BindingHelper)),
 		Helper(typeof(ViewHelper)),
@@ -87,6 +37,8 @@ namespace AdminInterface.Controllers
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
 		{
+			CancelLayout();
+
 			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
 			var detailsLogEntities = logEntity.UpdateDownload;
 			var detailDocumentLogs = logEntity.GetLoadedDocumentLogs();

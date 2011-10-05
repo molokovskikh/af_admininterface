@@ -12,14 +12,14 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers
 {
-	public class Setting
+	public class Tab
 	{
 		public string Name { get; set; }
 		public string Id { get; set; }
 		public Type Type { get; set; }
 		public IList Items { get; set; }
 
-		public Setting(Type type)
+		public Tab(Type type)
 		{
 			Id = type.Name;
 			Name = BindingHelper.GetDescription(type);
@@ -41,8 +41,8 @@ namespace AdminInterface.Controllers
 		public void Index()
 		{
 			var settings = new[] {
-				new Setting(typeof(IgnoredInn)),
-				new Setting(typeof(Nomenclature)),
+				new Tab(typeof(IgnoredInn)),
+				new Tab(typeof(Nomenclature)),
 			};
 
 			if (IsPost)

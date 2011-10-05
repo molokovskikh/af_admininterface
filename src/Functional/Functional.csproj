@@ -121,7 +121,7 @@
     <Compile Include="Drugstore\SettingsFixture.cs" />
     <Compile Include="Drugstore\UserRegistrationFixture.cs" />
     <Compile Include="ForTesting\ContactInformationFixture.cs" />
-    <Compile Include="DocumentLogFixture.cs" />
+    <Compile Include="Drugstore\DocumentLogFixture.cs" />
     <Compile Include="Drugstore\DrugstoreFixture.cs" />
     <Compile Include="ForTesting\FixtureForFixture.cs" />
     <Compile Include="ForTesting\FixtureMapping.cs" />

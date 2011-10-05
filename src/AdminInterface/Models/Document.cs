@@ -23,20 +23,14 @@ namespace AdminInterface.Models
 			WriteTime = DateTime.Now;
 			Supplier = log.FromSupplier;
 			ClientCode = log.ForClient.Id;
-			//AddressId = log.AddressId;
+			AddressId = log.Address.Id;
 		}
 
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
-		//[Property]
-		//public uint DownloadId { get; set; }
-
 		[Property]
 		public virtual DateTime WriteTime { get; set; }
-
-		[Property]
-		public virtual uint FirmCode { get; set; }
 
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }

@@ -143,6 +143,7 @@
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
+    <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DocumentBuilderFilter.cs" />
@@ -351,7 +352,6 @@
       <DependentUpon>SenderProperties.aspx</DependentUpon>
     </Compile>
     <Compile Include="Services\NotificationService.cs" />
-    <Compile Include="CustomSettings.cs" />
     <Compile Include="ViewAdministrators.aspx.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -364,6 +364,7 @@
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="Assets\JavaScript\confirmation.coffee" />
+    <Content Include="Assets\JavaScript\details.js" />
     <Content Include="Assets\JavaScript\order.delivery.group.editor.coffee" />
     <Content Include="Css\jquery-ui-1.8.6.custom.css" />
     <Content Include="Css\User.css" />
@@ -545,9 +546,8 @@
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
     <None Include="Views\Logs\ShowDownloadLog.brailjs" />
     <None Include="Views\Logs\ShowDownloadLogPartial.brail" />
-    <None Include="Views\Logs\ShowUpdateDetails.brailjs" />
     <None Include="Views\Logs\UpdateLog.brail" />
-    <None Include="Views\Logs\ShowUpdateDetailsPartial.brail" />
+    <None Include="Views\Logs\ShowUpdateDetails.brail" />
     <None Include="Views\Contact\NewContactGroup.brail" />
     <Content Include="OfficeUserRegistrationReport.aspx" />
     <Content Include="Rescue\NotAllowed.aspx" />

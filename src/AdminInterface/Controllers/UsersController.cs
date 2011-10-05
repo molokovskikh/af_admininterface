@@ -280,7 +280,7 @@ namespace AdminInterface.Controllers
 			try
 			{
 				var user = User.Find(id);
-				var file = String.Format(CustomSettings.UserPreparedDataFormatString, user.Id);
+				var file = String.Format(Config.UserPreparedDataFormatString, user.Id);
 				if (File.Exists(file))
 					File.Delete(file);
 				Notify("Подготовленные данные удалены");

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
@@ -12,7 +13,7 @@ namespace AdminInterface.Models.Logs
 		[Description("Документы от АК \"Инфорум\"")] InforoomDoc = 3
 	}
 
-	[ActiveRecord("DocumentSendLogs", Schema = "Logs")]
+	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true)]
 	public class DocumentSendLog : ActiveRecordBase<DocumentSendLog>
 	{
 		[PrimaryKey]
@@ -21,7 +22,7 @@ namespace AdminInterface.Models.Logs
 		[BelongsTo("UserId")]
 		public virtual User ForUser { get; set; }
 
-		[BelongsTo("DocumentId")]
+		[BelongsTo("DocumentId", Lazy = FetchWhen.OnInvoke)]
 		public virtual DocumentReceiveLog Received { get; set; }
 
 		[BelongsTo("UpdateId")]
@@ -31,9 +32,19 @@ namespace AdminInterface.Models.Logs
 		public virtual bool Committed { get; set; }
 	}
 
-	[ActiveRecord("Document_logs", Schema = "Logs")]
+	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true)]
 	public class DocumentReceiveLog : ActiveRecordBase<DocumentReceiveLog>
 	{
+		public DocumentReceiveLog()
+		{}
+
+		public DocumentReceiveLog(Supplier supplier)
+		{
+			FromSupplier = supplier;
+			LogTime = DateTime.Now;
+			DocumentType = DocumentType.Waybill;
+		}
+
 		[PrimaryKey("RowId")]
 		public virtual uint Id { get; set; }
 
@@ -66,5 +77,8 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual DocumentType DocumentType { get; set; }
+
+		[HasMany(Inverse = true, Lazy = true)]
+		public virtual IList<DocumentSendLog> SendLogs { get; set; }
 	}
 }

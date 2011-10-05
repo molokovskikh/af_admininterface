@@ -2,56 +2,11 @@
 	История обновлений
 <% end %>
 
-<script type="text/javascript" src="${siteroot}/JavaScript/Main.js"></script>
-<script type="text/javascript">
-	function ShowDownloadResult(id, url, callerDescription) {
-		var isCallerVisible = IsVisible(id, callerDescription);
-		HideAll(id, function () {
-			if (!isCallerVisible)
-				Download(url);
-		});
-	}
+${app.Asset("details.js")}
 
-	function Hide(id, description, afterFinish) {
-		$("#" + description + id).slideUp(0.5, function () {
-			$("#" + description + "Row" + id).remove();
-			afterFinish();
-		});
-	}
+<% if filter.Client: %>
 
-	function HideAll(id, afterFinish) {
-		if (IsVisible(id, "DownloadLog")) {
-			Hide(id, "DownloadLog", afterFinish);
-		}
-		else if (IsVisible(id, "UpdateDetails")) {
-			Hide(id, "UpdateDetails", afterFinish);
-		}
-		else if (IsVisible(id, "DocumentDetails")) {
-			Hide(id, "DocumentDetails", afterFinish);
-		}
-		else {
-			afterFinish();
-		}
-	}
-	
-	function IsVisible(id, description) {
-		return $("#" + description + id).length > 0;
-	}
-	
-	function DisableAction(id)
-	{
-		$("#ShowUpdateDetailsLink" + id).onclick = function () { return false; }
-		$("#ShowLogLink" + id).onclick = function() { return false; }
-		$("#ShowDocumentDetailsLink" + id).onclick = function() { return false; }
-	}
-
-	function Download(url) {
-		$.ajax({ url: url });
-	}
-</script>
-
-	<% if filter.Client:
-		component CaptureFor, {"id" : "Title"}: %>
+	<% component CaptureFor, {"id" : "Title"}: %>
 			История обновлений клиента ${filter.Client.Name}
 	<% end %>
 
@@ -59,7 +14,7 @@
 		${FormHelper.HiddenField("clientCode", filter.Client.Id)}
 	<% end %>
 
-<%  else: %>
+<% else: %>
 
 	<% if filter.User: %>
 
@@ -72,20 +27,20 @@
 		<% end %>
 
 	<% end %>
-<%
-	end
 
-	if not filter.UpdateType:
-		OutputSubView("SelectDateIntervalSubView")
-	else:
-%>
+<% end %>
+
+<% if not filter.UpdateType: %>
+	<% OutputSubView("SelectDateIntervalSubView") %>
+<% else: %>
 	<table width="100%">
 		<tr align="center"><td><font face="Verdana" size="2"><b>${BindingHelper.GetDescription(filter.UpdateType)}</b></font></td></tr>
-		<tr align="center"><td style="padding-bottom: 15px"><font face="Verdana" size="2">Клиентов, отвечающих условиям выборки: ${logEntities.Count}</font></td></tr>
 	</table>
-<%	
-	end
-%>
+<% end %>
+
+<div class=block>
+	Всего обновлений ${logEntities.Count}
+</div>
 
 <div>
 	<table class="DataTable">
@@ -152,7 +107,7 @@
 			<% if filter.ShowUpdateType(): %>
 			<td>
 			<% if log.IsDataTransferUpdateType(): %>
-				<a id="ShowUpdateDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${log.Id}, 'ShowUpdateDetails.rails?updateLogEntityId=${log.Id}', 'UpdateDetails');">
+				<a id="ShowUpdateDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowUpdateDetails?updateLogEntityId=${log.Id}', 'UpdateDetails');">
 					${BindingHelper.GetDescription(log.UpdateType)}
 				</a>
 			<% else: %>
@@ -179,7 +134,7 @@
 			<% if filter.ShowLog(): %>
 			<td>
 				<% if not string.IsNullOrEmpty(log.Log): %>
-				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(${log.Id}, 'ShowDownloadLog.rails?updateLogEntityId=${log.Id}', 'DownloadLog');">
+				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDownloadLog?updateLogEntityId=${log.Id}', 'DownloadLog');">
 					Лог
 				</a>
 				<% else: %>

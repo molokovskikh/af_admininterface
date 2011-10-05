@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
@@ -134,6 +135,14 @@ namespace AdminInterface.MonoRailExtentions
 			get
 			{
 				return ADHelper.Storage;
+			}
+		}
+
+		protected AppConfig Config
+		{
+			get
+			{
+				return Global.Config;
 			}
 		}
 

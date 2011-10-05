@@ -7,6 +7,7 @@ using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
@@ -217,11 +218,11 @@ namespace AdminInterface.Controllers
 		Helper(typeof(ADHelper)),
 		Helper(typeof(PaginatorHelper), "paginator"),
 	]
-	public class PromotionsController : SmartDispatcherController
+	public class PromotionsController : AdminInterfaceController
 	{
 		private Dictionary<string, string> _allowedExtentions;
 
-		private void InitExtentions()
+		public PromotionsController()
 		{
 			_allowedExtentions = new Dictionary<string, string> 
 			{
@@ -229,17 +230,6 @@ namespace AdminInterface.Controllers
 				{".jpeg", "image/JPEG"},
 				{".txt", "text/plain"},
 			};
-		}
-
-		public PromotionsController(IDataBinder binder)
-			: base(binder)
-		{
-			InitExtentions();
-		}
-
-		public PromotionsController()
-		{
-			InitExtentions();
 		}
 
 		private bool IsAllowedExtention(string extention)
@@ -407,7 +397,7 @@ namespace AdminInterface.Controllers
 
 		private string GetPromoFile(SupplierPromotion promotion)
 		{
-			return Path.Combine(CustomSettings.PromotionsPath(), promotion.Id + Path.GetExtension(promotion.PromoFile));
+			return Path.Combine(Config.PromotionsPath, promotion.Id + Path.GetExtension(promotion.PromoFile));
 		}
 
 		public void GetPromoFile(uint id)

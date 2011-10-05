@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -11,6 +12,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
+using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Container;
@@ -32,9 +34,20 @@ using ILoggerFactory = Castle.Core.Logging.ILoggerFactory;
 
 namespace AddUser
 {
+	public class AppConfig
+	{
+		public string AptBox { get; set; }
+		public string OptBox { get; set; }
+		public string UserPreparedDataFormatString { get; set; }
+		public string CallRecordsDirectory { get; set; }
+		public string PromotionsPath { get; set; }
+	}
+
 	public class Global : WebApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
+
+		public static AppConfig Config = new AppConfig();
 
 		public Global()
 			: base(Assembly.Load("AdminInterface"))
@@ -49,12 +62,21 @@ namespace AddUser
 			try
 			{
 				ValidEventListner.ValidatorAccessor = new MonorailValidatorAccessor();
+				LoadSettings(Config);
 				Initialize();
 			}
 			catch(Exception ex)
 			{
 				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
+		}
+
+		private void LoadSettings(AppConfig config)
+		{
+			var builder = new TreeBuilder();
+			var tree = builder.BuildSourceNode(ConfigurationManager.AppSettings);
+			var binder = new DataBinder();
+			binder.BindObjectInstance(config, tree);
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)

@@ -16,9 +16,9 @@ namespace Functional.Drugstore
 {
 	public class AnalitFUpdateLogsFixture : WatinFixture2
 	{
-		private Client client;
-		private UpdateLogEntity updateLog;
-		private User user;
+		Client client;
+		UpdateLogEntity updateLog;
+		User user;
 
 		private void Set_calendar_dates(IE browser)
 		{
@@ -163,7 +163,7 @@ namespace Functional.Drugstore
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_from_client_update_history()
 		{
 			Client client = null;
@@ -174,31 +174,29 @@ namespace Functional.Drugstore
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Client/{0}", client.Id))
+			Open(client);
+			Click("История обновлений");
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений клиента {0}", client.Name))))
 			{
-				mainWindow.Link(Find.ByText("История обновлений")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
-				{
-					Thread.Sleep(2000);
-					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
-					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
-					Thread.Sleep(2000);
+				Thread.Sleep(2000);
+				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+				Thread.Sleep(2000);
 
-					Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
-					Assert.That(browser.Text, Is.StringContaining("Тип документа"));
-					Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
-					Assert.That(browser.Text, Is.StringContaining("Имя файла"));
-					Assert.That(browser.Text, Is.StringContaining("Статус"));
-					Assert.That(browser.Text, Is.StringContaining("Разобран"));
-					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
+				Assert.That(browser.Text, Is.StringContaining("Тип документа"));
+				Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
+				Assert.That(browser.Text, Is.StringContaining("Имя файла"));
+				Assert.That(browser.Text, Is.StringContaining("Статус"));
+				Assert.That(browser.Text, Is.StringContaining("Разобран"));
+				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
 
-					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-					Check_document_view(browser, document);
-				}
+				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+				Check_document_view(browser, document);
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_from_user_update_history()
 		{
 			Client client = null;
@@ -209,30 +207,29 @@ namespace Functional.Drugstore
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
+			var user = client.Users[0];
+			Open(user);
+			Click("История обновлений");
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login))))
 			{
-				mainWindow.Link(Find.ByText("История обновлений")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("Статистика обновлений"))))
-				{
-					Thread.Sleep(2000);
-					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+				Thread.Sleep(2000);
+				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
 					
-					Thread.Sleep(2000);
-					Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
-					Assert.That(browser.Text, Is.StringContaining("Тип документа"));
-					Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
-					Assert.That(browser.Text, Is.StringContaining("Имя файла"));
-					Assert.That(browser.Text, Is.StringContaining("Статус"));
-					Assert.That(browser.Text, Is.StringContaining("Разобран"));
-					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining("Дата загрузки"));
+				Assert.That(browser.Text, Is.StringContaining("Тип документа"));
+				Assert.That(browser.Text, Is.StringContaining("Дата разбора"));
+				Assert.That(browser.Text, Is.StringContaining("Имя файла"));
+				Assert.That(browser.Text, Is.StringContaining("Статус"));
+				Assert.That(browser.Text, Is.StringContaining("Разобран"));
+				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
 
-					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-					Check_document_view(browser, document);
-				}
+				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+				Check_document_view(browser, document);
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_from_client_document_history()
 		{
 			Client client = null;
@@ -243,28 +240,26 @@ namespace Functional.Drugstore
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Client/{0}", client.Id))
+			Open(client);
+			Click("История документов");
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов")))
 			{
-				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов клиента " + client.Name))))
-				{
-					Thread.Sleep(2000);
-					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
-					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-					Thread.Sleep(1000);
-					Assert.That(browser.Text, Is.StringContaining("Код товара"));
-					Assert.That(browser.Text, Is.StringContaining("Наименование"));
-					Assert.That(browser.Text, Is.StringContaining("Производитель"));
-					Assert.That(browser.Text, Is.StringContaining("Страна"));
-					Assert.That(browser.Text, Is.StringContaining("Количество"));
-					Assert.That(browser.Text, Is.StringContaining("Срок годности"));
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining(supplier.Name));
+				browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+				Thread.Sleep(1000);
+				Assert.That(browser.Text, Is.StringContaining("Код товара"));
+				Assert.That(browser.Text, Is.StringContaining("Наименование"));
+				Assert.That(browser.Text, Is.StringContaining("Производитель"));
+				Assert.That(browser.Text, Is.StringContaining("Страна"));
+				Assert.That(browser.Text, Is.StringContaining("Количество"));
+				Assert.That(browser.Text, Is.StringContaining("Срок годности"));
 
-					Check_document_view(browser, document);
-				}
+				Check_document_view(browser, document);
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_from_user_document_history()
 		{
 			Client client = null;
@@ -275,28 +270,26 @@ namespace Functional.Drugstore
 
 			Create_loaded_document_logs(out client, out supplier, out documentLogEntity, out document, out updateEntity);
 
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
+			Open(client);
+			Click("История документов");
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов")))
 			{
-				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
-				{
-					Thread.Sleep(2000);
-					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
-					browser.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
-					Thread.Sleep(1000);
-					Assert.That(browser.Text, Is.StringContaining("Код товара"));
-					Assert.That(browser.Text, Is.StringContaining("Наименование"));
-					Assert.That(browser.Text, Is.StringContaining("Производитель"));
-					Assert.That(browser.Text, Is.StringContaining("Страна"));
-					Assert.That(browser.Text, Is.StringContaining("Количество"));
-					Assert.That(browser.Text, Is.StringContaining("Срок годности"));
+				Thread.Sleep(2000);
+				Assert.That(openedWindow.Text, Is.StringContaining(supplier.Name));
+				openedWindow.Link("ShowDocumentDetailsLink" + documentLogEntity.Id).Click();
+				Thread.Sleep(1000);
+				Assert.That(openedWindow.Text, Is.StringContaining("Код товара"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Наименование"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Производитель"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Страна"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Количество"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Срок годности"));
 
-					Check_document_view(browser, document);
-				}
+				Check_document_view(openedWindow, document);
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_unparsed_document_documents()
 		{
 			Client client = null;
@@ -308,7 +301,7 @@ namespace Functional.Drugstore
 			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
 			{
 				mainWindow.Link(Find.ByText(@"История документов")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format(@"Статистика получения\отправки документов пользователя " + client.Users[0].Login))))
+				using (var browser = IE.AttachTo<IE>(Find.ByTitle("История документов")))
 				{
 					Thread.Sleep(2000);
 					Assert.That(browser.Text, Is.StringContaining(supplier.Name));
@@ -318,7 +311,7 @@ namespace Functional.Drugstore
 			}
 		}
 
-		[Test, Ignore("Временно до починки")]
+		[Test]
 		public void View_loaded_documents_details_unparsed_document_updates()
 		{
 			Client client = null;
@@ -327,17 +320,16 @@ namespace Functional.Drugstore
 			UpdateLogEntity updateEntity = null;
 
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateEntity);
-			using (var mainWindow = Open("Users/{0}/edit", client.Users[0].Id))
+			var user = client.Users[0];
+			Open(user);
+			Click(@"История обновлений");
+			using (var browser = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений пользователя {0}", user.Login))))
 			{
-				mainWindow.Link(Find.ByText(@"История обновлений")).Click();
-				using (var browser = IE.AttachTo<IE>(Find.ByTitle(@"Статистика обновлений")))
-				{
-					Thread.Sleep(2000);
-					Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
-					browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
-					Thread.Sleep(2000);
-					Assert.That(browser.Text, Is.StringContaining("Не разобран"));
-				}
+				Thread.Sleep(2000);
+				Assert.IsTrue(browser.Link(Find.ByText("Загрузка документов на сервер")).Exists);
+				browser.Link("ShowUpdateDetailsLink" + updateEntity.Id).Click();
+				Thread.Sleep(2000);
+				Assert.That(browser.Text, Is.StringContaining("Не разобран"));
 			}
 		}
 
