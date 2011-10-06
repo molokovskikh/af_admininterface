@@ -21,7 +21,7 @@ namespace AdminInterface.Models
 			if (auditable != null)
 			{
 				var record = auditable.GetAuditRecord();
-				record.Message = message.Remove(0, 3);
+				record.Message = message;
 				@event.Session.Save(record);
 			}
 			else

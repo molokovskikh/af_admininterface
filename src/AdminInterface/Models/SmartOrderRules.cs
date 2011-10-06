@@ -1,4 +1,6 @@
-﻿using Castle.ActiveRecord;
+﻿using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 
 namespace AdminInterface.Models

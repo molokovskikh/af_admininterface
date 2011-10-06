@@ -27,30 +27,35 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
-	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>, IUrlContributor
+	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>, IUrlContributor, IAuditRecord
 	{
 		public ClientInfoLogEntity()
 		{}
 
-		private ClientInfoLogEntity(string message)
+		public ClientInfoLogEntity(object entity)
 		{
-			Message = message;
 			var admin = SecurityContext.Administrator;
 			Administrator = admin;
 			UserName = admin.UserName;
 			WriteTime = DateTime.Now;
+			SetObjectInfo(entity);
 		}
 
-		public ClientInfoLogEntity(string message, object entity) : this(message)
+		public ClientInfoLogEntity(string message, object entity) : this(entity)
+		{
+			Message = message;
+		}
+
+		private void SetObjectInfo(object entity)
 		{
 			if (entity is DrugstoreSettings)
 			{
-				entity = ((DrugstoreSettings)entity).Client;
+				entity = ((DrugstoreSettings) entity).Client;
 			}
 
 			if (entity is Service)
 			{
-				var service = ((Service)entity);
+				var service = ((Service) entity);
 				Service = service;
 				ObjectId = Service.Id;
 				Name = service.Name;
@@ -61,7 +66,7 @@ namespace AdminInterface.Models.Logs
 			}
 			else if (entity is User)
 			{
-				var user = (User)entity;
+				var user = (User) entity;
 				ObjectId = user.Id;
 				Service = user.RootService;
 				Type = LogObjectType.User;
@@ -69,7 +74,7 @@ namespace AdminInterface.Models.Logs
 			}
 			else if (entity is Address)
 			{
-				var address = ((Address)entity);
+				var address = ((Address) entity);
 				ObjectId = address.Id;
 				Service = address.Client;
 				Type = LogObjectType.Address;

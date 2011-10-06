@@ -23,6 +23,8 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord(Schema = "Billing")]
 	public class PayerAuditRecord : IAuditRecord
 	{
+		private string _message;
+
 		public PayerAuditRecord()
 		{
 		}
@@ -63,8 +65,20 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public string Name { get; set; }
 
-		[Property]
-		public string Message { get; set; }
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		public string Message
+		{
+			get
+			{
+				return _message;
+			}
+			set
+			{
+				_message = value;
+				if (_message != null)
+					_message = _message.Remove(0, 3);
+			}
+		}
 
 		public static IList<PayerAuditRecord> Find(Payer payer)
 		{

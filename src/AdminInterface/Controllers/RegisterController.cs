@@ -103,6 +103,7 @@ namespace AdminInterface.Controllers
 
 				supplier.Payer = currentPayer;
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
+				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));
 				supplier.Save();
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
@@ -137,7 +138,7 @@ namespace AdminInterface.Controllers
 
 				scope.Flush();
 
-				CreateSupplier(DefaultValues.Get(), supplier);
+				CreateSupplier(supplier);
 				Maintainer.MaintainIntersection(supplier);
 
 				user = new User(supplier.Payer, supplier) {
@@ -350,11 +351,8 @@ namespace AdminInterface.Controllers
 			client.Addresses.Each(a => a.MaintainInscribe());
 		}
 
-		private void CreateSupplier(DefaultValues defaults, Supplier supplier)
+		private void CreateSupplier(Supplier supplier)
 		{
-			var orderSendRules = new OrderSendRules(defaults, supplier);
-			orderSendRules.Save();
-
 			var command = @"
 INSERT INTO pricesdata(Firmcode, PriceCode) VALUES(:ClientCode, null);
 SET @NewPriceCode = Last_Insert_ID(); 

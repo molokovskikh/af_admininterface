@@ -231,8 +231,8 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 			else
 			{
 				PropertyBag["Defaults"] = defaults;
-				PropertyBag["Formaters"] = OrderHandler.GetFormaters();
-				PropertyBag["Senders"] = OrderHandler.GetSenders();
+				PropertyBag["Formaters"] = OrderHandler.Formaters();
+				PropertyBag["Senders"] = OrderHandler.Senders();
 			}
 		}
 

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
 {
@@ -51,11 +53,13 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord(Table = "order_send_rules", Schema = "OrderSendRules")]
-	public class OrderSendRules : ActiveRecordBase<OrderHandler>
+	[ActiveRecord(Table = "order_send_rules", Schema = "OrderSendRules"), Auditable]
+	public class OrderSendRules : ActiveRecordBase<OrderHandler>, IAuditable
 	{
 		public OrderSendRules()
-		{}
+		{
+			ErrorNotificationDelay = 60;
+		}
 
 		public OrderSendRules(DefaultValues defaults, Supplier supplier)
 		{
@@ -70,11 +74,25 @@ namespace AdminInterface.Models
 		[BelongsTo("FirmCode")]
 		public Supplier Supplier { get; set; }
 
-		[BelongsTo("FormaterId")]
+		[BelongsTo("FormaterId"), Auditable("Форматер")]
 		public OrderHandler Formater { get; set; }
 
-		[BelongsTo("SenderId")]
+		[BelongsTo("SenderId"), Auditable("Отправщик")]
 		public OrderHandler Sender{ get; set; }
+
+		[Property]
+		public ulong? RegionCode { get; set; }
+
+		[Property]
+		public bool SendDebugMessage { get; set; }
+
+		[Property]
+		public uint ErrorNotificationDelay { get; set; }
+
+		public IAuditRecord GetAuditRecord()
+		{
+			return new ClientInfoLogEntity(Supplier);
+		}
 	}
 
 	[ActiveRecord(Table = "order_handlers", Schema = "OrderSendRules")]
@@ -89,14 +107,19 @@ namespace AdminInterface.Models
 		[Property]
 		public HandlerType Type { get; set; }
 
-		public static IList<OrderHandler> GetSenders()
+		public static IList<OrderHandler> Senders()
 		{
 			return Queryable.Where(h => h.Type == HandlerType.Sender).OrderBy(h => h.ClassName).ToList();
 		}
 
-		public static IList<OrderHandler> GetFormaters()
+		public static IList<OrderHandler> Formaters()
 		{
 			return Queryable.Where(h => h.Type == HandlerType.Formater).OrderBy(h => h.ClassName).ToList();
+		}
+
+		public override string ToString()
+		{
+			return ClassName;
 		}
 	}
 }

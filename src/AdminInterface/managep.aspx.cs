@@ -374,37 +374,6 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-			var orderSendRulesDataAdapter = new MySqlDataAdapter();
-			orderSendRulesDataAdapter.UpdateCommand = new MySqlCommand(@"
-update ordersendrules.order_send_rules
-set SenderId = ?senderId, 
-	FormaterId = ?formaterId, 
-	RegionCode = ?RegionCode, 
-	SendDebugMessage = ?SendDebugMessage, 
-	ErrorNotificationDelay = ?ErrorNotificationDelay
-where id = ?Id;");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?SendDebugMessage", MySqlDbType.Bit, 0, "SendDebugMessage");
-			orderSendRulesDataAdapter.UpdateCommand.Parameters.Add("?ErrorNotificationDelay", MySqlDbType.Bit, 0, "ErrorNotificationDelay");
-
-			orderSendRulesDataAdapter.InsertCommand = new MySqlCommand(@"
-insert into ordersendrules.order_send_rules(FirmCode, SenderId, FormaterId, RegionCode, SendDebugMessage, ErrorNotificationDelay)
-values(?FirmCode, ?senderId, ?formaterId, ?regionCode, ?SendDebugMessage, ?ErrorNotificationDelay);");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SenderId", MySqlDbType.Int32, 0, "SenderId");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?FormaterId", MySqlDbType.Int32, 0, "FormaterId");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?RegionCode", MySqlDbType.Int64, 0, "RegionCode");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?SendDebugMessage", MySqlDbType.Bit, 0, "SendDebugMessage");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.Add("?ErrorNotificationDelay", MySqlDbType.Bit, 0, "ErrorNotificationDelay");
-			orderSendRulesDataAdapter.InsertCommand.Parameters.AddWithValue("?FirmCode", supplier.Id);
-
-			orderSendRulesDataAdapter.DeleteCommand = new MySqlCommand(@"
-delete FROM ordersendrules.order_send_rules
-where id = ?Id;");
-			orderSendRulesDataAdapter.DeleteCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "Id");
-
 			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
 			With.Transaction((connection, transaction) => {
 				pricesDataAdapter.InsertCommand.Connection = connection;
@@ -416,31 +385,25 @@ where id = ?Id;");
 				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
 				regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
 
-				orderSendRulesDataAdapter.InsertCommand.Transaction = transaction;
-				orderSendRulesDataAdapter.InsertCommand.Connection = connection;
-				orderSendRulesDataAdapter.UpdateCommand.Transaction = transaction;
-				orderSendRulesDataAdapter.UpdateCommand.Connection = connection;
-				orderSendRulesDataAdapter.DeleteCommand.Transaction = transaction;
-				orderSendRulesDataAdapter.DeleteCommand.Connection = connection;
-					
 				pricesDataAdapter.Update(Data.Tables["Prices"]);
 				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
-				orderSendRulesDataAdapter.Update(Data.Tables["OrderSendConfig"]);
-
-				if (updateIntersection)
+				using (var scope = new ConnectionScope(connection, FlushAction.Never))
 				{
-					//нагрузка балансируетс€ (один запрос может уйти в одну базу, другой в другую)
-					//если код ниже будет выполнен в другой транзакции то в той базе где он выполнитс€
-					//может еще не быть создаваемого прайса
+					var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
+					BindRule(currentSupplier);
+					currentSupplier.Save();
 
-					//FlushAction.Never - что бы не автоматически не запускать транзакцию
-					using (var scope = new ConnectionScope(connection, FlushAction.Never))
+					if (updateIntersection)
 					{
-						var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
+						//нагрузка балансируетс€ (один запрос может уйти в одну базу, другой в другую)
+						//если код ниже будет выполнен в другой транзакции то в той базе где он выполнитс€
+						//может еще не быть создаваемого прайса
+
+						//FlushAction.Never - что бы не автоматически не запускать транзакцию
 						var addedPriceId = supplier.Prices.Max(p => p.Id);
 						Maintainer.MaintainIntersection(supplier);
 						ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"
+						s.CreateSQLQuery(@"
 DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
@@ -468,8 +431,8 @@ WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.Intersecti
 							.SetParameter("supplierId", supplier.Id)
 							.ExecuteUpdate();
 						});
-						scope.Flush();
 					}
+					scope.Flush();
 				}
 			});
 
@@ -477,6 +440,61 @@ WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.Intersecti
 			ConnectDataSource();
 			DataBind();
 			SetRegions();
+		}
+
+		private void BindRule(Supplier supplier)
+		{
+			foreach (var row in Data.Tables["OrderSendConfig"].Rows.Cast<DataRow>())
+			{
+				switch (row.RowState)
+				{
+					case DataRowState.Added:
+					{
+						var rule = new OrderSendRules();
+						rule.Supplier = supplier;
+						BindRule(rule, row);
+						supplier.OrderRules.Add(rule);
+						break;
+					}
+					case DataRowState.Deleted:
+					{
+						var rule = GetExistRule(supplier, row);
+						if (rule == null)
+							continue;
+						rule.Delete();
+						supplier.OrderRules.Remove(rule);
+						break;
+					}
+					case DataRowState.Modified:
+					{
+						var rule = GetExistRule(supplier, row);
+						if (rule == null)
+							continue;
+						BindRule(rule, row);
+						break;
+					}
+				}
+			}
+			Data.Tables["OrderSendConfig"].AcceptChanges();
+		}
+
+		private void BindRule(OrderSendRules rule, DataRow row)
+		{
+			var formaterId = Convert.ToUInt32(row["FormaterId"]);
+			var senderId = Convert.ToUInt32(row["SenderId"]);
+			rule.Sender = OrderHandler.Find(senderId);
+			rule.Formater = OrderHandler.Find(formaterId);
+			rule.SendDebugMessage = Convert.ToBoolean(row["SendDebugMessage"]);
+			rule.ErrorNotificationDelay = Convert.ToUInt32(row["ErrorNotificationDelay"]);
+			rule.RegionCode = Equals(row["RegionCode"], DBNull.Value) ? null : (ulong?) Convert.ToUInt64(row["RegionCode"]);
+		}
+
+		private OrderSendRules GetExistRule(Supplier supplier, DataRow row)
+		{
+			var id = Convert.ToUInt32(row["id", DataRowVersion.Original]);
+			if (id == 0)
+				return null;
+			return supplier.OrderRules.FirstOrDefault(r => r.Id == id);
 		}
 
 		private void ProcessChanges()
