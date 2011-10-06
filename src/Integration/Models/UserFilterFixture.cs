@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
@@ -12,10 +15,12 @@ namespace Integration.Models
 	public class UserFilterFixture : IntegrationFixture
 	{
 		UserFilter filter;
+		Random random;
 
 		[SetUp]
 		public void Setup()
 		{
+			random = new Random();
 			filter = new UserFilter();
 		}
 
@@ -50,6 +55,51 @@ namespace Integration.Models
 			var result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(1), result.Implode());
 			Assert.That(result[0].Disabled, Is.True);
+		}
+
+		[Test]
+		public void Search_by_supplier_contact_phone()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+			
+			var phone = RandomPhone();
+			supplier.ContactGroupOwner.ContactGroups[0].AddContact(ContactType.Phone, phone);
+			supplier.Save();
+			Flush();
+
+			filter.SearchText = phone;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+			Assert.That(result[0].ClientId, Is.EqualTo(supplier.Id));
+		}
+
+		[Test]
+		public void Do_not_search_contacts_in_disabled_order_delivery_groups()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+			
+			var phone = RandomPhone();
+			var orderGroup = new RegionalDeliveryGroup(Region.Find(2ul));
+			orderGroup.AddContact(ContactType.Phone, phone);
+			supplier.ContactGroupOwner.AddContactGroup(orderGroup, true);
+			supplier.Save();
+			Flush();
+
+			filter.SearchText = phone;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(0), result.Implode(r => r.ClientId));
+		}
+
+		private string RandomPhone()
+		{
+			return String.Format("{0}-{1}", RandomDigits(random, 4).Implode(""), RandomDigits(random, 6).Implode(""));
+		}
+
+		private static IEnumerable<string> RandomDigits(Random random, int count)
+		{
+			return Enumerable.Range(1, count).Select(i => random.Next(0, 9).ToString());
 		}
 	}
 }

@@ -120,9 +120,10 @@ FROM
 		join farm.Regions r ON r.RegionCode = s.HomeRegion
 	left join Future.Suppliers sup on sup.Id = u.RootService
 	left join future.Clients ON Clients.Id = u.ClientId
-		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = Clients.ContactGroupOwnerId
-		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id
-		left join contacts.Persons ON Persons.ContactGroupId = cg.Id
+		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = ifnull(Clients.ContactGroupOwnerId, sup.ContactGroupOwnerId)
+		left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
+		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
+		left join contacts.Persons ON Persons.ContactGroupId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
 	join Billing.Payers p on p.PayerId = u.PayerId
 {2}
 WHERE
