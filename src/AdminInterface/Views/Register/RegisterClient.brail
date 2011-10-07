@@ -17,14 +17,14 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		jQuery("#SearchSupplierDiv").css("display", "none");
 		jQuery("#SelectSupplierDiv").css("display", "none");
 
-		jQuery.validator.addMethod( "noEmailAddress", function(value, element) {  
-			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 
-				&& jQuery("#SendRegistrationCard").attr("checked"))  
-			{  
-				return false;  
-			}  
-			else return true;  
-		}, "Это поле необходимо заполнить."); 
+		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
+			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0
+				&& jQuery("#SendRegistrationCard").attr("checked"))
+			{
+				return false;
+			}
+			else return true;
+		}, "Это поле необходимо заполнить.");
 		
 		validateForm();
 	});
@@ -67,7 +67,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 			jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
 			jQuery("#SearchSupplierTextPattern").focus();
 			return false;
-		}	    
+		}
 		if (!validatePayer()) {
 			jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
 			jQuery("#SearchPayerTextPattern").focus();
@@ -83,16 +83,19 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		if (jQuery('#PayerComboBox').val() != null) {
 			var payerId = parseInt(jQuery('#PayerComboBox').val());
 			searchText += "&payerId=" + payerId;
+		} else {
+			$("#PayerComboBox").data("setSupplierSelection", true);
 		}
+
 		jQuery.get("SearchSuppliers",
 			{"searchPattern" : searchText},
 			function(htmlOptions) {
-			jQuery('#SupplierComboBox').find('option').remove().end();
-			if (htmlOptions.length == 0) {
-				jQuery("#SearchSupplierTextPattern").attr("disabled", null);
-				jQuery("#SearchSupplierButton").attr("disabled", null);
-				jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
-				return;
+				jQuery('#SupplierComboBox').find('option').remove().end();
+				if (htmlOptions.length == 0) {
+					jQuery("#SearchSupplierTextPattern").attr("disabled", null);
+					jQuery("#SearchSupplierButton").attr("disabled", null);
+					jQuery("#MessageForSupplier").html("<i>Ничего не найдено</i>");
+					return;
 			}
 			jQuery("#SupplierComboBox").append(htmlOptions);
 			ViewDiv(false, "#SearchSupplierDiv");
@@ -104,8 +107,9 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		jQuery("#SearchSupplierTextPattern").attr("disabled", "disabled");
 		jQuery("#SearchSupplierButton").attr("disabled", "disabled");
 	}
-	
+
 	function ShowSearchSupplierDiv() {
+		resetPayer();
 		jQuery('#SupplierComboBox').find('option').remove().end();
 		jQuery("#MessageForSupplier").html("");
 		jQuery("#SearchSupplierTextPattern").attr("disabled", null);
@@ -129,13 +133,23 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		ViewDiv(false, "#SearchSupplierDiv");
 		ViewDiv(false, "#SelectSupplierDiv");
 		if (selectedValue) {
-			ShowSearchSupplierDiv();	
+			ShowSearchSupplierDiv();
 		}
 		else {
 			UnlockPayer();
 		}
 	}
-	
+
+	//если плательщик был выбран в результате выбора поставщика то при отмене выбора
+	//поставщика нужно отменить выбор плательщика
+	function resetPayer() {
+		if ($("#PayerComboBox").data("setSupplierSelection")) {
+			$("#PayerComboBox option").remove();
+			$("#PayerIdValue").val(null);
+			$("#PayerComboBox").remove("setSupplierSelection");
+		}
+	}
+
 	function OnSupplierChange(payerName) {
 		var payer = jQuery("#SupplierComboBox option:selected").attr("title");
 		SetLockedPayer(payer);
@@ -164,8 +178,9 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		jQuery("#PayerComboBox").html("<option selected>" + payerName + "</option>");
 		ViewDiv(true, "#SelectPayerDiv");
 	}
-	
+
 	function UnlockPayer() {
+		resetPayer();
 		jQuery("#PayerExists").removeAttr('checked');
 		jQuery("#PayerExistsValue").val(false);
 		jQuery("#PayerExists").removeAttr('disabled');
@@ -274,17 +289,21 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		<h3>Настройка</h3>
 		<table cellpadding="1" border="0" width="100%">
 			<tr>
-				<td colspan="2"><input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">Не подключать новые прайс-листы</input></td>
+				<td colspan="2">
+					<input type="checkbox" id="ignoreNewPrices" name="flags.IgnoreNewPrices">
+					Не подключать новые прайс-листы
+				</td>
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
-					 <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
+					Выбрать существующего плательщика
+					<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
 				</td>
 				<td>
 					<div id="SearchPayerDiv" style="width: 100%; display: none">
 						<input type="text" id="SearchPayerTextPattern" name="SearchPayerTextPattern" style="width: 75%" />
-						<input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />                        
+						<input type="button" id="SearchPayerButton" name="SearchPayerButton" value="Найти" onclick="ShowSelectPayerDiv()" />
 					</div>
 					<div id="SelectPayerDiv" style="width: 100%; display: none">
 						<select id="PayerComboBox" name="payer.PayerID" style="width: 75%"></select>
@@ -295,11 +314,15 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input></td>
+				<td colspan="2">
+					<input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">
+					Заполнять информацию для биллинга
+				</td>
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">Зарегистрировать скрытую копию для поставщика</input>
+					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">
+					Зарегистрировать скрытую копию для поставщика
 				</td>
 				<td>
 					<div id="SelectSupplierDiv" style="width: 100%; display: none">
@@ -308,16 +331,22 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 					</div>
 					<div id="SearchSupplierDiv" style="width: 100%; display: none">
 						<input type="text" id="SearchSupplierTextPattern" name="SearchSupplierTextPattern" style="width: 75%" />
-						<input type="button" id="SearchSupplierButton" name="SearchSupplierButton" value="Найти" onclick="ShowSelectSupplierDiv()" />                        
-					</div>                
+						<input type="button" id="SearchSupplierButton" name="SearchSupplierButton" value="Найти" onclick="ShowSelectSupplierDiv()" />
+					</div>
 					<div id="MessageForSupplier"></div>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="checkbox" id="serviceClient" name="flags.IsServiceClient">Сотрудник АК Инфорум</input></td>                
+				<td colspan="2">
+					<input type="checkbox" id="serviceClient" name="flags.IsServiceClient">
+					Сотрудник АК Инфорум
+				</td>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input></td>
+				<td colspan="2">
+					<input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">
+					Показывать регистрационную карту
+				</td>
 			</tr>
 		</table>
 		<fieldset>

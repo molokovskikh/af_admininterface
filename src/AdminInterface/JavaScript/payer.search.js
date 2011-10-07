@@ -29,20 +29,20 @@ function ShowSelectPayerDiv() {
 	if (searchText.length == 0)
 		return;
 	$.get("SearchPayers",
-			{ "searchPattern": searchText },
-			function (htmlOptions) {
-				$('#PayerComboBox').find('option').remove().end();
-				if (htmlOptions.length == 0) {
-					$("#SearchPayerTextPattern").removeAttr("disabled");
-					$("#SearchPayerButton").removeAttr("disabled");
-					$("#MessageForPayer").html("<i>Ничего не найдено</i>");
-					return;
-				}
-				$("#PayerComboBox").append(htmlOptions);
-				$("#SearchPayerDiv").hide();
-				$("#SelectPayerDiv").show();
-				$("#MessageForPayer").html("");
-			});
+		{"searchPattern": searchText},
+		function (htmlOptions) {
+			$('#PayerComboBox').find('option').remove().end();
+			if (htmlOptions.length == 0) {
+				$("#SearchPayerTextPattern").removeAttr("disabled");
+				$("#SearchPayerButton").removeAttr("disabled");
+				$("#MessageForPayer").html("<i>Ничего не найдено</i>");
+				return;
+			}
+			$("#PayerComboBox").append(htmlOptions);
+			$("#SearchPayerDiv").hide();
+			$("#SelectPayerDiv").show();
+			$("#MessageForPayer").html("");
+		});
 	$("#MessageForPayer").html("<i>Выполняется поиск</i>");
 	$("#SearchPayerTextPattern").attr("disabled", "disabled");
 	$("#SearchPayerButton").attr("disabled", "disabled");

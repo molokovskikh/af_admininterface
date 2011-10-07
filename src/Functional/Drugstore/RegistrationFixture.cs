@@ -522,5 +522,39 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
+
+		[Test]
+		public void Search_supplier_after_reset()
+		{
+			var supplier1 = DataMother.CreateSupplier();
+			supplier1.Save();
+			supplier1.MakeNameUniq();
+			supplier1.Save();
+
+			var supplier2 = DataMother.CreateSupplier();
+			supplier2.Save();
+			supplier2.MakeNameUniq();
+			supplier1.Save();
+			Flush();
+
+			Css("#ShowForOneSupplier").Click();
+			SearchSupplier(supplier1.Name);
+			Console.WriteLine(supplier1.Name);
+
+			Assert.That(Css("#SupplierComboBox").Options.Count, Is.EqualTo(1));
+			Assert.That(Css("#SupplierComboBox").SelectedItem, Is.StringEnding(supplier1.Name));
+			Css("#ResetSupplierButton").Click();
+
+			SearchSupplier(supplier2.Name);
+			Assert.That(Css("#SupplierComboBox").Options.Count, Is.EqualTo(1));
+			Assert.That(Css("#SupplierComboBox").SelectedItem, Is.StringEnding(supplier2.Name));
+		}
+
+		private void SearchSupplier(string text)
+		{
+			Css("#SearchSupplierTextPattern").TypeText(text);
+			Css("#SearchSupplierButton").Click();
+			Thread.Sleep(1000);
+		}
 	}
 }
