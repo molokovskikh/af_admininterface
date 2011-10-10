@@ -31,14 +31,12 @@ namespace Functional
 		{
 			var text = String.Empty;
 			ArHelper.WithSession(session => text = session.CreateSQLQuery(sql).UniqueResult().ToString());
-			AssetSearch(browser, searchBy, text);
+			AssetSearch(searchBy, text);
 		}
 
-		private void AssetSearch(Browser browser, SearchUserBy searchBy, string text)
+		private void AssetSearch(SearchUserBy searchBy, string text)
 		{
-			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int)searchBy)).Checked = true;
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(text);
-			browser.Button(Find.ByValue("Поиск")).Click();
+			Search(searchBy, text);
 
 			if (browser.Text.Contains("Поиск пользователей") && browser.Text.Contains("Введите текст для поиска:"))
 			{
@@ -49,6 +47,13 @@ namespace Functional
 			{
 				CheckThatIsUserPage(browser);
 			}
+		}
+
+		private void Search(SearchUserBy searchBy, string text)
+		{
+			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int) searchBy)).Checked = true;
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(text);
+			browser.Button(Find.ByValue("Поиск")).Click();
 		}
 
 		private void CheckThatIsUserPage(Browser browser)
@@ -68,7 +73,7 @@ namespace Functional
 		[Test]
 		public void DefaultSearch()
 		{
-			Open("/");
+			Open();
 
 			browser.Link(Find.ByText("Поиск пользователей")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Поиск пользователей"));
@@ -92,7 +97,7 @@ namespace Functional
 			var user = client.Users[0];
 			scope.Flush();
 
-			AssetSearch(browser, SearchUserBy.ByLogin, user.Login);
+			AssetSearch(SearchUserBy.ByLogin, user.Login);
 			if (browser.TableBody(Find.ById("SearchResults")).Exists)
 			{
 				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.EqualTo(1));
@@ -115,7 +120,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithUser();
 			client.MakeNameUniq();
 			scope.Flush();
-			AssetSearch(browser, SearchUserBy.ByClientName, client.Name);
+			AssetSearch(SearchUserBy.ByClientName, client.Name);
 		}
 
 		[Test]
@@ -133,7 +138,7 @@ namespace Functional
 			payer.Update();
 			scope.Flush();
 			var name = payer.JuridicalName;
-			AssetSearch(browser, SearchUserBy.ByJuridicalName, name);
+			AssetSearch(SearchUserBy.ByJuridicalName, name);
 		}
 
 		[Test]
@@ -143,7 +148,7 @@ namespace Functional
 			var payer = client.Payers[0];
 			scope.Flush();
 
-			AssetSearch(browser, SearchUserBy.ByPayerId, payer.Id.ToString());
+			AssetSearch(SearchUserBy.ByPayerId, payer.Id.ToString());
 		}
 
 		[Test]
@@ -184,7 +189,7 @@ namespace Functional
 		public void SearchWithNoResults()
 		{
 			browser.TextField(Find.ById("filter_SearchText")).TypeText("1234567890qweasdzxc][p/.,';l");
-			browser.Button(Find.ByValue("Поиск")).Click();				
+			browser.Button(Find.ByValue("Поиск")).Click();
 			Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText("'%test%'");
@@ -230,9 +235,7 @@ namespace Functional
 		[Test]
 		public void Search_by_client_id_with_text()
 		{
-			browser.TextField(Find.ById("filter_SearchText")).TypeText("text");
-			browser.RadioButton(Find.ById("SearchByClientId")).Checked = true;
-			browser.Button(Find.ByValue("Поиск")).Click();
+			Search(SearchUserBy.ByClientId, "text");
 
 			Assert.IsFalse(browser.TableBody(Find.ById("SearchResults")).Exists);
 			Assert.That(browser.Text, Is.StringContaining("По вашему запросу ничего не найдено"));
@@ -248,9 +251,7 @@ namespace Functional
 			});
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Id.ToString());
-			browser.RadioButton(Find.ById("SearchByClientId")).Checked = true;
-			browser.Button(Find.ByValue("Поиск")).Click();
+			Search(SearchUserBy.ByClientId, client.Id.ToString());
 
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
 			Assert.That(browser.Text, Is.Not.StringContaining("По вашему запросу ничего не найдено"));
@@ -286,11 +287,12 @@ namespace Functional
 		public void Autosearch_by_contact_email()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var mail = String.Format("test{0}@test.test", client.Id);
 			client.Users[0].AddContactGroup();
-			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
+			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, mail));
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("test{0}@test.test", client.Id));
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(mail);
 			browser.Button(Find.ByValue("Поиск")).Click();
 
 			CheckThatIsUserPage(browser);
@@ -300,12 +302,13 @@ namespace Functional
 		public void Autosearch_by_person()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var person = String.Format("testPerson{0}", client.Id);
 			client.Users[0].AddContactGroup();
 			client.Users[0].SaveAndFlush();
-			client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
+			client.Users[0].ContactGroup.AddPerson(person);
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("testPerson{0}", client.Id));
+			browser.TextField(Find.ById("filter_SearchText")).TypeText(person);
 			browser.Button(Find.ByValue("Поиск")).Click();
 
 			CheckThatIsUserPage(browser);
@@ -315,14 +318,12 @@ namespace Functional
 		public void Search_by_contact_email()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var mail = String.Format("test{0}@test.test", client.Id);
 			client.Users[0].AddContactGroup();
-			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, String.Format("test{0}@test.test", client.Id)));
+			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, mail));
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("test{0}@test.test", client.Id));
-			browser.RadioButton(Find.ById("SearchByContacts")).Checked = true;
-			browser.Button(Find.ByValue("Поиск")).Click();
-
+			Search(SearchUserBy.ByContacts, mail);
 			CheckThatIsUserPage(browser);
 		}
 
@@ -330,15 +331,12 @@ namespace Functional
 		public void Search_by_contact_phone()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Users[0].AddContactGroup();
 			var phone = String.Format("{0}-123456", client.Id.ToString().RightSlice(4));
+			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, phone));
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(phone);
-			browser.RadioButton(Find.ById("SearchByContacts")).Checked = true;
-			browser.Button(Find.ByValue("Поиск")).Click();
-
+			Search(SearchUserBy.ByContacts, phone);
 			CheckThatIsUserPage(browser);
 		}
 
@@ -346,15 +344,13 @@ namespace Functional
 		public void Search_by_person_name()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var person = String.Format("testPerson{0}", client.Id);
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.SaveAndFlush();
-			client.Users[0].ContactGroup.AddPerson(String.Format("testPerson{0}", client.Id));
+			client.Users[0].ContactGroup.AddPerson(person);
 			scope.Flush();
 
-			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("testPerson{0}", client.Id));
-			browser.RadioButton(Find.ById("SearchByPersons")).Checked = true;
-			browser.Button(Find.ByValue("Поиск")).Click();
-
+			Search(SearchUserBy.ByPersons, person);
 			CheckThatIsUserPage(browser);
 		}
 
@@ -362,7 +358,7 @@ namespace Functional
 		public void Search_from_main_page()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			Open("/");
+			Open();
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Login);
 			browser.Button(Find.ByValue("Найти")).Click();
 			CheckThatIsUserPage(browser);
