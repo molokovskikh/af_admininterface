@@ -29,10 +29,8 @@ def CloseHandle(handle as IntPtr) as bool:
 	pass
 
 def Impersonate(action as Action):
-	Console.Write("user: ")
-	user = Console.ReadLine()
-	Console.Write("password: ")
-	password = Console.ReadLine()
+	user = Ask("user: ")
+	password = Ask("password: ")
 
 	LOGON32_PROVIDER_DEFAULT = 0;
 	LOGON32_LOGON_INTERACTIVE = 2;
