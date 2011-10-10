@@ -32,9 +32,9 @@ def Impersonate(action as Action):
 	user = Ask("user: ")
 	password = Ask("password: ")
 
-	LOGON32_PROVIDER_DEFAULT = 0;
-	LOGON32_LOGON_INTERACTIVE = 2;
-	tokenHandle = IntPtr.Zero;
+	LOGON32_PROVIDER_DEFAULT = 0
+	LOGON32_LOGON_INTERACTIVE = 2
+	tokenHandle = IntPtr.Zero
 
 	if not LogonUser(user, "", password, LOGON32_LOGON_INTERACTIVE, LOGON32_PROVIDER_DEFAULT, tokenHandle):
 		raise Win32Exception()
@@ -43,7 +43,7 @@ def Impersonate(action as Action):
 		try:
 			action()
 		ensure:
-			CloseHandle(tokenHandle);
+			CloseHandle(tokenHandle)
 
 Global(
 	Project : "AdminInterface",
@@ -53,7 +53,10 @@ Global(
 	Environment : @Local
 )
 
-Engine.Execute("LoadProject")
+#если мы запускаем тесты на сервере не надо загружать проект что бы
+#не блокировать библиотеки
+unless Configuration.IsDefined(@notInteractive):
+	Engine.Execute("LoadProject")
 
 task @default, [@Build]
 
