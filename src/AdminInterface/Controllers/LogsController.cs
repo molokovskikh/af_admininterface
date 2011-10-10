@@ -69,6 +69,8 @@ namespace AdminInterface.Controllers
 
 		public void ShowDownloadLog(uint updateLogEntityId)
 		{
+			CancelLayout();
+
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
 			PropertyBag["log"] = UpdateLogEntity.Find(updateLogEntityId).Log;
 		}

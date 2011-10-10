@@ -543,7 +543,6 @@
     <None Include="Views\Logs\Documents.brail" />
     <None Include="Views\Logs\PasswordChangeLog.brail" />
     <None Include="Views\Logs\SelectDateIntervalSubView.brail" />
-    <None Include="Views\Logs\ShowDownloadLog.brailjs" />
     <None Include="Views\Logs\ShowDownloadLogPartial.brail" />
     <None Include="Views\Logs\UpdateLog.brail" />
     <None Include="Views\Logs\ShowUpdateDetails.brail" />
