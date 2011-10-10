@@ -539,7 +539,6 @@ namespace Functional.Drugstore
 
 			Css("#ShowForOneSupplier").Click();
 			SearchSupplier(supplier1.Name);
-			Console.WriteLine(supplier1.Name);
 
 			Assert.That(Css("#SupplierComboBox").Options.Count, Is.EqualTo(1));
 			Assert.That(Css("#SupplierComboBox").SelectedItem, Is.StringEnding(supplier1.Name));

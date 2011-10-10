@@ -36,7 +36,7 @@ namespace Functional
 
 		private void AssetSearch(Browser browser, SearchUserBy searchBy, string text)
 		{
-			browser.RadioButton(Find.ById("Search" + searchBy.ToString())).Checked = true;
+			Css(String.Format("input[type='radio'][name='filter.SearchBy'][value='{0}']", (int)searchBy)).Checked = true;
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(text);
 			browser.Button(Find.ByValue("Поиск")).Click();
 

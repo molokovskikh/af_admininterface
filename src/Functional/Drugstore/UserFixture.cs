@@ -235,42 +235,34 @@ namespace Functional.Drugstore
 		[Test]
 		public void Delete_user_prepared_data()
 		{
-			var client = DataMother.CreateTestClientWithUser();
-			var user = client.Users.First();
-			user.Name = String.Empty;
-			user.Update();
 			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}.zip", user.Id);
-			using (var browser = Open("client/{0}", client.Id))
+
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
+			var directory = Path.GetDirectoryName(preparedDataPath);
+			if (!Directory.Exists(directory))
+				Directory.CreateDirectory(directory);
+			var file = File.Create(preparedDataPath);
+
+			browser.Refresh();
+
+			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
+			browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Ошибка удаления подготовленных данных, попробуйте позднее."));
+			file.Close();
+			browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Подготовленные данные удалены"));
+			try
 			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
-				var directory = Path.GetDirectoryName(preparedDataPath);
-				if (!Directory.Exists(directory))
-					Directory.CreateDirectory(directory);
-				var file = File.Create(preparedDataPath);
-				browser.Back();
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.True);
-				browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Ошибка удаления подготовленных данных, попробуйте позднее."));
-				file.Close();
-				browser.Button(Find.ByValue("Удалить подготовленные данные")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Подготовленные данные удалены"));
-				try
-				{
-					File.Delete(file.Name);
-				}
-				catch
-				{
-				}
-			}
+				File.Delete(file.Name);
+			} catch {}
 		}
 
 		[Test]
 		public void EditAnalitFSettings()
 		{
-			browser.Link(Find.ByText(client.Users[0].Login)).Click();
-			browser.Link(Find.ByText("Настройка")).Click();
+			Click(user.Login);
+			Click("Настройка");
 
 			for (int i = 0; i < 25; i++)
 				browser.CheckBox(Find.ByName(String.Format("user.AssignedPermissions[{0}].Id", i))).Checked = (i % 2 == 0);
@@ -288,19 +280,17 @@ namespace Functional.Drugstore
 
 			browser.Button(Find.ByValue("Создать")).Click();
 
-			using(new SessionScope())
-			{
-				client = Client.Find(client.Id);
-				Assert.AreEqual(2, client.Users.Count);
-				Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
-				Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
-			}
+			client.Refresh();
+			user.Refresh();
+			Assert.AreEqual(2, client.Users.Count);
+			Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
+			Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
 		}
 
 		[Test]
 		public void SendMessage()
 		{
-			Open(client.Users[0], "Edit");
+			Open(user, "Edit");
 
 			browser.TextField(Find.ByName("message")).TypeText("тестовое сообщение");
 			Click("Принять");

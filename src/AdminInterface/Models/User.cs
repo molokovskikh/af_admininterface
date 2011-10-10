@@ -432,8 +432,8 @@ namespace AdminInterface.Models
 
 		public virtual bool HavePreparedData()
 		{
-			var file = String.Format(Global.Config.PromotionsPath, Id);
-			return (File.Exists(file));
+			var file = String.Format(Global.Config.UserPreparedDataFormatString, Id);
+			return File.Exists(file);
 		}
 
 		public virtual bool HaveUin()

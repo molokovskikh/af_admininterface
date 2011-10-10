@@ -32,7 +32,7 @@ namespace Functional.Drugstore
 			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов")))
 			{
 				Assert.That(openedWindow.Text, Is.StringContaining(document.Id.ToString()));
-				Assert.That(openedWindow.Text, Is.StringContaining("тестовый адрес доставки"));
+				Assert.That(openedWindow.Text, Is.StringContaining("тестовый адрес"));
 			}
 		}
 	}

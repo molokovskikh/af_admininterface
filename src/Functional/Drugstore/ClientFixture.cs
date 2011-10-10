@@ -163,7 +163,7 @@ namespace Functional.Drugstore
 
 			browser.WaitUntilContainsText(payer.Name, 1);
 			var select = (SelectList)Css("select[name=payerId]");
-			Assert.That(select.SelectedItem, Is.EqualTo(payer.Name));
+			Assert.That(select.SelectedItem, Is.EqualTo(String.Format("{0}, {1}", payer.Id, payer.Name)));
 
 			Css("#ChangePayer [type=submit]").Click();
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
