@@ -18,6 +18,7 @@
 		${app.Asset("backbone.js")}
 		${app.Asset("jquery-ui-1.8.16.js")}
 		${app.Asset("confirmation.js")}
+		${app.Asset("themes/base/jquery.ui.all.css")}
 
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
@@ -25,13 +26,11 @@
 			"date-ru-RU.js",
 			"jquery.contact.validation.js",
 			"messages_ru.js",
-			"jquery-ui-1.8.6.custom.min.js",
 			"jquery.maskedinput-1.2.2.min.js",
 			"Common.js",
 			"coffee-script.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css",
-			"jquery-ui-1.8.6.custom.css",
 			"calendar-blue.css",
 			"Billing.css",
 			"Table.css",

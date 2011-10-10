@@ -252,7 +252,6 @@
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\StateExtensions.cs" />
-    <Compile Include="NHibernateExtentions\ValidEventListner.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
@@ -362,15 +361,15 @@
   <ItemGroup>
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
-    <Content Include="Assets\JavaScript\confirmation.coffee" />
-    <Content Include="Assets\JavaScript\details.js" />
-    <Content Include="Assets\JavaScript\order.delivery.group.editor.coffee" />
+    <Content Include="Assets\Javascripts\confirmation.coffee" />
+    <Content Include="Assets\Javascripts\details.js" />
+    <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
     <Content Include="Css\jquery-ui-1.8.6.custom.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\coffee-script.js" />
     <Content Include="JavaScript\Common.js" />
-    <Content Include="Assets\JavaScript\filter.coffee" />
+    <Content Include="Assets\Javascripts\filter.coffee" />
     <Content Include="JavaScript\contact.registrator.js" />
     <Content Include="JavaScript\jquery-ui-1.8.6.custom.min.js" />
     <Content Include="JavaScript\jquery.maskedinput-1.2.2.js" />

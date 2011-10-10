@@ -40,17 +40,20 @@ namespace AdminInterface.Helpers
 		public string Asset(string name)
 		{
 			var compiled = Path.ChangeExtension(name, ".js");
-			var file = Path.Combine(Context.ApplicationPhysicalPath, "Assets/JavaScript", compiled);
+			var file = Path.Combine(Context.ApplicationPhysicalPath, "Assets/Javascripts", compiled);
 			if (File.Exists(file))
 				name = compiled;
 
 			var type = "";
-			if (Path.GetExtension(name).ToLower() == ".js")
+			var extension = Path.GetExtension(name).ToLower();
+			if (extension == ".js")
 				type = "text/javascript";
-			else if (Path.GetExtension(name).ToLower() == ".coffee")
+			else if (extension == ".coffee")
 				type = "text/coffeescript";
+			else if (extension == ".css")
+				return assetHelper.Resource(new [] {name}, "Assets/Stylesheets", "<link type='text/css' rel='stylesheet' href='{0}'></link>");
 
-			return assetHelper.Resource(new [] {name}, "Assets/JavaScript", "<script type='" + type + "' src='{0}'></script>");
+			return assetHelper.Resource(new [] {name}, "Assets/Javascripts", "<script type='" + type + "' src='{0}'></script>");
 		}
 
 		public string Style(object item)
