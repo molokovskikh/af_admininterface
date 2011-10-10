@@ -12,7 +12,7 @@ namespace AdminInterface.NHibernateExtentions
 	{
 		public static bool IsChanged<TActiveRecord, TResult>(this TActiveRecord activeRecord, Expression<Func<TActiveRecord, TResult>> expression)
 		{
-			var property = GetProperty(expression);
+			var property = expression.GetProperty();
 			return ArHelper.WithSession(s => {
 				var entry = s.GetEntry(activeRecord);
 				//если объект только создан и не был еще сохранен
@@ -53,7 +53,7 @@ namespace AdminInterface.NHibernateExtentions
 
 		public static TResult OldValue<TActiveRecord, TResult>(this TActiveRecord activeRecord, Expression<Func<TActiveRecord, TResult>> expression)
 		{
-			var property = GetProperty(expression);
+			var property = expression.GetProperty();
 			return ArHelper.WithSession(s => {
 				var entry = s.GetEntry(activeRecord);
 				if (entry == null)
@@ -66,11 +66,6 @@ namespace AdminInterface.NHibernateExtentions
 					return default(TResult);
 				return (TResult)entry.LoadedState[index];
 			});
-		}
-
-		private static string GetProperty<T, T1>(Expression<Func<T, T1>> expression)
-		{
-			return ((MemberExpression)expression.Body).Member.Name;
 		}
 	}
 }
