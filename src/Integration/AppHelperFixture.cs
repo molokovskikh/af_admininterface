@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
@@ -277,6 +278,19 @@ namespace Integration
 		{
 			var link = helper.LinkTo(new Address{Enabled = true, Value = "Test"}, "Test", "Index", new Dictionary<string, object>{{"tab", "1"}});
 			Assert.That(link, Is.EqualTo("<a  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
+		}
+
+		[Test]
+		public void Check_for_minified_assets()
+		{
+			if (!Directory.Exists("Assets"))
+				Directory.CreateDirectory("Assets");
+			if (!Directory.Exists(@"Assets\Javascripts"))
+				Directory.CreateDirectory(@"Assets\Javascripts");
+			File.WriteAllText(@"Assets\Javascripts\test.min.js", "");
+
+			var asset = helper.Asset("test.js");
+			Assert.That(asset, Is.StringContaining("test.min.js"));
 		}
 	}
 }
