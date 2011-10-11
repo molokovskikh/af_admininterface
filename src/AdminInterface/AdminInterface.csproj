@@ -364,7 +364,6 @@
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\details.js" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
-    <Content Include="Css\jquery-ui-1.8.6.custom.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\coffee-script.js" />
