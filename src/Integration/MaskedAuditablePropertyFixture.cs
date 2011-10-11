@@ -25,5 +25,12 @@ namespace Integration
 			var property = new MaskedAuditableProperty(typeof(Test).GetProperty("MaskRegion"), "Регион", 1UL, 16UL);
 			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Тамбов' Добавлено 'Воронеж'"));
 		}
+
+		[Test]
+		public void Ignore_unknown_region()
+		{
+			var property = new MaskedAuditableProperty(typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, 18446742976345407488UL);
+			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Ижевск'"));
+		}
 	}
 }

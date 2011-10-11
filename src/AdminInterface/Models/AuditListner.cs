@@ -71,8 +71,9 @@ namespace AdminInterface.Models
 		public string ToString(IEnumerable<ulong> items)
 		{
 			return items
-				.Select(i => "'" + Region.Find(i).Name + "'")
-				.Implode();
+				.Select(i => Region.TryFind(i))
+				.Where(r => r != null)
+				.Implode(r => "'" + r.Name + "'");
 		}
 
 		public IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
