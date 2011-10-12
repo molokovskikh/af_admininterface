@@ -278,7 +278,7 @@ namespace AdminInterface.Controllers
 			}
 			newUser.UpdateContacts(userContacts);
 
-			Mailer.ClientRegistred(newClient, false);
+			Mailer.ClientRegistred(newClient);
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)

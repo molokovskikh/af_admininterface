@@ -249,31 +249,21 @@ Email: {2}
 			}
 		}
 
-		public static void ClientRegistred(Client client, bool renotification)
+		public static void ClientRegistred(Client client)
 		{
 			try
 			{
-				if (client.IsDrugstore())
-					new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
-				else
-					SupplierRegistred(client.Name, client.HomeRegion.Name);
-
-				if (renotification)
-				{
-					ClientRegistrationResened(client);
-				}
-				else
-				{
-					NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", client.FullName),
-						String.Format(
-							"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-							SecurityContext.Administrator.UserName,
-							client.HomeRegion.Name,
-							client.Users.First().Login,
-							client.Id,
-							client.Segment.GetDescription(),
-							client.Type.GetDescription()));
-				}
+				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
+				NotificationHelper.NotifyAboutRegistration(
+					String.Format("\"{0}\" - успешная регистрация", client.FullName),
+					String.Format(
+						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+						SecurityContext.Administrator.UserName,
+						client.HomeRegion.Name,
+						client.Users.First().Login,
+						client.Id,
+						client.Segment.GetDescription(),
+						client.Type.GetDescription()));
 			}
 			catch (Exception e)
 			{

@@ -14,6 +14,7 @@ using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
+using AdminInterface.Services;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -273,7 +274,7 @@ where Phone like :phone")
 		public void NotifySuppliers(uint clientId)
 		{
 			var client = Client.Find(clientId);
-			Mailer.ClientRegistred(client, true);
+			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, true);
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}

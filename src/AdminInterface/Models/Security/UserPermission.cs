@@ -40,18 +40,6 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public bool AssignDefaultValue { get; set; }
 
-		public static UserPermission[] FindPermissionsAvailableFor(Client client)
-		{
-			UserPermissionAvailability clientTypeFilter;
-			if (client.IsDrugstore())
-				clientTypeFilter = UserPermissionAvailability.Drugstore;
-			else
-				clientTypeFilter = UserPermissionAvailability.Supplier;
-
-			return FindAll(Order.Asc("Name"), Expression.Eq("AvailableFor", UserPermissionAvailability.All)
-											  || Expression.Eq("AvailableFor", clientTypeFilter));
-		}
-
 		public static UserPermission[] FindPermissionsByType(UserPermissionTypes type)
 		{
 			return FindAll(Expression.Eq("Type", type));

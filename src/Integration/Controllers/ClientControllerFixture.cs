@@ -178,44 +178,6 @@ namespace Integration.Controllers
 			}
 		}
 
-/*		[Test]
-		public void ShowUsersPermisions()
-		{
-			using (var user = TestUser())
-			{
-				using (new SessionScope())
-					_controller.ShowUsersPermissions(user.Parameter.Client.Id);
-
-				Assert.That(((Client)ControllerContext.PropertyBag["Client"]).Id, Is.EqualTo(user.Parameter.Client.Id));
-				Assert.That((new ListMapper((ICollection)ControllerContext.PropertyBag["Permissions"])).Property("Id"),
-				            Is.EquivalentTo(new ListMapper(UserPermission.FindPermissionsAvailableFor(user.Parameter.Client)).Property("Id")));
-			}
-		}*/
-
-/*		[Test]
-		[ExpectedException(typeof(NotHavePermissionException))]
-		public void Check_permission_on_show_users_permissions()
-		{
-			SecurityContext.GetAdministrator = () => new Administrator { AllowedPermissions = new List<Permission>() };
-			using (var user = TestUser())
-				using (new SessionScope())
-					_controller.ShowUsersPermissions(user.Parameter.Client.Id);
-		}*/
-
-/*		[Test]
-		public void Update_user_permissions()
-		{
-			using (var user = TestUser())
-			{
-				using (new SessionScope())
-				{
-					var permissions = UserPermission.FindPermissionsAvailableFor(user.Parameter.Client);
-					user.Parameter.AssignedPermissions = new List<UserPermission> {permissions[0]};
-					_controller.UpdateUsersPermissions(user.Parameter.Client.Id, new [] { user.Parameter });
-				}
-			}
-		}*/
-
 		[Test]
 		public void Move_last_user_to_another_client()
 		{

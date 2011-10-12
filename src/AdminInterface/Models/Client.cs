@@ -189,14 +189,10 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				if (!IsDrugstore())
-					return false;
-				return (Settings.InvisibleOnFirm == DrugstoreType.Hidden);
+				return Settings.InvisibleOnFirm == DrugstoreType.Hidden;
 			}
 			set
 			{
-				if (!IsDrugstore())
-					return;
 				var val = value ? 2 : 0;
 				var tmp = Settings.InvisibleOnFirm == DrugstoreType.Hidden;
 				if (tmp != value)
@@ -225,11 +221,6 @@ where
 						.ExecuteUpdate());
 				}
 			}
-		}
-
-		public virtual bool IsDrugstore()
-		{
-			return Type == ServiceType.Drugstore;
 		}
 
 		public virtual bool IsClientActive()
