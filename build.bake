@@ -48,7 +48,7 @@ def Impersonate(action as Action):
 Global(
 	Project : "AdminInterface",
 	DeployAlias : "FutureAdm",
-	HumanReadableName : "Административный интерфейс (Новая реальность)",
+	HumanReadableName : "Административный интерфейс",
 	AdditionalAssemblies : ("Common.Web.UI",),
 	Environment : @Local
 )
