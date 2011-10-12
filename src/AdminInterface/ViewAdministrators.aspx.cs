@@ -12,20 +12,20 @@ public partial class ViewAdministrators : Page
 {
 	private IList<Permission> permissions;
 
-    protected void Page_Load(object sender, EventArgs e)
-    {
+	protected void Page_Load(object sender, EventArgs e)
+	{
 		System.Threading.Thread.CurrentThread.CurrentCulture = System.Globalization.CultureInfo.InvariantCulture;
 		SecurityContext.Administrator.CheckPermisions(PermissionType.ManageAdministrators);
 
-    	permissions = Permission.FindAll();
+		permissions = Permission.FindAll();
 
 		if (IsPostBack)
 			return;
 
-    	var administrators = Administrator.FindAll();
-    	Administrators.DataSource = administrators;
+		var administrators = Administrator.FindAll();
+		Administrators.DataSource = administrators;
 		DataBind();
-    }
+	}
 
 	protected void Administrators_RowCommand(object sender, GridViewCommandEventArgs e)
 	{
@@ -94,8 +94,8 @@ public partial class ViewAdministrators : Page
 	protected string GetPermissionShortcut(PermissionType permissionType)
 	{
 		return (from permission in permissions
-		       where permissionType == permission.Type
-		       select permission.Shortcut).First();
+			   where permissionType == permission.Type
+			   select permission.Shortcut).First();
 	}
 
 	protected string GetPermissionName(PermissionType permissionType)

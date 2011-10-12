@@ -408,14 +408,14 @@ DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
 FROM future.AddressIntersection adr
-    join future.Intersection ins on ins.Id = adr.IntersectionId
-    join pricesdata as rootPrice on
-        rootPrice.PriceCode =
-            (select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
-        join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
-            and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
-        join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
-            and rootAdr.IntersectionId = rootIns.Id
+	join future.Intersection ins on ins.Id = adr.IntersectionId
+	join pricesdata as rootPrice on
+		rootPrice.PriceCode =
+			(select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
+		join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
+			and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
+		join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
+			and rootAdr.IntersectionId = rootIns.Id
 WHERE ins.PriceId = :priceId
 ;
 
