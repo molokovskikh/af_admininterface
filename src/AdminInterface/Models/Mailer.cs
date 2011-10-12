@@ -125,7 +125,7 @@ Email: {2}
 			}
 		}
 
-		public static void SupplierRegistred(string shortname, string homeregion)
+		private static void SupplierRegistred(string shortname, string homeregion)
 		{
 			try
 			{
@@ -182,8 +182,8 @@ Email: {2}
 				Func.Mail("register@analit.net",
 					subject,
 					String.Format(@"Для клиента {0} код {1} регион {2}
-	{3}
-	Регистратор {4}",
+{3}
+Регистратор {4}",
 					client.Name,
 					client.Id,
 					client.HomeRegion.Name,
@@ -227,21 +227,26 @@ Email: {2}
 			}
 		}
 
-		public static void SupplierRegistred(Supplier supplier)
+		public static void SupplierRegistred(Supplier supplier, string billingMessage)
 		{
 			try
 			{
 				SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
+				var body = String.Format(
+					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					SecurityContext.Administrator.UserName,
+					supplier.HomeRegion.Name,
+					supplier.Users.First().Login,
+					supplier.Id,
+					supplier.Segment.GetDescription(),
+					supplier.Type.GetDescription());
 
-				NotificationHelper.NotifyAboutRegistration(String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
-					String.Format(
-						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-						SecurityContext.Administrator.UserName,
-						supplier.HomeRegion.Name,
-						supplier.Users.First().Login,
-						supplier.Id,
-						supplier.Segment.GetDescription(),
-						supplier.Type.GetDescription()));
+				if (!String.IsNullOrEmpty(billingMessage))
+					body += "\r\nСообщение в биллинг: " + billingMessage;
+
+				NotificationHelper.NotifyAboutRegistration(
+					String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
+					body);
 			}
 			catch (Exception e)
 			{
@@ -249,21 +254,26 @@ Email: {2}
 			}
 		}
 
-		public static void ClientRegistred(Client client)
+		public static void ClientRegistred(Client client, string billingMessage)
 		{
 			try
 			{
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
+				var body = String.Format(
+					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					SecurityContext.Administrator.UserName,
+					client.HomeRegion.Name,
+					client.Users.First().Login,
+					client.Id,
+					client.Segment.GetDescription(),
+					client.Type.GetDescription());
+
+				if (!String.IsNullOrEmpty(billingMessage))
+					body += "\r\nСообщение в биллинг: " + billingMessage;
+
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", client.FullName),
-					String.Format(
-						"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
-						SecurityContext.Administrator.UserName,
-						client.HomeRegion.Name,
-						client.Users.First().Login,
-						client.Id,
-						client.Segment.GetDescription(),
-						client.Type.GetDescription()));
+					body);
 			}
 			catch (Exception e)
 			{

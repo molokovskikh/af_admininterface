@@ -138,14 +138,15 @@ namespace AdminInterface.Models.Suppliers
 				.Implode();
 		}
 
-		public virtual void AddComment(string billingMessage)
+		public virtual void AddBillingComment(string billingMessage)
 		{
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			billingMessage = "Сообщение в биллинг: " + billingMessage;
+			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			var user = Users.First();
+			billingMessage = String.Format("О регистрации поставщика: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payer.AddComment(billingMessage);
-			new ClientInfoLogEntity(billingMessage, this).Save();
 		}
 
 		public virtual void CreateDirs()

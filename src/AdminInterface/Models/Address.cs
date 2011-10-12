@@ -356,5 +356,15 @@ and i.LegalEntityId = :OldLegalEntityId
 					.ExecuteUpdate();
 			});
 		}
+
+		public virtual void AddBillingComment(string billingMessage)
+		{
+			if (String.IsNullOrEmpty(billingMessage))
+				return;
+
+			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			billingMessage = String.Format("О регистрации Адреса {0} для клиента {1} ( {2} ): {3}", Name, Client.Name, Client.Id, billingMessage);
+			Payer.AddComment(billingMessage);
+		}
 	}
 }

@@ -103,8 +103,12 @@ namespace AdminInterface.Controllers
 			client.Addresses.Each(a => a.SetAccessControl(user.Login));
 
 			Mailer.Registred(user, comment);
+			user.AddBillingComment(comment);
 			if (address != null)
-				Mailer.Registred(address, null);
+			{
+				address.AddBillingComment(comment);
+				Mailer.Registred(address, comment);
+			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);
@@ -126,7 +130,7 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.SetSentTo(smtpId, mails);
 				passwordChangeLog.Update();
 
-				Flash["Message"] = new Message("Пользователь создан");
+				Notify("Пользователь создан");
 				RedirectUsingRoute("client", "show", new {client.Id});
 			}
 			else

@@ -152,12 +152,12 @@ namespace AdminInterface.Controllers
 				user.SaveAndFlush();
 				password = user.CreateInAd();
 
-				supplier.AddComment(comment);
+				supplier.AddBillingComment(comment);
 
 				scope.VoteCommit();
 			}
 
-			Mailer.SupplierRegistred(supplier);
+			Mailer.SupplierRegistred(supplier, comment);
 			supplier.CreateDirs();
 
 			var log = new PasswordChangeLogEntity(user.Login);
@@ -272,13 +272,13 @@ namespace AdminInterface.Controllers
 					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
 
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
-				newClient.AddComment(comment);
+				newClient.AddBillingComment(comment);
 
 				scope.VoteCommit();
 			}
 			newUser.UpdateContacts(userContacts);
 
-			Mailer.ClientRegistred(newClient);
+			Mailer.ClientRegistred(newClient, comment);
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)

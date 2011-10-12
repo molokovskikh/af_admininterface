@@ -437,14 +437,15 @@ group by u.ClientId")
 			return Name;
 		}
 
-		public virtual void AddComment(string billingMessage)
+		public virtual void AddBillingComment(string billingMessage)
 		{
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			billingMessage = "Сообщение в биллинг: " + billingMessage;
+			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			var user = Users.First();
+			billingMessage = String.Format("О регистрации клиента: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payers.Single().AddComment(billingMessage);
-			new ClientInfoLogEntity(billingMessage, this).Save();
 		}
 
 		public virtual void JoinPayer(Payer payer)
