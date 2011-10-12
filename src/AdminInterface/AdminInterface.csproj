@@ -138,7 +138,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Components\Bredcrumbs.cs" />
-    <Compile Include="Components\Bubble.cs" />
     <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
