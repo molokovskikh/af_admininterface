@@ -381,6 +381,7 @@
     <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.contact.validation.js" />
     <Content Include="JavaScript\payer.search.js" />
+    <Content Include="JavaScript\slider.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
     <Content Include="Images\arrow-down-blue-reversed.gif" />

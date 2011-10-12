@@ -21,6 +21,8 @@ namespace AdminInterface.Controllers
 			SortKeyMap = new Dictionary<string, string>{
 				{"Messages.WriteTime", "WriteTime"},
 				{"Messages.Operator", "UserName"},
+				{"Messages.Service.Id", "s.Id"},
+				{"Messages.Service.Name", "s.Name"},
 				{"Messages.Type", "Type"},
 				{"Messages.ObjectId", "ObjectId"},
 				{"Messages.Name", "Name"}

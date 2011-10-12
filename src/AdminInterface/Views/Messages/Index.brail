@@ -15,9 +15,11 @@ ${app.EndFormFor("filter")}
 		<tr>
 			<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
 			<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+			<th>${app.Sortable("Код Клиента/Поставщика", "Messages.Service.Id")}</th>
+			<th>${app.Sortable("Наименование Клиента/Поставщика", "Messages.Service.Name")}</th>
 			<th>${app.Sortable("Тип", "Messages.Type")}</th>
-			<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
-			<th>${app.Sortable("Название", "Messages.Name")}</th>
+			<th>${app.Sortable("Код объекта", "Messages.ObjectId")}</th>
+			<th>${app.Sortable("Название/Комментарий", "Messages.Name")}</th>
 			<th>Событие</th>
 		</tr>
 	</thead>
@@ -25,6 +27,8 @@ ${app.EndFormFor("filter")}
 	<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
 		<td>${log.WriteTime}</td>
 		<td>${log.Operator}</td>
+		<td>${log.Service.Id}</td>
+		<td>${app.LinkTo(log.Service)}</td>
 		<td>${BindingHelper.GetDescription(log.Type)}</td>
 		<td>${log.ObjectId}</td>
 		<td>${app.LinkTo(log)}</td>
