@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
+using NHibernate;
 using NUnit.Framework;
 
 namespace Integration
@@ -25,6 +27,29 @@ namespace Integration
 			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == client.Id && l.Type == LogObjectType.Client).ToList();
 			Assert.That(logs[0].Message,
 				Is.EqualTo(String.Format("$$$Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
+		}
+
+		[Test]
+		public void Log_lazy_property()
+		{
+			var supplier = DataMother.CreateSupplier();
+			var client = DataMother.TestClient();
+			Save(supplier);
+			Save(client);
+			Flush();
+			Reopen();
+
+			client = Client.Find(client.Id);
+			var price = Price.Find(supplier.Prices[0].Id);
+			Assert.That(NHibernateUtil.IsInitialized(price), Is.False);
+			client.Settings.AssortimentPrice = price;
+			Save(client);
+			Flush();
+
+			var messages = ClientInfoLogEntity.MessagesForClient(client);
+			var message = messages.Last();
+			Assert.That(message.Message,
+				Is.EqualTo("$$$Изменено 'Ассортиментный прайс для преобразования накладной в формат dbf' было '' стало 'Тестовый поставщик - Базовый'"));
 		}
 
 		[Test]

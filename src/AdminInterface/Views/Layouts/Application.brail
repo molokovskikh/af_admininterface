@@ -27,8 +27,7 @@
 			"jquery.contact.validation.js",
 			"messages_ru.js",
 			"jquery.maskedinput-1.2.2.min.js",
-			"Common.js",
-			"coffee-script.js")}
+			"Common.js")}
 
 		${app.CSS("/App_Themes/Main/Main.css",
 			"calendar-blue.css",

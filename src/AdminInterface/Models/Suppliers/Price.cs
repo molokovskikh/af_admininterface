@@ -49,10 +49,10 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 
-		[HasMany(ColumnKey = "PriceCode", Inverse = true, Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Cost> Costs { get; set; }
 
-		[HasMany(ColumnKey = "PriceCode", Inverse = true, Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<PriceRegionalData> RegionalData { get; set; }
 
 		public virtual void AddCost()
@@ -64,6 +64,13 @@ namespace AdminInterface.Models.Suppliers
 				BaseCost = isBase,
 				PriceItem = new PriceItem { FormRule = new FormRule() }
 			});
+		}
+
+		public override string ToString()
+		{
+			if (Supplier == null)
+				return Name;
+			return String.Format("{0} - {1}", Supplier.Name, Name);
 		}
 	}
 

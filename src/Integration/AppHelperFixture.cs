@@ -292,5 +292,21 @@ namespace Integration
 			var asset = helper.Asset("test.js");
 			Assert.That(asset, Is.StringContaining("test.min.js"));
 		}
+
+		[Test]
+		public void Asset_for_coffee_Script()
+		{
+			if (!Directory.Exists("Assets"))
+				Directory.CreateDirectory("Assets");
+			if (!Directory.Exists(@"Assets\Javascripts"))
+				Directory.CreateDirectory(@"Assets\Javascripts");
+
+			File.Delete(@"Assets\Javascripts\test.min.js");
+			File.WriteAllText(@"Assets\Javascripts\test.js", "");
+			File.WriteAllText(@"Assets\Javascripts\test.coffee", "");
+
+			var asset = helper.Asset("test.coffee");
+			Assert.That(asset, Is.StringStarting("<script type='text/javascript' src='/Assets/Javascripts/test.js"));
+		}
 	}
 }

@@ -52,7 +52,10 @@ namespace AdminInterface.Helpers
 				var compiled = Path.ChangeExtension(name, ".js");
 				var file = Path.Combine(Context.ApplicationPhysicalPath, path, compiled);
 				if (File.Exists(file))
+				{
+					type = "text/javascript";
 					name = compiled;
+				}
 			}
 			else if (extension == ".css")
 				return assetHelper.Resource(new [] {name}, "Assets/Stylesheets", "<link type='text/css' rel='stylesheet' href='{0}'></link>");
