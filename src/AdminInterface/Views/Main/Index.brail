@@ -405,7 +405,7 @@
 					<label for="RegionList">Регион:</label>
 					<select name="regioncode">
 						<% for region in regions: %>
-						<option value=${region.Id}>${region.Name}</option>
+						<option value=${region.Id} ${"selected" if region.Id == regionMask}>${region.Name}</option>
 						<% end %>
 					</select>
 				</div>
