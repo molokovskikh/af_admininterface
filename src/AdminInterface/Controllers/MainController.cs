@@ -77,20 +77,21 @@ SELECT sum(ol.cost * ol.quantity) as OrderSum,
 	   count(DISTINCT oh.clientcode) as UniqClientOrders,
 	   count(DISTINCT oh.userid) as UniqUserOrders,
 	   Max(WriteTime) as MaxOrderTime
-FROM orders.ordershead oh,
+FROM (orders.ordershead oh,
 	 orders.orderslist ol, 
 	 future.Clients cd, 
-	 usersettings.retclientsset rcs
+	 usersettings.retclientsset rcs)
+	join Future.Users u on u.Id = oh.UserId
 WHERE oh.rowid = orderid
-	  AND cd.Id = oh.clientcode
-	  AND cd.PayerId <> 921
-	  AND rcs.clientcode = oh.clientcode
-	  AND cd.Segment = 0
-	  AND rcs.serviceclient = 0 
-	  AND oh.regioncode & ?RegionMaskParam   > 0
-	  AND oh.Deleted = 0
-	  AND oh.Submited = 1
-	  AND WriteTime >= ?StartDateParam AND WriteTime <= ?EndDateParam;
+	AND cd.Id = oh.clientcode
+	AND u.PayerId <> 921
+	AND rcs.clientcode = oh.clientcode
+	AND cd.Segment = 0
+	AND rcs.serviceclient = 0 
+	AND oh.regioncode & ?RegionMaskParam   > 0
+	AND oh.Deleted = 0
+	AND oh.Submited = 1
+	AND WriteTime >= ?StartDateParam AND WriteTime <= ?EndDateParam;
 
 select count(oh.RowId) as NonProcOrdersCount
 from orders.ordershead oh
