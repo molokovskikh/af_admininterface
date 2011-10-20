@@ -58,6 +58,8 @@ ${app.EndFormFor("filter")}
 				<% else: %>
 					!{log.FileName}
 				<% end %>
+				<br>
+				<a href="Download?id=${log.Id}">Загрузить</a>
 			</td>
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}

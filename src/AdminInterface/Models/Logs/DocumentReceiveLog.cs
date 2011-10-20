@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
+using AddUser;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Internal;
 
 namespace AdminInterface.Models.Logs
 {
@@ -80,5 +83,18 @@ namespace AdminInterface.Models.Logs
 
 		[HasMany(Inverse = true, Lazy = true)]
 		public virtual IList<DocumentSendLog> SendLogs { get; set; }
+
+		public virtual string GetRemoteFileName(AppConfig config)
+		{
+			if (String.IsNullOrEmpty(FileName))
+				return null;
+			if (FromSupplier == null)
+				return null;
+			if (Address == null)
+				return null;
+
+			var file = String.Format("{0}_{1}({2}){3}", Id, FromSupplier.Name, Path.GetFileNameWithoutExtension(FileName), Path.GetExtension(FileName));
+			return Path.Combine(config.AptBox, Address.Id.ToString(), DocumentType.ToString() + "s", file);
+		}
 	}
 }

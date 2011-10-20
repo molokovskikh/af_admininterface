@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using AdminInterface.Controllers.Filters;
@@ -33,6 +34,32 @@ namespace AdminInterface.Controllers
 		{
 			PropertyBag["filter"] = filter;
 			PropertyBag["logEntities"] = filter.Find();
+		}
+
+		public void Download(uint id)
+		{
+			var log = DocumentReceiveLog.Find(id);
+
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition", 
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(log.FileName)));
+
+			var file = log.GetRemoteFileName(Config);
+			if (!String.IsNullOrEmpty(file) && File.Exists(file))
+			{
+				using (var stream = File.OpenRead(file))
+				{
+					stream.CopyTo(Response.OutputStream);
+				}
+			}
+			else
+			{
+				if (!String.IsNullOrEmpty(file))
+					Logger.WarnFormat("файл {0} не найден", file);
+
+				Response.StatusCode = 404;
+			}
+			CancelView();
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)

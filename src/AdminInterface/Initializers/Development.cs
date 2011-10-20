@@ -15,14 +15,13 @@ namespace AdminInterface.Initializers
 		{
 			ADHelper.Storage = new MemoryUserStorage();
 
-			var path = HttpContext.Current.Server.MapPath(HttpContext.Current.Request.ApplicationPath);
-			if (Directory.Exists(Path.Combine(path, "bin")))
-				path = Path.Combine(path, "bin", "Promotions");
-			else
-				path = Path.Combine(path, "Promotions");
-			if (!Directory.Exists(path))
-				Directory.CreateDirectory(path);
-			Global.Config.PromotionsPath = path;
+			var config = Global.Config;
+			config.AptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.AptBox);
+			config.OptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.OptBox);
+			config.PromotionsPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.PromotionsPath);
+
+			if (!Directory.Exists(config.PromotionsPath))
+				Directory.CreateDirectory(config.PromotionsPath);
 
 			using(new SessionScope())
 			{
