@@ -10,16 +10,6 @@ using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
-	public interface IAuditRecord
-	{
-		string Message { get; set; }
-	}
-
-	public interface IAuditable
-	{
-		IAuditRecord GetAuditRecord();
-	}
-
 	[ActiveRecord(Schema = "Billing")]
 	public class PayerAuditRecord : IAuditRecord
 	{

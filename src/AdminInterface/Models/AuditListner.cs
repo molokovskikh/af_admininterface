@@ -19,11 +19,7 @@ namespace AdminInterface.Models
 		{
 			var auditable = @event.Entity as IAuditable;
 			if (auditable != null)
-			{
-				var record = auditable.GetAuditRecord();
-				record.Message = message;
-				@event.Session.Save(record);
-			}
+				base.Log(@event, message);
 			else
 				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
 		}
