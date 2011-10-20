@@ -449,10 +449,10 @@ namespace AdminInterface.Models
 		public virtual void AddContactGroup()
 		{
 			ContactGroupOwner groupOwner = null;
-			if (RootService is Client)
-				groupOwner = ((Client)RootService).ContactGroupOwner;
-			else if (RootService is Supplier)
-				groupOwner = ((Supplier)RootService).ContactGroupOwner;
+			if (NHibernateUtil.GetClass(RootService) == typeof(Client))
+				groupOwner = Client.Find(RootService.Id).ContactGroupOwner;
+			else if (NHibernateUtil.GetClass(RootService) == typeof(Supplier))
+				groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
 
 			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 			ContactGroup = group;
