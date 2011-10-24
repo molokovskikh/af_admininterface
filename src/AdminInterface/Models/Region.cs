@@ -18,18 +18,25 @@ namespace AdminInterface.Models
 		{
 			return ArHelper.WithSession(session =>
 			{
-
 				var regions = session.CreateSQLQuery(@"
 select
 	(select sum(regioncode) from farm.regions) as {Region.Id},
 	'Все' as {Region.Name}, 
 	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
-	1 as IsAll
+	1 as IsAll,
+	0 as {Region.DrugsSearchRegion},
+	0 as {Region.AddressPayment},
+	0 as {Region.UserPayment},
+	0 as {Region.SupplierUserPayment}
 union
 SELECT  r.RegionCode as {Region.Id},
 		r.Region as {Region.Name},
 		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
-		0 as IsAll
+		0 as IsAll,
+		r.DrugsSearchRegion as {Region.DrugsSearchRegion},
+		r.AddressPayment as {Region.AddressPayment},
+		r.UserPayment as {Region.UserPayment},
+		r.SupplierUserPayment as {Region.SupplierUserPayment}
 FROM	farm.regions as r
 WHERE	:Mask & r.regioncode > 0
 ORDER BY IsAll Desc, {Region.Name};")

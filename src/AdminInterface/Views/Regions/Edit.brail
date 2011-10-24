@@ -1,0 +1,49 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Редактирование регионов", "${siteroot}/Regions/")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	${Region.Name}
+<% end %>
+
+<div class=block>
+${FormHelper.FormTag("", {})}
+	<table>
+		<tr>
+			<td colspan=2>
+				${app.Edit("region.DrugsSearchRegion")}
+				${app.GetValidationError(region, "DrugsSearchRegion")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>${app.GetLabel("region.UserPayment")}:</label>
+			</td>
+			<td>
+				${app.Edit("region.UserPayment")}
+				${app.GetValidationError(region, "UserPayment")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>${app.GetLabel("region.AddressPayment")}:</label>
+			</td>
+			<td>
+				${app.Edit("region.AddressPayment")}
+				${app.GetValidationError(region, "AddressPayment")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<label>${app.GetLabel("region.SupplierUserPayment")}:</label>
+			</td>
+			<td>
+				${app.Edit("region.SupplierUserPayment")}
+				${app.GetValidationError(region, "SupplierUserPayment")}
+			</td>
+		</tr>
+		<tr>
+			<td>
+				${FormHelper.Submit("Сохранить")}
+			</td>
+		</tr>
+${app.End()}
+</div>

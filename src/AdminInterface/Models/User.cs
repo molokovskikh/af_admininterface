@@ -83,10 +83,6 @@ namespace AdminInterface.Models
 		public User(Service service)
 			: this()
 		{
-			UserUpdateInfo = new UserUpdateInfo(this);
-			Logs = new AuthorizationLogEntity(this);
-			Accounting = new UserAccount(this);
-
 			RootService = service;
 			if (service is Client)
 			{
@@ -98,6 +94,9 @@ namespace AdminInterface.Models
 			{
 				WorkRegionMask = ulong.MaxValue;
 			}
+			UserUpdateInfo = new UserUpdateInfo(this);
+			Logs = new AuthorizationLogEntity(this);
+			Accounting = new UserAccount(this);
 		}
 
 		public User(Client client)

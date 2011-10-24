@@ -22,6 +22,12 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Supplier : Service
 	{
+		public Supplier(Region homeRegion)
+			: this()
+		{
+			HomeRegion = homeRegion;
+		}
+
 		public Supplier()
 		{
 			Registration = new RegistrationInfo();

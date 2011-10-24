@@ -105,6 +105,7 @@
 						<li>
 							<a href="${siteroot}/Promotions/Index">Промо-акции</a>
 						</li>
+						<li>${app.LinkTo("Регионы", "Regions", "Index")}</li>
 					</ul>
 				</div>
 				

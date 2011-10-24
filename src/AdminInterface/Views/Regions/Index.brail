@@ -1,0 +1,18 @@
+﻿ <% component Bubble, {@bredcrumbs : []} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Редактирование регионов
+<% end %>
+
+<table class=DataTable>
+	<thead>
+		<tr>
+			<th>Название</th>
+		</tr>
+	</thead>
+	<% for region in regions: %>
+		<tr>
+			<td>${app.LinkTo(region, @Edit)}</td>
+		<tr>
+	<% end %>
+</table>

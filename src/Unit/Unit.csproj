@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="ClientFixture.cs" />
     <Compile Include="ClientRegistrationLogEntityFixture.cs" />
+    <Compile Include="Data.cs" />
     <Compile Include="DataBinderFixture.cs" />
     <Compile Include="EmailHelperFixture.cs" />
     <Compile Include="Extentions\EnumExtentionsFixtre.cs" />

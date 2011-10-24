@@ -14,6 +14,7 @@ using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;
+using Unit;
 
 namespace Integration
 {
@@ -200,7 +201,7 @@ namespace Integration
 			var oldPayer = new Payer {
 				Name = "Биона"
 			};
-			var oldClient = new Client(oldPayer) {
+			var oldClient = new Client(oldPayer, Data.DefaultRegion) {
 				Name = "Биона"
 			};
 			mailer.UserMoved(user, oldClient, oldPayer);
@@ -224,7 +225,7 @@ namespace Integration
 
 			var oldPayer = new Payer("Биона");
 			var oldLegalEntity = oldPayer.JuridicalOrganizations.First();
-			var oldClient = new Client(oldPayer) {
+			var oldClient = new Client(oldPayer, Data.DefaultRegion) {
 				Name = "Биона"
 			};
 			mailer.AddressMoved(address, oldClient, oldLegalEntity);

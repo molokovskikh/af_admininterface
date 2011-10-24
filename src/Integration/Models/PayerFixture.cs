@@ -67,7 +67,7 @@ namespace Integration.Models
 			var records = PayerAuditRecord.Find(payer);
 			Assert.That(records.Count, Is.EqualTo(1));
 			var record = records[0];
-			Assert.That(record.Message, Is.EqualTo("Изменено 'Платеж' было '800' стало '200'"));
+			Assert.That(record.Message, Is.EqualTo("Изменено 'Платеж' было '800,00000' стало '200'"));
 			Assert.That(record.Payer, Is.EqualTo(payer));
 			Assert.That(record.ObjectId, Is.EqualTo(user.Id));
 			Assert.That(record.ObjectType, Is.EqualTo(LogObjectType.User));

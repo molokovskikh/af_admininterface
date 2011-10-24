@@ -12,7 +12,7 @@ namespace Unit.Models
 		[Test]
 		public void Set_user_supplier_mask()
 		{
-			var supplier = new Supplier();
+			var supplier = new Supplier(Data.DefaultRegion);
 			var user = new User(supplier);
 			Assert.That(user.WorkRegionMask, Is.EqualTo(ulong.MaxValue));
 		}

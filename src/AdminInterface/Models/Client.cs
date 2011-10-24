@@ -79,11 +79,12 @@ namespace AdminInterface.Models
 			Addresses = new List<Address>();
 		}
 
-		public Client(Payer payer)
+		public Client(Payer payer, Region homeRegion)
 			: this()
 		{
 			Status = ClientStatus.On;
 			Settings = new DrugstoreSettings(this);
+			HomeRegion = homeRegion;
 			JoinPayer(payer);
 		}
 
@@ -348,13 +349,14 @@ group by u.ClientId")
 			if (address.Payer == null)
 				address.Payer = address.LegalEntity.Payer;
 
-			if (address.Accounting == null)
-				address.Accounting = new AddressAccount(address);
 			address.Registrant = SecurityContext.Administrator.UserName;
 			address.RegistrationDate = DateTime.Now;
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);
+
+			if (address.Accounting == null)
+				address.Accounting = new AddressAccount(address);
 			return address;
 		}
 

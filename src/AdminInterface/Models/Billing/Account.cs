@@ -11,6 +11,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
+using NHibernate;
 
 namespace AdminInterface.Models.Billing
 {
@@ -22,7 +23,10 @@ namespace AdminInterface.Models.Billing
 		public UserAccount(User user)
 		{
 			User = user;
-			_payment = 800;
+			if (user.RootService.GetType() == typeof(Supplier))
+				_payment = User.RootService.HomeRegion.SupplierUserPayment;
+			else
+				_payment = User.RootService.HomeRegion.UserPayment;
 		}
 
 		[BelongsTo("ObjectId")]
@@ -70,7 +74,7 @@ namespace AdminInterface.Models.Billing
 		public AddressAccount(Address address)
 		{
 			Address = address;
-			_payment = 200;
+			_payment = Address.Client.HomeRegion.AddressPayment;
 		}
 
 		[BelongsTo("ObjectId")]

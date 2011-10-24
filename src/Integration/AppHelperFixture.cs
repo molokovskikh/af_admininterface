@@ -190,7 +190,7 @@ namespace Integration
 		public void Build_sortable_url()
 		{
 			var link = helper.Sortable("test", "test");
-			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc'>test</a>"));
+			Assert.That(link, Is.EqualTo("<a href='/home/index?SortBy=test&Direction=asc' class='sort_link'>test</a>"));
 		}
 
 		[Test]
@@ -201,7 +201,7 @@ namespace Integration
 			context.CurrentControllerContext.RouteMatch = match;
 
 			var link = helper.Sortable("test", "test");
-			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc'>test</a>"));
+			Assert.That(link, Is.EqualTo("<a href='/users/1/edit?SortBy=test&Direction=asc' class='sort_link'>test</a>"));
 		}
 
 		[Test]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AdminInterface.Models;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Models;
@@ -10,11 +11,32 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Controllers
 {
 	[Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))]
-	public class RegionsController : SmartDispatcherController
+	public class RegionsController : AdminInterfaceController
 	{
+		public void Index()
+		{
+			PropertyBag["regions"] = Region.All();
+		}
+
+		public void Edit(ulong id)
+		{
+			var region = Region.Find(id);
+			if (IsPost)
+			{
+				BindObjectInstance(region, "region");
+				if (IsValid(region))
+				{
+					region.Save();
+					Notify("Сохранено");
+					RedirectToReferrer();
+				}
+			}
+			PropertyBag["region"] = region;
+		}
+
 		public void ShowRegions(uint? clientId, ulong? homeRegionId)
 		{
-			ShowRegions(clientId, homeRegionId, true, false);	
+			ShowRegions(clientId, homeRegionId, true, false);
 		}
 
 		public void ShowRegions(uint? clientId, ulong? homeRegionId, bool showDefaultRegions, bool showNonDefaultRegions)

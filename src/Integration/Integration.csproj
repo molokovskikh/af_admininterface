@@ -189,6 +189,10 @@
       <Project>{A215E837-1208-49E3-AF93-A9612223122C}</Project>
       <Name>Test.Support</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Unit\Unit.csproj">
+      <Project>{FDA13653-9A89-46A0-9E62-91A07A7E6044}</Project>
+      <Name>Unit</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

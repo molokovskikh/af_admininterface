@@ -5,6 +5,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -25,7 +26,7 @@ namespace Unit.Models
 				Addresses = new List<Address>(),
 				Ads = new List<Advertising>()
 			};
-			client = new Client(payer);
+			client = new Client(payer, Data.DefaultRegion);
 			var user = new User(client);
 			user.Accounting.ReadyForAccounting = true;
 			invoice = new Invoice(payer, Period.January, DateTime.Now);

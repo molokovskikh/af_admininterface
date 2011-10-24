@@ -16,7 +16,7 @@ namespace Unit.Models
 		public void Payer_get_total_sum_for_supplier()
 		{
 			var payer = new Payer("Тестовый поставщика", "Тестовый поставщика");
-			var supplier = new Supplier {
+			var supplier = new Supplier(Data.DefaultRegion) {
 				Payer = payer
 			};
 			var user = new User(payer, supplier);
@@ -30,7 +30,10 @@ namespace Unit.Models
 		public void Update_payer_payment_sum_on_user_disabled()
 		{
 			var payer = new Payer("Тестовый плательщик");
-			var client = new Client(payer);
+			var client = new Client(payer, new Region {
+				UserPayment = 800,
+				AddressPayment = 200
+			});
 			var user = new User(client);
 			client.AddUser(user);
 			user.Accounting.Accounted();
@@ -44,7 +47,7 @@ namespace Unit.Models
 		public void Update_payer_payment_sum_on_client_disabled()
 		{
 			var payer = new Payer("Тестовый плательщик");
-			var client = new Client(payer);
+			var client = new Client(payer, Data.DefaultRegion);
 			var user = new User(client);
 			client.AddUser(user);
 			user.Accounting.Accounted();
@@ -59,7 +62,7 @@ namespace Unit.Models
 		public void Do_not_notify_user_if_billing_by_quater_but_current_month_payed()
 		{
 			var payer = new Payer("Тестовый поставщика", "Тестовый поставщика");
-			var client = new Client(payer);
+			var client = new Client(payer, Data.DefaultRegion);
 			var user = new User(client);
 			user.Accounting.Accounted();
 

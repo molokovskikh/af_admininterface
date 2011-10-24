@@ -20,7 +20,7 @@ namespace Integration.ForTesting
 		{
 			var payer = CreatePayer();
 			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
-			var client = new Client(payer) {
+			var client = new Client(payer, homeRegion) {
 				Status = ClientStatus.On,
 				Segment = Segment.Wholesale,
 				Type = ServiceType.Drugstore,

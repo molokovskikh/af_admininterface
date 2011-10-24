@@ -6,6 +6,7 @@ using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -22,7 +23,7 @@ namespace Unit.Models
 			payer = new Payer("Тестовый плательщик") {
 				Recipient = new Recipient(),
 			};
-			client = new Client(payer);
+			client = new Client(payer, Data.DefaultRegion);
 			payer.Clients.Add(client);
 			client.Users.Add(new User(client));
 		}

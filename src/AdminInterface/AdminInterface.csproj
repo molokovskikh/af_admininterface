@@ -430,6 +430,8 @@
       <SubType>Designer</SubType>
     </Content>
     <None Include="Views\RegionalAdmin\AdminEditor.brail" />
+    <None Include="Views\Regions\Edit.brail" />
+    <None Include="Views\Regions\Index.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
     <None Include="Views\Templates\Addresses.brail" />
     <None Include="Views\Templates\Messages.brail" />
