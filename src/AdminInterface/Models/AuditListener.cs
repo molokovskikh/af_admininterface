@@ -13,7 +13,7 @@ using NHibernate.Event;
 namespace AdminInterface.Models
 {
 	[EventListener]
-	public class AuditListner : BaseAuditListner
+	public class AuditListener : BaseAuditListener
 	{
 		protected override void Log(PostUpdateEvent @event, string message)
 		{

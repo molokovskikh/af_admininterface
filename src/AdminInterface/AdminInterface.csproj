@@ -151,7 +151,7 @@
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
-    <Compile Include="Models\AuditListner.cs" />
+    <Compile Include="Models\AuditListener.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Models\Billing\ReportLogProcessorState.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
