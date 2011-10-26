@@ -51,7 +51,7 @@ namespace Unit.Models
 			invoice1.Period = Period.January;
 			invoice1.Date = DateTime.Now;
 			invoice1.Parts = new List<InvoicePart>();
-			invoice1.Parts.Add(new InvoicePart(invoice1, "Информационные услуги", 150, 1));
+			invoice1.Parts.Add(new InvoicePart(invoice1, "Информационные услуги", 150, 1, DateTime.Now));
 
 			var act = new Act(DateTime.Now, invoice, invoice1);
 			Assert.That(act.Parts.Count, Is.EqualTo(2));

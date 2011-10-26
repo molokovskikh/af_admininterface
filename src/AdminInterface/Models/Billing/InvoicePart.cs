@@ -71,6 +71,12 @@ namespace AdminInterface.Models.Billing
 		[Property, ValidateGreaterThanZero]
 		public int Count { get; set; }
 
+		[Property]
+		public DateTime PayDate { get; set; }
+
+		[Property]
+		public bool Processed { get; set; }
+
 		[BelongsTo]
 		public Invoice Invoice { get; set; }
 
@@ -88,12 +94,13 @@ namespace AdminInterface.Models.Billing
 		public InvoicePart()
 		{}
 
-		public InvoicePart(Invoice invoice, string name, decimal cost, int count)
+		public InvoicePart(Invoice invoice, string name, decimal cost, int count, DateTime payDate)
 		{
 			Invoice = invoice;
 			Name = name;
 			Cost = cost;
 			Count = count;
+			PayDate = payDate;
 		}
 
 		public static string GetPeriodName(Period period)
@@ -135,6 +142,12 @@ namespace AdminInterface.Models.Billing
 				default:
 					throw new Exception(String.Format("не знаю что за период такой {0}", period));
 			}
+		}
+
+		public virtual void Process()
+		{
+			Invoice.Payer.Balance -= Sum;
+			Processed = true;
 		}
 
 		public override string ToString()

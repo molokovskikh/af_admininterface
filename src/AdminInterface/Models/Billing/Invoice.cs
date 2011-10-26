@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -22,7 +23,10 @@ namespace AdminInterface.Models.Billing
 
 		public Invoice()
 			: base(BalanceUpdaterType.ChargeOff)
-		{}
+		{
+			TrackUpdate = false;
+			TrackSave = false;
+		}
 
 		public Invoice(Advertising ad)
 			: this(ad.Payer)
@@ -37,7 +41,8 @@ namespace AdminInterface.Models.Billing
 			return new InvoicePart(this,
 				"Рекламное объявление в информационной системе",
 				ad.Cost,
-				1) {
+				1,
+				Date) {
 					Ad = ad
 				};
 		}
@@ -122,7 +127,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public DateTime CreatedOn { get; set; }
 
-		[Property(NotNull = true, Default = "0")]
+		[Property]
 		public bool SendToEmail { get; set; }
 
 		[Property]
@@ -175,24 +180,34 @@ namespace AdminInterface.Models.Billing
 
 			var accounts = Payer.GetAccounts().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts)).ToList());
+			{
+				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts, GetPeriodDate(p))).ToList());
+			}
 			else
-				result.AddRange(GetPartsForPeriod(Period, accounts).ToList());
+				result.AddRange(GetPartsForPeriod(Period, accounts, Date).ToList());
 			return result;
 		}
 
-		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts)
+		private DateTime GetPeriodDate(Period period)
+		{
+			var month = ((int)period) - 3;
+			var maxDays = CultureInfo.CurrentUICulture.Calendar.GetDaysInMonth(Date.Year, month);
+			
+			return new DateTime(Date.Year, month, Math.Min(maxDays, Date.Day));
+		}
+
+		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts, DateTime payDate)
 		{
 			if (Payer.InvoiceSettings.DoNotGroupParts)
 			{
 				return accounts
-					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1));
+					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1, payDate));
 			}
 			else
 			{
 				return accounts
 					.GroupBy(a => new {a.Description, a.Payment})
-					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count()));
+					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count(), payDate));
 			}
 		}
 

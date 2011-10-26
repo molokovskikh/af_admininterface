@@ -11,6 +11,9 @@ namespace AdminInterface.Models.Billing
 
 	public abstract class BalanceUpdater<T> : ActiveRecordLinqBase<T>
 	{
+		protected bool TrackUpdate;
+		protected bool TrackSave;
+
 		public abstract Payer Payer { get; set; }
 		public abstract decimal Sum { get; set; }
 
@@ -23,12 +26,14 @@ namespace AdminInterface.Models.Billing
 
 		protected override void OnSave()
 		{
-			UpdateBalance();
+			if (TrackSave)
+				UpdateBalance();
 		}
 
 		protected override void OnUpdate()
 		{
-			UpdateBalance();
+			if (TrackUpdate)
+				UpdateBalance();
 		}
 
 		protected override void OnDelete()
