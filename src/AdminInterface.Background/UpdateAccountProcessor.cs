@@ -62,7 +62,8 @@ namespace AdminInterface.Background
 				});
 			}
 
-			for (var page = 0; page <= total / size; page++)
+			var pages = total / size + (total % size == 0 ? 0 : 1);
+			for (var page = 0; page <= pages; page++)
 			{
 				uint[] result;
 				using (new SessionScope())
