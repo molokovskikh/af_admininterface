@@ -1,7 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections;
+using System.Linq;
 using AdminInterface.Background;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework.Scopes;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -12,6 +16,7 @@ namespace Integration.Processors
 	{
 		Client client;
 		User user;
+		private Stack savedStack;
 
 		[SetUp]
 		public void Seup()
@@ -28,6 +33,7 @@ namespace Integration.Processors
 			MakeUpdates(user, 11);
 			Check();
 			user.Refresh();
+			user.Payer.Refresh();
 			Assert.That(user.Accounting.ReadyForAccounting, Is.True);
 			Assert.That(user.Payer.PaymentSum, Is.EqualTo(800));
 		}
@@ -74,12 +80,37 @@ namespace Integration.Processors
 		{
 			for (var i = 0; i < count; i++)
 				Save(new UpdateLogEntity(user) {Commit = true});
-
 		}
 
 		private void Check()
 		{
-			new UpdateAccountProcessor().Process();
+			Flush();
+			HideScope();
+			try
+			{
+				new UpdateAccountProcessor().Process();
+			}
+			finally
+			{
+				ShowScope();
+			}
+		}
+
+		private void HideScope()
+		{
+			savedStack = (Stack)ThreadScopeAccessor.Instance.CurrentStack.Clone();
+			ThreadScopeAccessor.Instance.CurrentStack.Clear();
+		}
+
+		private void ShowScope()
+		{
+			var stack = ThreadScopeAccessor.Instance.CurrentStack;
+			foreach (var sessionScope in stack.Cast<ISessionScope>().Reverse())
+				sessionScope.Dispose();
+			foreach (var scope in savedStack.Cast<ISessionScope>())
+			{
+				stack.Push(scope);
+			}
 		}
 	}
 }

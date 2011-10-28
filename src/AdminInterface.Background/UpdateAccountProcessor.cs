@@ -23,6 +23,7 @@ namespace AdminInterface.Background
 						var account = Account.TryFind(id);
 						if (account.ObjectType == LogObjectType.User)
 						{
+							account = ActiveRecordMediator<UserAccount>.FindByPrimaryKey(id);
 							var user = ((UserAccount)account).User;
 							var updateCount = UpdateLogEntity.Queryable.Count(u => u.User == user
 								&& u.Commit
@@ -35,6 +36,7 @@ namespace AdminInterface.Background
 						}
 						else if (account.ObjectType == LogObjectType.Address)
 						{
+							account = ActiveRecordMediator<AddressAccount>.FindByPrimaryKey(id);
 							var address = ((AddressAccount)account).Address;
 							if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting))
 							{
