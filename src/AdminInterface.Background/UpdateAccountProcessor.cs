@@ -20,7 +20,7 @@ namespace AdminInterface.Background
 				{
 					foreach (var id in ids)
 					{
-						var account = Account.Find(id);
+						var account = Account.TryFind(id);
 						if (account.ObjectType == LogObjectType.User)
 						{
 							var user = ((UserAccount)account).User;
