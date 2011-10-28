@@ -21,7 +21,7 @@ namespace AdminInterface.Background
 					foreach (var id in ids)
 					{
 						var account = Account.Find(id);
-						if (account is UserAccount)
+						if (account.ObjectType == LogObjectType.User)
 						{
 							var user = ((UserAccount)account).User;
 							var updateCount = UpdateLogEntity.Queryable.Count(u => u.User == user
@@ -33,7 +33,7 @@ namespace AdminInterface.Background
 								account.Save();
 							}
 						}
-						else if (account is AddressAccount)
+						else if (account.ObjectType == LogObjectType.Address)
 						{
 							var address = ((AddressAccount)account).Address;
 							if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting))
