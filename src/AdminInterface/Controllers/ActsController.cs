@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Drawing.Printing;
-using System.IO;
-using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -28,13 +24,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["acts"] = filter.Find<Act>();
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
-				.Cast<string>()
-#if !DEBUG
-				.Where(p => p.Contains("Бух"))
-				.OrderBy(p => p)
-#endif
-				.ToList();
+			PropertyBag["printers"] = Printer.All();
 		}
 
 		public void PrintIndex([DataBind("filter")] PayerDocumentFilter filter)

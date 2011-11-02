@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing.Printing;
 using System.IO;
+using System.Linq;
 
 namespace AdminInterface.Models
 {
@@ -26,6 +29,17 @@ namespace AdminInterface.Models
 			process.BeginErrorReadLine();
 			process.BeginOutputReadLine();
 			process.WaitForExit(30*1000);
+		}
+
+		public static List<string> All()
+		{
+			return PrinterSettings.InstalledPrinters
+				.Cast<string>()
+#if !DEBUG
+				.Where(p => p.Contains("Бух"))
+				.OrderBy(p => p)
+#endif
+				.ToList();
 		}
 	}
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
@@ -23,10 +24,7 @@ namespace AdminInterface.Models.Billing
 
 		public Invoice()
 			: base(BalanceUpdaterType.ChargeOff)
-		{
-			TrackUpdate = false;
-			TrackSave = false;
-		}
+		{}
 
 		public Invoice(Advertising ad)
 			: this(ad.Payer)
@@ -34,17 +32,6 @@ namespace AdminInterface.Models.Billing
 			Period = GetPeriod(Date);
 			Parts.Add(PartForAd(ad));
 			CalculateSum();
-		}
-
-		private InvoicePart PartForAd(Advertising ad)
-		{
-			return new InvoicePart(this,
-				"Рекламное объявление в информационной системе",
-				ad.Cost,
-				1,
-				Date) {
-					Ad = ad
-				};
 		}
 
 		public Invoice(Payer payer)
@@ -80,6 +67,17 @@ namespace AdminInterface.Models.Billing
 			CalculateSum();
 		}
 
+		private InvoicePart PartForAd(Advertising ad)
+		{
+			return new InvoicePart(this,
+				"Рекламное объявление в информационной системе",
+				ad.Cost,
+				1,
+				Date) {
+					Ad = ad
+				};
+		}
+
 		public static Period GetPeriod(DateTime dateTime)
 		{
 			return (Period)dateTime.Month + 3;
@@ -110,7 +108,10 @@ namespace AdminInterface.Models.Billing
 		public override Payer Payer { get; set; }
 
 		[Property]
-		public override decimal Sum { get; set; }
+		public virtual decimal Sum { get; set; }
+
+		[Property]
+		public virtual decimal PaidSum { get; set; }
 
 		[Property]
 		public string PayerName { get; set; }
@@ -147,6 +148,16 @@ namespace AdminInterface.Models.Billing
 			foreach (var part in Parts.Where(p => p.Ad != null))
 				part.Ad.Invoice = null;
 			base.OnDelete();
+		}
+
+		protected override decimal GetSum()
+		{
+			return PaidSum;
+		}
+
+		protected override string GetSumProperty()
+		{
+			return "PaidSum";
 		}
 
 		protected override void OnSave()
@@ -229,7 +240,7 @@ namespace AdminInterface.Models.Billing
 			return false;
 		}
 
-		public void Send(Castle.MonoRail.Framework.Controller controller)
+		public void Send(Controller controller)
 		{
 			if (Payer.InvoiceSettings.PrintInvoice)
 			{
@@ -272,6 +283,7 @@ namespace AdminInterface.Models.Billing
 		public void CalculateSum()
 		{
 			Sum = Parts.Sum(p => p.Sum);
+			PaidSum = Parts.Where(p => p.Processed).Sum(p => p.Sum);
 		}
 	}
 }

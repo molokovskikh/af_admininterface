@@ -13,6 +13,11 @@ namespace AdminInterface.NHibernateExtentions
 		public static bool IsChanged<TActiveRecord, TResult>(this TActiveRecord activeRecord, Expression<Func<TActiveRecord, TResult>> expression)
 		{
 			var property = expression.GetProperty();
+			return activeRecord.IsChanged(property);
+		}
+
+		public static bool IsChanged<TActiveRecord>(this TActiveRecord activeRecord, string property)
+		{
 			return ArHelper.WithSession(s => {
 				var entry = s.GetEntry(activeRecord);
 				//если объект только создан и не был еще сохранен
@@ -24,6 +29,28 @@ namespace AdminInterface.NHibernateExtentions
 					return !Equals(currentState, entry.LoadedState[index]);
 				else
 					return true;
+			});
+		}
+
+		public static TResult OldValue<TActiveRecord, TResult>(this TActiveRecord activeRecord, Expression<Func<TActiveRecord, TResult>> expression)
+		{
+			var property = expression.GetProperty();
+			return activeRecord.OldValue<TResult>(property);
+		}
+
+		public static T OldValue<T>(this object activeRecord, string property)
+		{
+			return ArHelper.WithSession(s =>{
+				var entry = s.GetEntry(activeRecord);
+				if (entry == null)
+					throw new Exception(String.Format(
+						"Не могу получить значение свойства загруженного из базы т.к. сесия в которой был загружен объект {0} уже закрыта",
+						activeRecord));
+
+				var index = entry.Persister.PropertyNames.IndexOf(n => n.Equals(property, StringComparison.OrdinalIgnoreCase));
+				if (entry.LoadedState == null)
+					return default(T);
+				return (T) entry.LoadedState[index];
 			});
 		}
 
@@ -49,23 +76,6 @@ namespace AdminInterface.NHibernateExtentions
 			}
 
 			return entry;
-		}
-
-		public static TResult OldValue<TActiveRecord, TResult>(this TActiveRecord activeRecord, Expression<Func<TActiveRecord, TResult>> expression)
-		{
-			var property = expression.GetProperty();
-			return ArHelper.WithSession(s => {
-				var entry = s.GetEntry(activeRecord);
-				if (entry == null)
-					throw new Exception(String.Format(
-						"Не могу получить значение свойства загруженного из базы т.к. сесия в которой был загружен объект {0} уже закрыта",
-						activeRecord));
-
-				var index = entry.Persister.PropertyNames.IndexOf(n => n.Equals(property, StringComparison.OrdinalIgnoreCase));
-				if (entry.LoadedState == null)
-					return default(TResult);
-				return (TResult)entry.LoadedState[index];
-			});
 		}
 	}
 }

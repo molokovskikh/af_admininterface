@@ -23,7 +23,7 @@ namespace Integration.Processors
 		[Test]
 		public void Process_invoice_part_ready_for_processing()
 		{
-			var invoice = BuildInvoice(DateTime.Now);
+			var invoice = BuildInvoice(DateTime.Now.Date);
 
 			processor.Process();
 

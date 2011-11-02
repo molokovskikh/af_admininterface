@@ -27,6 +27,7 @@ namespace AdminInterface.Background
 					ActiveRecordMediator.Save(part);
 				}
 
+				scope.Flush();
 				scope.VoteCommit();
 			}
 		}

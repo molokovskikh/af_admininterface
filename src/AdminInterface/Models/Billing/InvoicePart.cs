@@ -146,8 +146,9 @@ namespace AdminInterface.Models.Billing
 
 		public virtual void Process()
 		{
-			Invoice.Payer.Balance -= Sum;
 			Processed = true;
+			Invoice.CalculateSum();
+			Invoice.Save();
 		}
 
 		public override string ToString()

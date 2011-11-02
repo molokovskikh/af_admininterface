@@ -106,7 +106,7 @@ namespace AdminInterface.Controllers
 				if (!HasValidationError(invoice))
 				{
 					invoice.SetPayer(payer);
-					invoice.Sum = invoice.Parts.Sum(p => p.Sum);
+					invoice.CalculateSum();
 					invoice.Save();
 					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
 				}
