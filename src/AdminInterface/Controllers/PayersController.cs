@@ -113,7 +113,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				invoice.Parts.Add(new InvoicePart());
+				invoice.Parts.Add(new InvoicePart(invoice));
 			}
 		}
 

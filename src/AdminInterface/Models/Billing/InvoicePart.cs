@@ -91,8 +91,15 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
+
 		public InvoicePart()
 		{}
+
+		public InvoicePart(Invoice invoice)
+		{
+			Invoice = Invoice;
+			PayDate = invoice.Date;
+		}
 
 		public InvoicePart(Invoice invoice, string name, decimal cost, int count, DateTime payDate)
 		{
