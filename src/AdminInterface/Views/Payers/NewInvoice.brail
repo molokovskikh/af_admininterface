@@ -82,7 +82,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 					${app.GetValidationError(part, "Name")}
 				</td>
 				<td>
-					<input type=text name="invoice.parts[${i}].payDate" class="required validate-date input-date" value="${part.PayDate.ToShortDateString()}">
+					<input type=text name="invoice.parts[${i}].payDate" class="required validate-date input-date" value="${part.PayDate.ToShortDateString()}" ${"disabled" if part.Processed}>
 					<input type=button class=CalendarInput>
 					${app.GetValidationError(part, "PayDate")}
 				</td>
