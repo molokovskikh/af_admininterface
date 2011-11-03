@@ -24,8 +24,8 @@ namespace AdminInterface.Background
 				new ReportLogsProcessor().Process();
 				new InvoicePartProcessor().Process();
 
-/*				using(new SessionScope())
-					jobs.Each(j => j.Run());*/
+				using(new SessionScope())
+					jobs.Each(j => j.Run());
 			};
 		}
 
