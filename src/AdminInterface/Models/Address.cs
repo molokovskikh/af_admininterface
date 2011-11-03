@@ -183,8 +183,6 @@ set @skip = 0;
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Docs"));
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Rejects"));
 				Directory.CreateDirectory(Path.Combine(addressRoot, "Waybills"));
-				foreach (var user in Client.Users)
-					SetAccessControl(user.Login, addressRoot);
 			}
 			catch(Exception e)
 			{

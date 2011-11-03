@@ -100,8 +100,6 @@ namespace AdminInterface.Controllers
 			if (address != null)
 				address.CreateFtpDirectory();
 
-			client.Addresses.Each(a => a.SetAccessControl(user.Login));
-
 			Mailer.Registred(user, comment);
 			user.AddBillingComment(comment);
 			if (address != null)
