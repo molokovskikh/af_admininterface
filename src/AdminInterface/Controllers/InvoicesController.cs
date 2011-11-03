@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Printing;
 using System.IO;
@@ -27,13 +28,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["invoices"] = filter.Find<Invoice>();
 
-			PropertyBag["printers"] = PrinterSettings.InstalledPrinters
-				.Cast<string>()
-#if !DEBUG
-				.Where(p => p.Contains("Бух"))
-				.OrderBy(p => p)
-#endif
-				.ToList();
+			PropertyBag["printers"] = Printer.All();
 			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
 			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}

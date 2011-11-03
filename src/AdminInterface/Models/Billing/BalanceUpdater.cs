@@ -1,4 +1,6 @@
-﻿using AdminInterface.NHibernateExtentions;
+﻿using System;
+using System.Linq.Expressions;
+using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord.Framework;
 
 namespace AdminInterface.Models.Billing
@@ -11,15 +13,17 @@ namespace AdminInterface.Models.Billing
 
 	public abstract class BalanceUpdater<T> : ActiveRecordLinqBase<T>
 	{
-		public abstract Payer Payer { get; set; }
-		public abstract decimal Sum { get; set; }
-
 		private BalanceUpdaterType _type;
 
 		protected BalanceUpdater(BalanceUpdaterType type)
 		{
 			_type = type;
 		}
+
+		public abstract Payer Payer { get; set; }
+
+		protected abstract decimal GetSum();
+		protected abstract string GetSumProperty();
 
 		protected override void OnSave()
 		{
@@ -60,18 +64,18 @@ namespace AdminInterface.Models.Billing
 
 		private void ResetBalance()
 		{
-			Reset(Payer, Sum);
+			Reset(Payer, GetSum());
 		}
 
 		private void UpdateBalance()
 		{
 			var oldPayer = this.OldValue(p => p.Payer);
-			var oldSum = this.OldValue(p => p.Sum);
+			var oldSum = this.OldValue<decimal>(GetSumProperty());
 
-			if (this.IsChanged(p => p.Payer) || this.IsChanged(p => p.Sum))
+			if (this.IsChanged(p => p.Payer) || this.IsChanged(GetSumProperty()))
 			{
 				Reset(oldPayer, oldSum);
-				Apply(Payer, Sum);
+				Apply(Payer, GetSum());
 
 				if (oldPayer != null)
 					oldPayer.Save();

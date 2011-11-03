@@ -563,7 +563,6 @@ namespace Functional.Billing
 		[Test, NUnit.Framework.Description("Проверка фильтрации записей в статистике вкл./откл. по пользователю")]
 		public void FilterLogMessagesByUser()
 		{
-			Console.WriteLine(browser.Url);
 			AddUsersAdnAddresses(client, 3);
 			client.Refresh();
 			Refresh();

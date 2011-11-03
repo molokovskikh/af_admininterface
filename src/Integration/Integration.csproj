@@ -12,7 +12,8 @@
     <AssemblyName>Integration</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <FileUpgradeFlags></FileUpgradeFlags>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
     <OldToolsVersion>3.5</OldToolsVersion>
     <UpgradeBackupLocation />
     <TargetFrameworkProfile />
@@ -161,6 +162,7 @@
     <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
+    <Compile Include="Processors\InvoicePartProcessorFixture.cs" />
     <Compile Include="Processors\ReportLogProcessorFixture.cs" />
     <Compile Include="Processors\ReportProcessorFixture.cs" />
     <Compile Include="Processors\UpdateAccountProcessorFixture.cs" />

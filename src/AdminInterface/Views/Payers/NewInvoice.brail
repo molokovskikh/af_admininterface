@@ -1,5 +1,6 @@
 ﻿<script>
 	$(function () {
+		$("form").validate();
 		$("#bills").data("template", function (table) {
 			return $(table.find("tr").get(1)).clone();
 		});
@@ -66,6 +67,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 				<tr>
 					<th><a href="javascript:" class=add>Добавить</a></th>
 					<th>Услуга</th>
+					<th>Дата платежа</th>
 					<th>Стоимость</th>
 					<th>Количество</th>
 				</tr>
@@ -78,6 +80,11 @@ ${app.GetValidationError(invoice, "Recipient")}
 				<td>
 					<textarea name="invoice.parts[${i}].name" cols=30 rows=2 class="required">${part.Name}</textarea>
 					${app.GetValidationError(part, "Name")}
+				</td>
+				<td>
+					<input type=text name="invoice.parts[${i}].payDate" class="required validate-date input-date" value="${part.PayDate.ToShortDateString()}" ${"disabled" if part.Processed}>
+					<input type=button class=CalendarInput>
+					${app.GetValidationError(part, "PayDate")}
 				</td>
 				<td>
 					<input name="invoice.parts[${i}].cost" type=text class="required validate-cost" value="${part.Cost.ToString("#.##")}">

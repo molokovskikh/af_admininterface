@@ -1,5 +1,6 @@
 ﻿<script>
 	$(function () {
+		$("form").validate();
 		$("table.DataTable").data("template", function (table) {
 			return $(table.find("tr").get(1)).clone()
 		});

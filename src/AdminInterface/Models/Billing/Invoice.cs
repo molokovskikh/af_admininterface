@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
@@ -30,16 +32,6 @@ namespace AdminInterface.Models.Billing
 			Period = GetPeriod(Date);
 			Parts.Add(PartForAd(ad));
 			CalculateSum();
-		}
-
-		private InvoicePart PartForAd(Advertising ad)
-		{
-			return new InvoicePart(this,
-				"Рекламное объявление в информационной системе",
-				ad.Cost,
-				1) {
-					Ad = ad
-				};
 		}
 
 		public Invoice(Payer payer)
@@ -75,6 +67,17 @@ namespace AdminInterface.Models.Billing
 			CalculateSum();
 		}
 
+		private InvoicePart PartForAd(Advertising ad)
+		{
+			return new InvoicePart(this,
+				"Рекламное объявление в информационной системе",
+				ad.Cost,
+				1,
+				Date) {
+					Ad = ad
+				};
+		}
+
 		public static Period GetPeriod(DateTime dateTime)
 		{
 			return (Period)dateTime.Month + 3;
@@ -105,7 +108,10 @@ namespace AdminInterface.Models.Billing
 		public override Payer Payer { get; set; }
 
 		[Property]
-		public override decimal Sum { get; set; }
+		public virtual decimal Sum { get; set; }
+
+		[Property]
+		public virtual decimal PaidSum { get; set; }
 
 		[Property]
 		public string PayerName { get; set; }
@@ -122,7 +128,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public DateTime CreatedOn { get; set; }
 
-		[Property(NotNull = true, Default = "0")]
+		[Property]
 		public bool SendToEmail { get; set; }
 
 		[Property]
@@ -142,6 +148,16 @@ namespace AdminInterface.Models.Billing
 			foreach (var part in Parts.Where(p => p.Ad != null))
 				part.Ad.Invoice = null;
 			base.OnDelete();
+		}
+
+		protected override decimal GetSum()
+		{
+			return PaidSum;
+		}
+
+		protected override string GetSumProperty()
+		{
+			return "PaidSum";
 		}
 
 		protected override void OnSave()
@@ -175,24 +191,34 @@ namespace AdminInterface.Models.Billing
 
 			var accounts = Payer.GetAccounts().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
-				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts)).ToList());
+			{
+				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts, GetPeriodDate(p))).ToList());
+			}
 			else
-				result.AddRange(GetPartsForPeriod(Period, accounts).ToList());
+				result.AddRange(GetPartsForPeriod(Period, accounts, Date).ToList());
 			return result;
 		}
 
-		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts)
+		private DateTime GetPeriodDate(Period period)
+		{
+			var month = ((int)period) - 3;
+			var maxDays = CultureInfo.CurrentUICulture.Calendar.GetDaysInMonth(Date.Year, month);
+			
+			return new DateTime(Date.Year, month, Math.Min(maxDays, Date.Day));
+		}
+
+		private IEnumerable<InvoicePart> GetPartsForPeriod(Period period, IEnumerable<Account> accounts, DateTime payDate)
 		{
 			if (Payer.InvoiceSettings.DoNotGroupParts)
 			{
 				return accounts
-					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1));
+					.Select(a => new InvoicePart(this, FormatPartDescription(a.Description, period), a.Payment, 1, payDate));
 			}
 			else
 			{
 				return accounts
 					.GroupBy(a => new {a.Description, a.Payment})
-					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count()));
+					.Select(g => new InvoicePart(this, FormatPartDescription(g.Key.Description, period), g.Key.Payment, g.Count(), payDate));
 			}
 		}
 
@@ -214,7 +240,7 @@ namespace AdminInterface.Models.Billing
 			return false;
 		}
 
-		public void Send(Castle.MonoRail.Framework.Controller controller)
+		public void Send(Controller controller)
 		{
 			if (Payer.InvoiceSettings.PrintInvoice)
 			{
@@ -257,6 +283,7 @@ namespace AdminInterface.Models.Billing
 		public void CalculateSum()
 		{
 			Sum = Parts.Sum(p => p.Sum);
+			PaidSum = Parts.Where(p => p.Processed).Sum(p => p.Sum);
 		}
 	}
 }

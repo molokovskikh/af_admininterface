@@ -139,7 +139,7 @@
 			weekNumbers: false,
 			flat: this.id,
 			flatCallback: function () {
-				$("#" + id).get(0).value = calendar.date.print("%d.%m.%Y")
+				$("#" + id).get(0).value = calendar.date.print("%d.%m.%Y");
 				calendar.refresh();
 				if (beginCalendar && endCalendar) {
 					beginCalendar.refresh();
@@ -148,7 +148,7 @@
 			},
 			showOthers: true
 		});
-		calendar.parseDate(value)
+		calendar.parseDate(value);
 		if (id.indexOf("begin") >= 0) {
 			beginCalendar = calendar;
 			calendar.setDateStatusHandler(beginDateAllowed);
@@ -168,13 +168,13 @@
 function ShowHidden(folder) {
 	$(folder).removeClass("ShowHiden");
 	$(folder).addClass("HideVisible");
-	$(folder).siblings("div").removeClass("hidden")
+	$(folder).siblings("div").removeClass("hidden");
 }
 
 function HideVisible(folder) {
 	$(folder).removeClass("HideVisible");
 	$(folder).addClass("ShowHiden");
-	$(folder).siblings("div").addClass("hidden")
+	$(folder).siblings("div").addClass("hidden");
 }
 
 function SetupCalendarElements() {

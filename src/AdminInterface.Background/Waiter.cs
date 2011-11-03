@@ -22,6 +22,7 @@ namespace AdminInterface.Background
 				new ReportProcessor().Process();
 				new UpdateAccountProcessor().Process();
 				new ReportLogsProcessor().Process();
+				new InvoicePartProcessor().Process();
 
 /*				using(new SessionScope())
 					jobs.Each(j => j.Run());*/

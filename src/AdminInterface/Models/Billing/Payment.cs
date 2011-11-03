@@ -163,7 +163,7 @@ namespace AdminInterface.Models.Billing
 		public DateTime PayedOn { get; set; }
 
 		[Property, ValidateGreaterThanZero]
-		public override decimal Sum { get; set; }
+		public virtual decimal Sum { get; set; }
 
 		[Property]
 		public string Comment { get; set; }
@@ -510,6 +510,16 @@ namespace AdminInterface.Models.Billing
 		{
 			UpdateAd();
 			base.OnUpdate();
+		}
+
+		protected override decimal GetSum()
+		{
+			return Sum;
+		}
+
+		protected override string GetSumProperty()
+		{
+			return "Sum";
 		}
 
 		protected override void OnSave()

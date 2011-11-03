@@ -26,13 +26,13 @@ namespace Unit.Models
 			client = new Client(payer, Data.DefaultRegion);
 			payer.Clients.Add(client);
 			client.Users.Add(new User(client));
+
+			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 		}
 
 		[Test]
 		public void Invoice_by_quater_contains_bill_for_every_month()
 		{
-			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
-
 			var invoice = new Invoice(payer, Period.FirstQuarter, DateTime.Now);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
 			Assert.That(invoice.Parts[0].Name, Is.EqualTo("Мониторинг оптового фармрынка за январь"));
@@ -95,6 +95,8 @@ namespace Unit.Models
 		[Test]
 		public void Include_ad_in_next_building_invoice()
 		{
+			payer.Users.Each(a => a.Accounting.ReadyForAccounting = false);
+
 			var ad = new Advertising(payer) {Cost = 1500};
 			payer.Ads.Add(ad);
 			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
@@ -146,6 +148,26 @@ namespace Unit.Models
 			invoice = invoices[1];
 			Assert.That(invoice.Parts.Count, Is.EqualTo(1));
 			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(600));
+		}
+
+		
+		[Test]
+		public void Set_pay_date()
+		{
+			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var part = invoice.Parts[0];
+			Assert.That(part.PayDate, Is.EqualTo(invoice.Date));
+			Assert.That(part.Processed, Is.False);
+		}
+
+		[Test]
+		public void Set_quarter_period()
+		{
+			var invoice = new Invoice(payer, Period.FirstQuarter, new DateTime(2011, 1, 10));
+			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
+			Assert.That(invoice.Parts[0].PayDate, Is.EqualTo(new DateTime(2011, 1, 10)));
+			Assert.That(invoice.Parts[1].PayDate, Is.EqualTo(new DateTime(2011, 2, 10)));
+			Assert.That(invoice.Parts[2].PayDate, Is.EqualTo(new DateTime(2011, 3, 10)));
 		}
 	}
 }

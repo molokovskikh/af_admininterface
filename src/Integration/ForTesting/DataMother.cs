@@ -252,7 +252,7 @@ namespace Integration.ForTesting
 			var invoice1 = new Invoice(payer,
 				Period.January,
 				new DateTime(2011, 1, 10),
-				new List<InvoicePart> { new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 500, 2) }) {
+				new List<InvoicePart> { new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 500, 2, DateTime.Now) }) {
 					Id = 1,
 				};
 			var act = new Act(invoice1.Date, invoice1);
@@ -260,7 +260,7 @@ namespace Integration.ForTesting
 			var invoice2 = new Invoice(payer,
 				Period.January,
 				new DateTime(2011, 1, 20),
-				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1)});
+				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1, DateTime.Now)});
 			var act2 = new Act(invoice2.Date, invoice2);
 
 			return new RevisionAct(payer,

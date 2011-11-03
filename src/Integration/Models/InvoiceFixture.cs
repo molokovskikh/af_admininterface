@@ -27,6 +27,8 @@ namespace Integration.Models
 			var ad = new Advertising(payer, 1000);
 			ad.SaveAndFlush();
 			ad.Invoice = new Invoice(ad);
+			ad.Invoice.Parts[0].Processed = true;
+			ad.Invoice.CalculateSum();
 			ad.SaveAndFlush();
 			Assert.That(payer.Balance, Is.EqualTo(-1000));
 			ad.Invoice.DeleteAndFlush();
