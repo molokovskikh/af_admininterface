@@ -147,10 +147,10 @@ namespace AdminInterface.Models
 		[Property, Description("Подтверждать отправку заказов"), Auditable]
 		public virtual bool SubmitOrders { get; set; }
 
-		[Property, Description("Получать накладные"), Auditable]
+		[Property, Description("Передавать файлы-НАКЛАДНЫЕ на сторону аптеки"), Auditable]
 		public virtual bool SendWaybills { get; set; }
 
-		[Property, Description("Получать отказы"), Auditable]
+		[Property, Description("Передавать файлы-ОТКАЗЫ на сторону аптеки"), Auditable]
 		public virtual bool SendRejects { get; set; }
 
 		[Property, Description("Аудитор"), Auditable]
