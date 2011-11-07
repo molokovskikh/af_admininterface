@@ -45,7 +45,6 @@ namespace AdminInterface.Controllers
 			address.Maintain();
 
 			address.CreateFtpDirectory();
-			client.Users.Each(u => address.SetAccessControl(u.Login));
 			address.AddBillingComment(comment);
 			Mailer.Registred(address, comment);
 			Flash["Message"] = new Message("Адрес доставки создан");
