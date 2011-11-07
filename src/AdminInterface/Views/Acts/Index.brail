@@ -8,6 +8,7 @@
 		});
 	});
 </script>
+
 <div style="padding: 10px">
 	<% component Bubble, {"bredcrumbs" : [("Акты", "")]} %>
 
@@ -18,7 +19,7 @@
 	</div>
 
 	<div class=block style="float:left; width: 100%;padding:0; margin:0;">
-		<div style="float:left; width: 50%;padding:0; margin:0;">
+		<div class=column1of2>
 			<div style="margin:10px">
 				<h3>Акты</h3>
 				${app.BeginFormFor("filter")}
@@ -30,14 +31,13 @@
 			</div>
 		</div>
 
-		<div style="float:left; width: 50%;padding:0; margin:0;">
+		<div class=column2of2>
 			<div style="margin:10px">
 				<h3>Сформировать акты</h3>
 				<form action='${siteroot}/Acts/Build' method=post>
-					<table border='0'>
+					<% OutputSubView("/Templates/DocumentPayerSelector") %>
+					<table>
 						${app.FilterFor("buildFilter.Period")}
-						${app.FilterFor("buildFilter.Region")}
-						${app.FilterFor("buildFilter.Recipient")}
 						<tr>
 							<td class="filter-label">Дата акта:</td>
 							<td colspan=2>

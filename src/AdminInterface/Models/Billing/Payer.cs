@@ -426,11 +426,6 @@ ORDER BY {Payer}.shortname;";
 			return GetAccounts().GroupBy(a => a.InvoiceGroup).OrderBy(g => g.Key);
 		}
 
-		public virtual bool ShouldNotify()
-		{
-			throw new NotImplementedException();
-		}
-
 		public virtual IEnumerable<ReportAccount> ReportsForInvoice()
 		{
 			return GetReportAccounts().Where(a => a.ShouldPay());

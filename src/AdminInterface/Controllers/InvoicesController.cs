@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Drawing.Printing;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
+using Castle.ActiveRecord.Framework;
+using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 
@@ -27,10 +26,9 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["filter"] = filter;
 			PropertyBag["invoices"] = filter.Find<Invoice>();
+			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
 
 			PropertyBag["printers"] = Printer.All();
-			PropertyBag["regions"] = Region.Queryable.OrderBy(r => r.Name).ToList();
-			PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 		}
 
 		public void PrintIndex([DataBind("filter")] PayerDocumentFilter filter)
@@ -86,18 +84,53 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		public void Build(Period period, ulong regionId, string printer, DateTime invoiceDate, uint recipientId)
+		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime invoiceDate, string printer)
 		{
-			var arguments = String.Format("invoice \"{0}\" {1} {2} {3} {4}", printer, period, regionId, invoiceDate.ToShortDateString(), recipientId);
+			var invoices = BuildInvoices(filter, invoiceDate);
+
+			invoices = invoices.Where(i => i.Payer.InvoiceSettings.PrintInvoice).ToList();
+
+			var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
 			Printer.Execute(arguments);
 
-			Notify(String.Format("Счета за {0} сформированы", BindingHelper.GetDescription(period)));
-			RedirectToAction("Index",
-				new PayerDocumentFilter {
-					Period = period,
-					Region = Region.Find(regionId),
-					Recipient = Recipient.Find(recipientId)
-				}.GetQueryString());
+			Notify("Счета сформированы");
+			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
+		}
+
+		private static List<Invoice> BuildInvoices(DocumentBuilderFilter filter, DateTime invoiceDate)
+		{
+			var invoicePeriod = Invoice.GetInvoicePeriod(filter.Period);
+			List<Payer> payers;
+			if (filter.PayerId.Length == 0)
+			{
+				payers = ActiveRecordLinqBase<Payer>
+					.Queryable
+					.Where(p => p.AutoInvoice == InvoiceType.Auto
+						&& p.PayCycle == invoicePeriod
+						&& p.Recipient != null
+						&& p.Recipient == filter.Recipient)
+					.OrderBy(p => p.Name)
+					.ToList();
+				payers = payers.Where(p => p.Clients.Any(c => c.HomeRegion == filter.Region)).ToList();
+			}
+			else
+			{
+				payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => filter.PayerId.Contains(p.PayerID)).ToList();
+			}
+
+			var invoices = new List<Invoice>();
+			foreach (var payer in payers)
+			{
+				if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == filter.Period))
+					continue;
+
+				foreach (var invoice in payer.BuildInvoices(invoiceDate, filter.Period).Where(i => i.Sum > 0))
+				{
+					invoices.Add(invoice);
+					invoice.Save();
+				}
+			}
+			return invoices;
 		}
 	}
 }

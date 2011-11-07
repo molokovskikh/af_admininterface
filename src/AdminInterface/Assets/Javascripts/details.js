@@ -1,5 +1,5 @@
 ﻿function ShowDownloadResult(element, id, url, callerDescription) {
-	var row = $(element).parents("tr").get(0)
+	var row = $(element).parents("tr").get(0);
 	var isCallerVisible = IsVisible(id, callerDescription);
 	HideAll(id, function () {
 		if (!isCallerVisible)

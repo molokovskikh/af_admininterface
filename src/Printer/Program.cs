@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Configuration;
+using AdminInterface.Helpers;
+using Castle.ActiveRecord.Framework.Internal;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using System.Collections.Generic;
@@ -29,19 +31,18 @@ namespace Printer
 				if (args.FirstOrDefault() == "print")
 				{
 					var printer = args[2];
-					AdminInterface.Helpers.InternetExplorerPrinterHelper.SetPrinter(printer);
+					var name = args[1];
+					var ids = args[3].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToArray();
 
+					InternetExplorerPrinterHelper.SetPrinter(printer);
 					var brail = StandaloneInitializer.Init();
-
-					if (args[1] == "invoice")
+					if (name == "invoice")
 					{
-						PrintInvoice(args, brail);
+						Print(brail, name, Invoice.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName));
 					}
-					else if (args[1] == "act")
+					else if (name == "act")
 					{
-						var ids = args[3].Split(',').Select(id => Convert.ToUInt32(id.Trim())).ToArray();
-
-						PrintActs(brail, ids);
+						Print(brail, name, Act.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName));
 					}
 				}
 				else
@@ -69,72 +70,27 @@ namespace Printer
 			}
 		}
 
-		private static void PrintActs(IViewEngineManager brail, uint[] ids)
+		private static void Print<T>(IViewEngineManager brail, string name, IOrderedQueryable<T> query)
 		{
+			var plural = Inflector.Pluralize(name);
+			if (String.IsNullOrEmpty(plural))
+				plural = name;
+			var singular = Inflector.Singularize(name);
+			if (String.IsNullOrEmpty(name))
+				singular = name;
+
 			using (new SessionScope(FlushAction.Never))
 			{
-				var acts = Act.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName).ToArray();
-				foreach (var act in acts)
+				var documents = query.ToArray();
+				foreach (var document in documents)
 				{
-					new AdminInterface.Helpers.InternetExplorerPrinterHelper().PrintView(brail,
-						"Acts/Print",
+					new InternetExplorerPrinterHelper().PrintView(brail,
+						Inflector.Capitalize(plural) + "/Print",
 						"Print",
 						new Dictionary<string, object> {
-							{ "act", act },
-							{ "doc", act }
+							{ singular, document },
+							{ "doc", document }
 						});
-				}
-			}
-		}
-
-		private static void PrintInvoice(string[] args, IViewEngineManager brail)
-		{
-			var period = (Period)Period.Parse(typeof(Period), args[3]);
-			var regionId = ulong.Parse(args[4]);
-			var date = DateTime.Parse(args[5]);
-			var recipientId = uint.Parse(args[6]);
-			var invoicePeriod = Invoice.GetInvoicePeriod(period);
-
-			using (new SessionScope(FlushAction.Never))
-			{
-				var region = Region.Find(regionId);
-				var payers = ActiveRecordLinqBase<Payer>
-					.Queryable
-					.Where(p => p.AutoInvoice == InvoiceType.Auto
-						&& p.PayCycle == invoicePeriod
-						&& p.Recipient != null
-						&& p.Recipient.Id == recipientId)
-					.OrderBy(p => p.Name)
-					.ToList();
-
-				foreach (var payer in payers)
-				{
-					if (!payer.Clients.Any(c => c.HomeRegion == region))
-						continue;
-
-					if (Invoice.Queryable.Any(i => i.Payer == payer && i.Period == period))
-						continue;
-
-					var invoice = new Invoice(payer, period, date);
-					if (invoice.Sum == 0)
-						continue;
-
-					if (payer.InvoiceSettings.PrintInvoice)
-					{
-						using (var scope = new TransactionScope(OnDispose.Rollback))
-						{
-							invoice.Save();
-							scope.VoteCommit();
-						}
-
-						new AdminInterface.Helpers.InternetExplorerPrinterHelper().PrintView(brail,
-							"Invoices/Print",
-							"Print",
-							new Dictionary<string, object> {
-								{ "invoice", invoice },
-								{ "doc", invoice }
-							});
-					}
 				}
 			}
 		}

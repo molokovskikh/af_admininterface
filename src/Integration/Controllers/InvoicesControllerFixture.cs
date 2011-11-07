@@ -28,7 +28,7 @@ namespace Integration.Controllers
 			var recipient = Recipient.Queryable.First();
 			var region = Region.Queryable.First();
 
-			controller.Build(Period.April, region.Id, "test", DateTime.Now, recipient.Id);
+			controller.Build(null, DateTime.Now, "");
 
 			Assert.That(Response.RedirectedTo,
 				Is.StringEnding(String.Format("Index?filter.Period={0}&filter.Region.Id={1}&filter.Recipient.Id={2}",

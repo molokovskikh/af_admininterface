@@ -12,12 +12,18 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>AdminInterface</RootNamespace>
     <AssemblyName>AdminInterface</AssemblyName>
-    <SccProjectName></SccProjectName>
-    <SccLocalPath></SccLocalPath>
-    <SccAuxPath></SccAuxPath>
-    <SccProvider></SccProvider>
-    <FileUpgradeFlags></FileUpgradeFlags>
-    <UpgradeBackupLocation></UpgradeBackupLocation>
+    <SccProjectName>
+    </SccProjectName>
+    <SccLocalPath>
+    </SccLocalPath>
+    <SccAuxPath>
+    </SccAuxPath>
+    <SccProvider>
+    </SccProvider>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
     <OldToolsVersion>3.5</OldToolsVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
@@ -358,6 +364,7 @@
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\details.js" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
+    <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
     <Content Include="JavaScript\builder.js" />
@@ -375,6 +382,7 @@
     <Content Include="JavaScript\jquery.tmpl.min.js" />
     <Content Include="JavaScript\jquery.contact.validation.js" />
     <Content Include="JavaScript\payer.search.js" />
+    <Content Include="Assets\Javascripts\search.editor.js" />
     <Content Include="JavaScript\slider.js" />
     <Content Include="Rescue\Error.aspx" />
     <Content Include="Global.asax" />
@@ -429,6 +437,7 @@
     <None Include="Views\Regions\Index.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
     <None Include="Views\Templates\Addresses.brail" />
+    <None Include="Views\Templates\DocumentPayerSelector.brail" />
     <None Include="Views\Templates\Messages.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
@@ -439,7 +448,8 @@
     <Content Include="App_Themes\Main\Main.skin" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Billing\Edit.brail"></Content>
+    <Content Include="Views\Billing\Edit.brail">
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Css\Billing.css" />
@@ -614,12 +624,13 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>63020</DevelopmentServerPort>
+          <DevelopmentServerPort>59334</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost/AdminInterface</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl></CustomServerUrl>
+          <CustomServerUrl>
+          </CustomServerUrl>
           <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
         </WebProjectProperties>
       </FlavorProperties>
