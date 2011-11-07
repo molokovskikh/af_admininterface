@@ -23,7 +23,7 @@
 <h4>Или</h4>
 
 <div class=block>
-	<h4>Списов плательщиков</h4>
+	<h4>Список плательщиков</h4>
 	<table class=editable id=payers>
 		<tr>
 			<th><input type=button class=add value=Добавить></th>
