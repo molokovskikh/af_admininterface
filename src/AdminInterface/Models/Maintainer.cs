@@ -70,7 +70,7 @@ FROM Future.Clients as drugstore
 			and rootIntersection.LegalEntityId = le.Id
 WHERE i.Id IS NULL
 	{0}
-group by pd.pricecode, regions.regioncode, drugstore.Id;
+group by pd.pricecode, regions.regioncode, drugstore.Id, le.Id;
 ", filter));
 					prepare(query);
 					query.ExecuteUpdate();
