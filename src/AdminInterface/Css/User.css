@@ -72,3 +72,9 @@ tr.OddRow.NotExistsUser
 {
 	background-color: #98cbcb;
 }
+
+
+#user_Name
+{
+	width: 60%;
+}

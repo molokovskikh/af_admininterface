@@ -150,9 +150,8 @@
 				<% end %>
 			</div>
 			
-			Комментарий<br>
-			<input name=user.Name value="${user.Name}" style="width: 60%"><br>
-			<p>
+			${app.Label("user.Name")}<br>
+			${app.Edit("user.Name")}<br>
 		</div>
 		
 		<div class=block>

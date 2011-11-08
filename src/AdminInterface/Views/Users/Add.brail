@@ -1,4 +1,6 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
+﻿<link href="${siteroot}/Css/User.css" type="text/css" rel="stylesheet" />
+
+<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), client]} %>
 
 <% component CaptureFor, {"id" : "Title"}: %>
 	Новый пользователь
@@ -14,15 +16,12 @@
 	<form method=post name="AddUserForm" action="${siteroot}/users/add">
 		<input type=hidden value="${Client.Id}" name="clientId" />
 		<div class=block>
-			Комментарий<br>
-			<input type="text" name="user.Name" style="width: 60%"><br>
-			<label>Плательщик</label><br>
+			${app.Label("user.Name")}<br>
+			${app.Edit("user.Name")}<br>
+			${app.Label("user.Payer")}<br>
 			${app.Edit("user.Payer", client.Payers)}<br>
-			<input type="checkbox" name="user.SubmitOrders" value="true" /> Подтверждать отправку заказов<br>
-			<input type="hidden" name="user.SubmitOrders" value="false" />
-			
+			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.SendWaybills")}<br>
-
 			${app.Edit("user.SendRejects")}<br>
 		</div>
 
