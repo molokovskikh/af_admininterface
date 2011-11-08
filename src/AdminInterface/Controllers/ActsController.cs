@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -79,6 +80,7 @@ namespace AdminInterface.Controllers
 
 			var act = Act.Find(id);
 			PropertyBag["act"] = act;
+			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
 			if (IsPost)
 			{

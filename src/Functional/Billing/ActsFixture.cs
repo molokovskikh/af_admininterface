@@ -25,7 +25,7 @@ namespace Functional.Billing
 		[Test]
 		public void View_acts()
 		{
-			Open("/");
+			Open();
 			Assert.That(browser.Text, Is.StringContaining("Административный интерфейс"));
 			browser.Link(Find.ByText("Акты")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сформировать акты"));

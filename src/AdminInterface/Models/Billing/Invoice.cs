@@ -2,12 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Linq.Expressions;
-using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
-using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
@@ -29,7 +26,7 @@ namespace AdminInterface.Models.Billing
 		public Invoice(Advertising ad)
 			: this(ad.Payer)
 		{
-			Period = GetPeriod(Date);
+			Period = Date.ToPeriod();
 			Parts.Add(PartForAd(ad));
 			CalculateSum();
 		}
@@ -46,7 +43,7 @@ namespace AdminInterface.Models.Billing
 
 			SetPayer(payer);
 			Date = Payer.GetDocumentDate(date);
-			Period = GetPeriod(Date);
+			Period = Date.ToPeriod();
 		}
 
 		public Invoice(Payer payer, Period period, DateTime invoiceDate, IEnumerable<InvoicePart> parts)
@@ -78,16 +75,8 @@ namespace AdminInterface.Models.Billing
 				};
 		}
 
-		public static Period GetPeriod(DateTime dateTime)
-		{
-			return (Period)dateTime.Month + 3;
-		}
-
 		public void SetPayer(Payer payer)
 		{
-			if (payer.Recipient == null)
-				throw new Exception(String.Format("Получатель платежей для плательщика {0} не установлен", payer.Id));
-
 			Recipient = payer.Recipient;
 			Payer = payer;
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;

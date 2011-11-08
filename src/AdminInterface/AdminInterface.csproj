@@ -153,6 +153,7 @@
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListener.cs" />
+    <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Models\Billing\ReportLogProcessorState.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
@@ -439,6 +440,7 @@
     <None Include="Views\Templates\Addresses.brail" />
     <None Include="Views\Templates\DocumentPayerSelector.brail" />
     <None Include="Views\Templates\Messages.brail" />
+    <None Include="Views\Templates\Nomenclatures.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Templates\TwoColumnRadioList.brail" />

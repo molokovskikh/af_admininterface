@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Controllers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -12,7 +11,17 @@ namespace AdminInterface.Models.Billing
 	public class Act : ActiveRecordLinqBase<Act>
 	{
 		public Act()
-		{}
+		{
+			Parts = new List<ActPart>();
+		}
+
+		public Act(Payer payer, DateTime date)
+			: this()
+		{
+			SetPayer(payer);
+			ActDate = Payer.GetDocumentDate(date);
+			Period = date.ToPeriod();
+		}
 
 		public Act(DateTime actDate, params Invoice[] invoices)
 		{
@@ -45,7 +54,15 @@ namespace AdminInterface.Models.Billing
 			foreach (var invoice in invoices)
 				invoice.Act = this;
 		}
-		
+
+		public void SetPayer(Payer payer)
+		{
+			Payer = payer;
+			Recipient = payer.Recipient;
+			PayerName = payer.Name;
+			Customer = payer.Customer;
+		}
+
 		[PrimaryKey]
 		public uint Id { get; set; }
 
@@ -58,7 +75,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public decimal Sum { get; set; }
 
-		[BelongsTo]
+		[BelongsTo, ValidateNonEmpty("У плательщика должен быть установлен получатель платежей")]
 		public Recipient Recipient { get; set; }
 
 		[BelongsTo]
@@ -75,11 +92,6 @@ namespace AdminInterface.Models.Billing
 
 		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
-
-		public bool IsDuplicateDocument()
-		{
-			return Queryable.FirstOrDefault(a => a.Period == Period && a.Payer == Payer) != null;
-		}
 
 		public static IEnumerable<Act> Build(List<Invoice> invoices, DateTime documentDate)
 		{
@@ -102,6 +114,11 @@ namespace AdminInterface.Models.Billing
 		public ActPart()
 		{}
 
+		public ActPart(Act act)
+		{
+			Act = act;
+		}
+
 		public ActPart(string name, int count, decimal cost)
 		{
 			Name = name;
@@ -121,12 +138,12 @@ namespace AdminInterface.Models.Billing
 		[Property, ValidateGreaterThanZero]
 		public int Count { get; set; }
 
+		[BelongsTo]
+		public Act Act { get; set; }
+
 		public decimal Sum
 		{
 			get { return Count * Cost; }
 		}
-
-		[BelongsTo]
-		public Act Act { get; set; }
 	}
 }
