@@ -132,7 +132,6 @@
 		var id = this.id.substring(0, this.id.indexOf("CalendarHolder"));
 		var value = $("#" + id).get(0).value;
 
-
 		var calendar = Calendar.setup({
 			daFormat: "%d.%m.%Y",
 			ifFormat: "%d.%m.%Y",
@@ -178,17 +177,19 @@ function HideVisible(folder) {
 }
 
 function SetupCalendarElements() {
-	$(".CalendarInput")
-	.each(function (index, value) {
+	$(".CalendarInput").each(function (index, value) {
 		value.id = "CalendarInput" + index;
 		$(value).prev().id = "CalendarInputField" + index;
-		Calendar.setup({
-			ifFormat: "%d.%m.%Y",
-			inputField: $(value).prev().get(0),
-			button: value.id,
-			weekNumbers: false,
-			showOthers: true
-		});
+		input = $(value).prev().get(0);
+		if (!$(input).attr("disabled")) {
+			Calendar.setup({
+				ifFormat: "%d.%m.%Y",
+				inputField: input,
+				button: value.id,
+				weekNumbers: false,
+				showOthers: true
+			});
+		}
 	});
 }
 
