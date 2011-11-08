@@ -1,12 +1,9 @@
-using System;
+﻿using System;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.log4net;
 
 namespace Integration.Models
 {
@@ -44,7 +41,7 @@ namespace Integration.Models
 
 			Reopen();
 			payer = Payer.Find(payer.Id);
-			var invoices = payer.BuildInvoices(DateTime.Now, Invoice.GetPeriod(DateTime.Now));
+			var invoices = payer.BuildInvoices(DateTime.Now, DateTime.Now.ToPeriod());
 			var invoice = invoices.First();
 			Close();
 			Assert.That(invoice.Id, Is.EqualTo(0));
@@ -60,7 +57,7 @@ namespace Integration.Models
 			payer.Refresh();
 
 			var invoiceDate = new DateTime(2011, 09, 11);
-			var invoice = new Invoice(payer, Invoice.GetPeriod(invoiceDate), invoiceDate);
+			var invoice = new Invoice(payer, invoiceDate.ToPeriod(), invoiceDate);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(2), invoice.Parts.Implode());
 			var part = invoice.Parts[1];
 			Assert.That(part.Sum, Is.EqualTo(5000));

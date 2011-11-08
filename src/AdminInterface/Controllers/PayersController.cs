@@ -86,7 +86,7 @@ namespace AdminInterface.Controllers
 				return;
 			}
 
-			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now, group);
+			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now, group);
 			PropertyBag["doc"] = invoice;
 			PropertyBag["invoice"] = invoice;
 			LayoutName = "Print";
@@ -108,6 +108,7 @@ namespace AdminInterface.Controllers
 					invoice.SetPayer(payer);
 					invoice.CalculateSum();
 					invoice.Save();
+					Notify("Счет сформирован");
 					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
 				}
 			}
@@ -115,6 +116,32 @@ namespace AdminInterface.Controllers
 			{
 				invoice.Parts.Add(new InvoicePart(invoice));
 			}
+		}
+
+		public void NewAct(uint id)
+		{
+			var payer = Payer.Find(id);
+			var act = new Act(payer, DateTime.Now);
+			PropertyBag["act"] = act;
+			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
+
+			if (IsPost)
+			{
+				BindObjectInstance(act, "act");
+				if (IsValid(act))
+				{
+					act.SetPayer(payer);
+					act.CalculateSum();
+					act.Save();
+					Notify("Акт сформирован");
+					Redirect("Billing", "Edit", new {BillingCode = payer.Id});
+				}
+			}
+			else
+			{
+				act.Parts.Add(new ActPart(act));
+			}
+			RenderView("/Acts/Edit");
 		}
 
 		public void Ad(uint id)

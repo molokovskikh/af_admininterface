@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
-using Common.Web.Ui.Models;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -78,7 +76,7 @@ namespace Unit.Models
 		{
 			var ad = new Advertising(payer) {Cost = 1500};
 			payer.Ads.Add(ad);
-			invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			var act = new Act(DateTime.Now, invoice);
 			Assert.That(ad.Act, Is.EqualTo(act));
 			Assert.That(act.Sum, Is.EqualTo(2300));
@@ -92,7 +90,7 @@ namespace Unit.Models
 			var user = new User(client);
 			user.Accounting.ReadyForAccounting = true;
 
-			invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			var act = new Act(DateTime.Now, invoice);
 			Assert.That(act.Parts.Count, Is.EqualTo(2), act.Parts.Implode());
 			Assert.That(act.Parts[0].Sum, Is.EqualTo(800), act.Parts.Implode());

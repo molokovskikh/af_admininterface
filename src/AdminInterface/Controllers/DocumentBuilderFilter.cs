@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models.Billing;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate.Criterion;
@@ -10,6 +12,7 @@ namespace AdminInterface.Controllers
 {
 	public class DocumentBuilderFilter
 	{
+		public uint[] PayerId { get; set; }
 		public Period Period { get; set; }
 		public Region Region { get; set; }
 		public Recipient Recipient { get; set; }
@@ -21,13 +24,20 @@ namespace AdminInterface.Controllers
 
 			criteria.Add(Expression.Eq("Period", Period));
 
-			if (Region != null)
-				criteria.CreateCriteria("p.Clients", "c")
-					.Add(Expression.Sql("{alias}.RegionCode = " + Region.Id));
-			/*.Add(Expression.Eq("c.HomeRegion", Region))*/
+			if (PayerId != null && PayerId.Length > 0)
+			{
+				criteria.Add(Expression.In("p.PayerID", PayerId));
+			}
+			else
+			{
+				if (Region != null)
+					criteria.CreateCriteria("p.Clients", "c")
+						.Add(Expression.Sql("{alias}.RegionCode = " + Region.Id));
+				/*.Add(Expression.Eq("c.HomeRegion", Region))*/
 
-			if (Recipient != null)
-				criteria.Add(Expression.Eq("Recipient", Recipient));
+				if (Recipient != null)
+					criteria.Add(Expression.Eq("Recipient", Recipient));
+			}
 
 			List<T> items = null;
 
@@ -41,17 +51,17 @@ namespace AdminInterface.Controllers
 			return items;
 		}
 
-		public Dictionary<string, string> ToUrl()
+		public PayerDocumentFilter ToDocumentFilter()
 		{
-			var map = new Dictionary<string, string> {
-				{"filter.Period", Period.ToString()},
+			var filter = new PayerDocumentFilter {
+				Period = Period,
+				Region = Region,
+				Recipient = Recipient
 			};
-			if (Region != null)
-				map.Add("filter.Region.Id", Region.Id.ToString());
 
-			if (Recipient != null)
-				map.Add("filter.Recipient.Id", Recipient.Id.ToString());
-			return map;
+			if (PayerId != null && PayerId.Length > 0)
+				filter.SearchText = PayerId.Implode();
+			return filter;
 		}
 	}
 }

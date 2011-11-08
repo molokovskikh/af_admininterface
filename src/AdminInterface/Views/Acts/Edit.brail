@@ -7,7 +7,13 @@
 	});
 </script>
 
+<% if act.Id: %>
 <h2>Редактирование акта №${act.Id}</h2>
+<% else: %>
+<h2>Формирование дополнительного акта</h2>
+<% end %>
+
+${app.GetValidationError(act, "Recipient")}
 
 <form class="accountant-friendly" method=post>
 	<div class=block>
@@ -38,6 +44,9 @@
 		</tr>
 		</table>
 	</div>
+
+	<% OutputSubView("/Templates/Nomenclatures") %>
+
 	<div class=block>
 		<table class="DataTable editable">
 			<thead>
@@ -54,15 +63,15 @@
 					<a href="javascript:" class=delete>Удалить</a>
 				</td>
 				<td>
-					<textarea name="act.parts[${i}].name" cols=30 rows=2 class="required">${part.Name}</textarea>
+					<textarea id="act_parts_${i}__name" name="act.parts[${i}].name" cols=30 rows=2 class="required">!{part.Name}</textarea>
 					${app.GetValidationError(part, "Name")}
 				</td>
 				<td>
-					<input name="act.parts[${i}].cost" type=text class="required validate-cost" value="${part.Cost}">
+					<input id="act_parts_${i}__cost" name="act.parts[${i}].cost" type=text class="required validate-cost" value="!{part.Cost}">
 					${app.GetValidationError(part, "Cost")}
 				</td>
 				<td>
-					<input type=text name="act.parts[${i}].count" class="required validate-count" value="${part.Count}">
+					<input type=text id="act_parts_${i}__count" name="act.parts[${i}].count" class="required validate-count" value="!{part.Count}">
 					${app.GetValidationError(part, "Count")}
 				</td>
 			</tr>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -50,7 +51,7 @@ namespace AdminInterface.Controllers
 			foreach (var act in Act.Build(invoices, actDate))
 				act.Save();
 
-			RedirectToAction("Index", filter.ToUrl());
+			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
 		}
 
 		public void Process([ARDataBind("acts", AutoLoadBehavior.Always)] Act[] acts)
@@ -66,7 +67,7 @@ namespace AdminInterface.Controllers
 			if (Form["print"] != null)
 			{
 				var printer = Form["printer"];
-				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id.ToString()));
+				var arguments = String.Format("act \"{0}\" \"{1}\"", printer, acts.Implode(a => a.Id));
 				Printer.Execute(arguments);
 				Flash["message"] = "Отправлено на печать";
 				RedirectToReferrer();
@@ -79,6 +80,7 @@ namespace AdminInterface.Controllers
 
 			var act = Act.Find(id);
 			PropertyBag["act"] = act;
+			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
 
 			if (IsPost)
 			{

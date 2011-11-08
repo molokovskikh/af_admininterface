@@ -48,7 +48,7 @@ namespace Integration.Processors
 
 		private Invoice BuildInvoice(DateTime date)
 		{
-			var invoices = payer.BuildInvoices(date, Invoice.GetPeriod(date));
+			var invoices = payer.BuildInvoices(date, date.ToPeriod());
 
 			Assert.That(invoices.Count(), Is.EqualTo(1));
 			var invoice = invoices.Single();

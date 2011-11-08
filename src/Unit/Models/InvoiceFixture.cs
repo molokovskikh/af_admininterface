@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
-using Common.Web.Ui.Models;
 using NUnit.Framework;
 
 namespace Unit.Models
@@ -99,7 +97,7 @@ namespace Unit.Models
 
 			var ad = new Advertising(payer) {Cost = 1500};
 			payer.Ads.Add(ad);
-			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			Assert.That(invoice.Sum, Is.EqualTo(1500));
 			var part = invoice.Parts.Single();
 			Assert.That(part.Name, Is.EqualTo("Рекламное объявление в информационной системе"));
@@ -123,7 +121,7 @@ namespace Unit.Models
 			client.Users.Add(new User(client));
 			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
-			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(2), invoice.Parts.Implode());
 			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(800), invoice.Parts.Implode());
 			Assert.That(invoice.Parts[0].Count, Is.EqualTo(1), invoice.Parts.Implode());
@@ -140,7 +138,7 @@ namespace Unit.Models
 			payer.Users[1].Accounting.Payment = 600;
 			payer.Users[1].Accounting.InvoiceGroup = 1;
 
-			var invoices = payer.BuildInvoices(DateTime.Now, Invoice.GetPeriod(DateTime.Now)).ToList();
+			var invoices = payer.BuildInvoices(DateTime.Now, DateTime.Now.ToPeriod()).ToList();
 			Assert.That(invoices.Count, Is.EqualTo(2));
 			var invoice = invoices[0];
 			Assert.That(invoice.Parts.Count, Is.EqualTo(1));
@@ -154,7 +152,7 @@ namespace Unit.Models
 		[Test]
 		public void Set_pay_date()
 		{
-			var invoice = new Invoice(payer, Invoice.GetPeriod(DateTime.Now), DateTime.Now);
+			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
 			var part = invoice.Parts[0];
 			Assert.That(part.PayDate, Is.EqualTo(invoice.Date));
 			Assert.That(part.Processed, Is.False);

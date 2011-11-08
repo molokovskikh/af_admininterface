@@ -39,7 +39,8 @@
 			"Common.css",
 			"Contacts.css",
 			"form.css",
-			"User.css")}
+			"User.css",
+			"columns.css")}
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>

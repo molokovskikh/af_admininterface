@@ -1,0 +1,7 @@
+﻿.column1of2, .column2of2
+{
+	float:left;
+	width: 50%;
+	padding:0;
+	margin:0;
+}

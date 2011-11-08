@@ -40,19 +40,32 @@ namespace Functional.Billing
 			Assert.That(browser.Text, Is.StringContaining("У плательщика не указан получатель платежей, выберете получателя платежей"));
 		}
 
+		[Test]
+		public void Create_act()
+		{
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			Open(payer);
+			Click("Доп. акт");
+			AssertText("Формирование дополнительного акта");
+			Css("#act_ActDate").Value = DateTime.Now.ToShortDateString();
+			Css("#act_parts_0__name").Value = "Информационные услуги за октябрь";
+			Css("#act_parts_0__cost").Value = "800";
+			Css("#act_parts_0__count").Value = "2";
+			Click("Сохранить");
+			AssertText("Акт сформирован");
+		}
+
 		[Test, Ignore("Не реализованно")]
 		public void Custom_invoice()
 		{
-			Payer payer = null;
-			using (var browser = Open(payer))
-			{
-				browser.Link(Find.ByText("Новый счет")).Click();
-				browser.Css("#invoice_date").Value = DateTime.Now;
-				browser.Css("#invoice_bills[0]_Name").Value = "Информационные услуги за октябрь";
-				browser.Css("#invoice_bills[0]_Cost").Value = "500";
-				browser.Css("#invoice_bills[0]_Count").Value = "1";
-				browser.Button(Find.ByText("Сохранить")).Click();
-			}
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+			Open(payer);
+			Click("Новый счет");
+			Css("#invoice_date").Value = DateTime.Now;
+			Css("#invoice_bills[0]_Name").Value = "Информационные услуги за октябрь";
+			Css("#invoice_bills[0]_Cost").Value = "500";
+			Css("#invoice_bills[0]_Count").Value = "1";
+			Click("Сохранить");
 		}
 	}
 }

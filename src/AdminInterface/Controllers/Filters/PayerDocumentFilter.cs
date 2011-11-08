@@ -1,14 +1,9 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
-using AdminInterface.MonoRailExtentions;
-using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 
@@ -55,7 +50,23 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Expression.Eq("Recipient", Recipient));
 
 			if (!String.IsNullOrEmpty(SearchText))
-				criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
+			{
+				var parts = SearchText.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+				var ids = parts
+				.Select(p => {
+					uint id;
+					uint.TryParse(p, out id);
+					return id;
+				})
+				.Where(p => p > 0)
+				.ToArray();
+
+				if (ids.Length == parts.Length)
+					criteria.Add(Expression.In("p.PayerID", ids));
+				else
+					criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
+			}
+
 			if (typeof(T) == typeof(Act))
 				SortKeyMap["Date"] = "ActDate";
 

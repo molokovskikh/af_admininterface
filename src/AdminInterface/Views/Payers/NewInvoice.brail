@@ -4,10 +4,6 @@
 		$("#bills").data("template", function (table) {
 			return $(table.find("tr").get(1)).clone();
 		});
-
-		$("#add-reference").click(function () {
-			$("#bills tr:last textarea").val($("#reference").val());
-		});
 	});
 </script>
 
@@ -51,16 +47,7 @@ ${app.GetValidationError(invoice, "Recipient")}
 	</div>
 	<div class=block>
 
-		<% if IsDefined(@references) and references.Count: %>
-		<p>
-			<select id=reference>
-				<% for reference in references: %>
-				<option>${reference.Name}</option>
-				<% end %>
-			</select>
-			<input type=button id="add-reference" value="Вставить услугу из справочника">
-		</p>
-		<% end %>
+		<% OutputSubView("/Templates/Nomenclatures") %>
 
 		<table id=bills class="DataTable editable">
 			<thead>

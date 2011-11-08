@@ -8,7 +8,7 @@
 	</div>
 
 	<div class=block style="float:left; width: 100%;padding:0;">
-		<div style="float:left; width: 50%">
+		<div class=column1of2>
 			<div style="margin:10px">
 				<h3>Реестр счетов</h3>
 				${app.BeginFormFor("filter")}
@@ -20,45 +20,36 @@
 			</div>
 		</div>
 
-		<div style="float:left; width: 50%">
+		<div class=column2of2>
 			<div style="margin:10px">
 				<h3>Сформировать счета</h3>
 				<form action='${siteroot}/Invoices/Build' method=post>
-					<p>
-						<label>За период</label>
-						${FormHelper.Select(
-							"period",
-							BindingHelper.GetDescriptionsDictionary("AdminInterface.Models.Billing.Period, AdminInterface"),
-							BindingHelper.GetDictionaryMapping())}
-						<br>
-						<label>Регион</label>
-						<select name=regionId>
-							<% for region in regions: %>
-								<option value=${region.Id}>${region.Name}</option>
-							<% end %>
-						</select>
-						<br>
-						<label>Получатель</label>
-						<select name=recipientId>
-							<% for recipient in recipients: %>
-								<option value=${recipient.Id}>${recipient.Name}</option>
-							<% end %>
-						</select>
-						<br>
-						<label>Дата счета</label>
-						<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
-						<input type=button class=CalendarInput>
-						<br>
-						<label>Принтер</label>
-						<select name=printer>
-						<% for printer in printers: %>
-							<option value='${printer}'>${printer}</option>
-						<% end %>
-						</select>
-					</p>
-					<p>
-						<input type=submit value="Сформировать">
-					</p>
+					<% OutputSubView("/Templates/DocumentPayerSelector") %>
+					<table>
+						${app.FilterFor("buildFilter.Period")}
+						<tr>
+							<td class="filter-label">Дата акта:</td>
+							<td colspan=2>
+								<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
+								<input type=button class=CalendarInput>
+							</td>
+						</tr>
+						<tr>
+							<td class="filter-label">Принтер</td>
+							<td colspan=2>
+								<select name=printer>
+								<% for printer in printers: %>
+									<option value='${printer}'>${printer}</option>
+								<% end %>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td colspan=3>
+								<input type=submit value="Сформировать">
+							</td>
+						</tr>
+					</table>
 				</form>
 			</div>
 		</div>

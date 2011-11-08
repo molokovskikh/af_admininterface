@@ -1,0 +1,33 @@
+﻿${app.Asset("search.editor.js")}
+
+<script>
+	$(function () {
+		$("#payers").data("template", function () {
+			return $("<tr>")
+				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
+				.append($("<td>")
+					.append(searchTemplate("Выберете плательщика", "${siteroot}/Clients/SearchPayer"))
+					.append("<input type=hidden name='buildFilter.PayerId'>"));
+		});
+	});
+</script>
+
+<div class=block>
+	<h4>Все плательщики</h4>
+	<table>
+		${app.FilterFor("buildFilter.Region")}
+		${app.FilterFor("buildFilter.Recipient")}
+	</table>
+</div>
+
+<h4>Или</h4>
+
+<div class=block>
+	<h4>Список плательщиков</h4>
+	<table class=editable id=payers>
+		<tr>
+			<th><input type=button class=add value=Добавить></th>
+			<th></th>
+		</tr>
+	</table>
+</div>
