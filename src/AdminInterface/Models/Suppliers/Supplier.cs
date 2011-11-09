@@ -106,6 +106,16 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
+		public virtual DateTime GetLastPriceUpdate()
+		{
+			return Prices
+				.SelectMany(p => p.Costs)
+				.Where(c => c.PriceItem != null)
+				.Select(c => c.PriceItem.PriceDate)
+				.DefaultIfEmpty()
+				.Max();
+		}
+
 		public static IList<Supplier> GetByPayerId(uint payerId)
 		{
 			return Queryable

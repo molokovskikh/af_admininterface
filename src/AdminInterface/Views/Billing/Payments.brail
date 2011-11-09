@@ -306,7 +306,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<th>Регион</th>
 						<th>Сегмент</th>
 						<th>Дата регистрации</th>
-						<td>Дата последнего прайс-листа</td>
+						<th>Дата последнего прайс-листа</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -337,7 +337,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<td>
 						${supplier.Registration.RegistrationDate.ToShortDateString() if supplier.Registration}
 					</td>
-					<td></td>
+					<td>${supplier.GetLastPriceUpdate()}</td>
 					<td>
 						<a class="icon icon-email" href="mailto:${supplier.GetEmailsForBilling()}"></a>
 					</td>

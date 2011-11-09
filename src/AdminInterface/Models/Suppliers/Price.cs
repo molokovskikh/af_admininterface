@@ -122,6 +122,9 @@ namespace AdminInterface.Models.Suppliers
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
+		[Property]
+		public virtual DateTime PriceDate { get; set; }
+
 		[BelongsTo("FormRuleId", Cascade = CascadeEnum.All)]
 		public virtual FormRule FormRule { get; set; }
 	}
