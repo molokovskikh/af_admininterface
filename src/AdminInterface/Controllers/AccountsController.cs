@@ -30,7 +30,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["totalPages"] = pager.TotalPages;
 
 			PropertyBag["tab"] = tab;
-			PropertyBag["FindBy"] = filter;
 			PropertyBag["filter"] = filter;
 		}
 
