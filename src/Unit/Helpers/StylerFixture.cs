@@ -14,7 +14,22 @@ namespace Unit.Helpers
 		public class TestClass
 		{
 			[Style]
-			public bool Disabled { get; set; }
+			public virtual bool Disabled { get; set; }
+		}
+
+		public class TestChild : TestClass
+		{
+			public override bool Disabled
+			{
+				get
+				{
+					return base.Disabled;
+				}
+				set
+				{
+					base.Disabled = value;
+				}
+			}
 		}
 
 		[SetUp]
@@ -50,9 +65,10 @@ namespace Unit.Helpers
 		}
 
 		[Test]
-		public void Test()
+		public void Inherit_styles()
 		{
-			Assert.That(String.Join(" ", styler.GetStyles(new Address())), Is.EqualTo("123"));
+			var styles = styler.GetStyles(new TestChild { Disabled = true });
+			Assert.That(styles.ToArray(), Is.EquivalentTo(new [] {"disabled"}));
 		}
 	}
 }
