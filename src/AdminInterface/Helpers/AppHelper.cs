@@ -54,14 +54,7 @@ namespace AdminInterface.Helpers
 
 		public string Style(params object[] item)
 		{
-/*
-			if (item is IEnablable)
-			{
-				if (!((IEnablable)item).Enabled)
-					return "DisabledByBilling";
-			}
-*/
-			return String.Join(" ", item.SelectMany(i => _styler.GetStyles(i)));
+			return String.Join(" ", item.SelectMany(i => _styler.GetStyles(i).Distinct()));
 		}
 
 		public override string LinkTo(object item, object title, string action)

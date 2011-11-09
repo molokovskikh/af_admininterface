@@ -296,7 +296,7 @@ ORDER BY {Payer}.shortname;";
 
 		private IEnumerable<SupplierAccount> SupplierAccounts()
 		{
-			return Suppliers.Select(s => s.Account);
+			return Suppliers.Select(s => s.Account).Where(a => a.ShouldPay());
 		}
 
 		private IEnumerable<Account> AddressesForInvoice()
