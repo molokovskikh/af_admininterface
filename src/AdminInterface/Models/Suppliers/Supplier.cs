@@ -26,6 +26,7 @@ namespace AdminInterface.Models.Suppliers
 			: this()
 		{
 			HomeRegion = homeRegion;
+			Account = new SupplierAccount(this);
 		}
 
 		public Supplier()
@@ -52,7 +53,7 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo, Auditable, Description("Домашний регион")]
 		public override Region HomeRegion { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public override bool Disabled
 		{
 			get
@@ -81,6 +82,9 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("ContactGroupOwnerId", Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
+
+		[BelongsTo(Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
+		public virtual SupplierAccount Account { get; set; }
 
 		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<Price> Prices { get; set; }

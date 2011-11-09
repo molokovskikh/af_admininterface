@@ -35,7 +35,7 @@ namespace AdminInterface.Controllers
 		public IList<ClientInfoLogEntity> Find()
 		{
 			return ArHelper.WithSession(s => {
-				var id = 0u;
+				uint id;
 				uint.TryParse(SearchText, out id);
 				var query = s.QueryOver<ClientInfoLogEntity>()
 					.Where(l => l.WriteTime >= Period.Begin && l.WriteTime <= Period.End.AddDays(1))

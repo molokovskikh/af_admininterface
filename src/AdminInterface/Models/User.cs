@@ -56,10 +56,19 @@ namespace AdminInterface.Models
 	public interface IEnablable
 	{
 		bool Enabled { get; }
+
+		[Style]
+		bool Disabled { get; }
+	}
+
+	public interface IDisabledByParent
+	{
+		[Style]
+		bool DisabledByParent { get; }
 	}
 
 	[ActiveRecord(Schema = "future", Lazy = true), Auditable]
-	public class User : ActiveRecordLinqBase<User>, IEnablable
+	public class User : ActiveRecordLinqBase<User>, IEnablable, IDisabledByParent
 	{
 		private string _name;
 		private bool _enabled;
@@ -257,6 +266,18 @@ namespace AdminInterface.Models
 			}
 		}
 
+		[Style]
+		public virtual bool DisabledByParent
+		{
+			get { return RootService.Disabled; }
+		}
+
+		[Style]
+		public virtual bool Disabled
+		{
+			get { return !Enabled; }
+		}
+
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
@@ -418,14 +439,12 @@ namespace AdminInterface.Models
 			}
 		}
 
-		/// <summary>
-		/// Пользователь считается активным, если он получал обновление не более 7 дней назад
-		/// </summary>
-		public virtual bool IsActive
+		[Style]
+		public virtual bool IsOldUserUpdate
 		{
 			get
 			{
-				return Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7;
+				return !(Logs.AFTime.HasValue && DateTime.Now.Subtract(Logs.AFTime.Value).Days <= 7);
 			}
 		}
 
@@ -560,7 +579,7 @@ WHERE
 			else
 				ContactGroup.AddPerson(name);
 		}
-		
+
 		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
 			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))

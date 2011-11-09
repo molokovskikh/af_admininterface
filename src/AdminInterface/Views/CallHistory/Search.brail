@@ -20,7 +20,7 @@
 
 	<form id="SearchForm" action=search method="post">
 
-		<table style="width:100%">
+		<table>
 			<tr>
 				<td>Введите текст для поиска:</td>
 			</tr>
@@ -31,11 +31,11 @@
 			</tr>
 		</table>
 	
-		<fieldset style="padding: 0; margin: 0;">
+		<fieldset>
 			<legend>Период</legend>
-			<table style="width: 100%;">
+			<table>
 				<colgroup>
-				<col style="width:40%" />
+					<col style="width:40%" />
 					<col style="width:60%" />
 				</colgroup>
 
@@ -58,9 +58,9 @@
 			</table>
 		</fieldset>
 	
-		<fieldset style="padding: 0; margin: 0;">
+		<fieldset>
 			<legend>Фильтры:</legend>
-			<table style="width: 100%;" >
+			<table>
 				<colgroup>
 					<col style="width:40%" />
 					<col style="width:60%" />

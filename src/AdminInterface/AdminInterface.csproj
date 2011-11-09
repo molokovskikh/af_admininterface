@@ -150,15 +150,21 @@
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
+    <Compile Include="Helpers\AttributeStyler.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Models\AuditListener.cs" />
+    <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
+    <Compile Include="Helpers\Pager.cs" />
+    <Compile Include="Models\Billing\ReportAccount.cs" />
     <Compile Include="Models\Billing\ReportLogProcessorState.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
     <Compile Include="Models\Billing\IgnoredInn.cs" />
     <Compile Include="Models\Billing\PayerAuditRecord.cs" />
+    <Compile Include="Models\Billing\SupplierAccount.cs" />
+    <Compile Include="Models\Billing\UserAccount.cs" />
     <Compile Include="Models\Logs\SupplierLog.cs" />
     <Compile Include="Models\Printer.cs" />
     <Compile Include="Models\Suppliers\Intersection.cs" />
@@ -368,6 +374,12 @@
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
+    <Content Include="Images\email.png" />
+    <Content Include="Images\group.png" />
+    <Content Include="Images\kfm_home.png" />
+    <Content Include="Images\loading.gif" />
+    <Content Include="Images\sipphone.png" />
+    <Content Include="Images\Sound-icon.png" />
     <Content Include="JavaScript\builder.js" />
     <Content Include="JavaScript\coffee-script.js" />
     <Content Include="JavaScript\Common.js" />
@@ -443,7 +455,6 @@
     <None Include="Views\Templates\Nomenclatures.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
-    <None Include="Views\Templates\TwoColumnRadioList.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
   </ItemGroup>
   <ItemGroup>
@@ -468,13 +479,9 @@
     <Content Include="Images\ajax-loader.gif" />
     <Content Include="Images\bc_bg.png" />
     <Content Include="Images\bc_separator.png" />
-    <Content Include="Images\BottomLeftCorner.png" />
-    <Content Include="Images\BottomRightCorner.png" />
     <Content Include="Images\error.png" />
     <Content Include="Images\false.png" />
     <Content Include="Images\home.png" />
-    <Content Include="Images\TopLeftCorner.png" />
-    <Content Include="Images\TopRightCorner.png" />
     <Content Include="Images\true.png" />
     <Content Include="Images\warning.png" />
     <Content Include="JavaScript\date-ru-RU.js" />

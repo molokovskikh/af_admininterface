@@ -25,7 +25,7 @@ using AdminInterface.Models.Billing;
 namespace AdminInterface.Models
 {
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
-	public class Address : ActiveRecordLinqBase<Address>, IEnablable
+	public class Address : ActiveRecordLinqBase<Address>, IEnablable, IDisabledByParent
 	{
 		private bool _enabled;
 
@@ -105,6 +105,18 @@ namespace AdminInterface.Models
 			get { return LegalEntity.Name; }
 		}
 
+		[Style]
+		public virtual bool Disabled
+		{
+			get { return !Enabled; }
+		}
+
+		[Style]
+		public virtual bool DisabledByParent
+		{
+			get { return Client.Disabled; }
+		}
+
 		public virtual bool AvaliableFor(User user)
 		{
 			return AvaliableForUsers.Any(u => u.Id == user.Id);
@@ -122,15 +134,12 @@ namespace AdminInterface.Models
 			}
 		}
 
-		/// <summary>
-		/// true - адрес активен (активен хотя бы один пользователь, которому доступен этот адрес)
-		/// false - адрес неактивен (неактивны все пользователи, которым доступен этот адрес)
-		/// </summary>
-		public virtual bool IsActive
+		[Style]
+		public virtual bool IsOldUserUpdate
 		{
 			get
 			{
-				return (AvaliableForUsers.Where(user => user.IsActive).Count() > 0);
+				return !AvaliableForUsers.All(u => u.IsOldUserUpdate);
 			}
 		}
 

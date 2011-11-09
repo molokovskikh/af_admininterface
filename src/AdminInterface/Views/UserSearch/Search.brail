@@ -26,20 +26,19 @@
 		Введите текст для поиска:<br />
 		${app.Edit("filter.SearchText")}
 	</p>
-	<table style="width: 100%;">
+	<table>
 		<tr>
 			<td>Искать по:</td><td></td><td></td>
 		</tr>
 		<tr>
-			<td>
-			</td>
+			<td></td>
 			${app.Edit("filter.SearchBy", "TwoColumnRadioList")}
 		</tr>
 	</table>
 	
 	<fieldset>
 		<legend>Фильтры:</legend>
-		<table style="width:100%" border="0">
+		<table>
 			<col style="width:25%" />
 			<col style="width:25%" />
 			<col style="width:25%" />
@@ -112,9 +111,9 @@
 						oldUpdate = true
 						if (item.UpdateDate != null):
 							oldUpdate = (System.DateTime.Now.Subtract(item.UpdateDate).TotalDays >= 2)
-						end    
+						end
 					%>
-					<td class="${'OldUserUpdate' if (oldUpdate)} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
+					<td class="${'old-user-update' if oldUpdate} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
 					<td>${item.AFVersion}</td>
 					<td>${BindingHelper.GetDescription(item.ClientType)}</td>
 					<td>${BindingHelper.GetDescription(item.Segment)}</td>

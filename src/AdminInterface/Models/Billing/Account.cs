@@ -1,188 +1,16 @@
 ﻿using System;
 using System.Linq;
-using System.ComponentModel;
 using System.Collections.Generic;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
-using Common.MySql;
 using Common.Web.Ui.Helpers;
-using NHibernate;
 
 namespace AdminInterface.Models.Billing
 {
-	[ActiveRecord(DiscriminatorValue = "0")]
-	public class UserAccount : Account
-	{
-		public UserAccount() {}
-
-		public UserAccount(User user)
-		{
-			User = user;
-			if (user.RootService.GetType() == typeof(Supplier))
-				_payment = User.RootService.HomeRegion.SupplierUserPayment;
-			else
-				_payment = User.RootService.HomeRegion.UserPayment;
-		}
-
-		[BelongsTo("ObjectId")]
-		public virtual User User { get; set; }
-
-		public override uint ObjectId
-		{
-			get { return User.Id; }
-		}
-
-		public override Service Service
-		{
-			get
-			{
-				return User.RootService;
-			}
-		}
-
-		public override Payer Payer
-		{
-			get { return User.Payer; }
-		}
-
-		public override string Name
-		{
-			get { return User.Name; }
-		}
-
-		public override LogObjectType ObjectType
-		{
-			get { return LogObjectType.User; }
-		}
-
-		public override bool ShouldPay()
-		{
-			return !User.RootService.Disabled && User.Enabled && base.ShouldPay();
-		}
-	}
-
-	[ActiveRecord(DiscriminatorValue = "1")]
-	public class AddressAccount : Account
-	{
-		public AddressAccount() {}
-
-		public AddressAccount(Address address)
-		{
-			Address = address;
-			_payment = Address.Client.HomeRegion.AddressPayment;
-		}
-
-		[BelongsTo("ObjectId")]
-		public virtual Address Address { get; set; }
-
-		public override Service Service
-		{
-			get
-			{
-				return Address.Client;
-			}
-		}
-
-		public override Payer Payer
-		{
-			get { return Address.Payer; }
-		}
-
-		public override string Name
-		{
-			get { return Address.Name; }
-		}
-
-		public override LogObjectType ObjectType
-		{
-			get { return LogObjectType.Address; }
-		}
-
-		public override uint ObjectId
-		{
-			get { return Address.Id; }
-		}
-
-		public virtual bool HasPaidUsers
-		{
-			get
-			{
-				// Кол-во пользователей, которым доступен этот адрес и которые включены работают НЕ бесплатно, должно быть НЕ нулевым
-				return (Address.AvaliableForUsers.Where(user => !user.Accounting.IsFree && user.Enabled).Count() > 0);
-			}
-		}
-
-		public override bool ShouldPay()
-		{
-			return Address.Client.Enabled && Address.Enabled && HasPaidUsers && base.ShouldPay();
-		}
-	}
-
-	[ActiveRecord(DiscriminatorValue = "2")]
-	public class ReportAccount : Account
-	{
-		public ReportAccount() {}
-
-		public ReportAccount(Report report)
-		{
-			Report = report;
-			_readyForAccounting = true;
-		}
-
-		[BelongsTo("ObjectId", Cascade = CascadeEnum.All)]
-		public virtual Report Report { get; set; }
-
-		public override Payer Payer
-		{
-			get { return Report.Payer; }
-		}
-
-		public override string Name
-		{
-			get { return Report.Comment; }
-		}
-
-		public override LogObjectType ObjectType
-		{
-			get { return LogObjectType.Report; }
-		}
-
-		public override uint ObjectId
-		{
-			get { return Report.Id; }
-		}
-
-		public override bool ShouldPay()
-		{
-			return Report.Allow && base.ShouldPay();
-		}
-
-		public override bool Status
-		{
-			get
-			{
-				return Report.Allow;
-			}
-			set
-			{
-				Report.Allow = value;
-			}
-		}
-
-		public override string DefaultDescription
-		{
-			get
-			{
-				return "Статистический отчет по фармрынку за {0}";
-			}
-		}
-	}
-
 	[ActiveRecord(DiscriminatorColumn = "Type", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
@@ -255,7 +83,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual int InvoiceGroup { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore)]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public virtual bool IsFree
 		{
 			get
@@ -359,42 +187,6 @@ namespace AdminInterface.Models.Billing
 		public virtual IAuditRecord GetAuditRecord()
 		{
 			return new PayerAuditRecord(Payer, this);
-		}
-	}
-
-	public class Pager
-	{
-		public int Page;
-		public int PageSize = 30;
-
-		public int Total;
-
-		public int TotalPages
-		{
-			get
-			{
-				var result = Total / PageSize;
-				if (Total % PageSize > 0)
-					result++;
-				return result;
-			}
-		}
-
-		public Pager()
-		{}
-
-		public Pager(int? page, int pageSize)
-		{
-			if (page != null)
-				Page = page.Value;
-			PageSize = pageSize;
-		}
-
-		public IEnumerable<T> DoPage<T>(IEnumerable<T> enumerable)
-		{
-			return enumerable
-				.Skip(Page*PageSize)
-				.Take(PageSize);
 		}
 	}
 }

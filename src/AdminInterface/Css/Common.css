@@ -165,3 +165,10 @@ table td.NotCommitedUpdate
 {
 	background-color: #e2c5c5;
 }
+
+.waiter
+{
+	background-image: url(../images/loading.gif);
+	width: 18px;
+	height: 18px;
+}

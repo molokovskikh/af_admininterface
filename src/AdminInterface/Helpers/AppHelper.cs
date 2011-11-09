@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
@@ -11,6 +12,8 @@ namespace AdminInterface.Helpers
 {
 	public class AppHelper : Common.Web.Ui.Helpers.AppHelper
 	{
+		private Styler _styler = new Styler();
+
 		public AppHelper()
 		{}
 
@@ -49,14 +52,16 @@ namespace AdminInterface.Helpers
 			return assetHelper.Resource(new [] {name}, path, "<script type='" + type + "' src='{0}'></script>");
 		}
 
-		public string Style(object item)
+		public string Style(params object[] item)
 		{
+/*
 			if (item is IEnablable)
 			{
 				if (!((IEnablable)item).Enabled)
 					return "DisabledByBilling";
 			}
-			return "";
+*/
+			return String.Join(" ", item.SelectMany(i => _styler.GetStyles(i)));
 		}
 
 		public override string LinkTo(object item, object title, string action)

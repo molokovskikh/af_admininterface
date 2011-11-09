@@ -85,11 +85,6 @@
 </script>
 
 <style>
-	.InfoRow
-	{
-		height: 20px;
-	}
-	
 	input[type='text']
 	{
 		width: 70%;
@@ -112,10 +107,10 @@
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
-	<% if not client.IsClientActive(): %>
-	<div class="Warning">
-		<p>Клиент отключен</p>
-	</div>
+	<% if client.Disabled: %>
+		<div class="Warning">
+			<p>Клиент отключен</p>
+		</div>
 	<% end %>
 
 	<div class="TwoColumn">

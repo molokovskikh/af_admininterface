@@ -1,36 +1,6 @@
-﻿.OldUpdate
-{
-	background-color: Gray;
-}
-
-.HaveOnlyNotCommitedUpdates
-{
-	background-color: #ff7f7f;
-}
-
-.Debtor
+﻿.debtor, table.DataTable tr.debtor
 {
 	background-color: #ff4b42;
-}
-
-.PayerDisabled
-{
-	background-color: #ffa642;
-}
-
-.DisabledClient td
-{
-	background-color: #ff6600;
-}
-
-.DisabledLogin
-{
-	background-color: #bbffff;
-}
-
-.DisabledUser td
-{
-	background-color: #6a6a6a;
 }
 
 a.Disabled
@@ -41,16 +11,6 @@ a.Disabled
 .Disabled td
 {
 	background-color: #ff6600;
-}
-
-.BlockedLogin
-{
-	background-color: #f7c4f7;
-}
-
-.LoginNotExists
-{
-	background-color:#FFBABA;
 }
 
 .Error
@@ -71,11 +31,6 @@ a.Disabled
 .change-password-by-one-self
 {
 	background-color: #bbffbb;
-}
-
-.not-base-client
-{
-	background-color: #e7e7c2;
 }
 
 .DocumentNotParsed

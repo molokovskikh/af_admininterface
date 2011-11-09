@@ -118,6 +118,7 @@ namespace AdminInterface.Models
 			}
 		}
 
+		[Style]
 		public override bool Disabled
 		{
 			get
@@ -222,11 +223,6 @@ where
 						.ExecuteUpdate());
 				}
 			}
-		}
-
-		public virtual bool IsClientActive()
-		{
-			return Status == ClientStatus.On;
 		}
 
 		public static Client FindAndCheck(uint clientCode)

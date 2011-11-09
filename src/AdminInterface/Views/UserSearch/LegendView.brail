@@ -3,7 +3,7 @@
 	                                        "Пользователь отключен" : "DisabledInAd", 
 											"Пользователь заблокирован" : "LockedUser",
 											"Пользователь не существует" : "NotExistsUser",
-											"Обновление более 2 суток назад" : "OldUserUpdate",
+											"Обновление более 2 суток назад" : "old-user-update",
 											"Обновление не подтверждено" : "NotCommitedUpdate"},
 						"ByCenter" : false}
 %>

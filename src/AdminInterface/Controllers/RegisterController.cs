@@ -101,7 +101,9 @@ namespace AdminInterface.Controllers
 					currentPayer.Save();
 				}
 
+				currentPayer.Suppliers.Add(supplier);
 				supplier.Payer = currentPayer;
+				supplier.Account = new SupplierAccount(supplier);
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));
 				supplier.Save();

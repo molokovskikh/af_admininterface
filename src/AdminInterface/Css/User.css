@@ -28,32 +28,34 @@ table.DataTable tr.OddRow.DisabledInAd
 	background-color: #ff4848;
 }
 
-table.DataTable tr.EvenRow.DisabledByBilling
+/*ссылка на отключенного клиента/поставщика/адрес/пользователя*/
+a.disabled
 {
 	background-color: #ff9d5b;
 }
 
-table.DataTable tr.OddRow.DisabledByBilling
+/*легенда*/
+div.LegendMarker.disabled
 {
 	background-color: #ff9d5b;
 }
 
-.DisabledByBilling
+table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling
 {
 	background-color: #ff9d5b;
 }
 
-table.DataTable tr.OldUserUpdate
+table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled
 {
-	background-color: #aaaaaa;
+	background-color: #ff9d5b;
 }
 
-td.OldUserUpdate
+table.DataTable tr.OddRow.disabled-by-parent, table.DataTable tr.EvenRow.disabled-by-parent
 {
-	background-color: #aaaaaa;
+	background-color: #ff9d5b;
 }
 
-.OldUserUpdate
+table.DataTable tr.old-user-update, td.old-user-update, .old-user-update
 {
 	background-color: #aaaaaa;
 }

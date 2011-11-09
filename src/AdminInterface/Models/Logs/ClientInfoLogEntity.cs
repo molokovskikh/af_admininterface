@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
-using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -155,9 +155,15 @@ namespace AdminInterface.Models.Logs
 			return this;
 		}
 
-		public bool IsStatusChange()
+		[Style]
+		public bool IsDisabled
 		{
-			return Message.Contains("$$$Клиент ");
+			get
+			{
+				return Message.Contains("$$$Клиент включен")
+					|| Message.Contains("$$$Клиент отключен")
+					|| Message.Contains("$$$Изменено 'Включен'");
+			}
 		}
 
 		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)

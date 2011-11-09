@@ -1,4 +1,4 @@
-﻿<% def WriteInputGroupHeader(localHeader as string) as string: %>
+﻿`<% def WriteInputGroupHeader(localHeader as string) as string: %>
 	<tr>
 		<td class="InputGroupHeader" colspan="2">
 			${localHeader}
@@ -46,23 +46,23 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			"${siteroot}/Billing/AdditionalAddressInfo.rails?addressId=" + addressId + "&cssClassName=" + cssClass);
 	}
 
+	function updateChildren(id, status) {
+		if (status) {
+			$("tr[name=Client" + id + "]").removeClass("disabled-by-parent");
+			$("tr[name=Client" + id + "] input[name=status]").removeAttr("disabled");
+		}
+		else {
+			$("tr[name=Client" + id + "]").addClass("disabled-by-parent");
+			$("tr[name=Client" + id + "] input[name=status]").attr("disabled", "disabled");
+		}
+	}
+
 	function SetClientStatus(clientId, status) {
 		var link = "${siteroot}/Billing/UpdateClientStatus?clientId=" + clientId + "&enabled=" + status;
-		ShowElement(true, "#loaderImage" + clientId);
-		ShowElement(false, "#ClientStatus" + clientId);
 		AjaxRequest(link,
-			function(html) {
-				if (status) {
-					$("#ClientRow" + clientId).removeClass("DisabledByBilling");
-					$("tr[name=Client" + clientId + "] input[name=status]").removeAttr("disabled");
-				}
-				else {
-					$("#ClientRow" + clientId).addClass("DisabledByBilling");
-					$("tr[name=Client" + clientId + "] input[name=status]").attr("disabled", "disabled");
-				}
+			function (html) {
+				updateChildren(clientId, status);
 				RefreshTotalSum();
-				ShowElement(false, "#loaderImage" + clientId);
-				ShowElement(true, "#ClientStatus" + clientId);
 			}
 		);
 	}
@@ -98,18 +98,36 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			$("#JuridicalOrganization" + id + "Header").click();
 	}
 
-	function Update(url, item) {
-		var id = $(item).parents("tr").find("input[name=id]").val();
-		var value = item.value;
-		if (item.type == "checkbox")
-			value = item.checked;
+	function showWaiter(element) {
+		element.hide();
+		var waiter = $("<div></div>").attr("class", "waiter");
+		element.after(waiter);
+		return waiter;
+	}
 
-		var link = url + "?id=" + id + "&" + item.name + "=" + value;
+	function hideWaiter(element, waiter) {
+		(element).show();
+		waiter.remove();
+	}
+
+	function Update(url, item, success) {
+		var id = item.parents("tr").find("input[name=id]").val();
+		var value = item.val();
+		if (item.attr("type") == "checkbox")
+			value = item.get(0).checked;
+
+		var link = url + "?id=" + id + "&" + item.attr("name") + "=" + value;
+		var waiter = showWaiter(item);
 		AjaxRequest(link,
 			function (html) {
+				hideWaiter(item, waiter);
 				RefreshTotalSum();
+				if (success)
+					success();
 			},
-			function (xhr, textStatus, error) { }
+			function (xhr, textStatus, error) {
+				hideWaiter(item, waiter);
+			}
 		);
 	}
 
@@ -117,18 +135,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		$("input[name=free]").change(function () {
 			if (this.checked)
-				$(this).parents("tr").addClass("Free");
+				$(this).parents("tr").addClass("free");
 			else
-				$(this).parents("tr").removeClass("Free");
+				$(this).parents("tr").removeClass("free");
 		});
 
 		$("input[name=status]").change(function () {
 			if (this.checked) {
-				$(this).parents("tr").removeClass("DisabledByBilling");
 				$(this).parents("tr").removeClass("disabled");
 			}
 			else {
-				$(this).parents("tr").addClass("DisabledByBilling");
 				$(this).parents("tr").addClass("disabled");
 			}
 		});
@@ -139,8 +155,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			$("select#messageReceiverComboBox option[value='" + id + "']").attr("selected", "selected");
 		});
 
-		$("#addresses input, #users input, #reports input").change(function () {
-			Update("${siteroot}/Accounts/Update", this);
+		$("#addresses input, #users input, #reports input, #suppliers input").change(function () {
+			var item = $(this);
+			Update("${siteroot}/Accounts/Update", item, function () {
+				if (item.attr("name") == "status") {
+					var id = $(item).parents("tr").find("input[name=service_id]").val();
+					if (id) {
+						updateChildren(id, item.attr("checked"));
+					}
+				}
+			});
 		});
 
 		$("div.collapsible, div.autocollapsible").each(function () {
@@ -228,8 +252,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td class=short>
-						<div id="loaderImage${client.Id}" style="display: none"><img src="${siteroot}/Images/loading.gif" alt="Подождите..." /></div>
-						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.IsClientActive()} onclick="SetClientStatus(${client.Id}, this.checked)" />
+						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this.checked)" />
 					</td>
 					<td>${client.Id}</td>
 					<td>
@@ -271,21 +294,37 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		</div>
 
 		<div class="VisibleFolder">
-			<table class="DataTable">
+			<table class="DataTable" id=suppliers>
 				<thead>
 					<tr>
 						<th>Включен</th>
+						<th>Учтен</th>
+						<th>Бесплатно</th>
+						<th>Платеж</th>
 						<th>Код</th>
 						<th>Название</th>
 						<th>Регион</th>
+						<th>Сегмент</th>
 						<th>Дата регистрации</th>
+						<td>Дата последнего прайс-листа</td>
 						<th></th>
 					</tr>
 				</thead>
 				<% for i, supplier in enumerate(suppliers): %>
-				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier)}" align="center">
+				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier, supplier.Account)}" align="center">
 					<td class=short>
-						<input type="checkbox" name=status ${"checked" unless supplier.Disabled} onclick="SetClientStatus(${supplier.Id}, this.checked)" />
+						<input name=id type=hidden value=${supplier.Account.Id}>
+						<input name=service_id type=hidden value=${supplier.Id}>
+						<input type="checkbox" name=status ${"checked" unless supplier.Disabled} />
+					</td>
+					<td class=short>
+						<input name=accounted type="checkbox" ${"checked" if supplier.Account.BeAccounted} />
+					</td>
+					<td class=short>
+						<input name=free type="checkbox" ${"checked" if supplier.Account.IsFree} />
+					</td>
+					<td class=short>
+						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
 					</td>
 					<td>${supplier.Id}</td>
 					<td>
@@ -294,9 +333,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						</a>
 					</td>
 					<td>${supplier.HomeRegion.Name}</td>
+					<td>${BindingHelper.GetDescription(supplier.Segment)}</td>
 					<td>
 						${supplier.Registration.RegistrationDate.ToShortDateString() if supplier.Registration}
 					</td>
+					<td></td>
 					<td>
 						<a class="icon icon-email" href="mailto:${supplier.GetEmailsForBilling()}"></a>
 					</td>
@@ -336,7 +377,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</thead>
 					<% for i, user in enumerate(Users): %>
 					<% hidden = filter.Service and filter.Service.Id != user.RootService.Id %>
-					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not user.IsActive} ${'Free' if user.Accounting.IsFree} ${'DisabledByBilling' if not user.Enabled} ${'hidable hidden' if hidden}"
+					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(user, user.Accounting)} ${'hidable hidden' if hidden}"
 						align="center" name="Client${user.RootService.Id}">
 						<td class=short>
 							<input name=id type=hidden value=${user.Accounting.Id}>
@@ -403,11 +444,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
 						<% hidden = filter.Service and filter.Service.Id != addr.Client.Id %>
-						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'OldUserUpdate' if not addr.IsActive} ${'HasNoConnectedUsers' if (hasNoUsers)} ${'Free' if addr.Accounting.IsFree} ${'DisabledByBilling' if not addr.Enabled} ${'hidable hidden' if hidden}"
+						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'HasNoConnectedUsers' if hasNoUsers} ${'hidable hidden' if hidden} ${app.Style(addr, addr.Accounting)}"
 							align="center" name="Client${addr.Client.Id}">
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
-								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if not addr.Client.IsClientActive()} />
+								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if addr.Client.Disabled} />
 							</td>
 							<td class=short>
 								<input name=accounted type=checkbox ${"checked" if addr.Accounting.BeAccounted} />
@@ -462,7 +503,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							</tr>
 						</thead>
 						<% for i, report in enumerate(reports): %>
-						<tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if not report.Status}">
+						<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(report)}">
 							<td class=short>${app.LinkTo(report, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${report.Id}>
@@ -489,9 +530,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		<% end %>
 
 <%
-	component Legend, { "LegendItems" : {	"Выключен" : "DisabledByBilling",
-											"Работает бесплатно" : "Free",
-											"Не получал обновлений более 7 дней" : "OldUserUpdate",
+	component Legend, { "LegendItems" : {	"Выключен" : "disabled",
+											"Работает бесплатно" : "free",
+											"Не получал обновлений более 7 дней" : "old-user-update",
 											"Адрес не имеет подключенных пользователей" : "HasNoConnectedUsers"},
 						"ByCenter" : false}
 %>		

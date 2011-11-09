@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using AdminInterface.Security;
-using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
-using Common.MySql;
-using Common.Web.Ui.NHibernateExtentions;
+using AdminInterface.Helpers;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Billing
 {
 	public class BillingSearchItem
 	{
@@ -46,11 +41,13 @@ namespace AdminInterface.Models
 
 		public decimal PaymentSum { get; set; }
 
-		public bool IsDebitor()
+		[Style]
+		public bool IsDebtor
 		{
-			return Balance < 0;
+			get { return Balance < 0; }
 		}
 
+		[Style]
 		public bool IsDisabled
 		{
 			get { return (EnabledUsersCount == 0 || EnabledClientCount == 0) && EnabledSupplierCount == 0; }

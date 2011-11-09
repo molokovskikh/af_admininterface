@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Castle.ActiveRecord;
-using Common.Tools;
 
 namespace AdminInterface.Models.Logs
 {

@@ -291,7 +291,12 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<Account> GetAccounts()
 		{
-			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(ReportsForInvoice());
+			return UsersForInvoice().Concat(AddressesForInvoice()).Concat(ReportsForInvoice()).Concat(SupplierAccounts());
+		}
+
+		private IEnumerable<SupplierAccount> SupplierAccounts()
+		{
+			return Suppliers.Select(s => s.Account);
 		}
 
 		private IEnumerable<Account> AddressesForInvoice()
@@ -417,8 +422,9 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<Invoice> BuildInvoices(DateTime date, Period period)
 		{
-			foreach (var invoiceGroup in GetAccounts().GroupBy(a => a.InvoiceGroup))
-				yield return new Invoice(this, period, date, invoiceGroup.Key);
+			return GetAccounts()
+				.GroupBy(a => a.InvoiceGroup)
+				.Select(invoiceGroup => new Invoice(this, period, date, invoiceGroup.Key));
 		}
 
 		public virtual IEnumerable<IGrouping<int, Account>> GetInvoiceGroups()

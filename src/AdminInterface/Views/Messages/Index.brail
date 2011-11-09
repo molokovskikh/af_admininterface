@@ -24,7 +24,7 @@ ${app.EndFormFor("filter")}
 		</tr>
 	</thead>
 	<% for i, log in enumerate(messages): %>
-	<tr class="${ViewHelper.GetRowStyle(i)} ${"DisabledClient" if log.IsStatusChange()}"">
+	<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(log)}"">
 		<td>${log.WriteTime}</td>
 		<td>${log.Operator}</td>
 		<td>${log.Service.Id}</td>

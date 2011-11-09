@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -17,11 +15,8 @@ namespace AdminInterface.Controllers
 	[Secure(PermissionType.Billing)]
 	public class AccountsController : AdminInterfaceController
 	{
-		public void Index([DataBind("SearchBy")] AccountFilter searchBy, string tab, uint? currentPage)
+		public void Index([DataBind("filter")] AccountFilter filter, string tab, uint? currentPage)
 		{
-			if (searchBy.BeginDate == null && searchBy.EndDate == null && searchBy.SearchText == null)
-				searchBy = new AccountFilter();
-
 			if (String.IsNullOrEmpty(tab))
 				tab = "unregistredItems";
 
@@ -29,13 +24,14 @@ namespace AdminInterface.Controllers
 			if (tab.Equals("unregistredItems", StringComparison.CurrentCultureIgnoreCase))
 				PropertyBag["unaccountedItems"] = Account.GetReadyForAccounting(pager);
 			else if (tab.Equals("AccountingHistory", StringComparison.CurrentCultureIgnoreCase))
-				PropertyBag["accountingHistoryItems"] = searchBy.Find(pager);
+				PropertyBag["accountingHistoryItems"] = filter.Find(pager);
 
 			PropertyBag["currentPage"] = pager.Page;
 			PropertyBag["totalPages"] = pager.TotalPages;
 
 			PropertyBag["tab"] = tab;
-			PropertyBag["FindBy"] = searchBy;
+			PropertyBag["FindBy"] = filter;
+			PropertyBag["filter"] = filter;
 		}
 
 		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)

@@ -71,53 +71,12 @@ td.short
 	width:80%;
 }
 
-div table[class="DataTable"] tr[id*="Row"].Disabled
-{
-	background-color: #ff6600;
-}
-
-td.Disabled
-{
-	background-color: #ff6600;
-}
-
-div table.DataTable tr.Free
+div table.DataTable tr.free, td.free, .free
 {
 	background-color: #b0ffb0;
 }
 
-td.Free
-{
-	background-color: #b0ffb0;
-}
-
-.Free
-{
-	background-color: #b0ffb0;
-}
-
-
-table tr[id*="Row"].HasNoConnectedUsers
+table tr[id*="Row"].HasNoConnectedUsers, td.HasNoConnectedUsers, .HasNoConnectedUsers
 {
 	background-color: #cece9d;
-}
-
-td.HasNoConnectedUsers
-{
-	background-color: #cece9d;
-}
-
-.HasNoConnectedUsers
-{
-	background-color: #cece9d;
-}
-
-tr[id*="Row"].Inactive
-{
-	background-color: #Ababab;
-}
-
-td.Inactive
-{
-	background-color: #Ababab;
 }
