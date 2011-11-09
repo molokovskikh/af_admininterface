@@ -64,9 +64,9 @@ namespace AdminInterface.Models.Suppliers
 			{
 				if (_disabled != value)
 				{
-					if (Payer != null)
-						Payer.PaymentSum = Payer.TotalSum;
 					_disabled = value;
+					if (Payer != null)
+						Payer.UpdatePaymentSum();
 				}
 			}
 		}

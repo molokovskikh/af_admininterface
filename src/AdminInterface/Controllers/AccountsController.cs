@@ -2,7 +2,9 @@
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
@@ -50,12 +52,27 @@ namespace AdminInterface.Controllers
 					var address = ((AddressAccount)account).Address;
 					SetAddressStatus(address.Id, status);
 				}
+				else if (account is SupplierAccount)
+				{
+					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value);
+				}
 				else
 				{
 					account.Status = status.Value;
 				}
 			}
 			CancelView();
+		}
+
+		private void SetSupplierStatus(Supplier supplier, bool status)
+		{
+			supplier.Disabled = !status;
+			if (supplier.IsChanged(s => s.Disabled))
+			{
+				this.Mailer().EnableChanged(supplier).Send();
+				ClientInfoLogEntity.StatusChange(supplier).Save();
+			}
+			ActiveRecordMediator.Save(supplier);
 		}
 
 		public void SetUserStatus(uint userId, bool? enabled)
