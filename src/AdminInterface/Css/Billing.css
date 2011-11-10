@@ -49,11 +49,6 @@ td.short
 	cursor: pointer;
 }
 
-.ShowCalendar
-{
-	cursor: pointer;
-}
-
 .hidden
 {
 	display:none;
@@ -71,12 +66,12 @@ td.short
 	width:80%;
 }
 
-div table.DataTable tr.free, td.free, .free
+table.DataTable tbody tr.free, td.free, .free
 {
 	background-color: #b0ffb0;
 }
 
-table tr[id*="Row"].has-ho-connected-users, td.has-no-connected-users, .has-no-connected-users
+table.DataTable tbody tr.has-no-connected-users, td.has-no-connected-users, .has-no-connected-users
 {
 	background-color: #cece9d;
 }
