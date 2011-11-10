@@ -502,8 +502,8 @@ WHERE   intersection.pricecode IS NULL
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				if (payer.ContactGroupOwner == null)
-					payer.InitGroupOwner();
+				if (payer.Id == 0)
+					payer.Init(Admin);
 
 				payer.AddComment(paymentOptions.GetCommentForPayer());
 

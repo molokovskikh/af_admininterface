@@ -57,6 +57,8 @@ namespace AdminInterface.Models.Billing
 			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
 			Comment = String.Format("Дата регистрации: {0}", DateTime.Now);
+
+			Init(SecurityContext.Administrator);
 		}
 
 		public Payer()
@@ -171,6 +173,9 @@ namespace AdminInterface.Models.Billing
 
 		[Nested]
 		public virtual InvoiceSettings InvoiceSettings { get; set; }
+
+		[Nested]
+		public virtual RegistrationInfo Registration { get; set; }
 
 		[BelongsTo("RecipientId")]
 		public virtual Recipient Recipient { get; set; }
@@ -393,13 +398,13 @@ ORDER BY {Payer}.shortname;";
 			base.OnUpdate();
 		}
 
-		public virtual void InitGroupOwner()
+		public virtual void Init(Administrator admin)
 		{
+			Registration = new RegistrationInfo(admin);
+
 			if (ContactGroupOwner == null)
-			{
 				ContactGroupOwner = new ContactGroupOwner();
-				ContactGroupOwner.ContactGroups = new List<ContactGroup>();
-			}
+
 			if (!ContactGroupOwner.HaveGroup(ContactGroupType.Billing))
 				ContactGroupOwner.AddContactGroup(ContactGroupType.Billing);
 		}
