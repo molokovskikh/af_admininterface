@@ -1,17 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
-using log4net;
-using log4net.Config;
-using NHibernate;
-using NHibernate.Criterion;
-using NHibernate.SqlCommand;
 using NUnit.Framework;
 using WatiN.Core;
 
@@ -32,10 +24,11 @@ namespace Functional
 
 		private PromotionOwnerSupplier CreateSupplier()
 		{
-			var supplier = DataMother.CreateTestSupplier();
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
 			supplier.Name += " " + supplier.Id;
-			supplier.Save();
-			scope.Flush();
+			Save(supplier);
+			Flush();
 			return PromotionOwnerSupplier.Find(supplier.Id);
 		}
 

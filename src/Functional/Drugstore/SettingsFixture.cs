@@ -431,7 +431,8 @@ namespace Functional.Drugstore
 		[Test, Description("Зашумлять цены для всех поставщиков кроме одного")]
 		public void Set_costs_noising_except_one_supplier()
 		{
-			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
+			var supplier = DataMother.CreateSupplier(s => { s.Payer = client.Payers.First(); });
+			supplier.Save();
 
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 			Thread.Sleep(1000);
@@ -499,7 +500,8 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 		[Test, Description("Тест снятия галки 'зашумлять цены'")]
 		public void Unset_costs_noising()
 		{
-			var supplier = DataMother.CreateTestSupplier(s => { s.Payer = client.Payers.First(); });
+			var supplier = DataMother.CreateSupplier(s => { s.Payer = client.Payers.First(); });
+			supplier.Save();
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.Update();

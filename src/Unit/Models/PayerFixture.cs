@@ -14,9 +14,7 @@ namespace Unit.Models
 		public void Payer_get_total_sum_for_supplier()
 		{
 			var payer = new Payer("Тестовый поставщика", "Тестовый поставщика");
-			var supplier = new Supplier(Data.DefaultRegion) {
-				Payer = payer
-			};
+			var supplier = new Supplier(Data.DefaultRegion, payer);
 			var user = new User(payer, supplier);
 			user.Login = new Random().Next().ToString();
 			user.Accounting.Accounted();

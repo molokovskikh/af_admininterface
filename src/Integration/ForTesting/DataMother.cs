@@ -134,33 +134,6 @@ namespace Integration.ForTesting
 			return client;
 		}
 
-		public static Supplier CreateTestSupplier(Action<Supplier> action)
-		{
-			var juridicalOrganization = new LegalEntity();
-			var payer = new Payer {
-				Name = "test",
-				JuridicalOrganizations = new List<LegalEntity> {
-					juridicalOrganization
-				}
-			};
-			juridicalOrganization.Payer = payer;
-			payer.Save();
-			juridicalOrganization.Save();
-			var supplier = new Supplier {
-				Payer = payer,
-				HomeRegion = ActiveRecordBase<Region>.FindAll().Last(),
-				Name = "Test supplier",
-			};
-			action(supplier);
-			supplier.Save();
-			return supplier;
-		}
-
-		public static Supplier CreateTestSupplier()
-		{
-			return CreateTestSupplier(s => {});
-		}
-
 		public static DocumentReceiveLog CreateTestDocumentLog(Supplier supplier, Client client)
 		{
 			var documentLogEntity = new DocumentReceiveLog {
@@ -290,10 +263,7 @@ namespace Integration.ForTesting
 			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
 			var homeRegion = Region.Find(1UL);
-			var supplier = new Supplier {
-				Payer = payer,
-				HomeRegion = homeRegion,
-				RegionMask = homeRegion.Id,
+			var supplier = new Supplier(homeRegion, payer) {
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
 				ContactGroupOwner = new ContactGroupOwner(ContactGroupType.ClientManagers)

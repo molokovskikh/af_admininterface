@@ -1,4 +1,5 @@
 ﻿using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using NUnit.Framework;
 
@@ -12,7 +13,7 @@ namespace Unit.Models
 		[Test]
 		public void Set_user_supplier_mask()
 		{
-			var supplier = new Supplier(Data.DefaultRegion);
+			var supplier = new Supplier(Data.DefaultRegion, new Payer("Тестовый плательщик"));
 			var user = new User(supplier);
 			Assert.That(user.WorkRegionMask, Is.EqualTo(ulong.MaxValue));
 		}

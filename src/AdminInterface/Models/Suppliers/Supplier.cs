@@ -27,10 +27,12 @@ namespace AdminInterface.Models.Suppliers
 			ContactGroupType.OrderManagers
 		};
 
-		public Supplier(Region homeRegion)
+		public Supplier(Region homeRegion, Payer payer)
 			: this()
 		{
+			Payer = payer;
 			HomeRegion = homeRegion;
+			RegionMask = homeRegion.Id;
 			Account = new SupplierAccount(this);
 		}
 

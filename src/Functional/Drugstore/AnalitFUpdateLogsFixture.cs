@@ -131,28 +131,20 @@ namespace Functional.Drugstore
 		private void Create_loaded_document_logs(out Client client, out Supplier supplier, out DocumentReceiveLog documentLogEntity,
 			out Document document, out UpdateLogEntity updateLogEntity)
 		{
+			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateLogEntity);
 			using (var scope = new TransactionScope())
-			{
-				client = DataMother.CreateTestClientWithAddressAndUser();
-				supplier = DataMother.CreateTestSupplier();
-				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
 				document = DataMother.CreateTestDocument(supplier, client, documentLogEntity);
-				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
-
-				//documentLogEntity.SendUpdateId = updateLogEntity.Id;
-				documentLogEntity.SendUpdateLogEntity = updateLogEntity;
-				documentLogEntity.SaveAndFlush();
-				scope.VoteCommit();
-			}			
 		}
 
 		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
 			out DocumentReceiveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
 		{
+			
 			using (var scope = new TransactionScope())
 			{
 				client = DataMother.CreateTestClientWithAddressAndUser();
-				supplier = DataMother.CreateTestSupplier();
+				supplier = DataMother.CreateSupplier();
+				Save(supplier);
 				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
 				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
 
