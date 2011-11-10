@@ -252,7 +252,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td class=short>
-						<input id="ClientStatus${client.Id}" type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this.checked)" />
+						<input id="ClientStatus${client.Id}" name=status type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this.checked)" />
 					</td>
 					<td>${client.Id}</td>
 					<td>

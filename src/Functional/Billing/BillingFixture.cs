@@ -48,7 +48,7 @@ namespace Functional.Billing
 			foreach (var address in client.Addresses)
 			{
 				var row = browser.TableRow("AddressRow" + address.Id);
-				Assert.That(row.ClassName, Is.StringContaining("Disabled"));
+				Assert.That(row.ClassName, Is.StringContaining("disabled"));
 				var checkBox = row.Css("input[name=status]");
 				Assert.That(checkBox.Checked, Is.False);
 			}
@@ -67,7 +67,7 @@ namespace Functional.Billing
 			foreach (var item in client.Users)
 			{
 				var row = browser.TableRow("UserRow" + item.Id);
-				Assert.That(row.ClassName, Is.StringContaining("Disabled"));
+				Assert.That(row.ClassName, Is.StringContaining("disabled"));
 				var checkBox = row.Css("input[name=status]");
 				Assert.That(checkBox.Checked, Is.False);
 			}
@@ -223,9 +223,9 @@ namespace Functional.Billing
 			var checkbox = (CheckBox)browser.CssSelect("input[name=status]");
 
 			Assert.IsTrue(checkbox.Checked);
-			Assert.That(row.ClassName, Is.Not.StringContaining("Disabled"));
+			Assert.That(row.ClassName, Is.Not.StringContaining("disabled"));
 			SimulateClick(browser, selector, checkbox);
-			Assert.That(row.ClassName, Is.StringContaining("Disabled"));
+			Assert.That(row.ClassName, Is.StringContaining("disabled"));
 		}
 
 		[Test]
@@ -241,7 +241,7 @@ namespace Functional.Billing
 
 			SimulateClick(browser, selector, checkbox);
 
-			Assert.That(row.ClassName, Is.StringContaining("Disabled"));
+			Assert.That(row.ClassName, Is.StringContaining("disabled"));
 		}
 
 		//я обрабатываю change но почему то click не вызывает change, по этому симулирую его
@@ -266,9 +266,9 @@ namespace Functional.Billing
 			Assert.IsTrue(userStatus.Checked);
 			Assert.IsTrue(addressStatus.Checked);
 			Assert.IsTrue(clientStatus.Checked);
-			Assert.That(userRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
-			Assert.That(addressRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
-			Assert.That(clientRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
+			Assert.That(userRow.ClassName, Is.Not.StringContaining("disabled"));
+			Assert.That(addressRow.ClassName, Is.Not.StringContaining("disabled"));
+			Assert.That(clientRow.ClassName, Is.Not.StringContaining("disabled"));
 			clientStatus.Click();
 			Thread.Sleep(2000);
 			Assert.IsTrue(userStatus.Checked);
@@ -276,9 +276,9 @@ namespace Functional.Billing
 			Assert.IsTrue(addressStatus.Checked);
 			Assert.IsFalse(addressStatus.Enabled);
 			Assert.IsFalse(clientStatus.Checked);
-			Assert.That(userRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
-			Assert.That(addressRow.ClassName, Is.Not.StringContaining("DisabledByBilling"));
-			Assert.That(clientRow.ClassName, Is.StringContaining("DisabledByBilling"));
+			Assert.That(userRow.ClassName, Is.StringContaining("disabled-by-parent"));
+			Assert.That(addressRow.ClassName, Is.StringContaining("disabled-by-parent"));
+			Assert.That(clientRow.ClassName, Is.StringContaining("disabled"));
 		}
 
 		[Test]
