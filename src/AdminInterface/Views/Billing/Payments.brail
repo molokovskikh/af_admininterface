@@ -444,7 +444,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<% for i, addr in enumerate(Addresses): %>
 						<% hasNoUsers = not addr.AvaliableForUsers.Count %>
 						<% hidden = filter.Service and filter.Service.Id != addr.Client.Id %>
-						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'HasNoConnectedUsers' if hasNoUsers} ${'hidable hidden' if hidden} ${app.Style(addr, addr.Accounting)}"
+						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'hidable hidden' if hidden} ${app.Style(addr, addr.Accounting)}"
 							align="center" name="Client${addr.Client.Id}">
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
@@ -533,7 +533,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	component Legend, { "LegendItems" : {	"Выключен" : "disabled",
 											"Работает бесплатно" : "free",
 											"Не получал обновлений более 7 дней" : "old-user-update",
-											"Адрес не имеет подключенных пользователей" : "HasNoConnectedUsers"},
+											"Адрес не имеет подключенных пользователей" : "has-no-connected-users"},
 						"ByCenter" : false}
 %>		
 	<br />

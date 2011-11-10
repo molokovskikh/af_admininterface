@@ -135,6 +135,12 @@ namespace AdminInterface.Models
 		}
 
 		[Style]
+		public virtual bool HasNoConnectedUsers
+		{
+			get { return AvaliableForUsers.Count == 0; }
+		}
+
+		[Style]
 		public virtual bool IsOldUserUpdate
 		{
 			get

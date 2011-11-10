@@ -236,8 +236,8 @@ namespace Functional.Billing
 			var checkbox = (CheckBox)browser.Css(String.Format("tr#AddressRow{0} input[name=status]", address.Id));
 				
 			Assert.IsTrue(checkbox.Checked);
-			Assert.That(row.ClassName, Is.Not.StringContaining("Disabled"));
-			Assert.That(row.ClassName, Is.StringContaining("HasNoConnectedUsers"));
+			Assert.That(row.ClassName, Is.Not.StringContaining("disabled"));
+			Assert.That(row.ClassName, Is.StringContaining("has-no-connected-users"));
 
 			SimulateClick(browser, selector, checkbox);
 

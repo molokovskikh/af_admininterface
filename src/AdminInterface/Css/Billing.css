@@ -76,7 +76,7 @@ div table.DataTable tr.free, td.free, .free
 	background-color: #b0ffb0;
 }
 
-table tr[id*="Row"].HasNoConnectedUsers, td.HasNoConnectedUsers, .HasNoConnectedUsers
+table tr[id*="Row"].has-ho-connected-users, td.has-no-connected-users, .has-no-connected-users
 {
 	background-color: #cece9d;
 }
