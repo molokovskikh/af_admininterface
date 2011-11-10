@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;

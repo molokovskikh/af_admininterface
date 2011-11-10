@@ -32,63 +32,16 @@
 			<table>
 				<col style="width:40%" />
 				<col style="width:60%" />
-
-				<tr>
-					<td>
-						Должен\Не должен:
-					</td>
-					<td class=value>
-						${app.Edit("filter.PayerState")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Регион:
-					</td>
-					<td class=value>
-						${app.Edit("filter.Region")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Сегмент:
-					</td>
-					<td class=value>
-						${app.Edit("filter.Segment")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Тип:
-					</td>
-					<td class=value>
-						${app.Edit("filter.ClientType")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Отключен\Не отключен:
-					</td>
-					<td class=value>
-						${app.Edit("filter.ClientStatus")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Получатель платежей:
-					</td>
-					<td class=value>
-						${app.Edit("filter.Recipient")}
-					</td>
-				</tr>
-				<tr>
-					<td>
-						Тип выставления счета:
-					</td>
-					<td class=value>
-						${app.Edit("filter.InvoiceType")}
-					</td>
-				</tr>
+				${app.FilterFor("filter.PayerState")}
+				${app.FilterFor("filter.Region")}
+				${app.FilterFor("filter.Segment")}
+				${app.FilterFor("filter.ClientType")}
+				${app.FilterFor("filter.ClientStatus")}
+				${app.FilterFor("filter.Recipient")}
+				${app.FilterFor("filter.InvoiceType")}
+				${app.FilterFor("filter.SearchWithoutDocuments")}
+				${app.FilterFor("filter.Period")}
+				${app.FilterFor("filter.DocumentType")}
 			</table>
 		</fieldset>
 		<div class=submit>

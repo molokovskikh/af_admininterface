@@ -4,20 +4,25 @@
 	margin-right:auto;
 }
 
+.FilterBlock .filter-label
+{
+	font-weight: normal;
+}
+
 .FilterBlock fieldset
 {
 	padding: 0;
 	margin: 0;
 }
 
-.FilterBlock td.value select, .FilterBlock td.value input
+.FilterBlock td.value select, .FilterBlock td.value input, .FilterBlock p.value input
 {
 	width: 100%;
 }
 
-.FilterBlock td.value select, .FilterBlock td.value input, .FilterBlock p.value input
+.FilterBlock td.value input[type=checkbox]
 {
-	width: 100%;
+	width: auto;
 }
 
 form div.submit

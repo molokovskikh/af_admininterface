@@ -16,6 +16,5 @@ namespace AdminInterface.Extentions
 				return newValue;
 			return value;
 		}
-
 	}
 }

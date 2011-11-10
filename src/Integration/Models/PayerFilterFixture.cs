@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.log4net;
-using log4net.Config;
 
 namespace Integration.Models
 {
@@ -118,6 +115,27 @@ namespace Integration.Models
 			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));
 			Assert.That(items[0].PayerId, Is.EqualTo(payer.Id));
+		}
+
+		[Test]
+		public void Search_payer_without_document()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			client.Users.Each(u => u.Accounting.ReadyForAccounting = true);
+			client.Save();
+			var payer = client.Payers.First();
+
+			var period = DateTime.Now.ToPeriod();
+			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
+			var items = filter.Find();
+
+			Assert.Contains(payer.Id, items.Select(i => i.PayerId).ToArray());
+
+			Save(payer.BuildInvoices(DateTime.Now, period));
+			Flush();
+
+			items = filter.Find();
+			Assert.That(items.Select(i => i.PayerId).ToArray(), Is.Not.Contains(payer.Id));
 		}
 	}
 }

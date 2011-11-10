@@ -1,4 +1,5 @@
-﻿using Castle.ActiveRecord;
+﻿using System.Collections.Generic;
+using Castle.ActiveRecord;
 using NHibernate;
 using NUnit.Framework;
 
@@ -50,6 +51,13 @@ namespace Integration.ForTesting
 		{
 			ActiveRecordMediator.Save(entity);
 		}
+
+		public void Save(IEnumerable<object> entities)
+		{
+			foreach(var entity in entities)
+				Save(entity);
+		}
+
 
 		public void Delete(object entity)
 		{

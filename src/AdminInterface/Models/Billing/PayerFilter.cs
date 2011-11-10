@@ -1,20 +1,15 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
-using AdminInterface.Models.Billing;
-using AdminInterface.Models.Security;
-using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Billing
 {
 	public enum PayerStateFilter
 	{
@@ -54,25 +49,48 @@ namespace AdminInterface.Models
 		[Description("Адрес доставки")] Address,
 	}
 
+	public enum DocumentType
+	{
+		[Description("Счет")] Invoice,
+		[Description("Акт")] Act,
+		[Description("Счет и акт")] Both,
+	}
+
 	public class PayerFilter : Sortable
 	{
 		public string SearchText { get; set; }
 
+		[Description("Получатель платежей:")]
 		public Recipient Recipient { get; set; }
 
+		[Description("Регион:")]
 		public Region Region {get; set; }
 
+		[Description("Должен\\Не должен:")]
 		public PayerStateFilter PayerState { get; set; }
 
+		[Description("Сегмент:")]
 		public SearchSegment Segment { get; set; }
 
+		[Description("Тип:")]
 		public SearchClientType ClientType { get; set; }
 
+		[Description("Отключен\\Не отключен:")]
 		public SearchClientStatus ClientStatus { get; set; }
 
+		[Description("Тип выставления счета:")]
 		public InvoiceType? InvoiceType { get; set; }
 
 		public SearchBy SearchBy { get; set; }
+
+		[Description("Искать плательщиков без документов:")]
+		public bool SearchWithoutDocuments { get; set; }
+
+		[Description("Период:")]
+		public Period Period { get; set; }
+
+		[Description("Тип документа:")]
+		public DocumentType DocumentType { get; set; }
 
 		public PayerFilter()
 		{
@@ -191,6 +209,12 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			if (groupFilter.Length > 0)
 				And(having, String.Format("sum(if({0}, 1, 0)) > 0", groupFilter));
 
+			if (SearchWithoutDocuments)
+			{
+				And(where, GetDocumentSubQuery(DocumentType));
+				query.SetParameter("Period", Period);
+			}
+
 			var sql = String.Format(@"
 select p.PayerId,
 		p.ShortName,
@@ -231,18 +255,34 @@ order by p.ShortName
 			try
 			{
 				query.Sql = sql;
-				var result = query.GetSqlQuery(session).ToList<BillingSearchItem>();
-
-				ArHelper.Evict(session, result);
-				result = result.ToList();
-				((List<BillingSearchItem>)result).Sort(new PropertyComparer<BillingSearchItem>(GetSortDirection(), GetSortProperty()));
+				var result = query.GetSqlQuery(session).ToList<BillingSearchItem>().ToList();
+				result.Sort(new PropertyComparer<BillingSearchItem>(GetSortDirection(), GetSortProperty()));
 				return result;
 			}
 			finally
 			{
 				sessionHolder.ReleaseSession(session);
 			}
-			
+		}
+
+		private static string GetDocumentSubQuery(DocumentType documentType)
+		{
+			var template = "not exists(select * from {0} d where d.Payer = p.PayerId and d.Period = :Period)";
+			string table;
+			if (documentType == DocumentType.Invoice)
+			{
+				table = "Billing.Invoices";
+				return String.Format(template, table);
+			}
+			else if (documentType == DocumentType.Act)
+			{
+				table = "Billing.Acts";
+				return String.Format(template, table);
+			}
+			else
+			{
+				return String.Format("{0} and {1}", GetDocumentSubQuery(DocumentType.Invoice), GetDocumentSubQuery(DocumentType.Act));
+			}
 		}
 
 		private static void And(StringBuilder filter, string criteria)

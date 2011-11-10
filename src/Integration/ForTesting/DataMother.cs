@@ -11,6 +11,7 @@ using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
 using Test.Support.log4net;
+using DocumentType = AdminInterface.Models.Logs.DocumentType;
 
 namespace Integration.ForTesting
 {

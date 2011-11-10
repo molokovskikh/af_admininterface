@@ -19,6 +19,7 @@
 		${app.Asset("jquery-ui-1.8.16.js")}
 		${app.Asset("confirmation.js")}
 		${app.Asset("themes/base/jquery.ui.all.css")}
+		${app.Asset("filter.css")}
 
 		${app.JS("calendar.js",
 			"calendar-ru_win_.js",
@@ -33,7 +34,6 @@
 			"calendar-blue.css",
 			"Billing.css",
 			"Table.css",
-			"Block.css",
 			"ValidationStyles.css",
 			"Highlight.css",
 			"Common.css",
