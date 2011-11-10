@@ -22,6 +22,11 @@ namespace AdminInterface.Models.Suppliers
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Supplier : Service
 	{
+		private ContactGroupType[] _defaultGroups = new [] {
+			ContactGroupType.ClientManagers,
+			ContactGroupType.OrderManagers
+		};
+
 		public Supplier(Region homeRegion)
 			: this()
 		{
@@ -176,8 +181,7 @@ namespace AdminInterface.Models.Suppliers
 
 		public virtual IEnumerable<ContactGroup> GetAditionalContactGroups()
 		{
-			foreach(var type in new [] {ContactGroupType.ClientManagers, ContactGroupType.OrderManagers})
-				yield return new ContactGroup(type);
+			return _defaultGroups.Select(type => new ContactGroup(type));
 		}
 
 		public virtual void CreateDirs(string root)

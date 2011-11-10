@@ -3,14 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using AdminInterface.Controllers;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
-using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Adapters;
 using Castle.MonoRail.Framework.Helpers;
 using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
@@ -37,7 +32,7 @@ namespace Integration
 		[SetUp]
 		public void Setup()
 		{
-			helper = new AdminInterface.Helpers.AppHelper();
+			helper = new AppHelper();
 			var area = "";
 			var controllerName = "home";
 			var actionName = "index";
@@ -130,7 +125,11 @@ namespace Integration
 		public void Checkbox_edit()
 		{
 			var result = helper.FilterFor("Тест", "filter.SomeBool");
-			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td><td colspan=2><input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" /><input type=\"hidden\" id=\"filter_SomeBoolH\" name=\"filter.SomeBool\" value=\"false\" /></td></tr>"));
+			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td>" +
+				"<td colspan=2 class='value'>" +
+				"<input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" />" +
+				"<input type=\"hidden\" id=\"filter_SomeBoolH\" name=\"filter.SomeBool\" value=\"false\" />" +
+				"</td></tr>"));
 		}
 
 		[Test]
@@ -152,7 +151,8 @@ namespace Integration
 		public void Filter_for_text()
 		{
 			var result = helper.FilterFor("filter.TextField");
-			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'>Введите текст для поиска:</td><td colspan=2>"
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'>Введите текст для поиска:</td>" +
+				"<td colspan=2 class='value'>"
 				+"<input type=\"text\" id=\"filter_TextField\" name=\"filter.TextField\" value=\"\" /></td></tr>"));
 		}
 
@@ -162,7 +162,7 @@ namespace Integration
 			filter.Enum = TestEnum.Value2;
 
 			var result = helper.FilterFor("filter.Enum");
-			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2 class='value'>"
 				+ "<select name='filter.Enum'>"
 				+ "<option value=0>Value1</option>"
 				+ "<option value=1 selected>Value2</option>"
@@ -174,10 +174,11 @@ namespace Integration
 		public void Select_edit()
 		{
 			var result = helper.FilterFor("filter.Multivalue");
-			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2>"
-				+ "<select name='filter.Multivalue.Id'>"
-				+ "<option>Все</option><option value=1>test</option></select>" 
-				+ "</td></tr>"));
+			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td>" +
+				"<td colspan=2 class='value'>" +
+				"<select name='filter.Multivalue.Id'>" +
+				"<option>Все</option><option value=1>test</option></select>" +
+				"</td></tr>"));
 		}
 
 		[Test]
@@ -270,14 +271,14 @@ namespace Integration
 		public void Style_link()
 		{
 			var link = helper.LinkTo(new Address{Enabled = false, Value = "Test"});
-			Assert.That(link, Is.EqualTo("<a class=\"DisabledByBilling\"  href=\"/Addresses/0\">Test</a>"));
+			Assert.That(link, Is.EqualTo("<a class=\"disabled has-no-connected-users\"  href=\"/Addresses/0\">Test</a>"));
 		}
 
 		[Test]
 		public void Link_with_parameters()
 		{
 			var link = helper.LinkTo(new Address{Enabled = true, Value = "Test"}, "Test", "Index", new Dictionary<string, object>{{"tab", "1"}});
-			Assert.That(link, Is.EqualTo("<a  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
+			Assert.That(link, Is.EqualTo("<a class=\"has-no-connected-users\"  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
 		}
 
 		[Test]

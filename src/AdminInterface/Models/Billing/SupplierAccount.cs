@@ -14,7 +14,7 @@ namespace AdminInterface.Models.Billing
 		{
 			Supplier = supplier;
 			if (supplier.Segment == Segment.Retail)
-				Payment = 600;
+				_payment = 600;
 		}
 
 		[BelongsTo("ObjectId")]

@@ -114,7 +114,7 @@ namespace AdminInterface.Models
 		[Style]
 		public virtual bool DisabledByParent
 		{
-			get { return Client.Disabled; }
+			get { return Client != null && Client.Disabled; }
 		}
 
 		public virtual bool AvaliableFor(User user)
