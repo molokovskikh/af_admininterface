@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -122,8 +123,10 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			client.Users.Each(u => u.Accounting.ReadyForAccounting = true);
-			client.Save();
+			Save(client)
 			var payer = client.Payers.First();
+			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
+			Save(payer);
 
 			var period = DateTime.Now.ToPeriod();
 			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
