@@ -565,13 +565,13 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 
 		private static bool UserWorkRegionExists(Browser browser, string regionName)
 		{
-			var labels = browser.Labels.Where(label => label != null && label.For.Contains("WorkRegions"));
+			var labels = browser.Labels.Where(label => label != null && label.For != null && label.For.Contains("WorkRegions"));
 			return labels.Any(label => label.Text.Contains(regionName));
 		}
 
 		private static bool UserOrderRegionExists(Browser browser, string regionName)
 		{
-			var labels = browser.Labels.Where(label => label != null && label.For.Contains("OrderRegions"));
+			var labels = browser.Labels.Where(label => label != null && label.For != null && label.For.Contains("OrderRegions"));
 			return labels.Any(label => label.Text.Contains(regionName));
 		}
 	}
