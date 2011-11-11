@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Globalization;
 
@@ -155,6 +155,16 @@ namespace AdminInterface.Models.Billing
 				default:
 					throw new Exception(String.Format("не знаю что за период такой {0}", period));
 			}
+		}
+
+		public static InvoicePeriod GetInvoicePeriod(this Period period)
+		{
+			if (period == Period.FirstQuarter ||
+				period == Period.SecondQuarter ||
+				period == Period.ThirdQuarter ||
+				period == Period.FourthQuarter)
+				return InvoicePeriod.Quarter;
+			return InvoicePeriod.Month;
 		}
 	}
 }

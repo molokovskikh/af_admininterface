@@ -180,7 +180,7 @@ namespace AdminInterface.Models.Billing
 				result.Add(PartForAd(ad));
 
 			var accounts = Payer.GetAccounts().Where(a => a.InvoiceGroup == invoiceGroup);
-			if (GetInvoicePeriod(Period) == InvoicePeriod.Quarter)
+			if (Period.GetInvoicePeriod() == InvoicePeriod.Quarter)
 			{
 				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts, GetPeriodDate(p))).ToList());
 			}
@@ -242,16 +242,6 @@ namespace AdminInterface.Models.Billing
 				mailer.Invoice(this);
 				mailer.Send();
 			}
-		}
-
-		public static InvoicePeriod GetInvoicePeriod(Period period)
-		{
-			if (period == Period.FirstQuarter ||
-				period == Period.SecondQuarter ||
-				period == Period.ThirdQuarter ||
-				period == Period.FourthQuarter)
-				return InvoicePeriod.Quarter;
-			return InvoicePeriod.Month;
 		}
 
 		public void Send()

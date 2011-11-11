@@ -99,7 +99,7 @@ namespace AdminInterface.Controllers
 
 		private static List<Invoice> BuildInvoices(DocumentBuilderFilter filter, DateTime invoiceDate)
 		{
-			var invoicePeriod = Invoice.GetInvoicePeriod(filter.Period);
+			var invoicePeriod = filter.Period.GetInvoicePeriod();
 			List<Payer> payers;
 			if (filter.PayerId.Length == 0)
 			{
