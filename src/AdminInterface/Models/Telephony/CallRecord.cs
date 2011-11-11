@@ -3,17 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.IO;
-using System.Linq;
-using System.Web;
 using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
-using AdminInterface.Helpers;
-using Common.Web.Ui.Models;
-using NHibernate.Criterion;
-using AdminInterface.Models.Security;
-using NHibernate;
-using NHibernate.Transform;
-using Common.MySql;
 
 namespace AdminInterface.Models.Telephony
 {

@@ -6,6 +6,7 @@ using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate.Engine;
 
 namespace AdminInterface.Models.Billing
 {
@@ -123,11 +124,11 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public DateTime? LastErrorNotification { get; set; }
 
-		[BelongsTo]
+		[BelongsTo(Lazy = FetchWhen.OnInvoke)]
 		public virtual Act Act { get; set; }
 
 		[
-			HasMany(Cascade = ManyRelationCascadeEnum.AllDeleteOrphan, Lazy = true),
+			HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true),
 			ValidateCollectionNotEmpty("Нужно задать список услуг")
 		]
 		public IList<InvoicePart> Parts { get; set; }
@@ -214,7 +215,7 @@ namespace AdminInterface.Models.Billing
 		public string FormatPartDescription(string description, Period period)
 		{
 			if (IsSpecialLangCase(description))
-				return description.Replace("{0}", InvoicePart.GetPeriodName(period).ToLower());
+				return description.Replace("{0}", period.GetPeriodName().ToLower());
 			return description.Replace("{0}", BindingHelper.GetDescription(period).ToLower());
 		}
 

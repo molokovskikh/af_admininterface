@@ -156,8 +156,10 @@
     <Compile Include="Models\AuditListener.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
+    <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />
+    <Compile Include="Models\Billing\Period.cs" />
     <Compile Include="Models\Billing\ReportAccount.cs" />
     <Compile Include="Models\Billing\ReportLogProcessorState.cs" />
     <Compile Include="Models\Billing\RevisionAct.cs" />
