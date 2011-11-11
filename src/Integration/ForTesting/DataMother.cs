@@ -53,18 +53,7 @@ namespace Integration.ForTesting
 
 		public static Payer CreatePayer()
 		{
-			var legalEntity = new LegalEntity {
-				Name = "Тестовое юр.лицо"
-			};
-			var payer = new Payer {
-				Name = "Тестовый плательщик",
-				ContactGroupOwner = new ContactGroupOwner(),
-				JuridicalOrganizations = new List<LegalEntity> {
-					legalEntity
-				}
-			};
-			legalEntity.Payer = payer;
-			return payer;
+			return new Payer("Тестовый плательщик", "Тестовое юр.лицо");
 		}
 
 		public static Client CreateTestClientWithAddress()

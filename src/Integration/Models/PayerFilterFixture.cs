@@ -123,7 +123,7 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			client.Users.Each(u => u.Accounting.ReadyForAccounting = true);
-			Save(client)
+			Save(client);
 			var payer = client.Payers.First();
 			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
 			Save(payer);

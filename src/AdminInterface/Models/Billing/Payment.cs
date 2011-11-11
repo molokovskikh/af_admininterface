@@ -63,9 +63,9 @@ namespace AdminInterface.Models.Billing
 					return new DateTime(DateTime.Today.Year, 8, 1);
 				case Period.September:
 					return new DateTime(DateTime.Today.Year, 9, 1);
-				case Period.November:
-					return new DateTime(DateTime.Today.Year, 10, 1);
 				case Period.October:
+					return new DateTime(DateTime.Today.Year, 10, 1);
+				case Period.November:
 					return new DateTime(DateTime.Today.Year, 11, 1);
 				case Period.December:
 					return new DateTime(DateTime.Today.Year, 12, 1);
@@ -104,9 +104,9 @@ namespace AdminInterface.Models.Billing
 					return 8.MonthEnd();
 				case Period.September:
 					return 9.MonthEnd();
-				case Period.November:
-					return 10.MonthEnd();
 				case Period.October:
+					return 10.MonthEnd();
+				case Period.November:
 					return 11.MonthEnd();
 				case Period.December:
 					return 12.MonthEnd();
