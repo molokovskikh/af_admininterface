@@ -13,6 +13,7 @@ namespace AdminInterface.Models.Billing
 		public SupplierAccount(Supplier supplier)
 		{
 			Supplier = supplier;
+			_readyForAccounting = true;
 			if (supplier.Segment == Segment.Retail)
 				_payment = 600;
 		}

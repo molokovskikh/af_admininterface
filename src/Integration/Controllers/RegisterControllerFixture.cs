@@ -217,6 +217,7 @@ select 4474;")
 				.SetParameter("PriceId", price.Id)
 				.UniqueResult<long>());
 			Assert.That(intersectionCount, Is.GreaterThan(0));
+			Assert.That(supplier.Payer.PaymentSum, Is.EqualTo(600));
 		}
 
 		private Client RegistredClient()

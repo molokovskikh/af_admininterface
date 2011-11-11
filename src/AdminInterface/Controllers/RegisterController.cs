@@ -104,6 +104,7 @@ namespace AdminInterface.Controllers
 				currentPayer.Suppliers.Add(supplier);
 				supplier.Payer = currentPayer;
 				supplier.Account = new SupplierAccount(supplier);
+				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));
 				supplier.Save();
