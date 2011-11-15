@@ -783,5 +783,17 @@ namespace Functional.Billing
 			juridicalOrganization.Refresh();
 			Assert.That(juridicalOrganization.Name, Is.EqualTo(newName));
 		}
+
+		[Test]
+		public void Create_balance_operation()
+		{
+			Click("Платежи/Счета");
+			browser.WaitUntilContainsText("Списание", 1000);
+			Css("#operation_Description").TypeText("тестовый возврат");
+			Css("#operation_Sum").TypeText("500");
+			Css("#operation_Date").TypeText(DateTime.Now.ToShortDateString());
+			Click("#form1", "Добавить");
+			AssertText("Сохранено");
+		}
 	}
 }

@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing
 {
 	public class RevisionAct
 	{
-		public RevisionAct(Payer payer, DateTime begin, DateTime end, IEnumerable<Act> acts, IEnumerable<Payment> payments)
+		public RevisionAct(Payer payer, DateTime begin, DateTime end,
+			IEnumerable<Act> acts,
+			IEnumerable<Payment> payments,
+			IEnumerable<BalanceOperation> operations)
 		{
 			if (payer.Recipient == null)
 				throw new Exception("У плательщика не указан получатель платежей, выберете получателя платежей.");
@@ -15,8 +19,13 @@ namespace AdminInterface.Models.Billing
 			BeginDate = begin;
 			EndDate = end;
 
-			var beginDebit = acts.Where(i => i.ActDate < begin).Sum(i => i.Sum);
-			var beginCredit = payments.Where(p => p.PayedOn < begin).Sum(p => p.Sum);
+			var parts = acts.Select(i => new RevisionActPart(i))
+				.Union(payments.Select(p => new RevisionActPart(p)))
+				.Union(operations.Select(d => new RevisionActPart(d)))
+				.ToList();
+
+			var beginDebit = parts.Where(i => i.Date < begin).Sum(i => i.Debit);
+			var beginCredit = parts.Where(p => p.Date < begin).Sum(p => p.Credit);
 
 			var beginBalance = beginCredit - beginDebit;
 			beginBalance += payer.BeginBalance;
@@ -26,10 +35,7 @@ namespace AdminInterface.Models.Billing
 			else
 				BeginDebit = Math.Abs(beginBalance);
 
-			var movements = acts.Where(i => i.ActDate >= begin && i.ActDate <= end)
-				.Select(i => new RevisionActPart(i))
-				.Union(payments.Where(p => p.PayedOn >= begin && p.PayedOn <= end)
-					.Select(p => new RevisionActPart(p)))
+			var movements = parts.Where(p => p.Date >= begin && p.Date <= end)
 				.OrderBy(m => m.Date)
 				.ToList();
 			DebitSum = movements.Sum(m => m.Debit);
@@ -123,9 +129,27 @@ namespace AdminInterface.Models.Billing
 			Credit = payment.Sum;
 		}
 
+		public RevisionActPart(BalanceOperation operation)
+		{
+			Name = String.Format("{0} ({1:dd.MM.yy} № {2})",
+				BindingHelper.GetDescription(operation.Type),
+				operation.Date,
+				operation.Id);
+			Date = operation.Date;
+			if (operation.Type == OperationType.DebtRelief)
+				Debit = Decimal.Negate(operation.Sum);
+			else
+				Credit = Decimal.Negate(operation.Sum);
+		}
+
 		public string Name { get; set; }
 		public DateTime Date { get; set; }
 		public decimal Debit { get; set; }
 		public decimal Credit { get; set; }
+
+		public override string ToString()
+		{
+			return Name;
+		}
 	}
 }

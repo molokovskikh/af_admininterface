@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using AddUser;
 using AdminInterface.Helpers;
@@ -161,23 +162,22 @@ namespace AdminInterface.MonoRailExtentions
 		{
 			var controller = AppHelper.GetControllerName(entity);
 			var id = ((dynamic)entity).Id;
-			RedirectUsingRoute(controller, "Show", new {id = id});
+			RedirectUsingRoute(controller, "Show", new {id});
 		}
 
 		protected bool IsValid(object instance)
 		{
 			var errorSummary = Binder.GetValidationSummary(instance);
+			//если null значит валидация не проводилась и нужно её произвести
+			if (errorSummary == null && Validator != null)
+				return Validator.IsValid(instance);
+
 			return errorSummary == null || !errorSummary.HasError;
 		}
 
 		protected bool IsValid(IEnumerable enumerable)
 		{
-			foreach (var instance in enumerable)
-			{
-				if (!IsValid(instance))
-					return false;
-			}
-			return true;
+			return enumerable.Cast<object>().All(IsValid);
 		}
 
 		protected void SetARDataBinder()

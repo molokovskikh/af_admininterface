@@ -7,17 +7,20 @@ namespace AdminInterface.Models.Billing
 {
 	public enum BalanceUpdaterType
 	{
-		Payment,
-		ChargeOff
+		Credit,
+		Debit
 	}
 
 	public abstract class BalanceUpdater<T> : ActiveRecordLinqBase<T>
 	{
-		private BalanceUpdaterType _type;
+		protected BalanceUpdaterType BalanceType;
+
+		protected BalanceUpdater()
+		{}
 
 		protected BalanceUpdater(BalanceUpdaterType type)
 		{
-			_type = type;
+			BalanceType = type;
 		}
 
 		public abstract Payer Payer { get; set; }
@@ -45,7 +48,7 @@ namespace AdminInterface.Models.Billing
 			if (payer == null)
 				return;
 
-			if (_type == BalanceUpdaterType.ChargeOff)
+			if (BalanceType == BalanceUpdaterType.Debit)
 				payer.Balance += sum;
 			else
 				payer.Balance -= sum;
@@ -56,7 +59,7 @@ namespace AdminInterface.Models.Billing
 			if (payer == null)
 				return;
 
-			if (_type == BalanceUpdaterType.ChargeOff)
+			if (BalanceType == BalanceUpdaterType.Debit)
 				payer.Balance -= sum;
 			else
 				payer.Balance += sum;

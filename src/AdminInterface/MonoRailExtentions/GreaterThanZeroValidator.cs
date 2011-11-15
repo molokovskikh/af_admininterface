@@ -17,7 +17,7 @@ namespace AdminInterface.MonoRailExtentions
 			string target)
 		{
 			base.ApplyBrowserValidation(config, inputType, generator, attributes, target);
-			generator.SetDigitsOnly(target, BuildErrorMessage());
+			generator.SetNumberOnly(target, BuildErrorMessage());
 		}
 
 		public override bool IsValid(object instance, object fieldValue)

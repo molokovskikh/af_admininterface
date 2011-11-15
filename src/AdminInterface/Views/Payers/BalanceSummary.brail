@@ -3,33 +3,64 @@
 		$("#new-payment-form").validate();
 	});
 </script>
-<div class=block>
 
-<form id="new-payment-form" class="accountant-friendly" method=post action="${siteroot}/Payers/${payer.Id}/NewPayment">
+<div class=block>
 	<h4>Новый платеж</h4>
-	<table>
-		<tr>
-			<th>Дата платежа</th>
-			<th>Номер документа</th>
-			<th>Сумма</th>
-		</tr>
-		<tr>
-			<td>
-				<input type=text name=Payment.PayedOn value=${System.DateTime.Today} class="input-date required">
-				<input type="button" class="CalendarInput" />
-			</td>
-			<td>
-				<input type=text name=Payment.DocumentNumber>
-			</td>
-			<td>
-				<input type=text name=Payment.Sum class="input-sum required">
-			</td>
-			<td>
-				<input type=submit value="Добавить">
-			</td>
-		</tr>
-	</table>
-</form>
+	<form id="new-payment-form" class="accountant-friendly" method=post action="${siteroot}/Payers/${payer.Id}/NewPayment">
+		<table>
+			<tr>
+				<th>Дата платежа</th>
+				<th>Номер документа</th>
+				<th>Сумма</th>
+			</tr>
+			<tr>
+				<td>
+					<input type=text name=Payment.PayedOn value=${System.DateTime.Today} class="input-date required">
+					<input type="button" class="CalendarInput" />
+				</td>
+				<td>
+					<input type=text name=Payment.DocumentNumber>
+				</td>
+				<td>
+					<input type=text name=Payment.Sum class="input-sum required">
+				</td>
+				<td>
+					<input type=submit value="Добавить">
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+
+<div class=block>
+	<h4>Списание</h4>
+	${FormHelper.FormTag("${siteroot}/Payers/${payer.Id}/NewBalanceOperation", {@class: "accountant-friendly"})}
+		<table>
+			<tr>
+				<th>${app.GetLabel("operation.Date")}</th>
+				<th>${app.GetLabel("operation.Type")}</th>
+				<th>${app.GetLabel("operation.Description")}</th>
+				<th>${app.GetLabel("operation.Sum")}</th>
+			</tr>
+			<tr>
+				<td>
+					${app.Edit("operation.Date")}
+				</td>
+				<td>
+					${app.Edit("operation.Type")}
+				</td>
+				<td>
+					${app.Edit("operation.Description")}
+				</td>
+				<td>
+					${app.Edit("operation.Sum")}
+				</td>
+				<td>
+					<input type=submit value="Добавить">
+				</td>
+			</tr>
+		</table>
+	${FormHelper.EndFormTag()}
 </div>
 
 <table class=DataTable>
@@ -48,16 +79,19 @@
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
 			<% if item.Id > 0: %>
-				<% if item.IsPayment: %>
+				<% if item.IsPayment and not item.IsOperation: %>
 				<a href="${siteroot}/Payments/${item.Id}/Edit">Редактировать</a>
 				<% end %>
-				<% if item.IsInvoice: %>
+				<% if item.IsInvoice and not item.IsOperation: %>
 				<a href="${siteroot}/Invoices/${item.Id}/Print">Печать</a>
 				<a href="${siteroot}/Invoices/${item.Id}/Edit">Редактировать</a>
 				<% end %>
-				<% if item.IsAct: %>
+				<% if item.IsAct and not item.IsOperation: %>
 				<a href="${siteroot}/Acts/${item.Id}/Print">Печать</a>
 				<a href="${siteroot}/Acts/${item.Id}/Edit">Редактировать</a>
+				<% end %>
+				<% if item.IsOperation: %>
+				${UrlHelper.Link("Показать", {@controller: @BalanceOperations, @action: @Show, @params: {@id: item.Id}})}
 				<% end %>
 			<% end %>
 		</td>

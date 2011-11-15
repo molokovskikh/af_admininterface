@@ -143,6 +143,7 @@
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
+    <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
@@ -156,6 +157,7 @@
     <Compile Include="Models\AuditListener.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
+    <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />
@@ -412,6 +414,7 @@
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Accounts\Edit.brail" />
+    <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Payers\InvoiceGroups.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />

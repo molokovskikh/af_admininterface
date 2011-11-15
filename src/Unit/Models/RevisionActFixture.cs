@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Controllers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using NUnit.Framework;
 
@@ -14,6 +12,7 @@ namespace Unit.Models
 		private RevisionAct revisionAct;
 		private Payer payer;
 		private List<Payment> payments;
+		private List<BalanceOperation> operations;
 
 		[SetUp]
 		public void Setup()
@@ -26,6 +25,7 @@ namespace Unit.Models
 			payments = new List<Payment> {
 				new Payment(payer, new DateTime(2011, 1, 15), 1000)
 			};
+			operations = Enumerable.Empty<BalanceOperation>().ToList();
 			BuildAct();
 		}
 
@@ -55,7 +55,8 @@ namespace Unit.Models
 				new DateTime(2011, 1, 1),
 				new DateTime(2011, 2, 1),
 				new List<Act> { act, act1, act2 },
-				payments);
+				payments,
+				operations);
 		}
 
 		[Test]
@@ -124,6 +125,17 @@ namespace Unit.Models
 			BuildAct();
 			Assert.That(revisionAct.BeginDebit, Is.EqualTo(1500));
 			Assert.That(revisionAct.BeginCredit, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void Include_balance_operations()
+		{
+			operations.Add(new BalanceOperation(payer) { Sum = 1000, Type = OperationType.Refund, Date = new DateTime(2011, 1, 5)});
+			operations.Add(new BalanceOperation(payer) { Sum = 3000, Type = OperationType.DebtRelief, Date = new DateTime(2011, 1, 10)});
+			BuildAct();
+			Assert.That(revisionAct.EndDebit, Is.EqualTo(0));
+			Assert.That(revisionAct.CreditSum, Is.EqualTo(0));
+			Assert.That(revisionAct.Balance, Is.EqualTo(0));
 		}
 	}
 }

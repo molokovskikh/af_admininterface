@@ -3,6 +3,8 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
+using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
@@ -22,18 +24,6 @@ namespace AdminInterface.Controllers
 			Redirect("Billing", "Edit", request);
 		}
 
-		public void Payments(uint id)
-		{
-			var payer = Payer.Find(id);
-			PropertyBag["payments"] = Payment.Queryable.Where(p => p.Payer == payer).ToList();
-		}
-
-		public void Invoices(uint id)
-		{
-			var payer = Payer.Find(id);
-			PropertyBag["invoices"] = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
-		}
-
 		public void BalanceSummary(uint id)
 		{
 			CancelLayout();
@@ -42,16 +32,22 @@ namespace AdminInterface.Controllers
 			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
 			var payments = Payment.Queryable.Where(p => p.Payer == payer).ToList();
 			var acts = Act.Queryable.Where(p => p.Payer == payer).ToList();
+			var operations = ActiveRecordLinqBase<BalanceOperation>.Queryable.Where(d => d.Payer == payer).ToList();
+			var refunds = operations.Where(d => d.Type == OperationType.Refund);
+			var releifs = operations.Where(d => d.Type == OperationType.DebtRelief);
 			var items = invoices
-				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false })
-				.Union(payments.Select(p => new {p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true}))
-				.Union(acts.Select(a => new {a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false}))
+				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false })
+				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false }))
+				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false }))
+				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = true }))
+				.Union(releifs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true }))
 				.ToList();
 			if (payer.BeginBalance != 0 && payer.BeginBalanceDate.HasValue)
-				items.Add(new {Id = 0u, Date = payer.BeginBalanceDate.Value, Sum = payer.BeginBalance, IsInvoice = false, IsAct = false, IsPayment = true});
+				items.Add(new {Id = 0u, Date = payer.BeginBalanceDate.Value, Sum = payer.BeginBalance, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false});
 
 			items = items.OrderBy(i => i.Date).ToList();
 
+			PropertyBag["operation"] = new BalanceOperation(payer);
 			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = items;
 		}
@@ -63,17 +59,44 @@ namespace AdminInterface.Controllers
 			BindObjectInstance(payment, "payment");
 			if (!HasValidationError(payment))
 			{
+				Notify("Сохранено");
 				payment.RegisterPayment();
 				payment.Save();
 			}
 			else
 			{
-				Error(Validator.GetErrorSummary(payment).ErrorMessages[0]);
+				Error(GetFirstErrorWithProperty(payment));
 			}
 
 			//мы должны возвращаться на туже вкладку с которой был совершен переход
 			//RedirectToReferrer();
 			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
+		}
+
+		public void NewBalanceOperation(uint id)
+		{
+			var payer = Payer.Find(id);
+			var operation = new BalanceOperation(payer);
+			BindObjectInstance(operation, "operation");
+			if (IsValid(operation))
+			{
+				ActiveRecordMediator.Save(operation);
+				Notify("Сохранено");
+			}
+			else
+			{
+				Error(GetFirstErrorWithProperty(operation));
+			}
+
+			//мы должны возвращаться на туже вкладку с которой был совершен переход
+			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
+		}
+
+		private string GetFirstErrorWithProperty(object item)
+		{
+			var property = Validator.GetErrorSummary(item).InvalidProperties.First();
+			var message = Validator.GetErrorSummary(item).GetErrorsForProperty(property).First();
+			return String.Format("{0} - {1}", BindingHelper.GetDescription(item.GetType(), property), message);
 		}
 
 		public void InvoicePreview(uint id, int group)

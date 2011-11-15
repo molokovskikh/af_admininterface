@@ -32,7 +32,7 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Payment()
-			: base(BalanceUpdaterType.Payment)
+			: base(BalanceUpdaterType.Credit)
 		{
 			UpdatePayerInn = true;
 		}

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Linq;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
-using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Controllers
 {
@@ -26,11 +24,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["beginDate"] = begin.Value;
 			PropertyBag["endDate"] = end.Value;
-			PropertyBag["act"] = new RevisionAct(payer,
-				begin.Value,
-				end.Value,
-				Act.Queryable.Where(i => i.Payer == payer).ToList(),
-				Payment.Queryable.Where(p => p.Payer == payer).ToList());
+			PropertyBag["act"] = BuildRevisionAct(begin.Value, end.Value, payer);
 			PropertyBag["payer"] = payer;
 		}
 
@@ -50,11 +44,7 @@ namespace AdminInterface.Controllers
 			if (end == null)
 				end = DateTime.Now;
 
-			PropertyBag["act"] = new RevisionAct(payer,
-				begin.Value,
-				end.Value,
-				Act.Queryable.Where(i => i.Payer == payer).ToList(),
-				Payment.Queryable.Where(p => p.Payer == payer).ToList());
+			PropertyBag["act"] = BuildRevisionAct(begin.Value, end.Value, payer);
 			PropertyBag["payer"] = payer;
 		}
 
@@ -73,12 +63,7 @@ namespace AdminInterface.Controllers
 			if (end == null)
 				end = DateTime.Now;
 
-			var act = new RevisionAct(payer,
-				begin.Value,
-				end.Value,
-				Act.Queryable.Where(i => i.Payer == payer).ToList(),
-				Payment.Queryable.Where(p => p.Payer == payer).ToList());
-
+			var act = BuildRevisionAct(begin.Value, end.Value, payer);
 			this.Mailer().RevisionAct(act, emails, message).Send();
 
 			Notify("Отправлено");
@@ -100,14 +85,20 @@ namespace AdminInterface.Controllers
 			if (end == null)
 				end = DateTime.Now;
 
-			var act = new RevisionAct(payer,
-				begin.Value,
-				end.Value,
-				Act.Queryable.Where(i => i.Payer == payer).ToList(),
-				Payment.Queryable.Where(p => p.Payer == payer).ToList());
+			var act = BuildRevisionAct(begin.Value, end.Value, payer);
 
 			Exporter.ToResponse(Response, Exporter.Export(act));
 			CancelView();
+		}
+
+		private static RevisionAct BuildRevisionAct(DateTime begin, DateTime end, Payer payer)
+		{
+			return new RevisionAct(payer,
+				begin,
+				end,
+				Act.Queryable.Where(i => i.Payer == payer).ToList(),
+				Payment.Queryable.Where(p => p.Payer == payer).ToList(),
+				BalanceOperation.Queryable.Where(o => o.Payer == payer).ToList());
 		}
 	}
 }

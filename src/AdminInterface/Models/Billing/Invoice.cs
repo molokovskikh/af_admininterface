@@ -21,7 +21,7 @@ namespace AdminInterface.Models.Billing
 		};
 
 		public Invoice()
-			: base(BalanceUpdaterType.ChargeOff)
+			: base(BalanceUpdaterType.Debit)
 		{}
 
 		public Invoice(Advertising ad)

@@ -1,0 +1,24 @@
+﻿<% component Bubble, {@bredcrumbs : [("Поиск плательщиков", "${siteroot}/Billing/Search"), operation.Payer]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	${BindingHelper.GetDescription(operation.Type)} №${operation.Id}
+<% end %>
+
+<table>
+	<tr>
+		<td>${app.GetLabel("operation.Date")}:</td>
+		<td>${operation.Date.ToShortDateString()}</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Type")}:</td>
+		<td>${BindingHelper.GetDescription(operation.Type)}</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Description")}:</td>
+		<td>!{operation.Description}</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Sum")}:</td>
+		<td>${operation.Sum.ToString("C")}</td>
+	</tr>
+</table>

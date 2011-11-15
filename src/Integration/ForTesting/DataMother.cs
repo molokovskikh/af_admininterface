@@ -232,7 +232,8 @@ namespace Integration.ForTesting
 				new List<Act> { act, act2 },
 				new List<Payment> {
 					new Payment(payer, new DateTime(2011, 1, 15), 1000)
-				});
+				},
+				Enumerable.Empty<BalanceOperation>());
 		}
 
 		public static User CreateSupplierUser()
