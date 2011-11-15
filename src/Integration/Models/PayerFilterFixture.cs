@@ -121,12 +121,7 @@ namespace Integration.Models
 		[Test]
 		public void Search_payer_without_document()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Users.Each(u => u.Accounting.ReadyForAccounting = true);
-			Save(client);
-			var payer = client.Payers.First();
-			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
-			Save(payer);
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
 
 			var period = DateTime.Now.ToPeriod();
 			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
@@ -138,6 +133,18 @@ namespace Integration.Models
 			Flush();
 
 			items = filter.Find();
+			Assert.That(items.Select(i => i.PayerId).ToArray(), Is.Not.Contains(payer.Id));
+		}
+
+		[Test]
+		public void Do_not_include_payer_that_was_not_registred()
+		{
+			var payer = DataMother.CreatePayerForBillingDocumentTest();
+
+			var period = DateTime.Now.AddMonths(-1).ToPeriod();
+			var filter = new PayerFilter {SearchWithoutDocuments = true, Period = period, DocumentType = DocumentType.Invoice};
+			var items = filter.Find();
+
 			Assert.That(items.Select(i => i.PayerId).ToArray(), Is.Not.Contains(payer.Id));
 		}
 	}

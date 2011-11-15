@@ -213,7 +213,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			{
 				//мы не должны выбирать тех плательщиков у которых не могло быть документов
 				//за этот период тк они еще не были зарегистрированны
-				And(where, "p.RegistrationDate >= :PeriodBegin");
+				And(where, "p.RegistrationDate <= :PeriodBegin");
 				And(where, "p.PayCycle = :InvoicePeriod");
 				And(where, GetDocumentSubQuery(DocumentType));
 				query.SetParameter("InvoicePeriod", Period.GetInvoicePeriod());
