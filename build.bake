@@ -105,7 +105,7 @@ task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackgr
 
 task @TestDeploy, [@BuildWebSite, @WebDeploy]
 
-task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter,@DeployBackground, @SendDeployNotification]
+task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
 
 task @FindIntruders:
 	Impersonate:
