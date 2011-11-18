@@ -96,7 +96,12 @@ namespace AdminInterface.Controllers
 		{
 			var property = Validator.GetErrorSummary(item).InvalidProperties.First();
 			var message = Validator.GetErrorSummary(item).GetErrorsForProperty(property).First();
-			return String.Format("{0} - {1}", BindingHelper.GetDescription(item.GetType(), property), message);
+			var description = BindingHelper.TryGetDescription(item.GetType(), property);
+
+			if (String.IsNullOrEmpty(description))
+				return message;
+			else
+				return String.Format("{0} - {1}", description, message);
 		}
 
 		public void InvoicePreview(uint id, int group)
