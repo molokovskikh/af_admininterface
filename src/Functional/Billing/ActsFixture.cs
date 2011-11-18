@@ -40,6 +40,15 @@ namespace Functional.Billing
 		}
 
 		[Test]
+		public void Show_print_form()
+		{
+			Open("/acts/");
+			AssertText("Акты");
+			Click("Для печати");
+			AssertText("Реестр актов");
+		}
+
+		[Test]
 		public void Edit_act()
 		{
 			Open("/acts/");

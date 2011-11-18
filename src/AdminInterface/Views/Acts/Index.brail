@@ -61,7 +61,7 @@
 	</div>
 
 	<div class=block>
-		${UrlHelper.Link("Для печати", {@action: @PrintIndex, @querystring: filter})}
+		${UrlHelper.Link("Для печати", {@controller: @Acts, @action: @PrintIndex, @querystring: filter})}
 	</div>
 
 	<form method=post action="${siteroot}/Acts/Process">

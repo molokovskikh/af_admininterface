@@ -69,7 +69,7 @@
 	</div>
 
 	<div class=block>
-		${UrlHelper.Link("Для печати", {@action: @PrintIndex, @querystring: filter})}
+		${UrlHelper.Link("Для печати", {@controller: @Invoices, @action: @PrintIndex, @querystring: filter})}
 	</div>
 
 	<div class=block>
