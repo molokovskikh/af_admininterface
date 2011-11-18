@@ -1,35 +1,23 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
-using AdminInterface.Initializers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework.Config;
 using System.Reflection;
 using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Container;
 using Castle.MonoRail.Framework.Internal;
-using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using log4net;
 using MySql.Data.MySqlClient;
-using NHibernate;
-using NHibernate.Engine;
-using NHibernate.Type;
-using ILoggerFactory = Castle.Core.Logging.ILoggerFactory;
 
 namespace AddUser
 {

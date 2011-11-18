@@ -4,6 +4,9 @@ using System.IO;
 using System.Configuration;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Security;
+using System.Web.Hosting;
 using AddUser;
 using AdminInterface.Models.Security;
 using CassiniDev;
@@ -34,8 +37,10 @@ namespace Functional
 
 			_webServer = new Server(port, "/", Path.GetFullPath(webDir));
 			_webServer.Start();
+
+			SetupEnvironment();
+
 			Settings.Instance.AutoMoveMousePointerToTopLeft = false;
-			//ie разрушает мой разум, если поставить true то окно будет видно, false нет
 			Settings.Instance.MakeNewIeInstanceVisible = false;
 			Settings.Instance.AutoCloseDialogs = true;
 
@@ -45,6 +50,17 @@ namespace Functional
 			}
 
 			InitLogger(/*"NHibernate"*/);
+		}
+
+		private void SetupEnvironment()
+		{
+			var method = _webServer.GetType().GetMethod("GetHost", BindingFlags.Instance | BindingFlags.NonPublic);
+			method.Invoke(_webServer, null);
+
+			var manager = ApplicationManager.GetApplicationManager();
+			var apps = manager.GetRunningApplications();
+			var domain = manager.GetAppDomain(apps.Single().ID);
+			domain.SetData("environment", "test");
 		}
 
 		private void InitLogger()

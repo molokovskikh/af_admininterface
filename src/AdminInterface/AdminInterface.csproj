@@ -154,6 +154,7 @@
     <Compile Include="Helpers\AttributeStyler.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
+    <Compile Include="Initializers\Test.cs" />
     <Compile Include="Models\AuditListener.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
