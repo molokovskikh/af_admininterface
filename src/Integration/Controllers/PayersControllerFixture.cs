@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Specialized;
 using AdminInterface.Controllers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.Components.Binder;
 using Castle.Components.Validator;
-using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -19,14 +15,13 @@ namespace Integration.Controllers
 		private Payer payer;
 
 		[SetUp]
-		public void Setup()
+		public new void Setup()
 		{
 			controller = new PayersController();
-			controller.Validator = new ValidatorRunner(new CachedValidationRegistry());
-			controller.Binder.Validator = controller.Validator;
+			Prepare(controller);
+
 			payer = DataMother.CreatePayer();
 			payer.Save();
-			PrepareController(controller);
 		}
 
 		[Test]

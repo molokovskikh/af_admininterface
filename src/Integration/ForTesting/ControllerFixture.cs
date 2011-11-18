@@ -2,6 +2,7 @@
 using System.Net.Mail;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
+using Castle.Components.Validator;
 using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Routing;
@@ -18,11 +19,14 @@ namespace Integration.ForTesting
 		protected List<MailMessage> notifications;
 		protected ISessionScope scope;
 		protected string referer;
+		protected ValidatorRunner validator;
 
 		[SetUp]
 		public void Setup()
 		{
 			//Services.UrlBuilder.UseExtensions = false;
+
+			validator = new ValidatorRunner(new CachedValidationRegistry());
 
 			notifications = new List<MailMessage>();
 
@@ -37,6 +41,13 @@ namespace Integration.ForTesting
 			MailerExtention.SenderForTest = sender;
 
 			scope = new TransactionlessSession();
+		}
+
+		public void Prepare(SmartDispatcherController controller)
+		{
+			controller.Validator = validator;
+			controller.Binder.Validator = validator;
+			PrepareController(controller);
 		}
 
 		[TearDown]

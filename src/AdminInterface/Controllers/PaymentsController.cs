@@ -65,6 +65,7 @@ namespace AdminInterface.Controllers
 		public void SavePayments()
 		{
 			var payments = TempPayments();
+			Session["payments"] = null;
 			foreach (var payment in payments)
 			{
 				//если зайти в два платежа и отредактировать их
