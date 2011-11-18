@@ -19,7 +19,8 @@
 <div class="CenterBlock FilterBlock">
 
 	<form id="SearchForm" action=search method="post">
-
+		${FormHelper.HiddenField("filter.SortBy")}
+		${FormHelper.HiddenField("filter.SortDirection")}
 		<table style="width:100%">
 			<tr>
 				<td>Введите текст для поиска:</td>

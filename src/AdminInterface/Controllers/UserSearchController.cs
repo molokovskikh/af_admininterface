@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 			var filter = new UserFilter();
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
-				BindObjectInstance(filter, "filter", AutoLoadBehavior.NullIfInvalidKey);
+				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				var result = filter.Find();
 				if (result.Count == 1 && !String.IsNullOrEmpty(result.First().UserId.ToString()))
 				{

@@ -10,86 +10,87 @@
 	</h3>
 	
 	<form id="SearchForm" method="post">
+		${FormHelper.HiddenField("filter.SortBy")}
+		${FormHelper.HiddenField("filter.SortDirection")}
+		<fieldset>
+			<legend>Искать по:</legend>
+			<table style="width:100%">
+				<col style="width:60%" />
+				<col style="width:40%" />
+				<tr>
+					<td class=value>
+						${app.Edit("filter.SearchText")}
+					</td>
+					<td>
+						${app.Edit("filter.SearchBy", "RadioList")}
+					</td>
+				</tr>
+			</table>
+		</fieldset>
 	
-	<fieldset>
-		<legend>Искать по:</legend>
-		<table style="width:100%">
-			<col style="width:60%" />
-			<col style="width:40%" />
-			<tr>
-				<td class=value>
-					${app.Edit("filter.SearchText")}
-				</td>
-				<td>
-					${app.Edit("filter.SearchBy", "RadioList")}
-				</td>
-			</tr>
-		</table>
-	</fieldset>	
-	
-	<fieldset>
-		<legend>Фильтры:</legend>
-		<table style="width: 100%;" >
-			<col style="width:40%" />
-			<col style="width:60%" />
+		<fieldset>
+			<legend>Фильтры:</legend>
+			<table style="width: 100%;" >
+				<col style="width:40%" />
+				<col style="width:60%" />
 
-			<tr>
-				<td>
-					Должен\Не должен:
-				</td>
-				<td class=value>
-					${app.Edit("filter.PayerState")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Регион:
-				</td>
-				<td class=value>
-					${app.Edit("filter.Region")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Сегмент:
-				</td>
-				<td class=value>
-					${app.Edit("filter.Segment")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Тип:
-				</td>
-				<td class=value>
-					${app.Edit("filter.ClientType")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Отключен\Не отключен:
-				</td>
-				<td class=value>
-					${app.Edit("filter.ClientStatus")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Получатель платежей:
-				</td>
-				<td class=value>
-					${app.Edit("filter.Recipient")}
-				</td>
-			</tr>
-			<tr>
-				<td>
-					Тип выставления счета:
-				</td>
-				<td class=value>
-					${app.Edit("filter.InvoiceType")}
-				</td>
-			</tr>
-		</table>
+				<tr>
+					<td>
+						Должен\Не должен:
+					</td>
+					<td class=value>
+						${app.Edit("filter.PayerState")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Регион:
+					</td>
+					<td class=value>
+						${app.Edit("filter.Region")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Сегмент:
+					</td>
+					<td class=value>
+						${app.Edit("filter.Segment")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Тип:
+					</td>
+					<td class=value>
+						${app.Edit("filter.ClientType")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Отключен\Не отключен:
+					</td>
+					<td class=value>
+						${app.Edit("filter.ClientStatus")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Получатель платежей:
+					</td>
+					<td class=value>
+						${app.Edit("filter.Recipient")}
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Тип выставления счета:
+					</td>
+					<td class=value>
+						${app.Edit("filter.InvoiceType")}
+					</td>
+				</tr>
+			</table>
 		</fieldset>
 		<div class=submit>
 			${FormHelper.Submit("Найти")}

@@ -1,13 +1,10 @@
 ﻿using System;
-using System.Configuration;
 using System.IO;
 using System.Linq;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
-using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -25,7 +22,7 @@ namespace AdminInterface.Controllers
 			var filter = new CallRecordFilter();
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
-				BindObjectInstance(filter, "filter");
+				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter");
 				var calls = filter.Find();
 				PropertyBag["calls"] = calls;
 			}

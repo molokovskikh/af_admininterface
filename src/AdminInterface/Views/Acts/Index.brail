@@ -22,6 +22,8 @@
 			<div style="margin:10px">
 				<h3>Акты</h3>
 				${app.BeginFormFor("filter")}
+				${FormHelper.HiddenField("filter.SortBy")}
+				${FormHelper.HiddenField("filter.SortDirection")}
 				${app.FilterFor("filter.Period")}
 				${app.FilterFor("filter.Region")}
 				${app.FilterFor("filter.Recipient")}
