@@ -18,57 +18,59 @@
 			jQuery("#filter_SearchText").focus();
 		}
 	);
-
 </script>
+
 <div class="CenterBlock FilterBlock">
-<form id="SearchForm" name="SearchForm" method=post action="${siteroot}/Users/Search">
-	<p style="text-align: left;" class=value>
-		Введите текст для поиска:<br />
-		${app.Edit("filter.SearchText")}
-	</p>
-	<table>
-		<tr>
-			<td>Искать по:</td><td></td><td></td>
-		</tr>
-		<tr>
-			<td></td>
-			${app.Edit("filter.SearchBy", "TwoColumnRadioList")}
-		</tr>
-	</table>
-	
-	<fieldset>
-		<legend>Фильтры:</legend>
+
+	<form id="SearchForm" name="SearchForm" method=post action="${siteroot}/Users/Search">
+		${FormHelper.HiddenField("filter.SortBy")}
+		${FormHelper.HiddenField("filter.SortDirection")}
+		<p style="text-align: left;" class=value>
+			Введите текст для поиска:<br />
+			${app.Edit("filter.SearchText")}
+		</p>
 		<table>
-			<col style="width:25%" />
-			<col style="width:25%" />
-			<col style="width:25%" />
-			<col style="width:25%" />
-			<thead>
-				<tr align="left">
-					<td class=value>
-						Регион<br />
-						${app.Edit("filter.Region")}
-					</td>
-					<td class=value>
-						Тип<br />
-						${app.Edit("filter.ClientType")}
-					</td>
-					<td class=value>
-						Сегмент<br />
-						${app.Edit("filter.Segment")}
-					</td>
-					<td class=value>
-						Статус<br />
-						${app.Edit("filter.SearchStatus")}
-					</td>
-				</tr>
-			</thead>
+			<tr>
+				<td>Искать по:</td><td></td><td></td>
+			</tr>
+			<tr>
+				<td></td>
+				${app.Edit("filter.SearchBy", "TwoColumnRadioList")}
+			</tr>
 		</table>
-	</fieldset>
-	<p>
-		<input type="submit" id="SearchButton" value="Поиск" />
-	</p>
-</form>
+		<fieldset>
+			<legend>Фильтры:</legend>
+			<table>
+				<col style="width:25%" />
+				<col style="width:25%" />
+				<col style="width:25%" />
+				<col style="width:25%" />
+				<thead>
+					<tr align="left">
+						<td class=value>
+							Регион<br />
+							${app.Edit("filter.Region")}
+						</td>
+						<td class=value>
+							Тип<br />
+							${app.Edit("filter.ClientType")}
+						</td>
+						<td class=value>
+							Сегмент<br />
+							${app.Edit("filter.Segment")}
+						</td>
+						<td class=value>
+							Статус<br />
+							${app.Edit("filter.SearchStatus")}
+						</td>
+					</tr>
+				</thead>
+			</table>
+		</fieldset>
+		<p>
+			<input type="submit" id="SearchButton" value="Поиск" />
+		</p>
+	</form>
 </div>
 
 <% if ?searchResults: %>

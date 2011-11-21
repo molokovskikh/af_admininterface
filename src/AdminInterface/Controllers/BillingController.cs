@@ -242,7 +242,7 @@ namespace AdminInterface.Controllers
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
 			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.NullIfInvalidKey;
-				BindObjectInstance(filter, "filter");
+				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter");
 				PropertyBag["searchResults"] = filter.Find();
 			}
 			PropertyBag["filter"] = filter;

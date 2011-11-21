@@ -10,6 +10,23 @@
 	</h3>
 	
 	<form id="SearchForm" method="post">
+		${FormHelper.HiddenField("filter.SortBy")}
+		${FormHelper.HiddenField("filter.SortDirection")}
+		<fieldset>
+			<legend>Искать по:</legend>
+			<table style="width:100%">
+				<col style="width:60%" />
+				<col style="width:40%" />
+				<tr>
+					<td class=value>
+						${app.Edit("filter.SearchText")}
+					</td>
+					<td>
+						${app.Edit("filter.SearchBy", "RadioList")}
+					</td>
+				</tr>
+			</table>
+		</fieldset>
 	
 		<fieldset>
 			<legend>Искать по:</legend>

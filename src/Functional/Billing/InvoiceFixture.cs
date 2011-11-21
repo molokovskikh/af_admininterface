@@ -37,6 +37,15 @@ namespace Functional.Billing
 		}
 
 		[Test]
+		public void View_printing_form()
+		{
+			Open("Invoices/");
+			AssertText("Реестр счетов");
+			Click("Для печати");
+			AssertText("Реестр счетов");
+		}
+
+		[Test]
 		public void Show_predefine_invoice_positions()
 		{
 			Nomenclature.DeleteAll();

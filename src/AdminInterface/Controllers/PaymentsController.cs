@@ -3,11 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AdminInterface.Controllers.Filters;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -65,6 +62,7 @@ namespace AdminInterface.Controllers
 		public void SavePayments()
 		{
 			var payments = TempPayments();
+			Session["payments"] = null;
 			foreach (var payment in payments)
 			{
 				//если зайти в два платежа и отредактировать их
