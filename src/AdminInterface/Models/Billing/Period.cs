@@ -113,7 +113,7 @@ namespace AdminInterface.Models.Billing
 			var calendar = CultureInfo.GetCultureInfo("ru-Ru").Calendar;
 			var year = DateTime.Today.Year;
 
-			return new DateTime(year, 9, calendar.GetDaysInMonth(year, 9));
+			return new DateTime(year, month, calendar.GetDaysInMonth(year, month));
 		}
 
 		public static string GetPeriodName(this Period period)

@@ -5,6 +5,7 @@ using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Models
 {
