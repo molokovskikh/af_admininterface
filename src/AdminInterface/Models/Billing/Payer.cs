@@ -357,7 +357,7 @@ ORDER BY {Payer}.shortname;";
 			Balance = 0;
 			Balance += BeginBalance;
 			Balance += payments.Sum(p => p.Sum);
-			Balance -= invoices.Sum(i => i.Sum);
+			Balance -= invoices.Sum(i => i.PaidSum);
 		}
 
 		private void UpdateBalance()
