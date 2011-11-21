@@ -102,11 +102,12 @@ namespace Integration.Models
 		public void Ignore_new_prices_for_user()
 		{
 			client.Settings.IgnoreNewPriceForUser = true;
-			scope.Flush();
-
 			var pricesCount = user.GetUserPriceCount();
 			var supplier = DataMother.CreateSupplier();
 			supplier.Save();
+
+			Flush();
+
 			client.MaintainIntersection();
 			var newPricesCount = user.GetUserPriceCount();
 			Assert.That(newPricesCount, Is.EqualTo(pricesCount));

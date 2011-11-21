@@ -23,7 +23,7 @@ namespace Functional.Drugstore
 		DrugstoreSettings settings;
 
 		[SetUp]
-		public void Setup()
+		public new void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
 			scope.Flush();
@@ -433,6 +433,7 @@ namespace Functional.Drugstore
 		{
 			var supplier = DataMother.CreateSupplier(s => { s.Payer = client.Payers.First(); });
 			supplier.Save();
+			scope.Flush();
 
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 			Thread.Sleep(1000);
@@ -467,6 +468,7 @@ namespace Functional.Drugstore
 				s.AddRegion(region);
 			});
 			supplier.Save();
+			Flush();
 
 			browser.Link(Find.ByText("Показать все регионы")).Click();
 			Thread.Sleep(500);
@@ -505,6 +507,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.Update();
+			Flush();
 
 			Refresh();
 			//ждем тк список для редактирования отображает js

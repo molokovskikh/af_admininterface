@@ -37,6 +37,8 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			var payer = supplier.Payer;
 			supplier.Save();
+			Flush();
+
 			var items = new PayerFilter{
 				SearchBy = SearchBy.PayerId,
 				SearchText = payer.Id.ToString(),
@@ -53,6 +55,7 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			var payer = supplier.Payer;
 			supplier.Save();
+			Flush();
 
 			var items = new PayerFilter {
 				SearchBy = SearchBy.Name,

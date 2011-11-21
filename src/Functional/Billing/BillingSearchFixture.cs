@@ -1,15 +1,12 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 
-namespace Functional
+namespace Functional.Billing
 {
 	public class BillingSearchFixture : WatinFixture2
 	{
@@ -17,7 +14,7 @@ namespace Functional
 		private Payer payer;
 
 		[SetUp]
-		public void Setup()
+		public new void Setup()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
@@ -48,7 +45,7 @@ namespace Functional
 		[Test]
 		public void Payers_should_be_searchable_throw_payer_id()
 		{
-			Open("/");
+			Open();
 
 			browser.Link(Find.ByText("Биллинг")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Фильтр плательщиков"));
