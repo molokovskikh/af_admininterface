@@ -155,24 +155,5 @@ namespace Integration.Models
 			var identifyPayments = Payment.Identify(payments);
 			Assert.That(identifyPayments.First().Payer, Is.EqualTo(payer));
 		}
-
-		[Test]
-		public void Double_registration()
-		{
-			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var payment = new Payment(payer, DateTime.Now, 100);
-			payment.RegisterPayment();
-			payment.Save();
-			Flush();
-			Reopen();
-
-			payment.Payer = Payer.Find(payer.Id);
-			payment.RegisterPayment();
-			payment.Save();
-			Flush();
-
-			payer = Payer.Find(payer.Id);
-			Assert.That(payer.Balance, Is.EqualTo(100));
-		}
 	}
 }
