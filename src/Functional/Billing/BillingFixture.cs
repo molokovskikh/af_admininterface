@@ -217,10 +217,9 @@ namespace Functional.Billing
 		public void Change_user_status()
 		{
 			var user = client.Users[0];
-
 			var selector = String.Format("tr#UserRow{0}", user.Id);
 			var row = (TableRow)browser.CssSelect(selector);
-			var checkbox = (CheckBox)browser.CssSelect("input[name=status]");
+			var checkbox = (CheckBox)row.CssSelect("input[name=status]");
 
 			Assert.IsTrue(checkbox.Checked);
 			Assert.That(row.ClassName, Is.Not.StringContaining("disabled"));
