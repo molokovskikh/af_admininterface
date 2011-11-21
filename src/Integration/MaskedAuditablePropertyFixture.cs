@@ -30,8 +30,7 @@ namespace Integration
 		public void Ignore_unknown_region()
 		{
 			var property = new MaskedAuditableProperty(typeof(Test).GetProperty("MaskRegion"), "Регион", 0UL, 18446742976345407488UL);
-			Assert.That(property.ToString(), Is.EqualTo("$$$Изменено 'Регион' Удалено 'Ижевск', 'Справка-Воронеж', 'Справка-Белкород', 'Справка-Курск'")
-				.Or.EqualTo("$$$Изменено 'Регион' Удалено 'Ижевск'"));
+			Assert.That(property.ToString(), Is.StringContaining("$$$Изменено 'Регион' Удалено 'Ижевск'"));
 		}
 	}
 }
