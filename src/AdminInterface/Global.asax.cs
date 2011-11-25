@@ -49,21 +49,13 @@ namespace AddUser
 			try
 			{
 				ValidEventListner.ValidatorAccessor = new MonorailValidatorAccessor();
-				LoadSettings(Config);
+				ConfigReader.LoadSettings(Config);
 				Initialize();
 			}
 			catch(Exception ex)
 			{
 				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
-		}
-
-		private void LoadSettings(AppConfig config)
-		{
-			var builder = new TreeBuilder();
-			var tree = builder.BuildSourceNode(ConfigurationManager.AppSettings);
-			var binder = new DataBinder();
-			binder.BindObjectInstance(config, tree);
 		}
 
 		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
