@@ -405,43 +405,6 @@ WHERE   pricesdata.firmcode = clientsdata.firmcode
 		AND (clientsdata.maskregion & regions.regioncode)>0  
 		AND pricesregionaldata.pricecode is null;";
 
-			if (supplier.Segment == Segment.Retail)
-			{
-				command += @"
-INSERT
-INTO intersection
-(
-	ClientCode,
-	regioncode,
-	pricecode,
-	invisibleonclient,
-	InvisibleonFirm,
-	costcode
-)
-SELECT  DISTINCT clientsdata2.firmcode,
-	regions.regioncode,
-	pricesdata.pricecode,
-	if(pricesdata.PriceType = 0, 0, 1) as invisibleonclient,
-	a.invisibleonfirm,
-	(
-		SELECT costcode
-		FROM pricescosts pcc
-		WHERE basecost
-			AND pcc.PriceCode = pricesdata.PriceCode
-	) as CostCode
-FROM pricesdata
-	JOIN clientsdata ON clientsdata.FirmCode = pricesdata.FirmCode
-	JOIN clientsdata as clientsdata2 ON clientsdata.firmsegment = clientsdata2.firmsegment
-		JOIN retclientsset as a ON a.clientcode = clientsdata2.firmcode
-			JOIN farm.regions ON (clientsdata.maskregion & regions.regioncode) > 0 and (clientsdata2.maskregion & regions.regioncode) > 0
-				JOIN pricesregionaldata ON pricesregionaldata.pricecode = pricesdata.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN intersection ON intersection.pricecode = pricesdata.pricecode AND intersection.regioncode = regions.regioncode AND intersection.clientcode = clientsdata2.firmcode
-WHERE   intersection.pricecode IS NULL
-	AND clientsdata.firmtype = 0
-	AND pricesdata.PriceCode = @NewPriceCode
-	AND clientsdata2.firmtype = 1;";
-			}
-
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery(command)
 					.SetParameter("ClientCode", supplier.Id)
