@@ -14,9 +14,9 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(DiscriminatorColumn = "Type", Schema = "Billing", Lazy = true), Auditable]
 	public abstract class Account : ActiveRecordLinqBase<Account>, IAuditable
 	{
-		private bool _beAccounted;
+		protected bool _beAccounted;
 		protected bool _readyForAccounting;
-		private bool _isFree;
+		protected bool _isFree;
 		protected decimal _payment;
 		private string _description;
 

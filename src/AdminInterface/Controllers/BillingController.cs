@@ -152,7 +152,7 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["suppliers"] = Supplier.Queryable.Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
 			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
-			PropertyBag["Users"] = payer.Users;
+			PropertyBag["Users"] = payer.Users.Where(u => u.RootService.Type != ServiceType.Supplier).ToList();
 			PropertyBag["Addresses"] = payer.Addresses;
 			PropertyBag["Reports"] = payer.GetReportAccounts();
 

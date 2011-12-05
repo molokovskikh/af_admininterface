@@ -1,5 +1,7 @@
+using System;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 
 namespace AdminInterface.Models.Billing
@@ -13,7 +15,13 @@ namespace AdminInterface.Models.Billing
 		{
 			User = user;
 			if (user.RootService.GetType() == typeof(Supplier))
+			{
 				_payment = User.RootService.HomeRegion.SupplierUserPayment;
+				_readyForAccounting = true;
+				_beAccounted = true;
+				Operator = SecurityContext.Administrator.UserName;
+				WriteTime = DateTime.Now;
+			}
 			else
 				_payment = User.RootService.HomeRegion.UserPayment;
 		}
