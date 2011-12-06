@@ -91,7 +91,7 @@ namespace AdminInterface.Models.Billing
 		[HasMany(Lazy = true)]
 		public IList<Invoice> Invoices { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
+		[HasMany(Cascade = ManyRelationCascadeEnum.AllDeleteOrphan, Lazy = true)]
 		public IList<ActPart> Parts { get; set; }
 
 		public static IEnumerable<Act> Build(List<Invoice> invoices, DateTime documentDate)

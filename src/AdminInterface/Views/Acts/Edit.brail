@@ -1,9 +1,7 @@
 ﻿<script>
 	$(function () {
 		$("form").validate();
-		$("table.DataTable").data("template", function (table) {
-			return $(table.find("tr").get(1)).clone()
-		});
+		$("table.DataTable").data("template", cloneRowTemplate);
 	});
 </script>
 
@@ -63,6 +61,7 @@ ${app.GetValidationError(act, "Recipient")}
 					<a href="javascript:" class=delete>Удалить</a>
 				</td>
 				<td>
+					${FormHelper.HiddenField("act.parts[${i}].Id", part.Id)}
 					<textarea id="act_parts_${i}__name" name="act.parts[${i}].name" cols=30 rows=2 class="required">!{part.Name}</textarea>
 					${app.GetValidationError(part, "Name")}
 				</td>

@@ -210,13 +210,7 @@ select 4474;")
 				new Person[0], 
 				"",
 				"");
-			var price = Price.Queryable.First(p => p.Supplier == supplier);
 			Assert.That(supplier.Id, Is.GreaterThan(0));
-			var intersectionCount = ArHelper.WithSession(s => s
-				.CreateSQLQuery("select count(*) from Usersettings.Intersection where PriceCode = :PriceId")
-				.SetParameter("PriceId", price.Id)
-				.UniqueResult<long>());
-			Assert.That(intersectionCount, Is.GreaterThan(0));
 			Assert.That(supplier.Payer.PaymentSum, Is.EqualTo(600));
 		}
 

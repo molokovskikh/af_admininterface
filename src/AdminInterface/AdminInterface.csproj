@@ -159,6 +159,7 @@
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\BalanceOperation.cs" />
+    <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
     <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />

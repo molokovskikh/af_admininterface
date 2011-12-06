@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -84,6 +86,8 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
+				DoNotRecreateCollectionBinder.Prepare(this, "act.Parts");
+
 				BindObjectInstance(act, "act");
 				if (!HasValidationError(act))
 				{

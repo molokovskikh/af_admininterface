@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -73,6 +74,8 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
+				DoNotRecreateCollectionBinder.Prepare(this, "invoice.Parts");
+
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice))
 				{

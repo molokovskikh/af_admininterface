@@ -164,6 +164,13 @@
 		endCalendar.refresh();
 });
 
+function cloneRowTemplate(table) {
+	var row = $(table.find("tr").get(1)).clone();
+	row.find("input[type=hidden][name$=Id]").val("0");
+	row.find("input[type=hidden][name$=id]").val("0");
+	return row;
+}
+
 function ShowHidden(folder) {
 	$(folder).removeClass("ShowHiden");
 	$(folder).addClass("HideVisible");

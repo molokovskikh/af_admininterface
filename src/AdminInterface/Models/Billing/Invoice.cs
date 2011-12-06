@@ -128,7 +128,7 @@ namespace AdminInterface.Models.Billing
 		public virtual Act Act { get; set; }
 
 		[
-			HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true),
+			HasMany(Cascade = ManyRelationCascadeEnum.AllDeleteOrphan, Lazy = true),
 			ValidateCollectionNotEmpty("Нужно задать список услуг")
 		]
 		public IList<InvoicePart> Parts { get; set; }
