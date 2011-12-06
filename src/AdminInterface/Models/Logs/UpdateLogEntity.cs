@@ -1,4 +1,4 @@
-using System;
+п»їusing System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -13,17 +13,22 @@ namespace AdminInterface.Models.Logs
 {
 	public enum UpdateType
 	{
-		[Description("Накопительное")] Accumulative = 1,
-		[Description("Кумулятивное")] Cumulative = 2,
-		[Description("Отправка заказа")] OldOrderSending = 4,
-		[Description("Ошибка доступа")] AccessError = 5,
-		[Description("Ошибка сервера")] ServerError = 6,
-		[Description("Документы")] Documents = 8,
-		[Description("Загрузка документов на сервер")] LoadingDocuments = 9,
-		[Description("АвтоЗаказ")] AutoOrder = 10,
-		[Description("Отправка заказов")] NewOrderSending = 11,
-		[Description("Отправка измененных настроек прайс-листов")] PriceSettingSending = 12,
-		[Description("Загрузка отправленных заказов")] OrdersDownload = 13,
+		[Description("РќР°РєРѕРїРёС‚РµР»СЊРЅРѕРµ")] Accumulative = 1,
+		[Description("РљСѓРјСѓР»СЏС‚РёРІРЅРѕРµ")] Cumulative = 2,
+		[Description("РћС‚РїСЂР°РІРєР° Р·Р°РєР°Р·Р°")] OldOrderSending = 4,
+		[Description("РћС€РёР±РєР° РґРѕСЃС‚СѓРїР°")] AccessError = 5,
+		[Description("РћС€РёР±РєР° СЃРµСЂРІРµСЂР°")] ServerError = 6,
+		[Description("Р”РѕРєСѓРјРµРЅС‚С‹")] Documents = 8,
+		[Description("Р—Р°РіСЂСѓР·РєР° РґРѕРєСѓРјРµРЅС‚РѕРІ РЅР° СЃРµСЂРІРµСЂ")] LoadingDocuments = 9,
+		[Description("РђРІС‚РѕР—Р°РєР°Р·")] AutoOrder = 10,
+		[Description("РћС‚РїСЂР°РІРєР° Р·Р°РєР°Р·РѕРІ")] NewOrderSending = 11,
+		[Description("РћС‚РїСЂР°РІРєР° РёР·РјРµРЅРµРЅРЅС‹С… РЅР°СЃС‚СЂРѕРµРє РїСЂР°Р№СЃ-Р»РёСЃС‚РѕРІ")] PriceSettingSending = 12,
+		[Description("Р—Р°РіСЂСѓР·РєР° РѕС‚РїСЂР°РІР»РµРЅРЅС‹С… Р·Р°РєР°Р·РѕРІ")] OrdersDownload = 13,
+		[Description("РџРѕРґС‚РІРµСЂР¶РґРµРЅРёРµ СЃРѕРѕР±С‰РµРЅРёСЏ РґР»СЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ConfirmUserMessage = 14,
+		[Description("РђСЃРёРЅС…СЂРѕРЅРЅРѕРµ РЅР°РєРѕРїРёС‚РµР»СЊРЅРѕРµ")] AccumulativeAsync = 16,
+		[Description("РђСЃРёРЅС…СЂРѕРЅРЅРѕРµ РєСѓРјСѓР»СЏС‚РёРІРЅРѕРµ")] CumulativeAsync = 17,
+		[Description("Р§Р°СЃС‚РёС‡РЅРѕРµ РєСѓРјСѓР»СЏС‚РёРІРЅРѕРµ")] LimitedCumulative = 18,
+		[Description("Р§Р°СЃС‚РёС‡РЅРѕРµ Р°СЃРёРЅС…СЂРѕРЅРЅРѕРµ РєСѓРјСѓР»СЏС‚РёРІРЅРѕРµ")] LimitedCumulativeAsync = 19,
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
