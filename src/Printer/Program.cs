@@ -1,20 +1,17 @@
 ﻿using System;
-using System.Configuration;
+using System.Collections;
+using System.Threading;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord.Framework.Internal;
 using Castle.MonoRail.Framework;
-using Common.Tools;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
-using AdminInterface.Controllers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
-using Common.Web.Ui.Models;
+using Common.Tools;
 using log4net;
 using log4net.Config;
 
@@ -24,6 +21,10 @@ namespace Printer
 	{
 		static void Main(string[] args)
 		{
+			//сохранение счетов\актов производится внутри транзации что бы она гарантировано
+			//закончилась и акты стали доступны нужно немного подождать
+			Thread.Sleep(1000);
+
 			XmlConfigurator.Configure();
 			var logger = LogManager.GetLogger(typeof(Program));
 			try
@@ -36,13 +37,22 @@ namespace Printer
 
 					InternetExplorerPrinterHelper.SetPrinter(printer);
 					var brail = StandaloneInitializer.Init();
-					if (name == "invoice")
+					IEnumerable documents = null;
+					using(new SessionScope(FlushAction.Never))
 					{
-						Print(brail, name, Invoice.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName));
-					}
-					else if (name == "act")
-					{
-						Print(brail, name, Act.Queryable.Where(a => ids.Contains(a.Id)).OrderBy(a => a.PayerName));
+						if (name == "invoice")
+						{
+							documents = Invoice.Queryable.Where(a => ids.Contains(a.Id))
+								.OrderBy(a => a.PayerName)
+								.ToArray();
+						}
+						else if (name == "act")
+						{
+							documents = Act.Queryable.Where(a => ids.Contains(a.Id))
+								.OrderBy(a => a.PayerName)
+								.ToArray();
+						}
+						Print(brail, name, documents);
 					}
 				}
 				else
@@ -70,18 +80,17 @@ namespace Printer
 			}
 		}
 
-		private static void Print<T>(IViewEngineManager brail, string name, IOrderedQueryable<T> query)
+		private static void Print(IViewEngineManager brail, string name, IEnumerable documents)
 		{
 			var plural = Inflector.Pluralize(name);
 			if (String.IsNullOrEmpty(plural))
 				plural = name;
 			var singular = Inflector.Singularize(name);
-			if (String.IsNullOrEmpty(name))
+			if (String.IsNullOrEmpty(singular))
 				singular = name;
 
 			using (new SessionScope(FlushAction.Never))
 			{
-				var documents = query.ToArray();
 				foreach (var document in documents)
 				{
 					new InternetExplorerPrinterHelper().PrintView(brail,

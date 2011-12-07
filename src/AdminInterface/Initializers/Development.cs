@@ -19,6 +19,7 @@ namespace AdminInterface.Initializers
 			config.AptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.AptBox);
 			config.OptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.OptBox);
 			config.PromotionsPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.PromotionsPath);
+			config.PrinterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.PrinterPath);
 
 			if (!Directory.Exists(config.PromotionsPath))
 				Directory.CreateDirectory(config.PromotionsPath);

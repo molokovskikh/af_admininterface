@@ -92,9 +92,11 @@ namespace AdminInterface.Controllers
 			var invoices = BuildInvoices(filter, invoiceDate);
 
 			invoices = invoices.Where(i => i.Payer.InvoiceSettings.PrintInvoice).ToList();
-
-			var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
-			Printer.Execute(arguments);
+			if (invoices.Count > 0)
+			{
+				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
+				Printer.Execute(arguments);
+			}
 
 			Notify("Счета сформированы");
 			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());
@@ -103,22 +105,30 @@ namespace AdminInterface.Controllers
 		private static List<Invoice> BuildInvoices(DocumentBuilderFilter filter, DateTime invoiceDate)
 		{
 			var invoicePeriod = filter.Period.GetInvoicePeriod();
-			List<Payer> payers;
-			if (filter.PayerId.Length == 0)
+			IList<Payer> payers = null;
+			if (filter.PayerId == null || filter.PayerId.Length == 0)
 			{
-				payers = ActiveRecordLinqBase<Payer>
-					.Queryable
-					.Where(p => p.AutoInvoice == InvoiceType.Auto
-						&& p.PayCycle == invoicePeriod
-						&& p.Recipient != null
-						&& p.Recipient == filter.Recipient)
-					.OrderBy(p => p.Name)
-					.ToList();
-				payers = payers.Where(p => p.Clients.Any(c => c.HomeRegion == filter.Region)).ToList();
+				ArHelper.WithSession(s => {
+					var query = s.QueryOver<Payer>()
+						.Where(p => p.AutoInvoice == InvoiceType.Auto
+							&& p.PayCycle == invoicePeriod
+							&& p.Recipient != null);
+
+					if (filter.Recipient != null)
+						query.Where(p => p.Recipient == filter.Recipient);
+
+					query.OrderBy(p => p.Name);
+					payers = query.List<Payer>();
+				});
+
+				if (filter.Region != null)
+					payers = payers.Where(p => p.Clients.Any(c => c.HomeRegion == filter.Region)).ToList();
 			}
 			else
 			{
-				payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => filter.PayerId.Contains(p.PayerID)).ToList();
+				payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => filter.PayerId.Contains(p.PayerID))
+					.OrderBy(p => p.Name)
+					.ToList();
 			}
 
 			var invoices = new List<Invoice>();

@@ -28,6 +28,8 @@ namespace AddUser
 		public string UserPreparedDataFormatString { get; set; }
 		public string CallRecordsDirectory { get; set; }
 		public string PromotionsPath { get; set; }
+
+		public string PrinterPath { get; set; }
 	}
 
 	public class Global : WebApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
