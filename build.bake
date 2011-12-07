@@ -142,3 +142,5 @@ task @CleanFtp:
 			if not ids.Any({i| id == i}):
 				#print "delete $dir"
 				Directory.Delete(dir, true)
+
+task @BeforeTest, [@PrepareLocal]
