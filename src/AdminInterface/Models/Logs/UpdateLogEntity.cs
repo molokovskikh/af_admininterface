@@ -80,7 +80,9 @@ namespace AdminInterface.Models.Logs
 
 		public bool IsDataTransferUpdateType()
 		{
-			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative || IsDocumentLoading();
+			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative || UpdateType == UpdateType.LimitedCumulative 
+				|| UpdateType == UpdateType.AccumulativeAsync || UpdateType == UpdateType.CumulativeAsync || UpdateType == UpdateType.LimitedCumulativeAsync 
+				|| IsDocumentLoading();
 		}
 
 		public IList<DocumentReceiveLog> GetLoadedDocumentLogs()
