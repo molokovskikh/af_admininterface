@@ -1,6 +1,7 @@
 ﻿using System;
 using Common.Tools;
 using Common.Tools.Calendar;
+using Common.Web.Ui.Models.Jobs;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -23,14 +24,14 @@ namespace Integration.Models
 	}
 
 	[TestFixture]
-	public class JobFixture
+	public class MonthlyJobFixture
 	{
-		private Job job;
+		private MonthlyJob job;
 
 		[SetUp]
 		public void Setup()
 		{
-			job = new Job(() => {});
+			job = new MonthlyJob(() => {});
 			SystemTime.Now = () => new DateTime(2011, 1, 1);
 		}
 
