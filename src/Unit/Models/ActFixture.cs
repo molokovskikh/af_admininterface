@@ -27,7 +27,7 @@ namespace Unit.Models
 			client = new Client(payer, Data.DefaultRegion);
 			var user = new User(client);
 			user.Accounting.ReadyForAccounting = true;
-			invoice = new Invoice(payer, Period.January, DateTime.Now);
+			invoice = new Invoice(payer, new Period(2011, Interval.January), DateTime.Now);
 		}
 
 		[Test]
@@ -46,7 +46,7 @@ namespace Unit.Models
 		{
 			var invoice1 = new Invoice();
 			invoice1.SetPayer(payer);
-			invoice1.Period = Period.January;
+			invoice1.Period = new Period(2011, Interval.January);
 			invoice1.Date = DateTime.Now;
 			invoice1.Parts = new List<InvoicePart>();
 			invoice1.Parts.Add(new InvoicePart(invoice1, "Информационные услуги", 150, 1, DateTime.Now));
@@ -103,9 +103,9 @@ namespace Unit.Models
 		public void Build_different_act_if_payer_name_changed()
 		{
 			var invoices = new List<Invoice>();
-			invoices.Add(new Invoice(payer, Period.January, DateTime.Now));
+			invoices.Add(new Invoice(payer, new Period(2011, Interval.January), DateTime.Now));
 			payer.JuridicalName = "ООО 'Хвосты и плетки'";
-			invoices.Add(new Invoice(payer, Period.January, DateTime.Now));
+			invoices.Add(new Invoice(payer, new Period(2011, Interval.January), DateTime.Now));
 			var acts = Act.Build(invoices, DateTime.Now).ToList();
 			Assert.That(acts.Count, Is.EqualTo(2));
 			Assert.That(acts[0].PayerName, Is.EqualTo("ООО 'Рога и копыта'"));

@@ -17,6 +17,11 @@ namespace AdminInterface.Controllers
 		public Region Region { get; set; }
 		public Recipient Recipient { get; set; }
 
+		public DocumentBuilderFilter()
+		{
+			Period = new Period();
+		}
+
 		public List<T> Find<T>()
 		{
 			var criteria = DetachedCriteria.For<T>()
@@ -54,7 +59,8 @@ namespace AdminInterface.Controllers
 		public PayerDocumentFilter ToDocumentFilter()
 		{
 			var filter = new PayerDocumentFilter {
-				Period = Period,
+				Year = Period.Year,
+				Interval = Period.Interval,
 				Region = Region,
 				Recipient = Recipient
 			};

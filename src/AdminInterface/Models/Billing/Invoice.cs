@@ -13,13 +13,6 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord(Schema = "billing")]
 	public class Invoice : BalanceUpdater<Invoice>
 	{
-		private static Dictionary<Period, Period[]> quaterMap = new Dictionary<Period, Period[]> {
-			{ Period.FirstQuarter, new[] { Period.January, Period.February, Period.March } },
-			{ Period.SecondQuarter, new[] { Period.April, Period.May, Period.June } },
-			{ Period.ThirdQuarter, new[] { Period.July, Period.August, Period.September } },
-			{ Period.FourthQuarter, new[] { Period.October, Period.November, Period.December } }
-		};
-
 		public Invoice()
 			: base(BalanceUpdaterType.Debit)
 		{}
@@ -112,7 +105,7 @@ namespace AdminInterface.Models.Billing
 		[Property, ValidateNonEmpty]
 		public DateTime Date { get; set; }
 
-		[Property, ValidateNonEmpty]
+		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface"), ValidateNonEmpty]
 		public Period Period { get; set; }
 
 		[Property]
@@ -181,17 +174,15 @@ namespace AdminInterface.Models.Billing
 
 			var accounts = Payer.GetAccounts().Where(a => a.InvoiceGroup == invoiceGroup);
 			if (Period.GetInvoicePeriod() == InvoicePeriod.Quarter)
-			{
-				result.AddRange(quaterMap[Period].SelectMany(p => GetPartsForPeriod(p, accounts, GetPeriodDate(p))).ToList());
-			}
+				result.AddRange(Period.Months().SelectMany(p => GetPartsForPeriod(p, accounts, GetPeriodDate(p))));
 			else
-				result.AddRange(GetPartsForPeriod(Period, accounts, Date).ToList());
+				result.AddRange(GetPartsForPeriod(Period, accounts, Date));
 			return result;
 		}
 
 		private DateTime GetPeriodDate(Period period)
 		{
-			var month = ((int)period) - 3;
+			var month = period.GetPeriodBegin().Month;
 			var maxDays = CultureInfo.CurrentUICulture.Calendar.GetDaysInMonth(Date.Year, month);
 			
 			return new DateTime(Date.Year, month, Math.Min(maxDays, Date.Day));
@@ -216,7 +207,7 @@ namespace AdminInterface.Models.Billing
 		{
 			if (IsSpecialLangCase(description))
 				return description.Replace("{0}", period.GetPeriodName().ToLower());
-			return description.Replace("{0}", BindingHelper.GetDescription(period).ToLower());
+			return description.Replace("{0}", BindingHelper.GetDescription(period.Interval).ToLower());
 		}
 
 		public bool IsSpecialLangCase(string description)

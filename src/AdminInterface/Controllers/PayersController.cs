@@ -34,13 +34,13 @@ namespace AdminInterface.Controllers
 			var acts = Act.Queryable.Where(p => p.Payer == payer).ToList();
 			var operations = ActiveRecordLinqBase<BalanceOperation>.Queryable.Where(d => d.Payer == payer).ToList();
 			var refunds = operations.Where(d => d.Type == OperationType.Refund);
-			var releifs = operations.Where(d => d.Type == OperationType.DebtRelief);
+			var reliefs = operations.Where(d => d.Type == OperationType.DebtRelief);
 			var items = invoices
 				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false })
 				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false }))
 				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false }))
 				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = true }))
-				.Union(releifs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true }))
+				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true }))
 				.ToList();
 			if (payer.BeginBalance != 0 && payer.BeginBalanceDate.HasValue)
 				items.Add(new {Id = 0u, Date = payer.BeginBalanceDate.Value, Sum = payer.BeginBalance, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false});

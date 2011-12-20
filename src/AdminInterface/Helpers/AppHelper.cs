@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.MonoRailExtentions;
 
@@ -15,10 +17,43 @@ namespace AdminInterface.Helpers
 		private Styler _styler = new Styler();
 
 		public AppHelper()
-		{}
+		{
+			RegisterEditor();
+		}
 
 		public AppHelper(IEngineContext engineContext) : base(engineContext)
-		{}
+		{
+			RegisterEditor();
+		}
+
+		public void RegisterEditor()
+		{
+			Editors.Add(typeof(Period), (name, value, options) => {
+				var period = (Period) value;
+				if (period == null)
+					return null;
+
+				return "<label style='padding:2px'>Год</label>"
+					+ GetEdit(name + ".Year", typeof(int), period.Year, options)
+					+ "<label style='padding:2px'>Месяц</label>"
+					+ GetEdit(name + ".Interval", typeof(Interval), period.Interval, options);
+			});
+		}
+
+		protected override string GetBuiltinEdit(string name, Type valueType, object value, object options)
+		{
+			if (name.EndsWith(".Year"))
+			{
+				if (valueType == typeof(int))
+					return helper.Select(name, Period.Years);
+				else if (valueType == typeof(int?))
+				{
+					var items = new[] {"Все"}.Concat(Period.Years.Select(y => y.ToString())).ToArray();
+					return helper.Select(name, items);
+				}
+			}
+			return base.GetBuiltinEdit(name, valueType, value, options);
+		}
 
 		public string Liketemplate(string value)
 		{

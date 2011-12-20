@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AdminInterface.Models.Billing;
 using Common.Web.Ui.Helpers;
@@ -11,7 +12,12 @@ namespace AdminInterface.Controllers.Filters
 {
 	public class PayerDocumentFilter : Sortable
 	{
-		public Period? Period { get; set; }
+		[Description("Выберите год:")]
+		public int? Year { get; set; }
+
+		[Description("Выберите период:")]
+		public Interval? Interval { get; set; }
+
 		public Region Region { get; set; }
 		public Recipient Recipient { get; set; }
 		public string SearchText { get; set; }
@@ -38,8 +44,12 @@ namespace AdminInterface.Controllers.Filters
 			var criteria = DetachedCriteria.For<T>()
 				.CreateAlias("Payer", "p", JoinType.InnerJoin);
 
-			if (Period != null)
-				criteria.Add(Expression.Eq("Period", Period));
+			if (Year != null && Interval != null)
+				criteria.Add(Expression.Eq("Period", new Period(Year.Value, Interval.Value)));
+			else if (Year != null)
+				criteria.Add(Expression.Sql("{alias}.Period like " + String.Format("'{0}-%'", Year)));
+			else if (Interval != null)
+				criteria.Add(Expression.Sql("{alias}.Period like " + String.Format("'%-{0}'", (int)Interval)));
 
 			if (Region != null)
 				criteria.CreateCriteria("p.Clients", "c")
@@ -77,7 +87,7 @@ namespace AdminInterface.Controllers.Filters
 				.GroupBy(i => ((dynamic)i).Id)
 				.Select(g => g.First())
 				.ToList();
-			
+
 			Count = docs.Count;
 			Sum = docs.Sum(d => (decimal)((dynamic)d).Sum);
 			return docs;

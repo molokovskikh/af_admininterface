@@ -28,11 +28,14 @@ namespace Integration.Controllers
 			var recipient = Recipient.Queryable.First();
 			var region = Region.Queryable.First();
 
-			controller.Build(null, DateTime.Now, "");
+			var invoiceDate = DateTime.Now;
+			var period = invoiceDate.ToPeriod();
+			controller.Build(null, invoiceDate, "");
 
 			Assert.That(Response.RedirectedTo,
-				Is.StringEnding(String.Format("Index?filter.Period={0}&filter.Region.Id={1}&filter.Recipient.Id={2}",
-					(int)Period.April,
+				Is.StringEnding(String.Format("Index?filter.Period.Year={0}&filter.Period.Interval={1}&filter.Region.Id={2}&filter.Recipient.Id={3}",
+					period.Year,
+					(int)period.Interval,
 					region.Id,
 					recipient.Id)));
 		}

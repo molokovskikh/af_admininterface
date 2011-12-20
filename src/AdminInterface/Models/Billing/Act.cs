@@ -67,7 +67,7 @@ namespace AdminInterface.Models.Billing
 		[PrimaryKey]
 		public uint Id { get; set; }
 
-		[Property]
+		[Property(ColumnType = "AdminInterface.NHibernateExtentions.PeriodUserType, AdminInterface")]
 		public Period Period { get; set; }
 
 		[Property]

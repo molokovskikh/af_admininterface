@@ -23,7 +23,7 @@ namespace Functional.Billing
 		public void Setup()
 		{
 			payer = DataMother.CreatePayerForBillingDocumentTest();
-			invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
+			invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2010, 12, 27));
 			invoice.Save();
 		}
 

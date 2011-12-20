@@ -94,6 +94,7 @@ namespace AdminInterface.Models.Billing
 
 		public PayerFilter()
 		{
+			Period = new Period();
 			ClientStatus = SearchClientStatus.Enabled;
 			SearchBy = SearchBy.Name;
 			SortBy = "ShortName";
@@ -218,7 +219,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 				And(where, GetDocumentSubQuery(DocumentType));
 				query.SetParameter("InvoicePeriod", Period.GetInvoicePeriod());
 				query.SetParameter("PeriodEnd", Period.GetPeriodEnd());
-				query.SetParameter("Period", Period);
+				query.SetParameter("Period", Period.ToSqlString());
 			}
 
 			var sql = String.Format(@"

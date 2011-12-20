@@ -17,7 +17,7 @@ namespace Functional.Billing
 		public void Show_balance_summary()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			new Invoice(payer, Period.January, new DateTime(2011, 1, 11)).Save();
+			new Invoice(payer, new Period(2011, Interval.January), new DateTime(2011, 1, 11)).Save();
 			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 
 			Open(payer);

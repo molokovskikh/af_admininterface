@@ -31,7 +31,7 @@ namespace Unit.Models
 		[Test]
 		public void Invoice_by_quater_contains_bill_for_every_month()
 		{
-			var invoice = new Invoice(payer, Period.FirstQuarter, DateTime.Now);
+			var invoice = new Invoice(payer, new Period(2011, Interval.FirstQuarter), DateTime.Now);
 			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
 			Assert.That(invoice.Parts[0].Name, Is.EqualTo("Мониторинг оптового фармрынка за январь"));
 			Assert.That(invoice.Parts[0].Sum, Is.EqualTo(800));
@@ -56,7 +56,7 @@ namespace Unit.Models
 			});
 			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
-			var invoice = new Invoice(payer, Period.April, DateTime.Now);
+			var invoice = new Invoice(payer, new Period(2011, Interval.April), DateTime.Now);
 
 			var part = invoice.Parts[0];
 			Assert.That(part.Count, Is.EqualTo(2), part.ToString());
@@ -70,7 +70,7 @@ namespace Unit.Models
 		public void Send_invoice_to_email_if_should()
 		{
 			payer.InvoiceSettings.EmailInvoice = true;
-			var invoice = new Invoice(payer, Period.April, DateTime.Now);
+			var invoice = new Invoice(payer, new Period(2011, Interval.April), DateTime.Now);
 			Assert.That(invoice.SendToEmail, Is.True);
 		}
 
@@ -82,8 +82,8 @@ namespace Unit.Models
 			Assert.That(invoice.Payer, Is.EqualTo(payer));
 			Assert.That(invoice.Sum, Is.EqualTo(800));
 
-			Assert.That(invoice.Period.ToString(),
-				Is.EqualTo(CultureInfo.InvariantCulture.DateTimeFormat.MonthNames[DateTime.Now.Month - 1]));
+			Assert.That(invoice.Period,
+				Is.EqualTo(DateTime.Now.ToPeriod()));
 			var part = invoice.Parts.Single();
 			Assert.That(part.Cost, Is.EqualTo(800));
 			Assert.That(part.Count, Is.EqualTo(1));
@@ -161,7 +161,7 @@ namespace Unit.Models
 		[Test]
 		public void Set_quarter_period()
 		{
-			var invoice = new Invoice(payer, Period.FirstQuarter, new DateTime(2011, 1, 10));
+			var invoice = new Invoice(payer, new Period(2011, Interval.FirstQuarter), new DateTime(2011, 1, 10));
 			Assert.That(invoice.Parts.Count, Is.EqualTo(3));
 			Assert.That(invoice.Parts[0].PayDate, Is.EqualTo(new DateTime(2011, 1, 10)));
 			Assert.That(invoice.Parts[1].PayDate, Is.EqualTo(new DateTime(2011, 2, 10)));

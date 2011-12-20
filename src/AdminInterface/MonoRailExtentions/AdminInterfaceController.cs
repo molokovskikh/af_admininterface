@@ -18,6 +18,7 @@ namespace AdminInterface.MonoRailExtentions
 {
 	public class AdminInterfaceController : SmartDispatcherController
 	{
+
 		public AdminInterfaceController()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {

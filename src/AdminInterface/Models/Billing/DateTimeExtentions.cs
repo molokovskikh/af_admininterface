@@ -6,7 +6,7 @@ namespace AdminInterface.Models.Billing
 	{
 		public static Period ToPeriod(this DateTime dateTime)
 		{
-			return (Period)dateTime.Month + 3;
+			return new Period(dateTime);
 		}
 	}
 }

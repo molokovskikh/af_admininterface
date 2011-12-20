@@ -258,7 +258,7 @@ namespace Integration
 		private Invoice CreateInvoice()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var invoice = new Invoice(payer, Period.January, new DateTime(2010, 12, 27));
+			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
 			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
 			invoice.Save();

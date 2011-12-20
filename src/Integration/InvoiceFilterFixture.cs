@@ -16,7 +16,7 @@ namespace Integration
 		public void Find_invoice_by_home_region()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var invoice = new Invoice(payer, Period.December, DateTime.Now);
+			var invoice = new Invoice(payer, new Period(2010, Interval.December), DateTime.Now);
 			invoice.Save();
 			var filter = new PayerDocumentFilter {Region = payer.Clients.First().HomeRegion};
 			var invoices = filter.Find<Invoice>();
@@ -30,9 +30,9 @@ namespace Integration
 		{
 			var payer1 = DataMother.CreatePayerForBillingDocumentTest();
 			var payer2 = DataMother.CreatePayerForBillingDocumentTest();
-			var invoice1 = new Invoice(payer1, Period.December, DateTime.Now);
+			var invoice1 = new Invoice(payer1, new Period(2010, Interval.December), DateTime.Now);
 			invoice1.Save();
-			var invoice2 = new Invoice(payer2, Period.December, DateTime.Now);
+			var invoice2 = new Invoice(payer2, new Period(2010, Interval.December), DateTime.Now);
 			invoice2.Save();
 
 			var filter = new PayerDocumentFilter {
