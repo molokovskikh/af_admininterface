@@ -31,7 +31,7 @@ namespace Integration.Controllers
 			PrepareController(controller);
 			Request.Params.Add("payment.Sum", "500");
 
-			controller.NewPayment(payer.Id);
+			controller.NewPayment(payer.Id, DateTime.Now.Year);
 			var message = (Message) Context.Flash["Message"];
 			Assert.That(message.IsError, Is.True);
 			Assert.That(message.MessageText, Is.EqualTo("Получатель платежа не установлен"));

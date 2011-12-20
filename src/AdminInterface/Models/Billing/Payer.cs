@@ -458,6 +458,12 @@ ORDER BY {Payer}.shortname;";
 		{
 			PaymentSum = TotalSum;
 		}
+
+		public virtual int[] Years
+		{
+			get { return Period.Years; }
+		}
+
 	}
 
 	public class DoNotHaveContacts : Exception

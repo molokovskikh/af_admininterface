@@ -4,10 +4,20 @@
 			<h3>Реестр актов</h3>
 			<table style="width:auto;">
 				<tr>
-					<td style="border-style:none;">Период:</td>
+					<td style="border-style:none;">${app.GetLabel("filter.Interval")}</td>
 					<td style="border-style:none;">
-						<% if filter.Period: %>
-						${BindingHelper.GetDescription(filter.Period)}
+						<% if filter.Interval: %>
+						${BindingHelper.GetDescription(filter.Interval)}
+						<% else: %>
+						Все
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td style="border-style:none;">${app.GetLabel("filter.Year")}</td>
+					<td style="border-style:none;">
+						<% if filter.Year: %>
+						${BindingHelper.GetDescription(filter.Year)}
 						<% else: %>
 						Все
 						<% end %>

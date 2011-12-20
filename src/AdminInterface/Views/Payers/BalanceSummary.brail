@@ -6,7 +6,8 @@
 
 <div class=block>
 	<h4>Новый платеж</h4>
-	<form id="new-payment-form" class="accountant-friendly" method=post action="${siteroot}/Payers/${payer.Id}/NewPayment">
+	<form id="new-payment-form-${year}" class="accountant-friendly" method=post action="${siteroot}/Payers/${payer.Id}/NewPayment">
+		${FormHelper.HiddenField("year")}
 		<table>
 			<tr>
 				<th>Дата платежа</th>
@@ -34,7 +35,8 @@
 
 <div class=block>
 	<h4>Списание</h4>
-	${FormHelper.FormTag("${siteroot}/Payers/${payer.Id}/NewBalanceOperation", {@class: "accountant-friendly"})}
+	${FormHelper.FormTag("${siteroot}/Payers/${payer.Id}/NewBalanceOperation", {@id: "new-operation-${year}", @class: "accountant-friendly"})}
+		${FormHelper.HiddenField("year")}
 		<table>
 			<tr>
 				<th>${app.GetLabel("operation.Date")}</th>
@@ -75,6 +77,16 @@
 			<th>Акт</th>
 		</tr>
 	</thead>
+	<% if ?before: %>
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td style="text-align:right;">${before.ToString("C")}</td>
+		<td></td>
+	</tr>
+	<% end %>
 	<% for i, item in enumerate(items): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
 		<td>
@@ -121,14 +133,16 @@
 		<% end %>
 	</tr>
 	<% end %>
-	<tr class="${ViewHelper.GetRowStyle(items.Count)}">
-		<td></td>
-		<td></td>
-		<td></td>
-		<td style="text-align:right;">${payer.Balance.ToString("C")}</td>
-		<td></td>
-		<td></td>
+	<% if ?total: %>
 	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td style="text-align:right;">${total.ToString("C")}</td>
+		<td></td>
+		<td></td>
+	</tr>
+	<% end %>
 	<% else: %>
 	<tr class=EmptyData>
 		<td>По вашему запросу ничего не найдено</td>

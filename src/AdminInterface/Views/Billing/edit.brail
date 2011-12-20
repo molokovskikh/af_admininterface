@@ -119,9 +119,11 @@ ${app.Asset("filter.coffee")}
 		<li>
 			<a id="juridicalOrganization" href="#" ${"class='selected'" if filter.Tab == "juridicalOrganization"}>Юридические лица</a>
 		</li>
+		<% for year in payer.Years: %>
 		<li>
-			<a id="balance-summary" href="${app.GetUrl(payer, @BalanceSummary)}" class="inline-tab">Платежи/Счета</a>
+			<a id="balance-summary-${year}" href="${app.GetUrl(payer, @BalanceSummary)}?year=${year}" class="inline-tab">Платежи/Счета ${year}</a>
 		</li>
+		<% end %>
 	</ul>
 </div>
 
@@ -140,5 +142,7 @@ ${app.Asset("filter.coffee")}
 	<% OutputSubView("JuridicalOrganizations") %>
 </div>
 
-<div id="balance-summary-tab" class="tab" ${"style='display:none'" if filter.Tab != "balance-summary-tab"}>
+<% for year in payer.Years: %>
+<div id="balance-summary-${year}-tab" class="tab" ${"style='display:none'" if filter.Tab != "balance-summary-${year}"}>
 </div>
+<% end %>

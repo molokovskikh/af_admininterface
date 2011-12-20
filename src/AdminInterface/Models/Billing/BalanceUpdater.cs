@@ -11,7 +11,17 @@ namespace AdminInterface.Models.Billing
 		Debit
 	}
 
-	public abstract class BalanceUpdater<T> : ActiveRecordLinqBase<T>
+	public interface IBalanceUpdater
+	{
+		/// <summary>
+		/// сумма изменения баланся с учетом знака
+		/// "-" - списание
+		/// "+" - пополнение
+		/// </summary>
+		decimal BalanceAmount { get; }
+	}
+
+	public abstract class BalanceUpdater<T> : ActiveRecordLinqBase<T>, IBalanceUpdater
 	{
 		protected BalanceUpdaterType BalanceType;
 
@@ -84,6 +94,17 @@ namespace AdminInterface.Models.Billing
 					oldPayer.Save();
 				if (Payer != null)
 					Payer.Save();
+			}
+		}
+
+		public decimal BalanceAmount
+		{
+			get
+			{
+				if (BalanceType == BalanceUpdaterType.Debit)
+					return Decimal.Negate(GetSum());
+				else
+					return GetSum();
 			}
 		}
 	}

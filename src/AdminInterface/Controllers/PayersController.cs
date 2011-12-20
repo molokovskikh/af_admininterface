@@ -24,9 +24,12 @@ namespace AdminInterface.Controllers
 			Redirect("Billing", "Edit", request);
 		}
 
-		public void BalanceSummary(uint id)
+		public void BalanceSummary(uint id, int year)
 		{
 			CancelLayout();
+
+			var begin = new DateTime(year, 1, 1);
+			var end = new DateTime(year, 12, 31);
 
 			var payer = Payer.Find(id);
 			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
@@ -36,23 +39,39 @@ namespace AdminInterface.Controllers
 			var refunds = operations.Where(d => d.Type == OperationType.Refund);
 			var reliefs = operations.Where(d => d.Type == OperationType.DebtRelief);
 			var items = invoices
-				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false })
-				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false }))
-				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false }))
-				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = true }))
-				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true }))
+				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false, Object  = (object)i })
+				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false, Object = (object)p }))
+				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false, Object = (object)a }))
+				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = true, Object = (object)d }))
+				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true, Object = (object)d }))
 				.ToList();
-			if (payer.BeginBalance != 0 && payer.BeginBalanceDate.HasValue)
-				items.Add(new {Id = 0u, Date = payer.BeginBalanceDate.Value, Sum = payer.BeginBalance, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false});
+
+			var befores = items.Where(i => i.Date < begin);
+			var before = befores
+				.Select(i => i.Object)
+				.OfType<IBalanceUpdater>()
+				.Sum(i => i.BalanceAmount);
+			if (payer.BeginBalanceDate.HasValue)
+				before += payer.BeginBalance;
+
+			items = items.Where(i => i.Date >= begin && i.Date <= end).ToList();
+			var total = items.Select(i => i.Object).OfType<IBalanceUpdater>().Sum(i => i.BalanceAmount);
 
 			items = items.OrderBy(i => i.Date).ToList();
 
+			PropertyBag["year"] = year;
 			PropertyBag["operation"] = new BalanceOperation(payer);
 			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = items;
+
+			if (before != 0)
+				PropertyBag["before"] = before;
+
+			if (total != 0)
+				PropertyBag["total"] = total;
 		}
 
-		public void NewPayment(uint id)
+		public void NewPayment(uint id, int year)
 		{
 			var payer = Payer.Find(id);
 			var payment = new Payment(payer);
@@ -70,10 +89,10 @@ namespace AdminInterface.Controllers
 
 			//мы должны возвращаться на туже вкладку с которой был совершен переход
 			//RedirectToReferrer();
-			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
+			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary-{1}", payer.Id, year));
 		}
 
-		public void NewBalanceOperation(uint id)
+		public void NewBalanceOperation(uint id, int year)
 		{
 			var payer = Payer.Find(id);
 			var operation = new BalanceOperation(payer);
@@ -89,7 +108,7 @@ namespace AdminInterface.Controllers
 			}
 
 			//мы должны возвращаться на туже вкладку с которой был совершен переход
-			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary", payer.Id));
+			RedirectToUrl(String.Format("~/Billing/Edit?BillingCode={0}#tab-balance-summary-{1}", payer.Id, year));
 		}
 
 		private string GetFirstErrorWithProperty(object item)

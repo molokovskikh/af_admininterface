@@ -786,12 +786,12 @@ namespace Functional.Billing
 		[Test]
 		public void Create_balance_operation()
 		{
-			Click("Платежи/Счета");
+			Click(String.Format("Платежи/Счета {0}", DateTime.Now.Year));
 			browser.WaitUntilContainsText("Списание", 1000);
 			Css("#operation_Description").TypeText("тестовый возврат");
 			Css("#operation_Sum").TypeText("500");
 			Css("#operation_Date").TypeText(DateTime.Now.ToShortDateString());
-			Click("#form1", "Добавить");
+			Click(String.Format("#new-operation-{0}", DateTime.Now.Year), "Добавить");
 			AssertText("Сохранено");
 		}
 	}

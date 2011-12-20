@@ -22,7 +22,7 @@ namespace Functional.Billing
 
 			Open(payer);
 			Assert.That(browser.Text, Is.StringContaining("плательщик"));
-			browser.Link(Find.ByText(@"Платежи/Счета")).Click();
+			Click(String.Format(@"Платежи/Счета {0}", DateTime.Now.Year));
 			Thread.Sleep(1000);
 			Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
 			Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
