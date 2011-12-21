@@ -66,46 +66,65 @@
 		${UrlHelper.Link("Для печати", {@controller: @Invoices, @action: @PrintIndex, @querystring: filter})}
 	</div>
 
-	<div class=block>
-		<table class=DataTable>
-			<% if invoices.Count: %>
-			<thead>
-				<tr>
-					<th></th>
-					<th>${app.Sortable("№", "Id")}</th>
-					<th>${app.Sortable("Договор", "Payer")}</th>
-					<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
-					<th>${app.Sortable("Плательщик", "PayerName")}</th>
-					<th>${app.Sortable("Сумма счета", "Sum")}</th>
-					<th>${app.Sortable("За период", "Period")}</th>
-					<th>${app.Sortable("Дата", "Date")}</th>
-					<th></th>
-				</tr>
-			</thead>
-			<tbody>
-				<% for i, invoice in enumerate(invoices): %>
-				<tr class="${ViewHelper.GetRowStyle(i)}">
-					<td>${app.LinkTo(invoice, "Редактировать", @Edit)}</td>
-					<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
-					<td>${invoice.Payer.Id}</td>
-					<td>${invoice.Recipient.Name}</td>
-					<td>${app.LinkTo(invoice.Payer)}</td>
-					<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
-					<td>${BindingHelper.GetDescription(invoice.Period)}</td>
-					<td>${invoice.Date.ToShortDateString()}</td>
-					<td>
-						<form method=post action="${siteroot}/Invoices/${invoice.Id}/Cancel">
-							<input type=submit value="Удалить">
-						</form>
-					</td>
+	<form method=post action="${siteroot}/Invoices/Process">
+
+		<div class=block>
+			<input name=delete type=submit value="Удалить">
+
+			<input name=print type=submit value="Напечатать">
+			<label>Принтер</label>
+			<select name=printer>
+			<% for printer in printers: %>
+				<option value='${printer}'>${printer}</option>
+			<% end %>
+			</select>
+
+			<input name="mail" type=submit value="Отправить по e-mail" />
+		</div>
+
+		<div class=block>
+			<table class=DataTable>
+				<% if invoices.Count: %>
+				<thead>
+					<tr>
+						<th>
+							<input type=checkbox class=all>
+						</th>
+						<th></th>
+						<th>${app.Sortable("№", "Id")}</th>
+						<th>${app.Sortable("Договор", "Payer")}</th>
+						<th>${app.Sortable("Получатель платежей", "Recipient")}</th>
+						<th>${app.Sortable("Плательщик", "PayerName")}</th>
+						<th>${app.Sortable("Сумма счета", "Sum")}</th>
+						<th>${app.Sortable("За период", "Period")}</th>
+						<th>${app.Sortable("Дата", "Date")}</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<% for i, invoice in enumerate(invoices): %>
+					<tr class="${ViewHelper.GetRowStyle(i)}">
+						<td>
+							<input type=checkbox name="invoices[${i}].Id" value=${invoice.Id}>
+						</td>
+						<td>${app.LinkTo(invoice, "Редактировать", @Edit)}</td>
+						<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
+						<td>${invoice.Payer.Id}</td>
+						<td>${invoice.Recipient.Name}</td>
+						<td>${app.LinkTo(invoice.Payer)}</td>
+						<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
+						<td>${BindingHelper.GetDescription(invoice.Period)}</td>
+						<td>${invoice.Date.ToShortDateString()}</td>
+					</tr>
+					<% end %>
+				</tbody>
+				<% else: %>
+				<tr class=EmptyData>
+					<td>По вашему запросу ничего не найдено</td>
 				</tr>
 				<% end %>
-			</tbody>
-			<% else: %>
-			<tr class=EmptyData>
-				<td>По вашему запросу ничего не найдено</td>
-			</tr>
-			<% end %>
-		</table>
-	</div>
+			</table>
+		</div>
+
+	</form>
 </div>

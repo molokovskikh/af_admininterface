@@ -1,15 +1,4 @@
-﻿<script>
-	$(function () {
-		$("input[type=checkbox].all").click(function () {
-			$(this)
-				.parents("table")
-				.find("input[type=checkbox]")
-				.attr("checked", this.checked);
-		});
-	});
-</script>
-
-<div style="padding: 10px">
+﻿<div style="padding: 10px">
 	<% component Bubble, {"bredcrumbs" : [("Акты", "")]} %>
 
 	<div class=block>

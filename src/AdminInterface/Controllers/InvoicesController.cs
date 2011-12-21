@@ -32,6 +32,40 @@ namespace AdminInterface.Controllers
 			PropertyBag["printers"] = Printer.All();
 		}
 
+		public void Process()
+		{
+			var binder = new ARDataBinder();
+			binder.AutoLoad = AutoLoadBehavior.Always;
+			SetBinder(binder);
+			var invoices = BindObject<Invoice[]>("invoices");
+
+			if (Form["delete"] != null)
+			{
+				foreach (var act in invoices)
+					act.Delete();
+
+				Notify("Удалено");
+				RedirectToReferrer();
+			}
+			if (Form["print"] != null)
+			{
+				var printer = Form["printer"];
+				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
+				Printer.Execute(arguments);
+
+				Notify("Отправлено на печать");
+				RedirectToReferrer();
+			}
+			if (Form["mail"] != null)
+			{
+				foreach (var invoice in invoices)
+					this.Mailer().Invoice(invoice, true).Send();
+
+				Notify("Отправлено");
+				RedirectToReferrer();
+			}
+		}
+
 		public void PrintIndex([DataBind("filter")] PayerDocumentFilter filter)
 		{
 			LayoutName = "Print";
@@ -126,7 +160,8 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				payers = ActiveRecordLinqBase<Payer>.Queryable.Where(p => filter.PayerId.Contains(p.PayerID))
+				payers = ActiveRecordLinqBase<Payer>.Queryable
+					.Where(p => filter.PayerId.Contains(p.PayerID))
 					.OrderBy(p => p.Name)
 					.ToList();
 			}

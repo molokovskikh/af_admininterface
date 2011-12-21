@@ -154,7 +154,7 @@ namespace Integration
 			{
 				var invoice = CreateInvoice();
 
-				mailer.Invoice(invoice);
+				mailer.Invoice(invoice, false);
 				mailer.Send();
 			}
 

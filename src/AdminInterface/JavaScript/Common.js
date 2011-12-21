@@ -1,5 +1,12 @@
 ﻿$(function () {
-
+	
+	$("input[type=checkbox].all").click(function () {
+		$(this)
+			.parents("table")
+			.find("input[type=checkbox]")
+			.attr("checked", this.checked);
+	});
+	
 	$("table.editable tr input[type=button].add, table.editable tr a.add").live('click', function () {
 		var table = $(this).parents("table");
 		var body = table.find("tbody").get(0);

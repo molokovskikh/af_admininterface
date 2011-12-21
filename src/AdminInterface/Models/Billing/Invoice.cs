@@ -7,6 +7,7 @@ using Castle.Components.Validator;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Engine;
+using log4net;
 
 namespace AdminInterface.Models.Billing
 {
@@ -126,6 +127,8 @@ namespace AdminInterface.Models.Billing
 		]
 		public IList<InvoicePart> Parts { get; set; }
 
+		public bool NotifyAlways;
+
 		protected override void OnDelete()
 		{
 			foreach (var part in Parts.Where(p => p.Ad != null))
@@ -219,31 +222,6 @@ namespace AdminInterface.Models.Billing
 			if (word[formatMarkIndex - 1].ToLower() == "в")
 				return true;
 			return false;
-		}
-
-		public void Send(Controller controller)
-		{
-			if (Payer.InvoiceSettings.PrintInvoice)
-			{
-				//new Printer().Print(controller.Context.Services.ViewEngineManager, this);
-			}
-			if (Payer.InvoiceSettings.EmailInvoice)
-			{
-				var mailer = new MonorailMailer();
-				mailer.Invoice(this);
-				mailer.Send();
-			}
-		}
-
-		public void Send()
-		{
-			if (Payer.InvoiceSettings.EmailInvoice)
-			{
-				var mailer = new MonorailMailer();
-				mailer.Invoice(this);
-				mailer.Send();
-			}
-			SendToEmail = false;
 		}
 
 		public bool ShouldNotify()

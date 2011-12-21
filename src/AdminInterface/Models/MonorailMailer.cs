@@ -12,11 +12,14 @@ using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
+using log4net;
 
 namespace AdminInterface.Models
 {
 	public class MonorailMailer : BaseMailer
 	{
+		private static ILog _log = LogManager.GetLogger(typeof (MonorailMailer));
+
 		public MonorailMailer(IEmailSender sender) : base(sender)
 		{}
 
@@ -119,19 +122,6 @@ namespace AdminInterface.Models
 
 		}
 
-		public void Invoice(Invoice invoice)
-		{
-			Template = "Invoice";
-			Layout = "Print";
-			IsBodyHtml = true;
-
-			From = "billing@analit.net";
-			To = invoice.Payer.GetInvocesAddress();
-			Subject = String.Format("Счет за {0}", BindingHelper.GetDescription(invoice.Period));
-
-			PropertyBag["invoice"] = invoice;
-		}
-
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
 		{
 			Template = "DoNotHaveInvoiceContactGroup";
@@ -218,6 +208,58 @@ namespace AdminInterface.Models
 			PropertyBag["oldPayment"] = account.OldValue(a => a.Payment);
 
 			return this;
+		}
+
+		public MonorailMailer Invoice(Invoice invoice, bool interactive)
+		{
+			try
+			{
+				if (interactive)
+					invoice.SendToEmail = false;
+
+				SendInvoice(invoice);
+
+				if (_log.IsDebugEnabled)
+					_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
+						invoice.Period,
+						invoice.Payer.GetInvocesAddress(),
+						invoice.Payer.Name,
+						invoice.Id);
+			}
+			catch (DoNotHaveContacts)
+			{
+				if (_log.IsDebugEnabled)
+					_log.DebugFormat("Счет {0} не отправлен тк не задана контактная информация для плательщика {1} - {2}",
+						invoice.Id,
+						invoice.Payer.Id,
+						invoice.Payer.Name);
+
+				if (interactive)
+				{
+					DoNotHaveInvoiceContactGroup(invoice);
+				}
+				else if (invoice.ShouldNotify())
+				{
+					invoice.LastErrorNotification = DateTime.Now;
+					DoNotHaveInvoiceContactGroup(invoice);
+				}
+			}
+			return this;
+		}
+
+		private void SendInvoice(Invoice invoice)
+		{
+			var to = invoice.Payer.GetInvocesAddress();;
+
+			Template = "Invoice";
+			Layout = "Print";
+			IsBodyHtml = true;
+
+			From = "billing@analit.net";
+			To = to;
+			Subject = String.Format("Счет за {0}", invoice.Period);
+
+			PropertyBag["invoice"] = invoice;
 		}
 	}
 }
