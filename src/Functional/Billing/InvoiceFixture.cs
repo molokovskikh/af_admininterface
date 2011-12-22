@@ -32,8 +32,13 @@ namespace Functional.Billing
 		{
 			Open("Invoices/");
 			Assert.That(browser.Text, Is.StringContaining("Реестр счетов"));
-			browser.Button(invoice, "Cancel").Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			Css(String.Format("input[value='{0}']", invoice.Id)).Click();
+			Css("input[name='delete']").Click();
+			Assert.That(browser.Text, Is.StringContaining("Удалено"));
+
+			Reopen();
+			invoice =  Invoice.TryFind(invoice.Id);
+			Assert.That(invoice, Is.Null);
 		}
 
 		[Test]
