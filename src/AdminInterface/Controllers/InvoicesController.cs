@@ -123,14 +123,7 @@ namespace AdminInterface.Controllers
 
 		public void Build([ARDataBind("buildFilter", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] DocumentBuilderFilter filter, DateTime invoiceDate, string printer)
 		{
-			var invoices = BuildInvoices(filter, invoiceDate);
-
-			invoices = invoices.Where(i => i.Payer.InvoiceSettings.PrintInvoice).ToList();
-			if (invoices.Count > 0)
-			{
-				var arguments = String.Format("invoice \"{0}\" \"{1}\"", printer, invoices.Implode(i => i.Id));
-				Printer.Execute(arguments);
-			}
+			BuildInvoices(filter, invoiceDate);
 
 			Notify("Счета сформированы");
 			RedirectToAction("Index", filter.ToDocumentFilter().GetQueryString());

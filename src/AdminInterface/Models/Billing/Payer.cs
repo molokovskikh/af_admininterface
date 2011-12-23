@@ -33,9 +33,6 @@ namespace AdminInterface.Models.Billing
 		public virtual bool EmailInvoice { get; set; }
 
 		[Property]
-		public virtual bool PrintInvoice { get; set; }
-
-		[Property]
 		public virtual bool DocumentsOnLastWorkingDay { get; set; }
 
 		[Property]
