@@ -1,16 +1,84 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using AdminInterface.Models;
+using System.IO;
+using AddUser;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
+	[ActiveRecord(Schema = "Catalogs")]
+	public class Product
+	{
+		public Product()
+		{}
+
+		public Product(Catalog catalog)
+		{
+			Catalog = catalog;
+		}
+
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[BelongsTo("CatalogId")]
+		public virtual Catalog Catalog { get; set; }
+	}
+
+	[ActiveRecord(Schema = "Documents")]
+	public class Certificate
+	{
+		public Certificate()
+		{
+			Files = new List<CertificateFile>();
+		}
+
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[BelongsTo("CatalogId")]
+		public virtual Catalog Product { get; set; }
+
+		[Property]
+		public virtual string SerialNumber { get; set; }
+
+		[HasAndBelongsToMany(Lazy = true,
+			Schema = "Documents",
+			Table = "FileCertificates",
+			ColumnKey = "CertificateId",
+			ColumnRef = "CertificateFileId")]
+		public IList<CertificateFile> Files { get; set; }
+	}
+
+	[ActiveRecord(Schema = "Documents")]
+	public class CertificateFile
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[Property]
+		public virtual string OriginFileName { get; set; }
+
+		[Property]
+		public virtual string ExternalFileId { get; set; }
+
+		[Property]
+		public virtual string Extension { get; set; }
+
+		public virtual string Filename
+		{
+			get { return Id + Extension; }
+		}
+
+		public virtual string GetStorageFileName(AppConfig config)
+		{
+			return Path.Combine(config.CertificatesPath, Filename);
+		}
+	}
+
 	[ActiveRecord("DocumentHeaders", Schema = "documents")]
 	public class Document : ActiveRecordLinqBase<Document>
 	{
@@ -81,6 +149,9 @@ namespace AdminInterface.Models
 		[Property]
 		public string Product { get; set; }
 
+		[BelongsTo("ProductId")]
+		public Product CatalogProduct { get; set; }
+
 		[Property]
 		public string Code { get; set; }
 
@@ -122,6 +193,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public string SerialNumber { get; set; }
+
+		[BelongsTo("CertificateId")]
+		public Certificate Certificate { get; set; }
 
 		public void SetNds(decimal nds)
 		{

@@ -10,6 +10,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
@@ -40,11 +41,16 @@ namespace AdminInterface.Controllers
 		{
 			var log = DocumentReceiveLog.Find(id);
 
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition", 
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(log.FileName)));
-
 			var file = log.GetRemoteFileName(Config);
+			WriteFile(file, log.FileName);
+		}
+
+		private void WriteFile(string file, string filename)
+		{
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(filename)));
+
 			if (!String.IsNullOrEmpty(file) && File.Exists(file))
 			{
 				using (var stream = File.OpenRead(file))
@@ -92,6 +98,20 @@ namespace AdminInterface.Controllers
 			var documentLog = DocumentReceiveLog.Find(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
+		}
+
+		public void Certificates(uint id)
+		{
+			CancelLayout();
+
+			var line = DocumentLine.Find(id);
+			PropertyBag["line"] = line;
+		}
+
+		public void Certificate(uint id)
+		{
+			var file = ActiveRecordMediator<CertificateFile>.FindByPrimaryKey(id);
+			WriteFile(file.GetStorageFileName(Config), file.Filename);
 		}
 
 		public void ShowDownloadLog(uint updateLogEntityId)

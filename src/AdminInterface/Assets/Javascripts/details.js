@@ -29,6 +29,9 @@ function HideAll(id, afterFinish) {
 	else if (IsVisible(id, "DocumentDetails")) {
 		Hide(id, "DocumentDetails", afterFinish);
 	}
+	else if (IsVisible(id, "Certificates")) {
+		Hide(id, "Certificates", afterFinish);
+	}
 	else {
 		afterFinish();
 	}

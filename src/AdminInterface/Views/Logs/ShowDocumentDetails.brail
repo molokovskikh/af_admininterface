@@ -1,6 +1,6 @@
 ﻿<tr id="DocumentDetailsRow${documentLogId}">
 	<td />
-	<td colspan="15">
+	<td colspan="100">
 		<div id="DocumentDetails${documentLogId}">
 			<table class="DataTable" style="width:100%;">
 				<% if (documentLog.Document != null): %>
@@ -26,11 +26,19 @@
 					<%  for i,docLine in enumerate(documentLog.Document.Lines): %>
 						<tr class="${ViewHelper.GetRowStyle(i)}">
 							<td>${docLine.Code}</td>
-							<td>${docLine.Product}</td>
+							<td>
+								<% if docLine.CatalogProduct: %>
+									<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${docLine.Id}, 'Certificates?id=${docLine.Id}', 'Certificates');">
+										${docLine.Product}
+									</a>
+								<% else: %>
+								${docLine.Product}
+								<% end %>
+							</td>
 							<td>${docLine.Producer}</td>
 							<td>${docLine.Country}</td>
 							<td>${docLine.Quantity}</td>
-							<td>${docLine.Period}</td>                        
+							<td>${docLine.Period}</td>
 							<td>${ViewHelper.CostFormat(docLine.ProducerCost, 2)}</td>
 							<td>${ViewHelper.CostFormat(docLine.SupplierCost, 2)}</td>
 							<td>${ViewHelper.CostFormat(docLine.SupplierCostWithoutNDS, 2)}</td>
@@ -42,14 +50,13 @@
 							<% if (docLine.VitallyImportant != null): %>
 							${ViewHelper.ToHumanReadable(docLine.VitallyImportant)}
 							<% end %>
-							</td>                        
+							</td>
 							<td>${docLine.SerialNumber}</td>
 						</tr>
 					<% end %>
 				<% else: %>
 					<tr style="text-align: center;"><td>Документ не разобран</td></tr>
 				<% end %>
-				
 			</table>
 			<br />
 		</div>

@@ -159,6 +159,7 @@
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\BalanceOperation.cs" />
+    <Compile Include="Models\CatalogName.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
     <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
@@ -418,6 +419,7 @@
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
+    <None Include="Views\Logs\Certificates.brail" />
     <None Include="Views\Payers\InvoiceGroups.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />

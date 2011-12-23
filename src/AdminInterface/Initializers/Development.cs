@@ -20,9 +20,13 @@ namespace AdminInterface.Initializers
 			config.OptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.OptBox);
 			config.PromotionsPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.PromotionsPath);
 			config.PrinterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.PrinterPath);
+			config.CertificatesPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.CertificatesPath);
 
 			if (!Directory.Exists(config.PromotionsPath))
 				Directory.CreateDirectory(config.PromotionsPath);
+
+			if (!Directory.Exists(config.CertificatesPath))
+				Directory.CreateDirectory(config.CertificatesPath);
 
 			using(new SessionScope())
 			{

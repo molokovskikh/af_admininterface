@@ -286,5 +286,43 @@ namespace Integration.ForTesting
 			var account = new ReportAccount(report);
 			return account;
 		}
+
+		public static Product Product()
+		{
+			var catalogName = new CatalogName("Тестовое наименование");
+			var catalogForm = new CatalogForm("Тестовая форма выпуска");
+			var catalog = new Catalog {
+				Name = "Тестовый продукт"
+			};
+			var product = new Product(catalog);
+
+			ActiveRecordMediator.Save(catalogForm);
+			ActiveRecordMediator.SaveAndFlush(catalogName);
+			catalog.NameId = catalogName.Id;
+			catalog.FormId = catalogForm.Id;
+			ActiveRecordMediator.Save(catalog);
+			ActiveRecordMediator.Save(product);
+			return product;
+		}
+
+		public static Certificate Certificate(Catalog catalog)
+		{
+			var serial = DateTime.Today.ToShortDateString();
+
+			var certificate = new Certificate {
+				SerialNumber = serial,
+				Product = catalog
+			};
+			var certificateFile = new CertificateFile {
+				Extension = ".tif"
+			};
+			certificate.Files.Add(certificateFile);
+
+
+			ActiveRecordMediator.Save(certificateFile);
+			ActiveRecordMediator.Save(certificate);
+
+			return certificate;
+		}
 	}
 }
