@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Transform;
@@ -42,30 +43,7 @@ namespace AdminInterface.Controllers
 			var log = DocumentReceiveLog.Find(id);
 
 			var file = log.GetRemoteFileName(Config);
-			WriteFile(file, log.FileName);
-		}
-
-		private void WriteFile(string file, string filename)
-		{
-			Response.Clear();
-			Response.AppendHeader("Content-Disposition",
-				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString(filename)));
-
-			if (!String.IsNullOrEmpty(file) && File.Exists(file))
-			{
-				using (var stream = File.OpenRead(file))
-				{
-					stream.CopyTo(Response.OutputStream);
-				}
-			}
-			else
-			{
-				if (!String.IsNullOrEmpty(file))
-					Logger.WarnFormat("файл {0} не найден", file);
-
-				Response.StatusCode = 404;
-			}
-			CancelView();
+			this.RenderFile(file, log.FileName);
 		}
 
 		public void ShowUpdateDetails(uint updateLogEntityId)
@@ -111,7 +89,7 @@ namespace AdminInterface.Controllers
 		public void Certificate(uint id)
 		{
 			var file = ActiveRecordMediator<CertificateFile>.FindByPrimaryKey(id);
-			WriteFile(file.GetStorageFileName(Config), file.Filename);
+			this.RenderFile(file.GetStorageFileName(Config), file.Filename);
 		}
 
 		public void ShowDownloadLog(uint updateLogEntityId)
