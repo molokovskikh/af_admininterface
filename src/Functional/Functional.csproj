@@ -116,6 +116,7 @@
     <Compile Include="Drugstore\ClientFixture.cs" />
     <Compile Include="BindPhoneToClientFixture.cs" />
     <Compile Include="CallbackRulesFixture.cs" />
+    <Compile Include="Drugstore\MailsFixture.cs" />
     <Compile Include="Drugstore\SettingsFixture.cs" />
     <Compile Include="Drugstore\UserRegistrationFixture.cs" />
     <Compile Include="ForTesting\ContactInformationFixture.cs" />

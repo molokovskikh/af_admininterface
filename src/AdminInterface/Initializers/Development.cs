@@ -16,22 +16,36 @@ namespace AdminInterface.Initializers
 			ADHelper.Storage = new MemoryUserStorage();
 
 			var config = Global.Config;
-			config.AptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.AptBox);
-			config.OptBox = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.OptBox);
-			config.PromotionsPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.PromotionsPath);
+			var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");
+
+			config.AptBox = Path.Combine(dataPath, config.AptBox);
+			config.OptBox = Path.Combine(dataPath, config.OptBox);
+			config.PromotionsPath = Path.Combine(dataPath, config.PromotionsPath);
+			config.CertificatesPath = Path.Combine(dataPath, config.CertificatesPath);
+			config.AttachmentsPath = Path.Combine(dataPath, config.AttachmentsPath);
+
 			config.PrinterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.PrinterPath);
-			config.CertificatesPath = Path.Combine(HttpContext.Current.Request.PhysicalApplicationPath, "bin", config.CertificatesPath);
 
-			if (!Directory.Exists(config.PromotionsPath))
-				Directory.CreateDirectory(config.PromotionsPath);
-
-			if (!Directory.Exists(config.CertificatesPath))
-				Directory.CreateDirectory(config.CertificatesPath);
+			InitDirs(
+				dataPath,
+				config.AttachmentsPath,
+				config.CertificatesPath,
+				config.PromotionsPath
+			);
 
 			using(new SessionScope())
 			{
 				if (Administrator.GetByName(Environment.UserName) == null)
 					Administrator.CreateLocalAdministrator();
+			}
+		}
+
+		public void InitDirs(params string[] dirs)
+		{
+			foreach (var dir in dirs)
+			{
+				if (!Directory.Exists(dir))
+					Directory.CreateDirectory(dir);
 			}
 		}
 	}

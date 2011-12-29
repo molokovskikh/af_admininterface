@@ -145,6 +145,7 @@
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
+    <Compile Include="Controllers\MailsController.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
     <Compile Include="Controllers\DocumentBuilderFilter.cs" />
@@ -160,6 +161,7 @@
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
+    <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
     <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
@@ -420,6 +422,8 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
+    <None Include="Views\Mails\Body.brail" />
+    <None Include="Views\Mails\Index.brail" />
     <None Include="Views\Payers\InvoiceGroups.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />
@@ -452,6 +456,7 @@
     <None Include="Views\Mail\DrugstoreRegistred.brail" />
     <None Include="Views\Mail\EnableChanged.brail" />
     <None Include="Views\Mail\FreePasswordChange.brail" />
+    <None Include="Views\Mails\Attachments.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

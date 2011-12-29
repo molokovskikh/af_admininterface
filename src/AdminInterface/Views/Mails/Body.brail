@@ -1,0 +1,8 @@
+﻿<tr class=details>
+	<td />
+	<td colspan="100">
+		<div id="Body${log.Id}">
+			<pre>${log.Mail.Body}</pre>
+		</div>
+	</td>
+</tr>

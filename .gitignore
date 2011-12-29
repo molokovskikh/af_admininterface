@@ -6,3 +6,4 @@ output/
 _Resharper*
 *.user
 *.suo
+src/AdminInterface/Data

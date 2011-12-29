@@ -1,4 +1,4 @@
-﻿<tr id="DocumentDetailsRow${documentLogId}">
+﻿<tr class=details>
 	<td />
 	<td colspan="100">
 		<div id="DocumentDetails${documentLogId}">

@@ -1,16 +1,17 @@
 ﻿function ShowDownloadResult(element, id, url, callerDescription) {
 	var row = $(element).parents("tr").get(0);
 	var isCallerVisible = IsVisible(id, callerDescription);
-	HideAll(id, function () {
+	var detailsRow = $(row).next(".details");
+	hideDetails(detailsRow, function () {
 		if (!isCallerVisible)
 			Download(url, row);
 	});
 }
 
-function Hide(id, description, afterFinish) {
-	if ($("#" + description + id).length > 0) {
-		$("#" + description + id).slideUp(500, function () {
-			$("#" + description + "Row" + id).remove();
+function hide(element, afterFinish) {
+	if (element.length > 0) {
+		element.find("div").slideUp(500, function () {
+			element.remove();
 			afterFinish();
 		});
 	}
@@ -19,18 +20,9 @@ function Hide(id, description, afterFinish) {
 	}
 }
 
-function HideAll(id, afterFinish) {
-	if (IsVisible(id, "DownloadLog")) {
-		Hide(id, "DownloadLog", afterFinish);
-	}
-	else if (IsVisible(id, "UpdateDetails")) {
-		Hide(id, "UpdateDetails", afterFinish);
-	}
-	else if (IsVisible(id, "DocumentDetails")) {
-		Hide(id, "DocumentDetails", afterFinish);
-	}
-	else if (IsVisible(id, "Certificates")) {
-		Hide(id, "Certificates", afterFinish);
+function hideDetails(element, afterFinish) {
+	if (element.length > 0) {
+		hide(element, afterFinish);
 	}
 	else {
 		afterFinish();

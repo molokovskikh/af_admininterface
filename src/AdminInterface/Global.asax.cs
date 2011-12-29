@@ -31,6 +31,8 @@ namespace AddUser
 
 		public string PrinterPath { get; set; }
 		public string CertificatesPath { get; set; }
+
+		public string AttachmentsPath { get; set; }
 	}
 
 	public class Global : WebApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents

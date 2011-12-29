@@ -60,7 +60,7 @@ namespace Functional.Drugstore
 			line.Certificate = DataMother.Certificate(line.CatalogProduct.Catalog);
 			line.Save();
 
-			var dir = "../../../AdminInterface/bin/Certificates/";
+			var dir = "../../../AdminInterface/Data/Certificates/";
 			if (!Directory.Exists(dir))
 				Directory.CreateDirectory(dir);
 
