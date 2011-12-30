@@ -61,7 +61,7 @@ namespace Functional.Drugstore
 			session.Save(log);
 		}
 
-		private void BuildMailWithAttachments()
+		private void BuildAttachments()
 		{
 			var attachment = new Attachment {
 				Filename = "test",
@@ -97,7 +97,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Show_attachments()
 		{
-			BuildMailWithAttachments();
+			BuildAttachments();
 			session.Flush();
 
 			File.WriteAllBytes(mail.Attachments[0].StorageFilename(config), new byte[0]);
@@ -109,7 +109,7 @@ namespace Functional.Drugstore
 			//var element = Css("table.DataTable tbody tr > td:last-child");
 			var cell = ((TableRow) Css("table.DataTable tbody tr")).TableCells.Last();
 			Click(cell, "Показать");
-			browser.WaitUntilContainsText("Вложения");
+			browser.WaitUntilContainsText("test.txt");
 			AssertText("test.txt");
 		}
 
@@ -119,7 +119,7 @@ namespace Functional.Drugstore
 			for(var i = 0; i < 100; i++)
 			{
 				BuildMail();
-				BuildMailWithAttachments();
+				BuildAttachments();
 			}
 
 			session.Flush();
