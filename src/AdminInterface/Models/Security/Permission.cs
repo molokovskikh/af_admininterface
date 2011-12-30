@@ -32,7 +32,9 @@ namespace AdminInterface.Models.Security
 
 		ConfigurerEditProducers = 18,
 		CallHistory = 20,
-		ChangePayment = 22
+		ChangePayment = 22,
+
+		ManagerReport = 23
 	}
 
 	[ActiveRecord(Schema = "accessright", Lazy = false)]
@@ -120,6 +122,10 @@ namespace AdminInterface.Models.Security
 						|| action.ToLower() == "SearchSuppliers".ToLower()
 						|| action.ToLower() == "SearchPayers".ToLower()))
 					return true;
+			}
+			if (Type == PermissionType.ManagerReport) {
+				var controllers = new[] {"ManagerReports"};
+				return controllers.Any(c => c.ToLower() == controller.ToLower());
 			}
 			return false;
 		}
