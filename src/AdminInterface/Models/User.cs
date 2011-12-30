@@ -278,6 +278,18 @@ namespace AdminInterface.Models
 			get { return !Enabled; }
 		}
 
+		[Style]
+		public virtual bool CanNotOrder
+		{
+			get
+			{
+				return Client == null ||
+					Client.Settings.ServiceClient ||
+					OrderRegionMask == 0 ||
+					AvaliableAddresses.Count == 0;
+			}
+		}
+
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))

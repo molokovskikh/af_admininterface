@@ -75,3 +75,8 @@ table.DataTable tbody tr.has-no-connected-users, td.has-no-connected-users, .has
 {
 	background-color: #cece9d;
 }
+
+table.DataTable tbody tr.can-not-order td.can-not-order, .LegendMarker.can-not-order
+{
+	background-color: #edf0a2;
+}
