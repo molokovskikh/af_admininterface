@@ -17,7 +17,7 @@ namespace AdminInterface.Models.Documents
 		Client = 2
 	}
 
-	[ActiveRecord(Schema = "Documents")]
+	[ActiveRecord(Schema = "Documents", Lazy = true)]
 	public class Mail
 	{
 		public Mail()
@@ -44,10 +44,10 @@ namespace AdminInterface.Models.Documents
 		[BelongsTo("SupplierId")]
 		public virtual Supplier Supplier { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public virtual IList<Attachment> Attachments { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public virtual IList<MailRecipient> Recipients { get; set; }
 
 		public virtual void AddRecipient(Client client)
@@ -60,7 +60,7 @@ namespace AdminInterface.Models.Documents
 		}
 	}
 
-	[ActiveRecord(Schema = "Logs")]
+	[ActiveRecord(Schema = "Logs", Lazy = true)]
 	public class MailSendLog
 	{
 		[PrimaryKey]
@@ -79,7 +79,7 @@ namespace AdminInterface.Models.Documents
 		public virtual MailRecipient Recipient { get; set; }
 	}
 
-	[ActiveRecord(Schema = "Documents")]
+	[ActiveRecord(Schema = "Documents", Lazy = true)]
 	public class MailRecipient
 	{
 		[PrimaryKey]
@@ -112,7 +112,7 @@ namespace AdminInterface.Models.Documents
 		}
 	}
 
-	[ActiveRecord(Schema = "Documents")]
+	[ActiveRecord(Schema = "Documents", Lazy = true)]
 	public class Attachment
 	{
 		public Attachment()
@@ -135,7 +135,7 @@ namespace AdminInterface.Models.Documents
 		[Property]
 		public virtual uint Size { get; set; }
 
-		[HasMany(Cascade = ManyRelationCascadeEnum.All)]
+		[HasMany(Cascade = ManyRelationCascadeEnum.All, Lazy = true)]
 		public virtual IList<AttachmentSendLog> SendLogs { get; set; }
 
 		public virtual string FullFilename
@@ -143,12 +143,12 @@ namespace AdminInterface.Models.Documents
 			get { return Filename + Extension; }
 		}
 
-		public string StorageFilename(AppConfig config)
+		public virtual string StorageFilename(AppConfig config)
 		{
 			return Path.Combine(config.AttachmentsPath, Id + Extension);
 		}
 
-		public UpdateLogEntity GetAttachmentLog(User user)
+		public virtual UpdateLogEntity GetAttachmentLog(User user)
 		{
 			var log = SendLogs.FirstOrDefault(l => l.User == user);
 			if (log == null)
@@ -157,7 +157,7 @@ namespace AdminInterface.Models.Documents
 		}
 	}
 
-	[ActiveRecord(Schema = "Logs")]
+	[ActiveRecord(Schema = "Logs", Lazy = true)]
 	public class AttachmentSendLog
 	{
 		public AttachmentSendLog()
@@ -179,7 +179,7 @@ namespace AdminInterface.Models.Documents
 		[BelongsTo("AttachmentId")]
 		public virtual Attachment Attachment { get; set; }
 
-		[BelongsTo("UpdateId")]
-		public UpdateLogEntity Update { get; set; }
+		[BelongsTo("UpdateId", Lazy = FetchWhen.OnInvoke)]
+		public virtual UpdateLogEntity Update { get; set; }
 	}
 }

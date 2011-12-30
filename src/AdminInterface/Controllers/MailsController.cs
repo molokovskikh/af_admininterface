@@ -9,6 +9,9 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Common.Web.Ui.Helpers;
+using NHibernate.Criterion;
+using NHibernate.SqlCommand;
+using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
 {
@@ -26,10 +29,29 @@ namespace AdminInterface.Controllers
 
 		public IList<MailSendLog> Find()
 		{
-			return ActiveRecordLinqBase<MailSendLog>
-				.Queryable
-				.Where(l => l.User.Client == Client)
-				.ToList();
+			return ArHelper.WithSession(s => {
+				var query = s.QueryOver<MailSendLog>();
+				query.JoinQueryOver(m => m.Update, JoinType.LeftOuterJoin);
+				var mailJoin = query.JoinQueryOver(l => l.Mail, JoinType.InnerJoin);
+				var user = query.JoinQueryOver(l => l.User, JoinType.InnerJoin);
+				query.JoinQueryOver(l => l.Recipient, JoinType.InnerJoin);
+				mailJoin.JoinQueryOver(m => m.Attachments, JoinType.LeftOuterJoin);
+
+				if (Client != null)
+					user.Where(u => u.Client == Client);
+
+				if (User != null)
+					query.Where(l => l.User == User);
+
+				if (Supplier != null)
+					mailJoin.Where(m => m.Supplier == Supplier);
+
+				var dummy = mailJoin
+					.Where(m => m.LogTime >= Period.Begin && m.LogTime < Period.End.AddDays(1))
+					.OrderBy(m => m.LogTime).Desc;
+				query.TransformUsing(Transformers.DistinctRootEntity);
+				return query.List();
+			});
 		}
 	}
 

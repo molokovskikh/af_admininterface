@@ -61,18 +61,7 @@ namespace Functional.Drugstore
 			session.Save(log);
 		}
 
-		[Test]
-		public void Show_mails_history()
-		{
-			Open(client);
-			AssertText("История минипочты");
-			Click("История минипочты");
-			AssertText("История сообщений минипочты");
-			AssertText("Тестовое сообщение");
-		}
-
-		[Test]
-		public void Show_attachments()
+		private void BuildMailWithAttachments()
 		{
 			var attachment = new Attachment {
 				Filename = "test",
@@ -93,6 +82,22 @@ namespace Functional.Drugstore
 			mail.Attachments.Add(attachment);
 
 			session.Save(updateLog);
+		}
+
+		[Test]
+		public void Show_mails_history()
+		{
+			Open(client);
+			AssertText("История минипочты");
+			Click("История минипочты");
+			AssertText("История сообщений минипочты");
+			AssertText("Тестовое сообщение");
+		}
+
+		[Test]
+		public void Show_attachments()
+		{
+			BuildMailWithAttachments();
 			session.Flush();
 
 			File.WriteAllBytes(mail.Attachments[0].StorageFilename(config), new byte[0]);
@@ -106,6 +111,18 @@ namespace Functional.Drugstore
 			Click(cell, "Показать");
 			browser.WaitUntilContainsText("Вложения");
 			AssertText("test.txt");
+		}
+
+		[Test, Ignore("Тест что бы проверить нагрузку")]
+		public void Test()
+		{
+			for(var i = 0; i < 100; i++)
+			{
+				BuildMail();
+				BuildMailWithAttachments();
+			}
+
+			session.Flush();
 		}
 	}
 }

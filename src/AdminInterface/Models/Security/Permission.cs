@@ -101,6 +101,7 @@ namespace AdminInterface.Models.Security
 				var controllers = new [] {
 					"suppliers",
 					"users",
+					"mails",
 				};
 				return controllers.Any(c => c == controller.ToLower());
 			}
