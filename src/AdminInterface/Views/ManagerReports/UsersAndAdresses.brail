@@ -1,0 +1,82 @@
+﻿<script type="text/javascript">
+	$(function () {
+
+		$('#startDateDiv').datepicker({
+			onSelect: function (dateText, inst) {
+				$("#startDate").val(dateText)
+				},
+			defaultDate: new Date('${startDate}')
+		});
+		$('#endDateDiv').datepicker({ 
+			onSelect: function (dateText, inst) {
+				$("#endDate").val(dateText);
+			},
+			defaultDate: new Date('${endDate}')
+		});
+	});
+</script>
+ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Отчет о зарегистрированных пользователях в регионе
+<% end %>
+<form method=get>
+<table class="CenterBlock">
+<tbody>
+	<tr>
+		<td></td>
+		<td style="text-align:center;" class="filter-label">С</td>
+		<td style="text-align:center;" class="filter-label">По</td>
+	</tr>
+	<tr>
+		<td class="filter-label" valign=top>Выберите период</td>
+		<td>
+			<div id="startDateDiv"></div>
+			<input type=hidden value="${startDate}" name="filter.startDate" id="startDate"/>
+		</td>
+		<td>
+			<div id="endDateDiv"></div>
+			<input type=hidden value="${endDate}" name="filter.endDate" id="endDate"/>
+		</td>
+	</tr>
+	<tr>
+	<td class="filter-label">Выборите регион</td>
+	<td>
+		<select name="filter.region">
+		<%for region in Regions: %>
+			<option value="${region.Id}" ${"selected" if (region.Id == chRegion)}>${region}</option>
+		<%end %>
+		</select>
+	</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td style="text-align:right;"><input type="submit" value="Показать" /></td>
+	</tr>
+</tbody>
+</table>
+</form>
+<% if IsDefined("Users"): %>
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th>${app.Sortable("Id", "Id")}</th>
+			<th>${app.Sortable("Имя", "Name")}</th>
+			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
+		</tr>
+	</thead>
+	<tbody>
+		<%for user in Users: %>
+		<tr>
+			<td>${user.Id}</td>
+			<td>${user.Name}</td>
+			<td>${user.RegistrationDate}</td>
+		</tr>
+		<%end %>
+		<tr>
+			<td colspan=3>${paginator.ShowPaginator()}</td>
+		</tr>
+	</tbody>
+</table>
+<%end %>

@@ -421,7 +421,8 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
-    <None Include="Views\ManagerReports\Main.brail" />
+    <None Include="Views\ManagerReports\Index.brail" />
+    <None Include="Views\ManagerReports\UsersAndAdresses.brail" />
     <None Include="Views\Payers\InvoiceGroups.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />
