@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
 using ExcelLibrary.BinaryFileFormat;
@@ -144,40 +145,41 @@ namespace AdminInterface.Models.Billing
 	{
 		public static DateTime GetPeriodBegin(this Period period)
 		{
+			int year = period.Year;
 			switch (period.Interval)
 			{
 				case Interval.January:
-					return new DateTime(DateTime.Today.Year, 1, 1);
+					return new DateTime(year, 1, 1);
 				case Interval.February:
-					return new DateTime(DateTime.Today.Year, 2, 1);
+					return new DateTime(year, 2, 1);
 				case Interval.March:
-					return new DateTime(DateTime.Today.Year, 3, 1);
+					return new DateTime(year, 3, 1);
 				case Interval.May:
-					return new DateTime(DateTime.Today.Year, 4, 1);
+					return new DateTime(year, 4, 1);
 				case Interval.April:
-					return new DateTime(DateTime.Today.Year, 5, 1);
+					return new DateTime(year, 5, 1);
 				case Interval.June:
-					return new DateTime(DateTime.Today.Year, 6, 1);
+					return new DateTime(year, 6, 1);
 				case Interval.July:
-					return new DateTime(DateTime.Today.Year, 7, 1);
+					return new DateTime(year, 7, 1);
 				case Interval.August:
-					return new DateTime(DateTime.Today.Year, 8, 1);
+					return new DateTime(year, 8, 1);
 				case Interval.September:
-					return new DateTime(DateTime.Today.Year, 9, 1);
+					return new DateTime(year, 9, 1);
 				case Interval.October:
-					return new DateTime(DateTime.Today.Year, 10, 1);
+					return new DateTime(year, 10, 1);
 				case Interval.November:
-					return new DateTime(DateTime.Today.Year, 11, 1);
+					return new DateTime(year, 11, 1);
 				case Interval.December:
-					return new DateTime(DateTime.Today.Year, 12, 1);
+					return new DateTime(year, 12, 1);
 				case Interval.FirstQuarter:
-					return new DateTime(DateTime.Today.Year, 1, 1);
+					return new DateTime(year, 1, 1);
 				case Interval.SecondQuarter:
-					return new DateTime(DateTime.Today.Year, 4, 1);
+					return new DateTime(year, 4, 1);
 				case Interval.ThirdQuarter:
-					return new DateTime(DateTime.Today.Year, 7, 1);
+					return new DateTime(year, 7, 1);
 				case Interval.FourthQuarter:
-					return new DateTime(DateTime.Today.Year, 10, 1);
+					return new DateTime(year, 10, 1);
 				default:
 					throw new NotImplementedException();
 			}
@@ -185,43 +187,10 @@ namespace AdminInterface.Models.Billing
 
 		public static DateTime GetPeriodEnd(this Period period)
 		{
-			switch (period.Interval)
-			{
-				case Interval.January:
-					return 1.MonthEnd();
-				case Interval.February:
-					return 2.MonthEnd();
-				case Interval.March:
-					return 3.MonthEnd();
-				case Interval.May:
-					return 4.MonthEnd();
-				case Interval.April:
-					return 5.MonthEnd();
-				case Interval.June:
-					return 6.MonthEnd();
-				case Interval.July:
-					return 7.MonthEnd();
-				case Interval.August:
-					return 8.MonthEnd();
-				case Interval.September:
-					return 9.MonthEnd();
-				case Interval.October:
-					return 10.MonthEnd();
-				case Interval.November:
-					return 11.MonthEnd();
-				case Interval.December:
-					return 12.MonthEnd();
-				case Interval.FirstQuarter:
-					return 3.MonthEnd();
-				case Interval.SecondQuarter:
-					return 6.MonthEnd();
-				case Interval.ThirdQuarter:
-					return 9.MonthEnd();
-				case Interval.FourthQuarter:
-					return 12.MonthEnd();
-				default:
-					throw new NotImplementedException();
-			}
+			if (period.GetInvoicePeriod() == InvoicePeriod.Month)
+				return period.GetPeriodBegin().LastDayOfMonth();
+			else
+				return period.GetPeriodBegin().AddMonths(3).AddDays(-1);
 		}
 
 		public static DateTime MonthEnd(this int month)
