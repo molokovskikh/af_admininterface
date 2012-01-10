@@ -24,7 +24,8 @@ namespace AdminInterface.Models.Suppliers
 	{
 		private ContactGroupType[] _defaultGroups = new [] {
 			ContactGroupType.ClientManagers,
-			ContactGroupType.OrderManagers
+			ContactGroupType.OrderManagers,
+			ContactGroupType.MiniMails
 		};
 
 		public Supplier(Region homeRegion, Payer payer)
