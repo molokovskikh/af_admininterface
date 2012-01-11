@@ -1,4 +1,4 @@
-﻿<tr id="CertificatesRow${line.Id}">
+﻿<tr class=details>
 	<td />
 	<td colspan="100">
 		<div id="Certificates${line.Id}">

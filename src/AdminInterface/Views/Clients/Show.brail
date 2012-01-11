@@ -129,6 +129,9 @@
 				<li>
 					<a href="${siteroot}/Logs/Orders?filter.Client.Id=${client.Id}" target="_blank">История заказов</a>
 				</li>
+				<li>
+					${app.LinkTo("История минипочты", @Mails, @Index, {"filter.Client.Id": client.Id, @attributes: {"target": "_blank"}})}
+				</li>
 			</ul>
 		</div>
 

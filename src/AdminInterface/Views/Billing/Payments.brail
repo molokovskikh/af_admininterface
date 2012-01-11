@@ -400,7 +400,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<img src="${siteroot}/Images/kfm_home.png" border="0" />
 							</a>
 						</td>
-						<td>${user.Name}</td>
+						<td class="can-not-order">${user.Name}</td>
 						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
 						<td>${user.RootService.Name}</td>
 						<td>${user.RegistrationDate.ToShortDateString() if user.RegistrationDate != null}</td>
@@ -533,9 +533,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	component Legend, { "LegendItems" : {	"Выключен" : "disabled",
 											"Работает бесплатно" : "free",
 											"Не получал обновлений более 7 дней" : "old-user-update",
-											"Адрес не имеет подключенных пользователей" : "has-no-connected-users"},
+											"Адрес не имеет подключенных пользователей" : "has-no-connected-users",
+											"Пользователь не производит заказ" : "can-not-order"},
 						"ByCenter" : false}
-%>		
+%>
 	<br />
 
 	<div style="margin-bottom:10px;">

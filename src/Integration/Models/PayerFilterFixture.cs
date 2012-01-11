@@ -151,5 +151,24 @@ namespace Integration.Models
 
 			Assert.That(items.Select(i => i.PayerId).ToArray(), Is.Not.Contains(payer.Id));
 		}
+
+		[Test]
+		public void If_payer_have_report_it_not_disabled()
+		{
+			var payer = DataMother.CreatePayer();
+			var report = DataMother.Report(payer);
+
+			Save(payer);
+			Save(report);
+
+			Flush();
+
+			var filter = new PayerFilter();
+			var items = filter.Find();
+
+			var item = items.FirstOrDefault(i => payer.Id == i.PayerId);
+			Assert.That(item, Is.Not.Null, "не удалось найти плателщика {0} нашли {1}", payer.Id, items.Implode());
+			Assert.That(item.IsDisabled, Is.False);
+		}
 	}
 }

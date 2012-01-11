@@ -30,7 +30,9 @@ namespace AdminInterface.Models.Billing
 		public uint EnabledClientCount { get; set; }
 
 		public uint EnabledSupplierCount { get; set; }
-		
+
+		public uint EnabledReportsCount { get; set; }
+
 		public string Regions { get; set; }
 
 		public bool HasWholesaleSegment { get; set; }
@@ -50,7 +52,12 @@ namespace AdminInterface.Models.Billing
 		[Style]
 		public bool IsDisabled
 		{
-			get { return (EnabledUsersCount == 0 || EnabledClientCount == 0) && EnabledSupplierCount == 0; }
+			get
+			{
+				return EnabledClientCount == 0
+					&& EnabledSupplierCount == 0
+					&& EnabledReportsCount == 0;
+			}
 		}
 
 		public string GetSegments()
@@ -62,6 +69,11 @@ namespace AdminInterface.Models.Billing
 			if (HasRetailSegment)
 				return "Розница";
 			return "";
+		}
+
+		public override string ToString()
+		{
+			return PayerId.ToString();
 		}
 	}
 }

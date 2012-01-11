@@ -1,0 +1,36 @@
+﻿<tr class=details>
+	<td />
+	<td colspan="100">
+		<div id="Attachments${log.Id}">
+			<% if log.Mail.Attachments.Count: %>
+				<b>Вложения</b>
+				<table class=DataTable>
+					<thead>
+						<tr>
+							<th>Файл</th>
+							<th>Размер</th>
+							<th>Дата последней загрузки пользователем</th>
+						</tr>
+					</thead>
+					<tbody>
+						<% for attachment in log.Mail.Attachments: %>
+							<tr>
+								<td>
+									${app.LinkTo(attachment.FullFilename, @Mails, @Attachment, {@id: attachment.Id})}
+								</td>
+								<td>
+									${ViewHelper.ConvertToUserFriendlySize(attachment.Size)}
+								</td>
+								<td>
+									${?attachment.GetAttachmentLog(log.User).RequestTime}
+								</td>
+							</tr>
+						<% end %>
+					</tbody>
+				</table>
+			<% else: %>
+				<b>Нет вложений</b>
+			<% end %>
+		</div>
+	</td>
+</tr>

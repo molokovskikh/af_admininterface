@@ -35,6 +35,9 @@
 				<li>
 					${app.LinkTo(supplier.Payer, "Биллинг", "Show")}
 				</li>
+				<li>
+					${app.LinkTo("История минипочты", @Mails, @Index, {"filter.Supplier.Id": supplier.Id, @attributes: {"target": "_blank"}})}
+				</li>
 			</ul>
 		</div>
 

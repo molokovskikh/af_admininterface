@@ -1,0 +1,64 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	История сообщений минипочты
+<% end %>
+
+${app.Asset("details.js")}
+
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.Supplier.Id")}
+${FormHelper.HiddenField("filter.Client.Id")}
+${FormHelper.HiddenField("filter.User.Id")}
+${app.FilterFor("filter.Period")}
+${app.EndFormFor("filter")}
+
+<div class=block>
+	Всего сообщений ${logs.Count}
+</div>
+
+<div>
+	<table class="DataTable">
+	<% if logs.Count != 0: %>
+		<thead>
+			<tr>
+				<th>Дата отправки</th>
+				<th>Поставщик</th>
+				<th>Email отправителя</th>
+				<th>Получатель</th>
+				<th>Пользователь</th>
+				<th>Дата отправки</th>
+				<th>Тема</th>
+				<th>Тело</th>
+				<th>Вложения</th>
+			</tr>
+		</thead>
+	<% for i, log in enumerate(logs): %>
+	<% mail = log.Mail %>
+		<tr>
+			<td>${mail.LogTime}</td>
+			<td>${app.LinkTo(mail.Supplier)}</td>
+			<td>!{mail.SupplierEmail}</td>
+			<td>${log.Recipient}</td>
+			<td>${app.LinkTo(log.User)}</td>
+			<td>${?log.Update.RequestTime}</td>
+			<td>!{mail.Subject}</td>
+			<td>
+				<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, '${siteroot}/Mails/Body?id=${log.Id}', 'Body');">Показать</a>
+			</td>
+			<td>
+				<% if mail.Attachments.Count: %>
+					<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, '${siteroot}/Mails/Attachments?id=${log.Id}', 'Attachments');">Показать</a>
+				<% else: %>
+					Нет вложений
+				<% end %>
+			</td>
+		</tr>
+	<% end %>
+	<% else: %>
+		<tr class="EmptyData">
+			<td>
+				За указанный период сообщений не найдено
+			</td>
+		</tr>
+	<% end %>
+	</table>
+</div>

@@ -168,10 +168,10 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch(Segment)
 			{
 				case SearchSegment.Retail:
-					And(groupFilter, "cd.Segment = 1 or s.Segment = 1");
+					And(groupFilter, "(cd.Segment = 1 or s.Segment = 1)");
 					break;
 				case SearchSegment.Wholesale:
-					And(groupFilter, "cd.Segment = 0 or s.Segment = 1");
+					And(groupFilter, "(cd.Segment = 0 or s.Segment = 0)");
 					break;
 			}
 
@@ -188,10 +188,10 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 			switch(ClientStatus)
 			{
 				case SearchClientStatus.Enabled:
-					And(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) > 0");
+					And(having, "(EnabledClientCount > 0 or EnabledSupplierCount > 0 or EnabledReportsCount > 0)");
 					break;
 				case SearchClientStatus.Disabled:
-					And(having, "sum(if(cd.Status = 1 or s.Disabled = 0, 1, 0)) = 0");
+					And(having, "(EnabledClientCount = 0 and EnabledSupplierCount = 0 and EnabledReportsCount = 0)");
 					break;
 			}
 
@@ -235,6 +235,7 @@ select p.PayerId,
 		count(distinct if(users.Enabled = 1, users.Id, null)) as EnabledUsersCount,
 		count(distinct if(addresses.Enabled = 0, addresses.Id, null)) as DisabledAddressesCount,
 		count(distinct if(addresses.Enabled = 1, addresses.Id, null)) as EnabledAddressesCount,
+		(select count(*) from Reports.General_Reports r where r.Allow = 1 and r.PayerId = p.PayerId) as EnabledReportsCount,
 
 		not p.AutoInvoice as ShowPayDate,
 
