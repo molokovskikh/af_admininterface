@@ -1,42 +1,21 @@
-﻿<script type="text/javascript">
-	$(function () {
-
-		$('#startDateDiv').datepicker({
-			onSelect: function (dateText, inst) {
-				$("#startDate").val(dateText)
-				},
-			defaultDate: new Date('${startDate}')
-		});
-		$('#endDateDiv').datepicker({ 
-			onSelect: function (dateText, inst) {
-				$("#endDate").val(dateText);
-			},
-			defaultDate: new Date('${endDate}')
-		});
-	});
-</script>
- <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
 
  <% component CaptureFor, {@id : @Title}: %>
-	Отчет о зарегистрированных пользователях в регионе
+	Зарегистрированные пользователи и адреса в регионе
 <% end %>
-<form method=get>
+${app.BeginFormFor("filter")}
 <table class="CenterBlock">
 <tbody>
+	${app.FilterFor("filter.Period")}
 	<tr>
-		<td></td>
-		<td style="text-align:center;" class="filter-label">С</td>
-		<td style="text-align:center;" class="filter-label">По</td>
-	</tr>
-	<tr>
-		<td class="filter-label" valign=top>Выберите период</td>
-		<td>
-			<div id="startDateDiv"></div>
-			<input type=hidden value="${startDate}" name="filter.startDate" id="startDate"/>
+		<td class="filter-label" >
+			Поиск по
 		</td>
-		<td>
-			<div id="endDateDiv"></div>
-			<input type=hidden value="${endDate}" name="filter.endDate" id="endDate"/>
+		<td colspan=2">
+			<input id="userType" type=radio value=Users name="filter.finderType.Value" ${"checked" if filter.finderType.IsUsers()}/>
+			<label for="userType">Пользователям</label> <br />
+			<input id="adressType" type=radio value=Adresses name="filter.finderType.Value" ${"checked" if filter.finderType.IsAdresses()}/>
+			<label for="adressType">Адресам</label>
 		</td>
 	</tr>
 	<tr>
@@ -50,15 +29,14 @@
 	</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td></td>
-		<td style="text-align:right;"><input type="submit" value="Показать" /></td>
+		${app.EndFormFor("filter")}
 	</tr>
 </tbody>
 </table>
-</form>
+
 <% if IsDefined("Users"): %>
 <table class="DataTable">
+<%if Users.Count > 0: %>
 	<thead>
 		<tr>
 			<th>${app.Sortable("Id", "Id")}</th>
@@ -66,17 +44,36 @@
 			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
 		</tr>
 	</thead>
+<%end %>
 	<tbody>
-		<%for user in Users: %>
-		<tr>
-			<td>${user.Id}</td>
-			<td>${user.Name}</td>
-			<td>${user.RegistrationDate}</td>
+	<%if Users.Count > 0: %>
+		<%for i, item in enumerate(Users): %>
+		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if (filter.finderType.IsUsers() and (not item.UserEnabled or item.ServiceDisabled)) or (filter.finderType.IsAdresses() and( not item.AdressEnabled or not item.ClientEnabled))}">
+			<td>${item.Id}</td>
+			<td>${item.Name}</td>
+			<td>${item.RegistrationDate}</td>
 		</tr>
 		<%end %>
 		<tr>
 			<td colspan=3>${paginator.ShowPaginator()}</td>
 		</tr>
+	<%else: %>
+	<tr class="EmptyData">
+		<td>Ничего не найдено</td>
+	</tr>
+	<%end %>
 	</tbody>
 </table>
 <%end %>
+<div align="center" style="width: 100%;">
+	<table>
+		<tbody>
+			<tr>
+			<td><div class="LegendMarker DisabledByBilling"></div></td>
+			<td>
+					- Пользователь отключен биллингом
+			</td>
+		</tr>
+		</tbody>
+	</table>
+</div>
