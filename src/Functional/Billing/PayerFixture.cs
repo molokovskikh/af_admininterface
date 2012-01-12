@@ -17,12 +17,13 @@ namespace Functional.Billing
 		public void Show_balance_summary()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			new Invoice(payer, new Period(2011, Interval.January), new DateTime(2011, 1, 11)).Save();
+			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2011, 1, 11));
+			invoice.Save();
 			new Payment { Payer = payer, Recipient = payer.Recipient, PayedOn = new DateTime(2011, 1, 15), RegistredOn = DateTime.Now, Sum = 800 }.Save();
 
 			Open(payer);
 			Assert.That(browser.Text, Is.StringContaining("плательщик"));
-			Click(String.Format(@"Платежи/Счета {0}", DateTime.Now.Year));
+			Click(String.Format(@"Платежи/Счета {0}", invoice.Period.Year));
 			Thread.Sleep(1000);
 			Assert.That(browser.Text, Is.StringContaining("11.01.2011"));
 			Assert.That(browser.Text, Is.StringContaining("15.01.2011"));
