@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Controllers;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
@@ -15,15 +16,15 @@ namespace Functional
 		public void BaseShowTest()
 		{
 			Open();
-			browser.Link(Find.ByText("Отчеты менеджеров")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Отчеты для менеджеров"));
-			browser.Link(Find.ByText("Пользователи и адреса")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Зарегистрированные пользователи и адреса в регионе"));
-			browser.Button(Find.ByText("Показать"));
-			Assert.That(browser.Text, Is.StringContaining("Зарегистрированные пользователи и адреса в регионе"));
-			browser.RadioButton(Find.ByValue("Adresses")).Click();
-			browser.Button(Find.ByText("Показать"));
-			Assert.That(browser.Text, Is.StringContaining("Зарегистрированные пользователи и адреса в регионе"));
+			Click("Отчеты менеджеров");
+			AssertText("Отчеты для менеджеров");
+			Click("Пользователи и адреса");
+			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			Click("Показать");
+			AssertText("Зарегистрированные пользователи и адреса в регионе");
+			browser.SelectList(Find.ByName("filter.FinderType")).SelectByValue(((int)RegistrationFinderType.Adresses).ToString());
+			Click("Показать");
+			AssertText("Зарегистрированные пользователи и адреса в регионе");
 		}
 	}
 }

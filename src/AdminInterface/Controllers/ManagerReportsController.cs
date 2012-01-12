@@ -83,16 +83,6 @@ namespace AdminInterface.Controllers
 			Region = RegionHelper.GetAllRegions().Where(region => region.Name.ToLower().Equals("все")).First();
 		}
 
-		/*public bool ForUsers()
-		{
-			return FinderType == RegistrationFinderType.Users;
-		}
-
-		public bool ForAdresses()
-		{
-			return FinderType == RegistrationFinderType.Adresses;
-		}*/
-
 		public IList<RegistrationInformation> Find()
 		{
 			IList<RegistrationInformation> result = new List<RegistrationInformation>();
