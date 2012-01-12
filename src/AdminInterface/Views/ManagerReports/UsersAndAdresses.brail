@@ -4,29 +4,18 @@
 	Зарегистрированные пользователи и адреса в регионе
 <% end %>
 ${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
 <table class="CenterBlock">
 <tbody>
 	${app.FilterFor("filter.Period")}
 	<tr>
-		<td class="filter-label" >
-			Поиск по
-		</td>
-		<td colspan=2">
-			<input id="userType" type=radio value=Users name="filter.finderType.Value" ${"checked" if filter.finderType.IsUsers()}/>
-			<label for="userType">Пользователям</label> <br />
-			<input id="adressType" type=radio value=Adresses name="filter.finderType.Value" ${"checked" if filter.finderType.IsAdresses()}/>
-			<label for="adressType">Адресам</label>
-		</td>
+		<td class="filter-label" >Поиск по </td>
+		<td>${app.Edit("filter.FinderType")}</td>
 	</tr>
 	<tr>
-	<td class="filter-label">Выборите регион</td>
-	<td>
-		<select name="filter.region">
-		<%for region in Regions: %>
-			<option value="${region.Id}" ${"selected" if (region.Id == chRegion)}>${region}</option>
-		<%end %>
-		</select>
-	</td>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
 	</tr>
 	<tr>
 		${app.EndFormFor("filter")}
@@ -48,7 +37,7 @@ ${app.BeginFormFor("filter")}
 	<tbody>
 	<%if Users.Count > 0: %>
 		<%for i, item in enumerate(Users): %>
-		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if (filter.finderType.IsUsers() and (not item.UserEnabled or item.ServiceDisabled)) or (filter.finderType.IsAdresses() and( not item.AdressEnabled or not item.ClientEnabled))}">
+		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)} ${app.Style(item)}">
 			<td>${item.Id}</td>
 			<td>${item.Name}</td>
 			<td>${item.RegistrationDate}</td>
@@ -66,14 +55,8 @@ ${app.BeginFormFor("filter")}
 </table>
 <%end %>
 <div align="center" style="width: 100%;">
-	<table>
-		<tbody>
-			<tr>
-			<td><div class="LegendMarker DisabledByBilling"></div></td>
-			<td>
-					- Пользователь или адрес отключен биллингом
-			</td>
-		</tr>
-		</tbody>
-	</table>
+<% 
+	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "DisabledByBilling"},
+						"ByCenter" : false}
+%>
 </div>

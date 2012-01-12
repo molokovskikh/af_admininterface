@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Web;
+using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
@@ -11,13 +13,15 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate.Criterion;
+using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers
 {
 	public enum RegistrationFinderType
 	{
-		Users,
-		Adresses
+		[Description("Пользователям")] Users,
+		[Description("Адресам")] Adresses
 	}
 
 	public class RegistrationInformation
@@ -26,35 +30,27 @@ namespace AdminInterface.Controllers
 		public string Name { get; set; }
 		public DateTime RegistrationDate { get; set; }
 		public bool AdressEnabled { get; set; }
-		public bool ClientEnabled { get; set; }
+		public ClientStatus ClientEnabled { get; set; }
 		public bool UserEnabled { get; set; }
 		public bool ServiceDisabled { get; set; }
-	}
 
-	public class RegistrationFinderTypeProperties : ICompisite
-	{
-		public RegistrationFinderType Value { get; set; }
+		public RegistrationFinderType ObjectType;
 
-		public bool IsUsers()
+		[Style]
+		public bool DisabledByBilling
 		{
-			return Value == RegistrationFinderType.Users;
-		}
-
-		public bool IsAdresses()
-		{
-			return Value == RegistrationFinderType.Adresses;
-		}
-
-		public IEnumerable<Tuple<string, object>> Elements()
-		{
-			return new[] {new Tuple<string, object>("Value", Value)};
+			get
+			{
+				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) ||
+				       (ObjectType == RegistrationFinderType.Adresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
+			}
 		}
 	}
 
 	public class UserFinderFilter : Sortable, IPaginable
 	{
-		public long region { get; set; }
-		public RegistrationFinderTypeProperties finderType { get; set; }
+		public Region Region { get; set; }
+		public RegistrationFinderType FinderType { get; set; }
 		public DatePeriod Period { get; set; }
 
 		private int _lastRowsCount;
@@ -71,95 +67,106 @@ namespace AdminInterface.Controllers
 
 		public int CurrentPage { get; set; }
 
-		public string[] ToUrl()
+		public UserFinderFilter()
 		{
-			return
-				GetParameters().Where(p => p.Key != "CurrentPage").Select(p => string.Format("{0}={1}", p.Key, p.Value))
-					.ToArray();
-		}
+			SortBy = "RegistrationDate";
+			SortDirection = "Desc";
 
-		public Dictionary<string, object> GetParameters()
-		{
-			return new Dictionary<string, object> {
-				{"filter.Period.Begin", Period.Begin},
-				{"filter.Period.End", Period.End},
-				{"filter.region", region},
-				{"filter.finderType.Value", finderType.Value},
-				{"filter.Direction", SortDirection},
-				{"filter.SortBy", SortBy}
+			SortKeyMap = new Dictionary<string, string> {
+				{"Id", "Id"},
+				{"Name", "Name"},
+				{"RegistrationDate", "RegistrationDate"},
 			};
+
+			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now);
+			FinderType = RegistrationFinderType.Users;
+			Region = RegionHelper.GetAllRegions().Where(region => region.Name.ToLower().Equals("все")).First();
 		}
 
-		public string ToUrlQuery()
+		/*public bool ForUsers()
 		{
-			return string.Join("&", ToUrl());
+			return FinderType == RegistrationFinderType.Users;
 		}
 
-
-		public string GetUri()
+		public bool ForAdresses()
 		{
-			return ToUrlQuery();
-		}
-
-		private string GetFieldToSort(string originalField)
-		{
-			if (finderType.Value == RegistrationFinderType.Adresses) {
-				if (originalField == "Name")
-					return "Address";
-			}
-			return originalField;
-		}
+			return FinderType == RegistrationFinderType.Adresses;
+		}*/
 
 		public IList<RegistrationInformation> Find()
 		{
-			return ArHelper.WithSession<IList<RegistrationInformation>>(s => {
-				var newSql = string.Empty;
-				if (finderType.Value == RegistrationFinderType.Users)
-					newSql = string.Format(
-						@"
-SELECT u.Id, u.Name, u.RegistrationDate, u.Enabled as UserEnabled, s.Disabled as ServiceDisabled
-FROM future.users u
-join future.services s on s.id = u.rootservice
-where
-s.HomeRegion & :region > 0
-and RegistrationDate >= :startDate
-and RegistrationDate <= :endDate
-and u.PayerId <> 921
-ORDER BY {2}
-limit {0}, {1}", CurrentPage*PageSize, PageSize, (string.IsNullOrEmpty(SortBy) ? "u.Id" : "u." + GetFieldToSort(SortBy)) + " " + SortDirection);
+			IList<RegistrationInformation> result = new List<RegistrationInformation>();
 
-				if (finderType.Value == RegistrationFinderType.Adresses)
-					newSql = string.Format(
-						@"
-SELECT a.Id, a.Address as Name, a.RegistrationDate, a.Enabled as AdressEnabled, c.Status as ClientEnabled
-FROM future.addresses a
-join future.Clients c on a.ClientId = c.id
-where
-c.RegionCode & :region > 0
-and a.RegistrationDate >= :startDate
-and a.RegistrationDate <= :endDate
-ORDER BY {2}
-limit {0}, {1}", CurrentPage*PageSize, PageSize, (string.IsNullOrEmpty(SortBy) ? "a.Id" : "a." + GetFieldToSort(SortBy)) + " " + SortDirection);
+			if (FinderType == RegistrationFinderType.Users) {
 
-				var result = s.CreateSQLQuery(newSql)
-						.SetParameter("region", region)
-						.SetParameter("startDate", Period.Begin)
-						.SetParameter("endDate", Period.End)
-						.ToList<RegistrationInformation>();
+				var userCriteria = DetachedCriteria.For<User>();
 
-				newSql = newSql.Remove(newSql.IndexOf("limit"));
-				newSql = string.Format("select count(*) from ({0}) as t1;", newSql);
-				var countQuery = s.CreateSQLQuery(newSql);
-				countQuery.SetParameter("region", region)
-					.SetParameter("startDate", Period.Begin)
-					.SetParameter("endDate", Period.End);
-				_lastRowsCount = Convert.ToInt32(countQuery.UniqueResult());
+				userCriteria.CreateCriteria("RootService", "s", JoinType.InnerJoin)
+					.Add(Expression.Sql("{alias}.HomeRegion & " + Region.Id + " > 0"));
+				userCriteria.SetProjection(Projections.ProjectionList()
+				                           	.Add(Projections.Property<User>(u => u.Id).As("Id"))
+				                           	.Add(Projections.Property<User>(u => u.Name).As("Name"))
+				                           	.Add(Projections.Property<User>(u => u.RegistrationDate).As("RegistrationDate"))
+				                           	.Add(Projections.Property("Enabled").As("UserEnabled"))
+				                           	.Add(Projections.Property("s.Disabled").As("ServiceDisabled")))
+					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
+					.Add(Expression.Le("RegistrationDate", Period.End.Date))
+					.CreateAlias("Payer", "p", JoinType.InnerJoin)
+					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)));
 
-				return result;
-			});
+				DetachedCriteria countSubquery = NHibernate.CriteriaTransformer.TransformToRowCount(userCriteria);
+				_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
+
+				if (CurrentPage > 0)
+					userCriteria.SetFirstResult(CurrentPage*PageSize);
+
+				userCriteria.SetMaxResults(PageSize);
+
+				result = ArHelper.WithSession(
+					s => userCriteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
+					.ToList();
+
+				foreach (var registrationInformation in result) {
+					registrationInformation.ObjectType = RegistrationFinderType.Users;
+				}
+			}
+
+			if (FinderType == RegistrationFinderType.Adresses) {
+
+				var udressCriteria = DetachedCriteria.For<Address>();
+
+				udressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
+					.Add(Expression.Sql("{alias}.RegionCode & " + Region.Id + " > 0"));
+
+				udressCriteria.SetProjection(Projections.ProjectionList()
+				                             	.Add(Projections.Property<Address>(u => u.Id).As("Id"))
+				                             	.Add(Projections.Property<Address>(u => u.Value).As("Name"))
+				                             	.Add(Projections.Property<Address>(u => u.RegistrationDate).As("RegistrationDate"))
+				                             	.Add(Projections.Property("Enabled").As("AdressEnabled"))
+				                             	.Add(Projections.Property("c.Status").As("ClientEnabled")))
+					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
+					.Add(Expression.Le("RegistrationDate", Period.End.Date));
+
+				DetachedCriteria countSubquery = NHibernate.CriteriaTransformer.TransformToRowCount(udressCriteria);
+				_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
+
+				if (CurrentPage > 0)
+					udressCriteria.SetFirstResult(CurrentPage*PageSize);
+
+				udressCriteria.SetMaxResults(PageSize);
+
+				result = ArHelper.WithSession(
+					s => udressCriteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
+					.ToList();
+
+				foreach (var registrationInformation in result) {
+					registrationInformation.ObjectType = RegistrationFinderType.Adresses;
+				}
+			}
+
+			return result;
 		}
 	}
-
 
 	[
 		Helper(typeof(PaginatorHelper), "paginator"),
@@ -169,16 +176,7 @@ limit {0}, {1}", CurrentPage*PageSize, PageSize, (string.IsNullOrEmpty(SortBy) ?
 	{
 		public void UsersAndAdresses([DataBind("filter")]UserFinderFilter userFilter)
 		{
-			PropertyBag["Regions"] = RegionHelper.GetAllRegions();
-			PropertyBag["chRegion"] = userFilter.region;
-
-			if (userFilter.Period == null)
-				userFilter.Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now);
-			if (userFilter.finderType == null)
-				userFilter.finderType = new RegistrationFinderTypeProperties {Value = RegistrationFinderType.Users};
-
 			PropertyBag["filter"] = userFilter;
-
 			PropertyBag["Users"] = userFilter.Find();
 		}
 	}
