@@ -175,9 +175,9 @@
 						Приготовлено обычных:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ConfHL") and ConfHL != "0(0)": %>
+						<% if Updates.ToString() and Updates.ToString() != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateNormal)}">
-							<acronym title="В скобках указано количество уникальных пользователей.">${ConfHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${Updates}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -187,7 +187,7 @@
 						В процессе:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ReqHL"): %>
+						<% if ?ReqHL: %>
 						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
 						<% end %>
 					</td>
@@ -197,9 +197,9 @@
 						Приготовлено КО:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("CUHL") and CUHL != "0(0)": %>
+						<% if CumulativeUpdates.ToString() and CumulativeUpdates.ToString() != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateCumulative)}">
-							<acronym title="В скобках указано количество уникальных пользователей.">${CUHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${CumulativeUpdates}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -209,9 +209,9 @@
 						Запретов:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ADHL") and ADHL != "0(0)": %>
+						<% if UpdatesAD.ToString() and UpdatesAD.ToString() != "0(0)": %>
 						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">
-							<acronym title="В скобках указано количество уникальных пользователей.">${ADHL}</acronym>
+							<acronym title="В скобках указано количество уникальных пользователей.">${UpdatesAD}</acronym>
 						</a>
 						<% else: %>
 						-
@@ -223,8 +223,8 @@
 						Ошибок:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("ErrUpHL") and ErrUpHL != "0": %>
-						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateError)}">${ErrUpHL}</a>
+						<% if UpdatesErr.ToString() and UpdatesErr.ToString() != "0": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateError)}">${UpdatesErr}</a>
 						<% else: %>
 						-
 						<% end %>
@@ -233,11 +233,7 @@
 						Загруженно данных:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("DownloadDataSize"): %>
 						${DownloadDataSize}
-						<% else: %>
-						-
-						<% end %>
 					</td>
 				</tr>
 				<tr>
@@ -245,21 +241,13 @@
 						Последнее обновление:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("MaxUpdateTime"): %>
 						${MaxUpdateTime}
-						<% else: %>
-						-
-						<% end %>
 					</td>
 					<td class="statistic-label">
 						Загружено документов:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("DownloadDocumentSize"): %>
 						${DownloadDocumentSize}
-						<% else: %>
-						-
-						<% end %>
 					</td>
 				</tr>
 				<tr>
@@ -272,17 +260,17 @@
 						Очередь:
 					</td>
 					<td class="statistic-value">
-						<% if OprLB == 0: %>
+						<% if NonProcOrdersCount == 0: %>
 						-
 						<% else: %>
-						<a href="${siteroot}/Monitoring/Orders" target=_blank>${OprLB}</a>
+						<a href="${siteroot}/Monitoring/Orders" target=_blank>${NonProcOrdersCount}</a>
 						<% end %>
 					</td>
 					<td class="statistic-label">
 						Принято:
 					</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указано количество уникальных пользователей.">${OPLB}</acronym>
+						<acronym title="В скобках указано количество уникальных пользователей.">${TotalOrders} (${UniqUserOrders})</acronym>
 					</td>
 				</tr>
 				<tr>
@@ -290,17 +278,13 @@
 						Последний заказ:
 					</td>
 					<td class="statistic-value">
-						<% if IsDefined("LOT"): %>
-						${LOT}
-						<% else: %>
-						-
-						<% end %>
+						${MaxOrderTime}
 					</td>
 					<td class="statistic-label">
 						Сумма:
 					</td>
 					<td class="statistic-value">
-						${SumLB}
+						${OrderSum}
 					</td>
 				</tr>
 				<tr>
@@ -311,31 +295,27 @@
 				<tr>
 					<td class="statistic-label" colspan=2>Очередь формализации:</td>
 					<td class="statistic-value" colspan=2>
-						<% if not IsDefined("FormalizationQueue") or FormalizationQueue == "0": %>
-						-
-						<% else: %>
-						${FormalizationQueue}
-						<% end %>
+						${?FormalizationQueue}
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Загружено:</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указано количество уникальных прайс-листов.">${PriceDOKLB}</acronym>
+						<acronym title="В скобках указано количество уникальных прайс-листов.">${DownCount}</acronym>
 					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
 					<td class="statistic-value">
-						${DownPLB}
+						${LastDown}
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Формализовано:</td>
 					<td class="statistic-value">
-						<acronym title="В скобках указано количество уникальных прайс-листов.">${PriceFOKLB}</acronym>
+						<acronym title="В скобках указано количество уникальных прайс-листов.">${FormCount}</acronym>
 					</td>
 					<td class="statistic-label">Последняя формализация:</td>
 					<td class="statistic-value">
-						${FormPLB}
+						${LastForm}
 					</td>
 				</tr>
 				<tr>
@@ -365,6 +345,49 @@
 					<td class="statistic-label">Опознано по производителю:</td>
 					<td class="statistic-value">${DocumentProducerIdentifiedCount}(${ViewHelper.InPercent(DocumentProducerIdentifiedCount, DocumentLineCount)}%)</td>
 				</tr>
+
+				<tr>
+					<td class="statistic-header" colspan="4">
+						Сертификаты
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Запрошено:</td>
+					<td class="statistic-value">${TotalCertificates}</td>
+					<td class="statistic-label">Предоставлено:</td>
+					<td class="statistic-value">${TotalSendCertificates}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Отсутствуют:</td>
+					<td class="statistic-value">${TotalNotSendCertificates}</td>
+					<td class="statistic-label">Последний запрос:</td>
+					<td class="statistic-value">${LastCertificateRequest}</td>
+				</tr>
+
+				<tr>
+					<td class="statistic-header" colspan="4">
+						Минипочта
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Кол-во писем:</td>
+					<td class="statistic-value">${TotalMails}</td>
+					<td class="statistic-label">Кол-во получателей:</td>
+					<td class="statistic-value">${TotalMailRecipients}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Макс. объем инф. для одного пользователя:</td>
+					<td class="statistic-value">${MaxMailSize}</td>
+					<td class="statistic-label">Средний объем инф. для одного пользователя:</td>
+					<td class="statistic-value">${AvgMailSize}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Последнее письмо:</td>
+					<td class="statistic-value">${LastMailSend}</td>
+					<td class="statistic-label"></td>
+					<td class="statistic-value"></td>
+				</tr>
+
 				<tr>
 					<td colspan="4" class="statistic-header">Службы:</td>
 				</tr>

@@ -17,7 +17,7 @@ using System.Linq;
 namespace AdminInterface.Controllers
 {
 	[
-		Helper(typeof(BindingHelper)),
+		Helper(typeof (BindingHelper)),
 		Secure
 	]
 	public class MainController : AdminInterfaceController
@@ -54,7 +54,9 @@ namespace AdminInterface.Controllers
 
 			var data = new DataSet();
 			With.Connection(c => {
-				var adapter = new MySqlDataAdapter(@"
+				var adapter =
+					new MySqlDataAdapter(
+						@"
 SELECT max(UpdateDate) MaxUpdateTime
 FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id
@@ -99,8 +101,8 @@ where	oh.processed = 0
 		and oh.submited = 1
 		and oh.deleted = 0;
 
-SELECT ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DataSize,
-	   ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DocSize,
+SELECT ifnull(sum(if(afu.UpdateType in (1,2), resultsize, 0)), 0) as DownloadDataSize,
+	   ifnull(sum(if(afu.UpdateType in (8), resultsize, 0)), 0) as DownloadDocumentSize,
 	   sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
 	   cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
 	   cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
@@ -127,52 +129,66 @@ select ifnull(sum(if(db.ProductId is not null, 1, 0)), 0) as DocumentProductIden
 	count(*) as DocumentLineCount
 from documents.documentheaders d
 	join documents.documentbodies db on db.DocumentId = d.Id
-where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
-					adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
-					adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
-					adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Admin.RegionMask);
-					adapter.Fill(data);
-				});
-			//Заказы
-			//Количество принятых заказов
-			PropertyBag["OPLB"] = String.Format("{0} ({1})",
-									  data.Tables[3].Rows[0]["TotalOrders"],
-									  data.Tables[3].Rows[0]["UniqUserOrders"]);
-			//Сумма заказов
-			PropertyBag["SumLB"] = Convert.ToDouble(data.Tables[3].Rows[0]["OrderSum"].IfDbNull(0)).ToString("C");
+where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam);
 
-			//Очередь
-			if (data.Tables[4].Rows[0]["NonProcOrdersCount"] != DBNull.Value)
-				PropertyBag["OprLB"] = Convert.ToInt32(data.Tables[4].Rows[0]["NonProcOrdersCount"]);
+select count(*) as TotalCertificates,
+sum(if(l.Filename is null, 1, 0)) as TotalNotSendCertificates,
+sum(if(l.Filename is not null, 1, 0)) as TotalSendCertificates
+from Logs.CertificateRequestLogs l
+	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
+		join Future.Users fu on fu.Id = u.UserId
+			join Future.Clients c on c.Id = fu.ClientId
+where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
+and c.MaskRegion & ?RegionMaskParam > 0
+;
 
-			//Время последнего заказа
-			if (data.Tables[3].Rows[0]["MaxOrderTime"] != DBNull.Value)
-				PropertyBag["LOT"] = Convert.ToDateTime(data.Tables[3].Rows[0]["MaxOrderTime"]).ToLongTimeString();
+select max(u.RequestTime) as LastCertificateRequest
+from Logs.CertificateRequestLogs l
+	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
+		join Future.Users fu on fu.Id = u.UserId
+			join Future.Clients c on c.Id = fu.ClientId
+where c.MaskRegion & ?RegionMaskParam > 0
+;
 
-			//Обновления
-			//Запретов обновлений
-			if (data.Tables[5].Rows[0]["UpdatesAD"] != DBNull.Value)
-			{
-				PropertyBag["ADHL"] = data.Tables[5].Rows[0]["UpdatesAD"].ToString();
-			}
-			//Ошибок обновлений
-			if (data.Tables[5].Rows[0]["UpdatesErr"] != DBNull.Value)
-			{
-				PropertyBag["ErrUpHL"] = data.Tables[5].Rows[0]["UpdatesErr"].ToString();
-			}
-			//Кумулятивных обновлений
-			if (data.Tables[5].Rows[0]["CumulativeUpdates"] != DBNull.Value)
-			{
-				PropertyBag["CUHL"] = data.Tables[5].Rows[0]["CumulativeUpdates"].ToString();
-			}
-			//Обычных обновлений
-			if (data.Tables[5].Rows[0]["Updates"] != DBNull.Value)
-			{
-				PropertyBag["ConfHL"] = data.Tables[5].Rows[0]["Updates"].ToString();
-			}
-			//Время последнего обновления
-			if (data.Tables[0].Rows[0]["MaxUpdateTime"] != DBNull.Value)
-				PropertyBag["MaxUpdateTime"] = Convert.ToDateTime(data.Tables[0].Rows[0]["MaxUpdateTime"]).ToLongTimeString();
+select count(*) TotalMails,
+max(m1.Size) MaxMailSize,
+avg(m1.Size) AvgMailSize
+from (
+		select m.Id
+		from Documents.Mails m
+			join Logs.MailSendLogs l on l.MailId = m.Id
+				join Future.Users u on u.Id = l.UserId
+					join Future.Clients c on c.Id = u.ClientId
+		where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
+			and c.MaskRegion & ?RegionMaskParam > 0
+		group by m.Id
+	) as bm
+	join Documents.Mails m1 on m1.Id = bm.Id
+;
+
+select count(*) as TotalMailRecipients
+from Documents.Mails m
+	join Logs.MailSendLogs l on l.MailId = m.Id
+		join Future.Users u on u.Id = l.UserId
+			join Future.Clients c on c.Id = u.ClientId
+where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
+	and c.MaskRegion & ?RegionMaskParam > 0
+;
+
+select max(m.LogTime) as LastMailSend
+from Documents.Mails m
+	join Logs.MailSendLogs l on l.MailId = m.Id
+		join Future.Users u on u.Id = l.UserId
+			join Future.Clients c on c.Id = u.ClientId
+where c.MaskRegion & ?RegionMaskParam > 0
+;
+",
+						c);
+				adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
+				adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
+				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & Admin.RegionMask);
+				adapter.Fill(data);
+			});
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s =>
 			{
@@ -193,29 +209,45 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 			PropertyBag["PriceProcessorMasterStatus"] = "";
 #endif
 
-			PropertyBag["DownloadDataSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DataSize"]));
-			PropertyBag["DownloadDocumentSize"] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(data.Tables[5].Rows[0]["DocSize"]));
-			//прайсы
-			//Последняя формализация
-			PropertyBag["FormPLB"] = Convert.ToDateTime(data.Tables[1].Rows[0]["LastForm"]).ToLongTimeString();
-			//Последнее получение
-			PropertyBag["DownPLB"] = Convert.ToDateTime(data.Tables[2].Rows[0]["LastDown"]).ToLongTimeString();
-			//Получено прайсов
-			PropertyBag["PriceDOKLB"] = data.Tables[2].Rows[0]["DownCount"].ToString();
-			//Формализовано прайсов
-			PropertyBag["PriceFOKLB"] = data.Tables[1].Rows[0]["FormCount"].ToString();
-			// Количество загруженных накладных
-			PropertyBag["CountDownloadedWaybills"] = data.Tables[6].Rows[0]["CountDownloadedWaybills"].ToString();
-			// Дата последней загрузки накладной
-			PropertyBag["LastDownloadedWaybillDate"] = data.Tables[6].Rows[0]["LastDownloadedWaybillDate"].ToString();
-			// Количество разобранных накладных
-			PropertyBag["CountParsedWaybills"] = data.Tables[7].Rows[0]["CountParsedWaybills"].ToString();
-			// Дата последнего разбора накладной
-			PropertyBag["LastParsedWaybillDate"] = data.Tables[7].Rows[0]["LastParsedWaybillDate"].ToString();
+			for (var i = 0; i < data.Tables.Count; i++)
+			{
+				var table = data.Tables[i];
+				foreach (DataColumn column in table.Columns)
+				{
+					object value = null;
+					if (table.Rows.Count > 0)
+						value = table.Rows[0][column];
+					PropertyBag[column.ColumnName] = value;
+				}
+			}
 
-			PropertyBag["DocumentProductIdentifiedCount"] = data.Tables[8].Rows[0]["DocumentProductIdentifiedCount"];
-			PropertyBag["DocumentProducerIdentifiedCount"] = data.Tables[8].Rows[0]["DocumentProducerIdentifiedCount"];
-			PropertyBag["DocumentLineCount"] = data.Tables[8].Rows[0]["DocumentLineCount"];
+			Size("MaxMailSize");
+			Size("AvgMailSize");
+			Size("DownloadDataSize");
+			Size("DownloadDocumentSize");
+			InPercentOf("TotalNotSendCertificates", "TotalCertificates");
+			InPercentOf("TotalSendCertificates", "TotalCertificates");
+			PropertyBag["OrderSum"] = Convert.ToDouble(data.Tables[3].Rows[0]["OrderSum"].IfDbNull(0)).ToString("C");
+		}
+
+		private void Size(string key)
+		{
+			var value = PropertyBag[key];
+			if (value == null || value == DBNull.Value)
+				return;
+			PropertyBag[key] = ViewHelper.ConvertToUserFriendlySize(Convert.ToUInt64(value));
+		}
+
+		private void InPercentOf(string valueKey, string totalKey)
+		{
+			var value = PropertyBag[valueKey];
+			var total = PropertyBag[totalKey];
+			if (value == null || value == DBNull.Value)
+				return;
+			if (total == null || total == DBNull.Value)
+				return;
+
+			PropertyBag[valueKey] = String.Format("{0} ({1}%)", value, ViewHelper.InPercent(value, total));
 		}
 
 		[RequiredPermission(PermissionType.EditSettings)]

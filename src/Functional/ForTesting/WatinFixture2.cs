@@ -131,5 +131,12 @@ namespace Functional.ForTesting
 		{
 			Assert.That(browser.Text, Is.StringContaining(text));
 		}
+
+		protected void OpenedWindow(string title)
+		{
+			var opened = IE.AttachTo<IE>(Find.ByTitle(title));
+			browser.Dispose();
+			browser = opened;
+		}
 	}
 }

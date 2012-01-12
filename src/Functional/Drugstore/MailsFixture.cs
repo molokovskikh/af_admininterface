@@ -90,6 +90,8 @@ namespace Functional.Drugstore
 			Open(client);
 			AssertText("История минипочты");
 			Click("История минипочты");
+
+			OpenedWindow("История сообщений минипочты");
 			AssertText("История сообщений минипочты");
 			AssertText("Тестовое сообщение");
 		}
