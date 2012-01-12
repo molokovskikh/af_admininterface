@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using AdminInterface.Models;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -162,7 +163,7 @@ limit {0}, {1}", CurrentPage*PageSize, PageSize, (string.IsNullOrEmpty(SortBy) ?
 
 	[
 		Helper(typeof(PaginatorHelper), "paginator"),
-		Secure,
+		Secure(PermissionType.ManagerReport),
 	]
 	public class ManagerReportsController: ARSmartDispatcherController
 	{

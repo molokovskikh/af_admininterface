@@ -3,4 +3,4 @@
  <% component CaptureFor, {@id : @Title}: %>
 	Отчеты для менеджеров
 <% end %>
-<a href="UsersAndAdresses">Пользователи и адреса</a>
+<a href="${siteroot}/ManagerReports/UsersAndAdresses">Пользователи и адреса</a>

@@ -71,7 +71,7 @@ ${app.BeginFormFor("filter")}
 			<tr>
 			<td><div class="LegendMarker DisabledByBilling"></div></td>
 			<td>
-					- Пользователь отключен биллингом
+					- Пользователь или адрес отключен биллингом
 			</td>
 		</tr>
 		</tbody>
