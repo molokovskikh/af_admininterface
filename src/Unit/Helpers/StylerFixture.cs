@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using Common.Web.Ui.Helpers;
 using NUnit.Framework;
 
 namespace Unit.Helpers

@@ -22,7 +22,7 @@ namespace Functional
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
 			Click("Показать");
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
-			browser.SelectList(Find.ByName("filter.FinderType")).SelectByValue(((int)RegistrationFinderType.Adresses).ToString());
+			browser.SelectList(Find.ByName("filter.FinderType")).SelectByValue(((int)RegistrationFinderType.Addresses).ToString());
 			Click("Показать");
 			AssertText("Зарегистрированные пользователи и адреса в регионе");
 		}

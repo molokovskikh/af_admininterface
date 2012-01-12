@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -21,13 +22,24 @@ namespace AdminInterface.Controllers
 	public enum RegistrationFinderType
 	{
 		[Description("Пользователям")] Users,
-		[Description("Адресам")] Adresses
+		[Description("Адресам")] Addresses
 	}
 
-	public class RegistrationInformation
+	public class RegistrationInformation : IUrlContributor
 	{
 		public uint Id { get; set; }
-		public string Name { get; set; }
+
+		private string _name;
+
+		public string Name { get
+		{
+			if (_name == null)
+				return Id.ToString();
+			return _name;
+		}
+			set { _name = value; }
+		}
+
 		public DateTime RegistrationDate { get; set; }
 		public bool AdressEnabled { get; set; }
 		public ClientStatus ClientEnabled { get; set; }
@@ -42,8 +54,17 @@ namespace AdminInterface.Controllers
 			get
 			{
 				return (ObjectType == RegistrationFinderType.Users && (!UserEnabled || ServiceDisabled)) ||
-				       (ObjectType == RegistrationFinderType.Adresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
+				       (ObjectType == RegistrationFinderType.Addresses && (!AdressEnabled || ClientEnabled == ClientStatus.Off));
 			}
+		}
+
+		public IDictionary GetQueryString()
+		{
+			return new Dictionary<string, string> {
+				{"controller", ObjectType.ToString()},
+				{"action", "edit"},
+				{"id", Id.ToString()},
+			};
 		}
 	}
 
@@ -83,6 +104,21 @@ namespace AdminInterface.Controllers
 			Region = RegionHelper.GetAllRegions().Where(region => region.Name.ToLower().Equals("все")).First();
 		}
 
+		private IList<RegistrationInformation> AcceptPaganator(DetachedCriteria criteria)
+		{
+			DetachedCriteria countSubquery = NHibernate.CriteriaTransformer.TransformToRowCount(criteria);
+			_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
+
+			if (CurrentPage > 0)
+				criteria.SetFirstResult(CurrentPage*PageSize);
+
+			criteria.SetMaxResults(PageSize);
+
+			return ArHelper.WithSession(
+				s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
+				.ToList();
+		}
+
 		public IList<RegistrationInformation> Find()
 		{
 			IList<RegistrationInformation> result = new List<RegistrationInformation>();
@@ -104,31 +140,21 @@ namespace AdminInterface.Controllers
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)));
 
-				DetachedCriteria countSubquery = NHibernate.CriteriaTransformer.TransformToRowCount(userCriteria);
-				_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
-
-				if (CurrentPage > 0)
-					userCriteria.SetFirstResult(CurrentPage*PageSize);
-
-				userCriteria.SetMaxResults(PageSize);
-
-				result = ArHelper.WithSession(
-					s => userCriteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
-					.ToList();
+				result = AcceptPaganator(userCriteria);
 
 				foreach (var registrationInformation in result) {
 					registrationInformation.ObjectType = RegistrationFinderType.Users;
 				}
 			}
 
-			if (FinderType == RegistrationFinderType.Adresses) {
+			if (FinderType == RegistrationFinderType.Addresses) {
 
-				var udressCriteria = DetachedCriteria.For<Address>();
+				var adressCriteria = DetachedCriteria.For<Address>();
 
-				udressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
+				adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
 					.Add(Expression.Sql("{alias}.RegionCode & " + Region.Id + " > 0"));
 
-				udressCriteria.SetProjection(Projections.ProjectionList()
+				adressCriteria.SetProjection(Projections.ProjectionList()
 				                             	.Add(Projections.Property<Address>(u => u.Id).As("Id"))
 				                             	.Add(Projections.Property<Address>(u => u.Value).As("Name"))
 				                             	.Add(Projections.Property<Address>(u => u.RegistrationDate).As("RegistrationDate"))
@@ -137,20 +163,10 @@ namespace AdminInterface.Controllers
 					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("RegistrationDate", Period.End.Date));
 
-				DetachedCriteria countSubquery = NHibernate.CriteriaTransformer.TransformToRowCount(udressCriteria);
-				_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
-
-				if (CurrentPage > 0)
-					udressCriteria.SetFirstResult(CurrentPage*PageSize);
-
-				udressCriteria.SetMaxResults(PageSize);
-
-				result = ArHelper.WithSession(
-					s => udressCriteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
-					.ToList();
+				result = AcceptPaganator(adressCriteria);
 
 				foreach (var registrationInformation in result) {
-					registrationInformation.ObjectType = RegistrationFinderType.Adresses;
+					registrationInformation.ObjectType = RegistrationFinderType.Addresses;
 				}
 			}
 
