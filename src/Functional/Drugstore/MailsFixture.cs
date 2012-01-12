@@ -90,8 +90,11 @@ namespace Functional.Drugstore
 			Open(client);
 			AssertText("История минипочты");
 			Click("История минипочты");
-			AssertText("История сообщений минипочты");
-			AssertText("Тестовое сообщение");
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История сообщений минипочты"))))
+			{
+				Assert.That(openedWindow.Text, Is.StringContaining("История сообщений минипочты"));
+				Assert.That(openedWindow.Text, Is.StringContaining("Тестовое сообщение"));
+			}
 		}
 
 		[Test]

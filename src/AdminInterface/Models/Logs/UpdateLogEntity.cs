@@ -135,6 +135,7 @@ namespace AdminInterface.Models.Logs
 			return ArHelper.WithSession(session => 
 				session.CreateCriteria(typeof(UpdateLogEntity))
 					.CreateAlias("User", "u", JoinType.InnerJoin)
+					.CreateAlias("u.Client", "c", JoinType.InnerJoin)
 					.Add(Expression.Gt(Projections2.BitOr("u.WorkRegionMask", regionMask), 0))
 					.Add(Expression.Ge("RequestTime", beginDate))
 					.Add(Expression.Le("RequestTime", endDate.AddDays(1)))
