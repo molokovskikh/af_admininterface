@@ -114,6 +114,8 @@ namespace AdminInterface.Controllers
 
 			criteria.SetMaxResults(PageSize);
 
+			ApplySort(criteria);
+
 			return ArHelper.WithSession(
 				s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
 				.ToList();
