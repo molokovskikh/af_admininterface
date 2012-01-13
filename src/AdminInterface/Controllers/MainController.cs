@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.MySql;
@@ -258,8 +259,16 @@ where c.MaskRegion & ?RegionMaskParam > 0
 			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				Notify("Сохранено");
-				RedirectToReferrer();
+				if (defaults.IsValid()) {
+					Notify("Сохранено");
+					RedirectToReferrer();
+				}
+				else {
+					ActiveRecordMediator.Evict(defaults);
+					PropertyBag["Defaults"] = defaults;
+					PropertyBag["Formaters"] = OrderHandler.Formaters();
+					PropertyBag["Senders"] = OrderHandler.Senders();
+				}
 			}
 			else
 			{

@@ -16,5 +16,14 @@ namespace Functional
 			Open("main/index");
 			Assert.That(browser.Text, Is.StringContaining("Статистика"));
 		}
+
+		[Test]
+		public void OpenSettingsView()
+		{
+			Open("main/Settings");
+			Assert.That(browser.Text, Is.StringContaining("Настройки по умолчанию"));
+			Assert.That(browser.Text, Is.StringContaining("Общие настройки"));
+			Assert.That(browser.Text, Is.StringContaining("Настройки мини-почты"));
+		}
 	}
 }

@@ -1,13 +1,39 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
+	<fieldset style="width:600px">
+		<legend>${templateLabel}</legend>
+		<label>Тема:</label>
+		<input name="defaults.${subjectField}" value="${subjectValue}" style="width:100%"/>
+		${app.GetValidationError(defaults, subjectField)}
+		<br>
+		<label>Тело письма:</label><br>
+		<textarea  name="defaults.${bodyField}" cols=50 rows=10 style="width:100%">!{bodyValue}</textarea>
+		${app.GetValidationError(defaults, bodyField)}
+	</fieldset>
+<% end %>
+
+<% component CaptureFor, {"id" : "Title"}: %>
 	Настройки по умолчанию
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Правила обратного звонка", "")]} %>
+<% component Bubble, {"bredcrumbs" : [("Настройки по умолчанию", "")]} %>
 
 <h3>Настройки по умолчанию</h3>
 
 <form method=post>
 	<input type=hidden value=${defaults.Id} name="defaults.Id" />
+
+<div class="tabs">
+	<ul>
+		<li>
+			<a id="generalSettings" href="#" class="selected">Общие настройки</a>
+		</li>
+		<li>
+			<a id="miniMailSettings" href="#">Настройки мини-почты</a>
+		</li>
+	</ul>
+</div>
+
+<div id="generalSettings-tab" class="tab">
 	<fieldset style="width:600px">
 		<legend>Для аптеки</legend>
 		<label>Версия AnalitF:</label>
@@ -37,5 +63,26 @@
 			<textarea  name="defaults.Phones" cols=50 rows=10>!{defaults.Phones}</textarea>
 		</p>
 	</fieldset>
-	<input type=submit value="Сохранить" />
+</div>
+
+<div id="miniMailSettings-tab" class="tab" style="display:none">
+	${app.GetLabel("defaults.AllowedMiniMailExtensions")}
+	${app.Edit("defaults.AllowedMiniMailExtensions")}
+	${app.GetValidationError(defaults, "AllowedMiniMailExtensions")}
+	<br>
+	<label style="font-size:smaller">(список расширений без точки через запятую)</label>
+	<br>
+	<br>
+
+	<% WriteLabelAndEditTemplate("Шаблон для пустого списка получателей", "ResponseSubjectMiniMailOnEmptyRecipients", defaults.ResponseSubjectMiniMailOnEmptyRecipients, "ResponseBodyMiniMailOnEmptyRecipients", defaults.ResponseBodyMiniMailOnEmptyRecipients) %>
+
+	<% WriteLabelAndEditTemplate("Шаблон для неизвестного адреса поставщика", "ResponseSubjectMiniMailOnUnknownProvider", defaults.ResponseSubjectMiniMailOnUnknownProvider, "ResponseBodyMiniMailOnUnknownProvider", defaults.ResponseBodyMiniMailOnUnknownProvider) %>
+
+	<% WriteLabelAndEditTemplate("Шаблон при превышении размера вложения", "ResponseSubjectMiniMailOnMaxAttachment", defaults.ResponseSubjectMiniMailOnMaxAttachment, "ResponseBodyMiniMailOnMaxAttachment", defaults.ResponseBodyMiniMailOnMaxAttachment) %>
+
+	<% WriteLabelAndEditTemplate("Шаблон при недопустимом типе файла вложения", "ResponseSubjectMiniMailOnAllowedExtensions", defaults.ResponseSubjectMiniMailOnAllowedExtensions, "ResponseBodyMiniMailOnAllowedExtensions", defaults.ResponseBodyMiniMailOnAllowedExtensions) %>
+</div>
+
+<br>
+<input type=submit value="Сохранить" />
 </form>
