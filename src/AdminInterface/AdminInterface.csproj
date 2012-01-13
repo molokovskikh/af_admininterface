@@ -162,6 +162,8 @@
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
+    <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
+    <Compile Include="Models\Validators\ExtensionListValidator.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
     <Compile Include="MonoRailExtentions\GreaterThanZeroValidator.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />

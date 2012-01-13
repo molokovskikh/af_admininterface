@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.MySql;
@@ -226,8 +227,16 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam)", c);
 			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				Notify("Сохранено");
-				RedirectToReferrer();
+				if (defaults.IsValid()) {
+					Notify("Сохранено");
+					RedirectToReferrer();
+				}
+				else {
+					ActiveRecordMediator.Evict(defaults);
+					PropertyBag["Defaults"] = defaults;
+					PropertyBag["Formaters"] = OrderHandler.Formaters();
+					PropertyBag["Senders"] = OrderHandler.Senders();
+				}
 			}
 			else
 			{

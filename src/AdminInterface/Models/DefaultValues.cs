@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Models.Validators;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
@@ -17,7 +20,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Table = "Defaults", Schema = "UserSettings")]
-	public class DefaultValues : ActiveRecordBase<DefaultValues>
+	public class DefaultValues : ActiveRecordValidationBase<DefaultValues>
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }
@@ -36,6 +39,33 @@ namespace AdminInterface.Models
 
 		[BelongsTo("SenderId")]
 		public OrderHandler Sender{ get; set; }
+
+		[Property, ValidateNonEmpty, Description("Разрешенные расширения вложений мини-почты"), ExtensionListValidation]
+		public string AllowedMiniMailExtensions { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseSubjectMiniMailOnUnknownProvider { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseBodyMiniMailOnUnknownProvider { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseSubjectMiniMailOnEmptyRecipients { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseBodyMiniMailOnEmptyRecipients { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseSubjectMiniMailOnMaxAttachment { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseBodyMiniMailOnMaxAttachment { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseSubjectMiniMailOnAllowedExtensions { get; set; }
+
+		[Property, ValidateNonEmpty]
+		public string ResponseBodyMiniMailOnAllowedExtensions { get; set; }
 
 		public static DefaultValues Get()
 		{
