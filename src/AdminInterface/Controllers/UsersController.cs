@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
 using System.IO;
+using System.Text.RegularExpressions;
+using AddUser;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -282,9 +284,11 @@ namespace AdminInterface.Controllers
 			try
 			{
 				var user = User.Find(id);
-				var file = String.Format(Config.UserPreparedDataFormatString, user.Id);
-				if (File.Exists(file))
+				var files = Directory.GetFiles(Global.Config.UserPreparedDataDirectory)
+				.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", user.Id))).ToList();
+				foreach (var file in files) {
 					File.Delete(file);
+				}
 				Notify("Подготовленные данные удалены");
 			}
 			catch

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
@@ -462,8 +463,9 @@ namespace AdminInterface.Models
 
 		public virtual bool HavePreparedData()
 		{
-			var file = String.Format(Global.Config.UserPreparedDataFormatString, Id);
-			return File.Exists(file);
+			var files = Directory.GetFiles(Global.Config.UserPreparedDataDirectory)
+				.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", Id))).ToList();
+			return files.Count > 0;
 		}
 
 		public virtual bool HaveUin()

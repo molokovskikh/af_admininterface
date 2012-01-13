@@ -25,7 +25,7 @@ namespace AddUser
 	{
 		public string AptBox { get; set; }
 		public string OptBox { get; set; }
-		public string UserPreparedDataFormatString { get; set; }
+		public string UserPreparedDataDirectory { get; set; }
 		public string CallRecordsDirectory { get; set; }
 		public string PromotionsPath { get; set; }
 
