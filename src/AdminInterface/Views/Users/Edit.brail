@@ -169,6 +169,7 @@
 		<% OutputSubView("/Templates/Addresses") %>
 		<% end %>
 
+		<% if user.Client: %>
 
 		<div class="block">
 			<h3>Региональные настройки</h3>
@@ -199,6 +200,7 @@
 			</table>
 		</div>
 
+		<% end %>
 
 		<div class=save>
 			<input type=submit value="Сохранить">
