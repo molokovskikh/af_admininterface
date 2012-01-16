@@ -130,6 +130,7 @@
     <Compile Include="Drugstore\AnalitFUpdateLogsFixture.cs" />
     <Compile Include="ForTesting\WatinFixture2.cs" />
     <Compile Include="MainViewFixure.cs" />
+    <Compile Include="ManagerReportsFixture.cs" />
     <Compile Include="PromotionsFixture.cs" />
     <Compile Include="RegionalAdminFixture.cs" />
     <Compile Include="Drugstore\RegistrationFixture.cs" />

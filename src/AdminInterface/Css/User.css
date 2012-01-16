@@ -40,12 +40,18 @@ div.LegendMarker.disabled
 	background-color: #ff9d5b;
 }
 
-table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling
+/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing
 {
 	background-color: #ff9d5b;
 }
 
-table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled
+table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled
+{
+	background-color: #ff9d5b;
+}
+
+
+/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled, /*Используйте этот*/  table.DataTable tr.EvenRow.disabled-by-billing
 {
 	background-color: #ff9d5b;
 }

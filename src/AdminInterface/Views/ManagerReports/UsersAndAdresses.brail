@@ -1,0 +1,62 @@
+﻿ <% component Bubble, {@bredcrumbs : [("Отчеты для менеджеров", "${siteroot}/ManagerReports/")]} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Зарегистрированные пользователи и адреса в регионе
+<% end %>
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.SortBy")}
+${FormHelper.HiddenField("filter.SortDirection")}
+<table class="CenterBlock">
+<tbody>
+	${app.FilterFor("filter.Period")}
+	<tr>
+		<td class="filter-label" >Поиск по </td>
+		<td>${app.Edit("filter.FinderType")}</td>
+	</tr>
+	<tr>
+		<td class="filter-label">Регион</td>
+		<td>${app.Edit("filter.Region")}</td>
+	</tr>
+	<tr>
+		${app.EndFormFor("filter")}
+	</tr>
+</tbody>
+</table>
+
+<% if IsDefined("Users"): %>
+<table class="DataTable">
+<%if Users.Count > 0: %>
+	<thead>
+		<tr>
+			<th>${app.Sortable("Id", "Id")}</th>
+			<th>${app.Sortable("Имя", "Name")}</th>
+			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
+		</tr>
+	</thead>
+<%end %>
+	<tbody>
+	<%if Users.Count > 0: %>
+		<%for i, item in enumerate(Users): %>
+		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)} ${app.Style(item)}">
+			<td>${item.Id}</td>
+			<td>${app.LinkTo(item)}</td>
+			<td>${item.RegistrationDate}</td>
+		</tr>
+		<%end %>
+		<tr>
+			<td colspan=3>${paginator.ShowPaginator()}</td>
+		</tr>
+	<%else: %>
+	<tr class="EmptyData">
+		<td>Ничего не найдено</td>
+	</tr>
+	<%end %>
+	</tbody>
+</table>
+<%end %>
+<div align="center" style="width: 100%;">
+<% 
+	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "DisabledByBilling"},
+						"ByCenter" : false}
+%>
+</div>

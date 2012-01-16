@@ -1,0 +1,6 @@
+﻿ <% component Bubble, {@bredcrumbs : []} %>
+
+ <% component CaptureFor, {@id : @Title}: %>
+	Отчеты для менеджеров
+<% end %>
+<a href="${siteroot}/ManagerReports/UsersAndAdresses">Пользователи и адреса</a>
