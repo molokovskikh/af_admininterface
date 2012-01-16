@@ -235,7 +235,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Delete_user_prepared_data()
 		{
-			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}.zip", user.Id);
+			var preparedDataPath = String.Format(@"C:\Windows\Temp\{0}_123456.zip", user.Id);
 
 			browser.Link(Find.ByText(user.Login)).Click();
 			Assert.That(browser.Button(Find.ByValue("Удалить подготовленные данные")).Enabled, Is.False);
