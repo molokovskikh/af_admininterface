@@ -146,6 +146,7 @@
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\ManagerReportsController.cs" />
+    <Compile Include="Controllers\Filters\StatQuery.cs" />
     <Compile Include="Controllers\MailsController.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
@@ -424,6 +425,7 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
+    <None Include="Views\Main\Stat.brail" />
     <None Include="Views\ManagerReports\Index.brail" />
     <None Include="Views\ManagerReports\UsersAndAdresses.brail" />
     <None Include="Views\Mails\Body.brail" />
@@ -461,6 +463,7 @@
     <None Include="Views\Mail\EnableChanged.brail" />
     <None Include="Views\Mail\FreePasswordChange.brail" />
     <None Include="Views\Mails\Attachments.brail" />
+    <None Include="Views\Main\StatSubView.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

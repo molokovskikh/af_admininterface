@@ -1,0 +1,365 @@
+﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
+
+<style type="text/css">
+	.StatisticData
+	{
+		background-color: #d8f1ff;
+		text-align: right;
+		font-size: 9pt;
+		font-family: Verdana;
+	}
+
+	a
+	{
+		font-family: Verdana, Arial, Helvetica, sans-serif;
+		font-size: small;
+	}
+
+	.statistic-top-header
+	{
+		background-color: #eef8ff;
+		padding: 10px 0 10px 0;
+		font-size: 10pt;
+		text-align: center;
+	}
+
+	.statistic-header
+	{
+		background-color: #dadada;
+		font-weight: bold;
+		text-align: center;
+		font-size: 10pt;
+	}
+
+	.search-header
+	{
+		border:1px solid #E4E4E4;
+		margin-bottom:10px;
+		padding:6px;
+		text-align:left;
+	}
+
+	.statistic-label
+	{
+		background-color: #d8f1ff;
+		text-align: right;
+		font-size: 10pt;
+	}
+
+	.statistic-value
+	{
+		background-color: #d8f1ff;
+		font-weight: bold;
+		text-align: center;
+		font-size: 8pt;
+	}
+</style>
+
+<table valign=top style="width:100%">
+	<tr valign=top>
+		<td>
+			<table bordercolor="#dadada" cellspacing="1" cellpadding="0" border="0" style="width:100%">
+				<tr>
+					<td class="statistic-top-header" colspan=4>
+						Статистика:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Обновления:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено обычных:
+					</td>
+					<td class="statistic-value">
+						<% if Updates.ToString() and Updates.ToString() != "0(0)": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateNormal)}">
+							<abbr title="В скобках указано количество уникальных пользователей.">${Updates}</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						В процессе:
+					</td>
+					<td class="statistic-value">
+						<% if ?ReqHL: %>
+						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено КО:
+					</td>
+					<td class="statistic-value">
+						<% if CumulativeUpdates.ToString() and CumulativeUpdates.ToString() != "0(0)": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateCumulative)}">
+							<abbr title="В скобках указано количество уникальных пользователей.">${CumulativeUpdates}</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Запретов:
+					</td>
+					<td class="statistic-value">
+						<% if UpdatesAD.ToString() and UpdatesAD.ToString() != "0(0)": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">
+							<abbr title="В скобках указано количество уникальных пользователей.">${UpdatesAD}</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Ошибок:
+					</td>
+					<td class="statistic-value">
+						<% if UpdatesErr.ToString() and UpdatesErr.ToString() != "0": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateError)}">${UpdatesErr}</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Последнее обновление:
+					</td>
+					<td class="statistic-value">
+						${MaxUpdateTime}
+					</td>
+				</tr>
+				<% if IsDefined(@DownloadDataSize): %>
+				<tr>
+					<td class="statistic-label">
+						Загруженно данных:
+					</td>
+					<td class="statistic-value">
+						${DownloadDataSize}
+					</td>
+					<td class="statistic-label">
+						Загружено документов:
+					</td>
+					<td class="statistic-value">
+						${DownloadDocumentSize}
+					</td>
+				</tr>
+				<% end %>
+
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Заказы:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">
+						Очередь:
+					</td>
+					<td class="statistic-value">
+						<% if NonProcOrdersCount == 0: %>
+						-
+						<% else: %>
+						<a href="${siteroot}/Monitoring/Orders" target=_blank>${NonProcOrdersCount}</a>
+						<% end %>
+					</td>
+					<td class="statistic-label">
+						Последний заказ:
+					</td>
+					<td class="statistic-value">
+						${MaxOrderTime}
+					</td>
+				</tr>
+				<% if IsDefined(@TotalOrders): %>
+				<tr>
+					<td class="statistic-label">
+						Принято:
+					</td>
+					<td class="statistic-value">
+						<abbr title="В скобках указано количество уникальных пользователей.">${TotalOrders} (${UniqUserOrders})</abbr>
+					</td>
+					<td class="statistic-label">
+						Сумма:
+					</td>
+					<td class="statistic-value">
+						${OrderSum}
+					</td>
+				</tr>
+				<% end %>
+
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Прайсы:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label" colspan=2>Очередь формализации:</td>
+					<td class="statistic-value" colspan=2>
+						${?FormalizationQueue}
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Загружено:</td>
+					<td class="statistic-value">
+						<abbr title="В скобках указано количество уникальных прайс-листов.">${DownCount}</abbr>
+					</td>
+					<td class="statistic-label">Последняя загрузка:</td>
+					<td class="statistic-value">
+						${LastDown}
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Формализовано:</td>
+					<td class="statistic-value">
+						<abbr title="В скобках указано количество уникальных прайс-листов.">${FormCount}</abbr>
+					</td>
+					<td class="statistic-label">Последняя формализация:</td>
+					<td class="statistic-value">
+						${LastForm}
+					</td>
+				</tr>
+
+				<% if IsDefined(@LastDownloadedWaybillDate): %>
+				<tr>
+					<td class="statistic-header" colspan=4>
+						Накладные:
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Загружено:</td>
+					<td class="statistic-value"><abbr  title="В скобках указано количество уникальных клиентов.">${CountDownloadedWaybills}</abbr></td>
+					<td class="statistic-label">Последняя загрузка:</td>
+					<td class="statistic-value">${LastDownloadedWaybillDate}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Разобрано:</td>
+					<td class="statistic-value"><abbr title="В скобках указано количество уникальных клиентов.">${CountParsedWaybills}</abbr></td>
+					<td class="statistic-label">Последний разбор:</td>
+					<td class="statistic-value">${LastParsedWaybillDate}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label" colspan=2>Всего позиций:</td>
+					<td class="statistic-value" colspan=2>${DocumentLineCount}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Опознано по наименованию:</td>
+					<td class="statistic-value">${DocumentProductIdentifiedCount}(${ViewHelper.InPercent(DocumentProductIdentifiedCount, DocumentLineCount)}%)</td>
+					<td class="statistic-label">Опознано по производителю:</td>
+					<td class="statistic-value">${DocumentProducerIdentifiedCount}(${ViewHelper.InPercent(DocumentProducerIdentifiedCount, DocumentLineCount)}%)</td>
+				</tr>
+				<% end %>
+
+				<% if IsDefined(@TotalCertificates): %>
+				<tr>
+					<td class="statistic-header" colspan="4">
+						Сертификаты
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Запрошено:</td>
+					<td class="statistic-value">${TotalCertificates}</td>
+					<td class="statistic-label">Предоставлено:</td>
+					<td class="statistic-value">${TotalSendCertificates}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Отсутствуют:</td>
+					<td class="statistic-value">${TotalNotSendCertificates}</td>
+					<td class="statistic-label">Последний запрос:</td>
+					<td class="statistic-value">${LastCertificateRequest}</td>
+				</tr>
+				<% end %>
+
+				<% if IsDefined(@TotalMails): %>
+				<tr>
+					<td class="statistic-header" colspan="4">
+						Минипочта
+					</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Кол-во писем:</td>
+					<td class="statistic-value">${TotalMails}</td>
+					<td class="statistic-label">Кол-во получателей:</td>
+					<td class="statistic-value">${TotalMailRecipients}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Макс. объем инф. для одного пользователя:</td>
+					<td class="statistic-value">${MaxMailSize}</td>
+					<td class="statistic-label">Средний объем инф. для одного пользователя:</td>
+					<td class="statistic-value">${AvgMailSize}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Последнее письмо:</td>
+					<td class="statistic-value">${LastMailSend}</td>
+					<td class="statistic-label"></td>
+					<td class="statistic-value"></td>
+				</tr>
+				<% end %>
+
+				<tr>
+					<td colspan="4" class="statistic-header">Службы:</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Обработки заказов:</td>
+					<td class="statistic-value" colspan=3>${OrderProcStatus}</td>
+				</tr>
+				<tr>
+					<td class="statistic-label">Обработки прайс листов:</td>
+					<td class="statistic-value" colspan=3>${PriceProcessorMasterStatus}</td>
+				</tr>
+				<tr>
+					<td class="statistic-top-header" colspan=4>
+						В скобках указано количество уникальных клиентов.
+					</td>
+				</tr>
+			</table>
+
+			<div>
+				<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/Search">
+					<input type="hidden" name="filter.SearchBy" value="Auto" />
+					<input type="hidden" name="filter.Region.Id" value="${RegionId}" />
+					<div class="search-header" style="text-align:center">
+						<label>Поиск пользователей</label>
+						<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px;" value="" />
+						<input type="submit" style="width: auto;" value="Найти" />
+					</div>
+				</form>
+			</div>
+		</td>
+		<td>
+			<form>
+				<div class=block style="float:right">
+					<h4>Фильтр статистики</h4>
+					${FormHelper.HiddenField("from", fromDate.ToShortDateString())}
+					${FormHelper.HiddenField("to", toDate.ToShortDateString())}
+					<div>
+						<label for="RegionList">Регион:</label>
+						<select name="regioncode">
+							<% for region in regions: %>
+							<option value=${region.Id} ${"selected" if region.Id == regionMask}>${region.Name}</option>
+							<% end %>
+						</select>
+					</div>
+					<div>
+						${app.Edit("query.Full")}
+					</div>
+					<div>
+						<label for="FromCalendar">Начиная с даты:</label>
+						<div class=calendar style="border: none;" id="fromCalendarHolder"></div>
+					</div>
+					<div>
+						<label for="ToCalendar">По дату:</label>
+						<div class=calendar style="border: none;" id="toCalendarHolder"></div>
+					</div>
+					<div style="text-align:right;">
+						<input type=submit value=Показать></input>
+					</div>
+				</div>
+			</form>
+		</td>
+	</tr>
+</table>
