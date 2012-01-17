@@ -139,8 +139,8 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property("FirmType")]
-		public override ServiceType Type { get; set; }
+		/*[Property("FirmType")]
+		public override ServiceType Type { get; set; }*/
 
 		[Property]
 		public virtual Segment Segment { get; set; }

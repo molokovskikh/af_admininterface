@@ -18,6 +18,9 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<td>${app.Edit("filter.Region")}</td>
 	</tr>
 	<tr>
+		<td colspan=3 style="text-align:right;">${app.ExportLink("Выгрузить отчет в Ехсel", filter.SortBy, "GetUsersAndAdresses")}</td>
+	</tr>
+	<tr>
 		${app.EndFormFor("filter")}
 	</tr>
 </tbody>
@@ -28,9 +31,14 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <%if Users.Count > 0: %>
 	<thead>
 		<tr>
-			<th>${app.Sortable("Id", "Id")}</th>
-			<th>${app.Sortable("Имя", "Name")}</th>
+			<th>${app.Sortable("Код клиента", "ClientId")}</th>
+			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
+			<th>${app.Sortable(filter.HeadCodeName, "Id")}</th>
+			<th>${app.Sortable(filter.HeadName, "Name")}</th>
 			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
+			<%if filter.ShowUserNames(): %>
+				<th>С этим адресом зарегистриваны</th>
+			<%end %>
 		</tr>
 	</thead>
 <%end %>
@@ -38,9 +46,20 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 	<%if Users.Count > 0: %>
 		<%for i, item in enumerate(Users): %>
 		<tr style="text-align:center;" class="${ViewHelper.GetRowStyle(i)} ${app.Style(item)}">
+			<td>${item.ClientId}</td>
+			<td>
+				<% if item.IsDrugstore: %>
+					${UrlHelper.Link(item.ClientName, {@controller: @Clients, @params: {@id: item.ClientId}})}
+				<% else: %>
+					${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
+				<% end %>
+			</td>
 			<td>${item.Id}</td>
 			<td>${app.LinkTo(item)}</td>
 			<td>${item.RegistrationDate}</td>
+			<%if filter.ShowUserNames(): %>
+				<td>${item.UserNames}</td>
+			<%end %>
 		</tr>
 		<%end %>
 		<tr>
@@ -56,7 +75,8 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <%end %>
 <div align="center" style="width: 100%;">
 <% 
-	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "DisabledByBilling"},
+	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "DisabledByBilling",
+											"Клиент имеет единственного пользователя" : "SingleUser"},
 						"ByCenter" : false}
 %>
 </div>
