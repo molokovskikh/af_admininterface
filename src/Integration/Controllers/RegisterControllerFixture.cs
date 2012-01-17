@@ -156,7 +156,7 @@ namespace Integration.Controllers
 				FullName = "Тестовый поставщик"
 			};
 
-			controller.RegisterSupplier(supplier, 
+			controller.RegisterSupplier(/*supplier, */
 				new Contact[0], 1,
 				new [] {new RegionSettings{Id = 1, IsAvaliableForBrowse = true}},
 				new AdditionalSettings(),
@@ -175,26 +175,13 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_supplier_in_retail_segment()
 		{
-			//если нет то создаем специального клиента на для справки
-			var count = ArHelper.WithSession(s => s
-				.CreateSQLQuery(@"select count(*) from Usersettings.Clientsdata where firmcode = 4474")
-				.UniqueResult<long>());
-			if (count == 0)
-				ArHelper.WithSession(s => s
-					.CreateSQLQuery(@"
-insert into Usersettings.Clientsdata(FirmCode, FirmSegment, FirmStatus, FirmType, RegionCode, MaskRegion, FullName, ShortName)
-select 4474, 1, 1, 1, 1, 7, 'Веб-справка', 'Веб-справка';
-insert into Usersettings.RetClientsSet(ClientCode)
-select 4474;")
-					.ExecuteUpdate());
-
 			var supplier = new Supplier {
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
 				Segment = Segment.Retail
 			};
 
-			controller.RegisterSupplier(supplier, 
+			controller.RegisterSupplier(/*supplier, */
 				new Contact[0], 1,
 				new [] {
 					new RegionSettings {

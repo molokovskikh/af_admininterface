@@ -25,10 +25,7 @@
 			${app.Edit("user.SendRejects")}<br>
 		</div>
 
-		<div class=block>
-			<h3>Сообщение в биллинг</h3>
-			<textarea cols=60 rows=4 name=comment></textarea>
-		</div>
+		${ForHelper.Editor("user.Accounting")}
 
 		<div class=block>
 			<h3>
@@ -103,7 +100,7 @@
 					${permission.Name}
 					<br>
 				<% end %>
-			</div>							
+			</div>
 		</div>
 		
 		<div class="block">

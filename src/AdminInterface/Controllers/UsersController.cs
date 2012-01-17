@@ -34,7 +34,7 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			RedirectUsingRoute("Edit", new {id = id});
+			RedirectUsingRoute("Edit", new {id});
 		}
 
 		[AccessibleThrough(Verb.Get)]
@@ -57,7 +57,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([DataBind("user")] User user, 
+		public void Add(
 			[DataBind("contacts")] Contact[] contacts, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
@@ -68,6 +68,9 @@ namespace AdminInterface.Controllers
 			string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
+			var user = new User(client);
+			BindObjectInstance(user, "user");
+
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
 			if (String.IsNullOrEmpty(address.Value))
@@ -76,7 +79,6 @@ namespace AdminInterface.Controllers
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
 
-				user.Init(client);
 				user.Payer = Payer.Find(user.Payer.Id);
 				user.Setup();
 				password = user.CreateInAd();

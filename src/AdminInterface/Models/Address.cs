@@ -42,6 +42,13 @@ namespace AdminInterface.Models
 			AvaliableForUsers = new List<User>();
 		}
 
+		public Address(Client client)
+			: this()
+		{
+			Client = client;
+			Accounting = new AddressAccount(this);
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

@@ -7,6 +7,13 @@
 <form method="post">
 	<div>
 		<div>
+			${app.GetLabel("account.FreePeriodEnd")}:
+		</div>
+		<div>
+			${app.Edit("account.FreePeriodEnd")}
+			${app.GetValidationError(account, "FreePeriodEnd")}
+		</div>
+		<div>
 			Наименование в счете:<br>
 			<span style="font-size:smaller">символы '{0}' будут заменены на название месяца за который формируется счет</span>
 		</div>

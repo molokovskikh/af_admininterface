@@ -21,24 +21,29 @@ namespace AdminInterface.Controllers
 	{
 		public void Show(uint id)
 		{
-			RedirectUsingRoute("Edit", new {id = id});
+			RedirectUsingRoute("Edit", new {id});
 		}
 
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{
-			PropertyBag["client"] = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck(clientId);
+			PropertyBag["address"] = new Address(client);
+			PropertyBag["client"] = client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Add([ARDataBind("delivery", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
+		public void Add(
 			[DataBind("contacts")] Contact[] contacts,
 			uint clientId,
 			string comment)
 		{
 			var client = Client.FindAndCheck(clientId);
+			var address = new Address(client);
+			BindObjectInstance(address, "delivery", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
+
 			client.AddAddress(address);
 			address.UpdateContacts(contacts);
 			address.SaveAndFlush();

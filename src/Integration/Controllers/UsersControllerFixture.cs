@@ -67,7 +67,7 @@ namespace Integration.Controllers
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
 			var person = new[] {new Person()};
 
-			controller.Add(user, clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
+			controller.Add(/*user, */clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
 			scope.Flush();
 
 			var logs = PasswordChangeLogEntity.Queryable.Where(l => l.TargetUserName == user.Login).ToList();
@@ -82,7 +82,7 @@ namespace Integration.Controllers
 		{
 			client = DataMother.CreateTestClientWithUser();
 			var user = new User();
-			controller.Add(user, new Contact[0], new[] {
+			controller.Add(/*user, */new Contact[0], new[] {
 					new RegionSettings {
 						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 					},

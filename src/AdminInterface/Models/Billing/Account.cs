@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
 using AdminInterface.Helpers;
@@ -83,7 +84,11 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual int InvoiceGroup { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
+		[
+			Property(Access = PropertyAccess.FieldCamelcaseUnderscore),
+			Style,
+			Description("Обслуживается бесплатно")
+		]
 		public virtual bool IsFree
 		{
 			get
@@ -99,6 +104,12 @@ namespace AdminInterface.Models.Billing
 				}
 			}
 		}
+
+		[
+			Property,
+			Description("Дата окончания бесплатно периода")
+		]
+		public virtual DateTime? FreePeriodEnd { get; set; }
 
 		public virtual uint PayerId
 		{

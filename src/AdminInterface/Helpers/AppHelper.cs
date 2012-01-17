@@ -90,6 +90,59 @@ namespace AdminInterface.Helpers
 			return LinkTo(item, title, action, null);
 		}
 
+<<<<<<< HEAD
+=======
+		public string LinkTo(object item, object title, string action, IDictionary query = null)
+		{
+			if (item == null)
+				return "";
+
+			var parameters = new Dictionary<string, object>();
+
+			var contributor = item as IUrlContributor;
+			if (contributor != null)
+			{
+				var queryString = contributor.GetQueryString();
+				if (queryString.Contains("controller"))
+				{
+					parameters.Add("controller", ToControllerName(queryString["controller"].ToString()));
+					queryString.Remove("controller");
+				}
+				parameters.Add("params", queryString);
+			}
+			else
+			{
+				var controller = GetControllerName(item);
+				parameters.Add("controller", controller);
+
+				var dynamicItem = ((dynamic)item);
+				var id = (object)dynamicItem.Id;
+				parameters.Add("params", new Dictionary<string, object>{{"id", id}});
+			}
+
+			if (parameters.ContainsKey("controller"))
+			{
+
+				var controller = parameters["controller"].ToString();
+				if (!HavePermission(controller, action))
+					return String.Format("<a href='#' class='NotAllowedLink'>{0}</a>", title);
+			}
+
+			if (!String.IsNullOrEmpty(action))
+				parameters.Add("action", action);
+
+			if (query != null)
+				parameters.Add("querystring", query);
+
+			var attributes = new Dictionary<string, object>();
+			var clazz = Style(item);
+			if (!String.IsNullOrEmpty(clazz))
+				attributes.Add("class", clazz);
+
+			return UrlHelper.Link(title.ToString(), parameters, attributes);
+		}
+
+>>>>>>> частичная реализация требования #3707
 		public override bool HavePermission(string controller, string action)
 		{
 			return SecurityContext.Administrator.HaveAccessTo(controller, action);

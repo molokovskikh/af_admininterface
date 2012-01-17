@@ -297,6 +297,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<table class="DataTable" id=suppliers>
 				<thead>
 					<tr>
+						<th></th>
 						<th>Включен</th>
 						<th>Учтен</th>
 						<th>Бесплатно</th>
@@ -312,6 +313,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				</thead>
 				<% for i, supplier in enumerate(suppliers): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(supplier, supplier.Account)}" align="center">
+					<td class=short>${app.LinkTo(supplier.Account, "Редактировать", @Edit)}</td>
 					<td class=short>
 						<input name=id type=hidden value=${supplier.Account.Id}>
 						<input name=service_id type=hidden value=${supplier.Id}>
@@ -363,6 +365,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<table class="DataTable filter" id="users">
 					<thead>
 						<tr>
+							<th></th>
 							<th>Включен</th>
 							<th>Учтен</th>
 							<th>Бесплатно</th>
@@ -379,6 +382,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<% hidden = filter.Service and filter.Service.Id != user.RootService.Id %>
 					<tr id="UserRow${user.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(user, user.Accounting)} ${'hidable hidden' if hidden}"
 						align="center" name="Client${user.RootService.Id}">
+						<td class=short>${app.LinkTo(user.Accounting, "Редактировать", @Edit)}</td>
 						<td class=short>
 							<input name=id type=hidden value=${user.Accounting.Id}>
 							<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if user.RootService.Disabled} />
@@ -430,6 +434,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<table class="DataTable filter" id="addresses">
 						<thead>
 							<tr>
+								<th></th>
 								<th>Включен</th>
 								<th>Учтен</th>
 								<th>Бесплатно</th>
@@ -446,6 +451,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<% hidden = filter.Service and filter.Service.Id != addr.Client.Id %>
 						<tr id="AddressRow${addr.Id}" class="${ViewHelper.GetRowStyle(i)} ${'hidable hidden' if hidden} ${app.Style(addr, addr.Accounting)}"
 							align="center" name="Client${addr.Client.Id}">
+							<td class=short>${app.LinkTo(addr.Accounting, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
 								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if addr.Client.Disabled} />

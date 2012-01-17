@@ -1,0 +1,8 @@
+﻿<div class=block>
+	<h3>Биллинг</h3>
+	${app.Edit("${model.Target}.IsFree")}<br>
+	${app.Label("${model.Target}.FreePeriodEnd")}<br>
+	${app.Edit("${model.Target}.FreePeriodEnd")}<br>
+	Сообщение<br>
+	<textarea cols=60 rows=4 name=comment></textarea>
+</div>

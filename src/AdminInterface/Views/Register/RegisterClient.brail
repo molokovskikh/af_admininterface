@@ -269,10 +269,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		</table>
 	</div>
 
-	<div class=block>
-		<h3>Сообщение в биллинг</h3>
-		<textarea cols=60 rows=4 name=comment></textarea>
-	</div>
+	${ForHelper.Editor("user.Accounting")}
 
 	<div class="block">
 		<h3>Права доступа</h3>
