@@ -144,6 +144,7 @@
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
+    <Compile Include="Controllers\ExportController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\ManagerReportsController.cs" />
     <Compile Include="Controllers\Filters\StatQuery.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
+    <Compile Include="Helpers\ExcelHelper.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Initializers\Test.cs" />
@@ -163,6 +165,7 @@
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
+    <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />

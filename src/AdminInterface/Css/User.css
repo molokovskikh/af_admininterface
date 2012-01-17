@@ -40,7 +40,7 @@ div.LegendMarker.disabled
 	background-color: #ff9d5b;
 }
 
-/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing
+/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing, table.DataTable tr.OddRow.disabled-by-billing.single-user
 {
 	background-color: #ff9d5b;
 }
@@ -51,7 +51,7 @@ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled
 }
 
 
-/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled, /*Используйте этот*/  table.DataTable tr.EvenRow.disabled-by-billing
+/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled, /*Используйте этот*/  table.DataTable tr.EvenRow.disabled-by-billing, table.DataTable tr.EvenRow.disabled-by-billing.single-user
 {
 	background-color: #ff9d5b;
 }
@@ -84,4 +84,20 @@ tr.OddRow.NotExistsUser
 #user_Name
 {
 	width: 60%;
+}
+
+table.DataTable tr.EvenRow.single-user
+{
+	background-color: #BBFFB6;
+}
+
+table.DataTable tr.OddRow.single-user
+{
+	background-color: #BBFFB6;
+}
+
+/*легенда*/
+div.LegendMarker.SingleUser
+{
+	background-color: #BBFFB6;
 }

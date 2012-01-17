@@ -151,6 +151,7 @@
     <Compile Include="Models\OrdersViewFixture.cs" />
     <Compile Include="Models\PayerFixture.cs" />
     <Compile Include="Models\PaymentFixture.cs" />
+    <Compile Include="Models\RegistrationInformationFixture.cs" />
     <Compile Include="Models\RevisionActFixture.cs" />
     <Compile Include="Models\UpdateFilterFixture.cs" />
     <Compile Include="Models\UserFilterFixture.cs" />
