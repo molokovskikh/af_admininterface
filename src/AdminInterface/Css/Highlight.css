@@ -42,3 +42,11 @@ form#Unlock input[type=submit]:enabled
 {
 	background-color: red;
 }
+
+td.to-many-orders {
+	background-color: red;
+}
+
+td.service-stoped {
+	background-color: red;
+}

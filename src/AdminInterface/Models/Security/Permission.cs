@@ -64,6 +64,9 @@ namespace AdminInterface.Models.Security
 
 		public bool HaveAccessTo(string controller, string action)
 		{
+			if (controller.ToLower() == "main")
+				return true;
+
 			if (controller.ToLower() == "register" && action.ToLower() == "registerpayer")
 				return Type == PermissionType.RegisterDrugstore
 					|| Type == PermissionType.RegisterSupplier

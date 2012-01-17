@@ -1,0 +1,7 @@
+﻿<% component Bubble, {@bredcrumbs : []} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Статистика
+<% end %>
+
+<% OutputSubView(@StatSubView) %>
