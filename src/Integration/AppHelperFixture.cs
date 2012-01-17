@@ -209,7 +209,7 @@ namespace Integration
 		public void Edit_date()
 		{
 			var edit = helper.Edit("filter.Date");
-			Assert.That(edit, Is.EqualTo("<input type=\"text\" id=\"filter_Date\" name=\"filter.Date\" value=\"01.01.0001\" class=\"required validate-date input-date\" /><input type=button class=CalendarInput>"));
+			Assert.That(edit, Is.EqualTo("<input type=\"text\" id=\"filter_Date\" name=\"filter.Date\" value=\"01.01.0001\" class=\"validate-date input-date required\" /><input type=button class=CalendarInput>"));
 		}
 
 		[Test]
