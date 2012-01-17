@@ -83,11 +83,15 @@
 						<% end %>
 					</td>
 					<td class="statistic-label">
-						В процессе:
+						Запретов:
 					</td>
 					<td class="statistic-value">
-						<% if ?ReqHL: %>
-						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% if UpdatesAD.ToString() and UpdatesAD.ToString() != "0(0)": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">
+							<abbr title="В скобках указано количество уникальных пользователей.">${UpdatesAD}</abbr>
+						</a>
+						<% else: %>
+						-
 						<% end %>
 					</td>
 				</tr>
@@ -105,20 +109,6 @@
 						<% end %>
 					</td>
 					<td class="statistic-label">
-						Запретов:
-					</td>
-					<td class="statistic-value">
-						<% if UpdatesAD.ToString() and UpdatesAD.ToString() != "0(0)": %>
-						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.UpdateBan)}">
-							<abbr title="В скобках указано количество уникальных пользователей.">${UpdatesAD}</abbr>
-						</a>
-						<% else: %>
-						-
-						<% end %>
-					</td>
-				</tr>
-				<tr>
-					<td class="statistic-label">
 						Ошибок:
 					</td>
 					<td class="statistic-value">
@@ -128,11 +118,22 @@
 						-
 						<% end %>
 					</td>
+				</tr>
+				<tr>
 					<td class="statistic-label">
 						Последнее обновление:
 					</td>
 					<td class="statistic-value">
 						${MaxUpdateTime}
+					</td>
+
+					<td class="statistic-label">
+						В процессе:
+					</td>
+					<td class="statistic-value">
+						<% if ?ReqHL: %>
+						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% end %>
 					</td>
 				</tr>
 				<% if IsDefined(@DownloadDataSize): %>
