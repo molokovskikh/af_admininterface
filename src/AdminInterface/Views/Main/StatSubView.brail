@@ -332,8 +332,8 @@
 			</div>
 		</td>
 		<td>
-			<form>
-				<div class=block style="float:right">
+			<div class=block style="float:right">
+				<form>
 					<h4>Фильтр статистики</h4>
 					${FormHelper.HiddenField("from", fromDate.ToShortDateString())}
 					${FormHelper.HiddenField("to", toDate.ToShortDateString())}
@@ -359,8 +359,8 @@
 					<div style="text-align:right;">
 						<input type=submit value=Показать></input>
 					</div>
-				</div>
-			</form>
+				</form>
+			</div>
 		</td>
 	</tr>
 </table>
