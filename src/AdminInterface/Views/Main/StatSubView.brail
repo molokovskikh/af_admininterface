@@ -162,7 +162,7 @@
 					<td class="statistic-label">
 						Очередь:
 					</td>
-					<td class="statistic-value">
+					<td class="statistic-value ${"to-many-orders" if NonProcOrdersCount > 100}">
 						<% if NonProcOrdersCount == 0: %>
 						-
 						<% else: %>
@@ -306,11 +306,11 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки заказов:</td>
-					<td class="statistic-value" colspan=3>${OrderProcStatus}</td>
+					<td class="statistic-value ${"service-stoped" if OrderProcStatus == "Не запущена"}" colspan=3>${OrderProcStatus}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Обработки прайс листов:</td>
-					<td class="statistic-value" colspan=3>${PriceProcessorMasterStatus}</td>
+					<td class="statistic-value ${"service-stoped" if PriceProcessorMasterStatus == "Не запущена"}" colspan=3>${PriceProcessorMasterStatus}</td>
 				</tr>
 				<tr>
 					<td class="statistic-top-header" colspan=4>
