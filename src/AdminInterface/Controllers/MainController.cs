@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -73,21 +74,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["PriceProcessorMasterStatus"] = "";
 #endif
 
-			for (var i = 0; i < data.Tables.Count; i++)
+			foreach (var pair in data.ToKeyValuePairs())
 			{
-				var table = data.Tables[i];
-				foreach (DataColumn column in table.Columns)
+				var column = pair.Key;
+				var value = pair.Value;
+				value = TryToFixProkenDateTimeValue(value);
+				if (value != DBNull.Value && column.DataType == typeof(DateTime))
 				{
-					object value = null;
-					if (table.Rows.Count > 0)
-						value = table.Rows[0][column];
-					if (value != DBNull.Value && column.DataType == typeof(DateTime))
-					{
-						var dateTimeValue = ((DateTime) value);
-						value = dateTimeValue.ToLongTimeString();
-					}
-					PropertyBag[column.ColumnName] = value;
+					var dateTimeValue = ((DateTime) value);
+					value = dateTimeValue.ToLongTimeString();
 				}
+				PropertyBag[column.ColumnName] = value;
+
 			}
 
 			Size("MaxMailSize");
@@ -102,6 +100,22 @@ namespace AdminInterface.Controllers
 			PropertyBag["FromDate"] = fromDate;
 			PropertyBag["ToDate"] = toDate;
 			PropertyBag["query"] = query;
+		}
+
+		//елси в mysql применить агрегирующую функцию к выражению с датой
+		//то результирующий тип будет строка, правил это
+		//пример max(if(1 == 1, someDate, null))
+		public static object TryToFixProkenDateTimeValue(object value)
+		{
+			if (value == null)
+				return null;
+			if (!(value is string))
+				return value;
+			var stringValue = (string) value;
+			DateTime dateValue;
+			if (!DateTime.TryParseExact(stringValue, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateValue))
+				return value;
+			return dateValue.ToLongTimeString();
 		}
 
 		public void DoConvert<T>(string key, Func<T, object> convert)

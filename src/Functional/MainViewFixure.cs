@@ -25,5 +25,13 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Общие настройки"));
 			Assert.That(browser.Text, Is.StringContaining("Настройки мини-почты"));
 		}
+
+		[Test]
+		public void Stat()
+		{
+			Open();
+			Click("Статистика");
+			AssertText("Фильтр статистики");
+		}
 	}
 }

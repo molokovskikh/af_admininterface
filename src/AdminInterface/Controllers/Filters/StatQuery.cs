@@ -60,13 +60,13 @@ count(distinct fu.Id) as CertificateUniqUsers,
 count(distinct c.Id) as CertificateUniqClients,
 count(distinct dh.FirmCode) as CertificateUniqSuppliers,
 
-count(distinct if(l.Filename is null, fu.Id, null)) as CertificateSendUniqUsers,
-count(distinct if(l.Filename is null, c.Id, null)) as CertificateSendUniqClients,
-count(distinct if(l.Filename is null, dh.FirmCode, null)) as CertificateSendUniqSuppliers,
+count(distinct if(l.Filename is not null, fu.Id, null)) as CertificateSendUniqUsers,
+count(distinct if(l.Filename is not null, c.Id, null)) as CertificateSendUniqClients,
+count(distinct if(l.Filename is not null, dh.FirmCode, null)) as CertificateSendUniqSuppliers,
 
-count(distinct if(l.Filename is not null, fu.Id, null)) as CertificateNotSendUniqUsers,
-count(distinct if(l.Filename is not null, c.Id, null)) as CertificateNotSendUniqClients,
-count(distinct if(l.Filename is not null, dh.FirmCode, null)) as CertificateNotSendUniqSuppliers
+count(distinct if(l.Filename is null, fu.Id, null)) as CertificateNotSendUniqUsers,
+count(distinct if(l.Filename is null, c.Id, null)) as CertificateNotSendUniqClients,
+count(distinct if(l.Filename is null, dh.FirmCode, null)) as CertificateNotSendUniqSuppliers
 
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
