@@ -37,7 +37,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 			<th>${app.Sortable(filter.HeadName, "Name")}</th>
 			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
 			<%if filter.ShowUserNames(): %>
-				<th>С этим адресом зарегистриваны</th>
+				<th>С этим адресом зарегистриваны <br /> пользователи (Код)</th>
 			<%end %>
 		</tr>
 	</thead>
