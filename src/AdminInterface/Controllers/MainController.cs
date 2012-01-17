@@ -48,14 +48,10 @@ namespace AdminInterface.Controllers
 
 		private void GetStatistics(ulong regionMask, DateTime fromDate, DateTime toDate, bool full)
 		{
-			PropertyBag["RegionMask"] = regionMask;
-			PropertyBag["FromDate"] = fromDate;
-			PropertyBag["ToDate"] = toDate;
-
 			var query = new StatQuery();
 			query.Full = full;
 			BindObjectInstance(query, "query");
-			PropertyBag["query"] = query;
+			
 			var data = query.Load(regionMask, fromDate, toDate);
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s =>
@@ -85,6 +81,12 @@ namespace AdminInterface.Controllers
 					object value = null;
 					if (table.Rows.Count > 0)
 						value = table.Rows[0][column];
+					if (value != DBNull.Value && column.DataType == typeof(DateTime))
+					{
+						var dateTimeValue = ((DateTime) value);
+						if (dateTimeValue.Date == DateTime.Today)
+							value = dateTimeValue.ToLongTimeString();
+					}
 					PropertyBag[column.ColumnName] = value;
 				}
 			}
@@ -96,6 +98,11 @@ namespace AdminInterface.Controllers
 			InPercentOf("TotalNotSendCertificates", "TotalCertificates");
 			InPercentOf("TotalSendCertificates", "TotalCertificates");
 			DoConvert<double>("OrderSum", s => s.ToString("C"));
+
+			PropertyBag["RegionMask"] = regionMask;
+			PropertyBag["FromDate"] = fromDate;
+			PropertyBag["ToDate"] = toDate;
+			PropertyBag["query"] = query;
 		}
 
 		public void DoConvert<T>(string key, Func<T, object> convert)

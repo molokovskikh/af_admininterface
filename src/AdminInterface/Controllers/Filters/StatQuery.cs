@@ -17,8 +17,8 @@ namespace AdminInterface.Controllers.Filters
 		{
 			var data = new DataSet();
 
-			var additionalSql =
-				@"SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
+			var additionalSql =@"
+SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
 	   max(dlogs.LogTime) as LastDownloadedWaybillDate
 FROM logs.document_logs dlogs
 join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
@@ -96,12 +96,12 @@ WHERE   cd.RegionCode & ?RegionMaskParam > 0
 		AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate <= ?EndDateParam;
 
 SELECT cast(concat(count(if(resultid=2, PriceItemId, null)), '(', count(DISTINCT if(resultid=2, PriceItemId, null)), ')') as CHAR) as FormCount,
-	   cast(ifnull(max(if(resultid=2, logtime, null)), '2000-01-01') as CHAR) as LastForm
+		max(if(resultid=2, logtime, null)) as LastForm
 FROM logs.formlogs
 WHERE logtime >= ?StartDateParam AND logtime <= ?EndDateParam;
 
 SELECT cast(concat(count(if(resultcode=2, PriceItemId, null)), '(', count(DISTINCT if(resultcode=2, PriceItemId, null)), ')') as CHAR) as DownCount,
-	   cast(ifnull(max(if(resultcode=2, logtime, null)), '2000-01-01') as CHAR) as LastDown
+		max(if(resultcode=2, logtime, null)) as LastDown
 FROM logs.downlogs
 WHERE logtime >= ?StartDateParam AND logtime <= ?EndDateParam;
 
