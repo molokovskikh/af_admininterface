@@ -18,16 +18,32 @@ namespace AdminInterface.Controllers.Filters
 			var data = new DataSet();
 
 			var additionalSql =@"
-SELECT cast(concat(count(dlogs.RowId), '(', count(DISTINCT dlogs.ClientCode), ')') as CHAR) as CountDownloadedWaybills,
-	   max(dlogs.LogTime) as LastDownloadedWaybillDate
+SELECT count(dlogs.RowId) as CountDownloadedWaybills,
+	max(dlogs.LogTime) as LastDownloadedWaybillDate,
+	count(distinct dlogs.ClientCode) as CountDownloadedWaybilsByClient,
+	count(distinct dlogs.FirmCode) as CountDownloadedWaybilsBySupplier
 FROM logs.document_logs dlogs
 join usersettings.retclientsset rcs on rcs.ClientCode = dlogs.ClientCode
 WHERE (dlogs.LogTime >= ?StartDateParam AND dlogs.LogTime <= ?EndDateParam) AND dlogs.DocumentType = 1 and rcs.ParseWaybills = 1;
 
-SELECT cast(concat(count(dheaders.Id), '(', count(DISTINCT dheaders.ClientCode), ')') as CHAR) as CountParsedWaybills,
-	   max(dheaders.WriteTime) as LastParsedWaybillDate
+SELECT count(distinct dsl.UserId) as CountDownloadedWaybilsByUser
+FROM logs.document_logs dl
+		join usersettings.retclientsset rcs on rcs.ClientCode = dl.ClientCode
+	join Logs.DocumentSendLogs dsl on dsl.DocumentId = dl.RowId
+WHERE (dl.LogTime >= ?StartDateParam AND dl.LogTime <= ?EndDateParam) AND dl.DocumentType = 1 and rcs.ParseWaybills = 1;
+
+SELECT count(dheaders.Id) as CountParsedWaybills,
+	max(dheaders.WriteTime) as LastParsedWaybillDate,
+	count(distinct dheaders.ClientCode) as CountParsedWaybillsByClient,
+	count(distinct dheaders.FirmCode) as CountParsedWaybillsBySupplier
 FROM documents.documentheaders dheaders
 WHERE (dheaders.WriteTime >= ?StartDateParam AND dheaders.WriteTime <= ?EndDateParam) AND dheaders.DocumentType = 1;
+
+SELECT count(distinct dsl.UserId) as CountParsedWaybillsByUser
+FROM documents.documentheaders dh
+	join Logs.Document_Logs dl on dl.RowId = dh.DownloadId
+		join Logs.DocumentSendLogs dsl on dsl.DocumentId = dl.RowId
+WHERE (dh.WriteTime >= ?StartDateParam AND dh.WriteTime <= ?EndDateParam) and dh.DocumentType = 1;
 
 select ifnull(sum(if(db.ProductId is not null, 1, 0)), 0) as DocumentProductIdentifiedCount,
 	ifnull(sum(if(db.ProducerId is not null, 1, 0)), 0) as DocumentProducerIdentifiedCount,
@@ -38,11 +54,26 @@ where (d.WriteTime >= ?StartDateParam AND d.WriteTime <= ?EndDateParam);
 
 select count(*) as TotalCertificates,
 sum(if(l.Filename is null, 1, 0)) as TotalNotSendCertificates,
-sum(if(l.Filename is not null, 1, 0)) as TotalSendCertificates
+sum(if(l.Filename is not null, 1, 0)) as TotalSendCertificates,
+
+count(distinct fu.Id) as CertificateUniqUsers,
+count(distinct c.Id) as CertificateUniqClients,
+count(distinct dh.FirmCode) as CertificateUniqSuppliers,
+
+count(distinct if(l.Filename is null, fu.Id, null)) as CertificateSendUniqUsers,
+count(distinct if(l.Filename is null, c.Id, null)) as CertificateSendUniqClients,
+count(distinct if(l.Filename is null, dh.FirmCode, null)) as CertificateSendUniqSuppliers,
+
+count(distinct if(l.Filename is not null, fu.Id, null)) as CertificateNotSendUniqUsers,
+count(distinct if(l.Filename is not null, c.Id, null)) as CertificateNotSendUniqClients,
+count(distinct if(l.Filename is not null, dh.FirmCode, null)) as CertificateNotSendUniqSuppliers
+
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
 		join Future.Users fu on fu.Id = u.UserId
 			join Future.Clients c on c.Id = fu.ClientId
+	join Documents.DocumentBodies db on db.Id = l.DocumentBodyId
+		join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
 where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
 and c.MaskRegion & ?RegionMaskParam > 0
 ;
@@ -71,7 +102,9 @@ from (
 	join Documents.Mails m1 on m1.Id = bm.Id
 ;
 
-select count(*) as TotalMailRecipients
+select count(distinct u.Id) as MailsUniqByUser,
+	count(distinct c.Id) as  MailsUniqByClient,
+	count(distinct m.SupplierId) as MailsUniqBySupplier
 from Documents.Mails m
 	join Logs.MailSendLogs l on l.MailId = m.Id
 		join Future.Users u on u.Id = l.UserId
@@ -149,8 +182,9 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			};
 
 			var additionalOrderColumns = new[] {
-				"count(DISTINCT oh.userid) as UniqUserOrders",
+				"count(DISTINCT oh.UserId) as UniqUserOrders",
 				"count(DISTINCT oh.rowid) as TotalOrders",
+				"count(DISTINCT oh.ClientCode) as UniqClientOrders",
 				"sum(ol.cost * ol.quantity) as OrderSum"
 			};
 			string sql;

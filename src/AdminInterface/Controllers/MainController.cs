@@ -84,8 +84,7 @@ namespace AdminInterface.Controllers
 					if (value != DBNull.Value && column.DataType == typeof(DateTime))
 					{
 						var dateTimeValue = ((DateTime) value);
-						if (dateTimeValue.Date == DateTime.Today)
-							value = dateTimeValue.ToLongTimeString();
+						value = dateTimeValue.ToLongTimeString();
 					}
 					PropertyBag[column.ColumnName] = value;
 				}

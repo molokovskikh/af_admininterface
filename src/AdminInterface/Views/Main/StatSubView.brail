@@ -53,6 +53,11 @@
 		text-align: center;
 		font-size: 8pt;
 	}
+	
+	.header-description
+	{
+		text-align: right;
+	}
 </style>
 
 <table valign=top style="width:100%">
@@ -65,8 +70,11 @@
 					</td>
 				</tr>
 				<tr>
-					<td class="statistic-header" colspan=4>
+					<td class="statistic-header" colspan=2>
 						Обновления:
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						в скобках указано количество уникальных клиентов
 					</td>
 				</tr>
 				<tr>
@@ -154,8 +162,11 @@
 				<% end %>
 
 				<tr>
-					<td class="statistic-header" colspan=4>
+					<td class="statistic-header" colspan=2>
 						Заказы:
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						общее кол-во/уникальных пользователей/уникальных клиентов
 					</td>
 				</tr>
 				<tr>
@@ -182,7 +193,7 @@
 						Принято:
 					</td>
 					<td class="statistic-value">
-						<abbr title="В скобках указано количество уникальных пользователей.">${TotalOrders} (${UniqUserOrders})</abbr>
+						<abbr title="В скобках указано количество уникальных пользователей.">${TotalOrders}/${UniqUserOrders}/${UniqClientOrders}</abbr>
 					</td>
 					<td class="statistic-label">
 						Сумма:
@@ -194,8 +205,11 @@
 				<% end %>
 
 				<tr>
-					<td class="statistic-header" colspan=4>
+					<td class="statistic-header" colspan=2>
 						Прайсы:
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						в скобках указано количество уникальных поставщиков
 					</td>
 				</tr>
 				<tr>
@@ -227,19 +241,30 @@
 
 				<% if IsDefined(@LastDownloadedWaybillDate): %>
 				<tr>
-					<td class="statistic-header" colspan=4>
+					<td class="statistic-header" colspan=2>
 						Накладные:
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						общее кол-во/уникальных пользователей/уникальных клиентов/уникальных поставщиков
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Загружено:</td>
-					<td class="statistic-value"><abbr  title="В скобках указано количество уникальных клиентов.">${CountDownloadedWaybills}</abbr></td>
+					<td class="statistic-value">
+						<abbr title="В скобках указано количество уникальных клиентов.">
+							${CountDownloadedWaybills}/${CountDownloadedWaybilsByUser}/${CountDownloadedWaybilsByClient}/${CountDownloadedWaybilsBySupplier}
+						</abbr>
+					</td>
 					<td class="statistic-label">Последняя загрузка:</td>
 					<td class="statistic-value">${LastDownloadedWaybillDate}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Разобрано:</td>
-					<td class="statistic-value"><abbr title="В скобках указано количество уникальных клиентов.">${CountParsedWaybills}</abbr></td>
+					<td class="statistic-value">
+						<abbr title="В скобках указано количество уникальных клиентов.">
+							${CountParsedWaybills}/${CountParsedWaybillsByUser}/${CountParsedWaybillsByClient}/${CountParsedWaybillsBySupplier}
+						</abbr>
+					</td>
 					<td class="statistic-label">Последний разбор:</td>
 					<td class="statistic-value">${LastParsedWaybillDate}</td>
 				</tr>
@@ -257,19 +282,22 @@
 
 				<% if IsDefined(@TotalCertificates): %>
 				<tr>
-					<td class="statistic-header" colspan="4">
+					<td class="statistic-header" colspan="2">
 						Сертификаты
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						общее кол-во/уникальных пользователей/уникальных клиентов/уникальных поставщиков
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Запрошено:</td>
-					<td class="statistic-value">${TotalCertificates}</td>
+					<td class="statistic-value">${TotalCertificates}/${CertificateUniqUsers}/${CertificateUniqClients}/${CertificateUniqSuppliers}</td>
 					<td class="statistic-label">Предоставлено:</td>
-					<td class="statistic-value">${TotalSendCertificates}</td>
+					<td class="statistic-value">${TotalSendCertificates}/${CertificateSendUniqUsers}/${CertificateSendUniqClients}/${CertificateSendUniqSuppliers}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Отсутствуют:</td>
-					<td class="statistic-value">${TotalNotSendCertificates}</td>
+					<td class="statistic-value">${TotalNotSendCertificates}/${CertificateNotSendUniqUsers}/${CertificateNotSendUniqClients}/${CertificateNotSendUniqSuppliers}</td>
 					<td class="statistic-label">Последний запрос:</td>
 					<td class="statistic-value">${LastCertificateRequest}</td>
 				</tr>
@@ -277,27 +305,24 @@
 
 				<% if IsDefined(@TotalMails): %>
 				<tr>
-					<td class="statistic-header" colspan="4">
+					<td class="statistic-header" colspan="2">
 						Минипочта
+					</td>
+					<td class="statistic-header header-description" colspan=2>
+						общее кол-во/уникальных пользователей/уникальных клиентов/уникальных поставщиков
 					</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Кол-во писем:</td>
-					<td class="statistic-value">${TotalMails}</td>
-					<td class="statistic-label">Кол-во получателей:</td>
-					<td class="statistic-value">${TotalMailRecipients}</td>
+					<td class="statistic-value">${TotalMails}/${MailsUniqByUser}/${MailsUniqByClient}/${MailsUniqBySupplier}</td>
+					<td class="statistic-label">Последнее письмо:</td>
+					<td class="statistic-value">${LastMailSend}</td>
 				</tr>
 				<tr>
 					<td class="statistic-label">Макс. объем инф. для одного пользователя:</td>
 					<td class="statistic-value">${MaxMailSize}</td>
 					<td class="statistic-label">Средний объем инф. для одного пользователя:</td>
 					<td class="statistic-value">${AvgMailSize}</td>
-				</tr>
-				<tr>
-					<td class="statistic-label">Последнее письмо:</td>
-					<td class="statistic-value">${LastMailSend}</td>
-					<td class="statistic-label"></td>
-					<td class="statistic-value"></td>
 				</tr>
 				<% end %>
 
