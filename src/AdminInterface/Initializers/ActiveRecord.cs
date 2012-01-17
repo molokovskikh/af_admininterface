@@ -25,6 +25,7 @@ namespace AdminInterface.Initializers
 				config);
 			var configuration = ActiveRecordMediator.GetSessionFactoryHolder().GetAllConfigurations()[0];
 			configuration.AddSqlFunction("DATE_ADD", new StandardSQLFunction("DATE_ADD"));
+			configuration.AddSqlFunction("group_concat", new StandardSQLFunction("group_concat"));
 			foreach(var clazz in configuration.ClassMappings)
 			{
 				//тут баг для nested объектов я не выставлю is null

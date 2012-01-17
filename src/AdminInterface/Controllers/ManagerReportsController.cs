@@ -19,6 +19,7 @@ using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
+using NHibernate.Type;
 
 namespace AdminInterface.Controllers
 {
@@ -27,18 +28,6 @@ namespace AdminInterface.Controllers
 		[Description("Пользователям")] Users,
 		[Description("Адресам")] Addresses
 	}
-
-	/*public class ClientLinkContirbutor : IUrlContributor
-	{
-		public IDictionary GetQueryString()
-		{
-			return new Dictionary<string, string> {
-				{"controller", "Client"},
-				{"action", "edit"},
-				{"id", Id.ToString()},
-			};
-		}
-	}*/
 
 	public class RegistrationInformation : IUrlContributor
 	{
@@ -254,7 +243,7 @@ namespace AdminInterface.Controllers
 																Projections.SqlProjection("INTERVAL 1 hour as ", new[] {string.Empty}, new[] {NHibernateUtil.DateTime})), "ad.RegistrationDate")))
 														.CreateCriteria("Users", "u", JoinType.InnerJoin)
 														.SetProjection(Projections.ProjectionList()
-														.Add(Projections.SqlProjection("group_concat(distinct {alias}.Id, \" \")", new[] { "UserNames" }, new[] { NHibernateUtil.String })))), "UserNames")))
+														.Add(Projections.SqlFunction("group_concat", NHibernateUtil.String, Projections.Distinct(Projections.Property("u.id")))))), "UserNames")))
 					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("RegistrationDate", Period.End.Date));
 
