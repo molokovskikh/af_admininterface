@@ -679,5 +679,17 @@ WHERE
 			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для клиента {2} ( {3} ): {4}", Name, Id, Client.Name, Client.Id, billingMessage);
 			Payer.AddComment(billingMessage);
 		}
+
+		public virtual void RegistredWith(Address address)
+		{
+			if (address == null)
+				return;
+
+			address.Accounting.IsFree = Accounting.IsFree;
+			address.Accounting.FreePeriodEnd = Accounting.FreePeriodEnd;
+
+			address.AvaliableForUsers.Add(this);
+			AvaliableAddresses.Add(address);
+		}
 	}
 }

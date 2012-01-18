@@ -46,6 +46,8 @@ namespace AdminInterface.Models
 			: this()
 		{
 			Client = client;
+			Payer = client.Payers.First();
+			LegalEntity = Payer.JuridicalOrganizations.First();
 			Accounting = new AddressAccount(this);
 		}
 

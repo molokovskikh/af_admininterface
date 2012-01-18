@@ -283,7 +283,10 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(newUser.Accounting, "user.Accounting");
 				password = newUser.CreateInAd();
 				if (newClient.Addresses.Count > 0)
-					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
+				{
+					var address = newClient.Addresses.Last();
+					newUser.RegistredWith(address);
+				}
 
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
 				newClient.AddBillingComment(comment);

@@ -92,7 +92,7 @@ namespace AdminInterface.Controllers
 				if (address != null)
 				{
 					address = client.AddAddress(address);
-					address.AvaliableForUsers = new List<User> {user};
+					user.RegistredWith(address);
 					address.SaveAndFlush();
 					address.Maintain();
 				}
