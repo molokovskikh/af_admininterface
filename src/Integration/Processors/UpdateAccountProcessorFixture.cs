@@ -54,7 +54,7 @@ namespace Integration.Processors
 			Check();
 			var address = user.AvaliableAddresses.First();
 			address.Refresh();
-			Assert.That(address.Accounting.ReadyForAccounting, Is.True);
+			Assert.That(address.Accounting.ReadyForAccounting, Is.True, "адрес доставки {0}", address.Id);
 		}
 
 		[Test]
