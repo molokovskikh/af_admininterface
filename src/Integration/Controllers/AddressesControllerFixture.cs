@@ -28,9 +28,9 @@ namespace Integration.Controllers
 		[Test]
 		public void Add()
 		{
-			var address = new Address {Value = "тестовый адрес доставки"};
-			address.AvaliableForUsers.Add(user);
-			controller.Add(/*address, */new Contact[0], client.Id, "тестовое сообщение для биллинга");
+			Request.Params.Add("delivery.Value", "тестовый адрес доставки");
+			Request.Params.Add("delivery.AvaliableForUsers[0].Id", user.Id.ToString());
+			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
 			var messages = ClientInfoLogEntity.Queryable.Where(m => m.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));

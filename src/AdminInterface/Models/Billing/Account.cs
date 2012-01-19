@@ -179,10 +179,12 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
-		public virtual string AccountMessage
+		public virtual string RegistrationMessage
 		{
 			get
 			{
+				if (!IsFree)
+					return "";
 				var message = "Регистрация бесплатная";
 				if (FreePeriodEnd != null)
 					message += " до " + FreePeriodEnd.Value.ToShortDateString();

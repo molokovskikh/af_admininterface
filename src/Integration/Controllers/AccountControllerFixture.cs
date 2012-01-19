@@ -74,10 +74,10 @@ namespace Integration.Controllers
 			addressAccount.Refresh();
 			Assert.That(addressAccount.IsFree, Is.False);
 			Assert.That(result.message, Is.EqualTo(String.Format("Следующие адреса доставки стали платными: {0}", address.Value)));
-			Assert.That(result.addresses.Length, Is.EqualTo(1));
-			var resultAddress = ExposedObject.From(result.addresses[0]);
-			Assert.That(resultAddress.id, Is.EqualTo(addressAccount.Id));
-			Assert.That(resultAddress.free, Is.EqualTo(addressAccount.IsFree));
+			Assert.That(result.accounts.Length, Is.EqualTo(1));
+			var resultAccount = ExposedObject.From(result.accounts[0]);
+			Assert.That(resultAccount.id, Is.EqualTo(addressAccount.Id));
+			Assert.That(resultAccount.free, Is.EqualTo(addressAccount.IsFree));
 		}
 	}
 }

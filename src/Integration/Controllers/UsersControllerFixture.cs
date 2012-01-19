@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using System.Text.RegularExpressions;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -20,10 +22,12 @@ namespace Integration.Controllers
 		private User user1, user2;
 		private Client client;
 		private UserUpdateInfo info1, info2;
+		private DateTime begin;
 
 		[SetUp]
 		public void Setup()
 		{
+			begin = DateTime.Now;
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
 		}
@@ -59,19 +63,17 @@ namespace Integration.Controllers
 				Value = "тестовый адрес"
 			};
 			client.AddAddress(address);
-			var user = new User();
-			user.Payer = client1.Payers.First();
 			var clientContacts = new[] {
 				new Contact{Id = 1, Type = 0, ContactText = "4411@33.ru, hffty@jhg.ru"}};
 			var regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
 			var person = new[] {new Person()};
 
-			controller.Add(/*user, */clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");	
+			controller.Add(clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
 			scope.Flush();
 
+			var user = Registred();
 			var logs = PasswordChangeLogEntity.Queryable.Where(l => l.TargetUserName == user.Login).ToList();
-
 			Assert.That(logs.Count, Is.EqualTo(1));
 			Assert.That(logs.Single().SentTo, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
 			Assert.That(user.Accounting, Is.Not.Null);
@@ -81,13 +83,13 @@ namespace Integration.Controllers
 		public void Register_user_with_comment()
 		{
 			client = DataMother.CreateTestClientWithUser();
-			var user = new User();
-			controller.Add(/*user, */new Contact[0], new[] {
+			controller.Add(new Contact[0], new[] {
 					new RegionSettings {
 						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 					},
 				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
+			var user = Registred();
 			var messages = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
@@ -114,6 +116,11 @@ namespace Integration.Controllers
 			scope.Flush();
 
 			controller.Edit(user.Id);
+		}
+
+		private User Registred()
+		{
+			return User.Queryable.Where(u => u.RegistrationDate >= begin).ToArray().Last();
 		}
 	}
 }

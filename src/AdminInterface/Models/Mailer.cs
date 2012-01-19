@@ -184,7 +184,7 @@ Email: {2}
 				}
 
 				if (account.IsFree)
-					body += "\r\n" + account.AccountMessage;
+					body += "\r\n" + account.RegistrationMessage;
 
 				Func.Mail("register@analit.net",
 					subject,
@@ -252,7 +252,7 @@ Email: {2}
 					body += "\r\nСообщение в биллинг: " + billingMessage;
 
 				if (supplier.Account.IsFree)
-					body += "\r\n" + supplier.Account.AccountMessage;
+					body += "\r\n" + supplier.Account.RegistrationMessage;
 
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
@@ -283,7 +283,7 @@ Email: {2}
 					body += "\r\nСообщение в биллинг: " + billingMessage;
 
 				if (user.Accounting.IsFree)
-					body += "\r\n" + user.Accounting.AccountMessage;
+					body += "\r\n" + user.Accounting.RegistrationMessage;
 
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", client.FullName),

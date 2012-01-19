@@ -49,14 +49,14 @@ namespace Integration
 
 			ForTest.InitializeMailer();
 
-			client = new Client {
+			payer = new Payer("Тестовый плательщик") {PayerID = 10};
+			client = new Client(payer, Data.DefaultRegion) {
 				Id = 58,
 				Name = "Тестовый клиент",
 				HomeRegion = new Region { Name = "test" },
 				Settings = new DrugstoreSettings()
 			};
-			payer = new Payer("Тестовый плательщик") { PayerID = 10};
-			client.JoinPayer(payer);
+			client.Users.Add(new User(client));
 		}
 
 		[Test]
