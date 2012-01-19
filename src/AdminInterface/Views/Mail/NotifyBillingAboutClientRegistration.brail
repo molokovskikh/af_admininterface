@@ -9,3 +9,8 @@
 Кем зарегистрирован: ${admin.Name}
 <br>
 ${payer.Comment}
+<% if user.Accounting.IsFree: %>
+<br>
+${user.Account.FreeMessage}
+<br>
+<% end %>

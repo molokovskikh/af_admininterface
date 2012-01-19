@@ -14,61 +14,67 @@ ${app.Asset("filter.coffee")}
 	}
 
 	function AjaxRequest(link, action, errorAction) {
-		HideErrorMessage();
+		hideMessage();
 		$.ajax({
 			url: link,
 			cache: false,
 			success: function (html) { action(html); },
 			error: function (xhr, textStatus, error) {
-				ShowErrorMessage("При выполнении операции возникла ошибка. Попробуйте повторить позднее");
+				showErrorMessage("При выполнении операции возникла ошибка. Попробуйте повторить позднее.");
 				if (errorAction)
 					errorAction(xhr, textStatus, error);
 			}
 		});
 	}
 
-	function ShowErrorMessage(text) {
-		ShowElement(true, "#ErrorMessageDiv");
+	function showErrorMessage(text) {
+		showMessage(text, "err");
+	}
+
+	function showSuccessMessage(message) {
+		showMessage(message, "notice");
+	}
+
+	function showNotificationMessage(message) {
+		showMessage(message, "notice");
+	}
+
+	function showMessage(text, type) {
+		$("#ErrorMessageDiv").show();
+		$("#ErrorMessageDiv").removeClass("notice").removeClass("err").addClass(type);
 		$("#ErrorMessageDiv").html(text);
 	}
 
-	function HideErrorMessage() {
-		$(false, "#ErrorMessageDiv");
+	function hideMessage() {
+		$("#ErrorMessageDiv").hide();
 	}
 
 	function RemoveMessage(userId) {
-		SetStatusBarMessage("Удаление...", "Notification");
+		showNotificationMessage("Удаление...");
 		AjaxRequest("CancelMessage.rails?userId=" + userId,
 			function () {
 				$("#CurrentMessageForUser" + userId).remove();
-				SetStatusBarMessage("Сообщение удалено", "Success");
+				showSuccessMessage("Сообщение удалено");
 			});
 	}
 	
-	function RemoveMailEntity(id)
-	{
-		SetStatusBarMessage("Удаление...", "Notification");
+	function RemoveMailEntity(id) {
+		showNotificationMessage("Удаление...");
 		AjaxRequest("DeleteMail.rails?id=" + id, 
 			function() {
 				$('#mail' + id)
 					.addClass('DeletedMessage')
 					.find('input')
 					.remove();
-				SetStatusBarMessage("Сообщение удалено", "Success");
+				showSuccessMessage("Сообщение удалено");
 			});
-	}
-	
-	function SetStatusBarMessage(message, className)
-	{
-		$("#StatusBar td").html(message);
-		$("#StatusBar table").removeClass("Notification").removeClass("Error").removeClass("Success").addClass(className);
 	}
 
 	function ShowMessage(userId) {
-		SetStatusBarMessage("Загрузка...", "Notification");
+		showNotificationMessage("Загрузка...", "Notification");
 		AjaxRequest("ShowMessageForUser.rails?userId=" + userId,
 			function(html) {
-				SetStatusBarMessage("", "");
+				hideMessage();
 				$("#CurrentMessageForUser" + userId).children().replaceWith(html);
 			}
 		);
@@ -108,6 +114,9 @@ ${app.Asset("filter.coffee")}
 	}
 </style>
 
+<div id="ErrorMessageDiv" class="flash err" style="display: none">
+</div>
+
 <div class="tabs">
 	<ul>
 		<li>
@@ -121,7 +130,7 @@ ${app.Asset("filter.coffee")}
 		</li>
 		<% for year in payer.Years: %>
 		<li>
-			<a id="balance-summary-${year}" href="${app.GetUrl(payer, @BalanceSummary)}?year=${year}" class="inline-tab">Платежи/Счета ${year}</a>
+			${app.LinkTo(payer, "Платежи/Счета ${year}", @BalanceSummary, {@year: year, @attributes: {@id: "balance-summary-${year}", @class: "inline-tab"}})}
 		</li>
 		<% end %>
 	</ul>

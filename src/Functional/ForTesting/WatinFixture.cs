@@ -33,7 +33,7 @@ namespace Functional.ForTesting
 
 		protected IE Open(object item, string action = null)
 		{
-			return Open(AppHelper.GetShortUrl(item, action));
+			return Open(WatinFixture2.GetShortUrl(item, action));
 		}
 
 		protected IE Open(string uri = "/")

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -149,12 +150,14 @@ Email: {2}
 				Client client;
 				string body;
 				string subject;
+				Account account;
 				if (!String.IsNullOrWhiteSpace(billingMessage))
 					billingMessage = "Сообщение в биллинг: " + billingMessage;
 
 				if (item is User)
 				{
 					var user = ((User)item);
+					account = user.Accounting;
 					body = "Зарегистрирован новый пользователь " + user.Login;
 					subject = "Регистрация нового пользователя";
 					client = user.Client;
@@ -165,6 +168,7 @@ Email: {2}
 				else
 				{
 					var address = ((Address)item);
+					account = address.Accounting;
 					body = "Зарегистрирован новый адрес доставки " + address.Value;
 					subject = "Регистрация нового адреса доставки";
 					client = address.Client;
@@ -178,6 +182,9 @@ Email: {2}
 				{
 					body += "\r\n" + billingMessage;
 				}
+
+				if (account.IsFree)
+					body += "\r\n" + account.AccountMessage;
 
 				Func.Mail("register@analit.net",
 					subject,
@@ -244,6 +251,9 @@ Email: {2}
 				if (!String.IsNullOrEmpty(billingMessage))
 					body += "\r\nСообщение в биллинг: " + billingMessage;
 
+				if (supplier.Account.IsFree)
+					body += "\r\n" + supplier.Account.AccountMessage;
+
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", supplier.FullName),
 					body);
@@ -259,17 +269,21 @@ Email: {2}
 			try
 			{
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
+				var user = client.Users.First();
 				var body = String.Format(
 					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
 					SecurityContext.Administrator.UserName,
 					client.HomeRegion.Name,
-					client.Users.First().Login,
+					user.Login,
 					client.Id,
 					client.Segment.GetDescription(),
 					client.Type.GetDescription());
 
 				if (!String.IsNullOrEmpty(billingMessage))
 					body += "\r\nСообщение в биллинг: " + billingMessage;
+
+				if (user.Accounting.IsFree)
+					body += "\r\n" + user.Accounting.AccountMessage;
 
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", client.FullName),

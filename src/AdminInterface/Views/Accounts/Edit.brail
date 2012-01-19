@@ -7,6 +7,9 @@
 <form method="post">
 	<div>
 		<div>
+			${app.Edit("account.IsFree")}
+		</div>
+		<div>
 			${app.GetLabel("account.FreePeriodEnd")}:
 		</div>
 		<div>

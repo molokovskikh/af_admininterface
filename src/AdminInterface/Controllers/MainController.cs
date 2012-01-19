@@ -176,13 +176,12 @@ namespace AdminInterface.Controllers
 		public void Report(uint id, bool isPasswordChange)
 		{
 			CancelLayout();
-			if (Session["password"] != null)
-				PropertyBag["password"] = Session["password"];
 
 			PropertyBag["now"] = DateTime.Now;
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = DefaultValues.Get();
+			PropertyBag["password"] = Session["password"];
 		}
 
 		public void Stat(ulong? regioncode, DateTime? from, DateTime? to)

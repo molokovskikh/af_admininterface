@@ -159,11 +159,11 @@ namespace AdminInterface.MonoRailExtentions
 			Flash["Message"] = Message.Error(message);
 		}
 
-		public void Redirect(object entity)
+		public void Redirect(object entity, string action = "Show")
 		{
 			var controller = AppHelper.GetControllerName(entity);
 			var id = ((dynamic)entity).Id;
-			RedirectUsingRoute(controller, "Show", new {id});
+			RedirectUsingRoute(controller, action, new {id});
 		}
 
 		protected bool IsValid(object instance)

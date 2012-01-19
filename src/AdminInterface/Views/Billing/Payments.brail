@@ -122,6 +122,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function (html) {
 				hideWaiter(item, waiter);
 				RefreshTotalSum();
+				processResponse(html);
 				if (success)
 					success();
 			},
@@ -129,6 +130,22 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				hideWaiter(item, waiter);
 			}
 		);
+	}
+
+	function processResponse(data) {
+		if (data.message)
+			showSuccessMessage(data.message);
+		if (data.accounts) {
+			$(data.accounts).each(function (index, account) {
+				idElement = $("input[name=id][value=" + account.id + "]");
+				row = idElement.parents("tr").first();
+				row.find("input[name=free]").attr("checked", account.free);
+				if (account.free)
+					row.addClass("free");
+				else
+					row.removeClass("free");
+			});
+		}
 	}
 
 	$(function () {
@@ -210,9 +227,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		cursor:default;
 	}
 </style>
-
-<div id="ErrorMessageDiv" class="flash err" style="display: none">
-</div>
 
 <div class="left">
 

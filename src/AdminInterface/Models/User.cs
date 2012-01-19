@@ -688,7 +688,6 @@ WHERE
 			address.Accounting.IsFree = Accounting.IsFree;
 			address.Accounting.FreePeriodEnd = Accounting.FreePeriodEnd;
 
-			address.AvaliableForUsers.Add(this);
 			AvaliableAddresses.Add(address);
 		}
 	}

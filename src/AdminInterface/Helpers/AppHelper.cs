@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 
@@ -80,14 +82,14 @@ namespace AdminInterface.Helpers
 			return assetHelper.Resource(new [] {name}, path, "<script type='" + type + "' src='{0}'></script>");
 		}
 
-		public override string LinkTo(object item, object title, string action)
-		{
-			return LinkTo(item, title, action, null);
-		}
-
 		public override bool HavePermission(string controller, string action)
 		{
 			return SecurityContext.Administrator.HaveAccessTo(controller, action);
+		}
+
+		public override bool HaveEditPermission(PropertyInfo propertyInfo)
+		{
+			return Permission.CheckPermissionByAttribute(SecurityContext.Administrator, propertyInfo);
 		}
 	}
 }

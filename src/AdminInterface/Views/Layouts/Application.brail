@@ -18,6 +18,7 @@
 		${app.Asset("backbone.js")}
 		${app.Asset("jquery-ui-1.8.16.js")}
 		${app.Asset("confirmation.js")}
+		${app.Asset("input.dependency.coffee")}
 		${app.Asset("themes/base/jquery.ui.all.css")}
 		${app.Asset("filter.css")}
 

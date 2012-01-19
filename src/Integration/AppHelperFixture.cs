@@ -5,13 +5,10 @@ using System.IO;
 using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
-using Castle.MonoRail.Framework;
-using Castle.MonoRail.Framework.Helpers;
 using Castle.MonoRail.Framework.Routing;
-using Castle.MonoRail.Framework.Services;
-using Castle.MonoRail.Framework.Test;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.Test;
 using NHibernate;
 using NUnit.Framework;
 using AppHelper = AdminInterface.Helpers.AppHelper;
@@ -20,30 +17,15 @@ using DescriptionAttribute=System.ComponentModel.DescriptionAttribute;
 namespace Integration
 {
 	[TestFixture]
-	public class AppHelperFixture
+	public class AppHelperFixture : BaseHelperFixture
 	{
 		private AppHelper helper;
-		private StubEngineContext context;
-
 		private TestFilter filter;
-		private RoutingEngine engine;
-		private IDictionary propertyBag;
 
 		[SetUp]
 		public void Setup()
 		{
 			helper = new AppHelper();
-			var area = "";
-			var controllerName = "home";
-			var actionName = "index";
-			var appPath = "";
-			var urlInfo = new UrlInfo(area, controllerName, actionName, appPath, "");
-			context = new StubEngineContext(urlInfo) {
-				CurrentControllerContext = new ControllerContext(area, controllerName, actionName, null)
-			};
-			propertyBag = context.CurrentControllerContext.PropertyBag;
-
-			engine = new RoutingEngine();
 			engine.Add(new PatternRoute("/<controller>/<action>"));
 			engine.Add(new PatternRoute("/<controller>/<id>/[action]"));
 			var match = engine.FindMatch("home/index", new RouteContext(context.Request, null, appPath, null));
@@ -53,19 +35,6 @@ namespace Integration
 
 			filter = new TestFilter();
 			propertyBag["filter"] = filter;
-		}
-
-		private void PrepareHelper(AbstractHelper helper)
-		{
-			helper.UrlHelper = new UrlHelper(context) {
-				UrlBuilder = new DefaultUrlBuilder {
-					RoutingEngine = engine,
-					ServerUtil = new StubServerUtility(),
-					UseExtensions = false,
-				},
-			};
-			helper.SetContext(context);
-			helper.SetController(null, context.CurrentControllerContext);
 		}
 
 		[Test]
