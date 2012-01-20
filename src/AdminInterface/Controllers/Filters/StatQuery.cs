@@ -17,7 +17,7 @@ namespace AdminInterface.Controllers.Filters
 		{
 			var data = new DataSet();
 
-			var additionalSql =@"
+			var additionalSql = @"
 SELECT count(dlogs.RowId) as CountDownloadedWaybills,
 	max(dlogs.LogTime) as LastDownloadedWaybillDate,
 	count(distinct dlogs.ClientCode) as CountDownloadedWaybilsByClient,
@@ -75,7 +75,8 @@ from Logs.CertificateRequestLogs l
 	join Documents.DocumentBodies db on db.Id = l.DocumentBodyId
 		join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
 where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
-and c.MaskRegion & ?RegionMaskParam > 0
+	and c.MaskRegion & ?RegionMaskParam > 0
+	and u.PayerId <> 921
 ;
 
 select max(u.RequestTime) as LastCertificateRequest
@@ -84,6 +85,7 @@ from Logs.CertificateRequestLogs l
 		join Future.Users fu on fu.Id = u.UserId
 			join Future.Clients c on c.Id = fu.ClientId
 where c.MaskRegion & ?RegionMaskParam > 0
+	and u.PayerId <> 921
 ;
 
 select count(*) TotalMails,
@@ -97,6 +99,7 @@ from (
 					join Future.Clients c on c.Id = u.ClientId
 		where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
 			and c.MaskRegion & ?RegionMaskParam > 0
+			and u.PayerId <> 921
 		group by m.Id
 	) as bm
 	join Documents.Mails m1 on m1.Id = bm.Id
@@ -111,6 +114,7 @@ from Documents.Mails m
 			join Future.Clients c on c.Id = u.ClientId
 where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
 	and c.MaskRegion & ?RegionMaskParam > 0
+	and u.PayerId <> 921
 ;
 
 select max(m.LogTime) as LastMailSend
@@ -119,6 +123,7 @@ from Documents.Mails m
 		join Future.Users u on u.Id = l.UserId
 			join Future.Clients c on c.Id = u.ClientId
 where c.MaskRegion & ?RegionMaskParam > 0
+	and u.PayerId <> 921
 ;";
 				var mainSql = @"
 SELECT max(UpdateDate) MaxUpdateTime
