@@ -166,6 +166,7 @@
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
+    <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
@@ -246,7 +247,6 @@
     <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\OrderView.cs" />
-    <Compile Include="Models\PrgData\UpdatingClientStatus.cs" />
     <Compile Include="Models\Suppliers\Price.cs" />
     <Compile Include="Models\RedmineUser.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
@@ -483,6 +483,9 @@
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
+    <Content Include="Web.test.config">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.skin" />

@@ -8,22 +8,33 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using NHibernate;
 
 namespace AdminInterface.MonoRailExtentions
 {
 	public class AdminInterfaceController : SmartDispatcherController
 	{
+		protected ISession DbSession;
 
 		public AdminInterfaceController()
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
 				Binder.Validator = Validator;
 				controllerContext.PropertyBag["admin"] = Admin;
+
+				var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+				DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
+			};
+
+			AfterAction += (action, context1, controller, controllerContext) => {
+				var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+				sessionHolder.ReleaseSession(DbSession);
 			};
 		}
 

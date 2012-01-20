@@ -5,7 +5,6 @@ using System.Net.Security;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
-using AdminInterface.Models.PrgData;
 using log4net;
 using RemotePriceProcessor;
 using AdminInterface.Properties;
@@ -51,28 +50,6 @@ namespace AdminInterface.Helpers
 					&& communicationObject.State != CommunicationState.Closed)
 					communicationObject.Abort();
 				channelFactory.Close();
-			}
-		}
-
-		public static void TryDoCall(Action<StatisticServiceClient> action)
-		{
-			using (WindowsIdentity.GetCurrent().Impersonate())
-			{
-				StatisticServiceClient client = null;
-				try
-				{
-					client = new StatisticServiceClient();
-					client.ClientCredentials.Windows.AllowedImpersonationLevel = TokenImpersonationLevel.Impersonation;
-					action(client);
-					client.Close();
-				}
-				catch (Exception e)
-				{
-					if (client != null && client.State != CommunicationState.Closed)
-						client.Abort();
-
-					_log.Warn("Ошибка при обращении к сервису подготовки данных", e);
-				}
 			}
 		}
 

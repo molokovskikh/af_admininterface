@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using AdminInterface.Test.ForTesting;
+﻿using System.Linq;
+using AdminInterface.Models.Logs;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
+using WatiN.Core;
 
 namespace Functional
 {
-	public class MainViewFixure : WatinFixture2
+	public class MainFixure : WatinFixture2
 	{
 		[Test]
 		public void Open_main_view()
 		{
-			Open("main/index");
+			Open();
 			Assert.That(browser.Text, Is.StringContaining("Статистика"));
 		}
 
@@ -32,6 +31,22 @@ namespace Functional
 			Open();
 			Click("Статистика");
 			AssertText("Фильтр статистики");
+		}
+
+		[Test]
+		public void Show_update_in_process()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var log = new PrgDataLog(client.Users.First(), "FileHandler");
+			Save(log);
+
+			Open();
+			var link = browser.Links.First(l => l.Url.EndsWith("Monitoring/Updates"));
+			link.Click();
+
+			OpenedWindow("Обновляющиеся клиенты");
+			AssertText("Обновляющиеся клиенты");
+			AssertText("FileHandler");
 		}
 	}
 }

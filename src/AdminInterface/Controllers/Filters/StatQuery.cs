@@ -76,7 +76,7 @@ from Logs.CertificateRequestLogs l
 		join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
 where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
 	and c.MaskRegion & ?RegionMaskParam > 0
-	and u.PayerId <> 921
+	and fu.PayerId <> 921
 ;
 
 select max(u.RequestTime) as LastCertificateRequest
@@ -85,7 +85,7 @@ from Logs.CertificateRequestLogs l
 		join Future.Users fu on fu.Id = u.UserId
 			join Future.Clients c on c.Id = fu.ClientId
 where c.MaskRegion & ?RegionMaskParam > 0
-	and u.PayerId <> 921
+	and fu.PayerId <> 921
 ;
 
 select count(*) TotalMails,
@@ -126,6 +126,9 @@ where c.MaskRegion & ?RegionMaskParam > 0
 	and u.PayerId <> 921
 ;";
 				var mainSql = @"
+select count(*) as RequestInProcessCount
+from Logs.PrgDataLogs;
+
 SELECT max(UpdateDate) MaxUpdateTime
 FROM future.Clients cd
 	join future.Users u on u.ClientId = cd.Id

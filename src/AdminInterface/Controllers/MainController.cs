@@ -55,15 +55,8 @@ namespace AdminInterface.Controllers
 			
 			var data = query.Load(regionMask, fromDate, toDate);
 #if !DEBUG
-			RemoteServiceHelper.RemotingCall(s =>
-			{
+			RemoteServiceHelper.RemotingCall(s => {
 				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
-			});
-
-			//Обновлений в процессе
-			RemoteServiceHelper.TryDoCall(s =>
-			{
-				PropertyBag["ReqHL"] = s.GetUpdatingClientCount().ToString();
 			});
 
 
@@ -103,7 +96,7 @@ namespace AdminInterface.Controllers
 		}
 
 		//елси в mysql применить агрегирующую функцию к выражению с датой
-		//то результирующий тип будет строка, правил это
+		//то результирующий тип будет строка, правим это
 		//пример max(if(1 == 1, someDate, null))
 		public static object TryToFixProkenDateTimeValue(object value)
 		{

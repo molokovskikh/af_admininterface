@@ -1,15 +1,11 @@
-﻿<% component CaptureFor, {"id" : "Title"}: %>
+﻿<% component CaptureFor, {@id : @Title}: %>
 	Обновляющиеся клиенты
 <% end %>
 
-<% component Bubble, {"bredcrumbs" : [("Обновляющиеся клиенты", "")]} %>
+<% component Bubble, {@bredcrumbs : []} %>
 
 <table class="DataTable">
-<% if statuses.Length == 0: %>
-	<tr>
-		<td class="EmptyData">Никто в данный момент не обновляется</td>
-	</tr>
-<% else: %>
+<% if logs.Count: %>
 	<thead>
 		<tr>
 			<th>
@@ -19,6 +15,9 @@
 				${app.Sortable("Название", "ShortName")}
 			</th>
 			<th>
+				${app.Sortable("Пользователь", "User")}
+			</th>
+			<th>
 				${app.Sortable("Метод", "MethodName")}
 			</th>
 			<th>
@@ -26,13 +25,18 @@
 			</th>
 		</tr>
 	</thead>
-<% for i, status in enumerate(statuses): %>
+<% for i, status in enumerate(logs): %>
 	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>${status.ClientCode}</td>
-		<td><a href="${siteroot}/Client/${status.ClientCode}">${status.Client.Name}</a></td>
+		<td>${status.User.Client.Id}</td>
+		<td>${app.LinkTo(status.User.Client)}</td>
+		<td>${app.LinkTo(status.User)}</td>
 		<td>${status.MethodName}</td>
 		<td>${status.StartTime}</td>
 	</tr>
 <% end %>
+<% else: %>
+	<tr>
+		<td class="EmptyData">Никто в данный момент не обновляется</td>
+	</tr>
 <% end %>
 </table>
