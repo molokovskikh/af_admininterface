@@ -210,7 +210,7 @@ namespace AdminInterface.Helpers
 	{
 		private static ILog log = LogManager.GetLogger(typeof(ADHelper));
 
-		private static readonly DateTime _badPasswordDateIfNotLogin = new DateTime(1601, 1, 1, 3, 0, 0);
+		private static readonly DateTime _adDateInitValue = new DateTime(1601, 1, 1, 3, 0, 0);
 
 		public static IUserStorage Storage = new ActiveDirectoryUserStorage();
 
@@ -284,7 +284,6 @@ namespace AdminInterface.Helpers
 				};
 				if (result.IsLoginExists)
 				{
-					result.BadPasswordDate = GetBadPasswordDate(login);
 					result.BadPasswordDate = GetBadPasswordDate(login);
 					result.IsDisabled = IsDisabled(login);
 					result.IsLocked = IsLocked(login);
@@ -581,25 +580,7 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastLogOnDate(string login)
 		{
-			DateTime? resultDate = null;
-			var controllers = GetDomainControllers();
-			foreach (var serverName in controllers)
-			{
-				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
-				{
-					searcher.Filter = String.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
-					var result = searcher.FindOne();
-					if ((result == null) || (result.Properties["lastLogon"].Count == 0))
-						continue;
-					var lastLogon = DateTime.FromFileTime((long)searcher.FindOne().Properties["lastLogon"][0]);
-					//ad инициализирует этим значением поле
-					if (lastLogon == DateTime.Parse("01.01.1601 3:00:00"))
-						continue;
-					if (!resultDate.HasValue || (lastLogon.CompareTo(resultDate.Value) > 0))
-						resultDate = lastLogon;
-				}
-			}
-			return resultDate;
+			return ReadNotReplicatedDate(login, "lastLogon");
 		}
 
 		public static void Disable(string login)
@@ -622,21 +603,33 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetBadPasswordDate(string login)
 		{
+			return ReadNotReplicatedDate(login, "badPasswordTime");
+		}
+
+		private static DateTime? ReadNotReplicatedDate(string login, string name)
+		{
 			DateTime? resultDate = null;
 			var controllers = GetDomainControllers();
 			foreach (var serverName in controllers)
 			{
-				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
+				try
 				{
-					searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
-					var result = searcher.FindOne();
-					if ((result == null) || (result.Properties["badPasswordTime"].Count == 0))
-						continue;
-					var date = DateTime.FromFileTime((long) searcher.FindOne().Properties["badPasswordTime"][0]);
-					if (date == _badPasswordDateIfNotLogin)
-						continue;
-					if (!resultDate.HasValue || (date.CompareTo(resultDate.Value) > 0))
-						resultDate = date;
+					using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
+					{
+						searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
+						var result = searcher.FindOne();
+						if (result == null || result.Properties[name].Count == 0)
+							continue;
+						var date = DateTime.FromFileTime((long) searcher.FindOne().Properties[name][0]);
+						if (date == _adDateInitValue)
+							continue;
+						if (!resultDate.HasValue || date.CompareTo(resultDate.Value) > 0)
+							resultDate = date;
+					}
+				}
+				catch(Exception e)
+				{
+					log.Warn(String.Format("Ошибка при запросе к контролеру домена {0}", serverName), e);
 				}
 			}
 			return resultDate;
@@ -656,22 +649,7 @@ namespace AdminInterface.Helpers
 
 		public static DateTime? GetLastPasswordChange(string login)
 		{
-			DateTime? resultDate = null;
-			var controllers = GetDomainControllers();
-			foreach (var serverName in controllers)
-			{
-				using (var searcher = new DirectorySearcher(new DirectoryEntry(String.Format("LDAP://{0}", serverName))))
-				{
-					searcher.Filter = string.Format("(&(objectClass=user)(sAMAccountName={0}))", login);
-					var result = searcher.FindOne();
-					if ((result == null) || (result.Properties["pwdLastSet"].Count == 0))
-						continue;
-					var date = DateTime.FromFileTime((long) searcher.FindOne().Properties["pwdLastSet"][0]);
-					if (!resultDate.HasValue || (date.CompareTo(resultDate.Value) > 0))
-						resultDate = date;
-				}
-			}
-			return resultDate;
+			return ReadNotReplicatedDate(login, "pwdLastSet");
 		}
 
 		public static IList<string> GetDomainControllers()
