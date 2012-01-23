@@ -55,6 +55,7 @@ namespace AdminInterface.Controllers
 
 		public int UserCount { get; set; }
 		public string UserNames { get; set; }
+		public string RegionName { get; set; }
 
 		public ServiceType ClientType { get; set; }
 
@@ -102,6 +103,8 @@ namespace AdminInterface.Controllers
 
 		private int _lastRowsCount;
 
+		private static IList<Region> _regions = Region.All();
+
 		public int RowsCount
 		{
 			get { return _lastRowsCount; }
@@ -124,7 +127,7 @@ namespace AdminInterface.Controllers
 				{"Name", "Name"},
 				{"RegistrationDate", "RegistrationDate"},
 				{"ClientId", "c.Id"},
-				{"ClientName", "c.FullName"}
+				{"ClientName", "c.Name"}
 			};
 
 			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now);
@@ -149,7 +152,7 @@ namespace AdminInterface.Controllers
 			get
 			{
 				if (FinderType == RegistrationFinderType.Users)
-					return "Имя пользователя";
+					return "Комментарий к пользователю";
 				if (FinderType == RegistrationFinderType.Addresses)
 					return "Адрес";
 				return string.Empty;
@@ -173,6 +176,18 @@ namespace AdminInterface.Controllers
 
 			ApplySort(criteria);
 
+			/*if (SortBy != "RegionName")
+				ApplySort(criteria);
+			else {
+				var regionName = string.Empty;
+				if (FinderType == RegistrationFinderType.Users)
+					regionName = "HomeRegion";
+				if (FinderType == RegistrationFinderType.Addresses)
+					regionName = "RegionCode";
+				var homeRegionProjection = Projections.SqlProjection(string.Format("{0} as RegionName", regionName), new[] {"RegionName"}, new[] {NHibernateUtil.String});
+				criteria.AddOrder(IsDesc() ? Order.Desc(homeRegionProjection) : Order.Asc(homeRegionProjection));
+			}*/
+
 			return ArHelper.WithSession(
 				s => criteria.GetExecutableCriteria(s).ToList<RegistrationInformation>())
 				.ToList();
@@ -180,6 +195,11 @@ namespace AdminInterface.Controllers
 
 		public DetachedCriteria GetCriteria()
 		{
+			if (FinderType == RegistrationFinderType.Users)
+				SortKeyMap.Add("RegionName", "s.HomeRegion");
+			if (FinderType == RegistrationFinderType.Addresses)
+				SortKeyMap.Add("RegionName", "c.HomeRegion");
+
 			var userCountProjection = Projections.SubQuery(DetachedCriteria.For<Client>()
 												.CreateAlias("Users", "u", JoinType.InnerJoin)
 												.Add(Expression.EqProperty("Id", "c.Id"))
@@ -191,7 +211,9 @@ namespace AdminInterface.Controllers
 				var userCriteria = DetachedCriteria.For<User>();
 
 				userCriteria.CreateCriteria("RootService", "s", JoinType.InnerJoin)
-					.Add(Expression.Sql("{alias}.HomeRegion & " + Region.Id + " > 0"));
+					.Add(Expression.Sql("{alias}.HomeRegion & " + Region.Id + " > 0"))
+					.SetProjection(Projections.ProjectionList().Add(Projections.SqlProjection("{alias}.HomeRegion as RegionName", new[] {"RegionName"}, new[] {NHibernateUtil.String})));
+
 				userCriteria.SetProjection(Projections.ProjectionList()
 				                           	.Add(Projections.Property<User>(u => u.Id).As("Id"))
 				                           	.Add(Projections.Property<User>(u => u.Name).As("Name"))
@@ -201,6 +223,7 @@ namespace AdminInterface.Controllers
 				                           	.Add(Projections.Property("s.Name").As("ClientName"))
 				                           	.Add(Projections.Property("s.Disabled").As("ServiceDisabled"))
 				                           	.Add(Projections.Property("s.Type").As("ClientType"))
+											.Add(Projections.Property("s.HomeRegion").As("RegionName"))
 											.Add(Projections.Alias(userCountProjection, "UserCount")))
 					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("RegistrationDate", Period.End.Date))
@@ -218,16 +241,16 @@ namespace AdminInterface.Controllers
 				adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
 					.Add(Expression.Sql("{alias}.RegionCode & " + Region.Id + " > 0"));
 
-
 				adressCriteria.SetProjection(Projections.ProjectionList()
 				                            	.Add(Projections.Property<Address>(u => u.Id).As("Id"))
 				                            	.Add(Projections.Property<Address>(u => u.Value).As("Name"))
 				                            	.Add(Projections.Property<Address>(u => u.RegistrationDate).As("RegistrationDate"))
 				                            	.Add(Projections.Property("Enabled").As("AdressEnabled"))
 												.Add(Projections.Property("c.Id").As("ClientId"))
-												.Add(Projections.Property("c.FullName").As("ClientName"))
+												.Add(Projections.Property("c.Name").As("ClientName"))
 				                            	.Add(Projections.Property("c.Status").As("ClientEnabled"))
 				                            	.Add(Projections.Property("c.Type").As("ClientType"))
+				                            	.Add(Projections.Property("c.HomeRegion").As("RegionName"))
 												.Add(Projections.Alias(userCountProjection, "UserCount"))
 												.Add(Projections.Alias(Projections.SubQuery(
 												DetachedCriteria.For<Client>()
@@ -243,7 +266,9 @@ namespace AdminInterface.Controllers
 																Projections.SqlProjection("INTERVAL 1 hour as ", new[] {string.Empty}, new[] {NHibernateUtil.DateTime})), "ad.RegistrationDate")))
 														.CreateCriteria("Users", "u", JoinType.InnerJoin)
 														.SetProjection(Projections.ProjectionList()
-														.Add(Projections.SqlFunction("group_concat", NHibernateUtil.String, Projections.Distinct(Projections.Property("u.id")))))), "UserNames")))
+														.Add(Projections.Conditional(Expression.Gt(Projections.Count(Projections.Distinct(Projections.Property("u.id"))), 1), 
+														Projections.SqlFunction("group_concat", NHibernateUtil.String, Projections.Distinct(Projections.Property("u.id"))),
+														Projections.SqlFunction("group_concat", NHibernateUtil.String, Projections.Distinct(Projections.Property("u.id")), Projections.Constant(" - ("), Projections.Property("u.Name"), Projections.Constant(")")))))), "UserNames")))
 					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
 					.Add(Expression.Le("RegistrationDate", Period.End.Date));
 
