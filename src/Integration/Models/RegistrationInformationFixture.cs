@@ -6,13 +6,14 @@ using AdminInterface.Controllers;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class RegistrationInformationFixture
+	public class RegistrationInformationFixture : IntegrationFixture
 	{
 		[Test]
 		public void BaseTest()
