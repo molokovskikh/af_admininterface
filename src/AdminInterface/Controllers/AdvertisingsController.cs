@@ -55,8 +55,7 @@ namespace AdminInterface.Controllers
 			ad.Invoice = new Invoice(ad);
 			ad.UpdateAndFlush();
 
-			var app = new AppHelper(Context);
-			RedirectToUrl(app.GetUrl(ad.Invoice, "Print"));
+			Redirect(ad.Invoice, "Print");
 		}
 
 		public void BuildAct(uint id)
@@ -75,8 +74,7 @@ namespace AdminInterface.Controllers
 			ad.Act = new Act(invoice.Date, invoice);
 			ad.UpdateAndFlush();
 
-			var app = new AppHelper(Context);
-			RedirectToUrl(app.GetUrl(ad.Act, "Print"));
+			Redirect(ad.Act, "Print");
 		}
 
 		public void Delete(uint id)

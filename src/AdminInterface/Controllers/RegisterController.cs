@@ -40,14 +40,15 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterSupplier()
 		{
-			PropertyBag["supplier"] = new Supplier();
+			var supplier = new Supplier();
+			supplier.Account = new SupplierAccount(supplier);
+			PropertyBag["supplier"] = supplier;
 			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["SingleRegions"] = true;
 		}
 
 		[AccessibleThrough(Verb.Post)]
 		public void RegisterSupplier(
-			[DataBind("supplier")] Supplier supplier,
 			[DataBind("supplierContacts")] Contact[] supplierContacts,
 			ulong homeRegion, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
@@ -65,6 +66,10 @@ namespace AdminInterface.Controllers
 		{
 			User user;
 			string password;
+
+			var supplier = new Supplier();
+			supplier.Account = new SupplierAccount(supplier);
+			BindObjectInstance(supplier, "supplier");
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
@@ -192,8 +197,13 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void RegisterClient()
 		{
+			var regions = Region.All().ToArray();
+			var client = new Client(new Payer(""), regions.First());
+			var user = new User(client);
+
+			PropertyBag["user"] = user;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
-			PropertyBag["regions"] = Region.All().ToArray();
+			PropertyBag["regions"] = regions;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -270,9 +280,13 @@ namespace AdminInterface.Controllers
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
+				BindObjectInstance(newUser.Accounting, "user.Accounting");
 				password = newUser.CreateInAd();
 				if (newClient.Addresses.Count > 0)
-					newUser.AvaliableAddresses.Add(newClient.Addresses.Last());
+				{
+					var address = newClient.Addresses.Last();
+					newUser.RegistredWith(address);
+				}
 
 				newClient.Addresses.Each(a => a.CreateFtpDirectory());
 				newClient.AddBillingComment(comment);

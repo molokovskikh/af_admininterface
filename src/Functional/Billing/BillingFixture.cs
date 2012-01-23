@@ -21,6 +21,7 @@ namespace Functional.Billing
 		private Client client;
 		private Payer payer;
 		private Address address;
+		private User user;
 
 		[SetUp]
 		public void Setup()
@@ -33,6 +34,7 @@ namespace Functional.Billing
 			client.AddAddress("test address for billing");
 			client.SaveAndFlush();
 			address = client.Addresses[0];
+			user = client.Users[0];
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
@@ -94,7 +96,6 @@ namespace Functional.Billing
 		[Test]
 		public void View_additional_user_info()
 		{
-			var user = client.Users[0];
 			var userId = "addressesForUser" + user.Id;
 			browser.Link(Find.ById(userId)).Click();
 			Thread.Sleep(500);
@@ -113,7 +114,6 @@ namespace Functional.Billing
 		[Test]
 		public void Adding_users_to_address()
 		{
-			var user = client.Users[0];
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
 			address.AvaliableForUsers = new List<User>();
 			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
@@ -137,13 +137,12 @@ namespace Functional.Billing
 			scope.Evict(client);
 
 			client = Client.Find(client.Id);
-			Assert.That(address.AvaliableFor(client.Users[0]), Is.True);
+			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
 		[Test]
 		public void Adding_addresses_to_users()
 		{
-			var user = client.Users[0];
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
 			address.AvaliableForUsers = new List<User>();
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
@@ -165,13 +164,12 @@ namespace Functional.Billing
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
 			client.Refresh();
-			Assert.That(address.AvaliableFor(client.Users[0]), Is.True);
+			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
 		[Test]
 		public void DisconnectUserFromAddress()
 		{
-			var user = client.Users[0];
 			browser.Link(Find.ById("usersForAddress" + address.Id)).Click();
 			Thread.Sleep(500);
 			var connectUserLink = browser.Link(Find.ByText("Подключить пользователя"));
@@ -188,13 +186,12 @@ namespace Functional.Billing
 			Assert.That(checkBox.Exists, Is.False);
 
 			client.Refresh();
-			Assert.That(address.AvaliableFor(client.Users[0]), Is.False);
+			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
 		[Test]
 		public void DisconnectAddressFromUser()
 		{
-			var user = client.Users[0];
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
 			browser.Link(Find.ByText("Подключить адрес")).Click();
@@ -210,13 +207,12 @@ namespace Functional.Billing
 			Assert.That(checkBox.Exists, Is.False);
 
 			client.Refresh();
-			Assert.That(address.AvaliableFor(client.Users[0]), Is.False);
+			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
 		[Test]
 		public void Change_user_status()
 		{
-			var user = client.Users[0];
 			var selector = String.Format("tr#UserRow{0}", user.Id);
 			var row = (TableRow)browser.CssSelect(selector);
 			var checkbox = (CheckBox)row.CssSelect("input[name=status]");
@@ -253,7 +249,6 @@ namespace Functional.Billing
 		[Test]
 		public void Change_client_status()
 		{
-			var user = client.Users[0];
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 
 			var userRow = browser.TableRow(Find.ById("UserRow" + user.Id));
@@ -313,7 +308,6 @@ namespace Functional.Billing
 		[Test]
 		public void Test_view_connecting_address_to_user()
 		{
-			var user = client.Users[0];
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
 			browser.Link(Find.ByText("Подключить адрес")).Click();
@@ -419,10 +413,9 @@ namespace Functional.Billing
 			user.Setup();
 			client.AddAddress("address");
 			client.AddAddress("address");
-			client.Users[0].Enabled = true;
+			user.Enabled = true;
 			address.Enabled = false;
 			client.Save();
-			//BasicConfigurator.Configure();
 			foreach (var a in client.Addresses)
 			{
 				a.Accounting.ReadyForAccounting = true;
@@ -466,7 +459,6 @@ namespace Functional.Billing
 		[Test]
 		public void Show_message_if_server_error_occured()
 		{
-			var user = client.Users[0];
 			// Подключаем пользователю адрес
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
@@ -489,14 +481,14 @@ namespace Functional.Billing
 			Thread.Sleep(500);
 
 			Assert.IsTrue(errorMessageDiv.Exists);
-			Assert.That(errorMessageDiv.Text, Is.EqualTo("При выполнении операции возникла ошибка. Попробуйте повторить позднее"));
+			Assert.That(errorMessageDiv.Text, Is.EqualTo("При выполнении операции возникла ошибка. Попробуйте повторить позднее."));
 			Assert.That(errorMessageDiv.Style.Display, Is.EqualTo("block"));
 		}
 
 		[Test]
 		public void Send_message_to_user()
 		{
-			var username = client.Users[0].GetLoginOrName();
+			var username = user.GetLoginOrName();
 
 			browser.SelectList(Find.ByName("NewClientMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
@@ -517,14 +509,14 @@ namespace Functional.Billing
 		public void Cancel_message_for_user()
 		{
 			client.Refresh();
-			var username = client.Users[0].GetLoginOrName();
+			var username = user.GetLoginOrName();
 			browser.SelectList(Find.ByName("NewClientMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
 			browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
 			browser.Button(Find.ByValue("Отправить сообщение")).Click();
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
-			browser.Button(String.Format("CancelViewMessage{0}", client.Users[0].Id)).Click();
+			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
 			var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			var message = messages[0];
 
@@ -793,6 +785,33 @@ namespace Functional.Billing
 			Css("#operation_Date").TypeText(DateTime.Now.ToShortDateString());
 			Click(String.Format("#new-operation-{0}", DateTime.Now.Year), "Добавить");
 			AssertText("Сохранено");
+		}
+
+		[Test]
+		public void If_free_flag_turnoff_on_user_than_free_flag_should_by_thurnoff_on_all_related_addresses()
+		{
+			user.Accounting.IsFree = true;
+			address.Accounting.IsFree = true;
+			user.AvaliableAddresses.Add(address);
+			client.Save();
+			Flush();
+
+			Refresh();
+
+			Css(String.Format("#UserRow{0} input[name=free]", user.Id)).Click();
+			browser.WaitUntilContainsText("Следующие адреса доставки стали платными", 1);
+			AssertText(String.Format("Следующие адреса доставки стали платными: {0}", address.Value));
+
+			Assert.That(Css(String.Format("#UserRow{0} input[name=free]", user.Id)).Checked, Is.False);
+			Assert.That(Css(String.Format("#UserRow{0}", user.Id)).ClassName, Is.Not.StringContaining("free"));
+
+			Assert.That(Css(String.Format("#AddressRow{0} input[name=free]", address.Id)).Checked, Is.False);
+			Assert.That(Css(String.Format("#AddressRow{0}", address.Id)).ClassName, Is.Not.StringContaining("free"));
+
+			user.Accounting.Refresh();
+			Assert.That(user.Accounting.IsFree, Is.False);
+			address.Accounting.Refresh();
+			Assert.That(address.Accounting.IsFree, Is.False);
 		}
 	}
 }

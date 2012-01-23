@@ -42,12 +42,22 @@ namespace Functional.ForTesting
 
 		protected Browser Open(object item, string action = null)
 		{
-			return Open(AppHelper.GetShortUrl(item, action));
+			return Open(GetShortUrl(item, action));
 		}
 
 		protected Browser Open(string uri, params object[] args)
 		{
 			return Open(String.Format(uri, args));
+		}
+
+		public static string GetShortUrl(object item, string action = null)
+		{
+			var dynamicItem = ((dynamic)item);
+			var id = dynamicItem.Id;
+			var controller = AppHelper.GetControllerName(item);
+			if (!String.IsNullOrEmpty(action))
+				action = "/" + action;
+			return String.Format("{0}/{1}{2}", controller, id, action);
 		}
 
 		protected Browser Open(string uri = "/")

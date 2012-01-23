@@ -139,8 +139,8 @@
 						В процессе:
 					</td>
 					<td class="statistic-value">
-						<% if ?ReqHL: %>
-						<a href="${siteroot}/Monitoring/Updates" target=_blank>${ReqHL}</a>
+						<% if ?RequestInProcessCount and RequestInProcessCount: %>
+							${app.LinkTo(RequestInProcessCount.ToString(), @Monitoring, @Updates, {@attributes: {"target": "_blank"}})}
 						<% end %>
 					</td>
 				</tr>

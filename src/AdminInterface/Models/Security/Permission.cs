@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
@@ -54,7 +56,7 @@ namespace AdminInterface.Models.Security
 
 		public static Permission Find(PermissionType permissionType)
 		{
-			return ActiveRecordMediator<Permission>.FindFirst(Expression.Eq("Type", permissionType));
+			return ActiveRecordMediator<Permission>.FindFirst(Restrictions.Eq("Type", permissionType));
 		}
 
 		public static IList<Permission> FindAll()
@@ -91,7 +93,7 @@ namespace AdminInterface.Models.Security
 			if (Type == PermissionType.ViewDrugstore)
 			{
 				var drugstore = new [] {
-					"clients", "users", "addresses", "mails"
+					"clients", "users", "addresses", "mails", "monitoring"
 				};
 				return drugstore.Any(c => c == controller.ToLower());
 			}
@@ -200,6 +202,26 @@ namespace AdminInterface.Models.Security
 				default:
 					return department == Department.Administration;
 			}
+		}
+
+		public static bool CheckPermissionByAttribute(Administrator administrator, ICustomAttributeProvider action)
+		{
+			var attributes = action.GetCustomAttributes(typeof (RequiredPermissionAttribute), true);
+
+			foreach (RequiredPermissionAttribute attribute in attributes)
+			{
+				bool isPermissionGranted;
+				if (attribute.Required == Required.All)
+					isPermissionGranted = administrator.HavePermisions(attribute.PermissionTypes);
+				else
+					isPermissionGranted = administrator.HaveAnyOfPermissions(attribute.PermissionTypes);
+
+				if (!isPermissionGranted)
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 	}
 }

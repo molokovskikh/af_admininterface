@@ -185,10 +185,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	</div>
 	<% end %>
 
-	<div class=block>
-		<h3>Сообщение в биллинг</h3>
-		<textarea cols=60 rows=4 name=comment></textarea>
-	</div>
+	${ForHelper.Editor("supplier.Account")}
 
 	<div class="block">
 		<h3>Настройка</h3>

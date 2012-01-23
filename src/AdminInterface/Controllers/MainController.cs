@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Globalization;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
@@ -54,15 +55,8 @@ namespace AdminInterface.Controllers
 			
 			var data = query.Load(regionMask, fromDate, toDate);
 #if !DEBUG
-			RemoteServiceHelper.RemotingCall(s =>
-			{
+			RemoteServiceHelper.RemotingCall(s => {
 				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
-			});
-
-			//Обновлений в процессе
-			RemoteServiceHelper.TryDoCall(s =>
-			{
-				PropertyBag["ReqHL"] = s.GetUpdatingClientCount().ToString();
 			});
 
 
@@ -73,21 +67,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["PriceProcessorMasterStatus"] = "";
 #endif
 
-			for (var i = 0; i < data.Tables.Count; i++)
+			foreach (var pair in data.ToKeyValuePairs())
 			{
-				var table = data.Tables[i];
-				foreach (DataColumn column in table.Columns)
+				var column = pair.Key;
+				var value = pair.Value;
+				value = TryToFixProkenDateTimeValue(value);
+				if (value != DBNull.Value && column.DataType == typeof(DateTime))
 				{
-					object value = null;
-					if (table.Rows.Count > 0)
-						value = table.Rows[0][column];
-					if (value != DBNull.Value && column.DataType == typeof(DateTime))
-					{
-						var dateTimeValue = ((DateTime) value);
-						value = dateTimeValue.ToLongTimeString();
-					}
-					PropertyBag[column.ColumnName] = value;
+					var dateTimeValue = ((DateTime) value);
+					value = dateTimeValue.ToLongTimeString();
 				}
+				PropertyBag[column.ColumnName] = value;
+
 			}
 
 			Size("MaxMailSize");
@@ -102,6 +93,22 @@ namespace AdminInterface.Controllers
 			PropertyBag["FromDate"] = fromDate;
 			PropertyBag["ToDate"] = toDate;
 			PropertyBag["query"] = query;
+		}
+
+		//елси в mysql применить агрегирующую функцию к выражению с датой
+		//то результирующий тип будет строка, правим это
+		//пример max(if(1 == 1, someDate, null))
+		public static object TryToFixProkenDateTimeValue(object value)
+		{
+			if (value == null)
+				return null;
+			if (!(value is string))
+				return value;
+			var stringValue = (string) value;
+			DateTime dateValue;
+			if (!DateTime.TryParseExact(stringValue, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.AssumeLocal, out dateValue))
+				return value;
+			return dateValue.ToLongTimeString();
 		}
 
 		public void DoConvert<T>(string key, Func<T, object> convert)
@@ -162,13 +169,12 @@ namespace AdminInterface.Controllers
 		public void Report(uint id, bool isPasswordChange)
 		{
 			CancelLayout();
-			if (Session["password"] != null)
-				PropertyBag["password"] = Session["password"];
 
 			PropertyBag["now"] = DateTime.Now;
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = DefaultValues.Get();
+			PropertyBag["password"] = Session["password"];
 		}
 
 		public void Stat(ulong? regioncode, DateTime? from, DateTime? to)

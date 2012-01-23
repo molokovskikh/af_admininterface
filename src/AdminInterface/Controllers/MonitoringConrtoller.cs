@@ -1,17 +1,11 @@
-﻿using System;
-using System.Linq;
-using System.Security.Principal;
-using System.ServiceModel;
-using AdminInterface.Helpers;
+﻿using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using AdminInterface.Models.PrgData;
-using AdminInterface.Models.Security;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
+using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers
 {
@@ -23,37 +17,27 @@ namespace AdminInterface.Controllers
 	]
 	public class MonitoringController : AdminInterfaceController
 	{
-		public void Updates(string sortBy, string direction)
+		public void Updates()
 		{
-			UpdatingClientStatus[] info;
-			//сраная магия, хрен его знает почему и как это работает
-			using (WindowsIdentity.GetCurrent().Impersonate())
-			{
-				StatisticServiceClient client = null;
-				try
-				{
-					client = new StatisticServiceClient();
-					client.ClientCredentials.Windows.AllowedImpersonationLevel = TokenImpersonationLevel.Impersonation;
-					client.ClientCredentials.Windows.AllowNtlm = true;
-					info = client.GetUpdateInfo();
-					client.Close();
-				}
-				catch (Exception)
-				{
-					if (client.State != CommunicationState.Closed)
-						client.Abort();
-					throw;
-				}
-			}
+			var sortMap = new Dictionary<string, string> {
+				{"MethodName", "MethodName"},
+				{"StartTime", "StartTime"},
+				{"ShortName", "c.Name"},
+				{"ClientCode", "c.Id"},
+				{"User", "u.Name"}
+			};
 
-			foreach (var status in info)
-				status.FetchClient();
+			var sortable = new Sortable(sortMap);
+			BindObjectInstance(sortable, "filter");
 
-			info = info.Where(i => i.Client != null).ToArray();
+			var criteria = DbSession.CreateCriteria<PrgDataLog>()
+				.CreateAlias("User", "u", JoinType.InnerJoin)
+				.CreateAlias("u.Client", "c", JoinType.InnerJoin);
+			sortable.ApplySort(criteria);
+			var logs = criteria.List<PrgDataLog>();
 
-			PropertyBag["statuses"] = info.Sort(ref sortBy, ref direction, "StartTime").ToArray();
-			PropertyBag["sortBy"] = sortBy;
-			PropertyBag["direction"] = direction;
+			PropertyBag["logs"] = logs;
+			PropertyBag["filter"] = sortable;
 		}
 
 		public void Orders()

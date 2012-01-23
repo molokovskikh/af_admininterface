@@ -9,7 +9,7 @@ namespace AdminInterface.Security
 		AnyOf,
 	}
 
-	[AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true), Serializable]
+	[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, AllowMultiple = false, Inherited = true), Serializable]
 	public class RequiredPermissionAttribute : Attribute
 	{
 		public RequiredPermissionAttribute(params PermissionType[] permissionTypes)

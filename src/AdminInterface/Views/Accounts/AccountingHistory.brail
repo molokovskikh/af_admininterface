@@ -5,10 +5,10 @@
 </script>
 
 <style>
-		#filter_SearchText
-		{
-			width: 100%;
-		}
+	#filter_SearchText
+	{
+		width: 100%;
+	}
 </style>
 
 <div class="CenterBlock FilterBlock">

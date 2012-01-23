@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -11,6 +13,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using NHibernate;
+using Common.Tools;
 
 namespace AdminInterface.Controllers
 {
@@ -35,10 +38,11 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 		}
 
-		public void Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
+		[return: JSONReturnBinder]
+		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
 		{
 			var account = Account.TryFind(id);
-			UpdateAccounting(account.Id, accounted, payment, free);
+			var result = UpdateAccounting(account.Id, accounted, payment, free);
 			if (status != null)
 			{
 				NHibernateUtil.Initialize(account);
@@ -61,7 +65,7 @@ namespace AdminInterface.Controllers
 					account.Status = status.Value;
 				}
 			}
-			CancelView();
+			return result;
 		}
 
 		private void SetSupplierStatus(Supplier supplier, bool status)
@@ -97,11 +101,11 @@ namespace AdminInterface.Controllers
 				}
 			}
 			ActiveRecordMediator.Save(user.RootService);
-			CancelView();
 		}
 
-		public void UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)
+		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)
 		{
+			object result = null;
 			var account = Account.Find(accountId);
 			if (accounted.HasValue)
 			{
@@ -113,7 +117,29 @@ namespace AdminInterface.Controllers
 
 			if (isFree.HasValue)
 			{
+				IEnumerable<Address> addresses = null;
+				if (account is UserAccount)
+				{
+					addresses = ((UserAccount) account).User
+						.AvaliableAddresses
+						.Where(a => a.Accounting.IsFree)
+						.ToArray();
+				}
+
 				account.IsFree = isFree.Value;
+				
+				if (addresses != null && !account.IsFree && addresses.Count() > 0)
+				{
+					foreach (var address in addresses)
+						address.Accounting.IsFree = isFree.Value;
+					result = new {
+						accounts = addresses.Select(a => new {
+							id = a.Accounting.Id,
+							free = a.Accounting.IsFree
+						}).ToArray(),
+						message = String.Format("Следующие адреса доставки стали платными: {0}", addresses.Implode(a => a.Value))
+					};
+				}
 			}
 
 			if (payment.HasValue)
@@ -126,7 +152,7 @@ namespace AdminInterface.Controllers
 				this.Mailer().AccountingChanged(account).Send();
 
 			account.Update();
-			CancelView();
+			return result;
 		}
 
 		public void SetAddressStatus(uint addressId, bool? enabled)

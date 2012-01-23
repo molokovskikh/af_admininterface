@@ -1,8 +1,10 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Collections.Generic;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -83,7 +85,13 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual int InvoiceGroup { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
+		[
+			Style,
+			Property(Access = PropertyAccess.FieldCamelcaseUnderscore),
+			Description("Обслуживается бесплатно"),
+			Auditable("Обслуживается бесплатно"),
+			RequiredPermission(PermissionType.CanRegisterClientWhoWorkForFree)
+		]
 		public virtual bool IsFree
 		{
 			get
@@ -99,6 +107,14 @@ namespace AdminInterface.Models.Billing
 				}
 			}
 		}
+
+		[
+			Property,
+			Description("Дата окончания бесплатно периода"),
+			DependOn("IsFree"),
+			RequiredPermission(PermissionType.CanRegisterClientWhoWorkForFree)
+		]
+		public virtual DateTime? FreePeriodEnd { get; set; }
 
 		public virtual uint PayerId
 		{
@@ -163,6 +179,18 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
+		public virtual string RegistrationMessage
+		{
+			get
+			{
+				if (!IsFree)
+					return "";
+				var message = "Регистрация бесплатная";
+				if (FreePeriodEnd != null)
+					message += " до " + FreePeriodEnd.Value.ToShortDateString();
+				return message;
+			}
+		}
 
 		public virtual void Accounted()
 		{
@@ -178,7 +206,11 @@ namespace AdminInterface.Models.Billing
 
 		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
 		{
-			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting && !a.BeAccounted);
+			var freeEnd = DateTime.Today.AddDays(-10);
+			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
+				&& !a.BeAccounted
+				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd < freeEnd)
+			);
 
 			pager.Total = readyForAccounting.Count();
 			return pager.DoPage(readyForAccounting).ToList();

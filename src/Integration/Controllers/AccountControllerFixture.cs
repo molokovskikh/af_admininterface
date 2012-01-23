@@ -1,7 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using IgorO.ExposedObjectProject;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -49,6 +51,33 @@ namespace Integration.Controllers
 			account.Refresh();
 			Assert.That(account.Payment, Is.EqualTo(500));
 			Assert.That(account.BeAccounted, Is.True);
+		}
+
+		[Test]
+		public void Return_updated_addresses()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			var user = client.Users[0];
+			var address = client.Addresses[0];
+			user.AvaliableAddresses.Add(address);
+
+			var userAccount = user.Accounting;
+			userAccount.IsFree = true;
+			var addressAccount = address.Accounting;
+			addressAccount.IsFree = true;
+
+			client.Save();
+
+			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
+			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null));
+
+			addressAccount.Refresh();
+			Assert.That(addressAccount.IsFree, Is.False);
+			Assert.That(result.message, Is.EqualTo(String.Format("Следующие адреса доставки стали платными: {0}", address.Value)));
+			Assert.That(result.accounts.Length, Is.EqualTo(1));
+			var resultAccount = ExposedObject.From(result.accounts[0]);
+			Assert.That(resultAccount.id, Is.EqualTo(addressAccount.Id));
+			Assert.That(resultAccount.free, Is.EqualTo(addressAccount.IsFree));
 		}
 	}
 }

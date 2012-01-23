@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Reflection;
+using AdminInterface.Models.Security;
 using Castle.MonoRail.Framework;
 
 namespace AdminInterface.Security
@@ -43,21 +44,10 @@ namespace AdminInterface.Security
 			if (action == null)
 				return true;
 
-			var attributes = action.GetCustomAttributes(typeof (RequiredPermissionAttribute), true);
-
-
-			foreach (RequiredPermissionAttribute attribute in attributes)
+			if (!Permission.CheckPermissionByAttribute(administrator, action))
 			{
-				if (attribute.Required == Required.All)
-					isPermissionGranted = administrator.HavePermisions(attribute.PermissionTypes);
-				else
-					isPermissionGranted = administrator.HaveAnyOfPermissions(attribute.PermissionTypes);
-
-				if (!isPermissionGranted)
-				{
-					context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
-					return false;
-				}
+				context.Response.RedirectToUrl("~/Rescue/NotAllowed.aspx");
+				return false;
 			}
 
 			return true;

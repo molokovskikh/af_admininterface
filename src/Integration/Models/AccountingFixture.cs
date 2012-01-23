@@ -1,16 +1,28 @@
 using System;
 using System.Linq;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Models
 {
 	public class AccountingFixture : IntegrationFixture
 	{
+		private Client client;
+		private Account userAccount;
+
+		[SetUp]
+		public void Setup()
+		{
+			client = DataMother.CreateTestClientWithAddressAndUser();
+			userAccount = client.Users[0].Accounting;
+		}
+
 		[Test]
 		public void Find_ready_for_accounting()
 		{
@@ -19,8 +31,7 @@ update billing.Accounts
 set ReadyForAccounting = 0,
 BeAccounted = 0;
 ").ExecuteUpdate());
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-
+			
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAccounting = true;
@@ -33,13 +44,38 @@ BeAccounted = 0;
 		[Test]
 		public void Find_accounting_by_user()
 		{
-			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Users[0].Accounting.Accounted();
+			userAccount.Accounted();
 			client.SaveAndFlush();
 
 			var accounts = new AccountFilter {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()}.Find(new Pager());
 			Assert.That(accounts.Count, Is.EqualTo(1));
 			Assert.That(accounts.Single().Id, Is.EqualTo(client.Users[0].Accounting.Id));
+		}
+
+		[Test]
+		public void Find_after_free_period_end()
+		{
+			userAccount.ReadyForAccounting = true;
+			userAccount.FreePeriodEnd = DateTime.Today.AddDays(-20);
+			userAccount.IsFree = true;
+
+			client.Save();
+			Flush();
+
+			Assert.That(Ready(), Is.Not.Contains(userAccount.Id));
+
+			userAccount.FreePeriodEnd = DateTime.Today;
+			userAccount.Save();
+			Flush();
+
+			Assert.That(Ready().Any(id => id == userAccount.Id), Is.True, "не нашли аккаунт {0}", userAccount.Id);
+		}
+
+		private static uint[] Ready()
+		{
+			var items = Account.GetReadyForAccounting(new Pager());
+			var ready = items.Select(i => i.Id).ToArray();
+			return ready;
 		}
 	}
 }

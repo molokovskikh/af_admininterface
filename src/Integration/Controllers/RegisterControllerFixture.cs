@@ -67,7 +67,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Append_to_payer_comment_comment_from_payment_options()
 		{
-			client = DataMother.TestClient();
+			client = DataMother.CreateTestClientWithUser();
 			payer = client.Payers.First();
 
 			payer.Comment = "ata";
@@ -86,6 +86,8 @@ namespace Integration.Controllers
 		public void Create_organization()
 		{
 			DataMother.CreateSupplier().Save();
+
+			Request.Params.Add("user.Accounting.IsFree", "False");
 
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
@@ -116,6 +118,8 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_client_without_address()
 		{
+			Request.Params.Add("user.Accounting.IsFree", "False");
+
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
@@ -151,12 +155,10 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_supplier()
 		{
-			var supplier = new Supplier {
-				Name = "Тестовый поставщик",
-				FullName = "Тестовый поставщик"
-			};
+			Request.Params.Add("supplier.Name", "Тестовый поставщик");
+			Request.Params.Add("supplier.FullName", "Тестовый поставщик");
 
-			controller.RegisterSupplier(supplier, 
+			controller.RegisterSupplier(
 				new Contact[0], 1,
 				new [] {new RegionSettings{Id = 1, IsAvaliableForBrowse = true}},
 				new AdditionalSettings(),
@@ -167,6 +169,7 @@ namespace Integration.Controllers
 				new Person[0],
 				"",
 				"");
+			var supplier = RegistredSupplier();
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			var user = supplier.Users.First();
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
@@ -175,26 +178,11 @@ namespace Integration.Controllers
 		[Test]
 		public void Register_supplier_in_retail_segment()
 		{
-			//если нет то создаем специального клиента на для справки
-			var count = ArHelper.WithSession(s => s
-				.CreateSQLQuery(@"select count(*) from Usersettings.Clientsdata where firmcode = 4474")
-				.UniqueResult<long>());
-			if (count == 0)
-				ArHelper.WithSession(s => s
-					.CreateSQLQuery(@"
-insert into Usersettings.Clientsdata(FirmCode, FirmSegment, FirmStatus, FirmType, RegionCode, MaskRegion, FullName, ShortName)
-select 4474, 1, 1, 1, 1, 7, 'Веб-справка', 'Веб-справка';
-insert into Usersettings.RetClientsSet(ClientCode)
-select 4474;")
-					.ExecuteUpdate());
+			Request.Params.Add("supplier.Name", "Тестовый поставщик");
+			Request.Params.Add("supplier.FullName", "Тестовый поставщик");
+			Request.Params.Add("supplier.Segment", Segment.Retail.ToString());
 
-			var supplier = new Supplier {
-				Name = "Тестовый поставщик",
-				FullName = "Тестовый поставщик",
-				Segment = Segment.Retail
-			};
-
-			controller.RegisterSupplier(supplier, 
+			controller.RegisterSupplier(
 				new Contact[0], 1,
 				new [] {
 					new RegionSettings {
@@ -210,6 +198,8 @@ select 4474;")
 				new Person[0], 
 				"",
 				"");
+
+			var supplier = RegistredSupplier();
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			Assert.That(supplier.Payer.PaymentSum, Is.EqualTo(600));
 		}
@@ -220,6 +210,14 @@ select 4474;")
 			if (registredClient == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registredClient;
+		}
+
+		private Supplier RegistredSupplier()
+		{
+			var registred = Supplier.Queryable.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+			if (registred == null)
+				throw new Exception("не зарегистрировалли клиента");
+			return registred;
 		}
 	}
 }

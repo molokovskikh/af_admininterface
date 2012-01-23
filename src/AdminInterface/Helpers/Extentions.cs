@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 
 namespace AdminInterface.Helpers
@@ -31,6 +32,22 @@ namespace AdminInterface.Helpers
 				return collection.OrderBy(i => propertyInfo.GetValue(i, null));
 
 			return collection.OrderByDescending(i => propertyInfo.GetValue(i, null));
+		}
+
+		public static IEnumerable<KeyValuePair<DataColumn, object>> ToKeyValuePairs(this DataSet data)
+		{
+			for (var i = 0; i < data.Tables.Count; i++)
+			{
+				var table = data.Tables[i];
+				foreach (DataColumn column in table.Columns)
+				{
+					object value = null;
+					if (table.Rows.Count > 0)
+						value = table.Rows[0][column];
+
+					yield return new KeyValuePair<DataColumn, object>(column, value);
+				}
+			}
 		}
 	}
 }

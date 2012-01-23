@@ -16,7 +16,7 @@ namespace Functional.ForTesting
 	{
 		public static Button Button(this Browser browser, object item, string action)
 		{
-			var url = AppHelper.GetShortUrl(item, action);
+			var url = WatinFixture2.GetShortUrl(item, action);
 			return (Button)browser
 				.Form(l => l.GetAttributeValue("action") != null && l.GetAttributeValue("action").EndsWith(url))
 				.CssSelect("input[type=submit]");
@@ -24,7 +24,7 @@ namespace Functional.ForTesting
 
 		public static Link LinkFor(this Browser browser, object item, string action)
 		{
-			var url = AppHelper.GetShortUrl(item, action);
+			var url = WatinFixture2.GetShortUrl(item, action);
 			return browser.Link(l => l.Url.EndsWith(url));
 		}
 

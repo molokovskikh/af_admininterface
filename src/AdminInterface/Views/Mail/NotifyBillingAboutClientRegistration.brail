@@ -9,3 +9,8 @@
 Кем зарегистрирован: ${admin.Name}
 <br>
 ${payer.Comment}
+<% if user.Accounting.RegistrationMessage:
+%><br>
+${user.Account.RegistrationMessage}
+<br>
+<% end %>

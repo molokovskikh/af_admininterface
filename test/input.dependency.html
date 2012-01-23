@@ -3,14 +3,10 @@
 			<meta http-equiv="content-type" content="text/html; charset=UTF-8">
 			<script src="http://code.jquery.com/jquery-latest.js"></script>
 			<script src="http://code.jquery.com/qunit/git/qunit.js"></script>
-			<script type="" src="../packages/underscore.js.1.1.7/Content/Scripts/Underscore.js"></script>
-			<script type="" src="../packages/Backbone.js.0.5.3/Content/Scripts/Backbone.js"></script>
 			<script src="../src/AdminInterface/Assets/Javascripts/input.dependency.js"></script>
-			<script src="../src/AdminInterface/JavaScript/common.js"></script>
-			<script src="tab.history.js"></script>
+			<script src="input.dependency.js"></script>
 			<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css"></link>
 	</head>
-
 	<body>
 		<h1 id="qunit-header">QUnit example</h1>
 		<h2 id="qunit-banner"></h2>
@@ -19,24 +15,6 @@
 		<ol id="qunit-tests"></ol>
 		<div id="qunit-fixture">test markup, will be hidden</div>
 	</body>
-
-	<div class="tabs">
-		<ul>
-			<li>
-				<a id="test1" href="#" class=selected>Тестовый 1</a>
-			</li>
-			<li>
-				<a id="test2" href="#">Тестовый 2</a>
-			</li>
-		</ul>
-	</div>
-
-	<div id="test1-tab" class="tab">
-		Тестовый 1
-	</div>
-
-	<div id="test2-tab" class="tab" style="display:none">
-		Тестовый 2
-	</div>
-
+	<input type=checkbox id="on-box">
+	<input type=textbox data-depend-on="on-box">
 </html>
