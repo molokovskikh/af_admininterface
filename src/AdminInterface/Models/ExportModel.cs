@@ -30,19 +30,21 @@ namespace AdminInterface.Models
 			int headerRow = 3;
 			ExcelHelper.WriteHeader1(ws, headerRow, 0, "Код клиента", true, true);
 			ExcelHelper.WriteHeader1(ws, headerRow, 1, "Наименование клиента", true, true);
-			ExcelHelper.WriteHeader1(ws, headerRow, 2, filter.HeadCodeName, true, true);
-			ExcelHelper.WriteHeader1(ws, headerRow, 3, filter.HeadName, true, true);
-			ExcelHelper.WriteHeader1(ws, headerRow, 4, "Дата регистрации", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 2, "Регион", true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 3, filter.HeadCodeName, true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 4, filter.HeadName, true, true);
+			ExcelHelper.WriteHeader1(ws, headerRow, 5, "Дата регистрации", true, true);
 			if (filter.ShowUserNames())
-				ExcelHelper.WriteHeader1(ws, headerRow, 5, "С этим адресом зарегистриваны", true, true);
+				ExcelHelper.WriteHeader1(ws, headerRow, 6, "С этим адресом зарегистрированы пользователи, код пользователя (комментарий к пользователю)", true, true);
 
 			ws.Cells.ColumnWidth[0] = 4000;
 			ws.Cells.ColumnWidth[1] = 12000;
-			ws.Cells.ColumnWidth[2] = 3000;
-			ws.Cells.ColumnWidth[3] = 12000;
-			ws.Cells.ColumnWidth[4] = 8000;
+			ws.Cells.ColumnWidth[2] = 6000;
+			ws.Cells.ColumnWidth[3] = 3000;
+			ws.Cells.ColumnWidth[4] = 12000;
+			ws.Cells.ColumnWidth[5] = 8000;
 			if (filter.ShowUserNames())
-				ws.Cells.ColumnWidth[5] = 8000;
+				ws.Cells.ColumnWidth[6] = 15000;
 
 			ws.Cells.Rows[headerRow].Height = 514;
 		}
@@ -54,11 +56,15 @@ namespace AdminInterface.Models
 
 			int row = 4; int colShift = 0;
 
-			ws.Merge(0, 0, 0, 9);
-			ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные пользователи и адреса в регионе", false, true);
+			ws.Merge(0, 0, 0, 6);
+
+			if (filter.FinderType == RegistrationFinderType.Users)
+				ExcelHelper.Write(ws, 0, 0, "Зарегистрированные пользователи", false);
+			if (filter.FinderType == RegistrationFinderType.Addresses)
+				ExcelHelper.Write(ws, 0, 0, "Зарегистрированные адреса", false);
 
 			ws.Merge(1, 1, 1, 2);
-			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
+			ExcelHelper.Write(ws, 1	, 0, "Регион:", false);
 			string regionName;
 			if (filter.Region.Id == ulong.MaxValue)
 				regionName = "Все";
@@ -83,11 +89,12 @@ namespace AdminInterface.Models
 			foreach (var item in reportData) {
 				ExcelHelper.Write(ws, row, colShift + 0, item.ClientId, true);
 				ExcelHelper.Write(ws, row, colShift + 1, item.ClientName, true);
-				ExcelHelper.Write(ws, row, colShift + 2, item.Id, true);
-				ExcelHelper.Write(ws, row, colShift + 3, item.Name, true);
-				ExcelHelper.Write(ws, row, colShift + 4, item.RegistrationDate, true);
+				ExcelHelper.Write(ws, row, colShift + 2, item.RegionName, true);
+				ExcelHelper.Write(ws, row, colShift + 3, item.Id, true);
+				ExcelHelper.Write(ws, row, colShift + 4, item.Name, true);
+				ExcelHelper.Write(ws, row, colShift + 5, item.RegistrationDate, true);
 				if (showUserNames)
-					ExcelHelper.Write(ws, row, colShift + 5, item.UserNames, true);
+					ExcelHelper.Write(ws, row, colShift + 6, item.UserNames, true);
 				row++;
 			}
 

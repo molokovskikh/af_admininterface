@@ -33,11 +33,12 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 		<tr>
 			<th>${app.Sortable("Код клиента", "ClientId")}</th>
 			<th>${app.Sortable("Наименование клиента", "ClientName")}</th>
+			<th>${app.Sortable("Регион", "RegionName")}</th>
 			<th>${app.Sortable(filter.HeadCodeName, "Id")}</th>
 			<th>${app.Sortable(filter.HeadName, "Name")}</th>
 			<th>${app.Sortable("Дата регистрации", "RegistrationDate")}</th>
 			<%if filter.ShowUserNames(): %>
-				<th>С этим адресом зарегистриваны <br /> пользователи (Код)</th>
+				<th>С этим адресом зарегистрированы <br /> пользователи, код пользователя <br /> (комментарий к пользователю)</th>
 			<%end %>
 		</tr>
 	</thead>
@@ -54,6 +55,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 					${UrlHelper.Link(item.ClientName, {@controller: @Suppliers, @params: {@id: item.ClientId}})}
 				<% end %>
 			</td>
+			<td>${item.RegionName}</td>
 			<td>${item.Id}</td>
 			<td>${app.LinkTo(item)}</td>
 			<td>${item.RegistrationDate}</td>
