@@ -59,9 +59,9 @@ namespace AdminInterface.Models
 			ws.Merge(0, 0, 0, 6);
 
 			if (filter.FinderType == RegistrationFinderType.Users)
-				ExcelHelper.Write(ws, 0, 0, "Зарегистрированные пользователи", false);
+				ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные пользователи", false, true);
 			if (filter.FinderType == RegistrationFinderType.Addresses)
-				ExcelHelper.Write(ws, 0, 0, "Зарегистрированные адреса", false);
+				ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные адреса", false, true);
 
 			ws.Merge(1, 1, 1, 2);
 			ExcelHelper.Write(ws, 1	, 0, "Регион:", false);
