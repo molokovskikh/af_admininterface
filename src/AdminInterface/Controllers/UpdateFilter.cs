@@ -28,6 +28,7 @@ namespace AdminInterface.Controllers
 
 		public UpdateFilter()
 		{
+			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
 				{"RequestTime", "RequestTime"},
 				//хак, тк HomeRegion перегружен хибер не может разобраться по какому полю сортировать
