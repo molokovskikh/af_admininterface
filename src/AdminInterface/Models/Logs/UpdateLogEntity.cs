@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
-using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
-using NHibernate.SqlCommand;
 
 namespace AdminInterface.Models.Logs
 {
@@ -78,134 +75,25 @@ namespace AdminInterface.Models.Logs
 		[HasMany(typeof(UpdateDownloadLogEntity), Lazy = true, Inverse = true, OrderBy = "LogTime")]
 		public IList<UpdateDownloadLogEntity> UpdateDownload { get; set; }
 
-		public bool IsDataTransferUpdateType()
+		public static bool IsDataTransferUpdateType(UpdateType updateType)
 		{
-			return UpdateType == UpdateType.Accumulative || UpdateType == UpdateType.Cumulative || UpdateType == UpdateType.LimitedCumulative 
-				|| UpdateType == UpdateType.AccumulativeAsync || UpdateType == UpdateType.CumulativeAsync || UpdateType == UpdateType.LimitedCumulativeAsync 
-				|| IsDocumentLoading();
+			return updateType == UpdateType.Accumulative || updateType == UpdateType.Cumulative || updateType == UpdateType.LimitedCumulative 
+				|| updateType == UpdateType.AccumulativeAsync || updateType == UpdateType.CumulativeAsync || updateType == UpdateType.LimitedCumulativeAsync 
+				|| IsDocumentLoading(updateType);
+		}
+
+		public static bool IsDocumentLoading(UpdateType updateType)
+		{
+			return updateType == UpdateType.LoadingDocuments;
 		}
 
 		public IList<DocumentReceiveLog> GetLoadedDocumentLogs()
 		{
-			//return DocumentLogEntity.FindAllByProperty("SendUpdateId", Id);
 			return ArHelper.WithSession(
 				session => session.CreateCriteria(typeof(DocumentReceiveLog))
 					.Add(Expression.Eq("SendUpdateLogEntity", this))
-					.AddOrder(Order.Desc("LogTime"))
-					.List<DocumentReceiveLog>());
+						.AddOrder(Order.Desc("LogTime"))
+						.List<DocumentReceiveLog>());
 		}
-
-		public bool IsDocumentLoading()
-		{
-			return UpdateType == UpdateType.LoadingDocuments;
-		}
-
-		public static IList<UpdateLogEntity> GetEntitiesFormClient(uint clientCode,
-			DateTime beginDate,
-			DateTime endDate)
-		{
-			var client = Client.Find(clientCode);
-			return ArHelper.WithSession(
-				session => session.CreateCriteria(typeof (UpdateLogEntity))
-					.Add(Expression.InG("User", client.Users.ToList()))
-					.Add(Expression.Ge("RequestTime", beginDate))
-					.Add(Expression.Le("RequestTime", endDate.AddDays(1)))
-					//.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
-					.AddOrder(Order.Desc("RequestTime"))
-					.List<UpdateLogEntity>());
-		}
-
-		public static IList<UpdateLogEntity> GetEntitiesByUser(uint userId,
-			DateTime beginDate,
-			DateTime endDate)
-		{
-			var user = User.Find(userId);
-			return ArHelper.WithSession(
-				session => session.CreateCriteria(typeof(UpdateLogEntity))
-					.Add(Expression.Eq("User", user))
-					.Add(Expression.Ge("RequestTime", beginDate))
-					.Add(Expression.Le("RequestTime", endDate.AddDays(1)))
-					//.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
-					.AddOrder(Order.Desc("RequestTime"))
-					.List<UpdateLogEntity>());
-		}
-
-		public static IList<UpdateLogEntity> GetEntitiesByUpdateType(UpdateType? updateType, ulong regionMask, DateTime beginDate, DateTime endDate)
-		{
-			return ArHelper.WithSession(session => 
-				session.CreateCriteria(typeof(UpdateLogEntity))
-					.CreateAlias("User", "u", JoinType.InnerJoin)
-					.Add(Expression.Gt(Projections2.BitOr("u.WorkRegionMask", regionMask), 0))
-					.Add(Expression.Ge("RequestTime", beginDate))
-					.Add(Expression.Le("RequestTime", endDate.AddDays(1)))
-					//.Add(Expression.Between("RequestTime", beginDate, endDate.AddDays(1)))
-					.Add(Expression.Eq("UpdateType", updateType))
-					.AddOrder(Order.Desc("RequestTime"))
-					.List<UpdateLogEntity>());
-		}
-	}
-
-	public static class UpdateLogEntityExtension
-	{
-		public static IList<UpdateLogEntity> SortBy(this IList<UpdateLogEntity> logEntities, string columnName, bool descending)
-		{
-			if (String.IsNullOrEmpty(columnName))
-				return logEntities;
-			if (columnName.Equals("RequestTime", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.RequestTime).ToList();
-				return logEntities.OrderBy(entity => entity.RequestTime).ToList();
-			}
-			if (columnName.Equals("ResultSize", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.ResultSize).ToList();
-				return logEntities.OrderBy(entity => entity.ResultSize).ToList();
-			}
-			if (columnName.Equals("Addition", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.Addition).ToList();
-				return logEntities.OrderBy(entity => entity.Addition).ToList();
-			}
-			if (columnName.Equals("UserName", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.UserName).ToList();
-				return logEntities.OrderBy(entity => entity.UserName).ToList();
-			}
-			if (columnName.Equals("Login", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.User.Login).ToList();
-				return logEntities.OrderBy(entity => entity.User.Login).ToList();
-			}
-			if (columnName.Equals("ClientName", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.User.Client.Name).ToList();
-				return logEntities.OrderBy(entity => entity.User.Client.Name).ToList();
-			}
-			if (columnName.Equals("UpdateType", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.UpdateType).ToList();
-				return logEntities.OrderBy(entity => entity.UpdateType).ToList();
-			}
-			if (columnName.Equals("AppVersion", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.AppVersion).ToList();
-				return logEntities.OrderBy(entity => entity.AppVersion).ToList();
-			}
-			if (columnName.Equals("Region", StringComparison.OrdinalIgnoreCase))
-			{
-				if (descending)
-					return logEntities.OrderByDescending(entity => entity.User.Client.HomeRegion.Name).ToList();
-				return logEntities.OrderBy(entity => entity.User.Client.HomeRegion.Name).ToList();
-			}
-			return logEntities;
-		}		
 	}
 }

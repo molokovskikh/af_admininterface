@@ -7,7 +7,7 @@ ${app.Asset("details.js")}
 <% if filter.Client: %>
 
 	<% component CaptureFor, {"id" : "Title"}: %>
-			История обновлений клиента ${filter.Client.Name}
+		История обновлений клиента ${filter.Client.Name}
 	<% end %>
 
 	<% component CaptureFor, {"id" : "PostToServer"}: %>
@@ -94,13 +94,13 @@ ${app.Asset("details.js")}
 			</td>
 			<% if filter.ShowRegion(): %>
 			<td>
-				${?log.User.Client.HomeRegion.Name}
+				${log.Region}
 			</td>
 			<% end %>
 			<% if filter.ShowClient(): %>
 			<td>
-				<% if log.User.Client: %>
-				<a title="ClientSettings" href="${siteroot}/client/${log.User.Client.Id}">${log.User.Client.Name}</a>
+				<% if log.ClientId: %>
+					${UrlHelper.Link(log.ClientName, {@controller: @Clients, @action: @Show, @params: {@id: log.ClientId}})}
 				<% end %>
 			</td>
 			<% end %>
@@ -117,7 +117,7 @@ ${app.Asset("details.js")}
 			<% end %>
 			<% if filter.ShowUser(): %>
 			<td>
-				<a title="UserSettings" href="${siteroot}/users/${log.User.Id}/edit">${log.User.GetLoginWithName()}</a>
+				${UrlHelper.Link(log.UserName, {@controller: @Users, @action: @Show, @params: {@id: log.UserId}})}
 			</td>
 			<% end %>
 			<% if filter.ShowUpdateSize(): %>
@@ -133,7 +133,7 @@ ${app.Asset("details.js")}
 			</td>
 			<% if filter.ShowLog(): %>
 			<td>
-				<% if not string.IsNullOrEmpty(log.Log): %>
+				<% if log.HaveLog: %>
 				<a id="ShowLogLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDownloadLog?updateLogEntityId=${log.Id}', 'DownloadLog');">
 					Лог
 				</a>

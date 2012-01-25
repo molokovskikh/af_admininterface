@@ -155,6 +155,7 @@
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
+    <Compile Include="Controllers\UpdateFilter.cs" />
     <Compile Include="Helpers\ExcelHelper.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
