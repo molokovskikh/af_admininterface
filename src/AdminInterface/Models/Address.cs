@@ -139,7 +139,7 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				return (AvaliableForUsers.Where(user => user.Enabled && (user.Client.Status == ClientStatus.On)).Count() > 0);
+				return AvaliableForUsers.Any(user => user.Enabled && (user.Client.Status == ClientStatus.On));
 			}
 		}
 
@@ -154,7 +154,9 @@ namespace AdminInterface.Models
 		{
 			get
 			{
-				return !AvaliableForUsers.All(u => u.IsOldUserUpdate);
+				if (AvaliableForUsers.Count == 0)
+					return false;
+				return AvaliableForUsers.All(u => u.IsOldUserUpdate);
 			}
 		}
 

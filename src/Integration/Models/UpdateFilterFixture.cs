@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models.Logs;
+using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -30,8 +31,8 @@ namespace Integration.Models
 			filter.UpdateType = UpdateType.Accumulative;
 			var results = filter.Find();
 			Assert.That(results.Count, Is.GreaterThan(0));
-			Assert.That(results.Any(r => r.Id == update1.Id), Is.False, "нашли запись обновления в воронеже");
-			Assert.That(results.Any(r => r.Id == update2.Id), Is.True, "не нашли запись обновления в челябинске");
+			Assert.That(results.Any(r => r.Id == update1.Id), Is.False, "нашли запись обновления в воронеже, {0}", update1.Id);
+			Assert.That(results.Any(r => r.Id == update2.Id), Is.True, "не нашли запись обновления в челябинске, {0} {1}", update2.Id, results.Implode(r => r.Id));
 		}
 	}
 }

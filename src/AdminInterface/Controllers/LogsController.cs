@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -16,6 +15,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate.Linq;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
@@ -122,12 +122,18 @@ namespace AdminInterface.Controllers
 			else if (userId.HasValue)
 				filter.User = User.Find(userId.Value);
 
+			BindObjectInstance(filter, "filter");
+
+			if (filter.Client != null)
+				filter.Client = Client.Find(filter.Client.Id);
+
+			if (filter.User != null)
+				filter.User = User.Find(filter.User.Id);
+
 			PropertyBag["beginDate"] = filter.BeginDate;
 			PropertyBag["endDate"] = filter.EndDate;
 			PropertyBag["filter"] = filter;
-			PropertyBag["logEntities"] = filter.Find().SortBy(Request["SortBy"], Request["Direction"] == "desc");
-			PropertyBag["SortBy"] = Request["SortBy"];
-			PropertyBag["Direction"] = Request["Direction"];
+			PropertyBag["logEntities"] = filter.Find();
 		}
 
 		public void PasswordChangeLog(uint id)
@@ -181,82 +187,6 @@ namespace AdminInterface.Controllers
 				Begin = DateTime.Today,
 				End = DateTime.Today
 			};
-		}
-	}
-
-	public class UpdateFilter : SortableContributor
-	{
-		public UpdateType? UpdateType { get; set; }
-		public ulong RegionMask { get; set; }
-		public DateTime BeginDate { get; set; }
-		public DateTime EndDate { get; set; }
-		public Client Client { get; set; }
-		public User User { get; set; }
-
-		public IList<UpdateLogEntity> Find()
-		{
-			if (User != null)
-				return UpdateLogEntity.GetEntitiesByUser(User.Id, BeginDate, EndDate);
-			if (Client != null)
-				return UpdateLogEntity.GetEntitiesFormClient(Client.Id, BeginDate, EndDate);
-
-			return UpdateLogEntity.GetEntitiesByUpdateType(UpdateType, RegionMask, BeginDate, EndDate);
-		}
-
-		public bool ShowRegion()
-		{
-			return UpdateType != null;
-		}
-
-		public bool ShowClient()
-		{
-			return ShowRegion();
-		}
-
-		public bool ShowUpdateType()
-		{
-			return User != null || Client != null;
-		}
-
-		private bool IsDataTransferUpdate()
-		{
-			return UpdateType != null
-				&& (UpdateType == Models.Logs.UpdateType.Cumulative
-					|| UpdateType == Models.Logs.UpdateType.Accumulative);
-		}
-
-		public bool ShowUser()
-		{
-			return Client != null || UpdateType != null;
-		}
-
-		public bool ShowUpdateSize()
-		{
-			return ShowUpdateType();
-		}
-
-		public bool ShowLog()
-		{
-			return ShowUpdateType();
-		}
-
-		public string GetUri()
-		{
-			var result = new StringBuilder();
-			if (UpdateType != null)
-			{
-				result.Append("updateType=" + (int)UpdateType);
-				result.Append("&regionMask=" + RegionMask);
-			}
-			if (Client != null)
-				result.Append("clientcode=" + Client.Id);
-			if (User != null)
-				result.Append("userid=" + User.Id);
-
-			result.Append("&beginDate="+BeginDate.ToShortDateString());
-			result.Append("&endDate="+EndDate.ToShortDateString());
-
-			return result.ToString();
 		}
 	}
 
