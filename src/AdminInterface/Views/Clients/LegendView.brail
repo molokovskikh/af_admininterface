@@ -1,8 +1,14 @@
 ﻿<% 
-	component Legend, { "LegendItems" : {	"Пользователь отключен" : "DisabledInAd", 
-	                                        "Пользователь отключен биллингом" : "DisabledByBilling",
-											"Пользователь заблокирован" : "LockedUser",
-											"Пользователь не существует" : "NotExistsUser",
-											"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self"},
-						"ByCenter" : false}
+	items = {"Пользователь отключен" : "DisabledInAd",
+		"Пользователь отключен биллингом" : "DisabledByBilling",
+		"Пользователь заблокирован" : "LockedUser",
+		"Пользователь не существует" : "NotExistsUser",
+		"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self"}
+
+	if ?showAddressLegend:
+		items.Add("Адрес не имеет подключенных пользователей", "has-no-connected-users")
+		items.Add("Не получал обновлений более 7 дней", "old-user-update")
+	end
+
+	component Legend, { "LegendItems" : items, "ByCenter" : false}
 %>

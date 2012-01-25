@@ -297,7 +297,7 @@
 			<% end %>
 			</table>
 		</div>
-		<% OutputSubView("LegendView") %>
+		<% OutputSubView("LegendView", {@showAddressLegend: true}) %>
 	</div>
 	
 	<div class="TwoColumn" style="margin-left: 10px">
