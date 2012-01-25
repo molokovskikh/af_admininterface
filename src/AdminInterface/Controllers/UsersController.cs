@@ -156,11 +156,18 @@ namespace AdminInterface.Controllers
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			if (user.Client != null)
 			{
 				var setting = user.Client.Settings;
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
+			}
+			if (user.SupplierUser()) {
+				var supplier = Supplier.Find(user.RootService.Id);
+				if (supplier != null) {
+					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
+				}
 			}
 			if (String.IsNullOrEmpty(user.Registrant))
 				PropertyBag["Registrant"] = null;

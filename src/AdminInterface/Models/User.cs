@@ -291,6 +291,11 @@ namespace AdminInterface.Models
 			}
 		}
 
+		public virtual bool SupplierUser()
+		{
+			return RootService.Type == ServiceType.Supplier;
+		}
+
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
