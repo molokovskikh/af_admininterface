@@ -36,7 +36,7 @@ namespace Integration.Controllers
 			var ws = wb.Worksheets.First();
 			Assert.That(ws.Name, Is.StringContaining("Зарегистрированные пользователи и адреса в регионе"));
 			Assert.That(ws.Cells.GetRow(1).GetCell(0).Value, Is.EqualTo("Регион:"));
-			Assert.That(ws.Cells.GetRow(1).GetCell(1).Value, Is.EqualTo(_filter.Region.ToString()));
+			Assert.That(ws.Cells.GetRow(1).GetCell(1).Value, Is.EqualTo("Все"));
 			Assert.That(ws.Cells.GetRow(2).GetCell(0).Value, Is.EqualTo("Период:"));
 			Assert.That(ws.Cells.GetRow(2).GetCell(1).Value, Is.EqualTo(string.Format("С {0} по {1}", _filter.Period.Begin.ToShortDateString(), _filter.Period.End.ToShortDateString())));
 			Assert.That(ws.Cells.GetRow(3).GetCell(0).Value, Is.EqualTo("Код клиента"));

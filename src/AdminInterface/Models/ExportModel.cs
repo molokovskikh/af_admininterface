@@ -64,9 +64,9 @@ namespace AdminInterface.Models
 				ExcelHelper.WriteHeader1(ws, 0, 0, "Зарегистрированные адреса", false, true);
 
 			ws.Merge(1, 1, 1, 2);
-			ExcelHelper.Write(ws, 1	, 0, "Регион:", false);
+			ExcelHelper.Write(ws, 1, 0, "Регион:", false);
 			string regionName;
-			if (filter.Region.Id == ulong.MaxValue)
+			if (filter.Region == null)
 				regionName = "Все";
 			else
 			{
