@@ -130,7 +130,6 @@ namespace AdminInterface.Controllers
 
 			Period = new DatePeriod(DateTime.Now.AddDays(-1), DateTime.Now);
 			FinderType = RegistrationFinderType.Users;
-			Region = RegionHelper.GetAllRegions().Where(region => region.Name.ToLower().Equals("все")).First();
 		}
 
 		public string HeadCodeName
@@ -162,7 +161,7 @@ namespace AdminInterface.Controllers
 			return FinderType == RegistrationFinderType.Addresses;
 		}
 
-		private IList<RegistrationInformation> AcceptPaganator(DetachedCriteria criteria)
+		private IList<RegistrationInformation> AcceptPaginator(DetachedCriteria criteria)
 		{
 			var countSubquery = CriteriaTransformer.TransformToRowCount(criteria);
 			_lastRowsCount = ArHelper.WithSession(s => countSubquery.GetExecutableCriteria(s).UniqueResult<int>());
@@ -190,12 +189,16 @@ namespace AdminInterface.Controllers
 			    .SetProjection(Projections.ProjectionList()
 			                    .Add(Projections.Count("u.Id"))));
 
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+
 			if (FinderType == RegistrationFinderType.Users) {
 
 				var userCriteria = DetachedCriteria.For<User>();
 
 				userCriteria.CreateCriteria("RootService", "s", JoinType.InnerJoin)
-					.Add(Expression.Sql("{alias}.HomeRegion & " + Region.Id + " > 0"))
+					.Add(Expression.Sql("{alias}.HomeRegion & " + regionMask + " > 0"))
 					.SetProjection(Projections.ProjectionList().Add(Projections.SqlProjection("{alias}.HomeRegion as RegionName", new[] {"RegionName"}, new[] {NHibernateUtil.String})));
 
 				userCriteria.SetProjection(Projections.ProjectionList()
@@ -223,7 +226,7 @@ namespace AdminInterface.Controllers
 				var adressCriteria = DetachedCriteria.For<Address>("ad");
 
 				adressCriteria.CreateCriteria("Client", "c", JoinType.InnerJoin)
-					.Add(Expression.Sql("{alias}.RegionCode & " + Region.Id + " > 0"));
+					.Add(Expression.Sql("{alias}.RegionCode & " + regionMask + " > 0"));
 
 				adressCriteria.SetProjection(Projections.ProjectionList()
 				    .Add(Projections.Property<Address>(u => u.Id).As("Id"))
@@ -276,7 +279,7 @@ namespace AdminInterface.Controllers
 
 		public IList<RegistrationInformation> Find()
 		{
-			var result = AcceptPaganator(GetCriteria());
+			var result = AcceptPaginator(GetCriteria());
 
 			foreach (var registrationInformation in result) {
 				registrationInformation.ObjectType = FinderType;
@@ -292,8 +295,10 @@ namespace AdminInterface.Controllers
 	]
 	public class ManagerReportsController: ARSmartDispatcherController
 	{
-		public void UsersAndAdresses([DataBind("filter")] UserFinderFilter userFilter)
+		public void UsersAndAdresses()
 		{
+			var userFilter = new UserFinderFilter();
+			BindObjectInstance(userFilter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 			PropertyBag["filter"] = userFilter;
 			PropertyBag["Users"] = userFilter.Find();
 		}
