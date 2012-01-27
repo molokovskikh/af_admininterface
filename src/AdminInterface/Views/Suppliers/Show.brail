@@ -4,6 +4,14 @@
 	Поставщик ${supplier.Name}, Код ${supplier.Id}
 <% end %>
 
+${app.Asset("search.editor.js")}
+
+<script type="text/javascript">
+	$(function () {
+		$("input[type=button].search").data("url", "${siteroot}/Client/SearchPayer");
+	});
+</script>
+
 <style>
 	input[type='text']
 	{
@@ -39,6 +47,29 @@
 					${app.LinkTo("История минипочты", @Mails, @Index, {"filter.Supplier.Id": supplier.Id, @attributes: {"target": "_blank"}})}
 				</li>
 			</ul>
+		</div>
+
+		<div class=block>
+			<form id=ChangePayer method=post action=ChangePayer>
+			${FormHelper.HiddenField("supplierId", supplier.Id)}
+			<h3>Изменение плательщика</h3>
+				<table style="width:100%">
+					<tbody>
+						<tr>
+							<td>
+								${FormHelper.HiddenField("payerId")}
+								<div class=search>
+									<input type=text class=term class=required>
+									<input type=button class=search value="Найти">
+								</div>
+								<div class=settings style="display:none;">
+									<input type=submit value="Изменить">
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
 		</div>
 
 		<div class=block>

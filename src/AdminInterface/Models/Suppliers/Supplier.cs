@@ -293,6 +293,23 @@ namespace AdminInterface.Models.Suppliers
 			foreach (var price in Prices)
 				price.RegionalData.Add(new PriceRegionalData(price, region));
 		}
+
+
+		public virtual void ChangePayer(Payer payer)
+		{
+			var oldPayers = Payer;
+			Payer = payer;
+
+			foreach (var user in Users)
+			{
+				user.Payer.Users.Remove(user);
+				user.Payer = payer;
+				user.Payer.Users.Add(user);
+			}
+
+			payer.UpdatePaymentSum();
+			oldPayers.UpdatePaymentSum();
+		}
 	}
 
 	[ActiveRecord("RegionalData", Schema = "Usersettings")]
