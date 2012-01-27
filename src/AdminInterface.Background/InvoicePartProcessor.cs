@@ -24,6 +24,7 @@ namespace AdminInterface.Background
 				{
 					var part = ActiveRecordMediator<InvoicePart>.FindByPrimaryKey(id);
 					part.Process();
+					ActiveRecordMediator.Save(part.Invoice);
 					ActiveRecordMediator.Save(part);
 				}
 

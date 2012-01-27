@@ -161,6 +161,7 @@
     <Compile Include="Initializers\Test.cs" />
     <Compile Include="Models\AuditListener.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
+    <Compile Include="Models\Billing\BalanceSummary.cs" />
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />

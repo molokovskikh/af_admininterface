@@ -62,7 +62,6 @@ namespace AdminInterface.Models.Billing
 		{
 			Processed = true;
 			Invoice.CalculateSum();
-			Invoice.Save();
 		}
 
 		public override string ToString()

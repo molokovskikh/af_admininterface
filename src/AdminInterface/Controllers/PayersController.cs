@@ -30,45 +30,19 @@ namespace AdminInterface.Controllers
 
 			var begin = new DateTime(year, 1, 1);
 			var end = new DateTime(year, 12, 31);
-
 			var payer = Payer.Find(id);
-			var invoices = Invoice.Queryable.Where(p => p.Payer == payer).ToList();
-			var payments = Payment.Queryable.Where(p => p.Payer == payer).ToList();
-			var acts = Act.Queryable.Where(p => p.Payer == payer).ToList();
-			var operations = ActiveRecordLinqBase<BalanceOperation>.Queryable.Where(d => d.Payer == payer).ToList();
-			var refunds = operations.Where(d => d.Type == OperationType.Refund);
-			var reliefs = operations.Where(d => d.Type == OperationType.DebtRelief);
-			var items = invoices
-				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false, Object  = (object)i })
-				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false, Object = (object)p }))
-				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false, Object = (object)a }))
-				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = true, Object = (object)d }))
-				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = true, Object = (object)d }))
-				.ToList();
-
-			var befores = items.Where(i => i.Date < begin);
-			var before = befores
-				.Select(i => i.Object)
-				.OfType<IBalanceUpdater>()
-				.Sum(i => i.BalanceAmount);
-			if (payer.BeginBalanceDate.HasValue)
-				before += payer.BeginBalance;
-
-			items = items.Where(i => i.Date >= begin && i.Date <= end).ToList();
-			var total = items.Select(i => i.Object).OfType<IBalanceUpdater>().Sum(i => i.BalanceAmount);
-
-			items = items.OrderBy(i => i.Date).ToList();
+			var summary = new BalanceSummary(begin, end, payer);
 
 			PropertyBag["year"] = year;
 			PropertyBag["operation"] = new BalanceOperation(payer);
 			PropertyBag["payer"] = payer;
-			PropertyBag["items"] = items;
+			PropertyBag["items"] = summary.Items;
 
-			if (before != 0)
-				PropertyBag["before"] = before;
+			if (summary.Before != 0)
+				PropertyBag["before"] = summary.Before;
 
-			if (total != 0)
-				PropertyBag["total"] = total;
+			if (summary.Total != 0)
+				PropertyBag["total"] = summary.Total;
 		}
 
 		public void NewPayment(uint id, int year)

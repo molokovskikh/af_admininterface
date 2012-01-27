@@ -135,6 +135,7 @@
     <Compile Include="Models\AddressFixture.cs" />
     <Compile Include="Models\AuditLogRecordFixture.cs" />
     <Compile Include="Models\BalanceOperationFixture.cs" />
+    <Compile Include="Models\BalanceSummaryFixture.cs" />
     <Compile Include="Models\ClientSettingFixture.cs" />
     <Compile Include="Models\DocumentFilterFixture.cs" />
     <Compile Include="Models\PayerFilterFixture.cs" />
