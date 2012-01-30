@@ -381,7 +381,7 @@ WHERE RowId = ?Id;
 			foreach (var dataRow in modifiedIntersection) {
 				if (Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip) { 
 					Intersection.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
-					inter=> {
+					inter => {
 						inter.AvailableForClient = false;
 						inter.Save();
 					});
