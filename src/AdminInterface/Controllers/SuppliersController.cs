@@ -1,6 +1,8 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -42,6 +44,21 @@ namespace AdminInterface.Controllers
 					RedirectToReferrer();
 				}
 			}
+		}
+
+		public void ChangePayer(uint supplierId, uint payerId)
+		{
+			var suplier = Supplier.Find(supplierId);
+
+			SecurityContext.Administrator.CheckClientHomeRegion(suplier.HomeRegion.Id);
+			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
+				throw new NotHavePermissionException();
+
+			var payer = Payer.Find(payerId);
+			suplier.ChangePayer(payer);
+
+			Notify("Изменено");
+			RedirectToAction("Show", new {id = suplier.Id});
 		}
 
 		public void SendMessage(uint id, string message)

@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Functional.Billing;
@@ -15,12 +16,15 @@ namespace Functional.Suppliers
 	{
 		private User user;
 		private Supplier supplier;
+		private Payer  payer;
 
 		[SetUp]
 		public void SetUp()
 		{
 			user = DataMother.CreateSupplierUser();
 			supplier = (Supplier)user.RootService;
+			payer = DataMother.CreatePayer();
+			payer.Save();
 		}
 
 		[Test]
@@ -92,6 +96,20 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Новый пользователь"));
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+		}
+
+		[Test]
+		public void Change_Payer()
+		{
+			Open(supplier);
+			browser.TextField(Find.ByClass("term")).AppendText("Тестовый");
+			browser.Button(Find.ByClass("search")).Click();
+			var selectList = browser.Div(Find.ByClass("search")).SelectLists.First();
+			Assert.IsNotNull(selectList);
+			Assert.That(selectList.Options.Count, Is.GreaterThan(0));
+			selectList.SelectByValue(payer.Id.ToString());
+			Click("Изменить");
+			AssertText("Изменено");
 		}
 	}
 }
