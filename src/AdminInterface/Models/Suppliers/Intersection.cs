@@ -25,5 +25,8 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("CostId")]
 		public virtual Cost Cost { get; set; }
+
+		[Property]
+		public virtual bool AvailableForClient { get; set;}
 	}
 }

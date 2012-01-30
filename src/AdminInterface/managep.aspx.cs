@@ -375,6 +375,19 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
+
+			var modifiedIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
+
+			foreach (var dataRow in modifiedIntersection) {
+				if (Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip) { 
+					Intersection.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
+					inter=> {
+						inter.AvailableForClient = false;
+						inter.Save();
+					});
+				}
+			}
+
 			With.Transaction((connection, transaction) => {
 				pricesDataAdapter.InsertCommand.Connection = connection;
 				pricesDataAdapter.InsertCommand.Transaction = transaction;
