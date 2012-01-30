@@ -111,5 +111,15 @@ namespace Functional.Suppliers
 			Click("Изменить");
 			AssertText("Изменено");
 		}
+
+		[Test]
+		public void Vip_Price()
+		{
+			Open(supplier);
+			Click("Настройка");
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
+			Click("Применить");
+			AssertText("Все клиенты были отключены от VIP прайсов");
+		}
 	}
 }

@@ -1,12 +1,14 @@
 <%@ Page Language="c#" AutoEventWireup="true" Inherits="AddUser.managep" CodeBehind="managep.aspx.cs"
 	Theme="Main" MasterPageFile="~/Main.Master" %>
 
-<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">	
+<asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
+	<link rel="Stylesheet" type="text/css" href="Css/Common.css" />
 <form id="form1" runat="server">
 		<div class="MainBlock">
 			<h4 class="MainHeader">
 				<asp:Label ID="HeaderLabel" runat="server" />
 			</h4>
+			 <div runat="server" id="messageDiv" class="flash notice" style="display: none;">Сохранено</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
 					Прайс листы

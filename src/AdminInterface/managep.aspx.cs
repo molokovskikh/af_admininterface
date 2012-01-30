@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Linq;
 using System.Web;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
@@ -377,16 +378,20 @@ WHERE RowId = ?Id;
 			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
 
 			var modifiedIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
-
-			foreach (var dataRow in modifiedIntersection) {
-				if (Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip) { 
-					Intersection.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
+			var vipChangeFlag = false;
+			foreach (var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip)) {
+				Intersection.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
 					inter => {
 						inter.AvailableForClient = false;
 						inter.Save();
 					});
-				}
+				vipChangeFlag = true;
 			}
+			if (vipChangeFlag) { 
+				messageDiv.InnerText = "Все клиенты были отключены от VIP прайсов";
+				messageDiv.Style.Add("display", "block");
+			}
+
 
 			With.Transaction((connection, transaction) => {
 				pricesDataAdapter.InsertCommand.Connection = connection;
