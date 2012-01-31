@@ -3,7 +3,7 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<link rel="Stylesheet" type="text/css" href="Css/Common.css" />
-	<script src="/Assets/Javascripts/jquery-1.6.2.js" type="text/javascript"></script>
+	<script src="/futureAdm/Assets/Javascripts/jquery-1.6.2.min.js" type="text/javascript"></script>
 
 	<script type="text/javascript">
 		$(function () {
