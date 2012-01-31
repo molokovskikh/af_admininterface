@@ -3,12 +3,28 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 	<link rel="Stylesheet" type="text/css" href="Css/Common.css" />
+	<script src="/Assets/Javascripts/jquery-1.6.2.js" type="text/javascript"></script>
+
+	<script type="text/javascript">
+		$(function () {
+			$('.PriceTypeList').change(function () {
+				$('#messageDiv').html('');
+				$('#messageDiv').append("Все клиенты будут отключены от VIP прайсов");
+				if ($(this).val() == 2) {
+					$('#messageDiv').css("display", "block");
+				} else {
+					$('#messageDiv').css("display", "none");
+				}
+			});
+		});
+	</script>
+
 <form id="form1" runat="server">
 		<div class="MainBlock">
 			<h4 class="MainHeader">
 				<asp:Label ID="HeaderLabel" runat="server" />
 			</h4>
-			 <div runat="server" id="messageDiv" class="flash notice" style="display: none;">Сохранено</div>
+			<div runat="server" id="messageDiv" class="Warning" style="display: none; padding: 10px 10px 10px 50px;" ClientIDMode="Static"></div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
 					Прайс листы
@@ -49,7 +65,7 @@
 							</asp:TemplateField>
 							<asp:TemplateField HeaderText="Тип прайса">
 								<ItemTemplate>
-									<asp:DropDownList ID="PriceTypeList" runat="server" SelectedValue='<%# Eval("PriceType") %>'>
+									<asp:DropDownList ID="PriceTypeList" runat="server" SelectedValue='<%# Eval("PriceType") %>' ClientIDMode="Inherit" CssClass="PriceTypeList">
 										<asp:ListItem Value="0">Обычный</asp:ListItem>
 										<asp:ListItem Value="1">Ассортиментный</asp:ListItem>
 										<asp:ListItem Value="2">VIP</asp:ListItem>
