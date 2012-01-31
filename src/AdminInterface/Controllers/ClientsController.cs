@@ -405,6 +405,12 @@ where s.Name like :SearchText")
 				}
 			}
 
+			if (user != null && user.AvaliableAddresses.Any(a => a.AvaliableForUsers.Count > 1)) {
+					Error("Пользователь не может быть перемещен т.к. подключен к адресу который связан с другими пользователями");
+					RedirectUsingRoute("users", "Edit", new { id = user.Id });
+					return;
+			}
+
 			if (address != null)
 				user = address.AvaliableForUsers.SingleOrDefault();
 			if (user != null)
