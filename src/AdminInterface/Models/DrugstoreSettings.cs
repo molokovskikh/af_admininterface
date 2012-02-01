@@ -52,7 +52,7 @@ namespace AdminInterface.Models
 		[OneToOne]
 		public virtual Client Client { get; set; }
 		
-		[Property, Description("Сотрудник АК \"Инфорум\""), Auditable]
+		[Property, Description("Не доставлять заказы поставщикам"), Auditable]
 		public virtual bool ServiceClient { get; set; }
 
 		[Property, Description("Тип клиента в интефрейсе поставщика"), Auditable]
