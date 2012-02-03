@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
@@ -90,6 +91,53 @@ namespace Integration.Models
 			filter.SearchText = phone;
 			var result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(0), result.Implode(r => r.ClientId));
+		}
+
+		[Test]
+		public void Search_email_in_user()
+		{
+			var user = DataMother.CreateSupplierUser();
+			var supplier = (Supplier)user.RootService;
+			
+			var email = @"testmailQWERTYS@mail.ru";
+			var contactGroup = new ContactGroup {
+				Type = ContactGroupType.General,
+				Specialized = true,
+				Name = "testGroup",
+				ContactGroupOwner = supplier.ContactGroupOwner
+			};
+			contactGroup.Save();
+			user.ContactGroup = contactGroup;
+			user.ContactGroup.AddContact(ContactType.Email, email);
+			user.Save();
+
+			var user2 = new User(supplier.Payer, supplier) {
+				Login = "temporary-login2"
+			};
+			user2.Save();
+			user2.Setup();
+			user2.Update();
+
+			Flush();
+
+			filter.SearchText = email;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+			Assert.That(result[0].ClientId, Is.EqualTo(supplier.Id));
+
+			var email2 = "testmailQWERTYS2@mail.ru";
+			supplier.ContactGroupOwner.ContactGroups[0].AddContact(ContactType.Email, email2);
+			supplier.Save();
+
+			Flush();
+
+			filter.SearchText = email2;
+			result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(2));
+
+			user.Delete();
+			user2.Delete();
+			ActiveRecordMediator.Delete(supplier);
 		}
 
 		private string RandomPhone()

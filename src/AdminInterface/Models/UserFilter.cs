@@ -249,7 +249,7 @@ left join Future.Addresses a on a.Id = ua.AddressId";
 LOWER(u.Login) like '{0}' or
 LOWER(u.Name) like '{0}' or
 LOWER(s.Name) like '{0}' or
-(LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0) or
+(LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))) or
 LOWER(Persons.Name) like '{0}' ",
 							sqlSearchText));
 					if (searchTextIsNumber)
@@ -294,7 +294,7 @@ LOWER(Persons.Name) like '{0}' ",
 							String.Format(" REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ", sqlSearchText.Replace("-", "")));
 					else
 						filter = AddFilterCriteria(filter,
-							String.Format(" LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 ", sqlSearchText));
+							String.Format(" LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))", sqlSearchText));
 					break;
 				}
 				case SearchUserBy.ByPersons: {
