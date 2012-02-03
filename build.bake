@@ -60,9 +60,7 @@ unless Configuration.IsDefined(@notInteractive):
 
 task @default, [@Build]
 
-task @Build, [@BuildWebSite, @BuildBackground]
-
-task @BuildFull, [@Build, @BuildPrinter]
+task @Build, [@BuildWebSite, @BuildBackground, @BuildPrinter]
 
 task @BuildPrinter:
 	oldProject = Globals.Project
@@ -70,13 +68,10 @@ task @BuildPrinter:
 	project = @Printer
 	Engine.Tasks.First({t| t.Name == "BuildApp"}).Executed = false
 	Engine.Execute("BuildApp")
-	config = "output/$project/$project.exe.config"
-	doc = XDocument.Load(config)
-	doc.XPathSelectElement("//appSettings/add[@key=\"User\"]").Add(XAttribute("value", Ask("user for acdcserv:")))
-	doc.XPathSelectElement("//appSettings/add[@key=\"Password\"]").Add(XAttribute("value", Ask("password:")))
-	doc.Save(config)
+	Cp("src/$project/app.release.config", "output/$project/$project.config")
+	Cp("lib/Chrome.Printer/bin/*", "output/$project/")
+	Rm("output/$project/_PublishedWebsites", true)
 	Globals.Project = oldProject
-	Rm("output/Printer/_PublishedWebsites", true)
 
 task @DeployPrinter:
 	Globals.Project = @Printer
@@ -101,11 +96,9 @@ task @BuildBackground:
 	Rm("output/$project/$project.*.config")
 	Globals.Project = oldProject
 
-task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackground, @SendDeployNotification]
+task @deploy, [@Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackground, @DeployPrinter, @SendDeployNotification]
 
 task @TestDeploy, [@BuildWebSite, @WebDeploy]
-
-task @FullDeploy, [@Production, @BuildFull, @Backup, @Migrate, @WebDeploy, @DeployPrinter, @DeployBackground, @SendDeployNotification]
 
 task @FindIntruders:
 	Impersonate:
