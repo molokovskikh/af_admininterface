@@ -8,6 +8,7 @@ using System.Security.AccessControl;
 using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -102,6 +103,19 @@ namespace AdminInterface.Models.Suppliers
 
 		[HasMany(Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<OrderSendRules> OrderRules { get; set; }
+
+		[HasAndBelongsToMany(typeof (CertificateSource),
+			Lazy = true,
+			ColumnKey = "SupplierId",
+			Table = "SourceSuppliers",
+			Schema = "Documents",
+			ColumnRef = "CertificateSourceId")]
+		public virtual IList<CertificateSource> CertificateSources { get; set; }
+
+		public virtual CertificateSource GetSertificateSource()
+		{
+			return CertificateSources.FirstOrDefault();
+		}
 
 		public virtual IList<User> Users
 		{

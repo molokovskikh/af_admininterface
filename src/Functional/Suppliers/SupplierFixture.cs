@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Functional.Billing;
@@ -102,7 +105,6 @@ namespace Functional.Suppliers
 		[Test]
 		public void Change_Payer()
 		{
-			
 			Open(supplier);
 			browser.TextField(Find.ByClass("term")).AppendText("Тестовый");
 			browser.Button(Find.ByClass("search")).Click();
@@ -123,6 +125,28 @@ namespace Functional.Suppliers
 			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
 			Click("Применить");
 			AssertText("Все клиенты были отключены от VIP прайсов");
+		}
+
+
+		[Test]
+		public void Set_sertificate_source()
+		{
+			Open(supplier);
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
+			Thread.Sleep(3000);
+			var newCertificate = new CertificateSource {
+				Name = "Test_Source",
+				SourceClassName = "Test_class_Name"
+			};
+			newCertificate.Save();
+			Flush();
+			browser.Button("editChangerButton").Click();
+			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
+			browser.Button("saveCertificateSourceButton").Click();
+			AssertText("Сохранено");
+			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
+			newCertificate.Delete();
 		}
 	}
 }

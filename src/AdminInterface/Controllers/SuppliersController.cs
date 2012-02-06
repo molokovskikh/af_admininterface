@@ -1,8 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Text;
 using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -11,6 +16,7 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Controllers
 {
@@ -70,6 +76,40 @@ namespace AdminInterface.Controllers
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
+		}
+
+		[ManualAuditable]
+		public void ChangeSertificateSource(uint supplierId, uint sertificateSourceId)
+		{
+			var supplier = Supplier.Find(supplierId);
+			var oldSource = CertificateSource.Queryable.Where(c => c.Suppliers.Contains(supplier)).ToList();
+			var logMessage = new StringBuilder();
+			oldSource.ForEach(s => {
+				s.Suppliers.Remove(supplier);
+				logMessage.AppendLine(string.Format("Удален источник сертификатов {0}", s.GetName()));
+				s.Save();
+			});
+			if (sertificateSourceId > 0) { 
+				var sertSource = CertificateSource.Find(sertificateSourceId);
+				sertSource.Suppliers.Add(supplier);
+				logMessage.AppendLine(string.Format("Установлен источник сертификатов {0}", sertSource.GetName()));
+				sertSource.Save();
+			}
+			Notify("Сохранено");
+
+			new ClientInfoLogEntity(logMessage.ToString(), supplier).Save();
+
+			RedirectToReferrer();
+		}
+
+		[return : JSONReturnBinder]
+		public object[] GetCertificateSourses()
+		{
+			Func<CertificateSource, string> predicate = c => !string.IsNullOrEmpty(c.Name) ? c.Name : c.SourceClassName;
+			return CertificateSource.Queryable.ToList()
+				.OrderBy(predicate)
+				.Select(c => new {c.Id, Name = predicate(c)})
+				.ToArray();
 		}
 	}
 }

@@ -165,6 +165,7 @@
     <Compile Include="Models\Billing\DateTimeExtentions.cs" />
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
+    <Compile Include="Models\Certificates\CertificateSource.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Logs\PrgDataLog.cs" />

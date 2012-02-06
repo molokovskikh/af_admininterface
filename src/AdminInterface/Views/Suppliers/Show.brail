@@ -10,6 +10,21 @@ ${app.Asset("search.editor.js")}
 	$(function () {
 		$("input[type=button].search").data("url", "${siteroot}/Client/SearchPayer");
 	});
+
+	function loadChanger() {
+		var selectList = "<select name='sertificateSourceId'><option value=0>Нет</option>";
+		$.ajax({
+			url: "${siteroot}/Suppliers/GetCertificateSourses",
+			success: function (data) {
+				for (var item in data) {
+					selectList += "<option value=" + data[item].Id + ">" + data[item].Name + "</option>";
+				}
+				selectList += "</select> <br/> <button type=submit id='saveCertificateSourceButton'>Сохранить</button>";
+				$('#sertificateChanger').append(selectList);
+				$('#editChangerButton').css("display", "none");
+			}
+		});
+	}
 </script>
 
 <style>
@@ -69,6 +84,21 @@ ${app.Asset("search.editor.js")}
 						</tr>
 					</tbody>
 				</table>
+			</form>
+		</div>
+
+		<div class="block">
+			<form id=ChangeSertificateSource method=post action=ChangeSertificateSource>
+			${FormHelper.HiddenField("supplierId", supplier.Id)}
+				<h3>Источник сертификатов</h3>
+				<%	sertificateSource = supplier.GetSertificateSource() %>
+				<%if sertificateSource != null: %>
+					<p>Установлен источник сертификатов <b>${sertificateSource.GetName()}</b></p>
+				<%else: %>
+					<p>Источник сертификатов не установлен</p>
+				<%end %>
+				<button id="editChangerButton" type=button onclick="loadChanger()">Изменить</button>
+				<div id="sertificateChanger"></div>
 			</form>
 		</div>
 
