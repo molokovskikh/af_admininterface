@@ -73,7 +73,9 @@ BeAccounted = 0;
 
 		private static uint[] Ready()
 		{
-			var items = Account.GetReadyForAccounting(new Pager());
+			var pager = new Pager();
+			pager.PageSize = 1000;
+			var items = Account.GetReadyForAccounting(pager);
 			var ready = items.Select(i => i.Id).ToArray();
 			return ready;
 		}
