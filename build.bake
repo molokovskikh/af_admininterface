@@ -68,8 +68,8 @@ task @BuildPrinter:
 	project = @Printer
 	Engine.Tasks.First({t| t.Name == "BuildApp"}).Executed = false
 	Engine.Execute("BuildApp")
-	Cp("src/$project/app.release.config", "output/$project/$project.config")
-	Cp("lib/Chrome.Printer/bin/*", "output/$project/")
+	Cp("src/$project/app.release.config", "output/$project/$project.config", true)
+	Cp("lib/Chrome.Printer/bin/*", "output/$project/", true)
 	Rm("output/$project/_PublishedWebsites", true)
 	Globals.Project = oldProject
 
