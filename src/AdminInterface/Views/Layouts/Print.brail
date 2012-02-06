@@ -51,10 +51,27 @@
 			#mail_address
 			{
 				position:fixed;
-				bottom: 0.5cm;
-				right:0;
-				width: 8cm;
+				bottom:2cm;
+				right:1cm;
+				width:8cm;
 			}
+
+<% if IsDefined(@print): %>
+			#page_holder
+			{
+				width:7.5in;
+				height:11in;
+			}
+<% else: %>
+			@media print
+			{
+				#page_holder
+				{
+					width:7.5in;
+					height:11in;
+				}
+			}
+<% end %>
 		</style>
 	</head>
 	<body>

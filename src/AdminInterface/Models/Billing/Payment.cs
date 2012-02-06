@@ -170,7 +170,8 @@ namespace AdminInterface.Models.Billing
 			var payments = new List<Payment>();
 			while ((line = reader.ReadLine()) != null)
 			{
-				if (line.Equals("СекцияДокумент=Платежное поручение", StringComparison.CurrentCultureIgnoreCase))
+				if (line.Equals("СекцияДокумент=Платежное поручение", StringComparison.CurrentCultureIgnoreCase)
+					|| line.Equals("СекцияДокумент=Прочее", StringComparison.CurrentCultureIgnoreCase))
 				{
 					var payment = ParsePayment(reader);
 					payments.Add(payment);

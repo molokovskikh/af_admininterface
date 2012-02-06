@@ -213,7 +213,6 @@
     <Compile Include="Helpers\AppHelper.cs" />
     <Compile Include="Helpers\EmailHelper.cs" />
     <Compile Include="Helpers\Extentions.cs" />
-    <Compile Include="Helpers\InternetExplorerPrinterHelper.cs" />
     <Compile Include="Helpers\RemoteServiceHelper.cs" />
     <Compile Include="Helpers\SoundHelper.cs" />
     <Compile Include="Helpers\Wav\Structs.cs" />
