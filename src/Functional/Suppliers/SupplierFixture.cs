@@ -6,6 +6,7 @@ using Castle.ActiveRecord;
 using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using WatiN.Core.Native.Windows;
 using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core;
@@ -101,13 +102,15 @@ namespace Functional.Suppliers
 		[Test]
 		public void Change_Payer()
 		{
+			
 			Open(supplier);
 			browser.TextField(Find.ByClass("term")).AppendText("Тестовый");
 			browser.Button(Find.ByClass("search")).Click();
 			var selectList = browser.Div(Find.ByClass("search")).SelectLists.First();
 			Assert.IsNotNull(selectList);
 			Assert.That(selectList.Options.Count, Is.GreaterThan(0));
-			selectList.SelectByValue(payer.Id.ToString());
+			var option = selectList.Options.First();
+			selectList.SelectByValue(option.Value);
 			Click("Изменить");
 			AssertText("Изменено");
 		}
