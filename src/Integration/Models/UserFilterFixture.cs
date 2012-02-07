@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
@@ -138,6 +139,31 @@ namespace Integration.Models
 			user.Delete();
 			user2.Delete();
 			ActiveRecordMediator.Delete(supplier);
+		}
+
+		[Test]
+		public void WorkRegionTest()
+		{
+			var client = DataMother.CreateClientAndUsers();
+			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id != 1UL);
+			if (newRegion != null)
+			{
+				client.UpdateRegionSettings(new [] {
+					new RegionSettings {
+						Id = newRegion.Id,
+						IsAvaliableForBrowse = true
+					}
+				});
+				client.Save();
+				Flush();
+				filter.Region = newRegion;
+				filter.ClientType = SearchClientType.Drugstore;
+				var result = filter.Find();
+				Assert.That(result.Count, Is.EqualTo(2));
+			}
+			else {
+				throw new Exception("Не найден альтернативный регион работы");
+			}
 		}
 
 		private string RandomPhone()

@@ -123,7 +123,7 @@ FROM
 	join Billing.Payers p on p.PayerId = u.PayerId
 {2}
 WHERE
-	(r.RegionCode & :RegionMask > 0)
+	((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0))
 	{0}
 GROUP BY u.Id
 {1}
@@ -131,9 +131,7 @@ GROUP BY u.Id
 					.SetParameter("RegionMask", regionMask)
 					.ToList<UserSearchItem>();
 				ArHelper.Evict(session, result);
-				var logins = new List<string>();
-				for (var i = 0; i < result.Count; i++)
-					logins.Add(result[i].Login);
+				var logins = result.Select(t => t.Login).ToList();
 
 				var adInfo = ADHelper.GetPartialUsersInformation(logins);
 
