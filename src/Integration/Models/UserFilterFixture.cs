@@ -145,7 +145,7 @@ namespace Integration.Models
 		public void Work_Region_Test()
 		{
 			var client = DataMother.CreateClientAndUsers();
-			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id != 1UL);
+			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id == 2UL);
 			if (newRegion != null)
 			{
 				client.UpdateRegionSettings(new [] {
@@ -159,7 +159,7 @@ namespace Integration.Models
 				filter.Region = newRegion;
 				filter.ClientType = SearchClientType.Drugstore;
 				var result = filter.Find();
-				Assert.That(result.Count, Is.EqualTo(2));
+				Assert.That(result.Count(r => r.ClientId == client.Id), Is.EqualTo(2));
 				ActiveRecordMediator<Client>.Delete(client);
 			}
 			else {
