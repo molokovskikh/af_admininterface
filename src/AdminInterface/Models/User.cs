@@ -629,6 +629,7 @@ WHERE
 			Client = newOwner;
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
+			InheritPricesFrom = null;
 			Update();
 		}
 

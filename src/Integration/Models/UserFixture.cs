@@ -96,6 +96,7 @@ namespace Integration.Models
 			Assert.That(user.Client, Is.EqualTo(otherClient));
 			Assert.That(user.RootService, Is.EqualTo(otherClient));
 			Assert.That(user.Payer, Is.EqualTo(org.Payer));
+			Assert.That(user.InheritPricesFrom, Is.Null);
 		}
 
 		[Test]
