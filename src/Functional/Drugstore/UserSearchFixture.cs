@@ -151,16 +151,12 @@ namespace Functional
 			AssetSearch(SearchUserBy.ByPayerId, payer.Id.ToString());
 		}
 
-		[Test]
+		[Test, NUnit.Framework.Description("Потерял актуальность из-за изменившегося функционала, его заменил Work_Region_Test")]
 		public void SearchWithFilterByRegion()
 		{
 			browser.SelectList(Find.ByName("filter.Region.Id")).Select("Воронеж");
 			browser.Button(Find.ByValue("Поиск")).Click();
 			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
-			foreach (TableRow row in browser.TableBody(Find.ById("SearchResults")).TableRows)
-			{
-				Assert.That(row.TableCells[6].Text, Is.EqualTo("Воронеж"));
-			}
 		}
 
 		[Test]

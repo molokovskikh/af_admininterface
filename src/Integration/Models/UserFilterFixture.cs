@@ -142,7 +142,7 @@ namespace Integration.Models
 		}
 
 		[Test]
-		public void WorkRegionTest()
+		public void Work_Region_Test()
 		{
 			var client = DataMother.CreateClientAndUsers();
 			var newRegion = Region.Queryable.FirstOrDefault(r => r.Id != 1UL);
@@ -160,6 +160,7 @@ namespace Integration.Models
 				filter.ClientType = SearchClientType.Drugstore;
 				var result = filter.Find();
 				Assert.That(result.Count, Is.EqualTo(2));
+				ActiveRecordMediator<Client>.Delete(client);
 			}
 			else {
 				throw new Exception("Не найден альтернативный регион работы");
