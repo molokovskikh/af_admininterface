@@ -40,7 +40,7 @@ div.LegendMarker.disabled
 	background-color: #ff9d5b;
 }
 
-/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing, table.DataTable tr.OddRow.disabled-by-billing.single-user
+/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing, table.DataTable tr.OddRow.disabled-by-billing.single-user, span.disabled
 {
 	background-color: #ff9d5b;
 }
@@ -56,7 +56,7 @@ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled
 	background-color: #ff9d5b;
 }
 
-table.DataTable tr.OddRow.disabled-by-parent, table.DataTable tr.EvenRow.disabled-by-parent
+table.DataTable tr.OddRow.disabled-by-parent, table.DataTable tr.EvenRow.disabled-by-parent, span.disabled-by-parent
 {
 	background-color: #ff9d5b;
 }
