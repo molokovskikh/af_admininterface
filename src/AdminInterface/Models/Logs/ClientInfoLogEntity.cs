@@ -59,7 +59,10 @@ namespace AdminInterface.Models.Logs
 				Service = service;
 				ObjectId = Service.Id;
 				Name = service.Name;
-				Type = (LogObjectType)service.Type;
+				if (service.Type == ServiceType.Drugstore)
+					Type = LogObjectType.Client;
+				if (service.Type == ServiceType.Supplier)
+					Type = LogObjectType.Supplier;
 			}
 			else if (entity is User)
 			{
