@@ -78,7 +78,7 @@ namespace AdminInterface.Models.Logs
 		public static bool IsDataTransferUpdateType(UpdateType updateType)
 		{
 			return updateType == UpdateType.Accumulative || updateType == UpdateType.Cumulative || updateType == UpdateType.LimitedCumulative 
-				|| updateType == UpdateType.AccumulativeAsync || updateType == UpdateType.CumulativeAsync || updateType == UpdateType.LimitedCumulativeAsync 
+				|| updateType == UpdateType.AccumulativeAsync || updateType == UpdateType.CumulativeAsync || updateType == UpdateType.LimitedCumulativeAsync || updateType == UpdateType.AutoOrder
 				|| IsDocumentLoading(updateType);
 		}
 
