@@ -4,6 +4,7 @@ using System.ComponentModel;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
@@ -213,6 +214,9 @@ namespace AdminInterface.Models
 
 		[Property, Description("Отображать сертификаты без привязки к поставщику"), Auditable]
 		public virtual bool ShowCertificatesWithoutRefSupplier { get; set; }
+
+		[Property, Description("Формат для сохранения накладных Протек"), Auditable]
+		public virtual ProtekWaybillSavingType ProtekWaybillSavingType { get; set; }
 
 		protected override void OnUpdate()
 		{
