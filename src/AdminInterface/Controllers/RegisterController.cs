@@ -157,7 +157,6 @@ namespace AdminInterface.Controllers
 				foreach (var person in userPersons)
 					user.AddContactPerson(person.Name);
 				user.Setup();
-				user.SaveAndFlush();
 				password = user.CreateInAd();
 
 				supplier.AddBillingComment(comment);
@@ -321,7 +320,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				Notify("Регистрация завершена успешно");
-				Redirect(newClient);
+				RedirectTo(newClient);
 			}
 		}
 
@@ -441,7 +440,7 @@ WHERE   pricesdata.firmcode = clientsdata.firmcode
 			client.Users = new List<User> {user};
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
-			user.SaveAndFlush();
+			user.Save();
 			return user;
 		}
 

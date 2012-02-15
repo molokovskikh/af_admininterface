@@ -32,7 +32,7 @@ namespace Integration.Processors
 		{
 			MakeUpdates(user, 11);
 			Check();
-			user.Refresh();
+			session.Refresh(user);
 			user.Payer.Refresh();
 			Assert.That(user.Accounting.ReadyForAccounting, Is.True);
 			Assert.That(user.Payer.PaymentSum, Is.EqualTo(800));
@@ -43,7 +43,7 @@ namespace Integration.Processors
 		{
 			MakeUpdates(user, 9);
 			Check();
-			user.Refresh();
+			ActiveRecordMediator.Refresh(user);
 			Assert.That(user.Accounting.ReadyForAccounting, Is.False);
 		}
 

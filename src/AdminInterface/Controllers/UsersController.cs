@@ -199,7 +199,7 @@ namespace AdminInterface.Controllers
 			user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 			user.UpdateContacts(contacts, deletedContacts);
 			user.UpdatePersons(persons, deletedPersons);
-			user.Update();
+			user.Save();
 
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new {id = user.Id});
@@ -354,7 +354,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom")] User user)
 		{
-			user.Update();
+			user.Save();
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
@@ -365,6 +365,23 @@ namespace AdminInterface.Controllers
 			if (!String.IsNullOrEmpty(searchText))
 				PropertyBag["Offers"] = Offer.Search(user, searchText);
 			PropertyBag["user"] = user;
+		}
+
+		public void Delete(uint id)
+		{
+			var user = User.Find(id);
+
+			if (user.CanDelete()) {
+				var payer = user.Payer;
+				user.Delete();
+				payer.UpdatePaymentSum();
+				Notify("Удалено");
+				RedirectTo(user.RootService);
+			}
+			else {
+				Error("Не могу удалить пользователя т.к. у него есть заказы");
+				RedirectToReferrer();
+			}
 		}
 	}
 }

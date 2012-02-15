@@ -181,23 +181,18 @@ namespace Integration.Controllers
 		[Test]
 		public void Move_last_user_to_another_client()
 		{
-			Client oldClient;
-			Client newClient;
-			Address address;
-			User oldUser;
-
-			oldClient = DataMother.CreateTestClientWithAddressAndUser();
-			oldUser = oldClient.Users[0];
-			address = oldClient.Addresses[0];
+			var oldClient = DataMother.CreateTestClientWithAddressAndUser();
+			var oldUser = oldClient.Users[0];
+			var address = oldClient.Addresses[0];
 			oldUser.AvaliableAddresses = new List<Address>();
 			address.AvaliableForUsers.Add(oldUser);
-			newClient = DataMother.CreateTestClientWithAddressAndUser();
+			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			oldUser.Refresh();
+			ActiveRecordMediator.Refresh(oldUser);
 			Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
 
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));

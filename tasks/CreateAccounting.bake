@@ -4,7 +4,7 @@ import AdminInterface.Models
 
 task @CreateAccounting, [@InitActiveRecord]:
 	using SessionScope():
-		for user in User.FindAll():
+		for user in ActiveRecordMediator[of User].FindAll():
 			continue if user.Accounting
 			user.Accounting = UserAccount(user)
 			user.Save()

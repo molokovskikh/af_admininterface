@@ -170,7 +170,7 @@ namespace AdminInterface.MonoRailExtentions
 			Flash["Message"] = Message.Error(message);
 		}
 
-		public void Redirect(object entity, string action = "Show")
+		public void RedirectTo(object entity, string action = "Show")
 		{
 			var controller = AppHelper.GetControllerName(entity);
 			var id = ((dynamic)entity).Id;

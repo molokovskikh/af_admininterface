@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using IgorO.ExposedObjectProject;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -29,7 +30,7 @@ namespace Integration.Controllers
 		{
 			Assert.That(user.Enabled, Is.True);
 			controller.SetUserStatus(user.Id, false);
-			user.Refresh();
+			ActiveRecordMediator.Refresh(user);
 			Assert.That(user.Enabled, Is.False);
 		}
 

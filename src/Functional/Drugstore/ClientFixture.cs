@@ -67,7 +67,6 @@ namespace Functional.Drugstore
 			{				
 				var user = new User(client) {Name = "User2",};
 				user.Setup();
-				user.SaveAndFlush();
 				client.Users.Add(user);
 				client.SaveAndFlush();
 				scope.VoteCommit();

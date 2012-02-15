@@ -38,7 +38,7 @@ where UserId = :userId and priceId = :priceId")
 					.ExecuteUpdate();
 
 				child.InheritPricesFrom = parent;
-				parent.Update();
+				parent.Save();
 			});
 
 			var pricesForParent = ArHelper.WithSession(s =>

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AddUser;
+using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
@@ -11,6 +13,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Tools.Calendar;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Billing
@@ -461,6 +464,74 @@ ORDER BY {Payer}.shortname;";
 			get { return Period.Years; }
 		}
 
+		public virtual bool CanDelete()
+		{
+			var operations = ArHelper.WithSession(s => {
+				var maxInvoice = s.QueryOver<Invoice>()
+					.Where(i => i.Payer == this)
+					.SelectList(l => l.SelectMax(i => i.CreatedOn))
+					.SingleOrDefault<DateTime>();
+
+				var maxAct = s.QueryOver<Act>()
+					.Where(a => a.Payer == this)
+					.SelectList(l => l.SelectMax(i => i.ActDate))
+					.SingleOrDefault<DateTime>();
+
+				var maxPayment = s.QueryOver<Payment>()
+					.Where(p => p.Payer == this)
+					.SelectList(l => l.SelectMax(p => p.PayedOn))
+					.SingleOrDefault<DateTime>();
+
+				var maxBalanceOperation = s.QueryOver<BalanceOperation>()
+					.Where(o => o.Payer == this)
+					.SelectList(l => l.SelectMax(o => o.Date))
+					.SingleOrDefault<DateTime>();
+				return new [] {maxInvoice, maxAct, maxPayment, maxBalanceOperation};
+			});
+
+			return Suppliers.Count == 0
+				&& Clients.All(c => c.Disabled)
+				&& Reports.All(r => !r.Allow)
+				&& Clients.All(c => c.CanDelete())
+				&& operations.Max().AddYears(3) < DateTime.Now;
+		}
+
+		public override void Delete()
+		{
+			foreach (var client in Clients.Where(c => c.CanDelete())) {
+				client.Delete();
+			}
+
+			DeleteReportsRequest.Process(Reports);
+
+			base.Delete();
+		}
+
+		public virtual IEnumerable<ModelAction> Actions
+		{
+			get
+			{
+				return new [] {
+					new ModelAction(this, "Delete", "Удалить", !CanDelete())
+				};
+			}
+		}
+	}
+
+	public class DeleteReportsRequest : BaseRemoteRequest
+	{
+		public static void Process(IList<Report> reports)
+		{
+			if (reports.Count > 0) {
+				var config = Global.Config;
+				var request = reports.Implode(r => String.Format("ids={0}", r.Id), "&");
+				MakeRequest(config.DeleteReportUri,
+					config.ReportSystemUser,
+					config.ReportSystemPassword,
+					request
+				);
+			}
+		}
 	}
 
 	public class DoNotHaveContacts : Exception

@@ -139,9 +139,6 @@ namespace AdminInterface.Models
 			}
 		}
 
-		/*[Property("FirmType")]
-		public override ServiceType Type { get; set; }*/
-
 		[Property]
 		public virtual Segment Segment { get; set; }
 
@@ -225,9 +222,9 @@ where
 			}
 		}
 
-		public static Client FindAndCheck(uint clientCode)
+		public static Client FindAndCheck(uint id)
 		{
-			var client = Find(clientCode);
+			var client = Find(id);
 
 			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckClientType(client.Type);
@@ -279,17 +276,6 @@ group by u.ClientId")
 					.UniqueResult<long?>());
 
 			return result != null && result.Value == 0;
-		}
-
-		public virtual bool HavePreparedData()
-		{
-			foreach (var user in Users)
-			{
-				var file = String.Format(@"U:\wwwroot\ios\Results\{0}.zip", user.Id);
-				if (File.Exists(file))
-					return true;
-			}
-			return false;
 		}
 
 		public virtual int EnabledUserForPayerCount(Payer payer)
@@ -504,6 +490,55 @@ where ClientId = :clientId")
 			MaskRegion = region.Id;
 			Settings.WorkRegionMask = region.Id;
 			Settings.OrderRegionMask = region.Id;
+		}
+
+		public virtual bool CanDelete()
+		{
+			return ClientOrder.Queryable.Count(o => o.Client == this) == 0
+				&& Addresses.All(a => a.CanDelete())
+				&& Users.All(u => u.CanDelete());
+		}
+
+		public virtual void Delete()
+		{
+			foreach (var user in Users.ToArray()) {
+				user.Delete();
+			}
+
+			foreach (var address in Addresses.ToArray()) {
+				address.Delete();
+			}
+
+			var payers = Payers.ToArray();
+			Payers.Clear();
+			foreach (var payer in payers) {
+				//какая то фигня с загрузкой объектов
+				payer.Clients.Remove(payer.Clients.First(c => c.Id == Id));
+				if (payer.CanDelete())
+					payer.Delete();
+				else
+					payer.UpdatePaymentSum();
+			}
+
+
+			var rule = Settings.SmartOrderRules;
+			if (rule != null) {
+				var overHaveSameSettins = ActiveRecordLinqBase<DrugstoreSettings>.Queryable.Any(s => s.Id != Id && s.SmartOrderRules == rule);
+				if (!overHaveSameSettins)
+					rule.Delete();
+			}
+			ClientInfoLogEntity.DeleteAuditRecords(this);
+			ActiveRecordMediator.Delete(this);
+		}
+
+		public virtual IEnumerable<ModelAction> Actions
+		{
+			get
+			{
+				return new [] {
+					new ModelAction(this, "Delete", "Удалить", !CanDelete())
+				};
+			}
 		}
 	}
 }

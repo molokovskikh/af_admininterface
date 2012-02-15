@@ -6,6 +6,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework.Descriptors;
 using Castle.MonoRail.Framework.Routing;
 using Common.Web.Ui.Helpers;
@@ -44,7 +45,7 @@ namespace Integration
 		{
 			using (new SessionScope())
 			{
-				var user = User.Queryable.Where(u => u.Payer != null).First();
+				var user = ActiveRecordLinqBase<User>.Queryable.First(u => u.Payer != null);
 				Assert.That(NHibernateUtil.IsInitialized(user.Payer), Is.False);
 				var linkTo = helper.LinkTo(user.Payer);
 				Assert.That(linkTo, Is.EqualTo(String.Format(@"<a  href=""/Payers/{0}"">{1}</a>", user.Payer.Id, user.Payer.Name)));

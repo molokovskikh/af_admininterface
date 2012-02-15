@@ -179,7 +179,7 @@ namespace AdminInterface.Models
 		[Property, Description("Pассчитывать лидеров при получении заказов"), Auditable]
 		public virtual bool CalculateLeader { get; set; }
 
-		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.All)]
+		[BelongsTo("SmartOrderRuleId", Cascade = CascadeEnum.SaveUpdate)]
 		public virtual SmartOrderRules SmartOrderRules { get; set; }
 
 		[BelongsTo("OfferMatrixPriceId"), Description("Матрица предложений"), Auditable]
@@ -230,10 +230,10 @@ namespace AdminInterface.Models
 			{
 				ArHelper.WithSession(s => {
 					s.CreateSQLQuery(@"
-	update Usersettings.AnalitFReplicationInfo r
-	join Future.Users u on u.Id = r.UserId
-	set ForceReplication = 1
-	where u.ClientId = :ClientId")
+update Usersettings.AnalitFReplicationInfo r
+join Future.Users u on u.Id = r.UserId
+set ForceReplication = 1
+where u.ClientId = :ClientId")
 						.SetParameter("ClientId", Client.Id)
 						.ExecuteUpdate();
 				});

@@ -234,5 +234,16 @@ where ObjectId = :objectId")
 				{"id", ObjectId.ToString()},
 			};
 		}
+
+		public static void DeleteAuditRecords(object entity)
+		{
+			var auditRecord = new ClientInfoLogEntity(entity);
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery("delete from Logs.ClientsInfo where ObjectId = :Id and Type = :Type")
+					.SetParameter("Id", auditRecord.ObjectId)
+					.SetParameter("Type", auditRecord.Type)
+					.ExecuteUpdate();
+			});
+		}
 	}
 }

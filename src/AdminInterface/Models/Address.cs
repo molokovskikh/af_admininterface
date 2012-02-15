@@ -60,7 +60,7 @@ namespace AdminInterface.Models
 		[BelongsTo("ClientId"), Description("Клиент"), Auditable]
 		public virtual Client Client { get; set; }
 
-		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke)]
+		[BelongsTo("ContactGroupId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.All)]
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
@@ -389,6 +389,21 @@ and i.LegalEntityId = :OldLegalEntityId
 			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
 			billingMessage = String.Format("О регистрации Адреса {0} для клиента {1} ( {2} ): {3}", Name, Client.Name, Client.Id, billingMessage);
 			Payer.AddComment(billingMessage);
+		}
+
+		public virtual bool CanDelete()
+		{
+			return ClientOrder.Queryable.Count(o => o.Address == this) == 0;
+		}
+
+		public override void Delete()
+		{
+			Payer.Addresses.Remove(this);
+			Client.Addresses.Remove(this);
+			ClientInfoLogEntity.DeleteAuditRecords(this);
+			PayerAuditRecord.DeleteAuditRecords(Accounting);
+
+			base.Delete();
 		}
 	}
 }

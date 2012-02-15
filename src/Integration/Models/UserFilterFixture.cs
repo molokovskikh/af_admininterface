@@ -117,7 +117,7 @@ namespace Integration.Models
 			};
 			user2.Save();
 			user2.Setup();
-			user2.Update();
+			user2.Save();
 
 			Flush();
 

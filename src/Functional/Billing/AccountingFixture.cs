@@ -115,13 +115,11 @@ namespace Functional.Billing
 		public void Check_user_for_accounting()
 		{
 			client.Users[0].Name = String.Format("Test username for Accounting [{0}]", client.Users[0].Id);
-			client.Users[0].UpdateAndFlush();
+			client.Users[0].Save();
 
-			using (var browser = Open("Billing/Accounting"))
-			{
-				Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));
-				Assert.That(browser.Text, Is.StringContaining(client.Users[0].Name));
-			}
+			Open("Billing/Accounting");
+			Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));
+			Assert.That(browser.Text, Is.StringContaining(client.Users[0].Name));
 		}
 
 		[Test]

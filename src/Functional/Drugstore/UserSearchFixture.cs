@@ -300,7 +300,7 @@ namespace Functional
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var person = String.Format("testPerson{0}", client.Id);
 			client.Users[0].AddContactGroup();
-			client.Users[0].SaveAndFlush();
+			client.Users[0].Save();
 			client.Users[0].ContactGroup.AddPerson(person);
 			scope.Flush();
 

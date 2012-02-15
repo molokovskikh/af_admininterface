@@ -14,6 +14,7 @@ namespace AdminInterface.Initializers
 		public void Run()
 		{
 			ADHelper.Storage = new MemoryUserStorage();
+			BaseRemoteRequest.Runner = new StubRequestRunner();
 
 			var config = Global.Config;
 			var dataPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data");

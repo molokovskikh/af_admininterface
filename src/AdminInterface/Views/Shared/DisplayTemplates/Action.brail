@@ -1,0 +1,8 @@
+﻿<form method=post action="${siteroot}/${action.Controller}/${action.Action}">
+	${FormHelper.HiddenField("id", action.Id)}
+	<% attrs = {} %>
+	<% if action.Disabled: %>
+		<% attrs.Add("disabled", "disabled") %>
+	<% end %>
+	${FormHelper.Submit(action.Name, attrs)}
+</form>

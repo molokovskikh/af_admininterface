@@ -23,6 +23,10 @@ namespace AddUser
 {
 	public class AppConfig
 	{
+		public string ReportSystemPassword { get; set; }
+		public string ReportSystemUser { get; set; }
+		public string DeleteReportUri { get; set; }
+
 		public string AptBox { get; set; }
 		public string OptBox { get; set; }
 		public string UserPreparedDataDirectory { get; set; }
@@ -53,6 +57,7 @@ namespace AddUser
 		{
 			try
 			{
+				BaseRemoteRequest.Runner = new WebRequestRunner();
 				ValidEventListner.ValidatorAccessor = new MonorailValidatorAccessor();
 				ConfigReader.LoadSettings(Config);
 				Initialize();

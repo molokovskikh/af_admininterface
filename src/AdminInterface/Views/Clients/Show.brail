@@ -147,6 +147,11 @@
 				<% end %>
 				<input type=submit ${"disabled" if not haveUin } value="Сбросить УИН" />
 			</form>
+
+		<% for action in client.Actions: %>
+			${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
+		<% end %>
+
 		</div>
 
 		<div class=block>

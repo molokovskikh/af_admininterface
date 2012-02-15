@@ -150,7 +150,7 @@ namespace Functional.Drugstore
 		public void Change_login_when_change_password()
 		{
 			user.Login = "testLogin" + user.Id;
-			user.SaveAndFlush();
+			user.Save();
 			Refresh();
 
 			browser.Link(Find.ByText(user.Login)).Click();
@@ -165,7 +165,8 @@ namespace Functional.Drugstore
 				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
 
-			user.Refresh();
+			session.Refresh(user);
+
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 		}
 
@@ -185,7 +186,7 @@ namespace Functional.Drugstore
 				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
 			}
 
-			user.Refresh();
+			session.Refresh(user);
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 		}
 
@@ -281,7 +282,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 
 			client.Refresh();
-			user.Refresh();
+			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
 			Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
 			Assert.AreEqual(13, client.Users[1].AssignedPermissions.Count);
@@ -400,7 +401,7 @@ namespace Functional.Drugstore
 			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			user.Refresh();
+			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.Button(Find.ByName(String.Format("persons[{0}].Delete", group.Persons[0].Id))).Click();
 			browser.Button(Find.ByValue("Сохранить")).Click();
@@ -421,7 +422,7 @@ namespace Functional.Drugstore
 			ContactInformationFixture.AddPerson(browser, "Test person2", applyButtonText, client.Id);
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			user.Refresh();
+			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("");
 			browser.Button(Find.ByValue("Сохранить")).Click();
@@ -438,7 +439,7 @@ namespace Functional.Drugstore
 			Open(user, "Edit");
 			ContactInformationFixture.AddPerson(browser, "Test person", applyButtonText, client.Id);
 
-			user.Refresh();
+			session.Refresh(user);
 			var group = user.ContactGroup;
 			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Test person changed");
 			browser.Button(Find.ByValue("Сохранить")).Click();
@@ -476,7 +477,7 @@ namespace Functional.Drugstore
 			browser.CheckBox("OrderRegions[0]").Checked = true;
 			browser.Button(Find.ByValue("Сохранить")).Click();
 
-			user.Refresh();
+			session.Refresh(user);
 			Assert.AreEqual(3, user.WorkRegionMask);
 			Assert.AreEqual(3, user.OrderRegionMask);
 
@@ -484,7 +485,7 @@ namespace Functional.Drugstore
 			browser.CheckBox("OrderRegions[0]").Checked = false;
 			browser.Button(Find.ByValue("Сохранить")).Click();
 
-			user.Refresh();
+			session.Refresh(user);
 			Assert.AreEqual(2, user.WorkRegionMask);
 			Assert.AreEqual(1, user.OrderRegionMask);
 
@@ -729,7 +730,7 @@ namespace Functional.Drugstore
 
 			oldClient = Client.Find(oldClient.Id);
 			newClient = Client.Find(newClient.Id);
-			user.Refresh();
+			session.Refresh(user);
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));
 			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
@@ -814,7 +815,7 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 			{
 				oldClient.Refresh();
 				newClient.Refresh();
-				user.Refresh();
+				session.Refresh(user);
 				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 
 				Assert.That(newClient.Users.Count, Is.EqualTo(2));

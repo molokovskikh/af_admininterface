@@ -1,10 +1,13 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Models
 {
@@ -78,6 +81,23 @@ namespace Integration.Models
 
 			Assert.That(oldPayer.PaymentSum, Is.EqualTo(0));
 			Assert.That(newPayer.PaymentSum, Is.EqualTo(800));
+		}
+
+		[Test]
+		public void Delete_client()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			Reopen();
+
+			var clientId = client.Id;
+			var payerId = client.Payers[0].Id;
+
+			client = ActiveRecordMediator<Client>.FindByPrimaryKey(client.Id);
+			client.Delete();
+			Reopen();
+
+			Assert.That(session.Get<Client>(clientId), Is.Null);
+			Assert.That(session.Get<Payer>(payerId), Is.Null);
 		}
 	}
 }

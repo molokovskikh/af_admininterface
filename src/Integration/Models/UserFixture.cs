@@ -6,6 +6,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Common.Tools;
 using Integration.ForTesting;
+using Test.Support.log4net;
 using log4net.Config;
 using NUnit.Framework;
 
@@ -112,6 +113,15 @@ namespace Integration.Models
 			client.MaintainIntersection();
 			var newPricesCount = user.GetUserPriceCount();
 			Assert.That(newPricesCount, Is.EqualTo(pricesCount));
+		}
+
+		[Test]
+		public void Delete_user()
+		{
+			Assert.That(user.CanDelete(), Is.True);
+			scope.Flush();
+			user.Delete();
+			scope.Flush();
 		}
 	}
 }

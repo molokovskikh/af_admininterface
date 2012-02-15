@@ -122,7 +122,7 @@ namespace AdminInterface.Models.Suppliers
 			get
 			{
 				if (Id > 0)
-					return User.Queryable.Where(u => u.RootService == this).ToList();
+					return ActiveRecordLinqBase<User>.Queryable.Where(u => u.RootService == this).ToList();
 
 				return Enumerable.Empty<User>().ToList();
 			}

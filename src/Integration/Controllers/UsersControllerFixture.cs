@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -120,7 +121,7 @@ namespace Integration.Controllers
 
 		private User Registred()
 		{
-			return User.Queryable.Where(u => u.RegistrationDate >= begin).ToArray().Last();
+			return ActiveRecordLinqBase<User>.Queryable.Where(u => u.RegistrationDate >= begin).ToArray().Last();
 		}
 	}
 }

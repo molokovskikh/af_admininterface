@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
 
-namespace AdminInterface.Models.Logs
+namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "Billing")]
 	public class PayerAuditRecord : IAuditRecord
@@ -74,7 +74,8 @@ namespace AdminInterface.Models.Logs
 		{
 			return ActiveRecordLinqBase<PayerAuditRecord>.Queryable
 				.Where(r => r.Payer == payer)
-				.OrderByDescending(r => r.WriteTime).ToList();
+				.OrderByDescending(r => r.WriteTime)
+				.ToList();
 		}
 
 		public AuditLogRecord ToAuditRecord()
@@ -87,6 +88,16 @@ namespace AdminInterface.Models.Logs
 				Message = Message,
 				Name = Name,
 			};
+		}
+
+		public static void DeleteAuditRecords(Account account)
+		{
+			ArHelper.WithSession(s => {
+				s.CreateSQLQuery("delete from Billing.PayerAuditRecords where ObjectId = :id and ObjectType = :type")
+					.SetParameter("id", account.ObjectId)
+					.SetParameter("type", account.ObjectType)
+					.ExecuteUpdate();
+			});
 		}
 	}
 }

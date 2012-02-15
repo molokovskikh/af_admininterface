@@ -206,7 +206,7 @@ namespace Functional.Drugstore
 			Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
 
 			var user = client.Users[0];
-			user.Refresh();
+			session.Refresh(user);
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
@@ -237,7 +237,7 @@ namespace Functional.Drugstore
 
 			client.Refresh();
 			var user = client.Users[0];
-			user.Refresh();
+			session.Refresh(user);
 			Assert.IsFalse((user.WorkRegionMask & 1) > 0);
 			Assert.IsFalse((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);
@@ -257,7 +257,7 @@ namespace Functional.Drugstore
 			Assert.IsTrue(UserWorkRegionExists(browser, "Липецк"));
 
 			var user = client.Users[0];
-			user.Refresh();
+			session.Refresh(user);
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 8) > 0);
@@ -290,7 +290,7 @@ namespace Functional.Drugstore
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 			client.Refresh();
 			var user = client.Users[0];
-			user.Refresh();
+			session.Refresh(user);
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
 			Assert.IsTrue((user.OrderRegionMask & 1) > 0);
 			Assert.IsTrue((user.WorkRegionMask & 4) > 0);

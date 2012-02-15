@@ -211,5 +211,20 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["payer"] = payer;
 		}
+
+		public void Delete(uint id)
+		{
+			var payer = Payer.Find(id);
+
+			if (!payer.CanDelete()) {
+				Error("Не могу удалить плательщика");
+				RedirectToReferrer();
+				return;
+			}
+
+			payer.Delete();
+			Notify("Удалено");
+			Redirect("Billing", "Search");
+		}
 	}
 }

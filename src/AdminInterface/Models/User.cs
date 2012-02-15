@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
 using AdminInterface.Security;
@@ -69,7 +71,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "future", Lazy = true), Auditable]
-	public class User : ActiveRecordLinqBase<User>, IEnablable, IDisabledByParent
+	public class User : IEnablable, IDisabledByParent
 	{
 		private string _name;
 		private bool _enabled;
@@ -237,7 +239,7 @@ namespace AdminInterface.Models
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 
-		[BelongsTo(Cascade = CascadeEnum.All)]
+		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
 
 		public virtual IList<User> ImpersonableUsers { set; get; }
@@ -402,7 +404,7 @@ namespace AdminInterface.Models
 				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
 			Save();
 			Login = Id.ToString();
-			Update();
+			Save();
 
 			if (Client != null)
 			{
@@ -630,7 +632,7 @@ WHERE
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
 			InheritPricesFrom = null;
-			Update();
+			Save();
 		}
 
 		public virtual object GetRegistrant()
@@ -696,5 +698,64 @@ WHERE
 
 			AvaliableAddresses.Add(address);
 		}
+
+		public virtual IEnumerable<ModelAction> Actions
+		{
+			get
+			{
+				return new [] {
+					new ModelAction(this, "Unlock", "Разблокировать", !IsLocked),
+					new ModelAction(this, "DeletePreparedData", "Удалить подготовленные данные", !HavePreparedData()),
+					new ModelAction(this, "Delete", "Удалить", !CanDelete()),
+				};
+			}
+		}
+
+		public static User Find(uint id)
+		{
+			return ActiveRecordMediator<User>.FindByPrimaryKey(id);
+		}
+
+		public static User TryFind(uint id)
+		{
+			return ActiveRecordMediator<User>.FindByPrimaryKey(id, false);
+		}
+
+		public virtual void Save()
+		{
+			ActiveRecordMediator.Save(this);
+		}
+
+		public virtual bool CanDelete()
+		{
+			return ClientOrder.Queryable.Count(o => o.User == this) == 0;
+		}
+
+		public virtual void Delete()
+		{
+			Payer.Users.Remove(this);
+			Client.Users.Remove(this);
+			ClientInfoLogEntity.DeleteAuditRecords(this);
+			PayerAuditRecord.DeleteAuditRecords(Accounting);
+			ActiveRecordMediator.Delete(this);
+		}
+	}
+
+	public class ModelAction
+	{
+		public ModelAction(object entity, string action, string name, bool disabled)
+		{
+			Controller = Common.Web.Ui.Helpers.AppHelper.GetControllerName(entity);
+			Id = ((dynamic)entity).Id;
+			Action = action;
+			Name = name;
+			Disabled = disabled;
+		}
+
+		public string Controller { get; set; }
+		public string Action { get; set; }
+		public uint Id { get; set; }
+		public string Name { get; set; }
+		public bool Disabled { get; set; }
 	}
 }

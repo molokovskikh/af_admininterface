@@ -459,5 +459,20 @@ where s.Name like :SearchText")
 			}
 			oldClient.Save();
 		}
+
+		public void Delete(uint id)
+		{
+			var client = Client.FindAndCheck(id);
+
+			if (!client.CanDelete()) {
+				Error("Не могу удалить клиента т.к. у него есть заказы");
+				RedirectToReferrer();
+				return;
+			}
+
+			client.Delete();
+			Notify("Удалено");
+			Redirect("Users", "Search");
+		}
 	}
 }

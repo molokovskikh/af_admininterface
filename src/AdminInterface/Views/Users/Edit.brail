@@ -62,24 +62,9 @@
 	<div class=block>
 		<h3>Операции</h3>
 
-		<form id="Unlock" method=post action="${siteroot}/users/Unlock">
-			<input type=hidden name=id value=${user.Id} />
-			<input type=submit ${"disabled" if not user.IsLocked} value="Разблокировать" />
-			<% if IsDefined("UnlockMessage"): %> 
-			<span style="color:Green;">${UnlockMessage}</span>
-			<% end %>
-		</form>
-		
-		<form method=post action="${siteroot}/users/DeletePreparedData">
-			<input type=hidden name=id value=${User.Id} />
-			<input type=submit ${"disabled" if not User.HavePreparedData()} value="Удалить подготовленные данные" />
-			<% if IsDefined("DeleteMessage"): %>
-				<span style="color:Green;">${DeleteMessage}</span>
-			<% end %>
-			<% if IsDefined("DeleteErrorMessage"): %> 
-				<span style="color:Red;">${DeleteErrorMessage}</span>
-			<% end %>
-		</form>
+		<% for action in user.Actions: %>
+			${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
+		<% end %>
 
 		<form id=ReseteUin method=post action="${siteroot}/users/ResetUin">
 			<input type=hidden name=Id value=${User.Id} />

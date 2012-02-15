@@ -113,9 +113,9 @@ namespace Integration.ForTesting
 			};
 			client.AddAddress(address);
 			client.Users[0].Name += client.Users[0].Id;
-			client.Users[0].UpdateAndFlush();
+			client.Users[0].Save();
 			client.Addresses[0].Value += client.Addresses[0].Id;
-			client.Addresses[0].UpdateAndFlush();
+			client.Addresses[0].Save();
 			client.Name += client.Id;
 			client.SaveAndFlush();
 			client.Addresses.Single().MaintainIntersection();
@@ -244,7 +244,7 @@ namespace Integration.ForTesting
 			};
 			user.Save();
 			user.Setup();
-			user.Update();
+			user.Save();
 			return user;
 		}
 

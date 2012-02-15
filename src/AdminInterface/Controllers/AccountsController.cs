@@ -85,7 +85,6 @@ namespace AdminInterface.Controllers
 			var oldStatus = user.Enabled;
 			if (enabled.HasValue)
 				user.Enabled = enabled.Value;
-			user.UpdateAndFlush();
 			if (enabled != oldStatus)
 				this.Mailer().EnableChanged(user).Send();
 			if (enabled.HasValue && !enabled.Value)
@@ -100,7 +99,7 @@ namespace AdminInterface.Controllers
 					address.Update();
 				}
 			}
-			ActiveRecordMediator.Save(user.RootService);
+			ActiveRecordMediator.Save(user);
 		}
 
 		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)

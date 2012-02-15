@@ -55,7 +55,7 @@ namespace AdminInterface.Controllers
 			ad.Invoice = new Invoice(ad);
 			ad.UpdateAndFlush();
 
-			Redirect(ad.Invoice, "Print");
+			RedirectTo(ad.Invoice, "Print");
 		}
 
 		public void BuildAct(uint id)
@@ -74,7 +74,7 @@ namespace AdminInterface.Controllers
 			ad.Act = new Act(invoice.Date, invoice);
 			ad.UpdateAndFlush();
 
-			Redirect(ad.Act, "Print");
+			RedirectTo(ad.Act, "Print");
 		}
 
 		public void Delete(uint id)
@@ -96,7 +96,7 @@ namespace AdminInterface.Controllers
 				if (!HasValidationError(ad))
 				{
 					ad.Save();
-					Redirect("Advertisings", "Index");
+					RedirectTo("Advertisings", "Index");
 				}
 			}
 			PropertyBag["payer"] = ad.Payer;

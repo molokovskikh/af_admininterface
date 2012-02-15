@@ -12,7 +12,8 @@
     <RootNamespace>Printer</RootNamespace>
     <AssemblyName>Printer</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile></TargetFrameworkProfile>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
@@ -121,7 +122,9 @@
       <Link>Views\SubViews\MailAddressSubView.brail</Link>
     </EmbeddedResource>
     <None Include="App.config" />
-    <None Include="App.release.config" />
+    <None Include="App.release.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties\" />

@@ -117,6 +117,10 @@ ${app.Asset("filter.coffee")}
 <div id="ErrorMessageDiv" class="flash err" style="display: none">
 </div>
 
+<% for action in payer.Actions: %>
+	${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
+<% end %>
+
 <div class="tabs">
 	<ul>
 		<li>
