@@ -139,6 +139,7 @@ namespace Integration.Models
 			user.Delete();
 			user2.Delete();
 			ActiveRecordMediator.Delete(supplier);
+			Flush();
 		}
 
 		[Test]

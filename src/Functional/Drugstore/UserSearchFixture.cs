@@ -5,6 +5,7 @@ using AdminInterface.Test.ForTesting;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.log4net;
 using WatiN.Core;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
@@ -286,7 +287,7 @@ namespace Functional
 			var mail = String.Format("test{0}@test.test", client.Id);
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, mail));
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(mail);
 			browser.Button(Find.ByValue("Поиск")).Click();
@@ -299,10 +300,11 @@ namespace Functional
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			var person = String.Format("testPerson{0}", client.Id);
+			QueryCatcher.Catch();
 			client.Users[0].AddContactGroup();
-			client.Users[0].Save();
+			client.Users[0].ContactGroup.Save();
 			client.Users[0].ContactGroup.AddPerson(person);
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(person);
 			browser.Button(Find.ByValue("Поиск")).Click();

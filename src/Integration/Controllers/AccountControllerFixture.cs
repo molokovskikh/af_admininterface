@@ -20,6 +20,7 @@ namespace Integration.Controllers
 		public void Setup()
 		{
 			user = DataMother.CreateSupplierUser();
+			scope.Flush();
 			payer = user.Payer;
 			controller = new AccountsController();
 			PrepareController(controller, "Account", "SetUserStatus");
@@ -30,6 +31,7 @@ namespace Integration.Controllers
 		{
 			Assert.That(user.Enabled, Is.True);
 			controller.SetUserStatus(user.Id, false);
+			scope.Flush();
 			ActiveRecordMediator.Refresh(user);
 			Assert.That(user.Enabled, Is.False);
 		}

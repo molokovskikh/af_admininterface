@@ -734,7 +734,8 @@ WHERE
 		public virtual void Delete()
 		{
 			Payer.Users.Remove(this);
-			Client.Users.Remove(this);
+			if (Client != null)
+				Client.Users.Remove(this);
 			ClientInfoLogEntity.DeleteAuditRecords(this);
 			PayerAuditRecord.DeleteAuditRecords(Accounting);
 			ActiveRecordMediator.Delete(this);
