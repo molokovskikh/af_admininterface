@@ -89,5 +89,20 @@ namespace Integration.Models
 			payer.Refresh();
 			Assert.That(payer.TotalSum, Is.EqualTo(1500));
 		}
+
+		[Test]
+		public void Delete_payer()
+		{
+			var client = DataMother.TestClient();
+			client.Disabled = true;
+			var payer = client.Payers.First();
+			Assert.That(payer.CanDelete(), Is.True);
+
+			payer.Delete();
+			scope.Flush();
+			Reopen();
+
+			Assert.That(session.Get<Payer>(payer.Id), Is.Null);
+		}
 	}
 }

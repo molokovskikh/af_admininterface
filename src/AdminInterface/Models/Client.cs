@@ -524,8 +524,10 @@ where ClientId = :clientId")
 			var rule = Settings.SmartOrderRules;
 			if (rule != null) {
 				var overHaveSameSettins = ActiveRecordLinqBase<DrugstoreSettings>.Queryable.Any(s => s.Id != Id && s.SmartOrderRules == rule);
-				if (!overHaveSameSettins)
+				if (!overHaveSameSettins) {
+					Settings.SmartOrderRules = null;
 					rule.Delete();
+				}
 			}
 			ClientInfoLogEntity.DeleteAuditRecords(this);
 			ActiveRecordMediator.Delete(this);

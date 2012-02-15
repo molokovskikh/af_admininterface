@@ -498,7 +498,7 @@ ORDER BY {Payer}.shortname;";
 
 		public override void Delete()
 		{
-			foreach (var client in Clients.Where(c => c.CanDelete())) {
+			foreach (var client in Clients.Where(c => c.CanDelete()).ToArray()) {
 				client.Delete();
 			}
 
