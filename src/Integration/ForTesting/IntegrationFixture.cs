@@ -34,11 +34,6 @@ namespace Integration.ForTesting
 		[TearDown]
 		public void TearDown()
 		{
-			if (_session != null)
-			{
-				var holder = ActiveRecordMediator.GetSessionFactoryHolder();
-				holder.ReleaseSession(session);
-			}
 			Close();
 		}
 
@@ -58,7 +53,6 @@ namespace Integration.ForTesting
 				Save(entity);
 		}
 
-
 		public void Delete(object entity)
 		{
 			ActiveRecordMediator.Delete(entity);
@@ -72,6 +66,12 @@ namespace Integration.ForTesting
 
 		protected void Close()
 		{
+			if (_session != null)
+			{
+				var holder = ActiveRecordMediator.GetSessionFactoryHolder();
+				holder.ReleaseSession(session);
+				_session = null;
+			}
 			if (scope != null)
 			{
 				scope.Dispose();
