@@ -330,9 +330,13 @@ namespace AdminInterface.Models.Suppliers
 	public class RegionalData
 	{
 		public RegionalData()
-		{}
+		{
+			ContactInfo = "";
+			OperativeInfo = "";
+		}
 
 		public RegionalData(Region region, Supplier supplier)
+			: this()
 		{
 			Region = region;
 			Supplier = supplier;
@@ -347,10 +351,10 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 
-		[Property]
+		[Property(NotNull = true)]
 		public virtual string ContactInfo { get; set; }
 
-		[Property]
+		[Property(NotNull = true)]
 		public virtual string OperativeInfo { get; set; }
 	}
 }
