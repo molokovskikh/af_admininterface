@@ -339,12 +339,18 @@ namespace AdminInterface.Models.Suppliers
 		}
 
 		[PrimaryKey("RowId")]
-		public uint Id { get; set; }
+		public virtual uint Id { get; set; }
 
 		[BelongsTo("RegionCode")]
-		public Region Region { get; set; }
+		public virtual Region Region { get; set; }
 
 		[BelongsTo("FirmCode")]
-		public Supplier Supplier { get; set; }
+		public virtual Supplier Supplier { get; set; }
+
+		[Property]
+		public virtual string ContactInfo { get; set; }
+
+		[Property]
+		public virtual string OperativeInfo { get; set; }
 	}
 }

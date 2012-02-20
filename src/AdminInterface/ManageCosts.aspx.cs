@@ -7,7 +7,9 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -59,7 +61,7 @@ namespace AddUser
 		}
 
 		MySqlTransaction MyTrans;
-		Int32 PriceCode;
+		uint PriceCode;
 		protected DataSet DS;
 		protected MySqlDataAdapter MyDA;
 		protected MySqlConnection MyCn;
@@ -209,48 +211,37 @@ WHERE RowID = ?Id
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 
 			MyCn.ConnectionString = Literals.GetConnectionString();
-			PriceCode = Convert.ToInt32(Request["pc"]);
+			PriceCode = Convert.ToUInt32(Request["pc"]);
 			if (!IsPostBack)
 				PostDataToGrid();
 		}
 
 		protected void CreateCost_Click(object sender, EventArgs e)
 		{
-			Int32 FirmCode;
-			var adapter = new MySqlDataAdapter(@"
-SELECT  pd.FirmCode, 
-		pd.PriceName, 
-		cd.ShortName, 
-		pd.CostType,
-		r.Region
-FROM pricesdata pd
-	JOIN clientsdata cd on cd.firmcode = pd.firmcode 
-		JOIN farm.Regions r on r.RegionCode = cd.RegionCode
-WHERE pd.pricecode = ?PriceCode; ", MyCn);
+			MySqlTransaction transaction = null;
 			try
 			{
 				MyCn.Open();
 
+				var adapter = new MySqlDataAdapter("", MyCn);
 				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
+				transaction = adapter.SelectCommand.Transaction;
 
 				adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
 				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-				var MyReader = adapter.SelectCommand.ExecuteReader();
-				MyReader.Read();
-				FirmCode = Convert.ToInt32(MyReader["FirmCode"]);
-				var ShortName = MyReader["ShortName"].ToString();
-				var PriceName = MyReader["PriceName"].ToString();
-				var region = MyReader["Region"].ToString();
-				var costType = Convert.ToInt32(MyReader["CostType"]);
-				MyReader.Close();
+				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(PriceCode);
+				var supplier = price.Supplier;
+				var supplierId = supplier.Id;
+				var shortName = supplier.Name;
+				var priceName = price.Name;
+				var region = supplier.HomeRegion.Name;
+				var costType = price.CostType;
 
-				adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", FirmCode);
-
-
+				adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", supplierId);
 
 				if (costType == 0)
-					adapter.SelectCommand.CommandText +=
+					adapter.SelectCommand.CommandText =
 @"
 SELECT pc.PriceItemId
 FROM Usersettings.PricesData pd
@@ -261,12 +252,12 @@ INTO @NewPriceItemId;
 INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT ?PriceCode, 0, @NewPriceItemId;
 SET @NewPriceCostId:=Last_Insert_ID(); 
 
-INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
+INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 ";
 				else
-					adapter.SelectCommand.CommandText +=
+					adapter.SelectCommand.CommandText =
 @"
-INSERT INTO farm.formrules() VALUES();   
+INSERT INTO farm.formrules() VALUES();
 SET @NewFormRulesId = Last_Insert_ID();
 
 INSERT INTO farm.sources() VALUES(); 
@@ -285,17 +276,18 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 
 				adapter.SelectCommand.Transaction.Commit();
 				NotificationHelper.NotifyAboutRegistration(
-					String.Format("\"{0}\" - регистрация ценовой колонки", ShortName),
+					String.Format("\"{0}\" - регистрация ценовой колонки", shortName),
 					String.Format(
 @"Оператор: {0} 
 Поставщик: {1}
 Регион: {2}
 Прайс-лист: {3}
-", SecurityContext.Administrator.UserName, ShortName, region, PriceName));
+", SecurityContext.Administrator.UserName, shortName, region, priceName));
 			}
 			catch
 			{
-				adapter.SelectCommand.Transaction.Rollback();
+				if (transaction != null)
+					transaction.Rollback();
 				throw;
 			}
 			finally
@@ -318,23 +310,13 @@ INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
 			{
 				MyCn.Open();
 				var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-				MyDA.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
-				SelCommand.Transaction = transaction;
-				SelCommand.CommandText = @"
-select pd.PriceName, pd.CostType, cd.regioncode
-from pricesdata pd
-	join clientsdata cd on cd.firmcode = pd.firmcode
-where PriceCode=?PriceCode";
-				int costType;
-				using (var reader = SelCommand.ExecuteReader())
-				{
-					reader.Read();
-					PriceNameLB.Text = reader.GetString("PriceName");
-					costType = reader.GetInt32("CostType");
-					SecurityContext.Administrator.CheckClientHomeRegion(reader.GetUInt64("RegionCode"));
-				}
 
-				if (costType == 0)
+				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(PriceCode);
+				var supplier = price.Supplier;
+				SecurityContext.Administrator.CheckRegion(supplier.HomeRegion.Id);
+				PriceNameLB.Text = price.Name;
+
+				if (price.CostType == 0)
 				{
 					foreach (DataGridColumn column in CostsDG.Columns)
 					{
@@ -346,6 +328,7 @@ where PriceCode=?PriceCode";
 					}
 				}
 
+				SelCommand.Parameters.AddWithValue("?PriceCode", price.Id);
 				SelCommand.CommandText =
 @"
 SELECT  pc.CostCode, 
@@ -421,9 +404,9 @@ where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 					}
 
 					var deleteCommandText = @"
-update usersettings.intersection
-set CostCode = ?BaseCostCode
-where CostCode = ?CostCode;";
+update Future.Intersection
+set CostId = ?BaseCostCode
+where CostId = ?CostCode;";
 
 					if (costType == 1)
 					{

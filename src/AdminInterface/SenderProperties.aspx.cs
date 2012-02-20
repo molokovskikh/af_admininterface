@@ -74,7 +74,7 @@ order by hp.name;";
 				dataAdapter.Fill(Data, "RuleInfo");
 
 				if (Data.Tables["RuleInfo"].Rows[0]["RegionCode"] != DBNull.Value)
-					SecurityContext.Administrator.CheckClientHomeRegion(Convert.ToUInt64(Data.Tables["RuleInfo"].Rows[0]["RegionCode"]));
+					SecurityContext.Administrator.CheckRegion(Convert.ToUInt64(Data.Tables["RuleInfo"].Rows[0]["RegionCode"]));
 			}
 
 			Header.Text = String.Format("Настройка свойств для отправщика {0} и форматера {1}",

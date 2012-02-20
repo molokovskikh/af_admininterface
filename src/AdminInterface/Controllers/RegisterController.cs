@@ -386,36 +386,36 @@ SET @NewPriceCostId = Last_Insert_ID();
 
 INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
 
-INSERT 
-INTO    regionaldata
-		(
-				regioncode, 
-				firmcode
-		)  
-SELECT  DISTINCT regions.regioncode, 
-		clientsdata.firmcode  
-FROM (clientsdata, farm.regions, pricesdata)  
-	LEFT JOIN regionaldata ON regionaldata.firmcode = clientsdata.firmcode AND regionaldata.regioncode = regions.regioncode  
-WHERE   pricesdata.firmcode = clientsdata.firmcode  
-		AND clientsdata.firmcode = :ClientCode  
-		AND (clientsdata.maskregion & regions.regioncode)>0  
-		AND regionaldata.firmcode is null; 
+INSERT
+INTO regionaldata
+	(
+		regioncode,
+		firmcode
+	)
+SELECT DISTINCT regions.regioncode,
+		s.Id
+FROM (Future.Suppliers s, farm.regions, pricesdata)
+	LEFT JOIN regionaldata ON regionaldata.firmcode = s.id AND regionaldata.regioncode = regions.regioncode
+WHERE   pricesdata.firmcode = s.Id
+		AND s.Id = :ClientCode
+		AND (s.RegionMask & regions.regioncode)>0
+		AND regionaldata.firmcode is null;
 
-INSERT 
-INTO    pricesregionaldata
-		(
-				regioncode, 
-				pricecode
-		)  
-SELECT  DISTINCT regions.regioncode, 
-		pricesdata.pricecode  
-FROM    (clientsdata, farm.regions, pricesdata, clientsdata as a)  
-LEFT JOIN pricesregionaldata 
-		ON pricesregionaldata.pricecode = pricesdata.pricecode 
-		AND pricesregionaldata.regioncode = regions.regioncode  
-WHERE   pricesdata.firmcode = clientsdata.firmcode  
-		AND clientsdata.firmcode = :ClientCode  
-		AND (clientsdata.maskregion & regions.regioncode)>0  
+INSERT
+INTO pricesregionaldata
+	(
+		regioncode,
+		pricecode
+	)
+SELECT DISTINCT regions.regioncode,
+		pricesdata.pricecode
+FROM (Future.Suppliers s, farm.regions, pricesdata)
+LEFT JOIN pricesregionaldata
+		ON pricesregionaldata.pricecode = pricesdata.pricecode
+		AND pricesregionaldata.regioncode = regions.regioncode
+WHERE   pricesdata.firmcode = s.Id
+		AND s.Id = :ClientCode
+		AND (s.RegionMask & regions.regioncode) > 0
 		AND pricesregionaldata.pricecode is null;";
 
 			ArHelper.WithSession(s => {

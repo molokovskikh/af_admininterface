@@ -184,50 +184,12 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public virtual bool IsHiddenForProducer
-		{
-			get
-			{
-				return Settings.InvisibleOnFirm == DrugstoreType.Hidden;
-			}
-			set
-			{
-				var val = value ? 2 : 0;
-				var tmp = Settings.InvisibleOnFirm == DrugstoreType.Hidden;
-				if (tmp != value)
-				{
-					Settings.InvisibleOnFirm = DrugstoreType.Standart;
-					var updateSql = @"
-update 
-	intersection, pricesdata 
-set 
-	intersection.invisibleonfirm = :InvisibleOnFirm";
-					if (value)
-					{
-						Settings.InvisibleOnFirm = DrugstoreType.Hidden;
-						updateSql += ", DisabledByFirm = if(PriceType = 2, 1, 0), InvisibleOnClient = if(PriceType = 2, 1, 0)";
-					}
-					updateSql += @"
-where 
-	intersection.pricecode = pricesdata.pricecode and 
-	intersection.clientcode = :ClientCode";
-
-					Settings.Update();
-
-					ArHelper.WithSession(session => session.CreateSQLQuery(updateSql)
-						.SetParameter("ClientCode", Id)
-						.SetParameter("InvisibleOnFirm", val)
-						.ExecuteUpdate());
-				}
-			}
-		}
-
 		public static Client FindAndCheck(uint id)
 		{
 			var client = Find(id);
 
-			SecurityContext.Administrator.CheckClientHomeRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckClientType(client.Type);
+			SecurityContext.Administrator.CheckRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckType(client.Type);
 			return client;
 		}
 
@@ -237,12 +199,8 @@ where
 				session => session.CreateCriteria(typeof (Client))
 					.Add(Restrictions.Eq("Id", clientCode))
 					.SetFetchMode("BillingInstance", FetchMode.Join)
-					//.SetFetchMode("Payer.Clients", FetchMode.Eager)
 					.SetFetchMode("HomeRegion", FetchMode.Join)
 					.SetFetchMode("ContactGroupOwner", FetchMode.Join)
-					//.SetFetchMode("ContactGroupOwner.ContactGroups", FetchMode.Eager)
-					//.SetFetchMode("ContactGroupOwner.ContactGroups.Contacts", FetchMode.Eager)
-					//.SetFetchMode("ContactGroupOwner.ContactGroups.Persons", FetchMode.Eager)
 					.UniqueResult<Client>());
 		}
 
@@ -280,22 +238,22 @@ group by u.ClientId")
 
 		public virtual int EnabledUserForPayerCount(Payer payer)
 		{
-			return Users.Where(u => u.Payer == payer && u.Enabled).Count();
+			return Users.Count(u => u.Payer == payer && u.Enabled);
 		}
 
 		public virtual int DisabledUserForPayerCount(Payer payer)
 		{
-			return Users.Where(u => u.Payer == payer && !u.Enabled).Count();
+			return Users.Count(u => u.Payer == payer && !u.Enabled);
 		}
 
 		public virtual int EnabledAddressForPayerCount(Payer payer)
 		{
-			return Addresses.Where(a => a.Payer == payer && a.Enabled).Count();
+			return Addresses.Count(a => a.Payer == payer && a.Enabled);
 		}
 
 		public virtual int DisabledAddressForPayerCount(Payer payer)
 		{
-			return Addresses.Where(a => a.Payer == payer && !a.Enabled).Count();
+			return Addresses.Count(a => a.Payer == payer && !a.Enabled);
 		}
 
 		public virtual bool HaveLockedUsers()

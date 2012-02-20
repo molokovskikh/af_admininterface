@@ -142,6 +142,22 @@ namespace AdminInterface.Models
 		[Property, Description("Не подключать новые прайсы \"В работе\""), Auditable]
 		public virtual bool IgnoreNewPriceForUser { get; set; }
 
+		[Description("Скрыть клиента в интефрейсе поставщика")]
+		public virtual bool IsHiddenForProducer
+		{
+			get
+			{
+				return InvisibleOnFirm == DrugstoreType.Hidden;
+			}
+			set
+			{
+				if (value)
+					InvisibleOnFirm = DrugstoreType.Hidden;
+				else
+					InvisibleOnFirm = DrugstoreType.Standart;
+			}
+		}
+
 		public virtual bool EnableBuyingMatrix
 		{
 			get

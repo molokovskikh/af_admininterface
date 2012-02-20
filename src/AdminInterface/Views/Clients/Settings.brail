@@ -116,9 +116,7 @@
 					</td>
 				</tr>
 				<tr><td colspan="2">
-				<input type="checkbox" name="client.IsHiddenForProducer" value="true" ${"checked" if client.IsHiddenForProducer } />
-				<input type="hidden" name="client.IsHiddenForProducer" value="false" />
-				Скрыть клиента в интефрейсе поставщика<br />
+				${app.Edit("drugstore.IsHiddenForProducer")}<br>
 				${app.Edit("drugstore.AllowDelayOfPayment")}<br>
 				${app.Edit("drugstore.ServiceClient")}<br>
 				${app.Edit("drugstore.IgnoreNewPrices")}<br>

@@ -56,7 +56,7 @@ namespace AdminInterface.Controllers
 		{
 			var suplier = Supplier.Find(supplierId);
 
-			SecurityContext.Administrator.CheckClientHomeRegion(suplier.HomeRegion.Id);
+			SecurityContext.Administrator.CheckRegion(suplier.HomeRegion.Id);
 			if (!SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers))
 				throw new NotHavePermissionException();
 

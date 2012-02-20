@@ -111,7 +111,7 @@ namespace Unit.Models
 		public void FailCheckForDrugstorePermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
-			Assert.That(() => _adm.CheckClientType(ServiceType.Drugstore),
+			Assert.That(() => _adm.CheckType(ServiceType.Drugstore),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
@@ -120,7 +120,7 @@ namespace Unit.Models
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewDrugstore});
 
-			Assert.That(() => _adm.CheckClientType(ServiceType.Supplier),
+			Assert.That(() => _adm.CheckType(ServiceType.Supplier),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
@@ -128,7 +128,7 @@ namespace Unit.Models
 		public void FailCheckClientHomeRegion()
 		{
 			_adm.RegionMask = 1;
-			Assert.That(() => _adm.CheckClientHomeRegion(2),
+			Assert.That(() => _adm.CheckRegion(2),
 				Throws.InstanceOf<NotHavePermissionException>());
 		}
 
@@ -136,14 +136,14 @@ namespace Unit.Models
 		public void CheckPermissionForViewClient()
 		{
 			_adm.RegionMask = 1;
-			_adm.CheckClientHomeRegion(1);
+			_adm.CheckRegion(1);
 		}
 
 		[Test]
 		public void CheckForSupplierPermissionForViewClient()
 		{
 			_adm.AllowedPermissions.Add(new Permission {Type = PermissionType.ViewSuppliers});
-			_adm.CheckClientType(ServiceType.Supplier);
+			_adm.CheckType(ServiceType.Supplier);
 		}
 
 		[Test]

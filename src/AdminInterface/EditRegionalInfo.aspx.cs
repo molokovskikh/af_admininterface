@@ -3,7 +3,9 @@ using System.Data;
 using System.Web.UI;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
+using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using MySql.Data.MySqlClient;
 
 
@@ -15,9 +17,9 @@ public partial class EditRegionalInfo : Page
 		set { Session["RegionalSettingsCode"] = value; }
 	}
 	
-	private int _clientCode
+	private uint _clientCode
 	{
-		get { return Convert.ToInt32(Session["ClientCode"]); }
+		get { return Convert.ToUInt32(Session["ClientCode"]); }
 		set { Session["ClientCode"] = value; }
 	}
 	
@@ -37,32 +39,13 @@ public partial class EditRegionalInfo : Page
 
 	private void BindData()
 	{	
-		var commandText = @"
-SELECT Region, rd.RegionCode, ShortName, ContactInfo, OperativeInfo, rd.FirmCode
-FROM usersettings.regionaldata rd
-	INNER JOIN usersettings.clientsdata cd ON cd.FirmCode = rd.FirmCode
-		INNER JOIN farm.regions r on r.RegionCode = rd.RegionCode
-WHERE RowID = ?Id";
-
-		using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-		{
-			connection.Open();
-			var command = new MySqlCommand(commandText, connection);
-			command.Parameters.AddWithValue("?Id", _regionalSettingsCode);
-			using (var reader = command.ExecuteReader())
-			{
-				reader.Read();
-
-				ContactInfoText.Text = reader.GetString("ContactInfo");
-				OperativeInfoText.Text = reader.GetString("OperativeInfo");
-				_clientCode = reader.GetInt32("FirmCode");
-				ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", reader.GetString("ShortName"));
-				RegionInfoLabel.Text = String.Format("В регионе: {0}", reader.GetString("Region"));
-
-				var regionCode = reader.GetUInt64("RegionCode");
-				SecurityContext.Administrator.CheckClientHomeRegion(regionCode);
-			}
-		}
+		var regionalData = ActiveRecordMediator<RegionalData>.FindByPrimaryKey(_regionalSettingsCode);
+		ContactInfoText.Text = regionalData.ContactInfo;
+		OperativeInfoText.Text = regionalData.OperativeInfo;
+		_clientCode = regionalData.Supplier.Id;
+		ClientInfoLabel.Text = String.Format("Информация клиента \"{0}\"", regionalData.Supplier.Name);
+		RegionInfoLabel.Text = String.Format("В регионе: {0}", regionalData.Region.Name);
+		SecurityContext.Administrator.CheckRegion(regionalData.Region.Id);
 	}
 	
 	protected void SaveButton_Click(object sender, EventArgs e)

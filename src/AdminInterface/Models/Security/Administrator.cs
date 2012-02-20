@@ -174,7 +174,7 @@ namespace AdminInterface.Models.Security
 			throw new NotHavePermissionException();
 		}
 
-		public Administrator CheckClientType(ServiceType clientType)
+		public Administrator CheckType(ServiceType clientType)
 		{
 			if (clientType == ServiceType.Drugstore && !HavePermisions(PermissionType.ViewDrugstore))
 				throw new NotHavePermissionException();
@@ -184,7 +184,7 @@ namespace AdminInterface.Models.Security
 			return this;
 		}
 
-		public Administrator CheckClientHomeRegion(ulong homeRegionId)
+		public Administrator CheckRegion(ulong homeRegionId)
 		{
 			if ((homeRegionId & RegionMask) == 0)
 				throw new NotHavePermissionException();
@@ -234,8 +234,8 @@ namespace AdminInterface.Models.Security
 
 		public void CheckClientPermission(Client client)
 		{
-			CheckClientHomeRegion(client.HomeRegion.Id);
-			CheckClientType(client.Type);
+			CheckRegion(client.HomeRegion.Id);
+			CheckType(client.Type);
 		}
 
 		public override string ToString()

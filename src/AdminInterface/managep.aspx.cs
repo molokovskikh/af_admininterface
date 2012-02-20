@@ -248,8 +248,8 @@ Set @InUser = ?UserName;
 DELETE FROM PricesData
 WHERE PriceCode = ?PriceCode;
 
-DELETE FROM Intersection
-WHERE PriceCode = ?PriceCode;
+DELETE FROM Future.Intersection
+WHERE PriceId = ?PriceCode;
 
 DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
