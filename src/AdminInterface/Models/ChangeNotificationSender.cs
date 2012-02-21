@@ -36,11 +36,15 @@ namespace AdminInterface.Models
 			message.AppendLine("Клиент " + clientId);
 			var entity = _entity as Client;
 			if (entity != null) {
-				message.AppendLine("Плательщики: " + (entity).Payers.Implode(p => p.Name));
+				message.AppendLine("Плательщики: " + entity.Payers.Implode(p => p.Name));
+				if (entity.Payers.Any( p => p.PayerID == 921))
+					return;
 			}
 			var supplier = _entity as Supplier;
 			if (supplier != null) {
-				message.AppendLine("Плательщик: " + (supplier).Payer.Name);
+				message.AppendLine("Плательщик: " + supplier.Payer.Name);
+				if (supplier.Payer.PayerID == 921)
+					return;
 			}
 			message.AppendLine(String.Format("Изменено '{0}' было '{1}' стало '{2}'", name, oldValue, newValue));
 			mailer.ChangeNameFullName(message.ToString()).Send();
