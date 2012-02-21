@@ -91,10 +91,10 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable, ValidateNonEmpty]
+		[Property, Description("Краткое наименование"), Auditable, SendEmail(typeof(ChangeNotificationSender)), ValidateNonEmpty]
 		public override string Name { get; set; }
 
-		[Property, Description("Полное наименование"), Auditable, ValidateNonEmpty]
+		[Property, Description("Полное наименование"), Auditable, SendEmail(typeof(ChangeNotificationSender)), ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
@@ -169,7 +169,7 @@ namespace AdminInterface.Models
 			Table = "PayerClients",
 			Schema = "Billing",
 			ColumnRef = "PayerId")]
-		public virtual IList<Payer> Payers { get; set; }
+		public virtual IList<Payer>  Payers { get; set; }
 
 		public override bool Enabled
 		{

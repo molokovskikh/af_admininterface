@@ -65,7 +65,7 @@ namespace AdminInterface.MonoRailExtentions
 				message.To.Clear();
 				message.To.Add(ConfigurationManager.AppSettings["DebugMail"]);
 			}
-#endif 
+#endif
 			_sender.Send(message);
 		}
 

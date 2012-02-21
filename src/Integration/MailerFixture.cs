@@ -238,6 +238,18 @@ namespace Integration
 		}
 
 		[Test]
+		public void Change_Name_Full_Name()
+		{
+			mailer.ChangeNameFullName("Test_Message_Text");
+			mailer.Send();
+			Assert.That(message.Subject, Is.EqualTo("Изменено краткого или полного наименования клиента"));
+			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
+			Assert.That(message.Body, Is.StringContaining("Изменено краткого или полного наименования клиента в административном интерфейсе"));
+			Assert.That(message.Body, Is.StringContaining("Test_Message_Text"));
+			Assert.That(message.Body, Is.StringContaining(DateTime.Now.Date.ToShortDateString()));
+		}
+
+		[Test]
 		public void Accounting_changed()
 		{
 			using (new SessionScope())

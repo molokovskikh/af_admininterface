@@ -168,6 +168,19 @@ namespace AdminInterface.Models
 			return this;
 		}
 
+		public MonorailMailer ChangeNameFullName(string Message)
+		{
+			Template = "ChangeNameFullName";
+			From = "register@analit.net";
+			Subject = "Изменено краткого или полного наименования клиента";
+			To = "RegisterList@subscribe.analit.net";
+			PropertyBag["message"] = Message;
+			PropertyBag["dtn"] = DateTime.Now;
+			PropertyBag["admin"] = SecurityContext.Administrator;
+
+			return this;
+		}
+
 		public MonorailMailer AddressMoved(Address address, Client oldClient, LegalEntity oldLegalEntity)
 		{
 			Template = "AddressMoved";

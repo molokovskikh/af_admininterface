@@ -24,13 +24,13 @@ namespace AdminInterface.Models
 				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
 		}
 
-		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState)
+		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState, object entity)
 		{
 			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
 			{
 				return new MaskedAuditableProperty(property, name, newState, oldState);
 			}
-			return base.GetAuditableProperty(property, name, newState, oldState);
+			return base.GetAuditableProperty(property, name, newState, oldState, entity);
 		}
 	}
 

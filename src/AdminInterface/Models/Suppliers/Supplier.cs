@@ -50,10 +50,10 @@ namespace AdminInterface.Models.Suppliers
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, ValidateNonEmpty, Auditable, Description("Краткое наименование")]
+		[Property, ValidateNonEmpty, Auditable, SendEmail(typeof(ChangeNotificationSender)), Description("Краткое наименование")]
 		public override string Name { get; set; }
 
-		[Property, ValidateNonEmpty, Auditable, Description("Полное наименование")]
+		[Property, ValidateNonEmpty, Auditable, SendEmail(typeof(ChangeNotificationSender)), Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
 		[Property, Auditable, Description("Регионы работы")]

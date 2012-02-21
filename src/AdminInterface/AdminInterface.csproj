@@ -167,6 +167,7 @@
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Certificates\CertificateSource.cs" />
+    <Compile Include="Models\ChangeNotificationSender.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Logs\PrgDataLog.cs" />
@@ -432,6 +433,7 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
+    <None Include="Views\Mail\ChangeNameFullName.brail" />
     <None Include="Views\Main\Stat.brail" />
     <None Include="Views\ManagerReports\Index.brail" />
     <None Include="Views\ManagerReports\UsersAndAdresses.brail" />
