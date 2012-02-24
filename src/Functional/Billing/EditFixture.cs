@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -21,11 +22,12 @@ namespace Functional.Billing
 			payer.Recipient = Recipient.FindFirst();
 			payer.Save();
 			using (var browser = Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", payer.Id))) {
+				browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 				var selectList = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 				var items = selectList.Options;
 				Console.WriteLine(items[0].Value);
 				selectList.SelectByValue(items[0].Value);
-				Click("Сохранить");
+				browser.TableCell("savePayer").Buttons.First().Click();
 			}
 			scope.Flush();
 			payer.Refresh();

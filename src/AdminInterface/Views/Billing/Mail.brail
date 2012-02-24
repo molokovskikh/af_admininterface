@@ -181,7 +181,7 @@ end
 									FormHelper.TextField("Instance.AfterNamePrefix"))}
 									
 		<tr style="text-align:right">
-			<td colspan="2">${FormHelper.Submit("Сохранить")}</td>
+			<td colspan="2" id="savePayer">${FormHelper.Submit("Сохранить")}</td>
 		</tr>
 	</table>
 	${app.End()}
