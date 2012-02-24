@@ -1,6 +1,6 @@
 ﻿<%
 def Select(name, value) as string:
-	result = "<select name='${name}'>" + "<option></option>"
+	result = "<select name='${name}'>" + "<option value=0></option>"
 	for recipient in Recipients:
 		selected = ""
 		if value and recipient.Id == value.Id:
