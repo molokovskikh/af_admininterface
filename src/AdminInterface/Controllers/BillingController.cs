@@ -161,7 +161,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public void Update(
-			[ARDataBind("Instance", AutoLoadBehavior.Always)] Payer payer,
+			[ARDataBind("Instance", AutoLoadBehavior.NullIfInvalidKey)] Payer payer,
 			uint clientCode,
 			string tab)
 		{
