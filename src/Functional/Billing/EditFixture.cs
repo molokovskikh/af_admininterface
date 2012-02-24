@@ -22,7 +22,6 @@ namespace Functional.Billing
 			payer.Recipient = Recipient.FindFirst();
 			payer.Save();
 			using (var browser = Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", payer.Id))) {
-				browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 				var selectList = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 				var items = selectList.Options;
 				Console.WriteLine(items[0].Value);
