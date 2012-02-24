@@ -728,11 +728,9 @@ namespace Functional.Drugstore
 				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
 			}
 
-			oldClient = Client.Find(oldClient.Id);
-			newClient = Client.Find(newClient.Id);
+			oldClient.Refresh();
+			newClient.Refresh();
 			session.Refresh(user);
-			Console.WriteLine(oldClient.Id);
-			Console.WriteLine(newClient.Id);
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));
 			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
