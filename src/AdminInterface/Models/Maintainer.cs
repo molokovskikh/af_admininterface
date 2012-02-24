@@ -55,12 +55,11 @@ SELECT  DISTINCT drugstore.Id,
 		ifnull(parent.AvailableForClient, if(pd.PriceType = 0, 1, 0)),
 		rootIntersection.SupplierClientId,
 		rootIntersection.SupplierPaymentId
-FROM Future.Clients as drugstore
+FROM (Future.Clients as drugstore, future.suppliers s)
 	JOIN retclientsset as a ON a.clientcode = drugstore.Id
 	join billing.PayerClients p on p.ClientId = drugstore.Id
-		join Billing.LegalEntities le on le.PayerId = p.PayerId
-	JOIN future.suppliers s ON s.Segment = drugstore.Segment
-		JOIN pricesdata pd ON pd.firmcode = s.Id
+		JOIN Billing.LegalEntities le on le.PayerId = p.PayerId
+	JOIN pricesdata pd ON pd.firmcode = s.Id
 	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pd.pricecode AND pricesregionaldata.regioncode = regions.regioncode
 	LEFT JOIN Future.Intersection i ON i.PriceId = pd.pricecode and i.RegionId = regions.regioncode and i.ClientId = drugstore.Id and i.LegalEntityId = le.Id

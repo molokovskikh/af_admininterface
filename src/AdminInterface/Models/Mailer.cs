@@ -240,12 +240,11 @@ Email: {2}
 			{
 				SupplierRegistred(supplier.Name, supplier.HomeRegion.Name);
 				var body = String.Format(
-					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\nТип: {4}",
 					SecurityContext.Administrator.UserName,
 					supplier.HomeRegion.Name,
 					supplier.Users.First().Login,
 					supplier.Id,
-					supplier.Segment.GetDescription(),
 					supplier.Type.GetDescription());
 
 				if (!String.IsNullOrEmpty(billingMessage))
@@ -271,12 +270,11 @@ Email: {2}
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
 				var user = client.Users.First();
 				var body = String.Format(
-					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\n\nСегмент: {4}\nТип: {5}",
+					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\nТип: {4}",
 					SecurityContext.Administrator.UserName,
 					client.HomeRegion.Name,
 					user.Login,
 					client.Id,
-					client.Segment.GetDescription(),
 					client.Type.GetDescription());
 
 				if (!String.IsNullOrEmpty(billingMessage))

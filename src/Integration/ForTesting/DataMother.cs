@@ -23,7 +23,6 @@ namespace Integration.ForTesting
 			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
 			var client = new Client(payer, homeRegion) {
 				Status = ClientStatus.On,
-				Segment = Segment.Wholesale,
 				Type = ServiceType.Drugstore,
 				Name = "test",
 				FullName = "test",

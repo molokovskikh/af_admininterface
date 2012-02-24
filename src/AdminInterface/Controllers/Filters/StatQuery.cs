@@ -158,7 +158,6 @@ WHERE oh.rowid = orderid
 	AND cd.Id = oh.clientcode
 	AND u.PayerId <> 921
 	AND rcs.clientcode = oh.clientcode
-	AND cd.Segment = 0
 	AND rcs.serviceclient = 0 
 	AND oh.regioncode & ?RegionMaskParam   > 0
 	AND oh.Deleted = 0

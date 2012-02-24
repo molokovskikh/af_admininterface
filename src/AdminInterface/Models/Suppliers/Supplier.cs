@@ -80,9 +80,6 @@ namespace AdminInterface.Models.Suppliers
 			}
 		}
 
-		[Property]
-		public virtual Segment Segment { get; set; }
-
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 

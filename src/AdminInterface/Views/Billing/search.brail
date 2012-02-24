@@ -35,7 +35,6 @@
 				<col style="width:60%" />
 				${app.FilterFor("filter.PayerState")}
 				${app.FilterFor("filter.Region")}
-				${app.FilterFor("filter.Segment")}
 				${app.FilterFor("filter.ClientType")}
 				${app.FilterFor("filter.ClientStatus")}
 				${app.FilterFor("filter.Recipient")}
@@ -92,9 +91,6 @@
 						${app.Sortable("Работающих адресов", "EnabledAddressesCount")}
 					</th>
 					<th>
-						Сегменты
-					</th>
-					<th>
 						Регионы
 					</th>
 				</tr>
@@ -133,9 +129,6 @@
 				</td>
 				<td class=short>
 					${searchResult.EnabledAddressesCount}
-				</td>
-				<td>
-					${searchResult.GetSegments()}
 				</td>
 				<td>
 					${searchResult.Regions}

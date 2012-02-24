@@ -1,13 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
-using AdminInterface.Models.Security;
-using Castle.ActiveRecord;
-using Common.Web.Ui.Helpers;
-using Common.MySql;
 
 namespace AdminInterface.Models
 {
@@ -28,8 +20,6 @@ namespace AdminInterface.Models
 		public string RegionName { get; set; }
 
 		public uint AFVersion { get; set; }
-
-		public SearchSegment Segment { get; set; }
 
 		public SearchClientType ClientType { get; set; }
 

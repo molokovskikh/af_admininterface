@@ -14,7 +14,7 @@ namespace AdminInterface.Models.Billing
 		{
 			Supplier = supplier;
 			_readyForAccounting = true;
-			if (supplier.Segment == Segment.Retail)
+			if (supplier.HomeRegion.Name.Contains("Справка"))
 				_payment = 600;
 		}
 

@@ -33,12 +33,6 @@ namespace AdminInterface.Models
 		[Description("Включен")] On = 1,
 	}
 
-	public enum Segment
-	{
-		[Description("Опт")] Wholesale = 0,
-		[Description("Розница")] Retail = 1,
-	}
-
 	public class RegistrationInfo
 	{
 		public RegistrationInfo()
@@ -138,9 +132,6 @@ namespace AdminInterface.Models
 				}
 			}
 		}
-
-		[Property]
-		public virtual Segment Segment { get; set; }
 
 		[Property, Description("Регионы работы"), Auditable]
 		public virtual UInt64 MaskRegion { get; set; }

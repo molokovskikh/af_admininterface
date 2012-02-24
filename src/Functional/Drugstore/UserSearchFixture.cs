@@ -161,28 +161,6 @@ namespace Functional
 		}
 
 		[Test]
-		public void SearchWithFilterBySegment()
-		{
-			var client = DataMother.CreateTestClientWithUser();
-			client.Segment = Segment.Retail;
-			Save(client);
-			scope.Flush();
-
-			browser.SelectList(Find.ByName("filter.Segment")).Select("Розница");
-			browser.Button(Find.ByValue("Поиск")).Click();
-			if (browser.TableBody(Find.ById("SearchResults")).Exists)
-			{
-				Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows.Count, Is.GreaterThan(0));
-				foreach (var row in browser.TableBody(Find.ById("SearchResults")).TableRows)
-					Assert.That(row.GetCellByHeader("Сегмент").Text, Is.EqualTo("Розница"));
-			}
-			else
-			{
-				CheckThatIsUserPage(browser);
-			}
-		}
-
-		[Test]
 		public void SearchWithNoResults()
 		{
 			browser.TextField(Find.ById("filter_SearchText")).TypeText("1234567890qweasdzxc][p/.,';l");

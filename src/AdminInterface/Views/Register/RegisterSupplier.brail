@@ -7,15 +7,6 @@
 ${app.JS("contact.registrator.js", "payer.search.js", "jquery.tmpl.js")}
 ${app.Asset("order.delivery.group.editor.coffee")}
 
-<style>
-
-	select[name='supplier.Segment']
-	{
-		width: 100%;
-	}
-
-</style>
-
 <script type="text/javascript">
 
 	$(function () {
@@ -97,13 +88,6 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	<div class="block">
 		<h3>Общая информация</h3>
 		<table border="0" width="100%" cellpadding="5" cellspacing="0">
-			<tr>
-				<td>Сегмент:</td>
-				<td>
-					${app.Edit("supplier.Segment")}
-				</td>
-				<td></td>
-			</tr>
 			<tr>
 				<td>Юридическое наименование:</td>
 				<td><input type="text" id="JuridicalName" name="supplier.FullName" style="width: 100%" /></td>

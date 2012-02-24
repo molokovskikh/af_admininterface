@@ -36,10 +36,6 @@ namespace AdminInterface.Models.Billing
 
 		public string Regions { get; set; }
 
-		public bool HasWholesaleSegment { get; set; }
-
-		public bool HasRetailSegment { get; set; }
-
 		public bool ShowPayDate { get; set; }
 
 		public decimal PaymentSum { get; set; }
@@ -59,17 +55,6 @@ namespace AdminInterface.Models.Billing
 					&& EnabledSupplierCount == 0
 					&& EnabledReportsCount == 0;
 			}
-		}
-
-		public string GetSegments()
-		{
-			if (HasWholesaleSegment && HasRetailSegment)
-				return "Опт, Розница";
-			if (HasWholesaleSegment)
-				return "Опт";
-			if (HasRetailSegment)
-				return "Розница";
-			return "";
 		}
 
 		public override string ToString()

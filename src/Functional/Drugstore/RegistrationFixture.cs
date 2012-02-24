@@ -192,7 +192,6 @@ namespace Functional.Drugstore
 			var updateInfo = UserUpdateInfo.Find(user.Id);
 			Assert.That(updateInfo.AFAppVersion, Is.EqualTo(705u));
 
-			Assert.That(client.Segment, Is.EqualTo(Segment.Wholesale));
 			Assert.That(client.Status, Is.EqualTo(ClientStatus.On));
 			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адрес доставки");
 

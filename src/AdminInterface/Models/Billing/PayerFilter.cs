@@ -18,13 +18,6 @@ namespace AdminInterface.Models.Billing
 		[Description("Не должники")] NotDebitors,
 	}
 
-	public enum SearchSegment
-	{
-		[Description("Все")] All,
-		[Description("Розница")] Retail,
-		[Description("Опт")] Wholesale,
-	}
-
 	public enum SearchClientType
 	{
 		[Description("Все")] All,
@@ -68,9 +61,6 @@ namespace AdminInterface.Models.Billing
 
 		[Description("Должен\\Не должен:")]
 		public PayerStateFilter PayerState { get; set; }
-
-		[Description("Сегмент:")]
-		public SearchSegment Segment { get; set; }
 
 		[Description("Тип:")]
 		public SearchClientType ClientType { get; set; }
@@ -165,16 +155,6 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 				query.SetParameter("InvoiceType", InvoiceType.Value);
 			}
 
-			switch(Segment)
-			{
-				case SearchSegment.Retail:
-					And(groupFilter, "(cd.Segment = 1 or s.Segment = 1)");
-					break;
-				case SearchSegment.Wholesale:
-					And(groupFilter, "(cd.Segment = 0 or s.Segment = 0)");
-					break;
-			}
-
 			switch(ClientType)
 			{
 				case SearchClientType.Drugstore:
@@ -243,8 +223,6 @@ select p.PayerId,
 		from farm.regions r
 		where r.regioncode & bit_or(cd.maskregion) > 0) as Regions,
 
-		sum(if(cd.Segment = 1 or s.Segment = 1, 1, 0)) > 0 as HasRetailSegment,
-		sum(if(cd.Segment = 0 or s.Segment = 0, 1, 0)) > 0 as HasWholesaleSegment,
 		r.Name as Recipient
 from billing.payers p
 	left join Billing.Recipients r on r.Id = p.RecipientId

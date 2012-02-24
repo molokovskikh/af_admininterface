@@ -44,7 +44,6 @@
 				<col style="width:25%" />
 				<col style="width:25%" />
 				<col style="width:25%" />
-				<col style="width:25%" />
 				<thead>
 					<tr align="left">
 						<td class=value>
@@ -54,10 +53,6 @@
 						<td class=value>
 							Тип<br />
 							${app.Edit("filter.ClientType")}
-						</td>
-						<td class=value>
-							Сегмент<br />
-							${app.Edit("filter.Segment")}
 						</td>
 						<td class=value>
 							Статус<br />
@@ -88,7 +83,6 @@
 					<th>${app.Sortable("Обновление", "UpdateDate")}</th>
 					<th>${app.Sortable("Версия", "AFVersion")}</th>
 					<th>${app.Sortable("Тип", "ClientType")}</th>
-					<th>${app.Sortable("Сегмент", "Segment")}</th>
 				</tr>
 			</thead>
 			<tbody id="SearchResults" class="HighLightCurrentRow">
@@ -118,7 +112,6 @@
 					<td class="${'old-user-update' if oldUpdate} ${'NotCommitedUpdate' if (item.UpdateIsUncommited)}">${item.UpdateDate}</td>
 					<td>${item.AFVersion}</td>
 					<td>${BindingHelper.GetDescription(item.ClientType)}</td>
-					<td>${BindingHelper.GetDescription(item.Segment)}</td>
 				</tr>
 			<% end %>
 			</tbody>

@@ -260,7 +260,6 @@ namespace AdminInterface.Controllers
 					FullName = client.FullName.Replace("№", "N").Trim(),
 					Name = client.Name.Replace("№", "N").Trim(),
 					HomeRegion = Region.Find(homeRegion),
-					Segment = client.Segment,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()

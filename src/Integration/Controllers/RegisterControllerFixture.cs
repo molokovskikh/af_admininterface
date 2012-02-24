@@ -46,7 +46,6 @@ namespace Integration.Controllers
 
 			client = new Client {
 				Status = ClientStatus.On,
-				Segment = Segment.Wholesale,
 				Type = ServiceType.Drugstore,
 				Name = "test",
 				FullName = "test",
@@ -173,35 +172,6 @@ namespace Integration.Controllers
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			var user = supplier.Users.First();
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
-		}
-
-		[Test]
-		public void Register_supplier_in_retail_segment()
-		{
-			Request.Params.Add("supplier.Name", "Тестовый поставщик");
-			Request.Params.Add("supplier.FullName", "Тестовый поставщик");
-			Request.Params.Add("supplier.Segment", Segment.Retail.ToString());
-
-			controller.RegisterSupplier(
-				new Contact[0], 1,
-				new [] {
-					new RegionSettings {
-						Id = 1,
-						IsAvaliableForBrowse = true
-					}, 
-				},
-				new AdditionalSettings(),
-				null,
-				null,
-				"тестовый пользователь",
-				new Contact[0],
-				new Person[0], 
-				"",
-				"");
-
-			var supplier = RegistredSupplier();
-			Assert.That(supplier.Id, Is.GreaterThan(0));
-			Assert.That(supplier.Payer.PaymentSum, Is.EqualTo(600));
 		}
 
 		private Client RegistredClient()

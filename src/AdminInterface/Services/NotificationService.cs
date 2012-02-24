@@ -107,7 +107,6 @@ where length(c.contactText) > 0
 		from pricesdata as pd, pricesregionaldata as prd
 		where prd.enabled = 1)
 	and s.Disabled = 0
-	and s.Segment = 0
 	and s.RegionMask & ?Region > 0
 	and cg.Type = ?ContactGroupType
 	and c.Type = ?ContactType
@@ -124,7 +123,6 @@ where length(c.contactText) > 0
 		from pricesdata as pd, pricesregionaldata as prd
 		where prd.enabled = 1)
 	and s.Disabled = 0
-	and s.Segment = 0
 	and s.RegionMask & ?Region > 0
 	and cg.Type = ?ContactGroupType
 	and c.Type = ?ContactType;", connection);

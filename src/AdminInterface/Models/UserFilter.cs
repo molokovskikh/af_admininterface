@@ -44,8 +44,6 @@ namespace AdminInterface.Models
 
 		public SearchClientStatus SearchStatus { get; set; }
 
-		public SearchSegment Segment { get; set; }
-
 		public SearchClientType ClientType { get; set; }
 
 		public Region Region { get; set; }
@@ -65,7 +63,6 @@ namespace AdminInterface.Models
 				{"UpdateDate", "UpdateDate"},
 				{"AFVersion", "AFVersion"},
 				{"ClientType", "ClientType"},
-				{"Segment", "Segment"}
 			};
 		}
 
@@ -80,7 +77,6 @@ namespace AdminInterface.Models
 				var filter = String.Empty;
 				var from = GetAdditionalFrom();
 				filter = AddFilterCriteria(filter, GetFilterBy());
-				filter = AddFilterCriteria(filter, GetSegmentFilter(Segment));
 				filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
 				filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
 				if (!String.IsNullOrEmpty(filter))
@@ -107,8 +103,7 @@ SELECT
 	s.Disabled as ServiceDisabled,
 
 	p.JuridicalName as JuridicalName,
-	r.Region as RegionName,
-	if(sup.Segment is null, if(Clients.Segment = 0, 2, 1), if(sup.Segment = 0, 2, 1)) as Segment
+	r.Region as RegionName
 FROM
 	future.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
@@ -178,23 +173,6 @@ left join Future.Addresses a on a.Id = ua.AddressId";
 		{
 			if (filter.Contains('№'))
 				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('№', 'N'));
-			return filter;
-		}
-
-		private static string GetSegmentFilter(SearchSegment segment)
-		{
-			var filter = String.Empty;
-			switch (segment)
-			{
-				case SearchSegment.Retail: {
-					filter = AddFilterCriteria(filter, " (sup.Segment = 1 or Clients.Segment = 1) ");
-					break;
-				}
-				case SearchSegment.Wholesale: {
-					filter = AddFilterCriteria(filter, " (sup.Segment = 0 or Clients.Segment = 0)");
-					break;
-				}
-			}
 			return filter;
 		}
 
