@@ -14,7 +14,7 @@ $ ->
 
 		regions.add(name: "test1")
 		element = $("#groups").children().get(0)
-		return equals($(element).html(), "test1")
+		equal $(element).html(), "test1"
 
 	test "remove group on region delete", ->
 		$("#groups").children().remove()

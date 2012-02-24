@@ -11,7 +11,7 @@
 			$ ->
 				test "filter table rows", ->
 					link = $(".filter a[data-filter=f1]")
-					equals link.length, 1
+					equal link.length, 1
 					link.click()
 					equal $("tr[data-filter=f2]").css("display"), "none"
 					notEqual $("tr[data-filter=f1]").css("display"), "none"

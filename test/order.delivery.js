@@ -31,7 +31,7 @@
         name: "test1"
       });
       element = $("#groups").children().get(0);
-      return equals($(element).html(), "test1");
+      return equal($(element).html(), "test1");
     });
     return test("remove group on region delete", function() {
       var view;
