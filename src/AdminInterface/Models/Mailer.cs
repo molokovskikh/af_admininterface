@@ -32,7 +32,7 @@ Email: {2}
 						admin.PhoneSupport,
 						admin.Email,
 						admin.Department.GetDescription()),
-					"Help@analit.net");
+					"RegisterList@subscribe.analit.net");
 			}
 			catch (Exception e)
 			{
@@ -52,7 +52,7 @@ Email: {2}
 Подразделение: {1}
 ",					admin.ManagerName,
 						admin.Department.GetDescription()),
-					"Help@analit.net");
+					"RegisterList@subscribe.analit.net");
 			}
 			catch(Exception e)
 			{
@@ -70,7 +70,7 @@ Email: {2}
 Подразделение: {1}
 ",					admin.ManagerName,
 					admin.Department.GetDescription()),
-				"Help@analit.net");
+				"RegisterList@subscribe.analit.net");
 		}
 
 		public static void ClientRegistrationResened(Client client)
