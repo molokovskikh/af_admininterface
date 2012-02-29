@@ -388,9 +388,14 @@ namespace AdminInterface.Models
 			return password;
 		}
 
+		public static string GetTempLogin()
+		{
+			 return Convert.ToInt64((DateTime.Now - DateTime.MinValue).TotalSeconds).ToString() + GeneratePassword();
+		}
+
 		public virtual void Setup()
 		{
-			Login = DateTime.Now.ToString();
+			Login = GetTempLogin();
 			Enabled = true;
 			if (Logs == null)
 				Logs = new AuthorizationLogEntity(this);

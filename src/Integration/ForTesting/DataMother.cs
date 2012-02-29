@@ -239,7 +239,7 @@ namespace Integration.ForTesting
 		{
 			var supplier = CreateSupplier();
 			var user = new User(supplier.Payer, supplier) {
-				Login = DateTime.Now.ToString()
+				Login = User.GetTempLogin()
 			};
 			user.Save();
 			user.Setup();
