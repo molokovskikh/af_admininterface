@@ -390,7 +390,7 @@ namespace AdminInterface.Models
 
 		public virtual void Setup()
 		{
-			Login = "temporary-login";
+			Login = DateTime.Now.ToString();
 			Enabled = true;
 			if (Logs == null)
 				Logs = new AuthorizationLogEntity(this);
