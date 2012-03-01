@@ -14,7 +14,8 @@ namespace AdminInterface.Models.Billing
 		{
 			Supplier = supplier;
 			_readyForAccounting = true;
-			if (supplier.HomeRegion.Name.Contains("Справка"))
+			if (supplier.HomeRegion != null
+				&& supplier.HomeRegion.Name.Contains("Справка"))
 				_payment = 600;
 		}
 
