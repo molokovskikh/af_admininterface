@@ -22,11 +22,9 @@ namespace AdminInterface.Controllers
 	{
 		public bool ShowRegistrationCard { get; set; }
 		public bool FillBillingInfo { get; set; }
-		public bool IsServiceClient { get; set; }
 		public bool PayerExists { get; set; }
 		public bool ShowForOneSupplier { get; set; }
 		public bool SendRegistrationCard { get; set; }
-		public bool IgnoreNewPrices { get; set; }
 	}
 
 	[
@@ -200,6 +198,7 @@ namespace AdminInterface.Controllers
 			var client = new Client(new Payer(""), regions.First());
 			var user = new User(client);
 
+			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["regions"] = regions;
@@ -274,7 +273,7 @@ namespace AdminInterface.Controllers
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
-				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
+				CreateDrugstore(newClient, client, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
@@ -335,7 +334,7 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
+		private void CreateDrugstore(Client client, Client bindedClient, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
 		{
 			var costCrypKey = ArHelper.WithSession(s =>
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
@@ -349,9 +348,9 @@ namespace AdminInterface.Controllers
 					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
 				WorkRegionMask = client.MaskRegion,
 				OrderRegionMask = orderMask,
-				ServiceClient = additionalSettings.IsServiceClient,
+				ServiceClient = bindedClient.Settings.ServiceClient,
 				BasecostPassword = costCrypKey,
-				IgnoreNewPrices = additionalSettings.IgnoreNewPrices,
+				IgnoreNewPrices = bindedClient.Settings.IgnoreNewPrices,
 				SmartOrderRules = smartOrder
 			};
 
