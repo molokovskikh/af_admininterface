@@ -333,8 +333,8 @@ namespace Functional.Drugstore
 		{
 			SetupGeneralInformation(browser);
 			browser.CheckBox("FillBillingInfo").Checked = false;
-			Assert.IsFalse(browser.CheckBox(Find.ById("ignoreNewPrices")).Checked);
-			browser.CheckBox(Find.ById("ignoreNewPrices")).Checked = true;
+			Assert.IsFalse(browser.CheckBox(Find.ById("client_Settings_IgnoreNewPrices")).Checked);
+			browser.CheckBox(Find.ById("client_Settings_IgnoreNewPrices")).Checked = true;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
