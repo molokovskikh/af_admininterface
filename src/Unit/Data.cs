@@ -7,7 +7,8 @@ namespace Unit
 		public static Region DefaultRegion = new Region {
 			SupplierUserPayment = 800,
 			UserPayment = 800,
-			AddressPayment = 200
+			AddressPayment = 200,
+			Name = "testRegion"
 		};
 	}
 }
