@@ -345,6 +345,7 @@ namespace Functional.Billing
 				{
 					var user = new User(client) { Name = "user", };
 					user.Setup();
+					Thread.Sleep(500);
 					var address = new Address { Client = client, Value = "address", };
 					client.AddAddress(address);
 					address.Save();
