@@ -68,7 +68,6 @@ namespace AdminInterface.Controllers
 			string password;
 
 			var supplier = new Supplier();
-			supplier.Account = new SupplierAccount(supplier);
 			BindObjectInstance(supplier, "supplier");
 
 			using (var scope = new TransactionScope(OnDispose.Rollback))
@@ -98,6 +97,7 @@ namespace AdminInterface.Controllers
 				if (supplier.RegionMask == 0)
 					throw new Exception("Попытка зарегистрировать поставщика без регионов работы");
 				supplier.HomeRegion = Region.Find(homeRegion);
+				supplier.Account = new SupplierAccount(supplier);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Admin);
 				if (currentPayer == null)
