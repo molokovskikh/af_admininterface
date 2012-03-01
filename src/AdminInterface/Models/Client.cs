@@ -67,6 +67,7 @@ namespace AdminInterface.Models
 		public Client()
 		{
 			Type = ServiceType.Drugstore;
+			Settings = new DrugstoreSettings(this);
 			Registration = new RegistrationInfo();
 			Payers = new List<Payer>();
 			Users = new List<User>();
