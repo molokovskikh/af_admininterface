@@ -5,16 +5,23 @@ using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Tools.Calendar;
+using Common.Web.Ui.Models.Jobs;
 
 namespace AdminInterface.Background
 {
-	public class SendPaymentNotification
+	public class SendPaymentNotification : MonthlyJob
 	{
-		private static string FirstNotificationText = @"Вами не оплачено обслуживание в ИС АналитФармация за текущий месяц.
-Просим своевременно производить оплату (не позднее первой недели текущего месяца (авансом).";
+		private static string FirstNotificationText = @"Р’Р°РјРё РЅРµ РѕРїР»Р°С‡РµРЅРѕ РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ РІ РРЎ РђРЅР°Р»РёС‚Р¤Р°СЂРјР°С†РёСЏ Р·Р° С‚РµРєСѓС‰РёР№ РјРµСЃСЏС†.
+РџСЂРѕСЃРёРј СЃРІРѕРµРІСЂРµРјРµРЅРЅРѕ РїСЂРѕРёР·РІРѕРґРёС‚СЊ РѕРїР»Р°С‚Сѓ (РЅРµ РїРѕР·РґРЅРµРµ РїРµСЂРІРѕР№ РЅРµРґРµР»Рё С‚РµРєСѓС‰РµРіРѕ РјРµСЃСЏС†Р° (Р°РІР°РЅСЃРѕРј).";
 
-		private static string SecondNotificationText = @"Вами не оплачено обслуживание в ИС АналитФармация за текущий месяц.
-В случае отсутствия оплаты до 20 числа обслуживание будет приостановлено.";
+		private static string SecondNotificationText = @"Р’Р°РјРё РЅРµ РѕРїР»Р°С‡РµРЅРѕ РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ РІ РРЎ РђРЅР°Р»РёС‚Р¤Р°СЂРјР°С†РёСЏ Р·Р° С‚РµРєСѓС‰РёР№ РјРµСЃСЏС†.
+Р’ СЃР»СѓС‡Р°Рµ РѕС‚СЃСѓС‚СЃС‚РІРёСЏ РѕРїР»Р°С‚С‹ РґРѕ 20 С‡РёСЃР»Р° РѕР±СЃР»СѓР¶РёРІР°РЅРёРµ Р±СѓРґРµС‚ РїСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅРѕ.";
+
+		public SendPaymentNotification()
+		{
+			Action = Process;
+		}
 
 		public void Process()
 		{
@@ -39,6 +46,22 @@ namespace AdminInterface.Background
 						scope.VoteCommit();
 					}
 				}
+			}
+		}
+
+		public override DateTime NextRun
+		{
+			get
+			{
+				var lazyMonthOffset = TimeSpan.Zero;
+				var month = SystemTime.Now().Month;
+				if (month == 1 || month == 5)
+					lazyMonthOffset = 7.Days();
+
+				if (IsFirstNotification())
+					return CalculateNextRun(8.Day() + lazyMonthOffset);
+				else
+					return CalculateNextRun(15.Day() + lazyMonthOffset);
 			}
 		}
 

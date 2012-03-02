@@ -15,10 +15,10 @@ namespace Integration.Models
 		{
 			var name = String.Format("TestJob{0}", DateTime.Now);
 			var job = new ActiveRecordJob(name, () => {});
-			job.Plan(PlanPeriod.Month, 1.Day());
+			job.Job.Plan(PlanPeriod.Month, 1.Day());
 			Assert.That(job.Run(), Is.True);
 			job = new ActiveRecordJob(name, () => {});
-			job.Plan(PlanPeriod.Month, 1.Day());
+			job.Job.Plan(PlanPeriod.Month, 1.Day());
 			Assert.That(job.Run(), Is.False);
 		}
 	}

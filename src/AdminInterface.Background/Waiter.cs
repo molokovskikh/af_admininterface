@@ -12,7 +12,7 @@ namespace AdminInterface.Background
 	public class Waiter : RepeatableCommand
 	{
 		private static ILog log = LogManager.GetLogger(typeof(Waiter));
-		private List<MonthlyJob> jobs = new List<MonthlyJob>();
+		private List<ActiveRecordJob> jobs = new List<ActiveRecordJob>();
 
 		public Waiter()
 		{
@@ -35,11 +35,7 @@ namespace AdminInterface.Background
 
 			using(new SessionScope())
 			{
-				var job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
-				job.Plan(PlanPeriod.Month, 8.Day());
-				jobs.Add(job);
-				job = new ActiveRecordJob("SendPaymentNotification", () => new SendPaymentNotification().Process());
-				job.Plan(PlanPeriod.Month, 15.Days());
+				var job = new ActiveRecordJob(new SendPaymentNotification());
 				jobs.Add(job);
 			}
 
