@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
@@ -253,6 +254,16 @@ where u.ClientId = :ClientId")
 						.SetParameter("ClientId", Client.Id)
 						.ExecuteUpdate();
 				});
+			}
+		}
+
+		public virtual void CheckDefaults()
+		{
+			if (Client == null)
+				return;
+			var payer = Client.Payers.FirstOrDefault();
+			if (payer != null) {
+				payer.ApplySettingsTemplate(this);
 			}
 		}
 	}

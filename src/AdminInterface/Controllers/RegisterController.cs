@@ -253,22 +253,24 @@ namespace AdminInterface.Controllers
 					}
 				}
 
-				newClient = new Client {
+				var fullName = client.FullName.Replace("№", "N").Trim();
+				var name = client.Name.Replace("№", "N").Trim();
+				if (currentPayer == null)
+				{
+					currentPayer = new Payer(name, fullName);
+					currentPayer.BeforeNamePrefix = "Аптека";
+					currentPayer.Save();
+				}
+
+				newClient = new Client(currentPayer,
+					Region.Find(homeRegion)) {
 					Status = ClientStatus.On,
-					Type = client.Type,
-					FullName = client.FullName.Replace("№", "N").Trim(),
-					Name = client.Name.Replace("№", "N").Trim(),
-					HomeRegion = Region.Find(homeRegion),
+					FullName = fullName,
+					Name = name,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
-				if (currentPayer == null)
-				{
-					currentPayer = new Payer(newClient.Name, newClient.FullName);
-					currentPayer.BeforeNamePrefix = "Аптека";
-					currentPayer.Save();
-				}
 				newClient.JoinPayer(currentPayer);
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);

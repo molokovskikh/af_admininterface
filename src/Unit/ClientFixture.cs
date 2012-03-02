@@ -54,5 +54,15 @@ namespace Unit
 			});
 			Assert.That(client.Settings.WorkRegionMask, Is.EqualTo(1 | 2 | 4));
 		}
+
+		[Test]
+		public void If_client_registred_for_special_payer_set_receive_waybills_in_true()
+		{
+			var payer = new Payer("Тестовый плательщик", "Тестовый плательщик") {
+				Id =  921
+			};
+			client = new Client(payer, Data.DefaultRegion);
+			Assert.That(client.Settings.SendWaybillsFromClient, Is.True);
+		}
 	}
 }

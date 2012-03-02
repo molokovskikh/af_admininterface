@@ -78,9 +78,9 @@ namespace AdminInterface.Models
 			: this()
 		{
 			Status = ClientStatus.On;
-			Settings = new DrugstoreSettings(this);
 			HomeRegion = homeRegion;
 			JoinPayer(payer);
+			Settings.CheckDefaults();
 		}
 
 		[JoinedKey("Id")]

@@ -516,6 +516,12 @@ ORDER BY {Payer}.shortname;";
 				};
 			}
 		}
+
+		public virtual void ApplySettingsTemplate(DrugstoreSettings settings)
+		{
+			if (Id == 921)
+				settings.SendWaybillsFromClient = true;
+		}
 	}
 
 	public class DeleteReportsRequest : BaseRemoteRequest
