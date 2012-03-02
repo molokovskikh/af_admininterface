@@ -1,0 +1,9 @@
+﻿Изменено поле '${name}'<br>
+${System.DateTime.Now}<br>
+${admin.Name}<br>
+${admin.Host}<br>
+<div>
+<% for diff in diffs: %>
+	${diff}
+<% end %>
+</div>

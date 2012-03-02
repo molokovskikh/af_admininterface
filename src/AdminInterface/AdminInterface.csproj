@@ -155,6 +155,8 @@
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Controllers\UpdateFilter.cs" />
+    <Compile Include="Helpers\DiffHelper.cs" />
+    <Compile Include="Helpers\DiffMatchPatch.cs" />
     <Compile Include="Helpers\ExcelHelper.cs" />
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
@@ -434,6 +436,7 @@
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
     <None Include="Views\Mail\ChangeNameFullName.brail" />
+    <None Include="Views\Mail\PropertyChanges.brail" />
     <None Include="Views\Main\Stat.brail" />
     <None Include="Views\ManagerReports\Index.brail" />
     <None Include="Views\ManagerReports\UsersAndAdresses.brail" />

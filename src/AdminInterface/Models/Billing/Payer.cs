@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
@@ -42,8 +43,8 @@ namespace AdminInterface.Models.Billing
 		public virtual bool DoNotGroupParts { get; set; }
 	}
 
-	[ActiveRecord(Schema = "billing", Lazy = true)]
-	public class Payer : ActiveRecordValidationBase<Payer>
+	[ActiveRecord(Schema = "billing", Lazy = true), Auditable]
+	public class Payer : ActiveRecordValidationBase<Payer>, IAuditable
 	{
 		public Payer(string name)
 			: this(name, name)
@@ -138,7 +139,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string AfterNamePrefix { get; set; }
 
-		[Property]
+		[Property, Notify, Auditable, Description("Комментарий")]
 		public virtual string Comment { get; set; }
 
 		[Property]
@@ -317,6 +318,11 @@ ORDER BY {Payer}.shortname;";
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual IAuditRecord GetAuditRecord()
+		{
+			return new ClientInfoLogEntity(Clients.First());
 		}
 
 		public virtual void AddComment(string comment)

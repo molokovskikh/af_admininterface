@@ -10,6 +10,7 @@ using Castle.ActiveRecord;
 using Castle.Core.Smtp;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -30,6 +31,7 @@ namespace Integration
 		[SetUp]
 		public void Setup()
 		{
+			message = null;
 			controller = new RegisterController();
 
 			PrepareController(controller, "Registered");
@@ -240,12 +242,19 @@ namespace Integration
 		[Test]
 		public void Change_Name_Full_Name()
 		{
-			mailer.ChangeNameFullName("Test_Message_Text");
-			mailer.Send();
-			Assert.That(message.Subject, Is.EqualTo("Изменено краткого или полного наименования клиента"));
+			var client = new Client(new Payer("Тестовы плательщик", "Тестовы плательщик"), Data.DefaultRegion) {
+				Name = "Тестовый клиент",
+				FullName = "Тестовый клиент"
+			};
+			var oldValue = client.Name;
+			client.Name += "1";
+			var property = new AuditableProperty(payer.GetType().GetProperty("Name"), "Наименование", client.Name, oldValue);
+
+			mailer.NotifyAboutChanges(property, client);
+			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Наименование'"));
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
 			Assert.That(message.Body, Is.StringContaining("Изменено краткого или полного наименования клиента в административном интерфейсе"));
-			Assert.That(message.Body, Is.StringContaining("Test_Message_Text"));
+			Assert.That(message.Body, Is.StringContaining("Изменено 'Наименование' было 'Тестовый клиент' стало 'Тестовый клиент1'"));
 			Assert.That(message.Body, Is.StringContaining(DateTime.Now.Date.ToShortDateString()));
 		}
 
@@ -265,6 +274,17 @@ namespace Integration
 				Assert.That(message.Subject, Is.EqualTo(String.Format("Изменение стоимости Тестовый плательщик - {0}, test - {1}, Аптека", payer.Id, client.Id)));
 				Assert.That(message.Body, Is.StringContaining("было 800,00р. стало 200,00р."));
 			}
+		}
+
+		[Test]
+		public void Diff_notify()
+		{
+			var oldValue = payer.Comment;
+			payer.Comment += "\r\nТестовый комментарий";
+			var property = new AuditableProperty(payer.GetType().GetProperty("Comment"), "Comment", payer.Comment, oldValue);
+			mailer.NotifyAboutChanges(property, payer);
+
+			Assert.That(message.Body, Is.StringContaining("Изменено поле"));
 		}
 
 		private Invoice CreateInvoice()

@@ -59,6 +59,14 @@ namespace AdminInterface.Models
 		}
 	}
 
+	public class NotifyAttribute : SendEmail
+	{
+		public NotifyAttribute()
+			: base(typeof(ChangeNotificationSender))
+		{
+		}
+	}
+
 	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
 	public class Client : Service
 	{
@@ -86,10 +94,10 @@ namespace AdminInterface.Models
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, Description("Краткое наименование"), Auditable, SendEmail(typeof(ChangeNotificationSender)), ValidateNonEmpty]
+		[Property, Description("Краткое наименование"), Auditable, Notify, ValidateNonEmpty]
 		public override string Name { get; set; }
 
-		[Property, Description("Полное наименование"), Auditable, SendEmail(typeof(ChangeNotificationSender)), ValidateNonEmpty]
+		[Property, Description("Полное наименование"), Auditable, Notify, ValidateNonEmpty]
 		public virtual string FullName { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]

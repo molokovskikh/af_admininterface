@@ -2,6 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Reflection;
+using System.Text;
+using System.Web;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -9,7 +12,9 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
+using DiffMatchPatch;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
 using log4net;
@@ -113,16 +118,6 @@ namespace AdminInterface.Models
 			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
 
-		public void NotifySupplierAboutAddressRegistration(Address address)
-		{
-
-		}
-
-		public void NotifySupplierAboutDrugstoreRegistration(Client client)
-		{
-
-		}
-
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
 		{
 			Template = "DoNotHaveInvoiceContactGroup";
@@ -168,13 +163,75 @@ namespace AdminInterface.Models
 			return this;
 		}
 
-		public MonorailMailer ChangeNameFullName(string Message)
+		public void NotifyAboutChanges(AuditableProperty property, object entity)
 		{
+			MonorailMailer mailer = null;
+			if (entity is Service) {
+				mailer = NotifyAboutServiceChanges(property, entity);
+			}
+
+			if (entity is Payer) {
+				mailer = NotifyPropertyDiff(property, entity);
+			}
+
+			if (mailer != null)
+				mailer.Send();
+		}
+
+		private MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
+		{
+			var diff = new diff_match_patch();
+			var text1 = property.OldValue;
+			var text2 = property.NewValue;
+			var diffs = diff.diff_main(text1, text2);
+
+			To = "RegisterList@subscribe.analit.net";
+			From = "register@analit.net";
+			Subject = String.Format("Изменено поле '{0}'", property.Name);
+			IsBodyHtml = true;
+			Template = "PropertyChanges";
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["diffs"] = diffs.Select(d => ToHtml(d)).ToArray();
+			PropertyBag["name"] = property.Name;
+
+			return this;
+		}
+
+		public string ToHtml(Diff diff)
+		{
+			var text = ViewHelper.FormatMessage(HttpUtility.HtmlEncode(diff.text));
+			if (diff.operation == Operation.INSERT)
+				return String.Format("<ins style=\"background:#e6ffe6;\">{0}</ins>", text);
+			else if (diff.operation == Operation.DELETE)
+				return String.Format("<del style=\"background:#ffe6e6;\">{0}</del>", text);
+			return String.Format("<span>{0}</span>", text);
+		}
+
+		public MonorailMailer NotifyAboutServiceChanges(AuditableProperty property, object entity)
+		{
+			var message = new StringBuilder();
+			var id = ((Service)entity).Id;
+			message.AppendLine("Клиент " + id);
+			var client = entity as Client;
+			if (client != null) {
+				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
+				if (client.Payers.Any( p => p.PayerID == 921))
+					return null;
+			}
+			var supplier = entity as Supplier;
+			if (supplier != null) {
+				message.AppendLine("Плательщик: " + supplier.Payer.Name);
+				if (supplier.Payer.PayerID == 921)
+					return null;
+			}
+			message.AppendLine(String.Format("Изменено '{0}' было '{1}' стало '{2}'",
+				property.Name, property.OldValue, property.NewValue));
+
 			Template = "ChangeNameFullName";
 			From = "register@analit.net";
-			Subject = "Изменено краткого или полного наименования клиента";
+			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			To = "RegisterList@subscribe.analit.net";
-			PropertyBag["message"] = Message;
+			PropertyBag["message"] = message;
 			PropertyBag["dtn"] = DateTime.Now;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 
