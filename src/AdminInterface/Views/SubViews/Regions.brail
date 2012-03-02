@@ -11,7 +11,7 @@
 		<% if IsDefined("SingleRegions"): %>
 			link += "&singleRegions=${singleRegions}";
 		<% end %>
-		<% if IsDefined("client"): %>
+		<% if IsDefined("client") and client.Id: %>
 			link += "&clientId=${client.Id}";
 		<% end %>
 		jQuery.ajax({

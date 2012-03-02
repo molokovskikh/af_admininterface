@@ -12,6 +12,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
 using Functional.ForTesting;
+using WatiN.CssSelectorExtensions;
 
 namespace Functional.Drugstore
 {
@@ -479,11 +480,7 @@ namespace Functional.Drugstore
 		[Test, NUnit.Framework.Description("После регистрации клиента, должны бюыть выставлены флаги 'Получать накладные' и 'Получать отказы'")]
 		public void After_client_registration_SendWaybills_and_SendRejects_must_be_selected()
 		{
-			SetupGeneralInformation(browser);
-			browser.CheckBox("FillBillingInfo").Checked = false;
-			browser.Button("RegisterButton").Click();
-
-			var client = GetRegistredClient();
+			var client = Register();
 			Assert.That(client.Users.Count, Is.EqualTo(1));
 			Assert.That(client.Users[0].SendWaybills, Is.True);
 			Assert.That(client.Users[0].SendRejects, Is.True);
@@ -548,11 +545,33 @@ namespace Functional.Drugstore
 			Assert.That(Css("#SupplierComboBox").SelectedItem, Is.StringEnding(supplier2.Name));
 		}
 
+		[Test]
+		public void Select_mask_region_after_home_region_change()
+		{
+			var region = Region.All().First(r => r.Name == "Златоуст");
+			Css("#HomeRegionComboBox").Select("Златоуст");
+			Assert.That(Css(String.Format("#browseRegion{0}", region.Id)).Checked, Is.True);
+
+			var client = Register();
+			Assert.That(client.HomeRegion, Is.EqualTo(region));
+			Assert.That(client.MaskRegion, Is.EqualTo(region.Id));
+		}
+
 		private void SearchSupplier(string text)
 		{
 			Css("#SearchSupplierTextPattern").TypeText(text);
 			Css("#SearchSupplierButton").Click();
 			Thread.Sleep(1000);
+		}
+
+		private Client Register()
+		{
+			SetupGeneralInformation(browser);
+			browser.CheckBox("FillBillingInfo").Checked = false;
+			browser.Button("RegisterButton").Click();
+
+			var client = GetRegistredClient();
+			return client;
 		}
 	}
 }
