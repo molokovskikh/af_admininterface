@@ -111,7 +111,7 @@
 						<td>${app.LinkTo(invoice, invoice.Id, @Print)}</td>
 						<td>${invoice.Payer.Id}</td>
 						<td>${invoice.Recipient.Name}</td>
-						<td>${app.LinkTo(invoice.Payer)}</td>
+						<td>${app.LinkTo(invoice.Payer, invoice.PayerName, "")}</td>
 						<td style="text-align:right;">${invoice.Sum.ToString("C")}</td>
 						<td>${BindingHelper.GetDescription(invoice.Period)}</td>
 						<td>${invoice.Date.ToShortDateString()}</td>
