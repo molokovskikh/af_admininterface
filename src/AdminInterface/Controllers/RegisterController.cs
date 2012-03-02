@@ -271,7 +271,6 @@ namespace AdminInterface.Controllers
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
-				newClient.JoinPayer(currentPayer);
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
