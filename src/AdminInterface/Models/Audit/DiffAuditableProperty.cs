@@ -12,6 +12,7 @@ namespace AdminInterface.Models.Audit
 		public DiffAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 			: base(property, name, newValue, oldValue)
 		{
+			IsHtml = true;
 		}
 
 		protected override void Convert(PropertyInfo property, object newValue, object oldValue)

@@ -44,5 +44,29 @@ namespace Integration.Models
 			Assert.That(log.Message, Is.StringContaining("ins style"));
 			Assert.That(log.IsHtml, Is.True);
 		}
+
+		[Test]
+		public void Log_payer_comment_changes_for_all_clients()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+
+			var client1 = DataMother.TestClient(c => {
+				c.Payers.Clear();
+				c.Payers.Add(payer);
+			});
+			payer.Clients.Add(client1);
+			payer.Comment += "\r\nтестовое сообщение";
+			payer.Save();
+			scope.Flush();
+
+			var logs = ClientInfoLogEntity.MessagesForClient(client);
+			var log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
+
+			logs = ClientInfoLogEntity.MessagesForClient(client1);
+			log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
+		}
 	}
 }

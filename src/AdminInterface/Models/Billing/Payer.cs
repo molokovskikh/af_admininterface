@@ -45,7 +45,7 @@ namespace AdminInterface.Models.Billing
 	}
 
 	[ActiveRecord(Schema = "billing", Lazy = true), Auditable]
-	public class Payer : ActiveRecordValidationBase<Payer>, IAuditable
+	public class Payer : ActiveRecordValidationBase<Payer>, IMultiAuditable
 	{
 		public Payer(string name)
 			: this(name, name)
@@ -321,11 +321,9 @@ ORDER BY {Payer}.shortname;";
 			return Name;
 		}
 
-		public virtual IAuditRecord GetAuditRecord()
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords()
 		{
-			if (Clients.Count == 0)
-				return null;
-			return new ClientInfoLogEntity(Clients.First());
+			return Clients.Select(c => new ClientInfoLogEntity(c));
 		}
 
 		public virtual void AddComment(string comment)
@@ -341,8 +339,7 @@ ORDER BY {Payer}.shortname;";
 		public virtual string GetInvocesAddress()
 		{
 			var group = ContactGroupOwner.ContactGroups
-				.Where(g => g.Type == ContactGroupType.Invoice)
-				.FirstOrDefault();
+				.FirstOrDefault(g => g.Type == ContactGroupType.Invoice);
 
 			if (group == null)
 				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для от правки счетов", Id, Name));

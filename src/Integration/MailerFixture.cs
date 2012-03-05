@@ -253,7 +253,6 @@ namespace Integration
 			mailer.NotifyAboutChanges(property, client);
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Наименование'"));
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
-			Assert.That(message.Body, Is.StringContaining("Изменено краткого или полного наименования клиента в административном интерфейсе"));
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Наименование' было 'Тестовый клиент' стало 'Тестовый клиент1'"));
 			Assert.That(message.Body, Is.StringContaining(DateTime.Now.Date.ToShortDateString()));
 		}
