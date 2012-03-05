@@ -27,10 +27,7 @@
 		$($(this).parents("tr").get(0)).remove();
 	});
 
-	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
-		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
-		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
-	});
+	joinRowHighlighter();
 
 	$('.input-date').each(function () {
 		$(this).mask("99.99.9999");
@@ -170,6 +167,13 @@
 	if (endCalendar)
 		endCalendar.refresh();
 });
+
+function joinRowHighlighter() {
+	$('.HighLightCurrentRow tr').not('.NoHighLightRow').each(function () {
+		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
+		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
+	});
+}
 
 function cloneRowTemplate(table) {
 	var row = $(table.find("tr").get(1)).clone();
