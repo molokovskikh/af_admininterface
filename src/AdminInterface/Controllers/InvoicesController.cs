@@ -15,7 +15,10 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Helper(typeof(BindingHelper))]
+	[
+		Helper(typeof(BindingHelper)),
+		Helper(typeof(PaginatorHelper), "paginator"),
+	]
 	public class InvoicesController : AdminInterfaceController
 	{
 		public void Index([DataBind("filter")] PayerDocumentFilter filter)

@@ -65,7 +65,7 @@
 	${FormHelper.EndFormTag()}
 </div>
 
-<table class=DataTable>
+<table class="DataTable HighLightCurrentRow">
 	<% if items.Count: %>
 	<thead>
 		<tr>

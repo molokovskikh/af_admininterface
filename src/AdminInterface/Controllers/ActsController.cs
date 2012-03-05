@@ -13,7 +13,10 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
-	[Helper(typeof(BindingHelper))]
+	[
+		Helper(typeof(BindingHelper)),
+		Helper(typeof(PaginatorHelper), "paginator"),
+	]
 	public class ActsController : ARSmartDispatcherController
 	{
 		public void Index([DataBind("filter")] PayerDocumentFilter filter)

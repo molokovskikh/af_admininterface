@@ -10,7 +10,7 @@ using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers.Filters
 {
-	public class PayerDocumentFilter : Sortable
+	public class PayerDocumentFilter : PaginableSortable
 	{
 		[Description("Выберите год:")]
 		public int? Year { get; set; }
@@ -80,16 +80,20 @@ namespace AdminInterface.Controllers.Filters
 			if (typeof(T) == typeof(Act))
 				SortKeyMap["Date"] = "ActDate";
 
-			ApplySort(criteria);
+			var items = Find<T>(criteria);
 
-			var docs = ArHelper.WithSession(s => criteria
-				.GetExecutableCriteria(s).List<T>())
+			var docs = items
 				.GroupBy(i => ((dynamic)i).Id)
 				.Select(g => g.First())
 				.ToList();
 
-			Count = docs.Count;
-			Sum = docs.Sum(d => (decimal)((dynamic)d).Sum);
+			Count = RowsCount;
+			Sum = ArHelper.WithSession(s => {
+				criteria.SetProjection(Projections.Sum("Sum"));
+				return criteria
+					.GetExecutableCriteria(s)
+					.UniqueResult<decimal>();
+			});
 			return docs;
 		}
 	}

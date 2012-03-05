@@ -22,10 +22,10 @@
 </div>
 
 <div class=block>
-	Всего платежей ${stat.Count} на сумму ${stat.Sum.ToString("C")}
+	Всего платежей ${filter.Count} на сумму ${filter.Sum.ToString("C")}
 </div>
 
-<table class=DataTable>
+<table class="DataTable HighLightCurrentRow">
 	<% if payments.Count: %>
 	<thead>
 		<tr>
@@ -52,6 +52,11 @@
 		</tr>
 		<% end %>
 	</tbody>
+	<tfoot>
+		<tr>
+			<td colspan=100>${paginator.ShowPaginator()}</td>
+		</tr>
+	</tfoot>
 	<% else: %>
 	<tr class="EmptyData">
 		<td>По вашему запросу ничего не найдено</td>
