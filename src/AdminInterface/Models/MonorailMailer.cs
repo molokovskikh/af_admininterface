@@ -180,31 +180,16 @@ namespace AdminInterface.Models
 
 		private MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
 		{
-			var diff = new diff_match_patch();
-			var text1 = property.OldValue;
-			var text2 = property.NewValue;
-			var diffs = diff.diff_main(text1, text2);
-
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			IsBodyHtml = true;
 			Template = "PropertyChanges";
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["diffs"] = diffs.Select(d => ToHtml(d)).ToArray();
+			PropertyBag["message"] = property.Message.Remove(0, 3);
 			PropertyBag["name"] = property.Name;
 
 			return this;
-		}
-
-		public string ToHtml(Diff diff)
-		{
-			var text = ViewHelper.FormatMessage(HttpUtility.HtmlEncode(diff.text));
-			if (diff.operation == Operation.INSERT)
-				return String.Format("<ins style=\"background:#e6ffe6;\">{0}</ins>", text);
-			else if (diff.operation == Operation.DELETE)
-				return String.Format("<del style=\"background:#ffe6e6;\">{0}</del>", text);
-			return String.Format("<span>{0}</span>", text);
 		}
 
 		public MonorailMailer NotifyAboutServiceChanges(AuditableProperty property, object entity)
@@ -224,16 +209,15 @@ namespace AdminInterface.Models
 				if (supplier.Payer.PayerID == 921)
 					return null;
 			}
-			message.AppendLine(String.Format("Изменено '{0}' было '{1}' стало '{2}'",
-				property.Name, property.OldValue, property.NewValue));
+			message.AppendLine(property.Message.Remove(0, 3));
 
 			Template = "ChangeNameFullName";
 			From = "register@analit.net";
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			To = "RegisterList@subscribe.analit.net";
 			PropertyBag["message"] = message;
-			PropertyBag["dtn"] = DateTime.Now;
 			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["name"] = property.Name;
 
 			return this;
 		}

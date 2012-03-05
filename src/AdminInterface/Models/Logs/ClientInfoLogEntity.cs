@@ -113,6 +113,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public string Message { get; set; }
 
+		[Property]
+		public bool IsHtml { get; set; }
+
 		public string Operator
 		{
 			get
@@ -127,6 +130,8 @@ namespace AdminInterface.Models.Logs
 		{
 			get
 			{
+				if (IsHtml)
+					return Message;
 				return AppealHelper.TnasformRedmineToLink(ViewHelper.FormatMessage(HttpUtility.HtmlEncode(Message)));
 			}
 		}

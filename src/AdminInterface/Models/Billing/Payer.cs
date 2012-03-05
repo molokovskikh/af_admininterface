@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -322,6 +323,8 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IAuditRecord GetAuditRecord()
 		{
+			if (Clients.Count == 0)
+				return null;
 			return new ClientInfoLogEntity(Clients.First());
 		}
 

@@ -1,10 +1,17 @@
 ﻿using System;
-using System.Reflection;
 using Common.Web.Ui.Helpers;
 using log4net;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Audit
 {
+	public class NotifyAttribute : SendEmail
+	{
+		public NotifyAttribute()
+			: base(typeof(ChangeNotificationSender))
+		{
+		}
+	}
+
 	public class ChangeNotificationSender : ISendNoticationChangesInterface
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (ChangeNotificationSender));

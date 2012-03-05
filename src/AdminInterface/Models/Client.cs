@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
@@ -56,14 +57,6 @@ namespace AdminInterface.Models
 				return null;
 			
 			return Administrator.GetByName(Registrant);
-		}
-	}
-
-	public class NotifyAttribute : SendEmail
-	{
-		public NotifyAttribute()
-			: base(typeof(ChangeNotificationSender))
-		{
 		}
 	}
 

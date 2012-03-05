@@ -70,6 +70,9 @@ namespace AdminInterface.Models.Billing
 			}
 		}
 
+		[Property]
+		public bool IsHtml { get; set; }
+
 		public static IList<PayerAuditRecord> Find(Payer payer)
 		{
 			return ActiveRecordLinqBase<PayerAuditRecord>.Queryable

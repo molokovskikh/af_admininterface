@@ -161,7 +161,9 @@
     <Compile Include="Initializers\Development.cs" />
     <Compile Include="Initializers\Route.cs" />
     <Compile Include="Initializers\Test.cs" />
-    <Compile Include="Models\AuditListener.cs" />
+    <Compile Include="Models\Audit\AuditListener.cs" />
+    <Compile Include="Models\Audit\DiffAuditableProperty.cs" />
+    <Compile Include="Models\Audit\MaskedAuditableProperty.cs" />
     <Compile Include="Models\Billing\AddressAccount.cs" />
     <Compile Include="Models\Billing\BalanceSummary.cs" />
     <Compile Include="Helpers\BaseRemoteRequest.cs" />
@@ -169,7 +171,7 @@
     <Compile Include="Models\Billing\BalanceOperation.cs" />
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Certificates\CertificateSource.cs" />
-    <Compile Include="Models\ChangeNotificationSender.cs" />
+    <Compile Include="Models\Audit\ChangeNotificationSender.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Logs\PrgDataLog.cs" />

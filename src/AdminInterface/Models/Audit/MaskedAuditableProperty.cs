@@ -1,39 +1,13 @@
-п»їusing System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using AdminInterface.Models.Billing;
-using AdminInterface.Models.Logs;
-using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using NHibernate.Event;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Audit
 {
-	[EventListener]
-	public class AuditListener : BaseAuditListener
-	{
-		protected override void Log(PostUpdateEvent @event, string message)
-		{
-			var auditable = @event.Entity as IAuditable;
-			if (auditable != null)
-				base.Log(@event, message);
-			else
-				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity));
-		}
-
-		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState, object entity)
-		{
-			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
-			{
-				return new MaskedAuditableProperty(property, name, newState, oldState);
-			}
-			return base.GetAuditableProperty(property, name, newState, oldState, entity);
-		}
-	}
-
 	public class MaskedAuditableProperty : AuditableProperty
 	{
 		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
@@ -55,13 +29,13 @@ namespace AdminInterface.Models
 			var added = Complement(current, old).ToArray();
 			var removed = Complement(old, current).ToArray();
 
-			Message = String.Format("$$$РР·РјРµРЅРµРЅРѕ '{0}'", Name);
+			Message = String.Format("$$$Изменено '{0}'", Name);
 
 			if (removed.Length > 0)
-				Message += " РЈРґР°Р»РµРЅРѕ " + ToString(removed);
+				Message += " Удалено " + ToString(removed);
 
 			if (added.Length > 0)
-				Message += " Р”РѕР±Р°РІР»РµРЅРѕ " + ToString(added);
+				Message += " Добавлено " + ToString(added);
 		}
 
 		public string ToString(IEnumerable<ulong> items)
