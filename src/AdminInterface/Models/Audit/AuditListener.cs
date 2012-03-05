@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -35,7 +36,7 @@ namespace AdminInterface.Models.Audit
 		private void LogMultiAuditable(PostUpdateEvent @event, IMultiAuditable auditable, string message, bool isHtml)
 		{
 			var session = @event.Session;
-			var records = PreventFlush(session, auditable.GetAuditRecords);
+			var records = PreventFlush(session, () => auditable.GetAuditRecords().ToArray());
 			if (records == null)
 				return;
 
