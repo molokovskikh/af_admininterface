@@ -79,72 +79,76 @@
 			<th>Платеж</th>
 			<th>Акт</th>
 		</tr>
+		<% if ?before: %>
+			<tr>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th style="text-align:right;">Начальное сальдо ${before.ToString("C")}</th>
+				<th></th>
+			</tr>
+		<% end %>
 	</thead>
-	<% if ?before: %>
-	<tr>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td style="text-align:right;">${before.ToString("C")}</td>
-		<td></td>
-	</tr>
-	<% end %>
-	<% for i, item in enumerate(items): %>
-	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>
-			<% if item.Id > 0: %>
-				<% if item.IsPayment and not item.IsOperation: %>
-				<a href="${siteroot}/Payments/${item.Id}/Edit">Редактировать</a>
+	<tbody>
+		<% for i, item in enumerate(items): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				<% if item.Id > 0: %>
+					<% if item.IsPayment and not item.IsOperation: %>
+					<a href="${siteroot}/Payments/${item.Id}/Edit">Редактировать</a>
+					<% end %>
+					<% if item.IsInvoice and not item.IsOperation: %>
+					<a href="${siteroot}/Invoices/${item.Id}/Print">Печать</a>
+					<a href="${siteroot}/Invoices/${item.Id}/Edit">Редактировать</a>
+					<% end %>
+					<% if item.IsAct and not item.IsOperation: %>
+					<a href="${siteroot}/Acts/${item.Id}/Print">Печать</a>
+					<a href="${siteroot}/Acts/${item.Id}/Edit">Редактировать</a>
+					<% end %>
+					<% if item.IsOperation: %>
+					${UrlHelper.Link("Показать", {@controller: @BalanceOperations, @action: @Show, @params: {@id: item.Id}})}
+					<% end %>
 				<% end %>
-				<% if item.IsInvoice and not item.IsOperation: %>
-				<a href="${siteroot}/Invoices/${item.Id}/Print">Печать</a>
-				<a href="${siteroot}/Invoices/${item.Id}/Edit">Редактировать</a>
+			</td>
+			<td>
+				<% if item.Id > 0: %>
+					${item.Id}
 				<% end %>
-				<% if item.IsAct and not item.IsOperation: %>
-				<a href="${siteroot}/Acts/${item.Id}/Print">Печать</a>
-				<a href="${siteroot}/Acts/${item.Id}/Edit">Редактировать</a>
-				<% end %>
-				<% if item.IsOperation: %>
-				${UrlHelper.Link("Показать", {@controller: @BalanceOperations, @action: @Show, @params: {@id: item.Id}})}
-				<% end %>
+			</td>
+			<td>${item.Date.ToShortDateString()}</td>
+
+			<% if item.IsInvoice: %>
+			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<% else: %>
+			<td></td>
 			<% end %>
-		</td>
-		<td>
-			<% if item.Id > 0: %>
-				${item.Id}
+
+			<% if item.IsPayment: %>
+			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<% else: %>
+			<td></td>
 			<% end %>
-		</td>
-		<td>${item.Date.ToShortDateString()}</td>
 
-		<% if item.IsInvoice: %>
-		<td style="text-align:right;">${item.Sum.ToString("C")}</td>
-		<% else: %>
-		<td></td>
+			<% if item.IsAct: %>
+			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<% else: %>
+			<td></td>
+			<% end %>
+		</tr>
 		<% end %>
-
-		<% if item.IsPayment: %>
-		<td style="text-align:right;">${item.Sum.ToString("C")}</td>
-		<% else: %>
-		<td></td>
-		<% end %>
-
-		<% if item.IsAct: %>
-		<td style="text-align:right;">${item.Sum.ToString("C")}</td>
-		<% else: %>
-		<td></td>
-		<% end %>
-	</tr>
-	<% end %>
+	</tbody>
 	<% if ?total: %>
-	<tr>
-		<td></td>
-		<td></td>
-		<td></td>
-		<td style="text-align:right;">${total.ToString("C")}</td>
-		<td></td>
-		<td></td>
-	</tr>
+	<tfoot>
+		<tr>
+			<th></th>
+			<th></th>
+			<th></th>
+			<th style="text-align:right;">Конечное сальдо ${total.ToString("C")}</th>
+			<th></th>
+			<th></th>
+		</tr>
+	</tfoot>
 	<% end %>
 	<% else: %>
 	<tr class=EmptyData>
