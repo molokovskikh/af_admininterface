@@ -132,7 +132,7 @@ namespace AdminInterface.Models.Logs
 			{
 				if (IsHtml)
 					return Message;
-				return AppealHelper.TnasformRedmineToLink(ViewHelper.FormatMessage(HttpUtility.HtmlEncode(Message)));
+				return AppealHelper.TnasformRedmineToLink(ViewHelper.FormatMessage(Message));
 			}
 		}
 

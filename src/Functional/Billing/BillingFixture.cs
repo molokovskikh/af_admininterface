@@ -814,5 +814,16 @@ namespace Functional.Billing
 			address.Accounting.Refresh();
 			Assert.That(address.Accounting.IsFree, Is.False);
 		}
+
+		[Test]
+		public void Show_payer_message_history()
+		{
+			Css("textarea[name='NewClientMessage.Message']").TypeText("Тестовое сообщение");
+			Click("Отправить сообщение");
+			AssertText("Сообщение сохранено");
+			Click("История сообщений");
+			AssertText("История сообщения");
+			AssertText("Тестовое сообщение");
+		}
 	}
 }

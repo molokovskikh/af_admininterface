@@ -175,6 +175,7 @@
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Logs\PrgDataLog.cs" />
+    <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
@@ -445,6 +446,7 @@
     <None Include="Views\Mails\Body.brail" />
     <None Include="Views\Mails\Index.brail" />
     <None Include="Views\Payers\InvoiceGroups.brail" />
+    <None Include="Views\Payers\Messages.brail" />
     <None Include="Views\References\Index.brail" />
     <None Include="Views\Mail\AccountingChanged.brail" />
     <None Include="Views\Messages\Index.brail" />

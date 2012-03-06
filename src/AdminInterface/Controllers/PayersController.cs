@@ -1,13 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using NHibernate;
+using NHibernate.SqlCommand;
 
 namespace AdminInterface.Controllers
 {
@@ -225,6 +229,45 @@ namespace AdminInterface.Controllers
 			payer.Delete();
 			Notify("Удалено");
 			Redirect("Billing", "Search");
+		}
+
+		public void Messages(uint id)
+		{
+			var payer = Payer.Find(id);
+
+			var filter = new PayerMessagesFilter {
+				Payer = payer,
+				DbSession = DbSession
+			};
+
+			BindObjectInstance(filter, "filter");
+
+			PropertyBag["payer"] = payer;
+			PropertyBag["filter"] = filter;
+			PropertyBag["messages"] = filter.Find();
+		}
+	}
+
+	public class PayerMessagesFilter
+	{
+		public ISession DbSession { get; set; }
+
+		public Payer Payer { get; set; }
+		public DatePeriod Period { get; set; }
+
+		public PayerMessagesFilter()
+		{
+			Period = new DatePeriod(DateTime.Today.AddDays(-14), DateTime.Today);
+		}
+
+		public IList<UserMessageSendLog> Find()
+		{
+			return DbSession.QueryOver<UserMessageSendLog>()
+				.Where(m => m.LogTime >= Period.Begin && m.LogTime < Period.End.AddDays(1))
+				.OrderBy(m => m.LogTime).Desc
+				.Inner.JoinQueryOver(m => m.User)
+				.Where(u => u.Payer == Payer)
+				.List();
 		}
 	}
 }

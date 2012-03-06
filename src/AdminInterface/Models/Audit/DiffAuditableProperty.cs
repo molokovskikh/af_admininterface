@@ -44,7 +44,7 @@ namespace AdminInterface.Models.Audit
 
 		public string ToHtml(Diff diff)
 		{
-			var text = ViewHelper.FormatMessage(HttpUtility.HtmlEncode(diff.text));
+			var text = ViewHelper.FormatMessage(diff.text);
 			if (diff.operation == Operation.INSERT)
 				return String.Format("<ins style=\"background:#e6ffe6;\">{0}</ins>", text);
 			else if (diff.operation == Operation.DELETE)

@@ -221,6 +221,8 @@ namespace AdminInterface.Controllers
 			message.Message = clientMessage.Message;
 			message.ShowMessageCount = clientMessage.ShowMessageCount;
 			message.Update();
+
+			DbSession.Save(new UserMessageSendLog(message));
 		}
 
 		public void UpdateClientStatus(uint clientId, bool enabled)
