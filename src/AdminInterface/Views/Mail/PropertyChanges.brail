@@ -1,5 +1,5 @@
-﻿Изменено поле '${name}'<br>
-${System.DateTime.Now}<br>
+﻿${System.DateTime.Now}<br>
 ${admin.Name}<br>
 ${admin.Host}<br>
+Плательщик '${payer}'<br>
 ${message}

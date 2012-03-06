@@ -184,6 +184,7 @@ namespace AdminInterface.Models
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["message"] = property.Message.Remove(0, 3);
 			PropertyBag["name"] = property.Name;
+			PropertyBag["payer"] = entity;
 
 			return this;
 		}

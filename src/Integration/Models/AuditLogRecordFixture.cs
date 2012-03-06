@@ -31,10 +31,13 @@ namespace Integration.Models
 		[Test]
 		public void Log_comment_diff()
 		{
+			ForTest.InitializeMailer();
+
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 
 			payer.Comment += "\r\nтестовое сообщение";
+			payer.CheckCommentChangesAndLog();
 			payer.Save();
 			scope.Flush();
 

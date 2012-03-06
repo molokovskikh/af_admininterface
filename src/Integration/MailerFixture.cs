@@ -281,7 +281,7 @@ namespace Integration
 			var oldValue = payer.Comment;
 			payer.Comment += "\r\nТестовый комментарий";
 			var property = new AuditableProperty(payer.GetType().GetProperty("Comment"), "Comment", payer.Comment, oldValue);
-			mailer.NotifyAboutChanges(property, payer);
+			mailer.NotifyPropertyDiff(property, payer).Send();
 
 			Assert.That(message.Body, Is.StringContaining("Изменено поле"));
 		}
