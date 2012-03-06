@@ -58,7 +58,7 @@ namespace AdminInterface.Models.Billing
 			JuridicalName = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
-			Comment = String.Format("Дата регистрации: {0}", DateTime.Now);
+			Comment = "";
 
 			Init(SecurityContext.Administrator);
 		}
@@ -140,7 +140,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string AfterNamePrefix { get; set; }
 
-		[Property, Notify, Auditable, Description("Комментарий")]
+		[Property, Description("Комментарий")]
 		public virtual string Comment { get; set; }
 
 		[Property]
@@ -527,6 +527,25 @@ ORDER BY {Payer}.shortname;";
 		{
 			if (Id == 921)
 				settings.SendWaybillsFromClient = true;
+		}
+
+		public virtual void CheckCommentChangesAndLog()
+		{
+			if (!this.IsChanged(p => p.Comment))
+				return;
+
+			var oldValue = this.OldValue(p => p.Comment);
+			var mailer = new MonorailMailer();
+			var propertyInfo = typeof (Payer).GetProperty("Comment");
+			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
+			mailer.NotifyPropertyDiff(property, this).Send();
+			foreach (var client in Clients) {
+				var log = new ClientInfoLogEntity(client) {
+					Message = property.Message,
+					IsHtml = property.IsHtml
+				};
+				log.Save();
+			}
 		}
 	}
 

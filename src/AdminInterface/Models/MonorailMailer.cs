@@ -170,15 +170,11 @@ namespace AdminInterface.Models
 				mailer = NotifyAboutServiceChanges(property, entity);
 			}
 
-			if (entity is Payer) {
-				mailer = NotifyPropertyDiff(property, entity);
-			}
-
 			if (mailer != null)
 				mailer.Send();
 		}
 
-		private MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
+		public MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
 		{
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";

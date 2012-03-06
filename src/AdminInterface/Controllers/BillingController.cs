@@ -166,6 +166,7 @@ namespace AdminInterface.Controllers
 			uint clientCode,
 			string tab)
 		{
+			payer.CheckCommentChangesAndLog();
 			payer.Update();
 			Notify("Изменения сохранены");
 			RedirectToReferrer();

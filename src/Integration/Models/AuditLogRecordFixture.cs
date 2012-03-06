@@ -48,6 +48,8 @@ namespace Integration.Models
 		[Test]
 		public void Log_payer_comment_changes_for_all_clients()
 		{
+			ForTest.InitializeMailer();
+
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 
@@ -57,6 +59,7 @@ namespace Integration.Models
 			});
 			payer.Clients.Add(client1);
 			payer.Comment += "\r\nтестовое сообщение";
+			payer.CheckCommentChangesAndLog();
 			payer.Save();
 			scope.Flush();
 
