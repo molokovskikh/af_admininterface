@@ -16,6 +16,7 @@ using Castle.Components.Validator;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Controllers
 {
@@ -291,6 +292,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var user = User.Find(userId);
 			PropertyBag["user"] = user;
+			PropertyBag["regions"] = Region.All().Where(r => (r.Id & user.WorkRegionMask) > 0).ToArray();
 		}
 
 		public void AdditionalAddressInfo(uint addressId, string cssClassName)

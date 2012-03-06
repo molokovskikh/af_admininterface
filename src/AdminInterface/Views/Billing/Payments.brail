@@ -381,7 +381,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<th>Бесплатно</th>
 							<th>Платеж</th>
 							<th>Код пользователя</th>
-							<th>Адреса</th>
+							<th>Подробнее</th>
 							<th>Комментарий</th>
 							<th>Дата последнего обновления</th>
 							<th>Клиент</th>
