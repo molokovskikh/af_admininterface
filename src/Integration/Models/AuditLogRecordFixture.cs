@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Common.Tools;
@@ -14,6 +15,15 @@ namespace Integration.Models
 	[TestFixture]
 	public class AuditLogRecordFixture : IntegrationFixture
 	{
+		private MonorailMailer mailer;
+
+		[SetUp]
+		public void Setup()
+		{
+			ForTest.InitializeMailer();
+			mailer = ForTest.TestMailer(m => {});
+		}
+
 		[Test]
 		public void Get_audit_logs_from_payer_audit_logs()
 		{
@@ -31,13 +41,11 @@ namespace Integration.Models
 		[Test]
 		public void Log_comment_diff()
 		{
-			ForTest.InitializeMailer();
-
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 
 			payer.Comment += "\r\nтестовое сообщение";
-			payer.CheckCommentChangesAndLog();
+			payer.CheckCommentChangesAndLog(mailer);
 			payer.Save();
 			scope.Flush();
 
@@ -51,8 +59,6 @@ namespace Integration.Models
 		[Test]
 		public void Log_payer_comment_changes_for_all_clients()
 		{
-			ForTest.InitializeMailer();
-
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
 
@@ -62,7 +68,7 @@ namespace Integration.Models
 			});
 			payer.Clients.Add(client1);
 			payer.Comment += "\r\nтестовое сообщение";
-			payer.CheckCommentChangesAndLog();
+			payer.CheckCommentChangesAndLog(mailer);
 			payer.Save();
 			scope.Flush();
 

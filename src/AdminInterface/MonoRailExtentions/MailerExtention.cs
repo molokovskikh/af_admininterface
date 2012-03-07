@@ -22,7 +22,7 @@ namespace AdminInterface.MonoRailExtentions
 			if (controller.Request != null && controller.Request.Uri != null)
 			{
 				var request = controller.Request;
-				mailer.SiteRoot = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + request.ApplicationPath;
+				mailer.SiteRoot = request.Uri.AbsoluteUri.Replace(request.Uri.AbsolutePath, "") + controller.Context.ApplicationPath;
 			}
 			return mailer;
 		}

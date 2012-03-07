@@ -1,6 +1,9 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Net.Mail;
 using System.Reflection;
 using AdminInterface.Initializers;
+using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
@@ -11,6 +14,7 @@ using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Views.Brail;
 using IgorO.ExposedObjectProject;
+using Rhino.Mocks;
 using log4net.Config;
 
 namespace Integration.ForTesting
@@ -49,6 +53,22 @@ namespace Integration.ForTesting
 		public static void InitializeMailer()
 		{
 			BaseMailer.ViewEngineManager = GetViewManager();
+		}
+
+		public static MonorailMailer TestMailer(Action<MailMessage> action)
+		{
+			MailMessage dummy = null;
+			var sender = MockRepository.GenerateStub<IEmailSender>();
+			sender.Stub(s => s.Send(dummy)).IgnoreArguments()
+				.Repeat.Any()
+				.Callback(new Delegates.Function<bool, MailMessage>(m => {
+					action(null);
+					return true;
+				}));
+			return new MonorailMailer(sender) {
+				UnderTest = true,
+				SiteRoot = "https://stat.analit.net/adm"
+			};
 		}
 	}
 }

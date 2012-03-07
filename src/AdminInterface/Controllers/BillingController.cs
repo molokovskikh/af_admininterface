@@ -166,7 +166,7 @@ namespace AdminInterface.Controllers
 			uint clientCode,
 			string tab)
 		{
-			payer.CheckCommentChangesAndLog();
+			payer.CheckCommentChangesAndLog(this.Mailer());
 			payer.Update();
 			Notify("Изменения сохранены");
 			RedirectToReferrer();

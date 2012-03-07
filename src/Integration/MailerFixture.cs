@@ -38,18 +38,8 @@ namespace Integration
 			PrepareController(controller, "Registered");
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
-			var sender = MockRepository.GenerateStub<IEmailSender>();
-			sender.Stub(s => s.Send(message)).IgnoreArguments()
-				.Repeat.Any()
-				.Callback(new Delegates.Function<bool, MailMessage>(m => {
-					message = m;
-					return true;
-				}));
-			mailer = new MonorailMailer(sender) {
-				UnderTest = true,
-				SiteRoot = "https://stat.analit.net/adm"
-			};
 
+			mailer = ForTest.TestMailer(m => message = m);
 			ForTest.InitializeMailer();
 
 			payer = new Payer("Тестовый плательщик") {PayerID = 10};

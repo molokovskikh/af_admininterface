@@ -529,13 +529,12 @@ ORDER BY {Payer}.shortname;";
 				settings.SendWaybillsFromClient = true;
 		}
 
-		public virtual void CheckCommentChangesAndLog()
+		public virtual void CheckCommentChangesAndLog(MonorailMailer mailer)
 		{
 			if (!this.IsChanged(p => p.Comment))
 				return;
 
 			var oldValue = this.OldValue(p => p.Comment);
-			var mailer = new MonorailMailer();
 			var propertyInfo = typeof (Payer).GetProperty("Comment");
 			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
 			mailer.NotifyPropertyDiff(property, this).Send();
