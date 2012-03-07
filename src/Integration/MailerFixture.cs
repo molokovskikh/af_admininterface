@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
@@ -280,10 +281,10 @@ namespace Integration
 		{
 			var oldValue = payer.Comment;
 			payer.Comment += "\r\nТестовый комментарий";
-			var property = new AuditableProperty(payer.GetType().GetProperty("Comment"), "Comment", payer.Comment, oldValue);
+			var property = new DiffAuditableProperty(payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
 			mailer.NotifyPropertyDiff(property, payer).Send();
 
-			Assert.That(message.Body, Is.StringContaining("Изменено поле"));
+			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
 		}
 
 		private Invoice CreateInvoice()
