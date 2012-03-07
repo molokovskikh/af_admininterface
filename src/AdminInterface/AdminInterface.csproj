@@ -150,11 +150,11 @@
     <Compile Include="Controllers\MailsController.cs" />
     <Compile Include="Controllers\ReferencesController.cs" />
     <Compile Include="Controllers\CallHistoryController.cs" />
-    <Compile Include="Controllers\DocumentBuilderFilter.cs" />
+    <Compile Include="Controllers\Filters\DocumentBuilderFilter.cs" />
     <Compile Include="Controllers\Filters\PayerDocumentFilter.cs" />
     <Compile Include="Controllers\Filters\PaymentFilter.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
-    <Compile Include="Controllers\UpdateFilter.cs" />
+    <Compile Include="Controllers\Filters\UpdateFilter.cs" />
     <Compile Include="Helpers\DiffHelper.cs" />
     <Compile Include="Helpers\DiffMatchPatch.cs" />
     <Compile Include="Helpers\ExcelHelper.cs" />

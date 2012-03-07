@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
@@ -13,9 +11,8 @@ using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
-using NHibernate.Type;
 
-namespace AdminInterface.Controllers
+namespace AdminInterface.Controllers.Filters
 {
 	public class UpdateFilter : Sortable
 	{

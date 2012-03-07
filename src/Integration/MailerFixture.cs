@@ -39,8 +39,8 @@ namespace Integration
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
 
-			mailer = ForTest.TestMailer(m => message = m);
 			ForTest.InitializeMailer();
+			mailer = ForTest.TestMailer(m => message = m);
 
 			payer = new Payer("Тестовый плательщик") {PayerID = 10};
 			client = new Client(payer, Data.DefaultRegion) {

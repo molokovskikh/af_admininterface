@@ -10,6 +10,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
 {
@@ -19,13 +20,8 @@ namespace AdminInterface.Controllers
 	]
 	public class ActsController : ARSmartDispatcherController
 	{
-		public void Index([DataBind("filter")] PayerDocumentFilter filter)
+		public void Index([SmartBinder] PayerDocumentFilter filter)
 		{
-			if (filter.Region != null && filter.Region.Id == 0)
-				filter.Region = null;
-			if (filter.Recipient != null && filter.Recipient.Id == 0)
-				filter.Recipient = null;
-
 			PropertyBag["filter"] = filter;
 			PropertyBag["acts"] = filter.Find<Act>();
 			PropertyBag["buildFilter"] = new DocumentBuilderFilter();
@@ -33,19 +29,9 @@ namespace AdminInterface.Controllers
 			PropertyBag["printers"] = Printer.All();
 		}
 
-		public void PrintIndex([DataBind("filter")] PayerDocumentFilter filter)
+		public void PrintIndex([SmartBinder] PayerDocumentFilter filter)
 		{
 			LayoutName = "Print";
-			if (filter.Region != null && filter.Region.Id == 0)
-				filter.Region = null;
-			else if (filter.Region != null)
-				filter.Region = Region.Find(filter.Region.Id);
-
-			if (filter.Recipient != null && filter.Recipient.Id == 0)
-				filter.Recipient = null;
-			else if (filter.Recipient != null)
-				filter.Recipient = Recipient.Find(filter.Recipient.Id);
-
 			PropertyBag["filter"] = filter;
 			PropertyBag["acts"] = filter.Find<Act>();
 		}

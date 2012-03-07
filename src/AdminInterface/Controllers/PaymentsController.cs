@@ -9,6 +9,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
 {
@@ -33,11 +34,8 @@ namespace AdminInterface.Controllers
 	]
 	public class PaymentsController : ARSmartDispatcherController
 	{
-		public void Index([DataBind("filter")] PaymentFilter filter)
+		public void Index([SmartBinder] PaymentFilter filter)
 		{
-			if (filter.Recipient != null && filter.Recipient.Id == 0)
-				filter.Recipient = null;
-
 			var payments = filter.Find();
 			PropertyBag["filter"] = filter;
 			PropertyBag["payments"] = payments;

@@ -62,7 +62,7 @@ namespace Integration.ForTesting
 			sender.Stub(s => s.Send(dummy)).IgnoreArguments()
 				.Repeat.Any()
 				.Callback(new Delegates.Function<bool, MailMessage>(m => {
-					action(null);
+					action(m);
 					return true;
 				}));
 			return new MonorailMailer(sender) {
