@@ -301,7 +301,7 @@ namespace AdminInterface.Models
 
 		private void SendInvoice(Invoice invoice)
 		{
-			var to = invoice.Payer.GetInvocesAddress();;
+			var to = invoice.Payer.GetInvocesAddress();
 
 			Template = "Invoice";
 			Layout = "Print";
