@@ -14,6 +14,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Linq;
 using NHibernate.Transform;
@@ -153,7 +154,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["endDate"] = endDate;
 		}
 
-		public void Orders([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] OrderFilter filter)
+		public void Orders([SmartBinder] OrderFilter filter)
 		{
 			if (filter.Client == null && filter.User != null)
 				filter.Client = filter.User.Client;
@@ -280,7 +281,7 @@ FROM orders.ordershead oh
 WHERE {0} and oh.RegionCode & :RegionCode > 0
 	and oh.Deleted = 0
 group by oh.rowid
-ORDER BY writetime desc;", sqlFilter))
+ORDER BY writetime desc", sqlFilter))
 					.SetParameter("FromDate", filter.Period.Begin)
 					.SetParameter("ToDate", filter.Period.End)
 					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask);

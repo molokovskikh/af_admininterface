@@ -9,6 +9,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Criterion;
 using NHibernate.SqlCommand;
 using NHibernate.Transform;
@@ -57,7 +58,7 @@ namespace AdminInterface.Controllers
 
 	public class MailsController : AdminInterfaceController
 	{
-		public void Index([ARDataBind("filter", AutoLoad = AutoLoadBehavior.Always)] MailFilter filter)
+		public void Index([SmartBinder] MailFilter filter)
 		{
 			PropertyBag["filter"] = filter;
 			PropertyBag["logs"] = filter.Find();
