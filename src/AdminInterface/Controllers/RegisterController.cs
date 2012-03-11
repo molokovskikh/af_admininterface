@@ -271,6 +271,8 @@ namespace AdminInterface.Controllers
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
+				if (newClient.MaskRegion == 0)
+					throw new Exception("Попытка зарегистрировать клиента без регионов работы");
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
