@@ -71,15 +71,8 @@ namespace AdminInterface.MonoRailExtentions
 
 		protected virtual MailMessage GetMessage()
 		{
-			if (ViewEngineManager == null)
-				throw new Exception("Mailer не инициализирован");
-
-			if (!Template.StartsWith("/"))
-				Template = Path.Combine("mail", Template);
-
 			var writer = new StringWriter();
-			PropertyBag["siteroot"] = SiteRoot;
-			ViewEngineManager.Process(Template, Layout, writer, PropertyBag);
+			RenderTemplate(Template, writer);
 
 			var message = new MailMessage();
 			message.Subject = Subject;
@@ -92,6 +85,18 @@ namespace AdminInterface.MonoRailExtentions
 			foreach (var attachment in Attachments)
 				message.Attachments.Add(attachment);
 			return message;
+		}
+
+		protected void RenderTemplate(string template, TextWriter writer)
+		{
+			if (ViewEngineManager == null)
+				throw new Exception("Mailer не инициализирован");
+
+			if (!template.StartsWith("/"))
+				template = Path.Combine("mail", template);
+
+			PropertyBag["siteroot"] = SiteRoot;
+			ViewEngineManager.Process(template, Layout, writer, PropertyBag);
 		}
 	}
 }

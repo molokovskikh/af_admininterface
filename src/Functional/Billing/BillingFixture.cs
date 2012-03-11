@@ -491,9 +491,9 @@ namespace Functional.Billing
 		{
 			var username = user.GetLoginOrName();
 
-			browser.SelectList(Find.ByName("NewClientMessage.Id")).Select(username);
+			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
-			browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
+			browser.TextField(Find.ByName("userMessage.Message")).TypeText(messageText);
 			browser.Button(Find.ByValue("Отправить сообщение")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
@@ -511,9 +511,9 @@ namespace Functional.Billing
 		{
 			client.Refresh();
 			var username = user.GetLoginOrName();
-			browser.SelectList(Find.ByName("NewClientMessage.Id")).Select(username);
+			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
-			browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(messageText);
+			browser.TextField(Find.ByName("userMessage.Message")).TypeText(messageText);
 			browser.Button(Find.ByValue("Отправить сообщение")).Click();
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
@@ -529,9 +529,9 @@ namespace Functional.Billing
 		[Test]
 		public void Send_message_to_all_users()
 		{
-			browser.SelectList(Find.ByName("NewClientMessage.Id")).Select("Для всех пользователей");
+			browser.SelectList(Find.ByName("userMessage.Id")).Select("Для всех пользователей");
 			var message = "test message for all users";
-			browser.TextField(Find.ByName("NewClientMessage.Message")).TypeText(message);
+			browser.TextField(Find.ByName("userMessage.Message")).TypeText(message);
 			browser.Button(Find.ByValue("Отправить сообщение")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
 			foreach (var user in client.Users)
@@ -589,7 +589,7 @@ namespace Functional.Billing
 			var user = client.Users[2];
 			browser.Link(Find.ByText(user.Login)).Click();
 			// Этот пользователь должен стать выделенным в списке "Сообщение для пользователя"
-			Assert.That(browser.SelectList(Find.ByName("NewClientMessage.Id")).SelectedOption.Text, Is.EqualTo(user.GetLoginOrName()));
+			Assert.That(browser.SelectList(Find.ByName("userMessage.Id")).SelectedOption.Text, Is.EqualTo(user.GetLoginOrName()));
 		}
 
 		[Test, NUnit.Framework.Description("Проверка, что при выделении клиента, отображаются адреса и пользователи только для выбранного клиента")]
@@ -818,7 +818,7 @@ namespace Functional.Billing
 		[Test]
 		public void Show_payer_message_history()
 		{
-			Css("textarea[name='NewClientMessage.Message']").TypeText("Тестовое сообщение");
+			Css("textarea[name='userMessage.Message']").TypeText("Тестовое сообщение");
 			Click("Отправить сообщение");
 			AssertText("Сообщение сохранено");
 			Click("История сообщений");

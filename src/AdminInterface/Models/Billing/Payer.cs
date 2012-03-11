@@ -42,6 +42,9 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public virtual bool DoNotGroupParts { get; set; }
+
+		[Property, Description("Отправлять счета с помощью минипочты")]
+		public bool SendToMinimail { get; set; }
 	}
 
 	[ActiveRecord(Schema = "billing", Lazy = true), Auditable]
@@ -338,23 +341,33 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual string GetInvocesAddress()
 		{
+			var mails = new List<string>();
+
 			var group = ContactGroupOwner.ContactGroups
 				.FirstOrDefault(g => g.Type == ContactGroupType.Invoice);
+			if (group != null)
+				mails.AddRange(group
+					.Contacts
+					.Where(c => c.Type == ContactType.Email)
+					.Select(c => c.ContactText));
 
-			if (group == null)
-				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для от правки счетов", Id, Name));
-
-			var contacts = group
-				.Contacts
-				.Where(c => c.Type == ContactType.Email)
-				.Select(c => c.ContactText)
-				.Implode();
-
+			var contacts = mails.Implode();
 			if (String.IsNullOrWhiteSpace(contacts))
 				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));
 
 			return contacts;
 		}
+
+		public virtual IEnumerable<string> ClientsMinimailAddresses
+		{
+			get { return Clients.Where(c => !c.Disabled).Select(c => String.Format("{0}@client.docs.analit.net", c.Id)); }
+		}
+
+		public virtual string ClientsMinimailAddressesAsString
+		{
+			get { return ClientsMinimailAddresses.Implode(); }
+		}
+
 
 		public virtual void RecalculateBalance()
 		{

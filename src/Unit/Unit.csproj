@@ -98,6 +98,7 @@
     <Compile Include="Models\PeriodFixture.cs" />
     <Compile Include="Models\RevisionActFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />
+    <Compile Include="Models\UserMessageFixture.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
     <Compile Include="PermissionFixture.cs" />
     <Compile Include="SortFixture.cs" />

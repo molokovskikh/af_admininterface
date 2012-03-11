@@ -75,6 +75,7 @@ namespace AdminInterface.Models.Billing
 			Recipient = payer.Recipient;
 			Payer = payer;
 			SendToEmail = Payer.InvoiceSettings.EmailInvoice;
+			SendToMinimail = Payer.InvoiceSettings.SendToMinimail;
 			PayerName = payer.JuridicalName;
 			Customer = payer.Customer;
 		}
@@ -116,6 +117,9 @@ namespace AdminInterface.Models.Billing
 		public bool SendToEmail { get; set; }
 
 		[Property]
+		public virtual bool SendToMinimail { get; set; }
+
+		[Property]
 		public DateTime? LastErrorNotification { get; set; }
 
 		[BelongsTo(Lazy = FetchWhen.OnInvoke)]
@@ -126,8 +130,6 @@ namespace AdminInterface.Models.Billing
 			ValidateCollectionNotEmpty("Нужно задать список услуг")
 		]
 		public IList<InvoicePart> Parts { get; set; }
-
-		public bool NotifyAlways;
 
 		protected override void OnDelete()
 		{
