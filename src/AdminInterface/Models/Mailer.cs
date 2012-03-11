@@ -210,11 +210,11 @@ Email: {2}
 			}
 		}
 
-		public static void SendMessageFromBillingToClient(User user, string text, string subject)
+		public static void SendMessageFromBillingToClient(UserMessage message)
 		{
 			try
 			{
-				Func.Mail("billing@analit.net", subject, text, user.GetEmailForBilling());
+				Func.Mail("billing@analit.net", message.Subject, message.Message, message.To);
 			}
 			catch (Exception e)
 			{

@@ -74,14 +74,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function(xhr, textStatus, error) { $("#TotalSum").html(""); });
 	}
 
-	function ShowOrHideTheme(show) {
-		if (show) {
-			$("#EmailSubjectRow").css("display", "");
-			return;
-		}
-		$("#EmailSubjectRow").css("display", "none");
-	}
-
 	function ShowJuridicalOrganization(id) {
 		$(".tab").hide();
 		$(".tabs ul li a.selected").removeClass("selected");
@@ -106,7 +98,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	}
 
 	function hideWaiter(element, waiter) {
-		(element).show();
+		element.show();
 		waiter.remove();
 	}
 
@@ -149,6 +141,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	}
 
 	$(function () {
+		var sendMessageView = new PayerSendMessage();
 
 		$("input[name=free]").change(function () {
 			if (this.checked)
@@ -164,12 +157,6 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			else {
 				$(this).parents("tr").addClass("disabled");
 			}
-		});
-
-		$("#users a[data-id]").click(function () {
-			id = $(this).attr("data-id");
-			$("select#messageReceiverComboBox option[selected]").removeAttr("selected");
-			$("select#messageReceiverComboBox option[value='" + id + "']").attr("selected", "selected");
 		});
 
 		$("#addresses input, #users input, #reports input, #suppliers input").change(function () {
@@ -225,6 +212,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		font-weight:bold;
 		text-decoration:none;
 		cursor:default;
+	}
+	
+	#userMessage_Subject
+	{
+		width: 100%;
 	}
 </style>
 
@@ -563,6 +555,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${app.LinkTo(payer, "Настройка счетов", @InvoiceGroups)}
 		${app.LinkTo(payer, "История сообщений", @Messages)}
 		<a href="${siteroot}/RevisionActs/${payer.Id}">Акт сверки</a>
+		<a href="mailto:${payer.ClientsMinimailAddressesAsString}">Письмо в минипочту</a>
 	</div>
 
 	<div>
@@ -642,7 +635,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<tr>
 					<td class="InputGroupHeader">
 						Сообщение для пользователя:
-						<select id="messageReceiverComboBox" name="NewClientMessage.Id">
+						<select id="messageReceiverComboBox" name="userMessage.Id">
 							<option value="0" selected="selected">Для всех пользователей</option>
 							<% for i, user in enumerate(Users): %>
 							<option value="${user.Id}">${user.GetLoginOrName()}</option>
@@ -657,23 +650,25 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					</td>
 				</tr>
 				<% end %>
-				<tr id="EmailSubjectRow" style="display: none;">
-					<td>Тема письма:<input type="text" style="width: 100%;" name="subjectForEmailToClient" /></td>
+				<tr id="EmailSubjectRow">
+					<td>
+						${app.Label("userMessage.Subject")}
+						${app.Edit("userMessage.Subject")}
+					</td>
 				</tr>
 				<tr>
 					<td>
-						<textarea name="NewClientMessage.Message" rows="20" style="width:100%"></textarea>
+						<textarea name="userMessage.Message" rows="20" style="width:100%"></textarea>
 					</td>
 				</tr>
 				<tr>
 					<td>
 						<p>
-							<input id="sendMessageToClientEmails" type="checkbox" value="true" name="sendMessageToClientEmails" onclick="ShowOrHideTheme(this.checked)" />
-							<label for="sendMessageToClientEmails">Отправлять это сообщение также на Email клиенту</label>
-							<input type="hidden" name="sendMessageToClientEmails" value="false" />
+							${app.Edit("userMessage.SendToEmail")}<br>
+							${app.Edit("userMessage.SendToMinimail")}<br>
 						</p>
 						Показать
-						<select name="NewClientMessage.ShowMessageCount">
+						<select name="userMessage.ShowMessageCount">
 							<option>1</option>
 							<option>2</option>
 							<option>5</option>

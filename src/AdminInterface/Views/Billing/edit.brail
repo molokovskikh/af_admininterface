@@ -5,6 +5,7 @@
 <% component Bubble, {"bredcrumbs" : [("Поиск плательщиков", "${siteroot}/Billing/Search")]} %>
 
 ${app.Asset("filter.coffee")}
+${app.Asset("payer.send.message.coffee")}
 
 <script>
 	window.skipFirstDefaultRoute = true;

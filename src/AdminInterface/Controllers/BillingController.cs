@@ -156,6 +156,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Users"] = payer.Users.Where(u => u.RootService.Type != ServiceType.Supplier).ToList();
 			PropertyBag["Addresses"] = payer.Addresses;
 			PropertyBag["Reports"] = payer.GetReportAccounts();
+			PropertyBag["userMessage"] = new UserMessage();
 
 			if (currentJuridicalOrganizationId > 0)
 				PropertyBag["currentJuridicalOrganizationId"] = currentJuridicalOrganizationId;
@@ -172,12 +173,10 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void SendMessage([DataBind("NewClientMessage")] UserMessage message,
+		public void SendMessage([DataBind("userMessage")] UserMessage message,
 			uint clientCode,
 			uint billingCode,
-			string tab,
-			bool sendMessageToClientEmails,
-			string subjectForEmailToClient)
+			string tab)
 		{
 			try
 			{
@@ -202,8 +201,8 @@ namespace AdminInterface.Controllers
 					}
 					scope.VoteCommit();
 				}
-				if (sendMessageToClientEmails)
-					Mailer.SendMessageFromBillingToClient(notificationUser, message.Message, subjectForEmailToClient);
+				if (message.Mail)
+					Mailer.SendMessageFromBillingToClient(message);
 				Notify("Сообщение сохранено");
 			}
 			catch (ValidationException exception)

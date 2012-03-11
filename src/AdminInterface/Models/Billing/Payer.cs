@@ -352,7 +352,7 @@ ORDER BY {Payer}.shortname;";
 					.Select(c => c.ContactText));
 
 			if (InvoiceSettings.SendToMinimail)
-				mails.AddRange(Clients.Select(c => String.Format("{0}@client.docs.analit.net", c.Id)));
+				mails.AddRange(ClientsMinimailAddresses);
 
 			var contacts = mails.Implode();
 			if (String.IsNullOrWhiteSpace(contacts))
@@ -360,6 +360,17 @@ ORDER BY {Payer}.shortname;";
 
 			return contacts;
 		}
+
+		public virtual IEnumerable<string> ClientsMinimailAddresses
+		{
+			get { return Clients.Where(c => !c.Disabled).Select(c => String.Format("{0}@client.docs.analit.net", c.Id)); }
+		}
+
+		public virtual string ClientsMinimailAddressesAsString
+		{
+			get { return ClientsMinimailAddresses.Implode(); }
+		}
+
 
 		public virtual void RecalculateBalance()
 		{
