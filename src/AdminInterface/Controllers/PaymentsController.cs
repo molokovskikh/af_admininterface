@@ -8,12 +8,14 @@ using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
 {
 	public class PaymentStatistics
 	{
-		public PaymentStatistics(List<Payment> payments)
+		public PaymentStatistics(IList<Payment> payments)
 		{
 			Count = payments.Count;
 			Sum = payments.Sum(p => p.Sum);
@@ -26,18 +28,17 @@ namespace AdminInterface.Controllers
 	public class SessionExpiredException : Exception
 	{}
 
-	[Rescue(typeof(PaymentsController), "SessionExpired", typeof(SessionExpiredException))]
+	[
+		Rescue(typeof(PaymentsController), "SessionExpired", typeof(SessionExpiredException)),
+		Helper(typeof(PaginatorHelper), "paginator"),
+	]
 	public class PaymentsController : ARSmartDispatcherController
 	{
-		public void Index([DataBind("filter")] PaymentFilter filter)
+		public void Index([SmartBinder] PaymentFilter filter)
 		{
-			if (filter.Recipient != null && filter.Recipient.Id == 0)
-				filter.Recipient = null;
-
 			var payments = filter.Find();
 			PropertyBag["filter"] = filter;
 			PropertyBag["payments"] = payments;
-			PropertyBag["stat"] = new PaymentStatistics(payments);
 		}
 
 		public void New()

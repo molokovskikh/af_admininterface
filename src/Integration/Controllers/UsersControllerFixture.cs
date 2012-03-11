@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
-using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
-using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
-using TransactionlessSession = Integration.ForTesting.TransactionlessSession;
 
 namespace Integration.Controllers
 {
@@ -22,7 +18,6 @@ namespace Integration.Controllers
 		private UsersController controller;
 		private User user1, user2;
 		private Client client;
-		private UserUpdateInfo info1, info2;
 		private DateTime begin;
 
 		[SetUp]
@@ -39,19 +34,17 @@ namespace Integration.Controllers
 			client = DataMother.CreateClientAndUsers();
 			user1 = client.Users[0];
 			user2 = client.Users[1];
-			info1 = UserUpdateInfo.Find(user1.Id);
-			info1.AFCopyId = "qwerty";
-			info1.Update();
-			info2 = UserUpdateInfo.Find(user2.Id);
-			info2.AFCopyId = "12345";
-			info2.Update();
+			user1.UserUpdateInfo.AFCopyId = "qwerty";
+			user1.UserUpdateInfo.Save();
+			user2.UserUpdateInfo.AFCopyId = "12345";
+			user2.UserUpdateInfo.Save();
 
 			controller.DoPasswordChange(user1.Id, "", false, true, false, "");
 
-			info1.Refresh();
-			info2.Refresh();
-			Assert.That(info1.AFCopyId, Is.Empty);
-			Assert.That(info2.AFCopyId, Is.EqualTo("12345"));
+			user1.UserUpdateInfo.Refresh();
+			user2.UserUpdateInfo.Refresh();
+			Assert.That(user1.UserUpdateInfo.AFCopyId, Is.Empty);
+			Assert.That(user2.UserUpdateInfo.AFCopyId, Is.EqualTo("12345"));
 		}
 
 		[Test]

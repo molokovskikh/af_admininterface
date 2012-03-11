@@ -112,10 +112,7 @@ namespace Integration.Models
 			user.ContactGroup.AddContact(ContactType.Email, email);
 			user.Save();
 
-			var user2 = new User(supplier.Payer, supplier) {
-				Login = "temporary-login2"
-			};
-			user2.Save();
+			var user2 = new User(supplier.Payer, supplier);
 			user2.Setup();
 			user2.Save();
 

@@ -390,7 +390,7 @@ namespace AdminInterface.Models
 
 		public static string GetTempLogin()
 		{
-			 return Convert.ToInt64((DateTime.Now - DateTime.MinValue).TotalSeconds).ToString() + GeneratePassword();
+			 return Guid.NewGuid().ToString();
 		}
 
 		public virtual void Setup()
@@ -423,6 +423,8 @@ namespace AdminInterface.Models
 			RootService = client;
 			if (Payer == null)
 			{
+				if (client.Payers.Count > 1)
+					throw new Exception(String.Format("У клиента более одного плательщика {0}", client.Payers.Implode()));
 				Payer = client.Payers.Single();
 				if (Payer.Users == null)
 					Payer.Users = new List<User>();

@@ -1,0 +1,37 @@
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск плательщиков", "${siteroot}/Billing/Search"), payer]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	История сообщения
+<% end %>
+
+${app.BeginFormFor("filter")}
+${FormHelper.HiddenField("filter.Payer.Id")}
+${app.FilterFor("filter.Period")}
+${app.EndFormFor("filter")}
+
+<table class=DataTable>
+	<% if messages.Count: %>
+		<thead>
+			<tr>
+				<th>Дата</th>
+				<th>Пользователь</th>
+				<th>Оператор</th>
+				<th>Сообщение</th>
+			</tr>
+		</thead>
+		<tbody id="SearchResults">
+		<% for i, message in enumerate(messages): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>${message.LogTime}</td>
+			<td>${message.User.Name}</td>
+			<td>${message.Admin.Name}</td>
+			<td><pre>${ViewHelper.FormatMessage(message.Message)}</pre></td>
+		</tr>
+		<% end %>
+		</tbody>
+	<% else: %>
+		<tr class="EmptyData">
+			<td>По вашему запросу ничего не найдено.</td>
+		</tr>
+	<% end %>
+</table>

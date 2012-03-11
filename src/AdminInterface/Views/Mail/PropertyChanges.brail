@@ -1,0 +1,6 @@
+﻿${System.DateTime.Now}<br>
+${admin.Name}<br>
+${admin.Host}<br>
+Договор ${payer.Id}<br>
+Плательщик <a href="${siteroot}/Payers/${payer.Id}">${payer.Name}</a><br>
+${message}

@@ -83,7 +83,7 @@
 		</div>
 
 		<div class=block>
-			<table class=DataTable>
+			<table class="DataTable HighLightCurrentRow">
 				<% if invoices.Count: %>
 				<thead>
 					<tr>
@@ -118,6 +118,11 @@
 					</tr>
 					<% end %>
 				</tbody>
+				<tfoot>
+					<tr>
+						<td colspan=100>${paginator.ShowPaginator()}</td>
+					</tr>
+				</tfoot>
 				<% else: %>
 				<tr class=EmptyData>
 					<td>По вашему запросу ничего не найдено</td>

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.AccessControl;
 using System.Threading;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
@@ -50,10 +51,10 @@ namespace AdminInterface.Models.Suppliers
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, ValidateNonEmpty, Auditable, SendEmail(typeof(ChangeNotificationSender)), Description("Краткое наименование")]
+		[Property, ValidateNonEmpty, Auditable, Notify, Description("Краткое наименование")]
 		public override string Name { get; set; }
 
-		[Property, ValidateNonEmpty, Auditable, SendEmail(typeof(ChangeNotificationSender)), Description("Полное наименование")]
+		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
 		[Property, Auditable, Description("Регионы работы")]

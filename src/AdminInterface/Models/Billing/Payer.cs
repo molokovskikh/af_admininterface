@@ -4,6 +4,8 @@ using System.ComponentModel;
 using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Audit;
+using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
@@ -42,8 +44,8 @@ namespace AdminInterface.Models.Billing
 		public virtual bool DoNotGroupParts { get; set; }
 	}
 
-	[ActiveRecord(Schema = "billing", Lazy = true)]
-	public class Payer : ActiveRecordValidationBase<Payer>
+	[ActiveRecord(Schema = "billing", Lazy = true), Auditable]
+	public class Payer : ActiveRecordValidationBase<Payer>, IMultiAuditable
 	{
 		public Payer(string name)
 			: this(name, name)
@@ -56,7 +58,7 @@ namespace AdminInterface.Models.Billing
 			JuridicalName = fullname;
 			ContactGroupOwner = new ContactGroupOwner();
 			JuridicalOrganizations.Add(new LegalEntity(name, JuridicalName, this));
-			Comment = String.Format("Дата регистрации: {0}", DateTime.Now);
+			Comment = "";
 
 			Init(SecurityContext.Administrator);
 		}
@@ -138,7 +140,7 @@ namespace AdminInterface.Models.Billing
 		[Property]
 		public virtual string AfterNamePrefix { get; set; }
 
-		[Property]
+		[Property, Description("Комментарий")]
 		public virtual string Comment { get; set; }
 
 		[Property]
@@ -319,6 +321,11 @@ ORDER BY {Payer}.shortname;";
 			return Name;
 		}
 
+		public virtual IEnumerable<IAuditRecord> GetAuditRecords()
+		{
+			return Clients.Select(c => new ClientInfoLogEntity(c));
+		}
+
 		public virtual void AddComment(string comment)
 		{
 			if (String.IsNullOrEmpty(comment))
@@ -332,8 +339,7 @@ ORDER BY {Payer}.shortname;";
 		public virtual string GetInvocesAddress()
 		{
 			var group = ContactGroupOwner.ContactGroups
-				.Where(g => g.Type == ContactGroupType.Invoice)
-				.FirstOrDefault();
+				.FirstOrDefault(g => g.Type == ContactGroupType.Invoice);
 
 			if (group == null)
 				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для от правки счетов", Id, Name));
@@ -521,6 +527,24 @@ ORDER BY {Payer}.shortname;";
 		{
 			if (Id == 921)
 				settings.SendWaybillsFromClient = true;
+		}
+
+		public virtual void CheckCommentChangesAndLog(MonorailMailer mailer)
+		{
+			if (!this.IsChanged(p => p.Comment))
+				return;
+
+			var oldValue = this.OldValue(p => p.Comment);
+			var propertyInfo = typeof (Payer).GetProperty("Comment");
+			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
+			mailer.NotifyPropertyDiff(property, this).Send();
+			foreach (var client in Clients) {
+				var log = new ClientInfoLogEntity(client) {
+					Message = property.Message,
+					IsHtml = property.IsHtml
+				};
+				log.Save();
+			}
 		}
 	}
 

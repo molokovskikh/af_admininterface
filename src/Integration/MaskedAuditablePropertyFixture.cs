@@ -1,4 +1,5 @@
 ﻿using AdminInterface.Models;
+using AdminInterface.Models.Audit;
 using Common.Web.Ui.Helpers;
 using NUnit.Framework;
 

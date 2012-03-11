@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Controllers;
+using AdminInterface.Controllers.Filters;
 using AdminInterface.Models.Logs;
 using Common.Tools;
 using Common.Web.Ui.Models;

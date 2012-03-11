@@ -2,6 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
+using System.Reflection;
+using System.Text;
+using System.Web;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -9,7 +12,9 @@ using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.Core.Smtp;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
+using DiffMatchPatch;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;
 using log4net;
@@ -113,16 +118,6 @@ namespace AdminInterface.Models
 			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
 
-		public void NotifySupplierAboutAddressRegistration(Address address)
-		{
-
-		}
-
-		public void NotifySupplierAboutDrugstoreRegistration(Client client)
-		{
-
-		}
-
 		public void DoNotHaveInvoiceContactGroup(Invoice invoice)
 		{
 			Template = "DoNotHaveInvoiceContactGroup";
@@ -168,15 +163,58 @@ namespace AdminInterface.Models
 			return this;
 		}
 
-		public MonorailMailer ChangeNameFullName(string Message)
+		public void NotifyAboutChanges(AuditableProperty property, object entity)
 		{
+			MonorailMailer mailer = null;
+			if (entity is Service) {
+				mailer = NotifyAboutServiceChanges(property, entity);
+			}
+
+			if (mailer != null)
+				mailer.Send();
+		}
+
+		public MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
+		{
+			To = "RegisterList@subscribe.analit.net";
+			From = "register@analit.net";
+			Subject = String.Format("Изменено поле '{0}'", property.Name);
+			IsBodyHtml = true;
+			Template = "PropertyChanges";
+			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["message"] = property.Message.Remove(0, 3);
+			PropertyBag["name"] = property.Name;
+			PropertyBag["payer"] = entity;
+
+			return this;
+		}
+
+		public MonorailMailer NotifyAboutServiceChanges(AuditableProperty property, object entity)
+		{
+			var message = new StringBuilder();
+			var id = ((Service)entity).Id;
+			message.AppendLine("Клиент " + id);
+			var client = entity as Client;
+			if (client != null) {
+				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
+				if (client.Payers.Any( p => p.PayerID == 921))
+					return null;
+			}
+			var supplier = entity as Supplier;
+			if (supplier != null) {
+				message.AppendLine("Плательщик: " + supplier.Payer.Name);
+				if (supplier.Payer.PayerID == 921)
+					return null;
+			}
+			message.AppendLine(property.Message.Remove(0, 3));
+
 			Template = "ChangeNameFullName";
 			From = "register@analit.net";
-			Subject = "Изменено краткого или полного наименования клиента";
+			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			To = "RegisterList@subscribe.analit.net";
-			PropertyBag["message"] = Message;
-			PropertyBag["dtn"] = DateTime.Now;
+			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
+			PropertyBag["name"] = property.Name;
 
 			return this;
 		}

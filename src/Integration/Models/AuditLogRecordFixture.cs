@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Linq;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
+using log4net.Config;
 using IntegrationFixture = Test.Support.IntegrationFixture;
 
 namespace Integration.Models
@@ -11,6 +15,15 @@ namespace Integration.Models
 	[TestFixture]
 	public class AuditLogRecordFixture : IntegrationFixture
 	{
+		private MonorailMailer mailer;
+
+		[SetUp]
+		public void Setup()
+		{
+			ForTest.InitializeMailer();
+			mailer = ForTest.TestMailer(m => {});
+		}
+
 		[Test]
 		public void Get_audit_logs_from_payer_audit_logs()
 		{
@@ -22,7 +35,50 @@ namespace Integration.Models
 
 			var logs = AuditLogRecord.GetLogs(user.Payer);
 			Assert.AreEqual(3, logs.Count);
-			Assert.AreEqual("Изменено 'Платеж' было '800,00000' стало '1000'", logs[0].Message, logs.Implode(l => l.Message));
+			Assert.AreEqual("Изменено 'Платеж' было '800,00000' стало '1000'", logs[0].Message, logs.Implode());
+		}
+
+		[Test]
+		public void Log_comment_diff()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+
+			payer.Comment += "\r\nтестовое сообщение";
+			payer.CheckCommentChangesAndLog(mailer);
+			payer.Save();
+			scope.Flush();
+
+			var logs = ClientInfoLogEntity.MessagesForClient(client);
+			var log = logs.First();
+			Assert.That(log.Message, Is.StringContaining("Изменено 'Комментарий'"));
+			Assert.That(log.Message, Is.StringContaining("ins style"));
+			Assert.That(log.IsHtml, Is.True);
+		}
+
+		[Test]
+		public void Log_payer_comment_changes_for_all_clients()
+		{
+			var client = DataMother.CreateTestClientWithUser();
+			var payer = client.Payers.First();
+
+			var client1 = DataMother.TestClient(c => {
+				c.Payers.Clear();
+				c.Payers.Add(payer);
+			});
+			payer.Clients.Add(client1);
+			payer.Comment += "\r\nтестовое сообщение";
+			payer.CheckCommentChangesAndLog(mailer);
+			payer.Save();
+			scope.Flush();
+
+			var logs = ClientInfoLogEntity.MessagesForClient(client);
+			var log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
+
+			logs = ClientInfoLogEntity.MessagesForClient(client1);
+			log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
+			Assert.That(log, Is.Not.Null, logs.Implode());
 		}
 	}
 }

@@ -2,10 +2,12 @@ using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Tools.Calendar;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Jobs;
 
 namespace AdminInterface.Background
@@ -42,6 +44,7 @@ namespace AdminInterface.Background
 
 					using(var scope = new TransactionScope(OnDispose.Rollback))
 					{
+						ArHelper.WithSession(s => s.Save(new UserMessageSendLog(message)));
 						message.Save();
 						scope.VoteCommit();
 					}

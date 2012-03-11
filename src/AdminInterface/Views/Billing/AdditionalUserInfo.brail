@@ -1,7 +1,7 @@
 ﻿<script type="text/javascript">
 	function ShowConnectingAddressDiv(userId) {
 		ShowElement(true, "#ConnectingAddressDiv" + userId);
-		ShowElement(true, "#SearchAddressDiv" + userId);        
+		ShowElement(true, "#SearchAddressDiv" + userId);
 		ShowElement(false, "#SelectAddressDiv" + userId);
 		ShowElement(false, "#ConnectAddressLink" + userId);
 		$("#SearchAddressMessage" + userId).html("");
@@ -29,7 +29,7 @@
 				CancelSearchAddress(userId);
 				RefreshTotalSum();
 			}
-		});        
+		});
 	}
 	
 	function DisconnectAddressFromUser(userId, addressId) {
@@ -63,7 +63,7 @@
 				$("#SearchAddressMessage" + userId).html("<i>Ничего не найдено</i>");
 			}
 		});
-	}    
+	}
 	
 	function CancelSearchAddress(userId) {
 		ShowElement(false, "#ConnectingAddressDiv" + userId);
@@ -73,6 +73,14 @@
 
 <div id="additionalUserInfo${user.Id}">
 	<div style="padding: 15px; border-left: solid 1px #E4E4E4; border-right: solid 1px #E4E4E4; border-bottom: solid 1px #E4E4E4; background-color: #F6F6F6">
+
+		<div class=block>
+			<h4>Регионы работы</h4>
+			<% for region in regions: %>
+				${region.Name}<br>
+			<% end %>
+		</div>
+
 		<table style="width: 100%; height: 100%">
 			<tr>
 				<td align="left">

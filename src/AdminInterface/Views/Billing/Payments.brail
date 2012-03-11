@@ -381,7 +381,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<th>Бесплатно</th>
 							<th>Платеж</th>
 							<th>Код пользователя</th>
-							<th>Адреса</th>
+							<th>Подробнее</th>
 							<th>Комментарий</th>
 							<th>Дата последнего обновления</th>
 							<th>Клиент</th>
@@ -561,6 +561,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		${app.LinkTo(payer, "Доп. акт", @NewAct)}
 		${app.LinkTo(payer, "Реклама", @Ad)}
 		${app.LinkTo(payer, "Настройка счетов", @InvoiceGroups)}
+		${app.LinkTo(payer, "История сообщений", @Messages)}
 		<a href="${siteroot}/RevisionActs/${payer.Id}">Акт сверки</a>
 	</div>
 

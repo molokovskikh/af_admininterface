@@ -183,7 +183,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 
 			if (Region != null && Region.Id != 0)
 			{
-				And(groupFilter, "cd.MaskRegion & :RegionId > 0");
+				And(groupFilter, "(cd.MaskRegion & :RegionId > 0 or s.RegionMask & :RegionId > 0)");
 				query.SetParameter("RegionId", Region.Id);
 			}
 
@@ -221,7 +221,7 @@ select p.PayerId,
 
 		(select cast(group_concat(r.region order by r.region separator ', ') as char)
 		from farm.regions r
-		where r.regioncode & bit_or(cd.maskregion) > 0) as Regions,
+		where r.regioncode & bit_or(ifnull(cd.MaskRegion, s.RegionMask)) > 0) as Regions,
 
 		r.Name as Recipient
 from billing.payers p

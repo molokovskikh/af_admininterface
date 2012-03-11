@@ -9,12 +9,14 @@ using NHibernate.Criterion;
 
 namespace AdminInterface.Controllers.Filters
 {
-	public class PaymentFilter : Sortable
+	public class PaymentFilter : PaginableSortable
 	{
 		public Recipient Recipient { get; set; }
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
 		public bool ShowOnlyUnknown { get; set; }
+		public decimal Sum { get; private set; }
+		public int Count { get; private set; }
 
 		public PaymentFilter()
 		{
@@ -32,7 +34,7 @@ namespace AdminInterface.Controllers.Filters
 			};
 		}
 
-		public List<Payment> Find()
+		public IList<Payment> Find()
 		{
 			var criteria = DetachedCriteria.For<Payment>()
 				.Add(Expression.Ge("PayedOn", Period.Begin) && Expression.Lt("PayedOn", Period.End.AddDays(1)));
@@ -49,11 +51,15 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Expression.Like("p.Name", SearchText));
 			}
 
-			ApplySort(criteria);
+			var payments = Find<Payment>(criteria);
 
-			return ArHelper
-				.WithSession(s => criteria.GetExecutableCriteria(s).List<Payment>())
-				.ToList();
+			Sum = ArHelper.WithSession(s =>
+				criteria.GetExecutableCriteria(s)
+					.SetProjection(Projections.Sum("Sum"))
+					.UniqueResult<decimal>());
+			Count = RowsCount;
+
+			return payments;
 		}
 	}
 }

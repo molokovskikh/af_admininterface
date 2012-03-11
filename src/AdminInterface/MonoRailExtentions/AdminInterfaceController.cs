@@ -33,8 +33,12 @@ namespace AdminInterface.MonoRailExtentions
 			};
 
 			AfterAction += (action, context1, controller, controllerContext) => {
-				var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-				sessionHolder.ReleaseSession(DbSession);
+				//если что пошло не так, например исключение в BeforeAction
+				if (DbSession != null)
+				{
+					var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+					sessionHolder.ReleaseSession(DbSession);
+				}
 			};
 		}
 
