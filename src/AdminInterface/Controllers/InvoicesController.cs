@@ -58,7 +58,7 @@ namespace AdminInterface.Controllers
 			if (Form["mail"] != null)
 			{
 				foreach (var invoice in invoices)
-					this.Mailer().Invoice(invoice, true).Send();
+					this.Mailer().InvoiceToEmail(invoice, true).Send();
 
 				Notify("Отправлено");
 				RedirectToReferrer();

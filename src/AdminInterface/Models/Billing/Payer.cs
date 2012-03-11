@@ -351,9 +351,6 @@ ORDER BY {Payer}.shortname;";
 					.Where(c => c.Type == ContactType.Email)
 					.Select(c => c.ContactText));
 
-			if (InvoiceSettings.SendToMinimail)
-				mails.AddRange(ClientsMinimailAddresses);
-
 			var contacts = mails.Implode();
 			if (String.IsNullOrWhiteSpace(contacts))
 				throw new DoNotHaveContacts(String.Format("Для плательщика {0} - {1} не задана контактрая информаци для отправки счетов", Id, Name));

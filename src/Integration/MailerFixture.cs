@@ -147,11 +147,26 @@ namespace Integration
 			{
 				var invoice = CreateInvoice();
 
-				mailer.Invoice(invoice, false);
+				mailer.InvoiceToEmail(invoice, false);
 				mailer.Send();
 			}
 
 			Assert.That(message.Body, Is.StringContaining("Примите счет за информационное обслуживание в ИС АналитФармация."));
+		}
+
+		[Test]
+		public void Send_invoice_to_minimail_as_attachment()
+		{
+			using(new SessionScope())
+			{
+				var invoice = CreateInvoice();
+
+				mailer.SendInvoiceToMinimail(invoice);
+				mailer.Send();
+			}
+			Assert.That(message.Body, Is.StringContaining("Примите счет за информационное обслуживание в ИС АналитФармация."));
+			Assert.That(message.Attachments.Count, Is.EqualTo(1));
+			Assert.That(message.Attachments[0].Name, Is.EqualTo("Счет.html"));
 		}
 
 		[Test]
@@ -282,7 +297,7 @@ namespace Integration
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, new Period(2011, Interval.January), new DateTime(2010, 12, 27));
 			var group = invoice.Payer.ContactGroupOwner.AddContactGroup(ContactGroupType.Invoice);
-			group.AddContact(new Contact(ContactType.Email, "kvasovtest@analit.net"));
+			group.AddContact(ContactType.Email, "kvasovtest@analit.net");
 			invoice.Save();
 			return invoice;
 		}

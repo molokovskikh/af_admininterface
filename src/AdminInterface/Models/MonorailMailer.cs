@@ -262,14 +262,14 @@ namespace AdminInterface.Models
 			return this;
 		}
 
-		public MonorailMailer Invoice(Invoice invoice, bool interactive)
+		public MonorailMailer InvoiceToEmail(Invoice invoice, bool interactive)
 		{
 			try
 			{
+				SendInvoiceToEmail(invoice);
+
 				if (interactive)
 					invoice.SendToEmail = false;
-
-				SendInvoice(invoice);
 
 				if (_log.IsDebugEnabled)
 					_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
@@ -299,7 +299,7 @@ namespace AdminInterface.Models
 			return this;
 		}
 
-		private void SendInvoice(Invoice invoice)
+		private void SendInvoiceToEmail(Invoice invoice)
 		{
 			var to = invoice.Payer.GetInvocesAddress();
 
@@ -312,6 +312,30 @@ namespace AdminInterface.Models
 			Subject = String.Format("Счет за {0}", invoice.Period);
 
 			PropertyBag["invoice"] = invoice;
+			PropertyBag["inlineInvoice"] = true;
+		}
+
+		public void SendInvoiceToMinimail(Invoice invoice)
+		{
+			var to = invoice.Payer.ClientsMinimailAddressesAsString;
+
+			Template = "Invoice";
+			Layout = "Print";
+			IsBodyHtml = true;
+
+			From = "billing@analit.net";
+			To = to;
+			Subject = String.Format("Счет за {0}", invoice.Period);
+
+			PropertyBag["invoice"] = invoice;
+			PropertyBag["inlineInvoice"] = false;
+
+			var memory = new MemoryStream();
+			var writer = new StreamWriter(memory);
+			RenderTemplate("/Invoices/InvoiceBody", writer);
+			writer.Flush();
+			memory.Position = 0;
+			Attachments.Add(new Attachment(memory, "Счет.html"));
 		}
 	}
 }

@@ -59,15 +59,18 @@ namespace Unit.Models
 		}
 
 		[Test]
-		public void Include_into_invoice_mail_minimail_addresses()
+		public void Get_invoice_addresses()
 		{
 			payer.InvoiceSettings.SendToMinimail = true;
+			payer.ContactGroupOwner
+				.AddContactGroup(ContactGroupType.Invoice)
+				.AddContact(ContactType.Email, "test@analit.net");
 			var client = new Client(payer, Data.DefaultRegion) {
-				Id = 1
+				Id = 1,
 			};
 			payer.Clients.Add(client);
 			var addresses = payer.GetInvocesAddress();
-			Assert.That(addresses, Is.EqualTo("1@client.docs.analit.net"));
+			Assert.That(addresses, Is.EqualTo("test@analit.net"));
 		}
 	}
 }
