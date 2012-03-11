@@ -202,6 +202,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["regions"] = regions;
+			PropertyBag["clientContacts"] = new [] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -271,8 +272,14 @@ namespace AdminInterface.Controllers
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
-				if (newClient.MaskRegion == 0)
-					throw new Exception("Попытка зарегистрировать клиента без регионов работы");
+				if (!IsValid(newClient))
+				{
+					RegisterClient();
+					PropertyBag["clientContacts"] = clientContacts;
+					PropertyBag["client"] = newClient;
+					return;
+				}
+
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 

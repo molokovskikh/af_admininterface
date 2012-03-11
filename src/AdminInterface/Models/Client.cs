@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -9,6 +10,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -17,6 +19,7 @@ using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
 
@@ -135,7 +138,7 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Регионы работы"), Auditable]
+		[Property, Description("Регионы работы"), ValidateGreaterThanZero("Вы не выбрали регионы работы") , Auditable]
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[Nested]

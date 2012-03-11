@@ -199,12 +199,12 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		<table border="0" width="100%" cellpadding="5" cellspacing="0">
 			<tr>
 				<td>Юридическое наименование:</td>
-				<td><input type="text" id="JuridicalName" name="client.FullName" style="width: 100%" /></td>
+				<td><input type="text" id="JuridicalName" name="client.FullName" value="${client.FullName}" style="width: 100%" /></td>
 				<td></td>
 			</tr>
 			<tr>
 				<td>Краткое наименование:</td>
-				<td><input type="text" id="ShortName" name="client.Name" style="width: 100%" /></td>
+				<td><input type="text" id="ShortName" name="client.Name" value="${client.Name}" style="width: 100%" /></td>
 				<td></td>
 			</tr>
 			<tr valign="top">
@@ -221,7 +221,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 							<tr>
 								<td width="30%">Номер телефона:</td>
 								<td>
-									<input type="text" id="ClientContactPhone" name="clientContacts[0].ContactText" class="phone" style="width: 100%" />
+									<input type="text" id="ClientContactPhone" name="clientContacts[0].ContactText" value="${clientContacts[0].ContactText}" class="phone" style="width: 100%" />
 									<input type="hidden" name="clientContacts[0].Type" value="1" />
 								</td>
 							</tr>
@@ -251,7 +251,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 							<tr>
 								<td width="30%">Email:</td>
 								<td>
-									<input type="text" id="ClientContactEmail" name="clientContacts[1].ContactText" class="email" style="width: 100%" />
+									<input type="text" id="ClientContactEmail" name="clientContacts[1].ContactText" value="${clientContacts[1].ContactText}" class="email" style="width: 100%" />
 									<input type="hidden" name="clientContacts[1].Type" value="0" />
 								</td>
 							</tr>
@@ -355,6 +355,9 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	
 	<div class="block">
 		<h3>Региональная настройка</h3>
+		<%if IsDefined("client"): %>
+		${app.GetValidationError(client, "MaskRegion")}
+		<%end %>
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 

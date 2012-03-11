@@ -12,6 +12,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Models.Billing
 {
