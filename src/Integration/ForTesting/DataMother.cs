@@ -142,9 +142,9 @@ namespace Integration.ForTesting
 			return documentLogEntity;
 		}
 
-		public static Document CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
+		public static FullDocument CreateTestDocument(Supplier supplier, Client client, DocumentReceiveLog documentLogEntity)
 		{
-			var document = new Document {
+			var document = new FullDocument {
 				ClientCode = client.Id,
 				DocumentDate = DateTime.Now.AddDays(-1),
 				Supplier = supplier,
@@ -152,7 +152,6 @@ namespace Integration.ForTesting
 				Log = documentLogEntity,
 				AddressId = null,
 			};
-			document.Create();
 
 			var documentLine = new DocumentLine {
 				Certificates = "Test certificate",
@@ -165,12 +164,11 @@ namespace Integration.ForTesting
 				VitallyImportant = true,
 				Document = document,
 			};
-			documentLine.Create();
 
 			document.Lines = new List<DocumentLine> {
 				documentLine
 			};
-			document.SaveAndFlush();
+			ActiveRecordMediator.Save(document);
 
 			return document;
 		}

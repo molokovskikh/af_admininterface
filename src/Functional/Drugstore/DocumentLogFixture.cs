@@ -58,7 +58,7 @@ namespace Functional.Drugstore
 			line.CatalogProduct = DataMother.Product();
 			line.Product = line.CatalogProduct.Catalog.Name;
 			line.Certificate = DataMother.Certificate(line.CatalogProduct.Catalog);
-			line.Save();
+			session.Save(line);
 
 			var dir = "../../../AdminInterface/Data/Certificates/";
 			if (!Directory.Exists(dir))

@@ -10,7 +10,7 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using AdminInterface.Models.Logs;
 using System.Threading;
-using Document = AdminInterface.Models.Document;
+using Document = Common.Web.Ui.Models.Document;
 
 namespace Functional.Drugstore
 {
@@ -132,7 +132,7 @@ namespace Functional.Drugstore
 			out Document document, out UpdateLogEntity updateLogEntity)
 		{
 			Create_loaded_document_logs_unparsed_document(out client, out supplier, out documentLogEntity, out updateLogEntity);
-			using (new TransactionScope()) 
+			using (new TransactionScope())
 				document = DataMother.CreateTestDocument(supplier, client, documentLogEntity);
 		}
 

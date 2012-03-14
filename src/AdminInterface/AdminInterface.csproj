@@ -172,6 +172,7 @@
     <Compile Include="Models\CatalogName.cs" />
     <Compile Include="Models\Certificates\CertificateSource.cs" />
     <Compile Include="Models\Audit\ChangeNotificationSender.cs" />
+    <Compile Include="Models\FullDocument.cs" />
     <Compile Include="Models\Documents\Mail.cs" />
     <Compile Include="Models\ExportModel.cs" />
     <Compile Include="Models\Logs\PrgDataLog.cs" />
@@ -241,7 +242,6 @@
     <Compile Include="Models\Billing\Payment.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\DefaultValues.cs" />
-    <Compile Include="Models\Document.cs" />
     <Compile Include="Models\Billing\LegalEntity.cs" />
     <Compile Include="Models\Logs\DocumentReceiveLog.cs" />
     <Compile Include="Models\DrugstoreSettings.cs" />

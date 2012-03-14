@@ -6,6 +6,7 @@ using AddUser;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
+using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Logs
 {
@@ -61,7 +62,7 @@ namespace AdminInterface.Models.Logs
 		public virtual Address Address { get; set; }
 
 		[OneToOne(PropertyRef = "Log")]
-		public virtual Document Document { get; set; }
+		public virtual FullDocument Document { get; set; }
 
 		[BelongsTo("SendUpdateId")]
 		public virtual UpdateLogEntity SendUpdateLogEntity { get; set; }

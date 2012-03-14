@@ -14,6 +14,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Linq;
@@ -83,7 +84,7 @@ namespace AdminInterface.Controllers
 		{
 			CancelLayout();
 
-			var line = DocumentLine.Find(id);
+			var line = DbSession.Load<DocumentLine>(id);
 			PropertyBag["line"] = line;
 		}
 

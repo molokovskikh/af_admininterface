@@ -15,13 +15,14 @@ using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using log4net;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
-	public class AppConfig
+	public class AppConfig : BaseConfig
 	{
 		public string ReportSystemPassword { get; set; }
 		public string ReportSystemUser { get; set; }
@@ -34,7 +35,6 @@ namespace AddUser
 		public string PromotionsPath { get; set; }
 
 		public string PrinterPath { get; set; }
-		public string CertificatesPath { get; set; }
 
 		public string AttachmentsPath { get; set; }
 	}
