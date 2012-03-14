@@ -159,6 +159,9 @@ namespace AdminInterface.Models
 		[Property, Description("Подтверждать отправку заказов"), Auditable]
 		public virtual bool SubmitOrders { get; set; }
 
+		[Property, Description("Игнорировать проверку минимальной суммы заказа у Поставщика"), Auditable]
+		public virtual bool IgnoreCheckMinOrder { get; set; }
+
 		[Property, Description("Передавать файлы-НАКЛАДНЫЕ на сторону аптеки"), Auditable]
 		public virtual bool SendWaybills { get; set; }
 

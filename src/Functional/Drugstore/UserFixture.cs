@@ -106,7 +106,7 @@ namespace Functional.Drugstore
 			}
 		}
 
-		[Test(Description = "Тест для проверки состояния галок 'Получать накладные' и 'Получать отказы' при регистрации нового пользователя")]
+		[Test(Description = "Тест для проверки состояния галок 'Получать накладные', 'Получать отказы', 'Игнорировать проверку минимальной суммы заказа у Поставщика' при регистрации нового пользователя")]
 		public void Check_flags_by_adding_user()
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
@@ -123,6 +123,7 @@ namespace Functional.Drugstore
 				browser.Link(Find.ByText("Настройка")).Click();
 				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
 				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
+				Assert.IsFalse(browser.CheckBox(Find.ByName("user.IgnoreCheckMinOrder")).Checked);
 			}
 		}
 

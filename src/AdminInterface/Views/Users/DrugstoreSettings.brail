@@ -27,6 +27,7 @@
 			${app.Edit("user.SaveAFDataFiles")}<br>
 			${app.Edit("user.UseAdjustmentOrders")}<br>
 			${app.Edit("user.SubmitOrders")}<br>
+			${app.Edit("user.IgnoreCheckMinOrder")}<br>
 			${app.Edit("user.SendWaybills")}<br>
 			${app.Edit("user.SendRejects")}<br>
 			${app.Edit("user.AllowDownloadUnconfirmedOrders")}<br>
