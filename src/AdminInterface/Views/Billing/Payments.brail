@@ -575,6 +575,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.InvoiceSettings.EmailInvoice", "Отправлять счет по e-mail:"),
 				FormHelper.CheckboxField("Instance.InvoiceSettings.EmailInvoice"))}
 
+			${WriteLabelAndEditControle(app.Label("Instance.InvoiceSettings.SendToMinimail"),
+				FormHelper.CheckboxField("Instance.InvoiceSettings.SendToMinimail"))}
+
 			${WriteLabelAndEditControle(FormHelper.LabelFor("Instance.SendPaymentNotification", "Отправлять извещения об оплате:"),
 				FormHelper.CheckboxField("Instance.SendPaymentNotification"))}
 
