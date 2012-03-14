@@ -55,33 +55,6 @@ namespace AdminInterface.Helpers
 			return "$" + value;
 		}
 
-		public string Asset(string name)
-		{
-			var type = "";
-			var extension = Path.GetExtension(name).ToLower();
-			var path = "Assets/Javascripts";
-			if (extension == ".js")
-			{
-				type = "text/javascript";
-			}
-			else if (extension == ".coffee")
-			{
-				type = "text/coffeescript";
-				var compiled = Path.ChangeExtension(name, ".js");
-				var file = Path.Combine(Context.ApplicationPhysicalPath, path, compiled);
-				if (File.Exists(file))
-				{
-					type = "text/javascript";
-					name = compiled;
-				}
-			}
-			else if (extension == ".css")
-				return assetHelper.Resource(new [] {name}, "Assets/Stylesheets", "<link type='text/css' rel='stylesheet' href='{0}'></link>");
-
-			name = assetHelper.Environmentalize(Path.Combine(Context.ApplicationPhysicalPath, path), name);
-			return assetHelper.Resource(new [] {name}, path, "<script type='" + type + "' src='{0}'></script>");
-		}
-
 		public override bool HavePermission(string controller, string action)
 		{
 			return SecurityContext.Administrator.HaveAccessTo(controller, action);

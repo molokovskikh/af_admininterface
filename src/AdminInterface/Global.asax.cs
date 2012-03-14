@@ -163,12 +163,6 @@ WHERE PriceCode = ?Id", connection);
 		public new void Initialized(IMonoRailContainer container)
 		{
 			BaseMailer.ViewEngineManager = container.ViewEngineManager;
-
-			var monorailContainer = ((DefaultMonoRailContainer)container);
-			var builder = new UrlBuilder();
-			monorailContainer.ServiceInitializer.Initialize(builder, container);
-			monorailContainer.AddService<IUrlBuilder>(builder);
-
 			base.Initialized(container);
 		}
 

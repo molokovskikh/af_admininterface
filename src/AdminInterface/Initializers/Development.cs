@@ -1,11 +1,10 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
-using System.Web;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Initializers
 {

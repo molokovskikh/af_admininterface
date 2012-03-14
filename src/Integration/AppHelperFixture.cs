@@ -252,34 +252,5 @@ namespace Integration
 			var link = helper.LinkTo(new Address{Enabled = true, Value = "Test"}, "Test", "Index", new Dictionary<string, object>{{"tab", "1"}});
 			Assert.That(link, Is.EqualTo("<a class=\"has-no-connected-users\"  href=\"/Addresses/0/Index?tab=1\">Test</a>"));
 		}
-
-		[Test]
-		public void Check_for_minified_assets()
-		{
-			if (!Directory.Exists("Assets"))
-				Directory.CreateDirectory("Assets");
-			if (!Directory.Exists(@"Assets\Javascripts"))
-				Directory.CreateDirectory(@"Assets\Javascripts");
-			File.WriteAllText(@"Assets\Javascripts\test.min.js", "");
-
-			var asset = helper.Asset("test.js");
-			Assert.That(asset, Is.StringContaining("test.min.js"));
-		}
-
-		[Test]
-		public void Asset_for_coffee_Script()
-		{
-			if (!Directory.Exists("Assets"))
-				Directory.CreateDirectory("Assets");
-			if (!Directory.Exists(@"Assets\Javascripts"))
-				Directory.CreateDirectory(@"Assets\Javascripts");
-
-			File.Delete(@"Assets\Javascripts\test.min.js");
-			File.WriteAllText(@"Assets\Javascripts\test.js", "");
-			File.WriteAllText(@"Assets\Javascripts\test.coffee", "");
-
-			var asset = helper.Asset("test.coffee");
-			Assert.That(asset, Is.StringStarting("<script type='text/javascript' src='/Assets/Javascripts/test.js"));
-		}
 	}
 }
