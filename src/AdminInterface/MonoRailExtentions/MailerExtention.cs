@@ -115,6 +115,13 @@ namespace AdminInterface.MonoRailExtentions
 				template = Path.Combine("mail", template);
 
 			PropertyBag["siteroot"] = SiteRoot;
+			//хак если вьюха лежит в ресурсах то путь начинающийся / не будет работать, правим это
+			if (template.StartsWith("/")) {
+				var fixedTemplate = template.Remove(0, 1);
+				if (ViewEngineManager.HasTemplate(fixedTemplate))
+					template = fixedTemplate;
+			}
+
 			ViewEngineManager.Process(template, Layout, writer, PropertyBag);
 		}
 	}
