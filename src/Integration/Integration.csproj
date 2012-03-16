@@ -168,10 +168,11 @@
     <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
-    <Compile Include="Processors\InvoicePartProcessorFixture.cs" />
-    <Compile Include="Processors\ReportLogProcessorFixture.cs" />
-    <Compile Include="Processors\ReportProcessorFixture.cs" />
-    <Compile Include="Processors\UpdateAccountProcessorFixture.cs" />
+    <Compile Include="Tasks\InvoicePartProcessorFixture.cs" />
+    <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />
+    <Compile Include="Tasks\ReportLogProcessorFixture.cs" />
+    <Compile Include="Tasks\ReportProcessorFixture.cs" />
+    <Compile Include="Tasks\UpdateAccountProcessorFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
     <Compile Include="ScopeFixture.cs" />

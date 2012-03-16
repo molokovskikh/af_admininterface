@@ -1,14 +1,11 @@
 ﻿using System.Linq;
 using AdminInterface.Background;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NHibernate.Linq;
 using NUnit.Framework;
-using Test.Support.log4net;
 
-namespace Integration.Processors
+namespace Integration.Tasks
 {
 	[TestFixture]
 	public class ReportProcessorFixture : IntegrationFixture

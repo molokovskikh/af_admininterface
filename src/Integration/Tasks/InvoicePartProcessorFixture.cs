@@ -5,7 +5,7 @@ using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NUnit.Framework;
 
-namespace Integration.Processors
+namespace Integration.Tasks
 {
 	[TestFixture]
 	public class InvoicePartProcessorFixture : IntegrationFixture

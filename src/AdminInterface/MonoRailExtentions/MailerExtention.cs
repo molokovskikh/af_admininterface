@@ -58,6 +58,9 @@ namespace AdminInterface.MonoRailExtentions
 
 		public virtual void Send()
 		{
+			if (!HaveMessage)
+				return;
+
 			var message = GetMessage();
 #if DEBUG
 			if (!UnderTest)
@@ -67,6 +70,22 @@ namespace AdminInterface.MonoRailExtentions
 			}
 #endif
 			_sender.Send(message);
+		}
+
+		public bool HaveMessage
+		{
+			get { return Template != null; }
+		}
+
+		public void Clear()
+		{
+			Layout = null;
+			Template = null;
+			Subject = null;
+			From = null;
+			To = null;
+			IsBodyHtml = false;
+			Attachments.Clear();
 		}
 
 		protected virtual MailMessage GetMessage()

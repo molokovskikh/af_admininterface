@@ -2,9 +2,8 @@
 using AdminInterface.Models.Billing;
 using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.log4net;
 
-namespace Integration.Processors
+namespace Integration.Tasks
 {
 	[TestFixture]
 	public class ReportLogProcessorFixture : IntegrationFixture

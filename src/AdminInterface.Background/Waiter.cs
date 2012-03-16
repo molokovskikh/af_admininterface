@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Common.Tools;
@@ -18,7 +20,11 @@ namespace AdminInterface.Background
 		{
 			Delay = (int)TimeSpan.FromHours(1).TotalMilliseconds;
 			Action = () => {
-				new InvoiceProcessor().Process();
+				var mailer = new MonorailMailer {
+					SiteRoot = ConfigurationManager.AppSettings["SiteRoot"]
+				};
+
+				new SendInvoiceTask(mailer).Process();
 				new ReportProcessor().Process();
 				new UpdateAccountProcessor().Process();
 				new ReportLogsProcessor().Process();
@@ -31,7 +37,7 @@ namespace AdminInterface.Background
 
 		public void DoStart()
 		{
-			StandaloneInitializer.Init(typeof(InvoiceProcessor).Assembly);
+			StandaloneInitializer.Init(typeof(SendInvoiceTask).Assembly);
 
 			using(new SessionScope())
 			{

@@ -268,7 +268,7 @@ namespace AdminInterface.Models
 			{
 				SendInvoiceToEmail(invoice);
 
-				if (interactive)
+				if (!interactive)
 					invoice.SendToEmail = false;
 
 				if (_log.IsDebugEnabled)

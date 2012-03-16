@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Linq;
 using AdminInterface.Background;
 using AdminInterface.Models;
@@ -9,7 +8,7 @@ using Castle.ActiveRecord.Framework.Scopes;
 using Integration.ForTesting;
 using NUnit.Framework;
 
-namespace Integration.Processors
+namespace Integration.Tasks
 {
 	[TestFixture]
 	public class UpdateAccountProcessorFixture : IntegrationFixture
