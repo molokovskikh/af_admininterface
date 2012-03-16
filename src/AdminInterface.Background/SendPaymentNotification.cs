@@ -44,7 +44,6 @@ namespace AdminInterface.Background
 
 					using(var scope = new TransactionScope(OnDispose.Rollback))
 					{
-						ArHelper.WithSession(s => s.Save(new UserMessageSendLog(message)));
 						message.Save();
 						scope.VoteCommit();
 					}
