@@ -7,6 +7,7 @@ using AdminInterface.Models;
 using Castle.Core.Smtp;
 using Castle.MonoRail.Framework;
 using System.Net.Mail;
+using log4net;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -44,6 +45,8 @@ namespace AdminInterface.MonoRailExtentions
 
 		public static IViewEngineManager ViewEngineManager;
 
+		private static ILog log = LogManager.GetLogger(typeof(BaseMailer));
+
 		public BaseMailer(IEmailSender sender)
 		{
 			_sender = sender;
@@ -60,6 +63,12 @@ namespace AdminInterface.MonoRailExtentions
 		{
 			if (!HaveMessage)
 				return;
+
+			if (String.IsNullOrEmpty(To))
+			{
+				log.WarnFormat("Сообщение с темой '{0}' не отправлено тк не заполнен адрес получателя", Subject);
+				return;
+			}
 
 			var message = GetMessage();
 #if DEBUG
