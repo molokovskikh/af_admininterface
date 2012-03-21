@@ -103,14 +103,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 	}
 
 	function Update(url, item, success) {
-		var id = item.parents("tr").find("input[name=id]").val();
-		var value = item.val();
-		if (item.attr("type") == "checkbox")
-			value = item.get(0).checked;
-
-		var link = url + "?id=" + id + "&" + item.attr("name") + "=" + value;
 		var waiter = showWaiter(item);
-		AjaxRequest(link,
+		AjaxRequest(url,
 			function (html) {
 				hideWaiter(item, waiter);
 				RefreshTotalSum();
@@ -140,6 +134,16 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		}
 	}
 
+	function buildAjaxUrl(url, element) {
+		var id = element.parents("tr").find("input[name=id]").val();
+		var value = element.val();
+		if (element.attr("type") == "checkbox")
+			value = element.get(0).checked;
+
+		var link = url + "?id=" + id + "&" + element.attr("name") + "=" + value;
+		return link;
+	}
+
 	$(function () {
 		var sendMessageView = new PayerSendMessage();
 
@@ -161,13 +165,17 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 
 		$("#addresses input, #users input, #reports input, #suppliers input").change(function () {
 			var item = $(this);
-			Update("${siteroot}/Accounts/Update", item, function () {
-				if (item.attr("name") == "status") {
-					var id = $(item).parents("tr").find("input[name=service_id]").val();
-					if (id) {
-						updateChildren(id, item.attr("checked"));
+			var url = "${siteroot}/Accounts/Update";
+			url = buildAjaxUrl(url, item);
+			fillDependedData(url, item, function (resultUrl) {
+				Update(resultUrl, item, function () {
+					if (item.attr("name") == "status") {
+						var id = $(item).parents("tr").find("input[name=service_id]").val();
+						if (id) {
+							updateChildren(id, item.attr("checked"));
+						}
 					}
-				}
+				});
 			});
 		});
 
@@ -393,7 +401,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
 						</td>
 						<td class=short>
-							<input name=free type="checkbox" ${"checked" if user.Accounting.IsFree} />
+							<input name=free data-request="FreePeriodEnd" type="checkbox" ${"checked" if user.Accounting.IsFree} />
 						</td>
 						<td class=short>
 							<input name=payment class=payment type=text id=UserPayment${user.Id} value="${user.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>

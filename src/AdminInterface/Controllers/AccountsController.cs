@@ -39,10 +39,10 @@ namespace AdminInterface.Controllers
 		}
 
 		[return: JSONReturnBinder]
-		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment)
+		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd)
 		{
 			var account = Account.TryFind(id);
-			var result = UpdateAccounting(account.Id, accounted, payment, free);
+			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
 			if (status != null)
 			{
 				NHibernateUtil.Initialize(account);
@@ -102,10 +102,14 @@ namespace AdminInterface.Controllers
 			ActiveRecordMediator.Save(user);
 		}
 
-		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree)
+		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree, DateTime? freePeriodEnd)
 		{
 			object result = null;
 			var account = Account.Find(accountId);
+
+			if (freePeriodEnd.HasValue)
+				account.FreePeriodEnd = freePeriodEnd.Value;
+
 			if (accounted.HasValue)
 			{
 				if (accounted.Value)
@@ -127,7 +131,7 @@ namespace AdminInterface.Controllers
 
 				account.IsFree = isFree.Value;
 				
-				if (addresses != null && !account.IsFree && addresses.Count() > 0)
+				if (addresses != null && !account.IsFree && addresses.Any())
 				{
 					foreach (var address in addresses)
 						address.Accounting.IsFree = isFree.Value;
@@ -148,7 +152,7 @@ namespace AdminInterface.Controllers
 			}
 
 			if (account.IsChanged(a => a.Payment))
-				this.Mailer().AccountingChanged(account).Send();
+				this.Mailer().AccountChanged(account).Send();
 
 			account.Update();
 			return result;

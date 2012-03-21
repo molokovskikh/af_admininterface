@@ -6,6 +6,7 @@
 
 ${app.Asset("filter.coffee")}
 ${app.Asset("payer.send.message.coffee")}
+${app.Asset("request.coffee")}
 
 <script>
 	window.skipFirstDefaultRoute = true;
