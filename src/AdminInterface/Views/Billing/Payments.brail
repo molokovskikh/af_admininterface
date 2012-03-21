@@ -405,6 +405,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
 								<img src="${siteroot}/Images/kfm_home.png" border="0" />
 							</a>
+							${user.GetRegions().Count} /
+							${user.AvaliableAddresses.Count}
 						</td>
 						<td class="can-not-order">${user.Name}</td>
 						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>

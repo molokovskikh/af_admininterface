@@ -595,6 +595,11 @@ WHERE
 				.UniqueResult())) > 0);
 		}
 
+		public virtual List<Region> GetRegions()
+		{
+			return Region.All().Where(r => (r.Id & WorkRegionMask) > 0).ToList();
+		}
+
 		public virtual void AddContactPerson(string name)
 		{
 			if (String.IsNullOrEmpty(name))
