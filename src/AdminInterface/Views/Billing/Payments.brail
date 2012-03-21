@@ -402,11 +402,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<a id="UserLink${user.Id}" href="javascript:" data-filter="User${user.Id}" data-id="${user.Id}">${user.Id}</a>
 						</td>
 						<td class=short>
-							<a id="addressesForUser${user.Id}" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
-								<img src="${siteroot}/Images/kfm_home.png" border="0" />
+							<a id="addressesForUser${user.Id}" class="kfm_home" href="javascript:" onclick="ShowAdditionalInfoForUser(${user.Id}, '${ViewHelper.GetRowStyle(i)}')">
+								${user.GetRegions().Count} /
+								${user.AvaliableAddresses.Count}
 							</a>
-							${user.GetRegions().Count} /
-							${user.AvaliableAddresses.Count}
 						</td>
 						<td class="can-not-order">${user.Name}</td>
 						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>

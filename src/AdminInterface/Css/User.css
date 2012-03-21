@@ -101,3 +101,12 @@ div.LegendMarker.SingleUser
 {
 	background-color: #BBFFB6;
 }
+
+.kfm_home {
+	text-decoration: none;
+	background-image: url(/Images/kfm_home.png);
+	background-repeat: no-repeat;
+	background-position: 0% 100%;
+	padding-left: 25px;
+	padding-top: 7px;
+}
