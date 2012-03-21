@@ -274,7 +274,7 @@ namespace Integration
 				user.Accounting.Payment = 200;
 				user.Save();
 
-				mailer.AccountingChanged(user.Accounting);
+				mailer.AccountChanged(user.Accounting);
 				mailer.Send();
 				Assert.That(message.Subject, Is.EqualTo(String.Format("Изменение стоимости Тестовый плательщик - {0}, test - {1}, Аптека", payer.Id, client.Id)));
 				Assert.That(message.Body, Is.StringContaining("было 800,00р. стало 200,00р."));

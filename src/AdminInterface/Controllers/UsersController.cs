@@ -113,7 +113,7 @@ namespace AdminInterface.Controllers
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
-				(contacts.Where(contact => contact.Type == ContactType.Email).Count() > 0);
+				(contacts.Where(contact => contact.Type == ContactType.Email).Any());
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && haveMails)
 			{
@@ -289,7 +289,7 @@ namespace AdminInterface.Controllers
 		}
 
 		public void DeletePreparedData(uint id)
-		{			
+		{
 			try
 			{
 				var user = User.Find(id);

@@ -6,6 +6,7 @@
 
 ${app.Asset("filter.coffee")}
 ${app.Asset("payer.send.message.coffee")}
+${app.Asset("request.coffee")}
 
 <script>
 	window.skipFirstDefaultRoute = true;
@@ -63,10 +64,7 @@ ${app.Asset("payer.send.message.coffee")}
 		showNotificationMessage("Удаление...");
 		AjaxRequest("DeleteMail.rails?id=" + id, 
 			function() {
-				$('#mail' + id)
-					.addClass('DeletedMessage')
-					.find('input')
-					.remove();
+				$('#mail' + id).remove();
 				showSuccessMessage("Сообщение удалено");
 			});
 	}

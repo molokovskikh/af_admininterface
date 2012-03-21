@@ -32,7 +32,8 @@ namespace AdminInterface.Background
 				var payers = ActiveRecordLinq.AsQueryable<Payer>()
 					.Where(p => p.SendPaymentNotification && p.Balance < 0)
 					.ToList();
-				var usersForNotification = payers.SelectMany(p => p.Users).Where(u => u.Client != null);
+				var usersForNotification = payers.SelectMany(p => p.Users)
+					.Where(u => u.Client != null && u.Enabled && u.Client.Enabled && !u.Accounting.IsFree);
 				foreach (var user in usersForNotification)
 				{
 					var message = UserMessage.Find(user.Id);

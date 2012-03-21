@@ -48,7 +48,7 @@ namespace Integration.Controllers
 			account.Save();
 			scope.Flush();
 
-			controller.Update(account.Id, true, null, true, 500);
+			controller.Update(account.Id, true, null, true, 500, null);
 			scope.Flush();
 
 			account.Refresh();
@@ -72,7 +72,7 @@ namespace Integration.Controllers
 			client.Save();
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
-			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null));
+			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null));
 
 			addressAccount.Refresh();
 			Assert.That(addressAccount.IsFree, Is.False);

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Linq;
-using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
-using NHibernate.Criterion;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Table = "MailSentHistory", Schema = "billing")]
 	public class MailSentEntity : ActiveRecordValidationBase<MailSentEntity>

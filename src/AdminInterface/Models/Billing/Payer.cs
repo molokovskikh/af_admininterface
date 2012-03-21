@@ -371,12 +371,15 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual void RecalculateBalance()
 		{
-			var invoices = Invoice.Queryable.Where(i => i.Payer == this).ToList();
-			var payments = Payment.Queryable.Where(p => p.Payer == this).ToList();
+			var invoicesSum = Invoice.Queryable.Where(i => i.Payer == this).Sum(i => i.BalanceAmount);
+			var paymentsSum = Payment.Queryable.Where(p => p.Payer == this).Sum(p => p.BalanceAmount);
+			var operationsSum = BalanceOperation.Queryable.Where(o => o.Payer == this).Sum(o => o.BalanceAmount);
+
 			Balance = 0;
-			Balance += BeginBalance;
-			Balance += payments.Sum(p => p.Sum);
-			Balance -= invoices.Sum(i => i.PaidSum);
+			Balance = BeginBalance
+				+ invoicesSum
+				+ paymentsSum
+				+ operationsSum;
 		}
 
 		private void UpdateBalance()

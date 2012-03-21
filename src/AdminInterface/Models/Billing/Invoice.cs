@@ -4,10 +4,7 @@ using System.Globalization;
 using System.Linq;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
-using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
-using NHibernate.Engine;
-using log4net;
 
 namespace AdminInterface.Models.Billing
 {
@@ -15,7 +12,6 @@ namespace AdminInterface.Models.Billing
 	public class Invoice : BalanceUpdater<Invoice>
 	{
 		public Invoice()
-			: base(BalanceUpdaterType.Debit)
 		{}
 
 		public Invoice(Advertising ad)
@@ -96,7 +92,7 @@ namespace AdminInterface.Models.Billing
 		public virtual decimal Sum { get; set; }
 
 		[Property]
-		public virtual decimal PaidSum { get; set; }
+		public override decimal BalanceAmount { get; protected set; }
 
 		[Property]
 		public string PayerName { get; set; }
@@ -136,16 +132,6 @@ namespace AdminInterface.Models.Billing
 			foreach (var part in Parts.Where(p => p.Ad != null))
 				part.Ad.Invoice = null;
 			base.OnDelete();
-		}
-
-		protected override decimal GetSum()
-		{
-			return PaidSum;
-		}
-
-		protected override string GetSumProperty()
-		{
-			return "PaidSum";
 		}
 
 		protected override void OnSave()
@@ -234,7 +220,7 @@ namespace AdminInterface.Models.Billing
 		public void CalculateSum()
 		{
 			Sum = Parts.Sum(p => p.Sum);
-			PaidSum = Parts.Where(p => p.Processed).Sum(p => p.Sum);
+			BalanceAmount = Decimal.Negate(Parts.Where(p => p.Processed).Sum(p => p.Sum));
 		}
 	}
 }

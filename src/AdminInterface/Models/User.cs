@@ -759,7 +759,7 @@ WHERE
 
 	public class ModelAction
 	{
-		public ModelAction(object entity, string action, string name, bool disabled)
+		public ModelAction(object entity, string action, string name, bool disabled = false)
 		{
 			Controller = Common.Web.Ui.Helpers.AppHelper.GetControllerName(entity);
 			Id = ((dynamic)entity).Id;

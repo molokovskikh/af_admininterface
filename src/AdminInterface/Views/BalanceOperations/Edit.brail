@@ -1,0 +1,44 @@
+﻿<% component Bubble, {@bredcrumbs : [("Поиск плательщиков", "${siteroot}/Billing/Search"), operation.Payer]} %>
+
+<% for action in operation.Actions: %>
+	${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
+<% end %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	${BindingHelper.GetDescription(operation.Type)} №${operation.Id}
+<% end %>
+
+
+${FormHelper.FormTag("", {})}
+<table>
+	<tr>
+		<td>${app.GetLabel("operation.Date")}:</td>
+		<td>
+			${app.Edit("operation.Date")}
+			${app.GetValidationError(operation, "Date")}
+		</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Type")}:</td>
+		<td>
+			${app.Edit("operation.Type")}
+			${app.GetValidationError(operation, "Type")}
+		</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Description")}:</td>
+		<td>
+			${app.Edit("operation.Description")}
+			${app.GetValidationError(operation, "Description")}
+		</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("operation.Sum")}:</td>
+		<td>
+			${app.Edit("operation.Sum")}
+			${app.GetValidationError(operation, "Sum")}
+		</td>
+	</tr>
+</table>
+${FormHelper.Submit("Сохранить")}
+${FormHelper.EndFormTag()}

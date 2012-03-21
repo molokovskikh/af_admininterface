@@ -97,6 +97,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Billing\BalanceOperationFixture.cs" />
     <Compile Include="Billing\BillingSearchFixture.cs" />
     <Compile Include="Billing\AccountingFixture.cs" />
     <Compile Include="Billing\EditFixture.cs" />

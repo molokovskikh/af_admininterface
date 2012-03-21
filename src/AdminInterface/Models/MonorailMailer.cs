@@ -233,9 +233,9 @@ namespace AdminInterface.Models
 			return this;
 		}
 
-		public MonorailMailer AccountingChanged(Account account)
+		public MonorailMailer AccountChanged(Account account)
 		{
-			Template = "AccountingChanged";
+			Template = "AccountChanged";
 
 			var payer = account.Payer;
 			var service = account.Service;
