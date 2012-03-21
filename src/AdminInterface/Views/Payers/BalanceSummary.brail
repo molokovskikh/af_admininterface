@@ -108,6 +108,7 @@
 					<% end %>
 					<% if item.IsOperation: %>
 					${UrlHelper.Link("Показать", {@controller: @BalanceOperations, @action: @Show, @params: {@id: item.Id}})}
+					${UrlHelper.Link("Редактировать", {@controller: @BalanceOperations, @action: @Edit, @params: {@id: item.Id}})}
 					<% end %>
 				<% end %>
 			</td>
@@ -119,19 +120,34 @@
 			<td>${item.Date.ToShortDateString()}</td>
 
 			<% if item.IsInvoice: %>
-			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<td style="text-align:right;">
+				${item.Sum.ToString("C")}
+				<% if item.Comment: %>
+					(${item.Comment})
+				<% end %>
+			</td>
 			<% else: %>
 			<td></td>
 			<% end %>
 
 			<% if item.IsPayment: %>
-			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<td style="text-align:right;">
+				${item.Sum.ToString("C")}
+				<% if item.Comment: %>
+					(${item.Comment})
+				<% end %>
+			</td>
 			<% else: %>
 			<td></td>
 			<% end %>
 
 			<% if item.IsAct: %>
-			<td style="text-align:right;">${item.Sum.ToString("C")}</td>
+			<td style="text-align:right;">
+				${item.Sum.ToString("C")}
+				<% if item.Comment: %>
+					(${item.Comment})
+				<% end %>
+			</td>
 			<% else: %>
 			<td></td>
 			<% end %>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
@@ -37,7 +38,10 @@ namespace AdminInterface.Models.Billing
 			set
 			{
 				_type = value;
-				BalanceType = _type == OperationType.Refund ? BalanceUpdaterType.Debit : BalanceUpdaterType.Credit;
+				if (_type == OperationType.Refund)
+					BalanceAmount = Math.Abs(BalanceAmount) * -1;
+				else
+					BalanceAmount = Math.Abs(BalanceAmount);
 			}
 		}
 
@@ -51,16 +55,29 @@ namespace AdminInterface.Models.Billing
 		public virtual DateTime Date { get; set; }
 
 		[Property, ValidateGreaterThanZero, Description("Сумма")]
-		public virtual decimal Sum { get; set; }
-
-		protected override decimal GetSum()
+		public virtual decimal Sum
 		{
-			return Sum;
+			get
+			{
+				return Math.Abs(BalanceAmount);
+			}
+			set
+			{
+				BalanceAmount = Type == OperationType.Refund ? Decimal.Negate(value) : value;
+			}
 		}
 
-		protected override string GetSumProperty()
+		[Property]
+		public override decimal BalanceAmount { get; protected set; }
+
+		public virtual IEnumerable<ModelAction> Actions
 		{
-			return "Sum";
+			get
+			{
+				return new [] {
+					new ModelAction(this, "Delete", "Удалить")
+				};
+			}
 		}
 	}
 }

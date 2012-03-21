@@ -148,5 +148,15 @@ namespace Functional.ForTesting
 			browser.Dispose();
 			browser = opened;
 		}
+
+		protected void WaitForCss(string selector)
+		{
+			var timeOut = 3;
+			new TryFuncUntilTimeOut(TimeSpan.FromSeconds(timeOut)) {
+				SleepTime = TimeSpan.FromMilliseconds(50.0),
+				ExceptionMessage =
+					() => string.Format("waiting {0} seconds for document to contain element '{1}'.", timeOut, selector)
+			}.Try(() => browser.CssSelect(selector) != null);
+		}
 	}
 }

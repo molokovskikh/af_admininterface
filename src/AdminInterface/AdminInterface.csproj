@@ -435,6 +435,7 @@
   <ItemGroup>
     <Content Include="App_Themes\Main\Main.css" />
     <None Include="Views\Accounts\Edit.brail" />
+    <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\Certificates.brail" />
     <None Include="Views\Mail\ChangeNameFullName.brail" />

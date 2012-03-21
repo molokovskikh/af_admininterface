@@ -19,6 +19,8 @@ namespace AdminInterface.Models.Billing
 	[ActiveRecord("Payments", Schema = "Billing")]
 	public class Payment : BalanceUpdater<Payment>
 	{
+		private decimal _sum;
+
 		public Payment(Payer payer, DateTime payedOn, decimal sum) : this(payer)
 		{
 			Sum = sum;
@@ -33,7 +35,6 @@ namespace AdminInterface.Models.Billing
 		}
 
 		public Payment()
-			: base(BalanceUpdaterType.Credit)
 		{
 			UpdatePayerInn = true;
 		}
@@ -47,7 +48,21 @@ namespace AdminInterface.Models.Billing
 		public DateTime PayedOn { get; set; }
 
 		[Property, ValidateGreaterThanZero]
-		public virtual decimal Sum { get; set; }
+		public virtual decimal Sum
+		{
+			get
+			{
+				return _sum;
+			}
+			set
+			{
+				_sum = value;
+				BalanceAmount = value;
+			}
+		}
+
+		[Property]
+		public override decimal BalanceAmount { get; protected set; }
 
 		[Property]
 		public string Comment { get; set; }
@@ -397,16 +412,6 @@ namespace AdminInterface.Models.Billing
 			base.OnUpdate();
 		}
 
-		protected override decimal GetSum()
-		{
-			return Sum;
-		}
-
-		protected override string GetSumProperty()
-		{
-			return "Sum";
-		}
-
 		protected override void OnSave()
 		{
 			UpdateAd();
@@ -421,7 +426,7 @@ namespace AdminInterface.Models.Billing
 			{
 				//магия будь бдителен!
 				//запрос должен быть в другой сесии а то будет stackoverflow
-				Advertising ad = null;
+				Advertising ad;
 				using(new SessionScope())
 					ad = Advertising.Queryable.FirstOrDefault(a => a.Payer == Payer && a.Payment == null);
 				if (ad == null)
