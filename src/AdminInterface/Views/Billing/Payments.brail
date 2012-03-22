@@ -334,7 +334,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<input name=accounted type="checkbox" ${"checked" if supplier.Account.BeAccounted} />
 					</td>
 					<td class=short>
-						<input name=free type="checkbox" ${"checked" if supplier.Account.IsFree} />
+						<input name=free data-request="FreePeriodEnd" type="checkbox" ${"checked" if supplier.Account.IsFree} />
 					</td>
 					<td class=short>
 						<input name=payment class=payment type=text value="${supplier.Account.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -471,7 +471,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=accounted type=checkbox ${"checked" if addr.Accounting.BeAccounted} />
 							</td>
 							<td class=short>
-								<input name=free type=checkbox ${"checked" if addr.Accounting.IsFree} />
+								<input name=free data-request="FreePeriodEnd" type=checkbox ${"checked" if addr.Accounting.IsFree} />
 							</td>
 							<td class=short>
 								<input name=payment class=payment type=text value="${addr.Accounting.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
@@ -530,7 +530,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 								<input name=accounted type="checkbox" ${"checked" if report.BeAccounted} />
 							</td>
 							<td class=short>
-								<input name=free type=checkbox ${"checked" if report.IsFree} />
+								<input name=free data-request="FreePeriodEnd" type=checkbox ${"checked" if report.IsFree} />
 							</td>
 							<td  class=short>
 								<input name=payment class=payment type=text value="${report.Payment.ToString("#.#")}" ${"disabled" unless admin.CanChangePayment}>
