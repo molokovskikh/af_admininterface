@@ -1,0 +1,16 @@
+alter table Usersettings.RetClientsSet
+drop column RetUpCost,
+drop column AlowRegister,
+drop column AlowDocuments,
+drop column AdvertisingLevel,
+drop column AlowWayBill,
+drop column AllowDocuments,
+drop column AlowChangeSegment,
+drop column AlowCumulativeUpdate,
+drop column CheckCumulativeUpdateStatus,
+drop column OrdersVisualizationMode,
+drop column AllowPreparatInfo,
+drop column AllowPreparatDesc,
+drop column ShowNewDefecture,
+drop column MigrateToPrgDataService,
+drop column ManualComparison;
