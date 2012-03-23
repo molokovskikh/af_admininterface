@@ -38,7 +38,6 @@ namespace AdminInterface.Models
 		{
 			ParseWaybills = true;
 			ShowAdvertising = true;
-			ShowNewDefecture = true;
 			EnableSmartOrder = true;
 		}
 
@@ -124,12 +123,6 @@ namespace AdminInterface.Models
 
 		[Property, Description("Разбирать накладные"), Auditable]
 		public virtual bool ParseWaybills { get; set; }
-
-		[Property, Description("Показывать новую форму обработки дефектуры"), Auditable]
-		public virtual bool ShowNewDefecture { get; set; }
-
-		[Property, Description("Разрешить сопоставление вручную в AnalitOnline"), Auditable]
-		public virtual bool ManualComparison { get; set; }
 
 		[Property, Description("Проверять максимальный недельный заказ"), Auditable]
 		public virtual bool CheckWeeklyOrdersSum { get; set; }

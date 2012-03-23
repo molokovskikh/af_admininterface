@@ -138,10 +138,6 @@
 			"ShowCertificatesWithoutRefSupplier" : drugstore.ShowCertificatesWithoutRefSupplier }
 	}
 
-	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitOnline",
-		"Checkboxes" : { "ManualComparison" : drugstore.ManualComparison, "ShowNewDefecture" : drugstore.ShowNewDefecture}
-	}
-
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "Недельный заказ",
 		"Checkboxes" : { "CheckWeeklyOrdersSum" : drugstore.CheckWeeklyOrdersSum }
 	}

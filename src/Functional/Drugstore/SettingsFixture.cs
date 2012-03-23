@@ -357,21 +357,6 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
-		public void ManageManualComparison()
-		{
-			var uri = BuildTestUrl("client/" + client.Id);
-			Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(settings.ManualComparison));
-			settings.ManualComparison = !settings.ManualComparison;
-			settings.SaveAndFlush();
-			browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked = settings.ManualComparison;
-			browser.Button(Find.ByValue("Сохранить")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			browser.GoTo(browser.Url);
-			browser.Link(Find.ByText("Настройка")).Click();
-			Assert.That(browser.CheckBox(Find.ByName("drugstore.ManualComparison")).Checked, Is.EqualTo(settings.ManualComparison));
-		}
-
-		[Test]
 		public void When_change_home_region_it_must_be_selected()
 		{
 			var homeRegionSelect = GetHomeRegionSelect(browser);
