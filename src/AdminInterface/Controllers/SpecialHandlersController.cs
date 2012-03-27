@@ -19,6 +19,7 @@ namespace AdminInterface.Controllers
 			var supplier = DbSession.Load<Supplier>(supplierId);
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["handlers"] = DbSession.Query<SpecialHandler>()
+				.Where(h => h.Supplier == supplier)
 				.OrderBy(h => h.Handler.ClassName)
 				.ToList();
 		}
