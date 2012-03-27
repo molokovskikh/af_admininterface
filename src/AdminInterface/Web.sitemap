@@ -10,7 +10,6 @@
 				</siteMapNode>
 			</siteMapNode>
 		</siteMapNode>
-		<siteMapNode url="CopySynonym.aspx" title="Клонирование" />
 		<siteMapNode url="ViewAdministrators.aspx" title="Региональные администраторы" />
 	</siteMapNode>
 </siteMap>

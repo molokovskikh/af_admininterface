@@ -1,0 +1,32 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Обработчики заказов
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [
+	("Поиск пользователей", "${siteroot}/Users/Search"),
+	supplier,
+	("Настройка поставщика", "${siteroot}/managep.aspx?cc=${supplier.Id}"),
+	("Обработчики заказов", "${siteroot}/SpecialHandlers?supplierId=${supplier.Id}")]} %>
+
+${FormHelper.FormTag("", {})}
+<% if handler.Id: %>
+${FormHelper.HiddenField("handler.Id")}
+<% end %>
+<table>
+	<tr>
+		<td>${app.GetLabel("handler.Name")}:</td>
+		<td>
+			${app.Edit("handler.Name")}
+			${app.GetValidationError(handler, "Name")}
+		</td>
+	</tr>
+	<tr>
+		<td>${app.GetLabel("handler.Handler")}:</td>
+		<td>
+			${app.Edit("handler.Handler")}
+			${app.GetValidationError(handler, "handler")}
+		</td>
+	</tr>
+</table>
+${FormHelper.Submit("Сохранить")}
+${FormHelper.EndFormTag()}

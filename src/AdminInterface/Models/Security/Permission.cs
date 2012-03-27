@@ -112,6 +112,13 @@ namespace AdminInterface.Models.Security
 				};
 				return controllers.Any(c => c == controller.ToLower());
 			}
+			if (Type == PermissionType.ManageSuppliers)
+			{
+				var controllers = new [] {
+					"SpecialHandlers".ToLower(),
+				};
+				return controllers.Any(c => c == controller.ToLower());
+			}
 			if (Type == PermissionType.ViewSuppliers)
 			{
 				var controllers = new [] {

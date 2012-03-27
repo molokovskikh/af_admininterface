@@ -2,29 +2,37 @@
 	Theme="Main" MasterPageFile="~/Main.Master" %>
 
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
-	<link rel="Stylesheet" type="text/css" href="Css/Common.css" />
-	<script src="/futureAdm/Assets/Javascripts/jquery-1.6.2.min.js" type="text/javascript"></script>
+	<form id="form1" runat="server">
+		<asp:ScriptManager ID="ScriptManager1" runat="server" AjaxFrameworkMode="Disabled" EnableScriptLocalization="False" EnableScriptGlobalization="False" EnablePageMethods="False" EnablePartialRendering="False" EnableSecureHistoryState="False">
+			<Scripts>
+				<asp:ScriptReference Path="~/Assets/Javascripts/jquery-1.6.2.min.js" />
+			</Scripts>
+		</asp:ScriptManager>
 
-	<script type="text/javascript">
-		$(function () {
-			$('.PriceTypeList').change(function () {
-				$('#messageDiv').html('');
-				$('#messageDiv').append("Все клиенты будут отключены от VIP прайсов");
-				if ($(this).val() == 2) {
-					$('#messageDiv').css("display", "block");
-				} else {
-					$('#messageDiv').css("display", "none");
-				}
+		<script type="text/javascript">
+			$(function () {
+				$('.PriceTypeList').change(function () {
+					$('#messageDiv').html('');
+					$('#messageDiv').append("Все клиенты будут отключены от VIP прайсов");
+					if ($(this).val() == 2) {
+						$('#messageDiv').css("display", "block");
+					} else {
+						$('#messageDiv').css("display", "none");
+					}
+				});
 			});
-		});
-	</script>
+		</script>
 
-<form id="form1" runat="server">
 		<div class="MainBlock">
 			<h4 class="MainHeader">
 				<asp:Label ID="HeaderLabel" runat="server" />
 			</h4>
 			<div runat="server" id="messageDiv" class="Warning" style="display: none; padding: 10px 10px 10px 50px;" ClientIDMode="Static"></div>
+			<div class="block">
+				<ul class="navigation-menu">
+					<li><asp:HyperLink runat="server" ID="HandlersLink">Настройка форматеров и отправщиков доступных поставщику</asp:HyperLink></li>
+				</ul>
+			</div>
 			<div class="BorderedBlock">
 				<h3 class="Header">
 					Прайс листы

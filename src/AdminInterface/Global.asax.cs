@@ -1,24 +1,19 @@
 using System;
-using System.Configuration;
 using System.IO;
-using System.Web;
 using AdminInterface.Helpers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using System.Reflection;
-using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Container;
 using Castle.MonoRail.Framework.Internal;
-using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Views.Aspx;
 using Castle.MonoRail.Views.Brail;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using log4net;
-using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
@@ -67,80 +62,6 @@ namespace AddUser
 				_log.Fatal("Ошибка при запуске Административного интерфеса", ex);
 			}
 		}
-
-		private SiteMapNode SiteMapResolve(object sender, SiteMapResolveEventArgs e)
-		{
-			var currentNode = e.Provider.CurrentNode.Clone(true);
-			if (currentNode.Url.EndsWith("/manageret.aspx"))
-				currentNode.ParentNode.Url += e.Context.Request["cc"];
-			else if (currentNode.Url.EndsWith("/managep.aspx"))
-				currentNode.ParentNode.Url += e.Context.Request["cc"];
-			else if (currentNode.Url.EndsWith("/SenderProperties.aspx"))
-			{
-				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
-					connection.Open();
-					var command = new MySqlCommand(@"
-select firmcode 
-from ordersendrules.order_send_rules osr
-where osr.id = ?ruleId
-", connection);
-					command.Parameters.AddWithValue("?RuleId", e.Context.Request["RuleId"]);
-					firmCode = Convert.ToUInt32(command.ExecuteScalar());
-				}
-				currentNode.ParentNode.Url += "?cc=" + firmCode;
-				currentNode.ParentNode.ParentNode.Url += firmCode;
-			}
-			else if (currentNode.Url.EndsWith("/EditRegionalInfo.aspx"))
-			{
-				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
-					connection.Open();
-					var command = new MySqlCommand(@"
-SELECT FirmCode
-FROM usersettings.regionaldata rd
-WHERE RowID = ?Id", connection);
-					command.Parameters.AddWithValue("?Id", Convert.ToUInt32(e.Context.Request["id"]));
-					firmCode = Convert.ToUInt32(command.ExecuteScalar());
-				}
-				currentNode.ParentNode.Url += "?cc=" + firmCode;
-				currentNode.ParentNode.ParentNode.Url += firmCode;
-			}
-			else if (currentNode.Url.EndsWith("/managecosts.aspx"))
-			{
-				uint firmCode;
-				using (var connection = new MySqlConnection(Literals.GetConnectionString()))
-				{
-					connection.Open();
-					var command = new MySqlCommand(@"
-SELECT FirmCode
-FROM usersettings.PricesData pd
-WHERE PriceCode = ?Id", connection);
-					command.Parameters.AddWithValue("?Id", Convert.ToUInt32(e.Context.Request["pc"]));
-					firmCode = Convert.ToUInt32(command.ExecuteScalar());
-				}
-				currentNode.ParentNode.Url += "?cc=" + firmCode;
-				currentNode.ParentNode.ParentNode.Url += firmCode;
-			}
-			return currentNode;
-		}
-
-		void Session_Start(object sender, EventArgs e)
-		{}
-
-		void Application_BeginRequest(object sender, EventArgs e)
-		{}
-
-		void Application_AuthenticateRequest(object sender, EventArgs e)
-		{}
-
-		void Session_End(object sender, EventArgs e)
-		{}
-
-		void Application_End(object sender, EventArgs e)
-		{}
 
 		void Application_Error(object sender, EventArgs e)
 		{

@@ -145,6 +145,7 @@
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
+    <Compile Include="Controllers\SpecialHandlersController.cs" />
     <Compile Include="Controllers\ManagerReportsController.cs" />
     <Compile Include="Controllers\Filters\StatQuery.cs" />
     <Compile Include="Controllers\MailsController.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
     <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
@@ -438,6 +440,9 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
+    <None Include="Views\SpecialHandlers\Index.brail" />
+    <None Include="Views\SpecialHandlers\New.brail" />
+    <None Include="Views\SpecialHandlers\Edit.brail" />
     <None Include="Views\Logs\Certificates.brail" />
     <None Include="Views\Mail\ChangeNameFullName.brail" />
     <None Include="Views\Mail\PropertyChanges.brail" />

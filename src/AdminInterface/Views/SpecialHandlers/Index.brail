@@ -1,0 +1,41 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Обработчики заказов
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/Users/Search"), supplier, ("Настройка поставщика", "${siteroot}/managep.aspx?cc=${supplier.Id}")]} %>
+
+<div class=block>
+Данный список обработчиков заказов будет доступен поставщику для самостоятельной настройки с помощью клиентского интрфейса.
+</div>
+
+<div class=block>
+	${app.LinkTo("Новый", "SpecialHandlers", "New", {@supplierId: supplier.Id})}
+</div>
+
+<table class="DataTable HighLightCurrentRow">
+	<% if handlers.Count: %>
+	<thead>
+		<tr>
+			<th></th>
+			<th>Название</th>
+			<th>Обработчик</th>
+		</tr>
+	</thead>
+	<tbody>
+		<% for i, handler in enumerate(handlers): %>
+		<tr class="${ViewHelper.GetRowStyle(i)}">
+			<td>
+				${app.LinkTo(handler, "Редактировать", @Edit)}
+				${app.LinkTo(handler, "Удалить", @Delete)}
+			</td>
+			<td>${handler.Name}</td>
+			<td>${handler.Handler.ClassName}</td>
+		</tr>
+		<% end %>
+	</tbody>
+	<% else: %>
+	<tr class="EmptyData">
+		<td>По вашему запросу ничего не найдено</td>
+	</tr>
+	<% end %>
+</table>

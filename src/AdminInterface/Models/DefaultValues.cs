@@ -137,6 +137,11 @@ namespace AdminInterface.Models
 		[Property]
 		public HandlerType Type { get; set; }
 
+		public virtual string Name
+		{
+			get { return ClassName; }
+		}
+
 		public static IList<OrderHandler> Senders()
 		{
 			return Queryable.Where(h => h.Type == HandlerType.Sender).OrderBy(h => h.ClassName).ToList();
@@ -145,6 +150,11 @@ namespace AdminInterface.Models
 		public static IList<OrderHandler> Formaters()
 		{
 			return Queryable.Where(h => h.Type == HandlerType.Formater).OrderBy(h => h.ClassName).ToList();
+		}
+
+		public static IList<OrderHandler> All()
+		{
+			return Queryable.OrderBy(h => h.ClassName).ToList();
 		}
 
 		public override string ToString()

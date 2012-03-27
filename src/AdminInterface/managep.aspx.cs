@@ -54,6 +54,7 @@ namespace AddUser
 				throw new ArgumentException(String.Format("Не верное значение ClientCode = {0}", id), "ClientCode");
 			
 			supplier = Supplier.Find(id);
+			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 
 			if (!IsPostBack)
 			{

@@ -1,7 +1,6 @@
 <%@ Page Language="C#" AutoEventWireup="true" CodeBehind="EditRegionalInfo.aspx.cs"
 	Inherits="EditRegionalInfo" Theme="Main" MasterPageFile="~/Main.Master" %>
 
-
 <asp:Content runat="server" ContentPlaceHolderID="MainContentPlaceHolder">
 <form id="form1" runat="server">
 		<div>
