@@ -86,23 +86,24 @@ namespace AdminInterface.Controllers
 							organization.Name = currentPayer.Name;
 							organization.FullName = currentPayer.JuridicalName;
 							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
-							organization.Save();
 						}
 					}
 				}
 
 				supplier.RegionMask = regionSettings.GetBrowseMask();
-				if (supplier.RegionMask == 0)
-					throw new Exception("Попытка зарегистрировать поставщика без регионов работы");
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.Account = new SupplierAccount(supplier);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Admin);
-				if (currentPayer == null)
-				{
-					currentPayer = new Payer(supplier.Name, supplier.FullName);
-					currentPayer.Save();
+
+				if (!IsValid(supplier)) {
+					RegisterSupplier();
+					PropertyBag["supplier"] = supplier;
+					return;
 				}
+
+				if (currentPayer == null)
+					currentPayer = new Payer(supplier.Name, supplier.FullName);
 
 				currentPayer.Suppliers.Add(supplier);
 				supplier.Payer = currentPayer;

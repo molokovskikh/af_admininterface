@@ -138,7 +138,7 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Регионы работы"), ValidateGreaterThanZero("Вы не выбрали регионы работы") , Auditable]
+		[Property, Description("Регионы работы"), ValidateGreaterThanZero("Вы не выбрали регионы работы"), Auditable]
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[Nested]

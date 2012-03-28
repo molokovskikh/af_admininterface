@@ -355,9 +355,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	
 	<div class="block">
 		<h3>Региональная настройка</h3>
-		<%if IsDefined("client"): %>
 		${app.GetValidationError(client, "MaskRegion")}
-		<%end %>
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 
