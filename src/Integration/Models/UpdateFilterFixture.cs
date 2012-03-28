@@ -22,11 +22,6 @@ namespace Integration.Models
 			Flush();
 			var update1 = new UpdateLogEntity(user1);
 			update1.Save();
-			new UpdateLogEntity(user2) {
-				UpdateType = UpdateType.AutoOrder,
-				RequestTime = DateTime.Now.AddHours(1),
-				Commit = true
-			}.Save();
 			var update2 = new UpdateLogEntity(user2);
 			update2.Save();
 
@@ -37,9 +32,19 @@ namespace Integration.Models
 			filter.UpdateType = UpdateType.Accumulative;
 			var results = filter.Find();
 			Assert.That(results.Count, Is.GreaterThan(0));
-			Assert.IsTrue(results.Any(r => r.OkUpdate));
 			Assert.That(results.Any(r => r.Id == update1.Id), Is.False, "нашли запись обновления в воронеже, {0}", update1.Id);
 			Assert.That(results.Any(r => r.Id == update2.Id), Is.True, "не нашли запись обновления в челябинске, {0} {1}", update2.Id, results.Implode(r => r.Id));
+			filter.UpdateType = UpdateType.AccessError;
+			new UpdateLogEntity(user2) {
+				UpdateType = UpdateType.AutoOrder,
+				RequestTime = DateTime.Now.AddHours(1),
+				Commit = true
+			}.Save();
+			new UpdateLogEntity(user2) {
+				UpdateType = UpdateType.AccessError,
+			}.Save();
+			results = filter.Find();
+			Assert.IsTrue(results.Any(r => r.OkUpdate));
 		}
 	}
 }

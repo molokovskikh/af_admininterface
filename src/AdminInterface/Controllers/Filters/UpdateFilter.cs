@@ -42,20 +42,25 @@ namespace AdminInterface.Controllers.Filters
 
 		public IList<UpdateLogView> Find()
 		{
-			var items = ArHelper.WithSession(s => {
-				var criteria = s.CreateCriteria<UpdateLogEntity>("ue")
-					.CreateAlias("User", "u", JoinType.InnerJoin)
-					.CreateAlias("u.Client", "c", JoinType.LeftOuterJoin)
-					.SetProjection(
-						Projections.Property("Id").As("Id"),
-						Projections.Property("Addition").As("Addition"),
-						Projections.Property("Commit").As("Commit"),
-						Projections.Property("AppVersion").As("AppVersion"),
-						Projections.Property("ResultSize").As("ResultSize"),
-						Projections.Property("UpdateType").As("UpdateType"),
-						Projections.Property("RequestTime").As("RequestTime"),
-						Projections.Alias(Projections.Conditional(Restrictions.IsNotNull("Log"), Projections.Constant(1), Projections.Constant(0)), "HaveLog"),
-						Projections.Alias(Projections.SubQuery(DetachedCriteria.For<UpdateLogEntity>("ule")
+			var projectionsList = new List<IProjection> {
+				Projections.Property("Id").As("Id"),
+				Projections.Property("Addition").As("Addition"),
+				Projections.Property("Commit").As("Commit"),
+				Projections.Property("AppVersion").As("AppVersion"),
+				Projections.Property("ResultSize").As("ResultSize"),
+				Projections.Property("UpdateType").As("UpdateType"),
+				Projections.Property("RequestTime").As("RequestTime"),
+				Projections.Alias(Projections.Conditional(Restrictions.IsNotNull("Log"), Projections.Constant(1), Projections.Constant(0)), "HaveLog"),
+				Projections.Property("u.Id").As("UserId"),
+				Projections.Property("u.Name").As("UserName"),
+				Projections.Property("u.Login").As("Login"),
+				Projections.Property("c.Id").As("ClientId"),
+				Projections.Property("c.Name").As("ClientName"),
+				Projections.SqlProjection("c2_.RegionCode as RegionId", new[] {"RegionId"}, new [] {NHibernateUtil.String})
+			};
+
+			if (UpdateType == Models.Logs.UpdateType.AccessError) {
+				projectionsList.Add(Projections.ProjectionList().Add(Projections.Alias(Projections.SubQuery(DetachedCriteria.For<UpdateLogEntity>("ule")
 						.Add(Expression.EqProperty("ue.User", "ule.User"))
 						.Add(Expression.Eq("ule.Commit", true))
 						.Add(Expression.In("ule.UpdateType", new object[] {
@@ -70,15 +75,15 @@ namespace AdminInterface.Controllers.Filters
 							.Add(Projections.Conditional(Expression.Gt(
 								Projections.Count(Projections.Property("ule.Id")) , 0),
 								Projections.Constant(1),
-								Projections.Constant(0))))), "OkUpdate"),
+								Projections.Constant(0))))), "OkUpdate")));
+			}
 
-						Projections.Property("u.Id").As("UserId"),
-						Projections.Property("u.Name").As("UserName"),
-						Projections.Property("u.Login").As("Login"),
-						Projections.Property("c.Id").As("ClientId"),
-						Projections.Property("c.Name").As("ClientName"),
-						Projections.SqlProjection("c2_.RegionCode as RegionId", new[] {"RegionId"}, new [] {NHibernateUtil.String})
-					);
+			var items = ArHelper.WithSession(s => {
+				var criteria = s.CreateCriteria<UpdateLogEntity>("ue")
+					.CreateAlias("User", "u", JoinType.InnerJoin)
+					.CreateAlias("u.Client", "c", JoinType.LeftOuterJoin)
+					.SetProjection(projectionsList.ToArray());
+
 				if (User != null)
 					criteria.Add(Restrictions.Eq("User", User));
 
