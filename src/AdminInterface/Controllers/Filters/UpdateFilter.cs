@@ -43,7 +43,7 @@ namespace AdminInterface.Controllers.Filters
 		public IList<UpdateLogView> Find()
 		{
 			var items = ArHelper.WithSession(s => {
-				var criteria = s.CreateCriteria<UpdateLogEntity>()
+				var criteria = s.CreateCriteria<UpdateLogEntity>("ue")
 					.CreateAlias("User", "u", JoinType.InnerJoin)
 					.CreateAlias("u.Client", "c", JoinType.LeftOuterJoin)
 					.SetProjection(
@@ -55,6 +55,23 @@ namespace AdminInterface.Controllers.Filters
 						Projections.Property("UpdateType").As("UpdateType"),
 						Projections.Property("RequestTime").As("RequestTime"),
 						Projections.Alias(Projections.Conditional(Restrictions.IsNotNull("Log"), Projections.Constant(1), Projections.Constant(0)), "HaveLog"),
+						Projections.Alias(Projections.SubQuery(DetachedCriteria.For<UpdateLogEntity>("ule")
+						.Add(Expression.EqProperty("ue.User", "ule.User"))
+						.Add(Expression.Eq("ule.Commit", true))
+						.Add(Expression.In("ule.UpdateType", new object[] {
+							Models.Logs.UpdateType.Accumulative,
+							Models.Logs.UpdateType.Cumulative,
+							Models.Logs.UpdateType.LimitedCumulative,
+							Models.Logs.UpdateType.AutoOrder,
+							Models.Logs.UpdateType.LoadingDocuments
+						} ))
+						.Add(Expression.GtProperty("ule.RequestTime", "ue.RequestTime"))
+						.SetProjection(Projections.ProjectionList()
+							.Add(Projections.Conditional(Expression.Gt(
+								Projections.Count(Projections.Property("ule.Id")) , 0),
+								Projections.Constant(1),
+								Projections.Constant(0))))), "OkUpdate"),
+
 						Projections.Property("u.Id").As("UserId"),
 						Projections.Property("u.Name").As("UserName"),
 						Projections.Property("u.Login").As("Login"),
@@ -184,6 +201,8 @@ namespace AdminInterface.Controllers.Filters
 		public string Region { get; set; }
 
 		public bool HaveLog { get; set; }
+
+		public bool OkUpdate { get; set; }
 
 		public bool IsDataTransferUpdateType()
 		{

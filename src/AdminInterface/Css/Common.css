@@ -166,6 +166,10 @@ table td.NotCommitedUpdate
 	background-color: #e2c5c5;
 }
 
+.DataTable tbody tr.OkUpdate {
+	background-color: #c5e2c6;
+}
+
 .waiter
 {
 	background-image: url(../images/loading.gif);

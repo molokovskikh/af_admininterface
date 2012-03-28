@@ -94,7 +94,7 @@ ${app.Asset("details.js")}
 		</thead>
 		<tbody class="HighLightCurrentRow">
 		<% for i, log in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="logRow${log.Id}" align="center">
+		<tr class="${ViewHelper.GetRowStyle(i)} ${'OkUpdate' if log.OkUpdate}" id="logRow${log.Id}" align="center">
 			<td class="${'NotCommitedUpdate' if not log.Commit}" style="width:1%;">
 				${log.RequestTime}
 			</td>
