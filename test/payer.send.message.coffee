@@ -1,7 +1,7 @@
 $ ->
 	test "select user", ->
 		view = new PayerSendMessage()
-		flag = $("#message_SendToMinimail")
+		flag = $("#userMessage_SendToMinimail")
 		equal flag.attr("disabled"), "disabled"
 		$("#messageReceiverComboBox option:last").attr("selected", "selected")
 		$("#messageReceiverComboBox").change()

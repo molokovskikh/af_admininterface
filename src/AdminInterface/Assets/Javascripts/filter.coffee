@@ -2,7 +2,7 @@
 	allLabel = "Показать для всех"
 	currentLabel = "Показать только для текущего"
 
-	$(".filter a").click ->
+	$(".filter a[data-filter]").click ->
 		currentFilter = $(".current-filter")
 		if currentFilter.length
 			unfilter()

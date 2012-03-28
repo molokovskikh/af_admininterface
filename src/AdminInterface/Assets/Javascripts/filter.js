@@ -3,7 +3,7 @@
     var allLabel, currentLabel, filter, unfilter;
     allLabel = "Показать для всех";
     currentLabel = "Показать только для текущего";
-    $(".filter a").click(function() {
+    $(".filter a[data-filter]").click(function() {
       var currentFilter;
       currentFilter = $(".current-filter");
       if (currentFilter.length) {
