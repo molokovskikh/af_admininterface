@@ -1,0 +1,44 @@
+<html>
+	<head>
+			<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+			<script src="http://code.jquery.com/jquery-latest.js"></script>
+			<script src="http://code.jquery.com/qunit/git/qunit.js"></script>
+			<script src="../src/AdminInterface/Assets/Javascripts/table.editor.js"></script>
+			<script type="" src="table.editor.js"></script>
+			<link rel="stylesheet" href="http://code.jquery.com/qunit/git/qunit.css"></link>
+	</head>
+	<body>
+		<h1 id="qunit-header">QUnit example</h1>
+		<h2 id="qunit-banner"></h2>
+		<div id="qunit-testrunner-toolbar"></div>
+		<h2 id="qunit-userAgent"></h2>
+		<ol id="qunit-tests"></ol>
+		<div id="qunit-fixture">test markup, will be hidden</div>
+	</body>
+
+	<table id=empty class="DataTable inline-editable" data-name="название">
+	</table>
+
+	<table id=row1 class="DataTable inline-editable" data-name="название">
+		<thead>
+			<tr>
+				<th>
+					<a class=new href="javascript:">Новый</a>
+				</th>
+				<th>
+					Название
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>
+					<a class=delete href="javascript:">Удалить</a>
+				</td>
+				<td>
+					<input name="items[0].Name">
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</html>

@@ -4,33 +4,8 @@
 
 <% component Bubble, {@bredcrumbs : []} %>
 
-<% emptyTemplate = "<tr><td class='EmptyData'>Нет ни одного. <a class='new' href='javascript:'>Создать?</a></td></tr>" %>
+${app.Asset("table.editor.js")}
 
-<script type="text/javascript">
-	$(function () {
-		$("a.new").live('click', function () {
-			var body = $($(this).parents("tbody").get(0));
-			var index = body.children().length - 1;
-			if (index == 0) {
-				body.children().remove();
-				var name = body.parent().attr("data-name");
-				body.append("<tr><td><a class='new' href='javascript:'>Новый</a></td><th>" + name + "</th>");
-			}
-
-			body.append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='items[" + index + "].Name' type='text'></input></td></tr>");
-		});
-
-		$("a.delete").live('click', function () {
-			var body = $(this).parents("tbody").get(0);
-			$(this).parents("tr").remove();
-			var index = $(body).children().length - 1;
-			if (index == 0) {
-				$(body).children().remove();
-				$(body).append("${emptyTemplate}");
-			}
-		});
-	});
-</script>
 <style>
 	input[type=text]
 	{
@@ -61,6 +36,6 @@
 
 <% for setting in settings: %>
 <div id="${setting.Id}-tab" class="tab">
-	<% OutputSubView("/Templates/Settings", {@id: setting.Id, @name: setting.Name, @items: setting.Items, @emptyTemplate: emptyTemplate}) %>
+	<% OutputSubView("/Templates/Settings", {@id: setting.Id, @name: setting.Name, @items: setting.Items}) %>
 </div>
 <% end %>

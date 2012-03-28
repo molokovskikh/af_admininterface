@@ -399,6 +399,7 @@
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
     <Content Include="Assets\Javascripts\payer.send.message.coffee" />
     <Content Include="Assets\Javascripts\request.coffee" />
+    <Content Include="Assets\Javascripts\table.editor.js" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
