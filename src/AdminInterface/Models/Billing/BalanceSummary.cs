@@ -20,14 +20,16 @@ namespace AdminInterface.Models.Billing
 				.Select(i => new { i.Id, i.Date, i.Sum, IsInvoice = true, IsAct = false, IsPayment = false, IsOperation = false, Object  = (object)i, Comment = "" })
 				.Union(payments.Select(p => new { p.Id, Date = p.PayedOn, p.Sum, IsInvoice = false, IsAct = false, IsPayment = true, IsOperation = false, Object = (object)p, Comment = "" }))
 				.Union(acts.Select(a => new { a.Id, Date = a.ActDate, a.Sum, IsInvoice = false, IsAct = true, IsPayment = false, IsOperation = false, Object = (object)a, Comment = "" }))
-				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = true,
+				.Union(refunds.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum),
+					IsInvoice = true,
 					IsAct = false,
 					IsPayment = false,
 					IsOperation = true,
 					Object = (object)d,
 					Comment = BindingHelper.GetDescription(d.Type) 
 				}))
-				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum), IsInvoice = false,
+				.Union(reliefs.Select(d => new { d.Id, d.Date, Sum = Decimal.Negate(d.Sum),
+					IsInvoice = false,
 					IsAct = true,
 					IsPayment = false,
 					IsOperation = true,
@@ -49,7 +51,15 @@ namespace AdminInterface.Models.Billing
 			Total += Before;
 
 			Items = items.OrderBy(i => i.Date).ToList();
+
+			TotalAct = items.Where(i => i.IsAct).Sum(i => i.Sum);
+			TotalInvoice = items.Where(i => i.IsInvoice).Sum(i => i.Sum);
+			TotalPayment = items.Where(i => i.IsPayment).Sum(i => i.Sum);
 		}
+
+		public decimal TotalInvoice;
+		public decimal TotalAct;
+		public decimal TotalPayment;
 
 		public decimal Before { get; private set; }
 		public decimal Total { get; private set; }

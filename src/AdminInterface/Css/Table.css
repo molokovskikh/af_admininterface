@@ -69,3 +69,7 @@ th a.sort.desc
 {
 	background-color: #F6F6F6;
 }
+
+.currency {
+	text-align:right;
+}

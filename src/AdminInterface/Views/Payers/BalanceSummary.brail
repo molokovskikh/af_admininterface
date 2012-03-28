@@ -85,7 +85,7 @@
 				<th></th>
 				<th></th>
 				<th></th>
-				<th style="text-align:right;">Начальное сальдо ${before.ToString("C")}</th>
+				<th class=currency>Начальное сальдо ${before.ToString("C")}</th>
 				<th></th>
 			</tr>
 		<% end %>
@@ -120,7 +120,7 @@
 			<td>${item.Date.ToShortDateString()}</td>
 
 			<% if item.IsInvoice: %>
-			<td style="text-align:right;">
+			<td class=currency>
 				${item.Sum.ToString("C")}
 				<% if item.Comment: %>
 					(${item.Comment})
@@ -131,7 +131,7 @@
 			<% end %>
 
 			<% if item.IsPayment: %>
-			<td style="text-align:right;">
+			<td class=currency>
 				${item.Sum.ToString("C")}
 				<% if item.Comment: %>
 					(${item.Comment})
@@ -142,7 +142,7 @@
 			<% end %>
 
 			<% if item.IsAct: %>
-			<td style="text-align:right;">
+			<td class=currency>
 				${item.Sum.ToString("C")}
 				<% if item.Comment: %>
 					(${item.Comment})
@@ -157,10 +157,18 @@
 	<% if ?total: %>
 	<tfoot>
 		<tr>
+			<th>Итого</th>
+			<th></th>
+			<th></th>
+			<th class=currency>${summary.TotalInvoice.ToString("C")}</th>
+			<th class=currency>${summary.TotalPayment.ToString("C")}</th>
+			<th class=currency>${summary.TotalAct.ToString("C")}</th>
+		</tr>
+		<tr>
 			<th></th>
 			<th></th>
 			<th></th>
-			<th style="text-align:right;">Конечное сальдо ${total.ToString("C")}</th>
+			<th class=currency>Конечное сальдо ${total.ToString("C")}</th>
 			<th></th>
 			<th></th>
 		</tr>

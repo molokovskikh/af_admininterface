@@ -41,6 +41,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["operation"] = new BalanceOperation(payer);
 			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = summary.Items;
+			PropertyBag["summary"] = summary;
 
 			if (summary.Before != 0)
 				PropertyBag["before"] = summary.Before;
