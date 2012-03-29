@@ -141,7 +141,7 @@
 				<input type=hidden name=clientCode value=${Client.Id} />
 				<% haveUin = Client.HaveUin() %>
 				<% if haveUin: %>
-					Причина:<input class=required type=text name=reason/>
+					Причина:<input class="required" type="text" name="reason">
 				<% else: %> 
 					<span style="color:Green;">Идентификатор не присвоен</span>
 				<% end %>

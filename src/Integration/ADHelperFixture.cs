@@ -124,20 +124,11 @@ namespace Integration
 			var accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
 			Assert.That(accessibleComputers.Count, Is.EqualTo(0));
 
-			var count = 0;
-			foreach (var computer in computers)
-			{
-				ADHelper.AddAccessibleComputer("KvasovT", computer);
-				count++;
-				accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
-				Assert.That(accessibleComputers.Count, Is.EqualTo(count));
-				Assert.IsTrue(accessibleComputers.Contains(computer));
-			}
+			ADHelper.SetAccessibleComputer("KvasovT", computers);
 
 			// Пробуем добавить FMS, но он не должен добавиться т.к. доступ к нему уже есть
-			ADHelper.AddAccessibleComputer("KvasovT", computers[0]);
 			accessibleComputers = ADHelper.GetAccessibleComputers("KvasovT");
-			Assert.That(accessibleComputers.Count, Is.EqualTo(count));
+			Assert.That(accessibleComputers.Count, Is.EqualTo(computers.Length));
 		}
 
 		[Test]

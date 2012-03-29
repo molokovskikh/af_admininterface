@@ -180,21 +180,16 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				using (var scope = new TransactionScope(OnDispose.Rollback))
+				if (message.Id != 0)
 				{
-					DbLogHelper.SetupParametersForTriggerLogging();
-					if (message.Id != 0)
-					{
-						var user = User.Find(message.Id);
+					var user = User.Find(message.Id);
+					SendMessageToUser(user, message);
+				}
+				else
+				{
+					var payer = Payer.Find(billingCode);
+					foreach (var user in payer.Users)
 						SendMessageToUser(user, message);
-					}
-					else
-					{
-						var payer = Payer.Find(billingCode);
-						foreach (var user in payer.Users)
-							SendMessageToUser(user, message);
-					}
-					scope.VoteCommit();
 				}
 				if (message.Mail)
 					Mailer.SendMessageFromBillingToClient(message);

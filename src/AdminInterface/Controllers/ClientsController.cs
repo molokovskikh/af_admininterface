@@ -245,19 +245,9 @@ where Phone like :phone")
 		public void ResetUin(uint clientCode, string reason)
 		{
 			var client = Client.FindAndCheck(clientCode);
-
-			using (new TransactionScope())
-			{
-				DbLogHelper.SetupParametersForTriggerLogging(
-					new {
-						inHost = Request.UserHostAddress,
-						inUser = Admin.UserName,
-						ResetIdCause = reason
-					});
-				ClientInfoLogEntity.ReseteUin(client, reason).Save();
-				client.ResetUin();
-				RedirectToReferrer();
-			}
+			ClientInfoLogEntity.ReseteUin(client, reason).Save();
+			client.ResetUin();
+			RedirectToReferrer();
 		}
 
 		[AccessibleThrough(Verb.Get)]

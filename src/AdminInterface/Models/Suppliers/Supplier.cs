@@ -17,6 +17,7 @@ using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
@@ -57,7 +58,7 @@ namespace AdminInterface.Models.Suppliers
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
-		[Property, Auditable, Description("Регионы работы")]
+		[Property, Auditable, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы")]
 		public virtual ulong RegionMask { get; set; }
 
 		[BelongsTo, Auditable, Description("Домашний регион")]

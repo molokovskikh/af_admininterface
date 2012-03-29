@@ -291,6 +291,11 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 				</td>
 			</tr>
 			<tr>
+				<td colspan="2">
+					${app.Edit("client.Settings.IgnoreNewPriceForUser")}
+				</td>
+			</tr>
+			<tr>
 				<td width="50%">
 					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
 					Выбрать существующего плательщика
@@ -355,9 +360,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	
 	<div class="block">
 		<h3>Региональная настройка</h3>
-		<%if IsDefined("client"): %>
 		${app.GetValidationError(client, "MaskRegion")}
-		<%end %>
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 

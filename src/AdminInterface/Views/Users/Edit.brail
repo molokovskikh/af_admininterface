@@ -150,6 +150,7 @@
 			
 			${app.Label("user.Name")}<br>
 			${app.Edit("user.Name")}<br>
+			${app.GetValidationErrot("user.Name")}<br>
 		</div>
 		
 		<div class=block>

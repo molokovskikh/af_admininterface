@@ -214,6 +214,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	
 	<div class="block">
 		<h3>Региональная настройка</h3>
+		${app.GetValidationError("supplier.RegionMask")}
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 

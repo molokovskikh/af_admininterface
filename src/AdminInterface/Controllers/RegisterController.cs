@@ -86,23 +86,24 @@ namespace AdminInterface.Controllers
 							organization.Name = currentPayer.Name;
 							organization.FullName = currentPayer.JuridicalName;
 							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
-							organization.Save();
 						}
 					}
 				}
 
 				supplier.RegionMask = regionSettings.GetBrowseMask();
-				if (supplier.RegionMask == 0)
-					throw new Exception("Попытка зарегистрировать поставщика без регионов работы");
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.Account = new SupplierAccount(supplier);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Admin);
-				if (currentPayer == null)
-				{
-					currentPayer = new Payer(supplier.Name, supplier.FullName);
-					currentPayer.Save();
+
+				if (!IsValid(supplier)) {
+					RegisterSupplier();
+					PropertyBag["supplier"] = supplier;
+					return;
 				}
+
+				if (currentPayer == null)
+					currentPayer = new Payer(supplier.Name, supplier.FullName);
 
 				currentPayer.Suppliers.Add(supplier);
 				supplier.Payer = currentPayer;
@@ -283,7 +284,7 @@ namespace AdminInterface.Controllers
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
-				CreateDrugstore(newClient, client, additionalSettings, regionSettings.GetOrderMask(), supplier);
+				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
@@ -344,7 +345,7 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private void CreateDrugstore(Client client, Client bindedClient, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
+		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
 		{
 			var costCrypKey = ArHelper.WithSession(s =>
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
@@ -358,11 +359,10 @@ namespace AdminInterface.Controllers
 					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
 				WorkRegionMask = client.MaskRegion,
 				OrderRegionMask = orderMask,
-				ServiceClient = bindedClient.Settings.ServiceClient,
 				BasecostPassword = costCrypKey,
-				IgnoreNewPrices = bindedClient.Settings.IgnoreNewPrices,
 				SmartOrderRules = smartOrder
 			};
+			BindObjectInstance(client.Settings, "client.Settings");
 
 			if (additionalSettings.ShowForOneSupplier)
 			{

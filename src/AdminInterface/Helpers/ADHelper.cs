@@ -69,7 +69,7 @@ namespace AdminInterface.Helpers
 		bool IsLoginExists(string userName);
 		bool[,] GetLogonHours(string userName);
 		IList<string> GetAccessibleComputers(string userName);
-		void AddAccessibleComputer(string userName, string computer);
+		void SetAccessibleComputer(string userName, IEnumerable<string> workstations);
 	}
 
 	public class MemoryUserStorage : IUserStorage
@@ -116,11 +116,11 @@ namespace AdminInterface.Helpers
 			return (IList<string>)users[userName]["computers"];
 		}
 
-		public void AddAccessibleComputer(string userName, string computer)
+		public void SetAccessibleComputer(string userName, IEnumerable<string> workstations)
 		{
 			if (!IsLoginExists(userName))
 				return;
-			((List<string>)users[userName]["computers"]).Add(computer);
+			users[userName]["computers"] = workstations.ToList();
 		}
 	}
 
@@ -200,9 +200,9 @@ namespace AdminInterface.Helpers
 			return ADHelper.GetAccessibleComputers(userName);
 		}
 
-		public void AddAccessibleComputer(string userName, string computer)
+		public void SetAccessibleComputer(string userName, IEnumerable<string> workstations)
 		{
-			ADHelper.AddAccessibleComputer(userName, computer);
+			ADHelper.SetAccessibleComputer(userName, workstations);
 		}
 	}
 
@@ -549,23 +549,10 @@ namespace AdminInterface.Helpers
 			return computers;
 		}
 
-		public static void AddAccessibleComputer(string login, string computerName)
+		public static void SetAccessibleComputer(string login, IEnumerable<string> workstations)
 		{
 			var entry = GetDirectoryEntry(login);
-			var workstations = entry.Properties["userWorkstations"];
-			if (workstations.Count == 0)
-			{
-				entry.Properties["userWorkstations"].Add(computerName);
-				entry.CommitChanges();
-				return;
-			}
-			foreach (var workstation in workstations)
-			{
-				var names = workstation.ToString().ToUpper().Split(',');
-				if (names.Contains(computerName.ToUpper()))
-					return;
-			}
-			entry.Properties["userWorkstations"][0] = String.Format("{0},{1}", entry.Properties["userWorkstations"][0], computerName);
+			entry.Properties["userWorkstations"][0] = workstations.Implode(",");
 			entry.CommitChanges();
 		}
 

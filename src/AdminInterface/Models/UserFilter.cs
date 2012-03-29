@@ -197,11 +197,11 @@ left join Future.Addresses a on a.Id = ua.AddressId";
 			switch (status)
 			{
 				case SearchClientStatus.Enabled: {
-					filter = AddFilterCriteria(filter, " u.Enabled = 1 ");
+					filter = AddFilterCriteria(filter, " u.Enabled = 1 and s.Disabled = 0");
 					break;
 				}
 				case SearchClientStatus.Disabled: {
-					filter = AddFilterCriteria(filter, " u.Enabled = 0 ");
+					filter = AddFilterCriteria(filter, " (u.Enabled = 0 or s.Disabled = 1)");
 					break;
 				}
 			}

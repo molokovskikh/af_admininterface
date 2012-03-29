@@ -57,50 +57,43 @@ namespace AdminInterface.Controllers
 			[DataBind("machines")] string[] machines,
 			[DataBind("logonHours")] bool[] weekLogonHours)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			var admin = new Administrator {
+				UserName = administrator.UserName,
+				Department = administrator.Department,
+				Email = String.IsNullOrEmpty(administrator.Email) ? String.Empty : administrator.Email,
+				InternalPhone = administrator.InternalPhone,
+				ManagerName = administrator.ManagerName,
+				PhoneSupport = administrator.PhoneSupport,
+				AllowedPermissions = new List<Permission>(),
+			};
+			if (administrator.AllowedPermissions != null)
+				foreach (var permission in administrator.AllowedPermissions)
+					admin.AllowedPermissions.Add(permission);
+			var countAccessibleRegions = 0;
+			foreach (var region in accessibleRegions)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-				var admin = new Administrator {
-					UserName = administrator.UserName,
-					Department = administrator.Department,
-					Email = String.IsNullOrEmpty(administrator.Email) ? String.Empty : administrator.Email,
-					InternalPhone = administrator.InternalPhone,
-					ManagerName = administrator.ManagerName,
-					PhoneSupport = administrator.PhoneSupport,
-					AllowedPermissions = new List<Permission>(),
-				};
-				if (administrator.AllowedPermissions != null)
-					foreach (var permission in administrator.AllowedPermissions)
-						admin.AllowedPermissions.Add(permission);
-				var countAccessibleRegions = 0;
-				foreach (var region in accessibleRegions)
+				if (region.IsAvaliableForBrowse)
 				{
-					if (region.IsAvaliableForBrowse)
-					{
-						admin.RegionMask |= Convert.ToUInt64(region.Id);
-						countAccessibleRegions++;
-					}
-					else
-						admin.RegionMask &= ~Convert.ToUInt64(region.Id);
+					admin.RegionMask |= Convert.ToUInt64(region.Id);
+					countAccessibleRegions++;
 				}
-				if (countAccessibleRegions == accessibleRegions.Count())
-					admin.RegionMask = UInt64.MaxValue;
-				admin.Save();
-				new RedmineUser(admin).Save();
-				var isLoginCreated = CreateUserInAD(admin);
-
-				foreach (var computer in machines)
-					Storage.AddAccessibleComputer(admin.UserName, computer);
-				Administrator.SetLogonHours(admin.UserName, weekLogonHours);
-
-				scope.VoteCommit();
-				Mailer.RegionalAdminCreated(admin);
-
-				if (isLoginCreated)
-					RedirectToUrl(@"/OfficeUserRegistrationReport.aspx");
 				else
-					RedirectToUrl("~/ViewAdministrators.aspx");
+					admin.RegionMask &= ~Convert.ToUInt64(region.Id);
 			}
+			if (countAccessibleRegions == accessibleRegions.Count())
+				admin.RegionMask = UInt64.MaxValue;
+			admin.Save();
+			new RedmineUser(admin).Save();
+			var isLoginCreated = CreateUserInAD(admin);
+
+			UpdateAd(administrator, machines, weekLogonHours);
+
+			Mailer.RegionalAdminCreated(admin);
+
+			if (isLoginCreated)
+				RedirectToUrl(@"/OfficeUserRegistrationReport.aspx");
+			else
+				RedirectToUrl("~/ViewAdministrators.aspx");
 		}
 
 		public void Edit(uint id)
@@ -125,33 +118,30 @@ namespace AdminInterface.Controllers
 			[DataBind("machines")] string[] machines,
 			[DataBind("logonHours")] bool[] weekLogonHours)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			var countAccessibleRegions = 0;
+			foreach (var region in accessibleRegions)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-
-				var countAccessibleRegions = 0;
-				foreach (var region in accessibleRegions)
+				if (region.IsAvaliableForBrowse)
 				{
-					if (region.IsAvaliableForBrowse)
-					{
-						administrator.RegionMask |= Convert.ToUInt64(region.Id);
-						countAccessibleRegions++;
-					}
-					else
-						administrator.RegionMask &= ~Convert.ToUInt64(region.Id);
+					administrator.RegionMask |= Convert.ToUInt64(region.Id);
+					countAccessibleRegions++;
 				}
-				if (countAccessibleRegions == accessibleRegions.Count())
-					administrator.RegionMask = UInt64.MaxValue;
-
-				administrator.Update();
-				foreach (var computer in machines)
-					Storage.AddAccessibleComputer(administrator.UserName, computer);
-
-				Administrator.SetLogonHours(administrator.UserName, weekLogonHours);
-				scope.VoteCommit();
+				else
+					administrator.RegionMask &= ~Convert.ToUInt64(region.Id);
 			}
+			if (countAccessibleRegions == accessibleRegions.Count())
+				administrator.RegionMask = UInt64.MaxValue;
+
+			administrator.Update();
+			UpdateAd(administrator, machines, weekLogonHours);
 			Notify("Сохранено");
 			RedirectUsingRoute("RegionalAdmin", "Edit", new { id = administrator.Id });
+		}
+
+		private void UpdateAd(Administrator administrator, string[] machines, bool[] weekLogonHours)
+		{
+			Storage.SetAccessibleComputer(administrator.UserName, machines);
+			Administrator.SetLogonHours(administrator.UserName, weekLogonHours);
 		}
 
 		public void GetDefaultPermissions(string departmentDescription)
