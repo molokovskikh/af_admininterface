@@ -203,6 +203,7 @@
 
 			<div class="block">
 				<h3>Региональная настройка</h3>
+				${app.GetValidationError("client.MaskRegion")}
 				<% OutputSubView("/SubViews/Regions") %>
 			</div>
 

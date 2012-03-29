@@ -137,33 +137,6 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		[AccessibleThrough(Verb.Post)]
-		public void UpdateDrugstore(
-			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
-			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
-			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			ulong homeRegion)
-		{
-			Admin.CheckClientPermission(client);
-
-			var oldMaskRegion = client.MaskRegion;
-			client.HomeRegion = Region.Find(homeRegion);
-			client.UpdateRegionSettings(regionSettings);
-				
-			if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
-			{
-				var smartOrder = SmartOrderRules.TestSmartOrder();
-				drugstore.SmartOrderRules = smartOrder;
-			}
-			client.Save();
-			drugstore.UpdateAndFlush();
-			if (oldMaskRegion != client.MaskRegion)
-				client.MaintainIntersection();
-
-			Notify("Сохранено");
-			RedirectToUrl(String.Format("../client/{0}", client.Id));
-		}
-
 		public void SuppliersForCostNoising(uint clientId)
 		{
 			CancelLayout();
@@ -253,12 +226,46 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			var client = Client.Find(id);
+			var client = Client.FindAndCheck(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
 			PropertyBag["regions"] = regions;
 			PropertyBag["drugstore"] = drugstore;
+		}
+
+		[AccessibleThrough(Verb.Post)]
+		public void UpdateDrugstore(
+			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
+			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
+			[DataBind("regionSettings")] RegionSettings[] regionSettings,
+			ulong homeRegion)
+		{
+			Admin.CheckClientPermission(client);
+
+			var oldMaskRegion = client.MaskRegion;
+			client.HomeRegion = Region.Find(homeRegion);
+			client.UpdateRegionSettings(regionSettings);
+
+			if (!IsValid(client)) {
+				Settings(client.Id);
+				PropertyBag["client"] = client;
+				RenderView("Settings");
+				return;
+			}
+				
+			if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
+			{
+				var smartOrder = SmartOrderRules.TestSmartOrder();
+				drugstore.SmartOrderRules = smartOrder;
+			}
+			client.Save();
+			drugstore.UpdateAndFlush();
+			if (oldMaskRegion != client.MaskRegion)
+				client.MaintainIntersection();
+
+			Notify("Сохранено");
+			RedirectTo(client);
 		}
 
 		public void NotifySuppliers(uint clientId)
