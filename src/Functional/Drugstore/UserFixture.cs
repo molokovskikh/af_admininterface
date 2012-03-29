@@ -568,6 +568,7 @@ namespace Functional.Drugstore
 		public void Validate_email_list_for_sending_registration_card()
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
+			FillRequiredFields();
 			browser.TextField(Find.ByName("mails")).TypeText("asjkdf sdfj34kjl 4 ./4,524,l5; ");
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Поле содержит некорректный адрес электронной почты"));
@@ -604,6 +605,12 @@ namespace Functional.Drugstore
 			browser.CheckBox(Find.ByName("sendClientCard")).Checked = true;
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
 			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
+			FillRequiredFields();
+		}
+
+		private void FillRequiredFields()
+		{
+			Css("#user_Name").TypeText("Тестовый пользователь");
 		}
 
 		[Test]
@@ -631,6 +638,7 @@ namespace Functional.Drugstore
 		public void Create_user_with_contact_person_info()
 		{
 			browser.Link(Find.ByText("Новый пользователь")).Click();
+			FillRequiredFields();
 			browser.Link("addPersonLink").Click();
 			browser.TextField(Find.ByName(String.Format("persons[-1].Name"))).TypeText("Alice");
 			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
@@ -650,34 +658,32 @@ namespace Functional.Drugstore
 		[Test]
 		public void Update_person_contact_info()
 		{
-			var client = DataMother.TestClient();
-			using (var browser = Open(String.Format("client/{0}", client.Id)))
-			{
-				Click("Новый пользователь");
-				browser.Link("addPersonLink").Click();
-				browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
-				browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
-				browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
-				browser.Button(Find.ByValue("Создать")).Click();
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var user = client.Users[0];
-					browser.Link(Find.ByText(user.Id.ToString())).Click();
-					var group = client.Users[0].ContactGroup;
-					Assert.That(browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).Text, Is.EqualTo("Alice"));
-					browser.TextField(Find.ByName(String.Format("persons[{0}].Name", group.Persons[0].Id))).TypeText("Alice modified");
-					browser.Button(Find.ByValue("Сохранить")).Click();
-					Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-				}
-				using (new SessionScope())
-				{
-					client = Client.Find(client.Id);
-					var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
-					Assert.That(persons.Count, Is.EqualTo(1));
-					Assert.That(persons[0].Name, Is.EqualTo("Alice modified"));
-				}
-			}
+			Click("Новый пользователь");
+
+			FillRequiredFields();
+			browser.Link("addPersonLink").Click();
+			browser.TextField(Find.ByName("persons[-1].Name")).TypeText("Alice");
+			browser.TextField(Find.ByName("mails")).TypeText("KvasovTest@analit.net");
+			browser.TextField(Find.ByName("address.Value")).TypeText("TestAddress");
+			browser.Button(Find.ByValue("Создать")).Click();
+			AssertText("Пользователь создан");
+
+			Open(client);
+
+			client.Refresh();
+			var user = client.Users[1];
+			browser.Link(Find.ByText(user.Id.ToString())).Click();
+			var group = user.ContactGroup;
+			var person = @group.Persons[0];
+			Assert.That(browser.TextField(Find.ByName(String.Format("persons[{0}].Name", person.Id))).Text, Is.EqualTo("Alice"));
+			browser.TextField(Find.ByName(String.Format("persons[{0}].Name", person.Id))).TypeText("Alice modified");
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
+			var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
+			Assert.That(persons.Count, Is.EqualTo(1));
+			person.Refresh();
+			Assert.That(persons[0].Name, Is.EqualTo("Alice modified"));
 		}
 
 		[Test]
