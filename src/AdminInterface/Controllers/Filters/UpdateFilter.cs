@@ -106,6 +106,9 @@ namespace AdminInterface.Controllers.Filters
 				criteria.Add(Restrictions.Gt(Projections2.BitOr("u.WorkRegionMask", regionMask), 0));
 				ApplySort(criteria);
 
+				if (SortBy != "RequestTime")
+					criteria.AddOrder(Order.Desc("RequestTime"));
+
 				return criteria.ToList<UpdateLogView>();
 			});
 
@@ -123,6 +126,11 @@ namespace AdminInterface.Controllers.Filters
 					items = items.OrderByDescending(i => i.Region).ToList();
 				else
 					items = items.OrderBy(i => i.Region).ToList();
+
+				var bufList = new List<UpdateLogView>();
+				var groupItems = items.GroupBy(i => i.Region);
+				groupItems.Each(g => bufList.AddRange(g.OrderByDescending(i => i.RequestTime).ToList()));
+				items = bufList;
 			}
 			return items;
 		}
