@@ -68,8 +68,9 @@ namespace AdminInterface.Controllers
 			string mails)
 		{
 			var client = Client.FindAndCheck(clientId);
-			var user = new User(client);
+			var user = new User((Service)client);
 			BindObjectInstance(user, "user");
+			user.Init(client);
 
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;

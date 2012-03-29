@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord.Framework;
@@ -86,6 +87,25 @@ namespace Integration.Controllers
 			var user = Registred();
 			var messages = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
+		}
+
+		[Test]
+		public void Register_user_for_client_with_multyplay_payers()
+		{
+			client = DataMother.CreateTestClientWithUser();
+			var payer = new Payer("Тестовый плательщик");
+			payer.Save();
+			client.Payers.Add(payer);
+			client.Save();
+			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
+			controller.Add(new Contact[0], new[] {
+					new RegionSettings {
+						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
+					},
+				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+
+			var user = Registred();
+			Assert.That(user.Payer, Is.EqualTo(payer));
 		}
 
 		[Test]

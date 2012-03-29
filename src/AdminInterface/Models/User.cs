@@ -430,9 +430,6 @@ namespace AdminInterface.Models
 				if (client.Payers.Count > 1)
 					throw new Exception(String.Format("У клиента более одного плательщика {0}", client.Payers.Implode()));
 				Payer = client.Payers.Single();
-				if (Payer.Users == null)
-					Payer.Users = new List<User>();
-
 				if (!Payer.Users.Any(u => u == this))
 					Payer.Users.Add(this);
 			}
