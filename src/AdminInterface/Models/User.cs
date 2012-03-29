@@ -124,20 +124,8 @@ namespace AdminInterface.Models
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Комментарий"), Auditable, ValidateNonEmpty]
-		public virtual string Name
-		{
-			get
-			{
-				if (String.IsNullOrEmpty(_name))
-					return Login;
-				return _name;
-			}
-			set
-			{
-				_name = value;
-			}
-		}
+		[Property, Description("Комментарий"), Auditable, ValidateNonEmpty]
+		public virtual string Name { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Включен"), Auditable]
 		public virtual bool Enabled

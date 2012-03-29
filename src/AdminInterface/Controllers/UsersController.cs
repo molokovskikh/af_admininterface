@@ -70,6 +70,13 @@ namespace AdminInterface.Controllers
 			var client = Client.FindAndCheck(clientId);
 			var user = new User((Service)client);
 			BindObjectInstance(user, "user");
+
+			if (!IsValid(user)) {
+				Add(client.Id);
+				PropertyBag["user"] = user;
+				return;
+			}
+
 			user.Init(client);
 
 			string password;
@@ -196,6 +203,12 @@ namespace AdminInterface.Controllers
 			[DataBind("persons")] Person[] persons,
 			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
+			if (!IsValid(user)) {
+				Edit(user.Id);
+				RenderView("Edit");
+				return;
+			}
+
 			user.WorkRegionMask = workRegions.Aggregate(0UL, (v, a) => a + v);
 			user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 			user.UpdateContacts(contacts, deletedContacts);
