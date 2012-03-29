@@ -85,6 +85,15 @@ namespace AddUser {
         protected global::System.Web.UI.WebControls.CheckBox ShowAllRegionsCheck;
         
         /// <summary>
+        /// RegionValidationError control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Label RegionValidationError;
+        
+        /// <summary>
         /// WorkRegionList control.
         /// </summary>
         /// <remarks>

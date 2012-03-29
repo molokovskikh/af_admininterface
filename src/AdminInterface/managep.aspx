@@ -119,6 +119,9 @@
 					<label for="WRList">
 						Доступные регионы:
 					</label>
+					<div>
+						<asp:Label runat="server" ForeColor="Red" ID="RegionValidationError" Visible="False">Вы не выбрали регионы работы</asp:Label>
+					</div>
 					<asp:CheckBoxList ID="WorkRegionList" runat="server" BorderStyle="None" DataMember="EnableRegions"
 						DataTextField="Region" DataValueField="RegionCode" CellSpacing="0" CellPadding="0">
 					</asp:CheckBoxList>

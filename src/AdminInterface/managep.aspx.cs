@@ -236,6 +236,12 @@ order by r.Region;";
 
 		protected void SaveButton_Click(object sender, EventArgs e)
 		{
+			if (!WorkRegionList.Items.Cast<ListItem>().Any(i => i.Selected)) {
+				RegionValidationError.Visible = true;
+				return;
+			}
+
+			RegionValidationError.Visible = false;
 			ShowAllRegionsCheck.Checked = false;
 			UpdateHomeRegion();
 			UpdateMaskRegion();
