@@ -88,7 +88,9 @@
 			<tbody id="SearchResults" class="HighLightCurrentRow">
 			<% for i,item in enumerate(searchResults): %>
 				<tr class="${ViewHelper.GetRowStyle(i)} ${'DisabledByBilling' if item.Disabled} ${'DisabledInAd' if(item.IsLoginExists and item.IsDisabled)} ${'LockedUser' if(item.IsLoginExists and item.IsLocked)} ${'NotExistsUser' if(not item.IsLoginExists)}">
-					<td><a href="${siteroot}/Payers/${item.PayerId}?ClientCode=${item.ClientId}">${item.PayerId}</a></td>
+					<td>
+						${app.LinkTo(item.PayerId.ToString(), @Payers, @Show, {@ClientCode: item.ClientId, @id: item.PayerId})}
+					</td>
 					<td>${item.ClientId}</td>
 					<td>${item.UserId}</td>
 					<td>
