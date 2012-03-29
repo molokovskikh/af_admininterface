@@ -284,7 +284,7 @@ namespace AdminInterface.Controllers
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
-				CreateDrugstore(newClient, client, additionalSettings, regionSettings.GetOrderMask(), supplier);
+				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, userName, permissions, userPersons);
@@ -345,7 +345,7 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private void CreateDrugstore(Client client, Client bindedClient, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
+		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
 		{
 			var costCrypKey = ArHelper.WithSession(s =>
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
@@ -359,11 +359,10 @@ namespace AdminInterface.Controllers
 					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
 				WorkRegionMask = client.MaskRegion,
 				OrderRegionMask = orderMask,
-				ServiceClient = bindedClient.Settings.ServiceClient,
 				BasecostPassword = costCrypKey,
-				IgnoreNewPrices = bindedClient.Settings.IgnoreNewPrices,
 				SmartOrderRules = smartOrder
 			};
+			BindObjectInstance(client.Settings, "client.Settings");
 
 			if (additionalSettings.ShowForOneSupplier)
 			{
