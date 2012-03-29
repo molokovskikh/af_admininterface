@@ -18,6 +18,8 @@
 		<div class=block>
 			${app.Label("user.Name")}<br>
 			${app.Edit("user.Name")}<br>
+			${app.GetValidationError("user.Name")}<br>
+
 			${app.Label("user.Payer")}<br>
 			${app.Edit("user.Payer", client.Payers)}<br>
 			${app.Edit("user.SubmitOrders")}<br>

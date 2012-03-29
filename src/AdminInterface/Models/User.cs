@@ -12,6 +12,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
@@ -123,7 +124,7 @@ namespace AdminInterface.Models
 		[Property(NotNull = true), Description("Имя"), Auditable]
 		public virtual string Login { get; set; }
 
-		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Комментарий"), Auditable]
+		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Description("Комментарий"), Auditable, ValidateNonEmpty]
 		public virtual string Name
 		{
 			get
