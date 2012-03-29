@@ -43,9 +43,6 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual decimal UpCost { get; set; }
 
-		[Property]
-		public virtual bool AlowInt { get; set; }
-
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }
 
@@ -58,8 +55,7 @@ namespace AdminInterface.Models.Suppliers
 		public virtual void AddCost()
 		{
 			var isBase = Costs.Count == 0;
-			Costs.Add(new Cost
-			{
+			Costs.Add(new Cost {
 				Price = this,
 				BaseCost = isBase,
 				PriceItem = new PriceItem { FormRule = new FormRule() }

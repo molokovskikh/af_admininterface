@@ -90,9 +90,9 @@
 									<asp:CheckBox ID="InWorkCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("Enabled")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
-							<asp:TemplateField HeaderText="Интегр.">
+							<asp:TemplateField HeaderText="Матрица">
 								<ItemTemplate>
-									<asp:CheckBox ID="IntegratedCheck" runat="server" Checked='<%# Convert.ToBoolean(Eval("AlowInt")) %>' />
+									<asp:CheckBox ID="BuyingMatrix" runat="server" Checked='<%# Convert.ToBoolean(Eval("BuyingMatrix")) %>' />
 								</ItemTemplate>
 							</asp:TemplateField>
 						</Columns>

@@ -90,11 +90,11 @@ SELECT  pd.PriceCode,
 		pd.PriceName,
 		pd.AgencyEnabled,
 		pd.Enabled,
-		pd.AlowInt,
 		pi.PriceDate,
 		pd.UpCost,
 		pd.PriceType,
-		pd.CostType
+		pd.CostType,
+		pd.BuyingMatrix
 FROM pricesdata pd
 	JOIN usersettings.pricescosts pc on pd.PriceCode = pc.PriceCode and pc.BaseCost = 1
 		JOIN usersettings.PriceItems pi on pi.Id = pc.PriceItemId
@@ -220,7 +220,7 @@ order by r.Region;";
 					row["UpCost"] = 0;
 					row["Enabled"] = false;
 					row["AgencyEnabled"] = false;
-					row["AlowInt"] = false;
+					row["BuyingMatrix"] = false;
 					row["PriceType"] = 0;
 					Data.Tables["Prices"].Rows.Add(row);
 					((GridView)sender).DataBind();
@@ -271,7 +271,7 @@ SET UpCost = ?UpCost,
 	CostType = ?CostType,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
-	AlowInt = ?AlowInt,
+	BuyingMatrix = ?BuyingMatrix,
 	FirmCode = ?ClientCode;
 SET @InsertedPriceCode = Last_Insert_ID();
 
@@ -324,7 +324,7 @@ select @NewPriceCostId;
 			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
-			pricesDataAdapter.InsertCommand.Parameters.Add("?AlowInt", MySqlDbType.Bit, 0, "AlowInt");
+			pricesDataAdapter.InsertCommand.Parameters.Add("?BuyingMatrix", MySqlDbType.Bit, 0, "BuyingMatrix");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 			pricesDataAdapter.InsertCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
 
@@ -338,7 +338,7 @@ SET UpCost = ?UpCost,
 	PriceType = ?PriceType,
 	Enabled = ?Enabled,
 	AgencyEnabled = ?AgencyEnabled,
-	AlowInt = ?AlowInt
+	BuyingMatrix = ?BuyingMatrix
 WHERE PriceCode = ?PriceCode;
 
 call UpdateCostType(?PriceCode, ?CostType);
@@ -349,7 +349,7 @@ call UpdateCostType(?PriceCode, ?CostType);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?AgencyEnabled", MySqlDbType.Bit, 0, "AgencyEnabled");
-			pricesDataAdapter.UpdateCommand.Parameters.Add("?AlowInt", MySqlDbType.Bit, 0, "AlowInt");
+			pricesDataAdapter.UpdateCommand.Parameters.Add("?BuyingMatrix", MySqlDbType.Bit, 0, "BuyingMatrix");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
 
@@ -541,8 +541,8 @@ WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.Intersecti
 					Data.Tables["Prices"].DefaultView[i]["AgencyEnabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("EnableCheck")).Checked;
 				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["Enabled"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked)
 					Data.Tables["Prices"].DefaultView[i]["Enabled"] = ((CheckBox)PricesGrid.Rows[i].FindControl("InWorkCheck")).Checked;
-				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["AlowInt"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("IntegratedCheck")).Checked)
-					Data.Tables["Prices"].DefaultView[i]["AlowInt"] = ((CheckBox)PricesGrid.Rows[i].FindControl("IntegratedCheck")).Checked;
+				if (Convert.ToBoolean(Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"]) != ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked)
+					Data.Tables["Prices"].DefaultView[i]["BuyingMatrix"] = ((CheckBox)PricesGrid.Rows[i].FindControl("BuyingMatrix")).Checked;
 				if (Data.Tables["Prices"].DefaultView[i]["CostType"].ToString() != ((DropDownList)PricesGrid.Rows[i].FindControl("CostType")).SelectedValue)
 				{
 					var value = ((DropDownList) PricesGrid.Rows[i].FindControl("CostType")).SelectedValue;
