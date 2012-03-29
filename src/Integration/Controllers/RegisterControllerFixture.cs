@@ -87,6 +87,7 @@ namespace Integration.Controllers
 			DataMother.CreateSupplier().Save();
 
 			Request.Params.Add("user.Accounting.IsFree", "False");
+			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
@@ -118,6 +119,7 @@ namespace Integration.Controllers
 		public void Register_client_without_address()
 		{
 			Request.Params.Add("user.Accounting.IsFree", "False");
+			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
 				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
