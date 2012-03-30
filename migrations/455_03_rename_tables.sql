@@ -1,0 +1,14 @@
+rename table future.addresses to Customers.Addresses;
+rename table future.addressintersection to Customers.Addressintersection;
+rename table future.clients to Customers.Clients;
+rename table future.clienttoaddressmigrations to Customers.ClienttoAddressMigrations;
+rename table future.intersection to Customers.Intersection;
+rename table future.orderrules to Customers.OrderRules;
+rename table future.orderswap to Customers.OrderSwap;
+rename table future.rulegroups to Customers.RuleGroups;
+rename table future.services to Customers.Services;
+rename table future.showusers to Customers.Showusers;
+rename table future.suppliers to Customers.Suppliers;
+rename table future.useraddresses to Customers.UserAddresses;
+rename table future.userprices to Customers.UserPrices;
+rename table future.users to Customers.Users;
