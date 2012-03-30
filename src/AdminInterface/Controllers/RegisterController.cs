@@ -403,7 +403,7 @@ INTO regionaldata
 	)
 SELECT DISTINCT regions.regioncode,
 		s.Id
-FROM (Future.Suppliers s, farm.regions, pricesdata)
+FROM (Customers.Suppliers s, farm.regions, pricesdata)
 	LEFT JOIN regionaldata ON regionaldata.firmcode = s.id AND regionaldata.regioncode = regions.regioncode
 WHERE   pricesdata.firmcode = s.Id
 		AND s.Id = :ClientCode
@@ -418,7 +418,7 @@ INTO pricesregionaldata
 	)
 SELECT DISTINCT regions.regioncode,
 		pricesdata.pricecode
-FROM (Future.Suppliers s, farm.regions, pricesdata)
+FROM (Customers.Suppliers s, farm.regions, pricesdata)
 LEFT JOIN pricesregionaldata
 		ON pricesregionaldata.pricecode = pricesdata.pricecode
 		AND pricesregionaldata.regioncode = regions.regioncode

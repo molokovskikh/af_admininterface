@@ -17,7 +17,7 @@ namespace AdminInterface.Models
 			using (new TransactionScope())
 			{
 				ArHelper.WithSession(s => {
-					s.CreateSQLQuery(@"call future.GetActivePrices(:userid)")
+					s.CreateSQLQuery(@"call Customers.GetActivePrices(:userid)")
 						.SetParameter("userid", user.Id)
 						.ExecuteUpdate();
 

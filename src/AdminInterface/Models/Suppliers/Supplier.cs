@@ -22,7 +22,7 @@ using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
 	public class Supplier : Service
 	{
 		private ContactGroupType[] _defaultGroups = new [] {

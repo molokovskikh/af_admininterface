@@ -226,10 +226,10 @@ select p.PayerId,
 		r.Name as Recipient
 from billing.payers p
 	left join Billing.Recipients r on r.Id = p.RecipientId
-	left join future.Users users on users.PayerId = p.PayerId
-	left join future.Clients cd on cd.Id = users.ClientId
-	left join future.Addresses addresses on addresses.PayerId = p.PayerId
-	left join future.Suppliers s on s.Payer = p.PayerId
+	left join Customers.Users users on users.PayerId = p.PayerId
+	left join Customers.Clients cd on cd.Id = users.ClientId
+	left join Customers.Addresses addresses on addresses.PayerId = p.PayerId
+	left join Customers.Suppliers s on s.Payer = p.PayerId
 where {0}
 group by p.payerId
 having {1}

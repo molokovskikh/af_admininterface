@@ -468,7 +468,7 @@ namespace Functional.Drugstore
 select
 count(*) 
 from
-future.Intersection i
+Customers.Intersection i
 where i.ClientId = :ClientId and i.RegionId = :RegionId
 ";
 			var count = 0;

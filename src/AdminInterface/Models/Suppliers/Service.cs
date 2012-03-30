@@ -13,7 +13,7 @@ namespace AdminInterface.Models.Suppliers
 		[Description("Аптека")] Drugstore = 1
 	}
 
-	[ActiveRecord(Schema = "Future", Lazy = true), JoinedBase]
+	[ActiveRecord(Schema = "Customers", Lazy = true), JoinedBase]
 	public class Service : IEnablable
 	{
 		protected bool _disabled;

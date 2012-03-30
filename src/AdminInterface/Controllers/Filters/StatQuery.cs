@@ -70,8 +70,8 @@ count(distinct if(l.Filename is null, dh.FirmCode, null)) as CertificateNotSendU
 
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
-		join Future.Users fu on fu.Id = u.UserId
-			join Future.Clients c on c.Id = fu.ClientId
+		join Customers.Users fu on fu.Id = u.UserId
+			join Customers.Clients c on c.Id = fu.ClientId
 	join Documents.DocumentBodies db on db.Id = l.DocumentBodyId
 		join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
 where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
@@ -82,8 +82,8 @@ where (u.RequestTime >= ?StartDateParam AND u.RequestTime <= ?EndDateParam)
 select max(u.RequestTime) as LastCertificateRequest
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
-		join Future.Users fu on fu.Id = u.UserId
-			join Future.Clients c on c.Id = fu.ClientId
+		join Customers.Users fu on fu.Id = u.UserId
+			join Customers.Clients c on c.Id = fu.ClientId
 where c.MaskRegion & ?RegionMaskParam > 0
 	and fu.PayerId <> 921
 ;
@@ -95,8 +95,8 @@ from (
 		select m.Id
 		from Documents.Mails m
 			join Logs.MailSendLogs l on l.MailId = m.Id
-				join Future.Users u on u.Id = l.UserId
-					join Future.Clients c on c.Id = u.ClientId
+				join Customers.Users u on u.Id = l.UserId
+					join Customers.Clients c on c.Id = u.ClientId
 		where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
 			and c.MaskRegion & ?RegionMaskParam > 0
 			and u.PayerId <> 921
@@ -110,8 +110,8 @@ select count(distinct u.Id) as MailsUniqByUser,
 	count(distinct m.SupplierId) as MailsUniqBySupplier
 from Documents.Mails m
 	join Logs.MailSendLogs l on l.MailId = m.Id
-		join Future.Users u on u.Id = l.UserId
-			join Future.Clients c on c.Id = u.ClientId
+		join Customers.Users u on u.Id = l.UserId
+			join Customers.Clients c on c.Id = u.ClientId
 where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
 	and c.MaskRegion & ?RegionMaskParam > 0
 	and u.PayerId <> 921
@@ -120,8 +120,8 @@ where m.LogTime >= ?StartDateParam AND m.LogTime <= ?EndDateParam
 select max(m.LogTime) as LastMailSend
 from Documents.Mails m
 	join Logs.MailSendLogs l on l.MailId = m.Id
-		join Future.Users u on u.Id = l.UserId
-			join Future.Clients c on c.Id = u.ClientId
+		join Customers.Users u on u.Id = l.UserId
+			join Customers.Clients c on c.Id = u.ClientId
 where c.MaskRegion & ?RegionMaskParam > 0
 	and u.PayerId <> 921
 ;";
@@ -130,8 +130,8 @@ select count(*) as RequestInProcessCount
 from Logs.PrgDataLogs;
 
 SELECT max(UpdateDate) MaxUpdateTime
-FROM future.Clients cd
-	join future.Users u on u.ClientId = cd.Id
+FROM Customers.Clients cd
+	join Customers.Users u on u.ClientId = cd.Id
 		JOIN usersettings.UserUpdateInfo uui on uui.UserId = u.Id
 WHERE   cd.RegionCode & ?RegionMaskParam > 0
 		AND uui.UncommitedUpdateDate >= ?StartDateParam AND uui.UncommitedUpdateDate <= ?EndDateParam;
@@ -151,9 +151,9 @@ SELECT count(DISTINCT oh.clientcode) as UniqClientOrders,
 		{1}
 FROM (orders.ordershead oh,
 	 orders.orderslist ol, 
-	 future.Clients cd, 
+	 Customers.Clients cd, 
 	 usersettings.retclientsset rcs)
-	join Future.Users u on u.Id = oh.UserId
+	join Customers.Users u on u.Id = oh.UserId
 WHERE oh.rowid = orderid
 	AND cd.Id = oh.clientcode
 	AND u.PayerId <> 921
@@ -175,8 +175,8 @@ SELECT sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
 	   cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
 	   cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, u.Id, null)) ,')') as CHAR) Updates
 		{0}
-FROM Future.Clients cd
-	join Future.Users u on u.ClientId = cd.Id
+FROM Customers.Clients cd
+	join Customers.Users u on u.ClientId = cd.Id
 	join logs.AnalitFUpdates afu on afu.UserId = u.Id
 WHERE cd.maskregion & ?RegionMaskParam > 0
 	  AND afu.RequestTime >= ?StartDateParam AND afu.RequestTime <= ?EndDateParam;

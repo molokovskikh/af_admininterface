@@ -130,7 +130,7 @@ SELECT  a.RegionCode,
 		s.RegionMask & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
 		farm.regions as b, 
-		Future.Suppliers as s
+		Customers.Suppliers as s
 WHERE   b.regioncode = ?HomeRegion
 		AND s.Id = ?ClientCode
 		AND a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
@@ -140,7 +140,7 @@ ORDER BY region;";
 			var orderSendConfig = @"
 SELECT osr.Id, osr.SenderId, osr.FormaterId, osr.SendDebugMessage, osr.ErrorNotificationDelay, r.RegionCode
 FROM ordersendrules.order_send_rules osr
-	join future.Suppliers s on s.Id = osr.firmcode
+	join Customers.Suppliers s on s.Id = osr.firmcode
 	left join farm.regions r on osr.regioncode = r.regioncode
 where s.Id = ?ClientCode
 	  and (s.RegionMask & ?AdminRegionMask & r.regioncode > 0 or osr.RegionCode is null)
@@ -158,7 +158,7 @@ order by className;";
 
 			var sendRuleRegions = @"
 SELECT r.regioncode, r.region
-FROM (farm.regions r, Future.Suppliers s)
+FROM (farm.regions r, Customers.Suppliers s)
 where s.Id = ?ClientCode
 	  and s.RegionMask & ?AdminRegionMask & r.regioncode > 0
 order by r.Region;";
@@ -255,7 +255,7 @@ Set @InUser = ?UserName;
 DELETE FROM PricesData
 WHERE PriceCode = ?PriceCode;
 
-DELETE FROM Future.Intersection
+DELETE FROM Customers.Intersection
 WHERE PriceId = ?PriceCode;
 
 DELETE FROM PricesRegionalData
@@ -308,7 +308,7 @@ SELECT  r.RegionCode,
 		p.PriceCode,
 		if(p.pricetype<>1, 1, 0)
 FROM    pricesdata p,
-		future.Suppliers s,
+		Customers.Suppliers s,
 		farm.regions r
 WHERE   p.PriceCode  = @InsertedPriceCode
 		AND p.FirmCode = s.Id
@@ -432,25 +432,25 @@ WHERE RowId = ?Id;
 DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
-FROM future.AddressIntersection adr
-	join future.Intersection ins on ins.Id = adr.IntersectionId
+FROM Customers.AddressIntersection adr
+	join Customers.Intersection ins on ins.Id = adr.IntersectionId
 	join pricesdata as rootPrice on
 		rootPrice.PriceCode =
 			(select min(pricecode) from pricesdata as p where p.firmcode = :supplierId )
-		join future.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
+		join Customers.Intersection rootIns on rootIns.PriceId = rootPrice.PriceCode
 			and rootIns.ClientId = ins.ClientId and rootIns.RegionId = ins.RegionId
-		join future.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
+		join Customers.AddressIntersection rootAdr on rootadr.AddressId = adr.AddressId
 			and rootAdr.IntersectionId = rootIns.Id
 WHERE ins.PriceId = :priceId
 ;
 
-UPDATE Future.AddressIntersection adr
+UPDATE Customers.AddressIntersection adr
 SET SupplierDeliveryId =
 (select tmp.SupplierDeliveryId
 from tmp tmp
 where tmp.Id = adr.Id
 limit 1)
-WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
+WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
 );")
 							.SetParameter("priceId", addedPriceId)
 							.SetParameter("supplierId", supplier.Id)
@@ -596,7 +596,7 @@ WHERE Exists(select 1 from future.Intersection ins where ins.Id = adr.Intersecti
 SELECT  a.RegionCode,   
 		a.Region,
 		s.RegionMask & a.regioncode > 0 as Enable
-FROM farm.regions as a, future.Suppliers as s
+FROM farm.regions as a, Customers.Suppliers as s
 WHERE a.regionCode & ?AdminRegionMask > 0 and s.Id = ?ClientCode
 ORDER BY region;";
 			}
@@ -608,7 +608,7 @@ SELECT  a.RegionCode,
 		s.RegionMask & a.regioncode > 0 as Enable
 FROM    farm.regions as a, 
 		farm.regions as b, 
-		future.Suppliers as s
+		Customers.Suppliers as s
 WHERE   b.regioncode = ?HomeRegion
 		and s.Id = ?ClientCode
 		and a.regioncode & ?AdminRegionMask & (b.defaultshowregionmask | s.RegionMask) > 0
@@ -666,7 +666,7 @@ INTO    pricesregionaldata
 SELECT  r.RegionCode,
 		p.PriceCode,
 		if(p.pricetype<>1, 1, 0)
-FROM pricesdata p, future.Suppliers s, farm.regions r
+FROM pricesdata p, Customers.Suppliers s, farm.regions r
 WHERE s.Id = ?ClientCode
 		AND p.FirmCode = s.Id
 		AND (r.RegionCode & s.RegionMask > 0)
@@ -679,7 +679,7 @@ WHERE s.Id = ?ClientCode
 
 INSERT INTO regionaldata(FirmCode, RegionCode)
 SELECT s.Id, r.RegionCode
-FROM Future.Suppliers s, Farm.Regions r
+FROM Customers.Suppliers s, Farm.Regions r
 WHERE   s.Id = ?ClientCode
 		AND(r.RegionCode & s.RegionMask) > 0 
 		AND NOT exists

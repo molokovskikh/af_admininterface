@@ -25,8 +25,8 @@ namespace Integration.Models
 			address.MoveToAnotherClient(recepient, legalEntity);
 
 			ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"update future.AddressIntersection ai
-join future.Intersection i on ai.IntersectionId = i.Id
+				s.CreateSQLQuery(@"update Customers.AddressIntersection ai
+join Customers.Intersection i on ai.IntersectionId = i.Id
 set ai.SupplierDeliveryId = '123'
 where i.PriceId = :priceId and ai.AddressId = :addressId ")
 					.SetParameter("addressId", address.Id)
@@ -40,8 +40,8 @@ where i.PriceId = :priceId and ai.AddressId = :addressId ")
 			ArHelper.WithSession(s => {
 				var supplierDeliveryId = s.CreateSQLQuery(@"
 select ai.SupplierDeliveryId
-from future.AddressIntersection ai
-join future.Intersection i on ai.IntersectionId = i.Id
+from Customers.AddressIntersection ai
+join Customers.Intersection i on ai.IntersectionId = i.Id
 where i.PriceId = :priceId and ai.AddressId = :addressId ")
 					.SetParameter("addressId", address.Id)
 					.SetParameter("priceId", price.Id)

@@ -225,8 +225,8 @@ namespace Functional.Drugstore
 		{
 			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
 SELECT COUNT(*)
-FROM Future.AddressIntersection AS ai
-	JOIN Future.Intersection AS i ON i.ClientId = :ClientId AND ai.IntersectionId = i.Id
+FROM Customers.AddressIntersection AS ai
+	JOIN Customers.Intersection AS i ON i.ClientId = :ClientId AND ai.IntersectionId = i.Id
 WHERE AddressId = :AddressId
 ")
 					.SetParameter("AddressId", addressId)

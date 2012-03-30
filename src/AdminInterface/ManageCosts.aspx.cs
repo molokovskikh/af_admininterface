@@ -404,7 +404,7 @@ where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 					}
 
 					var deleteCommandText = @"
-update Future.Intersection
+update Customers.Intersection
 set CostId = ?BaseCostCode
 where CostId = ?CostCode;";
 

@@ -24,7 +24,7 @@ using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable, IDisabledByParent
 	{
 		private bool _enabled;
@@ -100,7 +100,7 @@ namespace AdminInterface.Models
 			Lazy = true,
 			ColumnKey = "AddressId",
 			Table = "UserAddresses",
-			Schema = "future",
+			Schema = "Customers",
 			ColumnRef = "UserId")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
 
@@ -172,17 +172,17 @@ namespace AdminInterface.Models
 				s.CreateSQLQuery(@"
 set @skip = 1;
 
-insert into Future.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
+insert into Customers.Intersection(ClientId, RegionId, PriceId, LegalEntityId, CostId, AvailableForClient, AgencyEnabled, PriceMarkup)
 select i.ClientId, i.RegionId, i.PriceId, :legalEntityId, i.CostId, i.AvailableForClient, i.AgencyEnabled, i.PriceMarkup
-from Future.Intersection i
-left join Future.Intersection li on li.ClientId = i.ClientId and i.RegionId = li.RegionId and i.PriceId = li.PriceId and li.LegalEntityId = :legalEntityId
+from Customers.Intersection i
+left join Customers.Intersection li on li.ClientId = i.ClientId and i.RegionId = li.RegionId and i.PriceId = li.PriceId and li.LegalEntityId = :legalEntityId
 where i.clientId = :clientId and li.Id is null
 group by i.ClientId, i.RegionId, i.PriceId;
 
-insert into Future.AddressIntersection(AddressId, IntersectionId)
+insert into Customers.AddressIntersection(AddressId, IntersectionId)
 select a.Id, i.Id
-from Future.Intersection i
-	join Future.Addresses a on a.ClientId = i.ClientId and i.LegalEntityID = a.LegalEntityId
+from Customers.Intersection i
+	join Customers.Addresses a on a.ClientId = i.ClientId and i.LegalEntityID = a.LegalEntityId
 where a.Id = :addressId
 ;
 set @skip = 0;
@@ -331,17 +331,17 @@ set @skip = 0;
 			Client oldClient, LegalEntity oldLegalEntity)
 		{
 			ArHelper.WithSession(session => session.CreateSQLQuery(@"
-insert into Future.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
+insert into Customers.AddressIntersection(AddressId, IntersectionId, SupplierDeliveryId, ControlMinReq, MinReq)
 select :AddressId, ni.Id, ai.SupplierDeliveryId, ai.ControlMinReq, ai.MinReq
-from Future.Intersection ni
-left join Future.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId and oi.LegalEntityId = :OldLegalEntityId
-left join Future.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.AddressId = :AddressId
+from Customers.Intersection ni
+left join Customers.Intersection oi on oi.PriceId = ni.PriceId and oi.RegionId = ni.RegionId and oi.ClientId = :OldClientId and oi.LegalEntityId = :OldLegalEntityId
+left join Customers.AddressIntersection ai on oi.Id = ai.IntersectionId and ai.AddressId = :AddressId
 where ni.ClientId = :NewClientId and ni.LegalEntityId = :NewLegalEntityId
 ;
 
 delete ai
-from Future.AddressIntersection ai
-join Future.Intersection i on i.Id = ai.IntersectionId
+from Customers.AddressIntersection ai
+join Customers.Intersection i on i.Id = ai.IntersectionId
 where ai.AddressId = :AddressId
 and i.ClientId = :OldClientId
 and i.LegalEntityId = :OldLegalEntityId

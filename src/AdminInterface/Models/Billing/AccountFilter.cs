@@ -51,26 +51,26 @@ namespace AdminInterface.Models.Billing
 			{
 				case AccountingSearchBy.ByAddress:
 					from = @"
-	join Future.Addresses a ON a.AccountingId = c.Id AND c.Type = 1";
+	join Customers.Addresses a ON a.AccountingId = c.Id AND c.Type = 1";
 					where = @"
 (a.Address LIKE :SearchText OR a.Id = :SearchNumber)";
 					break;
 				case AccountingSearchBy.ByClient:
 					from = @"
-	join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
-		join Future.Clients cl ON cl.Id = u.ClientId";
+	join Customers.Users u ON u.AccountingId = c.Id AND c.Type = 0
+		join Customers.Clients cl ON cl.Id = u.ClientId";
 					where = "cl.Name LIKE :SearchText OR cl.FullName LIKE :SearchText OR cl.Id = :SearchNumber";
 					break;
 				case AccountingSearchBy.ByPayer:
 					from = @"
-	join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
-		join Future.Clients cl ON cl.Id = u.ClientId
+	join Customers.Users u ON u.AccountingId = c.Id AND c.Type = 0
+		join Customers.Clients cl ON cl.Id = u.ClientId
 			join Billing.PayerClients pc on pc.ClientId = cl.Id
 				join Billing.Payers p ON pc.PayerId = p.PayerId";
 					where = "p.PayerId = :SearchNumber OR p.ShortName LIKE :SearchText OR p.JuridicalName LIKE :SearchText";
 					break;
 				case AccountingSearchBy.ByUser:
-					from = "join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0";
+					from = "join Customers.Users u ON u.AccountingId = c.Id AND c.Type = 0";
 					where = "(ifnull(u.Name, '') LIKE :SearchText OR u.Id = :SearchNumber)";
 					break;
 				case AccountingSearchBy.ByReport:
@@ -78,18 +78,18 @@ namespace AdminInterface.Models.Billing
 					where = "(gr.Comment LIKE :SearchText OR gr.GeneralReportCode = :SearchNumber)";
 					break;
 				case AccountingSearchBy.BySupplier:
-					from = "join Future.Suppliers s on s.Id = c.ObjectId and c.Type = 3";
+					from = "join Customers.Suppliers s on s.Id = c.ObjectId and c.Type = 3";
 					where = "(s.Name LIKE :SearchText or s.FullName like :SearchText or s.Id = :SearchNumber)";
 					break;
 				case AccountingSearchBy.Auto:
 					from = @"
-	left join Future.Users u ON u.AccountingId = c.Id AND c.Type = 0
-		left join Future.Clients  cl ON cl.Id = u.ClientId
+	left join Customers.Users u ON u.AccountingId = c.Id AND c.Type = 0
+		left join Customers.Clients  cl ON cl.Id = u.ClientId
 			left join Billing.PayerClients pc on pc.ClientId = cl.Id
 				left join Billing.Payers p ON pc.PayerId = p.PayerId
-	left join Future.Addresses a ON a.AccountingId = c.Id AND c.Type = 1
+	left join Customers.Addresses a ON a.AccountingId = c.Id AND c.Type = 1
 	left join Reports.general_reports gr on gr.GeneralReportCode = c.ObjectId and c.Type = 2
-	left join Future.Suppliers s on s.Id = c.ObjectId and c.Type = 3";
+	left join Customers.Suppliers s on s.Id = c.ObjectId and c.Type = 3";
 					where = @"(
 	(u.Id is not null and (ifnull(u.Name, '') LIKE :SearchText OR u.Id = :SearchNumber)) or 
 	(a.Address LIKE :SearchText or a.Id = :SearchNumber) or

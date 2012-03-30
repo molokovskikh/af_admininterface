@@ -71,7 +71,7 @@ namespace AdminInterface.Models
 		bool DisabledByParent { get; }
 	}
 
-	[ActiveRecord(Schema = "future", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
 	public class User : IEnablable, IDisabledByParent
 	{
 		private string _name;
@@ -236,7 +236,7 @@ namespace AdminInterface.Models
 			Lazy = true,
 			ColumnKey = "UserId",
 			Table = "UserAddresses",
-			Schema = "future",
+			Schema = "Customers",
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
@@ -548,10 +548,10 @@ namespace AdminInterface.Models
 		public virtual void AddPrices(Client client)
 		{
 			var sql = @"
-insert into Future.UserPrices(PriceId, UserId, RegionId)
+insert into Customers.UserPrices(PriceId, UserId, RegionId)
 select i.PriceId, u.Id, i.RegionId
-from Future.Users u
-	join Future.Intersection i on i.ClientId = :ClientId
+from Customers.Users u
+	join Customers.Intersection i on i.ClientId = :ClientId
 where u.Id = :UserId
 group by i.PriceId, i.RegionId";
 
@@ -564,10 +564,10 @@ group by i.PriceId, i.RegionId";
 		public virtual void AddPrices(Client client, Region region)
 		{
 			var sql = @"
-insert into Future.UserPrices(PriceId, UserId, RegionId)
+insert into Customers.UserPrices(PriceId, UserId, RegionId)
 select i.PriceId, u.Id, i.RegionId
-from Future.Users u
-	join Future.Intersection i on i.ClientId = :ClientId AND i.RegionId = :RegionId
+from Customers.Users u
+	join Customers.Intersection i on i.ClientId = :ClientId AND i.RegionId = :RegionId
 where u.Id = :UserId
 group by i.PriceId, i.RegionId";
 
@@ -583,7 +583,7 @@ group by i.PriceId, i.RegionId";
 			var sql = @"
 SELECT COUNT(*)
 FROM
-	Future.UserPrices
+	Customers.UserPrices
 WHERE
 	UserId = :UserId AND RegionId = :RegionId
 ";

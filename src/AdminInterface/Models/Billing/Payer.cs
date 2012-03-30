@@ -271,11 +271,11 @@ SELECT {Payer.*}
 FROM billing.payers {Payer}
 WHERE {Payer}.ShortName like :SearchText
 and (exists(
-		select * from Future.Clients c
+		select * from Customers.Clients c
 			join Billing.PayerClients pc on pc.ClientId = c.Id
 		where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
 	) or exists(
-		select * from Future.Suppliers s
+		select * from Customers.Suppliers s
 		where s.Payer = {Payer}.PayerId and s.Disabled = 0 and (s.RegionMask & :AdminRegionCode > 0)
 	))
 ORDER BY {Payer}.shortname;";

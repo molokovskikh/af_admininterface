@@ -63,7 +63,7 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord(Schema = "Future", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
 	public class Client : Service
 	{
 		private ClientStatus _status;
@@ -210,7 +210,7 @@ namespace AdminInterface.Models
 			ArHelper.WithSession(session =>
 				session.CreateSQLQuery(@"
 update usersettings.UserUpdateInfo uui
-	join Future.Users u on uui.UserId = u.Id
+	join Customers.Users u on uui.UserId = u.Id
 set uui.AFCopyId = '' 
 where u.ClientId = :clientcode")
 					.SetParameter("clientcode", Id)
@@ -223,7 +223,7 @@ where u.ClientId = :clientcode")
 				session.CreateSQLQuery(@"
 select sum(length(concat(uui.AFCopyId))) = 0
 from usersettings.UserUpdateInfo uui
-	join Future.Users u on uui.UserId = u.Id
+	join Customers.Users u on uui.UserId = u.Id
 where u.ClientId = :clientcode
 group by u.ClientId")
 					.SetParameter("clientcode", Id)
@@ -426,7 +426,7 @@ group by u.ClientId")
 			}
 
 			ArHelper.WithSession(s => s.CreateSQLQuery(@"
-update future.intersection
+update Customers.intersection
 set LegalEntityId = :orgId
 where ClientId = :clientId")
 				.SetParameter("clientId", Id)

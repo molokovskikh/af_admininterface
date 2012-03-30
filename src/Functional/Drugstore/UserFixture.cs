@@ -778,7 +778,7 @@ namespace Functional.Drugstore
 			return Convert.ToUInt32(ArHelper.WithSession(session => session.CreateSQLQuery(@"
 SELECT COUNT(*)
 FROM
-	Future.UserPrices
+	Customers.UserPrices
 WHERE UserId = :UserId AND RegionId = :RegionId
 ")
 				.SetParameter("UserId", userId)

@@ -105,12 +105,12 @@ SELECT
 	p.JuridicalName as JuridicalName,
 	r.Region as RegionName
 FROM
-	future.Users u
+	Customers.Users u
 	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
-	join future.Services s on s.Id = u.RootService
+	join Customers.Services s on s.Id = u.RootService
 		join farm.Regions r ON r.RegionCode = s.HomeRegion
-	left join Future.Suppliers sup on sup.Id = u.RootService
-	left join future.Clients ON Clients.Id = u.ClientId
+	left join Customers.Suppliers sup on sup.Id = u.RootService
+	left join Customers.Clients ON Clients.Id = u.ClientId
 		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = ifnull(Clients.ContactGroupOwnerId, sup.ContactGroupOwnerId)
 		left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
 		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
@@ -151,8 +151,8 @@ GROUP BY u.Id
 			switch (SearchBy)
 			{
 				case SearchUserBy.AddressMail:
-					return @"left join Future.UserAddresses ua on ua.UserId = u.Id
-left join Future.Addresses a on a.Id = ua.AddressId";
+					return @"left join Customers.UserAddresses ua on ua.UserId = u.Id
+left join Customers.Addresses a on a.Id = ua.AddressId";
 					break;
 				default:
 					return "";

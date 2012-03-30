@@ -348,13 +348,13 @@ where Phone like :phone")
 		{
 			var client = Client.Find(id);
 			var suppliers = ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"call future.GetPrices(:userid)")
+				s.CreateSQLQuery(@"call Customers.GetPrices(:userid)")
 					.SetParameter("userid", client.Users.First().Id)
 					.ExecuteUpdate();
 
 				return s.CreateSQLQuery(@"
 select s.Id, s.Name from Prices ap
-join Future.Suppliers s on s.Id = ap.FirmCode
+join Customers.Suppliers s on s.Id = ap.FirmCode
 where s.Name like :SearchText")
 						.SetParameter("SearchText", "%" + text + "%")
 						.List();

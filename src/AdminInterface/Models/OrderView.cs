@@ -52,8 +52,8 @@ SELECT  oh.rowid as {OrderView.Id},
 		oh.ClientOrderId as {OrderView.ClientOrderId}
 FROM    orders.ordershead oh
 		join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
-			join Future.Suppliers as s on s.Id = pd.firmcode 
-		join future.clients as c on oh.clientcode = c.Id
+			join Customers.Suppliers as s on s.Id = pd.firmcode 
+		join Customers.clients as c on oh.clientcode = c.Id
 WHERE   oh.RegionCode & :RegionCode > 0
 		and oh.Deleted = 0
 		and oh.Submited = 1

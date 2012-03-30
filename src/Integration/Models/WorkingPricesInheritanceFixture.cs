@@ -24,14 +24,14 @@ namespace Integration.Models
 			ArHelper.WithSession(s => {
 				var prices = s.CreateSQLQuery(@"
 select PriceId
-from Future.UserPrices
+from Customers.UserPrices
 where UserId = :id")
 				.SetParameter("id", parent.Id)
 				.List();
 
 				Assert.That(prices, Is.Not.Empty);
 				s.CreateSQLQuery(@"
-delete from Future.UserPrices
+delete from Customers.UserPrices
 where UserId = :userId and priceId = :priceId")
 					.SetParameter("userId", parent.Id)
 					.SetParameter("priceId", prices.Cast<uint>().First())
@@ -43,7 +43,7 @@ where UserId = :userId and priceId = :priceId")
 
 			var pricesForParent = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"
-call Future.GetPrices(:id);
+call Customers.GetPrices(:id);
 select PriceCode from Usersettings.Prices;")
 				.SetParameter("id", parent.Id)
 				.List());
@@ -51,7 +51,7 @@ select PriceCode from Usersettings.Prices;")
 			var pricesForChild = ArHelper.WithSession(s =>
 				s.CreateSQLQuery(@"
 drop temporary table Usersettings.Prices;
-call Future.GetPrices(:id);
+call Customers.GetPrices(:id);
 select PriceCode from Usersettings.Prices")
 				.SetParameter("id", child.Id)
 				.List());

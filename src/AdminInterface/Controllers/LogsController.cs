@@ -274,10 +274,10 @@ SELECT  oh.rowid as Id,
 		oh.ClientOrderId
 FROM orders.ordershead oh
 	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
-	join Future.Suppliers as s on s.Id = pd.firmcode
-	join Future.Clients c on oh.ClientCode = c.Id
-	join Future.Users u on u.Id = oh.UserId
-	join Future.Addresses a on a.Id = oh.AddressId
+	join Customers.Suppliers as s on s.Id = pd.firmcode
+	join Customers.Clients c on oh.ClientCode = c.Id
+	join Customers.Users u on u.Id = oh.UserId
+	join Customers.Addresses a on a.Id = oh.AddressId
 		left join logs.orders o on oh.rowid = o.orderid
 WHERE {0} and oh.RegionCode & :RegionCode > 0
 	and oh.Deleted = 0

@@ -28,7 +28,7 @@ namespace AdminInterface.Models
 set @skip = 0;
 
 INSERT
-INTO Future.Intersection (
+INTO Customers.Intersection (
 	ClientId,
 	RegionId,
 	PriceId,
@@ -55,17 +55,17 @@ SELECT  DISTINCT drugstore.Id,
 		ifnull(parent.AvailableForClient, if(pd.PriceType = 0, 1, 0)),
 		rootIntersection.SupplierClientId,
 		rootIntersection.SupplierPaymentId
-FROM (Future.Clients as drugstore, future.suppliers s)
+FROM (Customers.Clients as drugstore, Customers.suppliers s)
 	JOIN retclientsset as a ON a.clientcode = drugstore.Id
 	join billing.PayerClients p on p.ClientId = drugstore.Id
 		JOIN Billing.LegalEntities le on le.PayerId = p.PayerId
 	JOIN pricesdata pd ON pd.firmcode = s.Id
 	JOIN farm.regions ON (s.RegionMask & regions.regioncode) > 0 and (drugstore.maskregion & regions.regioncode) > 0
 		JOIN pricesregionaldata ON pricesregionaldata.pricecode = pd.pricecode AND pricesregionaldata.regioncode = regions.regioncode
-	LEFT JOIN Future.Intersection i ON i.PriceId = pd.pricecode and i.RegionId = regions.regioncode and i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
-	LEFT JOIN Future.Intersection parent ON parent.PriceId = pd.pricecode and parent.RegionId = regions.regioncode and parent.ClientId = drugstore.Id
+	LEFT JOIN Customers.Intersection i ON i.PriceId = pd.pricecode and i.RegionId = regions.regioncode and i.ClientId = drugstore.Id and i.LegalEntityId = le.Id
+	LEFT JOIN Customers.Intersection parent ON parent.PriceId = pd.pricecode and parent.RegionId = regions.regioncode and parent.ClientId = drugstore.Id
 	LEFT JOIN pricesdata as rootPrice on rootPrice.PriceCode = (select min(pricecode) from pricesdata as p where p.firmcode = s.Id)
-		LEFT JOIN future.intersection as rootIntersection on rootIntersection.PriceId = rootPrice.PriceCode and rootIntersection.RegionId = Regions.RegionCode and rootIntersection.ClientId = drugstore.Id
+		LEFT JOIN Customers.intersection as rootIntersection on rootIntersection.PriceId = rootPrice.PriceCode and rootIntersection.RegionId = Regions.RegionCode and rootIntersection.ClientId = drugstore.Id
 			and rootIntersection.LegalEntityId = le.Id
 WHERE i.Id IS NULL
 	{0}

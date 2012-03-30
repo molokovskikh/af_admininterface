@@ -18,13 +18,13 @@ namespace Functional
 	{
 		private void TestSearchResultsByUserInfo(Browser browser, string columnName, SearchUserBy searchBy)
 		{
-			var sql = String.Format(@"select max({0}) from future.Users", columnName);
+			var sql = String.Format(@"select max({0}) from Customers.Users", columnName);
 			TestSearchResults(browser, columnName, searchBy, sql);
 		}
 
 		private void TestSearchResultsByClientInfo(Browser browser, string columnName, SearchUserBy searchBy)
 		{
-			var sql = String.Format(@"select max({0}) from future.Clients", columnName);
+			var sql = String.Format(@"select max({0}) from Customers.Clients", columnName);
 			TestSearchResults(browser, columnName, searchBy, sql);
 		}
 

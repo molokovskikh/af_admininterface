@@ -5,7 +5,7 @@ using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord("Intersection", Schema = "Future", Lazy = true)]
+	[ActiveRecord("Intersection", Schema = "Customers", Lazy = true)]
 	public class Intersection : ActiveRecordLinqBase<Intersection>
 	{
 		[PrimaryKey]

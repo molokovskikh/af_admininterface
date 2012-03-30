@@ -75,7 +75,7 @@ namespace Functional.Drugstore
 		{
 			using (new SessionScope())
 			{
-				var sql = @"select max(ClientCode) from orders.ordershead join future.clients on clients.Id = ordershead.ClientCode";
+				var sql = @"select max(ClientCode) from orders.ordershead join Customers.clients on clients.Id = ordershead.ClientCode";
 				var clientId = String.Empty;
 				ArHelper.WithSession(session => clientId = session.CreateSQLQuery(sql).UniqueResult().ToString());
 				var client = Client.Find(Convert.ToUInt32(clientId));
@@ -103,7 +103,7 @@ namespace Functional.Drugstore
 		[Test, Ignore("Временно до починки")]
 		public void Check_users_links_when_client_orders_history_show()
 		{
-			var sql = @"select max(ClientCode) from orders.ordershead join future.clients on clients.Id = ordershead.ClientCode";
+			var sql = @"select max(ClientCode) from orders.ordershead join Customers.clients on clients.Id = ordershead.ClientCode";
 			var clientId = String.Empty;
 			ArHelper.WithSession(session => clientId = session.CreateSQLQuery(sql).UniqueResult().ToString());
 			var client = Client.Find(Convert.ToUInt32(clientId));

@@ -241,7 +241,7 @@ namespace AdminInterface.Models
 				ArHelper.WithSession(s => {
 					s.CreateSQLQuery(@"
 update Usersettings.AnalitFReplicationInfo r
-join Future.Users u on u.Id = r.UserId
+join Customers.Users u on u.Id = r.UserId
 set ForceReplication = 1
 where u.ClientId = :ClientId")
 						.SetParameter("ClientId", Client.Id)

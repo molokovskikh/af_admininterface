@@ -24,7 +24,7 @@ namespace Integration.Models
 			org.Save();
 			Maintainer.LegalEntityCreated(org);
 			var count = ArHelper.WithSession(s =>
-				s.CreateSQLQuery(@"select count(*) from future.Intersection where LegalEntityId = :LegalEntityId")
+				s.CreateSQLQuery(@"select count(*) from Customers.Intersection where LegalEntityId = :LegalEntityId")
 					.SetParameter("LegalEntityId", org.Id)
 					.UniqueResult<long>()
 			);

@@ -47,7 +47,7 @@ from
 	catalogs.catalog
 	left join usersettings.PromotionCatalogs pc on pc.CatalogId = catalog.Id
 	left join usersettings.SupplierPromotions sp on sp.Id = pc.PromotionId
-	left join Future.Suppliers s on s.Id = sp.SupplierId
+	left join Customers.Suppliers s on s.Id = sp.SupplierId
 where
 	catalog.Hidden = 0
 and s.Id is null
