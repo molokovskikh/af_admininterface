@@ -86,11 +86,13 @@ namespace Integration.Controllers
 		{
 			DataMother.CreateSupplier().Save();
 
+			
 			Request.Params.Add("user.Accounting.IsFree", "False");
-			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
+
+			Prepare();
 
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
-				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 
 			var registredClient = RegistredClient();
 			var registredPayer = registredClient.Payers.Single();
@@ -115,14 +117,20 @@ namespace Integration.Controllers
 			Assert.That(registredClient.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 
+		private void Prepare()
+		{
+			Request.Form.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
+		}
+
 		[Test]
 		public void Register_client_without_address()
 		{
+			Prepare();
 			Request.Params.Add("user.Accounting.IsFree", "False");
-			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 
 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
-				null, null, clientContacts, null, new Contact[0], person, "11@ff.ru", "");
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 
 			Assert.That(registredClient.Addresses.Count, Is.EqualTo(0));
@@ -158,6 +166,7 @@ namespace Integration.Controllers
 		{
 			Request.Params.Add("supplier.Name", "Тестовый поставщик");
 			Request.Params.Add("supplier.FullName", "Тестовый поставщик");
+			Request.Params.Add("user.Name", "тестовый пользователь");
 
 			controller.RegisterSupplier(
 				new Contact[0], 1,
@@ -165,7 +174,6 @@ namespace Integration.Controllers
 				new AdditionalSettings(),
 				null,
 				null,
-				"тестовый пользователь",
 				new Contact[0],
 				new Person[0],
 				"",

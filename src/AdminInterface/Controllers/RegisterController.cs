@@ -39,8 +39,10 @@ namespace AdminInterface.Controllers
 		public void RegisterSupplier()
 		{
 			var supplier = new Supplier();
+			var user = new User();
 			supplier.Account = new SupplierAccount(supplier);
 			PropertyBag["supplier"] = supplier;
+			PropertyBag["user"] = user;
 			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["SingleRegions"] = true;
 		}
@@ -55,7 +57,6 @@ namespace AdminInterface.Controllers
 			[DataBind("payer")] Payer payer,
 			uint? existingPayerId,
 
-			string userName,
 			[DataBind("userContacts")] Contact[] userContacts,
 			[DataBind("userPersons")] Person[] userPersons,
 
@@ -96,9 +97,13 @@ namespace AdminInterface.Controllers
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Admin);
 
-				if (!IsValid(supplier)) {
+				user = new User(supplier.Payer, supplier);
+				BindObjectInstance(user, "user");
+
+				if (!IsValid(supplier, user)) {
 					RegisterSupplier();
 					PropertyBag["supplier"] = supplier;
+					PropertyBag["user"] = user;
 					return;
 				}
 
@@ -147,10 +152,6 @@ namespace AdminInterface.Controllers
 
 				CreateSupplier(supplier);
 				Maintainer.MaintainIntersection(supplier);
-
-				user = new User(supplier.Payer, supplier) {
-					Name = userName,
-				};
 
 				user.UpdateContacts(userContacts);
 				foreach (var person in userPersons)
@@ -217,7 +218,6 @@ namespace AdminInterface.Controllers
 			uint? existingPayerId,
 			[DataBind("supplier")] Supplier supplier,
 			[DataBind("clientContacts")] Contact[] clientContacts,
-			string userName,
 			[DataBind("userContacts")] Contact[] userContacts,
 			[DataBind("userPersons")] Person[] userPersons,
 			string additionalEmailsForSendingCard,
@@ -227,8 +227,6 @@ namespace AdminInterface.Controllers
 			Client newClient;
 			string password;
 
-			if (!String.IsNullOrEmpty(userName))
-				userName = userName.Replace("№", "N").Trim();
 			if (!String.IsNullOrEmpty(deliveryAddress))
 				deliveryAddress = deliveryAddress.Replace("№", "N").Trim();
 
@@ -266,18 +264,22 @@ namespace AdminInterface.Controllers
 
 				newClient = new Client(currentPayer,
 					Region.Find(homeRegion)) {
-					Status = ClientStatus.On,
 					FullName = fullName,
 					Name = name,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
-				if (!IsValid(newClient))
+
+				var user = new User(newClient);
+				BindObjectInstance(user, "user");
+
+				if (!IsValid(newClient, user))
 				{
 					RegisterClient();
 					PropertyBag["clientContacts"] = clientContacts;
 					PropertyBag["client"] = newClient;
+					PropertyBag["user"] = user;
 					return;
 				}
 
@@ -287,7 +289,7 @@ namespace AdminInterface.Controllers
 				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
-				newUser = CreateUser(newClient, userName, permissions, userPersons);
+				newUser = CreateUser(newClient, user, permissions, userPersons);
 				BindObjectInstance(newUser.Accounting, "user.Accounting");
 				password = newUser.CreateInAd();
 				if (newClient.Addresses.Count > 0)
@@ -433,13 +435,9 @@ WHERE   pricesdata.firmcode = s.Id
 			});
 		}
 
-		private User CreateUser(Client client, string userName, UserPermission[] permissions, Person[] persons)
+		private User CreateUser(Client client, User user, UserPermission[] permissions, Person[] persons)
 		{
-			var user = new User(client) {
-				Name = userName,
-			};
-
-			if (permissions != null && permissions.Count() > 0)
+			if (permissions != null && permissions.Any())
 			{
 				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();

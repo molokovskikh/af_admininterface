@@ -240,8 +240,13 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		<table class="contact-group">
 
 			<tr>
-				<td width="20%">Комментарий:</td>
-				<td width="50%"><input type="text" id="UserName" name="userName" style="width: 100%" /></td>
+				<td width="20%">
+					${app.Label("user.Name")}
+				</td>
+				<td width="50%">
+					${app.Edit("user.Name")}
+					${app.GetValidationError("user.Name")}
+				</td>
 				<td></td>
 			</tr>
 

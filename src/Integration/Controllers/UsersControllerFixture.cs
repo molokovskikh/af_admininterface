@@ -63,6 +63,7 @@ namespace Integration.Controllers
 			var regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}};
 			var person = new[] {new Person()};
+			Prepare();
 
 			controller.Add(clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
 			scope.Flush();
@@ -78,6 +79,7 @@ namespace Integration.Controllers
 		public void Register_user_with_comment()
 		{
 			client = DataMother.CreateTestClientWithUser();
+			Prepare();
 			controller.Add(new Contact[0], new[] {
 					new RegionSettings {
 						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
@@ -106,6 +108,11 @@ namespace Integration.Controllers
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));
+		}
+
+		private void Prepare()
+		{
+			Request.Params.Add("user.Name", "Тестовый пользователь");
 		}
 
 		[Test]
