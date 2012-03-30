@@ -92,7 +92,11 @@ namespace AdminInterface.Controllers
 					}
 				}
 
+				if (currentPayer == null)
+					currentPayer = new Payer(supplier.Name, supplier.FullName);
+
 				supplier.HomeRegion = Region.Find(homeRegion);
+				supplier.Payer = currentPayer;
 				supplier.Account = new SupplierAccount(supplier);
 				supplier.ContactGroupOwner = new ContactGroupOwner(supplier.GetAditionalContactGroups());
 				supplier.Registration = new RegistrationInfo(Admin);
@@ -107,12 +111,7 @@ namespace AdminInterface.Controllers
 					return;
 				}
 
-				if (currentPayer == null)
-					currentPayer = new Payer(supplier.Name, supplier.FullName);
-
 				currentPayer.Suppliers.Add(supplier);
-				supplier.Payer = currentPayer;
-				supplier.Account = new SupplierAccount(supplier);
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
 				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));

@@ -109,6 +109,7 @@ namespace Functional.Suppliers
 			Css("#ShortName").TypeText("тестовый");
 			Css("#ClientContactPhone").TypeText("473-2606000");
 			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
+			Css("#user_Name").TypeText("Тестовый пользователь");
 		}
 	}
 }

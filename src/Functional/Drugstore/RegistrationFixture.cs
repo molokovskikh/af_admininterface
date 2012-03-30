@@ -36,6 +36,8 @@ namespace Functional.Drugstore
 		[Test]
 		public void Test_drugstore_validate_required_general_info()
 		{
+			Css("#user_Name").TypeText("Тестовый пользователь");
+
 			// Заполняем адрес доставки
 			browser.TextField("deliveryAddress").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
@@ -52,6 +54,8 @@ namespace Functional.Drugstore
 		[Test]
 		public void Test_validate_contact_info()
 		{
+			Css("#user_Name").TypeText("Тестовый пользователь");
+
 			browser.TextField("deliveryAddress").TypeText("Test address");
 			browser.TextField("JuridicalName").TypeText(_randomClientName);
 			browser.TextField("ShortName").TypeText(_randomClientName);
@@ -237,6 +241,7 @@ namespace Functional.Drugstore
 
 		private void SetupGeneralInformation(Browser browser)
 		{
+			Css("#user_Name").TypeText("Тестовый пользователь");
 			browser.TextField(Find.ById("JuridicalName")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("ShortName")).TypeText(_randomClientName);
 			// Заполняем контактную информацию для клиента
