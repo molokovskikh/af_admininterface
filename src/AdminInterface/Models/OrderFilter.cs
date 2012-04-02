@@ -81,9 +81,12 @@ FROM orders.ordershead oh
 WHERE {0} and oh.RegionCode & :RegionCode > 0
 group by oh.rowid
 ORDER BY writetime desc", sqlFilter))
-					.SetParameter("FromDate", Period.Begin)
-					.SetParameter("ToDate", Period.End)
 					.SetParameter("RegionCode", SecurityContext.Administrator.RegionMask);
+
+				if (!NotSent)
+					query
+						.SetParameter("FromDate", Period.Begin)
+						.SetParameter("ToDate", Period.End);
 
 				if (User != null)
 					query.SetParameter("UserId", User.Id);
