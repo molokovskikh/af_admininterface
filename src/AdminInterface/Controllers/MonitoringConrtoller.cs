@@ -42,7 +42,7 @@ namespace AdminInterface.Controllers
 
 		public void Orders()
 		{
-			PropertyBag["Orders"] = OrderView.FindNotSendedOrders();
+			PropertyBag["Orders"] = new OrderFilter().Find();
 		}
 	}
 }

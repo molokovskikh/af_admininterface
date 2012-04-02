@@ -1,5 +1,6 @@
 using System.Linq;
 using AdminInterface.Controllers;
+using AdminInterface.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -15,10 +16,10 @@ namespace Integration.Models
 			Flush();
 
 			var user = client.Users.First();
-			OrderLog.Load(new OrderFilter {
+			new OrderFilter {
 				User = user,
 				Client = client
-			});
+			}.Find();
 		}
 	}
 }

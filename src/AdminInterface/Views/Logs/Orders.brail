@@ -12,43 +12,4 @@ ${app.FilterFor("filter.Addresses")}
 <% end %>
 ${app.EndFormFor("filter")}
 
-<table class=DataTable>
-	<% if orders.Count > 0: %>
-		<thead>
-			<tr>
-				<th>№</th>
-				<th>№ в AnalitF</th>
-				<th>Дата заказа</th>
-				<th>Дата прайса</th>
-				<th>Клиент</th>
-				<th>Адрес</th>
-				<th>Пользователь</th>
-				<th>Поставщик</th>
-				<th>Прайс</th>
-				<th>Позиций</th>
-				<th>SmtpID</th>
-			</tr>
-		</thead>
-		<tbody id="SearchResults">
-		<% for i, order in enumerate(orders): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}">
-			<td>${order.Id}</td>
-			<td>${order.ClientOrderId}</td>
-			<td>${order.WriteTime}</td>
-			<td>${order.PriceDate}</td>
-			<td>!{order.Drugstore}</td>
-			<td>${UrlHelper.Link(order.Address, {@controller: @Addresses, @params: {@id: order.AddressId}})}
-			<td>${UrlHelper.Link(order.User, {@controller: @Users, @params: {@id: order.UserId}})}
-			<td>${order.Supplier}</td>
-			<td>${order.PriceName}</td>
-			<td>${order.RowCount}</td>
-			<td>${order.GetResult()}</td>
-		</tr>
-		<% end %>
-		</tbody>
-	<% else: %>
-		<tr class="EmptyData">
-			<td>За указанный период заказов не было</td>
-		</tr>
-	<% end %>
-</table>
+<% OutputSubView("OrdersTable", {@empty: "За указанный период заказов не было"}) %>

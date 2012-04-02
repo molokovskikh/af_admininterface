@@ -11,7 +11,9 @@ namespace Integration.Models
 		[Test]
 		public void Find_not_sended_orders()
 		{
-			OrderView.FindNotSendedOrders();
+			new OrderFilter {
+				NotSent = true
+			}.Find();
 		}
 	}
 }
