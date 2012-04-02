@@ -198,16 +198,14 @@ function SetupCalendarElements() {
 	$(".CalendarInput").each(function (index, value) {
 		value.id = "CalendarInput" + index;
 		$(value).prev().id = "CalendarInputField" + index;
-		input = $(value).prev().get(0);
-		if (!$(input).attr("disabled")) {
-			Calendar.setup({
-				ifFormat: "%d.%m.%Y",
-				inputField: input,
-				button: value.id,
-				weekNumbers: false,
-				showOthers: true
-			});
-		}
+		var input = $(value).prev().get(0);
+		Calendar.setup({
+			ifFormat: "%d.%m.%Y",
+			inputField: input,
+			button: value.id,
+			weekNumbers: false,
+			showOthers: true
+		});
 	});
 }
 
