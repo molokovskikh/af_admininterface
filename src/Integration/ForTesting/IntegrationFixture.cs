@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Castle.ActiveRecord;
 using NHibernate;
 using NUnit.Framework;
@@ -83,6 +84,18 @@ namespace Integration.ForTesting
 				scope.Dispose();
 				scope = null;
 			}
+		}
+
+		protected uint CreateCatelogProduct()
+		{
+			return Convert.ToUInt32(session.CreateSQLQuery(@"
+insert into Catalogs.CatalogNames(Name) values ('Тестовое наименование');
+set @Nameid = last_insert_id();
+insert into Catalogs.CatalogForms(Form) values ('Тестовая форма выпуска');
+set @FormId = last_insert_id();
+insert into Catalogs.Catalog(NameId, FormId) values (@NameId, @FormId);
+select last_insert_id();")
+				.UniqueResult());
 		}
 	}
 }

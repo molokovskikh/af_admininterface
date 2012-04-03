@@ -34,13 +34,8 @@ namespace Functional
 
 		private Catalog FindFirstFreeCatalog()
 		{
-			var catalogId = session.CreateSQLQuery(@"
-insert into Catalogs.CatalogNames(Name) values ('Тестовое наименование');
-set @Nameid = last_insert_id();
-insert into Catalogs.CatalogForms(Form) values ('Тестовая форма выпуска');
-set @FormId = last_insert_id();
-insert into Catalogs.Catalog(NameId, FormId) values (@NameId, @FormId);
-
+			CreateCatelogProduct();
+var catalogId = session.CreateSQLQuery(@"
 select
 	catalog.Id
 from

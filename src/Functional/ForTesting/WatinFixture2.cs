@@ -159,7 +159,7 @@ namespace Functional.ForTesting
 			}.Try(() => browser.CssSelect(selector) != null);
 		}
 
-		protected void SetCalendarDates(IE browser)
+		protected void SetCalendarDates(Browser browser)
 		{
 			var calendarFrom = browser.Div("beginDateCalendarHolder");
 			var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));

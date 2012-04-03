@@ -145,6 +145,7 @@
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
+    <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Models\OrderLog.cs" />
     <Compile Include="Models\OrderFilter.cs" />
     <Compile Include="Controllers\SpecialHandlersController.cs" />
@@ -489,6 +490,7 @@
     <None Include="Views\Mail\FreePasswordChange.brail" />
     <None Include="Views\Mails\Attachments.brail" />
     <None Include="Views\Main\StatSubView.brail" />
+    <None Include="Views\Orders\Details.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

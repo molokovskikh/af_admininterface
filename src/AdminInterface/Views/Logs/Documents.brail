@@ -2,8 +2,6 @@
 	История документов
 <% end %>
 
-${app.Asset("details.js")}
-
 ${app.BeginFormFor("filter")}
 ${FormHelper.HiddenField("filter.Supplier.Id")}
 ${FormHelper.HiddenField("filter.Client.Id")}

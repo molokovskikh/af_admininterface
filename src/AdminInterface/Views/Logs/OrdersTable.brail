@@ -18,7 +18,9 @@
 		<tbody id="SearchResults">
 		<% for i, order in enumerate(orders): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}">
-			<td>${order.Id}</td>
+			<td>
+				<a href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${order.Id}, '${siteroot}/Orders/Details?id=${order.Id}', 'details');">${order.Id}</a>
+			</td>
 			<td>${order.ClientOrderId}</td>
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>

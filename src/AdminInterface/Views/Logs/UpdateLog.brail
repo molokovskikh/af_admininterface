@@ -2,8 +2,6 @@
 	История обновлений
 <% end %>
 
-${app.Asset("details.js")}
-
 <% if filter.Client: %>
 
 	<% component CaptureFor, {"id" : "Title"}: %>
