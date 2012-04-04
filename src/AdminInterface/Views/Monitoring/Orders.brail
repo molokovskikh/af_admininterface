@@ -2,33 +2,4 @@
 	Очередь заказов к отправке
 <% end %>
 
-<% if orders.Count == 0: %>
-<table class="DataTable">
-	<tr class="EmptyData"><td>Нет заказов в очереди</td></tr>
-</table>
-<% else: %>
-<table class="DataTable">
-	<thead>
-		<tr>
-			<th>№</th>
-			<th>Дата заказа</th>
-			<th>Дата прайса</th>
-			<th>Аптека</th>
-			<th>Поставщик</th>
-			<th>Прайс</th>
-			<th>Позиций</th>
-		</tr>
-	</thead>
-	<% for i, order in enumerate(orders): %>
-	<tr class="${ViewHelper.GetRowStyle(i)}">
-		<td>${order.Id}</td>
-		<td>${order.WriteTime}</td>
-		<td>${order.PriceDate}</td>
-		<td>${order.Customer}</td>
-		<td>${order.Supplier}</td>
-		<td>${order.PriceName}</td>
-		<td>${order.RowCount}</td>
-	</tr>
-	<% end %>
-</table>
-<% end %>
+<% OutputSubView("/Logs/OrdersTable", {@empty: "Нет заказов в очереди"}) %>

@@ -158,5 +158,15 @@ namespace Functional.ForTesting
 					() => string.Format("waiting {0} seconds for document to contain element '{1}'.", timeOut, selector)
 			}.Try(() => browser.CssSelect(selector) != null);
 		}
+
+		protected void SetCalendarDates(Browser browser)
+		{
+			var calendarFrom = browser.Div("beginDateCalendarHolder");
+			var headerRow = calendarFrom.TableRow(Find.ByClass("headrow"));
+			headerRow.TableCells[1].MouseDown();
+			headerRow.TableCells[1].MouseUp();
+			headerRow.TableCells[1].MouseDown();
+			headerRow.TableCells[1].MouseUp(); //Выбрали 2 месяца назад
+		}
 	}
 }

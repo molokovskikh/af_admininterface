@@ -1,0 +1,25 @@
+﻿<tr class="details">
+	<td />
+	<td colspan="100">
+		<div id="details${order.Id}">
+			<table class="DataTable">
+				<thead>
+					<tr>
+						<th>Наименование</th>
+						<th>Производитель</th>
+						<th>Кол-во</th>
+						<th>Цена</th>
+					</tr>
+				</thead>
+				<% for i, line in enumerate(lines): %>
+				<tr class="${ViewHelper.GetRowStyle(i)}">
+					<td>${line.Product}</td>
+					<td>${line.Producer}</td>
+					<td>${line.Quantity}</td>
+					<td>${line.Cost}</td>
+				</tr>
+				<% end %>
+			</table>
+		</div>
+	</td>
+</tr>

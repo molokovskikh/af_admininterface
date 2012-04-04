@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Net.Mail;
 using System.Reflection;
 using AdminInterface.Initializers;
@@ -24,8 +25,10 @@ namespace Integration.ForTesting
 		public static void InitialzeAR()
 		{
 			XmlConfigurator.Configure();
-			if (!ActiveRecordStarter.IsInitialized)
-				new ActiveRecord().Initialize(ActiveRecordSectionHandler.Instance);
+			if (!ActiveRecordStarter.IsInitialized) {
+				var activeRecord = new ActiveRecord();
+				activeRecord.Initialize(ActiveRecordSectionHandler.Instance);
+			}
 		}
 
 		public static IViewEngineManager GetViewManager()

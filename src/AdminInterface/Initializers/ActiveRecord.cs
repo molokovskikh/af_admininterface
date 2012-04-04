@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -16,13 +17,13 @@ namespace AdminInterface.Initializers
 {
 	public class ActiveRecord
 	{
+		public string[] Assemblies = new [] {
+			"AdminInterface", "Common.Web.Ui"
+		};
+
 		public void Initialize(IConfigurationSource config)
 		{
-			ActiveRecordStarter.Initialize(new[] {
-					Assembly.Load("AdminInterface"),
-					Assembly.Load("Common.Web.Ui")
-				},
-				config);
+			ActiveRecordStarter.Initialize(Assemblies.Select(Assembly.Load).ToArray(), config);
 			var configuration = ActiveRecordMediator.GetSessionFactoryHolder().GetAllConfigurations()[0];
 			configuration.AddSqlFunction("DATE_ADD", new StandardSQLFunction("DATE_ADD"));
 			configuration.AddSqlFunction("group_concat", new StandardSQLFunction("group_concat"));

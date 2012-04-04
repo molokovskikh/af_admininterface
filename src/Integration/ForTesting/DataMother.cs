@@ -248,7 +248,6 @@ namespace Integration.ForTesting
 		public static Supplier CreateSupplier(Action<Supplier> action = null)
 		{
 			var payer = new Payer("Тестовый плательщик");
-			payer.Save();
 			var homeRegion = Region.Find(1UL);
 			var supplier = new Supplier(homeRegion, payer) {
 				Name = "Тестовый поставщик",

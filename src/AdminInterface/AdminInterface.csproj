@@ -145,6 +145,9 @@
     <Compile Include="Controllers\AdvertisingsController.cs" />
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
+    <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Models\OrderLog.cs" />
+    <Compile Include="Models\OrderFilter.cs" />
     <Compile Include="Controllers\SpecialHandlersController.cs" />
     <Compile Include="Controllers\ManagerReportsController.cs" />
     <Compile Include="Controllers\Filters\StatQuery.cs" />
@@ -256,7 +259,6 @@
     <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
-    <Compile Include="Models\OrderView.cs" />
     <Compile Include="Models\Suppliers\Price.cs" />
     <Compile Include="Models\RedmineUser.cs" />
     <Compile Include="Models\Security\ISecurityAware.cs" />
@@ -441,6 +443,7 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
+    <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />
@@ -487,6 +490,7 @@
     <None Include="Views\Mail\FreePasswordChange.brail" />
     <None Include="Views\Mails\Attachments.brail" />
     <None Include="Views\Main\StatSubView.brail" />
+    <None Include="Views\Orders\Details.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>
