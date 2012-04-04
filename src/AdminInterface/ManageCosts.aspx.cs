@@ -10,6 +10,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Common.MySql;
 using MySql.Data.MySqlClient;
 
 namespace AddUser
@@ -218,82 +219,17 @@ WHERE RowID = ?Id
 
 		protected void CreateCost_Click(object sender, EventArgs e)
 		{
-			MySqlTransaction transaction = null;
-			try
-			{
-				MyCn.Open();
-
-				var adapter = new MySqlDataAdapter("", MyCn);
-				adapter.SelectCommand.Transaction = MyCn.BeginTransaction(IsolationLevel.RepeatableRead);
-				transaction = adapter.SelectCommand.Transaction;
-
-				adapter.SelectCommand.Parameters.AddWithValue("?PriceCode", PriceCode);
-				adapter.SelectCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
-
-				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(PriceCode);
-				var supplier = price.Supplier;
-				var supplierId = supplier.Id;
-				var shortName = supplier.Name;
-				var priceName = price.Name;
-				var region = supplier.HomeRegion.Name;
-				var costType = price.CostType;
-
-				adapter.SelectCommand.Parameters.AddWithValue("?FirmCode", supplierId);
-
-				if (costType == 0)
-					adapter.SelectCommand.CommandText =
-@"
-SELECT pc.PriceItemId
-FROM Usersettings.PricesData pd
-	JOIN Usersettings.PricesCosts pc on pd.PriceCode = pc.PriceCode
-WHERE pd.PriceCode = ?PriceCode and pc.BaseCost = 1
-INTO @NewPriceItemId;
-
-INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT ?PriceCode, 0, @NewPriceItemId;
-SET @NewPriceCostId:=Last_Insert_ID(); 
-
-INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId;
-";
-				else
-					adapter.SelectCommand.CommandText =
-@"
-INSERT INTO farm.formrules() VALUES();
-SET @NewFormRulesId = Last_Insert_ID();
-
-INSERT INTO farm.sources() VALUES(); 
-SET @NewSourceId = Last_Insert_ID();
-
-INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
-SET @NewPriceItemId = Last_Insert_ID();
-
-INSERT INTO PricesCosts (PriceCode, BaseCost, PriceItemId) SELECT ?PriceCode, 0, @NewPriceItemId;
-SET @NewPriceCostId:=Last_Insert_ID(); 
-
-INSERT INTO farm.costformrules (CostCode) SELECT @NewPriceCostId; 
-";
-
-				adapter.SelectCommand.ExecuteNonQuery();
-
-				adapter.SelectCommand.Transaction.Commit();
-				NotificationHelper.NotifyAboutRegistration(
-					String.Format("\"{0}\" - регистрация ценовой колонки", shortName),
-					String.Format(
-@"Оператор: {0} 
+			var collumnCreator = new CostCollumnCreator(field => NotificationHelper.NotifyAboutRegistration(
+				String.Format("\"{0}\" - регистрация ценовой колонки", field.ShortName),
+				String.Format(
+					@"Оператор: {0} 
 Поставщик: {1}
 Регион: {2}
 Прайс-лист: {3}
-", SecurityContext.Administrator.UserName, shortName, region, priceName));
-			}
-			catch
-			{
-				if (transaction != null)
-					transaction.Rollback();
-				throw;
-			}
-			finally
-			{
-				MyCn.Close();
-			}
+", field.OperatorName, field.ShortName, field.Region, field.PriceName)));
+
+			collumnCreator.CreateCost(PriceCode, MyCn, SecurityContext.Administrator.UserName);
+
 			PostDataToGrid();
 		}
 
