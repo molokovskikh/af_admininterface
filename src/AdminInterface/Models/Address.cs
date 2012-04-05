@@ -375,7 +375,7 @@ and i.LegalEntityId = :OldLegalEntityId
 				return;
 
 			ArHelper.WithSession(s => {
-				s.CreateSQLQuery("insert into inscribe(ClientCode) values(:AddressId);")
+				s.CreateSQLQuery("insert into inscribe(AddressId) values(:AddressId);")
 					.SetParameter("AddressId", Id)
 					.ExecuteUpdate();
 			});
