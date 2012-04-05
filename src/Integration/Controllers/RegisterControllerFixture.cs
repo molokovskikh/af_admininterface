@@ -133,6 +133,8 @@ namespace Integration.Controllers
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 
+			Assert.That(registredClient.Users[0].WorkRegionMask, Is.EqualTo(1));
+			Assert.That(registredClient.Users[0].OrderRegionMask, Is.EqualTo(1));
 			Assert.That(registredClient.Addresses.Count, Is.EqualTo(0));
 		}
 

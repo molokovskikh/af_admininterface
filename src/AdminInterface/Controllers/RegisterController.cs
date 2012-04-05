@@ -269,6 +269,9 @@ namespace AdminInterface.Controllers
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
+				newClient.Settings.WorkRegionMask = newClient.MaskRegion;
+				newClient.Settings.OrderRegionMask = regionSettings.GetOrderMask();
+				BindObjectInstance(client.Settings, "client.Settings");
 
 				var user = new User(newClient);
 				BindObjectInstance(user, "user");
@@ -285,7 +288,7 @@ namespace AdminInterface.Controllers
 				if (!String.IsNullOrWhiteSpace(deliveryAddress))
 					newClient.AddAddress(deliveryAddress);
 
-				CreateDrugstore(newClient, additionalSettings, regionSettings.GetOrderMask(), supplier);
+				CreateDrugstore(newClient, additionalSettings, supplier);
 				AddContacts(newClient.ContactGroupOwner, clientContacts);
 
 				newUser = CreateUser(newClient, user, permissions, userPersons);
@@ -346,24 +349,16 @@ namespace AdminInterface.Controllers
 			return log;
 		}
 
-		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, ulong orderMask, Supplier supplier)
+		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, Supplier supplier)
 		{
 			var costCrypKey = ArHelper.WithSession(s =>
 				s.CreateSQLQuery("select usersettings.GeneratePassword()")
 				.UniqueResult<string>());
 
 			var smartOrder = SmartOrderRules.TestSmartOrder();
-
-			client.Settings = new DrugstoreSettings(client) {
-				Id = client.Id,
-				InvisibleOnFirm =
-					(Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart,
-				WorkRegionMask = client.MaskRegion,
-				OrderRegionMask = orderMask,
-				BasecostPassword = costCrypKey,
-				SmartOrderRules = smartOrder
-			};
-			BindObjectInstance(client.Settings, "client.Settings");
+			client.Settings.InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart;
+			client.Settings.BasecostPassword = costCrypKey;
+			client.Settings.SmartOrderRules = smartOrder;
 
 			if (additionalSettings.ShowForOneSupplier)
 			{
