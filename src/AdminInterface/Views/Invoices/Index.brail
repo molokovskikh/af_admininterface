@@ -31,7 +31,7 @@
 					<table>
 						${app.FilterFor("buildFilter.Period")}
 						<tr>
-							<td class="filter-label">Дата акта:</td>
+							<td class="filter-label">Дата счета:</td>
 							<td colspan=2>
 								<input type="text" name="invoiceDate" value="${System.DateTime.Now.ToShortDateString()}">
 								<input type=button class=CalendarInput>
