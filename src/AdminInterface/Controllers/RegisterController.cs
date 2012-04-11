@@ -271,7 +271,7 @@ namespace AdminInterface.Controllers
 				};
 				newClient.Settings.WorkRegionMask = newClient.MaskRegion;
 				newClient.Settings.OrderRegionMask = regionSettings.GetOrderMask();
-				BindObjectInstance(client.Settings, "client.Settings");
+				BindObjectInstance(newClient.Settings, "client.Settings");
 
 				var user = new User(newClient);
 				BindObjectInstance(user, "user");
