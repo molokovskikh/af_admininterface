@@ -146,6 +146,7 @@
     <Compile Include="UpdateLogFixture.cs" />
     <Compile Include="Drugstore\UserFixture.cs" />
     <Compile Include="Drugstore\UserSearchFixture.cs" />
+    <Compile Include="UserFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">

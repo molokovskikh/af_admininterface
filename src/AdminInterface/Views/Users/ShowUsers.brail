@@ -12,7 +12,7 @@
 </script>
 
 <div class=block>
-	<h3>Связи пользователей</h3>
+	<h3>Логины в видимости пользователя</h3>
 	<table id=excludes class=editable>
 		<tbody>
 			<tr>
@@ -33,3 +33,19 @@
 		</tbody>
 	</table>
 </div>
+<%if user.RootShowUsers.Count > 0: %>
+<div class=block>
+	<h3>Пользователь находится в видимости логинов</h3>
+	<table>
+		<tbody>
+		<%for i, item in enumerate(user.RootShowUsers): %>
+			<tr>
+				<td>
+					<a href="${siteroot}/users/${item.Id}/edit" class="${'Disabled' if not item.Enabled}">${item.Id} (${item.Name})</a>
+				</td>
+			</tr>
+		<%end %>
+		</tbody>
+	</table>
+</div>
+<%end %>

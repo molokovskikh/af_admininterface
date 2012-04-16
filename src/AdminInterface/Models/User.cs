@@ -248,6 +248,14 @@ namespace AdminInterface.Models
 			ColumnRef = "ShowUserId")]
 		public virtual IList<User> ShowUsers { get; set; }
 
+		[HasAndBelongsToMany(typeof (User),
+			Lazy = true,
+			ColumnKey = "ShowUserId",
+			Table = "Showusers",
+			Schema = "Customers",
+			ColumnRef = "PrimaryUserId")]
+		public virtual IList<User> RootShowUsers { get; set; }
+
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 
