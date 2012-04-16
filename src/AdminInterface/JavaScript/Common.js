@@ -1,32 +1,8 @@
 ﻿$(function () {
 	window.trackDependencies();
-	$("input[type=checkbox].all").click(function () {
-		$(this)
-			.parents("table")
-			.find("input[type=checkbox]")
-			.attr("checked", this.checked);
-	});
 
-	$("table.editable tr input[type=button].add, table.editable tr a.add").live('click', function () {
-		var table = $(this).parents("table");
-		var body = table.find("tbody").get(0);
-		var row = table.data("template")(table);
-
-		maxIndex = $(body).children("tr").length + 1;
-		row.find("input").each(function () {
-			this.name = this.name.replace(/\d+/, maxIndex);
-		});
-		row.find("textarea").each(function () {
-			this.name = this.name.replace(/\d+/, maxIndex);
-		});
-
-		row.appendTo(body);
-	});
-
-	$("table.editable tr input[type=button].delete, table.editable tr a.delete").live('click', function () {
-		$($(this).parents("tr").get(0)).remove();
-	});
-
+	registerCheckboxAll();
+	registerEditable();
 	joinRowHighlighter();
 
 	$('.input-date').each(function () {
@@ -173,13 +149,6 @@ function joinRowHighlighter() {
 		$(this).mouseout(function () { $(this).removeClass('SelectedRow'); });
 		$(this).mouseover(function () { $(this).addClass('SelectedRow'); });
 	});
-}
-
-function cloneRowTemplate(table) {
-	var row = $(table.find("tr").get(1)).clone();
-	row.find("input[type=hidden][name$=Id]").val("0");
-	row.find("input[type=hidden][name$=id]").val("0");
-	return row;
 }
 
 function ShowHidden(folder) {

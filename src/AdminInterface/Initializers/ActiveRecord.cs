@@ -1,83 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using Castle.ActiveRecord;
+﻿using System.Collections.Generic;
 using Castle.ActiveRecord.Framework;
-using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
-using NHibernate.Dialect.Function;
 using NHibernate.Engine;
-using NHibernate.Mapping;
-using NHibernate.Properties;
 using NHibernate.Type;
 
 namespace AdminInterface.Initializers
 {
-	public class ActiveRecord
+	public class ActiveRecord : ActiveRecordInitializer
 	{
-		public string[] Assemblies = new [] {
-			"AdminInterface", "Common.Web.Ui"
-		};
-
-		public void Initialize(IConfigurationSource config)
+		public ActiveRecord()
 		{
-			ActiveRecordStarter.Initialize(Assemblies.Select(Assembly.Load).ToArray(), config);
-			var configuration = ActiveRecordMediator.GetSessionFactoryHolder().GetAllConfigurations()[0];
-			configuration.AddSqlFunction("DATE_ADD", new StandardSQLFunction("DATE_ADD"));
-			configuration.AddSqlFunction("group_concat", new StandardSQLFunction("group_concat"));
-			foreach(var clazz in configuration.ClassMappings)
-			{
-				//тут баг для nested объектов я не выставлю is null
-				foreach(var property in clazz.PropertyIterator)
-				{
-					var getter = (IGetter)property.GetGetter(clazz.MappedClass);
-					var type = getter.ReturnType;
-					foreach (Column column in property.ColumnIterator)
-					{
-						//var type = ((SimpleValue)column.Value).Type.ReturnedClass;
-						if (String.IsNullOrEmpty(column.DefaultValue)
-							&& column.IsNullable
-							&& !IsNullableType(type))
-						{
-							column.IsNullable = false;
-							column.DefaultValue = "0";
-						}
-					}
-				}
-			}
+			Assemblies = new [] {"AdminInterface", "Common.Web.Ui"};
+		}
+
+		public override void Initialize(IConfigurationSource config)
+		{
+			base.Initialize(config);
 
 			SetupSecurityFilters();
 		}
 
-		private bool IsNullableType(Type type)
-		{
-			if (!type.IsValueType)
-				return true;
-
-			if (type.IsNullable())
-				return true;
-
-			return false;
-		}
-
 		private void SetupSecurityFilters()
 		{
-			var configuration = ActiveRecordMediator.GetSessionFactoryHolder()
-				.GetAllConfigurations()[0];
-
-			configuration.FilterDefinitions.Add("RegionFilter",
+			Configuration.FilterDefinitions.Add("RegionFilter",
 				new FilterDefinition("RegionFilter",
 					"",
 					new Dictionary<string, IType> {{"AdminRegionMask", NHibernateUtil.UInt64}},
 					true));
-			configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
+			Configuration.FilterDefinitions.Add("DrugstoreOnlyFilter",
 				new FilterDefinition("DrugstoreOnlyFilter", "", new Dictionary<string, IType>(), true));
-			configuration.FilterDefinitions.Add("SupplierOnlyFilter",
+			Configuration.FilterDefinitions.Add("SupplierOnlyFilter",
 				new FilterDefinition("SupplierOnlyFilter", "", new Dictionary<string, IType>(), true));
 
-			var regionMapping = configuration.GetClassMapping(typeof (Region));
+			var regionMapping = Configuration.GetClassMapping(typeof (Region));
 			regionMapping.AddFilter("RegionFilter", "if(RegionCode is null, 1, RegionCode & :AdminRegionMask > 0)");
 		}
 	}

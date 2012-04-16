@@ -20,6 +20,9 @@
 		${app.Asset("confirmation.js")}
 		${app.Asset("input.dependency.coffee")}
 		${app.Asset("details.js")}
+		${app.Asset("editable.js")}
+		${app.Asset("checkbox.all.js")}
+
 		${app.Asset("themes/base/jquery.ui.all.css")}
 		${app.Asset("filter.css")}
 

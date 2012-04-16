@@ -6,6 +6,7 @@ using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Views.Brail;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.MonoRailExtentions
 {

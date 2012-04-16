@@ -14,6 +14,7 @@ using Castle.MonoRail.Framework.Configuration;
 using Castle.MonoRail.Framework.Internal;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Views.Brail;
+using Common.Web.Ui.MonoRailExtentions;
 using IgorO.ExposedObjectProject;
 using Rhino.Mocks;
 using log4net.Config;
