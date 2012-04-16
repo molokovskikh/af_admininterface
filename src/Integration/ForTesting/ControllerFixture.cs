@@ -9,6 +9,7 @@ using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.MonoRailExtentions;
 using NUnit.Framework;
 using Rhino.Mocks;
 
@@ -38,7 +39,7 @@ namespace Integration.ForTesting
 					notifications.Add(m);
 					return true;
 				}));
-			MailerExtention.SenderForTest = sender;
+			BaseMailerExtention.SenderForTest = sender;
 
 			scope = new TransactionlessSession();
 		}

@@ -281,8 +281,8 @@
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
     <Compile Include="MonoRailExtentions\FakeServiceProvider.cs" />
-    <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="Models\MonorailMailer.cs" />
+    <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\PeriodUserType.cs" />
