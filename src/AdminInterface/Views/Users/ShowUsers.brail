@@ -1,0 +1,35 @@
+﻿${app.Asset("search.editor.js")}
+<script type="text/javascript">
+	$(function () {
+		$("#excludes").data("template", function () {
+			return $("<tr>")
+				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
+				.append($("<td>")
+					.append(searchTemplate("Выберите пользователя", "${siteroot}/users/SearchForShowUser"))
+					.append("<input type=hidden name=user.ShowUsers[0].Id>"));
+		});
+	});
+</script>
+
+<div class=block>
+	<h3>Связи пользователей</h3>
+	<table id=excludes class=editable>
+		<tbody>
+			<tr>
+				<td><input type=button class=add value=Добавить></td>
+				<th></th>
+			</tr>
+			<%for i, item in enumerate(user.ShowUsers): %>
+				<tr>
+					<td>
+						<input type=button value=Удалить class=delete>
+					</td>
+					<td>
+					<a href="${siteroot}/users/${item.Id}/edit" class="${'Disabled' if not item.Enabled}">${item.Id} (${item.Name})</a>
+					${FormHelper.HiddenField("user.ShowUsers[${i}].Id")}
+					</td>
+				</tr>
+			<%end %>
+		</tbody>
+	</table>
+</div>

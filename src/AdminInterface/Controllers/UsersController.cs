@@ -15,6 +15,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -366,7 +367,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom")] User user)
+		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user)
 		{
 			user.Save();
 			Notify("Сохранено");
@@ -396,6 +397,21 @@ namespace AdminInterface.Controllers
 				Error("Не могу удалить пользователя т.к. у него есть заказы");
 				RedirectToReferrer();
 			}
+		}
+
+		[return : JSONReturnBinder]
+		public object[] SearchForShowUser(string text)
+		{
+			uint id;
+			UInt32.TryParse(text, out id);
+			return ActiveRecordLinqBase<User>
+				.Queryable
+				.Where(u => (u.Name.Contains(text) || u.Id == id))
+				.OrderBy(u => u.Id)
+				.Take(50)
+				.ToArray()
+				.Select(p => new {id = p.Id, name = String.Format("{0} - {1}", p.Id, p.Name)})
+				.ToArray();
 		}
 	}
 }

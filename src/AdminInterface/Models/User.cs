@@ -240,6 +240,14 @@ namespace AdminInterface.Models
 			ColumnRef = "AddressId")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
+		[HasAndBelongsToMany(typeof (User),
+			Lazy = true,
+			ColumnKey = "PrimaryUserId",
+			Table = "Showusers",
+			Schema = "Customers",
+			ColumnRef = "ShowUserId")]
+		public virtual IList<User> ShowUsers { get; set; }
+
 		[BelongsTo("AccountingId", Cascade = CascadeEnum.All, Lazy = FetchWhen.OnInvoke)]
 		public virtual Account Accounting { get; set; }
 

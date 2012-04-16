@@ -9,11 +9,10 @@
 	<p>Пользователь отключен</p>
 </div>
 <% end %>
-
 <div class="TwoColumn" style="width: 49%;">
 	<form id="UserSettingsForm" method=post action="${siteroot}/users/SaveSettings">
 		<input name="user.Id" type=hidden value=${user.Id}>
-
+		<% OutputSubView("ShowUsers") %>
 		<div class=block>
 			<h3>
 				Права доступа в клиентском интерфейсе
