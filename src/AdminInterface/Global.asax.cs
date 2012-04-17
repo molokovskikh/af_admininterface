@@ -53,7 +53,6 @@ namespace AddUser
 			try
 			{
 				BaseRemoteRequest.Runner = new WebRequestRunner();
-				ValidEventListner.ValidatorAccessor = new MonorailValidatorAccessor();
 				ConfigReader.LoadSettings(Config);
 				Initialize();
 			}
