@@ -34,7 +34,7 @@ namespace AddUser
 		public string AttachmentsPath { get; set; }
 	}
 
-	public class Global : WebApplication, IMonoRailConfigurationEvents, IMonoRailContainerEvents
+	public class Global : WebApplication, IMonoRailConfigurationEvents
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (Global));
 
@@ -79,12 +79,6 @@ namespace AddUser
 
 			if (!Context.IsDebuggingEnabled)
 				Server.Transfer("~/Rescue/Error.aspx");
-		}
-
-		public new void Initialized(IMonoRailContainer container)
-		{
-			BaseMailer.ViewEngineManager = container.ViewEngineManager;
-			base.Initialized(container);
 		}
 
 		public new void Configure(IMonoRailConfiguration configuration)
