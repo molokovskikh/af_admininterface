@@ -9,7 +9,7 @@ using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional.Drugstore
 {

@@ -12,7 +12,7 @@ using Integration.ForTesting;
 using WatiN.Core.Native.Windows;
 using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional.Suppliers
 {

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Logs;
-using AdminInterface.Test.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using AdminInterface.Models.Telephony;
 using Functional.ForTesting;
 using Common.Web.Ui.Helpers;

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
-namespace AdminInterface.Test.ForTesting
+namespace Functional.ForTesting
 {
 	public class As
 	{

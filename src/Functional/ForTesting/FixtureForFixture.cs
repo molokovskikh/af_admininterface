@@ -1,5 +1,4 @@
-﻿using AdminInterface.Test.ForTesting;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 
 namespace Functional.ForTesting
 {

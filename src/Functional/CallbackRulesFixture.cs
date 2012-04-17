@@ -1,11 +1,10 @@
 ﻿using System;
 using AdminInterface.Models.Security;
-using AdminInterface.Test.ForTesting;
 using AdminInterface.Models.Telephony;
 using Functional.ForTesting;
 using NUnit.Framework;
 
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional
 {

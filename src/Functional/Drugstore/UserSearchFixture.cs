@@ -1,12 +1,11 @@
 ﻿using System;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
-using AdminInterface.Test.ForTesting;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Castle.ActiveRecord;

@@ -4,7 +4,7 @@ using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Common.Web.Ui.Helpers;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Functional.ForTesting;

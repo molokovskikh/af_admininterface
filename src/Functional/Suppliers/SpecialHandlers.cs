@@ -3,6 +3,7 @@ using AdminInterface.Models.Suppliers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.Web;
 
 namespace Functional.Suppliers
 {

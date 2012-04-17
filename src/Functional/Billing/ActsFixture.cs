@@ -3,7 +3,7 @@ using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional.Billing
 {

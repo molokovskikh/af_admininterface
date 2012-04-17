@@ -8,7 +8,7 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional.Drugstore
 {

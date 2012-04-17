@@ -10,7 +10,7 @@ using Integration.ForTesting;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
 using Document = WatiN.Core.Document;
 

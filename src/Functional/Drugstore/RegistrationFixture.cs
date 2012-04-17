@@ -5,12 +5,11 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using Functional.ForTesting;
 using WatiN.CssSelectorExtensions;
 

@@ -5,7 +5,8 @@ using System.Text;
 using AdminInterface.Controllers;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using Test.Support.Web;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional
 {

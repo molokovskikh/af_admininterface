@@ -9,8 +9,9 @@ using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.Web;
 using Test.Support.log4net;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
 using DescriptionAttribute=NUnit.Framework.DescriptionAttribute;
 

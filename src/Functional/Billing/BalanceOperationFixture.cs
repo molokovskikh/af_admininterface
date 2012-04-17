@@ -5,6 +5,7 @@ using AdminInterface.Models.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support.Web;
 using WatiN.Core.UtilityClasses;
 using WatiN.CssSelectorExtensions;
 

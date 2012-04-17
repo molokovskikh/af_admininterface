@@ -2,10 +2,9 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
-using AdminInterface.Test.ForTesting;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using Common.Web.Ui.Helpers;
 using AdminInterface.Helpers;
 

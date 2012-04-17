@@ -8,7 +8,7 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
 
 namespace Functional.Billing

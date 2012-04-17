@@ -2,13 +2,12 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using AdminInterface.Test.ForTesting;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using System.IO;
 using AdminInterface;
 using Common.Web.Ui.Models;

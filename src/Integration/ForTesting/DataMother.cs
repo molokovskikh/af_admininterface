@@ -7,6 +7,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
 using System.Linq;
@@ -220,7 +221,7 @@ namespace Integration.ForTesting
 			var invoice2 = new Invoice(payer,
 				new Period(2011, Interval.January),
 				new DateTime(2011, 1, 20),
-				new List<InvoicePart>{ new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1, DateTime.Now)});
+				new List<InvoicePart> { new InvoicePart(null, "Мониторинг оптового фармрынка за декабрь", 1000, 1, DateTime.Now)});
 			var act2 = new Act(invoice2.Date, invoice2);
 
 			return new RevisionAct(payer,
@@ -248,7 +249,7 @@ namespace Integration.ForTesting
 		public static Supplier CreateSupplier(Action<Supplier> action = null)
 		{
 			var payer = new Payer("Тестовый плательщик");
-			var homeRegion = Region.Find(1UL);
+			var homeRegion = ActiveRecordBase<Region>.Find(1UL);
 			var supplier = new Supplier(homeRegion, payer) {
 				Name = "Тестовый поставщик",
 				FullName = "Тестовый поставщик",
@@ -319,6 +320,20 @@ namespace Integration.ForTesting
 			ActiveRecordMediator.Save(certificate);
 
 			return certificate;
+		}
+
+		public static uint CreateCatelogProduct()
+		{
+			return ArHelper.WithSession(s => {
+				return Convert.ToUInt32(s.CreateSQLQuery(@"
+insert into Catalogs.CatalogNames(Name) values ('Тестовое наименование');
+set @Nameid = last_insert_id();
+insert into Catalogs.CatalogForms(Form) values ('Тестовая форма выпуска');
+set @FormId = last_insert_id();
+insert into Catalogs.Catalog(NameId, FormId) values (@NameId, @FormId);
+select last_insert_id();")
+					.UniqueResult());
+			});
 		}
 	}
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
 

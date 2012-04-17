@@ -14,7 +14,7 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using SecurityContext = AdminInterface.Security.SecurityContext;
 
 namespace Functional

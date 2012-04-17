@@ -2,7 +2,7 @@
 using System.Configuration;
 using AdminInterface.Helpers;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using mshtml;
 
 namespace Functional.ForTesting

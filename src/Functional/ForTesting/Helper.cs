@@ -1,12 +1,13 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Test.Support.Web;
+using WatiN.Core; using Test.Support.Web;
 
-using WatiN.Core;
-
-namespace AdminInterface.Test.ForTesting
+namespace Functional.ForTesting
 {
 	public static class Helper
 	{
@@ -121,6 +122,122 @@ namespace AdminInterface.Test.ForTesting
 		public static uint GetLoginFromRegistrationCard(Browser browser)
 		{
 			return Convert.ToUInt32(new Regex(@"\d+").Match(browser.FindText(new Regex(@"Login:\s*\d+", RegexOptions.IgnoreCase))).Value);
+		}
+
+		public static IE AssertThatTableContains<T>(this IE ie, params T[] activeRecords)
+		{
+			var table = GetDataTable(ie);
+			var dataRows = GetDataRow(table);
+			Assert.That(dataRows.Count,
+				Is.EqualTo(activeRecords.Length));
+
+			var index = 0;
+			foreach (var row in dataRows)
+			{
+				row.AssertEquality(activeRecords[index]);
+				index++;
+			}
+
+			return ie;
+		}
+
+		private static TableRowCollection GetDataRow(Table table)
+		{
+			return table.TableRows.Filter(r => r.ClassName != null && r.ClassName.Contains("Row"));
+		}
+
+		public static TableRow FindRow<T>(this IE ie, T activeRecord)
+		{
+			var table = GetDataTable(ie);
+			foreach (var row in GetDataRow(table))
+				if (row.IsEqualTo(activeRecord))
+					return row;
+
+			throw new Exception(String.Format("Не нашли строки для {0}", activeRecord));
+		}
+
+		public static void Input<T>(this IElementContainer container, Expression<Func<T, object>> input, object value)
+		{
+			var id = GetElementName(input);
+			if (value is DateTime)
+			{
+				var calendareButton = TryFindCalendareButton(container, id);
+				if (calendareButton == null)
+					container.TextField(Find.ById((string) id)).Value = value.ToString();
+				else
+					EnterIntoCalendar(calendareButton, (DateTime) value);
+			}
+			else if (value is bool)
+				container.CheckBox(Find.ById((string) id)).Checked = (bool) value;
+			else 
+				container.TextField(Find.ById((string) id)).Value = value.ToString();
+		}
+
+		public static bool IsEqualTo<T>(this TableRow row, T recordBase)
+		{
+			foreach (var header in FixtureMapping.Headers<T>())
+			{
+				var cell = GetCellByHeader(row, header);
+				if (!cell.IsEqual(recordBase, header))
+					return false;
+			}
+			return true;
+		}
+
+		private static void EnterIntoCalendar(Button button, DateTime value)
+		{
+			button.Click();
+			var div = button.DomContainer.Div(Find.ByClass("calendar"));
+			var calendarTable = div.Tables.First();
+			var text = calendarTable.TableCell(Find.ByClass("title")).Text;
+
+			var year = GetYear(text);
+			var month = GetMonth(text);
+			string marker;
+			if (month > value.Month)
+				marker = "‹";
+			else
+				marker = "›";
+			var changeMonth = calendarTable.Div(Find.ByText(marker));
+
+			var yearMarker = year > value.Year ? "«" : "»";
+			var changeYear = calendarTable.Div(Find.ByText(yearMarker));
+
+			foreach (var i in Enumerable.Range(0, Math.Abs(year - value.Year)))
+				SimulateClick(changeYear);
+
+			foreach (var i in Enumerable.Range(0, Math.Abs(month - value.Month)))
+				SimulateClick(changeMonth);
+
+			SimulateClick(calendarTable.TableCell(Find.ByText(value.Day.ToString())));
+		}
+
+		private static int GetYear(string title)
+		{
+			return Convert.ToInt32(title.Substring(title.IndexOf(",") + 1, title.Length - title.IndexOf(",") - 1).Trim());
+		}
+
+		private static void SimulateClick(Element changeMonth)
+		{
+			changeMonth.FireEvent("onmousedown");
+			changeMonth.FireEvent("onmouseup");
+		}
+
+		private static Button TryFindCalendareButton(IElementContainer container, string id)
+		{
+			var element = container.Element(Find.ById(id));
+			return ((IElementContainer) element.Parent).Button(Find.ByClass("CalendarInput"));
+		}
+
+		private static int GetMonth(string title)
+		{
+			var monthName = title.Substring(0, title.IndexOf(","));
+			return CultureInfo.GetCultureInfo("ru-Ru")
+				.DateTimeFormat
+				.MonthNames
+				.Select(s => s.ToLower())
+				.ToList()
+				.IndexOf(monthName) + 1;
 		}
 	}
 }

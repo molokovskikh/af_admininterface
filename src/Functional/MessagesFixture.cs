@@ -1,8 +1,7 @@
-﻿using AdminInterface.Test.ForTesting;
-using Functional.ForTesting;
+﻿using Functional.ForTesting;
 using NUnit.Framework;
-
-using WatiN.Core;
+using Test.Support.Web;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional
 {

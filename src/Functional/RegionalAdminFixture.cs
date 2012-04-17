@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Models;
-using AdminInterface.Test.ForTesting;
 using Common.Tools;
 using Functional.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 

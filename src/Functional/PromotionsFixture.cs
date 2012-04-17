@@ -5,7 +5,7 @@ using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core;
+using WatiN.Core; using Test.Support.Web;
 
 namespace Functional
 {
@@ -34,7 +34,7 @@ namespace Functional
 
 		private Catalog FindFirstFreeCatalog()
 		{
-			CreateCatelogProduct();
+			DataMother.CreateCatelogProduct();
 var catalogId = session.CreateSQLQuery(@"
 select
 	catalog.Id
