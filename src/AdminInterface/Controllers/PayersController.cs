@@ -42,12 +42,8 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 			PropertyBag["items"] = summary.Items;
 			PropertyBag["summary"] = summary;
-
-			if (summary.Before != 0)
-				PropertyBag["before"] = summary.Before;
-
-			if (summary.Total != 0)
-				PropertyBag["total"] = summary.Total;
+			PropertyBag["before"] = summary.Before;
+			PropertyBag["total"] = summary.Total;
 		}
 
 		public void NewPayment(uint id, int year)

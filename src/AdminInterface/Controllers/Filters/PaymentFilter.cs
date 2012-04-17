@@ -48,7 +48,7 @@ namespace AdminInterface.Controllers.Filters
 			if (!String.IsNullOrWhiteSpace(SearchText))
 			{
 				criteria.CreateAlias("Payer", "p");
-				criteria.Add(Expression.Like("p.Name", SearchText));
+				criteria.Add(Expression.Like("p.Name", SearchText, MatchMode.Anywhere));
 			}
 
 			var payments = Find<Payment>(criteria);
