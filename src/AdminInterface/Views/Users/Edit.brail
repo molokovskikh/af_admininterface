@@ -140,17 +140,12 @@
 		
 		<div class=block>
 			<h3>Общая информация</h3>
-			<div style="padding-bottom: 8px;">
-				<% if not Registrant: %>
-				Регистратор не указан${", дата регистрации " + user.RegistrationDate if user.RegistrationDate.ToBinary() > 0}
-				<% else: %>
-				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${user.RegistrationDate}
-				<% end %>
-			</div>
-			
-			${app.Label("user.Name")}<br>
-			${app.Edit("user.Name")}<br>
-			${app.GetValidationError("user.Name")}<br>
+			${app.Display("user.Registration")}
+			<p>
+				${app.Label("user.Name")}<br>
+				${app.Edit("user.Name")}<br>
+				${app.GetValidationError("user.Name")}<br>
+			</p>
 		</div>
 		
 		<div class=block>

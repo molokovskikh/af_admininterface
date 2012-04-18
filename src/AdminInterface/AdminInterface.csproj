@@ -185,7 +185,7 @@
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
-    <Compile Include="MonoRailExtentions\DoNotRecreateCollectionBinder.cs" />
+    <Compile Include="MonoRailExtentions\RecreateOnlyIfNullBinder.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />
     <Compile Include="Models\Billing\Period.cs" />
@@ -443,6 +443,7 @@
     <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
+    <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />
@@ -505,6 +506,7 @@
     <None Include="Views\Templates\Nomenclatures.brail" />
     <None Include="Views\Templates\Region.brail" />
     <None Include="Views\Templates\Settings.brail" />
+    <None Include="Views\Templates\Users.brail" />
     <None Include="Views\Users\ShowUsers.brail" />
     <None Include="Views\Users\SupplierSettings.brail" />
     <Content Include="Web.test.config">

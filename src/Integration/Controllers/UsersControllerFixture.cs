@@ -141,7 +141,7 @@ namespace Integration.Controllers
 
 		private User Registred()
 		{
-			return ActiveRecordLinqBase<User>.Queryable.Where(u => u.RegistrationDate >= begin).ToArray().Last();
+			return ActiveRecordLinqBase<User>.Queryable.Where(u => u.Registration.RegistrationDate >= begin).ToArray().Last();
 		}
 	}
 }

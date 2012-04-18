@@ -91,7 +91,7 @@
 
 <form id='MoveForm' method="post" action="${siteroot}/Client/MoveUserOrAddress">
 	
-	<% moveAddress = IsDefined("delivery") %>
+	<% moveAddress = IsDefined("address") %>
 
 	<input name="moveAddress" type="hidden" value="${moveAddress}"></input>
 		
@@ -108,7 +108,7 @@
 		<br />
 		<% if moveAddress: %>
 			Текущий адрес будет перемещен к выбранному клиенту.
-			<input name="addressId" type="hidden" value="${delivery.Id}" />
+			<input name="addressId" type="hidden" value="${address.Id}" />
 		<% else: %>
 			Текущий пользователь будет перемещен к выбранному клиенту.
 			<input name="userId" type="hidden" value="${user.Id}" />

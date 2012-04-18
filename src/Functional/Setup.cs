@@ -27,6 +27,7 @@ namespace Functional
 		[SetUp]
 		public void SetupFixture()
 		{
+			Test.Support.IntegrationFixture.DoNotUserTransaction = true;
 			ForTest.InitialzeAR();
 			var admin = Administrator.CreateLocalAdministrator();
 

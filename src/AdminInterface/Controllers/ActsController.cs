@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
-				DoNotRecreateCollectionBinder.Prepare(this, "act.Parts");
+				RecreateOnlyIfNullBinder.Prepare(this, "act.Parts");
 
 				BindObjectInstance(act, "act");
 				if (!HasValidationError(act))

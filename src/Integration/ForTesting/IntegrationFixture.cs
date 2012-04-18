@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Castle.ActiveRecord;
 using NHibernate;
 using NUnit.Framework;
+using Test.Support;
 
 namespace Integration.ForTesting
 {
