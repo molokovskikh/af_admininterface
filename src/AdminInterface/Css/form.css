@@ -117,3 +117,7 @@ input.error
 {
 	border: 1px dotted #f00;
 }
+
+#mainForm input[type=text], #mainForm select {
+	width: 100%;
+}
