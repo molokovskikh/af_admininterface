@@ -13,6 +13,8 @@ namespace Integration.Models
 		[Test]
 		public void Load_active_record_job()
 		{
+			SystemTime.Now = () => DateTime.Now.FirstDayOfMonth();
+
 			var name = String.Format("TestJob{0}", DateTime.Now);
 			var job = new ActiveRecordJob(name, () => {});
 			job.Job.Plan(PlanPeriod.Month, 1.Day());
