@@ -23,6 +23,7 @@ namespace AdminInterface.Initializers
 			config.PromotionsPath = Path.Combine(dataPath, config.PromotionsPath);
 			config.CertificatesPath = Path.Combine(dataPath, config.CertificatesPath);
 			config.AttachmentsPath = Path.Combine(dataPath, config.AttachmentsPath);
+			config.DocsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Docs");
 
 			config.PrinterPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, config.PrinterPath);
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mail;
+using AddUser;
 using AdminInterface.Models;
 using AdminInterface.Properties;
 using Common.Web.Ui.Helpers;
@@ -91,7 +92,7 @@ namespace AdminInterface.Helpers
 				From = new MailAddress("tech@analit.net"),
 				Subject = "Регистрационная карта для работы в системе АналитФармация",
 				Body = defaults.AppendFooter(body),
-				Attachments = { new Attachment(stream, "Регистрационная карта.jpg") },
+				Attachments = { new Attachment(stream, "Регистрационная карта.jpg"), new Attachment(Path.Combine(Global.Config.DocsPath, "Регистрационная карта.odt")) },
 			})
 			{
 				foreach (var mail in mails)

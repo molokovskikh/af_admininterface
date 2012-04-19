@@ -30,6 +30,7 @@ namespace AddUser
 		public string PromotionsPath { get; set; }
 
 		public string PrinterPath { get; set; }
+		public string DocsPath { get; set; }
 
 		public string AttachmentsPath { get; set; }
 	}
