@@ -138,6 +138,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Changer\HelpSupplierContact.cs" />
     <Compile Include="Components\Bredcrumbs.cs" />
     <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
