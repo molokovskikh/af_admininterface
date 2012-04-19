@@ -28,7 +28,8 @@ select
 	0 as {Region.AddressPayment},
 	0 as {Region.UserPayment},
 	0 as {Region.SupplierUserPayment},
-	'' as {Region.ShortAliase}
+	'' as {Region.ShortAliase},
+	false as {Region.Retail}
 union
 SELECT  r.RegionCode as {Region.Id},
 		r.Region as {Region.Name},
@@ -38,7 +39,8 @@ SELECT  r.RegionCode as {Region.Id},
 		r.AddressPayment as {Region.AddressPayment},
 		r.UserPayment as {Region.UserPayment},
 		r.SupplierUserPayment as {Region.SupplierUserPayment},
-		r.ShortAliase as {Region.ShortAliase}
+		r.ShortAliase as {Region.ShortAliase},
+		r.Retail as {Region.Retail}
 FROM	farm.regions as r
 WHERE	:Mask & r.regioncode > 0
 ORDER BY IsAll Desc, {Region.Name};")
