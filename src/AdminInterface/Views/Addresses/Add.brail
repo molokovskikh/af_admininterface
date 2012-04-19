@@ -6,41 +6,30 @@
 
 <div style="width: 600px;">
 
-	<form id="mainForm" method=post action="${siteroot}/deliveries/add">
+	${FormHelper.FormTag("${siteroot}/addresses/add", {@id: @mainForm})}
 		<input type=hidden name=clientId value=${client.Id}>
 		<div class=block>
 			<h3>Адрес</h3>
-			<input name=delivery.value class="required" style="width: 100%;">
+			${app.Edit("address.Value")}
+			${app.GetValidationError("address.Value")}
 		</div>
 
 		${ForHelper.Editor("address.Accounting")}
 
 		<div class="block">
 			<h3>Юридическое лицо</h3>
-			<select name="delivery.LegalEntity.Id" style="width: 80%;">
-			<% for i,item in enumerate(client.Orgs()): %>
-				<option value="${item.Id}" ${"selected" if (i == 0)}>${item.Name}</option>
-			<% end %>
-			</select>
+			${app.Edit("address.LegalEntity", client.Orgs())}
 		</div>
 
 		<div class="block">
 			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>
 
-		<div class=block>
-			<h3>Доступен пользователям</h3>
-			<div>
-				<% for i, user in enumerate(client.Users): %>
-					<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} >
-					${user.GetLoginWithName()}
-					<br>
-				<% end %>
-			</div>
-		</div>
-				
+		<% OutputSubView("/Templates/Users") %>
+
 		<div class=save>
 			<input type=submit value="Создать">
 		</div>
-	</form>
+	${FormHelper.EndFormTag()}
+
 </div>

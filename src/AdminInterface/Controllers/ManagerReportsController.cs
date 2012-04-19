@@ -35,12 +35,13 @@ namespace AdminInterface.Controllers
 
 		private string _name;
 
-		public string Name { get
-		{
-			if (_name == null)
-				return Id.ToString();
-			return _name;
-		}
+		public string Name {
+			get
+			{
+				if (_name == null)
+					return Id.ToString();
+				return _name;
+			}
 			set { _name = value; }
 		}
 
@@ -123,7 +124,7 @@ namespace AdminInterface.Controllers
 			SortKeyMap = new Dictionary<string, string> {
 				{"Id", "Id"},
 				{"Name", "Name"},
-				{"RegistrationDate", "RegistrationDate"},
+				{"RegistrationDate", "Registration.RegistrationDate"},
 				{"ClientId", "c.Id"},
 				{"ClientName", "c.Name"}
 			};
@@ -204,7 +205,7 @@ namespace AdminInterface.Controllers
 				userCriteria.SetProjection(Projections.ProjectionList()
 				        .Add(Projections.Property<User>(u => u.Id).As("Id"))
 				        .Add(Projections.Property<User>(u => u.Name).As("Name"))
-				        .Add(Projections.Property<User>(u => u.RegistrationDate).As("RegistrationDate"))
+				        .Add(Projections.Property<User>(u => u.Registration.RegistrationDate).As("RegistrationDate"))
 				        .Add(Projections.Property("Enabled").As("UserEnabled"))
 				        .Add(Projections.Property("s.Id").As("ClientId"))
 				        .Add(Projections.Property("s.Name").As("ClientName"))
@@ -212,8 +213,8 @@ namespace AdminInterface.Controllers
 				        .Add(Projections.Property("s.Type").As("ClientType"))
 				        .Add(Projections.Property("s.HomeRegion").As("RegionName"))
 				        .Add(Projections.Alias(userCountProjection, "UserCount")))
-					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
-					.Add(Expression.Le("RegistrationDate", Period.End.Date))
+					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
+					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date))
 					.CreateAlias("Payer", "p", JoinType.InnerJoin)
 					.CreateAlias("Client", "c", JoinType.LeftOuterJoin)
 					.Add(Expression.Or(Expression.Gt("p.PayerID", 921u), Expression.Lt("p.PayerID", 921u)));
@@ -231,7 +232,7 @@ namespace AdminInterface.Controllers
 				adressCriteria.SetProjection(Projections.ProjectionList()
 				    .Add(Projections.Property<Address>(u => u.Id).As("Id"))
 				    .Add(Projections.Property<Address>(u => u.Value).As("Name"))
-				    .Add(Projections.Property<Address>(u => u.RegistrationDate).As("RegistrationDate"))
+				    .Add(Projections.Property<Address>(u => u.Registration.RegistrationDate).As("RegistrationDate"))
 				    .Add(Projections.Property("Enabled").As("AdressEnabled"))
 				    .Add(Projections.Property("c.Id").As("ClientId"))
 				    .Add(Projections.Property("c.Name").As("ClientName"))
@@ -245,18 +246,18 @@ namespace AdminInterface.Controllers
 				            .Add(Expression.And(
 				                Expression.LeProperty(
 				                    Projections.SqlFunction("DATE_ADD", NHibernateUtil.DateTime,
-				                        Projections.Property("u.RegistrationDate"),
+				                        Projections.Property("u.Registration.RegistrationDate"),
 				                        Projections.SqlProjection("INTERVAL -1 hour as ",
 				                            new[] {string.Empty},
 				                            new[] {NHibernateUtil.DateTime})),
-				                    "ad.RegistrationDate"),
+				                    "ad.Registration.RegistrationDate"),
 				                Expression.GeProperty(
 				                    Projections.SqlFunction("DATE_ADD", NHibernateUtil.DateTime,
-				                        Projections.Property("u.RegistrationDate"),
+				                        Projections.Property("u.Registration.RegistrationDate"),
 				                        Projections.SqlProjection("INTERVAL 1 hour as ",
 				                            new[] {string.Empty},
 				                            new[] {NHibernateUtil.DateTime})),
-				                    "ad.RegistrationDate")))
+				                    "ad.Registration.RegistrationDate")))
 				            .CreateCriteria("Users", "u", JoinType.InnerJoin)
 				            .SetProjection(Projections.ProjectionList()
 				                .Add(Projections.Conditional(
@@ -268,8 +269,8 @@ namespace AdminInterface.Controllers
 				                        Projections.Constant(" - ("),
 				                        Projections.Property("u.Name"),
 				                        Projections.Constant(")")))))), "UserNames")))
-					.Add(Expression.Ge("RegistrationDate", Period.Begin.Date))
-					.Add(Expression.Le("RegistrationDate", Period.End.Date));
+					.Add(Expression.Ge("Registration.RegistrationDate", Period.Begin.Date))
+					.Add(Expression.Le("Registration.RegistrationDate", Period.End.Date));
 
 				return adressCriteria;
 			}

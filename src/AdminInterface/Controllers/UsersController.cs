@@ -178,11 +178,6 @@ namespace AdminInterface.Controllers
 					PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(supplier.RegionMask);
 				}
 			}
-			if (String.IsNullOrEmpty(user.Registrant))
-				PropertyBag["Registrant"] = null;
-			else 
-				PropertyBag["Registrant"] = Administrator.GetByName(user.Registrant);
-			PropertyBag["RegistrationDate"] = user.RegistrationDate;
 			if (user.ContactGroup != null && user.ContactGroup.Contacts != null)
 				PropertyBag["ContactGroup"] = user.ContactGroup;
 

@@ -1,0 +1,9 @@
+﻿<div>
+<% if not model.Value: %>
+Регистратор не указан, дата регистрации неизвестна
+<% elif not model.Value.GetRegistrant(): %>
+Регистратор не указан, дата регистрации ${model.Value.RegistrationDate}
+<% else: %>
+Зарегистрирован пользователем ${model.Value.GetRegistrant().ManagerName}, дата регистрации ${model.Value.RegistrationDate}
+<% end %>
+</div>

@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -28,12 +29,28 @@ namespace Integration.Controllers
 		[Test]
 		public void Add()
 		{
-			Request.Params.Add("delivery.Value", "тестовый адрес доставки");
-			Request.Params.Add("delivery.AvaliableForUsers[0].Id", user.Id.ToString());
+			Request.Params.Add("address.Value", "тестовый адрес доставки");
+			Request.Params.Add("address.AvaliableForUsers[0].Id", user.Id.ToString());
 			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
 			var messages = ClientInfoLogEntity.Queryable.Where(m => m.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
+		}
+
+		[Test]
+		public void Bind_account()
+		{
+			var begin = DateTime.Now;
+			Request.Params.Add("address.Value", "тестовый адрес доставки");
+			Request.Params.Add("address.Accounting.IsFree", "True");
+			Request.Params.Add("address.Accounting.FreePeriodEnd", "12.04.2012");
+			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
+
+			Assert.That(Response.WasRedirected, Is.True);
+			Assert.That(Context.Flash["Message"].ToString(), Is.EqualTo("Адрес доставки создан"));
+			var address = Address.Queryable.FirstOrDefault(a => a.Registration.RegistrationDate >= begin);
+			Assert.That(address.Accounting.IsFree, Is.True);
+			Assert.That(address.Accounting.FreePeriodEnd, Is.EqualTo(new DateTime(2012, 04, 12)));
 		}
 
 		[Test]

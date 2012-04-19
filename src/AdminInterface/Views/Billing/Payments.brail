@@ -418,7 +418,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<td class="can-not-order">${user.Name}</td>
 						<td>${user.Logs.AFTime if user.Logs.AFTime != null}</td>
 						<td>${user.RootService.Name}</td>
-						<td>${user.RegistrationDate.ToShortDateString() if user.RegistrationDate != null}</td>
+						<td>${user.Registration.RegistrationDate.ToShortDateString() if user.Registration.RegistrationDate != null}</td>
 					</tr>
 					<tr id="UserRowHidden${user.Id}" class="${'hidable hidden' if hidden}">
 						<td id="additionalUserInfoCell${user.Id}" colspan="10"></td>
@@ -488,7 +488,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td>
 								<a href="javascript:" onclick="ShowJuridicalOrganization(${addr.LegalEntity.Id})">${addr.LegalEntity.Name}</a>
 							</td>
-							<td>${addr.RegistrationDate.ToShortDateString() if addr.RegistrationDate != null}</td>
+							<td>${addr.Registration.RegistrationDate.ToShortDateString() if addr.Registration.RegistrationDate != null}</td>
 						</tr>
 						<tr id="AddressRowHidden${addr.Id}" class='${'hidable hidden' if hidden}'>
 							<td id="additionalAddressInfoCell${addr.Id}" colspan="10"></td>

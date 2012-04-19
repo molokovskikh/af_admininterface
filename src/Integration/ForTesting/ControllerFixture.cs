@@ -12,6 +12,7 @@ using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.MonoRailExtentions;
 using NUnit.Framework;
 using Rhino.Mocks;
+using Test.Support;
 
 namespace Integration.ForTesting
 {

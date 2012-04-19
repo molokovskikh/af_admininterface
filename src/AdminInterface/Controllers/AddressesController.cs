@@ -42,7 +42,8 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			var address = new Address(client);
-			BindObjectInstance(address, "delivery", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
+			RecreateOnlyIfNullBinder.Prepare(this);
+			BindObjectInstance(address, "address", AutoLoadBehavior.NewRootInstanceIfInvalidKey);
 
 			client.AddAddress(address);
 			address.UpdateContacts(contacts);
@@ -60,20 +61,16 @@ namespace AdminInterface.Controllers
 		public void Edit(uint id)
 		{
 			var address = Address.Find(id);
-			PropertyBag["delivery"] = address;
+			PropertyBag["address"] = address;
 			PropertyBag["client"] = address.Client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
-			if (String.IsNullOrEmpty(address.Registrant))
-				PropertyBag["Registrant"] = null;
-			else 
-				PropertyBag["Registrant"] = Administrator.GetByName(address.Registrant);
-			if ((address.ContactGroup != null) && (address.ContactGroup.Contacts != null))
+			if (address.ContactGroup != null && address.ContactGroup.Contacts != null)
 				PropertyBag["ContactGroup"] = address.ContactGroup;
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void Update([ARDataBind("delivery", AutoLoadBehavior.Always, Expect = "delivery.AvaliableForUsers")] Address address, 
+		public void Update([ARDataBind("address", AutoLoadBehavior.Always, Expect = "address.AvaliableForUsers")] Address address, 
 			[DataBind("contacts")] Contact[] contacts, [DataBind("deletedContacts")] Contact[] deletedContacts)
 		{
 			address.UpdateContacts(contacts, deletedContacts);

@@ -97,7 +97,7 @@ namespace AdminInterface.Controllers
 
 			if (IsPost)
 			{
-				DoNotRecreateCollectionBinder.Prepare(this, "invoice.Parts");
+				RecreateOnlyIfNullBinder.Prepare(this, "invoice.Parts");
 
 				BindObjectInstance(invoice, "invoice");
 				if (!HasValidationError(invoice))

@@ -184,11 +184,8 @@ namespace AdminInterface.Models
 		[Property, Description("Отображать реальную цену поставщика"), Auditable]
 		public virtual bool ShowSupplierCost { get; set; }
 
-		[Property]
-		public virtual DateTime RegistrationDate { get; set; }
-
-		[Property]
-		public virtual string Registrant { get; set; }
+		[Nested]
+		public virtual RegistrationInfo Registration { get; set;}
 
 		[Property, Description("Регионы работы"), Auditable]
 		public virtual ulong WorkRegionMask { get; set; }
@@ -456,8 +453,7 @@ namespace AdminInterface.Models
 			if (Accounting == null)
 				Accounting = new UserAccount(this);
 
-			Registrant = SecurityContext.Administrator.UserName;
-			RegistrationDate = DateTime.Now;
+			Registration = new RegistrationInfo(SecurityContext.Administrator);
 		}
 
 		public virtual bool IsLocked
@@ -662,14 +658,6 @@ WHERE
 			Payer = legalEntity.Payer;
 			InheritPricesFrom = null;
 			Save();
-		}
-
-		public virtual object GetRegistrant()
-		{
-			if (String.IsNullOrEmpty(Registrant))
-				return null;
-
-			return Administrator.GetByName(Registrant);
 		}
 
 		public virtual string GetEmailForBilling()

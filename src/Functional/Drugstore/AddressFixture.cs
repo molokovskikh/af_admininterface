@@ -51,7 +51,7 @@ namespace Functional.Drugstore
 		{
 			browser.Link(Find.ByText("Новый адрес доставки")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Новый адрес доставки"));
-			browser.TextField(Find.ByName("delivery.value")).TypeText("тестовый адрес");
+			browser.TextField(Find.ByName("address.value")).TypeText("тестовый адрес");
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
@@ -84,7 +84,7 @@ namespace Functional.Drugstore
 		{
 			var applyButtonText = "Создать";
 			browser.Link(Find.ByText("Новый адрес доставки")).Click();
-			browser.TextField(Find.ByName("delivery.value")).TypeText("Test address");
+			browser.TextField(Find.ByName("address.value")).TypeText("Test address");
 			ContactInformationFixture.AddContact(browser, ContactType.Email, applyButtonText, clientId);
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 			browser.Link(Find.ByText("Test address")).Click();
@@ -119,7 +119,7 @@ namespace Functional.Drugstore
 		public void Address_must_be_enabled_after_registration()
 		{
 			browser.Link(Find.ByText("Новый адрес доставки")).Click();
-			browser.TextField(Find.ByName("delivery.value")).TypeText("test address");
+			browser.TextField(Find.ByName("address.value")).TypeText("test address");
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
@@ -138,7 +138,7 @@ namespace Functional.Drugstore
 
 			Open(address);
 			// Даем доступ пользователю к адресу доставки
-			browser.CheckBox(Find.ByName("delivery.AvaliableForUsers[0].Id")).Checked = true;
+			browser.CheckBox(Find.ByName("address.AvaliableForUsers[0].Id")).Checked = true;
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			browser.Refresh();
 

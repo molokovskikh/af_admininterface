@@ -214,15 +214,7 @@
 
 		<div class=block>
 			<h3>Общая информация</h3>
-			<div>
-				<% if not client.Registration: %>
-				Регистратор не указан, дата регистрации неизвестна
-				<% elif not client.Registration.GetRegistrant(): %>
-				Регистратор не указан, дата регистрации ${client.Registration.RegistrationDate}
-				<% else: %>
-				Зарегистрирован пользователем ${client.Registration.GetRegistrant().ManagerName}, дата регистрации ${client.Registration.RegistrationDate}
-				<% end %>
-			</div>
+			${app.Display("client.Registration")}
 			${FormHelper.FormTag("Update", null)}
 				${FormHelper.HiddenField("client.Id")}
 				<div>

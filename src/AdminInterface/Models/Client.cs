@@ -285,8 +285,7 @@ group by u.ClientId")
 			if (address.Payer == null)
 				address.Payer = address.LegalEntity.Payer;
 
-			address.Registrant = SecurityContext.Administrator.UserName;
-			address.RegistrationDate = DateTime.Now;
+			address.Registration = new RegistrationInfo(SecurityContext.Administrator);
 			address.Client = this;
 			address.Enabled = true;
 			Addresses.Add(address);

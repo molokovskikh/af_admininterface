@@ -1,12 +1,12 @@
-﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), delivery.Client]} %>
+﻿<% component Bubble, {"bredcrumbs" : [("Поиск пользователей", "${siteroot}/users/search"), address.Client]} %>
 
 <% component CaptureFor, {@id : @Title}: %>
-	Адрес доставки ${delivery.Value}
+	Адрес доставки ${address.Value}
 <% end %>
 
 <div style="width: 600px;">
 
-	<% if not delivery.Enabled: %>
+	<% if not address.Enabled: %>
 	<div class="Warning">
 		<p>Адрес отключен</p>
 	</div>
@@ -15,8 +15,8 @@
 	<div class=block>
 		<h3>Операции</h3>
 
-		<form method=post action="${siteroot}/deliveries/notify" style="margin:0; padding:5px 0px 5px 0px">
-			<input type=hidden name=id value=${delivery.Id} />
+		<form method=post action="${siteroot}/addresses/notify" style="margin:0; padding:5px 0px 5px 0px">
+			<input type=hidden name=id value=${address.Id} />
 			<input type=submit value="Отправить уведомления о регистрации поставщикам" />
 		</form>
 	</div>
@@ -25,47 +25,31 @@
 		<% OutputSubView("/SubViews/MoveTo") %>
 	</div>
 
-	<form id="mainForm" method=post action="${siteroot}/deliveries/update">
-		<input type=hidden name=delivery.Id value="${delivery.Id}" >
+	${FormHelper.FormTag("${siteroot}/addresses/update", {@id: @mainForm})}
+		${FormHelper.HiddenField("address.Id")}
 
 		<div class=block>
 			<h3>Адрес</h3>
-			<div style="padding-bottom: 8px;">
-				<% if not Registrant: %>
-				Регистратор не указан${", дата регистрации " + delivery.RegistrationDate if delivery.RegistrationDate.ToBinary() > 0}
-				<% else: %>
-				Зарегистрирован пользователем ${Registrant.ManagerName}, дата регистрации ${delivery.RegistrationDate}
-				<% end %>
-			</div>
+			${app.Display("address.Registration")}
 			<p>
-				<input name=delivery.value class="required" style="width: 100%;" value="!{delivery.Value}">
+				${app.Edit("address.Value")}
+				${app.GetValidationError("address.Value")}
 			</p>
 		</div>
 
 		<div class="block">
 			<h3>Юридическое лицо</h3>
-			<select name="delivery.LegalEntity.Id" style="width: 80%;">
-			<% for item in delivery.Client.Orgs(): %>
-				<option value="${item.Id}" ${"selected" if (item.Id == delivery.LegalEntity.Id)}>${item.Payer.Name}, ${item.Name}</option>
-			<% end %>
-			</select>
+			${app.Edit("address.LegalEntity", client.Orgs())}
 		</div>
 
 		<div class="block">
 			<% OutputSubView("/SubViews/ContactInfo") %>
 		</div>
 
-		<div class=block>
-			<h3>Доступен пользователям</h3>
-			<% for i, user in enumerate(delivery.Client.Users): %>
-				<input type=checkbox name="delivery.AvaliableForUsers[${i}].Id" value=${user.Id} ${"checked" if delivery.AvaliableFor(user) }>
-				<span class="${app.Style(user)}">${user.GetLoginWithName()}</span>
-				<br />
-			<% end %>
-		</div>
+		<% OutputSubView("/Templates/Users") %>
 
 		<div class=save>
 			<input type=submit value="Сохранить">
 		</div>
-	</form>
+	${FormHelper.EndFormTag()}
 </div>

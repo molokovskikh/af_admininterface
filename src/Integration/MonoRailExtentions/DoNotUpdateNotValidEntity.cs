@@ -7,6 +7,8 @@ using Integration.ForTesting;
 using NHibernate;
 using NHibernate.Proxy;
 using NUnit.Framework;
+using Test.Support;
+using IntegrationFixture = Integration.ForTesting.IntegrationFixture;
 
 namespace Integration.MonoRailExtentions
 {
