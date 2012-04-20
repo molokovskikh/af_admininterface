@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
 using Common.Web.Ui.MonoRailExtentions;
+using log4net;
 
 namespace AdminInterface.Initializers
 {
