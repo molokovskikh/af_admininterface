@@ -48,6 +48,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		$("[name=\"supplierContacts[0].ContactText\"]").rules("add", {required: true});
 		$("[name=\"additionalEmailsForSendingCard\"]").rules("add", {validateEmailList: true});
 		$("[name=\"supplierContacts[1].ContactText\"]").rules("add", {noEmailAddress: true});
+		$("[name=\"ClientManagersContacts[1].ContactText\"]").rules("add", {required: true});
 	}
 
 	function validate() {
