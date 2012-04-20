@@ -1,4 +1,5 @@
 using System.Linq;
+using AddUser;
 using AdminInterface.Helpers;
 using Integration.ForTesting;
 using Integration.Models;
@@ -12,6 +13,7 @@ namespace Integration
 		[Test]
 		public void Send_client_card()
 		{
+			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 			var client = DataMother.CreateTestClientWithUser();
 			Flush();
 
