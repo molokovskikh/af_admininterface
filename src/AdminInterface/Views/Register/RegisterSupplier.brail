@@ -34,8 +34,6 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 			}  
 			else return true;  
 		}, "Это поле необходимо заполнить."); 
-		
-		validateForm();
 	});
 
 	function validatePayer() {
@@ -47,15 +45,9 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	}
 
 	function validateForm() {
-		jQuery("form").validate({
-			rules: {
-				"supplier.FullName": "required",
-				"supplier.Name": "required",
-				"supplierContacts[0].ContactText" : "required",
-				"additionalEmailsForSendingCard": "validateEmailList",
-				"supplierContacts[1].ContactText" : "noEmailAddress"
-			}
-		});
+		$("[name=\"supplierContacts[0].ContactText\"]").rules("add", {required: true});
+		$("[name=\"additionalEmailsForSendingCard\"]").rules("add", {validateEmailList: true});
+		$("[name=\"supplierContacts[1].ContactText\"]").rules("add", {noEmailAddress: true});
 	}
 
 	function validate() {
@@ -81,21 +73,30 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		width: 100%;
 		border-spacing: 0px;
 	}
+	
+	#supplier_Name, #supplier_FullName
+	{
+		width: 100%;
+	}
 </style>
 
 <div style="width: 800px;">
-<form method="post">
+${FormHelper.FormTag("", {})}
 	<div class="block">
 		<h3>Общая информация</h3>
 		<table border="0" width="100%" cellpadding="5" cellspacing="0">
 			<tr>
 				<td>Юридическое наименование:</td>
-				<td><input type="text" id="JuridicalName" name="supplier.FullName" style="width: 100%" /></td>
+				<td>
+					${app.Edit("supplier.FullName")}
+				</td>
 				<td></td>
 			</tr>
 			<tr>
 				<td>Краткое наименование:</td>
-				<td><input type="text" id="ShortName" name="supplier.Name" style="width: 100%" /></td>
+				<td>
+					${app.Edit("supplier.Name")}
+				</td>
 				<td></td>
 			</tr>
 			<tr valign="top">
@@ -257,6 +258,13 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	<div class="save">
 		<input type="submit" id="RegisterButton" name="RegisterButton" value="Зарегистрировать" />
 	</div>
-
-</form>
+${FormHelper.EndFormTag()}
 </div>
+
+<script>
+	//хак будь бдителен, регистрация валидаторо происходит здесь
+	//тк сначала регистрируются валидаторы которые сгенерировал monorails а затем только собственные
+	$(function () {
+		validateForm();
+	});
+</script>
