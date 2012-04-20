@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AddUser;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
@@ -27,6 +28,8 @@ namespace Integration.Controllers
 			begin = DateTime.Now;
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
+
+			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 		}
 
 		[Test]
