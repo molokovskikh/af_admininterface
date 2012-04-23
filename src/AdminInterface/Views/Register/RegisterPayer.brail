@@ -94,7 +94,7 @@ end
 	<input type="hidden" name="showRegistrationCard" value="${showRegistrationCard}" />
 	${FormHelper.HiddenField("Instance.PayerID")}
 
-<table>
+<table style="width:800px;">
 	${WriteInputGroupHeader("Юридическое лицо")}
 
 					
