@@ -127,6 +127,23 @@
 						<% end %>
 					</td>
 				</tr>
+				<%if query.Full: %>
+				<tr>
+					<td class="statistic-label">
+						Приготовлено частичных КО:
+					</td>
+					<td class="statistic-value">
+						<% if PartCumulativeUpdates.ToString() and PartCumulativeUpdates.ToString() != "0(0)": %>
+						<a href="${uriTemplate}&updateType=${cast(int, StatisticsType.LimitedCumulative)}">
+							<abbr title="В скобках указано количество уникальных пользователей.">${PartCumulativeUpdates}</abbr>
+						</a>
+						<% else: %>
+						-
+						<% end %>
+					</td>
+					<td class="statistic-label" colspan=2></td>
+				</tr>
+				<%end %>
 				<tr>
 					<td class="statistic-label">
 						Последнее обновление:

@@ -173,6 +173,7 @@ where	oh.processed = 0
 SELECT sum(if(afu.UpdateType = 6, 1, 0)) as UpdatesErr,
 	   cast(concat(Sum(afu.UpdateType IN (5)) ,'(' ,count(DISTINCT if(afu.UpdateType  IN (5), u.Id, null)) ,')') as CHAR) UpdatesAD,
 	   cast(concat(sum(afu.UpdateType = 2) ,'(' ,count(DISTINCT if(afu.UpdateType = 2, u.Id, null)) ,')') as CHAR) CumulativeUpdates,
+	   cast(concat(sum(afu.UpdateType IN (18, 19)) ,'(' ,count(DISTINCT if(afu.UpdateType IN (18, 19), u.Id, null)) ,')') as CHAR) PartCumulativeUpdates,
 	   cast(concat(sum(afu.UpdateType = 1) ,'(' ,count(DISTINCT if(afu.UpdateType = 1, u.Id, null)) ,')') as CHAR) Updates
 		{0}
 FROM Customers.Clients cd
