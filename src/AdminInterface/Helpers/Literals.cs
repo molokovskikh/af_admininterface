@@ -17,6 +17,6 @@ namespace AdminInterface.Helpers
 		[Description("Обычные обновления")] UpdateNormal = 1,
 		[Description("Ошибки подготовки данных")] UpdateError = 6,
 		[Description("Запреты")] UpdateBan = 5,
-		[Description("Частисные комулятивные")] LimitedCumulative = 5
+		[Description("Частисные комулятивные")] LimitedCumulative = 18
 	}
 }
