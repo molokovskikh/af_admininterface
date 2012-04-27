@@ -274,6 +274,8 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(newClient.Settings, "client.Settings");
 
 				var user = new User(newClient);
+				user.SendWaybills = false;
+				user.SendRejects = true;
 				BindObjectInstance(user, "user");
 
 				if (!IsValid(newClient, user))

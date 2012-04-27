@@ -21,11 +21,20 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using AdminInterface.Properties;
 using System.Web;
+using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Controllers
 {
+	public class RejectWaibillParams
+	{
+		public bool SendWaybills { get; set;}
+		public bool SendRejects { get; set;}
+		public long maxCou { get; set;}
+	}
+
 	[
 		Helper(typeof(HttpUtility)),
 		Secure,
@@ -43,6 +52,9 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			var user = new User((Service)client);
+			var rejectWaibillParams = GetRejectWaibillParams();
+			user.SendWaybills = rejectWaibillParams.SendWaybills;
+			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["user"] = user;
 			PropertyBag["client"] = client;
 			PropertyBag["drugstore"] = client.Settings;
@@ -149,6 +161,14 @@ namespace AdminInterface.Controllers
 				Flash["password"] = password;
 				Redirect("main", "report", new {id = user.Id});
 			}
+		}
+
+		private RejectWaibillParams GetRejectWaibillParams()
+		{
+			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
+select max(cou) as maxCou, SendRejects, SendWaybills from
+(select count(*) as cou, u.Id, u.SendRejects, SendWaybills from Customers.Users u
+group by u.SendWaybills and u.SendRejects) as k;").ToList<RejectWaibillParams>()).FirstOrDefault();
 		}
 
 		[AccessibleThrough(Verb.Get)]
