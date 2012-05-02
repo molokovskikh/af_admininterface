@@ -32,7 +32,6 @@ namespace AdminInterface.Controllers
 	{
 		public bool SendWaybills { get; set;}
 		public bool SendRejects { get; set;}
-		public long maxCou { get; set;}
 	}
 
 	[
@@ -52,7 +51,7 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			var user = new User((Service)client);
-			var rejectWaibillParams = GetRejectWaibillParams();
+			var rejectWaibillParams = GetRejectWaibillParams(clientId);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["user"] = user;
@@ -163,12 +162,16 @@ namespace AdminInterface.Controllers
 			}
 		}
 
-		private RejectWaibillParams GetRejectWaibillParams()
+		private RejectWaibillParams GetRejectWaibillParams(uint clientId)
 		{
 			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
-select max(cou) as maxCou, SendRejects, SendWaybills from
+select SendRejects, SendWaybills from
 (select count(*) as cou, u.Id, u.SendRejects, SendWaybills from Customers.Users u
-group by u.SendWaybills and u.SendRejects) as k;").ToList<RejectWaibillParams>()).FirstOrDefault();
+where clientId = :client
+group by u.SendWaybills and u.SendRejects) as k
+order by cou desc;")
+			.SetParameter("client", clientId)
+			.ToList<RejectWaibillParams>()).FirstOrDefault();
 		}
 
 		[AccessibleThrough(Verb.Get)]

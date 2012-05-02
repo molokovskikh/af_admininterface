@@ -17,10 +17,10 @@ namespace AdminInterface.Changer
 		{
 			using (var transaction = new TransactionScope(OnDispose.Rollback)) {
 				var rds = ArHelper.WithSession(session => session.CreateSQLQuery(@"
-	SELECT rd.* FROM regionaldata rd
+	SELECT rd.* FROM usersettings.regionaldata rd
 	join customers.Suppliers s on rd.firmCode = s.id
 	join farm.Regions r on s.HomeRegion = r.RegionCode
-	where r.Retail and ContactInfo <> '' ").AddEntity(typeof(RegionalData)).List<RegionalData>());
+	where r.Retail and rd.ContactInfo <> '';").AddEntity(typeof(RegionalData)).List<RegionalData>());
 
 				foreach (var regionalData in rds) {
 					var list = regionalData.ContactInfo.Split('\r').ToList();
