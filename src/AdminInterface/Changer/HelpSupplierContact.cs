@@ -31,7 +31,7 @@ namespace AdminInterface.Changer
 							list.Add(string.Empty);
 						}
 					}
-					var operativeInfo = string.Empty;
+					var operativeInfo = list[0] + list[1];
 
 					for (int i = 6; i < 14; i++) {
 						var val = list[i].Trim();
@@ -41,8 +41,12 @@ namespace AdminInterface.Changer
 					}
 					var contactInfo = list[4].Trim() + "\r\n" + list[5].Trim();
 
-					regionalData.ContactInfo = contactInfo;
-					regionalData.OperativeInfo = operativeInfo;
+					var supp = regionalData.Supplier;
+					supp.Adress = list[3].Trim();
+					supp.Save();
+					if (supp.SupplierId == 2133u || regionalData.Id == 2668u)
+							Console.WriteLine(supp.Name);
+
 					list[2] = list[2].Trim();
 					if (!Regex.IsMatch(list[2], @"^(\d{3,4})-(\d{6,7})(\*\d{3})?$"))
 					{
@@ -60,35 +64,35 @@ namespace AdminInterface.Changer
 							if (tel.Length == 6)
 							list[2] = "4732-2" + tel;
 								else
-								list[2] = string.Empty;
+								if (list[2].Contains("4732"))
+									list[2] = list[2].Replace("4732", "4732-");
+								else
+								{
+									operativeInfo += list[2];
+									list[2] = string.Empty;
+								}
 					}
 					if (!string.IsNullOrEmpty(list[2])) { 
-						var supp = regionalData.Supplier;
 						var generaleGroup = supp.ContactGroupOwner.Group(ContactGroupType.General);
 						if (generaleGroup == null) {
 							var group = supp.ContactGroupOwner.AddContactGroup(ContactGroupType.General);
 							group.AddContact(ContactType.Phone, list[2]);
-							var contact = group.Contacts.FirstOrDefault();
-							contact.Comment = list[3].Trim();
-							contact.Save();
 							group.Save();
 						}
 						else {
 							var contact = generaleGroup.Contacts.FirstOrDefault(c => c.Type == ContactType.Phone);
 							if (contact != null) {
 								contact.ContactText = string.IsNullOrEmpty(contact.ContactText) ? list[2] : contact.ContactText;
-								contact.Comment = string.IsNullOrEmpty(contact.Comment) ? list[3].Trim() : contact.Comment;
 								contact.Save();
 							}
 							else {
 								generaleGroup.AddContact(ContactType.Phone, list[2]);
-								var temp_contact = generaleGroup.Contacts.FirstOrDefault();
-								temp_contact.Comment = list[3].Trim();
-								temp_contact.Save();
 								generaleGroup.Save();
 							}
 						}
 					}
+					regionalData.ContactInfo = contactInfo;
+					regionalData.OperativeInfo = operativeInfo;
 					ActiveRecordMediator<RegionalData>.Update(regionalData);
 				}
 				transaction.VoteCommit();

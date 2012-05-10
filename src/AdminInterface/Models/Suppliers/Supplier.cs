@@ -64,6 +64,9 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo, Auditable, Description("Домашний регион")]
 		public override Region HomeRegion { get; set; }
 
+		[Property]
+		public virtual string Adress { get; set; }
+
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public override bool Disabled
 		{
