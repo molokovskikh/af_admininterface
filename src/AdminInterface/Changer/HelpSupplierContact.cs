@@ -31,7 +31,7 @@ namespace AdminInterface.Changer
 							list.Add(string.Empty);
 						}
 					}
-					var operativeInfo = list[0] + list[1];
+					var operativeInfo = list[0] + "\r\n" + list[1];
 
 					for (int i = 6; i < 14; i++) {
 						var val = list[i].Trim();
@@ -68,7 +68,7 @@ namespace AdminInterface.Changer
 									list[2] = list[2].Replace("4732", "4732-");
 								else
 								{
-									operativeInfo += list[2];
+									operativeInfo += "\r\n" + list[2];
 									list[2] = string.Empty;
 								}
 					}

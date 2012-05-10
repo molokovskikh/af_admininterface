@@ -314,7 +314,9 @@
 				</tr>
 				<tr>
 					<td class="statistic-label">Отсутствуют:</td>
-					<td class="statistic-value">${TotalNotSendCertificates}/${CertificateNotSendUniqUsers}/${CertificateNotSendUniqClients}/${CertificateNotSendUniqSuppliers}</td>
+					<td class="statistic-value">
+						<a href="${Siteroot}/Logs/Statistics?filter.Period.Begin=${FromDate}&filter.Period.End=${ToDate}">${TotalNotSendCertificates}/${CertificateNotSendUniqUsers}/${CertificateNotSendUniqClients}/${CertificateNotSendUniqSuppliers}</a>
+					</td>
 					<td class="statistic-label">Последний запрос:</td>
 					<td class="statistic-value">${LastCertificateRequest}</td>
 				</tr>

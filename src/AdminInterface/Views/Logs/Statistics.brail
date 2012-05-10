@@ -1,0 +1,33 @@
+﻿<% component CaptureFor, {"id" : "Title"}: %>
+	Статистика по сертификатам
+<% end %>
+	
+<% component Bubble, {@bredcrumbs : []} %>
+
+${app.BeginFormFor("filter")}
+${app.FilterFor("filter.Period")}
+${app.EndFormFor("filter")}
+<div>
+	<table class="DataTable">
+		<thead>
+			<tr>
+				<th>${app.Sortable("Имя клиента", "ClientName")}</th>
+				<th>${app.Sortable("Имя поставщика", "SupplierName")}</th>
+				<th>${app.Sortable("Дата запроса", "RequestTime")}</th>
+				<th>${app.Sortable("Наименование продукта", "ProductName")}</th>
+				<th>${app.Sortable("Дата", "ProductId")}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<%for i,item in enumerate(Statistics): %>
+			<tr>
+				<td>${item.ClientName}</td>
+				<td>${item.SupplierName}</td>
+				<td>${item.RequestTime}</td>
+				<td>${item.ProductName}</td>
+				<td>${item.GetReason()}</td>
+			</tr>
+			<%end %>
+		</tbody>
+	</table>
+</div>

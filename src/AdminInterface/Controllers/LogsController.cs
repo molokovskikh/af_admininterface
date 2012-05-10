@@ -134,6 +134,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["logEntities"] = filter.Find();
 		}
 
+		public void Statistics([SmartBinder] StatisticsFilter filter)
+		{
+			PropertyBag["Statistics"] = filter.Find();
+			PropertyBag["filter"] = filter;
+		}
+
 		public void PasswordChangeLog(uint id)
 		{
 			PasswordChangeLog(id, DateTime.Today.AddDays(-1), DateTime.Today);
