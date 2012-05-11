@@ -11,20 +11,34 @@ ${app.EndFormFor("filter")}
 	<table class="DataTable">
 		<thead>
 			<tr>
-				<th>${app.Sortable("Имя клиента", "ClientName")}</th>
-				<th>${app.Sortable("Имя поставщика", "SupplierName")}</th>
+				<th>${app.Sortable("Код клиента", "ClientCode")}</th>
+				<th>${app.Sortable("Код пользователя", "UserId")}</th>
+				<th>${app.Sortable("Клиент", "ClientName")}</th>
+				<th>${app.Sortable("Регион клиента", "ClientRegion")}</th>
+				<th>${app.Sortable("Поставщик", "SupplierName")}</th>
+				<th>${app.Sortable("Регион поставщика", "SupplierRegion")}</th>
+				<th>${app.Sortable("Код товара", "ProcuctCode")}</th>
+				<th>${app.Sortable("Товар", "ProductName")}</th>
+				<th>${app.Sortable("Код производителя", "ProducerId")}</th>
+				<th>${app.Sortable("Производитель", "Producer")}</th>
 				<th>${app.Sortable("Дата запроса", "RequestTime")}</th>
-				<th>${app.Sortable("Наименование продукта", "ProductName")}</th>
 				<th>${app.Sortable("Причина", "ProductId")}</th>
 			</tr>
 		</thead>
 		<tbody>
 			<%for i,item in enumerate(Statistics): %>
 			<tr>
-				<td>${item.ClientName}</td>
-				<td>${item.SupplierName}</td>
-				<td>${item.RequestTime}</td>
+				<td>${app.LinkTo("${item.ClientCode}",  @Clients, "${item.ClientCode}")}</td>
+				<td>${app.LinkTo("${item.UserId}",  @Users, "${item.UserId}")}</td>
+				<td>${app.LinkTo("${item.ClientName}",  @Clients, "${item.ClientCode}")}</td>
+				<td>${item.ClientRegion}</td>
+				<td>${app.LinkTo("${item.SupplierName}",  @Suppliers, "${item.SupplierId}")}</td>
+				<td>${item.SupplierRegion}</td>
+				<td>${item.ProcuctCode}</td>
 				<td>${item.ProductName}</td>
+				<td>${item.ProducerId}</td>
+				<td>${item.Producer}</td>
+				<td>${item.RequestTime}</td>
 				<td>${item.GetReason()}</td>
 			</tr>
 			<%end %>

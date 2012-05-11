@@ -15,6 +15,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Linq;
 using NHibernate.Transform;
+using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.Controllers
 {

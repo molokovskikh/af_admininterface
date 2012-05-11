@@ -10,10 +10,18 @@ namespace AdminInterface.Controllers.Filters
 {
 	public class StatResult
 	{
+		public uint ClientCode { get; set; }
+		public uint UserId { get; set; }
 		public string ClientName { get; set; }
+		public string ClientRegion { get; set; }
+		public string SupplierId { get; set; }
 		public string SupplierName { get; set; }
+		public string SupplierRegion { get; set; }
 		public string RequestTime { get; set; }
+		public string ProcuctCode { get; set; }
 		public string ProductName { get; set; }
+		public uint ProducerId { get; set; }
+		public string Producer { get; set; }
 		public uint? ProductId { get; set; }
 
 		public string GetReason()
@@ -33,11 +41,18 @@ namespace AdminInterface.Controllers.Filters
 			SortBy = "c.Name";
 			SortDirection = "Desc";
 			SortKeyMap = new Dictionary<string, string> {
+				{"ClientCode", "c.id"},
+				{"UserId", "u.UserId"},
 				{"ClientName", "c.Name"},
-				{"SupplierName", "s.FullName"},
+				{"ClientRegion", "r1.Region"},
+				{"SupplierName", "s.Name"},
+				{"SupplierRegion", "r2.Region"},
+				{"ProcuctCode", "db.Code"},
 				{"RequestTime", "u.RequestTime"},
 				{"ProductName", "db.Product"},
-				{"ProductId", "db.ProductId"}
+				{"ProductId", "db.ProductId"},
+				{"ProducerId", "db.ProducerId"},
+				{"Producer", "db.Producer"}
 			};
 		}
 
@@ -45,10 +60,18 @@ namespace AdminInterface.Controllers.Filters
 		{
 			var sql = string.Format(@"
 select 
+c.id as ClientCode,
+u.UserId,
 c.Name as ClientName,
-s.FullName as SupplierName,
+r1.Region as ClientRegion,
+s.Name as SupplierName,
+s.Id as SupplierId,
+r2.Region as SupplierRegion,
 u.RequestTime,
+db.Code ProcuctCode,
 db.Product as ProductName,
+db.ProducerId,
+db.Producer,
 db.ProductId
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
@@ -57,6 +80,8 @@ from Logs.CertificateRequestLogs l
 	join Documents.DocumentBodies db on db.Id = l.DocumentBodyId
 	join Documents.DocumentHeaders dh on dh.Id = db.DocumentId
 	join Customers.Suppliers s on s.Id = dh.FirmCode
+	join farm.Regions r1 on r1.RegionCode = c.RegionCode
+	join farm.Regions r2 on r2.RegionCode = s.HomeRegion
 where (u.RequestTime >= :StartDateParam AND u.RequestTime <= :EndDateParam)
 	and c.MaskRegion & :RegionMaskParam > 0
 	and fu.PayerId <> 921 and
