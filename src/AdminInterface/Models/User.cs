@@ -79,8 +79,8 @@ namespace AdminInterface.Models
 
 		public User()
 		{
+			SendWaybills = false;
 			SendRejects = true;
-			SendWaybills = true;
 			Enabled = true;
 			ShowSupplierCost = true;
 			AssignedPermissions = new List<UserPermission>();

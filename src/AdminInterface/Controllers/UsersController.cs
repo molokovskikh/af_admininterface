@@ -13,6 +13,7 @@ using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -28,12 +29,6 @@ using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Controllers
 {
-	public class RejectWaibillParams
-	{
-		public bool SendWaybills { get; set;}
-		public bool SendRejects { get; set;}
-	}
-
 	[
 		Helper(typeof(HttpUtility)),
 		Secure,
@@ -51,7 +46,7 @@ namespace AdminInterface.Controllers
 		{
 			var client = Client.FindAndCheck(clientId);
 			var user = new User((Service)client);
-			var rejectWaibillParams = GetRejectWaibillParams(clientId);
+			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["user"] = user;
@@ -160,18 +155,6 @@ namespace AdminInterface.Controllers
 				Flash["password"] = password;
 				Redirect("main", "report", new {id = user.Id});
 			}
-		}
-
-		private RejectWaibillParams GetRejectWaibillParams(uint clientId)
-		{
-			return ArHelper.WithSession(s => s.CreateSQLQuery(@"
-select SendRejects, SendWaybills from
-(select count(*) as cou, u.Id, u.SendRejects, SendWaybills from Customers.Users u
-where clientId = :client
-group by u.SendWaybills and u.SendRejects) as k
-order by cou desc;")
-			.SetParameter("client", clientId)
-			.ToList<RejectWaibillParams>()).FirstOrDefault();
 		}
 
 		[AccessibleThrough(Verb.Get)]

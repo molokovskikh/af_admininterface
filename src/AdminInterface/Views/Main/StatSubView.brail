@@ -315,7 +315,8 @@
 				<tr>
 					<td class="statistic-label">Отсутствуют:</td>
 					<td class="statistic-value">
-						<a href="${Siteroot}/Logs/Statistics?filter.Period.Begin=${FromDate}&filter.Period.End=${ToDate}">${TotalNotSendCertificates}/${CertificateNotSendUniqUsers}/${CertificateNotSendUniqClients}/${CertificateNotSendUniqSuppliers}</a>
+						<%title = TotalNotSendCertificates + "/" + CertificateNotSendUniqUsers + "/" + CertificateNotSendUniqClients + "/" + CertificateNotSendUniqSuppliers %>
+						${app.LinkTo(title, @Logs, @Statistics,  {"filter.Period.Begin": FromDate, "filter.Period.End" : ToDate})}
 					</td>
 					<td class="statistic-label">Последний запрос:</td>
 					<td class="statistic-value">${LastCertificateRequest}</td>

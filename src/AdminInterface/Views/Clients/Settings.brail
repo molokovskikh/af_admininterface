@@ -67,6 +67,10 @@
 			$.get(url, function(html){ $("#NotNoiseSupplier").append(html); });
 		}
 	}
+
+	function NotifySuppliers() {
+		$('#NotifySuppliers').submit();
+	}
 </script>
 
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
@@ -78,12 +82,8 @@
 	<% end %>
 	
 	<div style="width: 800px;">
-		<div class="block">
-			<h3>Операции</h3>
-			<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}">
-				<input type="submit" value="Отправить уведомления о регистрации поставщикам" />
-			</form>
-		</div>
+	
+		<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}"></form>
 		
 		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/client/UpdateDrugstore">
 			${FormHelper.HiddenField("client.Id")}
@@ -200,6 +200,11 @@
 				</tr>
 				</table>
 			</div>
+
+		<div class="block">
+			<h3>Операции</h3>
+			<input type="button" onclick="NotifySuppliers()" value="Отправить уведомления о регистрации поставщикам" />
+		</div>
 
 			<div class="block">
 				<h3>Региональная настройка</h3>
