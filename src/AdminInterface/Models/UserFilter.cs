@@ -220,16 +220,17 @@ left join Customers.Addresses a on a.Id = ua.AddressId";
 			switch (SearchBy)
 			{
 				case SearchUserBy.Auto: {
-					filter = AddFilterCriteria(filter,
+					if (searchTextIsNumber)
+						filter += String.Format(@" u.Id = {0} or s.Id = {0} ", searchText);
+					else {
+						filter = AddFilterCriteria(filter,
 						String.Format(@"
 LOWER(u.Login) like '{0}' or
 LOWER(u.Name) like '{0}' or
 LOWER(s.Name) like '{0}' or
-(LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))) or
 LOWER(Persons.Name) like '{0}' ",
 							sqlSearchText));
-					if (searchTextIsNumber)
-						filter += String.Format(@" or u.Id = {0} or s.Id = {0} ", searchText);
+					}
 					if (searchTextIsPhone && searchText.Length >= 5)
 						filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) ",
 							sqlSearchText.Replace("-", ""));
