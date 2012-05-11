@@ -15,7 +15,7 @@ ${app.EndFormFor("filter")}
 				<th>${app.Sortable("Имя поставщика", "SupplierName")}</th>
 				<th>${app.Sortable("Дата запроса", "RequestTime")}</th>
 				<th>${app.Sortable("Наименование продукта", "ProductName")}</th>
-				<th>${app.Sortable("Дата", "ProductId")}</th>
+				<th>${app.Sortable("Причина", "ProductId")}</th>
 			</tr>
 		</thead>
 		<tbody>
