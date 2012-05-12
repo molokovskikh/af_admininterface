@@ -227,8 +227,7 @@ left join Customers.Addresses a on a.Id = ua.AddressId";
 						String.Format(@"
 LOWER(u.Login) like '{0}' or
 LOWER(u.Name) like '{0}' or
-LOWER(s.Name) like '{0}' or
-LOWER(Persons.Name) like '{0}' ",
+LOWER(s.Name) like '{0}' ",
 							sqlSearchText));
 					}
 					if (searchTextIsPhone && searchText.Length >= 5)
