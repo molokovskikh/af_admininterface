@@ -148,6 +148,7 @@
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Models\Logs\CertificateRequestLog.cs" />
     <Compile Include="Models\OrderLog.cs" />
     <Compile Include="Models\OrderFilter.cs" />
     <Compile Include="Controllers\SpecialHandlersController.cs" />

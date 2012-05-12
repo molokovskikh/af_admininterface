@@ -19,7 +19,6 @@ ${app.EndFormFor("filter")}
 				<th>${app.Sortable("Регион поставщика", "SupplierRegion")}</th>
 				<th>${app.Sortable("Код товара", "ProcuctCode")}</th>
 				<th>${app.Sortable("Товар", "ProductName")}</th>
-				<th>${app.Sortable("Код производителя", "ProducerId")}</th>
 				<th>${app.Sortable("Производитель", "Producer")}</th>
 				<th>${app.Sortable("Дата запроса", "RequestTime")}</th>
 				<th>${app.Sortable("Причина", "ProductId")}</th>
@@ -36,7 +35,6 @@ ${app.EndFormFor("filter")}
 				<td>${item.SupplierRegion}</td>
 				<td>${item.ProcuctCode}</td>
 				<td>${item.ProductName}</td>
-				<td>${item.ProducerId}</td>
 				<td>${item.Producer}</td>
 				<td>${item.RequestTime}</td>
 				<td>${item.GetReason()}</td>

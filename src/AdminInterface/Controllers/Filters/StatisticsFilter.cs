@@ -51,7 +51,6 @@ namespace AdminInterface.Controllers.Filters
 				{"RequestTime", "u.RequestTime"},
 				{"ProductName", "db.Product"},
 				{"ProductId", "db.ProductId"},
-				{"ProducerId", "db.ProducerId"},
 				{"Producer", "db.Producer"}
 			};
 		}
@@ -70,7 +69,6 @@ r2.Region as SupplierRegion,
 u.RequestTime,
 db.Code ProcuctCode,
 db.Product as ProductName,
-db.ProducerId,
 db.Producer,
 db.ProductId
 from Logs.CertificateRequestLogs l
