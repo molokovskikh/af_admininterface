@@ -31,7 +31,7 @@ namespace AdminInterface.Changer
 							list.Add(string.Empty);
 						}
 					}
-					var operativeInfo = list[0] + "\r\n" + list[1];
+					var operativeInfo = list[0].Trim() + "\r\n" + list[1].Trim()  + "\r\n";
 
 					for (int i = 6; i < 14; i++) {
 						var val = list[i].Trim();
