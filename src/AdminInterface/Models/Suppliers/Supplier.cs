@@ -65,7 +65,7 @@ namespace AdminInterface.Models.Suppliers
 		public override Region HomeRegion { get; set; }
 
 		[Property]
-		public virtual string Adress { get; set; }
+		public virtual string Address { get; set; }
 
 		[Property(Access = PropertyAccess.FieldCamelcaseUnderscore), Style]
 		public override bool Disabled

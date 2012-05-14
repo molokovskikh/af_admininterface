@@ -42,7 +42,7 @@ namespace AdminInterface.Changer
 					var contactInfo = list[4].Trim() + "\r\n" + list[5].Trim();
 
 					var supp = regionalData.Supplier;
-					supp.Adress = list[3].Trim();
+					supp.Address = list[3].Trim();
 					supp.Save();
 					if (supp.SupplierId == 2133u || regionalData.Id == 2668u)
 							Console.WriteLine(supp.Name);
