@@ -160,6 +160,7 @@ namespace AdminInterface.Models
 			PropertyBag["user"] = user;
 			PropertyBag["oldClient"] = oldClient;
 			PropertyBag["oldPayer"] = oldPayer;
+			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			return this;
 		}
@@ -230,6 +231,7 @@ namespace AdminInterface.Models
 			PropertyBag["address"] = address;
 			PropertyBag["oldClient"] = oldClient;
 			PropertyBag["oldLegalEntity"] = oldLegalEntity;
+			PropertyBag["admin"] = SecurityContext.Administrator;
 
 			return this;
 		}

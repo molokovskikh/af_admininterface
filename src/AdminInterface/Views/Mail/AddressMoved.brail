@@ -1,3 +1,4 @@
 ﻿Адрес ${address.Value}
 Старый клиент ${oldClient.Name} плательщик ${oldLegalEntity.Payer.Name} юр.лицо ${oldLegalEntity.Name}
 Новый клиент ${address.Client.Name} плательщик ${address.LegalEntity.Payer.Name} юр.лицо ${address.LegalEntity.Name}
+Перенес ${admin.Name}
