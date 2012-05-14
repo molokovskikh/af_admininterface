@@ -220,7 +220,8 @@ namespace AdminInterface.Models.Billing
 					!String.IsNullOrWhiteSpace(ActualAddressHouse) ? "д. " + ActualAddressHouse: null,
 					!String.IsNullOrWhiteSpace(ActualAddressOffice) ? "оф. " + ActualAddressOffice : null,
 					!String.IsNullOrWhiteSpace(ActualAddressProvince) ? "обл. " + ActualAddressProvince : null,
-					!String.IsNullOrWhiteSpace(ActualAddressTown) ? "г. " + ActualAddressTown : null,
+					!String.IsNullOrWhiteSpace(ActualAddressRegion) ? "р-н " + ActualAddressRegion : null,
+					!String.IsNullOrWhiteSpace(ActualAddressTown) ? "г. " + ActualAddressTown : null
 				}.Where(s => !String.IsNullOrWhiteSpace(s)));
 		}
 
