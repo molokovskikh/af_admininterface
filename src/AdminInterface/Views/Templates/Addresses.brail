@@ -1,13 +1,31 @@
-﻿<div class=block>
+﻿<%addresses = user.GetAvaliableAddresses() %>
+<div class=block>
 	<h3>Доступ к адресам доставки</h3>
 	<div>
-		<% for i, address in enumerate(user.Client.Addresses): %>
-			<div class="${app.Style(address)}">
-				<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)} ${"disabled" if not address.Enabled} />
-				${address.Value}
-			</div>
-		<% or: %>
-			Нет адресов для доставки
+		<%if addresses.Count > 0: %>
+		<table>
+			<thead>
+				<tr>
+					<th>Адрес</th>
+					<th>Юр. Лицо</th>
+				</tr>
+			</thead>
+			<tbody>
+				<% for i, address in enumerate(addresses): %>
+					<tr class="${app.Style(address)}">
+						<td>
+							<input type=checkbox name=user.AvaliableAddresses[${i}].Id value=${address.Id} ${"checked" if address.AvaliableFor(user)} ${"disabled" if not address.Enabled} />
+							${address.Value}
+						</td>
+						<td>
+							${address.LegalEntity.Name}
+						</td>
+					</tr>
+				<%end %>
+			</tbody>
+		</table>
+		<% else: %>
+		Нет адресов для доставки
 		<% end %>
 	</div>
 </div>

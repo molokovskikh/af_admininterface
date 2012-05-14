@@ -315,6 +315,11 @@ namespace AdminInterface.Models
 			return RootService.Type == ServiceType.Supplier;
 		}
 
+		public virtual List<Address> GetAvaliableAddresses()
+		{
+			return AvaliableAddresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
+		}
+
 		public virtual string GetLoginOrName()
 		{
 			if (String.IsNullOrEmpty(Name))
