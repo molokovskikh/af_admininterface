@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Config;
@@ -29,7 +30,7 @@ namespace Functional
 			ActiveRecordMediator.Save(afUpdate);
 			var supplier = DataMother.CreateSupplier();
 			ActiveRecordMediator.Save(supplier);
-			var dh = new Common.Web.Ui.Models.Document {FirmCode = supplier.Id, ClientCode = client.Id};
+			var dh = new FullDocument {Supplier = supplier, ClientCode = client.Id};
 			ActiveRecordMediator.Save(dh);
 			var db = dh.NewLine(new DocumentLine {Product = "TestCertificateRequestLogProduct"});
 			ActiveRecordMediator.Save(db);
@@ -42,17 +43,9 @@ namespace Functional
 
 			Open("Main/Stat");
 			var link = browser.Elements.FirstOrDefault(e => e.Parent != null && e.Parent.Id == "StatisticsTD");
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			link.Click();
 			AssertText("Статистика по сертификатам");
 			AssertText("TestCertificateRequestLogProduct");
-
-			ActiveRecordMediator.Delete(client);
-			ActiveRecordMediator.Delete(afUpdate);
-			ActiveRecordMediator.Delete(db);
-			ActiveRecordMediator.Delete(dh);
-			ActiveRecordMediator.Delete(supplier);
-			ActiveRecordMediator.Delete(nuSert);
 		}
 	}
 }
