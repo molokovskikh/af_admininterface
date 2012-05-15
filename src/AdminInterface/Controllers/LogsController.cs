@@ -101,7 +101,7 @@ namespace AdminInterface.Controllers
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
 		{
-			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today.AddDays(-1), DateTime.Today);
+			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,

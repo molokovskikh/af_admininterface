@@ -120,7 +120,7 @@ namespace Functional.Drugstore
 				Assert.IsTrue(userLink.Exists);
 				userLink.Click();
 				browser.Link(Find.ByText("Настройка")).Click();
-				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
+				Assert.IsFalse(browser.CheckBox(Find.ByName("user.SendWaybills")).Checked);
 				Assert.IsTrue(browser.CheckBox(Find.ByName("user.SendRejects")).Checked);
 				Assert.IsFalse(browser.CheckBox(Find.ByName("user.IgnoreCheckMinOrder")).Checked);
 			}

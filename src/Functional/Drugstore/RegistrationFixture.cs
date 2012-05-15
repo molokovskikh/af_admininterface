@@ -11,6 +11,7 @@ using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
 using Functional.ForTesting;
+using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
 
 namespace Functional.Drugstore
@@ -241,8 +242,8 @@ namespace Functional.Drugstore
 		private void SetupGeneralInformation(Browser browser)
 		{
 			Css("#user_Name").TypeText("Тестовый пользователь");
-			browser.TextField(Find.ById("JuridicalName")).TypeText(_randomClientName);
-			browser.TextField(Find.ById("ShortName")).TypeText(_randomClientName);
+			browser.TextField(Find.ById("client_FullName")).TypeText(_randomClientName);
+			browser.TextField(Find.ById("client_Name")).TypeText(_randomClientName);
 			// Заполняем контактную информацию для клиента
 			browser.TextField("ClientContactPhone").TypeText("123-456789");
 			browser.TextField("ClientContactEmail").TypeText(_randomClientName + _mailSuffix);
@@ -486,7 +487,7 @@ namespace Functional.Drugstore
 		{
 			var client = Register();
 			Assert.That(client.Users.Count, Is.EqualTo(1));
-			Assert.That(client.Users[0].SendWaybills, Is.True);
+			Assert.That(client.Users[0].SendWaybills, Is.False);
 			Assert.That(client.Users[0].SendRejects, Is.True);
 		}
 
