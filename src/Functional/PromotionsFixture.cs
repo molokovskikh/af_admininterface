@@ -16,12 +16,6 @@ namespace Functional
 		private Catalog _catalog;
 		private SupplierPromotion _promotion;
 
-		[TestFixtureSetUp]
-		public void Init()
-		{
-			session.CreateQuery(@"delete SupplierPromotion").ExecuteUpdate();
-		}
-
 		private PromotionOwnerSupplier CreateSupplier()
 		{
 			var supplier = DataMother.CreateSupplier();
@@ -75,6 +69,8 @@ limit 1")
 		[SetUp]
 		public void SetUp()
 		{
+			session.CreateQuery(@"delete SupplierPromotion").ExecuteUpdate();
+
 			_supplier = CreateSupplier();
 			_catalog = FindFirstFreeCatalog();
 			_promotion = CreatePromotion(_supplier, _catalog);
