@@ -317,7 +317,7 @@ namespace AdminInterface.Models
 
 		public virtual List<Address> GetAvaliableAddresses()
 		{
-			return AvaliableAddresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
+			return Client.Addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 		}
 
 		public virtual string GetLoginOrName()
