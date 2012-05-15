@@ -218,7 +218,8 @@ namespace Integration
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
 			Assert.That(message.Body, Is.EqualTo(@"Пользователь 1 перемещен
 Старый клиент Биона плательщик Биона
-Новый клиент Фармаимпекс плательщик Фармаимпекс"));
+Новый клиент Фармаимпекс плательщик Фармаимпекс
+Перенес: test"));
 		}
 
 		[Test]
@@ -242,7 +243,8 @@ namespace Integration
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
 			Assert.That(message.Body, Is.EqualTo(@"Адрес N14 г.Бугульма, ул.Якупова, д.40
 Старый клиент Биона плательщик Биона юр.лицо Биона
-Новый клиент Фармаимпекс плательщик Фармаимпекс юр.лицо Фармаимпекс"));
+Новый клиент Фармаимпекс плательщик Фармаимпекс юр.лицо Фармаимпекс
+Перенес: test"));
 		}
 
 		[Test]

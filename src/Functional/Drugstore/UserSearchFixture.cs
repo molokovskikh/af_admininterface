@@ -272,7 +272,7 @@ namespace Functional
 			CheckThatIsUserPage(browser);
 		}
 
-		[Test]
+		[Test, Ignore("Функционал отключен")]
 		public void Autosearch_by_person()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
