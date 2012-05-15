@@ -42,8 +42,8 @@ namespace Functional.Drugstore
 			browser.TextField("deliveryAddress").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
-			browser.TextField("JuridicalName").TypeText(_randomClientName);
-			browser.TextField("ShortName").TypeText(_randomClientName);
+			browser.TextField("client_FullName").TypeText(_randomClientName);
+			browser.TextField("client_Name").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
 			browser.TextField("ClientContactPhone").TypeText("123-456789");
@@ -57,8 +57,8 @@ namespace Functional.Drugstore
 			Css("#user_Name").TypeText("Тестовый пользователь");
 
 			browser.TextField("deliveryAddress").TypeText("Test address");
-			browser.TextField("JuridicalName").TypeText(_randomClientName);
-			browser.TextField("ShortName").TypeText(_randomClientName);
+			browser.TextField("client_FullName").TypeText(_randomClientName);
+			browser.TextField("client_Name").TypeText(_randomClientName);
 			browser.TextField("ClientContactPhone").TypeText("123456789");
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Некорректный телефонный номер"));
