@@ -37,6 +37,8 @@
 	${app.BeginFormFor("filter")}
 	${FormHelper.HiddenField("filter.SortBy")}
 	${FormHelper.HiddenField("filter.SortDirection")}
+	${FormHelper.HiddenField("filter.BeginDate")}
+	${FormHelper.HiddenField("filter.EndDate")}
 	${app.FilterFor("filter.UpdateType")}
 	${app.EndFormFor("filter")}
 
