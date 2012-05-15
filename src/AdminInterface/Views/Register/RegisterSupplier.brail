@@ -9,6 +9,14 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 
 <script type="text/javascript">
 
+	function validatePayer() {
+		if (jQuery("#PayerExists").attr("checked"))
+			return ((jQuery("#PayerComboBox").val() != null) &&
+						(jQuery("#PayerComboBox").val().length > 0) &&
+						(jQuery("#SelectPayerDiv").css("display") == "block"));
+		return true;
+	}
+
 	$(function () {
 		selectedRegions = new window.Regions();
 		regions = new window.Regions();
@@ -26,43 +34,36 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 		jQuery("#SearchSupplierDiv").css("display", "none");
 		jQuery("#SelectSupplierDiv").css("display", "none");
 
-		jQuery.validator.addMethod( "noEmailAddress", function(value, element) {  
+		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
 			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 
-				&& jQuery("#SendRegistrationCard").attr("checked"))  
-			{  
-				return false;  
-			}  
-			else return true;  
-		}, "Это поле необходимо заполнить."); 
+				&& jQuery("#SendRegistrationCard").attr("checked"))
+			{
+				return false;
+			}
+			else return true;
+		}, "Это поле необходимо заполнить.");
+
+		$.validator.addMethod("payer", function (value, element) {
+			return validatePayer();
+		}, "Выберите плательщика");
 	});
 
-	function validatePayer() {
-		if (jQuery("#PayerExists").attr("checked"))
-			return ((jQuery("#PayerComboBox").val() != null) &&
-						(jQuery("#PayerComboBox").val().length > 0) &&
-						(jQuery("#SelectPayerDiv").css("display") == "block"));
-		return true;
-	}
-
 	function validateForm() {
+		$("form").data("validator").settings.errorPlacement = function (error, element) {
+			if (element.attr("name") == "flags.ShowForOneSupplier") {
+				$("#MessageForSupplier").html(error);
+			}
+			else if (element.attr("name") == "PayerExists") {
+				$("#MessageForPayer").html(error);
+			}
+			else {
+				error.insertAfter(element);
+			}
+		};
 		$("[name=\"supplierContacts[0].ContactText\"]").rules("add", {required: true});
 		$("[name=\"additionalEmailsForSendingCard\"]").rules("add", {validateEmailList: true});
 		$("[name=\"supplierContacts[1].ContactText\"]").rules("add", {noEmailAddress: true});
 		$("[name=\"ClientManagersContacts[1].ContactText\"]").rules("add", {required: true});
-	}
-
-	function validate() {
-		if (!validateSupplier()) {
-			jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
-			jQuery("#SearchSupplierTextPattern").focus();
-			return false;
-		}
-		if (!validatePayer()) {
-			jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
-			jQuery("#SearchPayerTextPattern").focus();
-			return false;
-		}
-		return true;
 	}
 
 </script>
@@ -178,8 +179,8 @@ ${FormHelper.FormTag("", {})}
 		<table cellpadding="1" border="0" width="100%">
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
-					 <input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
+					<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
 				</td>
 				<td>
 					<div id="SearchPayerDiv" style="width: 100%; display: none">

@@ -8,25 +8,6 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 
 <script type="text/javascript">
 
-	jQuery(function() {
-		jQuery("#PayerExists").attr({ checked: null, disabled: null});
-		jQuery("#ShowForOneSupplier").attr({ checked: null, disabled: null});
-		jQuery("#FillBillingInfo").attr({checked : "checked", disabled : null});
-		jQuery("#SearchPayerDiv").css("display", "none");
-		jQuery("#SelectPayerDiv").css("display", "none");
-		jQuery("#SearchSupplierDiv").css("display", "none");
-		jQuery("#SelectSupplierDiv").css("display", "none");
-
-		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
-			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0
-				&& jQuery("#SendRegistrationCard").attr("checked"))
-			{
-				return false;
-			}
-			else return true;
-		}, "Это поле необходимо заполнить.");
-	});
-
 	function validateSupplier() {
 		if (jQuery("#ShowForOneSupplier").attr("checked"))
 			return ((jQuery("#SupplierComboBox").val() != null) &&
@@ -43,29 +24,48 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		return true;
 	}
 
-	function validateAddress(value, element) {
-		res = /^.{1,100}$/.test(value)
-		return res;
-	}
+	$(function () {
+		jQuery("#PayerExists").attr({ checked: null, disabled: null });
+		jQuery("#ShowForOneSupplier").attr({ checked: null, disabled: null });
+		jQuery("#FillBillingInfo").attr({ checked: "checked", disabled: null });
+		jQuery("#SearchPayerDiv").css("display", "none");
+		jQuery("#SelectPayerDiv").css("display", "none");
+		jQuery("#SearchSupplierDiv").css("display", "none");
+		jQuery("#SelectSupplierDiv").css("display", "none");
+
+		$.validator.addMethod("noEmailAddress", function (value, element) {
+			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0
+				&& jQuery("#SendRegistrationCard").attr("checked")) {
+				return false;
+			}
+			else return true;
+		}, "Это поле необходимо заполнить");
+
+		$.validator.addMethod("supplier", function (value, element) {
+			return validateSupplier();
+		}, "Выберите поставщика");
+
+		$.validator.addMethod("payer", function (value, element) {
+			return validatePayer();
+		}, "Выберите плательщика");
+	});
+
 
 	function validateForm() {
+		$("form").data("validator").settings.errorPlacement = function (error, element) {
+			if (element.attr("name") == "flags.ShowForOneSupplier") {
+				$("#MessageForSupplier").html(error);
+			}
+			else if (element.attr("name") == "PayerExists") {
+				$("#MessageForPayer").html(error);
+			}
+			else {
+				error.insertAfter(element);
+			}
+		};
 		$("[name=\"clientContacts[0].ContactText\"]").rules("add", { required: true });
 		$("[name=\"additionalEmailsForSendingCard\"]").rules("add", { validateEmailList: true });
 		$("[name=\"clientContacts[1].ContactText\"]").rules("add", { noEmailAddress: true });
-	}
-
-	function validate() {
-		if (!validateSupplier()) {
-			jQuery("#MessageForSupplier").html("<font color='red'><i>Выберите поставщика</i></font>");
-			jQuery("#SearchSupplierTextPattern").focus();
-			return false;
-		}
-		if (!validatePayer()) {
-			jQuery("#MessageForPayer").html("<font color='red'><i>Выберите плательщика</i></font>");
-			jQuery("#SearchPayerTextPattern").focus();
-			return false;
-		}
-		return true;
 	}
 	
 	function ShowSelectSupplierDiv() {
@@ -300,7 +300,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
+					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
 					Выбрать существующего плательщика
 					<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
 				</td>
@@ -325,7 +325,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="ShowForOneSupplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">
+					<input type="checkbox" id="ShowForOneSupplier" class="supplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">
 					Зарегистрировать скрытую копию для поставщика
 				</td>
 				<td>
