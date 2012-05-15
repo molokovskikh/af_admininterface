@@ -117,7 +117,7 @@ namespace Integration.Models
 			user2.Save();
 
 			Flush();
-
+			filter.SearchBy = SearchUserBy.ByContacts;
 			filter.SearchText = email;
 			var result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(1));

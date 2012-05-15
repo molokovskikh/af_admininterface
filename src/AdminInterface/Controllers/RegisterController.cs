@@ -236,7 +236,7 @@ namespace AdminInterface.Controllers
 
 				if (additionalSettings.PayerExists)
 				{
-					if (payer != null || existingPayerId.HasValue)
+					if ((payer != null && payer.Id != 0) || existingPayerId.HasValue)
 					{
 						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
 						currentPayer = Payer.Find(id);
