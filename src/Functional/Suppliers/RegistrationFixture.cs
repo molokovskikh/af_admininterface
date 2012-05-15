@@ -6,6 +6,7 @@ using Common.Web.Ui.Models;
 using Functional.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -20,7 +21,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 
 			Prepare();
-
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			Click("Зарегистрировать");
 			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
 			Click("Сохранить");
@@ -106,10 +107,12 @@ namespace Functional.Suppliers
 
 		private void Prepare()
 		{
-			Css("#JuridicalName").TypeText("тестовый поставщик");
-			Css("#ShortName").TypeText("тестовый");
+			Css("#supplier_FullName").TypeText("тестовый поставщик");
+			Css("#supplier_Name").TypeText("тестовый");
 			Css("#ClientContactPhone").TypeText("473-2606000");
 			Css("#ClientContactEmail").TypeText("kvasovtest@analit.net");
+			Css("#ClientManagersContactEmail").TypeText("kvasovtest@analit.net");
+			Css("#OrderManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#user_Name").TypeText("Тестовый пользователь");
 		}
 	}
