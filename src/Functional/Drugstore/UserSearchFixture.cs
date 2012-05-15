@@ -257,7 +257,7 @@ namespace Functional
 			CheckThatIsUserPage(browser);
 		}
 
-		[Test]
+		[Test, Ignore("Функционал отключен")]
 		public void Autosearch_by_contact_email()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
