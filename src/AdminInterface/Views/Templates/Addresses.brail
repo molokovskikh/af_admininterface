@@ -1,9 +1,14 @@
-﻿<%addresses = user.GetAvaliableAddresses() %>
+﻿<script type="text/javascript">
+	$(function () {
+		$('#AvaliableAddresses tr.old-user-update').removeClass("old-user-update");
+	});
+</script>
+<%addresses = user.GetAvaliableAddresses() %>
 <div class=block>
 	<h3>Доступ к адресам доставки</h3>
 	<div>
 		<%if addresses.Count > 0: %>
-		<table>
+		<table id="AvaliableAddresses">
 			<thead>
 				<tr>
 					<th>Адрес</th>

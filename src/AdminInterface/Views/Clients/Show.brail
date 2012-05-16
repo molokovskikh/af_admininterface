@@ -2,7 +2,7 @@
 									  ("Информация о клиенте", "")]} %>
 <script>
 	$(function () {
-
+		$('a.old-user-update').removeClass("old-user-update");
 		$("form#MessagesForm").validate({
 			rules: {
 				"message": "required"
