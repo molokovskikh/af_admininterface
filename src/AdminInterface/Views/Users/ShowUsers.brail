@@ -25,7 +25,8 @@
 						<input type=button value=Удалить class=delete>
 					</td>
 					<td>
-					<a href="${siteroot}/users/${item.Id}/edit" class="${'Disabled' if not item.Enabled}">${item.Id} (${item.Name})</a>
+					<%title = "(" + item.Id + ") " + item.Name %>
+					${app.LinkTo(item, title, "Edit")} Клиент: ${app.LinkTo(item.Client)}
 					${FormHelper.HiddenField("user.ShowUsers[${i}].Id")}
 					</td>
 				</tr>

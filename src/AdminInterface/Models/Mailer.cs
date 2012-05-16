@@ -158,7 +158,8 @@ Email: {2}
 				{
 					var user = ((User)item);
 					account = user.Accounting;
-					body = "Зарегистрирован новый пользователь " + user.Login;
+					body = "Зарегистрирован новый пользователь \r\n" + user.Login;
+					body += "Комментарий: " + user.Name;
 					subject = "Регистрация нового пользователя";
 					client = user.Client;
 
