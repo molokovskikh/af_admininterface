@@ -585,6 +585,7 @@ namespace Functional.Drugstore
 			RegisterUserWithAddress(client, browser);
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
+			Assert.That(browser.Text, Is.StringContaining("Коометарий Тестовый пользователь"));
 
 			client.Refresh();
 			Assert.That(client.Users.Count, Is.EqualTo(2));
@@ -609,7 +610,7 @@ namespace Functional.Drugstore
 
 		private void FillRequiredFields()
 		{
-			Css("#user_Name").TypeText("Тестовый пользователь");
+			Css("#user_Name").TypeText("Коометарий Тестовый пользователь");
 		}
 
 		[Test]
