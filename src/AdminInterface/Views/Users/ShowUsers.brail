@@ -26,7 +26,7 @@
 					</td>
 					<td>
 					<%title = "(" + item.Id + ") " + item.Name %>
-					${app.LinkTo(item, title, "Edit")} Клиент: ${app.LinkTo(item.Client)}
+					${app.LinkTo(item, title, "Edit")} Клиент: ${app.LinkTo(item.RootService)}
 					${FormHelper.HiddenField("user.ShowUsers[${i}].Id")}
 					</td>
 				</tr>
@@ -42,7 +42,8 @@
 		<%for i, item in enumerate(user.RootShowUsers): %>
 			<tr>
 				<td>
-					<a href="${siteroot}/users/${item.Id}/edit" class="${'Disabled' if not item.Enabled}">${item.Id} (${item.Name})</a>
+					<%title = "(" + item.Id + ") " + item.Name %>
+					${app.LinkTo(item, title, "Edit")} Клиент: ${app.LinkTo(item.RootService)}
 				</td>
 			</tr>
 		<%end %>
