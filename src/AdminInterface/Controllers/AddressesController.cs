@@ -27,7 +27,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{
-			var client = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck<Client>(clientId);
 			PropertyBag["address"] = new Address(client);
 			PropertyBag["client"] = client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string comment)
 		{
-			var client = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck<Client>(clientId);
 			var address = new Address(client);
 			RecreateOnlyIfNullBinder.Prepare(this);
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewRootInstanceIfInvalidKey);

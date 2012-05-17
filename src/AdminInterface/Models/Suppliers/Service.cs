@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
@@ -73,6 +74,25 @@ namespace AdminInterface.Models.Suppliers
 		public virtual string GetHumanReadableType()
 		{
 			return BindingHelper.GetDescription(Type);
+		}
+
+		public static T FindAndCheck<T>(uint id) where T : Service
+		{
+			var client = Find<T>(id);
+
+			SecurityContext.Administrator.CheckRegion(client.HomeRegion.Id);
+			SecurityContext.Administrator.CheckType(client.Type);
+			return client;
+		}
+
+		public static T Find<T>(uint id)
+		{
+			return ActiveRecordBase<T>.Find(id);
+		}
+
+		public virtual bool IsClient()
+		{
+			return Type == ServiceType.Drugstore;
 		}
 	}
 }

@@ -21,7 +21,9 @@
 			${app.GetValidationError("user.Name")}<br>
 
 			${app.Label("user.Payer")}<br>
+			<%if client.IsClient(): %>
 			${app.Edit("user.Payer", client.Payers)}<br>
+			<%end %>
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.IgnoreCheckMinOrder")}<br>
 			${app.Edit("user.SendWaybills")}<br>
@@ -50,7 +52,7 @@
 		<div class=block>
 			<% OutputSubView("/SubViews/PersonInfo") %>
 		</div>
-
+		<%if client.IsClient(): %>
 		<div class="block" id="DeliveryAddressDiv">
 			<h3>Адрес доставки</h3>
 			<table border="0" width="100%" cellpadding="3" cellspacing="0">
@@ -64,7 +66,7 @@
 				<tr/>
 			</table>
 		</div>
-
+		<%end %>
 		<% OutputSubView("/Templates/Addresses") %>
 
 		<div class=block>

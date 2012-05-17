@@ -180,15 +180,6 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public static Client FindAndCheck(uint id)
-		{
-			var client = Find(id);
-
-			SecurityContext.Administrator.CheckRegion(client.HomeRegion.Id);
-			SecurityContext.Administrator.CheckType(client.Type);
-			return client;
-		}
-
 		public static Client FindClietnForBilling(uint clientCode)
 		{
 			return ArHelper.WithSession(

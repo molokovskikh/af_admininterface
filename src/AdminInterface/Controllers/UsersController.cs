@@ -44,14 +44,18 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{
-			var client = Client.FindAndCheck(clientId);
-			var user = new User((Service)client);
+			var client = Service.FindAndCheck<Service>(clientId);
+			var user = new User(client);
 			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["user"] = user;
 			PropertyBag["client"] = client;
-			PropertyBag["drugstore"] = client.Settings;
+			if (client.Type == ServiceType.Drugstore)
+			{
+				PropertyBag["drugstore"] = ((Client)client).Settings;
+				PropertyBag["Organizations"] = ((Client)client).Orgs().ToArray();
+			}
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
@@ -59,7 +63,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			PropertyBag["regions"] = Region.All().ToArray();
-			PropertyBag["Organizations"] = client.Orgs().ToArray();
 			PropertyBag["UserRegistration"] = true;
 		}
 
@@ -74,7 +77,7 @@ namespace AdminInterface.Controllers
 			uint clientId,
 			string mails)
 		{
-			var client = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck<Client>(clientId);
 			var user = new User((Service)client);
 			BindObjectInstance(user, "user");
 

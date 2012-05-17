@@ -112,7 +112,7 @@ namespace AdminInterface.Controllers
 
 		public void Show(uint id)
 		{
-			var client = Client.FindAndCheck(id);
+			var client = Client.FindAndCheck<Client>(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
 
@@ -140,7 +140,7 @@ namespace AdminInterface.Controllers
 		public void SuppliersForCostNoising(uint clientId)
 		{
 			CancelLayout();
-			var client = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck<Client>(clientId);
 			var suppliers = client.Payers.SelectMany(p => Supplier.GetByPayerId(p.Id)).OrderBy(s => s.Name).ToList();
 			PropertyBag["suppliers"] = suppliers;
 			if (client.Settings.NoiseCostExceptSupplier != null)
@@ -150,7 +150,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void BindPhone(uint clientCode, string phone)
 		{
-			var client = Client.FindAndCheck(clientCode);
+			var client = Client.FindAndCheck<Client>(clientCode);
 			var group = client.ContactGroupOwner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
 			if (group == null)
 				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
@@ -172,7 +172,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Post)]
 		public void SendMessage(string message, uint clientCode)
 		{
-			var client = Client.FindAndCheck(clientCode);
+			var client = Client.FindAndCheck<Client>(clientCode);
 
 			if (!String.IsNullOrEmpty(message))
 			{
@@ -184,7 +184,7 @@ where Phone like :phone")
 
 		public void Unlock(uint clientCode)
 		{
-			var client = Client.FindAndCheck(clientCode);
+			var client = Client.FindAndCheck<Client>(clientCode);
 
 			foreach(var user in client.Users)
 				if (ADHelper.IsLoginExists(user.Login) && ADHelper.IsLocked(user.Login))
@@ -196,7 +196,7 @@ where Phone like :phone")
 
 		public void DeletePreparedData(uint clientCode)
 		{
-			var client = Client.FindAndCheck(clientCode);
+			var client = Client.FindAndCheck<Client>(clientCode);
 
 			try
 			{
@@ -217,7 +217,7 @@ where Phone like :phone")
 
 		public void ResetUin(uint clientCode, string reason)
 		{
-			var client = Client.FindAndCheck(clientCode);
+			var client = Client.FindAndCheck<Client>(clientCode);
 			ClientInfoLogEntity.ReseteUin(client, reason).Save();
 			client.ResetUin();
 			RedirectToReferrer();
@@ -226,7 +226,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			var client = Client.FindAndCheck(id);
+			var client = Client.FindAndCheck<Client>(id);
 			var regions = Region.All().ToArray();
 			var drugstore = client.Settings;
 			PropertyBag["client"] = client;
@@ -287,7 +287,7 @@ where Phone like :phone")
 
 		public void ChangePayer(uint clientId, uint payerId, uint orgId)
 		{
-			var client = Client.FindAndCheck(clientId);
+			var client = Client.FindAndCheck<Client>(clientId);
 			var payer = Payer.Find(payerId);
 			var org = payer.JuridicalOrganizations.FirstOrDefault(j => j.Id == orgId);
 			client.ChangePayer(payer, org);
@@ -300,7 +300,7 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] LegalEntities(uint id)
 		{
-			var client = Client.FindAndCheck(id);
+			var client = Client.FindAndCheck<Client>(id);
 			return client.Orgs().Select(j => new {j.Id, j.Name}).ToArray();
 		}
 
@@ -459,7 +459,7 @@ where s.Name like :SearchText")
 
 		public void Delete(uint id)
 		{
-			var client = Client.FindAndCheck(id);
+			var client = Client.FindAndCheck<Client>(id);
 
 			if (!client.CanDelete()) {
 				Error("Не могу удалить клиента т.к. у него есть заказы");
