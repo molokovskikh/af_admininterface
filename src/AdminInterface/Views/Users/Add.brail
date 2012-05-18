@@ -21,9 +21,7 @@
 			${app.GetValidationError("user.Name")}<br>
 
 			${app.Label("user.Payer")}<br>
-			<%if client.IsClient(): %>
-			${app.Edit("user.Payer", client.Payers)}<br>
-			<%end %>
+			${app.Edit("user.Payer", Payers)}<br>
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.IgnoreCheckMinOrder")}<br>
 			${app.Edit("user.SendWaybills")}<br>

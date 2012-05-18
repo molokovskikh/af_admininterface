@@ -439,21 +439,34 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public virtual void Init(Client client)
+		public virtual void Init(Service client)
 		{
-			Client = client;
 			RootService = client;
-			if (Payer == null)
+			if (client.IsClient())
 			{
-				if (client.Payers.Count > 1)
-					throw new Exception(String.Format("У клиента более одного плательщика {0}", client.Payers.Implode()));
-				Payer = client.Payers.Single();
-				if (!Payer.Users.Any(u => u == this))
-					Payer.Users.Add(this);
-			}
+				var casClient = client as Client;
+				Client = casClient;
+				if (Payer == null)
+				{
+					if (casClient.Payers.Count > 1)
+						throw new Exception(String.Format("У клиента более одного плательщика {0}", casClient.Payers.Implode()));
+					Payer = casClient.Payers.Single();
+					if (!Payer.Users.Any(u => u == this))
+						Payer.Users.Add(this);
+				}
 
-			if (!Client.Users.Any(u => u == this))
+				if (!Client.Users.Any(u => u == this))
 				Client.Users.Add(this);
+			}
+			else {
+				//NHibernateUtil.Initialize(client);
+				var supplier = Supplier.Find(client.Id);
+				if (!supplier.Users.Any(u => u == this))
+				{
+					supplier.Users.Add(this);
+					supplier.Save();
+				}
+			}
 
 			if (Accounting == null)
 				Accounting = new UserAccount(this);

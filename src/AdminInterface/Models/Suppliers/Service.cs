@@ -94,5 +94,10 @@ namespace AdminInterface.Models.Suppliers
 		{
 			return Type == ServiceType.Drugstore;
 		}
+
+		public virtual void Save()
+		{
+			ActiveRecordMediator.Save(this);
+		}
 	}
 }

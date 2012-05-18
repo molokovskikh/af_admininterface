@@ -68,7 +68,7 @@ namespace Integration.Controllers
 			var person = new[] {new Person()};
 			Prepare();
 
-			controller.Add(clientContacts, regionSettings, address, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
+			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
 			scope.Flush();
 
 			var user = Registred();
@@ -87,7 +87,7 @@ namespace Integration.Controllers
 					new RegionSettings {
 						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 					},
-				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+				}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
 			var user = Registred();
 			var messages = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == user.Id);
@@ -107,7 +107,7 @@ namespace Integration.Controllers
 					new RegionSettings {
 						Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true
 					},
-				}, new Address(), new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
+				}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
 			var user = Registred();
 			Assert.That(user.Payer, Is.EqualTo(payer));

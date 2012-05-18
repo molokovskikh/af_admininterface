@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Configuration;
@@ -64,20 +65,26 @@ namespace AdminInterface.Controllers
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["UserRegistration"] = true;
+			IList<Payer> payers = new List<Payer>();
+			if (client.IsClient())
+				payers = ((Client)client).Payers;
+			else
+				payers = new List<Payer> { Supplier.Find(client.Id).Payer };
+			PropertyBag["Payers"] = payers;
 		}
 
 		[AccessibleThrough(Verb.Post)]
 		public void Add(
 			[DataBind("contacts")] Contact[] contacts, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,
+			/*[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,*/
 			[DataBind("persons")] Person[] persons,
 			string comment,
 			bool sendClientCard,
 			uint clientId,
 			string mails)
 		{
-			var client = Client.FindAndCheck<Client>(clientId);
+			var client = Client.FindAndCheck<Service>(clientId);
 			var user = new User((Service)client);
 			BindObjectInstance(user, "user");
 
@@ -86,6 +93,12 @@ namespace AdminInterface.Controllers
 				PropertyBag["user"] = user;
 				return;
 			}
+
+			var address = new Address();
+
+			SetBinder(new ARDataBinder());
+
+			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
 			user.Init(client);
 
@@ -107,9 +120,9 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
 
-				if (address != null)
+				if (client.IsClient() && address != null)
 				{
-					address = client.AddAddress(address);
+					address = ((Client)client).AddAddress(address);
 					user.RegistredWith(address);
 					address.SaveAndFlush();
 					address.Maintain();
