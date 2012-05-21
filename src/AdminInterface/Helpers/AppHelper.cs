@@ -35,7 +35,8 @@ namespace AdminInterface.Helpers
 			});
 		}
 
-		protected override string GetBuiltinEdit(string name, Type valueType, object value, object options)
+
+		protected override string GetBuiltinEdit(string name, Type valueType, object value, object options, PropertyInfo propertyInfo)
 		{
 			if (name.EndsWith(".Year"))
 			{
