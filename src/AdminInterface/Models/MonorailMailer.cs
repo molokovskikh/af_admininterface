@@ -15,6 +15,7 @@ using Castle.Core.Smtp;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 using DiffMatchPatch;
 using ExcelLibrary.SpreadSheet;
 using NHibernate;

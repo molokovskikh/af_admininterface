@@ -288,7 +288,6 @@
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\PeriodUserType.cs" />
-    <Compile Include="NHibernateExtentions\StateExtensions.cs" />
     <Compile Include="Queries\RejectWaibillParams.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
