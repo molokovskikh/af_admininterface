@@ -14,16 +14,6 @@ namespace Integration
 	public class ClientCardFixture : IntegrationFixture
 	{
 		[Test]
-		public void t()
-		{
-			var client = DataMother.CreateClientAndUsers();
-
-			session.Clear();
-
-			Console.WriteLine(session.Get<Service>(client.Id));
-		}
-
-		[Test]
 		public void Send_client_card()
 		{
 			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
