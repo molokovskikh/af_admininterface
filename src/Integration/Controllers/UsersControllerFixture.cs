@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -28,6 +29,9 @@ namespace Integration.Controllers
 			begin = DateTime.Now;
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
+
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			controller.DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
 
 			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 		}

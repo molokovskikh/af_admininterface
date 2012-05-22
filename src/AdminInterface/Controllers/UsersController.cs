@@ -58,7 +58,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = service;
 			if (service.IsClient())
 			{
-				//PropertyBag["drugstore"] = ((Client)service).Settings;
+				PropertyBag["drugstore"] = ((Client)service).Settings;
 				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
 			}
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
