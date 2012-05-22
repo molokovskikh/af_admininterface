@@ -61,6 +61,9 @@ namespace AdminInterface.Controllers
 				PropertyBag["drugstore"] = ((Client)service).Settings;
 				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
 			}
+			else {
+				PropertyBag["singleRegions"] = true;
+			}
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
