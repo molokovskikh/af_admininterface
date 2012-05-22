@@ -1,6 +1,9 @@
+using System;
 using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
+using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
 using Integration.Models;
 using NUnit.Framework;

@@ -17,6 +17,7 @@ using Common.Tools;
 using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models.Billing
 {

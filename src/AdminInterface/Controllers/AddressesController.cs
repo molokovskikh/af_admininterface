@@ -13,6 +13,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Controllers
 {

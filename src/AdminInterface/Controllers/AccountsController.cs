@@ -12,6 +12,7 @@ using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate;
 using Common.Tools;
 

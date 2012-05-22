@@ -22,6 +22,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers

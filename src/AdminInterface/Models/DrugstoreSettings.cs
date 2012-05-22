@@ -7,6 +7,7 @@ using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
 {

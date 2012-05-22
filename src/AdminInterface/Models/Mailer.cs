@@ -160,10 +160,11 @@ Email: {2}
 					account = user.Accounting;
 					var comment = "Комментарий: " + user.Name;
 					body = "Зарегистрирован новый пользователь \r\n" + user.Login;
-					body += comment;
 					subject = "Регистрация нового пользователя";
 					client = user.Client;
-					billingMessage += "\r\n" + comment;
+					if (!String.IsNullOrWhiteSpace(billingMessage))
+						billingMessage += "\r\n";
+					billingMessage += comment;
 					if (!String.IsNullOrEmpty(billingMessage))
 						new ClientInfoLogEntity(billingMessage, item).Save();
 				}

@@ -3,6 +3,7 @@ using System.Linq.Expressions;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models.Billing
 {

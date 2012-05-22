@@ -13,6 +13,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
 using Common.Web.Ui.MonoRailExtentions;
+using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models.Billing
 {
