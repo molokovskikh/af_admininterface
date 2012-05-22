@@ -112,7 +112,7 @@ namespace AdminInterface.Controllers
 
 		public void Show(uint id)
 		{
-			var client = Client.FindAndCheck<Client>(id);
+			var client = Service.FindAndCheck<Client>(id);
 			var users = client.Users;
 			var addresses = client.Addresses;
 

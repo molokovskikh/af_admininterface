@@ -45,17 +45,21 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Add(uint clientId)
 		{
-			var client = Service.FindAndCheck<Service>(clientId);
-			var user = new User(client);
+			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
+			DbSession.Get<Client>(clientId);
+			DbSession.Get<Supplier>(clientId);
+
+			var service = Service.FindAndCheck<Service>(clientId);
+			var user = new User(service);
 			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["user"] = user;
-			PropertyBag["client"] = client;
-			if (client.Type == ServiceType.Drugstore)
+			PropertyBag["client"] = service;
+			if (service.IsClient())
 			{
-				PropertyBag["drugstore"] = ((Client)client).Settings;
-				PropertyBag["Organizations"] = ((Client)client).Orgs().ToArray();
+				//PropertyBag["drugstore"] = ((Client)service).Settings;
+				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
 			}
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
@@ -66,10 +70,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["regions"] = Region.All().ToArray();
 			PropertyBag["UserRegistration"] = true;
 			IList<Payer> payers = new List<Payer>();
-			if (client.IsClient())
-				payers = ((Client)client).Payers;
+			if (service.IsClient())
+				payers = ((Client)service).Payers;
 			else
-				payers = new List<Payer> { Supplier.Find(client.Id).Payer };
+				payers = new List<Payer> { Supplier.Find(service.Id).Payer };
 			PropertyBag["Payers"] = payers;
 		}
 
@@ -77,19 +81,22 @@ namespace AdminInterface.Controllers
 		public void Add(
 			[DataBind("contacts")] Contact[] contacts, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			/*[ARDataBind("address", AutoLoadBehavior.NewRootInstanceIfInvalidKey)] Address address,*/
 			[DataBind("persons")] Person[] persons,
 			string comment,
 			bool sendClientCard,
 			uint clientId,
 			string mails)
 		{
-			var client = Client.FindAndCheck<Service>(clientId);
-			var user = new User((Service)client);
+			/*Грязный ХАК, почему-то если принудительно не загрузить так, не делается Service.FindAndCheck<Service>(clientId)*/
+			DbSession.Get<Client>(clientId);
+			DbSession.Get<Supplier>(clientId);
+
+			var service = Service.FindAndCheck<Service>(clientId);
+			var user = new User(service);
 			BindObjectInstance(user, "user");
 
 			if (!IsValid(user)) {
-				Add(client.Id);
+				Add(service.Id);
 				PropertyBag["user"] = user;
 				return;
 			}
@@ -100,7 +107,7 @@ namespace AdminInterface.Controllers
 
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
-			user.Init(client);
+			user.Init(service);
 
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
@@ -120,14 +127,14 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
 
-				if (client.IsClient() && address != null)
+				if (service.IsClient() && address != null)
 				{
-					address = ((Client)client).AddAddress(address);
+					address = ((Client)service).AddAddress(address);
 					user.RegistredWith(address);
 					address.SaveAndFlush();
 					address.Maintain();
 				}
-				client.Save();
+				service.Save();
 
 				scope.VoteCommit();
 			}
@@ -164,7 +171,10 @@ namespace AdminInterface.Controllers
 				passwordChangeLog.Update();
 
 				Notify("Пользователь создан");
-				RedirectUsingRoute("client", "show", new {client.Id});
+				if (service.IsClient())
+					RedirectUsingRoute("Clients", "show", new {service.Id});
+				else
+					RedirectUsingRoute("Suppliers", "show", new {service.Id});
 			}
 			else
 			{

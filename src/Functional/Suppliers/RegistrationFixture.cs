@@ -4,8 +4,10 @@ using AdminInterface.Models.Suppliers;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Functional.ForTesting;
+using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
+using WatiN.Core;
 using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
@@ -98,6 +100,20 @@ namespace Functional.Suppliers
 			Assert.That(group2.Contacts.Count, Is.EqualTo(2));
 			Assert.That(group2.Contacts[0].ContactText, Is.EqualTo("kvasovtest@analit.net"));
 			Assert.That(group2.Contacts[1].ContactText, Is.EqualTo("kvasovtest2@analit.net"));
+		}
+
+		[Test]
+		public void Register_user_for_supplier()
+		{
+			var supplier = DataMother.CreateSupplier();
+			supplier.Save();
+			Open(supplier);
+			Click("Новый пользователь");
+			browser.TextField("user_Name").AppendText("test_comment");
+			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
+			Click("Создать");
+			AssertText("Пользователь создан");
+			AssertText(string.Format("Поставщик {0}, Код {1}", supplier.Name, supplier.Id));
 		}
 
 		private static Supplier GetSupplier()
