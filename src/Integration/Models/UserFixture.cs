@@ -123,5 +123,35 @@ namespace Integration.Models
 			user.Delete();
 			scope.Flush();
 		}
+
+		[Test(Description = "Проверяем установку флага ForceReplication при изменении свойства InheritPricesFrom")]
+		public void SetReplicationInfo()
+		{
+			var parent = new User(client);
+
+			parent.Setup();
+
+			var supplier = DataMother.CreateSupplier();
+			supplier.Save();
+
+			session
+				.CreateSQLQuery("insert into Usersettings.AnalitfReplicationInfo(UserId, FirmCode, ForceReplication) values (:UserId, :SupplierId, 0)")
+				.SetParameter("UserId", user.Id)
+				.SetParameter("SupplierId", supplier.Id)
+				.ExecuteUpdate();
+
+			user.InheritPricesFrom = parent;
+			user.Save();
+
+			Flush();
+
+			var info = session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where UserId = :UserId")
+				.SetParameter("UserId", user.Id)
+				.List<object>()
+				.Select(v => Convert.ToBoolean(v))
+				.ToList();
+			Assert.That(info.Count, Is.GreaterThan(0));
+			Assert.That(info, Is.EqualTo(new [] {true}));
+		}
 	}
 }

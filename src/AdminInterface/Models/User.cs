@@ -71,8 +71,13 @@ namespace AdminInterface.Models
 		bool DisabledByParent { get; }
 	}
 
+	public interface IUser
+	{
+		uint Id { get; }
+	}
+
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
-	public class User : IEnablable, IDisabledByParent
+	public class User : IEnablable, IDisabledByParent, IUser
 	{
 		private string _name;
 		private bool _enabled;

@@ -13,8 +13,13 @@ namespace AdminInterface.Models.Suppliers
 		Vip
 	}
 
+	public interface IPrice
+	{
+		Supplier Supplier { get; }
+	}
+
 	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
-	public class Price : ActiveRecordLinqBase<Price>
+	public class Price : ActiveRecordLinqBase<Price>, IPrice
 	{
 		public Price()
 		{

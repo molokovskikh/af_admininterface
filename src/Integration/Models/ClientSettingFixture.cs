@@ -18,6 +18,9 @@ namespace Integration.Models
 			supplier.Save();
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
+
+			Flush();
+
 			session
 				.CreateSQLQuery("insert into Usersettings.AnalitfReplicationInfo(UserId, FirmCode, ForceReplication) values (:UserId, :SupplierId, 0)")
 				.SetParameter("UserId", user.Id)

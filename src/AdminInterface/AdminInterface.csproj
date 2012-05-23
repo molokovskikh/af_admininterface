@@ -185,6 +185,7 @@
     <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
+    <Compile Include="Models\UpdateReplicationInfoListener.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
