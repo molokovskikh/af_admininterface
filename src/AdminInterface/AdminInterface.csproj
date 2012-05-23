@@ -148,6 +148,8 @@
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
+    <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
     <Compile Include="Models\OrderLog.cs" />
     <Compile Include="Models\OrderFilter.cs" />
@@ -185,7 +187,7 @@
     <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\UpdateReplicationInfoListener.cs" />
+    <Compile Include="Models\Listeners\UpdateReplicationInfoListener.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
