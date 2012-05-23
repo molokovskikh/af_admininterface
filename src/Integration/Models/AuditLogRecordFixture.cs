@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
+using AdminInterface.Queries;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
@@ -49,7 +50,7 @@ namespace Integration.Models
 			payer.Save();
 			scope.Flush();
 
-			var logs = ClientInfoLogEntity.MessagesForClient(client);
+			var logs = new MessageQuery().Execute(client, session);
 			var log = logs.First();
 			Assert.That(log.Message, Is.StringContaining("Изменено 'Комментарий'"));
 			Assert.That(log.Message, Is.StringContaining("ins style"));
@@ -72,11 +73,11 @@ namespace Integration.Models
 			payer.Save();
 			scope.Flush();
 
-			var logs = ClientInfoLogEntity.MessagesForClient(client);
+			var logs = new MessageQuery().Execute(client, session);
 			var log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
 			Assert.That(log, Is.Not.Null, logs.Implode());
 
-			logs = ClientInfoLogEntity.MessagesForClient(client1);
+			logs = new MessageQuery().Execute(client1, session);
 			log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
 			Assert.That(log, Is.Not.Null, logs.Implode());
 		}

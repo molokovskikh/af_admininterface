@@ -1,20 +1,20 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
-using AdminInterface.Helpers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
-using NHibernate.SqlCommand;
-using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.Controllers
 {
 	public class AdvertisingFilter
 	{
+		[Description("Покачать только не размещенную:")]
 		public bool ShowWithoutDates { get; set; }
+
+		[Description("Показачать только неоплаченную:")]
 		public bool ShowWithoutPayment { get; set; }
 
 		public List<Advertising> Filter()
@@ -25,7 +25,7 @@ namespace AdminInterface.Controllers
 				criteria.Add(Expression.IsNull("Begin"));
 
 			if (ShowWithoutPayment)
-				criteria.Add(Expression.IsNull("Payment") /*|| Expression.g*/);
+				criteria.Add(Expression.IsNull("Payment"));
 
 			criteria.AddOrder(Order.Asc("Begin"));
 

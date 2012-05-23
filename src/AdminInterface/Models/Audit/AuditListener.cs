@@ -29,7 +29,8 @@ namespace AdminInterface.Models.Audit
 				base.Log(@event, message, isHtml);
 			else
 				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity) {
-					IsHtml = isHtml
+					IsHtml = isHtml,
+					MessageType = LogMessageType.System
 				});
 		}
 

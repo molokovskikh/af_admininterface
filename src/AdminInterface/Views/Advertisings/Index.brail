@@ -9,8 +9,8 @@
 </div>
 
 ${app.BeginFormFor("filter")}
-${app.FilterFor("Показачать только неоплаченную:", "filter.ShowWithoutPayment")}
-${app.FilterFor("Покачать только не размещенную:", "filter.ShowWithoutDates")}
+${app.FilterFor("filter.ShowWithoutPayment")}
+${app.FilterFor("filter.ShowWithoutDates")}
 ${app.EndFormFor("filter")}
 
 <table class=DataTable>

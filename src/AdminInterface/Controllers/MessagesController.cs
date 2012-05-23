@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
@@ -15,6 +16,8 @@ namespace AdminInterface.Controllers
 	{
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
+		[Description("Тип сообщения:")]
+		public IList<LogMessageType> Types { get; set; }
 
 		public MessageFilter()
 		{
@@ -30,6 +33,7 @@ namespace AdminInterface.Controllers
 			SortBy = "WriteTime";
 			SortDirection = "desc";
 			Period = new DatePeriod(DateTime.Today.AddDays(-7), DateTime.Today);
+			Types = new List<LogMessageType>{LogMessageType.User, LogMessageType.System};
 		}
 
 		public IList<ClientInfoLogEntity> Find()

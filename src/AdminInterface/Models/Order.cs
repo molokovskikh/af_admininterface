@@ -80,7 +80,7 @@ where ol.OrderId = :id
 			Quantity = quantity;
 		}
 
-		[PrimaryKey]
+		[PrimaryKey("RowId")]
 		public virtual uint Id { get; set; }
 
 		[BelongsTo("OrderId")]

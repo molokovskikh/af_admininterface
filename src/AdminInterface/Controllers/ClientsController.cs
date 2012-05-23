@@ -13,6 +13,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.NHibernateExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using AdminInterface.Services;
 using Castle.ActiveRecord;
@@ -22,6 +23,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Transform;
 
@@ -111,7 +113,7 @@ namespace AdminInterface.Controllers
 			SetBinder(new ARDataBinder());
 		}
 
-		public void Show(uint id)
+		public void Show(uint id, [SmartBinder(Expect = "filter.Types")] MessageQuery filter)
 		{
 			var client = Service.FindAndCheck<Client>(id);
 			var users = client.Users;
@@ -123,8 +125,10 @@ namespace AdminInterface.Controllers
 			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
-			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(client);
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
+
+			PropertyBag["filter"] = filter;
+			PropertyBag["messages"] = filter.Execute(client, DbSession);
 
 			Sort.Make(this);
 		}

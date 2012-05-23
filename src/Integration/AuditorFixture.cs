@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Queries;
 using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NHibernate;
@@ -46,7 +47,7 @@ namespace Integration
 			Save(client);
 			Flush();
 
-			var messages = ClientInfoLogEntity.MessagesForClient(client);
+			var messages = new MessageQuery().Execute(client, session);
 			var message = messages.Last();
 			Assert.That(message.Message,
 				Is.EqualTo("$$$Изменено 'Ассортиментный прайс для преобразования накладной в формат dbf' было '' стало 'Тестовый поставщик - Базовый'"));

@@ -83,7 +83,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void After_password_change_message_should_be_added_to_history()
 		{
-			ClientInfoLogEntity.MessagesForClient(testClient).Each(e => e.Delete());
+			ClientInfoLogEntity.DeleteAuditRecords(testClient);
 
 			browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
 			browser.Link(Find.ByText("Изменить пароль")).Click();

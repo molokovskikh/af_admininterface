@@ -170,5 +170,13 @@ namespace Functional.Drugstore
 			client.Refresh();
 			Assert.That(client.Payers, Is.EquivalentTo(new [] { payer }));
 		}
+
+		[Test]
+		public void Hide_system_messages()
+		{
+			AssertText("$$$Изменено");
+			Css("#filter_Types_1_").Click();
+			Assert.That(browser.Text, Is.Not.ContainsSubstring("$$$Изменено"));
+		}
 	}
 }

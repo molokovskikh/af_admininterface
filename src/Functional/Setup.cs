@@ -1,20 +1,14 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO;
 using System.Configuration;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security;
 using System.Web.Hosting;
-using AddUser;
 using AdminInterface.Models.Security;
 using CassiniDev;
-using Functional.ForTesting;
 using Integration.ForTesting;
-using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
 using SecurityContext = AdminInterface.Security.SecurityContext;
 
 namespace Functional
@@ -49,8 +43,6 @@ namespace Functional
 			{
 				Settings.Instance.WaitForCompleteTimeOut = int.MaxValue;
 			}
-
-			InitLogger(/*"NHibernate"*/);
 		}
 
 		private void SetupEnvironment()
@@ -62,24 +54,6 @@ namespace Functional
 			var apps = manager.GetRunningApplications();
 			var domain = manager.GetAppDomain(apps.Single().ID);
 			domain.SetData("environment", "test");
-		}
-
-		private void InitLogger()
-		{
-/*			var repository = LogManager.GetRepository();
-			var hierarchy = ((Hierarchy)repository);
-			hierarchy.Root.Level = Level.Debug;
-
-			PatternLayout layout = new PatternLayout();
-			layout.ConversionPattern = PatternLayout.DetailConversionPattern;
-			layout.ActivateOptions();
-
-			// Create the appender
-			ConsoleAppender appender = new ConsoleAppender();
-			appender.Layout = layout;
-			appender.ActivateOptions();
-			hierarchy.Root.AddAppender(new ConsoleAppender());
-			hierarchy.Configured = true;*/
 		}
 
 		[TearDown]
