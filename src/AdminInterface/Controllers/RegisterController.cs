@@ -156,6 +156,7 @@ namespace AdminInterface.Controllers
 				foreach (var person in userPersons)
 					user.AddContactPerson(person.Name);
 				user.Setup();
+				user.SetupSupplierPermission();
 				password = user.CreateInAd();
 
 				supplier.AddBillingComment(comment);
@@ -438,6 +439,7 @@ WHERE   pricesdata.firmcode = s.Id
 					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
 			}
 			user.Setup();
+			user.SetupSupplierPermission();
 			client.Users = new List<User> {user};
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);

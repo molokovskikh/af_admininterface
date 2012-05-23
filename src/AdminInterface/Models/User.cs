@@ -427,8 +427,6 @@ namespace AdminInterface.Models
 			var defaults = DefaultValues.Get();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
-			if (Client == null)
-				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
 			Save();
 			Login = Id.ToString();
 			Save();
@@ -437,6 +435,13 @@ namespace AdminInterface.Models
 			{
 				AddPrices(Client);
 			}
+		}
+
+		public virtual void SetupSupplierPermission()
+		{
+			if (Client == null)
+				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
+			Save();
 		}
 
 		public virtual void Init(Service client)

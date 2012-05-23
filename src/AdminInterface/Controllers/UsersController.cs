@@ -54,30 +54,33 @@ namespace AdminInterface.Controllers
 			var rejectWaibillParams = new RejectWaibillParams().Get(clientId, DbSession);
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
-			PropertyBag["user"] = user;
 			PropertyBag["client"] = service;
 			if (service.IsClient())
 			{
 				PropertyBag["drugstore"] = ((Client)service).Settings;
 				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			}
 			else {
 				PropertyBag["singleRegions"] = true;
+				PropertyBag["registerSupplierUser"] = true;
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface);
 			}
-			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+			PropertyBag["user"] = user;
 			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
 			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			PropertyBag["regions"] = Region.All().ToArray();
-			PropertyBag["UserRegistration"] = true;
 			IList<Payer> payers = new List<Payer>();
 			if (service.IsClient())
 				payers = ((Client)service).Payers;
 			else
 				payers = new List<Payer> { Supplier.Find(service.Id).Payer };
 			PropertyBag["Payers"] = payers;
+			PropertyBag["maxRegion"] = UInt64.MaxValue;
+			PropertyBag["UserRegistration"] = true;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -97,6 +100,7 @@ namespace AdminInterface.Controllers
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			BindObjectInstance(user, "user");
+			
 
 			if (!IsValid(user)) {
 				Add(service.Id);

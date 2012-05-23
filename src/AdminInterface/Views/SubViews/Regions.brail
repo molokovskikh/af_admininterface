@@ -211,6 +211,12 @@
 					</tr>
 				</thead>
 				<tbody id="RegionsTableBody" class="HighLightCurrentRow">
+					<% if IsDefined(@registerSupplierUser) :%>
+					<tr id="RegionRow${maxRegion}">
+						<td style="text-align: left">Все<input type="hidden" name="regionSettings[${maxRegion}].Id" value="${maxRegion}" /></td>
+						<td style="text-align: center"><input id="browseRegion{maxRegion}" type="checkbox" name="regionSettings[${maxRegion}].IsAvaliableForBrowse" value="true" onclick="onClickBrowseRegion({maxRegion})" /></td>
+					</tr>
+					<%end %>
 					<% for i, region in enumerate(regions):
 						if (defaultShowRegions.Contains(region.Id) or browseRegions.Contains(region.Id) or (orderRegions.Contains(region.Id))): %>
 					<tr id="RegionRow${region.Id}">

@@ -503,6 +503,7 @@
     <None Include="Views\Regions\Index.brail" />
     <None Include="Views\Shared\DisplayTemplates\Action.brail" />
     <None Include="Views\Shared\EditorTemplates\Account.brail" />
+    <None Include="Views\SubViews\ClientInterfacePermissionBlock.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
     <None Include="Views\Templates\Addresses.brail" />
     <None Include="Views\Templates\DocumentPayerSelector.brail" />

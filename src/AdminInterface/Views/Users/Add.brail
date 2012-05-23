@@ -10,6 +10,14 @@
 	$(function() {
 		$("form").validate({ rules: { "mails": "validateEmailList", } });
 	});
+
+	function AssignedPermissions()
+	{
+		if (this.checked)
+			 $(this).attr('checked', true);
+		else
+			$(this).attr('checked', false);
+	}
 </script>
 
 <div style="width: 800px;">
@@ -22,10 +30,12 @@
 
 			${app.Label("user.Payer")}<br>
 			${app.Edit("user.Payer", Payers)}<br>
+			<% if not IsDefined(@registerSupplierUser) :%>
 			${app.Edit("user.SubmitOrders")}<br>
 			${app.Edit("user.IgnoreCheckMinOrder")}<br>
 			${app.Edit("user.SendWaybills")}<br>
 			${app.Edit("user.SendRejects")}<br>
+			<%end %>
 		</div>
 
 		${ForHelper.Editor("user.Accounting")}
@@ -66,7 +76,7 @@
 		</div>
 		<%end %>
 		<% OutputSubView("/Templates/Addresses") %>
-
+		
 		<div class=block>
 			<h3>
 				Права доступа
@@ -79,7 +89,7 @@
 				<% end %>
 			</div>
 		</div>
-		
+		<% if not IsDefined(@registerSupplierUser) :%>
 		<div class=block>
 			<h3>
 				Права в программе АналитФармация
@@ -105,7 +115,7 @@
 				<% end %>
 			</div>
 		</div>
-		
+		<%end %>
 		<div class="block">
 			<h3>Региональная настройка</h3>
 			<% OutputSubView("/SubViews/Regions") %>
