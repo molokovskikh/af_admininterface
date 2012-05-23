@@ -29,8 +29,13 @@ namespace AdminInterface.Models
 		[Description("Выводить предупреждения")] Warning = 1,
 	}
 
+	public interface IDrugstoreSettings
+	{
+		uint Id { get; }
+	}
+
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
-	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>
+	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>, IDrugstoreSettings
 	{
 		private bool _noiseCosts;
 		private Supplier _noiseCostExceptSupplier;
@@ -228,28 +233,6 @@ namespace AdminInterface.Models
 
 		[Property, Description("Формат для сохранения накладных Протек"), Auditable]
 		public virtual ProtekWaybillSavingType ProtekWaybillSavingType { get; set; }
-
-		protected override void OnUpdate()
-		{
-			var forceReplication = this.IsChanged(s => s.BuyingMatrixPrice)
-				|| this.IsChanged(s => s.BuyingMatrixType)
-				|| this.IsChanged(s => s.WarningOnBuyingMatrix);
-
-			if (!forceReplication)
-				return;
-			using (new SessionScope())
-			{
-				ArHelper.WithSession(s => {
-					s.CreateSQLQuery(@"
-update Usersettings.AnalitFReplicationInfo r
-join Customers.Users u on u.Id = r.UserId
-set ForceReplication = 1
-where u.ClientId = :ClientId")
-						.SetParameter("ClientId", Client.Id)
-						.ExecuteUpdate();
-				});
-			}
-		}
 
 		public virtual void CheckDefaults()
 		{
