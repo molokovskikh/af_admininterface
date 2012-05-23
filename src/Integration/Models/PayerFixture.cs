@@ -5,6 +5,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
+using Test.Support.log4net;
 using log4net.Config;
 using NUnit.Framework;
 
@@ -30,10 +31,11 @@ namespace Integration.Models
 		public void Search_payet_with_supplier()
 		{
 			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
 			var payer = supplier.Payer;
 			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
-			supplier.Save();
-			payer.UpdateAndFlush();
+			Save(payer);
+			Flush();
 
 			var payers = Payer.GetLikeAvaliable(payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
