@@ -40,6 +40,7 @@ namespace Integration.ForTesting
 
 			var provider = new FakeServiceProvider();
 			var loader = new FileAssemblyViewSourceLoader(config.ViewEngineConfig.ViewPathRoot);
+			loader.AddAssemblySource(new AssemblySourceInfo("Common.Web.Ui", "Common.Web.Ui.Views"));
 			provider.Services.Add(typeof(IMonoRailConfiguration), config);
 			provider.Services.Add(typeof(IViewSourceLoader), loader);
 

@@ -50,7 +50,7 @@ namespace Integration.Models
 			payer.Save();
 			scope.Flush();
 
-			var logs = new MessageQuery().Execute(client, session);
+			var logs = new MessageQuery(LogMessageType.Stat).Execute(client, session);
 			var log = logs.First();
 			Assert.That(log.Message, Is.StringContaining("Изменено 'Комментарий'"));
 			Assert.That(log.Message, Is.StringContaining("ins style"));
@@ -73,11 +73,11 @@ namespace Integration.Models
 			payer.Save();
 			scope.Flush();
 
-			var logs = new MessageQuery().Execute(client, session);
+			var logs = new MessageQuery(LogMessageType.Stat).Execute(client, session);
 			var log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
 			Assert.That(log, Is.Not.Null, logs.Implode());
 
-			logs = new MessageQuery().Execute(client1, session);
+			logs = new MessageQuery(LogMessageType.Stat).Execute(client1, session);
 			log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));
 			Assert.That(log, Is.Not.Null, logs.Implode());
 		}

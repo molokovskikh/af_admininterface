@@ -10,6 +10,11 @@ namespace AdminInterface.Queries
 {
 	public class MessageQuery
 	{
+		public MessageQuery(params LogMessageType[] types)
+		{
+			Types = new List<LogMessageType>(types);
+		}
+
 		public MessageQuery()
 		{
 			Types = new List<LogMessageType> {

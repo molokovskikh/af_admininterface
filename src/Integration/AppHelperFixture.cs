@@ -8,10 +8,12 @@ using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.Framework.Descriptors;
+using Castle.MonoRail.Framework.Helpers;
 using Castle.MonoRail.Framework.Routing;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.Test;
+using Integration.ForTesting;
 using NHibernate;
 using NUnit.Framework;
 using AppHelper = AdminInterface.Helpers.AppHelper;
@@ -114,6 +116,11 @@ namespace Integration
 		[Test]
 		public void Filter_for_period()
 		{
+			var formHelper = new FormHelper();
+			PrepareHelper(formHelper);
+			context.CurrentControllerContext.Helpers.Add(formHelper);
+			context.Services.ViewEngineManager = ForTest.GetViewManager();
+
 			filter.Period = new DatePeriod();
 			var result = helper.FilterFor("filter.Period");
 			Assert.That(result, Is.StringContaining("calendar"));
