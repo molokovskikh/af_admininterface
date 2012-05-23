@@ -3,8 +3,7 @@
 		<% if IsDefined("PostToServer"): %>
 			${PostToServer}
 		<% end %>
-		${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
-		${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+
 		<table class="CenterBlock">
 			<tr>
 				<td colspan="2" style="font-weight:bold;">
@@ -21,10 +20,12 @@
 			</tr>
 			<tr>
 				<td>
-					<div style="width:100%; border: none;" id="beginDateCalendarHolder"></div>
+					${FormHelper.HiddenField("endDate", endDate.ToShortDateString())}
+					<div class="calendar" style="width:100%; border: none;" id="beginDateCalendarHolder"></div>
 				</td>
 				<td>
-					<div style="width:100%; border: none;" id="endDateCalendarHolder"></div>
+					${FormHelper.HiddenField("beginDate", beginDate.ToShortDateString())}
+					<div class="calendar" style="width:100%; border: none;" id="endDateCalendarHolder"></div>
 				</td>
 			</tr>
 			<tr>
@@ -35,32 +36,3 @@
 		</table>
 	</form>
 </div>
-
-<script type="text/javascript">
-	function beginDateCallBack(cal) 
-	{
-		document.getElementById("beginDate").value = cal.date.print("%d.%m.%Y");
-	};
-
-	function endDateCallBack(cal) 
-	{
-		document.getElementById("endDate").value = cal.date.print("%d.%m.%Y");
-	};
-
-  
-  Calendar.setup({
-	date: "${beginDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-    flat: "beginDateCalendarHolder",
-    flatCallback: beginDateCallBack,
-    showOthers: true
-  });
-  
-  Calendar.setup({
-	date: "${endDate.ToString("MM\"/\"dd\"/\"yyyy")}",
-	weekNumbers: false,
-    flat: "endDateCalendarHolder",
-    flatCallback: endDateCallBack,
-    showOthers: true
-  });
-</script>
