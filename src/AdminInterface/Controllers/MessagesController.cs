@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
@@ -43,6 +44,7 @@ namespace AdminInterface.Controllers
 				uint.TryParse(SearchText, out id);
 				var query = s.QueryOver<ClientInfoLogEntity>()
 					.Where(l => l.WriteTime >= Period.Begin && l.WriteTime <= Period.End.AddDays(1))
+					.Where(l => l.MessageType.IsIn(Types.ToArray()))
 					.And(
 						Restrictions.On<ClientInfoLogEntity>(l => l.Message).IsLike(SearchText, MatchMode.Anywhere) ||
 						Restrictions.On<ClientInfoLogEntity>(l => l.Name).IsLike(SearchText, MatchMode.Anywhere) ||
