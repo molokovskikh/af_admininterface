@@ -242,6 +242,7 @@ namespace Integration.ForTesting
 			};
 			user.Save();
 			user.Setup();
+			user.SetupSupplierPermission();
 			user.Save();
 			return user;
 		}
