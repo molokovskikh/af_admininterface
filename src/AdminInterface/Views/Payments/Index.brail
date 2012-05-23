@@ -17,7 +17,7 @@
 	${app.FilterFor("filter.Period")}
 	${app.FilterFor("filter.Recipient")}
 	${app.FilterFor("filter.SearchText")}
-	${app.FilterFor("Показывать только неопознанные:", "filter.ShowOnlyUnknown")}
+	${app.FilterFor("filter.ShowOnlyUnknown")}
 	${app.EndFormFor("filter")}
 </div>
 

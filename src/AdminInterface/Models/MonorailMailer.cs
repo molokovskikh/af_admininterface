@@ -179,7 +179,7 @@ namespace AdminInterface.Models
 
 		public MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
 		{
-			To = "RegisterList@subscribe.analit.net";
+			To = "BillingList@analit.net";
 			From = "register@analit.net";
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			IsBodyHtml = true;

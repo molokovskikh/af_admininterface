@@ -26,6 +26,7 @@ using System.Web;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using System.Linq;
+using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Controllers
@@ -187,7 +188,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Get)]
-		public void Edit(uint id)
+		public void Edit(uint id, [SmartBinder(Expect = "filter.Types")] MessageQuery filter)
 		{
 			var user = User.Find(id);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
@@ -195,12 +196,15 @@ namespace AdminInterface.Controllers
 			if (user.Client != null)
 				PropertyBag["client"] = user.Client;
 
-			PropertyBag["Messages"] = ClientInfoLogEntity.MessagesForUser(user);
 			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
+
+			PropertyBag["filter"] = filter;
+			PropertyBag["messages"] = filter.Execute(user, DbSession);
+
 			if (user.Client != null)
 			{
 				var setting = user.Client.Settings;
@@ -235,7 +239,7 @@ namespace AdminInterface.Controllers
 			[DataBind("deletedPersons")] Person[] deletedPersons)
 		{
 			if (!IsValid(user)) {
-				Edit(user.Id);
+				Edit(user.Id, new MessageQuery());
 				RenderView("Edit");
 				return;
 			}

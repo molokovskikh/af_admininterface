@@ -7,6 +7,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Castle.ActiveRecord;
+using AdminInterface.Queries;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -143,7 +144,7 @@ namespace Integration.Controllers
 			var user = DataMother.CreateSupplierUser();
 			scope.Flush();
 
-			controller.Edit(user.Id);
+			controller.Edit(user.Id, new MessageQuery());
 		}
 
 		private User Registred()

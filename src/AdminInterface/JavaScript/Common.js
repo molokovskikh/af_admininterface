@@ -110,7 +110,9 @@
 
 	$(".calendar").each(function () {
 		var id = this.id.substring(0, this.id.indexOf("CalendarHolder"));
-		var value = $("#" + id).get(0).value;
+		var value = $("#" + id);
+		if (!value.length)
+			value = $(this).siblings("input[type=hidden]");
 
 		var calendar = Calendar.setup({
 			daFormat: "%d.%m.%Y",
@@ -118,7 +120,7 @@
 			weekNumbers: false,
 			flat: this.id,
 			flatCallback: function () {
-				$("#" + id).get(0).value = calendar.date.print("%d.%m.%Y");
+				value.get(0).value = calendar.date.print("%d.%m.%Y");
 				calendar.refresh();
 				if (beginCalendar && endCalendar) {
 					beginCalendar.refresh();
@@ -127,7 +129,7 @@
 			},
 			showOthers: true
 		});
-		calendar.parseDate(value);
+		calendar.parseDate(value.val());
 		if (id.indexOf("begin") >= 0) {
 			beginCalendar = calendar;
 			calendar.setDateStatusHandler(beginDateAllowed);

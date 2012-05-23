@@ -559,7 +559,8 @@ ORDER BY {Payer}.shortname;";
 			foreach (var client in Clients) {
 				var log = new ClientInfoLogEntity(client) {
 					Message = property.Message,
-					IsHtml = property.IsHtml
+					IsHtml = property.IsHtml,
+					MessageType = LogMessageType.Stat
 				};
 				log.Save();
 			}

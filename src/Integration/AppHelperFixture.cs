@@ -96,7 +96,7 @@ namespace Integration
 		[Test]
 		public void Checkbox_edit()
 		{
-			var result = helper.FilterFor("Тест", "filter.SomeBool");
+			var result = helper.FilterFor("filter.SomeBool", "Тест");
 			Assert.That(result, Is.StringContaining("<tr><td class='filter-label'>Тест</td>" +
 				"<td colspan=2 class='value'>" +
 				"<input type=\"checkbox\" id=\"filter_SomeBool\" name=\"filter.SomeBool\" value=\"true\" />" +

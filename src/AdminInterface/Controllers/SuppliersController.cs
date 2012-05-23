@@ -13,10 +13,12 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
 {
@@ -26,7 +28,7 @@ namespace AdminInterface.Controllers
 	]
 	public class SuppliersController : AdminInterfaceController
 	{
-		public void Show(uint id)
+		public void Show(uint id, [SmartBinder(Expect = "filter.Types")] MessageQuery filter)
 		{
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			PropertyBag["supplier"] = supplier;
@@ -35,11 +37,12 @@ namespace AdminInterface.Controllers
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(supplier.Users);
 
 			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
-			PropertyBag["messages"] = ClientInfoLogEntity.MessagesForClient(supplier);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 
+			PropertyBag["filter"] = filter;
+			PropertyBag["messages"] = filter.Execute(supplier, DbSession);
+
 			Sort.Make(this);
-			var hast = supplier.GetHashCode();
 			if (IsPost)
 			{
 				BindObjectInstance(supplier, "supplier");
@@ -97,7 +100,7 @@ namespace AdminInterface.Controllers
 			}
 			Notify("Сохранено");
 
-			new ClientInfoLogEntity(logMessage.ToString(), supplier).Save();
+			new ClientInfoLogEntity(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
 
 			RedirectToReferrer();
 		}

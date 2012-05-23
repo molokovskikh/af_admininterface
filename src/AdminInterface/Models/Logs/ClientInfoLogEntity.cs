@@ -2,18 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Web;
-using AdminInterface.Helpers;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
-using System.Linq;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
-using NHibernate.Linq;
 
 namespace AdminInterface.Models.Logs
 {
@@ -24,6 +20,13 @@ namespace AdminInterface.Models.Logs
 		[Description("Пользователь")] User,
 		[Description("Адрес")] Address,
 		[Description("Отчет")] Report,
+	}
+
+	public enum LogMessageType
+	{
+		[Description("Пользовательское")] User,
+		[Description("Системное")] System,
+		[Description("Статистическое")] Stat
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
@@ -108,6 +111,9 @@ namespace AdminInterface.Models.Logs
 		public LogObjectType Type { get; set; }
 
 		[Property]
+		public LogMessageType MessageType { get; set; }
+
+		[Property]
 		public string Name { get; set; }
 
 		[Property]
@@ -183,7 +189,7 @@ namespace AdminInterface.Models.Logs
 				status = "отключен";
 			else
 				status = "включен";
-			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), service);
+			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), service) {MessageType = LogMessageType.System};
 		}
 
 		public static ClientInfoLogEntity ReseteUin(Client client, string reason)
@@ -194,26 +200,6 @@ namespace AdminInterface.Models.Logs
 		public static ClientInfoLogEntity ReseteUin(User user, string reason)
 		{
 			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user);
-		}
-
-		public static IList<ClientInfoLogEntity> MessagesForClient(Service service)
-		{
-			return Queryable
-				.Where(l => l.Service == service)
-				.OrderByDescending(l => l.WriteTime)
-				.Fetch(l => l.Administrator)
-				.ToList();
-		}
-
-		public static IList<ClientInfoLogEntity> MessagesForUser(User user)
-		{
-			var objectType = GetLogObjectType(user);
-			var serviceType = GetLogObjectType(user.RootService);
-			return Queryable
-				.Where(l => (l.ObjectId == user.Id && l.Type == objectType) || (l.ObjectId == user.RootService.Id && l.Type == serviceType))
-				.OrderByDescending(l => l.WriteTime)
-				.Fetch(l => l.Administrator)
-				.ToList();
 		}
 
 		public override string ToString()

@@ -212,17 +212,7 @@
 </div>
 
 <div class="TwoColumn Messages" style="margin-left: 10px">
-	<form id="MessagesForm" action="SendMessage" method="post">
 	<div class="block">
-		<h3>Сообщения пользователя</h3>
-		<input type=hidden value=${user.Id} name="userId" />
-		Новое сообщение:
-		<textarea style="height: 150px; width:100%;" name=message></textarea>
-		<br />
-		<input type=submit value="Принять" class="RightButton"/>
-		<p>
-			<% OutputSubView("/Templates/Messages") %>
-		</p>
+		<% OutputSubView("/Templates/Messages", {@hiddenId: "<input type=hidden value=${user.Id} name=\"userId\" />"}) %>
 	</div>
-	</form>
 </div>

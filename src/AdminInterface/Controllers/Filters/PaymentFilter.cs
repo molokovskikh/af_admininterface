@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
@@ -14,6 +15,8 @@ namespace AdminInterface.Controllers.Filters
 		public Recipient Recipient { get; set; }
 		public DatePeriod Period { get; set; }
 		public string SearchText { get; set; }
+
+		[Description("Показывать только неопознанные:")]
 		public bool ShowOnlyUnknown { get; set; }
 		public decimal Sum { get; private set; }
 		public int Count { get; private set; }

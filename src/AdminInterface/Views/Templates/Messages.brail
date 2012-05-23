@@ -1,30 +1,46 @@
-﻿<% if messages.Count > 0: %>
-<table id=messages class="DataTable HighLightCurrentRow">
-	<thead>
-		<tr>
-			<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
-			<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
-			<th>${app.Sortable("Тип", "Messages.Type")}</th>
-			<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
-			<th>${app.Sortable("Название", "Messages.Name")}</th>
-			<th>Событие</th>
+﻿<form id="MessagesForm" action="SendMessage" method="post">
+	<h3>Сообщения пользователя</h3>
+	${hiddenId}
+	Новое сообщение:
+	<textarea style="height: 150px; width:100%;" name=message></textarea>
+	<br />
+	<input type=submit value="Принять"/>
+</form>
+
+<div class="sub-block">
+	<form class=autosubmit>
+		<input type=hidden name="filter.Dummy" />
+		${app.Edit("filter.Types")}
+	</form>
+
+	<% if messages.Count > 0: %>
+	<table id=messages class="DataTable HighLightCurrentRow">
+		<thead>
+			<tr>
+				<th>${app.Sortable("Дата", "Messages.WriteTime")}</th>
+				<th>${app.Sortable("Оператор", "Messages.Operator")}</th>
+				<th>${app.Sortable("Тип", "Messages.Type")}</th>
+				<th>${app.Sortable("Код", "Messages.ObjectId")}</th>
+				<th>${app.Sortable("Название", "Messages.Name")}</th>
+				<th>Событие</th>
+			</tr>
+		</thead>
+		<% for i, log in enumerate(messages): %>
+		<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(log)}"">
+			<td>${log.WriteTime}</td>
+			<td>${log.Operator}</td>
+			<td>${BindingHelper.GetDescription(log.Type)}</td>
+			<td>${log.ObjectId}</td>
+			<td>${log.Name}</td>
+			<td>${log.HtmlMessage}</td>
 		</tr>
-	</thead>
-	<% for i, log in enumerate(messages): %>
-	<tr class="${ViewHelper.GetRowStyle(i)} ${app.Style(log)}"">
-		<td>${log.WriteTime}</td>
-		<td>${log.Operator}</td>
-		<td>${BindingHelper.GetDescription(log.Type)}</td>
-		<td>${log.ObjectId}</td>
-		<td>${log.Name}</td>
-		<td>${log.HtmlMessage}</td>
-	</tr>
+		<% end %>
+	</table>
+	<% else: %>
+	<table class="DataTable">
+		<tr class="EmptyData">
+			<td>Сообщений нет.</td>
+		</tr>
+	</table>
 	<% end %>
-</table>
-<% else: %>
-<table class="DataTable">
-	<tr class="EmptyData">
-		<td>Сообщений нет.</td>
-	</tr>
-</table>
-<% end %>
+</div>

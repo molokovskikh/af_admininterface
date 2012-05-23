@@ -190,19 +190,9 @@ ${app.Asset("search.editor.js")}
 	</div>
 
 	<div class="TwoColumn" style="margin-left: 10px">
-		<form action="SendMessage" method="post" id="MessagesForm">
 		<div class="block">
-			<h3>Сообщения пользователя</h3>
-			<input type=hidden value=${supplier.Id} name=id />
-			Новое сообщение:
-			<textarea style="height: 150px; width:100%;" class="reuired" name="message"></textarea>
-			<br />
-			<input type=submit value="Принять" class="RightButton"/>
-			<p>
-				<% OutputSubView("/Templates/Messages") %>
-			</p>
+			<% OutputSubView("/Templates/Messages", {@hiddenId: "<input type=hidden value=${supplier.Id} name=id />"}) %>
 		</div>
-		</form>
 	</div>
 
 </div>
