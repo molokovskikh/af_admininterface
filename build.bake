@@ -96,7 +96,7 @@ task @BuildBackground:
 	Rm("output/$project/$project.*.config")
 	Globals.Project = oldProject
 
-task @deploy, [/*@CheckScmChanges,*/ @Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackground, @DeployPrinter, @SendDeployNotification]
+task @deploy, [@CheckScmChanges, @Production, @Build, @Backup, @Migrate, @WebDeploy, @DeployBackground, @DeployPrinter, @SendDeployNotification]
 
 task @TestDeploy, [@BuildWebSite, @WebDeploy]
 
