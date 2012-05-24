@@ -185,7 +185,7 @@
                     if (IsDefined("UserRegistration") and (isForBrowse or isForOrder)):
                         defaultShowRegions.Add(region.Id)
                     end
-					if (not (user.Client)) and IsDefined(@registerSupplierUser):
+					if ((IsDefined("user")) and (not (user.Client))) and IsDefined(@registerSupplierUser):
 						isForBrowse = (availibleRegions & region.Id) > 0;
 					end
                     if (isForBrowse):
