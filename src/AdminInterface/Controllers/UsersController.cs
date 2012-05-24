@@ -65,6 +65,7 @@ namespace AdminInterface.Controllers
 			else {
 				PropertyBag["singleRegions"] = true;
 				PropertyBag["registerSupplierUser"] = true;
+				PropertyBag["availibleRegions"] = ((Supplier)service).RegionMask;
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface);
 			}
 			PropertyBag["user"] = user;

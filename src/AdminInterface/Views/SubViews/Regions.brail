@@ -170,8 +170,8 @@
                 orderRegions = []
                 homeRegion = regions[0]
                 if (IsDefined("client")):
-                    homeRegion = client.HomeRegion                            
-                end
+                    homeRegion = client.HomeRegion
+				end
                 for i, region in enumerate(regions): 
                     isForBrowse = homeRegion.Id == region.Id;
                     isForOrder = isForBrowse;
@@ -185,6 +185,9 @@
                     if (IsDefined("UserRegistration") and (isForBrowse or isForOrder)):
                         defaultShowRegions.Add(region.Id)
                     end
+					if ((IsDefined("user")) and (not (user.Client))) and IsDefined(@registerSupplierUser):
+						isForBrowse = (availibleRegions & region.Id) > 0;
+					end
                     if (isForBrowse):
                         browseRegions.Add(region.Id)
                     end
@@ -214,7 +217,7 @@
 					<% if IsDefined(@registerSupplierUser) :%>
 					<tr id="RegionRow${maxRegion}">
 						<td style="text-align: left">Все<input type="hidden" name="regionSettings[${maxRegion}].Id" value="${maxRegion}" /></td>
-						<td style="text-align: center"><input id="browseRegion{maxRegion}" type="checkbox" name="regionSettings[${maxRegion}].IsAvaliableForBrowse" value="true" onclick="onClickBrowseRegion({maxRegion})" /></td>
+						<td style="text-align: center"><input id="browseRegion{maxRegion}" type="checkbox" name="regionSettings[${maxRegion}].IsAvaliableForBrowse" value="true" onclick="onClickBrowseRegion({maxRegion})" checked/></td>
 					</tr>
 					<%end %>
 					<% for i, region in enumerate(regions):
