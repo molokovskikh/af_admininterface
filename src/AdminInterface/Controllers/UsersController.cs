@@ -187,6 +187,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
+				Flash["newUser"] = true;
 				Flash["password"] = password;
 				Redirect("main", "report", new {id = user.Id});
 			}
