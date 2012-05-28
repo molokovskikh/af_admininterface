@@ -13,6 +13,10 @@ namespace AdminInterface.Models.Listeners
 	{
 		public void OnPostUpdate(PostUpdateEvent @event)
 		{
+			//Если значение OldState не установлено, то не производим обработку
+			if (@event.OldState == null)
+				return;
+
 			var dirty = @event.Persister.FindDirty(@event.State, @event.OldState, @event.Entity, @event.Session);
 			var user = @event.Entity as IUser;
 			var price = @event.Entity as IPrice;

@@ -8,6 +8,10 @@ namespace AdminInterface.Models.Listeners
 	{
 		public void OnPostUpdate(PostUpdateEvent @event)
 		{
+			//Если значение OldState не установлено, то не производим обработку
+			if (@event.OldState == null)
+				return;
+
 			var settings = @event.Entity as IDrugstoreSettings;
 			if (settings != null) {
 				var dirty = @event.Persister.FindDirty(@event.State, @event.OldState, @event.Entity, @event.Session);
