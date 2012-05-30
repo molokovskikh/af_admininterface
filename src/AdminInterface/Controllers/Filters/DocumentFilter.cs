@@ -69,6 +69,8 @@ namespace AdminInterface.Controllers.Filters
 						.Add(Projections.Property("a.Value").As("Address"))
 						.Add(Projections.Property("u.Login").As("Login"))
 						.Add(Projections.Property("su.RequestTime").As("RequestTime"))
+						.Add(Projections.Property("sl.FileDelivered").As("FileDelivered"))
+						.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered"))
 				)
 				.Add(Expression.Ge("LogTime", begin))
 				.Add(Expression.Le("LogTime", end.AddDays(1)))
@@ -96,5 +98,20 @@ namespace AdminInterface.Controllers.Filters
 		public string Address { get; set; }
 		public string Login { get; set; }
 		public DateTime? RequestTime { get; set; }
+		public bool? FileDelivered { get; set;}
+		public bool? DocumentDelivered { get; set; }
+
+		public bool DocumentProcessedSuccessfully()
+		{
+			return (FileDelivered.HasValue && FileDelivered.Value) || (DocumentDelivered.HasValue && DocumentDelivered.Value);
+		}
+
+		public DateTime? GetDisplayRequestTime()
+		{
+			if (DocumentProcessedSuccessfully())
+				return RequestTime;
+
+			return null;
+		}
 	}
 }

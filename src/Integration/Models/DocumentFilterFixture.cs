@@ -44,5 +44,28 @@ namespace Integration.Models
 			}
 			Console.WriteLine(supplier.Id);
 		}
+
+		[Test(Description = "проверям работу DocumentLog")]
+		public void CheckDocumentProcessedSuccessfully()
+		{
+			var log = new DocumentLog {
+				FileDelivered = null,
+				DocumentDelivered = null
+			};
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
+
+			log.FileDelivered = false;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
+
+			log.DocumentDelivered = false;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
+
+			log.FileDelivered = true;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
+
+			log.FileDelivered = false;
+			log.DocumentDelivered = true;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
+		}
 	}
 }
