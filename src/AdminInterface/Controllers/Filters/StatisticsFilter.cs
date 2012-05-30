@@ -23,12 +23,13 @@ namespace AdminInterface.Controllers.Filters
 		public uint ProducerId { get; set; }
 		public string Producer { get; set; }
 		public uint? ProductId { get; set; }
+		public string CertificateError { get; set; }
 
 		public string GetReason()
 		{
-			if (ProductId.HasValue)
-				return "Не найден файл.";
-			return "Нет синонима.";
+			if (ProductId == null)
+				return "Нет синонима.";
+			return CertificateError;
 		}
 	}
 
@@ -70,7 +71,8 @@ u.RequestTime,
 db.Code ProcuctCode,
 db.Product as ProductName,
 db.Producer,
-db.ProductId
+db.ProductId,
+db.CertificateError
 from Logs.CertificateRequestLogs l
 	join Logs.AnalitFUpdates u on u.UpdateId = l.UpdateId
 	join Customers.Users fu on fu.Id = u.UserId

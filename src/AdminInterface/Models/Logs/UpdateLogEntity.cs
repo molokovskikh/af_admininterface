@@ -37,7 +37,7 @@ namespace AdminInterface.Models.Logs
 		public UpdateLogEntity(User user)
 		{
 			RequestTime = DateTime.Now;
-			UpdateType = UpdateType.Accumulative;;
+			UpdateType = UpdateType.Accumulative;
 			User = user;
 			UserName = user.Login;
 		}
