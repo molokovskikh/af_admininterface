@@ -66,8 +66,14 @@ namespace AdminInterface.Controllers.Filters
 						.Add(Projections.Property("d.DocumentDate").As("DocumentDate"))
 						.Add(Projections.Property("d.WriteTime").As("DocumentWriteTime"))
 						.Add(Projections.Property("fs.Name").As("Supplier"))
+						.Add(Projections.Property("fs.Id").As("SupplierId"))
+						.Add(Projections.Property("fc.Name").As("Client"))
+						.Add(Projections.Property("fc.Id").As("ClientId"))
 						.Add(Projections.Property("a.Value").As("Address"))
 						.Add(Projections.Property("u.Login").As("Login"))
+
+						.Add(Projections.Property("u.Id").As("LoginId"))
+
 						.Add(Projections.Property("su.RequestTime").As("RequestTime"))
 				)
 				.Add(Expression.Ge("LogTime", begin))
@@ -93,8 +99,12 @@ namespace AdminInterface.Controllers.Filters
 		public DateTime? DocumentWriteTime { get; set; }
 
 		public string Supplier { get; set; }
+		public string SupplierId { get; set; }
+		public string Client { get; set; }
+		public string ClientId { get; set; }
 		public string Address { get; set; }
 		public string Login { get; set; }
+		public string LoginId { get; set; }
 		public DateTime? RequestTime { get; set; }
 	}
 }

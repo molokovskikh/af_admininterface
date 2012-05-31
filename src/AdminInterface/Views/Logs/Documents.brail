@@ -25,6 +25,7 @@ ${app.EndFormFor("filter")}
 				<th>Дата документа</th>
 				<th>Дата разбора</th>
 				<th>От поставщика</th>
+				<th>Клиенту</th>
 				<th>На адрес</th>
 				<th>Название файла</th>
 				<th>Размер</th>
@@ -46,7 +47,8 @@ ${app.EndFormFor("filter")}
 			<td>${log.ProviderDocumentId}</td>
 			<td>${log.DocumentDate}</td>
 			<td>${log.DocumentWriteTime}</td>
-			<td>${log.Supplier}</td>
+			<td>${app.LinkTo(log.Supplier, @Suppliers, log.SupplierId)}</td>
+			<td>${app.LinkTo(log.Client, @Clients, log.ClientId)}</td>
 			<td>${log.Address}</td>
 			<td class="${'DocumentNotParsed' if not log.DocumentId and log.SendUpdateId}">
 				<% if log.DocumentId: %>
@@ -62,7 +64,7 @@ ${app.EndFormFor("filter")}
 			<td>
 				${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 			</td>
-			<td>${log.Login}</td>
+			<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
 			<td>${log.RequestTime}</td>
 			<td>
 				<pre>!{log.Addition}</pre>
