@@ -158,11 +158,13 @@ namespace AdminInterface.Controllers
 				address.AddBillingComment(comment);
 				Mailer.Registred(address, comment);
 			}
-			var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
-				user.Id,
-				user.Name, 
-				user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
-			new ClientInfoLogEntity(message, user.Client){ MessageType = LogMessageType.System }.Save();
+			if (user.Client != null) { 
+				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
+					user.Id,
+					user.Name, 
+					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
+				new ClientInfoLogEntity(message, user.Client){ MessageType = LogMessageType.System }.Save();
+			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
 				(contacts.Where(contact => contact.Type == ContactType.Email).Any());

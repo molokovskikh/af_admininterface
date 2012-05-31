@@ -59,14 +59,22 @@ namespace AdminInterface.Models.Audit
 			var item = @event.AffectedOwnerOrNull;
 			if (item != null) {
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
-					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					var newList = ((User)item).AvaliableAddresses;
+					IList<Address> oldList = new List<Address>();
+					IList<Address> newList = new List<Address>();
+					if (@event.Collection.StoredSnapshot != null)
+						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
+					if (NHibernateUtil.IsInitialized(((User)item).AvaliableAddresses))
+						newList = ((User)item).AvaliableAddresses;
 					var message = string.Format("$$$Изменен список адресов доставки пользовалеля {0} - ({1})", ((User)item).Id, ((User)item).Name);
 					BuildMessage(@event, message, newList, oldList);
 				}
 				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
-					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					var newList = ((Address)item).AvaliableForUsers;
+					IList<User> oldList = new List<User>();
+					IList<User> newList = new List<User>();
+					if (@event.Collection.StoredSnapshot != null)
+						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
+					if (NHibernateUtil.IsInitialized(((Address)item).AvaliableForUsers))
+						newList = ((Address)item).AvaliableForUsers;
 					var message = string.Format("$$$Изменен список пользователей, подключеных к адресу доставки {0} - ({1})", ((Address)item).Id, ((Address)item).Name);
 					BuildMessage(@event, message, newList, oldList);
 				}
@@ -83,7 +91,7 @@ namespace AdminInterface.Models.Audit
 
 			if (added.Length > 0)
 				_message += "</br> <b> Добавлено </b>" + GetListString(added);
-
+			if (((dynamic)@event.AffectedOwnerOrNull).Client != null)
 			AuditListener.PreventFlush(@event.Session, () => 
 				@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
 				MessageType = LogMessageType.System,
