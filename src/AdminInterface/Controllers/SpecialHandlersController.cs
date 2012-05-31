@@ -10,7 +10,7 @@ namespace AdminInterface.Controllers
 	{
 		public SpecialHandlersController()
 		{
-			SetARDataBinder();
+			SetBinder(new ARDataBinder());
 			((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 		}
 

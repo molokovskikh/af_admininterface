@@ -35,7 +35,7 @@ namespace AdminInterface.Controllers
 	{
 		public ReferencesController()
 		{
-			SetARDataBinder();
+			SetBinder(new ARDataBinder());
 		}
 
 		public void Index()
