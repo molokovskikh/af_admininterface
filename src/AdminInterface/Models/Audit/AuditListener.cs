@@ -25,13 +25,14 @@ namespace AdminInterface.Models.Audit
 			var item = @event.AffectedOwnerOrNull;
 			if (item != null) {
 				var message = string.Empty;
-
+				var needSave = false;
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
 					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: {2}",
 						((User)item).Id,
 						((User)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
+					needSave = true;
 				}
 				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
@@ -39,8 +40,10 @@ namespace AdminInterface.Models.Audit
 						((Address)item).Id,
 						((Address)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
+					needSave = true;
 				}
-				AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new ClientInfoLogEntity(message, ((dynamic)@event.AffectedOwnerOrNull).Client)));
+				if (needSave)
+					AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new ClientInfoLogEntity(message, ((dynamic)@event.AffectedOwnerOrNull).Client)));
 			}
 		}
 	}
