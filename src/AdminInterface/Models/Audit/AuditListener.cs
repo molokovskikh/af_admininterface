@@ -28,7 +28,7 @@ namespace AdminInterface.Models.Audit
 				var needSave = false;
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: {2}",
+					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: </br> {2}",
 						((User)item).Id,
 						((User)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
@@ -36,14 +36,17 @@ namespace AdminInterface.Models.Audit
 				}
 				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: {2}",
+					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: </br> {2}",
 						((Address)item).Id,
 						((Address)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
 					needSave = true;
 				}
 				if (needSave)
-					AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new ClientInfoLogEntity(message, ((dynamic)@event.AffectedOwnerOrNull).Client)));
+					AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new ClientInfoLogEntity(message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
+						MessageType = LogMessageType.System,
+						IsHtml = true
+					}));
 			}
 		}
 	}
@@ -76,17 +79,21 @@ namespace AdminInterface.Models.Audit
 			var removed = MaskedAuditableProperty.Complement(oldList, newList).ToArray();
 
 			if (removed.Length > 0)
-				_message += " Удалено " + GetListString(removed);
+				_message += "</br> <b> Удалено </b>" + GetListString(removed);
 
 			if (added.Length > 0)
-				_message += " Добавлено " + GetListString(added);
+				_message += "</br> <b> Добавлено </b>" + GetListString(added);
 
-			AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client)));
+			AuditListener.PreventFlush(@event.Session, () => 
+				@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
+				MessageType = LogMessageType.System,
+				IsHtml = true
+			}));
 		}
 
 		public static string GetListString(IEnumerable<object> addresses)
 		{
-			return addresses.Implode(a => string.Format("{0} - ({1})", ((dynamic)a).Id, ((dynamic)a).Name));
+			return addresses.Implode(a => string.Format("</br> {0} - ({1})", ((dynamic)a).Id, ((dynamic)a).Name));
 		}
 	}
 
