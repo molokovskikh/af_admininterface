@@ -38,7 +38,7 @@ namespace AdminInterface.Models.Audit
 				Message += " Добавлено " + ToString(added);
 		}
 
-		public string ToString(IEnumerable<ulong> items)
+		public static string ToString<T>(IEnumerable<T> items)
 		{
 			return items
 				.Select(i => Region.TryFind(i))
@@ -46,7 +46,7 @@ namespace AdminInterface.Models.Audit
 				.Implode(r => "'" + r.Name + "'");
 		}
 
-		public IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
+		public static IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
 		{
 			foreach (var item in first)
 			{
