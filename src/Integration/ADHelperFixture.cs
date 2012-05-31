@@ -311,7 +311,6 @@ namespace Integration
 			var root = new DirectoryEntry(container);
 			var user = root.Children.Add("CN=" + Login, "user");
 			user.Properties["samAccountName"].Value = Login;
-			user.Properties["userWorkstations"].Add("acdcserv");
 			user.CommitChanges();
 			user.Invoke("SetPassword", password);
 			user.Properties["userAccountControl"].Value = 66048;
