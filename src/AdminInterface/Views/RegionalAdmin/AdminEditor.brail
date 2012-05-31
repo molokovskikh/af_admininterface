@@ -118,15 +118,6 @@
 	</table>
 	</div>
 
-	<div class="block">
-	<h3>Вход на компьютеры</h3>
-	<% for i,computer in enumerate(computers): %>
-		<input id="computer${i}" type="checkbox" name="machines[${i}]" value="${computer}" ${"checked" if (accessibleComputers.Contains(computer) or (accessibleComputers.Count == 0))} />
-		<label for="computer${i}">${computer}</label>
-		<br />
-	<% end %>
-	</div>
-	
 	<div class=save>
 		<input type=submit value="Сохранить">
 	</div>
