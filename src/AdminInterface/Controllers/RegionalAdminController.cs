@@ -24,8 +24,6 @@ namespace AdminInterface.Controllers
 	]
 	public class RegionalAdminController : AdminInterfaceController
 	{
-		private IList<string> _avaliableComputers = new List<string> { "ACDCSERV", "FMS", "OFFDC" };
-
 		private string[] _weekDays = new[] { "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье" };
 
 		private int[] _defaultLogonHours = new [] {
@@ -44,9 +42,7 @@ namespace AdminInterface.Controllers
 			var regions = Region.FindAll().OrderBy(region => region.Name).ToArray();
 			PropertyBag["administrator"] = new Administrator();
 			PropertyBag["permissions"] = Permission.FindAll();
-			PropertyBag["computers"] = Storage.GetDomainComputers();
 			PropertyBag["regions"] = regions;
-			PropertyBag["accessibleComputers"] = _avaliableComputers;
 			PropertyBag["days"] = _weekDays;
 			PropertyBag["logonHours"] = _defaultLogonHours;
 		}
@@ -54,7 +50,6 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void Add([DataBind("administrator")] Administrator administrator,
 			[DataBind("accessibleRegions")] RegionSettings[] accessibleRegions,
-			[DataBind("machines")] string[] machines,
 			[DataBind("logonHours")] bool[] weekLogonHours)
 		{
 			var admin = new Administrator {
@@ -86,7 +81,7 @@ namespace AdminInterface.Controllers
 			new RedmineUser(admin).Save();
 			var isLoginCreated = CreateUserInAD(admin);
 
-			UpdateAd(administrator, machines, weekLogonHours);
+			UpdateAd(administrator, weekLogonHours);
 
 			Mailer.RegionalAdminCreated(admin);
 
@@ -102,8 +97,6 @@ namespace AdminInterface.Controllers
 			var admin = Administrator.GetById(id);
 			PropertyBag["administrator"] = admin;
 			PropertyBag["permissions"] = Permission.FindAll();
-			PropertyBag["computers"] = Storage.GetDomainComputers();
-			PropertyBag["accessibleComputers"] = Storage.GetAccessibleComputers(admin.UserName);
 			PropertyBag["regions"] = regions;
 			PropertyBag["days"] = _weekDays;
 
@@ -115,7 +108,6 @@ namespace AdminInterface.Controllers
 
 		public void Update([ARDataBind("administrator", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] Administrator administrator,
 			[DataBind("accessibleRegions")] RegionSettings[] accessibleRegions,
-			[DataBind("machines")] string[] machines,
 			[DataBind("logonHours")] bool[] weekLogonHours)
 		{
 			var countAccessibleRegions = 0;
@@ -133,14 +125,13 @@ namespace AdminInterface.Controllers
 				administrator.RegionMask = UInt64.MaxValue;
 
 			administrator.Update();
-			UpdateAd(administrator, machines, weekLogonHours);
+			UpdateAd(administrator, weekLogonHours);
 			Notify("Сохранено");
 			RedirectUsingRoute("RegionalAdmin", "Edit", new { id = administrator.Id });
 		}
 
-		private void UpdateAd(Administrator administrator, string[] machines, bool[] weekLogonHours)
+		private void UpdateAd(Administrator administrator, bool[] weekLogonHours)
 		{
-			Storage.SetAccessibleComputer(administrator.UserName, machines);
 			Administrator.SetLogonHours(administrator.UserName, weekLogonHours);
 		}
 
