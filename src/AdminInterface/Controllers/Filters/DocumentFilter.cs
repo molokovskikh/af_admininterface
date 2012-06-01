@@ -69,6 +69,7 @@ namespace AdminInterface.Controllers.Filters
 						.Add(Projections.Property("a.Value").As("Address"))
 						.Add(Projections.Property("u.Login").As("Login"))
 						.Add(Projections.Property("su.RequestTime").As("RequestTime"))
+						.Add(Projections.Property("sl.Id").As("DeliveredId"))
 						.Add(Projections.Property("sl.FileDelivered").As("FileDelivered"))
 						.Add(Projections.Property("sl.DocumentDelivered").As("DocumentDelivered"))
 				)
@@ -98,12 +99,13 @@ namespace AdminInterface.Controllers.Filters
 		public string Address { get; set; }
 		public string Login { get; set; }
 		public DateTime? RequestTime { get; set; }
+		public uint DeliveredId { get; set; } 
 		public bool? FileDelivered { get; set;}
 		public bool? DocumentDelivered { get; set; }
 
 		public bool DocumentProcessedSuccessfully()
 		{
-			return (FileDelivered.HasValue && FileDelivered.Value) || (DocumentDelivered.HasValue && DocumentDelivered.Value);
+			return (DeliveredId <= 15374942) || (FileDelivered.HasValue && FileDelivered.Value) || (DocumentDelivered.HasValue && DocumentDelivered.Value);
 		}
 
 		public DateTime? GetDisplayRequestTime()

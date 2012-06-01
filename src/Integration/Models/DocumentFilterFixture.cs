@@ -48,19 +48,41 @@ namespace Integration.Models
 		[Test(Description = "проверям работу DocumentLog")]
 		public void CheckDocumentProcessedSuccessfully()
 		{
-			var log = new DocumentLog {
-				FileDelivered = null,
-				DocumentDelivered = null
-			};
+
+			//Для документов с DocumentSendLogs.Id > 15374942 все должно работать по новому,
+
+			var log = new DocumentLog();
+			log.DeliveredId = 15374943;
+			log.FileDelivered = null;
+			log.DocumentDelivered = null;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
 
 			log.FileDelivered = false;
+			log.DocumentDelivered = null;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
 
+			log.FileDelivered = false;
 			log.DocumentDelivered = false;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(false));
 
 			log.FileDelivered = true;
+			log.DocumentDelivered = false;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
+
+			log.FileDelivered = false;
+			log.DocumentDelivered = true;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
+
+			
+			//для старых документов - они всегда должно помечатся как ProcessedSuccessfully и отдавать RequestTime сразу
+
+			log.DeliveredId = 1;
+			log.FileDelivered = null;
+			log.DocumentDelivered = null;
+			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
+
+			log.FileDelivered = false;
+			log.DocumentDelivered = false;
 			Assert.That(log.DocumentProcessedSuccessfully(), Is.EqualTo(true));
 
 			log.FileDelivered = false;
