@@ -34,6 +34,12 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual bool Committed { get; set; }
+
+		[Property]
+		public virtual bool FileDelivered { get; set; }
+
+		[Property]
+		public virtual bool DocumentDelivered { get; set; }
 	}
 
 	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true)]

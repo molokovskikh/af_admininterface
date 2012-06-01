@@ -30,6 +30,8 @@ ${app.EndFormFor("filter")}
 				<th>Название файла</th>
 				<th>Размер</th>
 				<th>Пользователь получивший документ</th>
+				<th>Файл доставлен</th>
+				<th>Документ доставлен</th>
 				<th>Дата отправки</th>
 				<th>Комментарий</th>
 			</tr>
@@ -65,7 +67,9 @@ ${app.EndFormFor("filter")}
 				${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
 			</td>
 			<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
-			<td>${log.RequestTime}</td>
+			<td>${ViewHelper.ToHumanReadable(log.FileDelivered)}</td>
+			<td>${ViewHelper.ToHumanReadable(log.DocumentDelivered)}</td>
+			<td>${log.GetDisplayRequestTime()}</td>
 			<td>
 				<pre>!{log.Addition}</pre>
 			</td>

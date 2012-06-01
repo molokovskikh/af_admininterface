@@ -174,7 +174,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = DefaultValues.Get();
-			if (Session["password"] != null)
+			if (Session["password"] != null && Flash["newUser"] == null)
 				PropertyBag["password"] = Session["password"];
 		}
 
