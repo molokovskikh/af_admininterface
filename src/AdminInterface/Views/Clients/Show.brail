@@ -5,7 +5,7 @@
 		$('a.old-user-update').removeClass("old-user-update");
 		$("form#MessagesForm").validate({
 			rules: {
-				"message": "required"
+				"message": { "required": true, "validateForbiddenSymbols": true}
 			}
 		});
 

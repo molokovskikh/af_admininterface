@@ -17,7 +17,7 @@
 			rules: { "reason": "required" }
 		});
 		$("form#MessagesForm").validate({
-			rules: { "message": "required" }
+			rules: { "message": { "required" : true, "validateForbiddenSymbols" : true} }
 		});
 		if (${user.WorkRegionMask} == ${maxRegion}){
 			

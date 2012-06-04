@@ -42,4 +42,11 @@ $(function () {
 		}
 		return true;
 	}, "Поле содержит некорректный адрес электронной почты.");
+
+	$.validator.addMethod("validateForbiddenSymbols", function (value, element) {
+		if (value.toString().length > 0) {
+			return /^[^<>]*$/.test(value);
+		}
+		return true;
+	}, "Поле содержит запрещенные символы(<, >).");
 });
