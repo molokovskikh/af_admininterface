@@ -67,8 +67,11 @@ namespace AdminInterface.Models.Audit
 					IEnumerable<object> newList = new List<object>();
 					if (@event.Collection.StoredSnapshot != null)
 						oldList = ((IList<object>)@event.Collection.StoredSnapshot).ToList();
-					if (NHibernateUtil.IsInitialized(item))
-						newList = (IEnumerable<object>)item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
+					if (NHibernateUtil.IsInitialized(item)) {
+						var persistentBag = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
+						if (NHibernateUtil.IsInitialized(persistentBag))
+							newList = (IEnumerable<object>)persistentBag;
+					}
 					var message = string.Format("$$$Изменен {2} {0} - ({1})", ((dynamic)item).Id, ((dynamic)item).Name, ((dynamic)auditables[0]).Name);
 					BuildMessage(@event, message, newList, oldList);
 				}
