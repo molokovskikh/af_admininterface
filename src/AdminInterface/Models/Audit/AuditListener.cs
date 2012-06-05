@@ -61,16 +61,13 @@ namespace AdminInterface.Models.Audit
 			if (item != null) {
 				var itemStringTypes = @event.Collection.Role.Split(new []{'.'});
 				var propertyName = itemStringTypes.Last();
-				var typeName = Path.GetFileNameWithoutExtension(@event.Collection.Role);
-				var assembly = Assembly.GetAssembly(typeof(UpdateCollectionListner));
-				var entity = Activator.CreateInstance(Path.GetFileNameWithoutExtension(assembly.ManifestModule.Name), typeName).Unwrap();
-				var auditables = entity.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
+				var auditables = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
 				if (auditables.Length > 0) {
-					IList<object> oldList = new List<object>();
+					IEnumerable<object> oldList = new List<object>();
 					IEnumerable<object> newList = new List<object>();
 					if (@event.Collection.StoredSnapshot != null)
 						oldList = ((IList<object>)@event.Collection.StoredSnapshot).ToList();
-					if (NHibernateUtil.IsInitialized(entity))
+					if (NHibernateUtil.IsInitialized(item))
 						newList = (IEnumerable<object>)item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
 					var message = string.Format("$$$Изменен {2} {0} - ({1})", ((dynamic)item).Id, ((dynamic)item).Name, ((dynamic)auditables[0]).Name);
 					BuildMessage(@event, message, newList, oldList);
