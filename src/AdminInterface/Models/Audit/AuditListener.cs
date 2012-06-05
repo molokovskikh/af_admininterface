@@ -28,7 +28,7 @@ namespace AdminInterface.Models.Audit
 				var needSave = false;
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: </br> {2}",
+					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: {2}",
 						((User)item).Id,
 						((User)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
@@ -36,7 +36,7 @@ namespace AdminInterface.Models.Audit
 				}
 				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: </br> {2}",
+					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: {2}",
 						((Address)item).Id,
 						((Address)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
@@ -91,12 +91,12 @@ namespace AdminInterface.Models.Audit
 
 			if (added.Length > 0)
 				_message += "</br> <b> Добавлено </b>" + GetListString(added);
-			if (((dynamic)@event.AffectedOwnerOrNull).Client != null)
-			AuditListener.PreventFlush(@event.Session, () => 
-				@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
-				MessageType = LogMessageType.System,
-				IsHtml = true
-			}));
+			if (((dynamic)@event.AffectedOwnerOrNull).Client != null && (removed.Length > 0 || added.Length > 0))
+				AuditListener.PreventFlush(@event.Session, () => 
+					@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
+					MessageType = LogMessageType.System,
+					IsHtml = true
+				}));
 		}
 
 		public static string GetListString(IEnumerable<object> addresses)
