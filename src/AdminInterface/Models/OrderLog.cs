@@ -32,6 +32,8 @@ namespace AdminInterface.Models
 
 		public uint SmtpId { get; set; }
 
+		public string Region { get; set; }
+
 		public string GetResult()
 		{
 			if (TransportType == null || ResultCode == 0)
