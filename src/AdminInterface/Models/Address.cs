@@ -99,7 +99,7 @@ namespace AdminInterface.Models
 			ColumnKey = "AddressId",
 			Table = "UserAddresses",
 			Schema = "Customers",
-			ColumnRef = "UserId")]
+			ColumnRef = "UserId"), Auditable("список пользователей, подключеных к адресу доставки")]
 		public virtual IList<User> AvaliableForUsers { get; set; }
 
 		public virtual string Name

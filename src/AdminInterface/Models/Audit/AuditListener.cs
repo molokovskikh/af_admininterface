@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Billing;
@@ -58,24 +59,20 @@ namespace AdminInterface.Models.Audit
 		{
 			var item = @event.AffectedOwnerOrNull;
 			if (item != null) {
-				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
-					IList<Address> oldList = new List<Address>();
-					IList<Address> newList = new List<Address>();
+				var itemStringTypes = @event.Collection.Role.Split(new []{'.'});
+				var propertyName = itemStringTypes.Last();
+				var typeName = Path.GetFileNameWithoutExtension(@event.Collection.Role);
+				var assembly = Assembly.GetAssembly(typeof(UpdateCollectionListner));
+				var entity = Activator.CreateInstance(Path.GetFileNameWithoutExtension(assembly.ManifestModule.Name), typeName).Unwrap();
+				var auditables = entity.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
+				if (auditables.Length > 0) {
+					IList<object> oldList = new List<object>();
+					IEnumerable<object> newList = new List<object>();
 					if (@event.Collection.StoredSnapshot != null)
-						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					if (NHibernateUtil.IsInitialized(((User)item).AvaliableAddresses))
-						newList = ((User)item).AvaliableAddresses;
-					var message = string.Format("$$$Изменен список адресов доставки пользовалеля {0} - ({1})", ((User)item).Id, ((User)item).Name);
-					BuildMessage(@event, message, newList, oldList);
-				}
-				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
-					IList<User> oldList = new List<User>();
-					IList<User> newList = new List<User>();
-					if (@event.Collection.StoredSnapshot != null)
-						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					if (NHibernateUtil.IsInitialized(((Address)item).AvaliableForUsers))
-						newList = ((Address)item).AvaliableForUsers;
-					var message = string.Format("$$$Изменен список пользователей, подключеных к адресу доставки {0} - ({1})", ((Address)item).Id, ((Address)item).Name);
+						oldList = ((IList<object>)@event.Collection.StoredSnapshot).ToList();
+					if (NHibernateUtil.IsInitialized(entity))
+						newList = (IEnumerable<object>)item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
+					var message = string.Format("$$$Изменен {2} {0} - ({1})", ((dynamic)item).Id, ((dynamic)item).Name, ((dynamic)auditables[0]).Name);
 					BuildMessage(@event, message, newList, oldList);
 				}
 			}
