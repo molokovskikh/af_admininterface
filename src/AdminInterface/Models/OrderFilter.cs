@@ -70,7 +70,8 @@ SELECT  oh.rowid as Id,
 		oh.RowCount,
 		max(o.ResultCode) as ResultCode,
 		o.TransportType,
-		oh.ClientOrderId
+		oh.ClientOrderId,
+		reg.Region
 FROM orders.ordershead oh
 	join usersettings.pricesdata pd on pd.pricecode = oh.pricecode
 	join Customers.Suppliers as s on s.Id = pd.firmcode
@@ -78,6 +79,7 @@ FROM orders.ordershead oh
 	join Customers.Users u on u.Id = oh.UserId
 	join Customers.Addresses a on a.Id = oh.AddressId
 		left join logs.orders o on oh.rowid = o.orderid
+	join Farm.Regions reg on reg.RegionCode = oh.RegionCode
 WHERE {0} and oh.RegionCode & :RegionCode > 0
 group by oh.rowid
 ORDER BY writetime desc", sqlFilter))

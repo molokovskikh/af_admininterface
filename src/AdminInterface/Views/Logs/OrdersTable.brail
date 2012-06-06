@@ -9,6 +9,7 @@
 				<th>Клиент</th>
 				<th>Адрес</th>
 				<th>Пользователь</th>
+				<th>Регион</th>
 				<th>Поставщик</th>
 				<th>Прайс</th>
 				<th>Позиций</th>
@@ -25,8 +26,9 @@
 			<td>${order.WriteTime}</td>
 			<td>${order.PriceDate}</td>
 			<td>!{order.Drugstore}</td>
-			<td>${UrlHelper.Link(order.Address, {@controller: @Addresses, @params: {@id: order.AddressId}})}
-			<td>${UrlHelper.Link(order.User, {@controller: @Users, @params: {@id: order.UserId}})}
+			<td>${UrlHelper.Link(order.Address, {@controller: @Addresses, @params: {@id: order.AddressId}})}</td>
+			<td>${UrlHelper.Link(order.User, {@controller: @Users, @params: {@id: order.UserId}})}</td>
+			<td>${order.Region}</td>
 			<td>${order.Supplier}</td>
 			<td>${order.PriceName}</td>
 			<td>${order.RowCount}</td>
