@@ -163,7 +163,7 @@ GROUP BY u.Id
 				}
 
 				var info = new SearchTextInfo(SearchText);
-				if ((info.SearchTextIsPhone && info.SearchText.Length >= 5) || SearchBy == SearchUserBy.ByContacts) {
+				if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 5) || SearchBy == SearchUserBy.ByContacts)) {
 					var findedUsers = result.Select(r => r.UserId).Implode();
 					var findInUsers = session.CreateSQLQuery(string.Format(@"
 select u.Id 
@@ -184,7 +184,9 @@ where
 (REPLACE(ContactAddress.ContactText, '-', '') like '{0}' and ContactAddress.Type = 1))
 and
 u.Id in ({1})
-", info.SqlSearchText.Replace("-", ""), findedUsers)).SetParameter("RegionMask", regionMask).List<uint>();
+", info.SqlSearchText.Replace("-", ""), findedUsers))
+					.SetParameter("RegionMask", regionMask)
+					.List<uint>();
 
 					if (findInUsers.Count > 0) { 
 						var bufResult = result.Where(r => findInUsers.Contains(r.UserId)).ToList();
