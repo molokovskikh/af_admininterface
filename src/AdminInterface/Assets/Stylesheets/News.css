@@ -1,0 +1,12 @@
+﻿#news_Body {
+	width: 600px;
+	height: 600px;
+}
+
+#news_Header {
+	width: 600px;
+}
+
+label {
+	display: block;
+}
