@@ -181,7 +181,7 @@ left join contacts.Contacts as ContactAddress ON ContactAddress.ContactOwnerId =
 where 
 ((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0)) and
 ((REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) or
-(REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1))
+(REPLACE(ContactAddress.ContactText, '-', '') like '{0}' and ContactAddress.Type = 1))
 and
 u.Id in ({1})
 ", info.SqlSearchText.Replace("-", ""), findedUsers)).SetParameter("RegionMask", regionMask).List<uint>();
