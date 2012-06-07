@@ -3,11 +3,6 @@
 <script>
 	$(function () {
 		$('a.old-user-update').removeClass("old-user-update");
-		$("form#MessagesForm").validate({
-			rules: {
-				"message": { "required": true, "validateForbiddenSymbols": true}
-			}
-		});
 
 		$("#ReseteUin").validate();
 		$("#ChangePayer").validate();

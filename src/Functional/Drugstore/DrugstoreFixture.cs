@@ -101,34 +101,6 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
-		public void Message_on_forbidden_symbols()
-		{
-			ClientInfoLogEntity.DeleteAuditRecords(testClient);
-
-			browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
-			browser.Link(Find.ByText("Изменить пароль")).Click();
-			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", testClient.Users[0].Login, testClient.FullName);
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
-			{
-				openedWindow.TextField(Find.ByName("reason")).TypeText("<Test with forbidden symbols");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Поле содержит запрещенные символы(<, >)."));
-
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Test with forbidden symbols>");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Поле содержит запрещенные символы(<, >)."));
-
-				openedWindow.TextField(Find.ByName("reason")).TypeText("<Test> with f<>orbidden symbols>");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Поле содержит запрещенные символы(<, >)."));
-
-				openedWindow.TextField(Find.ByName("reason")).TypeText("");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Это поле необходимо заполнить."));
-			}
-		}
-
-		[Test]
 		public void Try_to_update_general_info()
 		{
 			browser.Input<Client>(client => client.FullName, testClient.FullName);

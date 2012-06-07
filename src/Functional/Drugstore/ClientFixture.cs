@@ -179,24 +179,5 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.Not.ContainsSubstring("$$$Изменено"));
 		}
 
-		[Test]
-		public void Message_on_forbidden_symbols()
-		{
-			browser.TextField(Find.ByName("message")).TypeText("<Тестовое сообщение с запрещенными символами");
-			browser.Button(Find.ByValue("Принять")).Click();
-			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
-
-			browser.TextField(Find.ByName("message")).TypeText("Тестовое сообщение с запрещенными символами>");
-			browser.Button(Find.ByValue("Принять")).Click();
-			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
-
-			browser.TextField(Find.ByName("message")).TypeText("Тестовое> сообщение с<>запрещенными символами>");
-			browser.Button(Find.ByValue("Принять")).Click();
-			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
-
-			browser.TextField(Find.ByName("message")).TypeText("");
-			browser.Button(Find.ByValue("Принять")).Click();
-			Assert.That(browser.ContainsText("Это поле необходимо заполнить."), Is.True);
-		}
 	}
 }

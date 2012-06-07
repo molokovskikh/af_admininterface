@@ -23,6 +23,7 @@
 		${app.Asset("editable.js")}
 		${app.Asset("checkbox.all.js")}
 		${app.Asset("autosubmit.coffee")}
+		${app.Asset("input.check.fs.js")}
 
 		${app.Asset("themes/base/jquery.ui.all.css")}
 		${app.Asset("filter.css")}

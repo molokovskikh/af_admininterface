@@ -1,4 +1,13 @@
-﻿<form id="MessagesForm" action="SendMessage" method="post">
+﻿<script>
+	$(function () {
+		$("form#MessagesForm").validate({
+			rules: {
+				"message": { "required": true, "validateForbiddenSymbols": true }
+			}
+		});
+	});
+</script>
+<form id="MessagesForm" action="SendMessage" method="post">
 	<h3>Сообщения пользователя</h3>
 	${hiddenId}
 	Новое сообщение:
