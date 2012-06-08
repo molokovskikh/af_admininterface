@@ -44,6 +44,13 @@ $(function () {
 	}, "Поле содержит некорректный адрес электронной почты.");
 
 	$.validator.addMethod("validateForbiddenSymbols", function (value, element) {
-		return CheckForForbiddenSymbols(value);
+		return CheckOnForbiddenSymbols(value);
 	}, "Поле содержит запрещенные символы(<, >).");
 });
+
+function CheckOnForbiddenSymbols(checkedString) {
+	if (checkedString.toString().length > 0) {
+		return /^[^<>]*$/.test(checkedString);
+	}
+	return true;
+}
