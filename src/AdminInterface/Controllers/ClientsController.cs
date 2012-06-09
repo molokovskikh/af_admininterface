@@ -25,6 +25,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate.Criterion;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
@@ -242,6 +243,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Post)]
 		public void UpdateDrugstore(
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
+			[ARDataBind("drugstore.SmartOrderRules", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] SmartOrderRules smartOrderRules,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
@@ -259,10 +261,22 @@ where Phone like :phone")
 				return;
 			}
 				
-			if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
+			if (drugstore.EnableSmartOrder)
 			{
-				var smartOrder = SmartOrderRules.TestSmartOrder();
-				drugstore.SmartOrderRules = smartOrder;
+				if (drugstore.SmartOrderRules == null && smartOrderRules == null) { 
+					var smartOrder = SmartOrderRules.TestSmartOrder();
+					drugstore.SmartOrderRules = smartOrder;
+				}
+				else {
+					drugstore.SmartOrderRules = smartOrderRules;
+					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
+					var algorithmId = 0u;
+					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
+						var algorithm = DbSession.QueryOver<ParseAlgorithm>().Where(p => p.Id == algorithmId).List().FirstOrDefault();
+						if (algorithm != null)
+							drugstore.SmartOrderRules.ParseAlgorithm = algorithm.Name;
+					}
+				}
 			}
 			client.Save();
 			drugstore.UpdateAndFlush();
@@ -346,6 +360,17 @@ where Phone like :phone")
 				id = o.Id,
 				name = o.Name
 			}).ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] SerachParseAlgorithm(string text)
+		{
+			return DbSession.QueryOver<ParseAlgorithm>().Where(
+				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))
+				.Take(50)
+				.List()
+				.Select(p => new {id = p.Id, name = p.Name})
+				.ToArray();
 		}
 
 		[return: JSONReturnBinder]

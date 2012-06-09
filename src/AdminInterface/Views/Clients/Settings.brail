@@ -38,10 +38,25 @@
 		$("input[type=checkbox].activate").click(function() {
 			var root = $($(this).parents("td").get(0)).siblings("td");
 			if (this.checked)
-				search(root);
+				{
+					search(root);
+				}
 			else
 				cancel(root);
 		});
+
+		$("input[type=checkbox].activateParseAndPrice").click(function() {
+			var root = $($(this).parents("td").get(0)).siblings("td");
+			if (this.checked)
+				{
+					search(root);
+					searchParseAlgorithm();
+				}
+			else
+				cancel(root);
+		});
+
+		//$('#assortPriceBox').append(searchTemplate("Выберите ассортиментный прайс лист", "${siteroot}/Client/SearchAssortmentPrices"));
 	});
 
 	function cancel(root) {
@@ -58,6 +73,14 @@
 		root.find(".settings").css("display", "none");
 		var title = "Выберите ассортиментный прайс лист";
 		root.prepend(searchTemplate(title, "${siteroot}/Client/SearchAssortmentPrices"));
+	}
+
+	function searchParseAlgorithm() {
+		var root = $('#EnableSmartOrderSecondRow').children('td');
+		root.find(".value").remove();
+		root.find(".settings").css("display", "none");
+		var title = "Выберите парсер";
+		root.prepend(searchTemplate(title, "${siteroot}/Client/SerachParseAlgorithm"));
 	}
 
 	function setNoise(noiseStatus) {
@@ -88,6 +111,7 @@
 		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/client/UpdateDrugstore">
 			${FormHelper.HiddenField("client.Id")}
 			${FormHelper.HiddenField("drugstore.Id")}
+			${FormHelper.HiddenField("drugstore.SmartOrderRules.Id")}
 			<div class="block" id="commonSettings">
 				<h3>Общая настройка</h3>
 				<table border="0" style="width: 100%; height: 100%;">
@@ -134,9 +158,8 @@
 			"SendRetailMarkup": drugstore.SendRetailMarkup,
 			"ParseWaybills": drugstore.ParseWaybills,
 			"EnableImpersonalPrice" : drugstore.EnableImpersonalPrice,
-			"EnableSmartOrder" : drugstore.EnableSmartOrder,
 			"ShowCertificatesWithoutRefSupplier" : drugstore.ShowCertificatesWithoutRefSupplier }
-	}
+	} 
 
 	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "Недельный заказ",
 		"Checkboxes" : { "CheckWeeklyOrdersSum" : drugstore.CheckWeeklyOrdersSum }
@@ -145,6 +168,26 @@
 				Максимальный недельный заказ:
 				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
 				</td></tr>
+				<tr id="EnableSmartOrderFirstRow">
+					<td>
+						${FormHelper.CheckboxField("drugstore.EnableSmartOrder", {"class" : "activateParseAndPrice"})}
+						<label>Автозаказ</label>
+					</td>
+					<td>
+						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode")}
+						<%if drugstore.SmartOrderRules: %>
+							<div class=value>
+								Ассортиментный прайс лист: ${drugstore.SmartOrderRules.GetAssortimentPriceName()} <br />
+								Парсер: ${drugstore.SmartOrderRules.ParseAlgorithm}
+							</div>
+						<%end %>
+					</td>
+				</tr>
+				<tr id="EnableSmartOrderSecondRow">
+					<td>
+						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm")}
+					</td>
+				</tr>
 				<tr>
 					<td>
 						${FormHelper.CheckboxField("drugstore.EnableBuyingMatrix", {"class" : "activate"})}
