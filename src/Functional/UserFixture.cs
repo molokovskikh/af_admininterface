@@ -57,7 +57,7 @@ namespace Functional
 				browser.CheckBox(Find.ByName(string.Format("user.AvaliableAddresses[{0}].Id", i))).Checked = true;
 			}
 			Click("Сохранить");
-			AssertText("$$$Изменен список адресов доставки пользовалеля");
+			AssertText("$$$Изменен список адресов доставки пользователя");
 			for (int i = 0; i < addressesCount; i++) {
 				AssertText(user.Client.Addresses[i].Name);
 			}

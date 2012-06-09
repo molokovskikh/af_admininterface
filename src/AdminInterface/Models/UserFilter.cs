@@ -8,6 +8,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.MySql;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
@@ -34,6 +35,23 @@ namespace AdminInterface.Models
 		[Description("Все")] All,
 		[Description("Включенные")] Enabled,
 		[Description("Отключенные")] Disabled
+	}
+
+	public class SearchTextInfo
+	{
+		public string SearchText;
+		public string SqlSearchText;
+		public bool SearchTextIsNumber;
+		public bool SearchTextIsPhone;
+
+		public SearchTextInfo(string text)
+		{
+			SearchText = String.IsNullOrEmpty(text) ? String.Empty : Utils.StringToMySqlString(text);
+
+			SqlSearchText = String.Format("%{0}%", SearchText).ToLower();
+			SearchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(SearchText);
+			SearchTextIsPhone = new Regex("^\\d{1,10}$").IsMatch(SearchText.Replace("-", ""));
+		}
 	}
 
 	public class UserFilter : Sortable
@@ -75,7 +93,6 @@ namespace AdminInterface.Models
 			try
 			{
 				var filter = String.Empty;
-				var from = GetAdditionalFrom();
 				filter = AddFilterCriteria(filter, GetFilterBy());
 				filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
 				filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
@@ -86,7 +103,7 @@ namespace AdminInterface.Models
 				if (Region != null)
 					regionMask &= Region.Id;
 
-				var result = session.CreateSQLQuery(String.Format(@"
+				var sqlStr = String.Format(@"
 SELECT
 	u.Id as UserId,
 	u.Login as Login,
@@ -111,18 +128,24 @@ FROM
 		join farm.Regions r ON r.RegionCode = s.HomeRegion
 	left join Customers.Suppliers sup on sup.Id = u.RootService
 	left join Customers.Clients ON Clients.Id = u.ClientId
+	left join Customers.UserAddresses ua on ua.UserId = u.Id
+	left join Customers.Addresses a on a.Id = ua.AddressId
 		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = ifnull(Clients.ContactGroupOwnerId, sup.ContactGroupOwnerId)
+		left join contacts.contact_groups cga ON a.ContactGroupId = cga.Id
 		left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
+		left join contacts.RegionalDeliveryGroups rdga on rdga.ContactGroupId = cga.Id
 		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
+		left join contacts.Contacts as ContactsAddresses ON ContactsAddresses.ContactOwnerId = cga.Id and if(rdga.ContactGroupId is not null, (rdga.RegionId & sup.RegionMask > 0), 1)
 		left join contacts.Persons ON Persons.ContactGroupId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
 	join Billing.Payers p on p.PayerId = u.PayerId
-{2}
 WHERE
 	((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0))
 	{0}
 GROUP BY u.Id
 {1}
-", filter, orderFilter, from))
+", filter, orderFilter);
+
+				var result = session.CreateSQLQuery(sqlStr)
 					.SetParameter("RegionMask", regionMask)
 					.ToList<UserSearchItem>();
 				ArHelper.Evict(session, result);
@@ -138,24 +161,43 @@ GROUP BY u.Id
 					result[i].IsLocked = adInfo[result[i].Login].IsLocked;
 					result[i].IsLoginExists = adInfo[result[i].Login].IsLoginExists;
 				}
+
+				var info = new SearchTextInfo(SearchText);
+				if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 5) || SearchBy == SearchUserBy.ByContacts)) {
+					var findedUsers = result.Select(r => r.UserId).Implode();
+					var findInUsers = session.CreateSQLQuery(string.Format(@"
+select u.Id 
+from Customers.Users u
+left join Customers.UserAddresses ua on ua.UserId = u.Id
+left join Customers.Addresses a on a.Id = ua.AddressId
+left join contacts.contact_groups cg ON u.ContactGroupId = cg.Id
+left join contacts.contact_groups cga ON a.ContactGroupId = cga.Id
+left join Customers.Suppliers sup on sup.Id = u.RootService
+left join Customers.Clients ON Clients.Id = u.ClientId
+left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
+left join contacts.RegionalDeliveryGroups rdga on rdga.ContactGroupId = cga.Id
+left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
+left join contacts.Contacts as ContactAddress ON ContactAddress.ContactOwnerId = cga.Id and if(rdga.ContactGroupId is not null, (rdga.RegionId & sup.RegionMask > 0), 1)
+where 
+((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0)) and
+((REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) or
+(REPLACE(ContactAddress.ContactText, '-', '') like '{0}' and ContactAddress.Type = 1))
+and
+u.Id in ({1})
+", info.SqlSearchText.Replace("-", ""), findedUsers))
+					.SetParameter("RegionMask", regionMask)
+					.List<uint>();
+
+					if (findInUsers.Count > 0) { 
+						var bufResult = result.Where(r => findInUsers.Contains(r.UserId)).ToList();
+						result = bufResult;
+					}
+				}
 				return result;
 			}
 			finally
 			{
 				sessionHolder.ReleaseSession(session);
-			}
-		}
-
-		private string GetAdditionalFrom()
-		{
-			switch (SearchBy)
-			{
-				case SearchUserBy.AddressMail:
-					return @"left join Customers.UserAddresses ua on ua.UserId = u.Id
-left join Customers.Addresses a on a.Id = ua.AddressId";
-					break;
-				default:
-					return "";
 			}
 		}
 
@@ -211,11 +253,13 @@ left join Customers.Addresses a on a.Id = ua.AddressId";
 		private string GetFilterBy()
 		{
 			var filter = String.Empty;
-			var searchText = String.IsNullOrEmpty(SearchText) ? String.Empty : Utils.StringToMySqlString(SearchText);
 
-			var sqlSearchText = String.Format("%{0}%", searchText).ToLower();
-			var searchTextIsNumber = new Regex("^\\d{1,10}$").IsMatch(searchText);
-			var searchTextIsPhone = new Regex("^\\d{1,10}$").IsMatch(searchText.Replace("-", ""));
+			var info = new SearchTextInfo(SearchText);
+			var searchText = info.SearchText;
+
+			var sqlSearchText = info.SqlSearchText;
+			var searchTextIsNumber = info.SearchTextIsNumber;
+			var searchTextIsPhone = info.SearchTextIsPhone;
 
 			switch (SearchBy)
 			{
@@ -231,7 +275,8 @@ LOWER(s.Name) like '{0}' ",
 							sqlSearchText));
 					}
 					if (searchTextIsPhone && searchText.Length >= 5)
-						filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1) ",
+						filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1)" +
+								" or (REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1) ",
 							sqlSearchText.Replace("-", ""));
 					break;
 				}
@@ -267,10 +312,16 @@ LOWER(s.Name) like '{0}' ",
 				case SearchUserBy.ByContacts: {
 					if (searchTextIsPhone || searchTextIsNumber)
 						filter = AddFilterCriteria(filter,
-							String.Format(" REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ", sqlSearchText.Replace("-", "")));
+							String.Format(@"
+(REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1 ) or 
+(REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1 )
+", sqlSearchText.Replace("-", "")));
 					else
 						filter = AddFilterCriteria(filter,
-							String.Format(" LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))", sqlSearchText));
+							String.Format(@"
+(LOWER(Contacts.ContactText) like '{0}' and Contacts.Type = 0 and ((cg.Specialized = false) or (cg.id = ifnull(u.ContactGroupId, (cg.Specialized = false))))) or
+(LOWER(ContactsAddresses.ContactText) like '{0}' and ContactsAddresses.Type = 0 and ((cga.Specialized = false) or (cga.id = ifnull(u.ContactGroupId, (cga.Specialized = false)))))
+", sqlSearchText));
 					break;
 				}
 				case SearchUserBy.ByPersons: {

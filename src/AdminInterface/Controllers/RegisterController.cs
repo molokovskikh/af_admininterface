@@ -278,12 +278,15 @@ namespace AdminInterface.Controllers
 
 				BindObjectInstance(user, "user");
 
-				if (!IsValid(newClient, user))
+				var equalClientInRegion = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == homeRegion && c.Name == name).RowCount() > 0;
+				if (!IsValid(newClient, user) || equalClientInRegion)
 				{
 					RegisterClient();
 					PropertyBag["clientContacts"] = clientContacts;
 					PropertyBag["client"] = newClient;
 					PropertyBag["user"] = user;
+					if (equalClientInRegion)
+						Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", name));
 					return;
 				}
 
@@ -308,8 +311,9 @@ namespace AdminInterface.Controllers
 				scope.VoteCommit();
 			}
 			newUser.UpdateContacts(userContacts);
-
+#if !DEBUG
 			Mailer.ClientRegistred(newClient, comment);
+#endif
 
 			var log = new PasswordChangeLogEntity(newUser.Login);
 			if (additionalSettings.SendRegistrationCard)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Billing;
@@ -28,7 +29,7 @@ namespace AdminInterface.Models.Audit
 				var needSave = false;
 				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: </br> {2}",
+					message = string.Format("$$$У пользовалеля {0} - ({1}) отключены все адреса доставки: {2}",
 						((User)item).Id,
 						((User)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
@@ -36,7 +37,7 @@ namespace AdminInterface.Models.Audit
 				}
 				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
 					var oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: </br> {2}",
+					message = string.Format("$$$Адрес {0} - ({1}) отключен у всех пользователей: {2}",
 						((Address)item).Id,
 						((Address)item).Name,
 						UpdateCollectionListner.GetListString(oldList));
@@ -58,24 +59,20 @@ namespace AdminInterface.Models.Audit
 		{
 			var item = @event.AffectedOwnerOrNull;
 			if (item != null) {
-				if (item is User && @event.Collection.Role.Contains("AvaliableAddresses")) {
-					IList<Address> oldList = new List<Address>();
-					IList<Address> newList = new List<Address>();
+				var itemStringTypes = @event.Collection.Role.Split(new []{'.'});
+				var propertyName = itemStringTypes.Last();
+				var auditables = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetCustomAttributes(typeof(Auditable), true);
+				if (auditables.Length > 0) {
+					IEnumerable<object> oldList = new List<object>();
+					IEnumerable<object> newList = new List<object>();
 					if (@event.Collection.StoredSnapshot != null)
-						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<Address>().ToList();
-					if (NHibernateUtil.IsInitialized(((User)item).AvaliableAddresses))
-						newList = ((User)item).AvaliableAddresses;
-					var message = string.Format("$$$Изменен список адресов доставки пользовалеля {0} - ({1})", ((User)item).Id, ((User)item).Name);
-					BuildMessage(@event, message, newList, oldList);
-				}
-				if (item is Address && @event.Collection.Role.Contains("AvaliableForUsers")) {
-					IList<User> oldList = new List<User>();
-					IList<User> newList = new List<User>();
-					if (@event.Collection.StoredSnapshot != null)
-						oldList = ((IList<object>)@event.Collection.StoredSnapshot).Cast<User>().ToList();
-					if (NHibernateUtil.IsInitialized(((Address)item).AvaliableForUsers))
-						newList = ((Address)item).AvaliableForUsers;
-					var message = string.Format("$$$Изменен список пользователей, подключеных к адресу доставки {0} - ({1})", ((Address)item).Id, ((Address)item).Name);
+						oldList = ((IList<object>)@event.Collection.StoredSnapshot).ToList();
+					if (NHibernateUtil.IsInitialized(item)) {
+						var persistentBag = item.GetType().GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public).GetValue(item, null);
+						if (NHibernateUtil.IsInitialized(persistentBag))
+							newList = (IEnumerable<object>)persistentBag;
+					}
+					var message = string.Format("$$$Изменен {2} {0} - ({1})", ((dynamic)item).Id, ((dynamic)item).Name, ((dynamic)auditables[0]).Name);
 					BuildMessage(@event, message, newList, oldList);
 				}
 			}
@@ -91,12 +88,12 @@ namespace AdminInterface.Models.Audit
 
 			if (added.Length > 0)
 				_message += "</br> <b> Добавлено </b>" + GetListString(added);
-			if (((dynamic)@event.AffectedOwnerOrNull).Client != null)
-			AuditListener.PreventFlush(@event.Session, () => 
-				@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
-				MessageType = LogMessageType.System,
-				IsHtml = true
-			}));
+			if (((dynamic)@event.AffectedOwnerOrNull).Client != null && (removed.Length > 0 || added.Length > 0))
+				AuditListener.PreventFlush(@event.Session, () => 
+					@event.Session.Save(new ClientInfoLogEntity(_message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
+					MessageType = LogMessageType.System,
+					IsHtml = true
+				}));
 		}
 
 		public static string GetListString(IEnumerable<object> addresses)

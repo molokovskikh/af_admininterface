@@ -41,6 +41,9 @@ namespace Integration.Controllers
 
 			controller = new RegisterController();
 			PrepareController(controller, "Registered");
+
+			ActiveRecordMediator<ActiveRecordBase>.Execute((session, instance) => {controller.DbSession = session; return null;}, null);
+
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
 
@@ -82,6 +85,21 @@ namespace Integration.Controllers
 		}
 
 		[Test]
+		public void Register_equeal_client_in_one_region()
+		{
+			Prepare();
+ 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
+			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
+			Assert.That(controller.Flash["Message"].ToString(), Is.StringContaining("В данном регионе уже существует клиент с таким именем"));
+			controller.Flash["Message"] = null;
+			controller.RegisterClient(client, 2, regionSettings, null, addsettings, null, null,
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
+			Assert.That(controller.Flash["Message"], Is.Null);
+		}
+
+		[Test]
 		public void Create_organization()
 		{
 			DataMother.CreateSupplier().Save();
@@ -91,7 +109,7 @@ namespace Integration.Controllers
 
 			Prepare();
 
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, "address", null, 
+			controller.RegisterClient(client, 4, regionSettings, null, addsettings, "address", null, 
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 
 			var registredClient = RegistredClient();
@@ -129,7 +147,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Accounting.IsFree", "False");
 
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+			controller.RegisterClient(client, 8, regionSettings, null, addsettings, null, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 

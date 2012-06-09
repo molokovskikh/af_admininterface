@@ -239,7 +239,7 @@ namespace AdminInterface.Models
 			ColumnKey = "UserId",
 			Table = "UserAddresses",
 			Schema = "Customers",
-			ColumnRef = "AddressId")]
+			ColumnRef = "AddressId"), Auditable("список адресов доставки пользователя")]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
