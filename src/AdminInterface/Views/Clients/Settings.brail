@@ -46,22 +46,35 @@
 		});
 
 		$("input[type=checkbox].activateParseAndPrice").click(function() {
-			var root = $($(this).parents("td").get(0)).siblings("td");
+			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
+			var rootSearchParseAlgorithm = $('#EnableSmartOrderSecondRow').children('td');
 			if (this.checked)
 				{
-					search(root);
-					searchParseAlgorithm();
+					search(rootSmartOrder);
+					searchParseAlgorithm(rootSearchParseAlgorithm);
 				}
 			else
-				cancel(root);
+				{
+					cancelRoot(rootSmartOrder);
+					cancelRoot(rootSearchParseAlgorithm);
+				}
 		});
-
-		//$('#assortPriceBox').append(searchTemplate("Выберите ассортиментный прайс лист", "${siteroot}/Client/SearchAssortmentPrices"));
+		<%if not drugstore.SmartOrderRules: %>
+			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
+			var rootSearchParseAlgorithm = $('#EnableSmartOrderSecondRow').children('td');
+			search(rootSmartOrder);
+			searchParseAlgorithm(rootSearchParseAlgorithm);
+		<%end %>
 	});
 
-	function cancel(root) {
+	function cancel(root)
+	{
 		var activate = $(root.parents("tr").get(0)).find("input[type=checkbox].activate").get(0);
 		activate.checked = false;
+		cancelRoot(root);
+	}
+
+	function cancelRoot(root) {
 		root.find(".search").remove();
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
@@ -75,8 +88,7 @@
 		root.prepend(searchTemplate(title, "${siteroot}/Client/SearchAssortmentPrices"));
 	}
 
-	function searchParseAlgorithm() {
-		var root = $('#EnableSmartOrderSecondRow').children('td');
+	function searchParseAlgorithm(root) {
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
 		var title = "Выберите парсер";
@@ -168,11 +180,13 @@
 				Максимальный недельный заказ:
 				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
 				</td></tr>
-				<tr id="EnableSmartOrderFirstRow">
+				<tr>
 					<td>
 						${FormHelper.CheckboxField("drugstore.EnableSmartOrder", {"class" : "activateParseAndPrice"})}
 						<label>Автозаказ</label>
 					</td>
+				</tr>
+				<tr id="EnableSmartOrderFirstRow">
 					<td>
 						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode")}
 						<%if drugstore.SmartOrderRules: %>
