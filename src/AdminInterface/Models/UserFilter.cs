@@ -163,7 +163,7 @@ GROUP BY u.Id
 				}
 
 				var info = new SearchTextInfo(SearchText);
-				if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 5) || SearchBy == SearchUserBy.ByContacts)) {
+				if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 6) || SearchBy == SearchUserBy.ByContacts)) {
 					var findedUsers = result.Select(r => r.UserId).Implode();
 					var findInUsers = session.CreateSQLQuery(string.Format(@"
 select u.Id 
@@ -274,7 +274,7 @@ LOWER(u.Name) like '{0}' or
 LOWER(s.Name) like '{0}' ",
 							sqlSearchText));
 					}
-					if (searchTextIsPhone && searchText.Length >= 5)
+					if (searchTextIsPhone && searchText.Length >= 6)
 						filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1)" +
 								" or (REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1) ",
 							sqlSearchText.Replace("-", ""));
