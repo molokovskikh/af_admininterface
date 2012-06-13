@@ -59,7 +59,8 @@
 					cancelRoot(rootSearchParseAlgorithm);
 				}
 		});
-		<%if not drugstore.SmartOrderRules: %>
+
+		<%if (not drugstore.SmartOrderRules) and (drugstore.EnableSmartOrder): %>
 			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
 			var rootSearchParseAlgorithm = $('#EnableSmartOrderSecondRow').children('td');
 			search(rootSmartOrder);
