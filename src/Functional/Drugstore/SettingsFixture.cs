@@ -148,6 +148,39 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
+		public void Add_parser_and_assortiment_price()
+		{
+			var supplier = DataMother.CreateSupplier(s => {
+				s.Name = "Фармаимпекс";
+				s.FullName = "Фармаимпекс";
+				s.AddPrice("Матрица", PriceType.Assortment);
+			});
+			supplier.Save();
+			Maintainer.MaintainIntersection(client, client.Orgs().First());
+			session.Save(new ParseAlgorithm {Name = "testParse"});
+			scope.Flush();
+
+			Css("#drugstore_EnableSmartOrder").Click();
+			Css("#drugstore_EnableSmartOrder").Click();
+
+			Css("#EnableSmartOrderFirstRow .term").TypeText("Фармаимпекс");
+			Css("#EnableSmartOrderFirstRow .search[type=button]").Click();
+			Thread.Sleep(1000);
+			Assert.That(Css("#EnableSmartOrderFirstRow div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+
+			Css("#EnableSmartOrderSecondRow .term").TypeText("testParse");
+			Css("#EnableSmartOrderSecondRow .search[type=button]").Click();
+			Thread.Sleep(1000);
+			Assert.That(Css("#EnableSmartOrderSecondRow div.search select").SelectedItem, Is.EqualTo("testParse"));
+
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+			browser.Click("Настройка");
+			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
+			Assert.That(browser.Text, Is.StringContaining("testParse"));
+		}
+
+		[Test]
 		public void Try_to_send_email_notification()
 		{
 			browser = Open(client, "Settings");
