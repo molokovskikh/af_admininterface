@@ -27,6 +27,7 @@ namespace Functional.Drugstore
 		public new void Setup()
 		{
 			client = DataMother.CreateTestClientWithUser();
+			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
 			scope.Flush();
 			settings = client.Settings;
 
