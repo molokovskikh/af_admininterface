@@ -1,0 +1,39 @@
+﻿<div class="InputGroupHeader" style="margin-bottom:10px; width: 100%;">
+	<div id="JuridicalOrganization${juridicalOrganization.Id}Header" class="${headerCssClass}" align="left">
+		<a id="JuridicalOrganization${juridicalOrganization.Id}Link" href="#">
+			<b>Юридическое лицо "${juridicalOrganization.Name}"</b>
+		</a>
+	</div>
+	<div id="JuridicalOrganization${juridicalOrganization.Id}Body" class="VisibleFolder ${bodyCssClass}" style="background-color: White;">
+		<br />
+		<form action="${siteroot}/Billing/UpdateJuridicalOrganizationInfo.rails" method="post">
+			<input type="hidden" name="juridicalOrganization.Id" value="${juridicalOrganization.Id}" />
+			<table title="" style="width: 100%; height: 100%;" border="0">
+				${WriteJuridicalOrganizationInfo(juridicalOrganization)}
+				<tr><td colspan="10" align="right"><input id="SubmitChanges${juridicalOrganization.Id}" type="submit" value="Сохранить" /></td></tr>
+			</table>
+		</form>
+	</div>
+</div>
+
+<%
+def WriteJuridicalOrganizationInfo(juridicalOrganization) as string: %>
+	${WriteLabelAndEditControl(
+		FormHelper.LabelFor("JuridicalOrganization.Name", "Краткое наименование:"), 
+		FormHelper.TextFieldValue("JuridicalOrganization.Name", juridicalOrganization.Name))}
+
+	${WriteLabelAndEditControl(
+		FormHelper.LabelFor("JuridicalOrganization.FullName","Полное наименование:"), 
+		FormHelper.TextFieldValue("JuridicalOrganization.FullName", juridicalOrganization.FullName))}
+<% end %>
+
+<% def WriteLabelAndEditControl(labelText as string, editControlText as string) as string: %>
+	<tr align="left">
+		<td style="width: 30%">
+			${labelText}
+		</td>
+		<td class="BillingInput">
+			${editControlText}
+		</td>
+	</tr>
+<% end %>

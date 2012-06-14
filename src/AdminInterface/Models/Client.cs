@@ -486,5 +486,10 @@ where ClientId = :clientId")
 				};
 			}
 		}
+
+		public virtual IList<LegalEntity> GetLegalEntity()
+		{
+			return Payers.SelectMany(p => p.JuridicalOrganizations).ToList();
+		}
 	}
 }

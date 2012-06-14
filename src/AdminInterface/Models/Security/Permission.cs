@@ -93,7 +93,7 @@ namespace AdminInterface.Models.Security
 			if (Type == PermissionType.ViewDrugstore)
 			{
 				var drugstore = new [] {
-					"clients", "users", "addresses", "mails", "monitoring", "logs"
+					"clients", "users", "addresses", "mails", "monitoring", "logs", "legalentity"
 				};
 				return drugstore.Any(c => c == controller.ToLower());
 			}

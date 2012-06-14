@@ -208,6 +208,25 @@
 		</div>
 
 		<div class=block>
+			<div class=contextual>
+				<a class="icon icon-add" href="${siteroot}/LegalEntity/add?clientId=${client.Id}">Новое юр. лицо</a>
+			</div>
+			<h3>Юридические лица</h3>
+			<table id="JuridicalOrganizations">
+			<% for organization in client.GetLegalEntity(): %>
+			<tr>
+				<td>${app.LinkTo(organization.Name, @LegalEntity, @Show, {"id": organization.Id, "clientId": client.Id })} </td>
+				<td>
+					${FormHelper.FormTag("${siteroot}/LegalEntity/Delete?id=${organization.Id}", null)}
+						<button type=submit id="deleteButton${organization.Id}">Удалить</button>
+					${FormHelper.EndFormTag()}
+				</td>
+			</tr>
+			<% end %>
+			</table>
+		</div>
+
+		<div class=block>
 			<h3>Общая информация</h3>
 			${app.Display("client.Registration")}
 			${FormHelper.FormTag("Update", null)}

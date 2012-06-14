@@ -363,8 +363,7 @@ namespace AdminInterface.Controllers
 			organization.Update();
 
 			Notify("Сохранено");
-			var billingCode = organization.Payer.PayerID;
-			Redirect("Billing", "Edit", new { billingCode, tab = "juridicalOrganization", currentJuridicalOrganizationId = organization.Id });
+			RedirectToReferrer();
 		}
 
 		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
@@ -375,7 +374,7 @@ namespace AdminInterface.Controllers
 			Maintainer.LegalEntityCreated(legalEntity);
 
 			Notify("Юридическое лицо создано");
-			Redirect("Billing", "Edit", new { billingCode = payerId, tab = "juridicalOrganization", currentJuridicalOrganizationId = legalEntity.Id });
+			RedirectToReferrer();
 		}
 	}
 }

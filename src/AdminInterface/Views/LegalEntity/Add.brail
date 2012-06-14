@@ -1,0 +1,23 @@
+﻿ <% component Bubble, {"bredcrumbs" : [("Клиент ${client.Name}", "${siteroot}/Clients/${client.Id}"), ("Создать юридическое лицо", "")]} %>
+
+${FormHelper.FormTag("${siteroot}/Billing/AddJuridicalOrganization", null)}
+<div>
+	<table>
+		<tbody>
+			<tr>
+				<td>${FormHelper.LabelFor("JuridicalOrganization.Payer.Id", "Плательщик:")}</td>
+				<td>${FormHelper.Select("payerId", client.Payers, {"value" : "Id", "text" : "Name"})}</td>
+			</tr>
+			<tr>
+				<td>${FormHelper.LabelFor("JuridicalOrganization.Name", "Краткое наименование:")}</td>
+				<td>${FormHelper.TextField("JuridicalOrganization.Name")}</td>
+			</tr>
+			<tr>
+				<td>${FormHelper.LabelFor("JuridicalOrganization.FullName", "Полное наименование:")}</td>
+				<td>${FormHelper.TextField("JuridicalOrganization.FullName")}</td>
+			</tr>
+			<tr><td><input type=submit value="Создать"></td></tr>
+		</tbody>
+	</table>
+</div>
+${FormHelper.EndFormTag()}

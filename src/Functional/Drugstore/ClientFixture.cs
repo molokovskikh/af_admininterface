@@ -3,12 +3,14 @@ using System.Linq;
 using System.Threading;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
 using AdminInterface.Models.Logs;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
@@ -141,6 +143,49 @@ namespace Functional.Drugstore
 			browser.GoTo(browser.Link(Find.ByText("История заказов")).Url);
 			Assert.AreEqual("История заказов", browser.Title);
 			browser.GoTo(baseUrl);
+		}
+
+		[Test]
+		public void Legal_entity_block_view()
+		{
+			var organizaions = client.Payers.SelectMany(p => p.JuridicalOrganizations).ToList();
+			Assert.Greater(organizaions.Count, 0);
+			foreach (var legalEntity in organizaions) {
+				AssertText(legalEntity.Name);
+			}
+		}
+
+		[Test]
+		public void Legal_entity_click()
+		{
+			var organizaion = client.Payers.SelectMany(p => p.JuridicalOrganizations).FirstOrDefault();
+			Assert.IsNotNull(organizaion);
+			organizaion.Name = "JuridicalOrganization";
+			session.Save(organizaion);
+			scope.Flush();
+			browser.Refresh();
+			Click(organizaion.Name);
+			AssertText("Краткое наименование");
+			AssertText(organizaion.Name);
+			browser.TextField("JuridicalOrganization_Name").AppendText("Test_JuridicalOrganization");
+			Click("Сохранить");
+			AssertText("Test_JuridicalOrganization");
+			AssertText("Сохранено");
+		}
+
+		[Test]
+		public void Create_delete_legal_entity_test()
+		{
+			Click("Новое юр. лицо");
+			browser.TextField("JuridicalOrganization_Name").AppendText("new_JuridicalOrganization_name");
+			browser.TextField("JuridicalOrganization_FullName").AppendText("new_JuridicalOrganization_FullName");
+			Click("Создать");
+			AssertText("Юридическое лицо создано");
+			browser.Refresh();
+			Open(client);
+			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
+			browser.Button(string.Format("deleteButton{0}", organ.Id)).Click();
+			AssertText("Удалено");
 		}
 
 		[Test]
