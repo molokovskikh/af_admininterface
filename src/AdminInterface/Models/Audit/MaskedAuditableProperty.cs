@@ -5,11 +5,14 @@ using System.Reflection;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using NHibernate;
 
 namespace AdminInterface.Models.Audit
 {
 	public class MaskedAuditableProperty : AuditableProperty
 	{
+		public ulong[] Added { get; set; }
+
 		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 			: base(property, name, newValue, oldValue)
 		{}
@@ -26,7 +29,7 @@ namespace AdminInterface.Models.Audit
 			var current = ToRegionList(newRegionValue);
 			var old = ToRegionList(oldRegionValue);
 
-			var added = Complement(current, old).ToArray();
+			Added = Complement(current, old).ToArray();
 			var removed = Complement(old, current).ToArray();
 
 			Message = String.Format("$$$Изменено '{0}'", Name);
@@ -34,8 +37,8 @@ namespace AdminInterface.Models.Audit
 			if (removed.Length > 0)
 				Message += " Удалено " + ToString(removed);
 
-			if (added.Length > 0)
-				Message += " Добавлено " + ToString(added);
+			if (Added.Length > 0)
+				Message += " Добавлено " + ToString(Added);
 		}
 
 		public static string ToString<T>(IEnumerable<T> items)

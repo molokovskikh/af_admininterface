@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -150,8 +152,27 @@ namespace AdminInterface.Models.Audit
 
 		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState, object entity)
 		{
-			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region"))
-				return new MaskedAuditableProperty(property, name, newState, oldState);
+			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
+				var auditableProperty = new MaskedAuditableProperty(property, name, newState, oldState);
+				if (auditableProperty.Added.Length > 0) {
+					var user = entity as User;
+					if (user != null && property.Name.Contains("WorkRegionMask")) {
+						auditableProperty.DoActionPostSend = session => 
+							new SetForceReplication(session).ForUser(user.Id);
+					}
+					var client = entity as Client;
+					if (client != null && property.Name.Contains("MaskRegion")) {
+						auditableProperty.DoActionPostSend = session => 
+							new SetForceReplication(session).ForClient(client.Id);
+					}
+					var supplier = entity as Supplier;
+					if (supplier != null) {
+						auditableProperty.DoActionPostSend = session => 
+							new SetForceReplication(session).ForSupplier(supplier.Id);
+					}
+				}
+				return auditableProperty;
+			}
 			if (entity is Payer && property.Name == "Comment")
 				return new DiffAuditableProperty(property, name, newState, oldState);
 			return base.GetAuditableProperty(property, name, newState, oldState, entity);

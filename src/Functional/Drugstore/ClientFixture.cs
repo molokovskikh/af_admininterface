@@ -183,6 +183,7 @@ namespace Functional.Drugstore
 			AssertText("Юридическое лицо создано");
 			browser.Refresh();
 			Open(client);
+			client.Refresh();
 			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
 			browser.Button(string.Format("deleteButton{0}", organ.Id)).Click();
 			AssertText("Удалено");
