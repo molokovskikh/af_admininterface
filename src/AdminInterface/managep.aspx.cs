@@ -284,7 +284,7 @@ SET @InsertedPriceCode = Last_Insert_ID();
 INSERT INTO farm.formrules() VALUES();
 SET @NewFormRulesId = Last_Insert_ID();
 
-INSERT INTO farm.sources() VALUES();	
+INSERT INTO farm.sources(RequestInterval) VALUES(IF(?PriceType=1, 86400, NULL));	
 SET @NewSourceId = Last_Insert_ID();
 
 INSERT INTO usersettings.PriceItems(FormRuleId, SourceId) VALUES(@NewFormRulesId, @NewSourceId);
@@ -347,8 +347,14 @@ SET UpCost = ?UpCost,
 	BuyingMatrix = ?BuyingMatrix
 WHERE PriceCode = ?PriceCode;
 
+UPDATE farm.sources fs
+JOIN Usersettings.PriceItems pi ON fs.Id = pi.SourceId
+JOIN Usersettings.PricesCosts pc ON pi.Id = pc.PriceItemId AND pc.PriceCode=?PriceCode
+SET fs.RequestInterval=IF(?PriceType=1, 86400, NULL);
+
 call UpdateCostType(?PriceCode, ?CostType);
 ");
+
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");

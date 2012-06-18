@@ -12,7 +12,11 @@ using Integration.ForTesting;
 using WatiN.Core.Native.Windows;
 using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core; 
+using Test.Support.Web;
+using Common.MySql;
+using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace Functional.Suppliers
 {
@@ -147,6 +151,52 @@ namespace Functional.Suppliers
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
 			newCertificate.Delete();
+		}
+
+		[Test]
+		public void Change_pricelist_type_to_assortment()
+		{
+			Open(supplier);
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
+			Click("Настройка");
+			//создаем ассортиментный прайс
+			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)PriceType.Assortment).ToString());
+			Click("Применить");
+			//меняем тип на ассортиментный
+			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
+			Click("Применить");
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_2").SelectByValue(((int)PriceType.Assortment).ToString());
+			Click("Применить");
+			//меняем тип на базовый - RequsetInterval должен стать NULL
+			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_3").SelectByValue(((int)PriceType.Assortment).ToString());
+			Click("Применить");
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_3").SelectByValue(((int)PriceType.Regular).ToString());
+			Click("Применить");
+
+			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			DataSet result = new DataSet();
+			With.Connection(
+				c => {
+					var query = @"
+Select fs.RequestInterval 
+From farm.Sources fs
+	Join PriceItems pi on pi.SourceId = fs.Id
+	Join PricesCosts pc on pc.PriceItemId = pi.Id
+Where pc.PriceCode in (?PriceId1, ?PriceId2,  ?PriceId3)
+Order by fs.RequestInterval";
+					var dataAdapter = new MySqlDataAdapter(query, c);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId1", supplier.Prices[1].Id);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId2", supplier.Prices[2].Id);
+					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId3", supplier.Prices[3].Id);
+					dataAdapter.Fill(result);
+				});
+			DataRowCollection tr = result.Tables[0].Rows;
+			Assert.That(result.Tables[0].Columns[0].Caption, Is.EqualTo("RequestInterval"));
+			Assert.That(tr[0]["RequestInterval"], Is.EqualTo(DBNull.Value));
+			Assert.That(tr[1]["RequestInterval"], Is.EqualTo(86400));
+			Assert.That(tr[2]["RequestInterval"], Is.EqualTo(86400));
 		}
 	}
 }
