@@ -138,8 +138,33 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Admin.CheckClientPermission(client);
+
+			var savedNotify = true;
+			var changeName = client.IsChanged(c => c.Name);
+			var changeFullName = client.IsChanged(c => c.FullName);
+			if (changeFullName || changeName) {
+				var legalEntityes = client.GetLegalEntity();
+				if (legalEntityes.Count == 1) {
+					var legalEntity = legalEntityes.First();
+					if (changeName)
+						legalEntity.Name = client.Name;
+					if (changeFullName)
+						legalEntity.FullName = client.FullName;
+					legalEntity.Update();
+				}
+				else {
+					var changePartMessage = string.Empty;
+					if (changeName)
+						changePartMessage += "краткое";
+					if (changeFullName)
+						changePartMessage += "полное";
+					Notify(string.Format("Вы изменили {0} наименование клиента. У клиента более одного юр. лица, переименование юр. лиц не было произведено.", changePartMessage));
+					savedNotify = false;
+				}
+			}
 			client.Save();
-			Notify("Сохранено");
+			if (savedNotify)
+				Notify("Сохранено");
 			RedirectToReferrer();
 		}
 
@@ -260,7 +285,7 @@ where Phone like :phone")
 				RenderView("Settings");
 				return;
 			}
-				
+
 			if (drugstore.EnableSmartOrder)
 			{
 				if (drugstore.SmartOrderRules == null && smartOrderRules == null) { 
@@ -272,7 +297,7 @@ where Phone like :phone")
 					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
 					var algorithmId = 0u;
 					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
-						var algorithm = DbSession.QueryOver<ParseAlgorithm>().Where(p => p.Id == algorithmId).List().FirstOrDefault();
+						var algorithm = DbSession.Load<ParseAlgorithm>(algorithmId);
 						if (algorithm != null)
 							drugstore.SmartOrderRules.ParseAlgorithm = algorithm.Name;
 					}
