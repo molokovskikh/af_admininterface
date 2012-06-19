@@ -6,6 +6,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.NHibernateExtentions;
 using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -17,6 +18,7 @@ using Test.Support.Web;
 using Common.MySql;
 using MySql.Data.MySqlClient;
 using System.Data;
+using Test.Support.Farm;
 
 namespace Functional.Suppliers
 {
@@ -163,40 +165,17 @@ namespace Functional.Suppliers
 			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
 			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)PriceType.Assortment).ToString());
 			Click("Применить");
-			//меняем тип на ассортиментный
-			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
-			Click("Применить");
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_2").SelectByValue(((int)PriceType.Assortment).ToString());
-			Click("Применить");
-			//меняем тип на базовый - RequsetInterval должен стать NULL
-			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_3").SelectByValue(((int)PriceType.Assortment).ToString());
-			Click("Применить");
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_3").SelectByValue(((int)PriceType.Regular).ToString());
-			Click("Применить");
-
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
-			DataSet result = new DataSet();
-			With.Connection(
-				c => {
-					var query = @"
+			var a = session.CreateSQLQuery(@"
 Select fs.RequestInterval 
 From farm.Sources fs
 	Join PriceItems pi on pi.SourceId = fs.Id
 	Join PricesCosts pc on pc.PriceItemId = pi.Id
-Where pc.PriceCode in (?PriceId1, ?PriceId2,  ?PriceId3)
-Order by fs.RequestInterval";
-					var dataAdapter = new MySqlDataAdapter(query, c);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId1", supplier.Prices[1].Id);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId2", supplier.Prices[2].Id);
-					dataAdapter.SelectCommand.Parameters.AddWithValue("?PriceId3", supplier.Prices[3].Id);
-					dataAdapter.Fill(result);
-				});
-			DataRowCollection tr = result.Tables[0].Rows;
-			Assert.That(result.Tables[0].Columns[0].Caption, Is.EqualTo("RequestInterval"));
-			Assert.That(tr[0]["RequestInterval"], Is.EqualTo(DBNull.Value));
-			Assert.That(tr[1]["RequestInterval"], Is.EqualTo(86400));
-			Assert.That(tr[2]["RequestInterval"], Is.EqualTo(86400));
+Where pc.PriceCode = :PriceId1")
+			.SetParameter("PriceId1", supplier.Prices[1].Id)
+			.ToList<TestSource>();
+			//проверяем RequestInterval
+			Assert.That(a[0].RequestInterval, Is.EqualTo(86400));
 		}
 	}
 }

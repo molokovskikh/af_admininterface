@@ -349,8 +349,8 @@ WHERE PriceCode = ?PriceCode;
 
 UPDATE farm.sources fs
 JOIN Usersettings.PriceItems pi ON fs.Id = pi.SourceId
-JOIN Usersettings.PricesCosts pc ON pi.Id = pc.PriceItemId AND pc.PriceCode=?PriceCode
-SET fs.RequestInterval=IF(?PriceType=1, 86400, NULL);
+JOIN Usersettings.PricesCosts pc ON pi.Id = pc.PriceItemId AND pc.PriceCode = ?PriceCode
+SET fs.RequestInterval = IF(?PriceType = 1, 86400, NULL);
 
 call UpdateCostType(?PriceCode, ?CostType);
 ");
