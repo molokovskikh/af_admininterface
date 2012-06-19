@@ -18,7 +18,7 @@ using Test.Support.Web;
 using Common.MySql;
 using MySql.Data.MySqlClient;
 using System.Data;
-using Test.Support.Farm;
+using Test.Support;
 
 namespace Functional.Suppliers
 {
@@ -128,7 +128,7 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			Click("Настройка");
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Vip).ToString());
 			Click("Применить");
 			AssertText("Все клиенты были отключены от VIP прайсов");
 		}
@@ -163,7 +163,7 @@ namespace Functional.Suppliers
 			Click("Настройка");
 			//создаем ассортиментный прайс
 			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)PriceType.Assortment).ToString());
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
 			Click("Применить");
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
 			var a = session.CreateSQLQuery(@"
