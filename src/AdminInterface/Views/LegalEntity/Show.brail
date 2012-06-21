@@ -1,0 +1,10 @@
+﻿ <% component Bubble, {"bredcrumbs" : [("Клиент ${client.Name}", "${siteroot}/Clients/${client.Id}"), 
+									  ("Информация о юридическом лице", "")]} %>
+
+<%def WriteHeader(juridicalOrganization) as string: 
+	OutputSubView("/SubViews/JuridicalOrganizationForm", {@juridicalOrganization : juridicalOrganization}) 
+end %>
+
+<div style="width:50%;">
+<% WriteHeader(entity) %>
+</div>	

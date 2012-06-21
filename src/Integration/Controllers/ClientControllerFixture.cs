@@ -7,6 +7,8 @@ using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.MonoRail.Framework;
+using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
@@ -26,6 +28,7 @@ namespace Integration.Controllers
 		public void SetUp()
 		{
 			controller = new ClientsController();
+			referer = "http://ya.ru";
 			PrepareController(controller);
 			client = DataMother.CreateTestClientWithUser();
 		}
@@ -261,6 +264,28 @@ namespace Integration.Controllers
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			var suppliers = controller.SearchSuppliers(client.Id, "тест");
 			Assert.That(suppliers.Length, Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Rename_name_and_full_name_client()
+		{
+			client.Save();
+			
+			var legalEntity = client.GetLegalEntity()[0];
+			legalEntity.Name = "Name";
+			legalEntity.FullName = "FullName";
+			legalEntity.Save();
+			scope.Flush();
+
+			client.Name = "TestName";
+			client.FullName = "TestFullName";
+
+			controller.Update(client);
+
+			scope.Flush();
+
+			Assert.That(legalEntity.Name, Is.EqualTo("TestName"));
+			Assert.That(legalEntity.FullName, Is.EqualTo("TestFullName"));
 		}
 	}
 }

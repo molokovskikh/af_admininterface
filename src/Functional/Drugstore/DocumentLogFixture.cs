@@ -50,6 +50,51 @@ namespace Functional.Drugstore
 		}
 
 		[Test]
+		public void View_documents_with_client_column()
+		{
+			User testUser = new User(client);
+			testUser.Setup();
+			
+			client.Users.Add(
+				testUser
+			);
+			
+			client.Save();
+			Flush();
+
+			var document = new DocumentReceiveLog(supplier) {
+				FileName = "test.txt",
+				ForClient = client,
+				Address = client.Addresses.First(),
+			};
+
+			document.Save();
+			Flush();
+
+			var sendLog = new DocumentSendLog() {
+				Committed = true,
+				ForUser = client.Users.First(),
+				Received = document
+			};
+			sendLog.Save();
+			Flush();
+
+			Open(client);
+			Click("История документов");
+
+			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
+				//Смотрим, есть ли надпись "Клиенту"
+				Assert.That(openedWindow.ContainsText("Клиенту"));
+				//Смотрим, есть ли ссылка на поставщика
+				Assert.That(openedWindow.Links.Select(l => l.Text == supplier.Name && l.Text.Contains("Suppliers//" + supplier.Id.ToString())).Count(), Is.GreaterThan(0));
+				//Смотрим, есть ли ссылка на клиента
+				Assert.That(openedWindow.Links.Select(l => l.Text == client.Name && l.Text.Contains("Clients//" + client.Id.ToString())).Count(), Is.GreaterThan(0));
+				//Смотрим, есть ли ссылка на пользователя, получившего документ
+				Assert.That(openedWindow.Links.Select(l => l.Text == testUser.Name && l.Text.Contains("Users//" + testUser.Id.ToString())).Count(), Is.GreaterThan(0));
+			}
+		}
+
+		[Test]
 		public void View_document_certificates()
 		{
 			var log = DataMother.CreateTestDocumentLog(supplier, client);

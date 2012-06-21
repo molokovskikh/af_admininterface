@@ -27,6 +27,36 @@ namespace Integration.Models
 		}
 
 		[Test]
+		public void Search_in_contacts_and_cout_results()
+		{
+			var client = DataMother.CreateTestClientWithAddressAndUser();
+			client.Save();
+			var firstContact = new ContactGroup(ContactGroupType.General);
+			var phone1 = RandomPhone();
+			var phone2 = RandomPhone();
+			var phone3 = RandomPhone();
+			firstContact.AddContact(ContactType.Phone, phone1);
+			firstContact.AddContact(ContactType.Phone, phone2);
+			client.ContactGroupOwner.AddContactGroup(firstContact);
+			var user = client.Users.FirstOrDefault();
+			user.ContactGroup = new ContactGroup(ContactGroupType.General) {ContactGroupOwner = client.ContactGroupOwner};
+			user.ContactGroup.AddContact(ContactType.Phone, phone3);
+			var newUser = new User(client);
+			newUser.Setup();
+			client.AddUser(newUser);
+			newUser.Save();
+			client.Save();
+			Flush();
+			filter.SearchBy = SearchUserBy.Auto;
+			filter.SearchText = phone1;
+			var result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(2));
+			filter.SearchText = phone3;
+			result = filter.Find();
+			Assert.That(result.Count, Is.EqualTo(1));
+		}
+
+		[Test]
 		public void Search_by_address_mail()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();

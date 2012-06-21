@@ -148,6 +148,7 @@
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
     <Compile Include="Controllers\NewsController.cs" />
+    <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
     <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
@@ -190,6 +191,7 @@
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
     <Compile Include="Models\Listeners\UpdateReplicationInfoListener.cs" />
+    <Compile Include="Models\ParseAlgorithm.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
@@ -453,6 +455,7 @@
     <None Include="Views\Accounts\Edit.brail" />
     <None Include="Views\BalanceOperations\Edit.brail" />
     <None Include="Views\BalanceOperations\Show.brail" />
+    <None Include="Views\LegalEntity\Show.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
     <None Include="Views\News\Edit.brail" />
@@ -505,6 +508,8 @@
     <None Include="Views\Mails\Attachments.brail" />
     <None Include="Views\Main\StatSubView.brail" />
     <None Include="Views\Orders\Details.brail" />
+    <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
+    <None Include="Views\LegalEntity\Add.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

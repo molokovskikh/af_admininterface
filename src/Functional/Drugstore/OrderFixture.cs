@@ -94,5 +94,18 @@ namespace Functional.Drugstore
 			else
 				Assert.That(browser.TextField(Find.ByName("user.Name")).Text, Is.EqualTo(text));
 		}
+
+		[Test]
+		public void Check_Region_Column()
+		{
+			Open(client);
+			browser.Link(Find.ByText("История заказов")).Click();
+			OpenedWindow(@"История заказов");
+			SetCalendarDates(browser);
+			browser.Button(Find.ByValue("Показать")).Click();
+			Assert.IsTrue(browser.TableBody(Find.ById("SearchResults")).Exists);
+			//Смотрим, соотв. ли регион тестового клиента колонке в 1 строке таблицы - там должно быть Воронеж
+			Assert.That(browser.TableBody(Find.ById("SearchResults")).TableRows[0].TableCells[7].Text, Is.EqualTo(client.HomeRegion.Name));
+		}
 	}
 }

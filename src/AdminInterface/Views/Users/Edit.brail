@@ -16,9 +16,7 @@
 		$("form#ReseteUin").validate({
 			rules: { "reason": "required" }
 		});
-		$("form#MessagesForm").validate({
-			rules: { "message": "required" }
-		});
+
 		if (${user.WorkRegionMask} == ${maxRegion}){
 			
 		}

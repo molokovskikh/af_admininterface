@@ -46,5 +46,41 @@ namespace Functional
 			Click("Настройка");
 			AssertText(val);
 		}
+
+		[Test]
+		public void AvailibleAddressLogTest()
+		{
+			Open(user);
+			var addressesCount = user.Client.Addresses.Count;
+			Console.WriteLine(addressesCount);
+			for (int i = 0; i < addressesCount; i++) {
+				browser.CheckBox(Find.ByName(string.Format("user.AvaliableAddresses[{0}].Id", i))).Checked = true;
+			}
+			Click("Сохранить");
+			AssertText("$$$Изменен список адресов доставки пользователя");
+			for (int i = 0; i < addressesCount; i++) {
+				AssertText(user.Client.Addresses[i].Name);
+			}
+			Open(user.Client);
+			Click("Новый пользователь");
+			for (int i = 0; i < addressesCount; i++) {
+				browser.CheckBox(Find.ByName(string.Format("user.AvaliableAddresses[{0}].Id", i))).Checked = true;
+			}
+			browser.TextField("user_Name").AppendText("TestUser");
+			browser.CheckBox("sendClientCard").Checked = true;
+			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
+			Click("Создать");
+			AssertText("подключены слудующие адреса доставки:");
+
+			var address = user.Client.Addresses.First();
+			Click(address.Name);
+			AssertText("Адрес доставки");
+			var userCount = address.AvaliableForUsers.Count;
+			for (int i = 0; i < userCount; i++) {
+				browser.CheckBox(Find.ByName(string.Format("address.AvaliableForUsers[{0}].Id", i))).Checked = false;
+			}
+			Click("Сохранить");
+			AssertText("отключен у всех пользователей");
+		}
 	}
 }

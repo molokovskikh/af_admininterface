@@ -25,6 +25,7 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate.Criterion;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
@@ -137,8 +138,33 @@ namespace AdminInterface.Controllers
 		public void Update([ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client)
 		{
 			Admin.CheckClientPermission(client);
+
+			var savedNotify = true;
+			var changeName = client.IsChanged(c => c.Name);
+			var changeFullName = client.IsChanged(c => c.FullName);
+			if (changeFullName || changeName) {
+				var legalEntityes = client.GetLegalEntity();
+				if (legalEntityes.Count == 1) {
+					var legalEntity = legalEntityes.First();
+					if (changeName)
+						legalEntity.Name = client.Name;
+					if (changeFullName)
+						legalEntity.FullName = client.FullName;
+					legalEntity.Update();
+				}
+				else {
+					var changePartMessage = string.Empty;
+					if (changeName)
+						changePartMessage += "краткое";
+					if (changeFullName)
+						changePartMessage += "полное";
+					Notify(string.Format("Вы изменили {0} наименование клиента. У клиента более одного юр. лица, переименование юр. лиц не было произведено.", changePartMessage));
+					savedNotify = false;
+				}
+			}
 			client.Save();
-			Notify("Сохранено");
+			if (savedNotify)
+				Notify("Сохранено");
 			RedirectToReferrer();
 		}
 
@@ -242,6 +268,7 @@ where Phone like :phone")
 		[AccessibleThrough(Verb.Post)]
 		public void UpdateDrugstore(
 			[ARDataBind("client", AutoLoad = AutoLoadBehavior.Always)] Client client,
+			[ARDataBind("drugstore.SmartOrderRules", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] SmartOrderRules smartOrderRules,
 			[ARDataBind("drugstore", AutoLoad = AutoLoadBehavior.Always, Expect = "drugstore.OfferMatrixExcludes")] DrugstoreSettings drugstore,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
 			ulong homeRegion)
@@ -258,11 +285,23 @@ where Phone like :phone")
 				RenderView("Settings");
 				return;
 			}
-				
-			if (drugstore.EnableSmartOrder && drugstore.SmartOrderRules == null)
+
+			if (drugstore.EnableSmartOrder)
 			{
-				var smartOrder = SmartOrderRules.TestSmartOrder();
-				drugstore.SmartOrderRules = smartOrder;
+				if (drugstore.SmartOrderRules == null && smartOrderRules == null) { 
+					var smartOrder = SmartOrderRules.TestSmartOrder();
+					drugstore.SmartOrderRules = smartOrder;
+				}
+				else {
+					drugstore.SmartOrderRules = smartOrderRules;
+					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
+					var algorithmId = 0u;
+					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
+						var algorithm = DbSession.Load<ParseAlgorithm>(algorithmId);
+						if (algorithm != null)
+							drugstore.SmartOrderRules.ParseAlgorithm = algorithm.Name;
+					}
+				}
 			}
 			client.Save();
 			drugstore.UpdateAndFlush();
@@ -346,6 +385,17 @@ where Phone like :phone")
 				id = o.Id,
 				name = o.Name
 			}).ToArray();
+		}
+
+		[return: JSONReturnBinder]
+		public object[] SerachParseAlgorithm(string text)
+		{
+			return DbSession.QueryOver<ParseAlgorithm>().Where(
+				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))
+				.Take(50)
+				.List()
+				.Select(p => new {id = p.Id, name = p.Name})
+				.ToArray();
 		}
 
 		[return: JSONReturnBinder]

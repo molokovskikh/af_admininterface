@@ -832,5 +832,13 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 				Assert.That(oldClient.Addresses.Count, Is.EqualTo(0));
 			}
 		}
+
+		[Test]
+		public void Message_on_forbidden_symbols()
+		{
+			browser.TextField(Find.ByName("message")).TypeText("<Тестовое сообщение с ><запрещенными<> символами");
+			browser.Button(Find.ByValue("Принять")).Click();
+			Assert.That(browser.ContainsText("Поле содержит запрещенные символы(<, >)."), Is.True);
+		}
 	}
 }
