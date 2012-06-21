@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class MaintainerFixture : IntegrationFixture
+	public class MaintainerFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Create_intersection_after_legal_entity_creation()

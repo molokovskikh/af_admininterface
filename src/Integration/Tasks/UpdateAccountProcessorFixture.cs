@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class UpdateAccountProcessorFixture : IntegrationFixture
+	public class UpdateAccountProcessorFixture : Test.Support.IntegrationFixture
 	{
 		Client client;
 		User user;

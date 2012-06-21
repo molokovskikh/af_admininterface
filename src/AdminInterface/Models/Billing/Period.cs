@@ -188,9 +188,9 @@ namespace AdminInterface.Models.Billing
 		public static DateTime GetPeriodEnd(this Period period)
 		{
 			if (period.GetInvoicePeriod() == InvoicePeriod.Month)
-				return period.GetPeriodBegin().LastDayOfMonth();
+				return period.GetPeriodBegin().LastDayOfMonth().Add(new TimeSpan(23, 59, 59));
 			else
-				return period.GetPeriodBegin().AddMonths(3).AddDays(-1);
+				return period.GetPeriodBegin().AddMonths(3).AddDays(-1).Add(new TimeSpan(23, 59, 59));
 		}
 
 		public static DateTime MonthEnd(this int month)

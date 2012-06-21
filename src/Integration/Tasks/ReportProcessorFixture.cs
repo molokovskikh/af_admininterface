@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class ReportProcessorFixture : IntegrationFixture
+	public class ReportProcessorFixture : Test.Support.IntegrationFixture
 	{
 		ReportProcessor processor;
 		Payer payer;

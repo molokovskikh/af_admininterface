@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class RegistrationInformationFixture : IntegrationFixture
+	public class RegistrationInformationFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void BaseTest()

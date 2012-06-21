@@ -4,12 +4,11 @@ using AdminInterface.Models;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
-using IntegrationFixture = Integration.ForTesting.IntegrationFixture;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientSettingFixture : IntegrationFixture
+	public class ClientSettingFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Set_replication_if_matrix_settings_changed()

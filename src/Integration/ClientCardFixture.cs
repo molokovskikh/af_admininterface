@@ -11,7 +11,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class ClientCardFixture : IntegrationFixture
+	public class ClientCardFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Send_client_card()

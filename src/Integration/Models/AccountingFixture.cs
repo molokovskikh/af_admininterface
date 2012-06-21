@@ -11,7 +11,7 @@ using Test.Support.log4net;
 
 namespace Integration.Models
 {
-	public class AccountingFixture : IntegrationFixture
+	public class AccountingFixture : Test.Support.IntegrationFixture
 	{
 		private Client client;
 		private Account userAccount;

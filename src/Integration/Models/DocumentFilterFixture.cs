@@ -11,7 +11,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class DocumentFilterFixture : IntegrationFixture
+	public class DocumentFilterFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Get_document_error_for_supplier()

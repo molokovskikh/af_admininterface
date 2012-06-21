@@ -8,7 +8,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AddressFixture : IntegrationFixture
+	public class AddressFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Move_address()

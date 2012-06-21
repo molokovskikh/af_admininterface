@@ -4,6 +4,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support;
 
 namespace Integration
 {
@@ -13,6 +14,8 @@ namespace Integration
 		[SetUp]
 		public void Setup()
 		{
+			IntegrationFixture.DoNotUserTransaction = true;
+
 			ForTest.InitialzeAR();
 			var admin = new Administrator{
 				UserName = Environment.UserName,

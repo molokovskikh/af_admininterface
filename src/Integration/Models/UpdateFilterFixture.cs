@@ -12,7 +12,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class UpdateFilterFixture : IntegrationFixture
+	public class UpdateFilterFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Load_updates_by_filter()

@@ -198,7 +198,7 @@ or sum(if(cd.Name like :searchText or cd.FullName like :searchText, 1, 0)) > 0)"
 				And(where, "p.PayCycle = :InvoicePeriod");
 				And(where, GetDocumentSubQuery(DocumentType));
 				query.SetParameter("InvoicePeriod", Period.GetInvoicePeriod());
-				query.SetParameter("PeriodEnd", Period.GetPeriodEnd().Date.AddHours(23).AddMinutes(59).AddSeconds(59));
+				query.SetParameter("PeriodEnd", Period.GetPeriodEnd());
 				query.SetParameter("Period", Period.ToSqlString());
 			}
 

@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class AuditorFixture : IntegrationFixture
+	public class AuditorFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Audit_client_changes()
