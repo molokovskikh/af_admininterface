@@ -117,6 +117,7 @@
     <Compile Include="Controllers\PayersControllerFixture.cs" />
     <Compile Include="Controllers\PaymentsControllerFixture.cs" />
     <Compile Include="Controllers\RevisionActControllerFixture.cs" />
+    <Compile Include="DocumentBuildFilterFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="MaskedAuditablePropertyFixture.cs" />
     <Compile Include="AuditorFixture.cs" />
@@ -145,7 +146,6 @@
     <Compile Include="Controllers\RegisterControllerFixture.cs" />
     <Compile Include="Controllers\SmapRejectorControllerFixture.cs" />
     <Compile Include="DbLogHelperFixture.cs" />
-    <Compile Include="ForTesting\IntegrationFixture.cs" />
     <Compile Include="Models\InvoiceFixture.cs" />
     <Compile Include="Models\MonthlyJobFixture.cs" />
     <Compile Include="Models\MaintainerFixture.cs" />

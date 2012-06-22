@@ -133,6 +133,7 @@
     <Compile Include="LogsFixture.cs" />
     <Compile Include="MainFixure.cs" />
     <Compile Include="ManagerReportsFixture.cs" />
+    <Compile Include="NewsFixture.cs" />
     <Compile Include="PromotionsFixture.cs" />
     <Compile Include="RegionalAdminFixture.cs" />
     <Compile Include="Drugstore\RegistrationFixture.cs" />

@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Integration.Tasks
 {
 	[TestFixture]
-	public class ReportLogProcessorFixture : IntegrationFixture
+	public class ReportLogProcessorFixture : Test.Support.IntegrationFixture
 	{
 		Payer payer;
 		Report report;

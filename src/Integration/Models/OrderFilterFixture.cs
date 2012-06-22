@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class OrderFilterFixture : IntegrationFixture
+	public class OrderFilterFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Find_order_for_user()

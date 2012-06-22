@@ -6,10 +6,18 @@
 </script>
 
 <% if invoice.Id: %>
-<h2>Редактирование счета №${invoice.Id}</h2>
+<h2>Редактирование счета №!{invoice.Id}</h2>
 <% else: %>
 <h2>Формирование дополнительного счета</h2>
 <% end %>
+
+<div>
+	<% if not invoice.Author: %>
+	Автор не указан, дата создания !{invoice.CreatedOn}
+	<% else: %>
+	Автор !{invoice.Author}, дата создания !{invoice.CreatedOn}
+	<% end %>
+</div>
 
 ${app.GetValidationError(invoice, "Recipient")}
 

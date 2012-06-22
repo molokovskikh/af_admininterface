@@ -8,12 +8,11 @@ using NHibernate;
 using NHibernate.Proxy;
 using NUnit.Framework;
 using Test.Support;
-using IntegrationFixture = Integration.ForTesting.IntegrationFixture;
 
 namespace Integration.MonoRailExtentions
 {
 	[TestFixture]
-	public class ValidatorToNHibernateIntegrationFixture : IntegrationFixture
+	public class ValidatorToNHibernateIntegrationFixture : Test.Support.IntegrationFixture
 	{
 		private StaticValidatorAccessor accessor;
 		private ValidatorRunner validator;

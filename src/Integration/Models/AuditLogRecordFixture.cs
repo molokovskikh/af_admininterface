@@ -14,7 +14,7 @@ using IntegrationFixture = Test.Support.IntegrationFixture;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AuditLogRecordFixture : IntegrationFixture
+	public class AuditLogRecordFixture : Test.Support.IntegrationFixture
 	{
 		private MonorailMailer mailer;
 

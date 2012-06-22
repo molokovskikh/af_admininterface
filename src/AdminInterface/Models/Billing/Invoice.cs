@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
@@ -31,6 +32,7 @@ namespace AdminInterface.Models.Billing
 		{
 			Parts = new List<InvoicePart>();
 			CreatedOn = DateTime.Now;
+			Author = SecurityContext.Administrator.Name;
 
 			SetPayer(payer);
 			Date = Payer.GetDocumentDate(date);
@@ -108,6 +110,9 @@ namespace AdminInterface.Models.Billing
 
 		[Property]
 		public DateTime CreatedOn { get; set; }
+
+		[Property]
+		public string Author { get; set; }
 
 		[Property]
 		public bool SendToEmail { get; set; }

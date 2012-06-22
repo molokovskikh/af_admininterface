@@ -147,11 +147,13 @@
     <Compile Include="Controllers\BalanceOperationsController.cs" />
     <Compile Include="Controllers\Filters\DocumentFilter.cs" />
     <Compile Include="Controllers\Filters\StatisticsFilter.cs" />
+    <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
     <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
+    <Compile Include="Models\News.cs" />
     <Compile Include="Models\OrderLog.cs" />
     <Compile Include="Models\OrderFilter.cs" />
     <Compile Include="Controllers\SpecialHandlersController.cs" />
@@ -411,6 +413,7 @@
     <Content Include="Assets\Javascripts\payer.send.message.coffee" />
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
+    <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
     <Content Include="EditRegionalInfo.aspx" />
@@ -455,6 +458,8 @@
     <None Include="Views\LegalEntity\Show.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
+    <None Include="Views\News\Edit.brail" />
+    <None Include="Views\News\Index.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />

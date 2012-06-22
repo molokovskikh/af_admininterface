@@ -12,7 +12,7 @@ using NUnit.Framework;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PayerFixture : IntegrationFixture
+	public class PayerFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Search_payer()

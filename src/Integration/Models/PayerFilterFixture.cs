@@ -10,7 +10,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class PayerFilterFixture : IntegrationFixture
+	public class PayerFilterFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Search_payer()

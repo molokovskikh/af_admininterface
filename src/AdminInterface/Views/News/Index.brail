@@ -1,0 +1,30 @@
+﻿<% component CaptureFor, {@id : @Title}: %>
+	Новости
+<% end %>
+
+<% component Bubble, {"bredcrumbs" : []} %>
+
+<table class="DataTable">
+	<thead>
+		<tr>
+			<th>${app.LinkTo("Добавить", @News, @New)}</th>
+			<th>Дата публикации</th>
+			<th>Заголовок</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+	<% for news in newses: %>
+		<tr>
+			<td>${app.LinkTo(news, "Редактировать", @Edit)}</td>
+			<td>${news.PublicationDate.ToShortDateString()}</td>
+			<td>!{news.Header}</td>
+			<td>
+				<form method=post action="${siteroot}/News/${news.Id}/Delete/">
+					<input type=submit value="Удалить" />
+				</form>
+			</td>
+		</tr>
+	<% end %>
+	</tbody>
+</table>

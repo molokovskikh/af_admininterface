@@ -48,7 +48,8 @@ namespace Integration.Controllers
 
 			Assert.That(Response.WasRedirected, Is.True);
 			Assert.That(Context.Flash["Message"].ToString(), Is.EqualTo("Адрес доставки создан"));
-			var address = Address.Queryable.FirstOrDefault(a => a.Registration.RegistrationDate >= begin);
+			var addresses = Address.Queryable.Where(a => a.Registration.RegistrationDate >= begin).ToList();
+			var address = addresses.First(a => a.Id == addresses.Max(x => x.Id));
 			Assert.That(address.Accounting.IsFree, Is.True);
 			Assert.That(address.Accounting.FreePeriodEnd, Is.EqualTo(new DateTime(2012, 04, 12)));
 		}

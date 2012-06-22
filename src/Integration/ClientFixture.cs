@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class ClientFixture : IntegrationFixture
+	public class ClientFixture : Test.Support.IntegrationFixture
 	{
 		public Client client;
 		public Supplier supplier;

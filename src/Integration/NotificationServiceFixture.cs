@@ -6,7 +6,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class NotificationServiceFixture : IntegrationFixture
+	public class NotificationServiceFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Send_notification_for_client_without_address()

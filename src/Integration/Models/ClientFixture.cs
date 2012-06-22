@@ -7,12 +7,13 @@ using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
+using Test.Support;
 using Test.Support.log4net;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientFixture : IntegrationFixture
+	public class ClientFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void ResetUinTest()

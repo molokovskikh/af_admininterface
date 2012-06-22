@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace Integration
 {
 	[TestFixture]
-	public class InvoiceFilterFixture : IntegrationFixture
+	public class InvoiceFilterFixture : Test.Support.IntegrationFixture
 	{
 		[Test]
 		public void Find_invoice_by_home_region()
