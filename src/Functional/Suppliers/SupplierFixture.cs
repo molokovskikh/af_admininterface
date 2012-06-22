@@ -6,13 +6,19 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.NHibernateExtentions;
 using Functional.Billing;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using WatiN.Core.Native.Windows;
 using log4net.Config;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core; 
+using Test.Support.Web;
+using Common.MySql;
+using MySql.Data.MySqlClient;
+using System.Data;
+using Test.Support;
 
 namespace Functional.Suppliers
 {
@@ -122,7 +128,7 @@ namespace Functional.Suppliers
 		{
 			Open(supplier);
 			Click("Настройка");
-			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)PriceType.Vip).ToString());
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_0").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Vip).ToString());
 			Click("Применить");
 			AssertText("Все клиенты были отключены от VIP прайсов");
 		}
@@ -147,6 +153,29 @@ namespace Functional.Suppliers
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
 			newCertificate.Delete();
+		}
+
+		[Test]
+		public void Change_pricelist_type_to_assortment()
+		{
+			Open(supplier);
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
+			Click("Настройка");
+			//создаем ассортиментный прайс
+			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
+			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
+			Click("Применить");
+			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			var a = session.CreateSQLQuery(@"
+Select fs.RequestInterval 
+From farm.Sources fs
+	Join PriceItems pi on pi.SourceId = fs.Id
+	Join PricesCosts pc on pc.PriceItemId = pi.Id
+Where pc.PriceCode = :PriceId1")
+			.SetParameter("PriceId1", supplier.Prices[1].Id)
+			.ToList<TestSource>();
+			//проверяем RequestInterval
+			Assert.That(a[0].RequestInterval, Is.EqualTo(86400));
 		}
 	}
 }
