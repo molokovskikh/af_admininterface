@@ -2,6 +2,7 @@
 using AddUser;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Routing;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Initializers
 {
@@ -77,33 +78,4 @@ namespace AdminInterface.Initializers
 				.DefaultForAction().Is("Index"));
 		}
 	}
-
-	public class BugRoute : IRoutingRule
-	{
-		private PatternRoute route;
-
-		public BugRoute(PatternRoute route)
-		{
-			this.route = route;
-		}
-
-		public string CreateUrl(IDictionary parameters)
-		{
-			return route.CreateUrl(parameters);
-		}
-
-		public int Matches(string url, IRouteContext context, RouteMatch match)
-		{
-			if (url.Contains("WebResource.axd"))
-				return 0;
-
-			return route.Matches(url, context, match);
-		}
-
-		public string RouteName
-		{
-			get { return route.RouteName; }
-		}
-	}
-
 }
