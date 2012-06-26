@@ -142,7 +142,7 @@ namespace Integration
 
 			var result = helper.FilterFor("filter.Enum");
 			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td><td colspan=2 class='value'>"
-				+ "<select name='filter.Enum'>"
+				+ "<select id='filter_Enum' name='filter.Enum'>"
 				+ "<option value=0>Value1</option>"
 				+ "<option value=1 selected>Value2</option>"
 				+ "</select>"
@@ -155,8 +155,8 @@ namespace Integration
 			var result = helper.FilterFor("filter.Multivalue");
 			Assert.That(result, Is.EqualTo("<tr><td class='filter-label'></td>" +
 				"<td colspan=2 class='value'>" +
-				"<select name='filter.Multivalue.Id'>" +
-				"<option>Все</option><option value=1>test</option></select>" +
+				"<select id='filter_Multivalue_Id' name='filter.Multivalue.Id'>" +
+				"<option value=>Все</option><option value=1>test</option></select>" +
 				"</td></tr>"));
 		}
 
@@ -198,7 +198,7 @@ namespace Integration
 				new Entity{Id = 1, Name = "Test1"},
 				new Entity{Id = 2, Name = "Test2"}
 			});
-			Assert.That(edit, Is.EqualTo("<select name='filter.Entity.Id'>"
+			Assert.That(edit, Is.EqualTo("<select id='filter_Entity_Id' name='filter.Entity.Id'>"
 				+ "<option value=1>Test1</option>"
 				+ "<option value=2>Test2</option>"
 				+ "</select>"));
