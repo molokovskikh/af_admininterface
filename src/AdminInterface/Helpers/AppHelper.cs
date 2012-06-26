@@ -48,7 +48,7 @@ namespace AdminInterface.Helpers
 					return helper.Select(name, items);
 				}
 			}
-			return base.GetBuiltinEdit(name, valueType, value, options);
+			return base.GetBuiltinEdit(name, valueType, value, options, propertyInfo);
 		}
 
 		public string Liketemplate(string value)
