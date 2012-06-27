@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Security;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Controllers.Filters
@@ -36,6 +37,7 @@ namespace AdminInterface.Controllers.Filters
 	public class StatisticsFilter : Sortable
 	{
 		public DatePeriod Period { get; set; }
+		public Region Region { get; set; }
 
 		public StatisticsFilter()
 		{
@@ -88,10 +90,14 @@ where (u.RequestTime >= :StartDateParam AND u.RequestTime <= :EndDateParam)
 l.CertificateId is null
 order by {0} {1}
 ;", SortBy, SortDirection);
+			var adminMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null) {
+				adminMask &= Region.Id;
+			}
 			var result = ArHelper.WithSession(s => s.CreateSQLQuery(sql)
 				.SetParameter("StartDateParam", Period.Begin)
 				.SetParameter("EndDateParam", Period.End.AddDays(1))
-				.SetParameter("RegionMaskParam", SecurityContext.Administrator.RegionMask)
+				.SetParameter("RegionMaskParam", adminMask)
 				.ToList<StatResult>());
 
 			return result;

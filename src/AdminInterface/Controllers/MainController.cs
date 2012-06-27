@@ -35,8 +35,6 @@ namespace AdminInterface.Controllers
 			});
 
 			var regions = RegionHelper.GetAllRegions();
-			PropertyBag["Regions"] = regions;
-			PropertyBag["RegionId"] = regions.Where(region => region.Name.ToLower().Equals("все")).First().Id;
 
 			if (regioncode == null || from == null || to == null)
 			{
@@ -44,6 +42,10 @@ namespace AdminInterface.Controllers
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
+
+			PropertyBag["Regions"] = regions;
+			PropertyBag["regioncode"] = regioncode;
+
 			GetStatistics(regioncode.Value, from.Value, to.Value, full);
 		}
 

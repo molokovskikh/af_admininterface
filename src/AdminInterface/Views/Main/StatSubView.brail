@@ -316,7 +316,7 @@
 					<td class="statistic-label">Отсутствуют:</td>
 					<td class="statistic-value" id="StatisticsTD">
 						<%title = TotalNotSendCertificates + "/" + CertificateNotSendUniqUsers + "/" + CertificateNotSendUniqClients + "/" + CertificateNotSendUniqSuppliers %>
-						${app.LinkTo(title, @Logs, @Statistics,  {"filter.Period.Begin": FromDate, "filter.Period.End" : ToDate})}
+						${app.LinkTo(title, @Logs, @Statistics,  {"filter.Period.Begin": FromDate, "filter.Period.End" : ToDate, "filter.Region.Id" : regioncode})}
 					</td>
 					<td class="statistic-label">Последний запрос:</td>
 					<td class="statistic-value">${LastCertificateRequest}</td>
@@ -367,7 +367,7 @@
 			<div>
 				<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/Search">
 					<input type="hidden" name="filter.SearchBy" value="Auto" />
-					<input type="hidden" name="filter.Region.Id" value="${RegionId}" />
+					<input type="hidden" name="filter.Region.Id" value="${regioncode}" />
 					<div class="search-header" style="text-align:center">
 						<label>Поиск пользователей</label>
 						<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px;" value="" />
