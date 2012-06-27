@@ -6,7 +6,7 @@ using Castle.ActiveRecord;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord("ParseAlgorithm", Schema = "UserSettings", Lazy = true)]
+	[ActiveRecord("ParseAlgorithm", Schema = "ordersendrules", Lazy = true)]
 	public class ParseAlgorithm
 	{
 		[PrimaryKey]
