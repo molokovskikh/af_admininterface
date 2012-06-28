@@ -6,6 +6,7 @@
 
 ${app.BeginFormFor("filter")}
 ${app.FilterFor("filter.Period")}
+${app.FilterFor("filter.Region")}
 ${app.EndFormFor("filter")}
 <div>
 	<table class="DataTable">

@@ -393,7 +393,7 @@ where Phone like :phone")
 			return DbSession.QueryOver<ParseAlgorithm>().Where(
 				Restrictions.On<ParseAlgorithm>(l => l.Name).IsLike(text, MatchMode.Anywhere))
 				.Take(50)
-				.List()
+				.List().OrderBy(l => l.Name)
 				.Select(p => new {id = p.Id, name = p.Name})
 				.ToArray();
 		}
