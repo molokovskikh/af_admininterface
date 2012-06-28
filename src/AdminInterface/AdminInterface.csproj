@@ -195,6 +195,7 @@
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
     <Compile Include="Models\Validators\ExtensionListValidator.cs" />
+    <Compile Include="Models\Validators\ValidateForbiddenSymbols.cs" />
     <Compile Include="MonoRailExtentions\RecreateOnlyIfNullBinder.cs" />
     <Compile Include="Models\Billing\Nomenclature.cs" />
     <Compile Include="Helpers\Pager.cs" />

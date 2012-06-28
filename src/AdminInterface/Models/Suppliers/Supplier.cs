@@ -11,6 +11,7 @@ using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Logs;
+using AdminInterface.Models.Validators;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -51,7 +52,7 @@ namespace AdminInterface.Models.Suppliers
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
 
-		[Property, ValidateNonEmpty, Auditable, Notify, Description("Краткое наименование")]
+		[Property, ValidateNonEmpty, ValidateForbiddenSymbols, Auditable, Notify, Description("Краткое наименование")]
 		public override string Name { get; set; }
 
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]

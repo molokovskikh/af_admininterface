@@ -86,21 +86,27 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 ${FormHelper.FormTag("", {})}
 	<div class="block">
 		<h3>Общая информация</h3>
-		<table border="0" width="100%" cellpadding="5" cellspacing="0">
-			<tr>
-				<td>Юридическое наименование:</td>
-				<td>
-					${app.Edit("supplier.FullName")}
+		<table cellpadding="0" cellspacing="10" width="100%" border="0">
+			<tr valign="top">
+				<td colspan="2">
+					<table width="100%" cellpadding="0" cellspacing="0" border="0">
+						<tr>
+							<td width="30%">Юридическое наименование:</td>
+							<td>
+								${app.Edit("supplier.FullName")}
+							</td>
+						</tr>
+						<tr>
+							<td width="30%">Краткое наименование:</td>
+							<td>
+								${app.Edit("supplier.Name")}
+							</td>
+						</tr>
+					</table>
 				</td>
-				<td></td>
 			</tr>
-			<tr>
-				<td>Краткое наименование:</td>
-				<td>
-					${app.Edit("supplier.Name")}
-				</td>
-				<td></td>
-			</tr>
+
+
 			<tr valign="top">
 				<td colspan="2">
 					<div class="contextualNoTopSpace">
@@ -108,24 +114,18 @@ ${FormHelper.FormTag("", {})}
 							onclick="addPhone('supplier')">Добавить</a>
 					</div>
 					<h4>Телефоны</h4>
-					<table id = "clientPhones" cellpadding="0" cellspacing="10" width="100%" border="0">
+					<table id = "clientPhones" cellpadding="0" cellspacing="0" width="100%" border="0">
 						<tr>
+							<td width="30%">Номер телефона:</td>
 							<td>
-							<table width="100%" cellpadding="0" cellspacing="0" border="0">
-							<tr>
-								<td width="30%">Номер телефона:</td>
-								<td>
-									<input type="text" id="ClientContactPhone" name="supplierContacts[0].ContactText" class="phone" style="width: 100%" />
-									<input type="hidden" name="supplierContacts[0].Type" value="1" />
-								</td>
+								<input type="text" id="ClientContactPhone" name="supplierContacts[0].ContactText" class="phone" style="width: 100%" />
+								<input type="hidden" name="supplierContacts[0].Type" value="1" />
+							</td>
 							</tr>
 							<tr>
 								<td>Примечание:</td>
 								<td><input type="text" name="supplierContacts[0].Comment" style="width: 100%" /></td>
 							</tr>
-							</table>
-							</td>
-						</tr>
 					</table>
 				</td>
 				<td></td>
@@ -138,10 +138,7 @@ ${FormHelper.FormTag("", {})}
 							onclick="addEmail('supplier')">Добавить</a>
 					</div>
 					<h4>Email</h4>
-					<table id = "clientEmails" cellpadding="0" cellspacing="10" width="100%" border="0">
-						<tr>
-							<td>
-							<table width="100%" cellpadding="0" cellspacing="0" border="0">
+					<table id = "clientEmails" cellpadding="0" cellspacing="0" width="100%" border="0">
 							<tr>
 								<td width="30%">Email:</td>
 								<td>
@@ -153,9 +150,6 @@ ${FormHelper.FormTag("", {})}
 								<td>Примечание:</td>
 								<td><input type="text" name="supplierContacts[1].Comment" style="width: 100%" /></td>
 							</tr>
-							</table>
-							</td>
-						</tr>
 					</table>
 				</td>
 				<td></td>

@@ -131,5 +131,16 @@ namespace Functional.Suppliers
 			Css("#OrderManagersContactEmail").TypeText("kvasovtest@analit.net");
 			Css("#user_Name").TypeText("Тестовый пользователь");
 		}
+
+		[Test]
+		public void TestOnForbiddenSymbols()
+		{
+			Open();
+			Click("Поставщик");
+			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
+			Css("#supplier_Name").TypeText("тестовый!");
+			Click("Зарегистрировать");
+			Assert.That(browser.Text, Is.StringContaining("Поле может содержать только буквы, цифры и знаки('_', '-')"));
+		}
 	}
 }
