@@ -72,15 +72,19 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		var searchText = jQuery("#SearchSupplierTextPattern").val();
 		if (searchText.length == 0)
 			return;
-		if (jQuery('#PayerComboBox').val() != null) {
+
+		var params = { "searchPattern": searchText }
+
+		if ($('#PayerComboBox').val()) {
 			var payerId = parseInt(jQuery('#PayerComboBox').val());
-			searchText += "&payerId=" + payerId;
+			if (payerId)
+				params.payerId = payerId;
 		} else {
 			$("#PayerComboBox").data("setSupplierSelection", true);
 		}
 
 		jQuery.get("SearchSuppliers",
-			{"searchPattern" : searchText},
+			params,
 			function(htmlOptions) {
 				jQuery('#SupplierComboBox').find('option').remove().end();
 				if (htmlOptions.length == 0) {

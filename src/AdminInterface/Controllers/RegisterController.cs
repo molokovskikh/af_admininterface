@@ -15,6 +15,7 @@ using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -526,12 +527,12 @@ WHERE   pricesdata.firmcode = s.Id
 			var allowViewSuppliers = Admin.HavePermisions(PermissionType.ViewSuppliers);
 			if (!allowViewSuppliers)
 				return;
-			var suppliers = Supplier.Queryable
-					.Where(s => !s.Disabled && s.Name.Contains(searchPattern))
-					.Take(50);
-			if (payerId.HasValue && (payerId.Value > 0))
+			var suppliers = DbSession.Query<Supplier>()
+					.Where(s => !s.Disabled && s.Name.Contains(searchPattern));
+			if (payerId.HasValue && payerId.Value > 0)
 				suppliers = suppliers.Where(item => item.Payer.PayerID == payerId.Value);
-			PropertyBag["suppliers"] = suppliers;
+
+			PropertyBag["suppliers"] = suppliers.Take(50).ToArray();
 			CancelLayout();
 		}
 	}
