@@ -73,27 +73,7 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				Payer currentPayer = null;
-
-				if (additionalSettings.PayerExists)
-				{
-					if (payer != null || existingPayerId.HasValue)
-					{
-						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
-						currentPayer = Payer.Find(id);
-						if (currentPayer.JuridicalOrganizations.Count == 0)
-						{
-							var organization = new LegalEntity();
-							organization.Payer = currentPayer;
-							organization.Name = currentPayer.Name;
-							organization.FullName = currentPayer.JuridicalName;
-							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
-						}
-					}
-				}
-
-				if (currentPayer == null)
-					currentPayer = new Payer(supplier.Name, supplier.FullName);
+				var currentPayer = RegisterPayer(additionalSettings, payer, existingPayerId, supplier.Name, supplier.FullName);
 
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.Payer = currentPayer;
@@ -233,34 +213,11 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				Payer currentPayer = null;
-
-				if (additionalSettings.PayerExists)
-				{
-					if ((payer != null && payer.Id != 0) || existingPayerId.HasValue)
-					{
-						var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
-						currentPayer = Payer.Find(id);
-						if (currentPayer.JuridicalOrganizations.Count == 0)
-						{
-							var organization = new LegalEntity();
-							organization.Payer = currentPayer;
-							organization.Name = currentPayer.Name;
-							organization.FullName = currentPayer.JuridicalName;
-							currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
-							organization.Save();
-						}
-					}
-				}
 
 				var fullName = client.FullName.Replace("№", "N").Trim();
 				var name = client.Name.Replace("№", "N").Trim();
-				if (currentPayer == null)
-				{
-					currentPayer = new Payer(name, fullName);
-					currentPayer.BeforeNamePrefix = "Аптека";
-					currentPayer.Save();
-				}
+
+				var currentPayer = RegisterPayer(additionalSettings, payer, existingPayerId, name, fullName);
 
 				newClient = new Client(currentPayer,
 					Region.Find(homeRegion)) {
@@ -341,6 +298,31 @@ namespace AdminInterface.Controllers
 				Notify("Регистрация завершена успешно");
 				RedirectTo(newClient);
 			}
+		}
+
+		private static Payer RegisterPayer(AdditionalSettings additionalSettings, Payer payer, uint? existingPayerId, string name, string fullname)
+		{
+			Payer currentPayer = null;
+			if (additionalSettings.PayerExists) {
+				if ((payer != null && payer.Id != 0) || existingPayerId.HasValue) {
+					var id = existingPayerId.HasValue ? existingPayerId.Value : payer.PayerID;
+					currentPayer = Payer.Find(id);
+					if (currentPayer.JuridicalOrganizations.Count == 0) {
+						var organization = new LegalEntity();
+						organization.Payer = currentPayer;
+						organization.Name = currentPayer.Name;
+						organization.FullName = currentPayer.JuridicalName;
+						currentPayer.JuridicalOrganizations = new List<LegalEntity> {organization};
+						organization.Save();
+					}
+				}
+			}
+			if (currentPayer == null) {
+				currentPayer = new Payer(name, fullname);
+				currentPayer.BeforeNamePrefix = "Аптека";
+				currentPayer.Save();
+			}
+			return currentPayer;
 		}
 
 		private PasswordChangeLogEntity SendRegistrationCard(PasswordChangeLogEntity log, User user, string password, string additionalEmails)
