@@ -24,6 +24,7 @@ namespace AdminInterface.Models
 			User = user;
 			Price = price;
 			Submited = true;
+			WriteTime = DateTime.Now;
 		}
 
 		[PrimaryKey("RowId")]
@@ -46,6 +47,9 @@ namespace AdminInterface.Models
 
 		[Property]
 		public virtual bool Submited { get; set; }
+
+		[Property]
+		public virtual DateTime WriteTime { get; set; }
 
 		public IList<OrderLineView> Lines(ISession session)
 		{

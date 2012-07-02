@@ -68,8 +68,8 @@ SELECT  oh.rowid as Id,
 		pd.PriceName,
 		pd.PriceCode PriceId,
 		oh.RowCount,
-		max(o.ResultCode) as ResultCode,
-		o.TransportType,
+		(select oi.ResultCode from Logs.Orders oi where oi.RowId = max(o.RowId)) as ResultCode,
+		(select oi.TransportType from Logs.Orders oi where oi.RowId = max(o.RowId)) as TransportType,
 		oh.ClientOrderId,
 		reg.Region
 FROM orders.ordershead oh
