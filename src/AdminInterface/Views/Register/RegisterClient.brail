@@ -4,6 +4,7 @@
 	Регистрация клиента
 <% end %>
 
+${app.Asset("registration.js")}
 ${app.JS("contact.registrator.js", "payer.search.js")}
 
 <script type="text/javascript">
@@ -25,6 +26,10 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 	}
 
 	$(function () {
+
+		var viewModel = new RegistrationViewModel();
+		ko.applyBindings(viewModel);
+
 		jQuery("#PayerExists").attr({ checked: null, disabled: null });
 		jQuery("#ShowForOneSupplier").attr({ checked: null, disabled: null });
 		jQuery("#FillBillingInfo").attr({ checked: "checked", disabled: null });
@@ -303,6 +308,11 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 				</td>
 			</tr>
 			<tr>
+				<td colspan="2">
+					${app.Edit("client.Settings.IsHiddenFromSupplier", {"data-bind": "checked: isHiddenFromSupplier, enable: isHiddenFromSupplierEnable"})}
+				</td>
+			</tr>
+			<tr>
 				<td width="50%">
 					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
 					Выбрать существующего плательщика
@@ -329,7 +339,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="ShowForOneSupplier" class="supplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)">
+					<input type="checkbox" id="ShowForOneSupplier" class="supplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)" data-bind="checked: forSupplier">
 					Зарегистрировать скрытую копию для поставщика
 				</td>
 				<td>

@@ -143,7 +143,7 @@ namespace AdminInterface.Models
 		public virtual bool IgnoreNewPriceForUser { get; set; }
 
 		[Description("Скрыть клиента в интефрейсе поставщика")]
-		public virtual bool IsHiddenForProducer
+		public virtual bool IsHiddenFromSupplier
 		{
 			get
 			{
