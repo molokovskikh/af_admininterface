@@ -460,6 +460,7 @@ namespace Functional.Drugstore
 		{
 			SetupGeneralInformation();
 
+			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 			SearchSupplier("12839046eqwuiywiuryer");
 			Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
 			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = false;
