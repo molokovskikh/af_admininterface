@@ -51,8 +51,7 @@ namespace AdminInterface.Models.Suppliers
 
 		[JoinedKey("Id")]
 		public virtual uint SupplierId { get; set; }
-
-		[Property, ValidateNonEmpty, ValidateForbiddenSymbols, Auditable, Notify, Description("Краткое наименование")]
+		[Property, ValidateNonEmpty, ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё]+$", "Поле может содержать только буквы, цифры и знаки('_', '-')"), Auditable, Notify, Description("Краткое наименование")]
 		public override string Name { get; set; }
 
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]

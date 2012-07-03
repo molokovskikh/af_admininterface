@@ -100,7 +100,6 @@
     <Compile Include="Models\UserFixture.cs" />
     <Compile Include="Models\UserMessageFixture.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinderFixture.cs" />
-    <Compile Include="MonoRailExtentions\ValidateForbiddenSymbolsFixture.cs" />
     <Compile Include="PermissionFixture.cs" />
     <Compile Include="SortFixture.cs" />
   </ItemGroup>
