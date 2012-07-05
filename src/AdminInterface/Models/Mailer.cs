@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Web;
 using AdminInterface.Helpers;
@@ -271,24 +272,24 @@ Email: {2}
 			try
 			{
 				new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, false);
-				var user = client.Users.First();
-				var body = String.Format(
-					"Оператор: {0}\nРегион: {1}\nИмя пользователя: {2}\nКод: {3}\nТип: {4}",
-					SecurityContext.Administrator.UserName,
-					client.HomeRegion.Name,
-					user.Login,
-					client.Id,
-					client.Type.GetDescription());
+
+				var user = client.Users.FirstOrDefault();
+				var body = new StringWriter();
+				body.WriteLine("Оператор: {0}", SecurityContext.Administrator.UserName);
+				body.WriteLine("Регион: {0}", client.HomeRegion.Name);
+				if (user != null)
+					body.WriteLine("Имя пользователя: {0}", user.Login);
+				body.WriteLine("Код: {0}", client.Id);
 
 				if (!String.IsNullOrEmpty(billingMessage))
-					body += "\r\nСообщение в биллинг: " + billingMessage;
+					body.WriteLine("Сообщение в биллинг: " + billingMessage);
 
-				if (user.Accounting.IsFree)
-					body += "\r\n" + user.Accounting.RegistrationMessage;
+				if (user != null && user.Accounting.IsFree)
+					body.WriteLine(user.Accounting.RegistrationMessage);
 
 				NotificationHelper.NotifyAboutRegistration(
 					String.Format("\"{0}\" - успешная регистрация", client.FullName),
-					body);
+					body.ToString());
 			}
 			catch (Exception e)
 			{

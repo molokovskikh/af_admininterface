@@ -1,11 +1,6 @@
-using System;
 using System.Linq;
-using AddUser;
 using AdminInterface.Helpers;
-using AdminInterface.Models;
-using AdminInterface.Models.Suppliers;
 using Integration.ForTesting;
-using Integration.Models;
 using NUnit.Framework;
 
 namespace Integration
@@ -16,7 +11,6 @@ namespace Integration
 		[Test]
 		public void Send_client_card()
 		{
-			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 			var client = DataMother.CreateTestClientWithUser();
 			Flush();
 

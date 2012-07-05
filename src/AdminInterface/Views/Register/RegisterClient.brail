@@ -27,12 +27,12 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 
 	$(function () {
 
-		var viewModel = new RegistrationViewModel();
+		viewModel = new RegistrationViewModel();
 		ko.applyBindings(viewModel);
 
 		$("#PayerExists").attr({ checked: null, disabled: null });
 		$("#ShowForOneSupplier").attr({ checked: null, disabled: null });
-		$("#FillBillingInfo").attr({ checked: "checked", disabled: null });
+		$("#options_FillBillingInfo").attr({ disabled: null });
 		$("#SearchPayerDiv").css("display", "none");
 		$("#SelectPayerDiv").css("display", "none");
 		$("#SearchSupplierDiv").css("display", "none");
@@ -53,12 +53,19 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		$.validator.addMethod("payer", function (value, element) {
 			return validatePayer();
 		}, "Выберите плательщика");
+
+		$("#options_RegisterEmpty").change(function () {
+			if ($(this).attr("checked"))
+				$("#user_Name").rules("remove", "required");
+			else
+				$("#user_Name").rules("add", "required");
+		});
 	});
 
 
 	function validateForm() {
 		$("form").data("validator").settings.errorPlacement = function (error, element) {
-			if (element.attr("name") == "flags.ShowForOneSupplier") {
+			if (element.attr("name") == "options.ShowForOneSupplier") {
 				$("#MessageForSupplier").html(error);
 			}
 			else if (element.attr("name") == "PayerExists") {
@@ -71,6 +78,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		$("[name=\"clientContacts[0].ContactText\"]").rules("add", { required: true });
 		$("[name=\"additionalEmailsForSendingCard\"]").rules("add", { validateEmailList: true });
 		$("[name=\"clientContacts[1].ContactText\"]").rules("add", { noEmailAddress: true });
+		$("#address_Value").rules("remove", "required");
 	}
 	
 	function ShowSelectSupplierDiv() {
@@ -129,7 +137,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		}
 		jQuery(selector).css("display", displayValue);
 	}
-	
+
 	function OnClientViewChanged(selectedValue) {
 		ViewDiv(false, "#SearchSupplierDiv");
 		ViewDiv(false, "#SelectSupplierDiv");
@@ -148,6 +156,7 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 			$("#PayerComboBox option").remove();
 			$("#PayerIdValue").val(null);
 			$("#PayerComboBox").remove("setSupplierSelection");
+			viewModel.payerId(null);
 		}
 	}
 
@@ -155,8 +164,13 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		var payer = $("#SupplierComboBox option:selected").attr("title");
 		SetLockedPayer(payer);
 		var payerId = parseInt(payer);
-		if (payerId != NaN)
+		if (payerId) {
+			viewModel.payerId(payerId);
 			$("#PayerIdValue").val(payerId);
+		}
+		else {
+			viewModel.payerId(null);
+		}
 	}
 	
 	function LockPayer() {
@@ -164,8 +178,8 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		$("#PayerExists").click();
 		$("#PayerExistsValue").val(true);
 		$("#PayerExists").attr("disabled", "disabled");
-		$("#FillBillingInfo").removeAttr("checked");
-		$("#FillBillingInfo").attr("disabled", "disabled");
+		$("#options_FillBillingInfo").removeAttr("checked");
+		$("#options_FillBillingInfo").attr("disabled", "disabled");
 		ViewDiv(false, '#SelectPayerDiv');
 		ViewDiv(false, "#SearchPayerDiv");
 	}
@@ -187,14 +201,14 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		$("#PayerExists").removeAttr('disabled');
 		$("#PayerComboBox").removeAttr('disabled');
 		$("#ResetPayerButton").removeAttr('disabled');
-		$("#FillBillingInfo").removeAttr('checked');
-		$("#FillBillingInfo").removeAttr('disabled');
+		$("#options_FillBillingInfo").removeAttr('checked');
+		$("#options_FillBillingInfo").removeAttr('disabled');
 		ViewDiv(false, "#SelectPayerDiv");
 	}
 </script>
 
 <style>
-	#client_Name, #client_FullName
+	#client_Name, #client_FullName, #address_Value
 	{
 		width: 100%;
 	}
@@ -316,7 +330,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 				<td width="50%">
 					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">
 					Выбрать существующего плательщика
-					<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					<input type="hidden" id="PayerExistsValue" name="options.PayerExists" value="false" />
 				</td>
 				<td>
 					<div id="SearchPayerDiv" style="width: 100%; display: none">
@@ -333,13 +347,12 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td colspan="2">
-					<input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">
-					Заполнять информацию для биллинга
+					${app.Edit("options.FillBillingInfo")}
 				</td>
 			</tr>
 			<tr>
 				<td width="50%">
-					<input type="checkbox" id="ShowForOneSupplier" class="supplier" name="flags.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)" data-bind="checked: forSupplier">
+					<input type="checkbox" id="ShowForOneSupplier" class="supplier" name="options.ShowForOneSupplier" onclick="OnClientViewChanged(this.checked)" data-bind="checked: forSupplier">
 					Зарегистрировать скрытую копию для поставщика
 				</td>
 				<td>
@@ -361,13 +374,19 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 			</tr>
 			<tr>
 				<td colspan="2">
-					<input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">
-					Показывать регистрационную карту
+					${app.Edit("options.ShowRegistrationCard")}
+				</td>
+			</tr>
+			<tr>
+				<td>
+					${app.Edit("options.RegisterEmpty")}
 				</td>
 			</tr>
 		</table>
 		<fieldset>
-			<legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
+			<legend>
+				${app.Edit("options.SendRegistrationCard")}
+			</legend>
 			<br />
 			Дополнительные адреса для отправки регистрационной карты:<br />
 			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 
@@ -381,15 +400,17 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 		<% OutputSubView("/SubViews/Regions") %>
 	</div>
 
-	<div class="block" id="DeliveryAddressDiv">
+	<div class="block">
 		<h3>Адрес доставки</h3>
 		<table width="100%">
 			<tr>
 				<td width="20%">Адрес доставки медикаментов:</td>
-				<td width="80%"><input type="text" id="deliveryAddress" name="deliveryAddress" style="width: 60%" /></td>
+				<td width="80%">
+					${app.Edit("address.Value")}
+				</td>
 			</tr>
-			<tr>
-				<td>${app.Label("address.LegalEntity")}</td>
+			<tr data-bind="visible: showOrgsEdit">
+				<td>${app.Label("address.LegalEntity")}:</td>
 				<td>
 					${app.Edit("address.LegalEntity", {@items: client.Orgs(), "data-bind": "options: orgs, optionsText: 'name', optionsValue: 'id'"})}
 				</td>
@@ -402,7 +423,7 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 		<table width="100%">
 			<tr>
 				<td width="20%">
-					${app.Label("user.Name")}
+					${app.Label("user.Name")}:
 				</td>
 				<td width="50%">
 					${app.Edit("user.Name")}

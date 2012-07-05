@@ -37,7 +37,7 @@ namespace Functional.Drugstore
 				Address = client.Addresses.First(),
 			};
 
-			document.Save();
+			Save(document);
 			Flush();
 
 			Open(client);
@@ -68,7 +68,7 @@ namespace Functional.Drugstore
 				Address = client.Addresses.First(),
 			};
 
-			document.Save();
+			session.Save(document);
 			Flush();
 
 			var sendLog = new DocumentSendLog() {
@@ -76,7 +76,7 @@ namespace Functional.Drugstore
 				ForUser = client.Users.First(),
 				Received = document
 			};
-			sendLog.Save();
+			session.Save(sendLog);
 			Flush();
 
 			Open(client);

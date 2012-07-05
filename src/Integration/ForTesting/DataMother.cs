@@ -106,6 +106,7 @@ namespace Integration.ForTesting
 			var user = new User(client) {
 				Name = "test"
 			};
+			client.AddUser(user);
 			user.Setup();
 			var address = new Address {
 				Client = client,
@@ -135,11 +136,11 @@ namespace Integration.ForTesting
 				FileName = "TestFile.txt",
 				LogTime = DateTime.Now,
 			};
-			documentLogEntity.Create();
+			ActiveRecordMediator.Create(documentLogEntity);
 			client.Users.Select(u => new DocumentSendLog {
 				Received = documentLogEntity,
 				ForUser = u
-			}).Each(d => d.Save());
+			}).Each(ActiveRecordMediator.Save);
 			return documentLogEntity;
 		}
 
@@ -185,7 +186,6 @@ namespace Integration.ForTesting
 				UpdateType = UpdateType.LoadingDocuments,
 				UserName = client.Users[0].Name,
 			};
-			updateEntity.CreateAndFlush();
 			return updateEntity;
 		}
 

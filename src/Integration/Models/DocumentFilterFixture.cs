@@ -19,7 +19,7 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			supplier.Save();
 			var document = new DocumentReceiveLog(supplier);
-			document.Save();
+			Save(document);
 			Flush();
 
 			var filter = new DocumentFilter();
@@ -40,7 +40,7 @@ namespace Integration.Models
 			{
 				var client = DataMother.CreateTestClientWithAddress();
 				client.Save();
-				DataMother.CreateTestDocumentLog(supplier, client).Save();
+				Save(DataMother.CreateTestDocumentLog(supplier, client));
 			}
 			Console.WriteLine(supplier.Id);
 		}

@@ -9,7 +9,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord(Schema = "Logs", Table = "CertificateRequestLogs")]
-	public class CertificateRequestLog : ActiveRecordLinqBase<CertificateRequestLog>
+	public class CertificateRequestLog
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }

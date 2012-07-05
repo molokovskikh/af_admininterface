@@ -10,6 +10,7 @@ using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate;
 using NUnit.Framework;
 using Rhino.Mocks;
 using Test.Support;
@@ -22,6 +23,7 @@ namespace Integration.ForTesting
 		protected ISessionScope scope;
 		protected string referer;
 		protected ValidatorRunner validator;
+		protected ISession session;
 
 		[SetUp]
 		public void Setup()
@@ -43,6 +45,9 @@ namespace Integration.ForTesting
 			BaseMailerExtention.SenderForTest = sender;
 
 			scope = new TransactionlessSession();
+
+			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
+			session = sessionHolder.CreateSession(typeof (ActiveRecordBase));
 		}
 
 		public void Prepare(SmartDispatcherController controller)
@@ -55,6 +60,8 @@ namespace Integration.ForTesting
 		[TearDown]
 		public void TearDown()
 		{
+			if (session != null)
+				ActiveRecordMediator.GetSessionFactoryHolder().ReleaseSession(session);
 			if (scope != null)
 				scope.Dispose();
 		}

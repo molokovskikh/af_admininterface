@@ -12,20 +12,20 @@ namespace Unit
 		[Test]
 		public void Init()
 		{
-			var user = new User();
 			var client = new Client(new Payer(), new Region());
-			user.Init(client);
+			var user = new User(client);
+			client.AddUser(user);
 			Assert.That(user.AssignedPermissions, Is.Empty);
 		}
 
 		[Test]
 		public void Init_with_permissions()
 		{
-			var user = new User();
 			var client = new Client(new Payer(), new Region());
+			var user = new User(client);
+			client.AddUser(user);
 			var permission = new UserPermission();
 			user.AddPermission(permission);
-			user.Init(client);
 			Assert.That(user.AssignedPermissions.Count, Is.EqualTo(1));
 		}
 	}

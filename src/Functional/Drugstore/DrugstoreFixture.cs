@@ -48,7 +48,7 @@ namespace Functional.Drugstore
 				UserName = user.Login,
 				User = user,
 			};
-			updateLogEnity.Save();
+			Save(updateLogEnity);
 			browser.Link(l => l.Text == "История обновлений").Click();
 			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("История обновлений"))))
 			{

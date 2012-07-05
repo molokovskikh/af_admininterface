@@ -39,7 +39,7 @@ namespace Functional.Drugstore
 			Css("#user_Name").TypeText("Тестовый пользователь");
 
 			// Заполняем адрес доставки
-			browser.TextField("deliveryAddress").TypeText(_randomClientName);
+			Css("#address_Value").TypeText(_randomClientName);
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Это поле необходимо заполнить."));
 			browser.TextField("client_FullName").TypeText(_randomClientName);
@@ -56,7 +56,7 @@ namespace Functional.Drugstore
 		{
 			Css("#user_Name").TypeText("Тестовый пользователь");
 
-			browser.TextField("deliveryAddress").TypeText("Test address");
+			Css("#address_Value").TypeText("Test address");
 			browser.TextField("client_FullName").TypeText(_randomClientName);
 			browser.TextField("client_Name").TypeText(_randomClientName);
 			browser.TextField("ClientContactPhone").TypeText("123456789");
@@ -113,13 +113,13 @@ namespace Functional.Drugstore
 			Thread.Sleep(500);
 			Assert.That(browser.Text, Is.StringContaining(supplier.Name), "не нашли поставщика");
 			browser.SelectList(Find.ById("SupplierComboBox")).Select(String.Format("{0}. {1}", supplier.Id, supplier.Name));
-			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
+			Assert.That(Css("#options_FillBillingInfo").Enabled, Is.False);
 			Assert.That(browser.Css("#SelectSupplierDiv").Style.Display, Is.EqualTo("block"));
 			Assert.That(browser.Css("#SearchSupplierDiv").Style.Display, Is.EqualTo("none"));
 			Assert.That(browser.Css("#SupplierComboBox").AllContents.Count, Is.GreaterThan(0));
 			Assert.That(browser.Css("#SupplierComboBox").SelectedItem.Length, Is.GreaterThan(0));
 
-			browser.Css("#SendRegistrationCard").Click();
+			Css("#options_SendRegistrationCard").Click();
 
 			Click("Зарегистрировать");
 
@@ -137,7 +137,7 @@ namespace Functional.Drugstore
 			if (namePart.Equals("Payer"))
 				errorMessage = "Выберите плательщика";
 
-			Assert.That(browser.CheckBox(Find.ById("FillBillingInfo")).Enabled, Is.False);
+			Assert.That(Css("#options_FillBillingInfo").Enabled, Is.False);
 			Assert.That(browser.Div(Find.ById("Search" + namePart + "Div")).Style.Display, Is.EqualTo("block"));
 			Assert.That(browser.Div(Find.ById("Select" + namePart + "Div")).Style.Display, Is.EqualTo("none"));
 			browser.Button("RegisterButton").Click();
@@ -170,7 +170,7 @@ namespace Functional.Drugstore
 			scope.Flush();
 
 			SetupGeneralInformation();
-			browser.CheckBox(Find.ById("FillBillingInfo")).Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button(Find.ById("RegisterButton")).Click();
 
 			var client = GetRegistredClient();
@@ -211,7 +211,7 @@ namespace Functional.Drugstore
 			scope.Flush();
 
 			SetupGeneralInformation();
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button(Find.ById("RegisterButton")).Click();
 			var client = GetRegistredClient();
 
@@ -238,7 +238,7 @@ namespace Functional.Drugstore
 			SearchPayer(String.Format("Тестовый плательщик {0}", payer.Id));
 
 			Css("#PayerComboBox").Select(String.Format("{0}. Тестовый плательщик {0}", payer.Id));
-			Assert.That(Css("#FillBillingInfo").Enabled, Is.False);
+			Assert.That(Css("#options_FillBillingInfo").Enabled, Is.False);
 
 			browser.Button(Find.ById("RegisterButton")).Click();
 
@@ -260,7 +260,7 @@ namespace Functional.Drugstore
 			Assert.IsTrue(checkBox.Exists);
 			checkBox.Checked = true;
 			// Снимаем галку, чтобы не заполнять информацию для биллинга
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
@@ -288,7 +288,7 @@ namespace Functional.Drugstore
 		{
 			SetupGeneralInformation();
 			Css("input[name='userPersons[0].Name']").TypeText("Alice");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
@@ -302,7 +302,7 @@ namespace Functional.Drugstore
 		public void Register_with_flag_ignore_new_prices()
 		{
 			SetupGeneralInformation();
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			Assert.IsFalse(browser.CheckBox(Find.ById("client_Settings_IgnoreNewPrices")).Checked);
 			browser.CheckBox(Find.ById("client_Settings_IgnoreNewPrices")).Checked = true;
 			browser.Button("RegisterButton").Click();
@@ -322,7 +322,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("clientContacts[0].Comment")).TypeText("some comment");
 			browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("211-111111");
 			browser.TextField(Find.ByName("clientContacts[3].ContactText")).TypeText("311-111111");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
@@ -347,7 +347,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("userContacts[0].ContactText")).TypeText("111-111111");
 			browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("222-111111");
 			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("comment for user phone");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
@@ -376,7 +376,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("clientContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
 			browser.TextField(Find.ByName("clientContacts[2].ContactText")).TypeText("qwerty2@qq.qq");
 			browser.TextField(Find.ByName("clientContacts[2].Comment")).TypeText("some comment for email");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
@@ -401,7 +401,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("userContacts[1].ContactText")).TypeText("qwerty1@qq.qq");
 			browser.TextField(Find.ByName("userContacts[2].ContactText")).TypeText("qwerty2@qq.qq");
 			browser.TextField(Find.ByName("userContacts[2].Comment")).TypeText("some comment for email");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
@@ -429,7 +429,7 @@ namespace Functional.Drugstore
 			Thread.Sleep(500);
 			browser.TextField(Find.ByName("userPersons[0].Name")).TypeText("person1");
 			browser.TextField(Find.ByName("userPersons[1].Name")).TypeText("person2");
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();
@@ -460,10 +460,11 @@ namespace Functional.Drugstore
 		{
 			SetupGeneralInformation();
 
+			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = true;
 			SearchSupplier("12839046eqwuiywiuryer");
 			Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
 			browser.CheckBox(Find.ById("ShowForOneSupplier")).Checked = false;
-			browser.CheckBox("ShowRegistrationCard").Checked = false;
+			Css("#options_ShowRegistrationCard").Checked = false;
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
@@ -475,11 +476,11 @@ namespace Functional.Drugstore
 
 			SearchPayer("12839046eqwuiywiuryer");
 			Assert.That(browser.Text, Is.StringContaining("Ничего не найдено"));
-			browser.CheckBox("ShowRegistrationCard").Checked = false;
+			Css("#options_ShowRegistrationCard").Checked = false;
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Выберите плательщика"));
 			browser.CheckBox(Find.ById("PayerExists")).Checked = false;
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
@@ -548,13 +549,49 @@ namespace Functional.Drugstore
 			Assert.That(client.Settings.NoiseCostExceptSupplier, Is.EqualTo(supplier));
 		}
 
+		[Test]
+		public void Select_org()
+		{
+			var payer = DataMother.TestClient().Payers[0];
+			MakeNameUniq(payer);
+			var org = new LegalEntity(String.Format("Тестовое юр.лицо 2 {0}", payer.Id), payer);
+			payer.JuridicalOrganizations.Add(org);
+			Save(payer);
+			Refresh();
+
+			SetupGeneralInformation();
+
+			SearchPayer(payer.Name);
+			Assert.That(Css("#PayerComboBox").Options.Count, Is.EqualTo(1));
+			Assert.That(Css("#PayerComboBox").SelectedItem, Is.StringEnding(payer.Name));
+			Assert.That(Css("#address_LegalEntity_Id").Options.Count, Is.EqualTo(2));
+
+			Css("#address_LegalEntity_Id").Select(org.Name);
+			Click("Зарегистрировать");
+
+			var client = GetRegistredClient();
+			Assert.That(client.Addresses[0].LegalEntity, Is.EqualTo(org));
+		}
+
+		[Test]
+		public void Register_empty()
+		{
+			SetupClient();
+			Css("#options_FillBillingInfo").Checked = false;
+			Css("#options_RegisterEmpty").Click();
+			browser.Eval("$('#options_RegisterEmpty').change()");
+			Click("Зарегистрировать");
+
+			AssertText("Регистрация завершена успешно");
+		}
+
 		private void ClickRegisterAndCheck(Browser browser)
 		{
 			// Снимаем галку, чтобы не показывалась карта регистрации
-			browser.CheckBox("ShowRegistrationCard").Checked = false;
+			Css("#options_ShowRegistrationCard").Checked = false;
 			// Снимаем галку, чтобы не заполнять информацию для биллинга
-			if (browser.CheckBox("FillBillingInfo").Enabled)
-				browser.CheckBox("FillBillingInfo").Checked = false;
+			if (Css("#options_FillBillingInfo").Enabled)
+				Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрация завершена успешно"));
 		}
@@ -569,6 +606,13 @@ namespace Functional.Drugstore
 		private void SetupGeneralInformation()
 		{
 			Css("#user_Name").TypeText("Тестовый пользователь");
+			Css("#address_Value").TypeText("Тестовый адрес доставки");
+
+			SetupClient();
+		}
+
+		private void SetupClient()
+		{
 			browser.TextField(Find.ById("client_FullName")).TypeText(_randomClientName);
 			browser.TextField(Find.ById("client_Name")).TypeText(_randomClientName);
 			// Заполняем контактную информацию для клиента
@@ -578,7 +622,6 @@ namespace Functional.Drugstore
 			browser.TextField("userContactPhone").TypeText("123-456789");
 			browser.TextField("userContactEmail").TypeText(_randomClientName + _mailSuffix);
 			// Если это аптека, заполняем адрес доставки
-			browser.TextField(Find.ById("deliveryAddress")).TypeText(_randomClientName);
 		}
 
 		private void SearchSupplier(string text)
@@ -599,7 +642,7 @@ namespace Functional.Drugstore
 		private Client Register()
 		{
 			SetupGeneralInformation();
-			browser.CheckBox("FillBillingInfo").Checked = false;
+			Css("#options_FillBillingInfo").Checked = false;
 			browser.Button("RegisterButton").Click();
 
 			var client = GetRegistredClient();

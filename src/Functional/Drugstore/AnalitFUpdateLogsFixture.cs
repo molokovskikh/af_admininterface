@@ -30,7 +30,7 @@ namespace Functional.Drugstore
 				Addition = "Test update",
 				Commit = true,
 			};
-			updateLog.Save();
+			Save(updateLog);
 
 			Open("Logs/UpdateLog?userId={0}", user.Id);
 			Assert.That(browser.Text, Is.StringContaining("История обновлений"));
@@ -43,7 +43,7 @@ namespace Functional.Drugstore
 			updateLog = new UpdateLogEntity(user) {
 				UpdateType = UpdateType.AccessError,
 			};
-			updateLog.Save();
+			Save(updateLog);
 			Open("Logs/UpdateLog?regionMask={0}&updateType={1}", 18446744073709551615ul, UpdateType.AccessError);
 			Assert.That(browser.Text, Is.StringContaining(user.Login));
 		}
@@ -52,7 +52,7 @@ namespace Functional.Drugstore
 		public void Show_update_log()
 		{
 			updateLog.Log = "Тестовый лог обновления";
-			updateLog.Save();
+			Save(updateLog);
 			Refresh();
 
 			Click("Лог");
@@ -71,18 +71,16 @@ namespace Functional.Drugstore
 		private void Create_loaded_document_logs_unparsed_document(out Client client, out Supplier supplier,
 			out DocumentReceiveLog documentLogEntity, out UpdateLogEntity updateLogEntity)
 		{
-			
-			using (var scope = new TransactionScope())
-			{
+			using (var scope = new TransactionScope()) {
 				client = DataMother.CreateTestClientWithAddressAndUser();
 				supplier = DataMother.CreateSupplier();
 				Save(supplier);
 				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
 				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
 
-				//documentLogEntity.SendUpdateId = updateLogEntity.Id;
+				ActiveRecordMediator.Save(updateLogEntity);
 				documentLogEntity.SendUpdateLogEntity = updateLogEntity;
-				documentLogEntity.SaveAndFlush();
+				Save(documentLogEntity);
 				scope.VoteCommit();
 			}
 		}

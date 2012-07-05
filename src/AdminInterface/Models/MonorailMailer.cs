@@ -116,7 +116,7 @@ namespace AdminInterface.Models
 
 			PropertyBag["client"] = client;
 			PropertyBag["payer"] = client.Payers.First();
-			PropertyBag["user"] = client.Users.First();
+			PropertyBag["user"] = client.Users.FirstOrDefault();
 			PropertyBag["admin"] = SecurityContext.Administrator;
 		}
 

@@ -24,7 +24,9 @@ namespace Unit.Models
 		{
 			var client = new Client(new Payer(""), Data.DefaultRegion);
 			var user = new User(client);
+			client.AddUser(user);
 			var address = new Address(client);
+			client.AddAddress(address);
 
 			user.Accounting.IsFree = true;
 			user.Accounting.FreePeriodEnd = DateTime.Today.AddDays(10);

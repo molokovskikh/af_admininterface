@@ -191,8 +191,8 @@ namespace Functional
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User((Service)c) {Name = "test",});
-				c.AddUser(new User((Service)c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
 			});
 			scope.Flush();
 
@@ -220,8 +220,8 @@ namespace Functional
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User((Service)c) {Name = "test",});
-				c.AddUser(new User((Service)c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
 			});
 			scope.Flush();
 

@@ -325,6 +325,12 @@ namespace AdminInterface.Models.Suppliers
 			payer.UpdatePaymentSum();
 			oldPayers.UpdatePaymentSum();
 		}
+
+		public override void AddUser(User user)
+		{
+			if (!Users.Contains(user))
+				Users.Add(user);
+		}
 	}
 
 	[ActiveRecord("RegionalData", Schema = "Usersettings")]

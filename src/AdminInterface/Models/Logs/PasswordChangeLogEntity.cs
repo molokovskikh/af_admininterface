@@ -1,17 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
-using NHibernate.Criterion;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord("passwordchange", Schema = "logs")]
-	public class PasswordChangeLogEntity : ActiveRecordLinqBase<PasswordChangeLogEntity>
+	public class PasswordChangeLogEntity
 	{
 		public PasswordChangeLogEntity()
 		{}

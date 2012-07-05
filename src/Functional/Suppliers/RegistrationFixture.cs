@@ -1,14 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AdminInterface.Models.Suppliers;
-using Common.Tools;
 using Common.Web.Ui.Models;
-using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
-using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -23,7 +19,6 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 
 			Prepare();
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			Click("Зарегистрировать");
 			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
 			Click("Сохранить");

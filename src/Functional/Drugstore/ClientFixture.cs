@@ -56,7 +56,7 @@ namespace Functional.Drugstore
 		{
 			var logs = client.Users.First().Logs;
 			logs.AFTime = DateTime.Now;
-			logs.Save();
+			session.Save(logs);
 			Refresh();
 
 			Assert.That(browser.Text, Is.StringContaining(logs.AFTime.ToString()));

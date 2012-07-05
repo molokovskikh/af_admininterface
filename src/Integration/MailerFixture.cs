@@ -205,6 +205,7 @@ namespace Integration
 				Login = "1"
 			};
 			client.Name = "Фармаимпекс";
+			client.AddUser(user);
 			user.Payer.Name = "Фармаимпекс";
 			var oldPayer = new Payer {
 				Name = "Биона"

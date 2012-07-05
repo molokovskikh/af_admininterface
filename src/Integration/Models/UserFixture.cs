@@ -62,13 +62,13 @@ namespace Integration.Models
 		{
 			var entities = PasswordChangeLogEntity.GetByLogin(user.Login, DateTime.MinValue, DateTime.MaxValue);
 			if (entities.Count > 0)
-				entities.Each(l => l.Delete());
+				entities.Each(l => session.Delete(l));
 			Assert.That(user.IsChangePasswordByOneself(), Is.False);
-			new PasswordChangeLogEntity(user.Login, user.Login, Environment.MachineName).Save();
+			Save(new PasswordChangeLogEntity(user.Login, user.Login, Environment.MachineName));
 			Assert.That(user.IsChangePasswordByOneself(), Is.True);
-			new PasswordChangeLogEntity(user.Login, user.Login, Environment.MachineName) {
+			Save(new PasswordChangeLogEntity(user.Login, user.Login, Environment.MachineName) {
 				LogTime = DateTime.Now.AddSeconds(10)
-			}.Save();
+			});
 		}
 
 		[Test]

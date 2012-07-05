@@ -378,14 +378,22 @@ group by u.ClientId")
 
 		public virtual void JoinPayer(Payer payer)
 		{
-			if (Payers == null)
-				Payers = new List<Payer>();
 			Payers.Add(payer);
 		}
 
-		public virtual void AddUser(User user)
+		public override void AddUser(User user)
 		{
-			user.Init(this);
+			if (user.Payer == null) {
+				if (Payers.Count > 1)
+					throw new Exception(String.Format("У клиента более одного плательщика {0}", Payers.Implode()));
+				user.Payer = Payers.Single();
+			}
+
+			if (!user.Payer.Users.Contains(user))
+				user.Payer.Users.Add(user);
+
+			if (!Users.Contains(user))
+				Users.Add(user);
 		}
 
 		public virtual string GetEmailsForBilling()
