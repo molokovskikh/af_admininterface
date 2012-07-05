@@ -321,7 +321,7 @@ namespace AdminInterface.Controllers
 
 			if (isSendClientCard) {
 				Notify("Пароль успешно изменен.");
-				RedirectTo(user);
+				RedirectTo(user, "Edit");
 			}
 			else {
 				Flash["password"] = password;

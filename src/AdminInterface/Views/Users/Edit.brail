@@ -17,9 +17,6 @@
 			rules: { "reason": "required" }
 		});
 
-		if (${user.WorkRegionMask} == ${maxRegion}){
-			
-		}
 		$('.regionDiv').children('input').click(function () {
 			$('.maxRegionDiv').children('input').attr("checked", false);
 		});
@@ -41,7 +38,7 @@
 		<ul class="navigation-menu">
 			<li><a href="${siteroot}/users/${user.Id}/Settings">Настройка</a></li>
 			<% if admin.AlowChangePassword and user.CanChangePassword: %>
-			<li><a href="${siteroot}/users/${user.Id}/ChangePassword" target=_blank>Изменить пароль</a></li>
+			<li><a href="${siteroot}/users/${user.Id}/ChangePassword">Изменить пароль</a></li>
 			<li><a href="${siteroot}/logs/${user.Id}/PasswordChangeLog" target=_blank>Статистика изменения пароля</a></li>
 			<% end %>
 			<% if user.Client: %>

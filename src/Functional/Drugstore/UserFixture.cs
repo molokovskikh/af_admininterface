@@ -70,26 +70,6 @@ namespace Functional.Drugstore
 			}
 		}
 
-		[Test]
-		public void Change_password_and_view_card()
-		{
-			browser.Link(Find.ByText(user.Login)).Click();
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
-			browser.Link(Find.ByText("Изменить пароль")).Click();
-
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name))))
-			{
-				Assert.That(openedWindow.Text,
-					Is.StringContaining(String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name)));
-
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-				openedWindow.CheckBox(Find.ByName("isSendClientCard")).Click();
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Регистрационная карта"));
-				Assert.That(openedWindow.Text, Is.StringContaining("Изменение пароля по инициативе клиента"));
-			}
-		}
-
 		[Test(Description = "Тест для проверки состояния галок 'Получать накладные', 'Получать отказы', 'Игнорировать проверку минимальной суммы заказа у Поставщика' при регистрации нового пользователя")]
 		public void Check_flags_by_adding_user()
 		{
@@ -111,24 +91,36 @@ namespace Functional.Drugstore
 			}
 		}
 
-		[Test]
-		public void Change_password_and_send_card()
+		private void GoToChangePassword()
 		{
 			browser.Link(Find.ByText(user.Login)).Click();
 			Assert.That(browser.Text, Is.StringContaining(String.Format("Пользователь {0}", user.Login)));
 			browser.Link(Find.ByText("Изменить пароль")).Click();
+			AssertText("Изменение пароля пользователя");
+		}
 
-			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
-			{
-				Assert.That(openedWindow.Text, Is.StringContaining(title));
+		[Test]
+		public void Change_password_and_view_card()
+		{
+			GoToChangePassword();
 
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-				openedWindow.TextField(Find.ByName("emailsForSend")).Clear();
-				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-			}
+			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+			browser.CheckBox(Find.ByName("isSendClientCard")).Click();
+			browser.Button(Find.ByValue("Изменить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
+			Assert.That(browser.Text, Is.StringContaining("Изменение пароля по инициативе клиента"));
+		}
+
+		[Test]
+		public void Change_password_and_send_card()
+		{
+			GoToChangePassword();
+
+			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+			browser.TextField(Find.ByName("emailsForSend")).Clear();
+			browser.TextField(Find.ByName("emailsForSend")).TypeText("KvasovTest@analit.net");
+			browser.Button(Find.ByValue("Изменить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
 		}
 
 		[Test, NUnit.Framework.Description("При изменении пароля, если логин не совпадает с UserId и установлена соотв. опция, то изменить логин на UserId")]
@@ -138,38 +130,26 @@ namespace Functional.Drugstore
 			user.Save();
 			Refresh();
 
-			browser.Link(Find.ByText(user.Login)).Click();
-			browser.Link(Find.ByText("Изменить пароль")).Click();
-			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
-			{
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
-				Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-			}
+			GoToChangePassword();
+			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+			browser.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
+			Assert.That(browser.RadioButton(Find.ById("changeLogin")).Checked, Is.True);
+			browser.Button(Find.ByValue("Изменить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
 
 			session.Refresh(user);
-
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));
 		}
 
 		[Test, NUnit.Framework.Description("При изменении пароля, если логин совпадает с UserId то изменять логин не нужно")]
 		public void Not_change_login_when_change_password()
 		{
-			browser.Link(Find.ByText(user.Login)).Click();
-			browser.Link(Find.ByText("Изменить пароль")).Click();
-
-			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", user.Login, client.Name);
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
-			{
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-				openedWindow.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
-				Assert.That(openedWindow.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-			}
+			GoToChangePassword();
+			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+			browser.TextField(Find.ByName("emailsForSend")).TypeText("kvasovtest@analit.net");
+			Assert.That(browser.RadioButton(Find.ById("changeLogin")).Exists, Is.False);
+			browser.Button(Find.ByValue("Изменить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
 
 			session.Refresh(user);
 			Assert.That(user.Login, Is.EqualTo(user.Id.ToString()));

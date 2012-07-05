@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using Common.Tools;
@@ -8,6 +9,7 @@ using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Drugstore
 {
@@ -87,15 +89,12 @@ namespace Functional.Drugstore
 
 			browser.Link(Find.ByText(testClient.Users[0].Login)).Click();
 			browser.Link(Find.ByText("Изменить пароль")).Click();
-			var title = String.Format("Изменение пароля пользователя {0} [Клиент: {1}]", testClient.Users[0].Login, testClient.FullName);
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle(title)))
-			{
-				openedWindow.Css("#emailsForSend").TypeText("kvasovtest@analit.net");
-				openedWindow.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
-				openedWindow.Button(Find.ByValue("Изменить")).Click();
-				Assert.That(openedWindow.Text, Is.StringContaining("Пароль успешно изменен"));
-			}
-			browser.Refresh();
+			AssertText("Изменение пароля");
+			browser.Css("#emailsForSend").TypeText("kvasovtest@analit.net");
+			browser.TextField(Find.ByName("reason")).TypeText("Тестовое изменение пароля");
+			browser.Button(Find.ByValue("Изменить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пароль успешно изменен"));
+
 			var checkText = String.Format("$$$Пользователь {0}. Бесплатное изменение пароля: Тестовое изменение пароля", testClient.Users[0].Login);
 			Assert.That(browser.Text, Is.StringContaining(checkText));
 		}

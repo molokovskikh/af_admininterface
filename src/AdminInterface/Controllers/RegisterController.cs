@@ -61,6 +61,7 @@ namespace AdminInterface.Controllers
 			var supplier = new Supplier();
 			var user = new User();
 			supplier.Account = new SupplierAccount(supplier);
+			PropertyBag["options"] = new AdditionalSettings();
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["user"] = user;
 			PropertyBag["regions"] = Region.All().ToArray();
@@ -72,7 +73,7 @@ namespace AdminInterface.Controllers
 			[DataBind("supplierContacts")] Contact[] supplierContacts,
 			ulong homeRegion, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			[DataBind("flags")] AdditionalSettings additionalSettings, 
+			[DataBind("options")] AdditionalSettings options,
 
 			[DataBind("payer")] Payer payer,
 			uint? existingPayerId,
@@ -93,7 +94,7 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				var currentPayer = RegisterPayer(additionalSettings, payer, existingPayerId, supplier.Name, supplier.FullName);
+				var currentPayer = RegisterPayer(options, payer, existingPayerId, supplier.Name, supplier.FullName);
 
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.Payer = currentPayer;
@@ -106,6 +107,7 @@ namespace AdminInterface.Controllers
 
 				if (!IsValid(supplier, user)) {
 					RegisterSupplier();
+					PropertyBag["options"] = options;
 					PropertyBag["supplier"] = supplier;
 					PropertyBag["user"] = user;
 					return;
@@ -168,19 +170,19 @@ namespace AdminInterface.Controllers
 			supplier.CreateDirs();
 
 			var log = new PasswordChangeLogEntity(user.Login);
-			if (additionalSettings.SendRegistrationCard)
+			if (options.SendRegistrationCard)
 				log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
 			DbSession.Save(log);
 
-			if (additionalSettings.FillBillingInfo)
+			if (options.FillBillingInfo)
 			{
 				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
 					id = supplier.Payer.Id,
-					showRegistrationCard = additionalSettings.ShowRegistrationCard
+					showRegistrationCard = options.ShowRegistrationCard
 				});
 			}
-			else if (supplier.Users.Count > 0 && additionalSettings.ShowRegistrationCard)
+			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard)
 			{
 				Flash["password"] = password;
 				Redirect("main", "report", new{id = supplier.Users.First().Id});

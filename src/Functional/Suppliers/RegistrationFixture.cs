@@ -1,10 +1,12 @@
 ﻿using System.Linq;
+using System.Threading;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
+using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -32,7 +34,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 			Prepare();
 
-			browser.Css("#FillBillingInfo").Click();
+			browser.Css("#options_FillBillingInfo").Click();
 			browser.Click("Зарегистрировать");
 
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
@@ -47,7 +49,7 @@ namespace Functional.Suppliers
 			Css("#ClientManagersContactPhone").TypeText("473-2606000");
 			Css("#ClientManagersContactEmail").TypeText("manager1@analit.net");
 			Css("input[name='ClientManagersPersons[0].Name']").TypeText("Родионов Максим Валерьевич");
-			browser.Css("#FillBillingInfo").Click();
+			browser.Css("#options_FillBillingInfo").Click();
 			browser.Click("Зарегистрировать");
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 
@@ -68,7 +70,7 @@ namespace Functional.Suppliers
 			Open("Register/RegisterSupplier");
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 			Prepare();
-			browser.Css("#FillBillingInfo").Click();
+			browser.Css("#options_FillBillingInfo").Click();
 
 			Css("#browseRegion4").Click();
 			Css("#browseRegion1").Click();

@@ -65,6 +65,7 @@ namespace Functional.Drugstore
 		public void View_client_message_from_user()
 		{
 			client.AddUser("User2");
+			Refresh();
 
 			browser.TextField(Find.ByName("message")).TypeText("This message for client");
 			browser.Button(Find.ByValue("Принять")).Click();

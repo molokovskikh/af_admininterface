@@ -97,7 +97,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			PropertyBag["log"] = DbSession.Load<UpdateLogEntity>(updateLogEntityId);
+			PropertyBag["log"] = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)
