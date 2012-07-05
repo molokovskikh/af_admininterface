@@ -53,8 +53,10 @@
 		<script>
 			$(function () {
 				$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-					if (options.url[0] == "/")
-						options.url = "${siteroot}" + options.url;
+					var root = "${siteroot}";
+					var url = options.url;
+					if (url[0] == "/" && root != "" && url.indexOf(root) != 0)
+						options.url = root + options.url;
 				});
 			});
 		</script>
