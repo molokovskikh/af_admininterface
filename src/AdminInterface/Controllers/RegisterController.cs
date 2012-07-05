@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -21,11 +23,28 @@ namespace AdminInterface.Controllers
 {
 	public class AdditionalSettings
 	{
+		public AdditionalSettings()
+		{
+			ShowRegistrationCard = true;
+			SendRegistrationCard = true;
+			FillBillingInfo = true;
+		}
+
+		[Description("Показывать регистрационную карту")]
 		public bool ShowRegistrationCard { get; set; }
+
+		[Description("Заполнять информацию для биллинга")]
 		public bool FillBillingInfo { get; set; }
+
 		public bool PayerExists { get; set; }
+
 		public bool ShowForOneSupplier { get; set; }
+
+		[Description("Отправлять регистрационную карту клиенту")]
 		public bool SendRegistrationCard { get; set; }
+
+		[Description("Регистрировать без адреса доставки и пользователя")]
+		public bool RegisterEmpty { get; set; }
 	}
 
 	[
@@ -42,6 +61,7 @@ namespace AdminInterface.Controllers
 			var supplier = new Supplier();
 			var user = new User();
 			supplier.Account = new SupplierAccount(supplier);
+			PropertyBag["options"] = new AdditionalSettings();
 			PropertyBag["supplier"] = supplier;
 			PropertyBag["user"] = user;
 			PropertyBag["regions"] = Region.All().ToArray();
@@ -53,7 +73,7 @@ namespace AdminInterface.Controllers
 			[DataBind("supplierContacts")] Contact[] supplierContacts,
 			ulong homeRegion, 
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			[DataBind("flags")] AdditionalSettings additionalSettings, 
+			[DataBind("options")] AdditionalSettings options,
 
 			[DataBind("payer")] Payer payer,
 			uint? existingPayerId,
@@ -74,7 +94,7 @@ namespace AdminInterface.Controllers
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
 				DbLogHelper.SetupParametersForTriggerLogging();
-				var currentPayer = RegisterPayer(additionalSettings, payer, existingPayerId, supplier.Name, supplier.FullName);
+				var currentPayer = RegisterPayer(options, payer, existingPayerId, supplier.Name, supplier.FullName);
 
 				supplier.HomeRegion = Region.Find(homeRegion);
 				supplier.Payer = currentPayer;
@@ -87,6 +107,7 @@ namespace AdminInterface.Controllers
 
 				if (!IsValid(supplier, user)) {
 					RegisterSupplier();
+					PropertyBag["options"] = options;
 					PropertyBag["supplier"] = supplier;
 					PropertyBag["user"] = user;
 					return;
@@ -95,7 +116,7 @@ namespace AdminInterface.Controllers
 				currentPayer.Suppliers.Add(supplier);
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
-				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));
+				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
 				supplier.Save();
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
@@ -149,19 +170,19 @@ namespace AdminInterface.Controllers
 			supplier.CreateDirs();
 
 			var log = new PasswordChangeLogEntity(user.Login);
-			if (additionalSettings.SendRegistrationCard)
+			if (options.SendRegistrationCard)
 				log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
-			log.Save();
+			DbSession.Save(log);
 
-			if (additionalSettings.FillBillingInfo)
+			if (options.FillBillingInfo)
 			{
 				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
 					id = supplier.Payer.Id,
-					showRegistrationCard = additionalSettings.ShowRegistrationCard
+					showRegistrationCard = options.ShowRegistrationCard
 				});
 			}
-			else if (supplier.Users.Count > 0 && additionalSettings.ShowRegistrationCard)
+			else if (supplier.Users.Count > 0 && options.ShowRegistrationCard)
 			{
 				Flash["password"] = password;
 				Redirect("main", "report", new{id = supplier.Users.First().Id});
@@ -183,18 +204,19 @@ namespace AdminInterface.Controllers
 
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
+			PropertyBag["address"] = client.AddAddress("");
 			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
 			PropertyBag["regions"] = regions;
 			PropertyBag["clientContacts"] = new [] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
+			PropertyBag["options"] = new AdditionalSettings();
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void RegisterClient([DataBind("client")]Client client, 
-			ulong homeRegion, 
+		public void RegisterClient([DataBind("client")]Client client,
+			ulong homeRegion,
 			[DataBind("regionSettings")] RegionSettings[] regionSettings,
-			[DataBind("permissions")] UserPermission[] permissions, 
-			[DataBind("flags")] AdditionalSettings additionalSettings, 
-			string deliveryAddress,
+			[DataBind("permissions")] UserPermission[] permissions,
+			[DataBind("options")] AdditionalSettings options,
 			[DataBind("payer")] Payer payer,
 			uint? existingPayerId,
 			[DataBind("supplier")] Supplier supplier,
@@ -204,100 +226,102 @@ namespace AdminInterface.Controllers
 			string additionalEmailsForSendingCard,
 			string comment)
 		{
-			User newUser;
-			Client newClient;
-			string password;
+			var password = "";
+			var fullName = client.FullName.Replace("№", "N").Trim();
+			var name = client.Name.Replace("№", "N").Trim();
+			var currentPayer = RegisterPayer(options, payer, existingPayerId, name, fullName);
 
-			if (!String.IsNullOrEmpty(deliveryAddress))
-				deliveryAddress = deliveryAddress.Replace("№", "N").Trim();
-
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-
-				var fullName = client.FullName.Replace("№", "N").Trim();
-				var name = client.Name.Replace("№", "N").Trim();
-
-				var currentPayer = RegisterPayer(additionalSettings, payer, existingPayerId, name, fullName);
-
-				newClient = new Client(currentPayer,
-					Region.Find(homeRegion)) {
+			client = new Client(currentPayer,
+				Region.Find(homeRegion)) {
 					FullName = fullName,
 					Name = name,
 					MaskRegion = regionSettings.GetBrowseMask(),
 					Registration = new RegistrationInfo(Admin),
 					ContactGroupOwner = new ContactGroupOwner()
 				};
-				newClient.Settings.WorkRegionMask = newClient.MaskRegion;
-				newClient.Settings.OrderRegionMask = regionSettings.GetOrderMask();
-				BindObjectInstance(newClient.Settings, "client.Settings");
+			client.Settings.WorkRegionMask = client.MaskRegion;
+			client.Settings.OrderRegionMask = regionSettings.GetOrderMask();
+			var user = new User(client);
+			var address = new Address();
 
-				var user = new User(newClient);
+			BindObjectInstance(client.Settings, "client.Settings");
+			BindObjectInstance(user, "user");
+			BindObjectInstance(user.Accounting, "user.Accounting");
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+			BindObjectInstance(address, "address");
 
-				BindObjectInstance(user, "user");
+			var equalClientInRegion = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == homeRegion && c.Name == name).RowCount() > 0;
+			var forValidation = new List<object> {
+				client
+			};
+			if (!options.RegisterEmpty)
+				forValidation.Add(user);
 
-				var equalClientInRegion = DbSession.QueryOver<Client>().Where(c => c.HomeRegion.Id == homeRegion && c.Name == name).RowCount() > 0;
-				if (!IsValid(newClient, user) || equalClientInRegion)
-				{
-					RegisterClient();
-					PropertyBag["clientContacts"] = clientContacts;
-					PropertyBag["client"] = newClient;
-					PropertyBag["user"] = user;
-					if (equalClientInRegion)
-						Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", name));
-					return;
-				}
-
-				if (!String.IsNullOrWhiteSpace(deliveryAddress))
-					newClient.AddAddress(deliveryAddress);
-
-				CreateDrugstore(newClient, additionalSettings, supplier);
-				AddContacts(newClient.ContactGroupOwner, clientContacts);
-
-				newUser = CreateUser(newClient, user, permissions, userPersons);
-				BindObjectInstance(newUser.Accounting, "user.Accounting");
-				password = newUser.CreateInAd();
-				if (newClient.Addresses.Count > 0)
-				{
-					var address = newClient.Addresses.Last();
-					newUser.RegistredWith(address);
-				}
-
-				newClient.Addresses.Each(a => a.CreateFtpDirectory());
-				newClient.AddBillingComment(comment);
-
-				scope.VoteCommit();
+			if (!IsValid(forValidation) || equalClientInRegion) {
+				RegisterClient();
+				PropertyBag["clientContacts"] = clientContacts;
+				PropertyBag["client"] = client;
+				PropertyBag["user"] = user;
+				PropertyBag["address"] = address;
+				PropertyBag["options"] = options;
+				if (equalClientInRegion)
+					Error(string.Format("В данном регионе уже существует клиент с таким именем {0}", name));
+				return;
 			}
-			newUser.UpdateContacts(userContacts);
-#if !DEBUG
-			Mailer.ClientRegistred(newClient, comment);
-#endif
 
-			var log = new PasswordChangeLogEntity(newUser.Login);
-			if (additionalSettings.SendRegistrationCard)
-				log = SendRegistrationCard(log, newUser, password, additionalEmailsForSendingCard);
-			log.Save();
+			if (String.IsNullOrEmpty(address.Value) || options.RegisterEmpty)
+				address = null;
 
-			if (!additionalSettings.FillBillingInfo)
-				this.Mailer().NotifyBillingAboutClientRegistration(newClient);
+			if (options.RegisterEmpty)
+				user = null;
 
-			if (additionalSettings.FillBillingInfo)
-			{
+			if (address != null) {
+				address.Value = address.Value.Replace("№", "N").Trim();
+				client.AddAddress(address);
+			}
+
+			if (user != null)
+				client.AddUser(user);
+
+			CreateDrugstore(client, options, supplier);
+			AddContacts(client.ContactGroupOwner, clientContacts);
+
+			if (user != null) {
+				CreateUser(user, permissions, userPersons);
+				user.UpdateContacts(userContacts);
+				user.RegistredWith(client.Addresses.LastOrDefault());
+
+				password = user.CreateInAd();
+			}
+
+			client.Addresses.Each(a => a.CreateFtpDirectory());
+			client.AddBillingComment(comment);
+
+			if (user != null) {
+				var log = new PasswordChangeLogEntity(user.Login);
+				if (options.SendRegistrationCard)
+					log = SendRegistrationCard(log, user, password, additionalEmailsForSendingCard);
+				DbSession.Save(log);
+			}
+
+			Mailer.ClientRegistred(client, comment, Defaults);
+			if (!options.FillBillingInfo)
+				this.Mailer().NotifyBillingAboutClientRegistration(client);
+
+			if (options.FillBillingInfo) {
 				Session["password"] = password;
 				Redirect("Register", "RegisterPayer", new {
-					id = newClient.Payers.Single().Id,
-					showRegistrationCard = additionalSettings.ShowRegistrationCard
+					id = client.Payers.Single().Id,
+					showRegistrationCard = options.ShowRegistrationCard
 				});
 			}
-			else if (newClient.Users.Count > 0 && additionalSettings.ShowRegistrationCard)
-			{
+			else if (client.Users.Count > 0 && options.ShowRegistrationCard) {
 				Flash["password"] = password;
-				Redirect("main", "report", new{id = newClient.Users.First().Id});
+				Redirect("main", "report", new{id = client.Users.First().Id});
 			}
-			else
-			{
+			else {
 				Notify("Регистрация завершена успешно");
-				RedirectTo(newClient);
+				RedirectTo(client);
 			}
 		}
 
@@ -332,6 +356,7 @@ namespace AdminInterface.Controllers
 			var smtpid = ReportHelper.SendClientCard(user,
 				password,
 				true,
+				Defaults,
 				mailTo,
 				additionalEmails);
 			log.SetSentTo(smtpid, mailTo);
@@ -418,7 +443,7 @@ WHERE   pricesdata.firmcode = s.Id
 			});
 		}
 
-		private User CreateUser(Client client, User user, UserPermission[] permissions, Person[] persons)
+		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)
 		{
 			if (permissions != null && permissions.Any())
 			{
@@ -427,11 +452,9 @@ WHERE   pricesdata.firmcode = s.Id
 			}
 			user.Setup();
 			user.SetupSupplierPermission();
-			client.Users = new List<User> {user};
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
 			user.Save();
-			return user;
 		}
 
 		private void AddContacts(ContactGroupOwner owner, Contact[] clientContacts)
@@ -501,7 +524,7 @@ WHERE   pricesdata.firmcode = s.Id
 
 			string redirectUrl;
 			if (showRegistrationCard && client != null && client.Users.Count > 0)
-				redirectUrl = String.Format("~/main/report?id={0}", client.Users.First());
+				redirectUrl = String.Format("~/main/report?id={0}", client.Users.First().Id);
 			else if (client != null)
 				redirectUrl = String.Format("~/Client/{0}", client.Id);
 			else if (supplier != null)

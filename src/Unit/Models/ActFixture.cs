@@ -25,7 +25,8 @@ namespace Unit.Models
 				Ads = new List<Advertising>()
 			};
 			client = new Client(payer, Data.DefaultRegion);
-			var user = new User(client);
+			var user = new User(payer, client);
+			client.AddUser(user);
 			user.Accounting.ReadyForAccounting = true;
 			invoice = new Invoice(payer, new Period(2011, Interval.January), DateTime.Now);
 		}
@@ -88,6 +89,7 @@ namespace Unit.Models
 			payer.InvoiceSettings.DoNotGroupParts = true;
 
 			var user = new User(client);
+			client.AddUser(user);
 			user.Accounting.ReadyForAccounting = true;
 
 			invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);

@@ -378,14 +378,30 @@ group by u.ClientId")
 
 		public virtual void JoinPayer(Payer payer)
 		{
-			if (Payers == null)
-				Payers = new List<Payer>();
 			Payers.Add(payer);
 		}
 
-		public virtual void AddUser(User user)
+		public virtual User AddUser(string name)
 		{
-			user.Init(this);
+			var user = new User(this) {Name = name};
+			AddUser(user);
+			user.Setup();
+			return user;
+		}
+
+		public override void AddUser(User user)
+		{
+			if (user.Payer == null) {
+				if (Payers.Count > 1)
+					throw new Exception(String.Format("У клиента более одного плательщика {0}", Payers.Implode()));
+				user.Payer = Payers.Single();
+			}
+
+			if (!user.Payer.Users.Contains(user))
+				user.Payer.Users.Add(user);
+
+			if (!Users.Contains(user))
+				Users.Add(user);
 		}
 
 		public virtual string GetEmailsForBilling()
@@ -438,7 +454,7 @@ where ClientId = :clientId")
 
 		public virtual bool CanDelete()
 		{
-			return ClientOrder.Queryable.Count(o => o.Client == this) == 0
+			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.Client == this) == 0
 				&& Addresses.All(a => a.CanDelete())
 				&& Users.All(u => u.CanDelete());
 		}

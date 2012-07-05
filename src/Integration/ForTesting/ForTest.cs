@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Reflection;
 using AdminInterface.Initializers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;

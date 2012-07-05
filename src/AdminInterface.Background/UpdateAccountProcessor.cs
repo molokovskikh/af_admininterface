@@ -6,7 +6,9 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Helpers;
+using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 
 namespace AdminInterface.Background
 {
@@ -14,38 +16,39 @@ namespace AdminInterface.Background
 	{
 		public void Process()
 		{
-			foreach (var ids in Page<Account>(a => !a.ReadyForAccounting, 100))
-			{
-				using(var scope = new TransactionScope(OnDispose.Rollback))
-				{
-					foreach (var id in ids)
-					{
-						var account = Account.TryFind(id);
-						if (account.ObjectType == LogObjectType.User)
-						{
-							account = ActiveRecordMediator<UserAccount>.FindByPrimaryKey(id);
-							var user = ((UserAccount)account).User;
-							var updateCount = UpdateLogEntity.Queryable.Count(u => u.User == user
-								&& u.Commit
-								&& (u.UpdateType == UpdateType.Accumulative || u.UpdateType == UpdateType.Cumulative));
-							if (updateCount >= 10)
-							{
-								account.ReadyForAccounting = true;
-								account.Save();
-							}
-						}
-						else if (account.ObjectType == LogObjectType.Address)
-						{
-							account = ActiveRecordMediator<AddressAccount>.FindByPrimaryKey(id);
-							var address = ((AddressAccount)account).Address;
-							if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting))
-							{
-								account.ReadyForAccounting = true;
-								account.Save();
-							}
-						}
-					}
+			foreach (var ids in Page<Account>(a => !a.ReadyForAccounting, 100)) {
+				using(var scope = new TransactionScope(OnDispose.Rollback)) {
+					ArHelper.WithSession(s => {
+						Process(ids, s);
+					});
+					
 					scope.VoteCommit();
+				}
+			}
+		}
+
+		private static void Process(uint[] ids, ISession session)
+		{
+			foreach (var id in ids) {
+				var account = Account.TryFind(id);
+				if (account.ObjectType == LogObjectType.User) {
+					account = session.Load<UserAccount>(id);
+					var user = ((UserAccount) account).User;
+					var updateCount = session.Query<UpdateLogEntity>().Count(u => u.User == user
+						&& u.Commit
+						&& (u.UpdateType == UpdateType.Accumulative || u.UpdateType == UpdateType.Cumulative));
+					if (updateCount >= 10) {
+						account.ReadyForAccounting = true;
+						account.Save();
+					}
+				}
+				else if (account.ObjectType == LogObjectType.Address) {
+					account = session.Load<AddressAccount>(id);
+					var address = ((AddressAccount) account).Address;
+					if (address.AvaliableForUsers.Any(u => u.Accounting.ReadyForAccounting)) {
+						account.ReadyForAccounting = true;
+						account.Save();
+					}
 				}
 			}
 		}

@@ -1,17 +1,16 @@
 ﻿using System;
 using AdminInterface.Models;
-using AdminInterface.Models.Suppliers;
+using AdminInterface.Queries;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.log4net;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
+using Test.Support.Web;
 using Common.Web.Ui.Helpers;
-using Functional.ForTesting;
-using Castle.ActiveRecord;
 using Common.Tools;
 
-namespace Functional
+namespace Functional.Drugstore
 {
 	public class UserSearchFixture : WatinFixture2
 	{
@@ -191,8 +190,8 @@ namespace Functional
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User((Service)c) {Name = "test",});
-				c.AddUser(new User((Service)c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
 			});
 			scope.Flush();
 
@@ -220,8 +219,8 @@ namespace Functional
 		{
 			//нужно добавить еще одного пользователя что не произошел автовход
 			var client = DataMother.TestClient(c => {
-				c.AddUser(new User((Service)c) {Name = "test",});
-				c.AddUser(new User((Service)c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
+				c.AddUser(new User(c) {Name = "test",});
 			});
 			scope.Flush();
 

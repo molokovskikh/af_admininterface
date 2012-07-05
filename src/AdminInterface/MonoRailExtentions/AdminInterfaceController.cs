@@ -1,8 +1,11 @@
-﻿using AddUser;
+﻿using System.Linq;
+using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Common.Web.Ui.Controllers;
+using NHibernate.Linq;
 
 namespace AdminInterface.MonoRailExtentions
 {
@@ -13,6 +16,14 @@ namespace AdminInterface.MonoRailExtentions
 			BeforeAction += (action, context, controller, controllerContext) => {
 				controllerContext.PropertyBag["admin"] = Admin;
 			};
+		}
+
+		public DefaultValues Defaults
+		{
+			get
+			{
+				return DbSession.Query<DefaultValues>().First();
+			}
 		}
 
 		protected Administrator Admin

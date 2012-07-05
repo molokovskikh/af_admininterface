@@ -34,7 +34,7 @@ namespace Functional.Billing
 			var client = DataMother.TestClient(c => {
 				c.Payers.Clear();
 				c.Payers.Add(payer);
-				c.AddUser(new User((Service)c) {
+				c.AddUser(new User(c) {
 					Name = "Тестовый пользователь",
 				});
 			});
@@ -58,7 +58,7 @@ namespace Functional.Billing
 			var client = DataMother.TestClient(c => {
 				c.Payers.Clear();
 				c.Payers.Add(payer);
-				c.AddUser(new User((Service)c) {
+				c.AddUser(new User(c) {
 					Name = "Тестовый пользователь",
 				});
 			});

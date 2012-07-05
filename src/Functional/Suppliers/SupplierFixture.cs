@@ -138,7 +138,6 @@ namespace Functional.Suppliers
 		public void Set_sertificate_source()
 		{
 			Open(supplier);
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			Thread.Sleep(3000);
 			var newCertificate = new CertificateSource {
 				Name = "Test_Source",
@@ -159,7 +158,6 @@ namespace Functional.Suppliers
 		public void Change_pricelist_type_to_assortment()
 		{
 			Open(supplier);
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			Click("Настройка");
 			//создаем ассортиментный прайс
 			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();

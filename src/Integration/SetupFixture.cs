@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using AddUser;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Integration.ForTesting;
@@ -15,6 +16,7 @@ namespace Integration
 		public void Setup()
 		{
 			IntegrationFixture.DoNotUserTransaction = true;
+			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
 
 			ForTest.InitialzeAR();
 			var admin = new Administrator{

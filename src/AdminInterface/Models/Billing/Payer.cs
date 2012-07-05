@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;

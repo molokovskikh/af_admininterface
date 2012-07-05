@@ -5,6 +5,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
+using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -39,7 +40,7 @@ namespace AdminInterface.Controllers
 
 		public void Download(uint id)
 		{
-			var log = DocumentReceiveLog.Find(id);
+			var log = DbSession.Load<DocumentReceiveLog>(id);
 
 			var file = log.GetRemoteFileName(Config);
 			this.RenderFile(file, log.FileName);
@@ -49,7 +50,7 @@ namespace AdminInterface.Controllers
 		{
 			CancelLayout();
 
-			var logEntity = UpdateLogEntity.Find(updateLogEntityId);
+			var logEntity = DbSession.Load<UpdateLogEntity>(updateLogEntityId);
 			var detailsLogEntities = logEntity.UpdateDownload;
 			var detailDocumentLogs = logEntity.GetLoadedDocumentLogs();
 
@@ -72,7 +73,7 @@ namespace AdminInterface.Controllers
 		{
 			CancelLayout();
 
-			var documentLog = DocumentReceiveLog.Find(documentLogId);
+			var documentLog = DbSession.Load<DocumentReceiveLog>(documentLogId);
 			PropertyBag["documentLogId"] = documentLogId;
 			PropertyBag["documentLog"] = documentLog;
 		}
@@ -96,7 +97,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			PropertyBag["updateLogEnriryId"] = updateLogEntityId;
-			PropertyBag["log"] = UpdateLogEntity.Find(updateLogEntityId).Log;
+			PropertyBag["log"] = DbSession.Load<UpdateLogEntity>(updateLogEntityId).Log;
 		}
 
 		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId)

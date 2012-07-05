@@ -18,7 +18,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true)]
-	public class DocumentSendLog : ActiveRecordBase<DocumentSendLog>
+	public class DocumentSendLog
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -43,7 +43,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord("Document_logs", Schema = "Logs", Lazy = true)]
-	public class DocumentReceiveLog : ActiveRecordBase<DocumentReceiveLog>
+	public class DocumentReceiveLog
 	{
 		public DocumentReceiveLog()
 		{}

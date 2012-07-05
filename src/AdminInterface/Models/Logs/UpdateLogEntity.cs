@@ -29,7 +29,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "AnalitFUpdates", Schema = "logs")]
-	public class UpdateLogEntity : ActiveRecordLinqBase<UpdateLogEntity>
+	public class UpdateLogEntity
 	{
 		public UpdateLogEntity()
 		{}

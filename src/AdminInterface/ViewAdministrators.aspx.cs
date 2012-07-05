@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using AdminInterface.Models;

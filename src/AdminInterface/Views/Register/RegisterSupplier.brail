@@ -10,10 +10,10 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 <script type="text/javascript">
 
 	function validatePayer() {
-		if (jQuery("#PayerExists").attr("checked"))
-			return ((jQuery("#PayerComboBox").val() != null) &&
-						(jQuery("#PayerComboBox").val().length > 0) &&
-						(jQuery("#SelectPayerDiv").css("display") == "block"));
+		if ($("#PayerExists").attr("checked"))
+			return (($("#PayerComboBox").val() != null) &&
+						($("#PayerComboBox").val().length > 0) &&
+						($("#SelectPayerDiv").css("display") == "block"));
 		return true;
 	}
 
@@ -27,16 +27,17 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 	});
 
 	jQuery(function() {
-		jQuery("#PayerExists").attr({checked : null, disabled : null});
-		jQuery("#FillBillingInfo").attr({checked:"checked", disabled : null});
-		jQuery("#SearchPayerDiv").css("display", "none");
-		jQuery("#SelectPayerDiv").css("display", "none");
-		jQuery("#SearchSupplierDiv").css("display", "none");
-		jQuery("#SelectSupplierDiv").css("display", "none");
+		$("#PayerExists").attr({checked : null, disabled : null});
+		$("#SearchPayerDiv").css("display", "none");
+		$("#SelectPayerDiv").css("display", "none");
+		$("#SearchSupplierDiv").css("display", "none");
+		$("#SelectSupplierDiv").css("display", "none");
+
+		$("#options_FillBillingInfo").attr({ disabled: null });
 
 		jQuery.validator.addMethod("noEmailAddress", function(value, element) {
-			if (value.toString().length == 0 && jQuery("#additionalEmails").val().length == 0 
-				&& jQuery("#SendRegistrationCard").attr("checked"))
+			if (value.toString().length == 0 && $("#additionalEmails").val().length == 0 
+				&& $("#SendRegistrationCard").attr("checked"))
 			{
 				return false;
 			}
@@ -50,10 +51,7 @@ ${app.Asset("order.delivery.group.editor.coffee")}
 
 	function validateForm() {
 		$("form").data("validator").settings.errorPlacement = function (error, element) {
-			if (element.attr("name") == "flags.ShowForOneSupplier") {
-				$("#MessageForSupplier").html(error);
-			}
-			else if (element.attr("name") == "PayerExists") {
+			if (element.attr("name") == "PayerExists") {
 				$("#MessageForPayer").html(error);
 			}
 			else {
@@ -180,7 +178,7 @@ ${FormHelper.FormTag("", {})}
 			<tr>
 				<td width="50%">
 					<input type="checkbox" id="PayerExists" class="payer" name="PayerExists" onclick="OnPayerExistsChanged(this.checked)">Выбрать существующего плательщика</input>
-					<input type="hidden" id="PayerExistsValue" name="flags.PayerExists" value="false" />
+					<input type="hidden" id="PayerExistsValue" name="options.PayerExists" value="false" />
 				</td>
 				<td>
 					<div id="SearchPayerDiv" style="width: 100%; display: none">
@@ -197,17 +195,19 @@ ${FormHelper.FormTag("", {})}
 			</tr>
 			<tr>
 				<td colspan="2">
-					<input type="checkbox" id="FillBillingInfo" name="flags.FillBillingInfo" checked="checked">Заполнять информацию для биллинга</input>
+					${app.Edit("options.FillBillingInfo")}
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<input type="checkbox" id="ShowRegistrationCard" name="flags.ShowRegistrationCard" checked="checked">Показывать регистрационную карту</input>
+					${app.Edit("options.ShowRegistrationCard")}
 				</td>
 			</tr>
 		</table>
 		<fieldset>
-			<legend><input type="checkbox" id="SendRegistrationCard" name="flags.SendRegistrationCard" checked="checked">Отправлять регистрационную карту клиенту</input></legend>
+			<legend>
+				${app.Edit("options.SendRegistrationCard")}
+			</legend>
 			<br />
 			Дополнительные адреса для отправки регистрационной карты:<br />
 			<textarea rows="2" cols="60" name="additionalEmailsForSendingCard" 

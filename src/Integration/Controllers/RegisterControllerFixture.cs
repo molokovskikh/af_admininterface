@@ -10,6 +10,7 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework.Test;
+using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -24,7 +25,7 @@ namespace Integration.Controllers
 		private Client client;
 		private Payer payer;
 		private RegionSettings[] regionSettings;
-		private AdditionalSettings addsettings;
+		private AdditionalSettings options;
 		private Contact[] clientContacts;
 		private Person[] person;
 
@@ -41,8 +42,7 @@ namespace Integration.Controllers
 
 			controller = new RegisterController();
 			PrepareController(controller, "Registered");
-
-			ActiveRecordMediator<ActiveRecordBase>.Execute((session, instance) => {controller.DbSession = session; return null;}, null);
+			controller.DbSession = session;
 
 			((StubRequest)Request).Uri = new Uri("https://stat.analit.net/adm/Register/Register");
 			((StubRequest)Request).ApplicationPath = "/Adm";
@@ -50,8 +50,8 @@ namespace Integration.Controllers
 			client = new Client {
 				Status = ClientStatus.On,
 				Type = ServiceType.Drugstore,
-				Name = "test",
-				FullName = "test",
+				Name = "test " + Generator.Random(1000).First(),
+				FullName = "test " + Generator.Random(1000).First(),
 			};
 
 			payer = new Payer {
@@ -61,7 +61,7 @@ namespace Integration.Controllers
 			regionSettings = new [] {
 				new RegionSettings{Id = 1, IsAvaliableForBrowse = true, IsAvaliableForOrder = true}
 			};
-			addsettings = new AdditionalSettings {PayerExists = true};
+			options = new AdditionalSettings {PayerExists = true};
 			clientContacts = new[] {new Contact{Type = ContactType.Email, ContactText = "11@33.ru"}};
 			person = new[] {new Person()};
 		}
@@ -88,13 +88,13 @@ namespace Integration.Controllers
 		public void Register_equeal_client_in_one_region()
 		{
 			Prepare();
- 			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+			controller.RegisterClient(client, 1, regionSettings, null, options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
-			controller.RegisterClient(client, 1, regionSettings, null, addsettings, null, null,
+			controller.RegisterClient(client, 1, regionSettings, null, options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			Assert.That(controller.Flash["Message"].ToString(), Is.StringContaining("В данном регионе уже существует клиент с таким именем"));
 			controller.Flash["Message"] = null;
-			controller.RegisterClient(client, 2, regionSettings, null, addsettings, null, null,
+			controller.RegisterClient(client, 2, regionSettings, null, options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			Assert.That(controller.Flash["Message"], Is.Null);
 		}
@@ -104,12 +104,12 @@ namespace Integration.Controllers
 		{
 			DataMother.CreateSupplier().Save();
 
-			
 			Request.Params.Add("user.Accounting.IsFree", "False");
+			Request.Params.Add("address.Value", "address");
 
 			Prepare();
 
-			controller.RegisterClient(client, 4, regionSettings, null, addsettings, "address", null, 
+			controller.RegisterClient(client, 4, regionSettings, null, options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 
 			var registredClient = RegistredClient();
@@ -130,14 +130,13 @@ namespace Integration.Controllers
 			Assert.That(intersectionCount, Is.GreaterThan(0));
 			Assert.That(userPriceCount, Is.GreaterThan(0));
 
-			//Assert.That(registredClient.Settings.SmartOrderRules.AssortimentPriceCode, Is.EqualTo(4662));
 			Assert.That(registredClient.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
 			Assert.That(registredClient.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 
 		private void Prepare()
 		{
-			Request.Form.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("user.Name", "Тестовый пользователь");
 			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 		}
 
@@ -147,7 +146,7 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Accounting.IsFree", "False");
 
-			controller.RegisterClient(client, 8, regionSettings, null, addsettings, null, null,
+			controller.RegisterClient(client, 8, regionSettings, null, options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 

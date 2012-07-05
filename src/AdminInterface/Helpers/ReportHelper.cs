@@ -20,7 +20,8 @@ namespace AdminInterface.Helpers
 			string clientLogin,
 			string clientPassword,
 			DateTime operationDate,
-			bool isRegistration)
+			bool isRegistration,
+			DefaultValues defaults)
 		{
 			var report = new LocalReport
 			{
@@ -38,7 +39,7 @@ namespace AdminInterface.Helpers
   </DeviceInfo>";
 			Warning[] warnings;
 
-			var phones = DefaultValues.Get().Phones;
+			var phones = defaults.Phones;
 			phones = "Режим работы: Понедельник – Пятница с 9.00 до 18.00 часов по московскому времени\r\n"
 				+ "Телефоны:\r\n"
 				+ phones + "\r\n"
@@ -69,9 +70,9 @@ namespace AdminInterface.Helpers
 		public static int SendClientCard(User user,
 			string password,
 			bool isRegistration,
+			DefaultValues defaults,
 			params string[] mails)
 		{
-			var defaults = DefaultValues.Get();
 			string body;
 			if (user.RootService is Client)
 				body = Settings.Default.RegistrationCardEmailBodyForDrugstore;
@@ -86,7 +87,8 @@ namespace AdminInterface.Helpers
 				user.Login,
 				password,
 				DateTime.Now,
-				isRegistration))
+				isRegistration,
+				defaults))
 			using (var message = new MailMessage
 			{
 				From = new MailAddress("tech@analit.net"),

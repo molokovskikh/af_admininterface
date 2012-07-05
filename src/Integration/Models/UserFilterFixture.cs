@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Queries;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Models;

@@ -115,12 +115,7 @@ namespace AdminInterface.Models
 			UserUpdateInfo = new UserUpdateInfo(this);
 			Logs = new AuthorizationLogEntity(this);
 			Accounting = new UserAccount(this);
-		}
-
-		public User(Client client)
-			: this((Service)client)
-		{
-			Init(client);
+			Registration = new RegistrationInfo(SecurityContext.Administrator);
 		}
 
 		[PrimaryKey(PrimaryKeyType.Native)]
@@ -429,7 +424,7 @@ namespace AdminInterface.Models
 			if (UserUpdateInfo == null)
 				UserUpdateInfo = new UserUpdateInfo(this);
 
-			var defaults = DefaultValues.Get();
+			var defaults = ActiveRecordMediator<DefaultValues>.FindFirst();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			Save();
@@ -447,41 +442,6 @@ namespace AdminInterface.Models
 			if (Client == null)
 				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
 			Save();
-		}
-
-		public virtual void Init(Service client)
-		{
-			RootService = client;
-			if (client.IsClient())
-			{
-				var casClient = client as Client;
-				Client = casClient;
-				if (Payer == null)
-				{
-					if (casClient.Payers.Count > 1)
-						throw new Exception(String.Format("У клиента более одного плательщика {0}", casClient.Payers.Implode()));
-					Payer = casClient.Payers.Single();
-					if (!Payer.Users.Any(u => u == this))
-						Payer.Users.Add(this);
-				}
-
-				if (!Client.Users.Any(u => u == this))
-				Client.Users.Add(this);
-			}
-			else {
-				//NHibernateUtil.Initialize(client);
-				var supplier = Supplier.Find(client.Id);
-				if (!supplier.Users.Any(u => u == this))
-				{
-					supplier.Users.Add(this);
-					supplier.Save();
-				}
-			}
-
-			if (Accounting == null)
-				Accounting = new UserAccount(this);
-
-			Registration = new RegistrationInfo(SecurityContext.Administrator);
 		}
 
 		public virtual bool IsLocked
@@ -773,7 +733,7 @@ WHERE
 
 		public virtual bool CanDelete()
 		{
-			return ClientOrder.Queryable.Count(o => o.User == this) == 0;
+			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.User == this) == 0;
 		}
 
 		public virtual void Delete()

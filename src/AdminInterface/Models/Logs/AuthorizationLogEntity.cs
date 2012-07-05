@@ -30,7 +30,7 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "AuthorizationDates", Schema = "logs", Lazy = true)]
-	public class AuthorizationLogEntity : ActiveRecordLinqBase<AuthorizationLogEntity>
+	public class AuthorizationLogEntity
 	{
 		public AuthorizationLogEntity(User user)
 		{
@@ -56,11 +56,6 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual DateTime? IOLTime { get; set; }
-
-		public static List<AuthorizationLogEntity> GetEntitiesByUsers(IEnumerable<User> users)
-		{
-			return FindAll(Expression.In("Id", users.Select(r => r.Id).ToArray())).ToList();
-		}
 
 		public virtual string GetLastServicesUsage()
 		{

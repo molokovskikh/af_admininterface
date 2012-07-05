@@ -1,4 +1,5 @@
 ﻿using System;
+using AdminInterface.Mailers;
 using Common.Web.Ui.Helpers;
 using log4net;
 

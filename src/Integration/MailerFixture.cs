@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Controllers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
@@ -205,6 +206,7 @@ namespace Integration
 				Login = "1"
 			};
 			client.Name = "Фармаимпекс";
+			client.AddUser(user);
 			user.Payer.Name = "Фармаимпекс";
 			var oldPayer = new Payer {
 				Name = "Биона"

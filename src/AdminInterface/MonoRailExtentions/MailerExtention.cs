@@ -1,4 +1,5 @@
-﻿using AdminInterface.Models;
+﻿using AdminInterface.Mailers;
+using AdminInterface.Models;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.MonoRailExtentions;
 

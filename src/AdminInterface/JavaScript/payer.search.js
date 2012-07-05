@@ -1,4 +1,8 @@
 ﻿function OnPayerExistsChanged(selectedValue) {
+	$('#PayerComboBox').find('option').remove().end();
+	//что бы обновить view model
+	$("#PayerComboBox").change();
+
 	$("#SearchPayerDiv").hide();
 	$("#SelectPayerDiv").hide();
 	var disabled = null;
@@ -8,14 +12,15 @@
 		disabled = 'disabled';
 		checked = null;
 	}
+	$("#options_FillBillingInfo").attr('disabled', disabled);
 	$("#FillBillingInfo").attr('disabled', disabled);
+	$("#options_FillBillingInfo").attr('checked', checked);
 	$("#FillBillingInfo").attr('checked', checked);
 	$("#PayerExistsValue").val(selectedValue);
 	$("#MessageForPayer").html("");
 }
 
 function ShowSearchPayerDiv() {
-	$('#PayerComboBox').find('option').remove().end();
 	$("#MessageForPayer").html("");
 	$("#SearchPayerTextPattern").removeAttr("disabled");
 	$("#SearchPayerButton").removeAttr("disabled");
@@ -28,10 +33,13 @@ function ShowSelectPayerDiv() {
 	var searchText = $("#SearchPayerTextPattern").val();
 	if (searchText.length == 0)
 		return;
+	var data = { "searchPattern": searchText };
 	$.get("SearchPayers",
-		{"searchPattern": searchText},
+		data,
 		function (htmlOptions) {
 			$('#PayerComboBox').find('option').remove().end();
+			//что бы обновить view model
+			$("#PayerComboBox").change();
 			if (htmlOptions.length == 0) {
 				$("#SearchPayerTextPattern").removeAttr("disabled");
 				$("#SearchPayerButton").removeAttr("disabled");
@@ -39,6 +47,8 @@ function ShowSelectPayerDiv() {
 				return;
 			}
 			$("#PayerComboBox").append(htmlOptions);
+			//что бы обновить view model
+			$("#PayerComboBox").change();
 			$("#SearchPayerDiv").hide();
 			$("#SelectPayerDiv").show();
 			$("#MessageForPayer").html("");

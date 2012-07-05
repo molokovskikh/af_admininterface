@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Configuration;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;

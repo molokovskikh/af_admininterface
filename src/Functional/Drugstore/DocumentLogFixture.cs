@@ -37,7 +37,7 @@ namespace Functional.Drugstore
 				Address = client.Addresses.First(),
 			};
 
-			document.Save();
+			Save(document);
 			Flush();
 
 			Open(client);
@@ -52,14 +52,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void View_documents_with_client_column()
 		{
-			User testUser = new User(client);
-			testUser.Setup();
-			
-			client.Users.Add(
-				testUser
-			);
-			
-			client.Save();
+			var testUser = client.AddUser("Test user");
 			Flush();
 
 			var document = new DocumentReceiveLog(supplier) {
@@ -68,7 +61,7 @@ namespace Functional.Drugstore
 				Address = client.Addresses.First(),
 			};
 
-			document.Save();
+			session.Save(document);
 			Flush();
 
 			var sendLog = new DocumentSendLog() {
@@ -76,7 +69,7 @@ namespace Functional.Drugstore
 				ForUser = client.Users.First(),
 				Received = document
 			};
-			sendLog.Save();
+			session.Save(sendLog);
 			Flush();
 
 			Open(client);

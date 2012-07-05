@@ -16,7 +16,8 @@ namespace Integration.Models
 			var client = DataMother.TestClient();
 			var parent = new User(client);
 			var child = new User(client);
-
+			client.AddUser(parent);
+			client.AddUser(child);
 			parent.Setup();
 			child.Setup();
 			Flush();

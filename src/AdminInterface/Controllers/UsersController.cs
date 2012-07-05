@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -102,7 +103,6 @@ namespace AdminInterface.Controllers
 			var service = Service.FindAndCheck<Service>(clientId);
 			var user = new User(service);
 			BindObjectInstance(user, "user");
-			
 
 			if (!IsValid(user)) {
 				Add(service.Id);
@@ -111,12 +111,10 @@ namespace AdminInterface.Controllers
 			}
 
 			var address = new Address();
-
 			SetBinder(new ARDataBinder());
-
 			BindObjectInstance(address, "address", AutoLoadBehavior.NewInstanceIfInvalidKey);
 
-			user.Init(service);
+			service.AddUser(user);
 
 			string password;
 			PasswordChangeLogEntity passwordChangeLog;
@@ -132,7 +130,7 @@ namespace AdminInterface.Controllers
 				user.WorkRegionMask = regionSettings.GetBrowseMask();
 				user.OrderRegionMask = regionSettings.GetOrderMask();
 				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
-				passwordChangeLog.Save();
+				DbSession.Save(passwordChangeLog);
 				user.UpdateContacts(contacts);
 				user.UpdatePersons(persons);
 
@@ -143,7 +141,7 @@ namespace AdminInterface.Controllers
 					address.SaveAndFlush();
 					address.Maintain();
 				}
-				service.Save();
+				DbSession.SaveOrUpdate(service);
 
 				scope.VoteCommit();
 			}
@@ -151,12 +149,12 @@ namespace AdminInterface.Controllers
 			if (address != null)
 				address.CreateFtpDirectory();
 
-			Mailer.Registred(user, comment);
+			Mailer.Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
 			if (address != null)
 			{
 				address.AddBillingComment(comment);
-				Mailer.Registred(address, comment);
+				Mailer.Registred(address, comment, Defaults);
 			}
 			if (user.Client != null) { 
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
@@ -182,9 +180,10 @@ namespace AdminInterface.Controllers
 				var smtpId = ReportHelper.SendClientCard(user,
 					password,
 					false,
+					Defaults,
 					mails);
 				passwordChangeLog.SetSentTo(smtpId, mails);
-				passwordChangeLog.Update();
+				DbSession.SaveOrUpdate(passwordChangeLog);
 
 				Notify("Пользователь создан");
 				if (service.IsClient())
@@ -290,34 +289,29 @@ namespace AdminInterface.Controllers
 			var administrator = Admin;
 			var password = User.GeneratePassword();
 		
-			using (new TransactionScope())
-			{
-				ADHelper.ChangePassword(user.Login, password);
-				if (changeLogin)
-					ADHelper.RenameUser(user.Login, user.Id.ToString());
+			ADHelper.ChangePassword(user.Login, password);
+			if (changeLogin)
+				ADHelper.RenameUser(user.Login, user.Id.ToString());
 
-				DbLogHelper.SetupParametersForTriggerLogging();
-				user.ResetUin();
-				if (changeLogin)
-					user.Login = user.Id.ToString();
-				user.Save();
-				ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
+			user.ResetUin();
+			if (changeLogin)
+				user.Login = user.Id.ToString();
+			user.Save();
+			ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
 
-				var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
+			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
-				if (isSendClientCard)
-				{
-					var smtpId = ReportHelper.SendClientCard(
-						user,
-						password,
-						false,
-						emailsForSend);
-					passwordChangeLog.SetSentTo(smtpId, emailsForSend);
-				}
-
-				passwordChangeLog.Save();
+			if (isSendClientCard) {
+				var smtpId = ReportHelper.SendClientCard(
+					user,
+					password,
+					false,
+					Defaults,
+					emailsForSend);
+				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}
-			
+
+			DbSession.Save(passwordChangeLog);
 			NotificationHelper.NotifyAboutPasswordChange(administrator,
 				user,
 				password,
@@ -325,19 +319,15 @@ namespace AdminInterface.Controllers
 				Context.Request.UserHostAddress,
 				reason);
 
-			if (isSendClientCard)
-			{
-				RedirectToAction("SuccessPasswordChanged");
+			if (isSendClientCard) {
+				Notify("Пароль успешно изменен.");
+				RedirectTo(user, "Edit");
 			}
-			else
-			{
+			else {
 				Flash["password"] = password;
 				Redirect("main", "report", new {id = user.Id, isPasswordChange = true});
 			}
 		}
-
-		public void SuccessPasswordChanged()
-		{}
 
 		public void Unlock(uint id)
 		{

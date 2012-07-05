@@ -12,7 +12,10 @@ using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate;
+using NHibernate.Linq;
 using NUnit.Framework;
+using Test.Support.log4net;
 
 namespace Integration.Controllers
 {
@@ -30,11 +33,7 @@ namespace Integration.Controllers
 			begin = DateTime.Now;
 			controller = new UsersController();
 			PrepareController(controller, "DoPasswordChange");
-
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			controller.DbSession = sessionHolder.CreateSession(typeof(ActiveRecordBase));
-
-			Global.Config.DocsPath = "../../../AdminInterface/Docs/";
+			controller.DbSession = session;
 		}
 
 		[Test]
@@ -50,8 +49,6 @@ namespace Integration.Controllers
 
 			controller.DoPasswordChange(user1.Id, "", false, true, false, "");
 
-			user1.UserUpdateInfo.Refresh();
-			user2.UserUpdateInfo.Refresh();
 			Assert.That(user1.UserUpdateInfo.AFCopyId, Is.Empty);
 			Assert.That(user2.UserUpdateInfo.AFCopyId, Is.EqualTo("12345"));
 		}
@@ -77,7 +74,7 @@ namespace Integration.Controllers
 			scope.Flush();
 
 			var user = Registred();
-			var logs = PasswordChangeLogEntity.Queryable.Where(l => l.TargetUserName == user.Login).ToList();
+			var logs = session.Query<PasswordChangeLogEntity>().Where(l => l.TargetUserName == user.Login).ToList();
 			Assert.That(logs.Count, Is.EqualTo(1));
 			Assert.That(logs.Single().SentTo, Is.EqualTo("4411@33.ru, hffty@jhg.ru,11@33.ru, hgf@jhgj.ut"));
 			Assert.That(user.Accounting, Is.Not.Null);

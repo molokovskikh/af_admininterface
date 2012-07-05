@@ -50,6 +50,14 @@
 			"form.css",
 			"User.css",
 			"columns.css")}
+		<script>
+			$(function () {
+				$.ajaxPrefilter(function (options, originalOptions, jqXHR) {
+					if (options.url[0] == "/")
+						options.url = "${siteroot}" + options.url;
+				});
+			});
+		</script>
 	</head>
 	<body>
 	<% unless ?ShowHeader: %>

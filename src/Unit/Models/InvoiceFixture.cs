@@ -23,7 +23,7 @@ namespace Unit.Models
 			};
 			client = new Client(payer, Data.DefaultRegion);
 			payer.Clients.Add(client);
-			client.Users.Add(new User(client));
+			client.AddUser(new User(client));
 
 			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 		}
@@ -45,7 +45,7 @@ namespace Unit.Models
 		[Test]
 		public void Split_services_by_type()
 		{
-			client.Users.Add(new User(client));
+			client.AddUser(new User(client));
 			client.AddAddress("test");
 			client.AddAddress("test");
 			client.AddAddress("test");
@@ -118,7 +118,7 @@ namespace Unit.Models
 		public void Do_not_group_parts()
 		{
 			payer.InvoiceSettings.DoNotGroupParts = true;
-			client.Users.Add(new User(client));
+			client.AddUser(new User(client));
 			payer.Users.Each(a => a.Accounting.ReadyForAccounting = true);
 
 			var invoice = new Invoice(payer, DateTime.Now.ToPeriod(), DateTime.Now);
@@ -132,7 +132,7 @@ namespace Unit.Models
 		[Test]
 		public void Build_invoice_for_invoice_groups()
 		{
-			new User(client);
+			client.AddUser(new User(client));
 			payer.Users[0].Accounting.ReadyForAccounting = true;
 			payer.Users[1].Accounting.ReadyForAccounting = true;
 			payer.Users[1].Accounting.Payment = 600;
