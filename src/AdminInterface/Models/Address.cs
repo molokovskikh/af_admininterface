@@ -383,7 +383,7 @@ and i.LegalEntityId = :OldLegalEntityId
 
 		public virtual bool CanDelete()
 		{
-			return ClientOrder.Queryable.Count(o => o.Address == this) == 0;
+			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.Address == this) == 0;
 		}
 
 		public override void Delete()

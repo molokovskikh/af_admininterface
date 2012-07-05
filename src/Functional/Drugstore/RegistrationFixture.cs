@@ -8,6 +8,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
 using Functional.ForTesting;
@@ -164,9 +165,9 @@ namespace Functional.Drugstore
 		[Test]
 		public void After_drugstore_registration_should_insert_record_in_user_update_info_table()
 		{
-			var defaults = DefaultValues.Get();
+			var defaults = session.Query<DefaultValues>().First();
 			defaults.AnalitFVersion = 705;
-			defaults.Update();
+			Save(defaults);
 			scope.Flush();
 
 			SetupGeneralInformation();

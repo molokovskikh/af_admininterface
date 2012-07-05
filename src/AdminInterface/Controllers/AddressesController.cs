@@ -1,14 +1,7 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using AdminInterface.Helpers;
+﻿using AdminInterface.Mailers;
 using AdminInterface.Models;
-using AdminInterface.Models.Security;
-using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
-using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
-using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
@@ -18,8 +11,13 @@ using Common.Web.Ui.NHibernateExtentions;
 namespace AdminInterface.Controllers
 {
 	[Secure]
-	public class AddressesController : ARSmartDispatcherController
+	public class AddressesController : AdminInterfaceController
 	{
+		public AddressesController()
+		{
+			SetARDataBinder();
+		}
+
 		public void Show(uint id)
 		{
 			RedirectUsingRoute("Edit", new {id});
@@ -53,7 +51,7 @@ namespace AdminInterface.Controllers
 
 			address.CreateFtpDirectory();
 			address.AddBillingComment(comment);
-			Mailer.Registred(address, comment);
+			Mailer.Registred(address, comment, Defaults);
 			Flash["Message"] = new Message("Адрес доставки создан");
 			RedirectUsingRoute("client", "show", new { client.Id });
 		}
@@ -98,7 +96,7 @@ namespace AdminInterface.Controllers
 		public void Notify(uint id)
 		{
 			var address = Address.Find(id);
-			Mailer.NotifySupplierAboutAddressRegistration(address);
+			Mailer.NotifySupplierAboutAddressRegistration(address, Defaults);
 			Mailer.AddressRegistrationResened(address);
 			Flash["Message"] = new Message("Уведомления отправлены");
 			RedirectToReferrer();

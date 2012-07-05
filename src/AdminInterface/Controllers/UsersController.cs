@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Extentions;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -148,12 +149,12 @@ namespace AdminInterface.Controllers
 			if (address != null)
 				address.CreateFtpDirectory();
 
-			Mailer.Registred(user, comment);
+			Mailer.Registred(user, comment, Defaults);
 			user.AddBillingComment(comment);
 			if (address != null)
 			{
 				address.AddBillingComment(comment);
-				Mailer.Registred(address, comment);
+				Mailer.Registred(address, comment, Defaults);
 			}
 			if (user.Client != null) { 
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
@@ -179,6 +180,7 @@ namespace AdminInterface.Controllers
 				var smtpId = ReportHelper.SendClientCard(user,
 					password,
 					false,
+					Defaults,
 					mails);
 				passwordChangeLog.SetSentTo(smtpId, mails);
 				DbSession.SaveOrUpdate(passwordChangeLog);
@@ -304,6 +306,7 @@ namespace AdminInterface.Controllers
 					user,
 					password,
 					false,
+					Defaults,
 					emailsForSend);
 				passwordChangeLog.SetSentTo(smtpId, emailsForSend);
 			}

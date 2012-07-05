@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Controllers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;

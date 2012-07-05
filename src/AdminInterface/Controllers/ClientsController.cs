@@ -315,7 +315,7 @@ where Phone like :phone")
 		public void NotifySuppliers(uint clientId)
 		{
 			var client = Client.Find(clientId);
-			new NotificationService().NotifySupplierAboutDrugstoreRegistration(client, true);
+			new NotificationService(Defaults).NotifySupplierAboutDrugstoreRegistration(client, true);
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}

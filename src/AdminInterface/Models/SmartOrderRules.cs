@@ -32,7 +32,7 @@ namespace AdminInterface.Models
 		{
 			if (AssortimentPriceCode.HasValue)
 			{
- 				var price = Price.Find(AssortimentPriceCode.Value);
+				var price = Price.Find(AssortimentPriceCode.Value);
 				return string.Format("{0} - {1}", price.Supplier.Name, price.Name);
 			}
 			return string.Empty;

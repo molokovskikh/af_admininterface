@@ -1,9 +1,10 @@
-п»їusing System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text.RegularExpressions;
 using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
@@ -13,28 +14,28 @@ using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
 
-namespace AdminInterface.Models
+namespace AdminInterface.Queries
 {
 	public enum SearchUserBy
 	{
-		[Description("РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРё")] Auto,
-		[Description("РљРѕРґ РєР»РёРµРЅС‚Р°")] ByClientId,
-		[Description("РљРѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByUserId,
-		[Description("Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByLogin,
-		[Description("РљРѕРјРјРµРЅС‚Р°СЂРёР№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ")] ByUserName,
-		[Description("Email/С‚РµР»РµС„РѕРЅ")] ByContacts,
-		[Description("РљРѕРЅС‚Р°РєС‚РЅРѕРµ Р»РёС†Рѕ (Р¤.Р.Рћ.)")] ByPersons,
-		[Description("РРјСЏ РєР»РёРµРЅС‚Р°")] ByClientName,
-		[Description("Р®СЂРёРґРёС‡РµСЃРєРѕРµ РёРјСЏ")] ByJuridicalName,
-		[Description("РљРѕРґ РґРѕРіРѕРІРѕСЂР°")] ByPayerId,
-		[Description("РђРґСЂРµСЃ РґР»СЏ РѕС‚РїСЂР°РІРєРё РґРѕРєСѓРјРµРЅС‚РѕРІ")] AddressMail
+		[Description("Автоматически")] Auto,
+		[Description("Код клиента")] ByClientId,
+		[Description("Код пользователя")] ByUserId,
+		[Description("Логин пользователя")] ByLogin,
+		[Description("Комментарий пользователя")] ByUserName,
+		[Description("Email/телефон")] ByContacts,
+		[Description("Контактное лицо (Ф.И.О.)")] ByPersons,
+		[Description("Имя клиента")] ByClientName,
+		[Description("Юридическое имя")] ByJuridicalName,
+		[Description("Код договора")] ByPayerId,
+		[Description("Адрес для отправки документов")] AddressMail
 	}
 
 	public enum StatusStateFilter
 	{
-		[Description("Р’СЃРµ")] All,
-		[Description("Р’РєР»СЋС‡РµРЅРЅС‹Рµ")] Enabled,
-		[Description("РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ")] Disabled
+		[Description("Все")] All,
+		[Description("Включенные")] Enabled,
+		[Description("Отключенные")] Disabled
 	}
 
 	public class SearchTextInfo
@@ -185,8 +186,8 @@ where
 and
 u.Id in ({1})
 ", info.SqlSearchText.Replace("-", ""), findedUsers))
-					.SetParameter("RegionMask", regionMask)
-					.List<uint>();
+						.SetParameter("RegionMask", regionMask)
+						.List<uint>();
 
 					if (findInUsers.Count > 0) { 
 						var bufResult = result.Where(r => findInUsers.Contains(r.UserId)).ToList();
@@ -213,8 +214,8 @@ u.Id in ({1})
 
 		private static string ProcessFilter(string filter)
 		{
-			if (filter.Contains('в„–'))
-				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('в„–', 'N'));
+			if (filter.Contains('№'))
+				filter = String.Format(" ({0}) or ({1}) ", filter, filter.Replace('№', 'N'));
 			return filter;
 		}
 
@@ -268,15 +269,15 @@ u.Id in ({1})
 						filter += String.Format(@" u.Id = {0} or s.Id = {0} ", searchText);
 					else {
 						filter = AddFilterCriteria(filter,
-						String.Format(@"
+							String.Format(@"
 LOWER(u.Login) like '{0}' or
 LOWER(u.Name) like '{0}' or
 LOWER(s.Name) like '{0}' ",
-							sqlSearchText));
+								sqlSearchText));
 					}
 					if (searchTextIsPhone && searchText.Length >= 6)
 						filter += String.Format(" or (REPLACE(Contacts.ContactText, '-', '') like '{0}' and Contacts.Type = 1)" +
-								" or (REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1) ",
+							" or (REPLACE(ContactsAddresses.ContactText, '-', '') like '{0}' and ContactsAddresses.Type = 1) ",
 							sqlSearchText.Replace("-", ""));
 					break;
 				}

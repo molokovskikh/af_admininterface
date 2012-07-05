@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
@@ -113,7 +114,7 @@ namespace AdminInterface.Controllers
 				currentPayer.Suppliers.Add(supplier);
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
-				supplier.OrderRules.Add(new OrderSendRules(DefaultValues.Get(), supplier));
+				supplier.OrderRules.Add(new OrderSendRules(Defaults, supplier));
 				supplier.Save();
 
 				foreach (var group in supplier.ContactGroupOwner.ContactGroups)
@@ -301,7 +302,7 @@ namespace AdminInterface.Controllers
 				DbSession.Save(log);
 			}
 
-			Mailer.ClientRegistred(client, comment);
+			Mailer.ClientRegistred(client, comment, Defaults);
 			if (!options.FillBillingInfo)
 				this.Mailer().NotifyBillingAboutClientRegistration(client);
 
@@ -353,6 +354,7 @@ namespace AdminInterface.Controllers
 			var smtpid = ReportHelper.SendClientCard(user,
 				password,
 				true,
+				Defaults,
 				mailTo,
 				additionalEmails);
 			log.SetSentTo(smtpid, mailTo);

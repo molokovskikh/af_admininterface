@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Net.Mail;
 using AdminInterface.Helpers;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
@@ -13,6 +14,11 @@ namespace AdminInterface.Services
 {
 	public class NotificationService
 	{
+		public NotificationService(DefaultValues defaults)
+		{
+			this.defaults = defaults;
+		}
+
 		private readonly string _messageTemplateForSupplierAboutDrugstoreRegistration =
 @"Добрый день.
 
@@ -33,13 +39,14 @@ namespace AdminInterface.Services
 Адрес доставки отказов: {4}@refused.analit.net
 ".Replace('\'', '\"');
 
+		private DefaultValues defaults;
+
 		public void NotifySupplierAboutAddressRegistration(Address address)
 		{
 			if (!address.Client.ShouldSendNotification()
 				|| !address.Enabled)
 				return;
 
-			var defaults = DefaultValues.Get();
 			var client = address.Client;
 			var emails = GetEmailsForNotification(client);
 			var orgName = client.FullName;
@@ -66,7 +73,6 @@ namespace AdminInterface.Services
 			if (!client.ShouldSendNotification())
 				return;
 
-			var defaults = DefaultValues.Get();
 			var emails = GetEmailsForNotification(client);
 			foreach (var address in client.Addresses.Where(a => a.Enabled))
 			{

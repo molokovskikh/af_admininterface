@@ -144,12 +144,12 @@ namespace AdminInterface.Controllers
 		[RequiredPermission(PermissionType.EditSettings)]
 		public void Settings()
 		{
-			var defaults = DefaultValues.Get();
+			var defaults = Defaults;
 			if (IsPost)
 			{
 				((ARDataBinder)Binder).AutoLoad = AutoLoadBehavior.Always;
 				BindObjectInstance(defaults, ParamStore.Form, "defaults");
-				if (defaults.IsValid()) {
+				if (IsValid(defaults)) {
 					Notify("Сохранено");
 					RedirectToReferrer();
 				}
@@ -175,7 +175,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["now"] = DateTime.Now;
 			PropertyBag["user"] = User.Find(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
-			PropertyBag["defaults"] = DefaultValues.Get();
+			PropertyBag["defaults"] = Defaults;
 			if (Session["password"] != null && Flash["newUser"] == null)
 				PropertyBag["password"] = Session["password"];
 		}

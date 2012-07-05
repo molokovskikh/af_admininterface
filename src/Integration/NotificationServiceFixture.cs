@@ -1,6 +1,9 @@
-﻿using AdminInterface.Services;
+﻿using System.Linq;
+using AdminInterface.Models;
+using AdminInterface.Services;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration
@@ -15,8 +18,9 @@ namespace Integration
 			supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers).AddContact(ContactType.Email, "kvasovtest@analit.net");
 			supplier.Save();
 			var client = DataMother.TestClient();
+			var defaults = session.Query<DefaultValues>().First();
 
-			var service = new NotificationService();
+			var service = new NotificationService(defaults);
 			service.NotifySupplierAboutDrugstoreRegistration(client, false);
 		}
 	}

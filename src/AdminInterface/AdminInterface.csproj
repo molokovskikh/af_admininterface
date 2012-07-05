@@ -150,12 +150,13 @@
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Mailers\Mailer.cs" />
+    <Compile Include="Mailers\MonorailMailer.cs" />
     <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
     <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\OrderLog.cs" />
-    <Compile Include="Models\OrderFilter.cs" />
     <Compile Include="Controllers\SpecialHandlersController.cs" />
     <Compile Include="Controllers\ManagerReportsController.cs" />
     <Compile Include="Controllers\Filters\StatQuery.cs" />
@@ -266,7 +267,6 @@
     <Compile Include="Models\Logs\LogOperation.cs" />
     <Compile Include="Models\Logs\RejectedEmail.cs" />
     <Compile Include="Models\Logs\UserLogRecord.cs" />
-    <Compile Include="Models\Mailer.cs" />
     <Compile Include="Models\Maintainer.cs" />
     <Compile Include="Models\Offer.cs" />
     <Compile Include="Models\Suppliers\Price.cs" />
@@ -287,16 +287,16 @@
     <Compile Include="Models\Telephony\UnresolvedCall.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UserSearchItem.cs" />
-    <Compile Include="Models\UserFilter.cs" />
     <Compile Include="Models\UserUpdateInfo.cs" />
     <Compile Include="MonoRailExtentions\AnonymousTypeToPropertyBagBinder.cs" />
-    <Compile Include="Models\MonorailMailer.cs" />
     <Compile Include="MonoRailExtentions\MailerExtention.cs" />
     <Compile Include="MonoRailExtentions\StandaloneInitializer.cs" />
     <Compile Include="NHibernateExtentions\ConnectionScope.cs" />
     <Compile Include="NHibernateExtentions\PeriodUserType.cs" />
     <Compile Include="Queries\MessageQuery.cs" />
+    <Compile Include="Queries\OrderFilter.cs" />
     <Compile Include="Queries\RejectWaibillParams.cs" />
+    <Compile Include="Queries\UserFilter.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
     <Compile Include="Security\SecurityContext.cs" />
@@ -394,7 +394,7 @@
     <Compile Include="SenderProperties.aspx.designer.cs">
       <DependentUpon>SenderProperties.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="Mailers\NotificationService.cs" />
     <Compile Include="ViewAdministrators.aspx.cs">
       <DependentUpon>ViewAdministrators.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

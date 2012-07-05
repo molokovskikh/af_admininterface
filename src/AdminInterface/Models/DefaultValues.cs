@@ -20,7 +20,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Table = "Defaults", Schema = "UserSettings")]
-	public class DefaultValues : ActiveRecordValidationBase<DefaultValues>
+	public class DefaultValues
 	{
 		[PrimaryKey]
 		public uint Id { get; set; }
@@ -66,11 +66,6 @@ namespace AdminInterface.Models
 
 		[Property, ValidateNonEmpty]
 		public string ResponseBodyMiniMailOnAllowedExtensions { get; set; }
-
-		public static DefaultValues Get()
-		{
-			return FindAll().First();
-		}
 
 		public IEnumerable<string> GetPhones()
 		{

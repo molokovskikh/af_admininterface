@@ -1,17 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using AddUser;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models
 {
 	[ActiveRecord("DocumentHeaders", Schema = "documents")]
-	public class FullDocument : Common.Web.Ui.Models.Document
+	public class FullDocument : Document
 	{
 		public FullDocument()
 		{ }

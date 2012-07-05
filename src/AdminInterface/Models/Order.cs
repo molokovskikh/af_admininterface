@@ -11,7 +11,7 @@ using NHibernate;
 namespace AdminInterface.Models
 {
 	[ActiveRecord(Schema = "Orders", Table = "OrdersHead")]
-	public class ClientOrder : ActiveRecordLinqBase<ClientOrder>
+	public class ClientOrder
 	{
 		public ClientOrder()
 		{}

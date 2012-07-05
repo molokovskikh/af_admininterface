@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;

@@ -424,7 +424,7 @@ namespace AdminInterface.Models
 			if (UserUpdateInfo == null)
 				UserUpdateInfo = new UserUpdateInfo(this);
 
-			var defaults = DefaultValues.Get();
+			var defaults = ActiveRecordMediator<DefaultValues>.FindFirst();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
 			Save();
@@ -733,7 +733,7 @@ WHERE
 
 		public virtual bool CanDelete()
 		{
-			return ClientOrder.Queryable.Count(o => o.User == this) == 0;
+			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.User == this) == 0;
 		}
 
 		public virtual void Delete()

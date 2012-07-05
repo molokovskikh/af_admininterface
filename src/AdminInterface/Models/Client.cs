@@ -454,7 +454,7 @@ where ClientId = :clientId")
 
 		public virtual bool CanDelete()
 		{
-			return ClientOrder.Queryable.Count(o => o.Client == this) == 0
+			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.Client == this) == 0
 				&& Addresses.All(a => a.CanDelete())
 				&& Users.All(u => u.CanDelete());
 		}
