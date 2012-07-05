@@ -90,12 +90,12 @@ namespace Functional.Suppliers
 		public void Update_supplier_name()
 		{
 			Open(supplier);
-			browser.Css("#supplier_Name").TypeText("Тестовый поставщик обновленный");
+			browser.Css("#supplier_Name").TypeText("Тестовый_поставщик_обновленный");
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			Assert.That(browser.Css("#supplier_Name").Text, Is.EqualTo("Тестовый поставщик обновленный"));
+			Assert.That(browser.Css("#supplier_Name").Text, Is.EqualTo("Тестовый_поставщик_обновленный"));
 			ActiveRecordMediator.Refresh(supplier);
-			Assert.That(supplier.Name, Is.EqualTo("Тестовый поставщик обновленный"));
+			Assert.That(supplier.Name, Is.EqualTo("Тестовый_поставщик_обновленный"));
 		}
 
 		[Test, Ignore("Не реализовано")]
