@@ -24,6 +24,7 @@ namespace Integration.Controllers
 			user = client.Users.First();
 			controller = new AddressesController();
 			PrepareController(controller, "Addresses", "Add");
+			controller.DbSession = session;
 		}
 
 		[Test]
