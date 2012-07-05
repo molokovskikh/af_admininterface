@@ -52,14 +52,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void View_documents_with_client_column()
 		{
-			User testUser = new User(client);
-			testUser.Setup();
-			
-			client.Users.Add(
-				testUser
-			);
-			
-			client.Save();
+			var testUser = client.AddUser("Test user");
 			Flush();
 
 			var document = new DocumentReceiveLog(supplier) {

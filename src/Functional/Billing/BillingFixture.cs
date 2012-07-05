@@ -59,9 +59,9 @@ namespace Functional.Billing
 		[Test]
 		public void View_all_users()
 		{
-			var user = new User(client) {Name = "test user for billing",};
-			user.Setup();
-			user.Save();
+			var user = client.AddUser("test user for billing");
+			Save(user);
+
 			client.Users.Each(u => u.Enabled = false);
 			Refresh();
 
@@ -343,11 +343,8 @@ namespace Functional.Billing
 			{
 				for (var i = 0; i < countUsers; i++)
 				{
-					var user = new User(client) { Name = "user", };
-					user.Setup();
-					Thread.Sleep(500);
-					var address = new Address { Client = client, Value = "address", };
-					client.AddAddress(address);
+					client.AddUser("user");
+					var address = client.AddAddress("address");
 					address.Save();
 				}
 				scope.VoteCommit();
@@ -409,9 +406,8 @@ namespace Functional.Billing
 		public void Test_refresh_total_sum()
 		{
 			// Создаем 2 пользователя и 3 адреса. 2 пользователя и 2 адреса включены
-			var user = new User(client) { Name = "test user", };
+			var user = client.AddUser("test user");
 			user.Accounting.ReadyForAccounting = true;
-			user.Setup();
 			client.AddAddress("address");
 			client.AddAddress("address");
 			user.Enabled = true;

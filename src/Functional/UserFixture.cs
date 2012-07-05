@@ -28,10 +28,11 @@ namespace Functional
 		[Test]
 		public void ShowUsersTest()
 		{
-			new User(client) {
-				Name = "Пробный",
-				Login = User.GetTempLogin()
-			}.Save();
+			var user1 = new User(client) {
+				Name = "Пробный", Login = User.GetTempLogin()
+			};
+			client.AddUser(user1);
+			Save(user1);
 			Open(user);
 			Click("Настройка");
 			Assert.That(browser.Text, Is.StringContaining("Логины в видимости пользователя"));

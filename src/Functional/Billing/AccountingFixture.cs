@@ -77,8 +77,8 @@ namespace Functional.Billing
 		{
 			using (var scope = new TransactionScope(OnDispose.Rollback))
 			{
-				var user = new User(client) {Name = "test user",};
-				user.Setup();
+				client.AddUser("test user");
+
 				var address = new Address {Value = "address",};
 				client.AddAddress(address);
 				address.Save();

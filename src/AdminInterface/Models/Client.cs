@@ -381,6 +381,14 @@ group by u.ClientId")
 			Payers.Add(payer);
 		}
 
+		public virtual User AddUser(string name)
+		{
+			var user = new User(this) {Name = name};
+			AddUser(user);
+			user.Setup();
+			return user;
+		}
+
 		public override void AddUser(User user)
 		{
 			if (user.Payer == null) {

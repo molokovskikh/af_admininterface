@@ -43,33 +43,18 @@ namespace Functional.Drugstore
 		[Test]
 		public void Set_user_parent()
 		{
-			User user;
-			User mainUser;
-			Client client;
-			using (var transaction = new TransactionScope(OnDispose.Rollback))
-			{
-				client = DataMother.CreateTestClientWithUser();
-				user = client.Users.First();
-				mainUser = new User(client) {
-					Name = "test"
-				};
-				mainUser.Setup();
-				transaction.VoteCommit();
-			}
-			using(var browser = Open("client/{0}", client.Id))
-			{
-				browser.Link(Find.ByText(user.Login)).Click();
-				Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
-				browser.Link(Find.ByText("Настройка")).Click();
-				browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.Login);
-				browser.Button(Find.ByValue("Сохранить")).Click();
-				Assert.That(browser.Text, Is.StringContaining("Сохранен"));
-			}
-			using (new SessionScope())
-			{
-				user = User.Find(user.Id);
-				Assert.That(user.InheritPricesFrom.Id, Is.EqualTo(mainUser.Id));
-			}
+			var mainUser = client.AddUser("test");
+
+			Open("client/{0}", client.Id);
+			browser.Link(Find.ByText(user.Login)).Click();
+			Assert.That(browser.Text, Is.StringContaining("Пользователь " + user.Login));
+			browser.Link(Find.ByText("Настройка")).Click();
+			browser.SelectList(Find.ByName("user.InheritPricesFrom.Id")).Select(mainUser.Login);
+			browser.Button(Find.ByValue("Сохранить")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранен"));
+
+			session.Refresh(user);
+			Assert.That(user.InheritPricesFrom.Id, Is.EqualTo(mainUser.Id));
 		}
 
 		[Test]

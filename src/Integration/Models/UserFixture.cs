@@ -128,7 +128,7 @@ namespace Integration.Models
 		public void SetReplicationInfo()
 		{
 			var parent = new User(client);
-
+			client.AddUser(parent);
 			parent.Setup();
 
 			var supplier = DataMother.CreateSupplier();

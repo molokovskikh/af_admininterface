@@ -29,8 +29,7 @@ namespace Functional.Drugstore
 		[Test]
 		public void Try_sort_users()
 		{
-			var user = new User(client) {Name = "test user"};
-			user.Setup();
+			var user = client.AddUser("test user");
 			Refresh();
 			Assert.That(browser.Text, Is.StringContaining("клиент"));
 			Assert.IsTrue(browser.Link(Find.ByText("Код пользователя")).Exists);
@@ -65,18 +64,11 @@ namespace Functional.Drugstore
 		[Test]
 		public void View_client_message_from_user()
 		{
-			using (var scope = new TransactionScope())
-			{				
-				var user = new User(client) {Name = "User2",};
-				user.Setup();
-				client.Users.Add(user);
-				client.SaveAndFlush();
-				scope.VoteCommit();
-				client = Client.Find(client.Id);
-			}
+			client.AddUser("User2");
+
 			browser.TextField(Find.ByName("message")).TypeText("This message for client");
 			browser.Button(Find.ByValue("Принять")).Click();
-				
+
 			browser.Link(Find.ByText(client.Users[0].Login)).Click();
 			Assert.That(browser.Text, Is.StringContaining("This message for client"));
 			browser.TextField(Find.ByName("message")).TypeText("This message for user1");
