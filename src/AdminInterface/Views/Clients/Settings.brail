@@ -22,6 +22,11 @@
 
 <script>
 	$(function () {
+		window.searchEditors = {};
+		window.searchEditors["assortmentPrice"] = {
+			title: "Выберите ассортиментный прайс лист",
+			url: "/clients/SearchAssortmentPrices"
+		};
 
 		$("#excludes").data("template", function() {
 			return $("<tr>")
@@ -39,13 +44,13 @@
 				cancel(root);
 		});
 
-		<%if (not drugstore.SmartOrderRules) and (drugstore.EnableSmartOrder): %>
+		<% if (not drugstore.SmartOrderRules) and (drugstore.EnableSmartOrder): %>
 			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
 			search(rootSmartOrder);
-		<%end %>
+		<% end %>
 
-		$("drugstore_NoiseCosts").change(function () {
-			$("drugstore_NoiseCostExceptSupplier_Id").val("");
+		$("#drugstore_NoiseCosts").change(function () {
+			$("#drugstore_NoiseCostExceptSupplier_Id").val("");
 		});
 	});
 
@@ -66,11 +71,15 @@
 	function search(root) {
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
-		root.find("input[type=hidden][data-search-url]").each(function () {
-			var title = $(this).attr("data-search-title");
-			var url = $(this).attr("data-search-url");
-			root.prepend(searchTemplate(title, url));
-		});
+		root.find("input[type=hidden][data-search-url]")
+			.add(root.find("input[type=hidden][data-search-editor]"))
+			.each(function () {
+				var element = $(this);
+				var editor = window.searchEditors[element.attr("data-search-editor")] || {};
+				var title = element.attr("data-search-title") || editor.title;
+				var url = element.attr("data-search-url") || editor.url;
+				root.prepend(searchTemplate(title, url, element));
+			});
 	}
 
 	function NotifySuppliers() {
@@ -118,8 +127,7 @@
 					</td>
 					<td>
 						${FormHelper.HiddenField("drugstore.AssortimentPrice.Id", 
-							{"data-search-title": "Выберите ассортиментный прайс лист",
-								"data-search-url": "/clients/SearchAssortmentPrices"})}
+							{"data-search-editor": "assortmentPrice"})}
 						<div class=value>
 							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
@@ -160,12 +168,10 @@
 					</td>
 					<td>
 						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode",
-							{"data-search-title": "Выберите ассортиментный прайс лист",
-								"data-search-url": "/clients/SearchAssortmentPrices"})}
+							{"data-search-editor": "assortmentPrice"})}
 
 						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm",
-							{"data-search-title": "Выберите парсер",
-								"data-search-url": "/clients/SerachParseAlgorithm"})}
+							{"data-search-editor": "assortmentPrice"})}
 						<%if drugstore.SmartOrderRules: %>
 							<div class=value>
 								Ассортиментный прайс лист: ${drugstore.SmartOrderRules.GetAssortimentPriceName()} <br />
@@ -181,8 +187,7 @@
 					</td>
 					<td>
 						${FormHelper.HiddenField("drugstore.BuyingMatrixPrice.Id",
-							{"data-search-title": "Выберите ассортиментный прайс лист",
-								"data-search-url": "/clients/SearchAssortmentPrices"})}
+							{"data-search-editor": "assortmentPrice"})}
 						<% if drugstore.BuyingMatrixPrice: %>
 							<div class=value>
 								${drugstore.BuyingMatrixPrice.Supplier.Name} - ${drugstore.BuyingMatrixPrice.Name}
@@ -201,8 +206,7 @@
 					</td>
 					<td>
 						${FormHelper.HiddenField("drugstore.OfferMatrixPrice.Id",
-							{"data-search-title": "Выберите ассортиментный прайс лист",
-								"data-search-url": "/clients/SearchAssortmentPrices"})}
+							{"data-search-editor": "assortmentPrice"})}
 						<% if drugstore.OfferMatrixPrice: %>
 							<div class=value>
 								${drugstore.OfferMatrixPrice.Supplier.Name} - ${drugstore.OfferMatrixPrice.Name}

@@ -4,7 +4,8 @@
 	});
 
 	$("input[type=button].search").live("click", function () {
-		var url = $(this).data("url");
+		var url = $(this).data("search-editor").url;
+		var inputName = $(this).data("search-editor").inpurtName;
 		var root = $(this).parents("div.search").first();
 		var rootRow = root.parents("tr").first();
 		var term = root.find("input[type=text].term").val();
@@ -24,10 +25,14 @@
 				$.each(data, function () {
 					select.append($("<option>").attr("value", this.id).text(this.name));
 				});
+				var selector = "input[type=hidden]";
+				if (inputName)
+					selector += "[name=\"" + inputName + "\"]";
+
 				select.change(function () {
-					rootRow.find("input[type=hidden]").val($(this).val());
+					rootRow.find(selector).val($(this).val());
 				});
-				rootRow.find("input[type=hidden]").val(select.val());
+				rootRow.find(selector).val(select.val());
 				root.append(select);
 			},
 			error: function (xhr, textStatus, error) {
@@ -44,11 +49,17 @@ function message(root, text, clazz) {
 	root.append($("<span class=message>" + text + "<span>").addClass(clazz));
 }
 
-function searchTemplate(title, url) {
+function searchTemplate(title, url, item) {
+	var inpurtName = null;
+	if (item)
+		inpurtName = item.attr("name");
+
 	return $("<div class=search><span class=search-title>" + title + "</span><br>"
 			+ "<input type='text' class=term />"
 			+ "<input type='button' class=search value='Найти' />"
 			+ "<input type='button' class=cancel-search value='Отмена' />"
 			+ "</div>")
-			.find("input[type=button]").data("url", url).end();
+			.find("input[type=button]")
+				.data("search-editor", {url: url, inpurtName: inpurtName})
+			.end();
 }
