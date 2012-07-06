@@ -12,6 +12,7 @@ using NUnit.Framework;
 using Test.Support.Web;
 using Test.Support.log4net;
 using WatiN.Core; using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
 using DescriptionAttribute=NUnit.Framework.DescriptionAttribute;
 
@@ -43,14 +44,12 @@ namespace Functional.Drugstore
 				s.FullName = "Фармаимпекс";
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
-			supplier.Save();
+			Save(supplier);
 			scope.Flush();
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
-			Css(".term").TypeText("Фармаимпекс");
-			Css(".search[type=button]").Click();
-			Thread.Sleep(1000);
+			Search("Фармаимпекс");
 
 			Assert.That(Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
@@ -71,7 +70,6 @@ namespace Functional.Drugstore
 			Assert.That(client.Settings.WarningOnBuyingMatrix, Is.EqualTo(BuyingMatrixAction.Block));
 		}
 
-
 		[Test]
 		public void Set_offers_matrix()
 		{
@@ -80,7 +78,7 @@ namespace Functional.Drugstore
 				s.FullName = "Фармаимпекс";
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
-			supplier.Save();
+			Save(supplier);
 			scope.Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
@@ -112,7 +110,7 @@ namespace Functional.Drugstore
 				s.FullName = "Фармаимпекс";
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
-			supplier.Save();
+			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			scope.Flush();
 
@@ -128,7 +126,7 @@ namespace Functional.Drugstore
 			excludes.Css(".term").TypeText("Фармаимпекс");
 			excludes.Css(".search[type=button]").Click();
 			Thread.Sleep(1000);
-			Assert.That(excludes.Css("div.search select").SelectedItem, Is.EqualTo("Фармаимпекс"));
+			Assert.That(excludes.Css("div.search select").SelectedItem, Is.StringEnding("Фармаимпекс"));
 
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
@@ -155,7 +153,7 @@ namespace Functional.Drugstore
 				s.FullName = "Фармаимпекс";
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
-			supplier.Save();
+			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			session.Save(new ParseAlgorithm {Name = "testParse"});
 			scope.Flush();
@@ -163,19 +161,17 @@ namespace Functional.Drugstore
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_EnableSmartOrder").Click();
 
-			Css("#EnableSmartOrderFirstRow .term").TypeText("Фармаимпекс");
-			Css("#EnableSmartOrderFirstRow .search[type=button]").Click();
-			Thread.Sleep(1000);
-			Assert.That(Css("#EnableSmartOrderFirstRow div.search select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
+			Search("Фармаимпекс", "Выберите ассортиментный прайс лист");
+			Assert.That(SearchRoot("Выберите ассортиментный прайс лист")
+				.Css("select").SelectedItem, Is.EqualTo("Фармаимпекс - Матрица"));
 
-			Css("#EnableSmartOrderSecondRow .term").TypeText("testParse");
-			Css("#EnableSmartOrderSecondRow .search[type=button]").Click();
-			Thread.Sleep(1000);
-			Assert.That(Css("#EnableSmartOrderSecondRow div.search select").SelectedItem, Is.EqualTo("testParse"));
+			Search("testParse", "Выберите парсер");
+			Assert.That(SearchRoot("Выберите парсер")
+				.Css("select").SelectedItem, Is.EqualTo("testParse"));
 
-			browser.Button(Find.ByValue("Сохранить")).Click();
+			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
-			browser.Click("Настройка");
+			Click("Настройка");
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.Text, Is.StringContaining("testParse"));
 		}
@@ -451,13 +447,18 @@ namespace Functional.Drugstore
 		[Test, Description("Зашумлять цены для всех поставщиков кроме одного")]
 		public void Set_costs_noising_except_one_supplier()
 		{
-			var supplier = DataMother.CreateSupplier(s => { s.Payer = client.Payers.First(); });
-			supplier.Save();
-			scope.Flush();
+			var supplier = DataMother.CreateSupplier();
+			MakeNameUniq(supplier);
+			Maintainer.MaintainIntersection(supplier);
+			Refresh();
 
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
-			Thread.Sleep(1000);
-			browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectByValue(supplier.Id.ToString());
+			Search(supplier.Name);
+
+			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
+			Thread.Sleep(10000);
+			Assert.That(Css("div.search select").SelectedItem, Is.StringEnding(supplier.Name));
+
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
@@ -469,10 +470,6 @@ namespace Functional.Drugstore
 		public void Set_costs_noising_for_all_suppliers()
 		{
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
-			Thread.Sleep(1000);
-			Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Text,
-				Is.EqualTo("Зашумлять все прайс листы всех поставщиков"));
-			Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value, Is.EqualTo("0"));
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
@@ -487,7 +484,7 @@ namespace Functional.Drugstore
 			var supplier = DataMother.CreateSupplier(s => {
 				s.AddRegion(region);
 			});
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			browser.Link(Find.ByText("Показать все регионы")).Click();
@@ -506,16 +503,15 @@ from
 Customers.Intersection i
 where i.ClientId = :ClientId and i.RegionId = :RegionId
 ";
-			var count = 0;
-			ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
-													.SetParameter("RegionId", region.Id)
-													.SetParameter("ClientId", client.Id)
-													.UniqueResult()));
+			var count = Convert.ToInt32(session.CreateSQLQuery(sql)
+				.SetParameter("RegionId", region.Id)
+				.SetParameter("ClientId", client.Id)
+				.UniqueResult());
 			Assert.That(count, Is.GreaterThan(0));
-			ArHelper.WithSession(session => count = Convert.ToInt32(session.CreateSQLQuery(sql)
-													.SetParameter("RegionId", region.Id)
-													.SetParameter("ClientId", client.Id)
-													.UniqueResult()));
+			count = Convert.ToInt32(session.CreateSQLQuery(sql)
+				.SetParameter("RegionId", region.Id)
+				.SetParameter("ClientId", client.Id)
+				.UniqueResult());
 			Assert.That(count, Is.GreaterThan(0));
 		}
 
@@ -523,7 +519,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 		public void Unset_costs_noising()
 		{
 			var supplier = DataMother.CreateSupplier(s => { s.Payer = client.Payers.First(); });
-			supplier.Save();
+			Save(supplier);
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
 			client.Settings.Update();
@@ -531,10 +527,6 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 
 			Refresh();
 			//ждем тк список для редактирования отображает js
-			Thread.Sleep(200);
-			Assert.IsTrue(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).Exists);
-			Assert.That(browser.SelectList(Find.ByName("drugstore.NoiseCostExceptSupplier.Id")).SelectedOption.Value,
-				Is.EqualTo(client.Settings.NoiseCostExceptSupplier.Id.ToString()));
 			Assert.IsTrue(browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked);
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = false;
 			Thread.Sleep(1000);
@@ -553,7 +545,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 				s.FullName = "Поставщик для тестирования";
 				s.AddPrice("Ассортиментный прайс", PriceType.Assortment);
 			});
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			var checkbox = (CheckBox) Css("#drugstore_IsConvertFormat");
@@ -570,7 +562,26 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Assert.That(settings.IsConvertFormat, Is.True);
 			Assert.That(settings.AssortimentPrice, Is.Not.Null);
 		}
-		
+
+		private void Search(string term, string title = null)
+		{
+			if (String.IsNullOrEmpty(title)) {
+				Css(".term").TypeText(term);
+				Css(".search[type=button]").Click();
+			}
+			else {
+				var searchRoot = SearchRoot(title);
+				searchRoot.Css(".term").TypeText(term);
+				searchRoot.Css(".search[type=button]").Click();
+			}
+			Thread.Sleep(1000);
+		}
+
+		private Element SearchRoot(string title)
+		{
+			return browser.Element(Find.ByText(title).And(Find.ByClass("search-title"))).Parent;
+		}
+
 		private SelectList GetHomeRegionSelect(Browser browser)
 		{
 			return browser.SelectList(Find.ById("HomeRegionComboBox"));

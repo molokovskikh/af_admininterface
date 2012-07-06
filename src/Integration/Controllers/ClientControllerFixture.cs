@@ -258,7 +258,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Search_suppliers()
 		{
-			DataMother.CreateSupplier().Save();
+			session.Save(DataMother.CreateSupplier());
 			scope.Flush();
 
 			Maintainer.MaintainIntersection(client, client.Orgs().First());

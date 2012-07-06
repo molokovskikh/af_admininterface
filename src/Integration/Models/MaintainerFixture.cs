@@ -37,7 +37,7 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier(s => {
 				s.Prices.First().AddCost();
 			});
-			supplier.Save();
+			Save(supplier);
 
 			var client = DataMother.TestClient();
 

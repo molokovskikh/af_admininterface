@@ -106,7 +106,7 @@ namespace Integration.Models
 			client.Settings.IgnoreNewPriceForUser = true;
 			var pricesCount = user.GetUserPriceCount();
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 
 			Flush();
 
@@ -132,7 +132,7 @@ namespace Integration.Models
 			parent.Setup();
 
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 
 			session
 				.CreateSQLQuery("insert into Usersettings.AnalitfReplicationInfo(UserId, FirmCode, ForceReplication) values (:UserId, :SupplierId, 0)")

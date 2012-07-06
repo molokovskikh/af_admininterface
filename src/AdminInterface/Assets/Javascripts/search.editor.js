@@ -1,12 +1,12 @@
 ﻿$(function () {
 	$("input[type=button].cancel-search").live("click", function () {
-		cancel($($(this).parents("td").get(0)));
+		cancel($(this).parents("td").first());
 	});
 
 	$("input[type=button].search").live("click", function () {
 		var url = $(this).data("url");
-		var root = $($(this).parents("div.search").get(0));
-		var rootRow = $(root.parents("tr").get(0));
+		var root = $(this).parents("div.search").first();
+		var rootRow = root.parents("tr").first();
 		var term = root.find("input[type=text].term").val();
 		$.ajax({
 			url: url,
@@ -18,7 +18,7 @@
 					message(root, "Ничего не найдено.", "error");
 					return;
 				}
-				root.children().remove();
+				root.children().not(".search-title").remove();
 				rootRow.find(".settings").css("display", "");
 				var select = $("<select>");
 				$.each(data, function () {
@@ -45,7 +45,7 @@ function message(root, text, clazz) {
 }
 
 function searchTemplate(title, url) {
-	return $("<div class=search><span>" + title + "</span><br>"
+	return $("<div class=search><span class=search-title>" + title + "</span><br>"
 			+ "<input type='text' class=term />"
 			+ "<input type='button' class=search value='Найти' />"
 			+ "<input type='button' class=cancel-search value='Отмена' />"

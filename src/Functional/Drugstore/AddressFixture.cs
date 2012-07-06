@@ -22,7 +22,7 @@ namespace Functional.Drugstore
 		public void Setup()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			client = DataMother.CreateTestClientWithUser();
 			scope.Flush();
 			Open(client);

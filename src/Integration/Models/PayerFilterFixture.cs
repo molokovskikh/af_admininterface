@@ -36,7 +36,7 @@ namespace Integration.Models
 		{
 			var supplier = DataMother.CreateSupplier();
 			var payer = supplier.Payer;
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			var items = new PayerFilter{
@@ -54,7 +54,7 @@ namespace Integration.Models
 		{
 			var supplier = DataMother.CreateSupplier();
 			var payer = supplier.Payer;
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			var items = new PayerFilter {

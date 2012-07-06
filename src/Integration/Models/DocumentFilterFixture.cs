@@ -17,7 +17,7 @@ namespace Integration.Models
 		public void Get_document_error_for_supplier()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			var document = new DocumentReceiveLog(supplier);
 			Save(document);
 			Flush();
@@ -35,7 +35,7 @@ namespace Integration.Models
 		public void Build_data()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			for (int i = 0; i < 1000; i++)
 			{
 				var client = DataMother.CreateTestClientWithAddress();

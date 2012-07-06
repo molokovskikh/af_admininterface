@@ -48,7 +48,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(supplier, "supplier");
 				if (IsValid(supplier))
 				{
-					supplier.Save();
+					DbSession.SaveOrUpdate(supplier);
 					Notify("Сохранено");
 					RedirectToReferrer();
 				}

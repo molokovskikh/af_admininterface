@@ -422,7 +422,7 @@ WHERE RowId = ?Id;
 				{
 					var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
 					BindRule(currentSupplier);
-					currentSupplier.Save();
+					ActiveRecordMediator.Save(currentSupplier);
 
 					if (updateIntersection)
 					{
@@ -653,7 +653,7 @@ ORDER BY region;";
 					return;
 
 				supplier.RegionMask = newMaskRegion;
-				supplier.SaveAndFlush();
+				ActiveRecordMediator.SaveAndFlush(supplier);
 				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 				SessionScope.Current.Commit();
 
@@ -714,7 +714,7 @@ WHERE   s.Id = ?ClientCode
 				return;
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
-			supplier.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(supplier);
 			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 			SessionScope.Current.Commit();
 		}

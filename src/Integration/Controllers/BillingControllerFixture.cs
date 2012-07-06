@@ -20,7 +20,7 @@ namespace Integration.Controllers
 		public void Setup()
 		{
 			supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			session.Save(supplier);
 			client = DataMother.TestClient();
 			client.Save();
 			controller = new BillingController();

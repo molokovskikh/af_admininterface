@@ -16,7 +16,7 @@ namespace Functional.Suppliers
 		{
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
-			supplier.Save();
+			Save(supplier);
 			scope.Flush();
 
 			Open(supplier.Payer);

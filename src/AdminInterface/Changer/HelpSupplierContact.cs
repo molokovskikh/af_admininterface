@@ -43,7 +43,7 @@ namespace AdminInterface.Changer
 
 					var supp = regionalData.Supplier;
 					supp.Address = list[3].Trim();
-					supp.Save();
+					ActiveRecordMediator.Save(supp);
 					if (supp.SupplierId == 2133u || regionalData.Id == 2668u)
 							Console.WriteLine(supp.Name);
 

@@ -146,34 +146,9 @@ namespace AdminInterface.Models.Suppliers
 				.Max();
 		}
 
-		public static IList<Supplier> GetByPayerId(uint payerId)
-		{
-			return Queryable
-				.Where(p => p.Payer.PayerID == payerId).OrderBy(s => s.Name)
-				.ToList();
-		}
-
-		public static IOrderedQueryable<Supplier> Queryable
-		{
-			get
-			{
-				return ActiveRecordLinqBase<Supplier>.Queryable;
-			}
-		}
-
 		public static Supplier Find(uint id)
 		{
 			return ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
-		}
-
-		public virtual void Save()
-		{
-			ActiveRecordMediator.Save(this);
-		}
-
-		public virtual void SaveAndFlush()
-		{
-			ActiveRecordMediator.Save(this);
 		}
 
 		public override string ToString()

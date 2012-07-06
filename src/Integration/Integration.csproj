@@ -175,7 +175,6 @@
     <Compile Include="Tasks\UpdateAccountProcessorFixture.cs" />
     <Compile Include="SendPaymentNotificationFixture.cs" />
     <Compile Include="SetupFixture.cs" />
-    <Compile Include="ScopeFixture.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\AdminInterface.Background\AdminInterface.Background.csproj">

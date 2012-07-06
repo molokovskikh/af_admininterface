@@ -17,8 +17,7 @@ namespace Functional.Billing
 		public void Show_supplier_on_off_logs()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.MakeNameUniq();
-			supplier.Save();
+			MakeNameUniq(supplier);
 
 			Open(supplier.Payer);
 			var table = GetLogTable();
@@ -38,8 +37,7 @@ namespace Functional.Billing
 					Name = "Тестовый пользователь",
 				});
 			});
-			supplier.MakeNameUniq();
-			supplier.Save();
+			MakeNameUniq(supplier);
 			client.Save();
 
 			Open(payer);
@@ -62,8 +60,7 @@ namespace Functional.Billing
 					Name = "Тестовый пользователь",
 				});
 			});
-			supplier.MakeNameUniq();
-			supplier.Save();
+			MakeNameUniq(supplier);
 			client.Save();
 
 			Open(payer);

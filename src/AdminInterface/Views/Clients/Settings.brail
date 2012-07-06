@@ -27,45 +27,26 @@
 			return $("<tr>")
 				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
 				.append($("<td>")
-					.append(searchTemplate("Выберете поставщика", "${siteroot}/Client/${client.Id}/SearchSuppliers"))
+					.append(searchTemplate("Выберете поставщика", "/clients/${client.Id}/SearchSuppliers"))
 					.append("<input type=hidden name=drugstore.OfferMatrixExcludes[0].Id>"));
 		});
-
-		<% if drugstore.NoiseCosts: %>
-			setNoise(true);
-		<% end %>
 
 		$("input[type=checkbox].activate").click(function() {
 			var root = $($(this).parents("td").get(0)).siblings("td");
 			if (this.checked)
-				{
-					search(root);
-				}
+				search(root);
 			else
 				cancel(root);
 		});
 
-		$("input[type=checkbox].activateParseAndPrice").click(function() {
-			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
-			var rootSearchParseAlgorithm = $('#EnableSmartOrderSecondRow').children('td');
-			if (this.checked)
-				{
-					search(rootSmartOrder);
-					searchParseAlgorithm(rootSearchParseAlgorithm);
-				}
-			else
-				{
-					cancelRoot(rootSmartOrder);
-					cancelRoot(rootSearchParseAlgorithm);
-				}
-		});
-
 		<%if (not drugstore.SmartOrderRules) and (drugstore.EnableSmartOrder): %>
 			var rootSmartOrder = $('#EnableSmartOrderFirstRow').children('td');
-			var rootSearchParseAlgorithm = $('#EnableSmartOrderSecondRow').children('td');
 			search(rootSmartOrder);
-			searchParseAlgorithm(rootSearchParseAlgorithm);
 		<%end %>
+
+		$("drugstore_NoiseCosts").change(function () {
+			$("drugstore_NoiseCostExceptSupplier_Id").val("");
+		});
 	});
 
 	function cancel(root)
@@ -85,23 +66,11 @@
 	function search(root) {
 		root.find(".value").remove();
 		root.find(".settings").css("display", "none");
-		var title = "Выберите ассортиментный прайс лист";
-		root.prepend(searchTemplate(title, "${siteroot}/Client/SearchAssortmentPrices"));
-	}
-
-	function searchParseAlgorithm(root) {
-		root.find(".value").remove();
-		root.find(".settings").css("display", "none");
-		var title = "Выберите парсер";
-		root.prepend(searchTemplate(title, "${siteroot}/Client/SerachParseAlgorithm"));
-	}
-
-	function setNoise(noiseStatus) {
-		$("#NotNoiseSupplier").find('select').remove().end();
-		if (noiseStatus) {
-			var url = "${siteroot}/Client/SuppliersForCostNoising?clientId=${client.Id}";
-			$.get(url, function(html){ $("#NotNoiseSupplier").append(html); });
-		}
+		root.find("input[type=hidden][data-search-url]").each(function () {
+			var title = $(this).attr("data-search-title");
+			var url = $(this).attr("data-search-url");
+			root.prepend(searchTemplate(title, url));
+		});
 	}
 
 	function NotifySuppliers() {
@@ -121,7 +90,7 @@
 	
 		<form id="NotifySuppliers" method="post" action="NotifySuppliers?clientId=${client.Id}"></form>
 		
-		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/client/UpdateDrugstore">
+		<form id="DrugstoreSettingsForm" method=post action="${siteroot}/clients/UpdateDrugstore">
 			${FormHelper.HiddenField("client.Id")}
 			${FormHelper.HiddenField("drugstore.Id")}
 			${FormHelper.HiddenField("drugstore.SmartOrderRules.Id")}
@@ -130,12 +99,16 @@
 				<table border="0" style="width: 100%; height: 100%;">
 					<tr>
 					<td style="width: 50%;">
-						<input id="FirmCodeOnlyForClient" name="drugstore.NoiseCosts" onclick="setNoise(this.checked)" type="checkbox" value="true" ${"checked" if drugstore.NoiseCosts } />
-						<input type="hidden" name="drugstore.NoiseCosts" value="false" />
-						<label for="FirmCodeOnlyForClient">Зашумлять цены</label>
+						${app.Edit("drugstore.NoiseCosts", {@class: @activate})}
 					</td>
 					<td>
-						<div id="NotNoiseSupplier">
+						${FormHelper.HiddenField("drugstore.NoiseCostExceptSupplier.Id",
+							{"data-search-title":"Кроме",
+								"data-search-url": "/clients/${client.Id}/SearchSuppliers"})}
+						<div class=value>
+							<% if drugstore.NoiseCosts and drugstore.NoiseCostExceptSupplier: %>
+								Кроме: ${drugstore.NoiseCostExceptSupplier.Name}
+							<% end %>
 						</div>
 					</td>
 					</tr>
@@ -144,7 +117,9 @@
 						${app.Edit("drugstore.IsConvertFormat", {@class: @activate})}
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.AssortimentPrice.Id")}
+						${FormHelper.HiddenField("drugstore.AssortimentPrice.Id", 
+							{"data-search-title": "Выберите ассортиментный прайс лист",
+								"data-search-url": "/clients/SearchAssortmentPrices"})}
 						<div class=value>
 							<% if drugstore.IsConvertFormat and drugstore.AssortimentPrice: %>
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
@@ -152,44 +127,45 @@
 						</div>
 					</td>
 				</tr>
-				<tr><td colspan="2">
-				${app.Edit("drugstore.IsHiddenFromSupplier")}<br>
-				${app.Edit("drugstore.AllowDelayOfPayment")}<br>
-				${app.Edit("drugstore.ServiceClient")}<br>
-				${app.Edit("drugstore.IgnoreNewPrices")}<br>
-				${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
-				${app.Edit("drugstore.CalculateLeader")}<br>
-				${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
-				<label>Формат для сохранения накладных Протек</label> ${app.Edit("drugstore.ProtekWaybillSavingType")}
-				<br>
-				
-<% 
-	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "AnalitF",
-		"Checkboxes" : { 
-			"SendWaybillsFromClient" : drugstore.SendWaybillsFromClient,
-			"ShowAdvertising" : drugstore.ShowAdvertising,
-			"SendRetailMarkup": drugstore.SendRetailMarkup,
-			"ParseWaybills": drugstore.ParseWaybills,
-			"EnableImpersonalPrice" : drugstore.EnableImpersonalPrice,
-			"ShowCertificatesWithoutRefSupplier" : drugstore.ShowCertificatesWithoutRefSupplier }
-	} 
-
-	component SettingCheckbox, { "TypeName" : "AdminInterface.Models.DrugstoreSettings", "InstanceName" : "drugstore", "Header" : "Недельный заказ",
-		"Checkboxes" : { "CheckWeeklyOrdersSum" : drugstore.CheckWeeklyOrdersSum }
-	}
-%>
-				Максимальный недельный заказ:
-				<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
-				</td></tr>
 				<tr>
-					<td>
-						${FormHelper.CheckboxField("drugstore.EnableSmartOrder", {"class" : "activateParseAndPrice"})}
-						<label>Автозаказ</label>
+					<td colspan="2">
+						${app.Edit("drugstore.IsHiddenFromSupplier")}<br>
+						${app.Edit("drugstore.AllowDelayOfPayment")}<br>
+						${app.Edit("drugstore.ServiceClient")}<br>
+						${app.Edit("drugstore.IgnoreNewPrices")}<br>
+						${app.Edit("drugstore.IgnoreNewPriceForUser")}<br>
+						${app.Edit("drugstore.CalculateLeader")}<br>
+						${app.Edit("drugstore.AllowAnalitFSchedule")}<br>
+						<label>Формат для сохранения накладных Протек</label>
+						${app.Edit("drugstore.ProtekWaybillSavingType")}<br>
+
+						<h4>AnalitF</h4>
+						${app.Edit("drugstore.SendWaybillsFromClient")}<br>
+						${app.Edit("drugstore.ShowAdvertising")}<br>
+						${app.Edit("drugstore.SendRetailMarkup")}<br>
+						${app.Edit("drugstore.ParseWaybills")}<br>
+						${app.Edit("drugstore.EnableImpersonalPrice")}<br>
+						${app.Edit("drugstore.ShowCertificatesWithoutRefSupplier")}<br>
+
+						<h4>Недельный заказ</h4>
+						${app.Edit("drugstore.CheckWeeklyOrdersSum")}<br>
+						Максимальный недельный заказ:
+						<input type="text" name="drugstore.MaxWeeklyOrdersSum" value="${drugstore.MaxWeeklyOrdersSum}" /><br />
 					</td>
 				</tr>
-				<tr id="EnableSmartOrderFirstRow">
+				<tr>
 					<td>
-						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode")}
+						${FormHelper.CheckboxField("drugstore.EnableSmartOrder", {@class : @activate})}
+						<label>Автозаказ</label>
+					</td>
+					<td>
+						${FormHelper.HiddenField("drugstore.SmartOrderRules.AssortimentPriceCode",
+							{"data-search-title": "Выберите ассортиментный прайс лист",
+								"data-search-url": "/clients/SearchAssortmentPrices"})}
+
+						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm",
+							{"data-search-title": "Выберите парсер",
+								"data-search-url": "/clients/SerachParseAlgorithm"})}
 						<%if drugstore.SmartOrderRules: %>
 							<div class=value>
 								Ассортиментный прайс лист: ${drugstore.SmartOrderRules.GetAssortimentPriceName()} <br />
@@ -198,18 +174,15 @@
 						<%end %>
 					</td>
 				</tr>
-				<tr id="EnableSmartOrderSecondRow">
-					<td>
-						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm")}
-					</td>
-				</tr>
 				<tr>
 					<td>
-						${FormHelper.CheckboxField("drugstore.EnableBuyingMatrix", {"class" : "activate"})}
+						${FormHelper.CheckboxField("drugstore.EnableBuyingMatrix", {@class : @activate})}
 						<label>Подключить матрицу закупок</label>
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.BuyingMatrixPrice.Id")}
+						${FormHelper.HiddenField("drugstore.BuyingMatrixPrice.Id",
+							{"data-search-title": "Выберите ассортиментный прайс лист",
+								"data-search-url": "/clients/SearchAssortmentPrices"})}
 						<% if drugstore.BuyingMatrixPrice: %>
 							<div class=value>
 								${drugstore.BuyingMatrixPrice.Supplier.Name} - ${drugstore.BuyingMatrixPrice.Name}
@@ -223,11 +196,13 @@
 				</tr>
 				<tr>
 					<td>
-						${FormHelper.CheckboxField("drugstore.EnableOfferMatrix", {"class" : "activate"})}
+						${FormHelper.CheckboxField("drugstore.EnableOfferMatrix", {@class : @activate})}
 						<label>Подключить матрицу предложений</label>
 					</td>
 					<td>
-						${FormHelper.HiddenField("drugstore.OfferMatrixPrice.Id")}
+						${FormHelper.HiddenField("drugstore.OfferMatrixPrice.Id",
+							{"data-search-title": "Выберите ассортиментный прайс лист",
+								"data-search-url": "/clients/SearchAssortmentPrices"})}
 						<% if drugstore.OfferMatrixPrice: %>
 							<div class=value>
 								${drugstore.OfferMatrixPrice.Supplier.Name} - ${drugstore.OfferMatrixPrice.Name}
@@ -259,10 +234,10 @@
 				</table>
 			</div>
 
-		<div class="block">
-			<h3>Операции</h3>
-			<input type="button" onclick="NotifySuppliers()" value="Отправить уведомления о регистрации поставщикам" />
-		</div>
+			<div class="block">
+				<h3>Операции</h3>
+				<input type="button" onclick="NotifySuppliers()" value="Отправить уведомления о регистрации поставщикам" />
+			</div>
 
 			<div class="block">
 				<h3>Региональная настройка</h3>

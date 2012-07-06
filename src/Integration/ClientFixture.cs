@@ -20,7 +20,7 @@ namespace Integration
 		public void SetUp()
 		{
 			supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 
 			client = DataMother.CreateClientAndUsers();
 			client.Save();
