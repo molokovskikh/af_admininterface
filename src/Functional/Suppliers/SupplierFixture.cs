@@ -1,23 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Web.Ui.NHibernateExtentions;
-using Functional.Billing;
-using Functional.ForTesting;
 using Integration.ForTesting;
-using WatiN.Core.Native.Windows;
-using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core; 
 using Test.Support.Web;
-using Common.MySql;
-using MySql.Data.MySqlClient;
-using System.Data;
 using Test.Support;
 
 namespace Functional.Suppliers

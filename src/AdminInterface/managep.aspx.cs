@@ -66,7 +66,7 @@ namespace AddUser
 
 		private void LoadPageData()
 		{
-			GetData(supplier);
+			Data = GetData(supplier);
 			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
 			ConnectDataSource();
 			DataBind();

@@ -345,5 +345,37 @@ namespace AdminInterface.Controllers
 		{
 			return Payer.Find(payerId).PaymentSum.ToString("C");
 		}
+
+		public void JuridicalOrganizations(uint payerId, uint currentJuridicalOrganizationId)
+		{
+			var payer = Payer.Find(payerId);
+			PropertyBag["Payer"] = payer;
+			PropertyBag["tab"] = "juridicalOrganization";
+			PropertyBag["Addresses"] = payer.Addresses;
+			if (currentJuridicalOrganizationId > 0)
+				PropertyBag["currentJuridicalOrganization"] = LegalEntity.Find(currentJuridicalOrganizationId);
+		}
+
+		public void UpdateJuridicalOrganizationInfo([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NullIfInvalidKey)] LegalEntity juridicalOrganization)
+		{
+			var organization = LegalEntity.Find(juridicalOrganization.Id);
+			organization.Name = juridicalOrganization.Name;
+			organization.FullName = juridicalOrganization.FullName;
+			organization.Update();
+
+			Notify("Сохранено");
+			RedirectToReferrer();
+		}
+
+		public void AddJuridicalOrganization([ARDataBind("juridicalOrganization", AutoLoad = AutoLoadBehavior.NewRootInstanceIfInvalidKey)] LegalEntity legalEntity, uint payerId)
+		{
+			var payer = Payer.Find(payerId);
+			legalEntity.Payer = payer;
+			legalEntity.CreateAndFlush();
+			Maintainer.LegalEntityCreated(legalEntity);
+
+			Notify("Юридическое лицо создано");
+			RedirectToReferrer();
+		}
 	}
 }

@@ -730,6 +730,48 @@ namespace Functional.Billing
 			Assert.That(browser.SelectList(Find.ByName("Instance.Recipient.Id")).SelectedItem, Is.EqualTo(recipient.Name));
 		}
 
+		[Test, NUnit.Framework.Description("Создание нового юридического лица")]
+		public void Create_new_juridical_organization()
+		{
+			browser.Link(Find.ByText("Юридические лица")).Click();
+			Assert.IsTrue(browser.Div(Find.ById("FormForAdding")).Exists);
+			Assert.That(browser.Div(Find.ById("FormForAdding")).Style.Display, Is.EqualTo("none"));
+			Assert.That(browser.Button(Find.ById("AddJuridicalOrganizationButton")).Style.Display, Is.Not.EqualTo("none"));
+			browser.Button(Find.ById("AddJuridicalOrganizationButton")).Click();
+			Thread.Sleep(500);
+			Assert.That(browser.Div(Find.ById("FormForAdding")).Style.Display, Is.EqualTo("block"));
+			Assert.That(browser.Button(Find.ById("AddJuridicalOrganizationButton")).Style.Display, Is.EqualTo("none"));
+			browser.TextField(Find.ByName("JuridicalOrganization.Name")).TypeText(String.Format("TestJuridicalNameForClient{0}", client.Id));
+			browser.Button(Find.ById("SubmitFormButton")).Click();
+			Assert.That(browser.Text, Is.StringContaining("Юридическое лицо создано"));
+
+			var count = LegalEntity.Queryable.Count(u => u.Name == String.Format("TestJuridicalNameForClient{0}", client.Id));
+			Assert.That(count, Is.EqualTo(1));
+		}
+
+		[Test]
+		public void Update_juridical_organization_info()
+		{
+			var juridicalOrganization = new LegalEntity {
+				Name = "Test" + client.Id,
+				Payer = client.Payers.First(),
+			};
+			juridicalOrganization.Save();
+
+			Refresh();
+
+			browser.Link(Find.ByText("Юридические лица")).Click();
+			browser.Link(Find.ById(String.Format("JuridicalOrganization{0}Link", juridicalOrganization.Id))).Click();
+
+			var newName = juridicalOrganization.Name + "_" + client.Id;
+			browser.TextField(Find.ByValue(juridicalOrganization.Name)).TypeText(newName);
+			browser.Button(Find.ById(String.Format("SubmitChanges{0}", juridicalOrganization.Id))).Click();
+			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
+
+			juridicalOrganization.Refresh();
+			Assert.That(juridicalOrganization.Name, Is.EqualTo(newName));
+		}
+
 		[Test]
 		public void Create_balance_operation()
 		{

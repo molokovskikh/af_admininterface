@@ -128,6 +128,9 @@ ${app.Asset("request.coffee")}
 		<li>
 			<a id="mail" href="#" ${"class='selected'" if filter.Tab == "mail"}>Отправка кореспонденции</a>
 		</li>
+		<li>
+			<a id="juridicalOrganization" href="#" ${"class='selected'" if filter.Tab == "juridicalOrganization"}>Юридические лица</a>
+		</li>
 		<% for year in payer.Years: %>
 		<li>
 			${app.LinkTo(payer, "Платежи/Счета ${year}", @BalanceSummary, {@year: year, @attributes: {@id: "balance-summary-${year}", @class: "inline-tab"}})}
@@ -144,6 +147,11 @@ ${app.Asset("request.coffee")}
 <div id="mail-tab" class="tab" ${"style='display:none'" if filter.Tab != "mail"}>
 	<% filter.ActiveTab = "mail" %>
 	<% OutputSubView("Mail") %>
+</div>
+
+<div id="juridicalOrganization-tab" class="tab" ${"style='display:none'" if filter.Tab != "juridicalOrganization"}>
+	<% filter.ActiveTab = "juridicalOrganizations" %>
+	<% OutputSubView("JuridicalOrganizations") %>
 </div>
 
 <% for year in payer.Years: %>

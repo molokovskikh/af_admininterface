@@ -571,7 +571,6 @@
     <None Include="Views\Accounts\Index.brail" />
     <None Include="Views\Accounts\AccountingHistory.brail" />
     <None Include="Views\Billing\AdditionalUserInfo.brail" />
-    <None Include="Views\Billing\JuridicalOrganizations.brail" />
     <None Include="Views\Billing\Mail.brail" />
     <None Include="Views\Billing\SearchAddressesForUser.brail" />
     <None Include="Views\Billing\SearchUsersForAddress.brail" />

@@ -1,16 +1,11 @@
 ﻿using System;
 using System.Linq;
-using System.Threading;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
-using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using WatiN.Core; using Test.Support.Web;
-using AdminInterface.Models.Logs;
-using WatiN.Core.Native.Windows;
+using WatiN.Core;
+using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
