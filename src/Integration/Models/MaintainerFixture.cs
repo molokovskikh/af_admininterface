@@ -44,17 +44,21 @@ namespace Integration.Models
 			var client = DataMother.TestClient();
 
 			var price = supplier.Prices.First();
-			var intersection = session.Query<Intersection>().Single(i => i.Client == client && i.Price == price);
-			Assert.That(intersection.Cost, Is.EqualTo(price.Costs.First()));
-			intersection.Cost = price.Costs[1];
-			Save(intersection);
+			var baseCost = price.Costs.First();
+			var notBaseCost = price.Costs[1];
 
+			var intersection = session.Query<Intersection>().Single(i => i.Client == client && i.Price == price);
+			Assert.That(intersection.Cost, Is.EqualTo(baseCost));
+			intersection.Cost = notBaseCost;
+			Save(intersection);
 			var org = new LegalEntity("тараканов и сыновья", client.Payers.First());
-			org.Save();
+			Save(org);
+			Flush();
+
 			Maintainer.LegalEntityCreated(org);
 
 			intersection = session.Query<Intersection>().Single(i => i.Client == client && i.Price == price && i.Org == org);
-			Assert.That(intersection.Cost.Id, Is.EqualTo(price.Costs[1].Id), "идентификатор intersection {0}", intersection.Id);
+			Assert.That(intersection.Cost.Id, Is.EqualTo(notBaseCost.Id), "идентификатор intersection {0}", intersection.Id);
 		}
 
 		[Test]
