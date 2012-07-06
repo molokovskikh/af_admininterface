@@ -100,9 +100,9 @@ namespace Functional.Drugstore
 			using (new SessionScope())
 			{
 				supplier = DataMother.CreateSupplier();
-				supplier.Save();
+				Save(supplier);
 				supplier.Name = "Тестовый поставщик " + supplier.Id;
-				supplier.Save();
+				Save(supplier);
 			}
 
 			SetupGeneralInformation();
@@ -490,14 +490,10 @@ namespace Functional.Drugstore
 		public void Search_supplier_after_reset()
 		{
 			var supplier1 = DataMother.CreateSupplier();
-			supplier1.Save();
-			supplier1.MakeNameUniq();
-			supplier1.Save();
+			MakeNameUniq(supplier1);
 
 			var supplier2 = DataMother.CreateSupplier();
-			supplier2.Save();
-			supplier2.MakeNameUniq();
-			supplier1.Save();
+			MakeNameUniq(supplier2);
 			Flush();
 
 			Css("#ShowForOneSupplier").Click();

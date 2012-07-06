@@ -64,7 +64,7 @@ namespace Integration
 				Sender = OrderHandler.Senders().First()
 			};
 			supplier.OrderRules.Add(rule);
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			Assert.That(rule.Id, Is.Not.EqualTo(0));

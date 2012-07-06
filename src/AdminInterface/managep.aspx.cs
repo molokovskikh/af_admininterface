@@ -435,8 +435,9 @@ WHERE RowId = ?Id;
 				regionalSettingsDataAdapter.Update(data.Tables["RegionSettings"]);
 				using (var scope = new ConnectionScope(connection, FlushAction.Never)) {
 					var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
+
 					BindRule(currentSupplier, data);
-					currentSupplier.Save();
+					ActiveRecordMediator.Save(currentSupplier);
 
 					if (updateIntersection) {
 						//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
@@ -662,7 +663,7 @@ ORDER BY region;";
 					return;
 
 				supplier.RegionMask = newMaskRegion;
-				supplier.SaveAndFlush();
+				ActiveRecordMediator.SaveAndFlush(supplier);
 				//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 				SessionScope.Current.Commit();
 
@@ -723,7 +724,7 @@ WHERE   s.Id = ?ClientCode
 				return;
 
 			supplier.HomeRegion = Common.Web.Ui.Models.Region.Find(currentHomeRegion);
-			supplier.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(supplier);
 			//здесь длинная транзакция activerecord, что бы изменения были видны запросам комитем
 			SessionScope.Current.Commit();
 		}

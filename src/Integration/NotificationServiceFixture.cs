@@ -16,7 +16,7 @@ namespace Integration
 		{
 			var supplier = DataMother.CreateSupplier();
 			supplier.ContactGroupOwner.Group(ContactGroupType.ClientManagers).AddContact(ContactType.Email, "kvasovtest@analit.net");
-			supplier.Save();
+			Save(supplier);
 			var client = DataMother.TestClient();
 			var defaults = session.Query<DefaultValues>().First();
 

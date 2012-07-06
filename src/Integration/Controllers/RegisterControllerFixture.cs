@@ -13,6 +13,7 @@ using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Common.Web.Ui.Models;
 
@@ -102,7 +103,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Create_organization()
 		{
-			DataMother.CreateSupplier().Save();
+			session.Save(DataMother.CreateSupplier());
 
 			Request.Params.Add("user.Accounting.IsFree", "False");
 			Request.Params.Add("address.Value", "address");
@@ -213,7 +214,9 @@ namespace Integration.Controllers
 
 		private Supplier RegistredSupplier()
 		{
-			var registred = Supplier.Queryable.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+			var registred = session.Query<Supplier>()
+				.OrderByDescending(c => c.Id)
+				.FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
 			if (registred == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registred;

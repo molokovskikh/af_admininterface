@@ -168,16 +168,6 @@ namespace AdminInterface.Controllers
 			RedirectToReferrer();
 		}
 
-		public void SuppliersForCostNoising(uint clientId)
-		{
-			CancelLayout();
-			var client = Client.FindAndCheck<Client>(clientId);
-			var suppliers = client.Payers.SelectMany(p => Supplier.GetByPayerId(p.Id)).OrderBy(s => s.Name).ToList();
-			PropertyBag["suppliers"] = suppliers;
-			if (client.Settings.NoiseCostExceptSupplier != null)
-				PropertyBag["FirmCodeOnly"] = client.Settings.NoiseCostExceptSupplier.Id;
-		}
-
 		[AccessibleThrough(Verb.Post)]
 		public void BindPhone(uint clientCode, string phone)
 		{
@@ -187,16 +177,14 @@ namespace AdminInterface.Controllers
 				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
 			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
 			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
-			using(var scope = new TransactionScope())
-			{
-					ArHelper.WithSession(s => s.CreateSQLQuery(@"
+
+			DbSession.CreateSQLQuery(@"
 delete from telephony.UnresolvedPhone
 where Phone like :phone")
-							.SetParameter("phone", phone.Replace("-", ""))
-							.ExecuteUpdate());
-				group.Save();
-				scope.VoteCommit();
-			}
+				.SetParameter("phone", phone.Replace("-", ""))
+				.ExecuteUpdate();
+
+			group.Save();
 			RedirectToReferrer();
 		}
 
@@ -402,21 +390,22 @@ where Phone like :phone")
 		public object[] SearchSuppliers(uint id, string text)
 		{
 			var client = Client.Find(id);
-			var suppliers = ArHelper.WithSession(s => {
-				s.CreateSQLQuery(@"call Customers.GetPrices(:userid)")
-					.SetParameter("userid", client.Users.First().Id)
-					.ExecuteUpdate();
+			var user = client.Users.FirstOrDefault();
+			if (user == null)
+				return Enumerable.Empty<object>().ToArray();
 
-				return s.CreateSQLQuery(@"
+			DbSession.CreateSQLQuery(@"call Customers.GetPrices(:userid)")
+				.SetParameter("userid", user.Id)
+				.ExecuteUpdate();
+
+			return DbSession.CreateSQLQuery(@"
 select s.Id, s.Name from Prices ap
 join Customers.Suppliers s on s.Id = ap.FirmCode
 where s.Name like :SearchText")
-						.SetParameter("SearchText", "%" + text + "%")
-						.List();
-			});
-			return suppliers
+				.SetParameter("SearchText", "%" + text + "%")
+				.List()
 				.Cast<object[]>()
-				.Select(s => new { id = Convert.ToUInt32(s[0]), name = Convert.ToString(s[1])})
+				.Select(s => new { id = Convert.ToUInt32(s[0]), name = String.Format("{0}. {1}", s[0], s[1])})
 				.ToArray();
 		}
 

@@ -140,7 +140,6 @@
   <ItemGroup>
     <Compile Include="Changer\HelpSupplierContact.cs" />
     <Compile Include="Components\Bredcrumbs.cs" />
-    <Compile Include="Components\SettingCheckbox.cs" />
     <Compile Include="Controllers\AccountsController.cs" />
     <Compile Include="Controllers\ActsController.cs" />
     <Compile Include="Controllers\AdvertisingsController.cs" />
@@ -581,9 +580,7 @@
     <None Include="Views\CallHistory\Search.brail" />
     <None Include="Views\Clients\Settings.brail" />
     <None Include="Views\Clients\Show.brail" />
-    <None Include="Views\Clients\SearchAssortmentPrices.brail" />
     <None Include="Views\Clients\SearchClientSubview.brail" />
-    <None Include="Views\Clients\SuppliersForCostNoising.brail" />
     <None Include="Views\Layouts\Application.brail" />
     <None Include="Views\Logs\Orders.brail" />
     <None Include="Views\Logs\ShowDocumentDetails.brail" />

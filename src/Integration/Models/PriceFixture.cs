@@ -23,7 +23,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			var price = supplier.Prices[0];
 
 			session
@@ -56,7 +56,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			var price = supplier.Prices[0];
 
 			session

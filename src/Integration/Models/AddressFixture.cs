@@ -14,7 +14,7 @@ namespace Integration.Models
 		public void Move_address()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			var price = supplier.Prices.First();
 
 			var client = DataMother.CreateTestClientWithAddress();

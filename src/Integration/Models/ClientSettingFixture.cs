@@ -15,7 +15,7 @@ namespace Integration.Models
 		{
 			var supplier = DataMother.CreateSupplier();
 			var price = supplier.Prices[0];
-			supplier.Save();
+			Save(supplier);
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 

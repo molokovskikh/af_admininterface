@@ -29,6 +29,7 @@ using Common.Web.Ui.Models;
 using System.Linq;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -57,8 +58,7 @@ namespace AdminInterface.Controllers
 			user.SendWaybills = rejectWaibillParams.SendWaybills;
 			user.SendRejects = rejectWaibillParams.SendRejects;
 			PropertyBag["client"] = service;
-			if (service.IsClient())
-			{
+			if (service.IsClient()) {
 				PropertyBag["drugstore"] = ((Client)service).Settings;
 				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
 				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
@@ -165,7 +165,7 @@ namespace AdminInterface.Controllers
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
-				(contacts.Where(contact => contact.Type == ContactType.Email).Any());
+				(contacts.Any(contact => contact.Type == ContactType.Email));
 			// Если установлена галка отсылать рег. карту на email и задан email (в спец поле или в контактной информации)
 			if (sendClientCard && haveMails)
 			{
@@ -441,8 +441,7 @@ namespace AdminInterface.Controllers
 		{
 			uint id;
 			UInt32.TryParse(text, out id);
-			return ActiveRecordLinqBase<User>
-				.Queryable
+			return DbSession.Query<User>()
 				.Where(u => (u.Name.Contains(text) || u.Id == id))
 				.OrderBy(u => u.Id)
 				.Take(50)

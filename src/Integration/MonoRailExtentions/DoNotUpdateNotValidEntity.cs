@@ -47,7 +47,7 @@ namespace Integration.MonoRailExtentions
 			using (new SessionScope())
 			{
 				var supplier = DataMother.CreateSupplier();
-				supplier.Save();
+				Save(supplier);
 				id = supplier.Id;
 			}
 

@@ -98,7 +98,7 @@ namespace Integration.Models
 			
 			var phone = RandomPhone();
 			supplier.ContactGroupOwner.ContactGroups[0].AddContact(ContactType.Phone, phone);
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			filter.SearchText = phone;
@@ -117,7 +117,7 @@ namespace Integration.Models
 			var orderGroup = new RegionalDeliveryGroup(Region.Find(2ul));
 			orderGroup.AddContact(ContactType.Phone, phone);
 			supplier.ContactGroupOwner.AddContactGroup(orderGroup, true);
-			supplier.Save();
+			Save(supplier);
 			Flush();
 
 			filter.SearchText = phone;
@@ -156,7 +156,7 @@ namespace Integration.Models
 
 			var email2 = "testmailQWERTYS2@mail.ru";
 			supplier.ContactGroupOwner.ContactGroups[0].AddContact(ContactType.Email, email2);
-			supplier.Save();
+			Save(supplier);
 
 			Flush();
 

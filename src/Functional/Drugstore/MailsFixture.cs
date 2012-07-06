@@ -30,7 +30,7 @@ namespace Functional.Drugstore
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			user = client.Users[0];
 			supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 
 			BuildMail();
 

@@ -25,7 +25,7 @@ namespace Functional.Drugstore
 			supplier = DataMother.CreateSupplier();
 
 			client.Save();
-			supplier.Save();
+			Save(supplier);
 		}
 
 		[Test]

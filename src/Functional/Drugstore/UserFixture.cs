@@ -719,7 +719,7 @@ namespace Functional.Drugstore
 			var supplier = DataMother.CreateSupplier(s => {
 				s.AddRegion(Region.Find(16UL));
 			});
-			supplier.Save();
+			Save(supplier);
 			var maskRegion = 1UL | 16UL;
 			var newClient = DataMother.CreateTestClientWithAddressAndUser(maskRegion);
 

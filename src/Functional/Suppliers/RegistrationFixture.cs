@@ -1,12 +1,11 @@
 ﻿using System.Linq;
-using System.Threading;
 using AdminInterface.Models.Suppliers;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.Web;
 using WatiN.Core;
-using WatiN.Core.Native.Windows;
 
 namespace Functional.Suppliers
 {
@@ -103,7 +102,7 @@ namespace Functional.Suppliers
 		public void Register_user_for_supplier()
 		{
 			var supplier = DataMother.CreateSupplier();
-			supplier.Save();
+			Save(supplier);
 			Open(supplier);
 			Click("Новый пользователь");
 			browser.TextField("user_Name").AppendText("test_comment");
@@ -113,9 +112,9 @@ namespace Functional.Suppliers
 			AssertText(string.Format("Поставщик {0}, Код {1}", supplier.Name, supplier.Id));
 		}
 
-		private static Supplier GetSupplier()
+		private Supplier GetSupplier()
 		{
-			return Supplier.Queryable.OrderByDescending(s => s.Id).First();
+			return session.Query<Supplier>().OrderByDescending(s => s.Id).First();
 		}
 
 		private void Prepare()

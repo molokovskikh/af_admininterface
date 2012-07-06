@@ -49,13 +49,5 @@ namespace Integration.ForTesting
 			payer.Save();
 			return payer;
 		}
-
-		public static Supplier MakeNameUniq(this Supplier supplier)
-		{
-			supplier.Save();
-			supplier.Name += " " + supplier.Id;
-			supplier.Save();
-			return supplier;
-		}
 	}
 }

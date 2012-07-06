@@ -18,6 +18,7 @@ using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -152,7 +153,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Today"] = DateTime.Today;
 			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 
-			PropertyBag["suppliers"] = Supplier.Queryable.Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
+			PropertyBag["suppliers"] = DbSession.Query<Supplier>().Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
 			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
 			PropertyBag["Users"] = payer.Users.Where(u => u.RootService.Type != ServiceType.Supplier).ToList();
 			PropertyBag["Addresses"] = payer.Addresses;
