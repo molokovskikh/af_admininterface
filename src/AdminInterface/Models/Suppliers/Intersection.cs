@@ -6,7 +6,7 @@ using Common.Web.Ui.Models;
 namespace AdminInterface.Models.Suppliers
 {
 	[ActiveRecord("Intersection", Schema = "Customers", Lazy = true)]
-	public class Intersection : ActiveRecordLinqBase<Intersection>
+	public class Intersection
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -28,5 +28,18 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual bool AvailableForClient { get; set;}
+	}
+
+	[ActiveRecord("AddressIntersection", Schema = "Customers", Lazy = true)]
+	public class AddressIntersection
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
+
+		[BelongsTo("IntersectionId")]
+		public virtual Intersection Intersection { get; set; }
+
+		[Property]
+		public virtual string SupplierDeliveryId { get; set;}
 	}
 }

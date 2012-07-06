@@ -14,6 +14,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using AdminInterface.Security;
 using Castle.ActiveRecord;
+using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Framework.Scopes;
 using Common.MySql;
 using Common.Web.Ui.Helpers;
@@ -57,15 +58,19 @@ namespace AddUser
 			HandlersLink.NavigateUrl = "~/SpecialHandlers/?supplierId=" + supplier.Id;
 
 			if (!IsPostBack)
-			{
-				GetData();
-				ConnectDataSource();
-				DataBind();
-				SetRegions();
-			}
+				LoadPageData();
 			else
 				ConnectDataSource();
 
+		}
+
+		private void LoadPageData()
+		{
+			GetData(supplier);
+			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
+			ConnectDataSource();
+			DataBind();
+			SetRegions();
 		}
 
 		private void ConnectDataSource()
@@ -77,12 +82,9 @@ namespace AddUser
 			OrderSendRules.DataSource = Data;
 		}
 
-		private void GetData()
+		public static DataSet GetData(Supplier supplier)
 		{
-			if (Data == null)
-				Data = new DataSet();
-			else 
-				Data.Clear();
+			var data = new DataSet();
 
 			var pricesCommandText =
 @"
@@ -172,35 +174,34 @@ order by r.Region;";
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
 					dataAdapter.SelectCommand.Parameters.AddWithValue("?HomeRegion", supplier.HomeRegion.Id);
 
-					dataAdapter.Fill(Data, "Prices");
+					dataAdapter.Fill(data, "Prices");
 
 					dataAdapter.SelectCommand.CommandText = regionSettingsCommnadText;
-					dataAdapter.Fill(Data, "RegionSettings");
+					dataAdapter.Fill(data, "RegionSettings");
 
 					dataAdapter.SelectCommand.CommandText = regionsCommandText;
-					dataAdapter.Fill(Data, "Regions");
+					dataAdapter.Fill(data, "Regions");
 
 					dataAdapter.SelectCommand.CommandText = enableRegionsCommandText;
-					dataAdapter.Fill(Data, "EnableRegions");
+					dataAdapter.Fill(data, "EnableRegions");
 
 					dataAdapter.SelectCommand.CommandText = orderSendConfig;
-					dataAdapter.Fill(Data, "OrderSendConfig");
+					dataAdapter.Fill(data, "OrderSendConfig");
 
 					dataAdapter.SelectCommand.CommandText = senders;
-					dataAdapter.Fill(Data, "Senders");
+					dataAdapter.Fill(data, "Senders");
 
 					dataAdapter.SelectCommand.CommandText = formaters;
-					dataAdapter.Fill(Data, "Formaters");
+					dataAdapter.Fill(data, "Formaters");
 
 					dataAdapter.SelectCommand.CommandText = sendRuleRegions;
-					dataAdapter.Fill(Data, "SenRuleRegions");
-					var row = Data.Tables["SenRuleRegions"].NewRow();
+					dataAdapter.Fill(data, "SenRuleRegions");
+					var row = data.Tables["SenRuleRegions"].NewRow();
 					row["RegionCode"] = DBNull.Value;
 					row["Region"] = "Любой регион";
-					Data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
+					data.Tables["SenRuleRegions"].Rows.InsertAt(row, 0);
 				});
-
-			HeaderLabel.Text = String.Format("Конфигурация клиента \"{0}\"", supplier.Name);
+			return data;
 		}
 
 
@@ -246,9 +247,22 @@ order by r.Region;";
 			UpdateHomeRegion();
 			UpdateMaskRegion();
 			ProcessChanges();
+			var message = "";
+			Save(supplier, Data, HttpContext.Current.Request.UserHostAddress, ref message);
+
+			if (!String.IsNullOrEmpty(message)) {
+				messageDiv.InnerText = message;
+				messageDiv.Style.Add("display", "block");
+			}
+
+			LoadPageData();
+		}
+
+		public static void Save(Supplier supplier, DataSet data, string host, ref string message)
+		{
 			var pricesDataAdapter = new MySqlDataAdapter();
 			pricesDataAdapter.DeleteCommand = new MySqlCommand(
-@"
+				@"
 Set @InHost = ?UserHost;
 Set @InUser = ?UserName;
 
@@ -262,12 +276,12 @@ DELETE FROM PricesRegionalData
 WHERE PriceCode = ?PriceCode;
 ");
 
-			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserHost", host);
 			pricesDataAdapter.DeleteCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.DeleteCommand.Parameters.Add("?PriceCode", MySqlDbType.Int32, 0, "PriceCode");
 
 			pricesDataAdapter.InsertCommand = new MySqlCommand(
-@"
+				@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -323,7 +337,7 @@ WHERE   p.PriceCode  = @InsertedPriceCode
 
 select @NewPriceCostId;
 ");
-			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserHost", host);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.InsertCommand.Parameters.AddWithValue("?ClientCode", supplier.Id);
 			pricesDataAdapter.InsertCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
@@ -335,7 +349,7 @@ select @NewPriceCostId;
 			pricesDataAdapter.InsertCommand.Parameters.Add("?CostType", MySqlDbType.Int32, 0, "CostType");
 
 			pricesDataAdapter.UpdateCommand = new MySqlCommand(
-@"
+				@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 
@@ -355,7 +369,7 @@ SET fs.RequestInterval = IF(?PriceType = 1, 86400, NULL);
 call UpdateCostType(?PriceCode, ?CostType);
 ");
 
-			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", host);
 			pricesDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
 			pricesDataAdapter.UpdateCommand.Parameters.Add("?PriceType", MySqlDbType.Int32, 0, "PriceType");
@@ -367,7 +381,7 @@ call UpdateCostType(?PriceCode, ?CostType);
 
 			var regionalSettingsDataAdapter = new MySqlDataAdapter();
 			regionalSettingsDataAdapter.UpdateCommand = new MySqlCommand(
-@"
+				@"
 SET @InHost = ?UserHost;
 SET @InUser = ?UserName;
 UPDATE usersettings.regionaldata
@@ -385,24 +399,25 @@ WHERE RowId = ?Id;
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Storage", MySqlDbType.Bit, 0, "Storage");
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowID");
 
-			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost", HttpContext.Current.Request.UserHostAddress);
+			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserHost",
+				host);
 			regionalSettingsDataAdapter.UpdateCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
-			var updateIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
+			var updateIntersection = data.Tables["Prices"].Rows.Cast<DataRow>().Any(r => r.RowState == DataRowState.Added);
 
-			var modifiedIntersection = Data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
+			var modifiedIntersection = data.Tables["Prices"].Rows.Cast<DataRow>().Where(r => r.RowState == DataRowState.Modified);
 			var vipChangeFlag = false;
-			foreach (var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int)PriceType.Vip)) {
-				Intersection.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
+			foreach (
+				var dataRow in modifiedIntersection.Where(dataRow => Convert.ToInt32(dataRow["PriceType"]) == (int) PriceType.Vip)) {
+				ActiveRecordLinqBase<Intersection>.Queryable.Where(i => i.Price.Id == Convert.ToUInt32(dataRow["PriceCode"])).ToList().ForEach(
 					inter => {
 						inter.AvailableForClient = false;
-						inter.Save();
+						ActiveRecordMediator.Save(inter);
 					});
 				vipChangeFlag = true;
 			}
-			if (vipChangeFlag) { 
-				messageDiv.InnerText = "Все клиенты были отключены от VIP прайсов";
-				messageDiv.Style.Add("display", "block");
+			if (vipChangeFlag) {
+				message = "Все клиенты были отключены от VIP прайсов";
 			}
 
 
@@ -416,25 +431,24 @@ WHERE RowId = ?Id;
 				regionalSettingsDataAdapter.UpdateCommand.Transaction = transaction;
 				regionalSettingsDataAdapter.UpdateCommand.Connection = connection;
 
-				pricesDataAdapter.Update(Data.Tables["Prices"]);
-				regionalSettingsDataAdapter.Update(Data.Tables["RegionSettings"]);
-				using (var scope = new ConnectionScope(connection, FlushAction.Never))
-				{
+				pricesDataAdapter.Update(data.Tables["Prices"]);
+				regionalSettingsDataAdapter.Update(data.Tables["RegionSettings"]);
+				using (var scope = new ConnectionScope(connection, FlushAction.Never)) {
 					var currentSupplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(supplier.Id);
-					BindRule(currentSupplier);
+					BindRule(currentSupplier, data);
 					currentSupplier.Save();
 
-					if (updateIntersection)
-					{
+					if (updateIntersection) {
 						//нагрузка балансируется (один запрос может уйти в одну базу, другой в другую)
 						//если код ниже будет выполнен в другой транзакции то в той базе где он выполнится
 						//может еще не быть создаваемого прайса
 
 						//FlushAction.Never - что бы не автоматически не запускать транзакцию
-						var addedPriceId = supplier.Prices.Max(p => p.Id);
+						var addedPriceId = currentSupplier.Prices.Max(p => p.Id);
 						Maintainer.MaintainIntersection(supplier);
 						ArHelper.WithSession(s => {
-						s.CreateSQLQuery(@"
+							s.CreateSQLQuery(
+								@"
 DROP TEMPORARY TABLE IF EXISTS tmp;
 CREATE TEMPORARY TABLE tmp ENGINE MEMORY
 SELECT adr.Id, rootAdr.SupplierDeliveryId
@@ -458,24 +472,19 @@ where tmp.Id = adr.Id
 limit 1)
 WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.IntersectionId and ins.PriceId = :priceId
 );")
-							.SetParameter("priceId", addedPriceId)
-							.SetParameter("supplierId", supplier.Id)
-							.ExecuteUpdate();
+								.SetParameter("priceId", addedPriceId)
+								.SetParameter("supplierId", supplier.Id)
+								.ExecuteUpdate();
 						});
 					}
 					scope.Flush();
 				}
 			});
-
-			GetData();
-			ConnectDataSource();
-			DataBind();
-			SetRegions();
 		}
 
-		private void BindRule(Supplier supplier)
+		private static void BindRule(Supplier supplier, DataSet data)
 		{
-			foreach (var row in Data.Tables["OrderSendConfig"].Rows.Cast<DataRow>())
+			foreach (var row in data.Tables["OrderSendConfig"].Rows.Cast<DataRow>())
 			{
 				switch (row.RowState)
 				{
@@ -506,10 +515,10 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 					}
 				}
 			}
-			Data.Tables["OrderSendConfig"].AcceptChanges();
+			data.Tables["OrderSendConfig"].AcceptChanges();
 		}
 
-		private void BindRule(OrderSendRules rule, DataRow row)
+		private static void BindRule(OrderSendRules rule, DataRow row)
 		{
 			var formaterId = Convert.ToUInt32(row["FormaterId"]);
 			var senderId = Convert.ToUInt32(row["SenderId"]);
@@ -520,7 +529,7 @@ WHERE Exists(select 1 from Customers.Intersection ins where ins.Id = adr.Interse
 			rule.RegionCode = Equals(row["RegionCode"], DBNull.Value) ? null : (ulong?) Convert.ToUInt64(row["RegionCode"]);
 		}
 
-		private OrderSendRules GetExistRule(Supplier supplier, DataRow row)
+		private static OrderSendRules GetExistRule(Supplier supplier, DataRow row)
 		{
 			var id = Convert.ToUInt32(row["id", DataRowVersion.Original]);
 			if (id == 0)
