@@ -50,7 +50,7 @@
 				${app.LinkTo("История минипочты", @Mails, @Index, {"filter.User.Id": user.Id, @attributes: {"target": "_blank"}})}
 			</li>
 			<% end %>
-			<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Интерфейс пользователя</a></li>
+			<li><a href="${CiUrl}?UserId=${user.Id}" target="_blank">Личный кабинет пользователя</a></li>
 		</ul>
 	</div>
 
