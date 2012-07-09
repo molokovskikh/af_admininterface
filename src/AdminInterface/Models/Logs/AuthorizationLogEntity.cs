@@ -57,6 +57,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual DateTime? IOLTime { get; set; }
 
+		[Property]
+		public virtual DateTime? LastLogon { get; set; }
+
 		public virtual string GetLastServicesUsage()
 		{
 			var usages = new [] {

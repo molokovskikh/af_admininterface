@@ -31,12 +31,19 @@ namespace AdminInterface.Helpers
 	public class ADUserInformation
 	{
 		public string Login;
-		public bool IsLoginExists = false;
+		public bool IsLoginExists;
 		public bool IsLocked;
 		public bool IsDisabled;
+
 		public DateTime? LastLogOnDate;
 		public DateTime? BadPasswordDate;
 		public DateTime? LastPasswordChange;
+
+		public void CalculateLastLogon(DateTime? value)
+		{
+			if (value.GetValueOrDefault() > LastLogOnDate.GetValueOrDefault())
+				LastLogOnDate = value;
+		}
 	}
 
 	public class ADUserInformationCollection : List<ADUserInformation>
@@ -274,20 +281,21 @@ namespace AdminInterface.Helpers
 			return tempResult;
 		}
 
-		public static ADUserInformation GetADUserInformation(string login)
+		public static ADUserInformation GetADUserInformation(User user)
 		{
+			var login = user.Login;
+			var result = new ADUserInformation {
+				LastLogOnDate = user.Logs.LastLogon
+			};
 			try
 			{
-				var result = new ADUserInformation {
-					Login = login,
-					IsLoginExists = IsLoginExists(login),
-				};
-				if (result.IsLoginExists)
-				{
+				result.Login = login;
+				result.IsLoginExists = IsLoginExists(login);
+				if (result.IsLoginExists) {
 					result.BadPasswordDate = GetBadPasswordDate(login);
 					result.IsDisabled = IsDisabled(login);
 					result.IsLocked = IsLocked(login);
-					result.LastLogOnDate = GetLastLogOnDate(login);
+					result.CalculateLastLogon(GetLastLogOnDate(login));
 					result.LastPasswordChange = GetLastPasswordChange(login);
 					result.IsDisabled = IsDisabled(login);
 				}
@@ -295,7 +303,7 @@ namespace AdminInterface.Helpers
 			}
 			catch (Exception)
 			{
-				return null;
+				return result;
 			}
 		}
 

@@ -209,7 +209,7 @@ namespace AdminInterface.Controllers
 				PropertyBag["client"] = user.Client;
 
 			PropertyBag["authorizationLog"] = user.Logs;
-			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user.Login);
+			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user);
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
@@ -217,8 +217,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["filter"] = filter;
 			PropertyBag["messages"] = filter.Execute(user, DbSession);
 
-			if (user.Client != null)
-			{
+			if (user.Client != null) {
 				var setting = user.Client.Settings;
 				PropertyBag["AllowOrderRegions"] = Region.GetRegionsByMask(setting.OrderRegionMask);
 				PropertyBag["AllowWorkRegions"] = Region.GetRegionsByMask(user.Client.MaskRegion);
