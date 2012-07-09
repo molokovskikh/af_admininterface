@@ -29,7 +29,7 @@ namespace Integration.Controllers
 		{
 			controller = new ClientsController();
 			referer = "http://ya.ru";
-			PrepareController(controller);
+			Prepare(controller);
 			client = DataMother.CreateTestClientWithUser();
 		}
 

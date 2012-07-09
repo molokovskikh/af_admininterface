@@ -9,6 +9,7 @@ using Castle.MonoRail.Framework.Routing;
 using Castle.MonoRail.Framework.Services;
 using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
+using Common.Web.Ui.Controllers;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NUnit.Framework;
@@ -54,6 +55,10 @@ namespace Integration.ForTesting
 		{
 			controller.Validator = validator;
 			controller.Binder.Validator = validator;
+			var appController = controller as BaseController;
+			if (appController != null)
+				appController.DbSession = session;
+
 			PrepareController(controller);
 		}
 

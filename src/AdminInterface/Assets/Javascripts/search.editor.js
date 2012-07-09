@@ -4,8 +4,12 @@
 	});
 
 	$("input[type=button].search").live("click", function () {
-		var url = $(this).data("search-editor").url;
-		var inputName = $(this).data("search-editor").inpurtName;
+		var editorData = $(this).data("search-editor");
+		var url = $(this).data("url") || editorData.url;
+		var inputName = "";
+		if (editorData)
+			inputName = editorData.inpurtName;
+		
 		var root = $(this).parents("div.search").first();
 		var rootRow = root.parents("tr").first();
 		var term = root.find("input[type=text].term").val();

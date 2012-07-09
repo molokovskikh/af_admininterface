@@ -28,6 +28,11 @@
 			url: "/clients/SearchAssortmentPrices"
 		};
 
+		window.searchEditors["parser"] = {
+			title: "Выберите парсер",
+			url: "/clients/SerachParseAlgorithm"
+		}
+
 		$("#excludes").data("template", function() {
 			return $("<tr>")
 				.append($("<td>").append($("<input type=button value=Удалить>").addClass("delete")))
@@ -171,7 +176,7 @@
 							{"data-search-editor": "assortmentPrice"})}
 
 						${FormHelper.HiddenField("drugstore.SmartOrderRules.ParseAlgorithm",
-							{"data-search-editor": "assortmentPrice"})}
+							{"data-search-editor": "parser"})}
 						<%if drugstore.SmartOrderRules: %>
 							<div class=value>
 								Ассортиментный прайс лист: ${drugstore.SmartOrderRules.GetAssortimentPriceName()} <br />
