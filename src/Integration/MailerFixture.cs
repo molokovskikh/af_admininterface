@@ -291,7 +291,7 @@ namespace Integration
 			var oldValue = payer.Comment;
 			payer.Comment += "\r\nТестовый комментарий";
 			var property = new DiffAuditableProperty(payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
-			mailer.PropertyChanged(property, payer).Send();
+			mailer.NotifyAboutChanges(property, payer, "BillingList@analit.net");
 
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
 		}

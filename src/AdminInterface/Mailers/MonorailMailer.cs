@@ -9,6 +9,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord.Framework.Internal;
 using Castle.Core.Smtp;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
@@ -170,16 +171,15 @@ namespace AdminInterface.Mailers
 			mailer.Send();
 		}
 
-		public MonorailMailer PropertyChanged(AuditableProperty property, object entity)
+		private MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
 			From = "register@analit.net";
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			IsBodyHtml = true;
-			if (property.IsHtml) {
+			if (property.IsHtml)
 				Template = "PropertyChanged_html";
-			} else {
+			else
 				Template = "PropertyChanged_txt";
-			}
 			var message = new StringBuilder();
 			message.Append(GetAdditionalMessages(entity));
 			message.AppendLine(property.Message.Remove(0, 3));
@@ -192,6 +192,7 @@ namespace AdminInterface.Mailers
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["message"] = property.Message.Remove(0, 3);
 			PropertyBag["entity"] = entity;
+			PropertyBag["type"] = Inflector.Pluralize(NHibernateUtil.GetClass(entity).Name);
 			PropertyBag["idLabel"] = idLabel;
 
 			return this;

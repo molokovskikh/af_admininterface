@@ -1,21 +1,17 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AdminInterface.Mailers;
-using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Queries;
 using Common.Tools;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;
-using log4net.Config;
 using IntegrationFixture = Test.Support.IntegrationFixture;
 
 namespace Integration.Models
 {
 	[TestFixture]
-	public class AuditLogRecordFixture : Test.Support.IntegrationFixture
+	public class AuditLogRecordFixture : IntegrationFixture
 	{
 		private MonorailMailer mailer;
 

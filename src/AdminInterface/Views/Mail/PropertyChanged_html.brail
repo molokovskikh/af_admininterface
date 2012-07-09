@@ -2,5 +2,5 @@
 ${admin.Name}<br>
 ${admin.Host}<br>
 ${idLabel} ${entity.Id}<br>
-${BindingHelper.GetDescription(entity)} <a href="${siteroot}/Payers/${payer.Id}">${entity.Name}</a><br>
+${BindingHelper.GetDescription(entity)} <a href="${siteroot}/${type}/${entity.Id}">${entity.Name}</a><br>
 ${message}
