@@ -1,0 +1,6 @@
+﻿${System.DateTime.Now}
+${admin.Name}
+${admin.Host}
+${idLabel} ${entity.Id}
+${BindingHelper.GetDescription(entity)} ${entity.Name}
+${message}

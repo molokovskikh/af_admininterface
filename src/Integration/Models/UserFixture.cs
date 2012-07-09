@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Linq;
+using System.Net.Mail;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using Common.Tools;
@@ -152,6 +154,28 @@ namespace Integration.Models
 				.ToList();
 			Assert.That(info.Count, Is.GreaterThan(0));
 			Assert.That(info, Is.EqualTo(new [] {true}));
+		}
+
+		[Test]
+		public void Notify_about_work_region_mask_changes()
+		{
+			ForTest.InitializeMailer();
+			MailMessage message = null;
+			ChangeNotificationSender.Sender = ForTest.CreateStubSender(m => message = m);
+			ChangeNotificationSender.UnderTest = true;
+
+			Reopen();
+			user = session.Load<User>(user.Id);
+			user.WorkRegionMask = 3;
+			Save(user);
+			Close();
+
+			Assert.That(message, Is.Not.Null);
+			Assert.That(message.Body, Is.StringEnding(String.Format("Код {0}\r\n"
+				+ "Пользователь {1}\r\n"
+				+ "Изменено 'Регионы работы' Добавлено 'Белгород'", user.Id, user.Name)));
+			Assert.That(message.To[0].ToString(), Is.EqualTo("BillingList@analit.net"));
+			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
 		}
 	}
 }

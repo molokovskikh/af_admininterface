@@ -151,6 +151,7 @@
     <Compile Include="Controllers\OrdersController.cs" />
     <Compile Include="Mailers\Mailer.cs" />
     <Compile Include="Mailers\MonorailMailer.cs" />
+    <Compile Include="Models\Audit\CollectionListners.cs" />
     <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
     <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
@@ -465,8 +466,8 @@
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />
     <None Include="Views\Logs\Certificates.brail" />
-    <None Include="Views\Mail\ChangeNameFullName.brail" />
-    <None Include="Views\Mail\PropertyChanges.brail" />
+    <None Include="Views\Mail\PropertyChanged_txt.brail" />
+    <None Include="Views\Mail\PropertyChanged_html.brail" />
     <None Include="Views\Main\Stat.brail" />
     <None Include="Views\ManagerReports\Index.brail" />
     <None Include="Views\ManagerReports\UsersAndAdresses.brail" />

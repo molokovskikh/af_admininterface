@@ -1,0 +1,6 @@
+﻿${System.DateTime.Now}<br>
+${admin.Name}<br>
+${admin.Host}<br>
+${idLabel} ${entity.Id}<br>
+${BindingHelper.GetDescription(entity)} <a href="${siteroot}/Payers/${payer.Id}">${entity.Name}</a><br>
+${message}

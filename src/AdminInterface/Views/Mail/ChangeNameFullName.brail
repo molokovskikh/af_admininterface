@@ -1,4 +1,0 @@
-﻿${System.DateTime.Now}
-${admin.Name}
-${admin.Host}
-${message}

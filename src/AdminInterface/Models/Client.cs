@@ -64,7 +64,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
-	public class Client : Service
+	public class Client : Service, IChangesNotificationAware
 	{
 		private ClientStatus _status;
 
@@ -363,6 +363,11 @@ group by u.ClientId")
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual bool ShouldNotify()
+		{
+			return Payers.All(p => p.PayerID != 921);
 		}
 
 		public virtual void AddBillingComment(string billingMessage)

@@ -63,6 +63,15 @@ namespace Integration.ForTesting
 
 		public static MonorailMailer TestMailer(Action<MailMessage> action)
 		{
+			var sender = CreateStubSender(action);
+			return new MonorailMailer(sender) {
+				UnderTest = true,
+				SiteRoot = "https://stat.analit.net/adm"
+			};
+		}
+
+		public static IEmailSender CreateStubSender(Action<MailMessage> action)
+		{
 			MailMessage dummy = null;
 			var sender = MockRepository.GenerateStub<IEmailSender>();
 			sender.Stub(s => s.Send(dummy)).IgnoreArguments()
@@ -71,10 +80,7 @@ namespace Integration.ForTesting
 					action(m);
 					return true;
 				}));
-			return new MonorailMailer(sender) {
-				UnderTest = true,
-				SiteRoot = "https://stat.analit.net/adm"
-			};
+			return sender;
 		}
 	}
 }

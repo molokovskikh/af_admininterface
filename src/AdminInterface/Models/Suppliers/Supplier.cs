@@ -24,7 +24,7 @@ using log4net;
 namespace AdminInterface.Models.Suppliers
 {
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
-	public class Supplier : Service
+	public class Supplier : Service, IChangesNotificationAware
 	{
 		private ContactGroupType[] _defaultGroups = new [] {
 			ContactGroupType.ClientManagers,
@@ -154,6 +154,11 @@ namespace AdminInterface.Models.Suppliers
 		public override string ToString()
 		{
 			return Name;
+		}
+
+		public virtual bool ShouldNotify()
+		{
+			return Payer.PayerID != 921;
 		}
 
 		public virtual string GetEmailsForBilling()

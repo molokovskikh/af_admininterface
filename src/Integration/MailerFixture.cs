@@ -260,7 +260,7 @@ namespace Integration
 			client.Name += "1";
 			var property = new AuditableProperty(payer.GetType().GetProperty("Name"), "Наименование", client.Name, oldValue);
 
-			mailer.NotifyAboutChanges(property, client);
+			mailer.NotifyAboutChanges(property, client, "RegisterList@subscribe.analit.net");
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Наименование'"));
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Наименование' было 'Тестовый клиент' стало 'Тестовый клиент1'"));
@@ -291,7 +291,7 @@ namespace Integration
 			var oldValue = payer.Comment;
 			payer.Comment += "\r\nТестовый комментарий";
 			var property = new DiffAuditableProperty(payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
-			mailer.NotifyPropertyDiff(property, payer).Send();
+			mailer.PropertyChanged(property, payer).Send();
 
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
 		}

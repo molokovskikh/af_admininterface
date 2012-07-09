@@ -49,7 +49,7 @@ namespace AdminInterface.Models.Billing
 		public bool SendToMinimail { get; set; }
 	}
 
-	[ActiveRecord(Schema = "billing", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "billing", Lazy = true), Auditable, Description("Плательщик")]
 	public class Payer : ActiveRecordValidationBase<Payer>, IMultiAuditable
 	{
 		public Payer(string name)
@@ -80,7 +80,7 @@ namespace AdminInterface.Models.Billing
 			Reports = new List<Report>();
 		}
 
-		[PrimaryKey]
+		[PrimaryKey, Description("Договор")]
 		public virtual uint PayerID { get; set; }
 
 		public virtual uint Id
@@ -371,7 +371,6 @@ ORDER BY {Payer}.shortname;";
 			get { return ClientsMinimailAddresses.Implode(); }
 		}
 
-
 		public virtual void RecalculateBalance()
 		{
 			var invoicesSum = Invoice.Queryable.Where(i => i.Payer == this).Sum(i => i.BalanceAmount);
@@ -556,7 +555,7 @@ ORDER BY {Payer}.shortname;";
 			var oldValue = this.OldValue(p => p.Comment);
 			var propertyInfo = typeof (Payer).GetProperty("Comment");
 			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
-			mailer.NotifyPropertyDiff(property, this).Send();
+			mailer.NotifyAboutChanges(property, this, "BillingList@analit.net");
 			foreach (var client in Clients) {
 				var log = new ClientInfoLogEntity(client) {
 					Message = property.Message,

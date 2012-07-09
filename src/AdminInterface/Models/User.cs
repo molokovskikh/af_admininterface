@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -76,8 +77,8 @@ namespace AdminInterface.Models
 		uint Id { get; }
 	}
 
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
-	public class User : IEnablable, IDisabledByParent, IUser
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
+	public class User : IEnablable, IDisabledByParent, IUser, IChangesNotificationAware
 	{
 		private string _name;
 		private bool _enabled;
@@ -187,7 +188,7 @@ namespace AdminInterface.Models
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
-		[Property, Description("Регионы работы"), Auditable]
+		[Property, Description("Регионы работы"), Auditable, NotifyBilling]
 		public virtual ulong WorkRegionMask { get; set; }
 
 		[Property, Description("Регионы заказа"), Auditable]
@@ -375,6 +376,11 @@ namespace AdminInterface.Models
 			return Login;
 		}
 
+		public virtual bool ShouldNotify()
+		{
+			return Payer.Id != 921;
+		}
+
 		public virtual bool IsPermissionAssigned(UserPermission permission)
 		{
 			return AssignedPermissions.Any(p => permission.Shortcut == p.Shortcut);
@@ -432,9 +438,7 @@ namespace AdminInterface.Models
 			Save();
 
 			if (Client != null)
-			{
 				AddPrices(Client);
-			}
 		}
 
 		public virtual void SetupSupplierPermission()

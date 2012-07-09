@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using AdminInterface.Models;
+using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -41,47 +42,43 @@ namespace AdminInterface.Mailers
 			Template = "EnableChanged";
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
-			var lastDisable = "неизвестно";
+			var lastDisable = "РЅРµРёР·РІРµСЃС‚РЅРѕ";
 
 			var type = "";
 			var clazz = NHibernateUtil.GetClass(item);
-			if (clazz == typeof(User))
-			{
-				type = "пользователя";
+			if (clazz == typeof(User)) {
+				type = "РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 				var user = (User) item;
 				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
-			if (clazz == typeof(Address))
-			{
-				type = "адреса";
+			if (clazz == typeof(Address)) {
+				type = "Р°РґСЂРµСЃР°";
 				var address = (Address) item;
 				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
-			if (clazz == typeof(Client))
-			{
-				type = "клиента";
+			if (clazz == typeof(Client)) {
+				type = "РєР»РёРµРЅС‚Р°";
 				var client = Client.Find(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null)
-					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					lastDisable = String.Format("{0} РїРѕР»СЊР·РѕРІР°С‚РµР»РµРј {1}", disable.LogTime, disable.OperatorName);
 			}
-			if (clazz == typeof(Supplier))
-			{
-				type = "поставщика";
+			if (clazz == typeof(Supplier)) {
+				type = "РїРѕСЃС‚Р°РІС‰РёРєР°";
 				PropertyBag["service"] = item;
 			}
 
 			if (item.Enabled)
-				Subject = String.Format("Возобновлена работа {0}", type);
+				Subject = String.Format("Р’РѕР·РѕР±РЅРѕРІР»РµРЅР° СЂР°Р±РѕС‚Р° {0}", type);
 			else
-				Subject = String.Format("Приостановлена работа {0}", type);
+				Subject = String.Format("РџСЂРёРѕСЃС‚Р°РЅРѕРІР»РµРЅР° СЂР°Р±РѕС‚Р° {0}", type);
 			PropertyBag["lastDisable"] = lastDisable;
 			PropertyBag["item"] = item;
 			PropertyBag["admin"] = SecurityContext.Administrator;
@@ -92,14 +89,14 @@ namespace AdminInterface.Mailers
 		{
 			To = "RegisterList@subscribe.analit.net";
 			From = "register@analit.net";
-			Subject = String.Format("Бесплатное изменение пароля - {0}", user.Client.FullName);
+			Subject = String.Format("Р‘РµСЃРїР»Р°С‚РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ РїР°СЂРѕР»СЏ - {0}", user.Client.FullName);
 		}
 
 		public void PasswordChange(User user)
 		{
 			To = "billing@analit.net";
 			From = "register@analit.net";
-			Subject = String.Format("Платное изменение пароля - {0}", user.Client.FullName);
+			Subject = String.Format("РџР»Р°С‚РЅРѕРµ РёР·РјРµРЅРµРЅРёРµ РїР°СЂРѕР»СЏ - {0}", user.Client.FullName);
 		}
 
 		public void NotifyBillingAboutClientRegistration(Client client)
@@ -108,7 +105,7 @@ namespace AdminInterface.Mailers
 			IsBodyHtml = true;
 			To = "billing@analit.net";
 			From = "register@analit.net";
-			Subject = "Регистрация нового клиента";
+			Subject = "Р РµРіРёСЃС‚СЂР°С†РёСЏ РЅРѕРІРѕРіРѕ РєР»РёРµРЅС‚Р°";
 
 			PropertyBag["client"] = client;
 			PropertyBag["payer"] = client.Payers.First();
@@ -123,7 +120,7 @@ namespace AdminInterface.Mailers
 
 			To = "billing@analit.net";
 			From = "billing@analit.net";
-			Subject = "Не удалось отправить счет";
+			Subject = "РќРµ СѓРґР°Р»РѕСЃСЊ РѕС‚РїСЂР°РІРёС‚СЊ СЃС‡РµС‚";
 			PropertyBag["invoice"] = invoice;
 		}
 
@@ -133,7 +130,7 @@ namespace AdminInterface.Mailers
 
 			To = emails;
 			From = "billing@analit.net";
-			Subject = String.Format("Акт сверки");
+			Subject = String.Format("РђРєС‚ СЃРІРµСЂРєРё");
 
 			var file = new MemoryStream();
 			var book = new Workbook();
@@ -141,7 +138,7 @@ namespace AdminInterface.Mailers
 			book.Save(file);
 			file.Position = 0;
 
-			Attachments.Add(new Attachment(file, "Акт сверки.xls"));
+			Attachments.Add(new Attachment(file, "РђРєС‚ СЃРІРµСЂРєРё.xls"));
 			PropertyBag["act"] = act;
 			PropertyBag["comment"] = comment;
 			return this;
@@ -152,7 +149,7 @@ namespace AdminInterface.Mailers
 			Template = "UserMoved";
 
 			From = "register@analit.net";
-			Subject = "Перемещение пользователя";
+			Subject = "РџРµСЂРµРјРµС‰РµРЅРёРµ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ";
 			To = "RegisterList@subscribe.analit.net";
 			PropertyBag["user"] = user;
 			PropertyBag["oldClient"] = oldClient;
@@ -162,60 +159,61 @@ namespace AdminInterface.Mailers
 			return this;
 		}
 
-		public void NotifyAboutChanges(AuditableProperty property, object entity)
+		public void NotifyAboutChanges(AuditableProperty property, object entity, string to)
 		{
-			MonorailMailer mailer = null;
-			if (entity is Service) {
-				mailer = NotifyAboutServiceChanges(property, entity);
-			}
+			var notificationAware = entity as IChangesNotificationAware;
+			if (notificationAware != null && !notificationAware.ShouldNotify())
+				return;
 
-			if (mailer != null)
-				mailer.Send();
+			var mailer = PropertyChanged(property, entity);
+			mailer.To = to;
+			mailer.Send();
 		}
 
-		public MonorailMailer NotifyPropertyDiff(AuditableProperty property, object entity)
+		public MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
-			To = "BillingList@analit.net";
 			From = "register@analit.net";
-			Subject = String.Format("Изменено поле '{0}'", property.Name);
+			Subject = String.Format("РР·РјРµРЅРµРЅРѕ РїРѕР»Рµ '{0}'", property.Name);
 			IsBodyHtml = true;
-			Template = "PropertyChanges";
+			if (property.IsHtml) {
+				Template = "PropertyChanged_html";
+			} else {
+				Template = "PropertyChanged_txt";
+			}
+			var message = new StringBuilder();
+			message.Append(GetAdditionalMessages(entity));
+			message.AppendLine(property.Message.Remove(0, 3));
+
+			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
+			if (idLabel == null)
+				idLabel = "РљРѕРґ";
+
+			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["message"] = property.Message.Remove(0, 3);
-			PropertyBag["name"] = property.Name;
-			PropertyBag["payer"] = entity;
+			PropertyBag["entity"] = entity;
+			PropertyBag["idLabel"] = idLabel;
 
 			return this;
 		}
 
-		public MonorailMailer NotifyAboutServiceChanges(AuditableProperty property, object entity)
+		private static StringBuilder GetAdditionalMessages(object entity)
 		{
 			var message = new StringBuilder();
-			var id = ((Service)entity).Id;
-			message.AppendLine("Клиент " + id);
+			if (!(entity is Service))
+				return message;
+
+			var id = ((Service) entity).Id;
+			message.AppendLine("РљР»РёРµРЅС‚ " + id);
 			var client = entity as Client;
 			if (client != null) {
-				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
-				if (client.Payers.Any( p => p.PayerID == 921))
-					return null;
+				message.AppendLine("РџР»Р°С‚РµР»СЊС‰РёРєРё: " + client.Payers.Implode(p => p.Name));
 			}
 			var supplier = entity as Supplier;
 			if (supplier != null) {
-				message.AppendLine("Плательщик: " + supplier.Payer.Name);
-				if (supplier.Payer.PayerID == 921)
-					return null;
+				message.AppendLine("РџР»Р°С‚РµР»СЊС‰РёРє: " + supplier.Payer.Name);
 			}
-			message.AppendLine(property.Message.Remove(0, 3));
-
-			Template = "ChangeNameFullName";
-			From = "register@analit.net";
-			Subject = String.Format("Изменено поле '{0}'", property.Name);
-			To = "RegisterList@subscribe.analit.net";
-			PropertyBag["message"] = message;
-			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["name"] = property.Name;
-
-			return this;
+			return message;
 		}
 
 		public MonorailMailer AddressMoved(Address address, Client oldClient, LegalEntity oldLegalEntity)
@@ -223,7 +221,7 @@ namespace AdminInterface.Mailers
 			Template = "AddressMoved";
 
 			From = "register@analit.net";
-			Subject = "Перемещение адреса доставки";
+			Subject = "РџРµСЂРµРјРµС‰РµРЅРёРµ Р°РґСЂРµСЃР° РґРѕСЃС‚Р°РІРєРё";
 			To = "RegisterList@subscribe.analit.net";
 			PropertyBag["address"] = address;
 			PropertyBag["oldClient"] = oldClient;
@@ -242,7 +240,7 @@ namespace AdminInterface.Mailers
 
 			From = "billing@analit.net";
 			To = "billing@analit.net";
-			Subject = String.Format("Изменение стоимости {0} - {1}", payer.Name, payer.Id);
+			Subject = String.Format("РР·РјРµРЅРµРЅРёРµ СЃС‚РѕРёРјРѕСЃС‚Рё {0} - {1}", payer.Name, payer.Id);
 
 			if (service != null)
 			{
@@ -272,7 +270,7 @@ namespace AdminInterface.Mailers
 					invoice.SendToEmail = false;
 
 				if (_log.IsDebugEnabled)
-					_log.DebugFormat("Счет {3} для плательщика {2} за {0} отправлен на адреса {1}",
+					_log.DebugFormat("РЎС‡РµС‚ {3} РґР»СЏ РїР»Р°С‚РµР»СЊС‰РёРєР° {2} Р·Р° {0} РѕС‚РїСЂР°РІР»РµРЅ РЅР° Р°РґСЂРµСЃР° {1}",
 						invoice.Period,
 						invoice.Payer.GetInvocesAddress(),
 						invoice.Payer.Name,
@@ -281,7 +279,7 @@ namespace AdminInterface.Mailers
 			catch (DoNotHaveContacts)
 			{
 				if (_log.IsDebugEnabled)
-					_log.DebugFormat("Счет {0} не отправлен тк не задана контактная информация для плательщика {1} - {2}",
+					_log.DebugFormat("РЎС‡РµС‚ {0} РЅРµ РѕС‚РїСЂР°РІР»РµРЅ С‚Рє РЅРµ Р·Р°РґР°РЅР° РєРѕРЅС‚Р°РєС‚РЅР°СЏ РёРЅС„РѕСЂРјР°С†РёСЏ РґР»СЏ РїР»Р°С‚РµР»СЊС‰РёРєР° {1} - {2}",
 						invoice.Id,
 						invoice.Payer.Id,
 						invoice.Payer.Name);
@@ -309,7 +307,7 @@ namespace AdminInterface.Mailers
 
 			From = "billing@analit.net";
 			To = to;
-			Subject = String.Format("Счет за {0}", invoice.Period);
+			Subject = String.Format("РЎС‡РµС‚ Р·Р° {0}", invoice.Period);
 
 			PropertyBag["invoice"] = invoice;
 			PropertyBag["inlineInvoice"] = true;
@@ -325,7 +323,7 @@ namespace AdminInterface.Mailers
 
 			From = "billing@analit.net";
 			To = to;
-			Subject = String.Format("Счет за {0}", invoice.Period);
+			Subject = String.Format("РЎС‡РµС‚ Р·Р° {0}", invoice.Period);
 
 			PropertyBag["invoice"] = invoice;
 			PropertyBag["inlineInvoice"] = false;
@@ -335,7 +333,7 @@ namespace AdminInterface.Mailers
 			RenderTemplate("/Invoices/InvoiceBody", writer);
 			writer.Flush();
 			memory.Position = 0;
-			Attachments.Add(new Attachment(memory, "Счет.html"));
+			Attachments.Add(new Attachment(memory, "РЎС‡РµС‚.html"));
 		}
 	}
 }
