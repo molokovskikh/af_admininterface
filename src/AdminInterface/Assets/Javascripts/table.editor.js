@@ -26,7 +26,11 @@
 			body = table.children("tbody");
 		}
 		else {
-			index = body.children().length - 1;
+			index = _.max(_.map(body.find("input"), function (element) {
+				var name = element.name;
+				return parseInt(name.match(/\[(\d+)\]/)[1]) || 0;
+			}));
+			index++;
 		}
 
 		body.append("<tr><td><a class='delete' href='javascript:'>Удалить</a></td><td><input name='items[" + index + "].Name' type='text'></input></td></tr>");
