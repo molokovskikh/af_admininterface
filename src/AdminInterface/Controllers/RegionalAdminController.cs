@@ -78,8 +78,8 @@ namespace AdminInterface.Controllers
 			}
 			if (countAccessibleRegions == accessibleRegions.Count())
 				admin.RegionMask = UInt64.MaxValue;
-			admin.Save();
-			new RedmineUser(admin).Save();
+			DbSession.Save(admin);
+			DbSession.Save(new RedmineUser(admin));
 			var isLoginCreated = CreateUserInAD(admin);
 
 			UpdateAd(administrator, weekLogonHours);
@@ -125,7 +125,7 @@ namespace AdminInterface.Controllers
 			if (countAccessibleRegions == accessibleRegions.Count())
 				administrator.RegionMask = UInt64.MaxValue;
 
-			administrator.Update();
+			DbSession.Update(administrator);
 			UpdateAd(administrator, weekLogonHours);
 			Notify("Сохранено");
 			RedirectUsingRoute("RegionalAdmin", "Edit", new { id = administrator.Id });

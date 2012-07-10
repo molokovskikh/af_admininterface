@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Linq;
-using System.Web.UI.WebControls;
 using AdminInterface.Models.Security;
-using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
-using WatiN.Core; using Test.Support.Web;
+using WatiN.Core;
 
 namespace Functional.Billing
 {
@@ -22,7 +19,7 @@ namespace Functional.Billing
 
 			var admin = Administrator.GetByName(Environment.UserName);
 			admin.RemovePermission();
-			admin.Save();
+			Save(admin);
 
 			Open(payer);
 			AssertText("Плательщик");

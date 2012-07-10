@@ -511,7 +511,7 @@ where s.Name like :SearchText")
 				return;
 			}
 
-			client.Delete();
+			client.Delete(DbSession);
 			Notify("Удалено");
 			Redirect("Users", "Search");
 		}

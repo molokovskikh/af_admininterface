@@ -38,7 +38,7 @@ namespace AdminInterface.Initializers
 			using(new SessionScope())
 			{
 				if (Administrator.GetByName(Environment.UserName) == null)
-					Administrator.CreateLocalAdministrator();
+					ActiveRecordMediator.Save(Administrator.CreateLocalAdministrator());
 			}
 		}
 

@@ -114,5 +114,20 @@ namespace AdminInterface.Controllers
 				.Select(c => new {c.Id, Name = predicate(c)})
 				.ToArray();
 		}
+
+		public void Delete(uint id)
+		{
+			var supplier = DbSession.Load<Supplier>(id);
+
+			if (!supplier.CanDelete(DbSession)) {
+				Error("Не могу удалить поставщика");
+				RedirectToReferrer();
+				return;
+			}
+
+			supplier.Delete(DbSession);
+			Notify("Удалено");
+			Redirect("Users", "Search");
+		}
 	}
 }

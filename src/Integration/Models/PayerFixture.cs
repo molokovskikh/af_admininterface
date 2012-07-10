@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord.Framework;
 using Integration.ForTesting;
 using Test.Support.log4net;
 using log4net.Config;
@@ -98,7 +99,7 @@ namespace Integration.Models
 			var client = DataMother.TestClient();
 			client.Disabled = true;
 			var payer = client.Payers.First();
-			Assert.That(payer.CanDelete(), Is.True);
+			Assert.That(payer.CanDelete(session), Is.True);
 
 			payer.Delete();
 			scope.Flush();

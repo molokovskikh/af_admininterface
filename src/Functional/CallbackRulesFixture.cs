@@ -20,7 +20,7 @@ namespace Functional
 			if (!adm.HavePermision(PermissionType.ManageCallbacks))
 			{
 				adm.AllowedPermissions.Add(Permission.Find(PermissionType.ManageCallbacks));
-				adm.Save();
+				session.Save(adm);
 			}
 
 			FixtureMapping

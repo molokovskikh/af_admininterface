@@ -156,6 +156,7 @@
     <Compile Include="Models\RegistrationInformationFixture.cs" />
     <Compile Include="Models\RevisionActFixture.cs" />
     <Compile Include="Models\StatQueryFixture.cs" />
+    <Compile Include="Models\SupplierFixture.cs" />
     <Compile Include="Models\UpdateFilterFixture.cs" />
     <Compile Include="Models\UserFilterFixture.cs" />
     <Compile Include="Models\UserFixture.cs" />

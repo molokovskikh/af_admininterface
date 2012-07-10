@@ -23,7 +23,7 @@ namespace Integration.Models
 		[SetUp]
 		public void Setup()
 		{
-			client = DataMother.CreateTestClientWithUser();
+			client = DataMother.CreateTestClientWithAddressAndUser();
 			user = client.Users[0];
 			Flush();
 		}
@@ -120,6 +120,22 @@ namespace Integration.Models
 		[Test]
 		public void Delete_user()
 		{
+			user.Enabled = false;
+			Assert.That(user.CanDelete(), Is.True);
+			scope.Flush();
+			user.Delete();
+			scope.Flush();
+		}
+
+		[Test]
+		public void Delete_user_with_orders()
+		{
+			var supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			user.AvaliableAddresses.Add(client.Addresses[0]);
+			user.Enabled = false;
+			Save(new ClientOrder(user, supplier.Prices[0]));
+
 			Assert.That(user.CanDelete(), Is.True);
 			scope.Flush();
 			user.Delete();

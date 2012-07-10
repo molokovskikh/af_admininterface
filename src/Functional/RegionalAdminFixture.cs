@@ -93,7 +93,7 @@ namespace Functional
 			browser.Link(Find.ByText(admin.UserName)).Click();
 			Assert.That(browser.TextField(Find.ByName("administrator.InternalPhone")).Text, Is.EqualTo(phone.ToString()));
 
-			admin.Refresh();
+			session.Refresh(admin);
 			Assert.That(admin.InternalPhone, Is.EqualTo(phone.ToString()));
 			Assert.That(admin.Department, Is.EqualTo(department));
 		}
@@ -108,7 +108,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Assert.IsFalse(browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked);
 
-			admin.Refresh();
+			session.Refresh(admin);
 			Assert.That(admin.RegionMask & regionId, Is.EqualTo(0));
 
 			browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked = true;
@@ -116,7 +116,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Assert.IsTrue(browser.CheckBox(Find.ByName("accessibleRegions[0].IsAvaliableForBrowse")).Checked);
 
-			admin.Refresh();
+			session.Refresh(admin);
 			Assert.That(admin.RegionMask & regionId, Is.GreaterThan(0));
 		}
 
@@ -134,7 +134,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Assert.IsTrue(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked);
 
-			admin.Refresh();
+			session.Refresh(admin);
 			Assert.IsTrue(admin.HavePermision(permissionType));
 
 			browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked = false;
@@ -142,7 +142,7 @@ namespace Functional
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Assert.IsFalse(browser.CheckBox(Find.ByName("administrator.AllowedPermissions[0].Id")).Checked);
 
-			admin.Refresh();
+			session.Refresh(admin);
 			Assert.IsFalse(admin.HavePermision(permissionType));
 		}
 
@@ -170,7 +170,7 @@ namespace Functional
 				.Cast<PermissionType>()
 				.Select(p => Permission.Find(p))
 				.ToList();
-			admin.Save();
+			Save(admin);
 			return admin;
 		}
 	}

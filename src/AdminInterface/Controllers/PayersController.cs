@@ -34,7 +34,7 @@ namespace AdminInterface.Controllers
 
 			var begin = new DateTime(year, 1, 1);
 			var end = new DateTime(year, 12, 31);
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var summary = new BalanceSummary(begin, end, payer);
 
 			PropertyBag["year"] = year;
@@ -48,7 +48,7 @@ namespace AdminInterface.Controllers
 
 		public void NewPayment(uint id, int year)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var payment = new Payment(payer);
 			BindObjectInstance(payment, "payment");
 			if (!HasValidationError(payment))
@@ -69,7 +69,7 @@ namespace AdminInterface.Controllers
 
 		public void NewBalanceOperation(uint id, int year)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var operation = new BalanceOperation(payer);
 			BindObjectInstance(operation, "operation");
 			if (IsValid(operation))
@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 
 		public void InvoicePreview(uint id, int group)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			if (payer.Recipient == null)
 			{
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
@@ -117,7 +117,7 @@ namespace AdminInterface.Controllers
 
 		public void NewInvoice(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var invoice = new Invoice(payer);
 			PropertyBag["invoice"] = invoice;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
@@ -142,7 +142,7 @@ namespace AdminInterface.Controllers
 
 		public void NewAct(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var act = new Act(payer, DateTime.Now);
 			PropertyBag["act"] = act;
 			PropertyBag["references"] = Nomenclature.Queryable.OrderBy(n => n.Name).ToList();
@@ -168,7 +168,7 @@ namespace AdminInterface.Controllers
 
 		public void Ad(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			PropertyBag["payer"] = payer;
 			PropertyBag["ads"] = Advertising.Queryable.Where(a => a.Payer == payer)
 				.OrderBy(a => a.Begin).ToList();
@@ -176,7 +176,7 @@ namespace AdminInterface.Controllers
 
 		public void NewAd(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 			var ad = new Advertising(payer);
 			if (IsPost)
 			{
@@ -193,7 +193,7 @@ namespace AdminInterface.Controllers
 
 		public void InvoiceGroups(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 
 			if (payer.GetAccounts().Count() == 0)
 				Error("Нет ни одной позиции для формирования счета");
@@ -215,22 +215,22 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 
-			if (!payer.CanDelete()) {
+			if (!payer.CanDelete(DbSession)) {
 				Error("Не могу удалить плательщика");
 				RedirectToReferrer();
 				return;
 			}
 
-			payer.Delete();
+			payer.Delete(DbSession);
 			Notify("Удалено");
 			Redirect("Billing", "Search");
 		}
 
 		public void Messages(uint id)
 		{
-			var payer = Payer.Find(id);
+			var payer = DbSession.Load<Payer>(id);
 
 			var filter = new PayerMessagesFilter {
 				Payer = payer,

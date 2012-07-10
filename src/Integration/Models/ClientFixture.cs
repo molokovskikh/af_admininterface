@@ -94,7 +94,7 @@ namespace Integration.Models
 			var payerId = client.Payers[0].Id;
 
 			client = ActiveRecordMediator<Client>.FindByPrimaryKey(client.Id);
-			client.Delete();
+			client.Delete(session);
 			Reopen();
 
 			Assert.That(session.Get<Client>(clientId), Is.Null);

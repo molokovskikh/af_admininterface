@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Models.Security;
 using CassiniDev;
+using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
@@ -20,6 +21,7 @@ namespace Functional
 			ForTest.InitialzeAR();
 
 			var admin = Administrator.CreateLocalAdministrator();
+			ActiveRecordMediator.Save(admin);
 			SecurityContext.GetAdministrator = () => admin;
 
 			_webServer = WatinSetup.StartServer();

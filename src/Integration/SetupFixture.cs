@@ -3,6 +3,7 @@ using System.Linq;
 using AddUser;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support;
@@ -30,7 +31,7 @@ namespace Integration
 				.Cast<PermissionType>()
 				.Select(t => Permission.Find(t))
 				.ToList();
-			admin.Save();
+			ActiveRecordMediator.Save(admin);
 			SecurityContext.GetAdministrator = () => admin;
 			Administrator.GetHost = () => "localhost";
 		}

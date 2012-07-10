@@ -737,7 +737,8 @@ WHERE
 
 		public virtual bool CanDelete()
 		{
-			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.User == this) == 0;
+			var canDelete = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>.Queryable.Where(o => o.User == this));
+			return Disabled && canDelete;
 		}
 
 		public virtual void Delete()

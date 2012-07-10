@@ -19,6 +19,7 @@ using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
@@ -133,6 +134,18 @@ namespace AdminInterface.Models.Suppliers
 					return ActiveRecordLinqBase<User>.Queryable.Where(u => u.RootService == this).ToList();
 
 				return Enumerable.Empty<User>().ToList();
+			}
+		}
+
+		public virtual IEnumerable<ModelAction> Actions
+		{
+			get
+			{
+				return ArHelper.WithSession(s => {
+					return new [] {
+						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
+					};
+				});
 			}
 		}
 
@@ -302,8 +315,7 @@ namespace AdminInterface.Models.Suppliers
 			var oldPayers = Payer;
 			Payer = payer;
 
-			foreach (var user in Users)
-			{
+			foreach (var user in Users) {
 				user.Payer.Users.Remove(user);
 				user.Payer = payer;
 				user.Payer.Users.Add(user);
@@ -318,6 +330,37 @@ namespace AdminInterface.Models.Suppliers
 			if (!Users.Contains(user))
 				Users.Add(user);
 			return user;
+		}
+
+		public virtual bool CanDelete(ISession session)
+		{
+			var synonymCount = Convert.ToUInt32(session.CreateSQLQuery(@"
+select count(*)
+from Customers.Suppliers s
+	join Usersettings.PricesData pd on pd.FirmCode = s.Id
+	join Farm.Synonym s on s.PriceCode = pd.PriceCode
+where s.Id = :supplierId")
+				.SetParameter("supplierId", Id)
+				.UniqueResult());
+
+			return Disabled
+				&& synonymCount <= 200
+				&& Users.All(u => u.CanDelete());
+		}
+
+		public virtual void Delete(ISession session)
+		{
+			//если мы будем удалять плательщика он попробует рекурсивно удалить
+			//меня что бы этого избежать обнуляем плательщика
+			var payer = Payer;
+			Payer = null;
+
+			foreach (var user in Users.ToArray())
+				user.Delete();
+			session.Delete(this);
+
+			if (payer.CanDelete(session))
+				payer.Delete();
 		}
 	}
 

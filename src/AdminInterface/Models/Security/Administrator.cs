@@ -27,7 +27,7 @@ namespace AdminInterface.Models.Security
 	}
 
 	[ActiveRecord("Regionaladmins", Schema = "accessright", Lazy = false)]
-	public class Administrator : ActiveRecordLinqBase<Administrator>
+	public class Administrator
 	{
 		public static Func<string> GetHost = () => HttpContext.Current.Request.UserHostAddress;
 
@@ -104,16 +104,6 @@ namespace AdminInterface.Models.Security
 				user.Update();
 			}
 			ActiveRecordMediator<Administrator>.Delete(this);
-		}
-
-		public void Save()
-		{
-			ActiveRecordMediator<Administrator>.Save(this);
-		}
-
-		public void Update()
-		{
-			ActiveRecordMediator<Administrator>.Update(this);
 		}
 
 		public bool HavePermision(PermissionType permission)
@@ -283,7 +273,6 @@ namespace AdminInterface.Models.Security
 				.Cast<PermissionType>()
 				.Select(t => Permission.Find(t))
 				.ToList();
-			admin.Save();
 			return admin;
 		}
 

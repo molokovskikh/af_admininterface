@@ -19,6 +19,7 @@ using Common.Tools.Calendar;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 
 namespace AdminInterface.Models.Billing
 {
@@ -488,45 +489,29 @@ ORDER BY {Payer}.shortname;";
 			get { return Period.Years; }
 		}
 
-		public virtual bool CanDelete()
+		public virtual bool CanDelete(ISession session)
 		{
-			var operations = ArHelper.WithSession(s => {
-				var maxInvoice = s.QueryOver<Invoice>()
-					.Where(i => i.Payer == this)
-					.SelectList(l => l.SelectMax(i => i.CreatedOn))
-					.SingleOrDefault<DateTime>();
+			var maxPayment = session.QueryOver<Payment>()
+				.Where(p => p.Payer == this)
+				.SelectList(l => l.SelectMax(p => p.PayedOn))
+				.SingleOrDefault<DateTime>();
 
-				var maxAct = s.QueryOver<Act>()
-					.Where(a => a.Payer == this)
-					.SelectList(l => l.SelectMax(i => i.ActDate))
-					.SingleOrDefault<DateTime>();
+			var documentDates = new [] {maxPayment};
 
-				var maxPayment = s.QueryOver<Payment>()
-					.Where(p => p.Payer == this)
-					.SelectList(l => l.SelectMax(p => p.PayedOn))
-					.SingleOrDefault<DateTime>();
-
-				var maxBalanceOperation = s.QueryOver<BalanceOperation>()
-					.Where(o => o.Payer == this)
-					.SelectList(l => l.SelectMax(o => o.Date))
-					.SingleOrDefault<DateTime>();
-				return new [] {maxInvoice, maxAct, maxPayment, maxBalanceOperation};
-			});
-
-			return Suppliers.Count == 0
-				&& Clients.All(c => c.Disabled)
-				&& Reports.All(r => !r.Allow)
+			return Reports.Count == 0
 				&& Clients.All(c => c.CanDelete())
-				&& operations.Max().AddYears(3) < DateTime.Now;
+				&& Suppliers.All(s => s.CanDelete(session))
+				&& documentDates.Max().AddMonths(15) < DateTime.Now;
 		}
 
-		public override void Delete()
+		public virtual void Delete(ISession session)
 		{
-			foreach (var client in Clients.Where(c => c.CanDelete()).ToArray()) {
-				client.Delete();
-			}
+			var clients = Clients.Where(c => c.CanDelete()).ToArray();
+			foreach (var client in clients)
+				client.Delete(session);
 
-			DeleteReportsRequest.Process(Reports);
+			foreach (var supplier in Suppliers)
+				supplier.Delete(session);
 
 			base.Delete();
 		}
@@ -535,9 +520,11 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				return new [] {
-					new ModelAction(this, "Delete", "Удалить", !CanDelete())
-				};
+				return ArHelper.WithSession(s => {
+					return new [] {
+						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
+					};
+				});
 			}
 		}
 

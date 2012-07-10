@@ -154,7 +154,7 @@ namespace Functional.Suppliers
 			browser.Button("MainContentPlaceHolder_PricesGrid_AddButton").Click();
 			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
 			Click("Применить");
-			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			session.Refresh(supplier);
 			var a = session.CreateSQLQuery(@"
 Select fs.RequestInterval 
 From farm.Sources fs

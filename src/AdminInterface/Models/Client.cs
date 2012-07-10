@@ -460,12 +460,14 @@ where ClientId = :clientId")
 
 		public virtual bool CanDelete()
 		{
-			return ActiveRecordLinqBase<ClientOrder>.Queryable.Count(o => o.Client == this) == 0
+			var haveOrders = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>.Queryable.Where(o => o.Client == this));
+			return Disabled
+				&& haveOrders
 				&& Addresses.All(a => a.CanDelete())
 				&& Users.All(u => u.CanDelete());
 		}
 
-		public virtual void Delete()
+		public virtual void Delete(ISession session)
 		{
 			foreach (var user in Users.ToArray()) {
 				user.Delete();
@@ -480,7 +482,7 @@ where ClientId = :clientId")
 			foreach (var payer in payers) {
 				//какая то фигня с загрузкой объектов
 				payer.Clients.Remove(payer.Clients.First(c => c.Id == Id));
-				if (payer.CanDelete())
+				if (payer.CanDelete(session))
 					payer.Delete();
 				else
 					payer.UpdatePaymentSum();

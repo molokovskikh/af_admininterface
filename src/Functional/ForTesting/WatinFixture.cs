@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using AdminInterface.Helpers;
+using NHibernate;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
 using mshtml;
@@ -10,6 +11,7 @@ namespace Functional.ForTesting
 	[TestFixture, Obsolete("Устарел используй WatinFixture2")]
 	public class WatinFixture
 	{
+		protected ISession session;
 		protected Browser browser;
 
 		[TearDown]

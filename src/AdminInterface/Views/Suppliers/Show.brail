@@ -33,7 +33,11 @@ ${app.Asset("search.editor.js")}
 		width: 70%;
 	}
 </style>
-	
+
+<% for action in supplier.Actions: %>
+	${OutputSubView("/Shared/DisplayTemplates/Action", {@action: action})}
+<% end %>
+
 <div style="padding: 20px 0px 20px 0px; float:left; width: 95%;">
 
 	<% unless supplier.Enabled: %>

@@ -63,7 +63,10 @@ namespace AdminInterface.Models.Suppliers
 			Costs.Add(new Cost {
 				Price = this,
 				BaseCost = isBase,
-				PriceItem = new PriceItem { FormRule = new FormRule() }
+				PriceItem = new PriceItem {
+					FormRule = new FormRule(),
+					Source = new PriceSource()
+				}
 			});
 		}
 
@@ -128,6 +131,16 @@ namespace AdminInterface.Models.Suppliers
 
 		[BelongsTo("FormRuleId", Cascade = CascadeEnum.All)]
 		public virtual FormRule FormRule { get; set; }
+
+		[BelongsTo("SourceId", Cascade = CascadeEnum.All, NotFoundBehaviour = NotFoundBehaviour.Ignore)]
+		public virtual PriceSource Source { get; set; }
+	}
+
+	[ActiveRecord("Sources", Schema = "Farm", Lazy = true)]
+	public class PriceSource
+	{
+		[PrimaryKey]
+		public virtual uint Id { get; set; }
 	}
 
 	[ActiveRecord("FormRules", Schema = "Farm", Lazy = true)]

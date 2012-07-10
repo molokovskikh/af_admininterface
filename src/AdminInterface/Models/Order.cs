@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
@@ -67,6 +68,17 @@ where ol.OrderId = :id
 ", String.Format(Constants.CatalogNameSubquery, "ol.ProductId")))
 				.SetParameter("id", Id)
 				.ToList<OrderLineView>();
+		}
+
+		public static bool CanDelete(IQueryable<ClientOrder> orders)
+		{
+			var count = orders.Count();
+			if (count == 0)
+				return true;
+
+			var minDate = orders.Min(o => o.WriteTime);
+			var maxDate = orders.Max(o => o.WriteTime);
+			return (maxDate - minDate).Days < 14;
 		}
 	}
 
