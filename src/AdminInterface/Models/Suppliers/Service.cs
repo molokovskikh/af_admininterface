@@ -95,7 +95,9 @@ namespace AdminInterface.Models.Suppliers
 			return Type == ServiceType.Drugstore;
 		}
 
-		public virtual void AddUser(User user)
-		{}
+		public virtual User AddUser(User user)
+		{
+			return null;
+		}
 	}
 }

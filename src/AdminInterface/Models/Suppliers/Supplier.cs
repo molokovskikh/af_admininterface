@@ -313,10 +313,11 @@ namespace AdminInterface.Models.Suppliers
 			oldPayers.UpdatePaymentSum();
 		}
 
-		public override void AddUser(User user)
+		public override User AddUser(User user)
 		{
 			if (!Users.Contains(user))
 				Users.Add(user);
+			return user;
 		}
 	}
 

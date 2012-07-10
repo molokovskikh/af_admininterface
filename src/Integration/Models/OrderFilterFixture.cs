@@ -47,6 +47,7 @@ namespace Integration.Models
 			var line = new OrderLine(order, product, 100, 1);
 
 			Save(supplier, order, product, line);
+			Flush();
 			session.CreateSQLQuery(@"
 insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 0, 5);
 insert into Logs.Orders(OrderId, TransportType, ResultCode) values(:orderId, 1, 24989)")

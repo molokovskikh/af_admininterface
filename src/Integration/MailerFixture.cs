@@ -275,6 +275,8 @@ namespace Integration
 				var client = DataMother.CreateTestClientWithUser();
 				var user = client.Users[0];
 				var payer = user.Payer;
+				ActiveRecordMediator.Save(payer);
+
 				user.Accounting.Payment = 200;
 				user.Save();
 

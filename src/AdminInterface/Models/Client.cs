@@ -394,7 +394,7 @@ group by u.ClientId")
 			return user;
 		}
 
-		public override void AddUser(User user)
+		public override User AddUser(User user)
 		{
 			if (user.Payer == null) {
 				if (Payers.Count > 1)
@@ -407,6 +407,7 @@ group by u.ClientId")
 
 			if (!Users.Contains(user))
 				Users.Add(user);
+			return user;
 		}
 
 		public virtual string GetEmailsForBilling()

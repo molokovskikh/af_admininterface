@@ -72,9 +72,10 @@ namespace Integration.ForTesting
 			return TestClient(c => {
 				if (region != null)
 					c.ChangeHomeRegion(region);
-				c.AddUser(new User(c) {
+				var user = new User(c) {
 					Name = "test",
-				});
+				};
+				c.AddUser(user);
 			});
 		}
 

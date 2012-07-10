@@ -65,8 +65,10 @@ namespace Integration.ForTesting
 		[TearDown]
 		public void TearDown()
 		{
-			if (session != null)
+			if (session != null) {
+				session.Flush();
 				ActiveRecordMediator.GetSessionFactoryHolder().ReleaseSession(session);
+			}
 			if (scope != null)
 				scope.Dispose();
 		}

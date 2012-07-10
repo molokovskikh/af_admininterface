@@ -451,7 +451,6 @@ namespace Functional.Drugstore
 			browser.CheckBox(Find.ByName("drugstore.NoiseCosts")).Checked = true;
 			Search(supplier.Name);
 
-			browser.ShowWindow(NativeMethods.WindowShowStyle.Maximize);
 			Thread.Sleep(10000);
 			Assert.That(Css("div.search select").SelectedItem, Is.StringEnding(supplier.Name));
 
