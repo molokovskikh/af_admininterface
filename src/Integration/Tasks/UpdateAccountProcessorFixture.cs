@@ -52,7 +52,8 @@ namespace Integration.Tasks
 			MakeUpdates(user, 10);
 			Check();
 			var address = user.AvaliableAddresses.First();
-			address.Refresh();
+			session.Clear();
+			address = session.Load<Address>(address.Id);
 			Assert.That(address.Accounting.ReadyForAccounting, Is.True, "адрес доставки {0}", address.Id);
 		}
 
