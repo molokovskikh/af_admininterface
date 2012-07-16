@@ -22,6 +22,10 @@ tr.SelectedRow.OddRow,
 	width: 100%
 }
 
+.DataTable thead, tr th {
+	text-align: left;
+}
+
 .DataTable .EvenRow, tr.even
 {
 	background-color: #F6F6F6;
