@@ -10,6 +10,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models;
 using NHibernate;
 using NHibernate.Event;
 
@@ -64,6 +65,14 @@ namespace AdminInterface.Models.Audit
 			{
 				session.PersistenceContext.Flushing = oldFlushing;
 			}
+		}
+
+		protected override AuditableProperty GetPropertyForNotify(PropertyInfo property, string name, object newState, object oldState, object entity)
+		{
+			if (property.PropertyType == typeof(ulong) && property.Name.Contains("Region")) {
+				return  new MaskedAuditableProperty(property, name, newState, oldState);
+			}
+			return new HtmlAuditableProperty(property, name, newState, oldState);
 		}
 
 		protected override AuditableProperty GetAuditableProperty(PropertyInfo property, string name, object newState, object oldState, object entity)

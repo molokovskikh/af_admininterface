@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using AdminInterface.Mailers;
 using AdminInterface.Models;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Controllers;
@@ -26,6 +27,7 @@ namespace AdminInterface.Controllers
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
 					DbSession.Save(news);
+					new MonorailMailer().RegisterNews(news, "AFNews@subscribe.analit.net").Send();
 					Notify("Сохранено");
 					RedirectToAction("Index");
 					return;

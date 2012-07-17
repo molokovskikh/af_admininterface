@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
@@ -26,7 +27,7 @@ namespace AdminInterface.Models.Billing
 				_payment = User.RootService.HomeRegion.UserPayment;
 		}
 
-		[BelongsTo("ObjectId")]
+		[BelongsTo("ObjectId"), Description("Пользователь")]
 		public virtual User User { get; set; }
 
 		public override uint ObjectId

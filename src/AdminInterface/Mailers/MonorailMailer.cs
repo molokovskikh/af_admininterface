@@ -173,9 +173,7 @@ namespace AdminInterface.Mailers
 
 		private MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
-			From = "register@analit.net";
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
-			IsBodyHtml = true;
 			if (property.IsHtml)
 				Template = "PropertyChanged_html";
 			else
@@ -188,13 +186,30 @@ namespace AdminInterface.Mailers
 			if (idLabel == null)
 				idLabel = "Код";
 
+			GeneralizationPropertyChanged(entity, property.Message.Remove(0, 3), idLabel);
+
+			return this;
+		}
+
+		private void GeneralizationPropertyChanged(object entity, string message, string idLabel)
+		{
+			From = "register@analit.net";
+			IsBodyHtml = true;
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["message"] = property.Message.Remove(0, 3);
+			PropertyBag["message"] = message;
 			PropertyBag["entity"] = entity;
 			PropertyBag["type"] = Inflector.Pluralize(NHibernateUtil.GetClass(entity).Name);
 			PropertyBag["idLabel"] = idLabel;
+		}
 
+		public MonorailMailer RegisterNews(News news, string to)
+		{
+			To = to;
+			Template = "PropertyChanged_html";
+			Subject = String.Format("Зарегистрированна новость");
+			var message = string.Format("Зарегистрированна новость: <br/> Тема: {0}</br> Текст: {1}</br>", news.Header, news.Body);
+			GeneralizationPropertyChanged(news, message, "Код");
 			return this;
 		}
 

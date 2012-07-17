@@ -25,7 +25,7 @@ using AdminInterface.Models.Billing;
 
 namespace AdminInterface.Models
 {
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Адрес доставки")]
 	public class Address : ActiveRecordLinqBase<Address>, IEnablable, IDisabledByParent
 	{
 		private bool _enabled;

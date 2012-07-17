@@ -9,12 +9,23 @@ namespace AdminInterface.Models.Audit
 	public class NotifyAttribute : SendEmail
 	{
 		public NotifyAttribute()
-			: base(typeof(ChangeNotificationSender))
+			: base(typeof(ChangeNotificationSender), "RegisterList@subscribe.analit.net")
 		{}
 	}
 
-	public class NotifyBilling : NotifyAttribute
-	{}
+	public class NotifyBilling : SendEmail
+	{
+		public NotifyBilling()
+			: base(typeof(ChangeNotificationSender), "BillingList@analit.net")
+		{}
+	}
+
+	public class NotifyNews : SendEmail
+	{
+		public NotifyNews()
+			: base(typeof(ChangeNotificationSender), "AFNews@subscribe.analit.net")
+		{}
+	}
 
 	public interface IChangesNotificationAware
 	{
@@ -29,7 +40,7 @@ namespace AdminInterface.Models.Audit
 		public static IEmailSender Sender;
 		public static bool UnderTest;
 
-		public void Send(AuditableProperty property, object entity)
+		public void Send(AuditableProperty property, object entity, string to)
 		{
 			try {
 				MonorailMailer mailer;
@@ -38,12 +49,6 @@ namespace AdminInterface.Models.Audit
 				else
 					mailer = new MonorailMailer();
 				mailer.UnderTest = UnderTest;
-
-				var to = "RegisterList@subscribe.analit.net";
-				var attributes = property.Property.GetCustomAttributes(typeof(NotifyBilling), true);
-				if (attributes.Length > 0) {
-					to = "BillingList@analit.net";
-				}
 
 				mailer.NotifyAboutChanges(property, entity, to);
 

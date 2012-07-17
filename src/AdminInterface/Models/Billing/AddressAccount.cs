@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Linq;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
@@ -16,7 +17,7 @@ namespace AdminInterface.Models.Billing
 			_payment = Address.Client.HomeRegion.AddressPayment;
 		}
 
-		[BelongsTo("ObjectId")]
+		[BelongsTo("ObjectId"), Description("Адрес доставки")]
 		public virtual Address Address { get; set; }
 
 		public override Service Service
