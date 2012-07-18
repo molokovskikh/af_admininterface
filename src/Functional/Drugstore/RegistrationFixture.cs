@@ -100,14 +100,13 @@ namespace Functional.Drugstore
 		public void Register_client_for_supplier()
 		{
 			Supplier supplier;
-			using (new SessionScope())
-			{
-				supplier = DataMother.CreateSupplier();
-				Save(supplier);
-				supplier.Name = "Тестовый поставщик " + supplier.Id;
-				Save(supplier);
-			}
 
+			supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			supplier.Name = "Тестовый поставщик " + supplier.Id;
+			Save(supplier);
+
+			Flush();
 			SetupGeneralInformation();
 			browser.Css("#ShowForOneSupplier").Checked = true;
 			Assert.That(browser.Css("#PayerExists").Enabled, Is.False);
