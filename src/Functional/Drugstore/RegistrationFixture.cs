@@ -31,6 +31,9 @@ namespace Functional.Drugstore
 			_randomClientName = "test" + random.Next(100000);
 			_mailSuffix = "@test.test";
 			_registerPageUrl = "Register/RegisterClient";
+			var defaultSettings = session.Query<DefaultValues>().First();
+			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса при регистрации";
+			session.Save(defaultSettings);
 			Open(_registerPageUrl);
 		}
 
@@ -585,11 +588,6 @@ namespace Functional.Drugstore
 		[Test]
 		public void Check_memo_about_writing_addresses_for_register()
 		{
-			var defaultSettings = session.Query<DefaultValues>().First();
-			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса при регистрации";
-			session.Save(defaultSettings);
-			Flush();
-			Reopen();
 			AssertText("Тестовый текст памятки адреса при регистрации");
 		}
 
