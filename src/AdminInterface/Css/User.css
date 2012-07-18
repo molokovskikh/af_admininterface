@@ -110,3 +110,9 @@ div.LegendMarker.SingleUser
 	padding-left: 25px;
 	padding-top: 7px;
 }
+
+#MemoAboutWritingAddresses {
+	font-size:9px;
+	width:750px;
+	padding-left:10px;
+}

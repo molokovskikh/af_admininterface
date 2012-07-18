@@ -582,6 +582,17 @@ namespace Functional.Drugstore
 			AssertText("Регистрация завершена успешно");
 		}
 
+		[Test]
+		public void Check_memo_about_writing_addresses_for_register()
+		{
+			var defaultSettings = session.Query<DefaultValues>().First();
+			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса при регистрации";
+			session.Save(defaultSettings);
+			Flush();
+			Reopen();
+			AssertText("Тестовый текст памятки адреса при регистрации");
+		}
+
 		private void ClickRegisterAndCheck(Browser browser)
 		{
 			// Снимаем галку, чтобы не показывалась карта регистрации

@@ -1,4 +1,17 @@
-﻿<% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
+﻿${app.Asset("tinymce/tiny_mce.js")}
+${app.Asset("News.css")}
+
+<script type="text/javascript">
+	tinyMCE.init({
+		theme: "advanced",
+		mode: "textareas",
+		height: "500",
+		width: "600",
+		editor_selector: "tinymceAddressesHelpText"
+	});
+</script>
+
+<% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
 	<fieldset style="width:600px">
 		<legend>${templateLabel}</legend>
 		<label>Тема:</label>
@@ -30,7 +43,18 @@
 		<li>
 			<a id="miniMailSettings" href="#">Настройки мини-почты</a>
 		</li>
+		<li>
+			<a id="supportTexts" href="#">Справочная информация</a>
+		</li>
 	</ul>
+</div>
+
+<div id="supportTexts-tab" class="tab">
+<fieldset style="width:600px; height:530px;">
+	<legend>Текст справки для написания адреса доставки</legend>
+	${FormHelper.TextArea("Defaults.AddressesHelpText", {@class: @tinymceAddressesHelpText, @id: @AddressesHelpText})}
+	${app.GetValidationError("Defaults.AddressesHelpText")}
+</fieldset>
 </div>
 
 <div id="generalSettings-tab" class="tab">

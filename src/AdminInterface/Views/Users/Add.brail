@@ -73,6 +73,7 @@
 					<td>${FormHelper.Select("address.LegalEntity.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>
 				<tr/>
 			</table>
+			<% OutputSubView("/SubViews/MemoAboutWritingAddresses") %>
 		</div>
 		<%end %>
 		<% OutputSubView("/Templates/Addresses") %>

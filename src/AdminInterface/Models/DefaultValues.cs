@@ -67,6 +67,9 @@ namespace AdminInterface.Models
 		[Property, ValidateNonEmpty]
 		public string ResponseBodyMiniMailOnAllowedExtensions { get; set; }
 
+		[Property, ValidateNonEmpty]
+		public string AddressesHelpText { get; set; }
+
 		public IEnumerable<string> GetPhones()
 		{
 			return Phones.Split(new [] {"\r\n", "\n"}, StringSplitOptions.RemoveEmptyEntries);
