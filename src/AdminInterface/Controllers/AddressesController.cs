@@ -31,6 +31,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			PropertyBag["defaultSettings"] = Defaults;
 		}
 
 		[AccessibleThrough(Verb.Post)]
@@ -64,6 +65,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = address.Client;
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
+			PropertyBag["defaultSettings"] = Defaults;
 			if (address.ContactGroup != null && address.ContactGroup.Contacts != null)
 				PropertyBag["ContactGroup"] = address.ContactGroup;
 		}

@@ -15,7 +15,6 @@ namespace AdminInterface.MonoRailExtentions
 		{
 			BeforeAction += (action, context, controller, controllerContext) => {
 				controllerContext.PropertyBag["admin"] = Admin;
-				controllerContext.PropertyBag["defaultSettings"] = Defaults;
 			};
 		}
 

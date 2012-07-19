@@ -84,6 +84,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["Payers"] = payers;
 			PropertyBag["maxRegion"] = UInt64.MaxValue;
 			PropertyBag["UserRegistration"] = true;
+			PropertyBag["defaultSettings"] = Defaults;
 		}
 
 		[AccessibleThrough(Verb.Post)]

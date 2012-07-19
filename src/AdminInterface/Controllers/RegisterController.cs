@@ -202,6 +202,7 @@ namespace AdminInterface.Controllers
 			var client = new Client(new Payer(""), regions.First());
 			var user = new User(client);
 
+			PropertyBag["defaultSettings"] = Defaults;
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["address"] = client.AddAddress("");
