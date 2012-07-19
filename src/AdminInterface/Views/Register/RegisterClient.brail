@@ -213,7 +213,6 @@ ${app.JS("contact.registrator.js", "payer.search.js")}
 		width: 100%;
 	}
 </style>
-
 <div style="width: 800px;">
 ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationForm, @name: @RegistrationForm})}
 	<div class="block">
@@ -416,8 +415,8 @@ ${FormHelper.FormTag("${siteroot}/Register/RegisterClient", {@id: @RegistrationF
 				</td>
 			</tr>
 		</table>
+		<% OutputSubView("/SubViews/MemoAboutWritingAddresses") %>
 	</div>
-
 	<div class="block">
 		<h3>Сведения о пользователе</h3>
 		<table width="100%">

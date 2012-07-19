@@ -6,6 +6,7 @@ using Castle.ActiveRecord.Framework.Scopes;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using log4net.Config;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
@@ -27,6 +28,25 @@ namespace Functional.Drugstore
 			scope.Flush();
 			Open(client);
 			Assert.That(browser.Text, Is.StringContaining("Клиент"));
+		}
+
+		[Test]
+		public void Memo_about_writing_addresses_test()
+		{
+			var defaultSettings = session.Query<DefaultValues>().First();
+			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса";
+			session.Save(defaultSettings);
+			Flush();
+			Click("Новый пользователь");
+			AssertText("Тестовый текст памятки адреса");
+			Open(client);
+			Click("Новый адрес доставки");
+			AssertText("Тестовый текст памятки адреса");
+			browser.TextField("address_Value").AppendText("Тестовые адрес доставки");
+			Click("Создать");
+			Open(client);
+			Click("Тестовые адрес доставки");
+			AssertText("Тестовый текст памятки адреса");
 		}
 
 		[Test]

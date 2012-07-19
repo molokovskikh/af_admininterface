@@ -4,7 +4,7 @@
 	Новый адрес доставки
 <% end %>
 
-<div style="width: 600px;">
+<div style="width: 800px;">
 
 	${FormHelper.FormTag("${siteroot}/addresses/add", {@id: @mainForm})}
 		<input type=hidden name=clientId value=${client.Id}>
@@ -12,6 +12,7 @@
 			<h3>Адрес</h3>
 			${app.Edit("address.Value")}
 			${app.GetValidationError("address.Value")}
+			<% OutputSubView("/SubViews/MemoAboutWritingAddresses") %>
 		</div>
 
 		${ForHelper.Editor("address.Accounting")}

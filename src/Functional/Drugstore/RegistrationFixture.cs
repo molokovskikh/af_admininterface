@@ -31,6 +31,9 @@ namespace Functional.Drugstore
 			_randomClientName = "test" + random.Next(100000);
 			_mailSuffix = "@test.test";
 			_registerPageUrl = "Register/RegisterClient";
+			var defaultSettings = session.Query<DefaultValues>().First();
+			defaultSettings.AddressesHelpText = "Тестовый текст памятки адреса при регистрации";
+			session.Save(defaultSettings);
 			Open(_registerPageUrl);
 		}
 
@@ -97,14 +100,13 @@ namespace Functional.Drugstore
 		public void Register_client_for_supplier()
 		{
 			Supplier supplier;
-			using (new SessionScope())
-			{
-				supplier = DataMother.CreateSupplier();
-				Save(supplier);
-				supplier.Name = "Тестовый поставщик " + supplier.Id;
-				Save(supplier);
-			}
 
+			supplier = DataMother.CreateSupplier();
+			Save(supplier);
+			supplier.Name = "Тестовый поставщик " + supplier.Id;
+			Save(supplier);
+
+			Flush();
 			SetupGeneralInformation();
 			browser.Css("#ShowForOneSupplier").Checked = true;
 			Assert.That(browser.Css("#PayerExists").Enabled, Is.False);
@@ -580,6 +582,12 @@ namespace Functional.Drugstore
 			Click("Зарегистрировать");
 
 			AssertText("Регистрация завершена успешно");
+		}
+
+		[Test]
+		public void Check_memo_about_writing_addresses_for_register()
+		{
+			AssertText("Тестовый текст памятки адреса при регистрации");
 		}
 
 		private void ClickRegisterAndCheck(Browser browser)

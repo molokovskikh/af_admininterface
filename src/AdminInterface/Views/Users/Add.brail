@@ -68,6 +68,7 @@
 					<td width="20%">Адрес доставки медикаментов:</td>
 					<td width="80%"><input type="text" id="deliveryAddress" name="address.Value" style="width: 60%" /></td>
 				</tr>
+				<tr><td colspan=2><% OutputSubView("/SubViews/MemoAboutWritingAddresses") %></td></tr>
 				<tr>
 					<td wisth="20%">Юридическое лицо</td>
 					<td>${FormHelper.Select("address.LegalEntity.Id", Organizations, {"value" : "Id", "text" : "Name"})}</td>

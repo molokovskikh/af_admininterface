@@ -520,6 +520,7 @@
     <None Include="Views\Shared\DisplayTemplates\Action.brail" />
     <None Include="Views\Shared\EditorTemplates\Account.brail" />
     <None Include="Views\SubViews\ContactGroupRegistrator.brail" />
+    <None Include="Views\SubViews\MemoAboutWritingAddresses.brail" />
     <None Include="Views\Templates\Addresses.brail" />
     <None Include="Views\Templates\DocumentPayerSelector.brail" />
     <None Include="Views\Templates\Messages.brail" />
