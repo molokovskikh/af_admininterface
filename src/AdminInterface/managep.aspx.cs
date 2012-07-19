@@ -22,7 +22,7 @@ using MySql.Data.MySqlClient;
 
 namespace AddUser
 {
-	partial class managep : Page
+	partial class managep : System.Web.UI.Page
 	{
 		private readonly Dictionary<object, string> _configuratedCostTypes
 			= new Dictionary<object, string>
