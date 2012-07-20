@@ -36,6 +36,10 @@ ${FormHelper.FormTag("", {})}
 	${app.GetValidationError("news.Body")}
 </div>
 <div>
+	${app.Label("news.DestinationType")}
+	${FormHelper.Select("news.DestinationType", Destination, {@value: @key, @text: @value})}
+</div>
+<div>
 	${FormHelper.Submit("Сохранить")}
 </div>
 ${FormHelper.EndFormTag()}

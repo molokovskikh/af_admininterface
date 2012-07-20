@@ -206,14 +206,15 @@ namespace Integration.Models
 			var news = new News {
 				Header = "TestNewHeader",
 				Body = "TestNewsBody",
-				PublicationDate = DateTime.Now
+				PublicationDate = DateTime.Now,
+				DestinationType = NewsDestinationType.All
 			};
 			Save(news);
 			Reopen();
 			news = session.Load<News>(news.Id);
 			news.Body = "NewTestNewsBody";
 			Save(news);
-			Close();
+			Reopen();
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
 test<br>
@@ -224,6 +225,21 @@ localhost<br>
 ", news.Id, DateTime.Now)));
 			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Тело новости'"));
+
+			news = session.Load<News>(news.Id);
+			news.DestinationType = NewsDestinationType.Supplier;
+			Save(news);
+			Close();
+			Assert.That(message, Is.Not.Null);
+			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
+test<br>
+localhost<br>
+Код {0}<br>
+Новость <a href=""/News/{0}"">TestNewHeader</a><br>
+Изменено 'Адресат' </br> <b>было</b> 'Аптека и Поставщик'</br><b>стало</b> 'Поставщик'
+", news.Id, DateTime.Now)));
+			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
+			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Адресат'"));
 		}
 	}
 }

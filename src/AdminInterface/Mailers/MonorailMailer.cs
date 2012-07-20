@@ -207,8 +207,8 @@ namespace AdminInterface.Mailers
 		{
 			To = to;
 			Template = "PropertyChanged_html";
-			Subject = String.Format("Зарегистрированна новость");
-			var message = string.Format("Зарегистрированна новость: <br/> Тема: {0}</br> Текст: {1}</br>", news.Header, news.Body);
+			Subject = String.Format("Зарегистрирована новость");
+			var message = string.Format("Зарегистрирована новость: <br/> Тема: {0}</br> Текст: {1}</br> Адресат: {2}<br/>", news.Header, news.Body, news.DestinationType.GetDescription());
 			GeneralizationPropertyChanged(news, message, "Код");
 			return this;
 		}
