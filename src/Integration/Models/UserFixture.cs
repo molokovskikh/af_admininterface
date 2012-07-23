@@ -206,8 +206,6 @@ namespace Integration.Models
 			var news = new News {
 				Header = "TestNewHeader",
 				Body = "TestNewsBody",
-				PublicationDate = DateTime.Now,
-				DestinationType = NewsDestinationType.All
 			};
 			Save(news);
 			Reopen();

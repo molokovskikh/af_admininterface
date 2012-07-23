@@ -17,6 +17,12 @@ namespace AdminInterface.Models
 	[ActiveRecord(Schema = "Usersettings"), Auditable, Description("Новость")]
 	public class News
 	{
+		public News()
+		{
+			PublicationDate = DateTime.Today;
+			DestinationType = NewsDestinationType.All;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

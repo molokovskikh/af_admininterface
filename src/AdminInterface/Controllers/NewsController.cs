@@ -20,12 +20,8 @@ namespace AdminInterface.Controllers
 
 		public void New()
 		{
-			var news = new News {PublicationDate = DateTime.Today, DestinationType = NewsDestinationType.All};
+			var news = new News();
 			PropertyBag["news"] = news;
-			var dict =  Enum.GetValues(typeof(NewsDestinationType))
-				.Cast<NewsDestinationType>().ToDictionary(t => (int)t, t => t.GetDescription() );
-			PropertyBag["Destination"] = dict;
-
 			if (IsPost) {
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
@@ -43,10 +39,6 @@ namespace AdminInterface.Controllers
 		{
 			var news = DbSession.Load<News>(id);
 			PropertyBag["news"] = news;
-			var dict =  Enum.GetValues(typeof(NewsDestinationType))
-				.Cast<NewsDestinationType>().ToDictionary(t => (int)t, t => t.GetDescription() );
-			PropertyBag["Destination"] = dict;
-
 			if (IsPost) {
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {
