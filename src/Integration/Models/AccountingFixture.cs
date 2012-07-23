@@ -56,7 +56,7 @@ BeAccounted = 0;
 		public void Find_after_free_period_end()
 		{
 			userAccount.ReadyForAccounting = true;
-			userAccount.FreePeriodEnd = DateTime.Today.AddDays(-20);
+			userAccount.FreePeriodEnd = DateTime.Today.AddDays(20);
 			userAccount.IsFree = true;
 
 			client.Save();
@@ -64,7 +64,7 @@ BeAccounted = 0;
 
 			Assert.That(Ready(), Is.Not.Contains(userAccount.Id));
 
-			userAccount.FreePeriodEnd = DateTime.Today;
+			userAccount.FreePeriodEnd = DateTime.Today.AddDays(-1);
 			userAccount.Save();
 			Flush();
 
