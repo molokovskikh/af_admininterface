@@ -116,3 +116,11 @@ div.LegendMarker.SingleUser
 	width:750px;
 	padding-left:10px;
 }
+
+.tabFieldset {
+	width: 600px;
+}
+
+.allWidth {
+	width:100%;
+}
