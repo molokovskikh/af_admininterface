@@ -12,14 +12,14 @@ ${app.Asset("News.css")}
 </script>
 
 <% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>${templateLabel}</legend>
 		<label>Тема:</label>
-		<input name="defaults.${subjectField}" value="${subjectValue}" style="width:100%"/>
+		<input name="defaults.${subjectField}" value="${subjectValue}" class="allWidth"/>
 		${app.GetValidationError(defaults, subjectField)}
 		<br>
 		<label>Тело письма:</label><br>
-		<textarea  name="defaults.${bodyField}" cols=50 rows=10 style="width:100%">!{bodyValue}</textarea>
+		<textarea  name="defaults.${bodyField}" cols=50 rows=10 class="allWidth">!{bodyValue}</textarea>
 		${app.GetValidationError(defaults, bodyField)}
 	</fieldset>
 <% end %>
@@ -50,7 +50,7 @@ ${app.Asset("News.css")}
 </div>
 
 <div id="supportTexts-tab" class="tab">
-<fieldset style="width:600px; height:530px;">
+<fieldset class="tabFieldset">
 	<legend>Текст справки для написания адреса доставки</legend>
 	${FormHelper.TextArea("Defaults.AddressesHelpText", {@class: @tinymceAddressesHelpText, @id: @AddressesHelpText})}
 	${app.GetValidationError("Defaults.AddressesHelpText")}
@@ -58,12 +58,12 @@ ${app.Asset("News.css")}
 </div>
 
 <div id="generalSettings-tab" class="tab">
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>Для аптеки</legend>
 		<label>Версия AnalitF:</label>
 		<input name="defaults.AnalitFVersion" value="${defaults.AnalitFVersion}" />
 	</fieldset>
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>Для поставщика:</legend>
 		<label>Формат заказа:</label>
 		<select name="defaults.Formater.Id">

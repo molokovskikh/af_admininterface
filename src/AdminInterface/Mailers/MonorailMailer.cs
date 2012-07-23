@@ -197,7 +197,6 @@ namespace AdminInterface.Mailers
 			IsBodyHtml = true;
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["message"] = message;
 			PropertyBag["entity"] = entity;
 			PropertyBag["type"] = Inflector.Pluralize(NHibernateUtil.GetClass(entity).Name);
 			PropertyBag["idLabel"] = idLabel;
@@ -206,10 +205,11 @@ namespace AdminInterface.Mailers
 		public MonorailMailer RegisterNews(News news, string to)
 		{
 			To = to;
-			Template = "PropertyChanged_html";
+			Template = "RegisterNews";
 			Subject = String.Format("Зарегистрированна новость");
-			var message = string.Format("Зарегистрированна новость: <br/> Тема: {0}</br> Текст: {1}</br>", news.Header, news.Body);
-			GeneralizationPropertyChanged(news, message, "Код");
+			PropertyBag["header"] = news.Header;
+			PropertyBag["body"] = news.Body;
+			GeneralizationPropertyChanged(news, string.Empty, "Код");
 			return this;
 		}
 
