@@ -1,14 +1,18 @@
 (function() {
-  var freePeriodEnd, requests;
+  var addComment, freePeriodEnd, requests, showForm;
   requests = Object();
   this.fillDependedData = function(url, element, next) {
     var cancel, request, requestFunction, showRequest;
     request = element.attr("data-request");
     requestFunction = requests[request];
-    showRequest = element.attr("checked") && requestFunction;
+    showRequest = (element.attr("checked") && requestFunction && !element.attr("unchecked")) || (!element.attr("checked") && requestFunction && element.attr("unchecked"));
     if (showRequest) {
       cancel = function() {
-        element.removeAttr("checked");
+        if (!element.attr("unchecked")) {
+          element.removeAttr("checked");
+        } else {
+          element.attr("checked", true);
+        }
         return element.change();
       };
       return requestFunction(url, next, cancel);
@@ -16,9 +20,7 @@
       return next(url);
     }
   };
-  freePeriodEnd = function(url, next, cancel) {
-    var form;
-    form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>");
+  showForm = function(url, next, cancel, form) {
     form.dialog({
       modal: true,
       buttons: {
@@ -38,5 +40,16 @@
     });
     return form.validate();
   };
+  freePeriodEnd = function(url, next, cancel) {
+    var form;
+    form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>");
+    return showForm(url, next, cancel, form);
+  };
+  addComment = function(url, next, cancel) {
+    var form;
+    form = $("<form><div><label>Введите комментарий</label><input name=AddComment ></div></form>");
+    return showForm(url, next, cancel, form);
+  };
   requests["FreePeriodEnd"] = freePeriodEnd;
+  requests["AddComment"] = addComment;
 }).call(this);

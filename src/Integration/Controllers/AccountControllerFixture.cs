@@ -30,7 +30,7 @@ namespace Integration.Controllers
 		public void Disable_supplier_user()
 		{
 			Assert.That(user.Enabled, Is.True);
-			controller.SetUserStatus(user.Id, false);
+			controller.SetUserStatus(user.Id, false, null);
 			scope.Flush();
 			ActiveRecordMediator.Refresh(user);
 			Assert.That(user.Enabled, Is.False);
@@ -48,7 +48,7 @@ namespace Integration.Controllers
 			account.Save();
 			scope.Flush();
 
-			controller.Update(account.Id, true, null, true, 500, null);
+			controller.Update(account.Id, true, null, true, 500, null, null);
 			scope.Flush();
 
 			account.Refresh();
@@ -72,7 +72,7 @@ namespace Integration.Controllers
 			client.Save();
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
-			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null));
+			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null, null));
 
 			addressAccount.Refresh();
 			Assert.That(addressAccount.IsFree, Is.False);

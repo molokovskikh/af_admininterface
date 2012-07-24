@@ -8,7 +8,7 @@ using Castle.ActiveRecord.Framework;
 namespace AdminInterface.Models.Logs
 {
 	[ActiveRecord(Schema = "logs")]
-	public class SupplierLog : ActiveRecordLinqBase<ClientLogRecord>
+	public class SupplierLog : ActiveRecordLinqBase<SupplierLog>
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -24,6 +24,9 @@ namespace AdminInterface.Models.Logs
 
 		[Property]
 		public virtual bool? Disabled { get; set; }
+
+		[Property]
+		public virtual string Comment { get; set; }
 
 		public static IList<SupplierLog> GetLogs(IEnumerable<Supplier> suppliers)
 		{

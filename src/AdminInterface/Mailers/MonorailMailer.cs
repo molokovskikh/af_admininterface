@@ -38,7 +38,7 @@ namespace AdminInterface.Mailers
 			mailer.Send();
 		}
 
-		public MonorailMailer EnableChanged(IEnablable item)
+		public MonorailMailer EnableChanged(IEnablable item, string comment = null)
 		{
 			Template = "EnableChanged";
 			To = "RegisterList@subscribe.analit.net";
@@ -52,28 +52,42 @@ namespace AdminInterface.Mailers
 				var user = (User) item;
 				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
-				if (disable != null)
+				if (disable != null){
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Address)) {
 				type = "адреса";
 				var address = (Address) item;
 				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
-				if (disable != null)
+				if (disable != null){
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Client)) {
 				type = "клиента";
 				var client = Client.Find(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
-				if (disable != null)
+				if (disable != null) { 
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";
 				PropertyBag["service"] = item;
+				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null).OrderByDescending(s => s.LogTime).FirstOrDefault();
+				if (disable != null) {
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 
 			if (item.Enabled)
