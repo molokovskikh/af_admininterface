@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Queries;
 using AdminInterface.Security;
@@ -24,17 +25,24 @@ namespace AdminInterface.Controllers
 		public void Search()
 		{
 			var filter = new UserFilter();
-			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
-			{
+			PropertyBag["filter"] = filter;
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				var result = filter.Find();
-				if (result.Count == 1 && !String.IsNullOrEmpty(result.First().UserId.ToString()))
-				{
-					RedirectUsingRoute("users", "edit", new {id = result.First().UserId});
-				}
 				PropertyBag["SearchResults"] = result;
+				AutoOpen(result);
 			}
-			PropertyBag["filter"] = filter;
+		}
+
+		public void AutoOpen(IList<UserSearchItem> result)
+		{
+			if (result.Count == 1) {
+				var item = result.First();
+				if (item.ClientType == SearchClientType.Supplier)
+					RedirectUsingRoute("suppliers", "show", new {id = item.ClientId});
+				else
+					RedirectUsingRoute("users", "edit", new {id = item.UserId});
+			}
 		}
 	}
 }
