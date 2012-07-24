@@ -730,7 +730,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<td>${log.Name}</td>
 				<td>${log.OperatorName}</td>
 				<td>${log.Message}</td>
-				<td>${log.Comment}</td>
+				<td class="minTd">${log.Comment}</td>
 			</tr>
 		<% end %>
 		</table>
