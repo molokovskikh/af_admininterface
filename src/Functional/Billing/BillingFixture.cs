@@ -11,6 +11,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using WatiN.Core; using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
 using Document = WatiN.Core.Document;
 
@@ -264,6 +265,8 @@ namespace Functional.Billing
 			Assert.That(addressRow.ClassName, Is.Not.StringContaining("disabled"));
 			Assert.That(clientRow.ClassName, Is.Not.StringContaining("disabled"));
 			clientStatus.Click();
+			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
+			AddCommentInDisableDialig();
 			Thread.Sleep(2000);
 			Assert.IsTrue(userStatus.Checked);
 			Assert.IsFalse(userStatus.Enabled);
@@ -402,6 +405,12 @@ namespace Functional.Billing
 			return new Collapsible(header, body);
 		}
 
+		private void AddCommentInDisableDialig()
+		{
+			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+		}
+
 		[Test]
 		public void Test_refresh_total_sum()
 		{
@@ -435,6 +444,7 @@ namespace Functional.Billing
 			// Выключаем пользователя. Сумма должна уменьшиться
 			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();
+			AddCommentInDisableDialig();
 			Thread.Sleep(500);
 			currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.LessThan(sum));
@@ -442,6 +452,7 @@ namespace Functional.Billing
 
 			// Выключаем клиента. Сумма должна стать равной нулю
 			Css(String.Format("#ClientStatus{0}", client.Id)).Click();
+			AddCommentInDisableDialig();
 			Thread.Sleep(500);
 			currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.EqualTo(0));

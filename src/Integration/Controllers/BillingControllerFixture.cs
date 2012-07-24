@@ -24,6 +24,7 @@ namespace Integration.Controllers
 			client = DataMother.TestClient();
 			client.Save();
 			controller = new BillingController();
+			controller.DbSession = session;
 			PrepareController(controller);
 		}
 

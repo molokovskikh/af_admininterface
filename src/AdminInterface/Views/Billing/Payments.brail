@@ -265,6 +265,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td class=short>
 						<input id="ClientStatus${client.Id}" data-request="AddComment" unchecked="true" name=status type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this)" />
+						<input name=service_id type=hidden value=${client.Id}>
 					</td>
 					<td>${client.Id}</td>
 					<td>

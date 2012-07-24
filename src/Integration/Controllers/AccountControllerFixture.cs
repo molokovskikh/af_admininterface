@@ -23,6 +23,7 @@ namespace Integration.Controllers
 			scope.Flush();
 			payer = user.Payer;
 			controller = new AccountsController();
+			controller.DbSession = session;
 			PrepareController(controller, "Account", "SetUserStatus");
 		}
 
