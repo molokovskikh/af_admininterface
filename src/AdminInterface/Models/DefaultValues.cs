@@ -119,7 +119,7 @@ namespace AdminInterface.Models
 
 		public IAuditRecord GetAuditRecord()
 		{
-			return new ClientInfoLogEntity(Supplier);
+			return new AuditRecord(Supplier);
 		}
 	}
 

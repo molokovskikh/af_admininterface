@@ -34,7 +34,7 @@ namespace Integration.Controllers
 			controller.UpdateClientStatus(client.Id, false, null);
 			scope.Flush();
 
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == client.Id).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
 		}
 
@@ -49,7 +49,7 @@ namespace Integration.Controllers
 			
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
 	}

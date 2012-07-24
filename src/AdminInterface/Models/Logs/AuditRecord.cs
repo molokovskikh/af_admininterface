@@ -30,12 +30,12 @@ namespace AdminInterface.Models.Logs
 	}
 
 	[ActiveRecord(Table = "clientsinfo", Schema = "logs")]
-	public class ClientInfoLogEntity : ActiveRecordLinqBase<ClientInfoLogEntity>, IUrlContributor, IAuditRecord
+	public class AuditRecord : ActiveRecordLinqBase<AuditRecord>, IUrlContributor, IAuditRecord
 	{
-		public ClientInfoLogEntity()
+		public AuditRecord()
 		{}
 
-		public ClientInfoLogEntity(object entity)
+		public AuditRecord(object entity)
 		{
 			var admin = SecurityContext.Administrator;
 			Administrator = admin;
@@ -44,7 +44,7 @@ namespace AdminInterface.Models.Logs
 			SetObjectInfo(entity);
 		}
 
-		public ClientInfoLogEntity(string message, object entity) : this(entity)
+		public AuditRecord(string message, object entity) : this(entity)
 		{
 			Message = message;
 		}
@@ -157,7 +157,7 @@ namespace AdminInterface.Models.Logs
 			throw new Exception(String.Format("Не могу определить тип объекта для {0}", entity));
 		}
 
-		public ClientInfoLogEntity SetProblem(bool isFree, string username, string problem)
+		public AuditRecord SetProblem(bool isFree, string username, string problem)
 		{
 			if (isFree)
 				Message = String.Format("$$$Пользователь {0}. Бесплатное изменение пароля: {1}", username, problem);
@@ -177,29 +177,29 @@ namespace AdminInterface.Models.Logs
 			}
 		}
 
-		public static ClientInfoLogEntity PasswordChange(User user, bool isFree, string reason)
+		public static AuditRecord PasswordChange(User user, bool isFree, string reason)
 		{
-			return new ClientInfoLogEntity("", user).SetProblem(isFree, user.Login, reason);
+			return new AuditRecord("", user).SetProblem(isFree, user.Login, reason);
 		}
 
-		public static ClientInfoLogEntity StatusChange(Service service)
+		public static AuditRecord StatusChange(Service service)
 		{
 			string status;
 			if (service.Disabled)
 				status = "отключен";
 			else
 				status = "включен";
-			return new ClientInfoLogEntity(String.Format("$$$Клиент {0}", status), service) {MessageType = LogMessageType.System};
+			return new AuditRecord(String.Format("$$$Клиент {0}", status), service) {MessageType = LogMessageType.System};
 		}
 
-		public static ClientInfoLogEntity ReseteUin(Client client, string reason)
+		public static AuditRecord ReseteUin(Client client, string reason)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason), client);
+			return new AuditRecord(String.Format("$$$Изменение УИН: " + reason), client);
 		}
 
-		public static ClientInfoLogEntity ReseteUin(User user, string reason)
+		public static AuditRecord ReseteUin(User user, string reason)
 		{
-			return new ClientInfoLogEntity(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user);
+			return new AuditRecord(String.Format("$$$Изменение УИН: " + reason + ". $$$ Пользователь: " + user.Login), user);
 		}
 
 		public override string ToString()
@@ -228,7 +228,7 @@ where ObjectId = :objectId")
 
 		public static void DeleteAuditRecords(object entity)
 		{
-			var auditRecord = new ClientInfoLogEntity(entity);
+			var auditRecord = new AuditRecord(entity);
 			ArHelper.WithSession(s => {
 				s.CreateSQLQuery("delete from Logs.ClientsInfo where ObjectId = :Id and Type = :Type")
 					.SetParameter("Id", auditRecord.ObjectId)

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -25,7 +25,7 @@ namespace Integration
 			Flush();
 			Reopen();
 
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == client.Id && l.Type == LogObjectType.Client).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id && l.Type == LogObjectType.Client).ToList();
 			Assert.That(logs[0].Message,
 				Is.EqualTo(String.Format("$$$Изменено 'Краткое наименование' было '{0}' стало '{1}'", oldName, client.Name)));
 		}
@@ -75,7 +75,7 @@ namespace Integration
 			Flush();
 			Reopen();
 
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == supplier.Id && l.Type == LogObjectType.Supplier).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id && l.Type == LogObjectType.Supplier).ToList();
 			Assert.That(logs.Count, Is.GreaterThan(0), "нет ни одного сообщения");
 			Assert.That(logs[0].Message,
 				Is.EqualTo(String.Format("$$$Изменено 'Форматер' было '{0}' стало '{1}'", oldFormat.ClassName, newFormat.ClassName)));

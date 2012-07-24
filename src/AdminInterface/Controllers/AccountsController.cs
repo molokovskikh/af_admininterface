@@ -78,7 +78,7 @@ namespace AdminInterface.Controllers
 			if (oldStatus != !status)
 			{
 				this.Mailer().EnableChanged(supplier, comment).Send();
-				ClientInfoLogEntity.StatusChange(supplier).Save();
+				AuditRecord.StatusChange(supplier).Save();
 			}
 		}
 

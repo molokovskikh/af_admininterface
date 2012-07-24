@@ -34,7 +34,7 @@ namespace Integration.Controllers
 			Request.Params.Add("address.AvaliableForUsers[0].Id", user.Id.ToString());
 			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
-			var messages = ClientInfoLogEntity.Queryable.Where(m => m.ObjectId == user.Id);
+			var messages = AuditRecord.Queryable.Where(m => m.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 

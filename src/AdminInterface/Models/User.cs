@@ -222,28 +222,40 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
 
-		[HasAndBelongsToMany(typeof (UserPermission),
-			Lazy = true,
-			ColumnKey = "UserId",
-			Table = "AssignedPermissions",
-			Schema = "usersettings",
-			ColumnRef = "PermissionId")]
+		[
+			HasAndBelongsToMany(typeof (UserPermission),
+				Lazy = true,
+				ColumnKey = "UserId",
+				Table = "AssignedPermissions",
+				Schema = "usersettings",
+				ColumnRef = "PermissionId"),
+
+			Auditable("Права доступа")
+		]
 		public virtual IList<UserPermission> AssignedPermissions { get; set; }
 
-		[HasAndBelongsToMany(typeof (Address),
-			Lazy = true,
-			ColumnKey = "UserId",
-			Table = "UserAddresses",
-			Schema = "Customers",
-			ColumnRef = "AddressId"), Auditable("список адресов доставки пользователя")]
+		[
+			HasAndBelongsToMany(typeof (Address),
+				Lazy = true,
+				ColumnKey = "UserId",
+				Table = "UserAddresses",
+				Schema = "Customers",
+				ColumnRef = "AddressId"),
+
+			Auditable("список адресов доставки пользователя")
+		]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
-		[HasAndBelongsToMany(typeof (User),
-			Lazy = true,
-			ColumnKey = "PrimaryUserId",
-			Table = "Showusers",
-			Schema = "Customers",
-			ColumnRef = "ShowUserId")]
+		[
+			HasAndBelongsToMany(typeof (User),
+				Lazy = true,
+				ColumnKey = "PrimaryUserId",
+				Table = "Showusers",
+				Schema = "Customers",
+				ColumnRef = "ShowUserId"),
+
+			Auditable("Логины в видимости пользователя")
+		]
 		public virtual IList<User> ShowUsers { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
@@ -259,8 +271,6 @@ namespace AdminInterface.Models
 
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
-
-		public virtual IList<User> ImpersonableUsers { set; get; }
 
 		public virtual List<string> AvalilableAnalitFVersions
 		{
@@ -618,7 +628,7 @@ WHERE
 				ContactGroup.AddPerson(name);
 		}
 
-		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
+		public virtual AuditRecord MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
 			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))
 				throw new Exception(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
@@ -643,13 +653,15 @@ WHERE
 					}
 				}
 			}
-
-			ClientInfoLogEntity.UpdateLogs(newOwner.Id, Id);
+			var message = String.Format("Перемещение пользователя от {0} к {1}", Client, newOwner);
+			AuditRecord.UpdateLogs(newOwner.Id, Id);
 			Client = newOwner;
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
 			InheritPricesFrom = null;
 			Save();
+
+			return new AuditRecord(message, this);
 		}
 
 		public virtual string GetEmailForBilling()
@@ -691,7 +703,7 @@ WHERE
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 
 			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для клиента {2} ( {3} ): {4}", Name, Id, Client.Name, Client.Id, billingMessage);
 			Payer.AddComment(billingMessage);
@@ -746,7 +758,7 @@ WHERE
 			Payer.Users.Remove(this);
 			if (Client != null)
 				Client.Users.Remove(this);
-			ClientInfoLogEntity.DeleteAuditRecords(this);
+			AuditRecord.DeleteAuditRecords(this);
 			PayerAuditRecord.DeleteAuditRecords(Accounting);
 			ActiveRecordMediator.Delete(this);
 		}

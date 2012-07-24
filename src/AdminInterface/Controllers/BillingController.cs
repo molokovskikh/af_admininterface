@@ -227,7 +227,7 @@ namespace AdminInterface.Controllers
 			if (oldDisabled != service.Disabled)
 			{
 				this.Mailer().EnableChanged(service, addComment).Send();
-				ClientInfoLogEntity.StatusChange(service).Save();
+				AuditRecord.StatusChange(service).Save();
 			}
 			CancelView();
 		}
