@@ -195,7 +195,7 @@ where Phone like :phone")
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				new ClientInfoLogEntity(message, client).Save();
+				new AuditRecord(message, client).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -237,7 +237,7 @@ where Phone like :phone")
 		public void ResetUin(uint clientCode, string reason)
 		{
 			var client = Client.FindAndCheck<Client>(clientCode);
-			ClientInfoLogEntity.ReseteUin(client, reason).Save();
+			AuditRecord.ReseteUin(client, reason).Save();
 			client.ResetUin();
 			RedirectToReferrer();
 		}
@@ -456,49 +456,44 @@ where s.Name like :SearchText")
 				user = address.AvaliableForUsers.SingleOrDefault();
 			if (user != null)
 				address = user.AvaliableAddresses.SingleOrDefault();
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
 
-				if (user != null)
-					user.MoveToAnotherClient(newClient, legalEntity);
-				if (address != null)
-					address.MoveToAnotherClient(newClient, legalEntity);
-				scope.VoteCommit();
-			}
+			AuditRecord log = null;
+			if (user != null)
+				log = user.MoveToAnotherClient(newClient, legalEntity);
+			if (address != null)
+				log = address.MoveToAnotherClient(newClient, legalEntity);
+			DbSession.Save(log);
+			//нужно сохранить изменения, иначе oldClient.Refresh(); не зафиксирует их
+			DbSession.Flush();
 
 			if (address != null)
-			{
 				this.Mailer()
 					.AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity))
 					.Send();
-			}
 
 			if (user != null)
 				this.Mailer()
 					.UserMoved(user, oldClient, user.OldValue(u => u.Payer))
 					.Send();
 
-			if (moveAddress)
-			{
+			if (moveAddress) {
 				Notify("Адрес доставки успешно перемещен");
 				RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 			}
-			else
-			{
+			else {
 				Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
-			oldClient.Refresh();
+			DbSession.Refresh(oldClient);
 			if (oldClient.Users.Count == 0
 				&& oldClient.Addresses.Count == 0
 				&& oldClient.Enabled)
 			{
 				oldClient.Disabled = true;
 				this.Mailer().EnableChanged(oldClient).Send();
-				ClientInfoLogEntity.StatusChange(oldClient).Save();
+				DbSession.Save(AuditRecord.StatusChange(oldClient));
 			}
-			oldClient.Save();
+			DbSession.Save(oldClient);
 		}
 
 		public void Delete(uint id)

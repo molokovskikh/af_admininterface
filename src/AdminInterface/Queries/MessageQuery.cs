@@ -25,11 +25,11 @@ namespace AdminInterface.Queries
 
 		public IList<LogMessageType> Types { get; set; }
 
-		public IList<ClientInfoLogEntity> Execute(User user, ISession session)
+		public IList<AuditRecord> Execute(User user, ISession session)
 		{
-			var objectType = ClientInfoLogEntity.GetLogObjectType(user);
-			var serviceType = ClientInfoLogEntity.GetLogObjectType(user.RootService);
-			return session.Query<ClientInfoLogEntity>()
+			var objectType = AuditRecord.GetLogObjectType(user);
+			var serviceType = AuditRecord.GetLogObjectType(user.RootService);
+			return session.Query<AuditRecord>()
 				.Where(l => (l.ObjectId == user.Id && l.Type == objectType) || (l.ObjectId == user.RootService.Id && l.Type == serviceType))
 				.Where(l => Types.Contains(l.MessageType))
 				.OrderByDescending(l => l.WriteTime)
@@ -37,9 +37,9 @@ namespace AdminInterface.Queries
 				.ToList();
 		}
 
-		public IList<ClientInfoLogEntity> Execute(Service service, ISession session)
+		public IList<AuditRecord> Execute(Service service, ISession session)
 		{
-			return session.Query<ClientInfoLogEntity>()
+			return session.Query<AuditRecord>()
 				.Where(l => l.Service == service)
 				.Where(l => Types.Contains(l.MessageType))
 				.OrderByDescending(l => l.WriteTime)

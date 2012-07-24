@@ -375,7 +375,7 @@ group by u.ClientId")
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 			var user = Users.First();
 			billingMessage = String.Format("О регистрации клиента: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payers.Single().AddComment(billingMessage);
@@ -497,7 +497,7 @@ where ClientId = :clientId")
 					rule.Delete();
 				}
 			}
-			ClientInfoLogEntity.DeleteAuditRecords(this);
+			AuditRecord.DeleteAuditRecords(this);
 			ActiveRecordMediator.Delete(this);
 		}
 

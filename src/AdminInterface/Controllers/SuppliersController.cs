@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			if (!string.IsNullOrWhiteSpace(message))
 			{
-				new ClientInfoLogEntity(message, supplier).Save();
+				new AuditRecord(message, supplier).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 			}
 			Notify("Сохранено");
 
-			new ClientInfoLogEntity(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
+			new AuditRecord(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
 
 			RedirectToReferrer();
 		}

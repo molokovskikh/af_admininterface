@@ -317,7 +317,7 @@
     </Compile>
     <Compile Include="Models\Security\Administrator.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
-    <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
+    <Compile Include="Models\Logs\AuditRecord.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
     <Compile Include="Models\Billing\MailSentEntity.cs" />

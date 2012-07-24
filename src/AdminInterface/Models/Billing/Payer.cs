@@ -330,7 +330,7 @@ ORDER BY {Payer}.shortname;";
 
 		public virtual IEnumerable<IAuditRecord> GetAuditRecords()
 		{
-			return Clients.Select(c => new ClientInfoLogEntity(c));
+			return Clients.Select(c => new AuditRecord(c));
 		}
 
 		public virtual void AddComment(string comment)
@@ -544,7 +544,7 @@ ORDER BY {Payer}.shortname;";
 			var property = new DiffAuditableProperty(propertyInfo, BindingHelper.GetDescription(propertyInfo), Comment, oldValue);
 			mailer.NotifyAboutChanges(property, this, "BillingList@analit.net");
 			foreach (var client in Clients) {
-				var log = new ClientInfoLogEntity(client) {
+				var log = new AuditRecord(client) {
 					Message = property.Message,
 					IsHtml = property.IsHtml,
 					MessageType = LogMessageType.Stat

@@ -33,7 +33,7 @@ namespace AdminInterface.Models.Audit
 			else if (auditable != null)
 				base.Log(@event, message, isHtml);
 			else
-				@event.Session.Save(new ClientInfoLogEntity(message, @event.Entity) {
+				@event.Session.Save(new AuditRecord(message, @event.Entity) {
 					IsHtml = isHtml,
 					MessageType = LogMessageType.System
 				});

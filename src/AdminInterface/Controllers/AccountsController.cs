@@ -75,7 +75,7 @@ namespace AdminInterface.Controllers
 			if (supplier.IsChanged(s => s.Disabled))
 			{
 				this.Mailer().EnableChanged(supplier).Send();
-				ClientInfoLogEntity.StatusChange(supplier).Save();
+				AuditRecord.StatusChange(supplier).Save();
 			}
 			ActiveRecordMediator.Save(supplier);
 		}

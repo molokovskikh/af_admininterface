@@ -12,6 +12,8 @@ using Castle.MonoRail.Framework.Test;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
+using NHibernate.Linq;
+using Test.Support.log4net;
 using log4net.Config;
 using NUnit.Framework;
 using AdminInterface.Models.Logs;
@@ -33,98 +35,6 @@ namespace Integration.Controllers
 			client = DataMother.CreateTestClientWithUser();
 		}
 
-
-/*		[Test]
-		public void Throw_not_found_exception_if_login_not_exists()
-		{
-			using (var testUser = TestUser())
-			using (new SessionScope())
-			{
-				var login = testUser.Parameter.Login;
-				try
-				{
-					_controller.ChangePassword(testUser.Parameter.Id);
-					Assert.Fail("Должны были выбросить исключение");
-				}
-				catch (Exception ex)
-				{
-					if (!(ex is LoginNotFoundException))
-						throw;
-					Assert.That(ex.Message, Is.EqualTo(String.Format("Пользователь {0} не найден", login)));
-				}
-
-				try
-				{
-					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "");
-					Assert.Fail("Должны были выбросить исключение");
-				}
-				catch (Exception ex)
-				{
-					if (!(ex is LoginNotFoundException))
-						throw;
-					Assert.That(ex.Message, Is.EqualTo(String.Format("Пользователь {0} не найден", login)));
-				}
-			}
-		}
-
-		[Test, Ignore("нет доступа к ad")]
-		public void Throw_cant_change_password_exception_if_user_from_office()
-		{
-			using (var testUser = TestUser())
-			using (var testADUser = new TestADUser(testUser.Parameter.Login, "LDAP://OU=Офис,DC=adc,DC=analit,DC=net"))
-			using (new SessionScope())
-			{
-				var login = testUser.Parameter.Login;
-
-				try
-				{
-					_controller.ChangePassword(testUser.Parameter.Id);
-					Assert.Fail("Должны были выбросить исключение");
-				}
-				catch (Exception ex)
-				{
-					if (!(ex is CantChangePassword))
-						throw;
-				}
-
-				try
-				{
-					_controller.DoPasswordChange(testUser.Parameter.Id, "", false, true, "");
-					Assert.Fail("Должны были выбросить исключение");
-				}
-				catch (Exception ex)
-				{
-					if (!(ex is CantChangePassword))
-						throw;
-				}
-			}
-		}
-
-		[Test, Ignore("нет доступа к ad")]
-		public void Log_password_change()
-		{
-			using(var connection = new MySqlConnection(Literals.GetConnectionString()))
-			{
-				connection.Open();
-				var command = connection.CreateCommand();
-				command.CommandText = @"delete from logs.passwordchange where logtime > curdate()";
-				command.ExecuteNonQuery();
-			}
-
-			using (new SessionScope())
-			using (var testAdUser = new TestADUser())
-			using (var testUser = TestUser(testAdUser.Login))
-			{
-				_controller.DoPasswordChange(testUser.Parameter.Id, "r.kvasov@analit.net", true, false, "");
-				var passwordChanges = PasswordChangeLogEntity.FindAll(Expression.Gt("LogTime", DateTime.Today));
-
-				Assert.That(passwordChanges.Count(), Is.EqualTo(1));
-				//не работает тк антивирус задерживает отправку писем
-				//Assert.That(passwordChanges[0].SmtpId, Is.GreaterThan(0));
-				Assert.That(passwordChanges[0].SentTo, Is.EqualTo("r.kvasov@analit.net"));
-			}
-		}
-*/
 		[Test, Ignore("нет доступа к ad")]
 		public void Unlock_every_locked_login()
 		{
@@ -192,6 +102,7 @@ namespace Integration.Controllers
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
+			session.Flush();
 
 			oldClient.Refresh();
 			newClient.Refresh();
@@ -220,17 +131,21 @@ namespace Integration.Controllers
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
+			session.Flush();
 
 			oldClient.Refresh();
 			newClient.Refresh();
-			var count = ClientInfoLogEntity.Queryable.Count(l => l.Service == newClient && l.ObjectId == user.Id);
+			var records = session.Query<AuditRecord>()
+				.Where(l => l.Service == newClient && l.ObjectId == user.Id)
+				.ToList();
 
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));
 			Assert.That(oldClient.Users.Count, Is.EqualTo(0));
 
-			Assert.That(count, Is.EqualTo(2));
+			Assert.That(records.Count, Is.EqualTo(3), records.Implode());
+			Assert.That(records.Implode(), Is.StringContaining("Перемещение пользователя от"));
 		}
 
 		[Test]
@@ -238,17 +153,20 @@ namespace Integration.Controllers
 		{
 			var sourceClient = DataMother.CreateTestClientWithAddress();
 			var destinationClient = DataMother.TestClient();
-
 			var address = sourceClient.Addresses[0];
+
 			controller.MoveUserOrAddress(destinationClient.Id,
 				0u,
 				address.Id,
 				destinationClient.Orgs().First().Id,
 				true);
-			destinationClient.Refresh();
-			sourceClient.Refresh();
+			session.Flush();
+
+			session.Refresh(destinationClient);
+			session.Refresh(sourceClient);
 
 			Assert.That(sourceClient.Addresses.Count, Is.EqualTo(0));
+			Assert.That(sourceClient.Disabled, Is.True);
 			Assert.That(destinationClient.Addresses.Count, Is.EqualTo(1));
 			Assert.That(destinationClient.Addresses[0].Id, Is.EqualTo(address.Id));
 			Assert.That(notifications.FirstOrDefault(m => m.Subject.Contains("Перемещение адреса доставки")),

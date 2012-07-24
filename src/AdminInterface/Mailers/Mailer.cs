@@ -167,7 +167,7 @@ Email: {2}
 						billingMessage += "\r\n";
 					billingMessage += comment;
 					if (!String.IsNullOrEmpty(billingMessage))
-						new ClientInfoLogEntity(billingMessage, item).Save();
+						new AuditRecord(billingMessage, item).Save();
 				}
 				else
 				{
@@ -179,7 +179,7 @@ Email: {2}
 
 					if (!String.IsNullOrEmpty(billingMessage))
 						foreach (var user in address.AvaliableForUsers)
-							new ClientInfoLogEntity(billingMessage, user).Save();
+							new AuditRecord(billingMessage, user).Save();
 				}
 
 				if (!String.IsNullOrEmpty(billingMessage))

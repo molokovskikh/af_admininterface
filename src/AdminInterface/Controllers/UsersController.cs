@@ -162,7 +162,7 @@ namespace AdminInterface.Controllers
 					user.Id,
 					user.Name, 
 					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
-				new ClientInfoLogEntity(message, user.Client){ MessageType = LogMessageType.System }.Save();
+				new AuditRecord(message, user.Client){ MessageType = LogMessageType.System }.Save();
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
@@ -297,7 +297,7 @@ namespace AdminInterface.Controllers
 			if (changeLogin)
 				user.Login = user.Id.ToString();
 			user.Save();
-			ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
+			AuditRecord.PasswordChange(user, isFree, reason).Save();
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
@@ -365,7 +365,7 @@ namespace AdminInterface.Controllers
 			DbLogHelper.SetupParametersForTriggerLogging(new {
 				ResetIdCause = reason
 			});
-			ClientInfoLogEntity.ReseteUin(user, reason).Save();
+			AuditRecord.ReseteUin(user, reason).Save();
 			user.ResetUin();
 			Notify("УИН сброшен");
 			RedirectToReferrer();
@@ -378,7 +378,7 @@ namespace AdminInterface.Controllers
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				new ClientInfoLogEntity(message, user).Save();
+				new AuditRecord(message, user).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
