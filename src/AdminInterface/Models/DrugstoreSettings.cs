@@ -34,6 +34,13 @@ namespace AdminInterface.Models
 		uint Id { get; }
 	}
 
+	public enum ProtekWaybillSavingType
+	{
+		[Description("SST")] SST = 0,
+		[Description("DBF")] DBF = 1,
+		[Description("SST для Здоровые Люди")] SSTLong = 2
+	}
+
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
 	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>, IDrugstoreSettings
 	{
