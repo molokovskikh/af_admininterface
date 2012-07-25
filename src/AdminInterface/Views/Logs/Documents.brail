@@ -18,6 +18,7 @@ ${app.EndFormFor("filter")}
 	<% if logEntities.Count != 0: %>
 		<thead>
 			<tr>
+				<th></th>
 				<th>Номер документа</th>
 				<th>Дата получения</th>
 				<th>Тип документа</th>
