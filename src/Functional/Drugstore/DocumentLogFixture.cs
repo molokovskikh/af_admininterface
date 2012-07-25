@@ -17,74 +17,70 @@ namespace Functional.Drugstore
 	{
 		private Client client;
 		private Supplier supplier;
+		private Address address;
+		private User user;
+		private DocumentReceiveLog document;
+		private DocumentSendLog sendLog;
 
 		[SetUp]
 		public void Setup()
 		{
-			client = DataMother.CreateTestClientWithAddress();
+			client = DataMother.CreateTestClientWithAddressAndUser();
+			user = client.Users[0];
+			address = client.Addresses[0];
 			supplier = DataMother.CreateSupplier();
 
 			client.Save();
 			Save(supplier);
+
+			document = new DocumentReceiveLog(supplier) {
+				FileName = "test.txt",
+				ForClient = client,
+				Address = address,
+			};
+
+			sendLog = new DocumentSendLog(user, document);
+
+			Save(document, sendLog);
 		}
 
 		[Test]
 		public void View_documents()
 		{
-			var document = new DocumentReceiveLog(supplier) {
-				FileName = "test.txt",
-				ForClient = client,
-				Address = client.Addresses.First(),
-			};
-
-			Save(document);
-			Flush();
-
 			Open(client);
 			Click("История документов");
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов")))
-			{
-				Assert.That(openedWindow.Text, Is.StringContaining(document.Id.ToString()));
-				Assert.That(openedWindow.Text, Is.StringContaining("тестовый адрес"));
-			}
+			OpenedWindow("История документов");
+			AssertText(document.Id.ToString());
+			AssertText("тестовый адрес");
+		}
+
+		[Test]
+		public void Resend_document()
+		{
+			Console.WriteLine(client.Id);
+			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
+			Click("Повторить");
+			AssertText("Документ будет отправлен повторно");
+
+			session.Refresh(sendLog);
+			Assert.That(sendLog.Committed, Is.False);
 		}
 
 		[Test]
 		public void View_documents_with_client_column()
 		{
-			var testUser = client.AddUser("Test user");
-			Flush();
-
-			var document = new DocumentReceiveLog(supplier) {
-				FileName = "test.txt",
-				ForClient = client,
-				Address = client.Addresses.First(),
-			};
-
-			session.Save(document);
-			Flush();
-
-			var sendLog = new DocumentSendLog() {
-				Committed = true,
-				ForUser = client.Users.First(),
-				Received = document
-			};
-			session.Save(sendLog);
-			Flush();
-
 			Open(client);
 			Click("История документов");
 
-			using (var openedWindow = IE.AttachTo<IE>(Find.ByTitle("История документов"))) {
-				//Смотрим, есть ли надпись "Клиенту"
-				Assert.That(openedWindow.ContainsText("Клиенту"));
-				//Смотрим, есть ли ссылка на поставщика
-				Assert.That(openedWindow.Links.Select(l => l.Text == supplier.Name && l.Text.Contains("Suppliers//" + supplier.Id.ToString())).Count(), Is.GreaterThan(0));
-				//Смотрим, есть ли ссылка на клиента
-				Assert.That(openedWindow.Links.Select(l => l.Text == client.Name && l.Text.Contains("Clients//" + client.Id.ToString())).Count(), Is.GreaterThan(0));
-				//Смотрим, есть ли ссылка на пользователя, получившего документ
-				Assert.That(openedWindow.Links.Select(l => l.Text == testUser.Name && l.Text.Contains("Users//" + testUser.Id.ToString())).Count(), Is.GreaterThan(0));
-			}
+			OpenedWindow("История документов");
+			//Смотрим, есть ли надпись "Клиенту"
+			AssertText("Клиенту");
+			//Смотрим, есть ли ссылка на поставщика
+			Assert.That(browser.Links.Select(l => l.Text == supplier.Name && l.Text.Contains("Suppliers//" + supplier.Id.ToString())).Count(), Is.GreaterThan(0));
+			//Смотрим, есть ли ссылка на клиента
+			Assert.That(browser.Links.Select(l => l.Text == client.Name && l.Text.Contains("Clients//" + client.Id.ToString())).Count(), Is.GreaterThan(0));
+			//Смотрим, есть ли ссылка на пользователя, получившего документ
+			Assert.That(browser.Links.Select(l => l.Text == user.Name && l.Text.Contains("Users//" + user.Id.ToString())).Count(), Is.GreaterThan(0));
 		}
 
 		[Test]

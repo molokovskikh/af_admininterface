@@ -38,6 +38,12 @@ ${app.EndFormFor("filter")}
 		</thead>
 	<% for i, log in enumerate(logEntities): %>
 		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
+			<td>
+				<form method=post action="${siteroot}/Logs/Resend">
+					${FormHelper.HiddenField("id", log.DeliveredId)}
+					<input type=submit value="Повторить">
+				</form>
+			</td>
 			<td>${log.Id}</td>
 			<td>${log.LogTime}</td>
 			<td>

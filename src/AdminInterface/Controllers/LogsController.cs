@@ -1,22 +1,15 @@
 using System;
-using System.IO;
 using AdminInterface.Controllers.Filters;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
-using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
-using NHibernate.Linq;
-using NHibernate.Transform;
-using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.Controllers
 {
@@ -30,6 +23,16 @@ namespace AdminInterface.Controllers
 		public LogsController()
 		{
 			SetBinder(new ARDataBinder());
+		}
+
+		public void Resend(uint id)
+		{
+			var log = DbSession.Load<DocumentSendLog>(id);
+			log.SendedInUpdate = null;
+			log.Committed = false;
+			DbSession.Save(log);
+			Notify("Документ будет отправлен повторно");
+			RedirectToReferrer();
 		}
 
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
@@ -88,7 +91,7 @@ namespace AdminInterface.Controllers
 
 		public void Certificate(uint id)
 		{
-			var file = ActiveRecordMediator<CertificateFile>.FindByPrimaryKey(id);
+			var file = DbSession.Load<CertificateFile>(id);
 			this.RenderFile(file.GetStorageFileName(Config), file.Filename);
 		}
 
@@ -118,14 +121,14 @@ namespace AdminInterface.Controllers
 				filter.RegionMask = regionMask & Admin.RegionMask;
 			}
 			if (clientCode.HasValue)
-				filter.Client = Client.Find(clientCode.Value);
+				filter.Client = DbSession.Load<Client>(clientCode.Value);
 			else if (userId.HasValue)
 				filter.User = DbSession.Load<User>(userId.Value);
 
 			BindObjectInstance(filter, "filter");
 
 			if (filter.Client != null)
-				filter.Client = Client.Find(filter.Client.Id);
+				filter.Client = DbSession.Load<Client>(filter.Client.Id);
 
 			if (filter.User != null)
 				filter.User = DbSession.Load<User>(filter.User.Id);
