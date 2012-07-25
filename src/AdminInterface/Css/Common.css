@@ -156,7 +156,8 @@ div.flash {
 	 margin: 2px 0 8px 0;
 }
 
-table td.NotCommitedUpdate
+table td.NotCommitedUpdate,
+table.DataTable tr.update-is-uncommited td.update-date
 {
 	background-color: #e2c5c5;
 }

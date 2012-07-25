@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -20,11 +21,13 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class UserSearchController : ARSmartDispatcherController
+	public class UserSearchController : AdminInterfaceController
 	{
 		public void Search()
 		{
-			var filter = new UserFilter();
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+
+			var filter = new UserFilter(DbSession);
 			PropertyBag["filter"] = filter;
 			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);

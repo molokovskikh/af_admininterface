@@ -9,6 +9,7 @@ using System.Linq;
 using System.IO;
 using AdminInterface.Security;
 using Common.Tools;
+using Common.Web.Ui.Helpers;
 using log4net;
 
 namespace AdminInterface.Helpers
@@ -31,9 +32,20 @@ namespace AdminInterface.Helpers
 	public class ADUserInformation
 	{
 		public string Login;
+
 		public bool IsLoginExists;
-		public bool IsLocked;
-		public bool IsDisabled;
+
+		[Style]
+		public bool IsLocked { get; set; }
+
+		[Style]
+		public bool DisabledInAd { get; set; }
+
+		[Style]
+		public bool NotExistsUser
+		{
+			get { return !IsLoginExists; }
+		}
 
 		public DateTime? LastLogOnDate;
 		public DateTime? BadPasswordDate;
@@ -276,7 +288,7 @@ namespace AdminInterface.Helpers
 
 			var directoryEntry = searchResult.GetDirectoryEntry();
 			tempResult.IsLocked = Convert.ToBoolean(directoryEntry.InvokeGet("IsAccountLocked"));
-			tempResult.IsDisabled = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
+			tempResult.DisabledInAd = Convert.ToBoolean(directoryEntry.InvokeGet("AccountDisabled"));
 
 			return tempResult;
 		}
@@ -293,11 +305,11 @@ namespace AdminInterface.Helpers
 				result.IsLoginExists = IsLoginExists(login);
 				if (result.IsLoginExists) {
 					result.BadPasswordDate = GetBadPasswordDate(login);
-					result.IsDisabled = IsDisabled(login);
+					result.DisabledInAd = IsDisabled(login);
 					result.IsLocked = IsLocked(login);
 					result.CalculateLastLogon(GetLastLogOnDate(login));
 					result.LastPasswordChange = GetLastPasswordChange(login);
-					result.IsDisabled = IsDisabled(login);
+					result.DisabledInAd = IsDisabled(login);
 				}
 				return result;
 			}

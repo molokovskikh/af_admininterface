@@ -189,9 +189,11 @@
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>
 					<tr>
-						<td><a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
-						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
-							<a href="${siteroot}/users/${user.Id}/edit"">${user.Login}</a>
+						<td>
+							<a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a>
+						</td>
+						<td class="${app.Style(userInfo, user)}">
+							<a href="${siteroot}/users/${user.Id}/edit">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
 						<td>${user.Logs.GetLastServicesUsage()}</td>

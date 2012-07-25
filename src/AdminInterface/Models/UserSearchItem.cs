@@ -1,5 +1,6 @@
 ﻿using System;
 using AdminInterface.Models.Billing;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models
 {
@@ -25,6 +26,7 @@ namespace AdminInterface.Models
 
 		public DateTime? UpdateDate { get; set; }
 
+		[Style]
 		public bool UpdateIsUncommited { get; set; }
 
 		public bool ServiceDisabled { get; set; }
@@ -35,9 +37,20 @@ namespace AdminInterface.Models
 
 		public bool IsLoginExists { get; set; }
 
+		[Style]
+		public bool NotExistsUser
+		{
+			get { return !IsLoginExists; }
+		}
+
+		[Style]
 		public bool IsLocked { get; set; }
 
-		public bool IsDisabled { get; set; }
+		[Style]
+		public bool DisabledInAd { get; set; }
+
+		[Style]
+		public bool InvisibleClient { get; set; }
 
 		public bool IsDrugstore
 		{
@@ -47,11 +60,30 @@ namespace AdminInterface.Models
 			}
 		}
 
-		public bool Disabled
+		[Style]
+		public bool DisabledByParent
+		{
+			get { return ServiceDisabled; }
+		}
+
+		[Style]
+		public bool SelfDisabled
 		{
 			get
 			{
-				return ServiceDisabled || !UserEnabled;
+				return !UserEnabled;
+			}
+		}
+
+		[Style]
+		public bool IsOldUserUpdate
+		{
+			get
+			{
+				if (UpdateDate != null)
+					return DateTime.Now.Subtract(UpdateDate.Value).TotalDays >= 2;
+				else
+					return true;
 			}
 		}
 

@@ -24,7 +24,7 @@ namespace Integration.Models
 		public void Setup()
 		{
 			random = new Random();
-			filter = new UserFilter();
+			filter = new UserFilter(session);
 		}
 
 		[Test]
@@ -87,7 +87,7 @@ namespace Integration.Models
 			filter.SearchText = user.Id.ToString();
 			var result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(1), result.Implode());
-			Assert.That(result[0].Disabled, Is.True);
+			Assert.That(result[0].SelfDisabled, Is.True);
 		}
 
 		[Test]
