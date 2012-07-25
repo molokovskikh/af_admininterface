@@ -77,12 +77,12 @@ namespace AdminInterface.Controllers
 				this.Mailer().EnableChanged(supplier).Send();
 				AuditRecord.StatusChange(supplier).Save();
 			}
-			ActiveRecordMediator.Save(supplier);
+			DbSession.Save(supplier);
 		}
 
 		public void SetUserStatus(uint userId, bool? enabled)
 		{
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			var oldStatus = user.Enabled;
 			if (enabled.HasValue)
 				user.Enabled = enabled.Value;
@@ -100,7 +100,7 @@ namespace AdminInterface.Controllers
 					address.Update();
 				}
 			}
-			ActiveRecordMediator.Save(user);
+			DbSession.Save(user);
 		}
 
 		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree, DateTime? freePeriodEnd)

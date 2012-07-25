@@ -45,7 +45,7 @@ namespace Integration.Models
 			var newUser = new User(client);
 			newUser.Setup();
 			client.AddUser(newUser);
-			newUser.Save();
+			ActiveRecordMediator.Save(newUser);
 			client.Save();
 			Flush();
 			filter.SearchBy = SearchUserBy.Auto;
@@ -141,11 +141,11 @@ namespace Integration.Models
 			contactGroup.Save();
 			user.ContactGroup = contactGroup;
 			user.ContactGroup.AddContact(ContactType.Email, email);
-			user.Save();
+			ActiveRecordMediator.Save(user);
 
 			var user2 = new User(supplier.Payer, supplier);
 			user2.Setup();
-			user2.Save();
+			ActiveRecordMediator.Save(user2);
 
 			Flush();
 			filter.SearchBy = SearchUserBy.ByContacts;

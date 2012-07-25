@@ -3,6 +3,7 @@ using AdminInterface.Mailers;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Queries;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -28,7 +29,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 1000;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			scope.Flush();
 
 			var logs = AuditLogRecord.GetLogs(user.Payer);

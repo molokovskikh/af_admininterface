@@ -129,7 +129,7 @@ namespace Integration.Controllers
 			var permission = new UserPermission();
 			permission.Id = 1;
 			user1.AddPermission(permission);
-			user1.Save();
+			ActiveRecordMediator.Save(user1);
 			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
 			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
 			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));

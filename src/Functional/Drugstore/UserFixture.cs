@@ -127,7 +127,7 @@ namespace Functional.Drugstore
 		public void Change_login_when_change_password()
 		{
 			user.Login = "testLogin" + user.Id;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			Refresh();
 
 			GoToChangePassword();
@@ -424,7 +424,7 @@ namespace Functional.Drugstore
 			settings.Save();
 			user.WorkRegionMask = 2;
 			user.OrderRegionMask = 1;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			scope.Flush();
 
 			Open(user, "Edit");

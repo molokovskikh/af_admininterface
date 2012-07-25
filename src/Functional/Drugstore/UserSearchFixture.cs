@@ -28,8 +28,7 @@ namespace Functional.Drugstore
 
 		private void TestSearchResults(Browser browser, string columnName, SearchUserBy searchBy, string sql)
 		{
-			var text = String.Empty;
-			ArHelper.WithSession(session => text = session.CreateSQLQuery(sql).UniqueResult().ToString());
+			var text = session.CreateSQLQuery(sql).UniqueResult().ToString();
 			AssetSearch(searchBy, text);
 		}
 

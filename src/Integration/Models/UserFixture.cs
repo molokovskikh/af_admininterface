@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using Test.Support.log4net;
@@ -159,7 +160,7 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			user.InheritPricesFrom = parent;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 
 			Flush();
 

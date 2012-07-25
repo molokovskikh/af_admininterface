@@ -115,7 +115,7 @@ namespace Integration.ForTesting
 			};
 			client.AddAddress(address);
 			client.Users[0].Name += client.Users[0].Id;
-			client.Users[0].Save();
+			ActiveRecordMediator.Save(client.Users[0]);
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].Save();
 			client.Name += client.Id;
@@ -241,10 +241,10 @@ namespace Integration.ForTesting
 			var user = new User(supplier.Payer, supplier) {
 				Login = User.GetTempLogin()
 			};
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			user.Setup();
 			user.SetupSupplierPermission();
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			return user;
 		}
 

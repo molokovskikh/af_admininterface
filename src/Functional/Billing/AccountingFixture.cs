@@ -85,7 +85,7 @@ namespace Functional.Billing
 				client = Client.Find(client.Id);
 
 				client.Users[0].Enabled = true;
-				client.Users[0].Save();
+				ActiveRecordMediator.Save(client.Users[0]);
 
 				client.Addresses[0].Enabled = true;
 				client.Addresses[0].Accounting.BeAccounted = false;
@@ -115,7 +115,7 @@ namespace Functional.Billing
 		public void Check_user_for_accounting()
 		{
 			client.Users[0].Name = String.Format("Test username for Accounting [{0}]", client.Users[0].Id);
-			client.Users[0].Save();
+			ActiveRecordMediator.Save(client.Users[0]);
 
 			Open("Billing/Accounting");
 			Assert.That(browser.Text, Is.StringContaining("Учет адресов и пользователей"));

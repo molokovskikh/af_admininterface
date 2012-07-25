@@ -443,9 +443,9 @@ namespace AdminInterface.Models
 			var defaults = ActiveRecordMediator<DefaultValues>.FindFirst();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
-			Save();
+			ActiveRecordMediator.Save(this);
 			Login = Id.ToString();
-			Save();
+			ActiveRecordMediator.Save(this);
 
 			if (Client != null)
 				AddPrices(Client);
@@ -455,7 +455,7 @@ namespace AdminInterface.Models
 		{
 			if (Client == null)
 				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
-			Save();
+			ActiveRecordMediator.Save(this);
 		}
 
 		public virtual bool IsLocked
@@ -509,14 +509,22 @@ namespace AdminInterface.Models
 
 		public virtual void AddContactGroup()
 		{
-			ContactGroupOwner groupOwner = null;
-			if (NHibernateUtil.GetClass(RootService) == typeof(Client))
-				groupOwner = Client.Find(RootService.Id).ContactGroupOwner;
-			else if (NHibernateUtil.GetClass(RootService) == typeof(Supplier))
-				groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
-
+			var groupOwner = ContactGroupoOwner;
 			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 			ContactGroup = group;
+		}
+
+		public virtual ContactGroupOwner ContactGroupoOwner
+		{
+			get
+			{
+				ContactGroupOwner groupOwner = null;
+				if (NHibernateUtil.GetClass(RootService) == typeof (Client))
+					groupOwner = Client.Find(RootService.Id).ContactGroupOwner;
+				else if (NHibernateUtil.GetClass(RootService) == typeof (Supplier))
+					groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
+				return groupOwner;
+			}
 		}
 
 		public virtual void UpdateContacts(Contact[] contacts)
@@ -659,7 +667,7 @@ WHERE
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
 			InheritPricesFrom = null;
-			Save();
+			ActiveRecordMediator.Save(this);
 
 			return new AuditRecord(message, this);
 		}
@@ -692,7 +700,7 @@ WHERE
 				return "";
 
 			var emails = owner.GetEmails(groups);
-			if (emails.Count() > 0)
+			if (emails.Any())
 				return emails.Implode();
 
 			return owner.GetEmails(ContactGroupType.General).Implode();
@@ -730,21 +738,6 @@ WHERE
 					new ModelAction(this, "Delete", "Удалить", !CanDelete()),
 				};
 			}
-		}
-
-		public static User Find(uint id)
-		{
-			return ActiveRecordMediator<User>.FindByPrimaryKey(id);
-		}
-
-		public static User TryFind(uint id)
-		{
-			return ActiveRecordMediator<User>.FindByPrimaryKey(id, false);
-		}
-
-		public virtual void Save()
-		{
-			ActiveRecordMediator.Save(this);
 		}
 
 		public virtual bool CanDelete()

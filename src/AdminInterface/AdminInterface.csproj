@@ -512,6 +512,7 @@
     <None Include="Views\Orders\Details.brail" />
     <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
     <None Include="Views\LegalEntity\Add.brail" />
+    <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

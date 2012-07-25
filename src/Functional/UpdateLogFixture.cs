@@ -11,7 +11,7 @@ using AdminInterface.Helpers;
 namespace Functional
 {
 	[TestFixture, Ignore("Чинить")]
-	public class UpdateLogFixture : WatinFixture
+	public class UpdateLogFixture : WatinFixture2
 	{
 		[Test]
 		public void ViewAccumulativeUpdateLog()

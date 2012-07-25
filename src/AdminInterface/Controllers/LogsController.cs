@@ -120,7 +120,7 @@ namespace AdminInterface.Controllers
 			if (clientCode.HasValue)
 				filter.Client = Client.Find(clientCode.Value);
 			else if (userId.HasValue)
-				filter.User = User.Find(userId.Value);
+				filter.User = DbSession.Load<User>(userId.Value);
 
 			BindObjectInstance(filter, "filter");
 
@@ -128,7 +128,7 @@ namespace AdminInterface.Controllers
 				filter.Client = Client.Find(filter.Client.Id);
 
 			if (filter.User != null)
-				filter.User = User.Find(filter.User.Id);
+				filter.User = DbSession.Load<User>(filter.User.Id);
 
 			PropertyBag["beginDate"] = filter.BeginDate;
 			PropertyBag["endDate"] = filter.EndDate;
@@ -149,7 +149,7 @@ namespace AdminInterface.Controllers
 
 		public void PasswordChangeLog(uint id, DateTime beginDate, DateTime endDate)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
 				beginDate,

@@ -7,4 +7,4 @@ task @CreateAccounting, [@InitActiveRecord]:
 		for user in ActiveRecordMediator[of User].FindAll():
 			continue if user.Accounting
 			user.Accounting = UserAccount(user)
-			user.Save()
+			ActiveRecordMediator.Save(user)

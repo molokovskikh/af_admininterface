@@ -9,7 +9,7 @@ using WatiN.Core; using Test.Support.Web;
 namespace Functional
 {
 	[TestFixture, Ignore("Временно до починки")]
-	public class CallHistoryFixture : WatinFixture
+	public class CallHistoryFixture : WatinFixture2
 	{
 		[Test]
 		public void TestViewCallHistory()

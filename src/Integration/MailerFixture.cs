@@ -278,7 +278,7 @@ namespace Integration
 				ActiveRecordMediator.Save(payer);
 
 				user.Accounting.Payment = 200;
-				user.Save();
+				ActiveRecordMediator.Save(user);
 
 				mailer.AccountChanged(user.Accounting);
 				mailer.Send();

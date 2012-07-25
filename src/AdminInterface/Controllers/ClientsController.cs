@@ -125,7 +125,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
 			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 
-			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
 
 			PropertyBag["filter"] = filter;
@@ -169,12 +168,12 @@ namespace AdminInterface.Controllers
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void BindPhone(uint clientCode, string phone)
+		public void BindPhone(uint id, string phone)
 		{
-			var client = Client.FindAndCheck<Client>(clientCode);
-			var group = client.ContactGroupOwner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
+			var owner = DbSession.Load<ContactGroupOwner>(id);
+			var group = owner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
 			if (group == null)
-				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
+				group = owner.AddContactGroup(ContactGroupType.KnownPhones);
 			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
 			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
 
@@ -412,8 +411,8 @@ where s.Name like :SearchText")
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
 		{
 			var newClient = Client.Find(clientId);
-			var address = Address.TryFind(addressId);
-			var user = User.TryFind(userId);
+			var address = DbSession.Get<Address>(addressId);
+			var user = DbSession.Get<User>(userId);
 
 			Client oldClient = null;
 			if (user != null)

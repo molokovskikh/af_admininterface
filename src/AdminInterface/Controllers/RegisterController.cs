@@ -366,9 +366,9 @@ namespace AdminInterface.Controllers
 
 		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, Supplier supplier)
 		{
-			var costCrypKey = ArHelper.WithSession(s =>
-				s.CreateSQLQuery("select usersettings.GeneratePassword()")
-				.UniqueResult<string>());
+			var costCrypKey = DbSession
+				.CreateSQLQuery("select usersettings.GeneratePassword()")
+				.UniqueResult<string>();
 
 			var smartOrder = SmartOrderRules.TestSmartOrder();
 			client.Settings.InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart;
@@ -455,7 +455,7 @@ WHERE   pricesdata.firmcode = s.Id
 			user.SetupSupplierPermission();
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
-			user.Save();
+			DbSession.Save(user);
 		}
 
 		private void AddContacts(ContactGroupOwner owner, Contact[] clientContacts)

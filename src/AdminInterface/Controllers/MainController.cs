@@ -173,7 +173,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			PropertyBag["now"] = DateTime.Now;
-			PropertyBag["user"] = User.Find(id);
+			PropertyBag["user"] = DbSession.Load<User>(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = Defaults;
 			if (Session["password"] != null && Flash["newUser"] == null)

@@ -69,7 +69,7 @@ namespace Integration.Tasks
 
 			address.Refresh();
 			user.AvaliableAddresses.Add(address);
-			user.Save();
+			ActiveRecordMediator.Save(user);
 
 			Check();
 			address.Refresh();

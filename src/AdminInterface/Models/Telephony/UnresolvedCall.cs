@@ -8,8 +8,16 @@ using NHibernate.Criterion;
 namespace AdminInterface.Models.Telephony
 {
 	[ActiveRecord("UnresolvedPhone", Schema = "telephony")]
-	public class UnresolvedCall : ActiveRecordLinqBase<UnresolvedCall>
+	public class UnresolvedCall
 	{
+		public UnresolvedCall()
+		{}
+
+		public UnresolvedCall(string phone)
+		{
+			PhoneNumber = phone;
+		}
+
 		[PrimaryKey("id")]
 		public virtual ulong Id { get; set; }
 

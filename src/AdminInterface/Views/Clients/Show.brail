@@ -291,25 +291,6 @@
 			end
 		%>
 		
-		<div>
-			<h4 style="margin-bottom:0">Неопознанные звонки:</h4>
-			<table id="UnknownPhones" class="DataTable"	>
-			<% if CallLogs.Length == 0: %>
-				<tr><td class="EmptyData">Нет звонков</td></tr>
-			<% else: %>
-				<% for i, call in enumerate(CallLogs): %>
-				<tr class="${ViewHelper.GetRowStyle(i)}">
-					<td>
-						<form action="BindPhone?clientcode=${client.Id}&phone=${call}" method=post>
-							<input type=submit value="Связать" />
-						</form>
-					</td>
-					<td>${call}</td>
-				</tr>
-				<% end %>
-			<% end %>
-			</table>
-		</div>
 		<% OutputSubView("LegendView", {@showAddressLegend: true}) %>
 	</div>
 	

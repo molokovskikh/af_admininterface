@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Integration.ForTesting;
 using Test.Support.log4net;
@@ -63,7 +64,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 200;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			scope.Flush();
 
 			var payer = client.Payers[0];
