@@ -78,16 +78,11 @@ namespace AdminInterface.Models.Suppliers
 
 		public static T FindAndCheck<T>(uint id) where T : Service
 		{
-			var client = Find<T>(id);
+			var client = ActiveRecordMediator<T>.FindByPrimaryKey(id);
 
 			SecurityContext.Administrator.CheckRegion(client.HomeRegion.Id);
 			SecurityContext.Administrator.CheckType(client.Type);
 			return client;
-		}
-
-		public static T Find<T>(uint id)
-		{
-			return ActiveRecordBase<T>.Find(id);
 		}
 
 		public virtual bool IsClient()

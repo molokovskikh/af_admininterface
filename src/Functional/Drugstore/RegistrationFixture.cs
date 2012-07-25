@@ -230,7 +230,7 @@ namespace Functional.Drugstore
 			using (new SessionScope())
 			{
 				var payerClient = DataMother.TestClient();
-				payerClient.SaveAndFlush();
+				ActiveRecordMediator.SaveAndFlush(payerClient);
 				payer = payerClient.Payers.First();
 				payer.Name = "Тестовый плательщик " + payer.Id;
 				payer.Update();
@@ -269,7 +269,7 @@ namespace Functional.Drugstore
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
 			using (new SessionScope())
 			{
-				var client = Client.Find(clientCode);
+				var client = ActiveRecordBase<Client>.Find(clientCode);
 				browser.Link(Find.ByText(client.Users[0].Login)).Click();
 				var pass = false;
 				for (var i = 0; i < 10; i++)
@@ -331,7 +331,7 @@ namespace Functional.Drugstore
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", clientCode)));
 			Assert.That(browser.Text, Is.StringContaining("111-111111 - some comment, 211-111111, 311-111111"));
 
-			var client = Client.Find(clientCode);
+			var client = ActiveRecordBase<Client>.Find(clientCode);
 			var contacts = client.ContactGroupOwner.ContactGroups.First(g => g.Type == ContactGroupType.General).Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(4));
 			Assert.That(contacts[0].ContactText, Is.EqualTo("111-111111"));
@@ -408,7 +408,7 @@ namespace Functional.Drugstore
 			browser.Button("RegisterButton").Click();
 
 			var clientCode = Helper.GetClientCodeFromRegistrationCard(browser);
-			var client = Client.Find(clientCode);
+			var client = ActiveRecordBase<Client>.Find(clientCode);
 			var user = client.Users[0];
 			var contacts = client.Users[0].ContactGroup.Contacts;
 			Assert.That(contacts.Count, Is.EqualTo(3));
@@ -605,7 +605,7 @@ namespace Functional.Drugstore
 		{
 			AssertText("Регистрационная карта");
 			var id = Helper.GetClientCodeFromRegistrationCard(browser);
-			return Client.Find(id);
+			return ActiveRecordBase<Client>.Find(id);
 		}
 
 		private void SetupGeneralInformation()

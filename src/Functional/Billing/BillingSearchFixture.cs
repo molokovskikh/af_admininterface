@@ -1,6 +1,7 @@
-using System.Linq;
+﻿using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -23,7 +24,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			foreach (var address in client.Addresses)
 			{
 				address.Enabled = false;

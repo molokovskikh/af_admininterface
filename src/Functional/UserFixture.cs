@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using AdminInterface.Models;
+using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -21,7 +22,7 @@ namespace Functional
 		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			user = client.Users[0];
 		}
 

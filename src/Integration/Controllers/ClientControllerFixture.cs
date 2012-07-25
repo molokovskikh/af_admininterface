@@ -104,8 +104,8 @@ namespace Integration.Controllers
 			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
 			session.Flush();
 
-			oldClient.Refresh();
-			newClient.Refresh();
+			ActiveRecordMediator<Client>.Refresh(oldClient);
+			ActiveRecordMediator<Client>.Refresh(newClient);
 			ActiveRecordMediator.Refresh(oldUser);
 			Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
 
@@ -133,8 +133,8 @@ namespace Integration.Controllers
 			controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
 			session.Flush();
 
-			oldClient.Refresh();
-			newClient.Refresh();
+			ActiveRecordMediator<Client>.Refresh(oldClient);
+			ActiveRecordMediator<Client>.Refresh(newClient);
 			var records = session.Query<AuditRecord>()
 				.Where(l => l.Service == newClient && l.ObjectId == user.Id)
 				.ToList();

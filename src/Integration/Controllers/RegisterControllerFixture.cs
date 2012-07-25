@@ -206,7 +206,10 @@ namespace Integration.Controllers
 
 		private Client RegistredClient()
 		{
-			var registredClient = Client.Queryable.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+			var registredClient = session.Query<Client>()
+				.OrderByDescending(c => c.Id)
+				.FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+
 			if (registredClient == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registredClient;

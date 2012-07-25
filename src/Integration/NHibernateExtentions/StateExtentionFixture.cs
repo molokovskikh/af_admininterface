@@ -24,7 +24,7 @@ namespace Integration.NHibernateExtentions
 		public void Update_property()
 		{
 			var client = DataMother.TestClient();
-			var loadedClient = Client.Find(client.Id);
+			var loadedClient = ActiveRecordBase<Client>.Find(client.Id);
 			var oldValue = loadedClient.Name;
 			loadedClient.Name = "123";
 			Assert.That(loadedClient.IsChanged(c => c.Name), Is.True);

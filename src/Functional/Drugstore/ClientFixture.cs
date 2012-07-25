@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 using WatiN.Core;
@@ -171,7 +172,7 @@ namespace Functional.Drugstore
 			AssertText("Юридическое лицо создано");
 			browser.Refresh();
 			Open(client);
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			var organ = session.QueryOver<LegalEntity>().Where(e => e.Name == "new_JuridicalOrganization_name").List().Last();
 			browser.Button(string.Format("deleteButton{0}", organ.Id)).Click();
 			AssertText("Удалено");
@@ -201,7 +202,7 @@ namespace Functional.Drugstore
 			Css("#ChangePayer [type=submit]").Click();
 			Assert.That(browser.Text, Is.StringContaining("Изменено"));
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new [] { payer }));
 		}
 

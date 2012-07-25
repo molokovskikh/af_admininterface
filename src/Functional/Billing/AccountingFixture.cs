@@ -82,7 +82,7 @@ namespace Functional.Billing
 				var address = new Address {Value = "address",};
 				client.AddAddress(address);
 				address.Save();
-				client = Client.Find(client.Id);
+				client = ActiveRecordBase<Client>.Find(client.Id);
 
 				client.Users[0].Enabled = true;
 				ActiveRecordMediator.Save(client.Users[0]);
