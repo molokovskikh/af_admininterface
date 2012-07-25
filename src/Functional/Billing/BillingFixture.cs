@@ -407,7 +407,7 @@ namespace Functional.Billing
 
 		private void AddCommentInDisableDialig()
 		{
-			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
+			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 		}
 
@@ -440,7 +440,7 @@ namespace Functional.Billing
 			var currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.GreaterThan(sum));
 			sum = currentSum;
-
+			
 			// Выключаем пользователя. Сумма должна уменьшиться
 			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();

@@ -47,7 +47,7 @@
   };
   addComment = function(url, next, cancel) {
     var form;
-    form = $("<form><div><label>Введите причину отключения</label><input name=AddComment class='required' ></div></form>");
+    form = $("<form><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>");
     return showForm(url, next, cancel, form);
   };
   requests["FreePeriodEnd"] = freePeriodEnd;
