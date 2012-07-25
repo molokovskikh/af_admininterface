@@ -111,7 +111,7 @@ ${app.Asset("search.editor.js")}
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${supplier.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;" id=users>
+			<table style="width:100%;" id=users class="style">
 				<tr valign="top" align="left">
 					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
 					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>
@@ -125,7 +125,7 @@ ${app.Asset("search.editor.js")}
 							<a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a>
 						</td>
 						<td class="${app.Style(userInfo, user)}">
-							<a href="${siteroot}/users/${user.Id}/edit"">${user.Login}</a>
+							<a href="${siteroot}/users/${user.Id}/edit">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
 						<td>${user.Logs.GetLastServicesUsage()}</td>

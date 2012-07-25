@@ -4,11 +4,9 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
-using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
-using Test.Support.log4net;
-using WatiN.Core; using Test.Support.Web;
+using Test.Support.Web;
 
 namespace Functional.Drugstore
 {
