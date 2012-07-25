@@ -26,6 +26,8 @@ namespace AdminInterface.Models.Billing
 
 		public string Message { get; set; }
 
+		public string Comment { get; set; }
+
 		private static AuditLogRecord GetLogRecord(ClientLogRecord clientLogRecord)
 		{
 			var log = new AuditLogRecord {
@@ -35,6 +37,7 @@ namespace AdminInterface.Models.Billing
 				OperatorName = clientLogRecord.OperatorName,
 				Message = ViewHelper.HumanReadableStatus(clientLogRecord.ClientStatus.HasValue && clientLogRecord.ClientStatus.Value.Equals(ClientStatus.On)),
 				Name = clientLogRecord.Client.Name,
+				Comment = clientLogRecord.Comment
 			};
 			return log;
 		}
@@ -48,6 +51,7 @@ namespace AdminInterface.Models.Billing
 				OperatorName = supplierLog.OperatorName,
 				Message = ViewHelper.HumanReadableStatus(!supplierLog.Disabled.Value),
 				Name = supplierLog.Supplier.Name,
+				Comment = supplierLog.Comment
 			};
 			return log;
 		}
@@ -61,6 +65,7 @@ namespace AdminInterface.Models.Billing
 				OperatorName = addressLogRecord.OperatorName,
 				Message = ViewHelper.HumanReadableStatus(addressLogRecord.Enabled),
 				Name = addressLogRecord.Address.Value,
+				Comment = addressLogRecord.Comment
 			};
 			return log;
 		}
@@ -74,6 +79,7 @@ namespace AdminInterface.Models.Billing
 				OperatorName = userLogRecord.OperatorName,
 				Message = ViewHelper.HumanReadableStatus(userLogRecord.Enabled.HasValue && userLogRecord.Enabled.Value),
 				Name = userLogRecord.User.GetLoginOrName(),
+				Comment = userLogRecord.Comment
 			};
 			return log;
 		}

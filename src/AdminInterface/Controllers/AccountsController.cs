@@ -40,7 +40,7 @@ namespace AdminInterface.Controllers
 		}
 
 		[return: JSONReturnBinder]
-		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd)
+		public object Update(uint id, bool? status, bool? free, bool? accounted, decimal? payment, DateTime? freePeriodEnd, string addComment)
 		{
 			var account = Account.TryFind(id);
 			var result = UpdateAccounting(account.Id, accounted, payment, free, freePeriodEnd);
@@ -50,16 +50,16 @@ namespace AdminInterface.Controllers
 				if (account is UserAccount)
 				{
 					var user = ((UserAccount)account).User;
-					SetUserStatus(user.Id, status);
+					SetUserStatus(user.Id, status, addComment);
 				}
 				else if (account is AddressAccount)
 				{
 					var address = ((AddressAccount)account).Address;
-					SetAddressStatus(address.Id, status);
+					SetAddressStatus(address.Id, status, addComment);
 				}
 				else if (account is SupplierAccount)
 				{
-					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value);
+					SetSupplierStatus(((SupplierAccount)account).Supplier, status.Value, addComment);
 				}
 				else
 				{
@@ -69,25 +69,29 @@ namespace AdminInterface.Controllers
 			return result;
 		}
 
-		private void SetSupplierStatus(Supplier supplier, bool status)
+		private void SetSupplierStatus(Supplier supplier, bool status, string comment)
 		{
+			var oldStatus = supplier.Disabled;
 			supplier.Disabled = !status;
-			if (supplier.IsChanged(s => s.Disabled))
+			DbSession.Save(supplier);
+			DbSession.Flush();
+			if (oldStatus != !status)
 			{
-				this.Mailer().EnableChanged(supplier).Send();
+				this.Mailer().EnableChanged(supplier, comment).Send();
 				AuditRecord.StatusChange(supplier).Save();
 			}
-			DbSession.Save(supplier);
 		}
 
-		public void SetUserStatus(uint userId, bool? enabled)
+		public void SetUserStatus(uint userId, bool? enabled, string comment)
 		{
 			var user = DbSession.Load<User>(userId);
 			var oldStatus = user.Enabled;
 			if (enabled.HasValue)
 				user.Enabled = enabled.Value;
+			DbSession.Save(user);
+			DbSession.Flush();
 			if (enabled != oldStatus)
-				this.Mailer().EnableChanged(user).Send();
+				this.Mailer().EnableChanged(user, comment).Send();
 			if (enabled.HasValue && !enabled.Value)
 			{
 				// Если это отключение, то проходим по адресам и
@@ -100,7 +104,6 @@ namespace AdminInterface.Controllers
 					address.Update();
 				}
 			}
-			DbSession.Save(user);
 		}
 
 		private object UpdateAccounting(uint accountId, bool? accounted, decimal? payment, bool? isFree, DateTime? freePeriodEnd)
@@ -159,15 +162,16 @@ namespace AdminInterface.Controllers
 			return result;
 		}
 
-		public void SetAddressStatus(uint addressId, bool? enabled)
+		public void SetAddressStatus(uint addressId, bool? enabled, string comment)
 		{
 			var address = Address.Find(addressId);
 			var oldStatus = address.Enabled;
 			if (enabled.HasValue)
 				address.Enabled = enabled.Value;
-			if (enabled != oldStatus)
-				this.Mailer().EnableChanged(address).Send();
 			address.Client.Save();
+			DbSession.Flush();
+			if (enabled != oldStatus)
+				this.Mailer().EnableChanged(address, comment).Send();
 			CancelView();
 		}
 

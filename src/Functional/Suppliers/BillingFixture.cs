@@ -22,6 +22,8 @@ namespace Functional.Suppliers
 			Open(supplier.Payer);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
 			browser.CheckBox(Find.ByName("status")).Click();
+			browser.TextField(Find.ByName("AddComment")).AppendText("TestComment");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			Thread.Sleep(500);
 
 			ActiveRecordMediator<Supplier>.Refresh(supplier);

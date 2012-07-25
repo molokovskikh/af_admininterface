@@ -149,7 +149,7 @@ namespace AdminInterface.Models
 		[Property, Description("Не подключать новые прайсы \"В работе\""), Auditable]
 		public virtual bool IgnoreNewPriceForUser { get; set; }
 
-		[Description("Скрыть клиента в интефрейсе поставщика")]
+		[Description("Скрыть клиента в интефрейсе поставщика, не доставлять заказы поставщикам")]
 		public virtual bool IsHiddenFromSupplier
 		{
 			get

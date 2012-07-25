@@ -217,17 +217,18 @@ namespace AdminInterface.Controllers
 			DbSession.Save(new UserMessageSendLog(message));
 		}
 
-		public void UpdateClientStatus(uint clientId, bool enabled)
+		public void UpdateClientStatus(uint id, bool status, string addComment)
 		{
-			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(clientId);
+			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(id);
 			var oldDisabled = service.Disabled;
-			service.Disabled = !enabled;
+			service.Disabled = !status;
+			ActiveRecordMediator<Service>.Save(service);
+			DbSession.Flush();
 			if (oldDisabled != service.Disabled)
 			{
-				this.Mailer().EnableChanged(service).Send();
+				this.Mailer().EnableChanged(service, addComment).Send();
 				AuditRecord.StatusChange(service).Save();
 			}
-			ActiveRecordMediator<Service>.Save(service);
 			CancelView();
 		}
 

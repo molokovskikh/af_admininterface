@@ -3,17 +3,19 @@
 this.fillDependedData = (url, element, next) ->
 	request = element.attr("data-request")
 	requestFunction = requests[request]
-	showRequest = element.attr("checked") and requestFunction
+	showRequest = (element.attr("checked") and requestFunction and not element.attr("unchecked")) or (not element.attr("checked") and requestFunction and element.attr("unchecked"))
 	if showRequest
 		cancel = ->
-			element.removeAttr("checked")
+			if not element.attr("unchecked")
+				element.removeAttr("checked")
+			else
+				element.attr("checked", true)
 			element.change()
 		requestFunction(url, next, cancel)
 	else
 		next(url)
 
-freePeriodEnd = (url, next, cancel) ->
-	form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>")
+showForm = (url, next, cancel, form) ->
 	form.dialog
 		modal: true
 		buttons:
@@ -27,4 +29,13 @@ freePeriodEnd = (url, next, cancel) ->
 				$(this).dialog("destroy")
 	form.validate()
 
+freePeriodEnd = (url, next, cancel) ->
+	form = $("<form><div><label>Дата окончания бесплатного периода</label><input name=FreePeriodEnd class='date'></div></form>")
+	showForm(url, next, cancel, form)
+
+addComment = (url, next, cancel) ->
+	form = $("<form><div><label>Введите причину отключения</label><input id='AddCommentField' name='AddComment' class='required' ></div></form>")
+	showForm(url, next, cancel, form)
+
 requests["FreePeriodEnd"] = freePeriodEnd
+requests["AddComment"] = addComment

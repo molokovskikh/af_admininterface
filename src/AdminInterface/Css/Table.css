@@ -77,3 +77,7 @@ th a.sort.desc
 .currency {
 	text-align:right;
 }
+
+table td.minTd {
+	width: 150px;
+}

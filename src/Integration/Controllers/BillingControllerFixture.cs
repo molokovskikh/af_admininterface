@@ -24,13 +24,14 @@ namespace Integration.Controllers
 			client = DataMother.TestClient();
 			client.Save();
 			controller = new BillingController();
+			controller.DbSession = session;
 			PrepareController(controller);
 		}
 
 		[Test]
 		public void Update_client_status()
 		{
-			controller.UpdateClientStatus(client.Id, false);
+			controller.UpdateClientStatus(client.Id, false, null);
 			scope.Flush();
 
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id).ToList();
@@ -40,7 +41,7 @@ namespace Integration.Controllers
 		[Test]
 		public void Update_supplier_status()
 		{
-			controller.UpdateClientStatus(supplier.Id, false);
+			controller.UpdateClientStatus(supplier.Id, false, null);
 			scope.Flush();
 
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
