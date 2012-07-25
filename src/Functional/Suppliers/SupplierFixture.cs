@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
@@ -155,16 +157,40 @@ namespace Functional.Suppliers
 			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
 			Click("Применить");
 			session.Refresh(supplier);
-			var a = session.CreateSQLQuery(@"
+			var source = session.CreateSQLQuery(@"
 Select fs.RequestInterval 
 From farm.Sources fs
 	Join PriceItems pi on pi.SourceId = fs.Id
 	Join PricesCosts pc on pc.PriceItemId = pi.Id
 Where pc.PriceCode = :PriceId1")
-			.SetParameter("PriceId1", supplier.Prices[1].Id)
-			.ToList<TestSource>();
+				.SetParameter("PriceId1", supplier.Prices[1].Id)
+				.ToList<TestSource>()
+				.First();
 			//проверяем RequestInterval
-			Assert.That(a[0].RequestInterval, Is.EqualTo(86400));
+			Assert.That(source.RequestInterval, Is.EqualTo(86400));
+		}
+
+		[Test]
+		public void Delete_cost_column()
+		{
+			var price = supplier.Prices[0];
+			price.CostType = 1;
+			var cost = price.AddCost();
+			cost.CostFormRule.FieldName = "F10";
+			session.Save(supplier);
+
+			Open(supplier);
+			Click("Настройка");
+			Click("Базовый");
+			AssertText("Настройка ценовых колонок");
+			Click("Удалить");
+			AssertText("Внимание! Ценовая колонка настроена");
+			Click("Все равно удалить");
+			AssertText("Настройка ценовых колонок");
+
+			session.Clear();
+			price = session.Load<Price>(price.Id);
+			Assert.That(price.Costs.Count, Is.EqualTo(1));
 		}
 	}
 }
