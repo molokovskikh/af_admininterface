@@ -381,6 +381,7 @@ namespace AdminInterface.Controllers
 				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
 			}
 			DbSession.Save(client);
+			DbSession.Flush();
 
 			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());

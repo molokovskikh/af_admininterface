@@ -125,7 +125,6 @@ namespace Integration.Controllers
 
 			var intersectionCount = registredClient.GetIntersectionCount();
 			var userPriceCount = registredUser.GetUserPriceCount();
-
 			var user = registredClient.Users.First();
 			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));

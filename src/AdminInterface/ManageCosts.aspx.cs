@@ -157,9 +157,7 @@ WHERE RowID = ?Id
 Прайс-лист: {3}
 ", field.OperatorName, field.ShortName, field.Region, field.PriceName)));
 
-			collumnCreator.CreateCost(priceId,
-				new MySqlConnection(Literals.GetConnectionString()),
-				SecurityContext.Administrator.UserName);
+			collumnCreator.CreateCost(priceId,SecurityContext.Administrator.UserName);
 
 			PostDataToGrid();
 		}
