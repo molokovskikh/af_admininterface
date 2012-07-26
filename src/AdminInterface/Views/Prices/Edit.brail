@@ -1,0 +1,27 @@
+﻿<% component Bubble, {"bredcrumbs" : [
+	("Поиск пользователей", "${siteroot}/Users/Search"),
+	price.Supplier,
+	("Настройка поставщика", "${siteroot}/managep.aspx?cc=${price.Supplier.Id}")]} %>
+
+<% component CaptureFor, {@id : @Title}: %>
+	Редактирование прайса !{price.Name}
+<% end %>
+
+${FormHelper.FormTag("", {@class: @vertical})}
+<div>
+	${app.Label("price.Name")}
+	${app.Edit("price.Name")}
+	${app.GetValidationError("price.Name")}
+</div>
+<div>
+	${app.Edit("price.IsRejects")}
+	${app.GetValidationError("price.IsRejects")}
+</div>
+<div>
+	${app.Edit("price.IsRejectCancellations")}
+	${app.GetValidationError("price.IsRejectCancellations")}
+</div>
+<div>
+	${FormHelper.Submit("Сохранить")}
+</div>
+${FormHelper.EndFormTag()}
