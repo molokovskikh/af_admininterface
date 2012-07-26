@@ -26,6 +26,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
@@ -301,7 +302,7 @@ where Phone like :phone")
 
 		public void NotifySuppliers(uint clientId)
 		{
-			var client = Client.Find(clientId);
+			var client = DbSession.Load<Client>(clientId);
 			new NotificationService(Defaults).NotifySupplierAboutDrugstoreRegistration(client, true);
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
@@ -312,7 +313,10 @@ where Phone like :phone")
 			CancelLayout();
 			int searchNumber;
 			Int32.TryParse(searchText, out searchNumber);
-			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name).ToList();
+			PropertyBag["clients"] = DbSession.Query<Client>()
+				.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber)
+				.OrderBy(c => c.Name)
+				.ToList();
 			RenderView("SearchClientSubview");
 		}
 
@@ -388,7 +392,7 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] SearchSuppliers(uint id, string text)
 		{
-			var client = Client.Find(id);
+			var client = DbSession.Load<Client>(id);
 			var user = client.Users.FirstOrDefault();
 			if (user == null)
 				return Enumerable.Empty<object>().ToArray();
@@ -410,7 +414,7 @@ where s.Name like :SearchText")
 
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
 		{
-			var newClient = Client.Find(clientId);
+			var newClient = DbSession.Load<Client>(clientId);
 			var address = DbSession.Get<Address>(addressId);
 			var user = DbSession.Get<User>(userId);
 

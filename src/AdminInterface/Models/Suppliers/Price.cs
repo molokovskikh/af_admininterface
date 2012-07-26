@@ -57,17 +57,20 @@ namespace AdminInterface.Models.Suppliers
 		[HasMany(ColumnKey = "PriceCode", Inverse = true, Lazy = true, Cascade = ManyRelationCascadeEnum.All)]
 		public virtual IList<PriceRegionalData> RegionalData { get; set; }
 
-		public virtual void AddCost()
+		public virtual Cost AddCost()
 		{
 			var isBase = Costs.Count == 0;
-			Costs.Add(new Cost {
+			var cost = new Cost {
 				Price = this,
 				BaseCost = isBase,
 				PriceItem = new PriceItem {
 					FormRule = new FormRule(),
 					Source = new PriceSource()
 				}
-			});
+			};
+			cost.CostFormRule = new CostFormRule{Cost = cost, FieldName = ""};
+			Costs.Add(cost);
+			return cost;
 		}
 
 		public override string ToString()
@@ -116,8 +119,19 @@ namespace AdminInterface.Models.Suppliers
 		[BelongsTo("PriceCode")]
 		public virtual Price Price { get; set; }
 
+		[OneToOne(Cascade = CascadeEnum.All)]
+		public virtual CostFormRule CostFormRule { get; set; }
+
 		[BelongsTo("PriceItemId", Cascade = CascadeEnum.All)]
 		public virtual PriceItem PriceItem { get; set; }
+
+		public virtual bool IsConfigured
+		{
+			get
+			{
+				return !String.IsNullOrEmpty(CostFormRule.FieldName);
+			}
+		}
 	}
 
 	[ActiveRecord("PriceItems", Schema = "Usersettings", Lazy = true)]
@@ -148,5 +162,24 @@ namespace AdminInterface.Models.Suppliers
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
+	}
+
+	[ActiveRecord("CostFormRules", Schema = "Farm", Lazy = true)]
+	public class CostFormRule
+	{
+		[PrimaryKey("CostCode", Generator = PrimaryKeyType.Foreign)]
+		public virtual uint Id { get; set; }
+
+		[OneToOne]
+		public virtual Cost Cost { get; set; }
+
+		[Property(NotNull = true)]
+		public virtual string FieldName { get; set; }
+
+		[Property]
+		public virtual string TxtBegin { get; set; }
+
+		[Property]
+		public virtual string TxtEnd { get; set; }
 	}
 }

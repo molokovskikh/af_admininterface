@@ -332,32 +332,9 @@ group by u.ClientId")
 			}
 		}
 
-		public static Client Find(uint id)
-		{
-			return ActiveRecordBase<Client>.Find(id);
-		}
-
 		public virtual void Save()
 		{
 			ActiveRecordMediator<Client>.Save(this);
-		}
-
-		public virtual void SaveAndFlush()
-		{
-			ActiveRecordMediator.SaveAndFlush(this);
-		}
-
-		public virtual void Refresh()
-		{
-			ActiveRecordMediator<Client>.Refresh(this);
-		}
-
-		public static IOrderedQueryable<Client> Queryable
-		{
-			get
-			{
-				return ActiveRecordLinqBase<Client>.Queryable;
-			}
 		}
 
 		public override string ToString()

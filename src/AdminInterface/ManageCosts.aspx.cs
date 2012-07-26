@@ -17,136 +17,76 @@ namespace AddUser
 {
 	partial class ManageCosts : Page
 	{
-		[DebuggerStepThrough()]
-		private void InitializeComponent()
-		{
-			DS = new DataSet();
-			Costs = new DataTable();
-			DataColumn1 = new DataColumn();
-			DataColumn2 = new DataColumn();
-			DataColumn3 = new DataColumn();
-			DataColumn4 = new DataColumn();
-			MyDA = new MySqlDataAdapter();
-			SelCommand = new MySqlCommand();
-			MyCn = new MySqlConnection();
-			UpdCommand = new MySqlCommand();
-			DS.BeginInit();
-			Costs.BeginInit();
-			DS.DataSetName = "NewDataSet";
-			DS.Locale = new CultureInfo("ru-RU");
-			DS.Tables.AddRange(new[] {Costs});
-			Costs.Columns.AddRange(new[] {DataColumn1, DataColumn2, DataColumn3, DataColumn4});
-			Costs.TableName = "Costs";
-			DataColumn1.ColumnName = "CostCode";
-			DataColumn1.DataType = typeof (Int32);
-			DataColumn2.ColumnName = "CostName";
-			DataColumn3.ColumnName = "BaseCost";
-			DataColumn3.DataType = typeof (Boolean);
-			DataColumn4.ColumnName = "CostID";
-			MyDA.DeleteCommand = null;
-			MyDA.InsertCommand = null;
-			MyDA.SelectCommand = SelCommand;
-			MyDA.UpdateCommand = UpdCommand;
-			SelCommand.CommandTimeout = 0;
-			SelCommand.CommandType = CommandType.Text;
-			SelCommand.Connection = MyCn;
-			SelCommand.Transaction = null;
-			SelCommand.UpdatedRowSource = UpdateRowSource.Both;
-			UpdCommand.CommandTimeout = 0;
-			UpdCommand.CommandType = CommandType.Text;
-			UpdCommand.Connection = MyCn;
-			UpdCommand.Transaction = null;
-			UpdCommand.UpdatedRowSource = UpdateRowSource.Both;
-			DS.EndInit();
-			Costs.EndInit();
-		}
-
-		MySqlTransaction MyTrans;
-		uint PriceCode;
-		protected DataSet DS;
-		protected MySqlDataAdapter MyDA;
-		protected MySqlConnection MyCn;
-		protected MySqlCommand SelCommand;
-		protected MySqlCommand UpdCommand;
-		protected DataTable Costs;
-		protected DataColumn DataColumn1;
-		protected DataColumn DataColumn2;
-		protected DataColumn DataColumn3;
-		protected DataColumn DataColumn4;
-		protected RadioButton BaseCostRB;
-		protected RadioButton BCRB;
-
-		private void Page_Init(object sender, EventArgs e)
-		{
-			InitializeComponent();
-		}
+		private uint priceId;
+		private uint warningCostId;
 
 		protected void PostB_Click(object sender, EventArgs e)
 		{
 			UpdateLB.Text = "";
-			try
-			{
-				FillDataSet();
-				MyCn.Open();
-				PriceRegionSettings.DataSource = DS;
-				MyTrans = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
+
+			var dataSet = FillDataSet();
+			With.Transaction((c, t) => {
+				PriceRegionSettings.DataSource = dataSet;
 
 				foreach (DataGridItem Itm in CostsDG.Items)
 				{
-					for (var i = 0; i <= DS.Tables[0].Rows.Count - 1; i++)
+					for (var i = 0; i <= dataSet.Tables[0].Rows.Count - 1; i++)
 					{
-						if (DS.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value)
+						if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == ((HiddenField)Itm.FindControl("CostCode")).Value)
 						{
-							if (DS.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox) (Itm.FindControl("CostName"))).Text)
-								DS.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.FindControl("CostName"))).Text;
-							if (DS.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"])
-								DS.Tables[0].Rows[i]["BaseCost"] = true;
+							if (dataSet.Tables[0].Rows[i]["CostName"].ToString() != ((TextBox) (Itm.FindControl("CostName"))).Text)
+								dataSet.Tables[0].Rows[i]["CostName"] = ((TextBox) (Itm.FindControl("CostName"))).Text;
+							if (dataSet.Tables[0].Rows[i]["CostCode"].ToString() == Request.Form["uid"])
+								dataSet.Tables[0].Rows[i]["BaseCost"] = true;
 							else
-								DS.Tables[0].Rows[i]["BaseCost"] = false;
-							if (Convert.ToInt32(DS.Tables[0].Rows[i]["Enabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked))
-								DS.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox) (Itm.FindControl("Ena"))).Checked);
-							if (Convert.ToInt32(DS.Tables[0].Rows[i]["AgencyEnabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked))
-								DS.Tables[0].Rows[i]["AgencyEnabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked);
+								dataSet.Tables[0].Rows[i]["BaseCost"] = false;
+							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["Enabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Ena"))).Checked))
+								dataSet.Tables[0].Rows[i]["Enabled"] = Convert.ToInt32(((CheckBox) (Itm.FindControl("Ena"))).Checked);
+							if (Convert.ToInt32(dataSet.Tables[0].Rows[i]["AgencyEnabled"]) != Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked))
+								dataSet.Tables[0].Rows[i]["AgencyEnabled"] = Convert.ToInt32(((CheckBox)(Itm.FindControl("Pub"))).Checked);
 						}
 					}
 				}
 
 				for (var i = 0; i < PriceRegionSettings.Rows.Count; i++ )
 				{
-					DS.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
-					DS.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
-					DS.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
+					dataSet.Tables["PriceRegionSettings"].Rows[i]["Enabled"] = ((CheckBox)PriceRegionSettings.Rows[i].FindControl("EnableCheck")).Checked;
+					dataSet.Tables["PriceRegionSettings"].Rows[i]["UpCost"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("UpCostText")).Text;
+					dataSet.Tables["PriceRegionSettings"].Rows[i]["MinReq"] = ((TextBox)PriceRegionSettings.Rows[i].FindControl("MinReqText")).Text;
 				}
-				UpdCommand.Parameters.Add(new MySqlParameter("?CostCode", MySqlDbType.Int32));
-				UpdCommand.Parameters["?CostCode"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["?CostCode"].SourceColumn = "CostCode";
-				UpdCommand.Parameters["?CostCode"].SourceVersion = DataRowVersion.Current;
+				var adapter = new MySqlDataAdapter("", c);
+				adapter.UpdateCommand = new MySqlCommand("", c);
+				var command = adapter.UpdateCommand;
+				command.Parameters.Add(new MySqlParameter("?CostCode", MySqlDbType.Int32));
+				command.Parameters["?CostCode"].Direction = ParameterDirection.Input;
+				command.Parameters["?CostCode"].SourceColumn = "CostCode";
+				command.Parameters["?CostCode"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("?CostName", MySqlDbType.VarChar));
-				UpdCommand.Parameters["?CostName"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["?CostName"].SourceColumn = "CostName";
-				UpdCommand.Parameters["?CostName"].SourceVersion = DataRowVersion.Current;
+				command.Parameters.Add(new MySqlParameter("?CostName", MySqlDbType.VarChar));
+				command.Parameters["?CostName"].Direction = ParameterDirection.Input;
+				command.Parameters["?CostName"].SourceColumn = "CostName";
+				command.Parameters["?CostName"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("?BaseCost", MySqlDbType.Bit));
-				UpdCommand.Parameters["?BaseCost"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["?BaseCost"].SourceColumn = "BaseCost";
-				UpdCommand.Parameters["?BaseCost"].SourceVersion = DataRowVersion.Current;
+				command.Parameters.Add(new MySqlParameter("?BaseCost", MySqlDbType.Bit));
+				command.Parameters["?BaseCost"].Direction = ParameterDirection.Input;
+				command.Parameters["?BaseCost"].SourceColumn = "BaseCost";
+				command.Parameters["?BaseCost"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("?Enabled", MySqlDbType.Bit));
-				UpdCommand.Parameters["?Enabled"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["?Enabled"].SourceColumn = "Enabled";
-				UpdCommand.Parameters["?Enabled"].SourceVersion = DataRowVersion.Current;
+				command.Parameters.Add(new MySqlParameter("?Enabled", MySqlDbType.Bit));
+				command.Parameters["?Enabled"].Direction = ParameterDirection.Input;
+				command.Parameters["?Enabled"].SourceColumn = "Enabled";
+				command.Parameters["?Enabled"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.Add(new MySqlParameter("?AgencyEnabled", MySqlDbType.Bit));
-				UpdCommand.Parameters["?AgencyEnabled"].Direction = ParameterDirection.Input;
-				UpdCommand.Parameters["?AgencyEnabled"].SourceColumn = "AgencyEnabled";
-				UpdCommand.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
+				command.Parameters.Add(new MySqlParameter("?AgencyEnabled", MySqlDbType.Bit));
+				command.Parameters["?AgencyEnabled"].Direction = ParameterDirection.Input;
+				command.Parameters["?AgencyEnabled"].SourceColumn = "AgencyEnabled";
+				command.Parameters["?AgencyEnabled"].SourceVersion = DataRowVersion.Current;
 
-				UpdCommand.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
-				UpdCommand.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
+				command.Parameters.AddWithValue("?Host", HttpContext.Current.Request.UserHostAddress);
+				command.Parameters.AddWithValue("?UserName", SecurityContext.Administrator.UserName);
 
 
-				UpdCommand.CommandText =
+				command.CommandText =
 @"
 set @inHost = ?Host;
 set @inUser = ?UserName;
@@ -158,10 +98,10 @@ SET		BaseCost	 =?BaseCost,
 		AgencyEnabled=?AgencyEnabled 
 WHERE   CostCode     =?CostCode;
 ";
-				MyDA.Update(DS, "Costs");
+				adapter.Update(dataSet, "Costs");
 
-				UpdCommand.Parameters.Clear();
-				UpdCommand.CommandText =
+				command.Parameters.Clear();
+				command.CommandText =
 @"
 UPDATE PricesRegionalData
 SET UpCost = ?UpCost,
@@ -170,25 +110,15 @@ SET UpCost = ?UpCost,
 WHERE RowID = ?Id
 ";
 
-				UpdCommand.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
-				UpdCommand.Parameters.Add("?MinReq", MySqlDbType.Decimal, 0, "MinReq");
-				UpdCommand.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
-				UpdCommand.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowId");
-				MyDA.Update(DS, "PriceRegionSettings");
-				
-				MyTrans.Commit();
-				DataBind();
+				command.Parameters.Add("?UpCost", MySqlDbType.Decimal, 0, "UpCost");
+				command.Parameters.Add("?MinReq", MySqlDbType.Decimal, 0, "MinReq");
+				command.Parameters.Add("?Enabled", MySqlDbType.Bit, 0, "Enabled");
+				command.Parameters.Add("?Id", MySqlDbType.Int32, 0, "RowId");
+				adapter.Update(dataSet, "PriceRegionSettings");
+
 				UpdateLB.Text = "Сохранено.";
-			}
-			catch
-			{
-				MyTrans.Rollback();
-				throw;
-			}
-			finally
-			{
-				MyCn.Close();
-			}
+			});
+			PostDataToGrid();
 		}
 
 		public bool CanDelete(object baseCost)
@@ -211,8 +141,7 @@ WHERE RowID = ?Id
 		{
 			SecurityContext.Administrator.CheckPermisions(PermissionType.ViewSuppliers, PermissionType.ManageSuppliers);
 
-			MyCn.ConnectionString = Literals.GetConnectionString();
-			PriceCode = Convert.ToUInt32(Request["pc"]);
+			priceId = Convert.ToUInt32(Request["pc"]);
 			if (!IsPostBack)
 				PostDataToGrid();
 		}
@@ -228,26 +157,24 @@ WHERE RowID = ?Id
 Прайс-лист: {3}
 ", field.OperatorName, field.ShortName, field.Region, field.PriceName)));
 
-			collumnCreator.CreateCost(PriceCode, MyCn, SecurityContext.Administrator.UserName);
+			collumnCreator.CreateCost(priceId,SecurityContext.Administrator.UserName);
 
 			PostDataToGrid();
 		}
 
 		private void PostDataToGrid()
 		{
-			FillDataSet();
-			PriceRegionSettings.DataSource = DS;
+			var data = FillDataSet();
+			PriceRegionSettings.DataSource = data;
+			CostsDG.DataSource = data;
 			DataBind();
 		}
 
-		private void FillDataSet()
+		private DataSet FillDataSet()
 		{
-			try
-			{
-				MyCn.Open();
-				var transaction = MyCn.BeginTransaction(IsolationLevel.ReadCommitted);
-
-				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(PriceCode);
+			var data = new DataSet();
+			With.Transaction((c, t) => {
+				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(priceId);
 				var supplier = price.Supplier;
 				SecurityContext.Administrator.CheckRegion(supplier.HomeRegion.Id);
 				PriceNameLB.Text = price.Name;
@@ -263,9 +190,10 @@ WHERE RowID = ?Id
 						}
 					}
 				}
-
-				SelCommand.Parameters.AddWithValue("?PriceCode", price.Id);
-				SelCommand.CommandText =
+				var adapter = new MySqlDataAdapter("", c);
+				var command = adapter.SelectCommand;
+				command.Parameters.AddWithValue("?PriceCode", price.Id);
+				command.CommandText =
 @"
 SELECT  pc.CostCode, 
 		cast(concat(ifnull(ExtrMask, ''), ' - ', if(FieldName='BaseCost', concat(TxtBegin, ' - ', TxtEnd), if(left(FieldName,1)='F',  concat('№', right(Fieldname, length(FieldName)-1)), Fieldname))) as CHAR) CostID, 
@@ -280,9 +208,9 @@ FROM usersettings.pricescosts pc
 	JOIN farm.costformrules cf on cf.CostCode = pc.CostCode
 WHERE pc.PriceCode = ?PriceCode;";
 				
-				MyDA.Fill(DS, "Costs");
+				adapter.Fill(data, "Costs");
 
-				SelCommand.CommandText = @"
+				command.CommandText = @"
 SELECT  RowId, 
 		Region, 
 		UpCost, 
@@ -293,26 +221,26 @@ FROM PricesRegionalData prd
 WHERE PriceCode = ?PriceCode  
 	  and r.RegionCode & ?AdminRegionMask > 0;";
 
-				SelCommand.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
-				MyDA.Fill(DS, "PriceRegionSettings");
-				transaction.Commit();
-			}
-			finally
-			{
-				MyCn.Close();
-			}
+				command.Parameters.AddWithValue("?AdminRegionMask", SecurityContext.Administrator.RegionMask);
+				adapter.Fill(data, "PriceRegionSettings");
+			});
+			return data;
 		}
 
 		protected void CostsDG_DeleteCommand(object source, DataGridCommandEventArgs e)
 		{
-			var costCode = Convert.ToInt32(e.CommandArgument);
-			using (var connection = MyCn)
-			{
-				connection.Open();
-				var transaction = connection.BeginTransaction(IsolationLevel.RepeatableRead);
-				try
-				{
-					var selectCurrentCost = @"
+			var costId = Convert.ToUInt32(e.CommandArgument);
+
+			var cost = ActiveRecordMediator<Cost>.FindByPrimaryKey(costId);
+			var skipWarning = ((Button)e.CommandSource).Text == "Все равно удалить";
+			if (!skipWarning && cost.IsConfigured) {
+				warningCostId = costId;
+				PostDataToGrid();
+				return;
+			}
+
+			With.Transaction((c, t) => {
+				var selectCurrentCost = @"
 select pd.CostType, base.CostCode, f.Id as RuleId, s.Id as SourceId, pi.Id as ItemId
 from usersettings.PricesCosts pc
 	join usersettings.PricesData pd on pd.PriceCode = pc.PriceCode
@@ -322,31 +250,29 @@ from usersettings.PricesCosts pc
 			join Farm.sources s on s.Id = pi.SourceId
 where pc.CostCode = ?CostCode and base.BaseCost = 1;";
 
-					var command = new MySqlCommand(selectCurrentCost, connection, transaction);
-					command.Parameters.AddWithValue("?CostCode", costCode);
-					uint costType;
-					uint baseCost;
-					uint sourceId;
-					uint ruleId;
-					uint itemId;
-					using (var reader = command.ExecuteReader())
-					{
-						reader.Read();
-						costType = reader.GetUInt32("CostType");
-						baseCost = reader.GetUInt32("CostCode");
-						sourceId = reader.GetUInt32("SourceId");
-						ruleId = reader.GetUInt32("RuleId");
-						itemId = reader.GetUInt32("ItemId");
-					}
+				var command = new MySqlCommand(selectCurrentCost, c, t);
+				command.Parameters.AddWithValue("?CostCode", costId);
+				uint costType;
+				uint baseCost;
+				uint sourceId;
+				uint ruleId;
+				uint itemId;
+				using (var reader = command.ExecuteReader()) {
+					reader.Read();
+					costType = reader.GetUInt32("CostType");
+					baseCost = reader.GetUInt32("CostCode");
+					sourceId = reader.GetUInt32("SourceId");
+					ruleId = reader.GetUInt32("RuleId");
+					itemId = reader.GetUInt32("ItemId");
+				}
 
-					var deleteCommandText = @"
+				var deleteCommandText = @"
 update Customers.Intersection
 set CostId = ?BaseCostCode
 where CostId = ?CostCode;";
 
-					if (costType == 1)
-					{
-							deleteCommandText += @"
+				if (costType == 1) {
+					deleteCommandText += @"
 delete from Farm.FormRules
 where Id = ?RuleId;
 
@@ -358,38 +284,38 @@ where Id = ?ItemId;
 
 delete Farm.Core0
 from Farm.Core0
-  join Farm.CoreCosts on Farm.Core0.Id = Farm.CoreCosts.Core_Id
+join Farm.CoreCosts on Farm.Core0.Id = Farm.CoreCosts.Core_Id
 where Farm.CoreCosts.PC_CostCode = ?CostCode;";
-					}
+				}
 
-					deleteCommandText += @"
+				deleteCommandText += @"
 delete from Farm.CoreCosts
 where PC_CostCode = ?CostCode;
-
-delete from Orders.Leaders
-where CostCode = ?CostCode or LeaderCostCode = ?CostCode;
 
 delete from Farm.CostFormRules
 where CostCode = ?CostCode;
 
 delete from usersettings.pricescosts where costcode = ?costcode;";
-					command.CommandText = deleteCommandText;
-					command.Parameters.AddWithValue("?BaseCostCode", baseCost);
-					command.Parameters.AddWithValue("?SourceId", sourceId);
-					command.Parameters.AddWithValue("?RuleId", ruleId);
-					command.Parameters.AddWithValue("?ItemId", itemId);
-					command.ExecuteNonQuery();
+				command.CommandText = deleteCommandText;
+				command.Parameters.AddWithValue("?BaseCostCode", baseCost);
+				command.Parameters.AddWithValue("?SourceId", sourceId);
+				command.Parameters.AddWithValue("?RuleId", ruleId);
+				command.Parameters.AddWithValue("?ItemId", itemId);
+				command.ExecuteNonQuery();
+			});
+			Response.Redirect("ManageCosts.aspx?pc=" + priceId);
+		}
 
-					transaction.Commit();
-				}
-				catch (Exception)
-				{
-					if (transaction != null)
-						transaction.Rollback();
-					throw;
-				}
-				Response.Redirect("ManageCosts.aspx?pc=" + PriceCode);
-			}
+		protected bool ShowWarning(uint costId)
+		{
+			return costId == warningCostId;
+		}
+
+		protected object DeleteLabel(uint costId)
+		{
+			if (costId == warningCostId)
+				return "Все равно удалить";
+			return "Удалить";
 		}
 	}
 }

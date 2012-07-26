@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
@@ -35,7 +36,7 @@ BeAccounted = 0;
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAccounting = true;
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 
 			accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(1), accountings.Implode(a => a.Name));
@@ -45,7 +46,7 @@ BeAccounted = 0;
 		public void Find_accounting_by_user()
 		{
 			userAccount.Accounted();
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 
 			var accounts = new AccountFilter {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()}.Find(new Pager());
 			Assert.That(accounts.Count, Is.EqualTo(1));

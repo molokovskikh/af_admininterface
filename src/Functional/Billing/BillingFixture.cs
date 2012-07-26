@@ -33,7 +33,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress("test address for billing");
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			address = client.Addresses[0];
 			user = client.Users[0];
 			Open(payer);
@@ -134,10 +134,10 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			scope.Evict(client);
 
-			client = Client.Find(client.Id);
+			client = ActiveRecordBase<Client>.Find(client.Id);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -164,7 +164,7 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -186,7 +186,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -207,7 +207,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -507,7 +507,7 @@ namespace Functional.Billing
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
 			Assert.That(browser.Text, Is.StringContaining(messageText));
-			var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = ActiveRecordBase<Client>.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			messages[0].Refresh();
 			Assert.That(messages[0].Message, Is.EqualTo(messageText));
 			Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
@@ -516,7 +516,7 @@ namespace Functional.Billing
 		[Test]
 		public void Cancel_message_for_user()
 		{
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			var username = user.GetLoginOrName();
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
@@ -525,7 +525,7 @@ namespace Functional.Billing
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
 			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
-			var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = ActiveRecordBase<Client>.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			var message = messages[0];
 
 			message.Refresh();
@@ -563,7 +563,7 @@ namespace Functional.Billing
 		public void FilterLogMessagesByUser()
 		{
 			AddUsersAdnAddresses(client, 3);
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Refresh();
 
 			// Проверяем, что логины пользователей - это ссылки
@@ -605,12 +605,12 @@ namespace Functional.Billing
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.SaveAndFlush();
-			client.Refresh();
-			client2.Refresh();
+			ActiveRecordMediator.SaveAndFlush(client2);
+			ActiveRecordMediator<Client>.Refresh(client);
+			ActiveRecordMediator<Client>.Refresh(client2);
 			var testUserId = client2.Users[0].Id;
 			Refresh();
 
@@ -640,12 +640,12 @@ namespace Functional.Billing
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.SaveAndFlush();
-			client.Refresh();
-			client2.Refresh();
+			ActiveRecordMediator.SaveAndFlush(client2);
+			ActiveRecordMediator<Client>.Refresh(client);
+			ActiveRecordMediator<Client>.Refresh(client2);
 			var testAddressId = client2.Addresses[0].Id;
 			Refresh();
 

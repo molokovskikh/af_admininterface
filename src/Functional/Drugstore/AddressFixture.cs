@@ -54,7 +54,7 @@ namespace Functional.Drugstore
 		{
 			// Удаление контактной записи
 			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			var group = client.Addresses[0].ContactGroup;
 			browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
 			Thread.Sleep(500);
@@ -75,7 +75,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(client.Addresses.Count, Is.EqualTo(1), "не создали адресс доставки");
 			var address = client.Addresses.First();
 			Assert.That(address.Value, Is.EqualTo("тестовый адрес"));
@@ -124,7 +124,7 @@ namespace Functional.Drugstore
 			var countContacts = AddContactsToNewDeliveryAddress(client.Id);
 			// Проверка, что контактные записи создались в БД
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.NotNull(client.Addresses[0].ContactGroup);
 			var group = client.Addresses[0].ContactGroup;
 			Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
@@ -143,7 +143,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки создан"));
 
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			Assert.That(client.Addresses.Count, Is.EqualTo(1));
 			Assert.IsTrue(client.Addresses[0].Enabled);
 		}
@@ -173,8 +173,8 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Переместить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Адрес доставки успешно перемещен"));
 
-			oldClient.Refresh();
-			newClient.Refresh();
+			ActiveRecordMediator<Client>.Refresh(oldClient);
+			ActiveRecordMediator<Client>.Refresh(newClient);
 			address.Refresh();
 			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 
@@ -210,8 +210,8 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(newClient.Name));
 			Assert.That(browser.Text, Is.Not.StringContaining(oldClient.Name));
 
-			oldClient.Refresh();
-			newClient.Refresh();
+			ActiveRecordMediator<Client>.Refresh(oldClient);
+			ActiveRecordMediator<Client>.Refresh(newClient);
 			address = Address.Find(addressIdForMove);
 			Assert.That(address.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Addresses.Count, Is.EqualTo(2));

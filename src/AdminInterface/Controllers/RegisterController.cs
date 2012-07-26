@@ -380,7 +380,8 @@ namespace AdminInterface.Controllers
 				client.Settings.NoiseCosts = true;
 				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
 			}
-			client.SaveAndFlush();
+			DbSession.Save(client);
+			DbSession.Flush();
 
 			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());

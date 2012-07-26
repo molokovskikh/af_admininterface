@@ -43,7 +43,7 @@ namespace Integration.ForTesting
 				action(client);
 
 			client.Payers.Each(p => p.Save());
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Users.Each(u => u.Setup());
 
 			client.MaintainIntersection();
@@ -119,9 +119,9 @@ namespace Integration.ForTesting
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].Save();
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Addresses.Single().MaintainIntersection();
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			return client;
 		}
 

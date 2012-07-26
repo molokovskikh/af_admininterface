@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
@@ -115,7 +116,7 @@ namespace Integration.Models
 			var address = client.Addresses.First();
 			address.Value = address.Value + " " + address.Id;
 			address.SaveAndFlush();
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 
 			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));

@@ -9,6 +9,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
 using Castle.Core.Smtp;
 using Common.Tools;
@@ -71,7 +72,7 @@ namespace AdminInterface.Mailers
 			}
 			if (clazz == typeof(Client)) {
 				type = "клиента";
-				var client = Client.Find(((Service)item).Id); //(Client) item;
+				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
 				if (disable != null) { 
