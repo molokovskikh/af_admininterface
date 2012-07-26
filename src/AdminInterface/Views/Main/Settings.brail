@@ -17,8 +17,7 @@ ${app.Asset("News.css")}
 		<label>Тема:</label>
 		<input name="defaults.${subjectField}" value="${subjectValue}" class="allWidth"/>
 		${app.GetValidationError(defaults, subjectField)}
-		<br>
-		<label>Тело письма:</label><br>
+		<label>Тело письма:</label>
 		<textarea  name="defaults.${bodyField}" cols=50 rows=10 class="allWidth">!{bodyValue}</textarea>
 		${app.GetValidationError(defaults, bodyField)}
 	</fieldset>
@@ -32,7 +31,7 @@ ${app.Asset("News.css")}
 
 <h3>Настройки по умолчанию</h3>
 
-<form method=post>
+<form method=post class=vertical>
 	<input type=hidden value=${defaults.Id} name="defaults.Id" />
 
 <div class="tabs">
@@ -71,7 +70,6 @@ ${app.Asset("News.css")}
 			<option value=${formater.Id} ${"selected" if formater.Id == defaults.Formater.Id}>${formater.ClassName}</option>
 			<% end %>
 		</select>
-		<br>
 		<label>Отправщик:</label>
 		<select name="defaults.Formater.Id">
 			<% for sender in senders: %>
@@ -79,24 +77,23 @@ ${app.Asset("News.css")}
 			<% end %>
 		</select>
 		<p>
-			<label>Подпись к письмам:</label><br>
+			<label>Подпись к письмам:</label>
 			<textarea  name="defaults.EmailFooter" cols=50 rows=10>!{defaults.EmailFooter}</textarea>
 		</p>
 		<p>
-			<label>Телефоны в регистрационной карте:</label><br>
+			<label>Телефоны в регистрационной карте:</label>
 			<textarea  name="defaults.Phones" cols=50 rows=10>!{defaults.Phones}</textarea>
 		</p>
 	</fieldset>
 </div>
 
 <div id="miniMailSettings-tab" class="tab" style="display:none">
-	${app.GetLabel("defaults.AllowedMiniMailExtensions")}
-	${app.Edit("defaults.AllowedMiniMailExtensions")}
-	${app.GetValidationError(defaults, "AllowedMiniMailExtensions")}
-	<br>
-	<label style="font-size:smaller">(список расширений без точки через запятую)</label>
-	<br>
-	<br>
+	<p>
+		${app.GetLabel("defaults.AllowedMiniMailExtensions")}
+		${app.Edit("defaults.AllowedMiniMailExtensions")}
+		${app.GetValidationError(defaults, "AllowedMiniMailExtensions")}
+		<label style="font-size:smaller">(список расширений без точки через запятую)</label>
+	</p>
 
 	<% WriteLabelAndEditTemplate("Шаблон для пустого списка получателей", "ResponseSubjectMiniMailOnEmptyRecipients", defaults.ResponseSubjectMiniMailOnEmptyRecipients, "ResponseBodyMiniMailOnEmptyRecipients", defaults.ResponseBodyMiniMailOnEmptyRecipients) %>
 

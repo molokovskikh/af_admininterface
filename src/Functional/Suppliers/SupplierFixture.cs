@@ -169,28 +169,5 @@ Where pc.PriceCode = :PriceId1")
 			//проверяем RequestInterval
 			Assert.That(source.RequestInterval, Is.EqualTo(86400));
 		}
-
-		[Test]
-		public void Delete_cost_column()
-		{
-			var price = supplier.Prices[0];
-			price.CostType = 1;
-			var cost = price.AddCost();
-			cost.CostFormRule.FieldName = "F10";
-			session.Save(supplier);
-
-			Open(supplier);
-			Click("Настройка");
-			Click("Базовый");
-			AssertText("Настройка ценовых колонок");
-			Click("Удалить");
-			AssertText("Внимание! Ценовая колонка настроена");
-			Click("Все равно удалить");
-			AssertText("Настройка ценовых колонок");
-
-			session.Clear();
-			price = session.Load<Price>(price.Id);
-			Assert.That(price.Costs.Count, Is.EqualTo(1));
-		}
 	}
 }

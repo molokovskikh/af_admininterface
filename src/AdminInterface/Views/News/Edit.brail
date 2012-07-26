@@ -20,7 +20,7 @@ ${app.Asset("News.css")}
 	<% end %>
 <% end %>
 
-${FormHelper.FormTag("", {})}
+${FormHelper.FormTag("", {@class: @vertical})}
 <div>
 	${app.Label("news.PublicationDate")}
 	${app.Edit("news.PublicationDate")}

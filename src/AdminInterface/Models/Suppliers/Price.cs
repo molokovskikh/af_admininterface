@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Castle.Components.Validator;
 using Common.Web.Ui.Models;
 
 namespace AdminInterface.Models.Suppliers
@@ -30,7 +32,7 @@ namespace AdminInterface.Models.Suppliers
 		[PrimaryKey("PriceCode")]
 		public virtual uint Id { get; set; }
 
-		[Property("PriceName")]
+		[Property("PriceName"), Description("Название"), ValidateNonEmpty]
 		public virtual string Name { get; set; }
 
 		[Property]
@@ -47,6 +49,12 @@ namespace AdminInterface.Models.Suppliers
 
 		[Property]
 		public virtual decimal UpCost { get; set; }
+
+		[Property, Description("Прайс содержит забраковку")]
+		public virtual bool IsRejects { get; set; }
+
+		[Property, Description("Прайс содержит разбраковку")]
+		public virtual bool IsRejectCancellations { get; set; }
 
 		[BelongsTo("FirmCode")]
 		public virtual Supplier Supplier { get; set; }

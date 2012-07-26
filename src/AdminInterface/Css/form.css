@@ -126,3 +126,7 @@ input.error
 #mainForm input[type=text], #mainForm select {
 	width: 100%;
 }
+
+form.vertical label {
+	display: block;
+}
