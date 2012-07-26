@@ -165,7 +165,7 @@
 					<td><h4>Регионы заказа</h4></td>
 					<%end %>
 				</tr>
-				<%if user.AvaliableAddresses.Count == 0: %>
+				<%if (not supplierUser) and (user.AvaliableAddresses.Count == 0): %>
 				<tr>
 					<td></td><td><label class="error">(заказ невозможен-нет ни одного подключ. адреса)</label></td>
 				</tr>
