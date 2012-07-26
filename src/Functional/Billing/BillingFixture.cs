@@ -265,7 +265,6 @@ namespace Functional.Billing
 			Assert.That(addressRow.ClassName, Is.Not.StringContaining("disabled"));
 			Assert.That(clientRow.ClassName, Is.Not.StringContaining("disabled"));
 			clientStatus.Click();
-			browser.ShowWindow(NativeMethods.WindowShowStyle.ShowNormal);
 			AddCommentInDisableDialig();
 			Thread.Sleep(2000);
 			Assert.IsTrue(userStatus.Checked);
