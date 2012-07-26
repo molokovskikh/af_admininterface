@@ -1,0 +1,32 @@
+﻿.Main
+{
+	width:100%;
+	margin: 0;
+	padding: 0;
+}
+
+.left
+{
+	width:57%;
+	float:left;
+	margin: 0;
+	padding: 0;
+}
+
+.right
+{
+	width:40%;
+	float:right;
+	margin: 0;
+	padding: 0;
+}
+
+.UseCaseGroup
+{
+	margin-bottom: 20px;
+}
+
+.DeletedMessage td
+{
+	text-decoration: line-through;
+}

@@ -407,6 +407,7 @@
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="Assets\Javascripts\autosubmit.coffee" />
+    <Content Include="Assets\Javascripts\billing.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
@@ -414,6 +415,7 @@
     <Content Include="Assets\Javascripts\registration.js" />
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
+    <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
