@@ -138,6 +138,10 @@
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
 							<% end %>
 						</div>
+						<div class="settings" ${"style='display:none'" if not drugstore.IsConvertFormat}>
+							${app.Label("drugstore.WaybillConvertFormat")}
+							${app.Edit("drugstore.WaybillConvertFormat")}
+						</div>
 					</td>
 				</tr>
 				<tr>
