@@ -10,6 +10,7 @@ using Castle.ActiveRecord;
 using Functional.ForTesting;
 using AdminInterface.Models.Logs;
 using System.Threading;
+using WatiN.Core.Native.InternetExplorer;
 using Document = Common.Web.Ui.Models.Document;
 
 namespace Functional.Drugstore
@@ -264,6 +265,29 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].ProducerCost, 2)));
 			Assert.That(browser.Text, Is.StringContaining(ViewHelper.CostFormat(document.Lines[0].Nds, 2)));
 			Assert.That(browser.Text, Is.StringContaining(document.Lines[0].Certificates));
+		}
+
+		[Test]
+		public void Show_log_with_long_row()
+		{
+			updateLog.Log = "Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог";
+			Save(updateLog);
+			Refresh();
+			var logLink = browser.Link(Find.ByText("Лог")).NativeElement as IEElement;
+			int offset = logLink.AsHtmlElement.offsetLeft;
+			var tbl = browser.Css(".DataTable");
+			Click("Лог");
+			browser.WaitUntilContainsText("Тестовый лог Тестовый лог", 1);
+			Assert.That(browser.Text, Is.StringContaining("Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог " +
+				"Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог Тестовый лог"));
+			Assert.Less(logLink.AsHtmlElement.offsetLeft, offset*1.5);
 		}
 	}
 }
