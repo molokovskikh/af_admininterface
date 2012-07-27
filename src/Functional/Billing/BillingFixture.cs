@@ -134,7 +134,7 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			scope.Evict(client);
 
 			client = ActiveRecordBase<Client>.Find(client.Id);
@@ -164,7 +164,7 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -186,7 +186,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -207,7 +207,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -496,15 +496,17 @@ namespace Functional.Billing
 		public void Send_message_to_user()
 		{
 			var username = user.GetLoginOrName();
+			var messageText = "test message for user " + username;
 
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
-			var messageText = "test message for user " + username;
 			browser.TextField(Find.ByName("userMessage.Message")).TypeText(messageText);
-			browser.Button(Find.ByValue("Отправить сообщение")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
-			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
-			Thread.Sleep(500);
+			Click("Отправить сообщение");
+
+			AssertText("Сообщение сохранено");
+			AssertText(String.Format("Остались не показанные сообщения для пользователя {0}", username));
+			Click("Просмотреть сообщение");
+			browser.WaitUntilContainsText("test message for user", 2);
+
 			Assert.That(browser.Text, Is.StringContaining(messageText));
 			var messages = ActiveRecordBase<Client>.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			messages[0].Refresh();
@@ -515,7 +517,7 @@ namespace Functional.Billing
 		[Test]
 		public void Cancel_message_for_user()
 		{
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			var username = user.GetLoginOrName();
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
@@ -562,7 +564,7 @@ namespace Functional.Billing
 		public void FilterLogMessagesByUser()
 		{
 			AddUsersAdnAddresses(client, 3);
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Refresh();
 
 			// Проверяем, что логины пользователей - это ссылки
@@ -608,8 +610,8 @@ namespace Functional.Billing
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
 			ActiveRecordMediator.SaveAndFlush(client2);
-			ActiveRecordMediator<Client>.Refresh(client);
-			ActiveRecordMediator<Client>.Refresh(client2);
+			session.Refresh(client);
+			session.Refresh(client2);
 			var testUserId = client2.Users[0].Id;
 			Refresh();
 
@@ -643,8 +645,8 @@ namespace Functional.Billing
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
 			ActiveRecordMediator.SaveAndFlush(client2);
-			ActiveRecordMediator<Client>.Refresh(client);
-			ActiveRecordMediator<Client>.Refresh(client2);
+			session.Refresh(client);
+			session.Refresh(client2);
 			var testAddressId = client2.Addresses[0].Id;
 			Refresh();
 
@@ -755,6 +757,7 @@ namespace Functional.Billing
 		[Test]
 		public void If_free_flag_turnoff_on_user_than_free_flag_should_by_thurnoff_on_all_related_addresses()
 		{
+			Console.WriteLine(payer.Id);
 			user.Accounting.IsFree = true;
 			address.Accounting.IsFree = true;
 			user.AvaliableAddresses.Add(address);

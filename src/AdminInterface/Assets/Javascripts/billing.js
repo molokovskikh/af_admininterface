@@ -10,7 +10,6 @@ function AjaxRequest(link, action, errorAction) {
 		url: link,
 		cache: false,
 		success: function (html) {
-			showNotificationMessage("Сохранено");
 			action(html);
 		},
 		error: function (xhr, textStatus, error) {
