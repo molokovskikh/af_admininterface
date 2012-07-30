@@ -1,2 +1,2 @@
 alter table usersettings.News
-  add column DestinationType INTEGER UNSIGNED NOT NULL DEFAULT 2;
+  add column DestinationType INTEGER UNSIGNED NOT NULL DEFAULT 1;

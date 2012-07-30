@@ -20,7 +20,7 @@ namespace AdminInterface.Models
 		public News()
 		{
 			PublicationDate = DateTime.Today;
-			DestinationType = NewsDestinationType.All;
+			DestinationType = NewsDestinationType.Drugstore;
 		}
 
 		[PrimaryKey]

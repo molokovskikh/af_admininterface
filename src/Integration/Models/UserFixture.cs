@@ -234,7 +234,7 @@ test<br>
 localhost<br>
 Код {0}<br>
 Новость <a href=""/News/{0}"">TestNewHeader</a><br>
-Изменено 'Адресат' </br> <b>было</b> 'Аптека и Поставщик'</br><b>стало</b> 'Поставщик'
+Изменено 'Адресат' </br> <b>было</b> 'Аптека'</br><b>стало</b> 'Поставщик'
 ", news.Id, DateTime.Now)));
 			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Адресат'"));
