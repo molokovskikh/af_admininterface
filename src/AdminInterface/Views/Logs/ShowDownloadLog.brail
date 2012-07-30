@@ -2,7 +2,7 @@
 	<td />
 	<td colspan='100'>
 		<div id='DownloadLog${updateLogEntityId}'>
-			<pre>${log.Replace('\\', '\\\\')}</pre>
+			<pre class='Log'>${log.Replace('\\', '\\\\')}</pre>
 		</div>
 	</td>
 </tr>
