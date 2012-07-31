@@ -69,7 +69,7 @@ namespace AdminInterface.Helpers
 			}
 		}
 
-		public static string GetSmtpServer()
+		private static string GetSmtpServer()
 		{
 			return ConfigurationManager.AppSettings["SmtpServer"];
 		}

@@ -109,9 +109,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.ByteCode.Castle.dll</HintPath>
     </Reference>
-    <Reference Include="RemoteOrderSenderService">
-      <HintPath>..\..\lib\RemoteOrderSenderService.dll</HintPath>
-    </Reference>
     <Reference Include="RemotePriceProcessor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b87fa865681cc1c6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\RemotePriceProcessor.dll</HintPath>
@@ -470,7 +467,6 @@
     <None Include="Views\Mail\RegisterNews.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
-    <None Include="Views\Orders\Make.brail" />
     <None Include="Views\Prices\Edit.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />

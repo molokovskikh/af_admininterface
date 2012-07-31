@@ -60,9 +60,6 @@ ${app.Asset("search.editor.js")}
 					<a href="${siteroot}/Logs/Orders?filter.Supplier.Id=${supplier.Id}" target="_blank">История заказов</a>
 				</li>
 				<li>
-					<a href="${siteroot}/Orders/Make?supplierId=${supplier.Id}">Сформировать заказы</a>
-				</li>
-				<li>
 					${app.LinkTo(supplier.Payer, "Биллинг", "Show")}
 				</li>
 				<li>
