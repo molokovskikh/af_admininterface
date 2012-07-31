@@ -101,5 +101,13 @@ namespace AdminInterface.Properties {
                 return ((string)(this["WCFServiceUrl"]));
             }
         }
+		[global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("net.tcp://localhost:901/RemoteOrderSenderService")]
+        public string WCFOrderSenderServiceUrl {
+            get {
+                return ((string)(this["WCFOrderSenderServiceUrl"]));
+            }
+        }
     }
 }
