@@ -60,7 +60,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 
 			Assert.That(client.Settings.BuyingMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -93,7 +93,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -134,7 +134,7 @@ namespace Functional.Drugstore
 			excludes = ((Table)Css("#excludes"));
 			Assert.That(excludes.Text, Is.StringContaining("Фармаимпекс"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -263,7 +263,7 @@ namespace Functional.Drugstore
 			Assert.IsFalse(UserOrderRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			var user = client.Users[0];
 			session.Refresh(user);
 			Assert.IsFalse((user.WorkRegionMask & 1) > 0);
@@ -316,7 +316,7 @@ namespace Functional.Drugstore
 			Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
 			// При удалении региона заказа, регион работы должен оставаться
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			var user = client.Users[0];
 			session.Refresh(user);
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
@@ -404,7 +404,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.IsTrue(settings.IgnoreNewPrices);
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));

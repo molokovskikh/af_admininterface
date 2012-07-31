@@ -58,8 +58,8 @@ namespace AdminInterface.Models.Suppliers
 			Notify,
 			Description("Краткое наименование"),
 			ValidateNonEmpty,
-			ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+]+$",
-				"Поле может содержать только буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
+			ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+ ]+$",
+				"Поле может содержать только пробел, буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
 		public override string Name { get; set; }
 
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]

@@ -166,7 +166,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Регистрационная карта"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.That(client.Users.Count, Is.EqualTo(2));
 			var user = client.Users.OrderBy(u => u.Id).Last();
 			Assert.That(user.Name, Is.EqualTo("test"));
@@ -246,7 +246,7 @@ namespace Functional.Drugstore
 
 			browser.Button(Find.ByValue("Создать")).Click();
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			session.Refresh(user);
 			Assert.AreEqual(2, client.Users.Count);
 			Assert.AreEqual(13, client.Users[0].AssignedPermissions.Count);
@@ -552,7 +552,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 			Assert.That(browser.Text, Is.StringContaining("Коометарий Тестовый пользователь"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			Assert.That(client.Users.Count, Is.EqualTo(2));
 			Assert.That(client.Addresses.Count, Is.EqualTo(1));
 			var createdUser = client.Users.OrderBy(u => u.Id).Last();
@@ -594,7 +594,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			var createdAddress = client.Addresses.OrderBy(a => a.Id).Last();
 			Assert.That(createdAddress.LegalEntity.Name, Is.EqualTo("Тестовая организация 2"));
 		}
@@ -635,7 +635,7 @@ namespace Functional.Drugstore
 
 			Open(client);
 
-			ActiveRecordMediator<Client>.Refresh(client);
+			session.Refresh(client);
 			var user = client.Users[1];
 			browser.Link(Find.ByText(user.Id.ToString())).Click();
 			var group = user.ContactGroup;
@@ -700,8 +700,8 @@ namespace Functional.Drugstore
 				Assert.That(browser.Text, Is.StringContaining("Пользователь успешно перемещен"));
 			}
 
-			ActiveRecordMediator<Client>.Refresh(oldClient);
-			ActiveRecordMediator<Client>.Refresh(newClient);
+			session.Refresh(oldClient);
+			session.Refresh(newClient);
 			session.Refresh(user);
 			Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));
@@ -785,8 +785,8 @@ WHERE UserId = :UserId AND RegionId = :RegionId
 
 			using (new SessionScope())
 			{
-				ActiveRecordMediator<Client>.Refresh(oldClient);
-				ActiveRecordMediator<Client>.Refresh(newClient);
+				session.Refresh(oldClient);
+				session.Refresh(newClient);
 				session.Refresh(user);
 				Assert.That(user.Client.Id, Is.EqualTo(newClient.Id));
 

@@ -103,6 +103,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function (html) {
 				hideWaiter(item, waiter);
 				RefreshTotalSum();
+//				showSuccessMessage("Сохранено");
 				processResponse(html);
 				if (success)
 					success();

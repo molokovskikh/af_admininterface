@@ -34,11 +34,13 @@ namespace AdminInterface.Models
 		uint Id { get; }
 	}
 
-	public enum ProtekWaybillSavingType
+	public enum WaybillConvertFormat
 	{
 		[Description("SST")] SST = 0,
-		[Description("DBF")] DBF = 1,
-		[Description("SST для Здоровые Люди")] SSTLong = 2
+		[Description("Dbf для экспорта накладных Протек")] DBF = 1,
+		[Description("SST для Здоровые Люди")] SSTLong = 2,
+		[Description("Устаревшая версия универсального dbf")] LessUniversalDbf = 3,
+		[Description("Универсальный dbf")] UniversalDbf = 4,
 	}
 
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
@@ -187,8 +189,11 @@ namespace AdminInterface.Models
 		[Property, Description("Действие матрицы"), Auditable]
 		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
-		[Property, Description("Конвертировать накладную в dbf-файл"), Auditable]
+		[Property, Description("Конвертировать накладные"), Auditable]
 		public virtual bool IsConvertFormat { get; set; }
+
+		[Property, Description("Формат для конвертации накладных"), Auditable]
+		public virtual WaybillConvertFormat WaybillConvertFormat { get; set; }
 
 		[BelongsTo("AssortimentPriceId"), Description("Ассортиментный прайс для преобразования накладной в формат dbf"), Auditable]
 		public virtual Price AssortimentPrice { get; set; }
@@ -239,7 +244,7 @@ namespace AdminInterface.Models
 		public virtual bool ShowCertificatesWithoutRefSupplier { get; set; }
 
 		[Property, Description("Формат для сохранения накладных Протек"), Auditable]
-		public virtual ProtekWaybillSavingType ProtekWaybillSavingType { get; set; }
+		public virtual WaybillConvertFormat ProtekWaybillSavingType { get; set; }
 
 		public virtual void CheckDefaults()
 		{

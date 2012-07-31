@@ -461,10 +461,13 @@ where s.Name like :SearchText")
 				address = user.AvaliableAddresses.SingleOrDefault();
 
 			AuditRecord log = null;
+			var query = new UpdateOrders(newClient, user, address);
 			if (user != null)
 				log = user.MoveToAnotherClient(newClient, legalEntity);
 			if (address != null)
 				log = address.MoveToAnotherClient(newClient, legalEntity);
+
+			query.Execute(DbSession);
 			DbSession.Save(log);
 			//нужно сохранить изменения, иначе oldClient.Refresh(); не зафиксирует их
 			DbSession.Flush();

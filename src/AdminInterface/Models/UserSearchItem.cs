@@ -80,6 +80,8 @@ namespace AdminInterface.Models
 		{
 			get
 			{
+				if (ClientType == SearchClientType.Supplier)
+					return false;
 				if (UpdateDate != null)
 					return DateTime.Now.Subtract(UpdateDate.Value).TotalDays >= 2;
 				else

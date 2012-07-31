@@ -300,6 +300,7 @@
     <Compile Include="Queries\MessageQuery.cs" />
     <Compile Include="Queries\OrderFilter.cs" />
     <Compile Include="Queries\RejectWaibillParams.cs" />
+    <Compile Include="Queries\UpdateOrders.cs" />
     <Compile Include="Queries\UserFilter.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />

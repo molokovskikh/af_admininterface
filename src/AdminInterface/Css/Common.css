@@ -177,3 +177,8 @@ table.DataTable tr.update-is-uncommited td.update-date
 	width: 18px;
 	height: 18px;
 }
+
+pre.Log {
+	width:100%;
+	white-space:pre-wrap;
+}
