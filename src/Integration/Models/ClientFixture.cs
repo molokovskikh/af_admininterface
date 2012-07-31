@@ -61,7 +61,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayer();
 			payer.Save();
 			client.ChangePayer(payer, payer.JuridicalOrganizations.First());
-			client.Save();
+			session.SaveOrUpdate(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new []{payer}));
 			Assert.That(client.Users[0].Payer, Is.EqualTo(payer));
 			var address = client.Addresses[0];
@@ -78,7 +78,7 @@ namespace Integration.Models
 			var newPayer = DataMother.CreatePayer();
 			newPayer.Save();
 			client.ChangePayer(newPayer, newPayer.JuridicalOrganizations.First());
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			Assert.That(oldPayer.PaymentSum, Is.EqualTo(0));
 			Assert.That(newPayer.PaymentSum, Is.EqualTo(800));

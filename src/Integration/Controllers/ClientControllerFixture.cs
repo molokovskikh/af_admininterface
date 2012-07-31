@@ -43,7 +43,7 @@ namespace Integration.Controllers
 			{
 				client.Users.Add(new User(client) {Login = adUser1.Login});
 				client.Users[0].Login = adUser1.Login;
-				client.Save();
+				session.SaveOrUpdate(client);
 
 				using (new SessionScope())
 					controller.Unlock(client.Id);
@@ -80,7 +80,7 @@ namespace Integration.Controllers
 			using (var adUser1 = new TestADUser())
 			{
 				client.Users[0].Login = adUser1.Login;
-				client.Save();
+				session.SaveOrUpdate(client);
 
 				ADHelper.Block(adUser1.Login);
 
@@ -187,8 +187,8 @@ namespace Integration.Controllers
 		[Test]
 		public void Rename_name_and_full_name_client()
 		{
-			client.Save();
-			
+			session.SaveOrUpdate(client);
+
 			var legalEntity = client.GetLegalEntity()[0];
 			legalEntity.Name = "Name";
 			legalEntity.FullName = "FullName";

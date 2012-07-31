@@ -168,7 +168,7 @@ namespace AdminInterface.Controllers
 			var oldStatus = address.Enabled;
 			if (enabled.HasValue)
 				address.Enabled = enabled.Value;
-			address.Client.Save();
+			DbSession.SaveOrUpdate(address.Client);
 			DbSession.Flush();
 			if (enabled != oldStatus)
 				this.Mailer().EnableChanged(address, comment).Send();

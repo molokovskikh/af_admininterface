@@ -85,7 +85,7 @@ namespace Integration.ForTesting
 			var payer = client.Payers.First();
 			payer.Users.Each(u => u.Accounting.BeAccounted = true);
 			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
-			client.Save();
+			ActiveRecordMediator.Save(client);
 			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
 			payer.SaveAndFlush();
 			payer.Refresh();

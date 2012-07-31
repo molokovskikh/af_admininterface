@@ -419,7 +419,7 @@ namespace Functional.Drugstore
 		public void TestUserRegions()
 		{
 			client.MaskRegion = 7;
-			client.Save();
+			session.SaveOrUpdate(client);
 			settings.OrderRegionMask = 7;
 			settings.Save();
 			user.WorkRegionMask = 2;
@@ -455,7 +455,7 @@ namespace Functional.Drugstore
 			Assert.AreEqual(1, user.OrderRegionMask);
 
 			client.MaskRegion = 31;
-			client.Save();
+			session.SaveOrUpdate(client);
 			settings.OrderRegionMask = 3;
 			settings.Save();
 
@@ -477,7 +477,7 @@ namespace Functional.Drugstore
 			client.MaskRegion = 0;
 			foreach (var region in browseRegions)
 				client.MaskRegion |= region;
-			client.Save();
+			session.SaveOrUpdate(client);
 			foreach (var region in browseRegions)
 				settings.WorkRegionMask |= region;
 			foreach (var region in orderRegions)

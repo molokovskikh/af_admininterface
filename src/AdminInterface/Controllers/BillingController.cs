@@ -325,7 +325,7 @@ namespace AdminInterface.Controllers
 			var user = DbSession.Load<User>(userId);
 			var address = Address.Find(addressId);
 			address.AvaliableForUsers.Add(user);
-			address.Client.Save();
+			DbSession.SaveOrUpdate(address.Client);
 
 			CancelView();
 		}
@@ -337,7 +337,7 @@ namespace AdminInterface.Controllers
 			var client = user.Client;
 
 			address.AvaliableForUsers.Remove(user);
-			client.Save();
+			DbSession.SaveOrUpdate(client);
 
 			CancelView();
 		}

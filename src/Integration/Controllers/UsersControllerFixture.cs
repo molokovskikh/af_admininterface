@@ -103,7 +103,7 @@ namespace Integration.Controllers
 			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
 			client.Payers.Add(payer);
-			client.Save();
+			session.SaveOrUpdate(client);
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			controller.Add(new Contact[0], new[] {
 					new RegionSettings {

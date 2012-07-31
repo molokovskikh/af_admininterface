@@ -116,7 +116,7 @@ namespace Functional.Drugstore
 		public void SearchByClientName()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			client.MakeNameUniq();
+			MakeNameUniq(client);
 			scope.Flush();
 			AssetSearch(SearchUserBy.ByClientName, client.Name);
 		}

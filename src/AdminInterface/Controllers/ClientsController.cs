@@ -162,7 +162,7 @@ namespace AdminInterface.Controllers
 					savedNotify = false;
 				}
 			}
-			client.Save();
+			DbSession.SaveOrUpdate(client);
 			if (savedNotify)
 				Notify("Сохранено");
 			RedirectToReferrer();
@@ -291,7 +291,7 @@ where Phone like :phone")
 					}
 				}
 			}
-			client.Save();
+			DbSession.SaveOrUpdate(client);
 			drugstore.UpdateAndFlush();
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();

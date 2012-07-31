@@ -86,7 +86,7 @@ namespace Integration.Models
 			var report = DataMother.Report(payer);
 			report.Payment = 1500;
 
-			client.Save();
+			session.SaveOrUpdate(client);
 			payer.Save();
 			report.Save();
 

@@ -22,7 +22,7 @@ namespace Integration.Controllers
 			supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 			client = DataMother.TestClient();
-			client.Save();
+			session.SaveOrUpdate(client);
 			controller = new BillingController();
 			controller.DbSession = session;
 			PrepareController(controller);

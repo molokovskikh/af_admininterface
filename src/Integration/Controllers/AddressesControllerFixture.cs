@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -66,7 +67,7 @@ namespace Integration.Controllers
 			payer.JuridicalOrganizations[0].Name = "ООО Фарм-друган";
 			client.Payers.Add(payer);
 			payer.Save();
-			client.Save();
+			session.SaveOrUpdate(client);
 			scope.Flush();
 
 			address.LegalEntity = payer.JuridicalOrganizations.First();

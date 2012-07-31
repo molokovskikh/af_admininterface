@@ -60,7 +60,7 @@ BeAccounted = 0;
 			userAccount.FreePeriodEnd = DateTime.Today.AddDays(20);
 			userAccount.IsFree = true;
 
-			client.Save();
+			session.SaveOrUpdate(client);
 			Flush();
 
 			Assert.That(Ready(), Is.Not.Contains(userAccount.Id));

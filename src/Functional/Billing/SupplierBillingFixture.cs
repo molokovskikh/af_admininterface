@@ -2,6 +2,7 @@
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Functional.ForTesting;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -38,7 +39,7 @@ namespace Functional.Billing
 				});
 			});
 			MakeNameUniq(supplier);
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			Open(payer);
 			Click(supplier.Name);
@@ -61,7 +62,7 @@ namespace Functional.Billing
 				});
 			});
 			MakeNameUniq(supplier);
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			Open(payer);
 			Click(supplier.Name);

@@ -20,7 +20,7 @@ namespace Integration
 			var client = DataMother.TestClient();
 			var oldName = client.Name;
 			client.Name += "1";
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			Flush();
 			Reopen();

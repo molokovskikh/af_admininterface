@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
@@ -28,7 +29,7 @@ namespace Functional.Drugstore
 			address = client.Addresses[0];
 			supplier = DataMother.CreateSupplier();
 
-			client.Save();
+			session.SaveOrUpdate(client);
 			Save(supplier);
 
 			document = new DocumentReceiveLog(supplier) {

@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -24,7 +25,7 @@ namespace Functional.Billing
 			payer = client.Payers.First();
 			payer.Recipient = Recipient.Queryable.First();
 			payer.Users.Each(u => u.Accounting.ReadyForAccounting = true);
-			client.Save();
+			session.SaveOrUpdate(client);
 			payer.Save();
 		}
 

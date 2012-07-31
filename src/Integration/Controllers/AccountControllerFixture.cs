@@ -69,7 +69,7 @@ namespace Integration.Controllers
 			var addressAccount = address.Accounting;
 			addressAccount.IsFree = true;
 
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			//анонимные объекты internal для того что бы получить доступ к полям использую exposed object
 			var result = ExposedObject.From(controller.Update(userAccount.Id, null, false, null, null, null, null));

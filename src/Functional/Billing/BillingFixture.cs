@@ -420,7 +420,7 @@ namespace Functional.Billing
 			client.AddAddress("address");
 			user.Enabled = true;
 			address.Enabled = false;
-			client.Save();
+			session.SaveOrUpdate(client);
 			foreach (var a in client.Addresses)
 			{
 				a.Accounting.ReadyForAccounting = true;
@@ -675,8 +675,8 @@ namespace Functional.Billing
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
 			client2.Users[0].Payer = payer;
-			client.Save();
-			client2.Save();
+			session.SaveOrUpdate(client);
+			session.SaveOrUpdate(client2);
 
 			Refresh();
 
@@ -761,7 +761,7 @@ namespace Functional.Billing
 			user.Accounting.IsFree = true;
 			address.Accounting.IsFree = true;
 			user.AvaliableAddresses.Add(address);
-			client.Save();
+			session.SaveOrUpdate(client);
 			Flush();
 
 			Refresh();

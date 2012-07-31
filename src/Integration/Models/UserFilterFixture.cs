@@ -31,7 +31,7 @@ namespace Integration.Models
 		public void Search_in_contacts_and_cout_results()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Save();
+			session.SaveOrUpdate(client);
 			var firstContact = new ContactGroup(ContactGroupType.General);
 			var phone1 = RandomPhone();
 			var phone2 = RandomPhone();
@@ -46,7 +46,7 @@ namespace Integration.Models
 			newUser.Setup();
 			client.AddUser(newUser);
 			ActiveRecordMediator.Save(newUser);
-			client.Save();
+			session.SaveOrUpdate(client);
 			Flush();
 			filter.SearchBy = SearchUserBy.Auto;
 			filter.SearchText = phone1;
@@ -183,7 +183,7 @@ namespace Integration.Models
 						IsAvaliableForBrowse = true
 					}
 				});
-				client.Save();
+				session.SaveOrUpdate(client);
 				Flush();
 				filter.Region = newRegion;
 				filter.ClientType = SearchClientType.Drugstore;

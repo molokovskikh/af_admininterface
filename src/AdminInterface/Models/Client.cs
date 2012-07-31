@@ -332,11 +332,6 @@ group by u.ClientId")
 			}
 		}
 
-		public virtual void Save()
-		{
-			ActiveRecordMediator<Client>.Save(this);
-		}
-
 		public override string ToString()
 		{
 			return Name;
