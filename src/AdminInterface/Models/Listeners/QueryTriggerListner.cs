@@ -52,9 +52,12 @@ namespace AdminInterface.Models.Listeners
 					.FirstOrDefault())
 				.Where(a => a != null);
 
+			//что бы избежать рекурсивного flush
 			foreach (var queryAttribute in queries) {
-				var query = (IAppQuery)Activator.CreateInstance(queryAttribute.QueryType, @event.Entity);
-				query.Execute(@event.Session);
+				BaseAuditListener.LoadData(@event.Session, () => {
+					var query = (IAppQuery)Activator.CreateInstance(queryAttribute.QueryType, @event.Entity);
+					query.Execute(@event.Session);
+				});
 			}
 		}
 	}
