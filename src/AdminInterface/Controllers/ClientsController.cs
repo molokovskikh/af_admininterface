@@ -263,6 +263,13 @@ where Phone like :phone")
 		{
 			Admin.CheckClientPermission(client);
 
+			if (Form["ResetReclameDate"] != null) {
+				new ResetReclameDate(client).Execute(DbSession);
+				Notify("Сброшена");
+				RedirectTo(client);
+				return;
+			}
+
 			var oldMaskRegion = client.MaskRegion;
 			client.HomeRegion = Region.Find(homeRegion);
 			client.UpdateRegionSettings(regionSettings);
@@ -274,16 +281,15 @@ where Phone like :phone")
 				return;
 			}
 
-			if (drugstore.EnableSmartOrder)
-			{
-				if (drugstore.SmartOrderRules == null && smartOrderRules == null) { 
+			if (drugstore.EnableSmartOrder) {
+				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
 					var smartOrder = SmartOrderRules.TestSmartOrder();
 					drugstore.SmartOrderRules = smartOrder;
 				}
 				else {
 					drugstore.SmartOrderRules = smartOrderRules;
 					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
-					var algorithmId = 0u;
+					uint algorithmId;
 					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
 						var algorithm = DbSession.Load<ParseAlgorithm>(algorithmId);
 						if (algorithm != null)

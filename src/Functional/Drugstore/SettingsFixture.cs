@@ -559,6 +559,13 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Assert.That(settings.AssortimentPrice, Is.Not.Null);
 		}
 
+		[Test]
+		public void Reset_reclame_date()
+		{
+			Click("Сбросить дату рекламы");
+			AssertText("Сброшена");
+		}
+
 		private void Search(string term, string title = null)
 		{
 			if (String.IsNullOrEmpty(title)) {
