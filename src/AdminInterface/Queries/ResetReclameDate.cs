@@ -1,15 +1,19 @@
 ﻿using AdminInterface.Models;
+using AdminInterface.Models.Listeners;
 using NHibernate;
 
 namespace AdminInterface.Queries
 {
-	public class ResetReclameDate
+	public class ResetReclameDate : IAppQuery
 	{
 		private Client _client;
 
-		public ResetReclameDate(Client client)
+		public ResetReclameDate(object entity)
 		{
-			_client = client;
+			if (entity is Client)
+				_client = (Client)entity;
+			else
+				_client = ((DrugstoreSettings) entity).Client;
 		}
 
 		public void Execute(ISession session)

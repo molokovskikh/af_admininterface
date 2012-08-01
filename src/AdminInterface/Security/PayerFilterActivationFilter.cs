@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Models.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Security

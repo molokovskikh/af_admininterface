@@ -79,7 +79,7 @@ namespace Functional.Drugstore
 				documentLogEntity = DataMother.CreateTestDocumentLog(supplier, client);
 				updateLogEntity = DataMother.CreateTestUpdateLogEntity(client);
 
-				ActiveRecordMediator.Save(updateLogEntity);
+				session.SaveOrUpdate(updateLogEntity);
 				documentLogEntity.SendUpdateLogEntity = updateLogEntity;
 				Save(documentLogEntity);
 				scope.VoteCommit();

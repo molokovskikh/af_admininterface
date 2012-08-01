@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
@@ -29,11 +31,6 @@ namespace AdminInterface.Models
 		[Description("Выводить предупреждения")] Warning = 1,
 	}
 
-	public interface IDrugstoreSettings
-	{
-		uint Id { get; }
-	}
-
 	public enum WaybillConvertFormat
 	{
 		[Description("SST")] SST = 0,
@@ -44,7 +41,7 @@ namespace AdminInterface.Models
 	}
 
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
-	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>, IDrugstoreSettings
+	public class DrugstoreSettings
 	{
 		private bool _noiseCosts;
 		private Supplier _noiseCostExceptSupplier;
@@ -130,7 +127,7 @@ namespace AdminInterface.Models
 		[Property, Description("Принимать накладные от клиента"), Auditable]
 		public virtual bool SendWaybillsFromClient { get; set; }
 
-		[Property, Description("Показывать рекламу в AnalitF"), Auditable]
+		[Property, Description("Показывать рекламу в AnalitF"), Auditable, ResetReclameDate]
 		public virtual bool ShowAdvertising { get; set; }
 
 		[Property, Description("Передавать розничную цену (работа по договору комиссии)"), Auditable]
@@ -180,13 +177,13 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
+		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable, SetForceReplication]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
-		[Property, Description("Тип матрицы"), Auditable]
+		[Property, Description("Тип матрицы"), Auditable, SetForceReplication]
 		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
-		[Property, Description("Действие матрицы"), Auditable]
+		[Property, Description("Действие матрицы"), Auditable, SetForceReplication]
 		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
 		[Property, Description("Конвертировать накладные"), Auditable]

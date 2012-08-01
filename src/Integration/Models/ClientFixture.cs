@@ -13,7 +13,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientFixture : Test.Support.IntegrationFixture
+	public class ClientFixture : IntegrationFixture
 	{
 		[Test]
 		public void ResetUinTest()
@@ -42,15 +42,15 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			Flush();
 			client.Settings.NoiseCosts = true;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
 
 			client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 
 			client.Settings.NoiseCosts = false;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.Null);
 		}
 

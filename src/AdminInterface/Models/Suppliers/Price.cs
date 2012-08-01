@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using AdminInterface.Models.Listeners;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
@@ -15,13 +16,8 @@ namespace AdminInterface.Models.Suppliers
 		Vip
 	}
 
-	public interface IPrice
-	{
-		Supplier Supplier { get; }
-	}
-
 	[ActiveRecord("PricesData", Schema = "Usersettings", Lazy = true)]
-	public class Price : ActiveRecordLinqBase<Price>, IPrice
+	public class Price
 	{
 		public Price()
 		{
@@ -41,10 +37,10 @@ namespace AdminInterface.Models.Suppliers
 		[Property]
 		public virtual int? CostType { get; set; }
 
-		[Property]
+		[Property, SetForceReplication]
 		public virtual bool AgencyEnabled { get; set; }
 
-		[Property]
+		[Property, SetForceReplication]
 		public virtual bool Enabled { get; set; }
 
 		[Property]

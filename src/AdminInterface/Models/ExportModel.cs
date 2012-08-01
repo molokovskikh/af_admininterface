@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;

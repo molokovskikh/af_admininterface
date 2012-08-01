@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using AdminInterface.Controllers;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 using Integration.ForTesting;

@@ -14,6 +14,7 @@ using Castle.MonoRail.Framework.Test;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.Models.Audit;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Rhino.Mocks;

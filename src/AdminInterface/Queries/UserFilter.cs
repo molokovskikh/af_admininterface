@@ -10,6 +10,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;

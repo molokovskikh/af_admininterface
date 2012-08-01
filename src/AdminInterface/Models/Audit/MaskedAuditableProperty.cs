@@ -5,7 +5,7 @@ using System.Reflection;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using NHibernate;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Audit
 {
@@ -29,8 +29,8 @@ namespace AdminInterface.Models.Audit
 			var current = ToRegionList(newRegionValue);
 			var old = ToRegionList(oldRegionValue);
 
-			Added = Complement(current, old).ToArray();
-			var removed = Complement(old, current).ToArray();
+			Added = current.Except(old).ToArray();
+			var removed = old.Except(current).ToArray();
 
 			Message = String.Format("$$$Изменено '{0}'", Name);
 
@@ -47,15 +47,6 @@ namespace AdminInterface.Models.Audit
 				.Select(i => Region.TryFind(i))
 				.Where(r => r != null)
 				.Implode(r => "'" + r.Name + "'");
-		}
-
-		public static IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
-		{
-			foreach (var item in first)
-			{
-				if (second.All(i => !Equals(i, item)))
-					yield return item;
-			}
 		}
 
 		private IEnumerable<ulong> ToRegionList(ulong diff)

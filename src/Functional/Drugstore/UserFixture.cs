@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -127,7 +128,7 @@ namespace Functional.Drugstore
 		public void Change_login_when_change_password()
 		{
 			user.Login = "testLogin" + user.Id;
-			ActiveRecordMediator.Save(user);
+			session.SaveOrUpdate(user);
 			Refresh();
 
 			GoToChangePassword();
@@ -421,10 +422,10 @@ namespace Functional.Drugstore
 			client.MaskRegion = 7;
 			session.SaveOrUpdate(client);
 			settings.OrderRegionMask = 7;
-			settings.Save();
+			session.SaveOrUpdate(settings);
 			user.WorkRegionMask = 2;
 			user.OrderRegionMask = 1;
-			ActiveRecordMediator.Save(user);
+			session.SaveOrUpdate(user);
 			scope.Flush();
 
 			Open(user, "Edit");
@@ -457,7 +458,7 @@ namespace Functional.Drugstore
 			client.MaskRegion = 31;
 			session.SaveOrUpdate(client);
 			settings.OrderRegionMask = 3;
-			settings.Save();
+			session.SaveOrUpdate(settings);
 
 			Refresh();
 			Assert.IsTrue(browser.CheckBox("WorkRegions[3]").Exists);
@@ -482,7 +483,7 @@ namespace Functional.Drugstore
 				settings.WorkRegionMask |= region;
 			foreach (var region in orderRegions)
 				settings.OrderRegionMask |= region;
-			settings.Save();
+			session.SaveOrUpdate(settings);
 			scope.Flush();
 
 			browser.Link(Find.ByText("Новый пользователь")).Click();

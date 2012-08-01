@@ -5,6 +5,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;

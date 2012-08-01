@@ -41,7 +41,7 @@ namespace Integration
 			Reopen();
 
 			client = ActiveRecordBase<Client>.Find(client.Id);
-			var price = Price.Find(supplier.Prices[0].Id);
+			var price = session.Load<Price>(supplier.Prices[0].Id);
 			Assert.That(NHibernateUtil.IsInitialized(price), Is.False);
 			client.Settings.AssortimentPrice = price;
 			Save(client);

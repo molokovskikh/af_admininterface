@@ -292,7 +292,8 @@ where Phone like :phone")
 				}
 			}
 			DbSession.SaveOrUpdate(client);
-			drugstore.UpdateAndFlush();
+			DbSession.SaveOrUpdate(drugstore);
+			DbSession.Flush();
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();
 
@@ -344,7 +345,7 @@ where Phone like :phone")
 		{
 			uint id;
 			UInt32.TryParse(text, out id);
-			return Price.Queryable
+			return DbSession.Query<Price>()
 				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == PriceType.Assortment)
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)

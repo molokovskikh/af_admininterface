@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 

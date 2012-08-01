@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;

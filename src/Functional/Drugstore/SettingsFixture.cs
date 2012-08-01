@@ -427,7 +427,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
@@ -458,7 +458,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 		}
 
@@ -469,7 +469,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(0));
 		}
 
@@ -518,7 +518,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Save(supplier);
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.Update();
+			session.SaveOrUpdate(client.Settings);
 			Flush();
 
 			Refresh();
@@ -529,7 +529,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.Null);
 		}
 
@@ -554,7 +554,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Click("Сохранить");
 			AssertText("Сохранено");
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.IsConvertFormat, Is.True);
 			Assert.That(settings.AssortimentPrice, Is.Not.Null);
 		}

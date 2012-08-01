@@ -6,6 +6,7 @@ using System.Web;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 

@@ -1,6 +1,7 @@
 using System;
 using System.Reflection;
 using AdminInterface.Security;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 

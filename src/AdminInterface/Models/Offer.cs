@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Transform;
 

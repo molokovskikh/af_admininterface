@@ -12,6 +12,7 @@ using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;

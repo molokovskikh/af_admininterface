@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
 using NUnit.Framework;

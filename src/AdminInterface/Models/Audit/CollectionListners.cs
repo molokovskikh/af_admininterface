@@ -6,6 +6,7 @@ using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using NHibernate;
 using NHibernate.Event;
 
@@ -37,7 +38,7 @@ namespace AdminInterface.Models.Audit
 					needSave = true;
 				}
 				if (needSave)
-					AuditListener.PreventFlush(@event.Session, () => @event.Session.Save(new AuditRecord(message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
+					AuditListener.LoadData(@event.Session, () => @event.Session.Save(new AuditRecord(message, ((dynamic)@event.AffectedOwnerOrNull).Client) {
 						MessageType = LogMessageType.System,
 						IsHtml = true
 					}));
@@ -76,8 +77,8 @@ namespace AdminInterface.Models.Audit
 
 		public void BuildMessage(AbstractCollectionEvent @event, string message, IEnumerable<object> newList, IEnumerable<object> oldList)
 		{
-			var added = MaskedAuditableProperty.Complement(newList, oldList).ToArray();
-			var removed = MaskedAuditableProperty.Complement(oldList, newList).ToArray();
+			var added = newList.Except(oldList).ToArray();
+			var removed = oldList.Except(newList).ToArray();
 
 			if (removed.Length > 0)
 				message += "</br> <b> Удалено </b>" + GetListString(removed);
@@ -86,7 +87,7 @@ namespace AdminInterface.Models.Audit
 				message += "</br> <b> Добавлено </b>" + GetListString(added);
 
 			if (removed.Length > 0 || added.Length > 0)
-				AuditListener.PreventFlush(@event.Session, () => 
+				AuditListener.LoadData(@event.Session, () =>
 					@event.Session.Save(new AuditRecord(message, @event.AffectedOwnerOrNull) {
 					MessageType = LogMessageType.System,
 					IsHtml = true

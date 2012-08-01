@@ -10,6 +10,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Billing
 {

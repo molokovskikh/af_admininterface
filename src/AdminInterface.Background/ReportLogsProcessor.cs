@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Background

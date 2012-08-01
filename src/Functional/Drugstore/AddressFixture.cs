@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Models;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Scopes;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Functional.ForTesting;
 using Integration.ForTesting;

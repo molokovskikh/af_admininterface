@@ -3,6 +3,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 
 namespace Integration.ForTesting

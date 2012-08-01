@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -15,7 +16,9 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
@@ -72,13 +75,8 @@ namespace AdminInterface.Models
 		bool DisabledByParent { get; }
 	}
 
-	public interface IUser
-	{
-		uint Id { get; }
-	}
-
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
-	public class User : IEnablable, IDisabledByParent, IUser, IChangesNotificationAware
+	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware
 	{
 		private string _name;
 		private bool _enabled;
@@ -188,7 +186,7 @@ namespace AdminInterface.Models
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
-		[Property, Description("Регионы работы"), Auditable, NotifyBilling]
+		[Property, Description("Регионы работы"), Auditable, NotifyBilling, SetForceReplication]
 		public virtual ulong WorkRegionMask { get; set; }
 
 		[Property, Description("Регионы заказа"), Auditable]
@@ -208,7 +206,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
-			Description("Наследовать настройки прайс листов"), Auditable]
+			Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]

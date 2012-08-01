@@ -2,6 +2,7 @@
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 

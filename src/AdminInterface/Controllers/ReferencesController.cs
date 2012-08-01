@@ -7,6 +7,7 @@ using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 

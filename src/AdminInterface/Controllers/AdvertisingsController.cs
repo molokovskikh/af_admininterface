@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models.Billing;
 using AdminInterface.MonoRailExtentions;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 

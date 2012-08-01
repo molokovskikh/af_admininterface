@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;

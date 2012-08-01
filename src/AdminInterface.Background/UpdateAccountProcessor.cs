@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 using NHibernate.Criterion;

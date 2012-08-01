@@ -2,6 +2,7 @@
 using AdminInterface.Mailers;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using log4net;
 
 namespace AdminInterface.Models.Audit

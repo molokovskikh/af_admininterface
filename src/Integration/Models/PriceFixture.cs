@@ -16,7 +16,6 @@ namespace Integration.Models
 	[TestFixture]
 	public class PriceFixture : Test.Support.IntegrationFixture
 	{
-		 
 		[Test(Description = "при обновлении свойств Enabled AgencyEnabled должно устанавливаться свойство ForceReplication")]
 		public void ChangePriceEnabledAndForceReplication()
 		{
@@ -34,7 +33,7 @@ namespace Integration.Models
 
 			price.AgencyEnabled = false;
 			price.Enabled = false;
-			price.Save();
+			Save(price);
 
 			Flush();
 
@@ -43,7 +42,7 @@ namespace Integration.Models
 			ClearForceReplication(supplier);
 
 			price.AgencyEnabled = true;
-			price.Save();
+			Save(price);
 
 			Flush();
 
@@ -66,7 +65,7 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			price.Name = price.Name + " 123";
-			price.Save();
+			Save(price);
 
 			Flush();
 

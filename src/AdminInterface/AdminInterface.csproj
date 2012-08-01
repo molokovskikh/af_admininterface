@@ -153,8 +153,7 @@
     <Compile Include="Mailers\Mailer.cs" />
     <Compile Include="Mailers\MonorailMailer.cs" />
     <Compile Include="Models\Audit\CollectionListners.cs" />
-    <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
-    <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
+    <Compile Include="Models\Listeners\QueryTriggerListner.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\OrderLog.cs" />
@@ -192,7 +191,6 @@
     <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\Listeners\UpdateReplicationInfoListener.cs" />
     <Compile Include="Models\ParseAlgorithm.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
@@ -298,6 +296,7 @@
     <Compile Include="Queries\OrderFilter.cs" />
     <Compile Include="Queries\RejectWaibillParams.cs" />
     <Compile Include="Queries\ResetReclameDate.cs" />
+    <Compile Include="Queries\SetForceReplication.cs" />
     <Compile Include="Queries\UpdateOrders.cs" />
     <Compile Include="Queries\UserFilter.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />

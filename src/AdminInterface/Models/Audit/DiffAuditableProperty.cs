@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using DiffMatchPatch;
 
 namespace AdminInterface.Models.Audit

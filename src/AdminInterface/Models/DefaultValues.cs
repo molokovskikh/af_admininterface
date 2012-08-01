@@ -10,6 +10,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models
 {

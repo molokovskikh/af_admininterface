@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -14,6 +14,7 @@ using Castle.ActiveRecord.Framework.Internal;
 using Castle.Core.Smtp;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using ExcelLibrary.SpreadSheet;

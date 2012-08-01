@@ -30,7 +30,8 @@ namespace Integration.Models
 			client.Settings.BuyingMatrixPrice = price;
 			client.Settings.BuyingMatrixType = BuyingMatrixType.BlackList;
 			client.Settings.WarningOnBuyingMatrix = BuyingMatrixAction.Block;
-			client.Settings.SaveAndFlush();
+			session.SaveOrUpdate(client.Settings);
+			Flush();
 
 			var info = session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where UserId = :UserId")
 				.SetParameter("UserId", user.Id)
@@ -55,13 +56,13 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			client.Settings.ShowAdvertising = !client.Settings.ShowAdvertising;
-			client.Settings.SaveAndFlush();
+			session.SaveOrUpdate(client.Settings);
+			Flush();
 
 			var reclameDate = session.CreateSQLQuery("select ReclameDate from Usersettings.UserUpdateInfo where UserId = :UserId")
 				.SetParameter("UserId", user.Id)
 				.UniqueResult();
 			Assert.That(reclameDate, Is.Null, "Значение поля ReclameDate должно быть сброшено в null после изменения поля ShowAdvertising, чтобы пользователь получал рекламу заново");
 		}
-
 	}
 }

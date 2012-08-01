@@ -7,6 +7,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;

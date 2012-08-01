@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
