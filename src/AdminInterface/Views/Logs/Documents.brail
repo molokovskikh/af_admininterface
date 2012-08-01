@@ -13,81 +13,86 @@ ${app.EndFormFor("filter")}
 	Всего документов ${logEntities.Count}
 </div>
 
-<div>
-	<table class="DataTable">
-	<% if logEntities.Count != 0: %>
-		<thead>
-			<tr>
-				<th></th>
-				<th>Номер документа</th>
-				<th>Дата получения</th>
-				<th>Тип документа</th>
-				<th>Номер поставщика</th>
-				<th>Дата документа</th>
-				<th>Дата разбора</th>
-				<th>От поставщика</th>
-				<th>Клиенту</th>
-				<th>На адрес</th>
-				<th>Название файла</th>
-				<th>Размер</th>
-				<th>Пользователь получивший документ</th>
-				<th>Файл доставлен</th>
-				<th>Документ доставлен</th>
-				<th>Дата отправки</th>
-				<th>Комментарий</th>
-			</tr>
-		</thead>
-	<% for i, log in enumerate(logEntities): %>
-		<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
-			<td>
-				<form method=post action="${siteroot}/Logs/Resend">
-					${FormHelper.HiddenField("id", log.DeliveredId)}
-					<input type=submit value="Повторить">
-				</form>
-			</td>
-			<td>${log.Id}</td>
-			<td>${log.LogTime}</td>
-			<td>
-				${BindingHelper.GetDescription(log.DocumentType)}
-				<%if log.SendUpdateId: %>
-					(загрузка документов)
-				<% end %>
-			</td>
-			<td>${log.ProviderDocumentId}</td>
-			<td>${log.DocumentDate}</td>
-			<td>${log.DocumentWriteTime}</td>
-			<td>${app.LinkTo(log.Supplier, @Suppliers, log.SupplierId)}</td>
-			<td>${app.LinkTo(log.Client, @Clients, log.ClientId)}</td>
-			<td>${log.Address}</td>
-			<td class="${'DocumentNotParsed' if not log.DocumentId and log.SendUpdateId}">
-				<% if log.DocumentId: %>
-					<a id="ShowDocumentDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDocumentDetails?documentLogId=${log.Id}', 'DocumentDetails');">
+<form method=post action="${siteroot}/Logs/Resend">
+
+	<input type=submit value="Повторить">
+
+	<div>
+		<table class="DataTable">
+		<% if logEntities.Count != 0: %>
+			<thead>
+				<tr>
+					<th>
+						<input type=checkbox class="all" />
+					</th>
+					<th>Номер документа</th>
+					<th>Дата получения</th>
+					<th>Тип документа</th>
+					<th>Номер поставщика</th>
+					<th>Дата документа</th>
+					<th>Дата разбора</th>
+					<th>От поставщика</th>
+					<th>Клиенту</th>
+					<th>На адрес</th>
+					<th>Название файла</th>
+					<th>Размер</th>
+					<th>Пользователь получивший документ</th>
+					<th>Файл доставлен</th>
+					<th>Документ доставлен</th>
+					<th>Дата отправки</th>
+					<th>Комментарий</th>
+				</tr>
+			</thead>
+		<% for i, log in enumerate(logEntities): %>
+			<tr class="${ViewHelper.GetRowStyle(i)}" id="documentFileRow${log.Id}">
+				<td>
+					<input type=checkbox name="ids[${i}]" value="${log.DeliveredId}" >
+				</td>
+				<td>${log.Id}</td>
+				<td>${log.LogTime}</td>
+				<td>
+					${BindingHelper.GetDescription(log.DocumentType)}
+					<%if log.SendUpdateId: %>
+						(загрузка документов)
+					<% end %>
+				</td>
+				<td>${log.ProviderDocumentId}</td>
+				<td>${log.DocumentDate}</td>
+				<td>${log.DocumentWriteTime}</td>
+				<td>${app.LinkTo(log.Supplier, @Suppliers, log.SupplierId)}</td>
+				<td>${app.LinkTo(log.Client, @Clients, log.ClientId)}</td>
+				<td>${log.Address}</td>
+				<td class="${'DocumentNotParsed' if not log.DocumentId and log.SendUpdateId}">
+					<% if log.DocumentId: %>
+						<a id="ShowDocumentDetailsLink${log.Id}" href="javascript:void(0);" onclick="return ShowDownloadResult(this, ${log.Id}, 'ShowDocumentDetails?documentLogId=${log.Id}', 'DocumentDetails');">
+							!{log.FileName}
+						</a>
+					<% else: %>
 						!{log.FileName}
-					</a>
-				<% else: %>
-					!{log.FileName}
-				<% end %>
-				<br>
-				<a href="Download?id=${log.Id}">Загрузить</a>
-			</td>
-			<td>
-				${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
-			</td>
-			<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
-			<td>${ViewHelper.ToHumanReadable(log.FileDelivered)}</td>
-			<td>${ViewHelper.ToHumanReadable(log.DocumentDelivered)}</td>
-			<td>${log.GetDisplayRequestTime()}</td>
-			<td>
-				<pre>!{log.Addition}</pre>
-			</td>
-		</tr>
-	<% end %>
-	<% else: %>
-		<tr class="EmptyData">
-			<td>
-				За указанный период документов не найдено
-			</td>
-		</tr>
-	<% end %>
-	</table>
-</div>
+					<% end %>
+					<br>
+					<a href="Download?id=${log.Id}">Загрузить</a>
+				</td>
+				<td>
+					${ViewHelper.ConvertToUserFriendlySize(log.DocumentSize) if log.DocumentSize}
+				</td>
+				<td>${app.LinkTo(log.Login, @Users, log.LoginId)}</td>
+				<td>${ViewHelper.ToHumanReadable(log.FileDelivered)}</td>
+				<td>${ViewHelper.ToHumanReadable(log.DocumentDelivered)}</td>
+				<td>${log.GetDisplayRequestTime()}</td>
+				<td>
+					<pre>!{log.Addition}</pre>
+				</td>
+			</tr>
+		<% end %>
+		<% else: %>
+			<tr class="EmptyData">
+				<td>
+					За указанный период документов не найдено
+				</td>
+			</tr>
+		<% end %>
+		</table>
+	</div>
+
+</form>

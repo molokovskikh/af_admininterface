@@ -8,6 +8,7 @@ using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 using Test.Support.Web;
+using WatiN.Core;
 
 namespace Functional.Drugstore
 {
@@ -56,10 +57,10 @@ namespace Functional.Drugstore
 		[Test]
 		public void Resend_document()
 		{
-			Console.WriteLine(client.Id);
 			Open("Logs/Documents?filter.Client.Id={0}", client.Id);
+			browser.CheckBox(Find.ByName("ids[0]")).Click();
 			Click("Повторить");
-			AssertText("Документ будет отправлен повторно");
+			AssertText("Документы будут отправлены повторно");
 
 			session.Refresh(sendLog);
 			Assert.That(sendLog.Committed, Is.False);

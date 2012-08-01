@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
@@ -10,6 +11,7 @@ using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -25,13 +27,15 @@ namespace AdminInterface.Controllers
 			SetBinder(new ARDataBinder());
 		}
 
-		public void Resend(uint id)
+		public void Resend(uint[] ids)
 		{
-			var log = DbSession.Load<DocumentSendLog>(id);
-			log.SendedInUpdate = null;
-			log.Committed = false;
-			DbSession.Save(log);
-			Notify("Документ будет отправлен повторно");
+			var logs = DbSession.Query<DocumentSendLog>().Where(d => ids.Contains(d.Id));
+			foreach (var log in logs) {
+				log.SendedInUpdate = null;
+				log.Committed = false;
+				DbSession.Save(log);
+			}
+			Notify("Документы будут отправлены повторно");
 			RedirectToReferrer();
 		}
 
