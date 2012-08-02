@@ -468,6 +468,7 @@
     <None Include="Views\News\Index.brail" />
     <None Include="Views\Prices\Edit.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
+    <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />

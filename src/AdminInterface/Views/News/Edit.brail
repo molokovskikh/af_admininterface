@@ -27,6 +27,11 @@ ${FormHelper.FormTag("", {@class: @vertical})}
 	${app.GetValidationError("news.PublicationDate")}
 </div>
 <div>
+	${app.Label("news.PublicationTime")}
+	${app.Edit("news.PublicationTime")}
+	${app.GetValidationError("news.PublicationTime")}
+</div>
+<div>
 	${app.Label("news.Header")}
 	${app.Edit("news.Header")}
 	${app.GetValidationError("news.Header")}
