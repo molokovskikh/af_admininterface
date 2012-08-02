@@ -49,7 +49,7 @@ limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
 		{
 			var mailMessage = new MailMessage {Subject = "Сформированные заказы"};
 			mailMessage.To.Add(email);
-			mailMessage.From = new MailAddress("Lichcomp@bk.ru", "Сервис отправки заказов", Encoding.UTF8);
+			mailMessage.From = new MailAddress("tech@analit.net", "Сервис отправки заказов", Encoding.UTF8);
 			foreach (var order in orders.Split(',')) {
 				var orderProc = new RemoteOrderSendServiceHelper(Settings.Default.WCFOrderSenderServiceUrl);
 				var result = orderProc.CreateOrder(Convert.ToUInt32(order), formater);
