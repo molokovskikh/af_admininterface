@@ -5,6 +5,7 @@ using System.Net.Security;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
+using RemoteOrderSenderService;
 using log4net;
 using RemotePriceProcessor;
 using AdminInterface.Properties;
@@ -22,7 +23,7 @@ namespace AdminInterface.Helpers
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof(RemoteServiceHelper));
 
-		public static void RemotingCall(Action<IRemotePriceProcessor> action)
+		public static TResult RemotingCall<TInterface, TResult>(Func<TInterface, TResult> action)
 		{
 			var binding = new NetTcpBinding();
 			binding.Security.Transport.ProtectionLevel = ProtectionLevel.EncryptAndSign;
@@ -31,17 +32,24 @@ namespace AdminInterface.Helpers
 			binding.MaxReceivedMessageSize = Int32.MaxValue;
 			binding.MaxBufferSize = 524288;
 
-			var channelFactory = new ChannelFactory<IRemotePriceProcessor>(binding, Settings.Default.WCFServiceUrl);
-			IRemotePriceProcessor channel = null;
+			var wcfUrl = string.Empty;
+			if (typeof(TInterface) == typeof(IRemotePriceProcessor))
+				wcfUrl = Settings.Default.WCFServiceUrl;
+			if (typeof(TInterface) == typeof(IRemoteOrderSenderService))
+				wcfUrl = Settings.Default.WCFOrderSenderServiceUrl;
+
+			var channelFactory = new ChannelFactory<TInterface>(binding, wcfUrl);
+			TInterface channel = default(TInterface);
+			TResult result = default (TResult);
 			try
 			{
 				channel = channelFactory.CreateChannel();
-				action(channel);
+				result = action(channel);
 				((ICommunicationObject)channel).Close();
 			}
 			catch (Exception e)
 			{
-				_log.Warn("Ошибка при обращении к сервису обработки прайс листов", e);
+				_log.Warn("Ошибка при обращении к сервису", e);
 			}
 			finally
 			{
@@ -51,6 +59,7 @@ namespace AdminInterface.Helpers
 					communicationObject.Abort();
 				channelFactory.Close();
 			}
+			return result;
 		}
 
 		public static ServiceStatus GetServiceStatus(string host, string serviceName)

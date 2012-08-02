@@ -37,7 +37,7 @@ namespace AdminInterface.Queries
 			};
 		}
 
-		public IList<OrderLog> Find()
+		public List<OrderLog> Find()
 		{
 			return ArHelper.WithSession(s => {
 
@@ -105,7 +105,7 @@ ORDER BY writetime desc", sqlFilter))
 					query.SetParameter("SupplierId", Supplier.Id);
 
 				return query.ToList<OrderLog>();
-			});
+			}).ToList();
 		}
 	}
 }
