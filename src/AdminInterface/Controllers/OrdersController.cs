@@ -47,6 +47,7 @@ limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
 
 		public void DoMakeOrders(string orders, string email, string formater)
 		{
+			var isGood = true;
 			var mailMessage = new MailMessage {Subject = "Сформированные заказы"};
 			mailMessage.To.Add(email);
 			mailMessage.From = new MailAddress("tech@analit.net", "Сервис отправки заказов", Encoding.UTF8);
@@ -58,13 +59,14 @@ limit 5").SetParameter("SupplierId", supplier.Id).List<uint>();
 						mailMessage.Attachments.Add(attachment);
 					}
 				else {
-					Error("Не удалось получить файлы от сервиса");
-					return;
+					Error("Не удалось получить все файлы от сервиса, некоторые заказы не были сформированы, проверте почту");
+					isGood = false;
 				}
 			}
 			var smtpClient = new SmtpClient {Host = Func.GetSmtpServer()};
 			smtpClient.Send(mailMessage);
-			Notify("Заказы сформированы и отправлены");
+			if (isGood)
+				Notify("Заказы сформированы и отправлены, проверте почту");
 			RedirectToReferrer();
 		}
 	}
