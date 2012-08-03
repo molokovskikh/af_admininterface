@@ -66,7 +66,7 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Клиент")]
 	public class Client : Service, IChangesNotificationAware
 	{
 		private ClientStatus _status;

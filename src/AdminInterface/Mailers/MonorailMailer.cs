@@ -190,19 +190,23 @@ namespace AdminInterface.Mailers
 		private MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
-			if (property.IsHtml)
+			if (property.IsHtml) {
 				Template = "PropertyChanged_html";
-			else
+				IsBodyHtml = true;
+			}
+			else {
 				Template = "PropertyChanged_txt";
+				IsBodyHtml = false;
+			}
 			var message = new StringBuilder();
-			message.Append(GetAdditionalMessages(entity));
+			message.Append(GetAdditionalMessages(entity).ToString());
 			message.AppendLine(property.Message.Remove(0, 3));
 
 			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
 			if (idLabel == null)
 				idLabel = "Код";
 
-			GeneralizationPropertyChanged(entity, property.Message.Remove(0, 3), idLabel);
+			GeneralizationPropertyChanged(entity, message.ToString(), idLabel);
 
 			return this;
 		}
@@ -210,7 +214,6 @@ namespace AdminInterface.Mailers
 		private void GeneralizationPropertyChanged(object entity, string message, string idLabel)
 		{
 			From = "register@analit.net";
-			IsBodyHtml = true;
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
 			PropertyBag["entity"] = entity;
@@ -221,6 +224,7 @@ namespace AdminInterface.Mailers
 		public MonorailMailer RegisterNews(News news, string to)
 		{
 			To = to;
+			IsBodyHtml = true;
 			Template = "RegisterNews";
 			Subject = String.Format("Зарегистрированна новость");
 			PropertyBag["header"] = news.Header;
@@ -232,18 +236,22 @@ namespace AdminInterface.Mailers
 		private static StringBuilder GetAdditionalMessages(object entity)
 		{
 			var message = new StringBuilder();
+
+			var user = entity as User;
+			if (user != null) {
+				message.AppendLine("Клиент " + user.Client.Name);
+			}
+
 			if (!(entity is Service))
 				return message;
 
-			var id = ((Service) entity).Id;
-			message.AppendLine("Клиент " + id);
 			var client = entity as Client;
 			if (client != null) {
-				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
+				message.AppendLine("Плательщики " + client.Payers.Implode(p => p.Name));
 			}
 			var supplier = entity as Supplier;
 			if (supplier != null) {
-				message.AppendLine("Плательщик: " + supplier.Payer.Name);
+				message.AppendLine("Плательщик " + supplier.Payer.Name);
 			}
 			return message;
 		}

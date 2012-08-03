@@ -28,7 +28,9 @@ namespace Integration
 		private RegisterController controller;
 		private MonorailMailer mailer;
 		private MailMessage message;
+
 		private Client client;
+		private User user;
 		private Payer payer;
 
 		[SetUp]
@@ -51,7 +53,8 @@ namespace Integration
 				HomeRegion = new Region { Name = "test" },
 				Settings = new DrugstoreSettings()
 			};
-			client.Users.Add(new User(client));
+			user = new User(payer, client);
+			client.Users.Add(user);
 		}
 
 		[Test]
@@ -253,19 +256,28 @@ namespace Integration
 		[Test]
 		public void Change_Name_Full_Name()
 		{
-			var client = new Client(new Payer("Тестовы плательщик", "Тестовы плательщик"), Data.DefaultRegion) {
-				Name = "Тестовый клиент",
-				FullName = "Тестовый клиент"
-			};
 			var oldValue = client.Name;
 			client.Name += "1";
 			var property = new AuditableProperty(payer.GetType().GetProperty("Name"), "Наименование", client.Name, oldValue);
 
 			mailer.NotifyAboutChanges(property, client, "RegisterList@subscribe.analit.net");
+			Assert.That(message.IsBodyHtml, Is.False);
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Наименование'"));
 			Assert.That(message.To.ToString(), Is.EqualTo("RegisterList@subscribe.analit.net"));
+
+			Assert.That(message.Body, Is.StringContaining("Плательщики Тестовый плательщик"));
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Наименование' было 'Тестовый клиент' стало 'Тестовый клиент1'"));
 			Assert.That(message.Body, Is.StringContaining(DateTime.Now.Date.ToShortDateString()));
+		}
+
+		[Test]
+		public void Notify_about_user_region_change()
+		{
+			var property = new MaskedAuditableProperty(user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul, 3ul);
+			mailer.NotifyAboutChanges(property, user, "Billing@analit.net");
+			Assert.That(message.IsBodyHtml, Is.False);
+			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
+			Assert.That(message.Body, Is.StringContaining("Клиент: Тестовый клиент"));
 		}
 
 		[Test]
@@ -296,6 +308,7 @@ namespace Integration
 			var property = new DiffAuditableProperty(payer.GetType().GetProperty("Comment"), "Комментарий", payer.Comment, oldValue);
 			mailer.NotifyAboutChanges(property, payer, "BillingList@analit.net");
 
+			Assert.That(message.IsBodyHtml, Is.True);
 			Assert.That(message.Body, Is.StringContaining("Изменено 'Комментарий'"));
 		}
 

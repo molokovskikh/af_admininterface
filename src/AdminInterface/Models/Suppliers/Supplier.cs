@@ -27,7 +27,7 @@ using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
 	public class Supplier : Service, IChangesNotificationAware
 	{
 		private ContactGroupType[] _defaultGroups = new [] {
