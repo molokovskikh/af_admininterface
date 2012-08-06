@@ -9,9 +9,9 @@ using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Audit
 {
-	public class MaskedAuditableProperty : AuditableProperty
+	public class MaskedAuditableProperty : AuditableProperty, INotificationAware
 	{
-		public ulong[] Added { get; set; }
+		public string NotifyMessage { get; set; }
 
 		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 			: base(property, name, newValue, oldValue)
@@ -29,7 +29,7 @@ namespace AdminInterface.Models.Audit
 			var current = ToRegionList(newRegionValue);
 			var old = ToRegionList(oldRegionValue);
 
-			Added = current.Except(old).ToArray();
+			var added = current.Except(old).ToArray();
 			var removed = old.Except(current).ToArray();
 
 			Message = String.Format("$$$Изменено '{0}'", Name);
@@ -37,14 +37,35 @@ namespace AdminInterface.Models.Audit
 			if (removed.Length > 0)
 				Message += " Удалено " + ToString(removed);
 
-			if (Added.Length > 0)
-				Message += " Добавлено " + ToString(Added);
+			if (added.Length > 0)
+				Message += " Добавлено " + ToString(added);
+
+			var notifyAdded = ToStringForNotify(added);
+			var notifyRemoved = ToStringForNotify(removed);
+			if (!String.IsNullOrEmpty(notifyAdded) || !String.IsNullOrEmpty(notifyRemoved)) {
+				NotifyMessage = String.Format("Изменено '{0}'", Name);
+
+				if (!String.IsNullOrEmpty(notifyAdded))
+					NotifyMessage += " Удалено " + notifyAdded;
+
+				if (!String.IsNullOrEmpty(notifyRemoved))
+					NotifyMessage += " Добавлено " + notifyRemoved;
+			}
 		}
 
 		public static string ToString<T>(IEnumerable<T> items)
 		{
 			return items
 				.Select(i => Region.TryFind(i))
+				.Where(r => r != null)
+				.Implode(r => "'" + r.Name + "'");
+		}
+
+		private static string ToStringForNotify<T>(IEnumerable<T> items)
+		{
+			return items
+				.Select(i => Region.TryFind(i))
+				.Where(r => !r.DoNotNotify)
 				.Where(r => r != null)
 				.Implode(r => "'" + r.Name + "'");
 		}

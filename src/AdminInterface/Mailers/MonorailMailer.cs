@@ -189,6 +189,17 @@ namespace AdminInterface.Mailers
 
 		private MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
+			var propertyMessage = property.Message;
+			var notifyAware = property as INotificationAware;
+			if (notifyAware != null)
+				propertyMessage = notifyAware.NotifyMessage;
+
+			//может быть null если property решило что не нужно отправлять
+			//уведомления для этого изменения
+			//например: регин который был добавлен помечен как не уведомляемый
+			if (String.IsNullOrEmpty(propertyMessage))
+				return this;
+
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
 			if (property.IsHtml) {
 				Template = "PropertyChanged_html";
@@ -200,7 +211,9 @@ namespace AdminInterface.Mailers
 			}
 			var message = new StringBuilder();
 			message.Append(GetAdditionalMessages(entity).ToString());
-			message.AppendLine(property.Message.Remove(0, 3));
+			if (propertyMessage.StartsWith("$$$"))
+				propertyMessage = propertyMessage.Remove(0, 3);
+			message.AppendLine(propertyMessage);
 
 			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
 			if (idLabel == null)

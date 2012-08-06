@@ -18,21 +18,17 @@ namespace AdminInterface.Models.Audit
 
 		protected override void Convert(PropertyInfo property, object newValue, object oldValue)
 		{
-			if (oldValue == null)
-			{
+			if (oldValue == null) {
 				OldValue = "";
 			}
-			else
-			{
+			else {
 				OldValue = AsString(property, oldValue);
 			}
 
-			if (newValue == null)
-			{
+			if (newValue == null) {
 				NewValue = "";
 			}
-			else
-			{
+			else {
 				NewValue = AsString(property, newValue);
 			}
 

@@ -1,63 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AdminInterface.Security;
-using Castle.ActiveRecord;
-using Castle.ActiveRecord.Framework;
-using Castle.ActiveRecord.Linq;
-using Common.Tools;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
-using Common.Web.Ui.Models;
-using NHibernate.Criterion;
+﻿using System.Linq;
 
 namespace AdminInterface.Models
 {
-	public static class RegionHelper
-	{
-		public static IList<Region> GetAllRegions()
-		{
-			return ArHelper.WithSession(session =>
-			{
-				var regions = session.CreateSQLQuery(@"
-select
-	(select sum(regioncode) from farm.regions) as {Region.Id},
-	'Все' as {Region.Name}, 
-	(select sum(DefaultShowRegionMask) from farm.regions) as {Region.DefaultShowRegionMask},
-	1 as IsAll,
-	0 as {Region.DrugsSearchRegion},
-	0 as {Region.AddressPayment},
-	0 as {Region.UserPayment},
-	0 as {Region.SupplierUserPayment},
-	'' as {Region.ShortAliase},
-	false as {Region.Retail},
-	'' as {Region.TechContact},
-	'' as {Region.TechOperatingMode}
-union
-SELECT  r.RegionCode as {Region.Id},
-		r.Region as {Region.Name},
-		r.DefaultShowRegionMask as {Region.DefaultShowRegionMask},
-		0 as IsAll,
-		r.DrugsSearchRegion as {Region.DrugsSearchRegion},
-		r.AddressPayment as {Region.AddressPayment},
-		r.UserPayment as {Region.UserPayment},
-		r.SupplierUserPayment as {Region.SupplierUserPayment},
-		r.ShortAliase as {Region.ShortAliase},
-		r.Retail as {Region.Retail},
-		r.TechContact as {Region.TechContact},
-		r.TechOperatingMode as {Region.TechOperatingMode}
-FROM	farm.regions as r
-WHERE	:Mask & r.regioncode > 0
-ORDER BY IsAll Desc, {Region.Name};")
-					.AddEntity(typeof(Region))
-					.SetParameter("Mask", SecurityContext.Administrator.RegionMask)
-					.List<Region>();
-				regions.Each(session.Evict);
-				return regions;
-			});
-		}
-	}
-
 	public class RegionSettings
 	{
 		public ulong Id { get; set; }

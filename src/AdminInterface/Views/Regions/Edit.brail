@@ -23,6 +23,12 @@ ${FormHelper.FormTag("", {})}
 			</td>
 		</tr>
 		<tr>
+			<td colspan=2>
+				${app.Edit("region.DoNotNotify")}
+				${app.GetValidationError("region.DoNotNotify")}
+			</td>
+		</tr>
+		<tr>
 			<td>
 				<label>${app.GetLabel("region.UserPayment")}:</label>
 			</td>

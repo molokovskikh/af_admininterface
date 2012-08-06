@@ -33,6 +33,11 @@ namespace AdminInterface.Models.Audit
 		bool ShouldNotify();
 	}
 
+	public interface INotificationAware
+	{
+		string NotifyMessage { get; set; }
+	}
+
 	public class ChangeNotificationSender : ISendNoticationChangesInterface
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (ChangeNotificationSender));
@@ -52,10 +57,8 @@ namespace AdminInterface.Models.Audit
 				mailer.UnderTest = UnderTest;
 
 				mailer.NotifyAboutChanges(property, entity, to);
-
 			}
 			catch (Exception ex) {
-				Console.WriteLine(ex);
 				_log.Error("Ошибка отправки уведомлений об изменении наблюдаемых полей", ex);
 			}
 		}

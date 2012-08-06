@@ -112,17 +112,19 @@ namespace AdminInterface.Controllers
 			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
 		}
 
-		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
+		public void UpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
 			DateTime beginDate, DateTime endDate)
 		{
 			var filter = new UpdateFilter();
 			filter.BeginDate = beginDate;
 			filter.EndDate = endDate;
 
-			if (updateType.HasValue)
-			{
+			if (updateType.HasValue) {
 				filter.UpdateType = updateType;
-				filter.RegionMask = regionMask & Admin.RegionMask;
+				filter.RegionMask = Admin.RegionMask;
+
+				if (regionMask.HasValue)
+					filter.RegionMask &= regionMask.Value;
 			}
 			if (clientCode.HasValue)
 				filter.Client = DbSession.Load<Client>(clientCode.Value);

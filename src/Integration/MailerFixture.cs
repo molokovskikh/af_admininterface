@@ -281,6 +281,14 @@ namespace Integration
 		}
 
 		[Test]
+		public void Do_not_notify_about_ignored_region_changes()
+		{
+			var property = new MaskedAuditableProperty(user.GetType().GetProperty("WorkRegionMask"), "Регионы работы", 1ul | 524288ul, 1ul);
+			mailer.NotifyAboutChanges(property, user, "Billing@analit.net");
+			Assert.That(message, Is.Null);
+		}
+
+		[Test]
 		public void Accounting_changed()
 		{
 			using (new SessionScope())

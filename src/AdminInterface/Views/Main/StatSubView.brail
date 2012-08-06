@@ -1,4 +1,4 @@
-﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${RegionMask}" %>
+﻿<% uriTemplate = "${siteroot}/Logs/UpdateLog?BeginDate=${FromDate}&EndDate=${ToDate.AddDays(1)}&RegionMask=${?query.Region.Id}" %>
 
 <style type="text/css">
 	.StatisticData
@@ -316,7 +316,7 @@
 					<td class="statistic-label">Отсутствуют:</td>
 					<td class="statistic-value" id="StatisticsTD">
 						<%title = TotalNotSendCertificates + "/" + CertificateNotSendUniqUsers + "/" + CertificateNotSendUniqClients + "/" + CertificateNotSendUniqSuppliers %>
-						${app.LinkTo(title, @Logs, @Statistics,  {"filter.Period.Begin": FromDate, "filter.Period.End" : ToDate, "filter.Region.Id" : regioncode})}
+						${app.LinkTo(title, @Logs, @Statistics,  {"filter.Period.Begin": FromDate, "filter.Period.End" : ToDate, "filter.Region.Id" : ?query.Region.Id})}
 					</td>
 					<td class="statistic-label">Последний запрос:</td>
 					<td class="statistic-value">${LastCertificateRequest}</td>
@@ -367,7 +367,7 @@
 			<div>
 				<form id="SearchForm" name="SearchForm" action="${siteroot}/UserSearch/Search">
 					<input type="hidden" name="filter.SearchBy" value="Auto" />
-					<input type="hidden" name="filter.Region.Id" value="${regioncode}" />
+					<input type="hidden" name="filter.Region.Id" value="${?query.Region.Id}" />
 					<div class="search-header" style="text-align:center">
 						<label>Поиск пользователей</label>
 						<input type="text" id="filter_SearchText" name="filter.SearchText" style="width: 300px;" value="" />
@@ -383,12 +383,8 @@
 					${FormHelper.HiddenField("from", fromDate.ToShortDateString())}
 					${FormHelper.HiddenField("to", toDate.ToShortDateString())}
 					<div>
-						<label for="RegionList">Регион:</label>
-						<select name="regioncode">
-							<% for region in regions: %>
-							<option value=${region.Id} ${"selected" if region.Id == regionMask}>${region.Name}</option>
-							<% end %>
-						</select>
+						${app.Label("query.Region")}
+						${app.Edit("query.Region")}
 					</div>
 					<div>
 						${app.Edit("query.Full")}
