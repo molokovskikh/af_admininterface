@@ -46,10 +46,10 @@ namespace AdminInterface.Models.Audit
 				NotifyMessage = String.Format("Изменено '{0}'", Name);
 
 				if (!String.IsNullOrEmpty(notifyAdded))
-					NotifyMessage += " Удалено " + notifyAdded;
+					NotifyMessage += " Добавлено " + notifyAdded;
 
 				if (!String.IsNullOrEmpty(notifyRemoved))
-					NotifyMessage += " Добавлено " + notifyRemoved;
+					NotifyMessage += " Удалено " + notifyRemoved;
 			}
 		}
 
@@ -65,8 +65,8 @@ namespace AdminInterface.Models.Audit
 		{
 			return items
 				.Select(i => Region.TryFind(i))
-				.Where(r => !r.DoNotNotify)
 				.Where(r => r != null)
+				.Where(r => !r.DoNotNotify)
 				.Implode(r => "'" + r.Name + "'");
 		}
 

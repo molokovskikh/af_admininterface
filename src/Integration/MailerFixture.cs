@@ -277,7 +277,7 @@ namespace Integration
 			mailer.NotifyAboutChanges(property, user, "Billing@analit.net");
 			Assert.That(message.IsBodyHtml, Is.False);
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
-			Assert.That(message.Body, Is.StringContaining("Клиент: Тестовый клиент"));
+			Assert.That(message.Body, Is.StringContaining("Клиент Тестовый клиент"));
 		}
 
 		[Test]
