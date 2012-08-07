@@ -134,12 +134,6 @@ namespace Integration.Controllers
 			Assert.That(registredClient.Settings.EnableSmartOrder, Is.EqualTo(true));
 		}
 
-		private void Prepare()
-		{
-			Request.Params.Add("user.Name", "Тестовый пользователь");
-			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
-		}
-
 		[Test]
 		public void Register_client_without_address()
 		{
@@ -201,6 +195,24 @@ namespace Integration.Controllers
 			Assert.That(supplier.Id, Is.GreaterThan(0));
 			var user = supplier.Users.First();
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
+		}
+
+		[Test]
+		public void Register_hidden_client()
+		{
+			Prepare();
+			Request.Params.Add("client.Settings.IsHiddenFromSupplier", "True");
+
+			controller.RegisterClient(client, 4, regionSettings, null, options, null,
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
+			var registredClient = RegistredClient();
+			Assert.That(registredClient.Settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
+		}
+
+		private void Prepare()
+		{
+			Request.Params.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 		}
 
 		private Client RegistredClient()

@@ -34,7 +34,6 @@ namespace Integration.ForTesting
 			};
 
 			client.Settings = new DrugstoreSettings(client) {
-				BasecostPassword = "",
 				WorkRegionMask = homeRegion.Id,
 				OrderRegionMask = homeRegion.Id,
 			};

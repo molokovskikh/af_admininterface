@@ -367,17 +367,10 @@ namespace AdminInterface.Controllers
 
 		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, Supplier supplier)
 		{
-			var costCrypKey = DbSession
-				.CreateSQLQuery("select usersettings.GeneratePassword()")
-				.UniqueResult<string>();
+			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
 
-			var smartOrder = SmartOrderRules.TestSmartOrder();
-			client.Settings.InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart;
-			client.Settings.BasecostPassword = costCrypKey;
-			client.Settings.SmartOrderRules = smartOrder;
-
-			if (additionalSettings.ShowForOneSupplier)
-			{
+			if (additionalSettings.ShowForOneSupplier) {
+				client.Settings.InvisibleOnFirm = DrugstoreType.Hidden;
 				client.Settings.NoiseCosts = true;
 				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
 			}

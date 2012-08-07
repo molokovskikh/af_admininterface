@@ -121,9 +121,6 @@ namespace AdminInterface.Models
 		[Property, Description("Активировать механизм аптечной корректировки цен (CreditNote, пересчет отсрочек в цены)"), Auditable]
 		public virtual bool AllowDelayOfPayment { get; set; }
 
-		[Property(NotNull = true)]
-		public virtual string BasecostPassword { get; set; }
-
 		[Property, Description("Принимать накладные от клиента"), Auditable]
 		public virtual bool SendWaybillsFromClient { get; set; }
 
