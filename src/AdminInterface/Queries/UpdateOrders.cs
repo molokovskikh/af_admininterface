@@ -38,7 +38,7 @@ namespace AdminInterface.Queries
 
 			sql = sql.Select(s => String.Format(s, "Orders")).ToList();
 #if !DEBUG
-			sql.AddRange(sql.Select(s => String.Format(s, "OrdersOld")));
+			sql.AddRange(sql.Select(s => String.Format(s, "OrdersOld")).ToList());
 #endif
 			query.Sql = sql.Implode(";");
 			query.SetParameter("clientId", Client.Id);
