@@ -195,37 +195,5 @@ namespace Integration.Models
 			Assert.That(message.To[0].ToString(), Is.EqualTo("BillingList@analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
 		}
-
-		[Test]
-		public void Notify_about_news_change_propertyes()
-		{
-			ForTest.InitializeMailer();
-			MailMessage message = null;
-			ChangeNotificationSender.Sender = ForTest.CreateStubSender(m => message = m);
-			ChangeNotificationSender.UnderTest = true;
-
-			Reopen();
-			var news = new News {
-				Header = "TestNewHeader",
-				Body = "TestNewsBody",
-				PublicationDate = DateTime.Now
-			};
-			Save(news);
-			Reopen();
-			news = session.Load<News>(news.Id);
-			news.Body = "NewTestNewsBody";
-			Save(news);
-			Close();
-			Assert.That(message, Is.Not.Null);
-			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
-test<br>
-localhost<br>
-Код {0}<br>
-Новость <a href=""/News/{0}"">TestNewHeader</a><br>
-Изменено 'Тело новости' </br> <b>было</b> 'TestNewsBody'</br><b>стало</b> 'NewTestNewsBody'
-", news.Id, DateTime.Now)));
-			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
-			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Тело новости'"));
-		}
 	}
 }
