@@ -10,8 +10,7 @@ namespace AdminInterface.Controllers
 		public void Show(uint id, DateTime? begin, DateTime? end)
 		{
 			var payer = Payer.Find(id);
-			if (payer.Recipient == null)
-			{
+			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
@@ -31,8 +30,7 @@ namespace AdminInterface.Controllers
 		public void Print(uint id, DateTime? begin, DateTime? end)
 		{
 			var payer = Payer.Find(id);
-			if (payer.Recipient == null)
-			{
+			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
@@ -51,8 +49,7 @@ namespace AdminInterface.Controllers
 		public void Mail(uint id, DateTime? begin, DateTime? end, string emails, string message)
 		{
 			var payer = Payer.Find(id);
-			if (payer.Recipient == null)
-			{
+			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
@@ -73,8 +70,7 @@ namespace AdminInterface.Controllers
 		public void Excel(uint id, DateTime? begin, DateTime? end)
 		{
 			var payer = Payer.Find(id);
-			if (payer.Recipient == null)
-			{
+			if (payer.Recipient == null) {
 				Error("У плательщика не указан получатель платежей, выберете получателя платежей.");
 				RedirectToReferrer();
 				return;
