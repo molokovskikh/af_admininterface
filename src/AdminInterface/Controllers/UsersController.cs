@@ -422,7 +422,7 @@ namespace AdminInterface.Controllers
 		{
 			var user = DbSession.Load<User>(id);
 
-			if (user.CanDelete()) {
+			if (user.CanDelete(DbSession)) {
 				var payer = user.Payer;
 				user.Delete();
 				payer.UpdatePaymentSum();

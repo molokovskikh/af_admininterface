@@ -21,6 +21,8 @@ using Common.Tools;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models.Audit;
+using NHibernate;
+using NHibernate.Linq;
 using log4net;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Billing;
@@ -386,11 +388,21 @@ and i.LegalEntityId = :OldLegalEntityId
 			Payer.AddComment(billingMessage);
 		}
 
-		public virtual bool CanDelete()
+		public virtual bool CanDelete(ISession session)
 		{
-			var canDelete = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>
-				.Queryable.Where(o => o.Address == this));
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>()
+				.Where(o => o.Address == this));
 			return Disabled && canDelete;
+		}
+
+		public virtual void CheckBeforeDelete(ISession session)
+		{
+			if (!Disabled)
+				throw new EndUserException(String.Format("Клиент {0} не отключен", Name));
+
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>().Where(o => o.Address == this));
+			if (!canDelete)
+				throw new EndUserException(String.Format("Для адреса доставки {0} есть заказы за интервал больше 14 дней", Name));
 		}
 
 		public override void Delete()

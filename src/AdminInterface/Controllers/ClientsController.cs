@@ -513,7 +513,7 @@ where s.Name like :SearchText")
 		{
 			var client = Client.FindAndCheck<Client>(id);
 
-			if (!client.CanDelete()) {
+			if (!client.CanDelete(DbSession)) {
 				Error("Не могу удалить клиента т.к. у него есть заказы");
 				RedirectToReferrer();
 				return;

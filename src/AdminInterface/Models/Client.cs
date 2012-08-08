@@ -25,6 +25,7 @@ using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models
 {
@@ -440,13 +441,26 @@ where ClientId = :clientId")
 			Settings.OrderRegionMask = region.Id;
 		}
 
-		public virtual bool CanDelete()
+		public virtual bool CanDelete(ISession session)
 		{
-			var haveOrders = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>.Queryable.Where(o => o.Client == this));
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>().Where(o => o.Client == this));
 			return Disabled
-				&& haveOrders
-				&& Addresses.All(a => a.CanDelete())
-				&& Users.All(u => u.CanDelete());
+				&& canDelete
+				&& Addresses.All(a => a.CanDelete(session))
+				&& Users.All(u => u.CanDelete(session));
+		}
+
+		public virtual void CheckBeforeDelete(ISession session)
+		{
+			if (!Disabled)
+				throw new EndUserException(String.Format("Клиент {0} не отключен", Name));
+
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>().Where(o => o.Client == this));
+			if (!canDelete)
+				throw new EndUserException(String.Format("Для клиента {0} есть заказы за интервал больше 14 дней", Name));
+
+			Addresses.Each(a => a.CheckBeforeDelete(session));
+			Users.Each(u => u.CheckBeforeDelete(session));
 		}
 
 		public virtual void Delete(ISession session)
@@ -487,9 +501,11 @@ where ClientId = :clientId")
 		{
 			get
 			{
-				return new [] {
-					new ModelAction(this, "Delete", "Удалить", !CanDelete())
-				};
+				return ArHelper.WithSession(s => {
+					return new [] {
+						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
+					};
+				});
 			}
 		}
 

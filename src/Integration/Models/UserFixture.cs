@@ -122,7 +122,7 @@ namespace Integration.Models
 		public void Delete_user()
 		{
 			user.Enabled = false;
-			Assert.That(user.CanDelete(), Is.True);
+			Assert.That(user.CanDelete(session), Is.True);
 			scope.Flush();
 			user.Delete();
 			scope.Flush();
@@ -137,7 +137,7 @@ namespace Integration.Models
 			user.Enabled = false;
 			Save(new ClientOrder(user, supplier.Prices[0]));
 
-			Assert.That(user.CanDelete(), Is.True);
+			Assert.That(user.CanDelete(session), Is.True);
 			scope.Flush();
 			user.Delete();
 			scope.Flush();
