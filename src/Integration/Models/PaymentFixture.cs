@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using AdminInterface.Models.Billing;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Models
@@ -124,7 +125,7 @@ namespace Integration.Models
 		public void Ignore_inn_from_black_list()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.INN = DataMother.RandomInn();
 			new IgnoredInn(payer.INN).Save();
 			payer.SaveAndFlush();
@@ -145,7 +146,7 @@ namespace Integration.Models
 		public void Identify_payment()
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.INN = DataMother.RandomInn();
 			payer.SaveAndFlush();
 

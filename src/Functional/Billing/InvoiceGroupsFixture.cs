@@ -6,6 +6,7 @@ using Castle.ActiveRecord;
 using Common.Tools;
 using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
 using WatiN.CssSelectorExtensions;
@@ -23,7 +24,7 @@ namespace Functional.Billing
 		{
 			client = DataMother.CreateClientAndUsers();
 			payer = client.Payers.First();
-			payer.Recipient = Recipient.Queryable.First();
+			payer.Recipient = session.Query<Recipient>().First();
 			payer.Users.Each(u => u.Accounting.ReadyForAccounting = true);
 			session.SaveOrUpdate(client);
 			payer.Save();

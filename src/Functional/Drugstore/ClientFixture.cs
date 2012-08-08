@@ -151,7 +151,7 @@ namespace Functional.Drugstore
 			Assert.IsNotNull(organizaion);
 			organizaion.Name = "JuridicalOrganization";
 			session.Save(organizaion);
-			scope.Flush();
+			Flush();
 			browser.Refresh();
 			Click(organizaion.Name);
 			AssertText("Краткое наименование");
@@ -190,7 +190,7 @@ namespace Functional.Drugstore
 			var payer = DataMother.CreatePayer();
 			payer.Save();
 			payer.Name = "Тестовый плательщик " + payer.Id;
-			scope.Flush();
+			Flush();
 
 			Css("#ChangePayer .term").TypeText(payer.Name);
 			Css("#ChangePayer input[type=button].search").Click();

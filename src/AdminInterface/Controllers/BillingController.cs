@@ -151,8 +151,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
 			PropertyBag["Today"] = DateTime.Today;
-			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
-
+			PropertyBag["Recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 			PropertyBag["suppliers"] = DbSession.Query<Supplier>().Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
 			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
 			PropertyBag["Users"] = payer.Users.Where(u => u.RootService.Type != ServiceType.Supplier).ToList();

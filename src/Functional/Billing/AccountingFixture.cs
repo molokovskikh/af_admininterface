@@ -75,33 +75,29 @@ namespace Functional.Billing
 			Ignore("Временно до починки")]
 		public void Check_address_for_accounting()
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			client.AddUser("test user");
+
+			var address = new Address {Value = "address",};
+			client.AddAddress(address);
+			address.Save();
+			client = session.Load<Client>(client.Id);
+
+			client.Users[0].Enabled = true;
+			session.SaveOrUpdate(client.Users[0]);
+
+			client.Addresses[0].Enabled = true;
+			client.Addresses[0].Accounting.BeAccounted = false;
+			client.Addresses[0].Value = String.Format("Test address for accounting [{0}]", client.Addresses[0].Id);
+			client.Addresses[0].Save();
+
+			client.Addresses[1].Enabled = true;
+			client.Addresses[1].Accounting.BeAccounted = true;
+			client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
+			client.Addresses[1].Save();
+			foreach (var addr in client.Addresses)
 			{
-				client.AddUser("test user");
-
-				var address = new Address {Value = "address",};
-				client.AddAddress(address);
-				address.Save();
-				client = ActiveRecordBase<Client>.Find(client.Id);
-
-				client.Users[0].Enabled = true;
-				session.SaveOrUpdate(client.Users[0]);
-
-				client.Addresses[0].Enabled = true;
-				client.Addresses[0].Accounting.BeAccounted = false;
-				client.Addresses[0].Value = String.Format("Test address for accounting [{0}]", client.Addresses[0].Id);
-				client.Addresses[0].Save();
-
-				client.Addresses[1].Enabled = true;
-				client.Addresses[1].Accounting.BeAccounted = true;
-				client.Addresses[1].Value = String.Format("Test address for accounting [{0}]", client.Addresses[1].Id);
-				client.Addresses[1].Save();
-				foreach (var addr in client.Addresses)
-				{
-					addr.AvaliableForUsers = new List<User> { client.Users[0] };
-					addr.Save();
-				}
-				scope.VoteCommit();
+				addr.AvaliableForUsers = new List<User> { client.Users[0] };
+				addr.Save();
 			}
 			using (var browser = Open("Billing/Accounting"))
 			{

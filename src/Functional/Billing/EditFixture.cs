@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using AdminInterface.Models.Billing;
-using Functional.ForTesting;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
-using WatiN.Core.Native.Windows;
 
 namespace Functional.Billing
 {
@@ -21,8 +17,8 @@ namespace Functional.Billing
 		public void SetUp()
 		{
 			payer = DataMother.CreatePayer();
-			payer.Recipient = Recipient.FindFirst();
-			payer.Save();
+			payer.Recipient = session.Query<Recipient>().First();
+			session.Save(payer);
 			browser = Open(string.Format("Billing/Edit?BillingCode={0}#tab-mail", payer.Id));
 		}
 
@@ -34,7 +30,7 @@ namespace Functional.Billing
 			Console.WriteLine(items[0].Value);
 			selectList.SelectByValue(items[0].Value);
 			browser.TableCell("savePayer").Buttons.First().Click();
-			scope.Flush();
+			Flush();
 			payer.Refresh();
 			Assert.IsNull(payer.Recipient);
 		}

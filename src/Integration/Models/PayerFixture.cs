@@ -24,7 +24,7 @@ namespace Integration.Models
 			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
 			payer.UpdateAndFlush();
 
-			var payers = Payer.GetLikeAvaliable(payer.ShortName);
+			var payers = Payer.GetLikeAvaliable(session, payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
 			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
 		}
@@ -39,7 +39,7 @@ namespace Integration.Models
 			Save(payer);
 			Flush();
 
-			var payers = Payer.GetLikeAvaliable(payer.ShortName);
+			var payers = Payer.GetLikeAvaliable(session, payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
 			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
 		}

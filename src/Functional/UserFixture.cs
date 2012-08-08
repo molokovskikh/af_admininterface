@@ -22,7 +22,7 @@ namespace Functional
 		public void Setup()
 		{
 			client = DataMother.CreateTestClientWithAddressAndUser();
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 			user = client.Users[0];
 		}
 

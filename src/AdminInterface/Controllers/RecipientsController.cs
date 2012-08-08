@@ -1,26 +1,33 @@
 ﻿using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
-	public class RecipientsController : ARSmartDispatcherController
+	public class RecipientsController : AdminInterfaceController
 	{
+		public RecipientsController()
+		{
+			SetARDataBinder();
+		}
+
 		public void Index()
 		{
-			var recipients = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+			var recipients = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 			if (IsPost)
 			{
 				var forSave = (Recipient[])BindObject(ParamStore.Form, typeof(Recipient[]), "recipients", AutoLoadBehavior.NewInstanceIfInvalidKey);
 				var deleted = recipients.Where(r => !forSave.Any(n => n.Id == r.Id));
-				deleted.Each(d => d.Delete());
+				deleted.Each(d => DbSession.Delete(d));
 				foreach (var recipient in forSave)
-					recipient.Save();
-				Flash["Message"] = Message.Notify("Сохранено");
+					DbSession.Save(recipient);
+				Notify("Сохранено");
 				RedirectToAction("Index");
 			}
 			else
@@ -31,12 +38,12 @@ namespace AdminInterface.Controllers
 
 		public void Edit(uint id)
 		{
-			var recipient = Recipient.Find(id);
+			var recipient = DbSession.Load<Recipient>(id);
 			if (IsPost)
 			{
 				BindObjectInstance(recipient, "recipient");
-				recipient.Save();
-				Flash["Message"] = Message.Notify("Сохранено");
+				DbSession.Save(recipient);
+				Notify("Сохранено");
 				RedirectToReferrer();
 			}
 			else

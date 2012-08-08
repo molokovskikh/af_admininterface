@@ -142,7 +142,7 @@ namespace Functional.Suppliers
 			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
 			browser.Button("saveCertificateSourceButton").Click();
 			AssertText("Сохранено");
-			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			session.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
 			newCertificate.Delete();
 		}

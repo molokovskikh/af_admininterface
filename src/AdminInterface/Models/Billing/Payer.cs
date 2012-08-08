@@ -259,42 +259,33 @@ namespace AdminInterface.Models.Billing
 			return AutoInvoice == InvoiceType.Manual;
 		}
 
-		public static IEnumerable<Payer> GetLikeAvaliable(string searchPattern)
+		public static IEnumerable<Payer> GetLikeAvaliable(ISession session, string searchPattern)
 		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
-			var session = sessionHolder.CreateSession(typeof(Payer));
 			var allowViewSuppliers = SecurityContext.Administrator.HavePermisions(PermissionType.ViewSuppliers);
 			var allowViewDrugstore = SecurityContext.Administrator.HavePermisions(PermissionType.ViewDrugstore);
-			try
-			{
-				var filter = String.Empty;
-				if (!allowViewDrugstore)
-					filter += " and c.FirmType <> 1 ";
-				if (!allowViewSuppliers)
-					filter += " and c.FirmType <> 0 ";
-				var sql = @"
+			var filter = String.Empty;
+			if (!allowViewDrugstore)
+				filter += " and c.FirmType <> 1 ";
+			if (!allowViewSuppliers)
+				filter += " and c.FirmType <> 0 ";
+			var sql = @"
 SELECT {Payer.*}
 FROM billing.payers {Payer}
 WHERE {Payer}.ShortName like :SearchText
 and (exists(
-		select * from Customers.Clients c
-			join Billing.PayerClients pc on pc.ClientId = c.Id
-		where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
-	) or exists(
-		select * from Customers.Suppliers s
-		where s.Payer = {Payer}.PayerId and s.Disabled = 0 and (s.RegionMask & :AdminRegionCode > 0)
-	))
+	select * from Customers.Clients c
+		join Billing.PayerClients pc on pc.ClientId = c.Id
+	where pc.PayerId = {Payer}.PayerId and c.Status = 1 and (c.MaskRegion & :AdminRegionCode > 0) " + filter + @"
+) or exists(
+	select * from Customers.Suppliers s
+	where s.Payer = {Payer}.PayerId and s.Disabled = 0 and (s.RegionMask & :AdminRegionCode > 0)
+))
 ORDER BY {Payer}.shortname;";
-				var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
-					.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
-					.SetParameter("SearchText", "%" + searchPattern  + "%")
-					.List<Payer>().Distinct();
-				return resultList;
-			}
-			finally
-			{
-				sessionHolder.ReleaseSession(session);
-			}
+			var resultList = session.CreateSQLQuery(sql).AddEntity(typeof(Payer))
+				.SetParameter("AdminRegionCode", SecurityContext.Administrator.RegionMask)
+				.SetParameter("SearchText", "%" + searchPattern  + "%")
+				.List<Payer>().Distinct();
+			return resultList;
 		}
 
 		public virtual decimal TotalSum
@@ -522,11 +513,9 @@ ORDER BY {Payer}.shortname;";
 		{
 			get
 			{
-				return ArHelper.WithSession(s => {
-					return new [] {
-						new ModelAction(this, "Delete", "Удалить", !CanDelete(s))
-					};
-				});
+				return new [] {
+					new ModelAction(this, "Delete", "Удалить Плательщика")
+				};
 			}
 		}
 

@@ -5,6 +5,7 @@ using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.log4net;
 
@@ -18,7 +19,7 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
 			payer.SaveAndFlush();
 
@@ -72,12 +73,12 @@ namespace Integration.Models
 		{
 			var client = DataMother.TestClient();
 			var payer = client.Payers.First();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
 			payer.Save();
 
 			var items = new PayerFilter{
-				Recipient = Recipient.Queryable.First()
+				Recipient = session.Query<Recipient>().First()
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
 		}

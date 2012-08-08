@@ -26,7 +26,7 @@ namespace Functional.Drugstore
 			var supplier = DataMother.CreateSupplier();
 			Save(supplier);
 			client = DataMother.CreateTestClientWithUser();
-			scope.Flush();
+			Flush();
 			Open(client);
 			Assert.That(browser.Text, Is.StringContaining("Клиент"));
 		}
@@ -194,7 +194,7 @@ namespace Functional.Drugstore
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 			var address = oldClient.Addresses[0];
 			var addressIdForMove = address.Id;
-			scope.Flush();
+			Flush();
 
 			Open(address);
 			browser.TextField(Find.ById("TextForSearchClient")).TypeText(newClient.Id.ToString());

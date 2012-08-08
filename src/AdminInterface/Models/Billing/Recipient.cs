@@ -3,11 +3,14 @@ using System.Linq;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
+using Common.Web.Ui.ActiveRecordExtentions;
+using NHibernate;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Billing
 {
 	[ActiveRecord(Schema = "Billing")]
-	public class Recipient : ActiveRecordLinqBase<Recipient>
+	public class Recipient
 	{
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
@@ -60,7 +63,12 @@ namespace AdminInterface.Models.Billing
 
 		public static IList<Recipient> All()
 		{
-			return Queryable.OrderBy(r => r.Name).ToList();
+			return ArHelper.WithSession(s => All(s));
+		}
+
+		public static IList<Recipient> All(ISession session)
+		{
+			return session.Query<Recipient>().OrderBy(r => r.Name).ToList();
 		}
 	}
 }

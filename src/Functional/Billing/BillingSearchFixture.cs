@@ -24,7 +24,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress(new Address { Client = client, Value = "test address for billing", });
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 			foreach (var address in client.Addresses)
 			{
 				address.Enabled = false;

@@ -535,7 +535,7 @@ WHERE   pricesdata.firmcode = s.Id
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			PropertyBag["payers"] = Payer.GetLikeAvaliable(searchPattern);
+			PropertyBag["payers"] = Payer.GetLikeAvaliable(DbSession, searchPattern);
 			CancelLayout();
 		}
 

@@ -93,7 +93,7 @@ namespace Functional.Drugstore
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
-			scope.Flush();
+			Flush();
 
 			AssetSearch(SearchUserBy.ByLogin, user.Login);
 			if (browser.TableBody(Find.ById("SearchResults")).Exists)
@@ -117,7 +117,7 @@ namespace Functional.Drugstore
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			MakeNameUniq(client);
-			scope.Flush();
+			Flush();
 			AssetSearch(SearchUserBy.ByClientName, client.Name);
 		}
 
@@ -134,7 +134,7 @@ namespace Functional.Drugstore
 			var payer = client.Payers[0];
 			payer.JuridicalName = payer.JuridicalOrganizations[0].Name;
 			payer.Update();
-			scope.Flush();
+			Flush();
 			var name = payer.JuridicalName;
 			AssetSearch(SearchUserBy.ByJuridicalName, name);
 		}
@@ -144,7 +144,7 @@ namespace Functional.Drugstore
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers[0];
-			scope.Flush();
+			Flush();
 
 			AssetSearch(SearchUserBy.ByPayerId, payer.Id.ToString());
 		}
@@ -173,7 +173,7 @@ namespace Functional.Drugstore
 		public void Autosearch_by_client_name()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Name);
 			browser.Button(Find.ByValue("Поиск")).Click();
@@ -192,7 +192,7 @@ namespace Functional.Drugstore
 				c.AddUser(new User(c) {Name = "test",});
 				c.AddUser(new User(c) {Name = "test",});
 			});
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Id.ToString());
 			browser.Button(Find.ByValue("Поиск")).Click();
@@ -221,7 +221,7 @@ namespace Functional.Drugstore
 				c.AddUser(new User(c) {Name = "test",});
 				c.AddUser(new User(c) {Name = "test",});
 			});
-			scope.Flush();
+			Flush();
 
 			Search(SearchUserBy.ByClientId, client.Id.ToString());
 
@@ -233,7 +233,7 @@ namespace Functional.Drugstore
 		public void Search_with_number_symbol()
 		{
 			var client = DataMother.CreateTestClientWithUser();
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(client.Users[0].Id.ToString());
 			browser.Button(Find.ByValue("Поиск")).Click();
@@ -247,7 +247,7 @@ namespace Functional.Drugstore
 			var client = DataMother.CreateTestClientWithAddressAndUser();
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, String.Format("{0}-124578", client.Id.ToString().Substring(0, 4))));
-			scope.Flush();
+			Flush();
 
 			browser.TextField(Find.ById("filter_SearchText")).TypeText(String.Format("{0}-124578", client.Id.ToString().Substring(0, 4)));
 			browser.Button(Find.ByValue("Поиск")).Click();
@@ -294,7 +294,7 @@ namespace Functional.Drugstore
 			var mail = String.Format("test{0}@test.test", client.Id);
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Email, mail));
-			scope.Flush();
+			Flush();
 
 			Search(SearchUserBy.ByContacts, mail);
 			CheckThatIsUserPage(browser);
@@ -307,7 +307,7 @@ namespace Functional.Drugstore
 			var phone = String.Format("{0}-123456", client.Id.ToString().RightSlice(4));
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.AddContact(new Contact(ContactType.Phone, phone));
-			scope.Flush();
+			Flush();
 
 			Search(SearchUserBy.ByContacts, phone);
 			CheckThatIsUserPage(browser);
@@ -321,7 +321,7 @@ namespace Functional.Drugstore
 			client.Users[0].AddContactGroup();
 			client.Users[0].ContactGroup.SaveAndFlush();
 			client.Users[0].ContactGroup.AddPerson(person);
-			scope.Flush();
+			Flush();
 
 			Search(SearchUserBy.ByPersons, person);
 			CheckThatIsUserPage(browser);

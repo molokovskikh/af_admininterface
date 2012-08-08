@@ -26,7 +26,7 @@ namespace Functional.Drugstore
 		{
 			client = DataMother.CreateTestClientWithUser();
 			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
-			scope.Flush();
+			Flush();
 			settings = client.Settings;
 
 			browser = Open(client, "Settings");
@@ -42,7 +42,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
@@ -76,7 +76,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -109,7 +109,7 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -153,7 +153,7 @@ namespace Functional.Drugstore
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			session.Save(new ParseAlgorithm {Name = "testParse"});
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_EnableSmartOrder").Click();

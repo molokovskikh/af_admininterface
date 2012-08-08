@@ -17,7 +17,7 @@ namespace Functional.Suppliers
 			var user = DataMother.CreateSupplierUser();
 			var supplier = (Supplier)user.RootService;
 			Save(supplier);
-			scope.Flush();
+			Flush();
 
 			Open(supplier.Payer);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
@@ -26,7 +26,7 @@ namespace Functional.Suppliers
 			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 			Thread.Sleep(500);
 
-			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			session.Refresh(supplier);
 			Assert.That(supplier.Disabled, Is.True);
 		}
 	}

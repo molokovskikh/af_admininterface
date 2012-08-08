@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Common.Tools;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -33,7 +34,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress("test address for billing");
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 			address = client.Addresses[0];
 			user = client.Users[0];
 			Open(payer);
@@ -135,9 +136,9 @@ namespace Functional.Billing
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
 			session.Refresh(client);
-			scope.Evict(client);
+			session.Evict(client);
 
-			client = ActiveRecordBase<Client>.Find(client.Id);
+			client = session.Load<Client>(client.Id);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -341,15 +342,11 @@ namespace Functional.Billing
 
 		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			for (var i = 0; i < countUsers; i++)
 			{
-				for (var i = 0; i < countUsers; i++)
-				{
-					client.AddUser("user");
-					var address = client.AddAddress("address");
-					address.Save();
-				}
-				scope.VoteCommit();
+				client.AddUser("user");
+				var address = client.AddAddress("address");
+				address.Save();
 			}
 		}
 
@@ -478,7 +475,7 @@ namespace Functional.Billing
 			// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
 			user.Delete();
 			address.Delete();
-			scope.Flush();
+			Flush();
 
 			var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
 			Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
@@ -508,7 +505,7 @@ namespace Functional.Billing
 			browser.WaitUntilContainsText("test message for user", 2);
 
 			Assert.That(browser.Text, Is.StringContaining(messageText));
-			var messages = ActiveRecordBase<Client>.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			messages[0].Refresh();
 			Assert.That(messages[0].Message, Is.EqualTo(messageText));
 			Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
@@ -526,7 +523,7 @@ namespace Functional.Billing
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
 			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
-			var messages = ActiveRecordBase<Client>.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			var message = messages[0];
 
 			message.Refresh();
@@ -606,10 +603,10 @@ namespace Functional.Billing
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 
 			client.Name += client.Id;
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			ActiveRecordMediator.SaveAndFlush(client2);
+			session.SaveOrUpdate(client2);
 			session.Refresh(client);
 			session.Refresh(client2);
 			var testUserId = client2.Users[0].Id;
@@ -641,10 +638,10 @@ namespace Functional.Billing
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 			client.Name += client.Id;
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			ActiveRecordMediator.SaveAndFlush(client2);
+			session.SaveOrUpdate(client2);
 			session.Refresh(client);
 			session.Refresh(client2);
 			var testAddressId = client2.Addresses[0].Id;
@@ -728,7 +725,7 @@ namespace Functional.Billing
 		[Test]
 		public void Change_recipient_for_payer()
 		{
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 
 			browser.Link(Find.ByText("Отправка кореспонденции")).Click();
 

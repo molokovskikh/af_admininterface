@@ -28,7 +28,7 @@ namespace Functional.Drugstore
 			client = DataMother.CreateTestClientWithUser();
 			settings = client.Settings;
 			user = client.Users.First();
-			scope.Flush();
+			Flush();
 
 			Open(client);
 			Assert.That(browser.Text, Is.StringContaining("Клиент"));
@@ -78,7 +78,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Создать")).Click();
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				Assert.That(client.Users.Count, Is.GreaterThan(0));
 				browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
 				browser.Refresh();
@@ -298,7 +298,7 @@ namespace Functional.Drugstore
 			ContactGroup group;
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				group = client.Users[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 							"Не совпадают Id владельца группы у клиента и у новой группы");
@@ -322,7 +322,7 @@ namespace Functional.Drugstore
 			ContactGroup group;
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				group = client.Users[0].ContactGroup;
 				Assert.That(client.ContactGroupOwner.Id, Is.EqualTo(group.ContactGroupOwner.Id),
 							"Не совпадают Id владельца группы у клиента и у новой группы");
@@ -346,7 +346,7 @@ namespace Functional.Drugstore
 			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.Button(Find.ByName(String.Format("contacts[{0}].Delete", group.Contacts[0].Id))).Click();
 				browser.Button(Find.ByValue("Сохранить")).Click();
@@ -426,7 +426,7 @@ namespace Functional.Drugstore
 			user.WorkRegionMask = 2;
 			user.OrderRegionMask = 1;
 			session.SaveOrUpdate(user);
-			scope.Flush();
+			Flush();
 
 			Open(user, "Edit");
 			Assert.IsTrue(browser.CheckBox("WorkRegions[0]").Checked);
@@ -484,7 +484,7 @@ namespace Functional.Drugstore
 			foreach (var region in orderRegions)
 				settings.OrderRegionMask |= region;
 			session.SaveOrUpdate(settings);
-			scope.Flush();
+			Flush();
 
 			browser.Link(Find.ByText("Новый пользователь")).Click();
 			Thread.Sleep(2000);
@@ -524,7 +524,7 @@ namespace Functional.Drugstore
 			browser.TextField(Find.ByName("user.Name")).TypeText("test user");
 			browser.Button(Find.ByValue("Создать")).Click();
 			browser.GoTo(BuildTestUrl(String.Format("client/{0}", client.Id)));
-			client = ActiveRecordBase<Client>.Find(client.Id);
+			client = session.Load<Client>(client.Id);
 			Assert.That(client.Users.Count, Is.EqualTo(1));
 			Assert.IsTrue(client.Users[0].Enabled);
 		}
@@ -613,7 +613,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Пользователь создан"));
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				Assert.That(client.ContactGroupOwner.ContactGroups.Count, Is.EqualTo(1));
 				var persons = client.ContactGroupOwner.ContactGroups[0].Persons;
 				Assert.That(persons.Count, Is.EqualTo(1));
@@ -662,7 +662,7 @@ namespace Functional.Drugstore
 			ContactInformationFixture.AddContact(browser, ContactType.Phone, applyButtonText, client.Id);
 			using (new SessionScope())
 			{
-				client = ActiveRecordBase<Client>.Find(client.Id);
+				client = session.Load<Client>(client.Id);
 				var group = client.Users[0].ContactGroup;
 				browser.TextField(Find.ByName(String.Format("contacts[{0}].Comment", group.Contacts[0].Id))).TypeText("some comment");
 				browser.Button(Find.ByValue("Сохранить")).Click();
@@ -680,11 +680,11 @@ namespace Functional.Drugstore
 			var newClient = DataMother.CreateTestClientWithAddressAndUser();
 
 			oldClient.Name += oldClient.Id.ToString();
-			ActiveRecordMediator.SaveAndFlush(oldClient);
+			session.SaveOrUpdate(oldClient);
 			var user = oldClient.Users[0];
 			newClient.Name += newClient.Id.ToString();
-			ActiveRecordMediator.SaveAndFlush(newClient);
-			scope.Flush();
+			session.SaveOrUpdate(newClient);
+			Flush();
 
 			using (var browser = Open("users/{0}/edit", user.Id))
 			{
