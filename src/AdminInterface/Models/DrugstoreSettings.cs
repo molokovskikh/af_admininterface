@@ -210,6 +210,9 @@ namespace AdminInterface.Models
 		[Property, Description("Тип матрицы предложений"), Auditable]
 		public virtual BuyingMatrixType OfferMatrixType { get; set; }
 
+		[Property(NotNull = true)]
+		public virtual string BasecostPassword { get; set; }
+
 		public virtual bool EnableOfferMatrix
 		{
 			get
@@ -248,6 +251,16 @@ namespace AdminInterface.Models
 			if (payer != null) {
 				payer.ApplySettingsTemplate(this);
 			}
+		}
+
+		public virtual void GenerateCryptPassword()
+		{
+			BasecostPassword = new String(Generator.Random(73)
+				.Select(i => i + 49)
+				.Where(i => !((i > 57 && i < 65) || (i > 90 && i < 97)))
+				.Take(16)
+				.Select(i => (char)i)
+				.ToArray());
 		}
 	}
 }

@@ -33,10 +33,8 @@ namespace Integration.ForTesting
 				ContactGroupOwner = new ContactGroupOwner(),
 			};
 
-			client.Settings = new DrugstoreSettings(client) {
-				WorkRegionMask = homeRegion.Id,
-				OrderRegionMask = homeRegion.Id,
-			};
+			client.Settings.WorkRegionMask = homeRegion.Id;
+			client.Settings.OrderRegionMask = homeRegion.Id;
 
 			payer.Clients = new List<Client> { client };
 			if (action != null)

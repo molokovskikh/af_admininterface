@@ -88,6 +88,7 @@ namespace AdminInterface.Models
 			HomeRegion = homeRegion;
 			JoinPayer(payer);
 			Settings.CheckDefaults();
+			Settings.GenerateCryptPassword();
 		}
 
 		[JoinedKey("Id")]
