@@ -3,6 +3,7 @@ using AddUser;
 using Castle.MonoRail.Framework;
 using Castle.MonoRail.Framework.Routing;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Initializers
 {

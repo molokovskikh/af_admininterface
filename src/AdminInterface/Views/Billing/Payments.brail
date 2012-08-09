@@ -57,14 +57,9 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		}
 	}
 
-	function SetClientStatus(clientId, status) {
-		var link = "${siteroot}/Billing/UpdateClientStatus?clientId=" + clientId + "&enabled=" + status;
-		AjaxRequest(link,
-			function (html) {
-				updateChildren(clientId, status);
-				RefreshTotalSum();
-			}
-		);
+	function SetClientStatus(clientId, item) {
+		var link = "${siteroot}/Billing/UpdateClientStatus?id=" + clientId + "&status=" + item.checked;
+		checkBoxChanger(link, $(item));
 	}
 
 	function RefreshTotalSum() {
@@ -108,6 +103,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			function (html) {
 				hideWaiter(item, waiter);
 				RefreshTotalSum();
+//				showSuccessMessage("Сохранено");
 				processResponse(html);
 				if (success)
 					success();
@@ -144,6 +140,19 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		return link;
 	}
 
+	function checkBoxChanger(url, item) {
+		fillDependedData(url, item, function (resultUrl) {
+			Update(resultUrl, item, function () {
+				if (item.attr("name") == "status") {
+					var id = $(item).parents("tr").find("input[name=service_id]").val();
+					if (id) {
+						updateChildren(id, item.attr("checked"));
+					}
+				}
+			});
+		});
+	}
+
 	$(function () {
 		var sendMessageView = new PayerSendMessage();
 
@@ -164,19 +173,10 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 		});
 
 		$("#addresses input, #users input, #reports input, #suppliers input").change(function () {
-			var item = $(this);
 			var url = "${siteroot}/Accounts/Update";
+			var item = $(this);
 			url = buildAjaxUrl(url, item);
-			fillDependedData(url, item, function (resultUrl) {
-				Update(resultUrl, item, function () {
-					if (item.attr("name") == "status") {
-						var id = $(item).parents("tr").find("input[name=service_id]").val();
-						if (id) {
-							updateChildren(id, item.attr("checked"));
-						}
-					}
-				});
-			});
+			checkBoxChanger(url, item);
 		});
 
 		$("div.collapsible, div.autocollapsible").each(function () {
@@ -265,7 +265,8 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<% for i, client in enumerate(clients): %>
 				<tr id="ClientRow${client.Id}" class="${ViewHelper.GetRowStyle(i)} ${app.Style(client)}" align="center">
 					<td class=short>
-						<input id="ClientStatus${client.Id}" name=status type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this.checked)" />
+						<input id="ClientStatus${client.Id}" data-request="AddComment" unchecked="true" name=status type="checkbox" ${"checked" if client.Enabled} onclick="SetClientStatus(${client.Id}, this)" />
+						<input name=service_id type=hidden value=${client.Id}>
 					</td>
 					<td>${client.Id}</td>
 					<td>
@@ -328,7 +329,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 					<td class=short>
 						<input name=id type=hidden value=${supplier.Account.Id}>
 						<input name=service_id type=hidden value=${supplier.Id}>
-						<input type="checkbox" name=status ${"checked" unless supplier.Disabled} />
+						<input type="checkbox" data-request="AddComment" unchecked="true" name=status ${"checked" unless supplier.Disabled} />
 					</td>
 					<td class=short>
 						<input name=accounted type="checkbox" ${"checked" if supplier.Account.BeAccounted} />
@@ -395,7 +396,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 						<td class=short>${app.LinkTo(user.Accounting, "Редактировать", @Edit)}</td>
 						<td class=short>
 							<input name=id type=hidden value=${user.Accounting.Id}>
-							<input name=status type="checkbox" ${"checked" if user.Enabled} ${"disabled" if user.RootService.Disabled} />
+							<input name=status data-request="AddComment" unchecked="true" type="checkbox" ${"checked" if user.Enabled} ${"disabled" if user.RootService.Disabled} />
 						</td>
 						<td class=short>
 							<input name=accounted type="checkbox" ${"checked" if user.Accounting.BeAccounted} />
@@ -465,7 +466,7 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 							<td class=short>${app.LinkTo(addr.Accounting, "Редактировать", @Edit)}</td>
 							<td class=short>
 								<input name=id type=hidden value=${addr.Accounting.Id}>
-								<input name=status type="checkbox" ${"checked" if addr.Enabled} ${"disabled" if addr.Client.Disabled} />
+								<input name=status type="checkbox" data-request="AddComment" unchecked="true" ${"checked" if addr.Enabled} ${"disabled" if addr.Client.Disabled} />
 							</td>
 							<td class=short>
 								<input name=accounted type=checkbox ${"checked" if addr.Accounting.BeAccounted} />
@@ -714,9 +715,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 				<tr>
 					<th>Дата</th>
 					<th>Объект</th>
+					<th>Код</th>
 					<th>Имя</th>
 					<th>Оператор</th>
 					<th>Событие</th>
+					<th>Комментарий</th>
 				</tr>
 			</thead>
 		<% end %>
@@ -724,9 +727,11 @@ def WriteLabelAndEditControle(labelText as string, editControlText as string) as
 			<tr class="${ViewHelper.GetRowStyle(i)}" ${filter.FilterRow(log)}>
 				<td>${log.LogTime}</td>
 				<td>${BindingHelper.GetDescription(log.LogType)}</td>
+				<td>${log.ObjectId}</td>
 				<td>${log.Name}</td>
 				<td>${log.OperatorName}</td>
 				<td>${log.Message}</td>
+				<td class="minTd">${log.Comment}</td>
 			</tr>
 		<% end %>
 		</table>

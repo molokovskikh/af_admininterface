@@ -17,7 +17,7 @@
 	<% for news in newses: %>
 		<tr>
 			<td>${app.LinkTo(news, "Редактировать", @Edit)}</td>
-			<td>${news.PublicationDate.ToShortDateString()}</td>
+			<td>!{news.PublicationDate}</td>
 			<td>!{news.Header}</td>
 			<td>
 				<form method=post action="${siteroot}/News/${news.Id}/Delete/">

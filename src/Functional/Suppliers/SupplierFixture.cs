@@ -1,4 +1,6 @@
-﻿using System.Threading;
+﻿using System;
+using System.Linq;
+using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
@@ -85,7 +87,7 @@ namespace Functional.Suppliers
 			browser.Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 			Assert.That(browser.Css("#supplier_Name").Text, Is.EqualTo("Тестовый_поставщик_обновленный"));
-			ActiveRecordMediator.Refresh(supplier);
+			session.Refresh(supplier);
 			Assert.That(supplier.Name, Is.EqualTo("Тестовый_поставщик_обновленный"));
 		}
 
@@ -140,7 +142,7 @@ namespace Functional.Suppliers
 			browser.SelectList(Find.ByName("sertificateSourceId")).SelectByValue(newCertificate.Id.ToString());
 			browser.Button("saveCertificateSourceButton").Click();
 			AssertText("Сохранено");
-			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			session.Refresh(supplier);
 			Assert.That(supplier.GetSertificateSource().Name, Is.StringContaining("Test_Source"));
 			newCertificate.Delete();
 		}
@@ -155,16 +157,17 @@ namespace Functional.Suppliers
 			browser.SelectList("MainContentPlaceHolder_PricesGrid_PriceTypeList_1").SelectByValue(((int)AdminInterface.Models.Suppliers.PriceType.Assortment).ToString());
 			Click("Применить");
 			session.Refresh(supplier);
-			var a = session.CreateSQLQuery(@"
+			var source = session.CreateSQLQuery(@"
 Select fs.RequestInterval 
 From farm.Sources fs
 	Join PriceItems pi on pi.SourceId = fs.Id
 	Join PricesCosts pc on pc.PriceItemId = pi.Id
 Where pc.PriceCode = :PriceId1")
-			.SetParameter("PriceId1", supplier.Prices[1].Id)
-			.ToList<TestSource>();
+				.SetParameter("PriceId1", supplier.Prices[1].Id)
+				.ToList<TestSource>()
+				.First();
 			//проверяем RequestInterval
-			Assert.That(a[0].RequestInterval, Is.EqualTo(86400));
+			Assert.That(source.RequestInterval, Is.EqualTo(86400));
 		}
 	}
 }

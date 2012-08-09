@@ -138,6 +138,10 @@
 								Ассортиментный прайс: ${drugstore.AssortimentPrice.Supplier.Name} - ${drugstore.AssortimentPrice.Name}
 							<% end %>
 						</div>
+						<div class="settings" ${"style='display:none'" if not drugstore.IsConvertFormat}>
+							${app.Label("drugstore.WaybillConvertFormat")}
+							${app.Edit("drugstore.WaybillConvertFormat")}
+						</div>
 					</td>
 				</tr>
 				<tr>
@@ -246,6 +250,7 @@
 			<div class="block">
 				<h3>Операции</h3>
 				<input type="button" onclick="NotifySuppliers()" value="Отправить уведомления о регистрации поставщикам" />
+				<input type="submit" name="ResetReclameDate" value="Сбросить дату рекламы" />
 			</div>
 
 			<div class="block">

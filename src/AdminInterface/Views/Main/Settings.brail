@@ -12,14 +12,13 @@ ${app.Asset("News.css")}
 </script>
 
 <% def WriteLabelAndEditTemplate(templateLabel as string, subjectField as string, subjectValue as string, bodyField as string, bodyValue as string) as string: %>
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>${templateLabel}</legend>
 		<label>Тема:</label>
-		<input name="defaults.${subjectField}" value="${subjectValue}" style="width:100%"/>
+		<input name="defaults.${subjectField}" value="${subjectValue}" class="allWidth"/>
 		${app.GetValidationError(defaults, subjectField)}
-		<br>
-		<label>Тело письма:</label><br>
-		<textarea  name="defaults.${bodyField}" cols=50 rows=10 style="width:100%">!{bodyValue}</textarea>
+		<label>Тело письма:</label>
+		<textarea  name="defaults.${bodyField}" cols=50 rows=10 class="allWidth">!{bodyValue}</textarea>
 		${app.GetValidationError(defaults, bodyField)}
 	</fieldset>
 <% end %>
@@ -32,7 +31,7 @@ ${app.Asset("News.css")}
 
 <h3>Настройки по умолчанию</h3>
 
-<form method=post>
+<form method=post class=vertical>
 	<input type=hidden value=${defaults.Id} name="defaults.Id" />
 
 <div class="tabs">
@@ -50,7 +49,7 @@ ${app.Asset("News.css")}
 </div>
 
 <div id="supportTexts-tab" class="tab">
-<fieldset style="width:600px; height:530px;">
+<fieldset class="tabFieldset">
 	<legend>Текст справки для написания адреса доставки</legend>
 	${FormHelper.TextArea("Defaults.AddressesHelpText", {@class: @tinymceAddressesHelpText, @id: @AddressesHelpText})}
 	${app.GetValidationError("Defaults.AddressesHelpText")}
@@ -58,12 +57,12 @@ ${app.Asset("News.css")}
 </div>
 
 <div id="generalSettings-tab" class="tab">
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>Для аптеки</legend>
 		<label>Версия AnalitF:</label>
 		<input name="defaults.AnalitFVersion" value="${defaults.AnalitFVersion}" />
 	</fieldset>
-	<fieldset style="width:600px">
+	<fieldset class="tabFieldset">
 		<legend>Для поставщика:</legend>
 		<label>Формат заказа:</label>
 		<select name="defaults.Formater.Id">
@@ -71,7 +70,6 @@ ${app.Asset("News.css")}
 			<option value=${formater.Id} ${"selected" if formater.Id == defaults.Formater.Id}>${formater.ClassName}</option>
 			<% end %>
 		</select>
-		<br>
 		<label>Отправщик:</label>
 		<select name="defaults.Formater.Id">
 			<% for sender in senders: %>
@@ -79,24 +77,23 @@ ${app.Asset("News.css")}
 			<% end %>
 		</select>
 		<p>
-			<label>Подпись к письмам:</label><br>
+			<label>Подпись к письмам:</label>
 			<textarea  name="defaults.EmailFooter" cols=50 rows=10>!{defaults.EmailFooter}</textarea>
 		</p>
 		<p>
-			<label>Телефоны в регистрационной карте:</label><br>
+			<label>Телефоны в регистрационной карте:</label>
 			<textarea  name="defaults.Phones" cols=50 rows=10>!{defaults.Phones}</textarea>
 		</p>
 	</fieldset>
 </div>
 
 <div id="miniMailSettings-tab" class="tab" style="display:none">
-	${app.GetLabel("defaults.AllowedMiniMailExtensions")}
-	${app.Edit("defaults.AllowedMiniMailExtensions")}
-	${app.GetValidationError(defaults, "AllowedMiniMailExtensions")}
-	<br>
-	<label style="font-size:smaller">(список расширений без точки через запятую)</label>
-	<br>
-	<br>
+	<p>
+		${app.GetLabel("defaults.AllowedMiniMailExtensions")}
+		${app.Edit("defaults.AllowedMiniMailExtensions")}
+		${app.GetValidationError(defaults, "AllowedMiniMailExtensions")}
+		<label style="font-size:smaller">(список расширений без точки через запятую)</label>
+	</p>
 
 	<% WriteLabelAndEditTemplate("Шаблон для пустого списка получателей", "ResponseSubjectMiniMailOnEmptyRecipients", defaults.ResponseSubjectMiniMailOnEmptyRecipients, "ResponseBodyMiniMailOnEmptyRecipients", defaults.ResponseBodyMiniMailOnEmptyRecipients) %>
 

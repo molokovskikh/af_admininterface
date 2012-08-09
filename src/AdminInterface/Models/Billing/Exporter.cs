@@ -130,8 +130,7 @@ namespace AdminInterface.Models.Billing
 				"№ п/п", "Наименование операции, документы", "Дебет", "Кредит",
 				"№ п/п", "Наименование операции, документы", "Дебет", "Кредит");
 			var index = 1;
-			foreach (var move in act.Movements)
-			{
+			foreach (var move in act.Movements) {
 				Row(table, 
 					index, move.Name, move.Debit.ToString("#.#"), move.Credit.ToString("#.#"),
 					"", "", "", "");

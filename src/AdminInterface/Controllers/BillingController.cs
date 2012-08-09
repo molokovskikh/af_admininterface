@@ -151,8 +151,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["payer"] = payer;
 			PropertyBag["MailSentHistory"] = MailSentEntity.GetHistory(payer);
 			PropertyBag["Today"] = DateTime.Today;
-			PropertyBag["Recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
-
+			PropertyBag["Recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 			PropertyBag["suppliers"] = DbSession.Query<Supplier>().Where(s => s.Payer == payer).OrderBy(s => s.Name).ToList();
 			PropertyBag["clients"] = payer.Clients.OrderBy(c => c.Name).ToList();
 			PropertyBag["Users"] = payer.Users.Where(u => u.RootService.Type != ServiceType.Supplier).ToList();
@@ -184,7 +183,7 @@ namespace AdminInterface.Controllers
 			{
 				if (message.Id != 0)
 				{
-					var user = User.Find(message.Id);
+					var user = DbSession.Load<User>(message.Id);
 					SendMessageToUser(user, message);
 				}
 				else
@@ -217,17 +216,18 @@ namespace AdminInterface.Controllers
 			DbSession.Save(new UserMessageSendLog(message));
 		}
 
-		public void UpdateClientStatus(uint clientId, bool enabled)
+		public void UpdateClientStatus(uint id, bool status, string addComment)
 		{
-			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(clientId);
+			var service = ActiveRecordMediator<Service>.FindByPrimaryKey(id);
 			var oldDisabled = service.Disabled;
-			service.Disabled = !enabled;
+			service.Disabled = !status;
+			ActiveRecordMediator<Service>.Save(service);
+			DbSession.Flush();
 			if (oldDisabled != service.Disabled)
 			{
-				this.Mailer().EnableChanged(service).Send();
-				ClientInfoLogEntity.StatusChange(service).Save();
+				this.Mailer().EnableChanged(service, addComment).Send();
+				AuditRecord.StatusChange(service).Save();
 			}
-			ActiveRecordMediator<Service>.Save(service);
 			CancelView();
 		}
 
@@ -270,7 +270,7 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 			var message = UserMessage.FindUserMessage(userId);
 			PropertyBag["Message"] = message;
-			PropertyBag["user"] = User.Find(message.Id);
+			PropertyBag["user"] = DbSession.Load<User>(message.Id);
 		}
 
 		public void CancelMessage(uint userId)
@@ -284,7 +284,7 @@ namespace AdminInterface.Controllers
 		public void AdditionalUserInfo(uint userId, string cssClassName)
 		{
 			CancelLayout();
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			PropertyBag["user"] = user;
 			PropertyBag["regions"] = Region.All().Where(r => (r.Id & user.WorkRegionMask) > 0).ToArray();
 		}
@@ -311,7 +311,7 @@ namespace AdminInterface.Controllers
 		{
 			if (String.IsNullOrEmpty(searchText))
 				searchText = String.Empty;
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			var addresses = user.Client.Addresses.Where(address => 
 				address.Value.ToLower().Contains(searchText.ToLower()) &&
 				!address.AvaliableFor(user));
@@ -321,22 +321,22 @@ namespace AdminInterface.Controllers
 
 		public void ConnectUserToAddress(uint userId, uint addressId)
 		{
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			var address = Address.Find(addressId);
 			address.AvaliableForUsers.Add(user);
-			address.Client.Save();
+			DbSession.SaveOrUpdate(address.Client);
 
 			CancelView();
 		}
 
 		public void DisconnectUserFromAddress(uint userId, uint addressId)
 		{
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			var address = Address.Find(addressId);
 			var client = user.Client;
 
 			address.AvaliableForUsers.Remove(user);
-			client.Save();
+			DbSession.SaveOrUpdate(client);
 
 			CancelView();
 		}

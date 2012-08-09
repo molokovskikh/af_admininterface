@@ -34,6 +34,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual LogOperation Operation { get; set; }
 
+		[Property]
+		public virtual string Comment { get; set; }
+
 		public static IList<UserLogRecord> GetLogs(IEnumerable<User> users)
 		{
 			if (users.Count() == 0)

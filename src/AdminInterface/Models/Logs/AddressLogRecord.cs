@@ -26,6 +26,9 @@ namespace AdminInterface.Models.Logs
 		[Property]
 		public virtual bool Enabled { get; set; }
 
+		[Property]
+		public virtual string Comment { get; set; }
+
 		public static IList<AddressLogRecord> GetLogs(IEnumerable<Address> addresses)
 		{
 			if (addresses.Count() == 0)

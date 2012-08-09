@@ -53,7 +53,7 @@ namespace AdminInterface.Controllers
 			}
 			else if (clientId.HasValue)
 			{
-				var client = Client.Find(clientId.Value);
+				var client = DbSession.Load<Client>(clientId.Value);
 				var drugstore = client.Settings;
 
 				if (showDefaultRegions)
@@ -86,7 +86,7 @@ namespace AdminInterface.Controllers
 		public void DefaultRegions(ulong homeRegionId, uint clientId)
 		{
 			var homeRegion = Region.Find(homeRegionId);
-			var client = Client.Find(clientId);
+			var client = DbSession.Load<Client>(clientId);
 			var drugstore = client.Settings;
 			var regions = Region.FindAll()
 				.Where(region => (region.Id & homeRegion.DefaultShowRegionMask) > 0 ||

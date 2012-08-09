@@ -5,13 +5,13 @@ using System.Reflection;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
-using NHibernate;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Audit
 {
-	public class MaskedAuditableProperty : AuditableProperty
+	public class MaskedAuditableProperty : AuditableProperty, INotificationAware
 	{
-		public ulong[] Added { get; set; }
+		public string NotifyMessage { get; set; }
 
 		public MaskedAuditableProperty(PropertyInfo property, string name, object newValue, object oldValue)
 			: base(property, name, newValue, oldValue)
@@ -29,16 +29,28 @@ namespace AdminInterface.Models.Audit
 			var current = ToRegionList(newRegionValue);
 			var old = ToRegionList(oldRegionValue);
 
-			Added = Complement(current, old).ToArray();
-			var removed = Complement(old, current).ToArray();
+			var added = current.Except(old).ToArray();
+			var removed = old.Except(current).ToArray();
 
 			Message = String.Format("$$$Изменено '{0}'", Name);
 
 			if (removed.Length > 0)
 				Message += " Удалено " + ToString(removed);
 
-			if (Added.Length > 0)
-				Message += " Добавлено " + ToString(Added);
+			if (added.Length > 0)
+				Message += " Добавлено " + ToString(added);
+
+			var notifyAdded = ToStringForNotify(added);
+			var notifyRemoved = ToStringForNotify(removed);
+			if (!String.IsNullOrEmpty(notifyAdded) || !String.IsNullOrEmpty(notifyRemoved)) {
+				NotifyMessage = String.Format("Изменено '{0}'", Name);
+
+				if (!String.IsNullOrEmpty(notifyAdded))
+					NotifyMessage += " Добавлено " + notifyAdded;
+
+				if (!String.IsNullOrEmpty(notifyRemoved))
+					NotifyMessage += " Удалено " + notifyRemoved;
+			}
 		}
 
 		public static string ToString<T>(IEnumerable<T> items)
@@ -49,13 +61,13 @@ namespace AdminInterface.Models.Audit
 				.Implode(r => "'" + r.Name + "'");
 		}
 
-		public static IEnumerable<T> Complement<T>(IEnumerable<T> first, IEnumerable<T> second)
+		private static string ToStringForNotify<T>(IEnumerable<T> items)
 		{
-			foreach (var item in first)
-			{
-				if (second.All(i => !Equals(i, item)))
-					yield return item;
-			}
+			return items
+				.Select(i => Region.TryFind(i))
+				.Where(r => r != null)
+				.Where(r => !r.DoNotNotify)
+				.Implode(r => "'" + r.Name + "'");
 		}
 
 		private IEnumerable<ulong> ToRegionList(ulong diff)

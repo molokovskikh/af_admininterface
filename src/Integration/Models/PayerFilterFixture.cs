@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Linq;
 using AdminInterface.Models.Billing;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Test.Support.log4net;
 
@@ -17,7 +19,7 @@ namespace Integration.Models
 		{
 			var client = DataMother.CreateTestClientWithUser();
 			var payer = client.Payers.First();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
 			payer.SaveAndFlush();
 
@@ -71,12 +73,12 @@ namespace Integration.Models
 		{
 			var client = DataMother.TestClient();
 			var payer = client.Payers.First();
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			payer.Recipient = recipient;
 			payer.Save();
 
 			var items = new PayerFilter{
-				Recipient = Recipient.Queryable.First()
+				Recipient = session.Query<Recipient>().First()
 			}.Find();
 			Assert.That(items.Count, Is.GreaterThan(0));
 		}
@@ -115,7 +117,7 @@ namespace Integration.Models
 			var address = client.Addresses.First();
 			address.Value = address.Value + " " + address.Id;
 			address.SaveAndFlush();
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 
 			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));

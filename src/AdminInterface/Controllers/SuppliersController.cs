@@ -18,6 +18,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.MonoRail.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 
 namespace AdminInterface.Controllers
@@ -75,7 +76,7 @@ namespace AdminInterface.Controllers
 			var supplier = ActiveRecordMediator<Supplier>.FindByPrimaryKey(id);
 			if (!string.IsNullOrWhiteSpace(message))
 			{
-				new ClientInfoLogEntity(message, supplier).Save();
+				new AuditRecord(message, supplier).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -100,7 +101,7 @@ namespace AdminInterface.Controllers
 			}
 			Notify("Сохранено");
 
-			new ClientInfoLogEntity(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
+			new AuditRecord(logMessage.ToString(), supplier) {MessageType = LogMessageType.System}.Save();
 
 			RedirectToReferrer();
 		}

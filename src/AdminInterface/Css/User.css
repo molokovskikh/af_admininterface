@@ -1,105 +1,86 @@
-tr.EvenRow.LockedUser
+#SearchResults tr.self-disabled td.login,
+#SearchResults tr.self-disabled td.user-name,
+#SearchResults tr.self-disabled td.region-name,
+#SearchResults tr.self-disabled td.update-date,
+#SearchResults tr.self-disabled td.af-version,
+#SearchResults tr.self-disabled td.client-type
+{
+	background-color: #ff9d5b;
+}
+
+tr.EvenRow.invisible-client td.client-name,
+tr.OddRow.invisible-client td.client-name,
+.invisible-client
+{
+	background-color: #ede948;
+}
+
+tr.EvenRow.not-exists-user td.login,
+tr.EvenRow.not-exists-user td.user-id,
+tr.OddRow.not-exists-user td.login,
+tr.OddRow.not-exists-user td.user-id,
+.not-exists-user
+{
+	background-color: #98cbcb;
+}
+
+tr.EvenRow.locked td.login,
+tr.EvenRow.locked td.user-id,
+tr.OddRow.locked td.login,
+tr.OddRow.locked td.user-id,
+.locked
 {
 	background-color: #ff80c0;
 }
 
-tr.OddRow.LockedUser
-{
-	background-color: #ff80c0;
-}
-
-.LockedUser
-{
-	background-color: #ff80c0;
-}
-
-table.DataTable tr.EvenRow.DisabledInAd
+table.DataTable tr.EvenRow.disabled-in-ad,
+table.DataTable tr.OddRow.disabled-in-ad,
+.disabled-in-ad
 {
 	background-color: #ff4848;
 }
 
-table.DataTable tr.OddRow.DisabledInAd
-{
-	background-color: #ff4848;
-}
-
-.DisabledInAd
-{
-	background-color: #ff4848;
-}
-
-/*ссылка на отключенного клиента/поставщика/адрес/пользователя*/
-a.disabled
-{
-	background-color: #ff9d5b;
-}
-
-/*легенда*/
-div.LegendMarker.disabled
-{
-	background-color: #ff9d5b;
-}
-
-/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled, .DisabledByBilling, /*Используйте этот*/ table.DataTable tr.OddRow.disabled-by-billing, table.DataTable tr.OddRow.disabled-by-billing.single-user, span.disabled
-{
-	background-color: #ff9d5b;
-}
-
-table.DataTable tr.OddRow.DisabledByBilling, table.DataTable tr.OddRow.disabled
-{
-	background-color: #ff9d5b;
-}
-
-
-/* Этот класс оставлен для обратной совместимости*/ table.DataTable tr.EvenRow.DisabledByBilling, table.DataTable tr.EvenRow.disabled, /*Используйте этот*/  table.DataTable tr.EvenRow.disabled-by-billing, table.DataTable tr.EvenRow.disabled-by-billing.single-user
-{
-	background-color: #ff9d5b;
-}
-
-table.DataTable tr.OddRow.disabled-by-parent, table.DataTable tr.EvenRow.disabled-by-parent, span.disabled-by-parent
-{
-	background-color: #ff9d5b;
-}
-
-table.DataTable tr.old-user-update, td.old-user-update, .old-user-update
+table.DataTable tr.old-user-update td.update-date,
+td.old-user-update,
+.old-user-update
 {
 	background-color: #aaaaaa;
 }
 
-tr.EvenRow.NotExistsUser
+table.DataTable tr.OddRow.disabled,
+table.DataTable tr.EvenRow.disabled,
+table.DataTable tr.OddRow.disabled-by-billing,
+table.DataTable tr.EvenRow.disabled-by-billing,
+table.DataTable tr.OddRow.disabled-by-billing.single-user,
+table.DataTable tr.EvenRow.disabled-by-billing.single-user
+span.disabled,
+/*ссылка на отключенного клиента/поставщика/адрес/пользователя*/
+a.disabled,
+/*легенда*/
+div.LegendMarker.disabled,
+/*что бы избежать конфликтов*/
+table.style td.disabled
 {
-	background-color: #98cbcb;
+	background-color: #ff9d5b;
 }
 
-tr.OddRow.NotExistsUser
+table.DataTable tr.OddRow.disabled-by-parent,
+table.DataTable tr.EvenRow.disabled-by-parent,
+span.disabled-by-parent
 {
-	background-color: #98cbcb;
+	background-color: #ff9d5b;
 }
 
-.NotExistsUser
+table.DataTable tr.EvenRow.single-user,
+table.DataTable tr.OddRow.single-user,
+div.LegendMarker.SingleUser
 {
-	background-color: #98cbcb;
+	background-color: #BBFFB6;
 }
 
 #user_Name
 {
 	width: 60%;
-}
-
-table.DataTable tr.EvenRow.single-user
-{
-	background-color: #BBFFB6;
-}
-
-table.DataTable tr.OddRow.single-user
-{
-	background-color: #BBFFB6;
-}
-
-/*легенда*/
-div.LegendMarker.SingleUser
-{
-	background-color: #BBFFB6;
 }
 
 .kfm_home {
@@ -115,4 +96,16 @@ div.LegendMarker.SingleUser
 	font-size:9px;
 	width:750px;
 	padding-left:10px;
+}
+
+.tabFieldset {
+	width: 600px;
+}
+
+.allWidth {
+	width:100%;
+}
+
+#AddCommentField {
+	width: 250px;
 }

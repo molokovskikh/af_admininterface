@@ -1,22 +1,17 @@
 using System;
-using System.IO;
+using System.Linq;
 using AdminInterface.Controllers.Filters;
-using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
-using Castle.ActiveRecord;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
-using Common.Web.Ui;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate.Linq;
-using NHibernate.Transform;
-using AppHelper = AdminInterface.Helpers.AppHelper;
 
 namespace AdminInterface.Controllers
 {
@@ -30,6 +25,18 @@ namespace AdminInterface.Controllers
 		public LogsController()
 		{
 			SetBinder(new ARDataBinder());
+		}
+
+		public void Resend(uint[] ids)
+		{
+			var logs = DbSession.Query<DocumentSendLog>().Where(d => ids.Contains(d.Id));
+			foreach (var log in logs) {
+				log.SendedInUpdate = null;
+				log.Committed = false;
+				DbSession.Save(log);
+			}
+			Notify("Документы будут отправлены повторно");
+			RedirectToReferrer();
 		}
 
 		public void Documents([ARDataBind("filter", AutoLoadBehavior.NullIfInvalidKey)] DocumentFilter filter)
@@ -88,7 +95,7 @@ namespace AdminInterface.Controllers
 
 		public void Certificate(uint id)
 		{
-			var file = ActiveRecordMediator<CertificateFile>.FindByPrimaryKey(id);
+			var file = DbSession.Load<CertificateFile>(id);
 			this.RenderFile(file.GetStorageFileName(Config), file.Filename);
 		}
 
@@ -105,30 +112,32 @@ namespace AdminInterface.Controllers
 			UpdateLog(updateType, regionMask, clientCode, userId, DateTime.Today, DateTime.Today.AddDays(1));
 		}
 
-		public void UpdateLog(UpdateType? updateType, ulong regionMask, uint? clientCode, uint? userId,
+		public void UpdateLog(UpdateType? updateType, ulong? regionMask, uint? clientCode, uint? userId,
 			DateTime beginDate, DateTime endDate)
 		{
 			var filter = new UpdateFilter();
 			filter.BeginDate = beginDate;
 			filter.EndDate = endDate;
 
-			if (updateType.HasValue)
-			{
+			if (updateType.HasValue) {
 				filter.UpdateType = updateType;
-				filter.RegionMask = regionMask & Admin.RegionMask;
+				filter.RegionMask = Admin.RegionMask;
+
+				if (regionMask.HasValue)
+					filter.RegionMask &= regionMask.Value;
 			}
 			if (clientCode.HasValue)
-				filter.Client = Client.Find(clientCode.Value);
+				filter.Client = DbSession.Load<Client>(clientCode.Value);
 			else if (userId.HasValue)
-				filter.User = User.Find(userId.Value);
+				filter.User = DbSession.Load<User>(userId.Value);
 
 			BindObjectInstance(filter, "filter");
 
 			if (filter.Client != null)
-				filter.Client = Client.Find(filter.Client.Id);
+				filter.Client = DbSession.Load<Client>(filter.Client.Id);
 
 			if (filter.User != null)
-				filter.User = User.Find(filter.User.Id);
+				filter.User = DbSession.Load<User>(filter.User.Id);
 
 			PropertyBag["beginDate"] = filter.BeginDate;
 			PropertyBag["endDate"] = filter.EndDate;
@@ -149,7 +158,7 @@ namespace AdminInterface.Controllers
 
 		public void PasswordChangeLog(uint id, DateTime beginDate, DateTime endDate)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 
 			PropertyBag["logEntities"] = PasswordChangeLogEntity.GetByLogin(user.Login,
 				beginDate,

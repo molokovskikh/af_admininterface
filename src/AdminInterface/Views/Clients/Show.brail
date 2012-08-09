@@ -179,7 +179,7 @@
 				<a class="icon icon-add" href="${siteroot}/users/add?clientId=${client.Id}">Новый пользователь</a>
 			</div>
 			<h3>Пользователи</h3>
-			<table style="width:100%;" id=users>
+			<table style="width:100%;" id=users class="style">
 				<tr valign="top" align="left">
 					<th>${app.Sortable("Код пользователя", "Users.Id")}</th>
 					<th>${app.Sortable("Имя пользователя", "Users.Login")}</th>
@@ -189,9 +189,11 @@
 				<% for user in users: %>
 					<% userInfo = usersInfo[user.Login] %>
 					<tr>
-						<td><a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a></td>
-						<td class="${"LockedUser" if userInfo.IsLoginExists and userInfo.IsLocked} ${"DisabledInAd" if userInfo.IsLoginExists and userInfo.IsDisabled} ${"NotExistsUser" if not userInfo.IsLoginExists} ${'DisabledByBilling' if not user.Enabled}">
-							<a href="${siteroot}/users/${user.Id}/edit"">${user.Login}</a>
+						<td>
+							<a href="${siteroot}/users/${user.Id}/edit" class="${'Disabled' if not user.Enabled}">${user.Id}</a>
+						</td>
+						<td class="${app.Style(userInfo, user)}">
+							<a href="${siteroot}/users/${user.Id}/edit">${user.Login}</a>
 						</td>
 						<td>${user.Name}</td>
 						<td>${user.Logs.GetLastServicesUsage()}</td>
@@ -289,25 +291,6 @@
 			end
 		%>
 		
-		<div>
-			<h4 style="margin-bottom:0">Неопознанные звонки:</h4>
-			<table id="UnknownPhones" class="DataTable"	>
-			<% if CallLogs.Length == 0: %>
-				<tr><td class="EmptyData">Нет звонков</td></tr>
-			<% else: %>
-				<% for i, call in enumerate(CallLogs): %>
-				<tr class="${ViewHelper.GetRowStyle(i)}">
-					<td>
-						<form action="BindPhone?clientcode=${client.Id}&phone=${call}" method=post>
-							<input type=submit value="Связать" />
-						</form>
-					</td>
-					<td>${call}</td>
-				</tr>
-				<% end %>
-			<% end %>
-			</table>
-		</div>
 		<% OutputSubView("LegendView", {@showAddressLegend: true}) %>
 	</div>
 	

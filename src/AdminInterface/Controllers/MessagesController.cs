@@ -6,6 +6,7 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Logs;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
@@ -37,18 +38,18 @@ namespace AdminInterface.Controllers
 			Types = new List<LogMessageType>{LogMessageType.User, LogMessageType.System};
 		}
 
-		public IList<ClientInfoLogEntity> Find()
+		public IList<AuditRecord> Find()
 		{
 			return ArHelper.WithSession(s => {
 				uint id;
 				uint.TryParse(SearchText, out id);
-				var query = s.QueryOver<ClientInfoLogEntity>()
+				var query = s.QueryOver<AuditRecord>()
 					.Where(l => l.WriteTime >= Period.Begin && l.WriteTime <= Period.End.AddDays(1))
 					.Where(l => l.MessageType.IsIn(Types.ToArray()))
 					.And(
-						Restrictions.On<ClientInfoLogEntity>(l => l.Message).IsLike(SearchText, MatchMode.Anywhere) ||
-						Restrictions.On<ClientInfoLogEntity>(l => l.Name).IsLike(SearchText, MatchMode.Anywhere) ||
-						Restrictions.On<ClientInfoLogEntity>(l => l.ObjectId).IsLike(id)
+						Restrictions.On<AuditRecord>(l => l.Message).IsLike(SearchText, MatchMode.Anywhere) ||
+						Restrictions.On<AuditRecord>(l => l.Name).IsLike(SearchText, MatchMode.Anywhere) ||
+						Restrictions.On<AuditRecord>(l => l.ObjectId).IsLike(id)
 					);
 
 				query.RootCriteria
@@ -57,7 +58,7 @@ namespace AdminInterface.Controllers
 
 				ApplySort(query.RootCriteria);
 				query.Fetch(c => c.Administrator);
-				return query.List<ClientInfoLogEntity>();
+				return query.List<AuditRecord>();
 			});
 		}
 	}

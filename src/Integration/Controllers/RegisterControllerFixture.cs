@@ -125,7 +125,6 @@ namespace Integration.Controllers
 
 			var intersectionCount = registredClient.GetIntersectionCount();
 			var userPriceCount = registredUser.GetUserPriceCount();
-
 			var user = registredClient.Users.First();
 			Assert.That(user.Accounting, Is.Not.Null);
 			Assert.That(intersectionCount, Is.GreaterThan(0));
@@ -133,12 +132,6 @@ namespace Integration.Controllers
 
 			Assert.That(registredClient.Settings.SmartOrderRules.ParseAlgorithm, Is.EqualTo("TestSource"));
 			Assert.That(registredClient.Settings.EnableSmartOrder, Is.EqualTo(true));
-		}
-
-		private void Prepare()
-		{
-			Request.Params.Add("user.Name", "Тестовый пользователь");
-			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
 		}
 
 		[Test]
@@ -204,9 +197,30 @@ namespace Integration.Controllers
 			Assert.That(user.AssignedPermissions.Count(p => p.Type == UserPermissionTypes.SupplierInterface), Is.GreaterThan(0));
 		}
 
+		[Test]
+		public void Register_hidden_client()
+		{
+			Prepare();
+			Request.Params.Add("client.Settings.IsHiddenFromSupplier", "True");
+
+			controller.RegisterClient(client, 4, regionSettings, null, options, null,
+				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
+			var registredClient = RegistredClient();
+			Assert.That(registredClient.Settings.InvisibleOnFirm, Is.EqualTo(DrugstoreType.Hidden));
+		}
+
+		private void Prepare()
+		{
+			Request.Params.Add("user.Name", "Тестовый пользователь");
+			Request.Params.Add("client.Settings.IgnoreNewPriceForUser", "False");
+		}
+
 		private Client RegistredClient()
 		{
-			var registredClient = Client.Queryable.OrderByDescending(c => c.Id).FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+			var registredClient = session.Query<Client>()
+				.OrderByDescending(c => c.Id)
+				.FirstOrDefault(c => c.Registration.RegistrationDate >= begin);
+
 			if (registredClient == null)
 				throw new Exception("не зарегистрировалли клиента");
 			return registredClient;

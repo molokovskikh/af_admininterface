@@ -5,6 +5,7 @@ using System.Net.Security;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceProcess;
+using RemoteOrderSenderService;
 using log4net;
 using RemotePriceProcessor;
 using AdminInterface.Properties;

@@ -6,6 +6,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using Test.Support.log4net;
@@ -159,7 +160,7 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			user.InheritPricesFrom = parent;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 
 			Flush();
 
@@ -189,55 +190,10 @@ namespace Integration.Models
 			Assert.That(message, Is.Not.Null);
 			Assert.That(message.Body, Is.StringEnding(String.Format("Код {0}\r\n"
 				+ "Пользователь {1}\r\n"
-				+ "Изменено 'Регионы работы' Добавлено 'Белгород'", user.Id, user.Name)));
+				+ "Клиент {2}\r\n"
+				+ "Изменено 'Регионы работы' Добавлено 'Белгород'\r\n", user.Id, user.Name, client.Name)));
 			Assert.That(message.To[0].ToString(), Is.EqualTo("BillingList@analit.net"));
 			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Регионы работы'"));
-		}
-
-		[Test]
-		public void Notify_about_news_change_propertyes()
-		{
-			ForTest.InitializeMailer();
-			MailMessage message = null;
-			ChangeNotificationSender.Sender = ForTest.CreateStubSender(m => message = m);
-			ChangeNotificationSender.UnderTest = true;
-
-			Reopen();
-			var news = new News {
-				Header = "TestNewHeader",
-				Body = "TestNewsBody",
-			};
-			Save(news);
-			Reopen();
-			news = session.Load<News>(news.Id);
-			news.Body = "NewTestNewsBody";
-			Save(news);
-			Reopen();
-			Assert.That(message, Is.Not.Null);
-			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
-test<br>
-localhost<br>
-Код {0}<br>
-Новость <a href=""/News/{0}"">TestNewHeader</a><br>
-Изменено 'Тело новости' </br> <b>было</b> 'TestNewsBody'</br><b>стало</b> 'NewTestNewsBody'
-", news.Id, DateTime.Now)));
-			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
-			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Тело новости'"));
-
-			news = session.Load<News>(news.Id);
-			news.DestinationType = NewsDestinationType.Supplier;
-			Save(news);
-			Close();
-			Assert.That(message, Is.Not.Null);
-			Assert.That(message.Body, Is.StringEnding(String.Format(@"{1}<br>
-test<br>
-localhost<br>
-Код {0}<br>
-Новость <a href=""/News/{0}"">TestNewHeader</a><br>
-Изменено 'Адресат' </br> <b>было</b> 'Аптека'</br><b>стало</b> 'Поставщик'
-", news.Id, DateTime.Now)));
-			Assert.That(message.To[0].ToString(), Is.EqualTo("AFNews@subscribe.analit.net"));
-			Assert.That(message.Subject, Is.EqualTo("Изменено поле 'Адресат'"));
 		}
 	}
 }

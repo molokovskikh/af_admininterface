@@ -13,6 +13,7 @@ using Castle.ActiveRecord.Framework;
 using Castle.Components.Binder;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using NHibernate.Criterion;

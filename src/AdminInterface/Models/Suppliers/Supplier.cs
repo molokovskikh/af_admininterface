@@ -10,21 +10,24 @@ using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Certificates;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Validators;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using log4net;
 
 namespace AdminInterface.Models.Suppliers
 {
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Поставщик")]
 	public class Supplier : Service, IChangesNotificationAware
 	{
 		private ContactGroupType[] _defaultGroups = new [] {
@@ -58,14 +61,14 @@ namespace AdminInterface.Models.Suppliers
 			Notify,
 			Description("Краткое наименование"),
 			ValidateNonEmpty,
-			ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+]+$",
-				"Поле может содержать только буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
+			ValidateRegExpAttribute(@"^[\wа-яА-Я-Ёё\.,\(\)\+ ]+$",
+				"Поле может содержать только пробел, буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')")]
 		public override string Name { get; set; }
 
 		[Property, ValidateNonEmpty, Auditable, Notify, Description("Полное наименование")]
 		public virtual string FullName { get; set; }
 
-		[Property, Auditable, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы")]
+		[Property, Auditable, ValidateGreaterThanZero("Вы не выбрали регионы работы"), Description("Регионы работы"), SetForceReplication]
 		public virtual ulong RegionMask { get; set; }
 
 		[BelongsTo, Auditable, Description("Домашний регион")]
@@ -186,7 +189,7 @@ namespace AdminInterface.Models.Suppliers
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 			var user = Users.First();
 			billingMessage = String.Format("О регистрации поставщика: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payer.AddComment(billingMessage);

@@ -9,7 +9,7 @@
 </p>
 <P>
 Мы, нижеподписавшиеся, __________________ ${payer.Recipient.FullName} _________________________,
-с одной стороны, и ________________________ ${payer.JuridicalName} __________________________, 
+с одной стороны, и ________________________ ${payer.JuridicalName} __________________________,
 с другой стороны составили настоящий акт сверки в том, что состояние взаимных расчетов по данным учета следующее:
 </P>
 <table>
@@ -31,8 +31,8 @@
 	<tr>
 		<td>${i + 1}</td>
 		<td>${move.Name}</td>
-		<td>${move.Debit.ToString("#.#") if move.Debit > 0}</td>
-		<td>${move.Credit.ToString("#.#") if move.Credit > 0}</td>
+		<td>${move.Debit.ToString("#.#")}</td>
+		<td>${move.Credit.ToString("#.#")}</td>
 		<td></td>
 		<td></td>
 		<td></td>

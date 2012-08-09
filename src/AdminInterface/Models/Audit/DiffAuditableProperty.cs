@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Web;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using DiffMatchPatch;
 
 namespace AdminInterface.Models.Audit
@@ -17,21 +18,17 @@ namespace AdminInterface.Models.Audit
 
 		protected override void Convert(PropertyInfo property, object newValue, object oldValue)
 		{
-			if (oldValue == null)
-			{
+			if (oldValue == null) {
 				OldValue = "";
 			}
-			else
-			{
+			else {
 				OldValue = AsString(property, oldValue);
 			}
 
-			if (newValue == null)
-			{
+			if (newValue == null) {
 				NewValue = "";
 			}
-			else
-			{
+			else {
 				NewValue = AsString(property, newValue);
 			}
 

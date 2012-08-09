@@ -77,7 +77,7 @@ ${FormHelper.HiddenField("filter.SortDirection")}
 <%end %>
 <div align="center" style="width: 100%;">
 <% 
-	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "DisabledByBilling",
+	component Legend, { "LegendItems" : {	"Пользователь или адрес отключен биллингом" : "disabled",
 											"Клиент имеет единственного пользователя" : "SingleUser"},
 						"ByCenter" : false}
 %>

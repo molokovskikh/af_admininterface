@@ -26,6 +26,7 @@ using Common.Web.Ui.Models;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 using NHibernate.Transform;
 
 namespace AdminInterface.Controllers
@@ -125,7 +126,6 @@ namespace AdminInterface.Controllers
 			PropertyBag["users"] = users.OrderBy(user => user.Id).ToList();
 			PropertyBag["addresses"] = addresses.OrderBy(a => a.LegalEntity.Name).ThenBy(a => a.Name).ToList();
 
-			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["usersInfo"] = ADHelper.GetPartialUsersInformation(users);
 
 			PropertyBag["filter"] = filter;
@@ -162,19 +162,19 @@ namespace AdminInterface.Controllers
 					savedNotify = false;
 				}
 			}
-			client.Save();
+			DbSession.SaveOrUpdate(client);
 			if (savedNotify)
 				Notify("Сохранено");
 			RedirectToReferrer();
 		}
 
 		[AccessibleThrough(Verb.Post)]
-		public void BindPhone(uint clientCode, string phone)
+		public void BindPhone(uint id, string phone)
 		{
-			var client = Client.FindAndCheck<Client>(clientCode);
-			var group = client.ContactGroupOwner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
+			var owner = DbSession.Load<ContactGroupOwner>(id);
+			var group = owner.ContactGroups.FirstOrDefault(c => c.Type == ContactGroupType.KnownPhones);
 			if (group == null)
-				group = client.ContactGroupOwner.AddContactGroup(ContactGroupType.KnownPhones);
+				group = owner.AddContactGroup(ContactGroupType.KnownPhones);
 			phone = phone.Substring(0, 4) + "-" + phone.Substring(4, phone.Length - 4);
 			group.AddContact(new Contact{ ContactText = phone, Type = ContactType.Phone});
 
@@ -195,7 +195,7 @@ where Phone like :phone")
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				new ClientInfoLogEntity(message, client).Save();
+				new AuditRecord(message, client).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -237,7 +237,7 @@ where Phone like :phone")
 		public void ResetUin(uint clientCode, string reason)
 		{
 			var client = Client.FindAndCheck<Client>(clientCode);
-			ClientInfoLogEntity.ReseteUin(client, reason).Save();
+			AuditRecord.ReseteUin(client, reason).Save();
 			client.ResetUin();
 			RedirectToReferrer();
 		}
@@ -263,6 +263,13 @@ where Phone like :phone")
 		{
 			Admin.CheckClientPermission(client);
 
+			if (Form["ResetReclameDate"] != null) {
+				new ResetReclameDate(client).Execute(DbSession);
+				Notify("Сброшена");
+				RedirectTo(client);
+				return;
+			}
+
 			var oldMaskRegion = client.MaskRegion;
 			client.HomeRegion = Region.Find(homeRegion);
 			client.UpdateRegionSettings(regionSettings);
@@ -274,16 +281,15 @@ where Phone like :phone")
 				return;
 			}
 
-			if (drugstore.EnableSmartOrder)
-			{
-				if (drugstore.SmartOrderRules == null && smartOrderRules == null) { 
+			if (drugstore.EnableSmartOrder) {
+				if (drugstore.SmartOrderRules == null && smartOrderRules == null) {
 					var smartOrder = SmartOrderRules.TestSmartOrder();
 					drugstore.SmartOrderRules = smartOrder;
 				}
 				else {
 					drugstore.SmartOrderRules = smartOrderRules;
 					var parseAlgorithm = drugstore.SmartOrderRules.ParseAlgorithm;
-					var algorithmId = 0u;
+					uint algorithmId;
 					if (UInt32.TryParse(parseAlgorithm, out algorithmId)) {
 						var algorithm = DbSession.Load<ParseAlgorithm>(algorithmId);
 						if (algorithm != null)
@@ -291,8 +297,9 @@ where Phone like :phone")
 					}
 				}
 			}
-			client.Save();
-			drugstore.UpdateAndFlush();
+			DbSession.SaveOrUpdate(client);
+			DbSession.SaveOrUpdate(drugstore);
+			DbSession.Flush();
 			if (oldMaskRegion != client.MaskRegion)
 				client.MaintainIntersection();
 
@@ -302,7 +309,7 @@ where Phone like :phone")
 
 		public void NotifySuppliers(uint clientId)
 		{
-			var client = Client.Find(clientId);
+			var client = DbSession.Load<Client>(clientId);
 			new NotificationService(Defaults).NotifySupplierAboutDrugstoreRegistration(client, true);
 			Notify("Уведомления отправлены");
 			RedirectToReferrer();
@@ -313,7 +320,10 @@ where Phone like :phone")
 			CancelLayout();
 			int searchNumber;
 			Int32.TryParse(searchText, out searchNumber);
-			PropertyBag["clients"] = Client.Queryable.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber).OrderBy(c => c.Name).ToList();
+			PropertyBag["clients"] = DbSession.Query<Client>()
+				.Where(c => c.Name.Contains(searchText) || c.Id == searchNumber)
+				.OrderBy(c => c.Name)
+				.ToList();
 			RenderView("SearchClientSubview");
 		}
 
@@ -341,7 +351,7 @@ where Phone like :phone")
 		{
 			uint id;
 			UInt32.TryParse(text, out id);
-			return Price.Queryable
+			return DbSession.Query<Price>()
 				.Where(p => (p.Supplier.Name.Contains(text) || p.Supplier.Id == id) && p.PriceType == PriceType.Assortment)
 				.OrderBy(p => p.Supplier.Name)
 				.Take(50)
@@ -389,7 +399,7 @@ where Phone like :phone")
 		[return: JSONReturnBinder]
 		public object[] SearchSuppliers(uint id, string text)
 		{
-			var client = Client.Find(id);
+			var client = DbSession.Load<Client>(id);
 			var user = client.Users.FirstOrDefault();
 			if (user == null)
 				return Enumerable.Empty<object>().ToArray();
@@ -411,9 +421,9 @@ where s.Name like :SearchText")
 
 		public void MoveUserOrAddress(uint clientId, uint userId, uint addressId, uint legalEntityId, bool moveAddress)
 		{
-			var newClient = Client.Find(clientId);
-			var address = Address.TryFind(addressId);
-			var user = User.TryFind(userId);
+			var newClient = DbSession.Load<Client>(clientId);
+			var address = DbSession.Get<Address>(addressId);
+			var user = DbSession.Get<User>(userId);
 
 			Client oldClient = null;
 			if (user != null)
@@ -456,49 +466,47 @@ where s.Name like :SearchText")
 				user = address.AvaliableForUsers.SingleOrDefault();
 			if (user != null)
 				address = user.AvaliableAddresses.SingleOrDefault();
-			using (var scope = new TransactionScope(OnDispose.Rollback))
-			{
-				DbLogHelper.SetupParametersForTriggerLogging();
 
-				if (user != null)
-					user.MoveToAnotherClient(newClient, legalEntity);
-				if (address != null)
-					address.MoveToAnotherClient(newClient, legalEntity);
-				scope.VoteCommit();
-			}
+			AuditRecord log = null;
+			var query = new UpdateOrders(newClient, user, address);
+			if (user != null)
+				log = user.MoveToAnotherClient(newClient, legalEntity);
+			if (address != null)
+				log = address.MoveToAnotherClient(newClient, legalEntity);
+
+			query.Execute(DbSession);
+			DbSession.Save(log);
+			//нужно сохранить изменения, иначе oldClient.Refresh(); не зафиксирует их
+			DbSession.Flush();
 
 			if (address != null)
-			{
 				this.Mailer()
 					.AddressMoved(address, oldClient, address.OldValue(a => a.LegalEntity))
 					.Send();
-			}
 
 			if (user != null)
 				this.Mailer()
 					.UserMoved(user, oldClient, user.OldValue(u => u.Payer))
 					.Send();
 
-			if (moveAddress)
-			{
+			if (moveAddress) {
 				Notify("Адрес доставки успешно перемещен");
 				RedirectUsingRoute("deliveries", "Edit", new { id = address.Id });
 			}
-			else
-			{
+			else {
 				Notify("Пользователь успешно перемещен");
 				RedirectUsingRoute("users", "Edit", new { id = user.Id });
 			}
-			oldClient.Refresh();
+			DbSession.Refresh(oldClient);
 			if (oldClient.Users.Count == 0
 				&& oldClient.Addresses.Count == 0
 				&& oldClient.Enabled)
 			{
 				oldClient.Disabled = true;
 				this.Mailer().EnableChanged(oldClient).Send();
-				ClientInfoLogEntity.StatusChange(oldClient).Save();
+				DbSession.Save(AuditRecord.StatusChange(oldClient));
 			}
-			oldClient.Save();
+			DbSession.Save(oldClient);
 		}
 
 		public void Delete(uint id)

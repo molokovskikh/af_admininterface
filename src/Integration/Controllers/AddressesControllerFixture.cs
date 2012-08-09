@@ -3,6 +3,7 @@ using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using Common.Tools;
 using Common.Web.Ui.Models;
@@ -34,7 +35,7 @@ namespace Integration.Controllers
 			Request.Params.Add("address.AvaliableForUsers[0].Id", user.Id.ToString());
 			controller.Add(new Contact[0], client.Id, "тестовое сообщение для биллинга");
 
-			var messages = ClientInfoLogEntity.Queryable.Where(m => m.ObjectId == user.Id);
+			var messages = AuditRecord.Queryable.Where(m => m.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 
@@ -66,7 +67,7 @@ namespace Integration.Controllers
 			payer.JuridicalOrganizations[0].Name = "ООО Фарм-друган";
 			client.Payers.Add(payer);
 			payer.Save();
-			client.Save();
+			session.SaveOrUpdate(client);
 			scope.Flush();
 
 			address.LegalEntity = payer.JuridicalOrganizations.First();

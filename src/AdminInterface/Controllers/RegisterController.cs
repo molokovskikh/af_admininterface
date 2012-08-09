@@ -13,6 +13,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using System.Linq;
 using Castle.ActiveRecord;
@@ -366,21 +367,15 @@ namespace AdminInterface.Controllers
 
 		private void CreateDrugstore(Client client, AdditionalSettings additionalSettings, Supplier supplier)
 		{
-			var costCrypKey = ArHelper.WithSession(s =>
-				s.CreateSQLQuery("select usersettings.GeneratePassword()")
-				.UniqueResult<string>());
+			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
 
-			var smartOrder = SmartOrderRules.TestSmartOrder();
-			client.Settings.InvisibleOnFirm = (Convert.ToUInt32(additionalSettings.ShowForOneSupplier) > 0) ? DrugstoreType.Hidden : DrugstoreType.Standart;
-			client.Settings.BasecostPassword = costCrypKey;
-			client.Settings.SmartOrderRules = smartOrder;
-
-			if (additionalSettings.ShowForOneSupplier)
-			{
+			if (additionalSettings.ShowForOneSupplier) {
+				client.Settings.InvisibleOnFirm = DrugstoreType.Hidden;
 				client.Settings.NoiseCosts = true;
 				client.Settings.NoiseCostExceptSupplier = Supplier.Find(supplier.Id);
 			}
-			client.SaveAndFlush();
+			DbSession.Save(client);
+			DbSession.Flush();
 
 			client.MaintainIntersection();
 			client.Addresses.Each(a => a.MaintainInscribe());
@@ -455,7 +450,7 @@ WHERE   pricesdata.firmcode = s.Id
 			user.SetupSupplierPermission();
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
-			user.Save();
+			DbSession.Save(user);
 		}
 
 		private void AddContacts(ContactGroupOwner owner, Contact[] clientContacts)
@@ -540,7 +535,7 @@ WHERE   pricesdata.firmcode = s.Id
 		{
 			if (String.IsNullOrEmpty(searchPattern))
 				return;
-			PropertyBag["payers"] = Payer.GetLikeAvaliable(searchPattern);
+			PropertyBag["payers"] = Payer.GetLikeAvaliable(DbSession, searchPattern);
 			CancelLayout();
 		}
 

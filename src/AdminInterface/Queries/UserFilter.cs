@@ -10,9 +10,11 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Common.MySql;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 
 namespace AdminInterface.Queries
 {
@@ -57,6 +59,8 @@ namespace AdminInterface.Queries
 
 	public class UserFilter : Sortable
 	{
+		private ISession session;
+
 		public SearchUserBy SearchBy { get; set; }
 
 		public string SearchText { get; set; }
@@ -67,8 +71,9 @@ namespace AdminInterface.Queries
 
 		public Region Region { get; set; }
 
-		public UserFilter()
+		public UserFilter(ISession session)
 		{
+			this.session = session;
 			SearchBy = SearchUserBy.Auto;
 			SortBy = "UserName";
 			SortKeyMap = new Dictionary<string, string> {
@@ -87,86 +92,84 @@ namespace AdminInterface.Queries
 
 		public IList<UserSearchItem> Find()
 		{
-			var sessionHolder = ActiveRecordMediator.GetSessionFactoryHolder();
 			var administrator = SecurityContext.Administrator;
-			var session = sessionHolder.CreateSession(typeof(UserSearchItem));
 			var orderFilter = String.Format("ORDER BY {0} {1}", GetSortProperty(), GetSortDirection());
-			try
-			{
-				var filter = String.Empty;
-				filter = AddFilterCriteria(filter, GetFilterBy());
-				filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
-				filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
-				if (!String.IsNullOrEmpty(filter))
-					filter = String.Format(" and ({0}) ", filter);
+			var filter = String.Empty;
+			filter = AddFilterCriteria(filter, GetFilterBy());
+			filter = AddFilterCriteria(filter, GetTypeFilter(ClientType));
+			filter = AddFilterCriteria(filter, GetStatusFilter(SearchStatus));
+			if (!String.IsNullOrEmpty(filter))
+				filter = String.Format(" and ({0}) ", filter);
 
-				var regionMask = administrator.RegionMask;
-				if (Region != null)
-					regionMask &= Region.Id;
+			var regionMask = administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
 
-				var sqlStr = String.Format(@"
+			var sqlStr = String.Format(@"
 SELECT
-	u.Id as UserId,
-	u.Login as Login,
-	u.Name as UserName,
-	u.PayerId as PayerId,
-	u.Enabled as UserEnabled,
-	if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as UpdateDate,
-	if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as UpdateIsUncommited,
-	max(uui.AFAppVersion) as AFVersion,
+u.Id as UserId,
+u.Login as Login,
+u.Name as UserName,
+u.PayerId as PayerId,
+u.Enabled as UserEnabled,
+if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), uui.UpdateDate, uui.UncommitedUpdateDate) as UpdateDate,
+if (uui.UpdateDate is not null, if (max(uui.UpdateDate) >= max(uui.UncommitedUpdateDate), 0, 1), 0) as UpdateIsUncommited,
+max(uui.AFAppVersion) as AFVersion,
 
-	if(s.Type = 0, 2, 1) as ClientType,
-	s.Id as ClientId,
-	s.Name as ClientName,
-	s.Disabled as ServiceDisabled,
+if(s.Type = 0, 2, 1) as ClientType,
+if(rcs.InvisibleOnFirm = 2, 1, 0) as InvisibleClient,
+s.Id as ClientId,
+s.Name as ClientName,
+s.Disabled as ServiceDisabled,
 
-	p.JuridicalName as JuridicalName,
-	r.Region as RegionName
+p.JuridicalName as JuridicalName,
+r.Region as RegionName
 FROM
-	Customers.Users u
-	join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
-	join Customers.Services s on s.Id = u.RootService
-		join farm.Regions r ON r.RegionCode = s.HomeRegion
+Customers.Users u
+join usersettings.UserUpdateInfo uui ON uui.UserId = u.Id
+join Customers.Services s on s.Id = u.RootService
+	join farm.Regions r ON r.RegionCode = s.HomeRegion
 	left join Customers.Suppliers sup on sup.Id = u.RootService
 	left join Customers.Clients ON Clients.Id = u.ClientId
+		left join Usersettings.RetClientsSet rcs on rcs.ClientCode = Clients.Id
 	left join Customers.UserAddresses ua on ua.UserId = u.Id
 	left join Customers.Addresses a on a.Id = ua.AddressId
-		left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = ifnull(Clients.ContactGroupOwnerId, sup.ContactGroupOwnerId)
-		left join contacts.contact_groups cga ON a.ContactGroupId = cga.Id
-		left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
-		left join contacts.RegionalDeliveryGroups rdga on rdga.ContactGroupId = cga.Id
-		left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
-		left join contacts.Contacts as ContactsAddresses ON ContactsAddresses.ContactOwnerId = cga.Id and if(rdga.ContactGroupId is not null, (rdga.RegionId & sup.RegionMask > 0), 1)
-		left join contacts.Persons ON Persons.ContactGroupId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
-	join Billing.Payers p on p.PayerId = u.PayerId
+	left join contacts.contact_groups cg ON cg.ContactGroupOwnerId = ifnull(Clients.ContactGroupOwnerId, sup.ContactGroupOwnerId)
+	left join contacts.contact_groups cga ON a.ContactGroupId = cga.Id
+	left join contacts.RegionalDeliveryGroups rdg on rdg.ContactGroupId = cg.Id
+	left join contacts.RegionalDeliveryGroups rdga on rdga.ContactGroupId = cga.Id
+	left join contacts.Contacts ON Contacts.ContactOwnerId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
+	left join contacts.Contacts as ContactsAddresses ON ContactsAddresses.ContactOwnerId = cga.Id and if(rdga.ContactGroupId is not null, (rdga.RegionId & sup.RegionMask > 0), 1)
+	left join contacts.Persons ON Persons.ContactGroupId = cg.Id and if(rdg.ContactGroupId is not null, (rdg.RegionId & sup.RegionMask > 0), 1)
+join Billing.Payers p on p.PayerId = u.PayerId
 WHERE
-	((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0))
-	{0}
+((Clients.MaskRegion & :RegionMask > 0) or (sup.RegionMask & :RegionMask > 0))
+{0}
 GROUP BY u.Id
 {1}
 ", filter, orderFilter);
 
-				var result = session.CreateSQLQuery(sqlStr)
-					.SetParameter("RegionMask", regionMask)
-					.ToList<UserSearchItem>();
-				ArHelper.Evict(session, result);
-				var logins = result.Select(t => t.Login).ToList();
+			var result = session.CreateSQLQuery(sqlStr)
+				.SetParameter("RegionMask", regionMask)
+				.ToList<UserSearchItem>();
+			ArHelper.Evict(session, result);
+			var logins = result.Select(t => t.Login).ToList();
 
-				var adInfo = ADHelper.GetPartialUsersInformation(logins);
+			var adInfo = ADHelper.GetPartialUsersInformation(logins);
 
-				for (var i = 0; i < result.Count; i++)
-				{
-					if (adInfo == null)
-						continue;
-					result[i].IsDisabled = adInfo[result[i].Login].IsDisabled;
-					result[i].IsLocked = adInfo[result[i].Login].IsLocked;
-					result[i].IsLoginExists = adInfo[result[i].Login].IsLoginExists;
-				}
+			for (var i = 0; i < result.Count; i++)
+			{
+				if (adInfo == null)
+					continue;
+				result[i].DisabledInAd = adInfo[result[i].Login].DisabledInAd;
+				result[i].IsLocked = adInfo[result[i].Login].IsLocked;
+				result[i].IsLoginExists = adInfo[result[i].Login].IsLoginExists;
+			}
 
-				var info = new SearchTextInfo(SearchText);
-				if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 6) || SearchBy == SearchUserBy.ByContacts)) {
-					var findedUsers = result.Select(r => r.UserId).Implode();
-					var findInUsers = session.CreateSQLQuery(string.Format(@"
+			var info = new SearchTextInfo(SearchText);
+			if (result.Count > 0 && ((info.SearchTextIsPhone && info.SearchText.Length >= 6) || SearchBy == SearchUserBy.ByContacts)) {
+				var findedUsers = result.Select(r => r.UserId).Implode();
+				var findInUsers = session.CreateSQLQuery(string.Format(@"
 select u.Id 
 from Customers.Users u
 left join Customers.UserAddresses ua on ua.UserId = u.Id
@@ -186,20 +189,15 @@ where
 and
 u.Id in ({1})
 ", info.SqlSearchText.Replace("-", ""), findedUsers))
-						.SetParameter("RegionMask", regionMask)
-						.List<uint>();
+					.SetParameter("RegionMask", regionMask)
+					.List<uint>();
 
-					if (findInUsers.Count > 0) { 
-						var bufResult = result.Where(r => findInUsers.Contains(r.UserId)).ToList();
-						result = bufResult;
-					}
+				if (findInUsers.Count > 0) {
+					var bufResult = result.Where(r => findInUsers.Contains(r.UserId)).ToList();
+					result = bufResult;
 				}
-				return result;
 			}
-			finally
-			{
-				sessionHolder.ReleaseSession(session);
-			}
+			return result;
 		}
 
 		private static string AddFilterCriteria(string filter, string criteria)

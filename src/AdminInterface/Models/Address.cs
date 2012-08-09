@@ -18,7 +18,9 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using log4net;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Billing;
@@ -308,7 +310,7 @@ set @skip = 0;
 			UpdateContacts(displayedContacts, null);
 		}
 
-		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity newLegalEntity)
+		public virtual AuditRecord MoveToAnotherClient(Client newOwner, LegalEntity newLegalEntity)
 		{
 			if (!newOwner.Orgs().Any(o => o.Id == newLegalEntity.Id))
 				throw new Exception(String.Format("Не могу переместить адрес {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
@@ -318,11 +320,14 @@ set @skip = 0;
 			MoveAddressIntersection(newOwner, newLegalEntity,
 				Client, LegalEntity);
 
+			var message = String.Format("Перемещение адреса доставки от {0} к {1}", Client, newOwner);
 			Client = newOwner;
 			Payer = newLegalEntity.Payer;
 			LegalEntity = newLegalEntity;
-			ClientInfoLogEntity.UpdateLogs(newOwner.Id, Id);
-			Update();
+			AuditRecord.UpdateLogs(newOwner.Id, Id);
+			Save();
+
+			return new AuditRecord(message, this);
 		}
 
 		public virtual void MoveAddressIntersection(Client newClient, LegalEntity newLegalEntity, 
@@ -376,7 +381,7 @@ and i.LegalEntityId = :OldLegalEntityId
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 			billingMessage = String.Format("О регистрации Адреса {0} для клиента {1} ( {2} ): {3}", Name, Client.Name, Client.Id, billingMessage);
 			Payer.AddComment(billingMessage);
 		}
@@ -392,7 +397,7 @@ and i.LegalEntityId = :OldLegalEntityId
 		{
 			Payer.Addresses.Remove(this);
 			Client.Addresses.Remove(this);
-			ClientInfoLogEntity.DeleteAuditRecords(this);
+			AuditRecord.DeleteAuditRecords(this);
 			PayerAuditRecord.DeleteAuditRecords(Accounting);
 
 			base.Delete();

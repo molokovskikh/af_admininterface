@@ -7,6 +7,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
 using AdminInterface.Models.Billing;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -17,8 +18,10 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
@@ -63,7 +66,7 @@ namespace AdminInterface.Models
 		}
 	}
 
-	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable]
+	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Клиент")]
 	public class Client : Service, IChangesNotificationAware
 	{
 		private ClientStatus _status;
@@ -85,6 +88,7 @@ namespace AdminInterface.Models
 			HomeRegion = homeRegion;
 			JoinPayer(payer);
 			Settings.CheckDefaults();
+			Settings.GenerateCryptPassword();
 		}
 
 		[JoinedKey("Id")]
@@ -138,7 +142,13 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[Property, Description("Регионы работы"), ValidateGreaterThanZero("Вы не выбрали регионы работы"), Auditable]
+		[
+			Property,
+			Description("Регионы работы"),
+			ValidateGreaterThanZero("Вы не выбрали регионы работы"),
+			Auditable,
+			SetForceReplication
+		]
 		public virtual UInt64 MaskRegion { get; set; }
 
 		[Nested]
@@ -150,7 +160,7 @@ namespace AdminInterface.Models
 		[BelongsTo("ContactGroupOwnerId", Lazy = FetchWhen.OnInvoke, Cascade = CascadeEnum.All)]
 		public virtual ContactGroupOwner ContactGroupOwner { get; set; }
 
-		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable]
+		[BelongsTo("RegionCode"), Description("Домашний регион"), Auditable, ResetReclameDate]
 		public override Region HomeRegion { get; set; }
 
 		[HasMany(ColumnKey = "ClientId", Lazy = true, Inverse = true, OrderBy = "Address", Cascade = ManyRelationCascadeEnum.All)]
@@ -332,34 +342,6 @@ group by u.ClientId")
 			}
 		}
 
-		public static Client Find(uint id)
-		{
-			return ActiveRecordBase<Client>.Find(id);
-		}
-
-		public virtual void Save()
-		{
-			ActiveRecordMediator<Client>.Save(this);
-		}
-
-		public virtual void SaveAndFlush()
-		{
-			ActiveRecordMediator.SaveAndFlush(this);
-		}
-
-		public virtual void Refresh()
-		{
-			ActiveRecordMediator<Client>.Refresh(this);
-		}
-
-		public static IOrderedQueryable<Client> Queryable
-		{
-			get
-			{
-				return ActiveRecordLinqBase<Client>.Queryable;
-			}
-		}
-
 		public override string ToString()
 		{
 			return Name;
@@ -375,7 +357,7 @@ group by u.ClientId")
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 			var user = Users.First();
 			billingMessage = String.Format("О регистрации клиента: {0} ( {1} ), пользователь: {2} ( {3} ): {4}", Id, Name, user.Id, user.Name, billingMessage);
 			Payers.Single().AddComment(billingMessage);
@@ -497,7 +479,7 @@ where ClientId = :clientId")
 					rule.Delete();
 				}
 			}
-			ClientInfoLogEntity.DeleteAuditRecords(this);
+			AuditRecord.DeleteAuditRecords(this);
 			ActiveRecordMediator.Delete(this);
 		}
 

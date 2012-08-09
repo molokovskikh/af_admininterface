@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Controllers.Filters;
 using AdminInterface.Models.Billing;
+using AdminInterface.MonoRailExtentions;
 using Castle.ActiveRecord.Framework;
 using Castle.MonoRail.ActiveRecordSupport;
 using Castle.MonoRail.Framework;
@@ -32,8 +33,13 @@ namespace AdminInterface.Controllers
 		Rescue(typeof(PaymentsController), "SessionExpired", typeof(SessionExpiredException)),
 		Helper(typeof(PaginatorHelper), "paginator"),
 	]
-	public class PaymentsController : ARSmartDispatcherController
+	public class PaymentsController : AdminInterfaceController
 	{
+		public PaymentsController()
+		{
+			SetARDataBinder();
+		}
+
 		public void Index([SmartBinder] PaymentFilter filter)
 		{
 			var payments = filter.Find();
@@ -53,7 +59,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 				PropertyBag["payments"] = Payment.Queryable
 					.Where(p => p.RegistredOn >= DateTime.Today)
 					.OrderBy(p => p.RegistredOn).ToList();
@@ -122,7 +128,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payment"] = payment;
-				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 				RenderView("Edit");
 			}
 		}
@@ -173,7 +179,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payment"] = payment;
-				PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
 			}
 		}
 

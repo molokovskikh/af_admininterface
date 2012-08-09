@@ -158,7 +158,7 @@ namespace AdminInterface.Models.Billing
 
 		public static IEnumerable<Payment> Identify(IEnumerable<Payment> payments)
 		{
-			var recipients = Recipient.Queryable.ToList();
+			var recipients = ActiveRecordLinqBase<Recipient>.Queryable.ToList();
 			var ignoredInns = IgnoredInn.Queryable.ToList();
 			foreach (var payment in payments)
 			{

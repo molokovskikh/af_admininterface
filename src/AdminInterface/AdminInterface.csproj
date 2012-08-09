@@ -109,6 +109,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\NHibernate.ByteCode.Castle.dll</HintPath>
     </Reference>
+    <Reference Include="RemoteOrderSenderService">
+      <HintPath>..\..\lib\RemoteOrderSenderService.dll</HintPath>
+    </Reference>
     <Reference Include="RemotePriceProcessor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b87fa865681cc1c6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\RemotePriceProcessor.dll</HintPath>
@@ -149,11 +152,11 @@
     <Compile Include="Controllers\NewsController.cs" />
     <Compile Include="Controllers\LegalEntityController.cs" />
     <Compile Include="Controllers\OrdersController.cs" />
+    <Compile Include="Controllers\PricesController.cs" />
     <Compile Include="Mailers\Mailer.cs" />
     <Compile Include="Mailers\MonorailMailer.cs" />
     <Compile Include="Models\Audit\CollectionListners.cs" />
-    <Compile Include="Models\Listeners\AbstractPostUpdateEventListener.cs" />
-    <Compile Include="Models\Listeners\UserUpdateInfoListener.cs" />
+    <Compile Include="Models\Listeners\QueryTriggerListner.cs" />
     <Compile Include="Models\Logs\CertificateRequestLog.cs" />
     <Compile Include="Models\News.cs" />
     <Compile Include="Models\OrderLog.cs" />
@@ -191,7 +194,6 @@
     <Compile Include="Models\Logs\PrgDataLog.cs" />
     <Compile Include="Models\Logs\UserMessageSendLog.cs" />
     <Compile Include="Models\Order.cs" />
-    <Compile Include="Models\Listeners\UpdateReplicationInfoListener.cs" />
     <Compile Include="Models\ParseAlgorithm.cs" />
     <Compile Include="Models\Suppliers\SpecialHandler.cs" />
     <Compile Include="Models\Validators\ExtensionListValidationAttribute.cs" />
@@ -296,6 +298,9 @@
     <Compile Include="Queries\MessageQuery.cs" />
     <Compile Include="Queries\OrderFilter.cs" />
     <Compile Include="Queries\RejectWaibillParams.cs" />
+    <Compile Include="Queries\ResetReclameDate.cs" />
+    <Compile Include="Queries\SetForceReplication.cs" />
+    <Compile Include="Queries\UpdateOrders.cs" />
     <Compile Include="Queries\UserFilter.cs" />
     <Compile Include="Security\PayerFilterActivationFilter.cs" />
     <Compile Include="Security\SecureAttribute.cs" />
@@ -317,7 +322,7 @@
     </Compile>
     <Compile Include="Models\Security\Administrator.cs" />
     <Compile Include="NHibernateExtentions\AggregateProjection2.cs" />
-    <Compile Include="Models\Logs\ClientInfoLogEntity.cs" />
+    <Compile Include="Models\Logs\AuditRecord.cs" />
     <Compile Include="Models\Logs\PasswordChangeLogEntity.cs" />
     <Compile Include="Models\Logs\UpdateDownloadLogEntity.cs" />
     <Compile Include="Models\Billing\MailSentEntity.cs" />
@@ -407,6 +412,7 @@
     <Content Include="App_Themes\WebApp\base.css" />
     <Content Include="App_Themes\WebApp\style.css" />
     <Content Include="Assets\Javascripts\autosubmit.coffee" />
+    <Content Include="Assets\Javascripts\billing.js" />
     <Content Include="Assets\Javascripts\confirmation.coffee" />
     <Content Include="Assets\Javascripts\input.dependency.coffee" />
     <Content Include="Assets\Javascripts\order.delivery.group.editor.coffee" />
@@ -414,6 +420,7 @@
     <Content Include="Assets\Javascripts\registration.js" />
     <Content Include="Assets\Javascripts\request.coffee" />
     <Content Include="Assets\Javascripts\table.editor.js" />
+    <Content Include="Assets\Stylesheets\billing.css" />
     <Content Include="Assets\Stylesheets\News.css" />
     <Content Include="Css\columns.css" />
     <Content Include="Css\User.css" />
@@ -459,9 +466,13 @@
     <None Include="Views\LegalEntity\Show.brail" />
     <None Include="Views\Logs\OrdersTable.brail" />
     <None Include="Views\Logs\Statistics.brail" />
+    <None Include="Views\Mail\RegisterNews.brail" />
     <None Include="Views\News\Edit.brail" />
     <None Include="Views\News\Index.brail" />
+    <None Include="Views\Orders\Make.brail" />
+    <None Include="Views\Prices\Edit.brail" />
     <None Include="Views\Shared\DisplayTemplates\RegistrationInfo.brail" />
+    <None Include="Views\Shared\EditorTemplates\TimeSpan.brail" />
     <None Include="Views\SpecialHandlers\Index.brail" />
     <None Include="Views\SpecialHandlers\New.brail" />
     <None Include="Views\SpecialHandlers\Edit.brail" />
@@ -511,6 +522,7 @@
     <None Include="Views\Orders\Details.brail" />
     <None Include="Views\SubViews\JuridicalOrganizationForm.brail" />
     <None Include="Views\LegalEntity\Add.brail" />
+    <None Include="Views\Templates\UnknownCalls.brail" />
     <Content Include="Web.Config">
       <SubType>Designer</SubType>
     </Content>

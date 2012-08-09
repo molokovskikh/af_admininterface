@@ -165,6 +165,11 @@
 					<td><h4>Регионы заказа</h4></td>
 					<%end %>
 				</tr>
+				<%if (not supplierUser) and (user.AvaliableAddresses.Count == 0): %>
+				<tr>
+					<td></td><td><label class="error">(заказ невозможен-нет ни одного подключ. адреса)</label></td>
+				</tr>
+				<%end %>
 				<tr>
 					<td valign="top">
 					<% for i, region in enumerate(AllowWorkRegions): %>
@@ -204,6 +209,8 @@
 			<input type=submit value="Сохранить">
 		</div>
 	</form>
+
+	<% OutputSubView("/Templates/UnknownCalls", {@owner: user.ContactGroupoOwner}) %>
 </div>
 
 <div class="TwoColumn Messages" style="margin-left: 10px">

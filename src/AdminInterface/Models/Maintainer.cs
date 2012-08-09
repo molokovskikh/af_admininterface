@@ -1,6 +1,7 @@
 using System;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Suppliers;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate;
 

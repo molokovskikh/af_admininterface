@@ -14,6 +14,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
+using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
@@ -29,6 +30,7 @@ using Common.Web.Ui.Models;
 using System.Linq;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
+using NHibernate;
 using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
@@ -117,35 +119,28 @@ namespace AdminInterface.Controllers
 
 			service.AddUser(user);
 
-			string password;
-			PasswordChangeLogEntity passwordChangeLog;
 			if (String.IsNullOrEmpty(address.Value))
 				address = null;
-			using(var scope = new TransactionScope(OnDispose.Rollback))
+
+			user.Payer = Payer.Find(user.Payer.Id);
+			user.Setup();
+			var password = user.CreateInAd();
+			user.WorkRegionMask = regionSettings.GetBrowseMask();
+			user.OrderRegionMask = regionSettings.GetOrderMask();
+			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
+			DbSession.Save(passwordChangeLog);
+			user.UpdateContacts(contacts);
+			user.UpdatePersons(persons);
+
+			if (service.IsClient() && address != null)
 			{
-				DbLogHelper.SetupParametersForTriggerLogging();
-
-				user.Payer = Payer.Find(user.Payer.Id);
-				user.Setup();
-				password = user.CreateInAd();
-				user.WorkRegionMask = regionSettings.GetBrowseMask();
-				user.OrderRegionMask = regionSettings.GetOrderMask();
-				passwordChangeLog = new PasswordChangeLogEntity(user.Login);
-				DbSession.Save(passwordChangeLog);
-				user.UpdateContacts(contacts);
-				user.UpdatePersons(persons);
-
-				if (service.IsClient() && address != null)
-				{
-					address = ((Client)service).AddAddress(address);
-					user.RegistredWith(address);
-					address.SaveAndFlush();
-					address.Maintain();
-				}
-				DbSession.SaveOrUpdate(service);
-
-				scope.VoteCommit();
+				address = ((Client)service).AddAddress(address);
+				user.RegistredWith(address);
+				address.SaveAndFlush();
+				address.Maintain();
 			}
+			DbSession.SaveOrUpdate(service);
+
 
 			if (address != null)
 				address.CreateFtpDirectory();
@@ -161,8 +156,10 @@ namespace AdminInterface.Controllers
 				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name, 
-					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id)).Where(a => a != null).Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
-				new ClientInfoLogEntity(message, user.Client){ MessageType = LogMessageType.System }.Save();
+					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id))
+						.Where(a => a != null)
+						.Implode(a => string.Format("\r\n {0} - ({1})", a.Id, a.Name)));
+				new AuditRecord(message, user.Client){ MessageType = LogMessageType.System }.Save();
 			}
 
 			var haveMails = (!String.IsNullOrEmpty(mails) && !String.IsNullOrEmpty(mails.Trim())) ||
@@ -203,12 +200,14 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Edit(uint id, [SmartBinder(Expect = "filter.Types")] MessageQuery filter)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
+			NHibernateUtil.Initialize(user.RootService);
 			PropertyBag["CiUrl"] = Properties.Settings.Default.ClientInterfaceUrl;
 			PropertyBag["user"] = user;
 			if (user.Client != null)
 				PropertyBag["client"] = user.Client;
 
+			PropertyBag["CallLogs"] = UnresolvedCall.LastCalls;
 			PropertyBag["authorizationLog"] = user.Logs;
 			PropertyBag["userInfo"] = ADHelper.GetADUserInformation(user);
 			PropertyBag["EmailContactType"] = ContactType.Email;
@@ -260,7 +259,7 @@ namespace AdminInterface.Controllers
 			user.OrderRegionMask = orderRegions.Aggregate(0UL, (v, a) => a + v);
 			user.UpdateContacts(contacts, deletedContacts);
 			user.UpdatePersons(persons, deletedPersons);
-			user.Save();
+			DbSession.Save(user);
 
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new {id = user.Id});
@@ -269,7 +268,7 @@ namespace AdminInterface.Controllers
 		[RequiredPermission(PermissionType.ChangePassword)]
 		public void ChangePassword(uint id)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 			user.CheckLogin();
 
 			PropertyBag["user"] = user;
@@ -284,7 +283,7 @@ namespace AdminInterface.Controllers
 									 bool changeLogin,
 									 string reason)
 		{
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 			user.CheckLogin();
 			var administrator = Admin;
 			var password = User.GeneratePassword();
@@ -296,8 +295,8 @@ namespace AdminInterface.Controllers
 			user.ResetUin();
 			if (changeLogin)
 				user.Login = user.Id.ToString();
-			user.Save();
-			ClientInfoLogEntity.PasswordChange(user, isFree, reason).Save();
+			DbSession.Save(user);
+			AuditRecord.PasswordChange(user, isFree, reason).Save();
 
 			var passwordChangeLog = new PasswordChangeLogEntity(user.Login);
 
@@ -331,7 +330,7 @@ namespace AdminInterface.Controllers
 
 		public void Unlock(uint id)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 			var login = user.Login;
 			if (ADHelper.IsLoginExists(login) && ADHelper.IsLocked(login))
 				ADHelper.Unlock(login);
@@ -344,7 +343,7 @@ namespace AdminInterface.Controllers
 		{
 			try
 			{
-				var user = User.Find(id);
+				var user = DbSession.Load<User>(id);
 				var files = Directory.GetFiles(Global.Config.UserPreparedDataDirectory)
 				.Where(f => Regex.IsMatch(Path.GetFileName(f), string.Format(@"^({0}_)\d+?\.zip", user.Id))).ToList();
 				foreach (var file in files) {
@@ -361,11 +360,11 @@ namespace AdminInterface.Controllers
 
 		public void ResetUin(uint id, string reason)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 			DbLogHelper.SetupParametersForTriggerLogging(new {
 				ResetIdCause = reason
 			});
-			ClientInfoLogEntity.ReseteUin(user, reason).Save();
+			AuditRecord.ReseteUin(user, reason).Save();
 			user.ResetUin();
 			Notify("УИН сброшен");
 			RedirectToReferrer();
@@ -374,11 +373,11 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void SendMessage(string message, uint clientCode, uint userId)
 		{
-			var user = User.Find(userId);
+			var user = DbSession.Load<User>(userId);
 
 			if (!String.IsNullOrEmpty(message))
 			{
-				new ClientInfoLogEntity(message, user).Save();
+				new AuditRecord(message, user).Save();
 				Notify("Сохранено");
 			}
 			RedirectToReferrer();
@@ -387,7 +386,7 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Get)]
 		public void Settings(uint id)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 			PropertyBag["user"] = user;
 			if (user.Client == null)
 			{
@@ -406,14 +405,14 @@ namespace AdminInterface.Controllers
 		[AccessibleThrough(Verb.Post)]
 		public void SaveSettings([ARDataBind("user", AutoLoad = AutoLoadBehavior.NullIfInvalidKey, Expect = "user.AssignedPermissions, user.InheritPricesFrom, user.ShowUsers")] User user)
 		{
-			user.Save();
+			DbSession.Save(user);
 			Notify("Сохранено");
 			RedirectUsingRoute("users", "Edit", new { id = user.Id });
 		}
 
 		public void SearchOffers(uint id, string searchText)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 			if (!String.IsNullOrEmpty(searchText))
 				PropertyBag["Offers"] = Offer.Search(user, searchText);
 			PropertyBag["user"] = user;
@@ -421,7 +420,7 @@ namespace AdminInterface.Controllers
 
 		public void Delete(uint id)
 		{
-			var user = User.Find(id);
+			var user = DbSession.Load<User>(id);
 
 			if (user.CanDelete()) {
 				var payer = user.Payer;

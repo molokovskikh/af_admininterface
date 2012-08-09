@@ -1,5 +1,6 @@
 ﻿using AdminInterface.Mailers;
 using AdminInterface.Models;
+using AdminInterface.Models.Logs;
 using AdminInterface.MonoRailExtentions;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -100,7 +101,8 @@ namespace AdminInterface.Controllers
 			var address = Address.Find(id);
 			Mailer.NotifySupplierAboutAddressRegistration(address, Defaults);
 			Mailer.AddressRegistrationResened(address);
-			Flash["Message"] = new Message("Уведомления отправлены");
+			DbSession.Save(new AuditRecord("Разослано повторное уведомление о регистрации адреса", address));
+			Notify("Уведомления отправлены");
 			RedirectToReferrer();
 		}
 	}

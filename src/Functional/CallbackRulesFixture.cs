@@ -3,13 +3,13 @@ using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using Functional.ForTesting;
 using NUnit.Framework;
-
-using WatiN.Core; using Test.Support.Web;
+using Test.Support.Web;
+using WatiN.Core;
 
 namespace Functional
 {
 	[TestFixture, Ignore("Временно до починки")]
-	public class CallbackRulesFixture : WatinFixture
+	public class CallbackRulesFixture : WatinFixture2
 	{
 		private const string CallbackLinkText = "Правила обратного звонка";
 

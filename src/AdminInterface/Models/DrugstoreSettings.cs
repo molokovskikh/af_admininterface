@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.NHibernateExtentions;
 using Castle.ActiveRecord;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.NHibernateExtentions;
 
 namespace AdminInterface.Models
@@ -29,13 +31,17 @@ namespace AdminInterface.Models
 		[Description("Выводить предупреждения")] Warning = 1,
 	}
 
-	public interface IDrugstoreSettings
+	public enum WaybillConvertFormat
 	{
-		uint Id { get; }
+		[Description("SST")] SST = 0,
+		[Description("Dbf для экспорта накладных Протек")] DBF = 1,
+		[Description("SST для Здоровые Люди")] SSTLong = 2,
+		[Description("Устаревшая версия универсального dbf")] LessUniversalDbf = 3,
+		[Description("Универсальный dbf")] UniversalDbf = 4,
 	}
 
 	[ActiveRecord("RetClientsSet", Schema = "usersettings", Lazy = true), Auditable]
-	public class DrugstoreSettings : ActiveRecordBase<DrugstoreSettings>, IDrugstoreSettings
+	public class DrugstoreSettings
 	{
 		private bool _noiseCosts;
 		private Supplier _noiseCostExceptSupplier;
@@ -115,13 +121,10 @@ namespace AdminInterface.Models
 		[Property, Description("Активировать механизм аптечной корректировки цен (CreditNote, пересчет отсрочек в цены)"), Auditable]
 		public virtual bool AllowDelayOfPayment { get; set; }
 
-		[Property(NotNull = true)]
-		public virtual string BasecostPassword { get; set; }
-
 		[Property, Description("Принимать накладные от клиента"), Auditable]
 		public virtual bool SendWaybillsFromClient { get; set; }
 
-		[Property, Description("Показывать рекламу в AnalitF"), Auditable]
+		[Property, Description("Показывать рекламу в AnalitF"), Auditable, ResetReclameDate]
 		public virtual bool ShowAdvertising { get; set; }
 
 		[Property, Description("Передавать розничную цену (работа по договору комиссии)"), Auditable]
@@ -142,7 +145,7 @@ namespace AdminInterface.Models
 		[Property, Description("Не подключать новые прайсы \"В работе\""), Auditable]
 		public virtual bool IgnoreNewPriceForUser { get; set; }
 
-		[Description("Скрыть клиента в интефрейсе поставщика")]
+		[Description("Скрыть клиента в интефрейсе поставщика, не доставлять заказы поставщикам")]
 		public virtual bool IsHiddenFromSupplier
 		{
 			get
@@ -171,17 +174,20 @@ namespace AdminInterface.Models
 			}
 		}
 
-		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable]
+		[BelongsTo("BuyingMatrixPriceId"), Description("Ассортиментный прайс для матрицы закупок"), Auditable, SetForceReplication]
 		public virtual Price BuyingMatrixPrice { get; set; }
 
-		[Property, Description("Тип матрицы"), Auditable]
+		[Property, Description("Тип матрицы"), Auditable, SetForceReplication]
 		public virtual BuyingMatrixType BuyingMatrixType { get; set; }
 
-		[Property, Description("Действие матрицы"), Auditable]
+		[Property, Description("Действие матрицы"), Auditable, SetForceReplication]
 		public virtual BuyingMatrixAction WarningOnBuyingMatrix { get; set; }
 
-		[Property, Description("Конвертировать накладную в dbf-файл"), Auditable]
+		[Property, Description("Конвертировать накладные"), Auditable]
 		public virtual bool IsConvertFormat { get; set; }
+
+		[Property, Description("Формат для конвертации накладных"), Auditable]
+		public virtual WaybillConvertFormat WaybillConvertFormat { get; set; }
 
 		[BelongsTo("AssortimentPriceId"), Description("Ассортиментный прайс для преобразования накладной в формат dbf"), Auditable]
 		public virtual Price AssortimentPrice { get; set; }
@@ -203,6 +209,9 @@ namespace AdminInterface.Models
 
 		[Property, Description("Тип матрицы предложений"), Auditable]
 		public virtual BuyingMatrixType OfferMatrixType { get; set; }
+
+		[Property(NotNull = true)]
+		public virtual string BasecostPassword { get; set; }
 
 		public virtual bool EnableOfferMatrix
 		{
@@ -232,7 +241,7 @@ namespace AdminInterface.Models
 		public virtual bool ShowCertificatesWithoutRefSupplier { get; set; }
 
 		[Property, Description("Формат для сохранения накладных Протек"), Auditable]
-		public virtual ProtekWaybillSavingType ProtekWaybillSavingType { get; set; }
+		public virtual WaybillConvertFormat ProtekWaybillSavingType { get; set; }
 
 		public virtual void CheckDefaults()
 		{
@@ -242,6 +251,16 @@ namespace AdminInterface.Models
 			if (payer != null) {
 				payer.ApplySettingsTemplate(this);
 			}
+		}
+
+		public virtual void GenerateCryptPassword()
+		{
+			BasecostPassword = new String(Generator.Random(73)
+				.Select(i => i + 49)
+				.Where(i => !((i > 57 && i < 65) || (i > 90 && i < 97)))
+				.Take(16)
+				.Select(i => (char)i)
+				.ToArray());
 		}
 	}
 }

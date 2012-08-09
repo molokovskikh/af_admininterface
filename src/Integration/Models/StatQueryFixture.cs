@@ -14,7 +14,7 @@ namespace Integration.Models
 		public void Max_date()
 		{
 			var query = new StatQuery();
-			var data = query.Load(ulong.MaxValue, DateTime.Today, DateTime.Today);
+			var data = query.Load(DateTime.Today, DateTime.Today);
 			Assert.That(data.ToKeyValuePairs().Count(), Is.GreaterThan(0));
 		}
 

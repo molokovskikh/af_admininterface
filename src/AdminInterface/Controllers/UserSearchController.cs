@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
+using AdminInterface.MonoRailExtentions;
 using AdminInterface.Queries;
 using AdminInterface.Security;
 using Castle.MonoRail.ActiveRecordSupport;
@@ -19,22 +21,31 @@ namespace AdminInterface.Controllers
 		Secure(PermissionType.ViewDrugstore, PermissionType.ViewSuppliers, Required = Required.AnyOf),
 		Filter(ExecuteWhen.BeforeAction, typeof(SecurityActivationFilter))
 	]
-	public class UserSearchController : ARSmartDispatcherController
+	public class UserSearchController : AdminInterfaceController
 	{
 		public void Search()
 		{
-			var filter = new UserFilter();
-			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter.")))
-			{
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
+
+			var filter = new UserFilter(DbSession);
+			PropertyBag["filter"] = filter;
+			if (IsPost || Request.QueryString.Keys.Cast<string>().Any(k => k.StartsWith("filter."))) {
 				BindObjectInstance(filter, IsPost ? ParamStore.Form : ParamStore.QueryString, "filter", AutoLoadBehavior.NullIfInvalidKey);
 				var result = filter.Find();
-				if (result.Count == 1 && !String.IsNullOrEmpty(result.First().UserId.ToString()))
-				{
-					RedirectUsingRoute("users", "edit", new {id = result.First().UserId});
-				}
 				PropertyBag["SearchResults"] = result;
+				AutoOpen(result);
 			}
-			PropertyBag["filter"] = filter;
+		}
+
+		public void AutoOpen(IList<UserSearchItem> result)
+		{
+			if (result.Count == 1) {
+				var item = result.First();
+				if (item.ClientType == SearchClientType.Supplier)
+					RedirectUsingRoute("suppliers", "show", new {id = item.ClientId});
+				else
+					RedirectUsingRoute("users", "edit", new {id = item.UserId});
+			}
 		}
 	}
 }

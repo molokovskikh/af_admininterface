@@ -49,6 +49,11 @@
 									<asp:Button ID="DeleteButton" runat="server" CommandName="Delete" Text="Удалить" />
 								</ItemTemplate>
 							</asp:TemplateField>
+							<asp:TemplateField>
+								<ItemTemplate>
+									<asp:HyperLink runat="server" Text='Редактировать' NavigateUrl='<%# String.Format("~/Prices/{0}/Edit", Eval("PriceCode")) %>' />
+								</ItemTemplate>
+							</asp:TemplateField>
 							<asp:TemplateField  HeaderText="Наименование">
 								<ItemTemplate>
 									<asp:HyperLink runat="server" Text='<%# Eval("PriceName") %>' NavigateUrl='<%# Eval("CostType").Equals(DBNull.Value) ? "" : String.Format("managecosts.aspx?pc={0}", Eval("PriceCode")) %>'  />

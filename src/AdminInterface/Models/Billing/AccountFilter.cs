@@ -5,6 +5,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using Castle.ActiveRecord.Framework;
 using Common.MySql;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Billing

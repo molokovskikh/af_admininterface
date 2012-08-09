@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -25,7 +26,7 @@ namespace Functional.Drugstore
 		{
 			client = DataMother.CreateTestClientWithUser();
 			client.Settings.SmartOrderRules = SmartOrderRules.TestSmartOrder();
-			scope.Flush();
+			Flush();
 			settings = client.Settings;
 
 			browser = Open(client, "Settings");
@@ -41,7 +42,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableBuyingMatrix").Click();
 
@@ -59,7 +60,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.SelectList(Find.ByName("drugstore.BuyingMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.WarningOnBuyingMatrix")).SelectedItem, Is.EqualTo("Запретить заказ"));
 
-			client.Refresh();
+			session.Refresh(client);
 
 			Assert.That(client.Settings.BuyingMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.BuyingMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -75,7 +76,7 @@ namespace Functional.Drugstore
 				s.AddPrice("Матрица", PriceType.Assortment);
 			});
 			Save(supplier);
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -92,7 +93,7 @@ namespace Functional.Drugstore
 			Assert.That(browser.Text, Is.StringContaining("Фармаимпекс - Матрица"));
 			Assert.That(browser.SelectList(Find.ByName("drugstore.OfferMatrixType")).SelectedItem, Is.EqualTo("Белый список"));
 
-			client.Refresh();
+			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -108,7 +109,7 @@ namespace Functional.Drugstore
 			});
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableOfferMatrix").Click();
 
@@ -133,7 +134,7 @@ namespace Functional.Drugstore
 			excludes = ((Table)Css("#excludes"));
 			Assert.That(excludes.Text, Is.StringContaining("Фармаимпекс"));
 
-			client.Refresh();
+			session.Refresh(client);
 
 			Assert.That(client.Settings.OfferMatrixPrice.Name, Is.EqualTo("Матрица"));
 			Assert.That(client.Settings.OfferMatrixType, Is.EqualTo(BuyingMatrixType.WhiteList));
@@ -152,7 +153,7 @@ namespace Functional.Drugstore
 			Save(supplier);
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			session.Save(new ParseAlgorithm {Name = "testParse"});
-			scope.Flush();
+			Flush();
 
 			Css("#drugstore_EnableSmartOrder").Click();
 			Css("#drugstore_EnableSmartOrder").Click();
@@ -262,7 +263,7 @@ namespace Functional.Drugstore
 			Assert.IsFalse(UserOrderRegionExists(browser, "Воронеж"));
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
 
-			client.Refresh();
+			session.Refresh(client);
 			var user = client.Users[0];
 			session.Refresh(user);
 			Assert.IsFalse((user.WorkRegionMask & 1) > 0);
@@ -315,7 +316,7 @@ namespace Functional.Drugstore
 			Assert.IsFalse(UserOrderRegionExists(browser, "Курск"));
 			// При удалении региона заказа, регион работы должен оставаться
 			Assert.IsTrue(UserWorkRegionExists(browser, "Курск"));
-			client.Refresh();
+			session.Refresh(client);
 			var user = client.Users[0];
 			session.Refresh(user);
 			Assert.IsTrue((user.WorkRegionMask & 1) > 0);
@@ -403,7 +404,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			client.Refresh();
+			session.Refresh(client);
 			Assert.IsTrue(settings.IgnoreNewPrices);
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
@@ -426,7 +427,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.MaxWeeklyOrdersSum, Is.EqualTo(123456));
 
 			browser.GoTo(BuildTestUrl(String.Format("Client/{0}", client.Id)));
@@ -457,7 +458,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 		}
 
@@ -468,7 +469,7 @@ namespace Functional.Drugstore
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.EqualTo(0));
 		}
 
@@ -517,7 +518,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Save(supplier);
 			client.Settings.NoiseCosts = true;
 			client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.Update();
+			session.SaveOrUpdate(client.Settings);
 			Flush();
 
 			Refresh();
@@ -528,7 +529,7 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			browser.Button(Find.ByValue("Сохранить")).Click();
 			Assert.That(browser.Text, Is.StringContaining("Сохранено"));
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.FirmCodeOnly, Is.Null);
 		}
 
@@ -553,9 +554,16 @@ where i.ClientId = :ClientId and i.RegionId = :RegionId
 			Click("Сохранить");
 			AssertText("Сохранено");
 
-			settings.Refresh();
+			session.Refresh(settings);
 			Assert.That(settings.IsConvertFormat, Is.True);
 			Assert.That(settings.AssortimentPrice, Is.Not.Null);
+		}
+
+		[Test]
+		public void Reset_reclame_date()
+		{
+			Click("Сбросить дату рекламы");
+			AssertText("Сброшена");
 		}
 
 		private void Search(string term, string title = null)

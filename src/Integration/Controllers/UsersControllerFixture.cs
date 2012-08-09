@@ -92,7 +92,7 @@ namespace Integration.Controllers
 				}, new Person[0], "тестовое сообщение для биллинга", true, client.Id, null);
 
 			var user = Registred();
-			var messages = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == user.Id);
+			var messages = AuditRecord.Queryable.Where(l => l.ObjectId == user.Id);
 			Assert.That(messages.Any(m => m.Message == "Сообщение в биллинг: тестовое сообщение для биллинга"), Is.True, messages.Implode(m => m.Message));
 		}
 
@@ -103,7 +103,7 @@ namespace Integration.Controllers
 			var payer = new Payer("Тестовый плательщик");
 			payer.Save();
 			client.Payers.Add(payer);
-			client.Save();
+			session.SaveOrUpdate(client);
 			Request.Params.Add("user.Payer.Id", payer.Id.ToString());
 			controller.Add(new Contact[0], new[] {
 					new RegionSettings {
@@ -129,7 +129,7 @@ namespace Integration.Controllers
 			var permission = new UserPermission();
 			permission.Id = 1;
 			user1.AddPermission(permission);
-			user1.Save();
+			ActiveRecordMediator.Save(user1);
 			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
 			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
 			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));

@@ -5,6 +5,7 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Billing;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 

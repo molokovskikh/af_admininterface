@@ -20,6 +20,18 @@ namespace AdminInterface.Models.Logs
 	[ActiveRecord("DocumentSendLogs", Schema = "Logs", Lazy = true)]
 	public class DocumentSendLog
 	{
+		public DocumentSendLog()
+		{}
+
+		public DocumentSendLog(User user, DocumentReceiveLog document)
+		{
+			ForUser = user;
+			Received = document;
+			Committed = true;
+			FileDelivered = true;
+			DocumentDelivered = true;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 

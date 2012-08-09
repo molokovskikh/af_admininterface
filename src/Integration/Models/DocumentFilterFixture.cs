@@ -2,7 +2,9 @@
 using System.Linq;
 using AdminInterface.Controllers;
 using AdminInterface.Controllers.Filters;
+using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Castle.ActiveRecord;
 using Common.Tools;
 using Integration.ForTesting;
 using NUnit.Framework;
@@ -39,7 +41,7 @@ namespace Integration.Models
 			for (int i = 0; i < 1000; i++)
 			{
 				var client = DataMother.CreateTestClientWithAddress();
-				client.Save();
+				session.SaveOrUpdate(client);
 				Save(DataMother.CreateTestDocumentLog(supplier, client));
 			}
 			Console.WriteLine(supplier.Id);

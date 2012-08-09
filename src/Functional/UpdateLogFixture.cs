@@ -2,6 +2,7 @@
 using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Logs;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Functional.ForTesting;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;
@@ -11,7 +12,7 @@ using AdminInterface.Helpers;
 namespace Functional
 {
 	[TestFixture, Ignore("Чинить")]
-	public class UpdateLogFixture : WatinFixture
+	public class UpdateLogFixture : WatinFixture2
 	{
 		[Test]
 		public void ViewAccumulativeUpdateLog()

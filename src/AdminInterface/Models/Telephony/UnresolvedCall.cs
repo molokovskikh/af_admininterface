@@ -2,14 +2,23 @@
 using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using NHibernate.Criterion;
 
 namespace AdminInterface.Models.Telephony
 {
 	[ActiveRecord("UnresolvedPhone", Schema = "telephony")]
-	public class UnresolvedCall : ActiveRecordLinqBase<UnresolvedCall>
+	public class UnresolvedCall
 	{
+		public UnresolvedCall()
+		{}
+
+		public UnresolvedCall(string phone)
+		{
+			PhoneNumber = phone;
+		}
+
 		[PrimaryKey("id")]
 		public virtual ulong Id { get; set; }
 

@@ -4,6 +4,7 @@ using System.Data;
 using AdminInterface.Security;
 using Common.MySql;
 using Common.Tools;
+using Common.Web.Ui.Models;
 using MySql.Data.MySqlClient;
 
 namespace AdminInterface.Controllers.Filters
@@ -13,7 +14,10 @@ namespace AdminInterface.Controllers.Filters
 		[Description("Полностью")]
 		public bool Full { get; set; }
 
-		public DataSet Load(ulong regionMask, DateTime fromDate, DateTime toDate)
+		[Description("Регион:")]
+		public Region Region { get; set; }
+
+		public DataSet Load(DateTime fromDate, DateTime toDate)
 		{
 			var data = new DataSet();
 
@@ -211,11 +215,15 @@ WHERE cd.maskregion & ?RegionMaskParam > 0
 			if (Full)
 				sql += additionalSql;
 
+			var regionMask = SecurityContext.Administrator.RegionMask;
+			if (Region != null)
+				regionMask &= Region.Id;
+
 			With.Connection(c => {
 				var adapter = new MySqlDataAdapter(sql, c);
 				adapter.SelectCommand.Parameters.AddWithValue("?StartDateParam", fromDate);
 				adapter.SelectCommand.Parameters.AddWithValue("?EndDateParam", toDate.AddDays(1));
-				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask & SecurityContext.Administrator.RegionMask);
+				adapter.SelectCommand.Parameters.AddWithValue("?RegionMaskParam", regionMask);
 				adapter.Fill(data);
 			});
 			return data;

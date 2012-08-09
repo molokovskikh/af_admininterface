@@ -1,8 +1,8 @@
 ﻿<% 
-	items = {"Пользователь отключен" : "DisabledInAd",
-		"Пользователь отключен биллингом" : "DisabledByBilling",
-		"Пользователь заблокирован" : "LockedUser",
-		"Пользователь не существует" : "NotExistsUser",
+	items = {"Пользователь отключен" : "disabled-in-ad",
+		"Пользователь отключен биллингом" : "disabled",
+		"Пользователь заблокирован" : "locked",
+		"Пользователь не существует" : "not-exists-user",
 		"Пользователь самостоятельно изменял пароль" : "change-password-by-one-self"}
 
 	if ?showAddressLegend:

@@ -10,6 +10,7 @@ using AdminInterface.Security;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models.Billing
 {
@@ -206,10 +207,10 @@ namespace AdminInterface.Models.Billing
 
 		public static IEnumerable<Account> GetReadyForAccounting(Pager pager)
 		{
-			var freeEnd = DateTime.Today.AddDays(-10);
+			var freeEnd = DateTime.Today.AddDays(10);
 			var readyForAccounting = Queryable.Where(a => a.ReadyForAccounting
 				&& !a.BeAccounted
-				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd < freeEnd)
+				&& !(a.IsFree && a.FreePeriodEnd != null && a.FreePeriodEnd > freeEnd)
 			);
 
 			pager.Total = readyForAccounting.Count();

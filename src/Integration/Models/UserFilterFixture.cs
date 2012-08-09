@@ -24,14 +24,14 @@ namespace Integration.Models
 		public void Setup()
 		{
 			random = new Random();
-			filter = new UserFilter();
+			filter = new UserFilter(session);
 		}
 
 		[Test]
 		public void Search_in_contacts_and_cout_results()
 		{
 			var client = DataMother.CreateTestClientWithAddressAndUser();
-			client.Save();
+			session.SaveOrUpdate(client);
 			var firstContact = new ContactGroup(ContactGroupType.General);
 			var phone1 = RandomPhone();
 			var phone2 = RandomPhone();
@@ -45,8 +45,8 @@ namespace Integration.Models
 			var newUser = new User(client);
 			newUser.Setup();
 			client.AddUser(newUser);
-			newUser.Save();
-			client.Save();
+			ActiveRecordMediator.Save(newUser);
+			session.SaveOrUpdate(client);
 			Flush();
 			filter.SearchBy = SearchUserBy.Auto;
 			filter.SearchText = phone1;
@@ -87,7 +87,7 @@ namespace Integration.Models
 			filter.SearchText = user.Id.ToString();
 			var result = filter.Find();
 			Assert.That(result.Count, Is.EqualTo(1), result.Implode());
-			Assert.That(result[0].Disabled, Is.True);
+			Assert.That(result[0].SelfDisabled, Is.True);
 		}
 
 		[Test]
@@ -141,11 +141,11 @@ namespace Integration.Models
 			contactGroup.Save();
 			user.ContactGroup = contactGroup;
 			user.ContactGroup.AddContact(ContactType.Email, email);
-			user.Save();
+			ActiveRecordMediator.Save(user);
 
 			var user2 = new User(supplier.Payer, supplier);
 			user2.Setup();
-			user2.Save();
+			ActiveRecordMediator.Save(user2);
 
 			Flush();
 			filter.SearchBy = SearchUserBy.ByContacts;
@@ -183,7 +183,7 @@ namespace Integration.Models
 						IsAvaliableForBrowse = true
 					}
 				});
-				client.Save();
+				session.SaveOrUpdate(client);
 				Flush();
 				filter.Region = newRegion;
 				filter.ClientType = SearchClientType.Drugstore;

@@ -1,9 +1,11 @@
 ﻿<% 
-	component Legend, { "LegendItems" : {	"Пользователь отключен биллингом" : "DisabledByBilling", 
-	                                        "Пользователь отключен" : "DisabledInAd", 
-											"Пользователь заблокирован" : "LockedUser",
-											"Пользователь не существует" : "NotExistsUser",
-											"Обновление более 2 суток назад" : "old-user-update",
-											"Обновление не подтверждено" : "NotCommitedUpdate"},
-						"ByCenter" : false}
+	component Legend, { "LegendItems" : {
+		"Пользователь отключен биллингом" : "disabled",
+		"Пользователь отключен" : "disabled-in-ad",
+		"Пользователь заблокирован" : "locked",
+		"Пользователь не существует" : "not-exists-user",
+		"Обновление более 2 суток назад" : "old-user-update",
+		"Обновление не подтверждено" : "NotCommitedUpdate",
+		"Клиент скрыт в интефрейсе поставщика": "invisible-client"},
+		"ByCenter" : false}
 %>

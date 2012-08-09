@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using AddUser;
 using AdminInterface.Helpers;
 using AdminInterface.Models.Audit;
+using AdminInterface.Models.Listeners;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Suppliers;
@@ -15,7 +16,9 @@ using Castle.ActiveRecord.Framework;
 using Castle.ActiveRecord.Linq;
 using Castle.Components.Validator;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using NHibernate;
 using NHibernate.Criterion;
@@ -72,13 +75,8 @@ namespace AdminInterface.Models
 		bool DisabledByParent { get; }
 	}
 
-	public interface IUser
-	{
-		uint Id { get; }
-	}
-
 	[ActiveRecord(Schema = "Customers", Lazy = true), Auditable, Description("Пользователь")]
-	public class User : IEnablable, IDisabledByParent, IUser, IChangesNotificationAware
+	public class User : IEnablable, IDisabledByParent, IChangesNotificationAware
 	{
 		private string _name;
 		private bool _enabled;
@@ -188,7 +186,7 @@ namespace AdminInterface.Models
 		[Nested]
 		public virtual RegistrationInfo Registration { get; set;}
 
-		[Property, Description("Регионы работы"), Auditable, NotifyBilling]
+		[Property, Description("Регионы работы"), Auditable, NotifyBilling, SetForceReplication]
 		public virtual ulong WorkRegionMask { get; set; }
 
 		[Property, Description("Регионы заказа"), Auditable]
@@ -208,7 +206,7 @@ namespace AdminInterface.Models
 		public virtual ContactGroup ContactGroup { get; set; }
 
 		[BelongsTo("InheritPricesFrom", Lazy = FetchWhen.OnInvoke),
-			Description("Наследовать настройки прайс листов"), Auditable]
+			Description("Наследовать настройки прайс листов"), Auditable, SetForceReplication]
 		public virtual User InheritPricesFrom { get; set; }
 
 		[BelongsTo("PayerId", Lazy = FetchWhen.OnInvoke), Description("Плательщик"), Auditable]
@@ -222,28 +220,40 @@ namespace AdminInterface.Models
 		[OneToOne(Cascade = CascadeEnum.All)]
 		public virtual UserUpdateInfo UserUpdateInfo { get; set; }
 
-		[HasAndBelongsToMany(typeof (UserPermission),
-			Lazy = true,
-			ColumnKey = "UserId",
-			Table = "AssignedPermissions",
-			Schema = "usersettings",
-			ColumnRef = "PermissionId")]
+		[
+			HasAndBelongsToMany(typeof (UserPermission),
+				Lazy = true,
+				ColumnKey = "UserId",
+				Table = "AssignedPermissions",
+				Schema = "usersettings",
+				ColumnRef = "PermissionId"),
+
+			Auditable("Права доступа")
+		]
 		public virtual IList<UserPermission> AssignedPermissions { get; set; }
 
-		[HasAndBelongsToMany(typeof (Address),
-			Lazy = true,
-			ColumnKey = "UserId",
-			Table = "UserAddresses",
-			Schema = "Customers",
-			ColumnRef = "AddressId"), Auditable("список адресов доставки пользователя")]
+		[
+			HasAndBelongsToMany(typeof (Address),
+				Lazy = true,
+				ColumnKey = "UserId",
+				Table = "UserAddresses",
+				Schema = "Customers",
+				ColumnRef = "AddressId"),
+
+			Auditable("список адресов доставки пользователя")
+		]
 		public virtual IList<Address> AvaliableAddresses { get; set; }
 
-		[HasAndBelongsToMany(typeof (User),
-			Lazy = true,
-			ColumnKey = "PrimaryUserId",
-			Table = "Showusers",
-			Schema = "Customers",
-			ColumnRef = "ShowUserId")]
+		[
+			HasAndBelongsToMany(typeof (User),
+				Lazy = true,
+				ColumnKey = "PrimaryUserId",
+				Table = "Showusers",
+				Schema = "Customers",
+				ColumnRef = "ShowUserId"),
+
+			Auditable("Логины в видимости пользователя")
+		]
 		public virtual IList<User> ShowUsers { get; set; }
 
 		[HasAndBelongsToMany(typeof (User),
@@ -259,8 +269,6 @@ namespace AdminInterface.Models
 
 		[BelongsTo(Cascade = CascadeEnum.SaveUpdate)]
 		public virtual Service RootService { get; set; }
-
-		public virtual IList<User> ImpersonableUsers { set; get; }
 
 		public virtual List<string> AvalilableAnalitFVersions
 		{
@@ -433,9 +441,9 @@ namespace AdminInterface.Models
 			var defaults = ActiveRecordMediator<DefaultValues>.FindFirst();
 			TargetVersion = defaults.AnalitFVersion;
 			UserUpdateInfo.AFAppVersion = defaults.AnalitFVersion;
-			Save();
+			ActiveRecordMediator.Save(this);
 			Login = Id.ToString();
-			Save();
+			ActiveRecordMediator.Save(this);
 
 			if (Client != null)
 				AddPrices(Client);
@@ -445,7 +453,7 @@ namespace AdminInterface.Models
 		{
 			if (Client == null)
 				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
-			Save();
+			ActiveRecordMediator.Save(this);
 		}
 
 		public virtual bool IsLocked
@@ -499,14 +507,22 @@ namespace AdminInterface.Models
 
 		public virtual void AddContactGroup()
 		{
-			ContactGroupOwner groupOwner = null;
-			if (NHibernateUtil.GetClass(RootService) == typeof(Client))
-				groupOwner = Client.Find(RootService.Id).ContactGroupOwner;
-			else if (NHibernateUtil.GetClass(RootService) == typeof(Supplier))
-				groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
-
+			var groupOwner = ContactGroupoOwner;
 			var group = groupOwner.AddContactGroup(ContactGroupType.General, true);
 			ContactGroup = group;
+		}
+
+		public virtual ContactGroupOwner ContactGroupoOwner
+		{
+			get
+			{
+				ContactGroupOwner groupOwner = null;
+				if (NHibernateUtil.GetClass(RootService) == typeof (Client))
+					groupOwner = ActiveRecordMediator<Client>.FindByPrimaryKey(RootService.Id).ContactGroupOwner;
+				else if (NHibernateUtil.GetClass(RootService) == typeof (Supplier))
+					groupOwner = Supplier.Find(RootService.Id).ContactGroupOwner;
+				return groupOwner;
+			}
 		}
 
 		public virtual void UpdateContacts(Contact[] contacts)
@@ -618,7 +634,7 @@ WHERE
 				ContactGroup.AddPerson(name);
 		}
 
-		public virtual void MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
+		public virtual AuditRecord MoveToAnotherClient(Client newOwner, LegalEntity legalEntity)
 		{
 			if (!newOwner.Orgs().Any(o => o.Id == legalEntity.Id))
 				throw new Exception(String.Format("Не могу переместить пользователя {0} т.к. юр. лицо {1} не принадлежит клиенту {2}",
@@ -643,13 +659,15 @@ WHERE
 					}
 				}
 			}
-
-			ClientInfoLogEntity.UpdateLogs(newOwner.Id, Id);
+			var message = String.Format("Перемещение пользователя от {0} к {1}", Client, newOwner);
+			AuditRecord.UpdateLogs(newOwner.Id, Id);
 			Client = newOwner;
 			RootService = newOwner;
 			Payer = legalEntity.Payer;
 			InheritPricesFrom = null;
-			Save();
+			ActiveRecordMediator.Save(this);
+
+			return new AuditRecord(message, this);
 		}
 
 		public virtual string GetEmailForBilling()
@@ -680,7 +698,7 @@ WHERE
 				return "";
 
 			var emails = owner.GetEmails(groups);
-			if (emails.Count() > 0)
+			if (emails.Any())
 				return emails.Implode();
 
 			return owner.GetEmails(ContactGroupType.General).Implode();
@@ -691,7 +709,7 @@ WHERE
 			if (String.IsNullOrEmpty(billingMessage))
 				return;
 
-			new ClientInfoLogEntity("Сообщение в биллинг: " + billingMessage, this).Save();
+			new AuditRecord("Сообщение в биллинг: " + billingMessage, this).Save();
 
 			billingMessage = String.Format("О регистрации Пользователя {0} ( {1} ) для клиента {2} ( {3} ): {4}", Name, Id, Client.Name, Client.Id, billingMessage);
 			Payer.AddComment(billingMessage);
@@ -720,21 +738,6 @@ WHERE
 			}
 		}
 
-		public static User Find(uint id)
-		{
-			return ActiveRecordMediator<User>.FindByPrimaryKey(id);
-		}
-
-		public static User TryFind(uint id)
-		{
-			return ActiveRecordMediator<User>.FindByPrimaryKey(id, false);
-		}
-
-		public virtual void Save()
-		{
-			ActiveRecordMediator.Save(this);
-		}
-
 		public virtual bool CanDelete()
 		{
 			var canDelete = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>.Queryable.Where(o => o.User == this));
@@ -746,7 +749,7 @@ WHERE
 			Payer.Users.Remove(this);
 			if (Client != null)
 				Client.Users.Remove(this);
-			ClientInfoLogEntity.DeleteAuditRecords(this);
+			AuditRecord.DeleteAuditRecords(this);
 			PayerAuditRecord.DeleteAuditRecords(Accounting);
 			ActiveRecordMediator.Delete(this);
 		}

@@ -4,6 +4,7 @@ using System.Linq;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.NHibernateExtentions;
 
@@ -36,7 +37,7 @@ namespace AdminInterface.Queries
 			};
 		}
 
-		public IList<OrderLog> Find()
+		public List<OrderLog> Find()
 		{
 			return ArHelper.WithSession(s => {
 
@@ -104,7 +105,7 @@ ORDER BY writetime desc", sqlFilter))
 					query.SetParameter("SupplierId", Supplier.Id);
 
 				return query.ToList<OrderLog>();
-			});
+			}).ToList();
 		}
 	}
 }

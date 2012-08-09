@@ -136,7 +136,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация поставщика"));
 			Css("#supplier_Name").TypeText("тестовый!");
 			Click("Зарегистрировать");
-			Assert.That(browser.Text, Is.StringContaining("Поле может содержать только буквы, цифры и знаки('_', '-', '+', '.', ',', '(', ')')"));
+			Assert.That(browser.Text, Is.StringContaining("Поле может содержать только"));
 		}
 	}
 }

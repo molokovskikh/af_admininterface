@@ -6,6 +6,7 @@ using AdminInterface.Models.Billing;
 using Castle.MonoRail.TestSupport;
 using Common.Web.Ui.Models;
 using Integration.ForTesting;
+using NHibernate.Linq;
 using NUnit.Framework;
 
 namespace Integration.Controllers
@@ -25,7 +26,7 @@ namespace Integration.Controllers
 		[Test, Ignore("НЕ запускается исполняемый файл для печати неправельный путь")]
 		public void After_build_redirect_to_index()
 		{
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 			var region = Region.Queryable.First();
 
 			var invoiceDate = DateTime.Now;

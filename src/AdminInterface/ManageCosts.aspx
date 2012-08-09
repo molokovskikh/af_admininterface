@@ -14,7 +14,8 @@
 			<tr>
 				<td align="center" style="height: 163px">
 					<asp:DataGrid ID="CostsDG" runat="server" Font-Names="Verdana" Font-Size="8pt" BorderColor="#DADADA"
-						DataSource="<%# Costs %>" HorizontalAlign="Center" AutoGenerateColumns="False" 
+						DataMember="Costs"
+						HorizontalAlign="Center" AutoGenerateColumns="False"
 						ondeletecommand="CostsDG_DeleteCommand">
 						<FooterStyle HorizontalAlign="Center"></FooterStyle>
 						<AlternatingItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#EEF8FF">
@@ -22,14 +23,17 @@
 						<ItemStyle HorizontalAlign="Center" VerticalAlign="Middle" BackColor="#F6F6F6"></ItemStyle>
 						<HeaderStyle Font-Bold="True" HorizontalAlign="Center" BackColor="#EBEBEB"></HeaderStyle>
 						<Columns>
-					<asp:TemplateColumn>
-						<ItemTemplate>
-							<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode")%>' runat="server" 
-										CausesValidation="False" CommandName="Delete" Text="Удалить" 
-										Visible='<%# CanDelete(Eval("BaseCost")) %>'/>
-						</ItemTemplate>
-						<ItemStyle HorizontalAlign="Left" />
-					</asp:TemplateColumn>
+							<asp:TemplateColumn>
+								<ItemTemplate>
+									<asp:Label runat="server" CssClass="ValidationErrorMessage" Visible='<%# ShowWarning(Convert.ToUInt32(Eval("CostCode"))) %>'>
+										Внимание! Ценовая колонка настроена.<br>
+									</asp:Label>
+									<asp:Button ID="DeletButton" CommandArgument='<%# Bind("CostCode")%>' runat="server"
+												CausesValidation="False" CommandName="Delete" Text='<%# DeleteLabel(Convert.ToUInt32(Eval("CostCode"))) %>'
+												Visible='<%# CanDelete(Eval("BaseCost")) %>'/>
+								</ItemTemplate>
+								<ItemStyle HorizontalAlign="Left" />
+							</asp:TemplateColumn>
 							<asp:TemplateColumn SortExpression="CostName" HeaderText="Наименование">
 								<HeaderStyle Width="160px"></HeaderStyle>
 								<ItemTemplate>

@@ -25,6 +25,9 @@ namespace AdminInterface.Models.Logs
 		[Property("Status")]
 		public virtual ClientStatus? ClientStatus { get; set; }
 
+		[Property]
+		public virtual string Comment { get; set; }
+
 		public static IList<ClientLogRecord> GetLogs(IEnumerable<Client> clients)
 		{
 			if (clients.Count() == 0)

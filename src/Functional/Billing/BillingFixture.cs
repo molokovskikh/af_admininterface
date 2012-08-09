@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Collections.Generic;
 using Common.Tools;
+using NHibernate.Linq;
 using NUnit.Framework;
 using Functional.ForTesting;
 using Integration.ForTesting;
@@ -11,6 +12,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using Castle.ActiveRecord;
 using WatiN.Core; using Test.Support.Web;
+using WatiN.Core.Native.Windows;
 using WatiN.CssSelectorExtensions;
 using Document = WatiN.Core.Document;
 
@@ -32,7 +34,7 @@ namespace Functional.Billing
 			payer.UpdateAndFlush();
 
 			client.AddAddress("test address for billing");
-			client.SaveAndFlush();
+			session.SaveOrUpdate(client);
 			address = client.Addresses[0];
 			user = client.Users[0];
 			Open(payer);
@@ -133,10 +135,10 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingUserDiv" + address.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			client.Refresh();
-			scope.Evict(client);
+			session.Refresh(client);
+			session.Evict(client);
 
-			client = Client.Find(client.Id);
+			client = session.Load<Client>(client.Id);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -163,7 +165,7 @@ namespace Functional.Billing
 			var connectingDiv = browser.Div(Find.ById("ConnectingAddressDiv" + user.Id));
 			Assert.That(connectingDiv.Style.Display, Is.EqualTo("none"));
 
-			client.Refresh();
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.True);
 		}
 
@@ -185,7 +187,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxAddress{0}User{1}", address.Id, user.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			client.Refresh();
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -206,7 +208,7 @@ namespace Functional.Billing
 			var checkBox = browser.CheckBox(Find.ById(String.Format("CheckBoxUser{0}Address{1}", user.Id, address.Id)));
 			Assert.That(checkBox.Exists, Is.False);
 
-			client.Refresh();
+			session.Refresh(client);
 			Assert.That(address.AvaliableFor(user), Is.False);
 		}
 
@@ -264,6 +266,7 @@ namespace Functional.Billing
 			Assert.That(addressRow.ClassName, Is.Not.StringContaining("disabled"));
 			Assert.That(clientRow.ClassName, Is.Not.StringContaining("disabled"));
 			clientStatus.Click();
+			AddCommentInDisableDialig();
 			Thread.Sleep(2000);
 			Assert.IsTrue(userStatus.Checked);
 			Assert.IsFalse(userStatus.Enabled);
@@ -339,15 +342,11 @@ namespace Functional.Billing
 
 		private void AddUsersAdnAddresses(Client client, int countUsers)
 		{
-			using (var scope = new TransactionScope(OnDispose.Rollback))
+			for (var i = 0; i < countUsers; i++)
 			{
-				for (var i = 0; i < countUsers; i++)
-				{
-					client.AddUser("user");
-					var address = client.AddAddress("address");
-					address.Save();
-				}
-				scope.VoteCommit();
+				client.AddUser("user");
+				var address = client.AddAddress("address");
+				address.Save();
 			}
 		}
 
@@ -402,6 +401,12 @@ namespace Functional.Billing
 			return new Collapsible(header, body);
 		}
 
+		private void AddCommentInDisableDialig()
+		{
+			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
+		}
+
 		[Test]
 		public void Test_refresh_total_sum()
 		{
@@ -412,7 +417,7 @@ namespace Functional.Billing
 			client.AddAddress("address");
 			user.Enabled = true;
 			address.Enabled = false;
-			client.Save();
+			session.SaveOrUpdate(client);
 			foreach (var a in client.Addresses)
 			{
 				a.Accounting.ReadyForAccounting = true;
@@ -435,6 +440,7 @@ namespace Functional.Billing
 			// Выключаем пользователя. Сумма должна уменьшиться
 			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();
+			AddCommentInDisableDialig();
 			Thread.Sleep(500);
 			currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.LessThan(sum));
@@ -442,6 +448,7 @@ namespace Functional.Billing
 
 			// Выключаем клиента. Сумма должна стать равной нулю
 			Css(String.Format("#ClientStatus{0}", client.Id)).Click();
+			AddCommentInDisableDialig();
 			Thread.Sleep(500);
 			currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.EqualTo(0));
@@ -468,7 +475,7 @@ namespace Functional.Billing
 			// Удаляем адрес и пользователя, чтобы произошла ошибка на сервере
 			user.Delete();
 			address.Delete();
-			scope.Flush();
+			Flush();
 
 			var errorMessageDiv = browser.Div(Find.ById("ErrorMessageDiv"));
 			Assert.IsTrue(errorMessageDiv.Style.Display.ToLower().Equals("none"));
@@ -486,17 +493,19 @@ namespace Functional.Billing
 		public void Send_message_to_user()
 		{
 			var username = user.GetLoginOrName();
+			var messageText = "test message for user " + username;
 
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
-			var messageText = "test message for user " + username;
 			browser.TextField(Find.ByName("userMessage.Message")).TypeText(messageText);
-			browser.Button(Find.ByValue("Отправить сообщение")).Click();
-			Assert.That(browser.Text, Is.StringContaining("Сообщение сохранено"));
-			Assert.That(browser.Text, Is.StringContaining(String.Format("Остались не показанные сообщения для пользователя {0}", username)));
-			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
-			Thread.Sleep(500);
+			Click("Отправить сообщение");
+
+			AssertText("Сообщение сохранено");
+			AssertText(String.Format("Остались не показанные сообщения для пользователя {0}", username));
+			Click("Просмотреть сообщение");
+			browser.WaitUntilContainsText("test message for user", 2);
+
 			Assert.That(browser.Text, Is.StringContaining(messageText));
-			var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			messages[0].Refresh();
 			Assert.That(messages[0].Message, Is.EqualTo(messageText));
 			Assert.That(messages[0].ShowMessageCount, Is.EqualTo(1));
@@ -505,7 +514,7 @@ namespace Functional.Billing
 		[Test]
 		public void Cancel_message_for_user()
 		{
-			client.Refresh();
+			session.Refresh(client);
 			var username = user.GetLoginOrName();
 			browser.SelectList(Find.ByName("userMessage.Id")).Select(username);
 			var messageText = "test message for user " + username;
@@ -514,7 +523,7 @@ namespace Functional.Billing
 			browser.Link(Find.ByText("Просмотреть сообщение")).Click();
 			Thread.Sleep(500);
 			browser.Button(String.Format("CancelViewMessage{0}", user.Id)).Click();
-			var messages = Client.Find(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
+			var messages = session.Load<Client>(client.Id).Users.Select(u => UserMessage.Find(u.Id)).ToList();
 			var message = messages[0];
 
 			message.Refresh();
@@ -552,7 +561,7 @@ namespace Functional.Billing
 		public void FilterLogMessagesByUser()
 		{
 			AddUsersAdnAddresses(client, 3);
-			client.Refresh();
+			session.Refresh(client);
 			Refresh();
 
 			// Проверяем, что логины пользователей - это ссылки
@@ -594,12 +603,12 @@ namespace Functional.Billing
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.SaveAndFlush();
-			client.Refresh();
-			client2.Refresh();
+			session.SaveOrUpdate(client2);
+			session.Refresh(client);
+			session.Refresh(client2);
 			var testUserId = client2.Users[0].Id;
 			Refresh();
 
@@ -629,12 +638,12 @@ namespace Functional.Billing
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			client2.SaveAndFlush();
-			client.Refresh();
-			client2.Refresh();
+			session.SaveOrUpdate(client2);
+			session.Refresh(client);
+			session.Refresh(client2);
 			var testAddressId = client2.Addresses[0].Id;
 			Refresh();
 
@@ -663,8 +672,8 @@ namespace Functional.Billing
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
 			client2.Users[0].Payer = payer;
-			client.Save();
-			client2.Save();
+			session.SaveOrUpdate(client);
+			session.SaveOrUpdate(client2);
 
 			Refresh();
 
@@ -716,7 +725,7 @@ namespace Functional.Billing
 		[Test]
 		public void Change_recipient_for_payer()
 		{
-			var recipient = Recipient.Queryable.First();
+			var recipient = session.Query<Recipient>().First();
 
 			browser.Link(Find.ByText("Отправка кореспонденции")).Click();
 
@@ -745,10 +754,11 @@ namespace Functional.Billing
 		[Test]
 		public void If_free_flag_turnoff_on_user_than_free_flag_should_by_thurnoff_on_all_related_addresses()
 		{
+			Console.WriteLine(payer.Id);
 			user.Accounting.IsFree = true;
 			address.Accounting.IsFree = true;
 			user.AvaliableAddresses.Add(address);
-			client.Save();
+			session.SaveOrUpdate(client);
 			Flush();
 
 			Refresh();

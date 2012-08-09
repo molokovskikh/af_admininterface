@@ -117,6 +117,7 @@
     <Compile Include="Controllers\PayersControllerFixture.cs" />
     <Compile Include="Controllers\PaymentsControllerFixture.cs" />
     <Compile Include="Controllers\RevisionActControllerFixture.cs" />
+    <Compile Include="Controllers\UserSearchControllerFixture.cs" />
     <Compile Include="DocumentBuildFilterFixture.cs" />
     <Compile Include="ForTesting\ModelExtension.cs" />
     <Compile Include="MaskedAuditablePropertyFixture.cs" />
@@ -163,12 +164,15 @@
     <Compile Include="Models\WorkingPricesInheritanceFixture.cs" />
     <Compile Include="MonoRailExtentions\BindParametersFixture.cs" />
     <Compile Include="MonoRailExtentions\DoNotUpdateNotValidEntity.cs" />
+    <Compile Include="NewsFixture.cs" />
     <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
     <Compile Include="NotificationServiceFixture.cs" />
     <Compile Include="PaymentFilterFixture.cs" />
     <Compile Include="PrinterFixture.cs" />
+    <Compile Include="Queries\ResetReclameDateFixture.cs" />
+    <Compile Include="Queries\UpdateOrdersFixture.cs" />
     <Compile Include="Tasks\InvoicePartProcessorFixture.cs" />
     <Compile Include="Tasks\SendInvoiceTaskFixture.cs" />
     <Compile Include="Tasks\ReportLogProcessorFixture.cs" />

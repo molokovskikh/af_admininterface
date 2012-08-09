@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using AdminInterface.Models;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Integration.ForTesting;
 using NUnit.Framework;
 
@@ -23,7 +24,7 @@ namespace Integration
 			Save(supplier);
 
 			client = DataMother.CreateClientAndUsers();
-			client.Save();
+			session.SaveOrUpdate(client);
 			scope.Flush();
 			user = client.Users.First();
 

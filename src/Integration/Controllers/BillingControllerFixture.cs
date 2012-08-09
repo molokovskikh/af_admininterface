@@ -22,25 +22,26 @@ namespace Integration.Controllers
 			supplier = DataMother.CreateSupplier();
 			session.Save(supplier);
 			client = DataMother.TestClient();
-			client.Save();
+			session.SaveOrUpdate(client);
 			controller = new BillingController();
+			controller.DbSession = session;
 			PrepareController(controller);
 		}
 
 		[Test]
 		public void Update_client_status()
 		{
-			controller.UpdateClientStatus(client.Id, false);
+			controller.UpdateClientStatus(client.Id, false, null);
 			scope.Flush();
 
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == client.Id).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
 		}
 
 		[Test]
 		public void Update_supplier_status()
 		{
-			controller.UpdateClientStatus(supplier.Id, false);
+			controller.UpdateClientStatus(supplier.Id, false, null);
 			scope.Flush();
 
 			ActiveRecordMediator<Supplier>.Refresh(supplier);
@@ -48,7 +49,7 @@ namespace Integration.Controllers
 			
 			var message = notifications.First();
 			Assert.That(message.Subject, Is.EqualTo("Приостановлена работа поставщика"), notifications.Implode(n => n.Subject));
-			var logs = ClientInfoLogEntity.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
+			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == supplier.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Supplier), Is.Not.Null, logs.Implode());
 		}
 	}

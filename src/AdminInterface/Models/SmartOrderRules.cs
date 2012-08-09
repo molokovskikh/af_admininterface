@@ -30,9 +30,8 @@ namespace AdminInterface.Models
 
 		public virtual string GetAssortimentPriceName()
 		{
-			if (AssortimentPriceCode.HasValue)
-			{
-				var price = Price.Find(AssortimentPriceCode.Value);
+			if (AssortimentPriceCode.HasValue) {
+				var price = ActiveRecordMediator<Price>.FindByPrimaryKey(AssortimentPriceCode.Value);
 				return string.Format("{0} - {1}", price.Supplier.Name, price.Name);
 			}
 			return string.Empty;

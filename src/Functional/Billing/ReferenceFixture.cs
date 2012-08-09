@@ -13,7 +13,7 @@ namespace Functional.Billing
 		public void Setup()
 		{
 			Nomenclature.DeleteAll();
-			scope.Flush();
+			Flush();
 
 			Open("References");
 			AssertText("Справочники");

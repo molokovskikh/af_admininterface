@@ -13,7 +13,7 @@ using Test.Support.log4net;
 namespace Integration.Models
 {
 	[TestFixture]
-	public class ClientFixture : Test.Support.IntegrationFixture
+	public class ClientFixture : IntegrationFixture
 	{
 		[Test]
 		public void ResetUinTest()
@@ -42,15 +42,15 @@ namespace Integration.Models
 			var supplier = DataMother.CreateSupplier();
 			Flush();
 			client.Settings.NoiseCosts = true;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(0));
 
 			client.Settings.NoiseCostExceptSupplier = supplier;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.EqualTo(supplier.Id));
 
 			client.Settings.NoiseCosts = false;
-			client.Settings.Save();
+			session.SaveOrUpdate(client.Settings);
 			Assert.That(client.Settings.FirmCodeOnly, Is.Null);
 		}
 
@@ -61,7 +61,7 @@ namespace Integration.Models
 			var payer = DataMother.CreatePayer();
 			payer.Save();
 			client.ChangePayer(payer, payer.JuridicalOrganizations.First());
-			client.Save();
+			session.SaveOrUpdate(client);
 			Assert.That(client.Payers, Is.EquivalentTo(new []{payer}));
 			Assert.That(client.Users[0].Payer, Is.EqualTo(payer));
 			var address = client.Addresses[0];
@@ -78,7 +78,7 @@ namespace Integration.Models
 			var newPayer = DataMother.CreatePayer();
 			newPayer.Save();
 			client.ChangePayer(newPayer, newPayer.JuridicalOrganizations.First());
-			client.Save();
+			session.SaveOrUpdate(client);
 
 			Assert.That(oldPayer.PaymentSum, Is.EqualTo(0));
 			Assert.That(newPayer.PaymentSum, Is.EqualTo(800));

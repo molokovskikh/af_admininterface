@@ -25,37 +25,30 @@ namespace AdminInterface.Controllers
 	{
 		public MainController()
 		{
-			SetBinder(new ARDataBinder());
+			SetARDataBinder(AutoLoadBehavior.NullIfInvalidKey);
 		}
 
-		public void Index(ulong? regioncode, DateTime? from, DateTime? to, bool full)
+		public void Index(DateTime? from, DateTime? to, bool full = false)
 		{
 			RemoteServiceHelper.Try(() => {
 				PropertyBag["expirationDate"] = ADHelper.GetPasswordExpirationDate(Admin.UserName);
 			});
 
-			var regions = RegionHelper.GetAllRegions();
-
-			if (regioncode == null || from == null || to == null)
-			{
-				regioncode = Admin.RegionMask;
+			if (from == null || to == null) {
 				from = DateTime.Today;
 				to = DateTime.Today;
 			}
 
-			PropertyBag["Regions"] = regions;
-			PropertyBag["regioncode"] = regioncode;
-
-			GetStatistics(regioncode.Value, from.Value, to.Value, full);
+			GetStatistics(from.Value, to.Value, full);
 		}
 
-		private void GetStatistics(ulong regionMask, DateTime fromDate, DateTime toDate, bool full)
+		private void GetStatistics(DateTime fromDate, DateTime toDate, bool full)
 		{
 			var query = new StatQuery();
 			query.Full = full;
 			BindObjectInstance(query, "query");
 			
-			var data = query.Load(regionMask, fromDate, toDate);
+			var data = query.Load(fromDate, toDate);
 #if !DEBUG
 			RemoteServiceHelper.RemotingCall(s => {
 				PropertyBag["FormalizationQueue"] = s.InboundFiles().Length.ToString();
@@ -91,7 +84,6 @@ namespace AdminInterface.Controllers
 			InPercentOf("TotalSendCertificates", "TotalCertificates");
 			DoConvert<double>("OrderSum", s => s.ToString("C"));
 
-			PropertyBag["RegionMask"] = regionMask;
 			PropertyBag["FromDate"] = fromDate;
 			PropertyBag["ToDate"] = toDate;
 			PropertyBag["query"] = query;
@@ -173,16 +165,16 @@ namespace AdminInterface.Controllers
 			CancelLayout();
 
 			PropertyBag["now"] = DateTime.Now;
-			PropertyBag["user"] = User.Find(id);
+			PropertyBag["user"] = DbSession.Load<User>(id);
 			PropertyBag["IsPasswordChange"] = isPasswordChange;
 			PropertyBag["defaults"] = Defaults;
 			if (Session["password"] != null && Flash["newUser"] == null)
 				PropertyBag["password"] = Session["password"];
 		}
 
-		public void Stat(ulong? regioncode, DateTime? from, DateTime? to)
+		public void Stat(DateTime? from, DateTime? to)
 		{
-			Index(regioncode, from, to, true);
+			Index(from, to, true);
 		}
 	}
 }

@@ -4,6 +4,7 @@ using AdminInterface.Models;
 using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Integration.ForTesting;
 using Test.Support.log4net;
@@ -23,7 +24,7 @@ namespace Integration.Models
 			payer.ShortName = String.Format("Тестовый плательщик {0}", payer.Id);
 			payer.UpdateAndFlush();
 
-			var payers = Payer.GetLikeAvaliable(payer.ShortName);
+			var payers = Payer.GetLikeAvaliable(session, payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
 			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
 		}
@@ -38,7 +39,7 @@ namespace Integration.Models
 			Save(payer);
 			Flush();
 
-			var payers = Payer.GetLikeAvaliable(payer.ShortName);
+			var payers = Payer.GetLikeAvaliable(session, payer.ShortName);
 			Assert.That(payers.Count(), Is.EqualTo(1));
 			Assert.That(payers.Single().Id, Is.EqualTo(payer.Id));
 		}
@@ -63,7 +64,7 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 200;
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			scope.Flush();
 
 			var payer = client.Payers[0];
@@ -85,7 +86,7 @@ namespace Integration.Models
 			var report = DataMother.Report(payer);
 			report.Payment = 1500;
 
-			client.Save();
+			session.SaveOrUpdate(client);
 			payer.Save();
 			report.Save();
 

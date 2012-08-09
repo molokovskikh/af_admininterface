@@ -7,6 +7,7 @@ using AdminInterface.Models.Suppliers;
 using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework;
 using Common.Tools;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
 using AdminInterface.Models.Logs;
@@ -32,18 +33,15 @@ namespace Integration.ForTesting
 				ContactGroupOwner = new ContactGroupOwner(),
 			};
 
-			client.Settings = new DrugstoreSettings(client) {
-				BasecostPassword = "",
-				WorkRegionMask = homeRegion.Id,
-				OrderRegionMask = homeRegion.Id,
-			};
+			client.Settings.WorkRegionMask = homeRegion.Id;
+			client.Settings.OrderRegionMask = homeRegion.Id;
 
 			payer.Clients = new List<Client> { client };
 			if (action != null)
 				action(client);
 
 			client.Payers.Each(p => p.Save());
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Users.Each(u => u.Setup());
 
 			client.MaintainIntersection();
@@ -85,7 +83,7 @@ namespace Integration.ForTesting
 			var payer = client.Payers.First();
 			payer.Users.Each(u => u.Accounting.BeAccounted = true);
 			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
-			client.Save();
+			ActiveRecordMediator.Save(client);
 			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
 			payer.SaveAndFlush();
 			payer.Refresh();
@@ -115,13 +113,13 @@ namespace Integration.ForTesting
 			};
 			client.AddAddress(address);
 			client.Users[0].Name += client.Users[0].Id;
-			client.Users[0].Save();
+			ActiveRecordMediator.Save(client.Users[0]);
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].Save();
 			client.Name += client.Id;
-			client.SaveAndFlush();
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Addresses.Single().MaintainIntersection();
-			client.Refresh();
+			ActiveRecordMediator<Client>.Refresh(client);
 			return client;
 		}
 
@@ -241,10 +239,10 @@ namespace Integration.ForTesting
 			var user = new User(supplier.Payer, supplier) {
 				Login = User.GetTempLogin()
 			};
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			user.Setup();
 			user.SetupSupplierPermission();
-			user.Save();
+			ActiveRecordMediator.Save(user);
 			return user;
 		}
 

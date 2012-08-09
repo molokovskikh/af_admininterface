@@ -2,6 +2,7 @@
 using AdminInterface.Mailers;
 using Castle.Core.Smtp;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using log4net;
 
 namespace AdminInterface.Models.Audit
@@ -32,6 +33,11 @@ namespace AdminInterface.Models.Audit
 		bool ShouldNotify();
 	}
 
+	public interface INotificationAware
+	{
+		string NotifyMessage { get; set; }
+	}
+
 	public class ChangeNotificationSender : ISendNoticationChangesInterface
 	{
 		private static readonly ILog _log = LogManager.GetLogger(typeof (ChangeNotificationSender));
@@ -51,10 +57,8 @@ namespace AdminInterface.Models.Audit
 				mailer.UnderTest = UnderTest;
 
 				mailer.NotifyAboutChanges(property, entity, to);
-
 			}
 			catch (Exception ex) {
-				Console.WriteLine(ex);
 				_log.Error("Ошибка отправки уведомлений об изменении наблюдаемых полей", ex);
 			}
 		}

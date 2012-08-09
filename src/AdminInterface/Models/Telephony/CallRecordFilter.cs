@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Common.MySql;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Models.Telephony

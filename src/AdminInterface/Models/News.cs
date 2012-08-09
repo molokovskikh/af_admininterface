@@ -4,6 +4,7 @@ using AdminInterface.Models.Audit;
 using Castle.ActiveRecord;
 using Castle.Components.Validator;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models
 {
@@ -28,6 +29,23 @@ namespace AdminInterface.Models
 
 		[Property, Description("Дата публикации"), NotifyNews]
 		public virtual DateTime PublicationDate { get; set; }
+
+		//для возможности редактировать на форме
+		//тк календарь будет отсекать значение времени при редактировании
+		[Description("Время публикации")]
+		public virtual TimeSpan PublicationTime
+		{
+			get
+			{
+				return PublicationDate.TimeOfDay;
+			}
+			set
+			{
+				PublicationDate = PublicationDate
+					.Add(-PublicationDate.TimeOfDay)
+					.Add(value);
+			}
+		}
 
 		[Property, Description("Заголовок"), ValidateNonEmpty, NotifyNews]
 		public virtual string Header { get; set; }

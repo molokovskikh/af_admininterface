@@ -29,8 +29,6 @@ namespace Integration.ForTesting
 		[SetUp]
 		public void Setup()
 		{
-			//Services.UrlBuilder.UseExtensions = false;
-
 			validator = new ValidatorRunner(new CachedValidationRegistry());
 
 			notifications = new List<MailMessage>();

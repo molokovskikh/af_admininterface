@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -9,10 +9,12 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Logs;
 using AdminInterface.Models.Suppliers;
 using AdminInterface.Security;
+using Castle.ActiveRecord;
 using Castle.ActiveRecord.Framework.Internal;
 using Castle.Core.Smtp;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using Common.Web.Ui.Models.Audit;
 using Common.Web.Ui.MonoRailExtentions;
 using Common.Web.Ui.NHibernateExtentions;
 using ExcelLibrary.SpreadSheet;
@@ -38,7 +40,7 @@ namespace AdminInterface.Mailers
 			mailer.Send();
 		}
 
-		public MonorailMailer EnableChanged(IEnablable item)
+		public MonorailMailer EnableChanged(IEnablable item, string comment = null)
 		{
 			Template = "EnableChanged";
 			To = "RegisterList@subscribe.analit.net";
@@ -52,28 +54,42 @@ namespace AdminInterface.Mailers
 				var user = (User) item;
 				PropertyBag["service"] = user.RootService;
 				var disable = UserLogRecord.LastOff(user.Id);
-				if (disable != null)
+				if (disable != null){
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Address)) {
 				type = "адреса";
 				var address = (Address) item;
 				PropertyBag["service"] = address.Client;
 				var disable = AddressLogRecord.LastOff(address.Id);
-				if (disable != null)
+				if (disable != null){
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Client)) {
 				type = "клиента";
-				var client = Client.Find(((Service)item).Id); //(Client) item;
+				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
-				if (disable != null)
+				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 			if (clazz == typeof(Supplier)) {
 				type = "поставщика";
 				PropertyBag["service"] = item;
+				var disable = SupplierLog.Queryable.Where(s => s.Supplier == (Supplier)item && s.Disabled != null).OrderByDescending(s => s.LogTime).FirstOrDefault();
+				if (disable != null) {
+					disable.Comment = comment;
+					disable.Save();
+				}
 			}
 
 			if (item.Enabled)
@@ -173,20 +189,37 @@ namespace AdminInterface.Mailers
 
 		private MonorailMailer PropertyChanged(AuditableProperty property, object entity)
 		{
+			var propertyMessage = property.Message;
+			var notifyAware = property as INotificationAware;
+			if (notifyAware != null)
+				propertyMessage = notifyAware.NotifyMessage;
+
+			//может быть null если property решило что не нужно отправлять
+			//уведомления для этого изменения
+			//например: регин который был добавлен помечен как не уведомляемый
+			if (String.IsNullOrEmpty(propertyMessage))
+				return this;
+
 			Subject = String.Format("Изменено поле '{0}'", property.Name);
-			if (property.IsHtml)
+			if (property.IsHtml) {
 				Template = "PropertyChanged_html";
-			else
+				IsBodyHtml = true;
+			}
+			else {
 				Template = "PropertyChanged_txt";
+				IsBodyHtml = false;
+			}
 			var message = new StringBuilder();
-			message.Append(GetAdditionalMessages(entity));
-			message.AppendLine(property.Message.Remove(0, 3));
+			message.Append(GetAdditionalMessages(entity).ToString());
+			if (propertyMessage.StartsWith("$$$"))
+				propertyMessage = propertyMessage.Remove(0, 3);
+			message.AppendLine(propertyMessage);
 
 			var idLabel = BindingHelper.TryGetDescription(NHibernateUtil.GetClass(entity), "Id");
 			if (idLabel == null)
 				idLabel = "Код";
 
-			GeneralizationPropertyChanged(entity, property.Message.Remove(0, 3), idLabel);
+			GeneralizationPropertyChanged(entity, message.ToString(), idLabel);
 
 			return this;
 		}
@@ -194,10 +227,8 @@ namespace AdminInterface.Mailers
 		private void GeneralizationPropertyChanged(object entity, string message, string idLabel)
 		{
 			From = "register@analit.net";
-			IsBodyHtml = true;
 			PropertyBag["message"] = message;
 			PropertyBag["admin"] = SecurityContext.Administrator;
-			PropertyBag["message"] = message;
 			PropertyBag["entity"] = entity;
 			PropertyBag["type"] = Inflector.Pluralize(NHibernateUtil.GetClass(entity).Name);
 			PropertyBag["idLabel"] = idLabel;
@@ -206,28 +237,34 @@ namespace AdminInterface.Mailers
 		public MonorailMailer RegisterNews(News news, string to)
 		{
 			To = to;
-			Template = "PropertyChanged_html";
-			Subject = String.Format("Зарегистрирована новость");
-			var message = string.Format("Зарегистрирована новость: <br/> Тема: {0}</br> Текст: {1}</br> Адресат: {2}<br/>", news.Header, news.Body, news.DestinationType.GetDescription());
-			GeneralizationPropertyChanged(news, message, "Код");
+			IsBodyHtml = true;
+			Template = "RegisterNews";
+			Subject = String.Format("Зарегистрированна новость");
+			PropertyBag["header"] = news.Header;
+			PropertyBag["body"] = news.Body;
+			GeneralizationPropertyChanged(news, string.Empty, "Код");
 			return this;
 		}
 
 		private static StringBuilder GetAdditionalMessages(object entity)
 		{
 			var message = new StringBuilder();
+
+			var user = entity as User;
+			if (user != null) {
+				message.AppendLine("Клиент " + user.Client.Name);
+			}
+
 			if (!(entity is Service))
 				return message;
 
-			var id = ((Service) entity).Id;
-			message.AppendLine("Клиент " + id);
 			var client = entity as Client;
 			if (client != null) {
-				message.AppendLine("Плательщики: " + client.Payers.Implode(p => p.Name));
+				message.AppendLine("Плательщики " + client.Payers.Implode(p => p.Name));
 			}
 			var supplier = entity as Supplier;
 			if (supplier != null) {
-				message.AppendLine("Плательщик: " + supplier.Payer.Name);
+				message.AppendLine("Плательщик " + supplier.Payer.Name);
 			}
 			return message;
 		}

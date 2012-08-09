@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Models;
 using NUnit.Framework;
 using WatiN.Core; using Test.Support.Web;

@@ -55,7 +55,7 @@ namespace AdminInterface.Controllers
 			foreach (var track in files)
 			{
 				using (var fileStream = File.OpenRead(track))
-					fileStream.Copy(Response.OutputStream);
+					fileStream.CopyTo(Response.OutputStream);
 			}
 		}
 	}
