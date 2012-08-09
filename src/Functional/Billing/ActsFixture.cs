@@ -17,9 +17,9 @@ namespace Functional.Billing
 		{
 			var payer = DataMother.CreatePayerForBillingDocumentTest();
 			var invoice = new Invoice(payer, DateTime.Now);
-			invoice.Save();
+			session.SaveOrUpdate(invoice);
 			act = new Act(DateTime.Now, invoice);
-			act.Save();
+			session.SaveOrUpdate(act);
 		}
 
 		[Test]

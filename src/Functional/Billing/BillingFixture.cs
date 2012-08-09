@@ -190,9 +190,6 @@ namespace Functional.Billing
 		[Test]
 		public void DisconnectAddressFromUser()
 		{
-			Console.WriteLine(payer.Id);
-			Console.WriteLine(user.Id);
-			//return;
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
 			browser.Link(Find.ByText("Подключить адрес")).Click();
@@ -535,7 +532,6 @@ namespace Functional.Billing
 		public void FilterLogMessagesByUser()
 		{
 			AddUsersAdnAddresses(client, 3);
-			session.Refresh(client);
 			Refresh();
 
 			// Проверяем, что логины пользователей - это ссылки
@@ -724,13 +720,10 @@ namespace Functional.Billing
 		[Test]
 		public void If_free_flag_turnoff_on_user_than_free_flag_should_by_thurnoff_on_all_related_addresses()
 		{
-			Console.WriteLine(payer.Id);
 			user.Accounting.IsFree = true;
 			address.Accounting.IsFree = true;
 			user.AvaliableAddresses.Add(address);
 			session.SaveOrUpdate(client);
-			Flush();
-
 			Refresh();
 
 			Css(String.Format("#UserRow{0} input[name=free]", user.Id)).Click();
