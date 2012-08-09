@@ -29,8 +29,8 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 1000;
-			ActiveRecordMediator.Save(user);
-			scope.Flush();
+			session.SaveOrUpdate(user);
+			Flush();
 
 			var logs = AuditLogRecord.GetLogs(user.Payer);
 			Assert.AreEqual(3, logs.Count);
@@ -46,7 +46,7 @@ namespace Integration.Models
 			payer.Comment += "\r\nтестовое сообщение";
 			payer.CheckCommentChangesAndLog(mailer);
 			payer.Save();
-			scope.Flush();
+			Flush();
 
 			var logs = new MessageQuery(LogMessageType.Stat).Execute(client, session);
 			var log = logs.First();
@@ -69,7 +69,7 @@ namespace Integration.Models
 			payer.Comment += "\r\nтестовое сообщение";
 			payer.CheckCommentChangesAndLog(mailer);
 			payer.Save();
-			scope.Flush();
+			Flush();
 
 			var logs = new MessageQuery(LogMessageType.Stat).Execute(client, session);
 			var log = logs.FirstOrDefault(m => m.Message.Contains("Изменено 'Комментарий'"));

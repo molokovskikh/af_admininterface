@@ -63,7 +63,7 @@ namespace Integration.Controllers
 
 				ADHelper.Block(adUser1.Login);
 
-				ActiveRecordMediator.SaveAndFlush(new User(client) { Login = "test8779546" });
+				session.SaveOrUpdate(new User(client) { Login = "test8779546" });
 
 				using (new SessionScope())
 					controller.Unlock(client.Id);
@@ -104,9 +104,9 @@ namespace Integration.Controllers
 			controller.MoveUserOrAddress(newClient.Id, oldUser.Id, address.Id, newClient.Orgs().First().Id, false);
 			session.Flush();
 
-			ActiveRecordMediator<Client>.Refresh(oldClient);
-			ActiveRecordMediator<Client>.Refresh(newClient);
-			ActiveRecordMediator.Refresh(oldUser);
+			session.Refresh(oldClient);
+			session.Refresh(newClient);
+			session.Refresh(oldUser);
 			Assert.That(oldUser.Client.Id, Is.EqualTo(newClient.Id));
 
 			Assert.That(newClient.Users.Count, Is.EqualTo(2));
@@ -133,8 +133,8 @@ namespace Integration.Controllers
 			controller.MoveUserOrAddress(newClient.Id, user.Id, address.Id, newClient.Orgs().First().Id, false);
 			session.Flush();
 
-			ActiveRecordMediator<Client>.Refresh(oldClient);
-			ActiveRecordMediator<Client>.Refresh(newClient);
+			session.Refresh(oldClient);
+			session.Refresh(newClient);
 			var records = session.Query<AuditRecord>()
 				.Where(l => l.Service == newClient && l.ObjectId == user.Id)
 				.ToList();
@@ -177,7 +177,7 @@ namespace Integration.Controllers
 		public void Search_suppliers()
 		{
 			session.Save(DataMother.CreateSupplier());
-			scope.Flush();
+			Flush();
 
 			Maintainer.MaintainIntersection(client, client.Orgs().First());
 			var suppliers = controller.SearchSuppliers(client.Id, "тест");
@@ -193,14 +193,14 @@ namespace Integration.Controllers
 			legalEntity.Name = "Name";
 			legalEntity.FullName = "FullName";
 			legalEntity.Save();
-			scope.Flush();
+			Flush();
 
 			client.Name = "TestName";
 			client.FullName = "TestFullName";
 
 			controller.Update(client);
 
-			scope.Flush();
+			Flush();
 
 			Assert.That(legalEntity.Name, Is.EqualTo("TestName"));
 			Assert.That(legalEntity.FullName, Is.EqualTo("TestFullName"));

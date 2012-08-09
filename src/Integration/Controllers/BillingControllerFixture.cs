@@ -32,7 +32,7 @@ namespace Integration.Controllers
 		public void Update_client_status()
 		{
 			controller.UpdateClientStatus(client.Id, false, null);
-			scope.Flush();
+			Flush();
 
 			var logs = AuditRecord.Queryable.Where(l => l.ObjectId == client.Id).ToList();
 			Assert.That(logs.FirstOrDefault(l => l.Message == "$$$Клиент отключен" && l.Type == LogObjectType.Client), Is.Not.Null, logs.Implode());
@@ -42,9 +42,9 @@ namespace Integration.Controllers
 		public void Update_supplier_status()
 		{
 			controller.UpdateClientStatus(supplier.Id, false, null);
-			scope.Flush();
+			Flush();
 
-			ActiveRecordMediator<Supplier>.Refresh(supplier);
+			session.Refresh(supplier);
 			Assert.That(supplier.Disabled, Is.True);
 			
 			var message = notifications.First();

@@ -40,7 +40,7 @@ where UserId = :userId and priceId = :priceId")
 					.ExecuteUpdate();
 
 				child.InheritPricesFrom = parent;
-				ActiveRecordMediator.Save(parent);
+				session.SaveOrUpdate(parent);
 			});
 
 			var pricesForParent = ArHelper.WithSession(s =>

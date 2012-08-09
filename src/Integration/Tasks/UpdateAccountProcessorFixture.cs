@@ -42,7 +42,7 @@ namespace Integration.Tasks
 		{
 			MakeUpdates(user, 9);
 			Check();
-			ActiveRecordMediator.Refresh(user);
+			session.Refresh(user);
 			Assert.That(user.Accounting.ReadyForAccounting, Is.False);
 		}
 
@@ -69,7 +69,7 @@ namespace Integration.Tasks
 
 			address.Refresh();
 			user.AvaliableAddresses.Add(address);
-			ActiveRecordMediator.Save(user);
+			session.SaveOrUpdate(user);
 
 			Check();
 			address.Refresh();

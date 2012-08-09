@@ -45,7 +45,7 @@ namespace Integration.Models
 			var newUser = new User(client);
 			newUser.Setup();
 			client.AddUser(newUser);
-			ActiveRecordMediator.Save(newUser);
+			session.SaveOrUpdate(newUser);
 			session.SaveOrUpdate(client);
 			Flush();
 			filter.SearchBy = SearchUserBy.Auto;
@@ -141,11 +141,11 @@ namespace Integration.Models
 			contactGroup.Save();
 			user.ContactGroup = contactGroup;
 			user.ContactGroup.AddContact(ContactType.Email, email);
-			ActiveRecordMediator.Save(user);
+			session.SaveOrUpdate(user);
 
 			var user2 = new User(supplier.Payer, supplier);
 			user2.Setup();
-			ActiveRecordMediator.Save(user2);
+			session.SaveOrUpdate(user2);
 
 			Flush();
 			filter.SearchBy = SearchUserBy.ByContacts;
@@ -166,7 +166,6 @@ namespace Integration.Models
 
 			user.Delete();
 			user2.Delete();
-			ActiveRecordMediator.Delete(supplier);
 			Flush();
 		}
 
@@ -189,7 +188,6 @@ namespace Integration.Models
 				filter.ClientType = SearchClientType.Drugstore;
 				var result = filter.Find();
 				Assert.That(result.Count(r => r.ClientId == client.Id), Is.EqualTo(2));
-				ActiveRecordMediator<Client>.Delete(client);
 			}
 			else {
 				throw new Exception("Не найден альтернативный регион работы");

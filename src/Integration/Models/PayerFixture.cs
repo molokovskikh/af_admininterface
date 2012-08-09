@@ -64,8 +64,8 @@ namespace Integration.Models
 			var client = DataMother.CreateTestClientWithUser();
 			var user = client.Users[0];
 			user.Accounting.Payment = 200;
-			ActiveRecordMediator.Save(user);
-			scope.Flush();
+			session.SaveOrUpdate(user);
+			Flush();
 
 			var payer = client.Payers[0];
 			var records = PayerAuditRecord.Find(payer);
@@ -103,7 +103,7 @@ namespace Integration.Models
 			Assert.That(payer.CanDelete(session), Is.True);
 
 			payer.Delete();
-			scope.Flush();
+			Flush();
 			Reopen();
 
 			Assert.That(session.Get<Payer>(payer.Id), Is.Null);

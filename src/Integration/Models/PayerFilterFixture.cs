@@ -117,7 +117,7 @@ namespace Integration.Models
 			var address = client.Addresses.First();
 			address.Value = address.Value + " " + address.Id;
 			address.SaveAndFlush();
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
 
 			var items = new PayerFilter{SearchText = address.Value, SearchBy = SearchBy.Address}.Find();
 			Assert.That(items.Count, Is.EqualTo(1));

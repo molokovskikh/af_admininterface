@@ -71,7 +71,7 @@ namespace Integration.Controllers
 			Prepare();
 
 			controller.Add(clientContacts, regionSettings, person, "", true, client1.Id, "11@33.ru, hgf@jhgj.ut");
-			scope.Flush();
+			Flush();
 
 			var user = Registred();
 			var logs = session.Query<PasswordChangeLogEntity>().Where(l => l.TargetUserName == user.Login).ToList();
@@ -124,12 +124,12 @@ namespace Integration.Controllers
 		public void Create_user_with_permissions()
 		{
 			client = DataMother.CreateTestClientWithUser();
-			scope.Flush();
+			Flush();
 			user1 = client.Users[0];
 			var permission = new UserPermission();
 			permission.Id = 1;
 			user1.AddPermission(permission);
-			ActiveRecordMediator.Save(user1);
+			session.SaveOrUpdate(user1);
 			Assert.That(user1.AssignedPermissions[0].Id, Is.EqualTo(1));
 			Assert.That(user1.AssignedPermissions[0].Type.ToString(), Is.EqualTo("Base"));
 			Assert.That(user1.AssignedPermissions[0].AvailableFor.ToString(), Is.EqualTo("Supplier"));
@@ -139,7 +139,7 @@ namespace Integration.Controllers
 		public void Show_supplier_client()
 		{
 			var user = DataMother.CreateSupplierUser();
-			scope.Flush();
+			Flush();
 
 			controller.Edit(user.Id, new MessageQuery());
 		}
