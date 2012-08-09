@@ -226,15 +226,12 @@ namespace Functional.Drugstore
 		[Test]
 		public void Try_to_register_with_existing_payer()
 		{
-			Payer payer;
-			using (new SessionScope())
-			{
-				var payerClient = DataMother.TestClient();
-				session.SaveOrUpdate(payerClient);
-				payer = payerClient.Payers.First();
-				payer.Name = "Тестовый плательщик " + payer.Id;
-				payer.Update();
-			}
+			var payerClient = DataMother.TestClient();
+			session.SaveOrUpdate(payerClient);
+			var payer = payerClient.Payers.First();
+			payer.Name = "Тестовый плательщик " + payer.Id;
+			session.SaveOrUpdate(payer);
+			Refresh();
 
 			SetupGeneralInformation();
 
