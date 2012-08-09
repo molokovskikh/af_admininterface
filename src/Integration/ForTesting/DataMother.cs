@@ -41,7 +41,7 @@ namespace Integration.ForTesting
 				action(client);
 
 			client.Payers.Each(p => p.Save());
-			session.SaveOrUpdate(client);
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Users.Each(u => u.Setup());
 
 			client.MaintainIntersection();
@@ -83,7 +83,7 @@ namespace Integration.ForTesting
 			var payer = client.Payers.First();
 			payer.Users.Each(u => u.Accounting.BeAccounted = true);
 			payer.Addresses.Each(a => a.Accounting.BeAccounted = true);
-			session.SaveOrUpdate(client);
+			ActiveRecordMediator.Save(client);
 			payer.Recipient = ActiveRecordLinqBase<Recipient>.Queryable.First();
 			payer.SaveAndFlush();
 			payer.Refresh();
@@ -113,13 +113,13 @@ namespace Integration.ForTesting
 			};
 			client.AddAddress(address);
 			client.Users[0].Name += client.Users[0].Id;
-			session.SaveOrUpdate(client.Users[0]);
+			ActiveRecordMediator.Save(client.Users[0]);
 			client.Addresses[0].Value += client.Addresses[0].Id;
 			client.Addresses[0].Save();
 			client.Name += client.Id;
-			session.SaveOrUpdate(client);
+			ActiveRecordMediator.SaveAndFlush(client);
 			client.Addresses.Single().MaintainIntersection();
-			session.Refresh(client);
+			ActiveRecordMediator.Refresh(client);
 			return client;
 		}
 
@@ -169,7 +169,7 @@ namespace Integration.ForTesting
 			document.Lines = new List<DocumentLine> {
 				documentLine
 			};
-			session.SaveOrUpdate(document);
+			ActiveRecordMediator.Save(document);
 
 			return document;
 		}
@@ -239,10 +239,10 @@ namespace Integration.ForTesting
 			var user = new User(supplier.Payer, supplier) {
 				Login = User.GetTempLogin()
 			};
-			session.SaveOrUpdate(user);
+			ActiveRecordMediator.Save(user);
 			user.Setup();
 			user.SetupSupplierPermission();
-			session.SaveOrUpdate(user);
+			ActiveRecordMediator.Save(user);
 			return user;
 		}
 
@@ -293,12 +293,12 @@ namespace Integration.ForTesting
 			};
 			var product = new Product(catalog);
 
-			session.SaveOrUpdate(catalogForm);
-			session.SaveOrUpdate(catalogName);
+			ActiveRecordMediator.Save(catalogForm);
+			ActiveRecordMediator.SaveAndFlush(catalogName);
 			catalog.NameId = catalogName.Id;
 			catalog.FormId = catalogForm.Id;
-			session.SaveOrUpdate(catalog);
-			session.SaveOrUpdate(product);
+			ActiveRecordMediator.Save(catalog);
+			ActiveRecordMediator.Save(product);
 			return product;
 		}
 
@@ -316,8 +316,8 @@ namespace Integration.ForTesting
 			certificate.Files.Add(certificateFile);
 
 
-			session.SaveOrUpdate(certificateFile);
-			session.SaveOrUpdate(certificate);
+			ActiveRecordMediator.Save(certificateFile);
+			ActiveRecordMediator.Save(certificate);
 
 			return certificate;
 		}

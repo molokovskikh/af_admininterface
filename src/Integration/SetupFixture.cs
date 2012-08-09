@@ -31,7 +31,7 @@ namespace Integration
 				.Cast<PermissionType>()
 				.Select(t => Permission.Find(t))
 				.ToList();
-			session.SaveOrUpdate(admin);
+			ActiveRecordMediator.Save(admin);
 			SecurityContext.GetAdministrator = () => admin;
 			Administrator.GetHost = () => "localhost";
 		}
