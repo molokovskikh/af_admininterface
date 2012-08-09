@@ -11,6 +11,7 @@ using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.MonoRailExtentions;
+using NHibernate.Linq;
 
 namespace AdminInterface.Controllers
 {
@@ -59,7 +60,7 @@ namespace AdminInterface.Controllers
 			}
 			else
 			{
-				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 				PropertyBag["payments"] = Payment.Queryable
 					.Where(p => p.RegistredOn >= DateTime.Today)
 					.OrderBy(p => p.RegistredOn).ToList();
@@ -128,7 +129,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payment"] = payment;
-				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 				RenderView("Edit");
 			}
 		}
@@ -179,7 +180,7 @@ namespace AdminInterface.Controllers
 			else
 			{
 				PropertyBag["payment"] = payment;
-				//PropertyBag["recipients"] = Recipient.Queryable.OrderBy(r => r.Name).ToList();
+				PropertyBag["recipients"] = DbSession.Query<Recipient>().OrderBy(r => r.Name).ToList();
 			}
 		}
 

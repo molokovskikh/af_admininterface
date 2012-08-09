@@ -31,12 +31,13 @@ namespace Functional.Billing
 			client = DataMother.CreateTestClientWithAddressAndUser();
 			payer = client.Payers.First();
 			payer.Name += payer.Id;
-			payer.UpdateAndFlush();
+			session.SaveOrUpdate(payer);
 
 			client.AddAddress("test address for billing");
-			session.SaveOrUpdate(client);
-			address = client.Addresses[0];
 			user = client.Users[0];
+			address = client.Addresses[0];
+			session.SaveOrUpdate(client);
+
 			Open(payer);
 			browser.WaitUntilContainsText("Плательщик", 2);
 			Assert.That(browser.Text, Is.StringContaining("Плательщик"));
@@ -146,18 +147,13 @@ namespace Functional.Billing
 		public void Adding_addresses_to_users()
 		{
 			Assert.That(address.AvaliableForUsers.Count, Is.EqualTo(0));
-			address.AvaliableForUsers = new List<User>();
+
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
 			var connectAddressLink = browser.Link(Find.ByText("Подключить адрес"));
 			connectAddressLink.Click();
 			Assert.That(connectAddressLink.Style.Display, Is.EqualTo("none"));
-			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
-			Thread.Sleep(500);
-			var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
-			Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
-			Assert.That(comboBox.HasSelectedItems, Is.True);
-			Assert.That(comboBox.SelectedOption.Text.Contains(address.Value));
+			SearchAndSelectAddress(address.Value);
 
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 			Thread.Sleep(2000);
@@ -194,10 +190,13 @@ namespace Functional.Billing
 		[Test]
 		public void DisconnectAddressFromUser()
 		{
+			Console.WriteLine(payer.Id);
+			Console.WriteLine(user.Id);
+			//return;
 			browser.Link(Find.ById("addressesForUser" + user.Id)).Click();
 			Thread.Sleep(500);
 			browser.Link(Find.ByText("Подключить адрес")).Click();
-			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+			SearchAndSelectAddress(address.Value);
 			Thread.Sleep(500);
 			browser.Button(Find.ById("ConnectAddressToUserButton" + user.Id)).Click();
 			Thread.Sleep(2000);
@@ -242,6 +241,7 @@ namespace Functional.Billing
 		}
 
 		//я обрабатываю change но почему то click не вызывает change, по этому симулирую его
+
 		private void SimulateClick(Document browser, string selector, CheckBox checkbox)
 		{
 			checkbox.Click();
@@ -379,32 +379,6 @@ namespace Functional.Billing
 			collapsible.header.Click();
 			Assert.That(collapsible.header.ClassName.Trim().ToLower(), Is.StringContaining("hidevisible"));
 			Assert.That(collapsible.body.ClassName.Trim().ToLower(), Is.Not.StringContaining("hidden"));
-		}
-
-		public class Collapsible
-		{
-			public Collapsible(Element header, Element body)
-			{
-				this.header = header;
-				this.body = body;
-			}
-
-			public Element header;
-			public Element body;
-		}
-
-		private Collapsible GetCollapsible(string selector)
-		{
-			var collapsible = ((Table) Css(selector)).Parents().First(p => p.ClassName != null && p.ClassName.ToLower().Contains("collapsible"));
-			var header = collapsible.CssSelect(".trigger");
-			var body = collapsible.CssSelect(".VisibleFolder");
-			return new Collapsible(header, body);
-		}
-
-		private void AddCommentInDisableDialig()
-		{
-			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
-			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 		}
 
 		[Test]
@@ -601,23 +575,21 @@ namespace Functional.Billing
 		public void ShowUsersOnlyForSelectedClient()
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
-
 			client.Name += client.Id;
-			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			session.SaveOrUpdate(client2);
-			session.Refresh(client);
-			session.Refresh(client2);
 			var testUserId = client2.Users[0].Id;
+
+			session.SaveOrUpdate(client);
+			session.SaveOrUpdate(client2);
 			Refresh();
 
 			var clientRows = browser.TableRows.Where(row => (row != null) && (row.Id != null) && row.Id.Contains("ClientRow")).ToList();
 			Assert.That(clientRows.Count, Is.EqualTo(2));
 			Click("Клиенты");
-			Assert.That(browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Count(), Is.EqualTo(1));
+			Assert.That(browser.Links.Count(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)), Is.EqualTo(1));
 			// Кликаем на другого клиента
-			browser.Links.Where(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).First().Click();
+			browser.Links.First(link => (link != null) && (link.Text != null) && link.Text.Contains(client2.Name)).Click();
 
 			// В таблице, которая содержит всех пользователей плательщика должны быть видимыми только те строки,
 			// которые соответствуют пользователям, принадлежащим выделенному клиенту
@@ -638,13 +610,11 @@ namespace Functional.Billing
 		{
 			var client2 = DataMother.CreateTestClientWithAddressAndUser();
 			client.Name += client.Id;
-			session.SaveOrUpdate(client);
 			client2.Name += client2.Id;
 			client2.Payers.Add(client.Payers.First());
-			session.SaveOrUpdate(client2);
-			session.Refresh(client);
-			session.Refresh(client2);
 			var testAddressId = client2.Addresses[0].Id;
+			session.SaveOrUpdate(client);
+			session.SaveOrUpdate(client2);
 			Refresh();
 
 			// Кликаем на другого клиента
@@ -788,6 +758,41 @@ namespace Functional.Billing
 			Click("История сообщений");
 			AssertText("История сообщения");
 			AssertText("Тестовое сообщение");
+		}
+
+		private void SearchAndSelectAddress(string value)
+		{
+			browser.Button(Find.ById("SearchAddressButton" + user.Id)).Click();
+			var comboBox = browser.SelectList(Find.ById("AddressesComboBox" + user.Id));
+			Assert.That(comboBox.Options.Count, Is.GreaterThan(0));
+			Assert.That(comboBox.HasSelectedItems, Is.True);
+			comboBox.Select(value + " ");
+		}
+
+		public class Collapsible
+		{
+			public Collapsible(Element header, Element body)
+			{
+				this.header = header;
+				this.body = body;
+			}
+
+			public Element header;
+			public Element body;
+		}
+
+		private Collapsible GetCollapsible(string selector)
+		{
+			var collapsible = ((Table) Css(selector)).Parents().First(p => p.ClassName != null && p.ClassName.ToLower().Contains("collapsible"));
+			var header = collapsible.CssSelect(".trigger");
+			var body = collapsible.CssSelect(".VisibleFolder");
+			return new Collapsible(header, body);
+		}
+
+		private void AddCommentInDisableDialig()
+		{
+			browser.Css(".ui-dialog-content #AddCommentField").AppendText("TestComment");
+			browser.Button(Find.ByClass("ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only")).Click();
 		}
 	}
 }
