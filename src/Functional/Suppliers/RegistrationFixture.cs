@@ -24,6 +24,7 @@ namespace Functional.Suppliers
 			Assert.That(browser.Text, Is.StringContaining("Регистрация плательщика"));
 			Click("Сохранить");
 			Assert.That(browser.Text, Is.StringContaining("Поставщик тестовый"));
+			AssertText("Список E-mail, с которых разрешена отправка писем клиентам АналитФармация");
 		}
 
 		[Test]

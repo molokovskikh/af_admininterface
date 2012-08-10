@@ -113,7 +113,7 @@ namespace AdminInterface.Controllers
 					PropertyBag["user"] = user;
 					return;
 				}
-
+				supplier.ContactGroupOwner.AddContactGroup(new ContactGroup(ContactGroupType.MiniMails));
 				currentPayer.Suppliers.Add(supplier);
 				currentPayer.UpdatePaymentSum();
 				AddContacts(supplier.ContactGroupOwner, supplierContacts);
