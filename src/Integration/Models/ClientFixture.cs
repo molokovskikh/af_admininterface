@@ -24,7 +24,7 @@ namespace Integration.Models
 			var info = user.UserUpdateInfo;
 			info.AFCopyId = "123";
 			info.Update();
-			scope.Flush();
+			Flush();
 
 			Assert.That(client.HaveUin(), Is.True);
 

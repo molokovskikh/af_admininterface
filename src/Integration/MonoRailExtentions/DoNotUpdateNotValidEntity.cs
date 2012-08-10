@@ -63,7 +63,7 @@ namespace Integration.MonoRailExtentions
 
 		private void Reopen()
 		{
-			scope.Flush();
+			Flush();
 			scope.Dispose();
 			scope = new TransactionlessSession();
 		}

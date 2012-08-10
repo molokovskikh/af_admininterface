@@ -5,12 +5,13 @@ using AdminInterface.Models.Logs;
 using Castle.ActiveRecord;
 using Castle.MonoRail.TestSupport;
 using Common.Tools;
+using Integration.ForTesting;
 using NUnit.Framework;
 
 namespace Integration.Controllers
 {
 	[TestFixture]
-	public class SmapRejectorControllerFixture : BaseControllerTest
+	public class SmapRejectorControllerFixture : ControllerFixture
 	{
 		private SmapRejectorController controller;
 
@@ -19,16 +20,13 @@ namespace Integration.Controllers
 		{
 			controller = new SmapRejectorController();
 			PrepareController(controller);
-			using (new TransactionScope())
-			{
-				RejectedEmail.Queryable
-					.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
-					.Each(r => r.Delete());
+			RejectedEmail.Queryable
+				.Where(r => r.LogTime >= DateTime.Today.AddDays(-1))
+				.Each(r => r.Delete());
 
-				RejectedEmail.Queryable
-					.Where(r => r.LogTime >= new DateTime(2008, 10, 1) && r.LogTime <= new DateTime(2008, 10, 4))
-					.Each(r => r.Delete());
-			}
+			RejectedEmail.Queryable
+				.Where(r => r.LogTime >= new DateTime(2008, 10, 1) && r.LogTime <= new DateTime(2008, 10, 4))
+				.Each(r => r.Delete());
 		}
 
 		[Test]

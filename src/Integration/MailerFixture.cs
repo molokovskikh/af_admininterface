@@ -23,7 +23,7 @@ using Unit;
 namespace Integration
 {
 	[TestFixture]
-	public class MailerFixture : BaseControllerTest
+	public class MailerFixture : ControllerFixture
 	{
 		private RegisterController controller;
 		private MonorailMailer mailer;
@@ -67,13 +67,10 @@ namespace Integration
 			//хибер констуировал правельные прокми но я его не знаю
 			//mailer.EnableChanged(client);
 
-			using (new SessionScope())
-			{
-				var client = DataMother.TestClient(c => c.Name = "Тестовый клиент");
-				mailer.EnableChanged(client);
-				mailer.Send();
-				Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
-			}
+			var client = DataMother.TestClient(c => c.Name = "Тестовый клиент");
+			mailer.EnableChanged(client);
+			mailer.Send();
+			Assert.That(message.Body, Is.StringContaining("Наименование: Тестовый клиент"));
 		}
 
 		[Test]
@@ -291,21 +288,18 @@ namespace Integration
 		[Test]
 		public void Accounting_changed()
 		{
-			using (new SessionScope())
-			{
-				var client = DataMother.CreateTestClientWithUser();
-				var user = client.Users[0];
-				var payer = user.Payer;
-				ActiveRecordMediator.Save(payer);
+			var client = DataMother.CreateTestClientWithUser();
+			var user = client.Users[0];
+			var payer = user.Payer;
+			session.SaveOrUpdate(payer);
 
-				user.Accounting.Payment = 200;
-				ActiveRecordMediator.Save(user);
+			user.Accounting.Payment = 200;
+			session.SaveOrUpdate(user);
 
-				mailer.AccountChanged(user.Accounting);
-				mailer.Send();
-				Assert.That(message.Subject, Is.EqualTo(String.Format("Изменение стоимости Тестовый плательщик - {0}, test - {1}, Аптека", payer.Id, client.Id)));
-				Assert.That(message.Body, Is.StringContaining("было 800,00р. стало 200,00р."));
-			}
+			mailer.AccountChanged(user.Accounting);
+			mailer.Send();
+			Assert.That(message.Subject, Is.EqualTo(String.Format("Изменение стоимости Тестовый плательщик - {0}, test - {1}, Аптека", payer.Id, client.Id)));
+			Assert.That(message.Body, Is.StringContaining("было 800,00р. стало 200,00р."));
 		}
 
 		[Test]

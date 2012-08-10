@@ -165,7 +165,6 @@
     <Compile Include="MonoRailExtentions\BindParametersFixture.cs" />
     <Compile Include="MonoRailExtentions\DoNotUpdateNotValidEntity.cs" />
     <Compile Include="NewsFixture.cs" />
-    <Compile Include="NHibernateExtentions\IfProjectionFixture.cs" />
     <Compile Include="Models\OffersFixture.cs" />
     <Compile Include="NHibernateExtentions\StateExtentionFixture.cs" />
     <Compile Include="NotificationServiceFixture.cs" />

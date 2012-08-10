@@ -49,6 +49,17 @@ namespace Integration.ForTesting
 			session = sessionHolder.CreateSession(typeof (ActiveRecordBase));
 		}
 
+		[TearDown]
+		public void TearDown()
+		{
+			if (session != null) {
+				session.Flush();
+				ActiveRecordMediator.GetSessionFactoryHolder().ReleaseSession(session);
+			}
+			if (scope != null)
+				scope.Dispose();
+		}
+
 		public void Prepare(SmartDispatcherController controller)
 		{
 			controller.Validator = validator;
@@ -60,15 +71,9 @@ namespace Integration.ForTesting
 			PrepareController(controller);
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Flush()
 		{
-			if (session != null) {
-				session.Flush();
-				ActiveRecordMediator.GetSessionFactoryHolder().ReleaseSession(session);
-			}
-			if (scope != null)
-				scope.Dispose();
+			session.Flush();
 		}
 
 		protected override IMockResponse BuildResponse(UrlInfo info)

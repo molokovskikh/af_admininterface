@@ -27,6 +27,7 @@ using System.Web;
 using Common.Web.Ui.Models;
 using System.ComponentModel;
 using AdminInterface.Models.Billing;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models
 {
@@ -730,18 +731,30 @@ WHERE
 		{
 			get
 			{
-				return new [] {
-					new ModelAction(this, "Unlock", "Разблокировать", !IsLocked),
-					new ModelAction(this, "DeletePreparedData", "Удалить подготовленные данные", !HavePreparedData()),
-					new ModelAction(this, "Delete", "Удалить", !CanDelete()),
-				};
+				return ArHelper.WithSession(s => {
+					return new [] {
+						new ModelAction(this, "Unlock", "Разблокировать", !IsLocked),
+						new ModelAction(this, "DeletePreparedData", "Удалить подготовленные данные", !HavePreparedData()),
+						new ModelAction(this, "Delete", "Удалить", !CanDelete(s)),
+					};
+				});
 			}
 		}
 
-		public virtual bool CanDelete()
+		public virtual bool CanDelete(ISession session)
 		{
-			var canDelete = ClientOrder.CanDelete(ActiveRecordLinqBase<ClientOrder>.Queryable.Where(o => o.User == this));
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>().Where(o => o.User == this));
 			return Disabled && canDelete;
+		}
+
+		public virtual void CheckBeforeDelete(ISession session)
+		{
+			if (!Disabled)
+				throw new EndUserException(String.Format("Пользователь {0} не отключен", Name));
+
+			var canDelete = ClientOrder.CanDelete(session.Query<ClientOrder>().Where(o => o.User == this));
+			if (!canDelete)
+				throw new EndUserException(String.Format("Для пользователя {0} есть заказы за интервал больше 14 дней", Name));
 		}
 
 		public virtual void Delete()

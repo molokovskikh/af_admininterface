@@ -122,10 +122,10 @@ namespace Integration.Models
 		public void Delete_user()
 		{
 			user.Enabled = false;
-			Assert.That(user.CanDelete(), Is.True);
-			scope.Flush();
+			Assert.That(user.CanDelete(session), Is.True);
+			Flush();
 			user.Delete();
-			scope.Flush();
+			Flush();
 		}
 
 		[Test]
@@ -137,10 +137,10 @@ namespace Integration.Models
 			user.Enabled = false;
 			Save(new ClientOrder(user, supplier.Prices[0]));
 
-			Assert.That(user.CanDelete(), Is.True);
-			scope.Flush();
+			Assert.That(user.CanDelete(session), Is.True);
+			Flush();
 			user.Delete();
-			scope.Flush();
+			Flush();
 		}
 
 		[Test(Description = "Проверяем установку флага ForceReplication при изменении свойства InheritPricesFrom")]
@@ -160,7 +160,7 @@ namespace Integration.Models
 				.ExecuteUpdate();
 
 			user.InheritPricesFrom = parent;
-			ActiveRecordMediator.Save(user);
+			session.SaveOrUpdate(user);
 
 			Flush();
 

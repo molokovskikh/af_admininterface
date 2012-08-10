@@ -3,13 +3,10 @@ using System.Linq;
 using AdminInterface.Helpers;
 using AdminInterface.Models;
 using AdminInterface.Models.Billing;
-using Castle.ActiveRecord;
 using Common.Tools;
-using Common.Web.Ui.ActiveRecordExtentions;
-using Common.Web.Ui.Helpers;
 using Integration.ForTesting;
+using NHibernate;
 using NUnit.Framework;
-using Test.Support.log4net;
 
 namespace Integration.Models
 {
@@ -28,16 +25,17 @@ namespace Integration.Models
 		[Test]
 		public void Find_ready_for_accounting()
 		{
-			ArHelper.WithSession(s => s.CreateSQLQuery(@"
+			session.CreateSQLQuery(@"
 update billing.Accounts
 set ReadyForAccounting = 0,
 BeAccounted = 0;
-").ExecuteUpdate());
+").ExecuteUpdate();
 			
 			var accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(0));
 			client.Users[0].Accounting.ReadyForAccounting = true;
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
+			Flush();
 
 			accountings = Account.GetReadyForAccounting(new Pager());
 			Assert.That(accountings.Count(), Is.EqualTo(1), accountings.Implode(a => a.Name));
@@ -47,7 +45,8 @@ BeAccounted = 0;
 		public void Find_accounting_by_user()
 		{
 			userAccount.Accounted();
-			ActiveRecordMediator.SaveAndFlush(client);
+			session.SaveOrUpdate(client);
+			Flush();
 
 			var accounts = new AccountFilter {SearchBy = AccountingSearchBy.ByUser, SearchText = client.Users[0].Id.ToString()}.Find(new Pager());
 			Assert.That(accounts.Count, Is.EqualTo(1));

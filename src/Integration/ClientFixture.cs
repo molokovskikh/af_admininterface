@@ -25,7 +25,7 @@ namespace Integration
 
 			client = DataMother.CreateClientAndUsers();
 			session.SaveOrUpdate(client);
-			scope.Flush();
+			Flush();
 			user = client.Users.First();
 
 			Assert.That(GetReplication(user.Id).Count, Is.EqualTo(0));
@@ -42,7 +42,7 @@ namespace Integration
 		{
 			user.WorkRegionMask = ulong.MaxValue;
 			session.Save(user);
-			scope.Flush();
+			Flush();
 			var info = GetReplication(user.Id);
 
 			Assert.That(info.Count, Is.GreaterThan(0));
@@ -54,7 +54,7 @@ namespace Integration
 		{
 			client.MaskRegion = ulong.MaxValue;
 			session.Save(client);
-			scope.Flush();
+			Flush();
 			var info = GetReplication(user.Id);
 
 			Assert.That(info.Count, Is.GreaterThan(0));
@@ -66,7 +66,7 @@ namespace Integration
 		{
 			supplier.RegionMask = ulong.MaxValue;
 			session.Save(supplier);
-			scope.Flush();
+			Flush();
 			var info =  session.CreateSQLQuery("select ForceReplication from Usersettings.AnalitfReplicationInfo where FirmCode = :SupplierId")
 				.SetParameter("SupplierId", supplier.Id)
 				.List<object>()

@@ -40,7 +40,7 @@ namespace Integration
 			Flush();
 			Reopen();
 
-			client = ActiveRecordBase<Client>.Find(client.Id);
+			client = session.Load<Client>(client.Id);
 			var price = session.Load<Price>(supplier.Prices[0].Id);
 			Assert.That(NHibernateUtil.IsInitialized(price), Is.False);
 			client.Settings.AssortimentPrice = price;

@@ -20,7 +20,7 @@ namespace Integration.Controllers
 		public void Setup()
 		{
 			user = DataMother.CreateSupplierUser();
-			scope.Flush();
+			Flush();
 			payer = user.Payer;
 			controller = new AccountsController();
 			Prepare(controller);
@@ -31,7 +31,7 @@ namespace Integration.Controllers
 		{
 			Assert.That(user.Enabled, Is.True);
 			controller.SetUserStatus(user.Id, false, null);
-			scope.Flush();
+			Flush();
 			session.Refresh(user);
 			Assert.That(user.Enabled, Is.False);
 		}
@@ -46,10 +46,10 @@ namespace Integration.Controllers
 			};
 			var account = new ReportAccount(report);
 			account.Save();
-			scope.Flush();
+			Flush();
 
 			controller.Update(account.Id, true, null, true, 500, null, null);
-			scope.Flush();
+			Flush();
 
 			account.Refresh();
 			Assert.That(account.Payment, Is.EqualTo(500));

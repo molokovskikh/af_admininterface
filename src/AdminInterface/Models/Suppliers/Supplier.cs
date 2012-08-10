@@ -348,7 +348,27 @@ where s.Id = :supplierId")
 
 			return Disabled
 				&& synonymCount <= 200
-				&& Users.All(u => u.CanDelete());
+				&& Users.All(u => u.CanDelete(session));
+		}
+
+		public virtual void CheckBeforeDelete(ISession session)
+		{
+			if (!Disabled)
+				throw new EndUserException(String.Format("Поставщик {0} не отключен", Name));
+
+			var synonymCount = Convert.ToUInt32(session.CreateSQLQuery(@"
+select count(*)
+from Customers.Suppliers s
+	join Usersettings.PricesData pd on pd.FirmCode = s.Id
+	join Farm.Synonym s on s.PriceCode = pd.PriceCode
+where s.Id = :supplierId")
+				.SetParameter("supplierId", Id)
+				.UniqueResult());
+
+			if (synonymCount > 200)
+				throw new EndUserException(String.Format("У поставщика {0} больше 200 синонимов", Name));
+
+			Users.Each(u => u.CheckBeforeDelete(session));
 		}
 
 		public virtual void Delete(ISession session)

@@ -19,7 +19,7 @@ namespace Integration
 			payer.Balance = -1000;
 			payer.SendPaymentNotification = true;
 			payer.Save();
-			scope.Flush();
+			Flush();
 			SystemTime.Now = () => new DateTime(2011, 7, 27, 1, 2, 1);
 
 			new SendPaymentNotification().Process();

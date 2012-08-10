@@ -119,7 +119,7 @@ namespace Integration.ForTesting
 			client.Name += client.Id;
 			ActiveRecordMediator.SaveAndFlush(client);
 			client.Addresses.Single().MaintainIntersection();
-			ActiveRecordMediator<Client>.Refresh(client);
+			ActiveRecordMediator.Refresh(client);
 			return client;
 		}
 

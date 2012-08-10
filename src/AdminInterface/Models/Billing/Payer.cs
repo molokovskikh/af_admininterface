@@ -492,21 +492,40 @@ ORDER BY {Payer}.shortname;";
 			var documentDates = new [] {maxPayment};
 
 			return Reports.Count == 0
-				&& Clients.All(c => c.CanDelete())
+				&& Clients.All(c => c.CanDelete(session))
 				&& Suppliers.All(s => s.CanDelete(session))
 				&& documentDates.Max().AddMonths(15) < DateTime.Now;
 		}
 
+		public virtual void CheckBeforeDelete(ISession session)
+		{
+			var maxPayment = session.QueryOver<Payment>()
+				.Where(p => p.Payer == this)
+				.SelectList(l => l.SelectMax(p => p.PayedOn))
+				.SingleOrDefault<DateTime>();
+
+			if (maxPayment.AddMonths(15) < DateTime.Now)
+				throw new EndUserException("За последние 15 месяцев имеются платежи");
+
+			if (Reports.Count > 0)
+				throw new EndUserException("Есть отчеты");
+
+			Clients.Each(c => c.CheckBeforeDelete(session));
+			Suppliers.Each(s => s.CheckBeforeDelete(session));
+		}
+
 		public virtual void Delete(ISession session)
 		{
-			var clients = Clients.Where(c => c.CanDelete()).ToArray();
+			CheckBeforeDelete(session);
+
+			var clients = Clients.Where(c => c.CanDelete(session)).ToArray();
 			foreach (var client in clients)
 				client.Delete(session);
 
 			foreach (var supplier in Suppliers)
 				supplier.Delete(session);
 
-			base.Delete();
+			session.Delete(this);
 		}
 
 		public virtual IEnumerable<ModelAction> Actions

@@ -385,12 +385,13 @@ namespace AdminInterface.Models.Billing
 		public void Validate(ErrorSummary summary)
 		{
 			if (Recipient == null
-				|| Payer.Recipient == null)
+				|| (Payer != null && Payer.Recipient == null))
 				summary.RegisterErrorMessage(
 					"Recipient",
 					"Получатель платежа не установлен");
 
-			if (Recipient != null && Payer.Recipient != null && Recipient.Id != Payer.Recipient.Id)
+			if (Recipient != null && Payer != null && Payer.Recipient != null
+				&& Recipient.Id != Payer.Recipient.Id)
 				summary.RegisterErrorMessage(
 					"Recipient",
 					"Получатель платежей плательщика должен соответствовать получателю платежей выбранном в платеже");

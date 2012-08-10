@@ -217,15 +217,15 @@ namespace AdminInterface.Controllers
 		{
 			var payer = DbSession.Load<Payer>(id);
 
-			if (!payer.CanDelete(DbSession)) {
-				Error("Не могу удалить плательщика");
-				RedirectToReferrer();
-				return;
+			try {
+				payer.Delete(DbSession);
+				Notify("Удалено");
+				Redirect("Billing", "Search");
 			}
-
-			payer.Delete(DbSession);
-			Notify("Удалено");
-			Redirect("Billing", "Search");
+			catch (EndUserException e) {
+				Error(e.Message);
+				RedirectToReferrer();
+			}
 		}
 
 		public void Messages(uint id)
