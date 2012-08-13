@@ -44,7 +44,6 @@ namespace Integration.Models
 				session.SaveOrUpdate(client);
 				Save(DataMother.CreateTestDocumentLog(supplier, client));
 			}
-			Console.WriteLine(supplier.Id);
 		}
 
 		[Test(Description = "проверям работу DocumentLog")]

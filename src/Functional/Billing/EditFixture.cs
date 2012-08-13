@@ -27,7 +27,6 @@ namespace Functional.Billing
 		{
 			var selectList = browser.SelectList(Find.ByName("Instance.Recipient.Id"));
 			var items = selectList.Options;
-			Console.WriteLine(items[0].Value);
 			selectList.SelectByValue(items[0].Value);
 			browser.TableCell("savePayer").Buttons.First().Click();
 			Flush();

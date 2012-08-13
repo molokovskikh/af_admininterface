@@ -77,7 +77,6 @@ namespace Integration
 		{
 			var entyty = FindDirectoryEntry("KvasovT");
 			Log(entyty);
-			//Console.WriteLine(entyty.Properties["userAccountControl"][0]);
 		}
 
 		[Test]
@@ -228,7 +227,6 @@ namespace Integration
 				{
 					var directoryEntity = FindDirectoryEntry(user.Login);
 					var directoryEntry = new DirectoryEntry(directoryEntity.Path, user.Login, "1234");
-					Console.WriteLine(directoryEntry.NativeObject.ToString());
 					Assert.Fail("странно но пароль почему то подошел");
 				}
 				catch {}

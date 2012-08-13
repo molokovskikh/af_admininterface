@@ -45,9 +45,6 @@ namespace AdminInterface.Changer
 					var supp = regionalData.Supplier;
 					supp.Address = list[3].Trim();
 					ActiveRecordMediator.Save(supp);
-					if (supp.SupplierId == 2133u || regionalData.Id == 2668u)
-							Console.WriteLine(supp.Name);
-
 					list[2] = list[2].Trim();
 					if (!Regex.IsMatch(list[2], @"^(\d{3,4})-(\d{6,7})(\*\d{3})?$"))
 					{
