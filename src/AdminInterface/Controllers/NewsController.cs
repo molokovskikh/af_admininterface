@@ -19,9 +19,8 @@ namespace AdminInterface.Controllers
 
 		public void New()
 		{
-			var news = new News {PublicationDate = DateTime.Today};
+			var news = new News();
 			PropertyBag["news"] = news;
-
 			if (IsPost) {
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {

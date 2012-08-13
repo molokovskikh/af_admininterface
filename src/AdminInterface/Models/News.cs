@@ -8,9 +8,22 @@ using Common.Web.Ui.Models.Audit;
 
 namespace AdminInterface.Models
 {
+	public enum NewsDestinationType
+	{
+		[Description("Поставщик")] Supplier = 0,
+		[Description("Аптека")] Drugstore = 1,
+		[Description("Аптека и Поставщик")] All = 2
+	}
+
 	[ActiveRecord(Schema = "Usersettings"), Auditable, Description("Новость")]
 	public class News
 	{
+		public News()
+		{
+			PublicationDate = DateTime.Today;
+			DestinationType = NewsDestinationType.Drugstore;
+		}
+
 		[PrimaryKey]
 		public virtual uint Id { get; set; }
 
@@ -44,6 +57,9 @@ namespace AdminInterface.Models
 		public bool Deleted { get; set; }
 
 		public string Name { get {return Header; }}
+
+		[Property, Description("Адресат"), NotifyNews]
+		public virtual NewsDestinationType DestinationType { get; set; }
 
 		[Style]
 		public virtual bool HiddenNews

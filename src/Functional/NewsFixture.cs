@@ -15,6 +15,7 @@ namespace Functional
 			AssertText("Новости");
 			Click("Добавить");
 			AssertText("Дата публикации");
+			AssertText("Адресат");
 			Css("#news_Header").Value = "Тестовая новость";
 			Click("Сохранить");
 			AssertText("Сохранено");

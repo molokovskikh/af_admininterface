@@ -54,7 +54,6 @@ namespace Functional
 		{
 			Open(user);
 			var addressesCount = user.Client.Addresses.Count;
-			Console.WriteLine(addressesCount);
 			for (int i = 0; i < addressesCount; i++) {
 				browser.CheckBox(Find.ByName(string.Format("user.AvaliableAddresses[{0}].Id", i))).Checked = true;
 			}
