@@ -13,7 +13,6 @@ namespace AdminInterface.Controllers
 		public void Index()
 		{
 			PropertyBag["newses"] = DbSession.Query<News>()
-				.Where(n => !n.Deleted)
 				.OrderByDescending(n => n.PublicationDate)
 				.ToList();
 		}

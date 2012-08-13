@@ -44,5 +44,11 @@ namespace AdminInterface.Models
 		public bool Deleted { get; set; }
 
 		public string Name { get {return Header; }}
+
+		[Style]
+		public virtual bool HiddenNews
+		{
+			get{ return Deleted; }
+		}
 	}
 }
