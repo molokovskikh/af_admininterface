@@ -77,7 +77,6 @@ namespace Integration
 		{
 			var entyty = FindDirectoryEntry("KvasovT");
 			Log(entyty);
-			//Console.WriteLine(entyty.Properties["userAccountControl"][0]);
 		}
 
 		[Test]
