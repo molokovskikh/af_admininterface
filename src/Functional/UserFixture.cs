@@ -71,7 +71,7 @@ namespace Functional
 			browser.CheckBox("sendClientCard").Checked = true;
 			browser.TextField(Find.ByName("mails")).AppendText("kvasovtest@analit.net");
 			Click("Создать");
-			AssertText("подключены слудующие адреса доставки:");
+			AssertText("подключены следующие адреса доставки:");
 
 			var address = user.Client.Addresses.First();
 			Click(address.Name);
