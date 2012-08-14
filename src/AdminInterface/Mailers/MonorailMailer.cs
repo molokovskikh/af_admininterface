@@ -76,7 +76,7 @@ namespace AdminInterface.Mailers
 				var client = ActiveRecordMediator<Client>.FindByPrimaryKey(((Service)item).Id); //(Client) item;
 				PropertyBag["service"] = client;
 				var disable = ClientLogRecord.LastOff(client);
-				if (disable != null) { 
+				if (disable != null) {
 					lastDisable = String.Format("{0} пользователем {1}", disable.LogTime, disable.OperatorName);
 					disable.Comment = comment;
 					disable.Save();

@@ -15,10 +15,13 @@ namespace Functional
 			AssertText("Новости");
 			Click("Добавить");
 			AssertText("Дата публикации");
+			AssertText("Адресат");
 			Css("#news_Header").Value = "Тестовая новость";
 			Click("Сохранить");
 			AssertText("Сохранено");
 			AssertText("Тестовая новость");
+			Click("Удалить");
+			Assert.IsNotNull(browser.Css(".DataTable tbody tr.hidden-news"));
 		}
 	}
 }

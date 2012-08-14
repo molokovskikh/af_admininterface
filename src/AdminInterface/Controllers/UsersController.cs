@@ -153,7 +153,7 @@ namespace AdminInterface.Controllers
 				Mailer.Registred(address, comment, Defaults);
 			}
 			if (user.Client != null) { 
-				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены слудующие адреса доставки: \r\n {2}",
+				var message = string.Format("$$$Пользовалелю {0} - ({1}) подключены следующие адреса доставки: \r\n {2}",
 					user.Id,
 					user.Name, 
 					user.AvaliableAddresses.Select(a => Address.TryFind(a.Id))

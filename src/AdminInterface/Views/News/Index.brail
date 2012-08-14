@@ -1,4 +1,6 @@
-﻿<% component CaptureFor, {@id : @Title}: %>
+﻿${app.Asset("News.css")}
+
+<% component CaptureFor, {@id : @Title}: %>
 	Новости
 <% end %>
 
@@ -15,16 +17,22 @@
 	</thead>
 	<tbody>
 	<% for news in newses: %>
-		<tr>
+		<tr class="${app.Style(news)}">
 			<td>${app.LinkTo(news, "Редактировать", @Edit)}</td>
 			<td>!{news.PublicationDate}</td>
 			<td>!{news.Header}</td>
 			<td>
+			<%if not news.Deleted: %>
 				<form method=post action="${siteroot}/News/${news.Id}/Delete/">
 					<input type=submit value="Удалить" />
 				</form>
+			<%end %>
 			</td>
 		</tr>
 	<% end %>
 	</tbody>
 </table>
+
+<%
+	component Legend, { "LegendItems" : {"Новость удалена" : "hidden-news"},"ByCenter" : true}
+%>

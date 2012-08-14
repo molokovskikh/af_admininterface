@@ -407,7 +407,7 @@ namespace Functional.Billing
 			var currentSum = GetTotalSum();
 			Assert.That(currentSum, Is.GreaterThan(sum));
 			sum = currentSum;
-			
+
 			// Выключаем пользователя. Сумма должна уменьшиться
 			Assert.That(Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Checked, Is.True);
 			Css(String.Format("#UserRow{0} input[name=status]", user.Id)).Click();

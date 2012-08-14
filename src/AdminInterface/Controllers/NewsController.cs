@@ -13,16 +13,14 @@ namespace AdminInterface.Controllers
 		public void Index()
 		{
 			PropertyBag["newses"] = DbSession.Query<News>()
-				.Where(n => !n.Deleted)
 				.OrderByDescending(n => n.PublicationDate)
 				.ToList();
 		}
 
 		public void New()
 		{
-			var news = new News {PublicationDate = DateTime.Today};
+			var news = new News();
 			PropertyBag["news"] = news;
-
 			if (IsPost) {
 				BindObjectInstance(news, "news");
 				if (IsValid(news)) {

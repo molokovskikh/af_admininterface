@@ -41,6 +41,11 @@ ${FormHelper.FormTag("", {@class: @vertical})}
 	${app.GetValidationError("news.Body")}
 </div>
 <div>
+	${app.Label("news.DestinationType")}
+	${app.Edit("news.DestinationType")}
+	${app.GetValidationError("news.DestinationType")}
+</div>
+<div>
 	${FormHelper.Submit("Сохранить")}
 </div>
 ${FormHelper.EndFormTag()}
