@@ -22,6 +22,11 @@ ${app.Asset("News.css")}
 
 ${FormHelper.FormTag("", {@class: @vertical})}
 <div>
+	${app.Label("news.DestinationType")}
+	${app.Edit("news.DestinationType")}
+	${app.GetValidationError("news.DestinationType")}
+</div>
+<div>
 	${app.Label("news.PublicationDate")}
 	${app.Edit("news.PublicationDate")}
 	${app.GetValidationError("news.PublicationDate")}
@@ -39,11 +44,6 @@ ${FormHelper.FormTag("", {@class: @vertical})}
 <div>
 	${FormHelper.TextArea("news.Body", {@class: @tinymce})}
 	${app.GetValidationError("news.Body")}
-</div>
-<div>
-	${app.Label("news.DestinationType")}
-	${app.Edit("news.DestinationType")}
-	${app.GetValidationError("news.DestinationType")}
 </div>
 <div>
 	${FormHelper.Submit("Сохранить")}
