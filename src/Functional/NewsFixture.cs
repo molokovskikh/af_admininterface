@@ -20,6 +20,8 @@ namespace Functional
 			Click("Сохранить");
 			AssertText("Сохранено");
 			AssertText("Тестовая новость");
+			Click("Удалить");
+			Assert.IsNotNull(browser.Css(".DataTable tbody tr.hidden-news"));
 		}
 	}
 }

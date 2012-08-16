@@ -6,3 +6,12 @@
 #news_Header {
 	width: 600px;
 }
+
+.hidden-news {
+	background-color: #c4c3c3;
+}
+
+.DataTable tbody tr.hidden-news {
+	background-color: #c4c3c3;
+	height: 26px;
+}

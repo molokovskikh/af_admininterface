@@ -102,7 +102,7 @@ namespace Integration.Models
 			var payer = client.Payers.First();
 			Assert.That(payer.CanDelete(session), Is.True);
 
-			payer.Delete();
+			payer.Delete(session);
 			Flush();
 			Reopen();
 

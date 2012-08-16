@@ -504,8 +504,8 @@ ORDER BY {Payer}.shortname;";
 				.SelectList(l => l.SelectMax(p => p.PayedOn))
 				.SingleOrDefault<DateTime>();
 
-			if (maxPayment.AddMonths(15) < DateTime.Now)
-				throw new EndUserException("За последние 15 месяцев имеются платежи");
+			if (maxPayment.AddMonths(36) > DateTime.Now)
+				throw new EndUserException("За последние 36 месяцев имеются платежи");
 
 			if (Reports.Count > 0)
 				throw new EndUserException("Есть отчеты");
