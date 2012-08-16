@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using AdminInterface.Controllers;
 using AdminInterface.Helpers;
+using AdminInterface.Models.Telephony;
 using Common.Web.Ui.ActiveRecordExtentions;
 using Common.Web.Ui.Helpers;
 using Common.Web.Ui.Models;
@@ -106,6 +107,40 @@ namespace AdminInterface.Models
 			wb.Save(ms);
 
 			return ms.ToArray();
+		}
+
+		public static byte[] GetCallsHistory(CallRecordFilter filter)
+		{
+			var wb = new Workbook();
+			var ws = new Worksheet("История звонков");
+
+			int row = 1;
+			int col = 1;
+
+			ExcelHelper.WriteHeader1(ws, 0, 1, "Дата звонка", true, true);
+			ExcelHelper.WriteHeader1(ws, 0, 2, "Номер звонившего", true, true);
+			ExcelHelper.WriteHeader1(ws, 0, 3, "Имя звонившего", true, true);
+			ExcelHelper.WriteHeader1(ws, 0, 4, "Куда звонил", true, true);
+			ExcelHelper.WriteHeader1(ws, 0, 5, "Кому звонил", true, true);
+			ExcelHelper.WriteHeader1(ws, 0, 6, "Тип звонка", true, true);
+
+			var calls = filter.Find();
+			foreach (var call in calls) {
+				ExcelHelper.Write(ws, row, col, call.WriteTime, true);
+				ExcelHelper.Write(ws, row, col + 1, call.From, true);
+				ExcelHelper.Write(ws, row, col + 2, call.NameSource, true);
+				ExcelHelper.Write(ws, row, col + 3, call.To, true);
+				ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
+				ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
+				row ++;
+			}
+			for(ushort i = 1; i <= 6; i++) {
+				ws.Cells.ColumnWidth[i] = 20 * 256;
+			}
+			wb.Worksheets.Add(ws);
+			var buffer = new MemoryStream();
+			wb.Save(buffer);
+			return buffer.ToArray();
 		}
 	}
 }

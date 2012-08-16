@@ -85,6 +85,8 @@
 </div>
 
 <% if ?calls: %>
+${app.ExportLink("Выгрузить в Excel", @ToExcel, filter)}
+<p>
 	<form id="updateForm" name="updateForm" method=post action=search>
 		<table class="DataTable" style="width: 100%;">
 			<% if calls.Count: %>
