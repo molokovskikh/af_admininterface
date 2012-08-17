@@ -109,7 +109,7 @@ namespace AdminInterface.Models
 			return ms.ToArray();
 		}
 
-		public static byte[] GetCallsHistory(CallRecordFilter filter)
+		public static byte[] GetCallsHistory(IList<CallRecord> calls)
 		{
 			var wb = new Workbook();
 			var ws = new Worksheet("История звонков");
@@ -124,7 +124,6 @@ namespace AdminInterface.Models
 			ExcelHelper.WriteHeader1(ws, 0, 5, "Кому звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 6, "Тип звонка", true, true);
 
-			var calls = filter.Find();
 			foreach (var call in calls) {
 				ExcelHelper.Write(ws, row, col, call.WriteTime, true);
 				ExcelHelper.Write(ws, row, col + 1, call.From, true);

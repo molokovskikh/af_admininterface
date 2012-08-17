@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -6,6 +7,7 @@ using AdminInterface.Models.Billing;
 using AdminInterface.Models.Security;
 using AdminInterface.Security;
 using Castle.MonoRail.Framework;
+using Common.Web.Ui.Helpers;
 
 namespace AdminInterface.Helpers
 {
@@ -64,6 +66,19 @@ namespace AdminInterface.Helpers
 		public override bool HaveEditPermission(PropertyInfo propertyInfo)
 		{
 			return Permission.CheckPermissionByAttribute(SecurityContext.Administrator, propertyInfo);
+		}
+
+		public string ExportLink(string name, string action, object filter, IDictionary querystring)
+		{
+			if (filter is Sortable) {
+				var query = ((Sortable)filter).PublicPropertiesToUrlParts("filter");
+				foreach (var key in querystring.Keys) {
+					query.Add(key.ToString(),querystring[key]);
+				}
+				var controller = Context.CurrentControllerContext.ControllerDescriptor.ControllerDescriptor.Name;
+				return LinkTo(name, controller, action, query);
+			}
+			return string.Empty;
 		}
 	}
 }
