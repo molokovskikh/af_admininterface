@@ -123,7 +123,6 @@ namespace AdminInterface.Controllers
 				address = null;
 
 			user.Payer = Payer.Find(user.Payer.Id);
-			user.AssignDefaultPermission(DbSession);
 			user.Setup();
 			var password = user.CreateInAd();
 			user.WorkRegionMask = regionSettings.GetBrowseMask();
