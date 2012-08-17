@@ -140,6 +140,12 @@ namespace AdminInterface.Models.Security
 				var controllers = new[] {"ManagerReports"};
 				return controllers.Any(c => c.ToLower() == controller.ToLower());
 			}
+			if(Type == PermissionType.CallHistory) {
+				if(controller.ToLower() == "callhistory"
+					&& action.ToLower() == "toexcel") {
+					return true;
+				}
+			}
 			return false;
 		}
 

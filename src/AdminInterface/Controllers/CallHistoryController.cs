@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using AdminInterface.Helpers;
+using AdminInterface.Models;
 using AdminInterface.Models.Security;
 using AdminInterface.Models.Telephony;
 using AdminInterface.MonoRailExtentions;
@@ -8,6 +10,7 @@ using AdminInterface.Security;
 using Castle.MonoRail.Framework;
 using Common.Tools;
 using Common.Web.Ui.Helpers;
+using ExcelLibrary.SpreadSheet;
 
 namespace AdminInterface.Controllers
 {
@@ -58,5 +61,19 @@ namespace AdminInterface.Controllers
 					fileStream.CopyTo(Response.OutputStream);
 			}
 		}
+
+		public void ToExcel([DataBind("filter")] CallRecordFilter filter)
+		{
+			CancelLayout();
+			CancelView();
+
+			Response.Clear();
+			Response.AppendHeader("Content-Disposition",
+				String.Format("attachment; filename=\"{0}\"", Uri.EscapeDataString("История звонков")));
+			Response.ContentType = "application/vnd.ms-excel";
+			var result = ExportModel.GetCallsHistory(filter);
+			Response.OutputStream.Write(result, 0, result.Length);
+		}
+
 	}
 }
