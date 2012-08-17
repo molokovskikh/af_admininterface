@@ -442,7 +442,8 @@ WHERE   pricesdata.firmcode = s.Id
 
 		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)
 		{
-			permissions = permissions.Select(i => DbSession.Load<UserPermission>(i.Id)).ToArray();
+			if (permissions != null)
+				permissions = permissions.Select(i => DbSession.Load<UserPermission>(i.Id)).ToArray();
 			user.AssignDefaultPermission(DbSession, permissions);
 			user.Setup();
 			foreach (var person in persons)
