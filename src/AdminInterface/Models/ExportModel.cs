@@ -109,7 +109,7 @@ namespace AdminInterface.Models
 			return ms.ToArray();
 		}
 
-		public static byte[] GetCallsHistory(IList<CallRecord> calls)
+		public static byte[] GetCallsHistory(CallRecordFilter filter)
 		{
 			var wb = new Workbook();
 			var ws = new Worksheet("История звонков");
@@ -124,14 +124,19 @@ namespace AdminInterface.Models
 			ExcelHelper.WriteHeader1(ws, 0, 5, "Кому звонил", true, true);
 			ExcelHelper.WriteHeader1(ws, 0, 6, "Тип звонка", true, true);
 
-			foreach (var call in calls) {
-				ExcelHelper.Write(ws, row, col, call.WriteTime, true);
-				ExcelHelper.Write(ws, row, col + 1, call.From, true);
-				ExcelHelper.Write(ws, row, col + 2, call.NameSource, true);
-				ExcelHelper.Write(ws, row, col + 3, call.To, true);
-				ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
-				ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
-				row ++;
+			filter.Page = 0;
+			while (filter.Page <= filter.TotalPages) {
+				var calls = filter.Find();
+				foreach (var call in calls) {
+					ExcelHelper.Write(ws, row, col, call.WriteTime, true);
+					ExcelHelper.Write(ws, row, col + 1, call.From, true);
+					ExcelHelper.Write(ws, row, col + 2, call.NameSource, true);
+					ExcelHelper.Write(ws, row, col + 3, call.To, true);
+					ExcelHelper.Write(ws, row, col + 4, call.NameDestination, true);
+					ExcelHelper.Write(ws, row, col + 5, call.GetCallType(), true);
+					row ++;
+				}
+				filter.Page++;
 			}
 			for(ushort i = 1; i <= 6; i++) {
 				ws.Cells.ColumnWidth[i] = 20 * 256;

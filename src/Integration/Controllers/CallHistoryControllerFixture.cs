@@ -38,7 +38,7 @@ VALUES ('123', '321', '2012-07-07', 'from', 'to', 1)");
 		{
 			_filter.BeginDate = new DateTime(2012, 7, 6);
 			_filter.EndDate = new DateTime(2012, 7, 8);
-			var buf = ExportModel.GetCallsHistory(_filter.Find());
+			var buf = ExportModel.GetCallsHistory(_filter);
 			var stream = new MemoryStream(buf);
 			var wb = Workbook.Load(stream);
 			var ws = wb.Worksheets.First();
