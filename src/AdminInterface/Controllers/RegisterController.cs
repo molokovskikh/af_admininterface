@@ -158,8 +158,9 @@ namespace AdminInterface.Controllers
 				user.UpdateContacts(userContacts);
 				foreach (var person in userPersons)
 					user.AddContactPerson(person.Name);
+				user.AssignDefaultPermission(DbSession);
 				user.Setup();
-				user.SetupSupplierPermission();
+
 				password = user.CreateInAd();
 
 				supplier.AddBillingComment(comment);
@@ -207,7 +208,7 @@ namespace AdminInterface.Controllers
 			PropertyBag["client"] = client;
 			PropertyBag["user"] = user;
 			PropertyBag["address"] = client.AddAddress("");
-			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+			PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 			PropertyBag["regions"] = regions;
 			PropertyBag["clientContacts"] = new [] { new Contact(ContactType.Phone, string.Empty), new Contact(ContactType.Email, string.Empty) };
 			PropertyBag["options"] = new AdditionalSettings();
@@ -441,13 +442,9 @@ WHERE   pricesdata.firmcode = s.Id
 
 		private void CreateUser(User user, UserPermission[] permissions, Person[] persons)
 		{
-			if (permissions != null && permissions.Any())
-			{
-				user.AssignedPermissions = permissions.Select(i => UserPermission.Find(i.Id))
-					.Concat(UserPermission.GetDefaultPermissions()).Distinct().ToList();
-			}
+			permissions = permissions.Select(i => DbSession.Load<UserPermission>(i.Id)).ToArray();
+			user.AssignDefaultPermission(DbSession, permissions);
 			user.Setup();
-			user.SetupSupplierPermission();
 			foreach (var person in persons)
 				user.AddContactPerson(person.Name);
 			DbSession.Save(user);

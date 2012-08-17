@@ -450,11 +450,23 @@ namespace AdminInterface.Models
 				AddPrices(Client);
 		}
 
-		public virtual void SetupSupplierPermission()
+		public virtual void AssignDefaultPermission(ISession session, IEnumerable<UserPermission> permissions = null)
 		{
-			if (Client == null)
-				AssignedPermissions = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface).ToList();
-			ActiveRecordMediator.Save(this);
+			if (permissions == null)
+				permissions = new UserPermission[0];
+
+			var availability = UserPermissionAvailability.Supplier;
+			if (Client != null)
+				availability = UserPermissionAvailability.Drugstore;
+
+			var defaultPermissions = UserPermission.DefaultPermissions(session, availability);
+			permissions = permissions.Concat(defaultPermissions)
+				.Distinct()
+				.Except(AssignedPermissions)
+				.ToArray();
+			foreach (var permission in permissions) {
+				AssignedPermissions.Add(permission);
+			}
 		}
 
 		public virtual bool IsLocked

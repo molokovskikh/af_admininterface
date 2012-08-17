@@ -63,17 +63,17 @@ namespace AdminInterface.Controllers
 			if (service.IsClient()) {
 				PropertyBag["drugstore"] = ((Client)service).Settings;
 				PropertyBag["Organizations"] = ((Client)service).Orgs().ToArray();
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
 			}
 			else {
 				PropertyBag["singleRegions"] = true;
 				PropertyBag["registerSupplierUser"] = true;
 				PropertyBag["availibleRegions"] = ((Supplier)service).RegionMask;
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 			}
 			PropertyBag["user"] = user;
-			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
-			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
+			PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
+			PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
 			PropertyBag["emailForSend"] = user.GetAddressForSendingClientCard();
 			PropertyBag["EmailContactType"] = ContactType.Email;
 			PropertyBag["PhoneContactType"] = ContactType.Phone;
@@ -123,6 +123,7 @@ namespace AdminInterface.Controllers
 				address = null;
 
 			user.Payer = Payer.Find(user.Payer.Id);
+			user.AssignDefaultPermission(DbSession);
 			user.Setup();
 			var password = user.CreateInAd();
 			user.WorkRegionMask = regionSettings.GetBrowseMask();
@@ -390,14 +391,14 @@ namespace AdminInterface.Controllers
 			PropertyBag["user"] = user;
 			if (user.Client == null)
 			{
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.SupplierInterface);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.SupplierInterface);
 				RenderView("SupplierSettings");
 			}
 			else
 			{
-				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.Base);
-				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFExcel);
-				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(UserPermissionTypes.AnalitFPrint);
+				PropertyBag["permissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.Base);
+				PropertyBag["ExcelPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFExcel);
+				PropertyBag["PrintPermissions"] = UserPermission.FindPermissionsByType(DbSession, UserPermissionTypes.AnalitFPrint);
 				RenderView("DrugstoreSettings");
 			}
 		}

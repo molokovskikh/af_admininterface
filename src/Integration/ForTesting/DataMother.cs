@@ -241,7 +241,9 @@ namespace Integration.ForTesting
 			};
 			ActiveRecordMediator.Save(user);
 			user.Setup();
-			user.SetupSupplierPermission();
+			ArHelper.WithSession(s => {
+				user.AssignDefaultPermission(s);
+			});
 			ActiveRecordMediator.Save(user);
 			return user;
 		}

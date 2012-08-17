@@ -140,13 +140,22 @@ namespace Integration.Controllers
 			Prepare();
 			Request.Params.Add("user.Accounting.IsFree", "False");
 
-			controller.RegisterClient(client, 8, regionSettings, null, options, null,
+			var permissions = new[] { session.Query<UserPermission>().First(p => p.Shortcut == "AF") };
+			controller.RegisterClient(client, 8, regionSettings,
+				permissions,
+				options, null,
 				null, null, clientContacts, new Contact[0], person, "11@ff.ru", "");
 			var registredClient = RegistredClient();
 
-			Assert.That(registredClient.Users[0].WorkRegionMask, Is.EqualTo(1));
-			Assert.That(registredClient.Users[0].OrderRegionMask, Is.EqualTo(1));
+			var user = registredClient.Users[0];
+			Assert.That(user.WorkRegionMask, Is.EqualTo(1));
+			Assert.That(user.OrderRegionMask, Is.EqualTo(1));
 			Assert.That(registredClient.Addresses.Count, Is.EqualTo(0));
+			Assert.That(user.AssignedPermissions, Is.Not.Empty);
+			var notDrugstorePermissions = user.AssignedPermissions
+				.Where(p => p.AvailableFor != UserPermissionAvailability.Drugstore)
+				.ToArray();
+			Assert.That(notDrugstorePermissions.ToArray(), Is.Empty);
 		}
 
 		[Test]

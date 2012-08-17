@@ -1,13 +1,15 @@
 ﻿using System.ComponentModel;
+using System.Linq;
 using Castle.ActiveRecord;
+using NHibernate;
 using NHibernate.Criterion;
+using NHibernate.Linq;
 
 namespace AdminInterface.Models.Security
 {
 	public enum UserPermissionAvailability
 	{
-		All = 2,
-		Supplier = 0,
+		Supplier = 2,
 		Drugstore = 1,
 	}
 
@@ -20,7 +22,7 @@ namespace AdminInterface.Models.Security
 	}
 
 	[ActiveRecord(Schema = "usersettings")]
-	public class UserPermission : ActiveRecordBase<UserPermission>
+	public class UserPermission
 	{
 		[PrimaryKey("Id")]
 		public uint Id { get; set; }
@@ -40,14 +42,23 @@ namespace AdminInterface.Models.Security
 		[Property]
 		public bool AssignDefaultValue { get; set; }
 
-		public static UserPermission[] FindPermissionsByType(UserPermissionTypes type)
+		public static UserPermission[] DefaultPermissions(ISession session, UserPermissionAvailability availability)
 		{
-			return FindAll(Expression.Eq("Type", type));
+			return session.Query<UserPermission>()
+				.Where(p => p.AvailableFor == availability && p.AssignDefaultValue)
+				.ToArray();
 		}
 
-		public static UserPermission[] GetDefaultPermissions()
+		public static UserPermission[] FindPermissionsByType(ISession session, UserPermissionTypes type)
 		{
-			return FindAll(Expression.Eq("AssignDefaultValue", true));
+			return session.Query<UserPermission>()
+				.Where(p => p.Type == type)
+				.ToArray();
+		}
+
+		public override string ToString()
+		{
+			return Name;
 		}
 	}
 }
