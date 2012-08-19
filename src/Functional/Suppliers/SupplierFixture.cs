@@ -31,6 +31,20 @@ namespace Functional.Suppliers
 		}
 
 		[Test]
+		public void Make_orders_test()
+		{
+			Open(supplier);
+			Click("Сформировать заказы");
+			browser.TextField("email").Clear();
+			browser.TextField("email").AppendText("test@analit.net");
+			Click("Получить файлы");
+			AssertText("Вы не указали номера заказов");
+			browser.TextField("ordersNames").AppendText("0000");
+			Click("Получить файлы");
+			AssertText("Не удалось получить все файлы от сервиса, некоторые заказы не были сформированы, проверте почту");
+		}
+
+		[Test]
 		public void Search_supplier_user()
 		{
 			Open("/users/search");
