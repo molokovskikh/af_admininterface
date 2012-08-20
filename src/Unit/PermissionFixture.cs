@@ -25,7 +25,7 @@ namespace Unit
 			var user = new User(client);
 			client.AddUser(user);
 			var permission = new UserPermission();
-			user.AddPermission(permission);
+			user.AssignedPermissions.Add(permission);
 			Assert.That(user.AssignedPermissions.Count, Is.EqualTo(1));
 		}
 	}
